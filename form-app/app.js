@@ -101,7 +101,7 @@ const modelStep = {
   step_label: "Vehicle Setup",
 };
 const vehicleSetupStepKeys = new Set(["model", "body_style", "trim_level"]);
-const vehicleSetupStages = ["model", "body_style", "trim_level", "ready"];
+const vehicleSetupStages = ["model", "body_style", "trim_level"];
 const vehicleSetupHighlights = {
   stingray: {
     eyebrow: "Refreshed everyday supercar",
@@ -224,6 +224,20 @@ function formAssetBase() {
   return typeof window !== "undefined" && window.SC_FORM_ASSET_BASE ? window.SC_FORM_ASSET_BASE : "./assets/";
 }
 
+/* Vehicle renders live in per-model folders keyed by the render config-code letter
+   (see export-page/StingrayCorvetteDesignSystem_v1/assets/vehicle/README.md). */
+const VEHICLE_ASSET_FOLDERS = {
+  stingray: "c",
+  grandSport: "e",
+  z06: "h",
+  zr1: "r",
+  zr1x: "s",
+};
+
+function vehicleAssetFolder() {
+  return VEHICLE_ASSET_FOLDERS[activeModelKey] || VEHICLE_ASSET_FOLDERS.stingray;
+}
+
 function selectedPaintChoice() {
   const candidateIds = new Set([...state.selected, ...computeAutoAdded().keys()]);
   for (const optionId of candidateIds) {
@@ -251,7 +265,7 @@ function renderVehicleStage() {
   return `
     <div class="vehicle-stage">
       <div class="vehicle-stage-glow"></div>
-      <img src="${formAssetBase()}vehicle/${rpo.toLowerCase()}.png" alt="${escapeHtml(name)}">
+      <img src="${formAssetBase()}vehicle/${vehicleAssetFolder()}/${rpo.toLowerCase()}.png" alt="${escapeHtml(name)}">
       <div class="vehicle-stage-pill"><span class="rpo">${escapeHtml(rpo)}</span><span>${escapeHtml(name)}</span></div>
     </div>
   `;
@@ -568,13 +582,13 @@ function setVehicleSetupStage(stage, { shouldRender = true, preserveScroll = tru
 
 function advanceVehicleSetupStage() {
   const stage = normalizeVehicleSetupStage(state.vehicleSetupStage);
-  const nextStage = stage === "model" ? "body_style" : stage === "body_style" ? "trim_level" : stage === "trim_level" ? "ready" : "ready";
+  const nextStage = stage === "model" ? "body_style" : "trim_level";
   setVehicleSetupStage(nextStage);
 }
 
 function previousVehicleSetupStage() {
   const stage = normalizeVehicleSetupStage(state.vehicleSetupStage);
-  const previousStage = stage === "ready" ? "trim_level" : stage === "trim_level" ? "body_style" : stage === "body_style" ? "model" : "model";
+  const previousStage = stage === "trim_level" ? "body_style" : "model";
   setVehicleSetupStage(previousStage);
 }
 
@@ -646,7 +660,7 @@ function activateStep(stepKey, { closeDrawer = false } = {}) {
 }
 
 function goToNextStep() {
-  if (state.activeStep === "model" && normalizeVehicleSetupStage(state.vehicleSetupStage) !== "ready") {
+  if (state.activeStep === "model" && normalizeVehicleSetupStage(state.vehicleSetupStage) !== "trim_level") {
     advanceVehicleSetupStage();
     return;
   }
@@ -1834,7 +1848,7 @@ function handleContextChoice(choice) {
     return;
   }
   if (choice.context_type === "trim_level") {
-    setBodyAndTrim(choice.body_style, choice.trim_level, { vehicleSetupStage: currentSetupStage === "trim_level" ? "trim_level" : "ready" });
+    setBodyAndTrim(choice.body_style, choice.trim_level, { vehicleSetupStage: "trim_level" });
   }
 }
 
@@ -1909,8 +1923,8 @@ function goToPreviousStep() {
 function renderMobileProgress() {
   const { index, total, step, previous, next } = currentStepSummary();
   const setupStage = state.activeStep === "model" ? normalizeVehicleSetupStage(state.vehicleSetupStage) : "";
-  const setupPreviousLabel = setupStage === "body_style" ? "Model" : setupStage === "trim_level" ? "Body Style" : setupStage === "ready" ? "Trim Level" : "";
-  const setupNextLabel = setupStage === "model" ? "Body Style" : setupStage === "body_style" ? "Trim Level" : setupStage === "trim_level" ? "Review setup" : "";
+  const setupPreviousLabel = setupStage === "body_style" ? "Model" : setupStage === "trim_level" ? "Body Style" : "";
+  const setupNextLabel = setupStage === "model" ? "Body Style" : setupStage === "body_style" ? "Trim Level" : "";
   const hasPrevious = Boolean(previous || setupPreviousLabel);
   const hasNext = Boolean(next || setupNextLabel);
   const showMobileNext = hasNext;
@@ -2294,7 +2308,7 @@ function setupStageSummary(stage) {
 
 function renderVehicleSetupStepper() {
   const activeStage = normalizeVehicleSetupStage(state.vehicleSetupStage);
-  const stageOrder = ["model", "body_style", "trim_level", "ready"];
+  const stageOrder = ["model", "body_style", "trim_level"];
   const activeIndex = stageOrder.indexOf(activeStage);
   const stages = [
     ["model", "Model"],
@@ -2334,23 +2348,6 @@ function renderVehicleSetupPanel(title, note, cardsHtml, className = "", highlig
   `;
 }
 
-function renderVehicleSetupReadyPanel() {
-  const variant = currentVariant();
-  const displayName = variant?.display_name || activeModel.modelName || activeModel.label || "Corvette";
-  return `
-    <section class="vehicle-setup-panel vehicle-setup-ready" data-setup-panel>
-      <p class="eyebrow">Ready for customization</p>
-      <h3>${escapeHtml(displayName)}</h3>
-      <p>Model, body style, and trim are set. Continue to paint, or use the setup choices above to adjust the starting point.</p>
-      <div class="vehicle-setup-ready-meta" aria-label="Selected starting price">
-        <span>Base MSRP</span>
-        <strong>${formatMoney(Number(variant?.base_price || 0))}</strong>
-      </div>
-      ${renderVehicleSetupNextAction("Continue to Exterior Paint")}
-    </section>
-  `;
-}
-
 function renderVehicleSetupContent() {
   const stage = normalizeVehicleSetupStage(state.vehicleSetupStage);
   const modelCards = modelEntries().map(renderModelCard).join("");
@@ -2374,11 +2371,9 @@ function renderVehicleSetupContent() {
             trimCards,
             "trim-setup-group",
             { ...trimLevelHighlight(), equipmentDisclosure: true },
-            "Vehicle Setup Review"
+            "Exterior Paint"
           )
-        : stage === "ready"
-          ? renderVehicleSetupReadyPanel()
-          : renderVehicleSetupPanel(
+        : renderVehicleSetupPanel(
               "Choose your model",
               "Start with the Corvette personality for this build. Selection previews the highlights before the flow moves on.",
               modelCards,

@@ -637,8 +637,7 @@ textarea {
 }
 
 .vehicle-setup-intro h3,
-.vehicle-setup-group-heading h3,
-.vehicle-setup-ready h3 {
+.vehicle-setup-group-heading h3 {
   margin: 0;
 }
 
@@ -647,8 +646,7 @@ textarea {
 }
 
 .vehicle-setup-intro p,
-.vehicle-setup-group-heading p,
-.vehicle-setup-ready p {
+.vehicle-setup-group-heading p {
   margin: 0;
   color: var(--muted);
   font-size: 13px;
@@ -970,28 +968,6 @@ textarea {
   border-color: var(--accent);
   background: var(--accent);
   color: var(--on-accent);
-}
-
-.vehicle-setup-ready-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  width: min(100%, 320px);
-  border-top: 1px solid var(--hairline);
-  padding-top: 12px;
-}
-
-.vehicle-setup-ready-meta span {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.vehicle-setup-ready-meta strong {
-  color: var(--ink);
 }
 
 .selected-seat-context {

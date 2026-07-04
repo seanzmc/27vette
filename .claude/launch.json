@@ -6,6 +6,12 @@
       "runtimeExecutable": ".venv/bin/python",
       "runtimeArgs": ["scripts/ingest_wizard_server.py", "--port", "8040"],
       "port": 8040
+    },
+    {
+      "name": "form-app",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4173", "--directory", "form-app"],
+      "port": 4173
     }
   ]
 }
