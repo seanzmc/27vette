@@ -9,8 +9,15 @@ Raw GM order-guide ingest is an edge workflow, not routine maintenance. Use it o
 
 Routine corrections belong in canonical workbook source sheets, followed by normal regeneration and gates.
 
+## Standing division of responsibilities
+
+The script owns structure-derived parsing: sheet profiling, option row extraction, OVS status extraction, source evidence preservation, and exact 1-to-1 price joins.
+
+The user owns business interpretation: sections, groupings, exclusive groups, relationship meaning, ambiguous prices, vague disclosures, and any row where the raw sheet structure does not determine the workbook destination.
+
 ## Current docs
 
+- `pass-a/interactive-ingest-wizard-pass-a-spec.md` — active rewrite of the wizard entry path: browser-first upload/choose → friendly sheet-card profiling → sheet-role confirmation → deterministic option/price parsing → exact 1-to-1 price joins → read-only reviewable candidate table. Explicitly no apply planning, decision capture, or workbook writes. Records the corrected end-to-end flow later passes follow.
 - `pass-0/ingest-wizard-source-profiler-spec.md` — implemented CLI-first, read-only source profiler that emits source-layout, variant-matrix, raw-row, disclosure-link, manifest, and checkpoint artifacts before any candidate normalization or workbook apply exists.
 - `pass-1/candidate-normalizer-spec.md` — implemented CLI-first, read-only candidate normalizer over Pass 0 evidence artifacts; emits transient candidate and unresolved-review artifacts only.
 - `pass-2/interactive-review-wizard-spec.md` — implemented read-only Ingest Review tab over Pass 1 candidate artifacts; captures/export review decisions without workbook apply.
@@ -25,3 +32,4 @@ Routine corrections belong in canonical workbook source sheets, followed by norm
 - Pass 3 intentionally superseded the older Pass 2 next-step note that pointed directly to apply planning. Pass 4 proved the broad reduced queue was technically safe but not reviewer-usable enough. Pass 5 implemented the required correction: select target models early and review concrete workbook-build lanes. Dry-run apply planning stays a separate future pass, allowed only after the focused ZR1/ZR1X workbook-build review proves usable in real review sessions.
 - `docs/workbook-sheet-index.md` was stale and has been archived to `docs/archive/workbook-sheet-index-2026-06-12.md`.
 - Existing ZR1/ZR1X workbook source scaffolds should not be used as canonical ingest truth. They need a focused clean reprocess path through Pass 5 before future apply planning relies on them.
+- 2026-07-03: the CLI-first Pass 0→1→3→5 sequence proved confusing and ineffective at reaching a clean reviewable candidate table. Pass A supersedes it as the wizard entry path: the browser comes first, sheet roles are confirmed by the user before parsing, and price backfill is a deterministic exact-match join with an explicit ambiguity queue. Pass 0–5 modules stay in place as parsing/review libraries and reference (the workbook editor's legacy Ingest Review tab still reads their artifacts) until later passes retire them explicitly.
