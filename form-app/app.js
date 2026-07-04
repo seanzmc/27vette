@@ -251,7 +251,8 @@ function applyAccentForPaint() {
   if (!ACCENT_FOLLOWS_PAINT || typeof document === "undefined") return;
   const paint = selectedPaintChoice();
   const theme = (paint && PAINT_ACCENTS[String(paint.rpo || "").toUpperCase()]) || DEFAULT_PAINT_ACCENT;
-  const rootStyle = document.documentElement.style;
+  const rootStyle = document.documentElement?.style;
+  if (!rootStyle) return;
   rootStyle.setProperty("--accent", theme.accent);
   rootStyle.setProperty("--accent-dark", theme.accentDark);
   rootStyle.setProperty("--on-accent", theme.onAccent);
@@ -1949,9 +1950,10 @@ function renderMobileProgress() {
 function renderStepRail() {
   const steps = visibleRuntimeSteps();
   const activeIndex = steps.findIndex((step) => normalizeStepKey(state.activeStep) === step.step_key);
+  const missingStepKeys = new Set(missingRequirementDetails().map((item) => normalizeStepKey(item.stepKey)));
   els.stepRail.innerHTML = steps
     .map((step, index) => {
-      const isComplete = activeIndex >= 0 && index < activeIndex;
+      const isComplete = activeIndex >= 0 && index < activeIndex && !missingStepKeys.has(step.step_key);
       return `
         <button class="step-link ${index === activeIndex ? "active" : ""}${isComplete ? " complete" : ""}" data-step="${step.step_key}" type="button">
           <span class="step-index">${isComplete ? "✓" : index + 1}</span>
