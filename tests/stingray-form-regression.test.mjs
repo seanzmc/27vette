@@ -857,6 +857,42 @@ test("mobile progress and compact summary update from runtime state", () => {
   assert.equal(runtime.elements.get("#mobileProgress").dataset.hasPrevious, "true");
 });
 
+test("step rail checkmarks only appear for satisfied previous steps", () => {
+  const runtime = loadRuntime();
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.state.activeStep = "delivery";
+  runtime.render();
+
+  const stepRailHtml = runtime.elements.get("#stepRail").innerHTML;
+  assert.match(
+    stepRailHtml,
+    /<button class="step-link  complete" data-step="model" type="button">\s*<span class="step-index">✓<\/span>/,
+    "satisfied previous steps should still show completed checkmarks"
+  );
+  assert.match(
+    stepRailHtml,
+    /<button class="step-link " data-step="base_interior" type="button">\s*<span class="step-index">8<\/span>/,
+    "a previous step with a missing required selection should keep its number"
+  );
+  assert.doesNotMatch(
+    stepRailHtml,
+    /<button class="step-link  complete" data-step="base_interior" type="button">\s*<span class="step-index">✓<\/span>/,
+    "a missing required selection must suppress the green completion checkmark"
+  );
+
+  runtime.state.selectedInterior = "1LT_AQ9_HTA";
+  runtime.reconcileSelections();
+  runtime.render();
+  assert.match(
+    runtime.elements.get("#stepRail").innerHTML,
+    /<button class="step-link  complete" data-step="base_interior" type="button">\s*<span class="step-index">✓<\/span>/,
+    "the checkmark should return once the required selection is satisfied"
+  );
+});
+
 test("vehicle setup exposes paced readability hooks without changing option step content", () => {
   const runtime = loadRuntime();
   runtime.render();
