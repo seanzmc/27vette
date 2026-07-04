@@ -8,11 +8,13 @@ Staged workflow docs: `docs/ingest/README.md` and `docs/ingest/pass-{0..5}/*.md`
 
 Inputs: `<raw_export>.xlsx` (official GM order-guide export), `stingray_master.xlsx` (read-only schema/example reference), optional official price schedule. Never overwrite the raw export or the master workbook during preflight.
 
-All ingest passes write only run-scoped transient artifacts under `form-output/ingest/<run-id>/` (or `/tmp`). No pass may write `stingray_master.xlsx`, generated `form_*` sheets, other tracked `form-output/` outputs, or `form-app/data.js` unless a later approved apply pass explicitly allows it.
+All ingest passes write only run-scoped transient artifacts under `form-output/ingest/<run-id>/`, `form-output/ingest-wizard/<run-id>/`, or `/tmp`. No pass may write `stingray_master.xlsx`, generated `form_*` sheets, other tracked `form-output/` outputs, or `form-app/data.js` unless a later approved apply pass explicitly allows it.
 
 ## Pass sequence and artifacts
 
-All artifact paths below are under `form-output/ingest/<run-id>/`.
+- Pass A — interactive ingest wizard (current entry path): browser-first upload/choose → sheet-card profiling → user sheet-role confirmation → deterministic option/price parse → exact 1-to-1 price joins → read-only candidate table. Artifacts under `form-output/ingest-wizard/<run-id>/`: `session.json`, `sheet-profile.json`, `sheet-roles.json`, `option-candidates.json`, `price-rows.json`, `join-report.json`. No apply planning, decision capture, or workbook writes. Run: `.venv/bin/python scripts/ingest_wizard_server.py`.
+
+Passes 0–5 below are the superseded legacy entry path, kept as parsing/review libraries and reference until later passes retire them explicitly. Their artifact paths are under `form-output/ingest/<run-id>/`.
 
 - Pass 0 — CLI evidence profiler: `source-layout.json`, `variant-matrix.json`, `raw-rows.json`, `disclosure-links.json`, `checkpoint-report.md`.
 - Pass 1 — CLI candidate normalizer: `candidate-{options,ovs,rules,price-rules,summary}.json`, `unresolved-review.{json,md}`. Candidates are not approved workbook rows.

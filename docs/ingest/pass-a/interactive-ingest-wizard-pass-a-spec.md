@@ -2,7 +2,7 @@
 
 Date: 2026-07-03
 Branch: `claude/epic-lumiere-585836`
-Status: Proposed.
+Status: Implemented 2026-07-03. See "Implementation closeout" at the end of this file.
 Recommended reasoning level for implementation agent: high.
 
 ## Purpose
@@ -372,3 +372,52 @@ same RPO across model-family sheets; integration into the workbook editor UI.
   ambiguous queue (e.g. `PDB`/`PDD`/`PDF`), each with source evidence.
 - Workbook untouched check: `git status` shows no `stingray_master.xlsx`
   change; no gate regeneration needed (no generated-surface change).
+
+## Implementation closeout (2026-07-03)
+
+Changed files:
+
+- New: `scripts/corvette_form_generator/ingest/wizard/{__init__,profiler,parser,joiner,session}.py`,
+  `scripts/ingest_wizard_server.py`, `visualizer/ingest-wizard/{index.html,wizard.css,wizard.js}`,
+  `tests/{ingest_wizard_fixtures,test_ingest_wizard_profiler,test_ingest_wizard_parser,test_ingest_wizard_joiner,test_ingest_wizard_session,test_ingest_wizard_server}.py`,
+  `docs/ingest/pass-a/interactive-ingest-wizard-pass-a-plan.md`, `.claude/launch.json`.
+- Modified: `docs/ingest/README.md` (core principle, Pass A status, supersession note),
+  `Order-Guide_IngestPrompt.md` (Pass A entry path, legacy note, artifact boundary),
+  `README.md` (repository map + Ingest Wizard Workflow section), `.gitignore`
+  (transient `form-output/ingest/` and `form-output/ingest-wizard/` run dirs).
+
+Validation:
+
+- New suites: 28 tests across profiler/parser/joiner/session/server — all pass.
+- Full `pytest tests/`: 291 passed, 4 failed — all 4 failures
+  (`test_editor_lints.py` real-workbook compare ×3,
+  `test_source_assembly_characterization.py` ×1) are pre-existing on the base
+  commit: `git diff afa36fb` shows zero changes to those test files or their
+  source surfaces on this branch.
+- Browser proof of success against `2027 Chevrolet Car Corvette Export_RAW.xlsx`
+  (server on 127.0.0.1:8040): 23 sheet cards — 20 options matrices (16
+  recommended `options`, 4 standard-equipment subtypes recommended `exclude`),
+  1 price sheet (230 option price rows, 32 base-model rows, high confidence),
+  2 unsupported Color and Trim; all 4 combined sheets detected `mixed`
+  (ZR1 + ZR1X, 8 variant columns). Parse over the 16 recommended options
+  sheets + price sheet produced 1,516 candidates: 964 exact price matches
+  (BV4 = $395 verified with evidence cells; E60 = $2,995), 62 ambiguous
+  (PDB/PDD/PDF each attach 3 qualified Z06-wheel price rows), 84 without
+  price, 9 unmatched price rows, 108 skipped rows reported per sheet.
+  Filters, search, and the evidence drawer verified; zero console errors.
+- Workbook untouched: `git status` clean for `stingray_master.xlsx`; the
+  timestamp-only `form-output` churn from the full pytest run was reverted.
+
+Companion-file impact: workbook editor server/UI inspected, no change (legacy
+Ingest Review tab unaffected); `form-app/`, generated runtime data, dealer
+submission untouched; AGENTS.md §8 boundary unchanged.
+
+Residual risks / follow-up:
+
+- The 4 pre-existing test failures are unrelated to ingest and remain open on
+  the base branch.
+- Pass B+ (decision capture, relationship hints, export, apply planning) per
+  the corrected flow, steps 6–8.
+- Heuristic thresholds (`STANDARD_EQUIPMENT_S_SHARE = 0.60`) encode the 2027
+  export shape; future exports report drift via confidence reasons and
+  skipped rows rather than hard failure.

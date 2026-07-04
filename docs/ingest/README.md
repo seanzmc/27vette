@@ -17,7 +17,7 @@ The user owns business interpretation: sections, groupings, exclusive groups, re
 
 ## Current docs
 
-- `pass-a/interactive-ingest-wizard-pass-a-spec.md` — active rewrite of the wizard entry path: browser-first upload/choose → friendly sheet-card profiling → sheet-role confirmation → deterministic option/price parsing → exact 1-to-1 price joins → read-only reviewable candidate table. Explicitly no apply planning, decision capture, or workbook writes. Records the corrected end-to-end flow later passes follow.
+- `pass-a/interactive-ingest-wizard-pass-a-spec.md` — implemented (2026-07-03) rewrite of the wizard entry path: browser-first upload/choose → friendly sheet-card profiling → sheet-role confirmation → deterministic option/price parsing → exact 1-to-1 price joins → read-only reviewable candidate table. Explicitly no apply planning, decision capture, or workbook writes. Records the corrected end-to-end flow later passes follow.
 - `pass-0/ingest-wizard-source-profiler-spec.md` — implemented CLI-first, read-only source profiler that emits source-layout, variant-matrix, raw-row, disclosure-link, manifest, and checkpoint artifacts before any candidate normalization or workbook apply exists.
 - `pass-1/candidate-normalizer-spec.md` — implemented CLI-first, read-only candidate normalizer over Pass 0 evidence artifacts; emits transient candidate and unresolved-review artifacts only.
 - `pass-2/interactive-review-wizard-spec.md` — implemented read-only Ingest Review tab over Pass 1 candidate artifacts; captures/export review decisions without workbook apply.

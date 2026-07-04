@@ -32,6 +32,7 @@ scripts/
   validate_workbook_package.py / repair_workbook_tables.py  package integrity / repair
   apply_workbook_ops.py       gated workbook writes from exported ops batches
   workbook_editor_server.py   localhost workbook review/edit UI
+  ingest_wizard_server.py     localhost ingest wizard UI (raw order-guide intake)
   compare-generated-contracts.mjs  contract diff ignoring timestamps
   corvette_form_generator/    shared lib: config, workbook I/O, rules, pricing,
                               interiors, contract, registry, schema validation
@@ -90,6 +91,14 @@ python -m pip install -r requirements.txt
 ```
 
 Do not commit `.venv/`. Always run Python tooling with `.venv/bin/python` or the activated venv.
+
+## Ingest Wizard Workflow
+
+`scripts/ingest_wizard_server.py` serves a localhost-only UI for raw order-guide intake (Pass A): choose/upload a raw export, confirm detected sheet roles, run the deterministic option/price parse, and review the candidate table. Read-only toward the canonical workbook; run artifacts land under `form-output/ingest-wizard/<run-id>/`. Detail: `docs/ingest/pass-a/`.
+
+```sh
+.venv/bin/python scripts/ingest_wizard_server.py [--port 8040]
+```
 
 ## Workbook Editor Workflow
 
