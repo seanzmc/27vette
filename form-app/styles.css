@@ -667,7 +667,8 @@ textarea {
 }
 
 #stepContent[data-active-step="paint"] .choice-name {
-  font-size: 12.5px;
+  font-size: clamp(11px, 1.7vw, 12.5px);
+  line-height: 1.15;
 }
 
 #stepContent[data-active-step="paint"] .choice-availability:empty {
@@ -681,12 +682,16 @@ textarea {
   }
 
   #stepContent[data-active-step="paint"] .choice-grid {
-    grid-template-columns: repeat(auto-fill, minmax(106px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
   }
 
   #stepContent[data-active-step="paint"] .choice-media,
   #stepContent[data-active-step="paint"] .choice-media[data-fit="swatch"] {
     height: 36px;
+  }
+
+  #stepContent[data-active-step="paint"] .choice-name {
+    font-size: 11px;
   }
 }
 
@@ -1382,6 +1387,15 @@ textarea {
   margin: 0;
   font-size: 13px;
   font-weight: 750;
+}
+
+.choice-name > span:first-child {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.choice-name .info-tooltip {
+  flex: 0 0 auto;
 }
 
 .choice-note {
