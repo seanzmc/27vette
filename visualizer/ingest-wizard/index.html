@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ingest Wizard — Pass A</title>
+<link rel="stylesheet" href="/wizard.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-title">Ingest Wizard</span>
+    <span class="brand-sub">raw order-guide intake · Pass A · read-only</span>
+  </div>
+  <nav class="stepper" id="stepper">
+    <span class="step" data-stage="files">1 · Choose file</span>
+    <span class="step" data-stage="sheets">2 · Sheet roles</span>
+    <span class="step" data-stage="candidates">3 · Candidates</span>
+  </nav>
+  <div class="runinfo" id="run-info"></div>
+</header>
+
+<div id="error-banner" class="error-banner hidden"></div>
+
+<main>
+  <section id="stage-files" class="stage">
+    <h1>Choose a raw GM order-guide export</h1>
+    <p class="hint">Pick a workbook to profile. The file is never modified; the canonical workbook is never a source.</p>
+    <div id="file-list" class="file-list"></div>
+    <div class="file-actions">
+      <label class="upload-label">
+        Upload .xlsx
+        <input type="file" id="upload-input" accept=".xlsx">
+      </label>
+      <button id="profile-btn" class="primary" disabled>Profile sheets</button>
+    </div>
+  </section>
+
+  <section id="stage-sheets" class="stage hidden">
+    <h1>Confirm sheet roles</h1>
+    <p class="hint">The profiler recommends a role per sheet — you decide. Pass A parses only <strong>options</strong> sheets and one <strong>price</strong> sheet.</p>
+    <div id="sheet-cards" class="cards"></div>
+    <div class="sheet-actions">
+      <button id="confirm-roles-btn" class="primary">Confirm sheet roles</button>
+      <button id="run-parse-btn" class="primary hidden">Run first parse</button>
+      <span id="roles-status" class="status-note"></span>
+    </div>
+  </section>
+
+  <section id="stage-candidates" class="stage hidden">
+    <h1>Option candidates</h1>
+    <div id="summary-chips" class="summary"></div>
+    <div class="filters">
+      <select id="filter-sheet"><option value="">All sheets</option></select>
+      <select id="filter-price">
+        <option value="">All price states</option>
+        <option value="exact">Exact price match</option>
+        <option value="ambiguous">Ambiguous price</option>
+        <option value="none">No price</option>
+      </select>
+      <input type="search" id="filter-q" placeholder="Search RPO or description…">
+      <button id="back-to-sheets" class="ghost">Back to sheet roles</button>
+    </div>
+    <div id="candidate-table"></div>
+  </section>
+</main>
+
+<script src="/wizard.js"></script>
+</body>
+</html>

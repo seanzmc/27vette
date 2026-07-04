@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ingest-wizard",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": ["scripts/ingest_wizard_server.py", "--port", "8040"],
+      "port": 8040
+    }
+  ]
+}
