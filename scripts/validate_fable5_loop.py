@@ -273,6 +273,44 @@ def _validate_rubric(root: Path, contract: dict[str, Any], issues: list[str]) ->
         issues.append("eval rubric max_iterations does not match contract maxIterationsDefault")
 
 
+def _validate_claude_code_setup(root: Path, contract: dict[str, Any], issues: list[str]) -> None:
+    memory_path = root / contract.get("claudeMemoryFile", ".claude/CLAUDE.md")
+    if not memory_path.is_file():
+        issues.append(f"missing Claude project memory file: {memory_path.relative_to(root)}")
+    else:
+        memory_text = memory_path.read_text(encoding="utf-8")
+        for required_phrase in (
+            "fable5loop/README.md",
+            "AGENTS.md",
+            "fable5loop/STATE.md",
+            "fable5loop/skills/27vette-fable5-compounding.md",
+            "source of truth",
+        ):
+            if required_phrase not in memory_text:
+                issues.append(f"{memory_path.relative_to(root)} missing phrase: {required_phrase}")
+        if len(memory_text.splitlines()) > 40:
+            issues.append(f"{memory_path.relative_to(root)} should stay a concise pointer, not a duplicated workflow")
+
+    wrapper_path = root / contract.get("claudeSkillWrapper", ".claude/skills/27vette-fable5-compounding/SKILL.md")
+    if not wrapper_path.is_file():
+        issues.append(f"missing Claude project skill wrapper: {wrapper_path.relative_to(root)}")
+        return
+
+    wrapper_text = wrapper_path.read_text(encoding="utf-8")
+    for required_phrase in (
+        "name: 27vette-fable5-compounding",
+        "description:",
+        "fable5loop/README.md",
+        "fable5loop/STATE.md",
+        "fable5loop/skills/27vette-fable5-compounding.md",
+        ".venv/bin/python scripts/validate_fable5_loop.py",
+    ):
+        if required_phrase not in wrapper_text:
+            issues.append(f"{wrapper_path.relative_to(root)} missing phrase: {required_phrase}")
+    if len(wrapper_text.splitlines()) > 45:
+        issues.append(f"{wrapper_path.relative_to(root)} should stay a concise wrapper, not a duplicated workflow")
+
+
 def validate(root: Path = ROOT) -> list[str]:
     """Return structural issues for the Fable 5 loop scaffold."""
 
@@ -353,6 +391,7 @@ def validate(root: Path = ROOT) -> list[str]:
     _validate_state(root, contract, issues)
     _validate_run_receipts(root, contract, issues)
     _validate_rubric(root, contract, issues)
+    _validate_claude_code_setup(root, contract, issues)
 
     return issues
 
@@ -365,7 +404,7 @@ def main() -> int:
         for issue in issues:
             print(f"- {issue}")
         return 1
-    print("Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, memory, skill, routine, outcomes, and eval rubric are present.")
+    print("Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.")
     return 0
 
 

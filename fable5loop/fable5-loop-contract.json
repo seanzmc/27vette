@@ -8,6 +8,8 @@
   "outcomeTemplate": "fable5loop/outcomes/27vette-loop-outcomes.md",
   "routineTemplate": "fable5loop/routines/nightly-eval-compounding.md",
   "evalRubric": "fable5loop/evals/loop-contract-rubric.json",
+  "claudeMemoryFile": ".claude/CLAUDE.md",
+  "claudeSkillWrapper": ".claude/skills/27vette-fable5-compounding/SKILL.md",
   "runsDirectory": "fable5loop/runs",
   "runReceiptTemplate": "fable5loop/runs/run-receipt-template.json",
   "tiers": [
@@ -79,6 +81,8 @@
     "fable5loop/evals/loop-contract-rubric.json",
     "fable5loop/runs/README.md",
     "fable5loop/runs/run-receipt-template.json",
+    ".claude/CLAUDE.md",
+    ".claude/skills/27vette-fable5-compounding/SKILL.md",
     "scripts/validate_fable5_loop.py",
     "tests/test_fable5_loop_contract.py"
   ],

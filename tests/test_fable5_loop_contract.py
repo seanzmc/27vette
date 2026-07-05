@@ -21,9 +21,15 @@ def copy_scaffold(tmp_path: Path) -> Path:
     """Copy just enough repo structure for validator mutation tests."""
 
     shutil.copytree(ROOT / "fable5loop", tmp_path / "fable5loop")
+    (tmp_path / ".claude" / "skills" / "27vette-fable5-compounding").mkdir(parents=True)
     (tmp_path / "scripts").mkdir()
     (tmp_path / "tests").mkdir()
     shutil.copy2(ROOT / "README.md", tmp_path / "README.md")
+    shutil.copy2(ROOT / ".claude" / "CLAUDE.md", tmp_path / ".claude" / "CLAUDE.md")
+    shutil.copy2(
+        ROOT / ".claude" / "skills" / "27vette-fable5-compounding" / "SKILL.md",
+        tmp_path / ".claude" / "skills" / "27vette-fable5-compounding" / "SKILL.md",
+    )
     shutil.copy2(ROOT / "scripts" / "validate_fable5_loop.py", tmp_path / "scripts" / "validate_fable5_loop.py")
     shutil.copy2(ROOT / "tests" / "test_fable5_loop_contract.py", tmp_path / "tests" / "test_fable5_loop_contract.py")
     return tmp_path
@@ -64,6 +70,26 @@ def test_validator_rejects_direct_script_only_documentation(tmp_path: Path) -> N
 
     issues = validate(tmp_path)
     assert any("direct validator invocation" in issue for issue in issues)
+
+
+def test_validator_rejects_missing_claude_project_memory(tmp_path: Path) -> None:
+    copy_scaffold(tmp_path)
+    (tmp_path / ".claude" / "CLAUDE.md").unlink()
+
+    issues = validate(tmp_path)
+    assert any("missing Claude project memory file" in issue for issue in issues)
+
+
+def test_validator_rejects_stale_claude_skill_wrapper(tmp_path: Path) -> None:
+    copy_scaffold(tmp_path)
+    wrapper = tmp_path / ".claude" / "skills" / "27vette-fable5-compounding" / "SKILL.md"
+    wrapper.write_text(
+        wrapper.read_text(encoding="utf-8").replace("fable5loop/STATE.md", "fable5loop/OLD_STATE.md"),
+        encoding="utf-8",
+    )
+
+    issues = validate(tmp_path)
+    assert any(".claude/skills/27vette-fable5-compounding/SKILL.md missing phrase: fable5loop/STATE.md" in issue for issue in issues)
 
 
 def test_validator_rejects_missing_run_receipt_file(tmp_path: Path) -> None:
