@@ -1,0 +1,41 @@
+{
+  "id": "2026-07-05-tidy-passes-2-3-5-6",
+  "started_at": "2026-07-05T18:50:00-04:00",
+  "completed_at": "2026-07-05T19:45:00-04:00",
+  "objective": "Commit simplification passes 4+7, then implement the remaining audit passes 2 (orphan rule-audit artifacts), 3 (asset_map-Sync legacy retirement), 5 (unreferenced src/ images), 6 (route-map doc condensation), spec-first.",
+  "changed_surface": "orphaned inspection artifacts + dead generator metadata helper + legacy stub script/guard test + doc moves/condensation + README dirs line + loop artifacts",
+  "outcome_rubric": "fable5loop/runs/2026-07-05-tidy-passes-2-3-5-6/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-05-tidy-passes-2-3-5-6/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-05-tidy-passes-2-3-5-6/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-05-tidy-passes-2-3-5-6/verifier-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-05-tidy-passes-2-3-5-6/validation-output.txt"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-05-tidy-passes-2-3-5-6/verifier-report.md",
+    "note": "Added 'Completion-record staging drift' known failure mode: git rm/mv auto-stage but plain edits and new files do not, so 'staged, not committed' claims go silently false; confirm with git status --porcelain and staged-blob checks before completion records/verification. Earned by this run's FAIL->fix->PASS cycle."
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 2
+  },
+  "boundaries_preserved": [
+    "workbook",
+    "live generated artifacts",
+    "runtime app",
+    "styling",
+    "dealer submission",
+    "ingest"
+  ],
+  "notes": "Passes 4+7 committed first (871da89, 77a231f). Passes 2/3/5/6 staged, not committed, pending approval. Specs: .hermes/plans/rule-audit-orphan-retirement-pass2-spec.md, asset-map-sync-legacy-retirement-pass3-spec.md, src-images-retirement-pass5-spec.md, route-map-condensation-pass6-spec.md. Grand Sport node gate churned the grand-sport runtime contract timestamp; restored per the skill's known failure mode."
+}
