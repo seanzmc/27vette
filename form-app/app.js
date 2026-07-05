@@ -204,7 +204,7 @@ function formatMoney(value) {
 
 function renderPriceSpan(value, className = "price") {
   const amount = Number(value || 0);
-  if (amount === 0) return `<span class="${className} included">Included</span>`;
+  if (amount === 0) return `<span class="${className} included">${formatMoney(0)}</span>`;
   return `<span class="${className}">${formatMoney(amount)}</span>`;
 }
 
@@ -2810,8 +2810,10 @@ function resetCustomerInformation() {
 function renderStandardEquipment() {
   const rows = standardEquipmentRows();
   els.selectedStandardEquipmentList.innerHTML = `
-    <div class="standard-equipment-summary">Standard & Included <span>${rows.length}</span></div>
-    ${renderStandardEquipmentGroups(rows)}
+    <details class="standard-equipment-rollup">
+      <summary class="standard-equipment-summary">Standard & Included <span>${rows.length}</span></summary>
+      <div class="standard-equipment-list">${renderStandardEquipmentGroups(rows)}</div>
+    </details>
   `;
 }
 
@@ -3356,6 +3358,11 @@ function init() {
   els.mobileDrawerBackdrop?.addEventListener("click", closeMobileDrawers);
   document.addEventListener?.("keydown", handleMobileDrawerKeydown);
   document.addEventListener?.("wheel", handleDrawerWheel, { passive: false });
+  /* summary docks in-flow above 1120px; clear any open drawer state when
+     crossing into the docked layout so the body scroll lock releases */
+  window.matchMedia?.("(min-width: 1121px)")?.addEventListener?.("change", (event) => {
+    if (event.matches) closeMobileDrawers();
+  });
   els.dealerSubmitForm?.addEventListener("submit", submitDealerBuild);
   els.dealerSubmitCloseButton?.addEventListener("click", closeDealerSubmitModal);
   els.dealerSubmitCancelButton?.addEventListener("click", closeDealerSubmitModal);

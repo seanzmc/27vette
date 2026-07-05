@@ -761,7 +761,7 @@ test("summary drawer is callable from desktop and condensed at smaller breakpoin
   const mobileBreakpoint = stylesSource.slice(mobileStart, reducedMotionStart);
 
   assert.match(baseStyles, /grid-template-columns:\s*240px minmax\(0, 1fr\)/);
-  assert.doesNotMatch(baseStyles, /grid-template-columns:\s*240px minmax\(0, 1fr\) 340px/);
+  assert.match(baseStyles, /@media \(min-width: 1121px\)\s*\{[\s\S]*grid-template-columns:\s*240px minmax\(0, 1fr\) 340px[\s\S]*\.summary-panel\s*\{[\s\S]*position:\s*sticky/);
   assert.match(baseStyles, /\.toolbar \.mobile-drawer-button-right\s*\{[\s\S]*display:\s*inline-flex/);
   assert.match(baseStyles, /\.reset-icon-button,\n\.download-icon-button\s*\{[\s\S]*width:\s*42px/);
   assert.match(baseStyles, /\.reset-icon,\n\.download-icon\s*\{[\s\S]*stroke-linecap:\s*round/);

@@ -36,7 +36,6 @@
   --ghost-hover-bg: rgba(255, 255, 255, 0.05);
   --shadow: 0 18px 48px rgba(0, 0, 0, 0.55);
   --shell-gap: 12px;
-  --shell-radius: 12px;
 }
 
 * {
@@ -46,7 +45,13 @@
 body {
   margin: 0;
   min-width: 320px;
-  background: #33373a; /* desk color behind the shell; the shell interior is --bg */
+  /* full-page carbon checker to match the homepage (stingray-homepage index.html) */
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(45deg, #181c1f 25%, transparent 25%, transparent 75%, #181c1f 75%),
+    linear-gradient(45deg, #181c1f 25%, transparent 25%, transparent 75%, #181c1f 75%);
+  background-size: 6px 6px;
+  background-position: 0 0, 3px 3px;
   color: var(--ink);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -62,14 +67,13 @@ textarea {
 .app-shell {
   display: grid;
   gap: 0;
-  width: min(1680px, calc(100% - 32px));
-  margin: 24px auto 32px;
-  border: 1px solid var(--line);
-  border-radius: var(--shell-radius);
-  /* clip (not hidden) keeps the radius clipping without creating a scroll
-     container, so the paint step's sticky vehicle stage tracks the window */
+  /* full-bleed like the homepage: body carries the carbon background, the
+     shell is layout-only (no desk margin, border, radius, or own background).
+     clip (not hidden) avoids creating a scroll container, so the paint
+     step's sticky vehicle stage tracks the window */
+  width: 100%;
+  margin: 0;
   overflow: clip;
-  background: var(--bg);
 }
 
 .accent-stripe {
@@ -430,7 +434,10 @@ textarea {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
   min-height: 760px;
-  overflow: hidden;
+  /* clip (not hidden) so position: sticky descendants (paint vehicle stage,
+     docked summary panel) track the window scroll instead of a dead
+     scroll container */
+  overflow: clip;
 }
 
 .step-rail {
@@ -500,14 +507,9 @@ textarea {
 
 .choice-panel {
   min-width: 0;
-  padding: 24px 28px 28px;
-  /* signature 1a carbon checker texture */
-  background-color: var(--bg);
-  background-image:
-    linear-gradient(45deg, #16191c 25%, transparent 25%, transparent 75%, #16191c 75%),
-    linear-gradient(45deg, #16191c 25%, transparent 25%, transparent 75%, #16191c 75%);
-  background-size: 6px 6px;
-  background-position: 0 0, 3px 3px;
+  padding: 16px 28px 28px;
+  /* signature 1a carbon checker texture now lives on body (full-bleed,
+     matches the homepage), so the panel itself stays transparent */
 }
 
 .step-header {
@@ -632,15 +634,17 @@ textarea {
   position: sticky;
   top: 0;
   z-index: 6;
-  height: 240px;
+  /* hero-size the render; scales with the window so it stays dominant on
+     wide viewports without swallowing short ones */
+  height: min(42vh, 350px);
   margin: 0 0 14px;
   padding: 8px 0 14px;
   border-bottom: 1px solid var(--hairline);
-  /* repeat the choice-panel carbon texture so choices scroll cleanly beneath */
+  /* repeat the body carbon texture so choices scroll cleanly beneath */
   background-color: var(--bg);
   background-image:
-    linear-gradient(45deg, #16191c 25%, transparent 25%, transparent 75%, #16191c 75%),
-    linear-gradient(45deg, #16191c 25%, transparent 25%, transparent 75%, #16191c 75%);
+    linear-gradient(45deg, #181c1f 25%, transparent 25%, transparent 75%, #181c1f 75%),
+    linear-gradient(45deg, #181c1f 25%, transparent 25%, transparent 75%, #181c1f 75%);
   background-size: 6px 6px;
   background-position: 0 0, 3px 3px;
 }
@@ -673,6 +677,16 @@ textarea {
 
 #stepContent[data-active-step="paint"] .choice-availability:empty {
   display: none;
+}
+
+@media (min-width: 1400px) {
+  #stepContent[data-active-step="paint"] .vehicle-stage {
+    height: min(48vh, 440px);
+  }
+
+  #stepContent[data-active-step="paint"] .vehicle-stage img {
+    max-width: 90%;
+  }
 }
 
 @media (max-width: 760px) {
@@ -1005,12 +1019,10 @@ textarea {
   padding-bottom: 0;
 }
 
+/* auto-fill (not auto-fit) keeps track width tied to the viewport, not the
+   card count, so Model / Body Style / Trim cards all render the same size */
 .setup-choice-grid {
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-}
-
-.trim-setup-group .setup-choice-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
 }
 
 .setup-choice-card,
@@ -2109,6 +2121,38 @@ body:has(.app-shell[data-mobile-drawer]) {
   color: var(--muted);
 }
 
+/* sidebar rollup: the whole Standard & Included section collapses into its
+   heading and starts collapsed */
+.standard-equipment-rollup > summary.standard-equipment-summary {
+  justify-content: flex-start;
+  min-height: 44px;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+.standard-equipment-rollup > summary.standard-equipment-summary::-webkit-details-marker {
+  display: none;
+}
+
+.standard-equipment-rollup > summary.standard-equipment-summary::before {
+  content: "▸";
+  flex: 0 0 auto;
+  color: var(--accent);
+  font-size: 12px;
+}
+
+.standard-equipment-rollup[open] > summary.standard-equipment-summary::before {
+  content: "▾";
+}
+
+.standard-equipment-rollup > summary.standard-equipment-summary span {
+  margin-left: auto;
+}
+
+.standard-equipment-rollup > .standard-equipment-list {
+  margin-top: 8px;
+}
+
 .trim-standard-equipment {
   margin-top: 24px;
 }
@@ -2116,6 +2160,36 @@ body:has(.app-shell[data-mobile-drawer]) {
 .empty {
   color: var(--muted);
   font-style: italic;
+}
+
+/* ---- wide viewports: build summary docks as an in-flow right sidebar ---- */
+@media (min-width: 1121px) {
+  .workspace {
+    grid-template-columns: 240px minmax(0, 1fr) 340px;
+  }
+
+  .summary-panel {
+    position: sticky;
+    top: 0;
+    inset: auto;
+    z-index: 1;
+    align-self: start;
+    width: auto;
+    max-width: none;
+    max-height: 100vh;
+    transform: none;
+    transition: none;
+  }
+
+  .app-shell[data-mobile-drawer="summary"] .summary-panel {
+    box-shadow: none;
+  }
+
+  .summary-panel .mobile-drawer-header,
+  .toolbar .mobile-drawer-button-right,
+  .mobile-drawer-backdrop:not([hidden]) {
+    display: none;
+  }
 }
 
 @media (max-width: 1120px) {
@@ -2273,8 +2347,8 @@ body:has(.app-shell[data-mobile-drawer]) {
   .app-shell {
     display: grid;
     gap: 0;
-    width: min(100% - 20px, 1680px);
-    margin-top: 10px;
+    width: 100%;
+    margin-top: 0;
   }
 
   .topbar,
