@@ -3,7 +3,7 @@
 
 Synthetic-extract tests pin each check's behavior; real-workbook tests must
 reproduce the named, already-verified findings of the 2026-06-11 consistency
-review (workbook-consistency-review-2026-06-11.md) — that review is the
+review (docs/archive/old-reports/workbook-consistency-review-2026-06-11.md) — that review is the
 ground truth this module makes durable.
 """
 

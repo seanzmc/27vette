@@ -1,0 +1,1 @@
+Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.

@@ -1,0 +1,35 @@
+Validation output · 2026-07-05 simplification passes 2, 3, 5, 6
+================================================================
+
+[gate] PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_model_generation_route.py tests/test_asset_map_sync.py -q
+....................................                                     [100%]
+36 passed in 0.99s
+
+[gate] node --test tests/grand-sport-contract-preview.test.mjs tests/grand-sport-draft-data.test.mjs
+tests 25 / pass 25 / fail 0
+Side effect: gate rewrote form-output/runtime/grand-sport-runtime-contract.json
+generated_at ("2026-07-02T14:10:23+00:00" -> "2026-07-05T23:02:51+00:00");
+timestamp-only diff confirmed, restored via git restore (known gate-churn failure
+mode from fable5loop/skills/27vette-fable5-compounding.md).
+
+[scan] git grep "rule_audit|rule-audit" -- scripts/ tests/ form-app/ form-output/
+tests/test_editor_ops_apply.py:131 only — negative assertion that gate reminders
+exclude rule-audit commands (kept guard). No other matches.
+
+[scan] git grep "asset_map-Sync" outside archive/, docs/archive/, fable5loop/runs/, .hermes/plans/, STATE
+docs/asset-map-sync.md:3 (removal prose), tests/test_asset_map_sync.py:950,952
+(new absence guard). No other matches.
+
+[scan] git grep -E '\bsrc/[A-Za-z0-9_-]+\.png' → no matches (exit 1)
+
+[scan] git grep "Audit-route-map|audit-cleanup-overview" outside archives/receipts/specs/STATE → no matches (exit 1)
+
+[check] ls asset_map-Sync → No such file or directory
+[check] ls src → No such file or directory; git ls-files src/ | wc -l → 0
+[check] git diff HEAD --stat -- form-output/runtime form-output/stingray-form-data.json form-output/stingray-form-data.csv form-app stingray_master.xlsx → empty (exit 0)
+[check] git status --porcelain form-output/ form-app/ → only the two staged D lines for the orphaned grand-sport-rule-audit artifacts
+[check] git diff --check → clean (exit 0)
+
+Loop gate output appended below after receipt/STATE writes.
+----------------------------------------------------------------
+Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.

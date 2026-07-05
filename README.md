@@ -44,7 +44,7 @@ docs/, .hermes/plans/         active specs, reviews, ingest docs
 Order-Guide_IngestPrompt.md   raw ingest workflow prompt
 ```
 
-Other dirs (`product/`, `dist_updates/`, `archive/`, `backups/`, `asset_map-Sync`, `visualizer/`, `src/`) are reference/archive/visualizer surfaces — inspect only when a task names them. `visualizer/workbook-editor/intentional-differences.json` is the committed allowlist of intentional cross-model option differences (`status: intentional` suppresses; `pending-review` annotates); editing it is a normal file change, not a workbook write.
+Other dirs (`product/`, `dist_updates/`, `archive/`, `backups/`, `visualizer/`) are reference/archive/visualizer surfaces — inspect only when a task names them. `visualizer/workbook-editor/intentional-differences.json` is the committed allowlist of intentional cross-model option differences (`status: intentional` suppresses; `pending-review` annotates); editing it is a normal file change, not a workbook write.
 
 ## Workbook Source Surfaces
 

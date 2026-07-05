@@ -6,7 +6,7 @@ Change class: docs/tooling only.
 
 ## Purpose
 
-Create a repo-local operating system that lets a Fable 5 orchestration session start from durable context, execute through the three tiers described in `fable5loop/Most people are using Claude Fable 5 like Sonnet 4.6 with a bigger….md`, and write verified improvements back into the same loop for future runs.
+Create a repo-local operating system that lets a Fable 5 orchestration session start from durable context, execute through the three tiers described in `fable5loop/source-guidance.md`, and write verified improvements back into the same loop for future runs.
 
 This pass does not attempt to configure Anthropic-hosted Claude Managed Agents, change Hermes configuration, or modify the customer-facing Corvette app. It creates the project artifacts Fable 5 should read, follow, validate, and update.
 
@@ -14,7 +14,7 @@ This pass does not attempt to configure Anthropic-hosted Claude Managed Agents, 
 
 Root cause / current-state evidence:
 
-- `fable5loop/Most people are using Claude Fable 5 like Sonnet 4.6 with a bigger….md` contains the effectiveness guidelines: a three-tier roadmap, 4-layer compound stack, independent verifier pattern, worktree/routine orchestration, STATE.md memory progression, Skills compounding, vision verification, and safety-boundary fallback handling.
+- `fable5loop/source-guidance.md` contains the effectiveness guidelines: a three-tier roadmap, 4-layer compound stack, independent verifier pattern, worktree/routine orchestration, STATE.md memory progression, Skills compounding, vision verification, and safety-boundary fallback handling.
 - The repo had no existing `fable5loop` system files besides the source markdown and attachments; search for `fable`, `STATE.md`, `routine`, and `compound stack` found no active project-local loop scaffold.
 - `docs/roadmap_wishes.md` records Sean's need for high-leverage, guardrailed Fable 5 tasks with clear goals, guardrails, and expected outcomes to avoid quota burn.
 - `AGENTS.md` requires spec-first handling for non-trivial tooling/workflow changes, source-of-truth boundaries, scoped edits, and explicit validation.
@@ -24,7 +24,7 @@ Risk level: low-to-medium. Risk is process drift or future agent misuse, not run
 
 ## Source-of-truth decision
 
-- Source article: `fable5loop/Most people are using Claude Fable 5 like Sonnet 4.6 with a bigger….md` owns the imported Fable 5 loop guidance.
+- Source article: `fable5loop/source-guidance.md` owns the imported Fable 5 loop guidance.
 - Repo-local loop contract: `fable5loop/fable5-loop-contract.json` owns the current artifact inventory and structural requirements.
 - Operational entrypoint: `fable5loop/README.md` tells Fable 5 what to read first and how to execute the loop.
 - Project memory: `fable5loop/STATE.md` owns verified facts, general rules, open failures, lessons learned, and the resume pointer for future Fable 5 runs.

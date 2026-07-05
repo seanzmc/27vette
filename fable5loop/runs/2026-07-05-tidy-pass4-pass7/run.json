@@ -1,0 +1,41 @@
+{
+  "id": "2026-07-05-tidy-pass4-pass7",
+  "started_at": "2026-07-05T19:15:00-04:00",
+  "completed_at": "2026-07-05T20:00:00-04:00",
+  "objective": "Simplification-audit Pass 4 (archive completed docs/plans) and Pass 7 (rename ellipsis loop source doc), spec-first, after committing Pass 1.",
+  "changed_surface": "docs/file-organization + comment-only code/test path references + loop artifacts",
+  "outcome_rubric": "fable5loop/runs/2026-07-05-tidy-pass4-pass7/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-05-tidy-pass4-pass7/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-05-tidy-pass4-pass7/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-05-tidy-pass4-pass7/verifier-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-05-tidy-pass4-pass7/validation-output.txt"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-05-tidy-pass4-pass7/verifier-report.md",
+    "note": "Added 'Gate-induced artifact churn' known failure mode to the skill: validation gates regenerate tracked generated-artifact timestamps; restore churn after gates and re-verify read-only. Verified by this run's FAIL->fix->PASS cycle."
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 2
+  },
+  "boundaries_preserved": [
+    "workbook",
+    "generated artifacts",
+    "runtime app",
+    "styling",
+    "dealer submission",
+    "ingest"
+  ],
+  "notes": "Pass 1 committed first (ab21031 + aa8b1df + c5a2a04). Pass 4/7 changes staged, not committed, pending approval. Specs: .hermes/plans/docs-archival-pass4-spec.md, .hermes/plans/fable5-source-doc-rename-pass7-spec.md. Pre-existing failures reported honestly: test_editor_lints RealWorkbookCompareTest (3, live-workbook state), test_rule_derivation import path requires PYTHONPATH=scripts. Worktree .venv symlink added locally for gates (untracked)."
+}

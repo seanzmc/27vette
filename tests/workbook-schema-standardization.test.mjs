@@ -357,7 +357,7 @@ print(json.dumps(duplicates))
 });
 
 test("Z06 active replace excludes stay limited to true default-replacement rows", () => {
-  // New contract (docs/derived-swap-eviction-spec-2026-07-02.md §2 A6): authored
+  // New contract (docs/archive/completed-specs/derived-swap-eviction-spec-2026-07-02.md §2 A6): authored
   // replace rows must be true default-replacements; hand-stacked includes-closure
   // rows are forbidden BECAUSE generation-time derivation owns them
   // (scripts/corvette_form_generator/rule_derivation.py).

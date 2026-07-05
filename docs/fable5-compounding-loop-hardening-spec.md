@@ -33,7 +33,7 @@ Risk level: medium. The affected surface is docs/tooling only, but the purpose i
 
 ## Source-of-truth decision
 
-- Source article: `fable5loop/Most people are using Claude Fable 5 like Sonnet 4.6 with a bigger….md` remains the imported conceptual guidance.
+- Source article: `fable5loop/source-guidance.md` remains the imported conceptual guidance.
 - Loop contract: `fable5loop/fable5-loop-contract.json` owns required artifact paths, required run-record fields, and validator expectations.
 - Operational entrypoint: `fable5loop/README.md` owns the per-run start and closeout protocol.
 - Repo command discovery: `README.md` owns the repo-root command pointer and must mention the validator invocation.

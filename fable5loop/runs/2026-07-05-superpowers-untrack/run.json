@@ -1,0 +1,40 @@
+{
+  "id": "2026-07-05-superpowers-untrack",
+  "started_at": "2026-07-05T18:30:00-04:00",
+  "completed_at": "2026-07-05T19:00:00-04:00",
+  "objective": "Simplification-audit Pass 1: untrack .superpowers transient session state, archive brainstorm mockups, add ignore rule, spec-first.",
+  "changed_surface": "repo hygiene (git tracking, .gitignore, docs archive) + loop receipt/STATE",
+  "outcome_rubric": "fable5loop/runs/2026-07-05-superpowers-untrack/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-05-superpowers-untrack/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-05-superpowers-untrack/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-05-superpowers-untrack/verifier-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-05-superpowers-untrack/validation-output.txt"
+    }
+  ],
+  "skill_update": {
+    "decision": "not_applicable",
+    "evidence": "fable5loop/runs/2026-07-05-superpowers-untrack/verifier-report.md",
+    "note": "Verifier lesson candidates (spec-to-validation discipline, git mv history preservation, scope fencing) restate practices the skill and AGENTS.md already require; no new durable procedural lesson."
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false
+  },
+  "boundaries_preserved": [
+    "workbook",
+    "generated artifacts",
+    "runtime app",
+    "styling",
+    "dealer submission",
+    "ingest"
+  ],
+  "notes": "Spec: .hermes/plans/superpowers-untrack-pass1-spec.md. 6 mockups archived via git mv to docs/archive/brainstorm/2026-06-18-form-visualizer-flow/; server.pid + server-stopped deleted; .gitignore rule added. Other audit passes untouched (verifier criterion 9)."
+}
