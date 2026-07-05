@@ -302,7 +302,7 @@ test("Z06 CBF drafts with availability, direct blockers, and package/aero replac
 
   // The five package/aero swap rules are generation-derived (rule_derivation.py,
   // allowlist-gated) since the Phase B deletion of the hand-stacked workbook rows
-  // (docs/derived-swap-eviction-spec-2026-07-02.md). Copy is generated verbose text.
+  // (docs/archive/completed-specs/derived-swap-eviction-spec-2026-07-02.md). Copy is generated verbose text.
   for (const [ruleId, sourceId, reasonPattern] of [
     ["derived_opt_t0f_001_replaces_opt_cbf_001", "opt_t0f_001", /CBF.*removed.*T0F.*includes.*CFZ.*replaces it/i],
     ["derived_opt_t0g_001_replaces_opt_cbf_001", "opt_t0g_001", /CBF.*removed.*T0G.*includes.*CFV.*replaces it/i],

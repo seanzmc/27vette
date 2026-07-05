@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Unit tests for includes-closure swap-rule derivation (rule_derivation.py).
 
-Spec: docs/derived-swap-eviction-spec-2026-07-02.md §2 A1/A1b/A2/A3/A6.
+Spec: docs/archive/completed-specs/derived-swap-eviction-spec-2026-07-02.md §2 A1/A1b/A2/A3/A6.
 """
 
 from __future__ import annotations

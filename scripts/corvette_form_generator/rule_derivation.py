@@ -30,7 +30,7 @@ from pathlib import Path
 from typing import Any
 
 # Approved derived-swap emissions: (model_key, source_id, target_id).
-# Spec: docs/derived-swap-eviction-spec-2026-07-02.md §2 A1/A3 — the only
+# Spec: docs/archive/completed-specs/derived-swap-eviction-spec-2026-07-02.md §2 A1/A3 — the only
 # approved pairs this pass are the five Z06 CBF equivalents. Additions
 # require explicit approval of the checkpoint manifest's candidate queue.
 EMISSION_ALLOWLIST: frozenset[tuple[str, str, str]] = frozenset(
