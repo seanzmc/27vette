@@ -1,6 +1,6 @@
 # Fable 5 Compounding Loop for 27vette
 
-This directory is the repo-local operating system for Fable 5 runs on 27vette. It turns the source guidance in `Most people are using Claude Fable 5 like Sonnet 4.6 with a bigger….md` into artifacts a long-running agent can read, execute, verify, and improve.
+This directory is the repo-local operating system for Fable 5 runs on 27vette. It turns the source guidance in `fable5loop/source-guidance.md` into artifacts a long-running agent can read, execute, verify, and improve.
 
 ## Start here for every Fable 5 run
 

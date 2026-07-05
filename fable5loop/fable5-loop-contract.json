@@ -1,7 +1,7 @@
 {
   "id": "27vette-fable5-compounding-loop",
   "version": 1,
-  "sourceDocument": "fable5loop/Most people are using Claude Fable 5 like Sonnet 4.6 with a bigger….md",
+  "sourceDocument": "fable5loop/source-guidance.md",
   "entrypoint": "fable5loop/README.md",
   "stateFile": "fable5loop/STATE.md",
   "skillFile": "fable5loop/skills/27vette-fable5-compounding.md",

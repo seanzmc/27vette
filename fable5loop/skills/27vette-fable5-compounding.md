@@ -69,6 +69,7 @@ Every closeout must record a skill-update decision in the run receipt `run.json`
 - **Ungradable goal:** The outcome is subjective or vague. Fix: write measurable criteria before edits.
 - **Generated artifact as source:** Agent patches `form-output/` or `form-app/data.js` directly. Fix: return to workbook/generator source-of-truth boundary.
 - **Silent protected-boundary failure:** Dealer submission, workbook write, or safety-boundary issue is treated like a normal error. Fix: escalate and record as boundary/fallback.
+- **Gate-induced artifact churn:** Some validation gates regenerate tracked generated artifacts (e.g. `node --test tests/z06-form-data-draft.test.mjs` rewrites the `generated_at` timestamp in `form-output/runtime/z06-runtime-contract.json`), so running gates dirties `form-output/` and reads as a boundary violation. Fix: after any gate run in a pass that must not change generated artifacts, check `git status -- form-output form-app` and `git restore` timestamp-only churn before verification; verifiers must inspect read-only instead of re-running those gates, or they re-introduce the churn they then flag.
 
 ## Anti-patterns
 
