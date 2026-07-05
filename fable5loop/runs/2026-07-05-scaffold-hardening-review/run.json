@@ -1,0 +1,48 @@
+{
+  "id": "2026-07-05-scaffold-hardening-review",
+  "started_at": "2026-07-05T16:09:40-04:00",
+  "completed_at": "2026-07-05T16:16:33-04:00",
+  "objective": "Polish the fable5loop scaffold so Fable 5 runs a compounding loop with verifier proof, timestamped memory evidence, and skill-update decisions.",
+  "changed_surface": "docs/tooling",
+  "outcome_rubric": "fable5loop/runs/2026-07-05-scaffold-hardening-review/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-05-scaffold-hardening-review/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-05-scaffold-hardening-review/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Memory entry contract",
+      "evidence": "fable5loop/runs/2026-07-05-scaffold-hardening-review/outcome.md"
+    },
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-05-scaffold-hardening-review/validation-output.txt"
+    },
+    {
+      "section": "General rules",
+      "evidence": "fable5loop/runs/2026-07-05-scaffold-hardening-review/verifier-report.md"
+    },
+    {
+      "section": "Lessons learned",
+      "evidence": "fable5loop/runs/2026-07-05-scaffold-hardening-review/verifier-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-05-scaffold-hardening-review/run.json"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-05-scaffold-hardening-review/verifier-report.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false
+  },
+  "boundaries_preserved": [
+    "workbook",
+    "generated artifacts",
+    "runtime app",
+    "dealer submission"
+  ]
+}

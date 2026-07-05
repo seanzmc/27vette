@@ -1,0 +1,57 @@
+{
+  "id": "27vette-fable5-loop-rubric",
+  "version": 1,
+  "purpose": "Grade whether the Fable 5 compounding loop can start, run, verify, and improve through the three tiers and four compound-stack layers.",
+  "criteria": [
+    {
+      "id": "three_tiers_present",
+      "description": "The loop contract defines exactly three tiers: capability/routing, orchestration primitives, and self-improvement."
+    },
+    {
+      "id": "four_layers_present",
+      "description": "The compound stack defines exactly four layers: primitives, orchestration, memory, and self-improvement."
+    },
+    {
+      "id": "independent_verifier_required",
+      "description": "The outcome rubric and skill require an independent verifier instead of maker self-critique."
+    },
+    {
+      "id": "state_memory_progression",
+      "description": "STATE.md contains verified facts, general rules, open failures, lessons learned, and last-session sections."
+    },
+    {
+      "id": "skill_distillation_path",
+      "description": "The skill explains when durable lessons are added and rejects one-off task progress or guesses."
+    },
+    {
+      "id": "routine_template_present",
+      "description": "A routine template documents trigger, roles, run protocol, digest, and guardrails."
+    },
+    {
+      "id": "safety_boundaries_explicit",
+      "description": "Safety-boundary and protected 27vette-boundary failures are handled as fallback/escalation cases."
+    },
+    {
+      "id": "validator_passes",
+      "description": "scripts/validate_fable5_loop.py passes against the repository artifacts."
+    },
+    {
+      "id": "run_receipts_required",
+      "description": "Every non-trivial run leaves outcome, verifier report, validation output, and run.json receipt artifacts."
+    },
+    {
+      "id": "timestamped_memory_evidence",
+      "description": "STATE.md durable memory entries include ISO dates or timestamps plus Evidence references."
+    },
+    {
+      "id": "verifier_proof_recorded",
+      "description": "Run receipts point to verifier reports with verdict, criteria, and inspected evidence."
+    },
+    {
+      "id": "skill_update_decision_recorded",
+      "description": "Run receipts record whether the compounding skill was updated, deferred, or not applicable, with evidence."
+    }
+  ],
+  "verdicts": ["pass", "fail", "blocked"],
+  "max_iterations": 3
+}

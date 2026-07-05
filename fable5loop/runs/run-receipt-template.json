@@ -1,0 +1,32 @@
+{
+  "id": "YYYY-MM-DD-slug",
+  "started_at": "YYYY-MM-DDTHH:MM:SS-04:00",
+  "completed_at": "YYYY-MM-DDTHH:MM:SS-04:00",
+  "objective": "One sentence objective.",
+  "changed_surface": "docs/tooling",
+  "outcome_rubric": "fable5loop/runs/YYYY-MM-DD-slug/outcome.md",
+  "verifier_report": "fable5loop/runs/YYYY-MM-DD-slug/verifier-report.md",
+  "validation_output": "fable5loop/runs/YYYY-MM-DD-slug/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/YYYY-MM-DD-slug/validation-output.txt"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/YYYY-MM-DD-slug/verifier-report.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false
+  },
+  "boundaries_preserved": [
+    "workbook",
+    "generated artifacts",
+    "runtime app",
+    "dealer submission"
+  ]
+}

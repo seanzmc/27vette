@@ -1,0 +1,142 @@
+{
+  "id": "27vette-fable5-compounding-loop",
+  "version": 1,
+  "sourceDocument": "fable5loop/Most people are using Claude Fable 5 like Sonnet 4.6 with a bigger….md",
+  "entrypoint": "fable5loop/README.md",
+  "stateFile": "fable5loop/STATE.md",
+  "skillFile": "fable5loop/skills/27vette-fable5-compounding.md",
+  "outcomeTemplate": "fable5loop/outcomes/27vette-loop-outcomes.md",
+  "routineTemplate": "fable5loop/routines/nightly-eval-compounding.md",
+  "evalRubric": "fable5loop/evals/loop-contract-rubric.json",
+  "runsDirectory": "fable5loop/runs",
+  "runReceiptTemplate": "fable5loop/runs/run-receipt-template.json",
+  "tiers": [
+    {
+      "id": "tier1-capability-routing",
+      "name": "Capability and routing",
+      "goal": "Use Fable 5 for orchestration and route bounded work, verification, fallback, and human escalation deliberately.",
+      "layerCoverage": ["layer1-primitives"],
+      "requiredPractices": [
+        "Fable 5 orchestrates multi-stage work instead of doing all worker tasks directly.",
+        "Worker agents or deterministic tools handle bounded high-volume work.",
+        "Independent verifier grades artifacts with clean context.",
+        "Safety-boundary and protected 27vette-boundary cases escalate or use approved fallback."
+      ]
+    },
+    {
+      "id": "tier2-orchestration-primitives",
+      "name": "Orchestration primitives",
+      "goal": "Turn prompts into gradable loops using outcomes, dynamic workflow patterns, routines, and worktree safety.",
+      "layerCoverage": ["layer1-primitives", "layer2-orchestration"],
+      "requiredPractices": [
+        "Define outcome rubric before edits.",
+        "Use fan-out-and-synthesize, adversarial verification, or loop-until-done intentionally.",
+        "Use worktrees for parallel edit safety when agents can collide.",
+        "Template long-running or recurring runs before scheduling them."
+      ]
+    },
+    {
+      "id": "tier3-self-improvement",
+      "name": "Self-improvement layer",
+      "goal": "Close the loop by verifying outputs, writing state, distilling durable skill rules, and revalidating the loop.",
+      "layerCoverage": ["layer3-memory", "layer4-self-improvement"],
+      "requiredPractices": [
+        "Record failures with enough evidence to reproduce.",
+        "Investigate and verify before calling a fact durable.",
+        "Distill reusable procedural lessons into the skill, not just chat.",
+        "Run the loop validator after loop artifact changes."
+      ]
+    }
+  ],
+  "compoundStack": [
+    {
+      "id": "layer1-primitives",
+      "name": "Primitives",
+      "purpose": "Model roles, subagents, worktrees, and deterministic tools."
+    },
+    {
+      "id": "layer2-orchestration",
+      "name": "Orchestration",
+      "purpose": "Outcome rubrics, dynamic workflows, routines, and objective stop conditions."
+    },
+    {
+      "id": "layer3-memory",
+      "name": "Memory",
+      "purpose": "STATE.md and skill files that preserve verified facts and procedural rules."
+    },
+    {
+      "id": "layer4-self-improvement",
+      "name": "Self-improvement",
+      "purpose": "Independent verification, eval rubrics, vision checks where applicable, and rule distillation."
+    }
+  ],
+  "requiredArtifacts": [
+    "fable5loop/README.md",
+    "fable5loop/STATE.md",
+    "fable5loop/skills/27vette-fable5-compounding.md",
+    "fable5loop/outcomes/27vette-loop-outcomes.md",
+    "fable5loop/routines/nightly-eval-compounding.md",
+    "fable5loop/evals/loop-contract-rubric.json",
+    "fable5loop/runs/README.md",
+    "fable5loop/runs/run-receipt-template.json",
+    "scripts/validate_fable5_loop.py",
+    "tests/test_fable5_loop_contract.py"
+  ],
+  "stateRequiredSections": [
+    "Memory entry contract",
+    "Verified facts",
+    "General rules",
+    "Open failures",
+    "Lessons learned",
+    "Last session"
+  ],
+  "skillRequiredSections": [
+    "Start-of-run checklist",
+    "Model and agent routing",
+    "Dynamic workflow patterns",
+    "State update contract",
+    "Skill improvement contract",
+    "Known failure modes",
+    "Anti-patterns",
+    "Eval suite",
+    "Closeout response requirements"
+  ],
+  "loopCloseout": [
+    "Run relevant 27vette validation gates.",
+    "Use an independent verifier for non-trivial work.",
+    "Write a run receipt with outcome, verifier report, validation output, and run metadata.",
+    "Update STATE.md before ending the run.",
+    "Distill durable procedural lessons into the skill.",
+    "Record the skill-update decision in run.json.",
+    "Report validation, gates not run, residual risks, and boundaries preserved."
+  ],
+  "runReceiptRequiredFiles": [
+    "outcome.md",
+    "verifier-report.md",
+    "validation-output.txt",
+    "run.json"
+  ],
+  "runReceiptRequiredFields": [
+    "id",
+    "started_at",
+    "completed_at",
+    "objective",
+    "changed_surface",
+    "outcome_rubric",
+    "verifier_report",
+    "validation_output",
+    "state_updates",
+    "skill_update",
+    "verifier",
+    "boundaries_preserved"
+  ],
+  "verifierVerdicts": ["pass", "fail", "blocked"],
+  "skillUpdateDecisions": ["updated", "not_applicable", "deferred"],
+  "memoryEvidenceRequiredSections": [
+    "Verified facts",
+    "General rules",
+    "Open failures",
+    "Lessons learned"
+  ],
+  "maxIterationsDefault": 3
+}

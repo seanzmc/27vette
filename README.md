@@ -141,6 +141,14 @@ then regenerate the model + registry and run that model's tests plus `multi-mode
 
 ## Validation
 
+Fable 5 compounding loop scaffold:
+
+```sh
+.venv/bin/python scripts/validate_fable5_loop.py
+```
+
+The operating entrypoint is `fable5loop/README.md`. Use this gate after any change to the loop scaffold, run receipts, state file, or compounding skill.
+
 Workbook schema gate:
 
 ```sh

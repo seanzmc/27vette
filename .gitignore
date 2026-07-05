@@ -14,7 +14,6 @@ backups/**/*.xlsx
 archived/docs
 .worktrees/
 archive/workbook-backups/*.xlsx
-Stingray Corvette Homepage Redesign.zip
 export-page/
 
 # transient ingest run artifacts (never source, never checked in)
