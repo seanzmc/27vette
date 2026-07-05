@@ -64,18 +64,6 @@ def _write_runtime_contract_artifact(config: ModelConfig, runtime_contract: dict
     return {"json": str(runtime_json_path)}
 
 
-def _rule_audit_artifacts(config: ModelConfig) -> dict[str, str]:
-    slug = export_slug(config.model_key)
-    rule_audit_path = config.output_dir / "inspection" / f"{slug}-rule-audit.json"
-    rule_audit_markdown_path = config.output_dir / "inspection" / f"{slug}-rule-audit.md"
-    artifacts = {}
-    if rule_audit_path.exists():
-        artifacts["json"] = str(rule_audit_path)
-    if rule_audit_markdown_path.exists():
-        artifacts["markdown"] = str(rule_audit_markdown_path)
-    return artifacts
-
-
 def _inspection_artifact_prefix(config: ModelConfig) -> str:
     return f"{export_slug(config.model_key)}-inspection"
 
@@ -186,7 +174,6 @@ def _reviewable_result(config: ModelConfig, assembly: ModelSourceAssembly, optio
             "validation_warnings": sum(1 for row in assembly.draft["validation"] if row["severity"] == "warning"),
         },
         "draft_artifacts": draft_artifacts,
-        "rule_audit_artifacts": _rule_audit_artifacts(config),
         "validation_errors": validation_errors,
         "notes": list(config.notes),
     }

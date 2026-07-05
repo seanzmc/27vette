@@ -1,7 +1,7 @@
 # asset_map sync
 
-The old `asset_map-Sync/asset_map_sync.py` entry point is retired because it wrote
-`stingray_master.xlsx` directly. Do not run it for maintenance.
+The old `asset_map-Sync/asset_map_sync.py` entry point was retired and removed
+because it wrote `stingray_master.xlsx` directly.
 
 Use the safe project command instead:
 

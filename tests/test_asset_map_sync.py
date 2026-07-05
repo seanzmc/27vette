@@ -946,11 +946,10 @@ def test_cli_rejects_unsupported_schema_and_lifecycle_flags(tmp_path: Path) -> N
         assert flag in completed.stdout
 
 
-def test_legacy_entrypoint_no_longer_contains_direct_workbook_save() -> None:
-    legacy = (ROOT / "asset_map-Sync" / "asset_map_sync.py").read_text(encoding="utf-8")
-
-    assert "wb.save(args.workbook)" not in legacy
-    assert "scripts/sync_asset_map.py" in legacy or "asset_map_sync" not in legacy
+def test_legacy_entrypoint_stays_removed() -> None:
+    # The retired asset_map-Sync/asset_map_sync.py wrote the workbook directly;
+    # the supported entrypoint is scripts/sync_asset_map.py (docs/asset-map-sync.md).
+    assert not (ROOT / "asset_map-Sync").exists()
 
 
 def make_coverage_workbook(path: Path) -> None:
