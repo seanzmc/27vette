@@ -30,6 +30,7 @@ const state = {
   userSelected: new Set(),
   selectedInterior: "",
   activeStep: "model",
+  farthestStepIndex: 0,
   vehicleSetupStage: "model",
   customer: {
     name: "",
@@ -213,8 +214,12 @@ const ACCENT_FOLLOWS_PAINT = true;
 const DEFAULT_PAINT_ACCENT = { accent: "#d0425a", accentDark: "#b22234", onAccent: "#ffffff", accentGlow: "rgba(208,66,90,.40)" };
 const PAINT_ACCENTS = {
   GKZ: DEFAULT_PAINT_ACCENT,
+  G8G: { accent: "#f4f1eb", accentDark: "#c8c2b8", onAccent: "#111315", accentGlow: "rgba(244,241,235,.26)" },
+  GBA: { accent: "#a9aeb1", accentDark: "#2f3438", onAccent: "#080a0b", accentGlow: "rgba(169,174,177,.26)" },
+  GKA: { accent: "#c9d0d5", accentDark: "#8b949d", onAccent: "#101315", accentGlow: "rgba(201,208,213,.30)" },
+  GEC: { accent: "#9da3a8", accentDark: "#5b6166", onAccent: "#0b0d0f", accentGlow: "rgba(157,163,168,.28)" },
   G4Z: { accent: "#4fae6e", accentDark: "#2e7d4f", onAccent: "#06210f", accentGlow: "rgba(79,174,110,.36)" },
-  GTR: { accent: "#3f73ff", accentDark: "#1d4ed8", onAccent: "#ffffff", accentGlow: "rgba(63,115,255,.40)" },
+  GTR: { accent: "#3367ff", accentDark: "#1d4ed8", onAccent: "#ffffff", accentGlow: "rgba(51,103,255,.40)" },
   GBK: { accent: "#ffc81f", accentDark: "#e0a400", onAccent: "#1c1606", accentGlow: "rgba(255,200,31,.36)" },
   G26: { accent: "#ff6a1a", accentDark: "#d8480a", onAccent: "#1c0d04", accentGlow: "rgba(255,106,26,.38)" },
   GPH: { accent: "#cf3e5e", accentDark: "#8a1a2c", onAccent: "#ffffff", accentGlow: "rgba(207,62,94,.38)" },
@@ -598,6 +603,12 @@ function currentStepIndex() {
   return visibleRuntimeSteps().findIndex((step) => step.step_key === activeStepKey);
 }
 
+function markStepProgress(stepKey = state.activeStep) {
+  const normalizedStepKey = normalizeStepKey(stepKey);
+  const index = visibleRuntimeSteps().findIndex((step) => step.step_key === normalizedStepKey);
+  if (index >= 0) state.farthestStepIndex = Math.max(state.farthestStepIndex || 0, index);
+}
+
 function nextStep() {
   const steps = visibleRuntimeSteps();
   const index = currentStepIndex();
@@ -656,6 +667,7 @@ function activateStep(stepKey, { closeDrawer = false } = {}) {
     state.vehicleSetupStage = stepKey;
   }
   state.activeStep = normalizedStepKey;
+  markStepProgress(normalizedStepKey);
   render({ resetScroll: true });
   if (closeDrawer) closeMobileDrawers();
 }
@@ -1950,12 +1962,15 @@ function renderMobileProgress() {
 function renderStepRail() {
   const steps = visibleRuntimeSteps();
   const activeIndex = steps.findIndex((step) => normalizeStepKey(state.activeStep) === step.step_key);
+  markStepProgress(state.activeStep);
+  const furthestReachedIndex = Math.max(state.farthestStepIndex || 0, activeIndex);
   const missingStepKeys = new Set(missingRequirementDetails().map((item) => normalizeStepKey(item.stepKey)));
   els.stepRail.innerHTML = steps
     .map((step, index) => {
-      const isComplete = activeIndex >= 0 && index < activeIndex && !missingStepKeys.has(step.step_key);
+      const isActive = index === activeIndex;
+      const isComplete = !isActive && index < furthestReachedIndex && !missingStepKeys.has(step.step_key);
       return `
-        <button class="step-link ${index === activeIndex ? "active" : ""}${isComplete ? " complete" : ""}" data-step="${step.step_key}" type="button">
+        <button class="step-link ${isActive ? "active" : ""}${isComplete ? " complete" : ""}" data-step="${step.step_key}" type="button">
           <span class="step-index">${isComplete ? "✓" : index + 1}</span>
           <span>${step.step_label}</span>
         </button>
@@ -3245,6 +3260,7 @@ function resetModelScopedState() {
   state.userSelected.clear();
   state.selectedInterior = "";
   state.activeStep = "model";
+  state.farthestStepIndex = 0;
   state.vehicleSetupStage = "model";
 }
 

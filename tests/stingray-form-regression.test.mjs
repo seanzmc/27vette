@@ -58,6 +58,35 @@ function cssBlock(selector, source = stylesSource) {
   return source.match(new RegExp(`(?:^|\\n)${escapedSelector}\\s*\\{[\\s\\S]*?\\}`))?.[0] || "";
 }
 
+function colorChannel(value) {
+  const normalized = Number(value) / 255;
+  return normalized <= 0.03928 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+}
+
+function relativeLuminance(hexColor) {
+  const match = String(hexColor).match(/^#([0-9a-f]{6})$/i);
+  assert.ok(match, `expected ${hexColor} to be a six-digit hex color`);
+  const value = match[1];
+  const channels = [value.slice(0, 2), value.slice(2, 4), value.slice(4, 6)].map((part) => parseInt(part, 16));
+  return 0.2126 * colorChannel(channels[0]) + 0.7152 * colorChannel(channels[1]) + 0.0722 * colorChannel(channels[2]);
+}
+
+function contrastRatio(colorA, colorB) {
+  const a = relativeLuminance(colorA);
+  const b = relativeLuminance(colorB);
+  return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+}
+
+function activePaintRpos() {
+  return [
+    ...new Set(
+      data.choices
+        .filter((choice) => choice.step_key === "paint" && choice.active === "True")
+        .map((choice) => choice.rpo)
+    ),
+  ];
+}
+
 function makeElement() {
   return {
     textContent: "",
@@ -69,7 +98,14 @@ function makeElement() {
     scrollLeft: 0,
     clientHeight: 0,
     scrollHeight: 0,
-    style: {},
+    style: {
+      setProperty(name, value) {
+        this[name] = String(value);
+      },
+      getPropertyValue(name) {
+        return this[name] || "";
+      },
+    },
     attributes: {},
     listeners: {},
     addEventListener(type, listener) {
@@ -105,6 +141,7 @@ function loadRuntime({ fetchImpl, turnstileAvailable = true } = {}) {
   const fetchCalls = [];
   const turnstileCalls = [];
   let turnstileToken = "test-turnstile-token";
+  const documentElement = makeElement();
   const turnstileApi = {
     render(selector, options) {
       turnstileCalls.push({ fn: "render", selector, options });
@@ -140,6 +177,7 @@ function loadRuntime({ fetchImpl, turnstileAvailable = true } = {}) {
       };
     },
     document: {
+      documentElement,
       addEventListener(type, listener, options) {
         docListeners[type] = { listener, options };
       },
@@ -231,6 +269,9 @@ window.__testApi = {
   docListeners,
   turnstileCalls,
   setTurnstileToken: typeof setTurnstileToken === "function" ? setTurnstileToken : undefined,
+  PAINT_ACCENTS,
+  applyAccentForPaint: typeof applyAccentForPaint === "function" ? applyAccentForPaint : undefined,
+  documentElement: document.documentElement,
   setWindowTurnstile: () => {
     window.turnstile = ${"turnstileApi"};
   },
@@ -863,6 +904,32 @@ test("mobile progress and compact summary update from runtime state", () => {
   assert.equal(runtime.elements.get("#mobileProgress").dataset.hasPrevious, "true");
 });
 
+test("paint accent map covers active paint colors with readable foreground contrast", () => {
+  const runtime = loadRuntime();
+  const paintRpos = activePaintRpos();
+  assert.deepEqual(
+    paintRpos.filter((rpo) => !runtime.PAINT_ACCENTS[rpo]),
+    [],
+    "every active paint RPO should have a theme accent instead of falling back to Torch Red"
+  );
+
+  for (const rpo of paintRpos) {
+    const theme = runtime.PAINT_ACCENTS[rpo];
+    assert.ok(theme.accentDark, `${rpo} should define an accentDark value for gradients`);
+    assert.ok(theme.accentGlow, `${rpo} should define an accentGlow value for focus/vehicle-stage glow`);
+    assert.ok(
+      contrastRatio(theme.accent, theme.onAccent) >= 4.5,
+      `${rpo} accent/onAccent contrast should be at least 4.5:1 for readable button and active-step text`
+    );
+  }
+
+  runtime.state.selected.clear();
+  runtime.state.selected.add(data.choices.find((choice) => choice.rpo === "G8G" && choice.step_key === "paint").option_id);
+  runtime.applyAccentForPaint();
+  assert.equal(runtime.documentElement.style.getPropertyValue("--accent"), runtime.PAINT_ACCENTS.G8G.accent);
+  assert.equal(runtime.documentElement.style.getPropertyValue("--on-accent"), runtime.PAINT_ACCENTS.G8G.onAccent);
+});
+
 test("step rail checkmarks only appear for satisfied previous steps", () => {
   const runtime = loadRuntime();
   runtime.state.bodyStyle = "coupe";
@@ -889,6 +956,25 @@ test("step rail checkmarks only appear for satisfied previous steps", () => {
     "a missing required selection must suppress the green completion checkmark"
   );
 
+  runtime.activateStep("base_interior");
+  const backToIncompleteHtml = runtime.elements.get("#stepRail").innerHTML;
+  assert.match(
+    backToIncompleteHtml,
+    /<button class="step-link  complete" data-step="model" type="button">\s*<span class="step-index">✓<\/span>/,
+    "satisfied completed steps should keep checkmarks after navigating back"
+  );
+  assert.match(
+    backToIncompleteHtml,
+    /<button class="step-link  complete" data-step="exterior_appearance" type="button">\s*<span class="step-index">✓<\/span>/,
+    "later satisfied completed steps should not lose checkmarks when the active step moves backward"
+  );
+  assert.match(
+    backToIncompleteHtml,
+    /<button class="step-link active" data-step="base_interior" type="button">\s*<span class="step-index">8<\/span>/,
+    "the incomplete active step should keep its number rather than showing a completion checkmark"
+  );
+
+  runtime.activateStep("delivery");
   runtime.state.selectedInterior = "1LT_AQ9_HTA";
   runtime.reconcileSelections();
   runtime.render();
