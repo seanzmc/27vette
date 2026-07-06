@@ -1,0 +1,1712 @@
+✔ runtime steps omit customer info and interior styling (0.836166ms)
+✔ selection modes have friendly display labels (0.080875ms)
+✔ runtime payload trims choice-row duplicates while preserving consumed metadata (0.932875ms)
+✔ engine cover variants are consolidated with scoped B6P and ZZ3 price overrides (0.2515ms)
+✔ engine cover pricing stays base 695 with scoped coupe B6P and convertible ZZ3 595 (11.348375ms)
+✔ LS6 engine covers are treated as an exclusive selection group (0.568375ms)
+✔ spoilers are treated as an exclusive selection group (0.067375ms)
+✔ spoiler exclusive group removes other selected spoiler options (167.595541ms)
+✔ accessory exclusive groups are generated from the expected active RPOs (0.907083ms)
+✔ Stingray rear script badge replacement is owned by an exclusive group, not pairwise rules (0.107125ms)
+✔ accessory exclusive groups remove other selected options in the same group (51.020542ms)
+✔ exclusive group selection replaces ZZ3 default BC7 engine cover (30.166875ms)
+✔ Stingray required exterior accents cannot be cleared but can be switched (7.011084ms)
+✔ Stingray coupe engine covers switch BC7 and paid covers as radio peers (16.886ms)
+✔ Engine Appearance is not an open requirement for Stingray convertible without ZZ3 (12.487166ms)
+✔ 1LT interior color groups stay expanded when each group has one option (4.749459ms)
+✔ interior color groups render as collapsed disclosure containers without the rejected restyle (5.210792ms)
+✔ option selections preserve the current viewport instead of resetting to the page top (0.106042ms)
+✔ BC7, N26/TU7, and ZF1/T0A visibility follow the QA contract (0.218958ms)
+✔ app runtime has the requested navigation and filtering hooks (0.116709ms)
+✖ mobile shell exposes compact progress and summary targets (1.670167ms)
+✖ shell containers share one spacing and radius rhythm (0.690666ms)
+✖ summary drawer is callable from desktop and condensed at smaller breakpoints (0.761875ms)
+✔ summary drawer redirects page wheel scrolling and lets standard equipment tooltips escape (1.334416ms)
+✔ mobile progress and compact summary update from runtime state (1.948375ms)
+✔ step rail checkmarks only appear for satisfied previous steps (6.632583ms)
+✖ vehicle setup exposes paced readability hooks without changing option step content (2.6385ms)
+✔ card media support is optional and data-driven (6.087875ms)
+✔ choice cards reserve availability slot and move disabled reason into tooltip pill (3.125375ms)
+✔ tooltips use mobile-safe touch handlers without selecting parent cards (0.3535ms)
+✔ mobile drawers expose route and summary state without changing form logic (2.036708ms)
+✔ body style choices put coupe before convertible (0.067958ms)
+✔ body and trim selection do not auto-advance past the current context step (0.151083ms)
+✔ optional single-select sections can be unselected (0.149333ms)
+✔ UQT is selectable only on 1LT and included-only on higher trims (0.103208ms)
+✔ custom stitch choices are removed from the selectable runtime (0.073208ms)
+✔ auto-added included options render as locked selections without duplicate manual selection (0.133291ms)
+✔ order export omits the full standard equipment dump (0.209875ms)
+✔ current order exposes the stable Formidable-ready top-level contract (1.5695ms)
+✔ current order option lines are complete, separated, and omit standard equipment (88.349375ms)
+✔ current order section recap has predictable labels, one interior, and correct totals (5.699792ms)
+✔ compact order output keeps customer-facing fields and omits rich internals (113.432208ms)
+✔ compact order sections omit empty/admin sections and use minimal item rows (273.937958ms)
+✔ download build exports customer-facing Markdown (10.400375ms)
+✔ final step mirrors customer action buttons (10.408917ms)
+✔ submit to dealer modal posts a validated dealer payload (11.110959ms)
+✔ submit to dealer modal requires a Turnstile token before posting (6.885291ms)
+✔ submit to dealer modal renders Turnstile when the async API arrives after opening (8.195834ms)
+✔ Stingray workbook option placement keeps VK3 and BV4 in customer-facing sections (0.095917ms)
+✔ submit to dealer modal surfaces endpoint failures (8.273125ms)
+✔ reset button confirms dirty builds and returns to step one (8.140417ms)
+✔ plain text order summary renders compact order data for emails and review (93.168834ms)
+✔ plain text order summary omits empty comments and internal debug fields (2.897458ms)
+✔ generated interiors expose priced component metadata from PriceRef (0.181541ms)
+✔ compact and plain text order output break selected interior into priced component RPO lines (21.3985ms)
+✔ R6X component order output uses PriceRef pricing and D30 does not alter it (15.320625ms)
+✔ order summary helpers are exposed for browser debug inspection (0.243583ms)
+✔ runtime defaults and RPO exceptions are workbook-generated metadata (0.723625ms)
+✔ GBA replaces selected ZYC through workbook-owned grouped exclusion metadata (19.831458ms)
+✔ FE3 disabled tile explains that Z51 includes it without duplicating the RPO (22.848875ms)
+✔ ZF1 requires Z51, replaces T0A, and is auto-added by high wing spoilers only with Z51 (121.481333ms)
+✔ FE1 default selection prefers the visible suspension tile (0.303958ms)
+✔ initial selected FE1 state is de-duped to the visible suspension choice (239.681ms)
+✔ Stingray workbook default-selected standard choices seed every variant (11.352833ms)
+✔ standard equipment is sourced from canonical standard-status choices (0.195916ms)
+✔ standard equipment dedupes mirrored RPO rows and does not require default_selected (0.216833ms)
+✔ coupe defaults include BC7 engine appearance from workbook-authored choice metadata and default rules (2.124333ms)
+✔ 5V7 can satisfy spoiler requirement with either 5ZU or 5ZZ (0.1795ms)
+✔ 5ZU body-color spoiler can satisfy its paint requirement with any allowed body color (0.107875ms)
+✔ stripe sections use the requested order (0.095417ms)
+✔ Stingray hash marks are independent from dual racing and Jake stripe choices (6.733958ms)
+✔ Stingray section placement follows workbook step ownership (0.317292ms)
+✔ exterior appearance, engine appearance, and wheel sections use QA-4 ordering (0.296042ms)
+✔ BC7 ZZ3 requirement is constrained by OVS availability (0.115292ms)
+✔ spoiler replacement ownership preserves ZYC and keeps T0A replacement behavior (418.953334ms)
+✔ step rendering resets scroll to the top after content replacement (0.121ms)
+✔ interior pricing subtracts the resolved selected seat price (0.080959ms)
+✔ model_interior_scope maps every active Stingray interior (0.490583ms)
+✔ Grand Sport EL9 interiors are inactive for Stingray and H8T is in the AE4 Santorini hierarchy (0.134333ms)
+✔ active interiors have stable workbook-owned grouping fields (0.522167ms)
+✔ interior grouping preserves required 1LT, 2LT, and 3LT examples (0.182666ms)
+✔ R6X is component-priced and D30 is the only visible disabled color override card (0.466292ms)
+✔ generated R6X interiors include the PriceRef R6X price component (0.133916ms)
+✔ R6X keeps normal price even when D30 is present in the selected context (4.714417ms)
+✔ single interior and included seatbelt defaults are handled in runtime (0.143666ms)
+✔ Stingray 3LT interiors lock included color seatbelts against other seatbelt choices (71.89ms)
+✔ sidebar keeps one Standard & Included surface inside Selected RPOs (0.060375ms)
+✔ standard equipment grouping is data-driven by workbook metadata (0.132834ms)
+ℹ tests 88
+ℹ suites 0
+ℹ pass 84
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2229.8415
+
+✖ failing tests:
+
+test at tests/stingray-form-regression.test.mjs:700:1
+✖ mobile shell exposes compact progress and summary targets (1.670167ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /\.summary-panel\s*\{[\s\S]*padding:\s*8px;/. Input:
+  
+  '/* ============================================================\n' +
+    '   2027 Corvette Order Form — Option 1a "Full Carbon" theme.\n' +
+    '   Normative sources: export-page/form-style-1a/SPEC.md and\n' +
+    '   export-page/form-style-1a/reference/1a-reference.html.\n' +
+    '   Accent variables are dynamic — app.js re-themes --accent /\n' +
+    '   --accent-dark / --on-accent / --accent-glow to follow the\n' +
+    '   selected exterior paint.\n' +
+    '   ============================================================ */\n' +
+    ':root {\n' +
+    '  color-scheme: dark;\n' +
+    '  --bg: #0c0e0f;\n' +
+    '  --panel: #101315;\n' +
+    '  --panel-strong: #14181b;\n' +
+    '  --ink: #f4f1eb;\n' +
+    '  --muted: #a9aeb1;\n' +
+    '  --dim: #8b9094;\n' +
+    '  --line: #262c31;\n' +
+    '  --hairline: rgba(255, 255, 255, 0.07);\n' +
+    '  --hairline-strong: rgba(255, 255, 255, 0.12);\n' +
+    '  --accent: #d0425a;\n' +
+    '  --accent-dark: #b22234;\n' +
+    '  --on-accent: #ffffff;\n' +
+    '  --accent-glow: rgba(208, 66, 90, 0.4);\n' +
+    '  --ok: #35b85d;\n' +
+    '  --ok-bg: rgba(53, 184, 93, 0.16);\n' +
+    '  --warn: #e8a13c;\n' +
+    '  --disabled: #5c6166;\n' +
+    '  --choice-bg: #14181b;\n' +
+    '  --choice-hover: #181d20;\n' +
+    '  --choice-hover-border: #3a4248;\n' +
+    '  --choice-hover-shadow: 6px 6px 0 rgba(38, 44, 49, 0.95);\n' +
+    '  --control-bg: rgba(255, 255, 255, 0.06);\n' +
+    '  --control-border: rgba(255, 255, 255, 0.14);\n' +
+    '  --control-hover: rgba(255, 255, 255, 0.1);\n' +
+    '  --ghost-border: rgba(255, 255, 255, 0.24);\n' +
+    '  --ghost-hover-bg: rgba(255, 255, 255, 0.05);\n' +
+    '  --shadow: 0 18px 48px rgba(0, 0, 0, 0.55);\n' +
+    '  --shell-gap: 12px;\n' +
+    '}\n' +
+    '\n' +
+    '* {\n' +
+    '  box-sizing: border-box;\n' +
+    '}\n' +
+    '\n' +
+    'body {\n' +
+    '  margin: 0;\n' +
+    '  min-width: 320px;\n' +
+    '  /* full-page carbon checker to match the homepage (stingray-homepage index.html) */\n' +
+    '  background-color: var(--bg);\n' +
+    '  background-image:\n' +
+    '    linear-gradient(45deg, #181c1f 25%, transparent 25%, transparent 75%, #181c1f 75%),\n' +
+    '    linear-gradient(45deg, #181c1f 25%, transparent 25%, transparent 75%, #181c1f 75%);\n' +
+    '  background-size: 6px 6px;\n' +
+    '  background-position: 0 0, 3px 3px;\n' +
+    '  color: var(--ink);\n' +
+    '  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;\n' +
+    '  -webkit-font-smoothing: antialiased;\n' +
+    '}\n' +
+    '\n' +
+    'button,\n' +
+    'select,\n' +
+    'input,\n' +
+    'textarea {\n' +
+    '  font: inherit;\n' +
+    '}\n' +
+    '\n' +
+    '.app-shell {\n' +
+    '  display: grid;\n' +
+    '  gap: 0;\n' +
+    '  /* full-bleed like the homepage: body carries the carbon background, the\n' +
+    '     shell is layout-only (no desk margin, border, radius, or own background).\n' +
+    '     clip (not hidden) avoids creating a scroll container, so the paint\n' +
+    "     step's sticky vehicle stage tracks the window */\n" +
+    '  width: 100%;\n' +
+    '  margin: 0;\n' +
+    '  overflow: clip;\n' +
+    '}\n' +
+    '\n' +
+    '.accent-stripe {\n' +
+    '  height: 3px;\n' +
+    '  background: linear-gradient(90deg, var(--accent-dark), var(--accent), var(--accent-dark));\n' +
+    '}\n' +
+    '\n' +
+    '.topbar {\n' +
+    '  display: flex;\n' +
+    '  align-items: center;\n' +
+    '  justify-content: space-between;\n' +
+    '  gap: 18px;\n' +
+    '  padding: 12px 24px;\n' +
+    '  background: rgba(11, 13, 14, 0.92);\n' +
+    '  border-bottom: 1px solid var(--hairline);\n' +
+    '}\n' +
+    '\n' +
+    '.topbar > div:first-of-type,\n' +
+    '.brand-block > div {\n' +
+    '  min-width: 0;\n' +
+    '}\n' +
+    '\n' +
+    '.brand-block {\n' +
+    '  display: flex;\n' +
+    '  align-items: center;\n' +
+    '  gap: 14px;\n' +
+    '  min-width: 0;\n' +
+    '}\n' +
+    '\n' +
+    '.brand-block .brand-crossflags {\n' +
+    '  height: 26px;\n' +
+    '  width: auto;\n' +
+    '  opacity: 0.95;\n' +
+    '}\n' +
+    '\n' +
+    '.brand-block .brand-wordmark {\n' +
+    '  height: 30px;\n' +
+    '  width: auto;\n' +
+    '}\n' +
+    '\n' +
+    '.brand-divider {\n' +
+    '  width: 1px;\n' +
+    '  height: 36px;\n' +
+    '  margin: 0 8px;\n' +
+    '  background: var(--hairline-strong);\n' +
+    '}\n' +
+    '\n' +
+    '.eyebrow {\n' +
+    '  margin: 0 0 4px;\n' +
+    '  color: var(--accent);\n' +
+    '  font-size: 11px;\n' +
+    '  font-weight: 800;\n' +
+    '  letter-spacing: 0.14em;\n' +
+    '  text-transform: uppercase;\n' +
+    '}\n' +
+    '\n' +
+    'h1,\n' +
+    'h2,\n' +
+    'h3 {\n' +
+    '  margin: 0;\n' +
+    '  letter-spacing: 0;\n' +
+    '}\n' +
+    '\n' +
+    'h1 {\n' +
+    '  font-size: 21px;\n' +
+    '  font-weight: 850;\n' +
+    '  letter-spacing: 0.02em;\n' +
+    '  line-height: 1.15;\n' +
+    '  text-transform: uppercase;\n' +
+    '}\n' +
+    '\n' +
+    'h2 {\n' +
+    '  font-size: 22px;\n' +
+    '}\n' +
+    '\n' +
+    'h3 {\n' +
+    '  font-size: 16px;\n' +
+    '}\n' +
+    '\n' +
+    '.toolbar {\n' +
+    '  display: flex;\n' +
+    '  flex-wrap: wrap;\n' +
+    '  align-items: center;\n' +
+    '  justify-content: flex-end;\n' +
+    '  gap: 10px;\n' +
+    '}\n' +
+    '\n' +
+    '.toolbar-action-group {\n' +
+    '  display: flex;\n' +
+    '  align-items: center;\n' +
+    '  justify-content: flex-end;\n' +
+    '  gap: 8px;\n' +
+    '}\n' +
+    '\n' +
+    '.toolbar-build-group {\n' +
+    '  padding-left: 10px;\n' +
+    '  border-left: 1px solid var(--hairline-strong);\n' +
+    '}\n' +
+    '\n' +
+    '.model-picker {\n' +
+    '  display: grid;\n' +
+    '  gap: 4px;\n' +
+    '  min-width: 150px;\n' +
+    '  color: var(--muted);\n' +
+    '  font-size: 12px;\n' +
+    '  font-weight: 800;\n' +
+    '  text-transform: uppercase;\n' +
+    '}\n' +
+    '\n' +
+    '.model-picker select {\n' +
+    '  min-height: 42px;\n' +
+    '}\n' +
+    '\n' +
+    'button {\n' +
+    '  min-height: 44px;\n' +
+    '  border: 0;\n' +
+    '  border-radius: 7px;\n' +
+    '  padding: 0 16px;\n' +
+    '  background: var(--accent);\n' +
+    '  color: var(--on-accent);\n' +
+    '  cursor: pointer;\n' +
+    '  font-size: 12.5px;\n' +
+    '  font-weight: 800;\n' +
+    '  letter-spacing: 0.04em;\n' +
+    '  text-transform: uppercase;\n' +
+    '  box-shadow: 0 8px 24px var(--accent-glow);\n' +
+    '  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, color 140ms ease, filter 140ms ease;\n' +
+    '}\n' +
+    '\n' +
+    'button:hover {\n' +
+    '  filter: brightness(1.08);\n' +
+    '}\n' +
+    '\n' +
+    'button:disabled {\n' +
+    '  border-color: transparent;\n' +
+    '  background: var(--disabled);\n' +
+    '  color: #1a1d1f;\n' +
+    '  box-shadow: none;\n' +
+    '  cursor: not-allowed;\n' +
+    '  filter: none;\n' +
+    '}\n' +
+    '\n' +
+    '.ghost-button {\n' +
+    '  background: transparent;\n' +
+    '  border: 1px solid var(--ghost-border);\n' +
+    '  color: var(--ink);\n' +
+    '  box-shadow: none;\n' +
+    '}\n' +
+    '\n' +
+    '.ghost-button:hover {\n' +
+    '  border-color: var(--accent);\n' +
+    '  background: var(--ghost-hover-bg);\n' +
+    '  filter: none;\n' +
+    '}\n' +
+    '\n' +
+    '.reset-icon-button,\n' +
+    '.download-icon-button {\n' +
+    '  display: inline-grid;\n' +
+    '  place-items: center;\n' +
+    '  width: 44px;\n' +
+    '  min-width: 44px;\n' +
+    '  padding: 0;\n' +
+    '  background: var(--control-bg);\n' +
+    '  border: 1px solid var(--control-border);\n' +
+    '  border-radius: 8px;\n' +
+    '  color: #cfd3d6;\n' +
+    '  box-shadow: none;\n' +
+    '}\n' +
+    '\n' +
+    '.reset-icon-button:hover,\n' +
+    '.download-icon-button:hover {\n' +
+    '  border-color: rgba(255, 255, 255, 0.3);\n' +
+    '  background: var(--control-bg);\n' +
+    '  color: #ffffff;\n' +
+    '  filter: none;\n' +
+    '}\n' +
+    '\n' +
+    '.reset-icon,\n' +
+    '.download-icon {\n' +
+    '  width: 22px;\n' +
+    '  height: 22px;\n' +
+    '  fill: none;\n' +
+    '  stroke: currentColor;\n' +
+    '  stroke-linecap: round;\n' +
+    '  stroke-linejoin: round;\n' +
+    '  stroke-width: 2.4;\n' +
+    '}\n' +
+    '\n' +
+    '.reset-label,\n' +
+    '.download-label {\n' +
+    '  position: absolute;\n' +
+    '  width: 1px;\n' +
+    '  height: 1px;\n' +
+    '  overflow: hidden;\n' +
+    '  clip: rect(0 0 0 0);\n' +
+    '  white-space: nowrap;\n' +
+    '}\n' +
+    '\n' +
+    'label {\n' +
+    '  display: grid;\n' +
+    '  gap: 6px;\n' +
+    '  color: var(--muted);\n' +
+    '  font-size: 12px;\n' +
+    '  font-weight: 800;\n' +
+    '  text-transform: uppercase;\n' +
+    '}\n' +
+    '\n' +
+    'select,\n' +
+    'input,\n' +
+    'textarea {\n' +
+    '  width: 100%;\n' +
+    '  min-height: 44px;\n' +
+    '  border: 1px solid var(--line);\n' +
+    '  border-radius: 6px;\n' +
+    '  padding: 0 12px;\n' +
+    '  background: var(--panel-strong);\n' +
+    '  color: var(--ink);\n' +
+    '  font-weight: 700;\n' +
+    '}\n' +
+    '\n' +
+    'select:focus-visible,\n' +
+    'input:focus-visible,\n' +
+    'textarea:focus-visible {\n' +
+    '  outline: none;\n' +
+    '  border-color: var(--accent);\n' +
+    '  box-shadow: 0 0 0 3px var(--accent-glow);\n' +
+    '}\n' +
+    '\n' +
+    'textarea {\n' +
+    '  min-height: 108px;\n' +
+    '  padding: 10px 12px;\n' +
+    '  resize: vertical;\n' +
+    '}\n' +
+    '\n' +
+    '.alert-region {\n' +
+    '  display: grid;\n' +
+    '  gap: 8px;\n' +
+    '  margin: 12px 16px 0;\n' +
+    '}\n' +
+    '\n' +
+    '.alert-region:empty {\n' +
+    '  display: none;\n' +
+    '}\n' +
+    '\n' +
+    '.alert {\n' +
+    '  border: 1px solid rgba(232, 161, 60, 0.4);\n' +
+    '  border-radius: 6px;\n' +
+    '  padding: 12px 14px;\n' +
+    '  background: rgba(232, 161, 60, 0.12);\n' +
+    '  color: #f0c07a;\n' +
+    '  font-weight: 650;\n' +
+    '}\n' +
+    '\n' +
+    '.toast-region {\n' +
+    '  position: fixed;\n' +
+    '  bottom: 16px;\n' +
+    '  left: 50%;\n' +
+    '  transform: translateX(-50%);\n' +
+    '  display: grid;\n' +
+    '  gap: 8px;\n' +
+    '  z-index: 60;\n' +
+    '  width: min(480px, calc(100vw - 24px));\n' +
+    '  pointer-events: none;\n' +
+    '}\n' +
+    '\n' +
+    '.toast-region:empty {\n' +
+    '  display: none;\n' +
+    '}\n' +
+    '\n' +
+    '.toast {\n' +
+    '  display: flex;\n' +
+    '  align-items: flex-start;\n' +
+    '  gap: 10px;\n' +
+    '  border: 1px solid rgba(255, 255, 255, 0.16);\n' +
+    '  border-radius: 8px;\n' +
+    '  padding: 12px 14px;\n' +
+    '  background: var(--panel-strong);\n' +
+    '  color: var(--ink);\n' +
+    '  font-weight: 600;\n' +
+    '  box-shadow: var(--shadow);\n' +
+    '  pointer-events: auto;\n' +
+    '}\n' +
+    '\n' +
+    '.toast-message {\n' +
+    '  flex: 1;\n' +
+    '  min-width: 0;\n' +
+    '}\n' +
+    '\n' +
+    '.toast-dismiss {\n' +
+    '  flex: none;\n' +
+    '  height: 24px;\n' +
+    '  min-width: 24px;\n' +
+    '  min-height: 0;\n' +
+    '  padding: 0 6px;\n' +
+    '  border: none;\n' +
+    '  border-radius: 4px;\n' +
+    '  background: transparent;\n' +
+    '  color: inherit;\n' +
+    '  font-size: 16px;\n' +
+    '  font-weight: 700;\n' +
+    '  letter-spacing: 0;\n' +
+    '  line-height: 1;\n' +
+    '  text-transform: none;\n' +
+    '  box-shadow: none;\n' +
+    '  cursor: pointer;\n' +
+    '}\n' +
+    '\n' +
+    '.toast-dismiss:hover {\n' +
+    '  background: rgba(255, 255, 255, 0.12);\n' +
+    '  filter: none;\n' +
+    '}\n' +
+    '\n' +
+    '.mobile-summary-bar,\n' +
+    '.mobile-progress {\n' +
+    '  display: none;\n' +
+    '}\n' +
+    '\n' +
+    '.mobile-drawer-button,\n' +
+    '.mobile-drawer-header,\n' +
+    '.mobile-drawer-backdrop {\n' +
+    '  display: none;\n' +
+    '}\n' +
+    '\n' +
+    '.mobile-drawer-button-right {\n' +
+    '  display: none;\n' +
+    '  align-items: center;\n' +
+    '  justify-content: center;\n' +
+    '  gap: 8px;\n' +
+    '  min-width: 0;\n' +
+    '  border: 1px solid var(--ghost-border);\n' +
+    '  background: transparent;\n' +
+    '  color: var(--ink);\n' +
+    '  box-shadow: none;\n' +
+    '}\n' +
+    '\n' +
+    '.toolbar .mobile-drawer-button-right {\n' +
+    '  display: inline-flex;\n' +
+    '  min-height: 44px;\n' +
+    '  padding: 0 14px;\n' +
+    '  font-size: 12.5px;\n' +
+    '}\n' +
+    '\n' +
+    '.mobile-drawer-button-right:hover,\n' +
+    '.mobile-drawer-button-right:focus-visible,\n' +
+    '.mobile-drawer-button-right[aria-expanded="true"] {\n' +
+    '  border-color: var(--accent);\n' +
+    '  background: var(--ghost-hover-bg);\n' +
+    '  color: var(--ink);\n' +
+    '  filter: none;\n' +
+    '}\n' +
+    '\n' +
+    '.summary-drawer-icon {\n' +
+    '  font-size: 16px;\n' +
+    '  line-height: 1;\n' +
+    '}\n' +
+    '\n' +
+    '.workspace {\n' +
+    '  display: grid;\n' +
+    '  grid-template-columns: 240px minmax(0, 1fr);\n' +
+    '  min-height: 760px;\n' +
+    '  /* clip (not hidden) so position: sticky descendants (paint vehicle stage,\n' +
+    '     docked summary panel) track the window scroll instead of a dead\n' +
+    '     scroll container */\n' +
+    '  overflow: clip;\n' +
+    '}\n' +
+    '\n' +
+    '.step-rail {\n' +
+    '  border-right: 1px solid var(--hairline);\n' +
+    '  background: var(--panel);\n' +
+    '  padding: 14px 12px;\n' +
+    '}\n' +
+    '\n' +
+    '.step-link {\n' +
+    '  display: grid;\n' +
+    '  grid-template-columns: 26px 1fr;\n' +
+    '  align-items: center;\n' +
+    '  gap: 8px;\n' +
+    '  width: 100%;\n' +
+    '  min-height: 42px;\n' +
+    '  margin-bottom: 3px;\n' +
+    '  padding: 0 8px;\n' +
+    '  border: 1px solid transparent;\n' +
+    '  border-radius: 7px;\n' +
+    '  background: transparent;\n' +
+    '  color: var(--dim);\n' +
+    '  text-align: left;\n' +
+    '  font-size: 13px;\n' +
+    '  font-weight: 750;\n' +
+    '  letter-spacing: 0;\n' +
+    '  text-transform: none;\n' +
+    '  box-shadow: none;\n' +
+    '  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;\n' +
+    '}\n' +
+    '\n' +
+    '.step-link:hover {\n' +
+    '  background: rgba(255, 255, 255, 0.04);\n' +
+    '  filter: none;\n' +
+    '}\n' +
+    '\n' +
+    '.step-link.complete {\n' +
+    '  color: #cfd3d6;\n' +
+    '}\n' +
+    '\n' +
+    '.step-link.active {\n' +
+    '  border-color: var(--hairline-strong);\n' +
+    '  background: rgba(255, 255, 255, 0.05);\n' +
+    '  color: var(--accent);\n' +
+    '}\n' +
+    '\n' +
+    '.step-index {\n' +
+    '  display: inline-grid;\n' +
+    '  place-items: center;\n' +
+    '  width: 22px;\n' +
+    '  height: 22px;\n' +
+    '  border-radius: 50%;\n' +
+    '  background: rgba(255, 255, 255, 0.08);\n' +
+    '  color: var(--dim);\n' +
+    '  font-size: 11px;\n' +
+    '  font-weight: 850;\n' +
+    '}\n' +
+    '\n' +
+    '.step-link.complete .step-index {\n' +
+    '  background: var(--ok-bg);\n' +
+    '  color: var(--ok);\n' +
+    '}\n' +
+    '\n' +
+    '.step-link.active .step-index {\n' +
+    '  background: var(--accent);\n' +
+    '  color: var(--on-accent);\n' +
+    '}\n' +
+    '\n' +
+    '.choice-panel {\n' +
+    '  min-width: 0;\n' +
+    '  padding: 16px 28px 28px;\n' +
+    '  /* signature 1a carbon checker'... 44661 more characters
+  
+      at TestContext.<anonymous> (file:///Users/seandm/Projects/27vette/.claude/worktrees/reverent-keller-6ce2fe/tests/stingray-form-regression.test.mjs:734:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: `/* ============================================================\n   2027 Corvette Order Form — Option 1a "Full Carbon" theme.\n   Normative sources: export-page/form-style-1a/SPEC.md and\n   export-page/form-style-1a/reference/1a-reference.html.\n   Accent variables are dynamic — app.js re-themes --accent /\n   --accent-dark / --on-accent / --accent-glow to follow the\n   selected exterior paint.\n   ============================================================ */\n:root {\n  color-scheme: dark;\n  --bg: #0c0e0f;\n  --panel: #101315;\n  --panel-strong: #14181b;\n  --ink: #f4f1eb;\n  --muted: #a9aeb1;\n  --dim: #8b9094;\n  --line: #262c31;\n  --hairline: rgba(255, 255, 255, 0.07);\n  --hairline-strong: rgba(255, 255, 255, 0.12);\n  --accent: #d0425a;\n  --accent-dark: #b22234;\n  --on-accent: #ffffff;\n  --accent-glow: rgba(208, 66, 90, 0.4);\n  --ok: #35b85d;\n  --ok-bg: rgba(53, 184, 93, 0.16);\n  --warn: #e8a13c;\n  --disabled: #5c6166;\n  --choice-bg: #14181b;\n  --choice-hover: #181d20;\n  --choice-hover-border: #3a4248;\n  --choice-hover-shadow: 6px 6px 0 rgba(38, 44, 49, 0.95);\n  --control-bg: rgba(255, 255, 255, 0.06);\n  --control-border: rgba(255, 255, 255, 0.14);\n  --control-hover: rgba(255, 255, 255, 0.1);\n  --ghost-border: rgba(255, 255, 255, 0.24);\n  --ghost-hover-bg: rgba(255, 255, 255, 0.05);\n  --shadow: 0 18px 48px rgba(0, 0, 0, 0.55);\n  --shell-gap: 12px;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody {\n  margin: 0;\n  min-width: 320px;\n  /* full-page carbon checker to match the homepage (stingray-homepage index.html) */\n  background-color: var(--bg);\n  background-image:\n    linear-gradient(45deg, #181c1f 25%, transparent 25%, transparent 75%, #181c1f 75%),\n    linear-gradient(45deg, #181c1f 25%, transparent 25%, transparent 75%, #181c1f 75%);\n  background-size: 6px 6px;\n  background-position: 0 0, 3px 3px;\n  color: var(--ink);\n  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;\n  -webkit-font-smoothing: antialiased;\n}\n\nbutton,\nselect,\ninput,\ntextarea {\n  font: inherit;\n}\n\n.app-shell {\n  display: grid;\n  gap: 0;\n  /* full-bleed like the homepage: body carries the carbon background, the\n     shell is layout-only (no desk margin, border, radius, or own background).\n     clip (not hidden) avoids creating a scroll container, so the paint\n     step's sticky vehicle stage tracks the window */\n  width: 100%;\n  margin: 0;\n  overflow: clip;\n}\n\n.accent-stripe {\n  height: 3px;\n  background: linear-gradient(90deg, var(--accent-dark), var(--accent), var(--accent-dark));\n}\n\n.topbar {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 18px;\n  padding: 12px 24px;\n  background: rgba(11, 13, 14, 0.92);\n  border-bottom: 1px solid var(--hairline);\n}\n\n.topbar > div:first-of-type,\n.brand-block > div {\n  min-width: 0;\n}\n\n.brand-block {\n  display: flex;\n  align-items: center;\n  gap: 14px;\n  min-width: 0;\n}\n\n.brand-block .brand-crossflags {\n  height: 26px;\n  width: auto;\n  opacity: 0.95;\n}\n\n.brand-block .brand-wordmark {\n  height: 30px;\n  width: auto;\n}\n\n.brand-divider {\n  width: 1px;\n  height: 36px;\n  margin: 0 8px;\n  background: var(--hairline-strong);\n}\n\n.eyebrow {\n  margin: 0 0 4px;\n  color: var(--accent);\n  font-size: 11px;\n  font-weight: 800;\n  letter-spacing: 0.14em;\n  text-transform: uppercase;\n}\n\nh1,\nh2,\nh3 {\n  margin: 0;\n  letter-spacing: 0;\n}\n\nh1 {\n  font-size: 21px;\n  font-weight: 850;\n  letter-spacing: 0.02em;\n  line-height: 1.15;\n  text-transform: uppercase;\n}\n\nh2 {\n  font-size: 22px;\n}\n\nh3 {\n  font-size: 16px;\n}\n\n.toolbar {\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  justify-content: flex-end;\n  gap: 10px;\n}\n\n.toolbar-action-group {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  gap: 8px;\n}\n\n.toolbar-build-group {\n  padding-left: 10px;\n  border-left: 1px solid var(--hairline-strong);\n}\n\n.model-picker {\n  display: grid;\n  gap: 4px;\n  min-width: 150px;\n  color: var(--muted);\n  font-size: 12px;\n  font-weight: 800;\n  text-transform: uppercase;\n}\n\n.model-picker select {\n  min-height: 42px;\n}\n\nbutton {\n  min-height: 44px;\n  border: 0;\n  border-radius: 7px;\n  padding: 0 16px;\n  background: var(--accent);\n  color: var(--on-accent);\n  cursor: pointer;\n  font-size: 12.5px;\n  font-weight: 800;\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n  box-shadow: 0 8px 24px var(--accent-glow);\n  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, color 140ms ease, filter 140ms ease;\n}\n\nbutton:hover {\n  filter: brightness(1.08);\n}\n\nbutton:disabled {\n  border-color: transparent;\n  background: var(--disabled);\n  color: #1a1d1f;\n  box-shadow: none;\n  cursor: not-allowed;\n  filter: none;\n}\n\n.ghost-button {\n  background: transparent;\n  border: 1px solid var(--ghost-border);\n  color: var(--ink);\n  box-shadow: none;\n}\n\n.ghost-button:hover {\n  border-color: var(--accent);\n  background: var(--ghost-hover-bg);\n  filter: none;\n}\n\n.reset-icon-button,\n.download-icon-button {\n  display: inline-grid;\n  place-items: center;\n  width: 44px;\n  min-width: 44px;\n  padding: 0;\n  background: var(--control-bg);\n  border: 1px solid var(--control-border);\n  border-radius: 8px;\n  color: #cfd3d6;\n  box-shadow: none;\n}\n\n.reset-icon-button:hover,\n.download-icon-button:hover {\n  border-color: rgba(255, 255, 255, 0.3);\n  background: var(--control-bg);\n  color: #ffffff;\n  filter: none;\n}\n\n.reset-icon,\n.download-icon {\n  width: 22px;\n  height: 22px;\n  fill: none;\n  stroke: currentColor;\n  stroke-linecap: round;\n  stroke-linejoin: round;\n  stroke-width: 2.4;\n}\n\n.reset-label,\n.download-label {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  overflow: hidden;\n  clip: rect(0 0 0 0);\n  white-space: nowrap;\n}\n\nlabel {\n  display: grid;\n  gap: 6px;\n  color: var(--muted);\n  font-size: 12px;\n  font-weight: 800;\n  text-transform: uppercase;\n}\n\nselect,\ninput,\ntextarea {\n  width: 100%;\n  min-height: 44px;\n  border: 1px solid var(--line);\n  border-radius: 6px;\n  padding: 0 12px;\n  background: var(--panel-strong);\n  color: var(--ink);\n  font-weight: 700;\n}\n\nselect:focus-visible,\ninput:focus-visible,\ntextarea:focus-visible {\n  outline: none;\n  border-color: var(--accent);\n  box-shadow: 0 0 0 3px var(--accent-glow);\n}\n\ntextarea {\n  min-height: 108px;\n  padding: 10px 12px;\n  resize: vertical;\n}\n\n.alert-region {\n  display: grid;\n  gap: 8px;\n  margin: 12px 16px 0;\n}\n\n.alert-region:empty {\n  display: none;\n}\n\n.alert {\n  border: 1px solid rgba(232, 161, 60, 0.4);\n  border-radius: 6px;\n  padding: 12px 14px;\n  background: rgba(232, 161, 60, 0.12);\n  color: #f0c07a;\n  font-weight: 650;\n}\n\n.toast-region {\n  position: fixed;\n  bottom: 16px;\n  left: 50%;\n  transform: translateX(-50%);\n  display: grid;\n  gap: 8px;\n  z-index: 60;\n  width: min(480px, calc(100vw - 24px));\n  pointer-events: none;\n}\n\n.toast-region:empty {\n  display: none;\n}\n\n.toast {\n  display: flex;\n  align-items: flex-start;\n  gap: 10px;\n  border: 1px solid rgba(255, 255, 255, 0.16);\n  border-radius: 8px;\n  padding: 12px 14px;\n  background: var(--panel-strong);\n  color: var(--ink);\n  font-weight: 600;\n  box-shadow: var(--shadow);\n  pointer-events: auto;\n}\n\n.toast-message {\n  flex: 1;\n  min-width: 0;\n}\n\n.toast-dismiss {\n  flex: none;\n  height: 24px;\n  min-width: 24px;\n  min-height: 0;\n  padding: 0 6px;\n  border: none;\n  border-radius: 4px;\n  background: transparent;\n  color: inherit;\n  font-size: 16px;\n  font-weight: 700;\n  letter-spacing: 0;\n  line-height: 1;\n  text-transform: none;\n  box-shadow: none;\n  cursor: pointer;\n}\n\n.toast-dismiss:hover {\n  background: rgba(255, 255, 255, 0.12);\n  filter: none;\n}\n\n.mobile-summary-bar,\n.mobile-progress {\n  display: none;\n}\n\n.mobile-drawer-button,\n.mobile-drawer-header,\n.mobile-drawer-backdrop {\n  display: none;\n}\n\n.mobile-drawer-button-right {\n  display: none;\n  align-items: center;\n  justify-content: center;\n  gap: 8px;\n  min-width: 0;\n  border: 1px solid var(--ghost-border);\n  background: transparent;\n  color: var(--ink);\n  box-shadow: none;\n}\n\n.toolbar .mobile-drawer-button-right {\n  display: inline-flex;\n  min-height: 44px;\n  padding: 0 14px;\n  font-size: 12.5px;\n}\n\n.mobile-drawer-button-right:hover,\n.mobile-drawer-button-right:focus-visible,\n.mobile-drawer-button-right[aria-expanded="true"] {\n  border-color: var(--accent);\n  background: var(--ghost-hover-bg);\n  color: var(--ink);\n  filter: none;\n}\n\n.summary-drawer-icon {\n  font-size: 16px;\n  line-height: 1;\n}\n\n.workspace {\n  display: grid;\n  grid-template-columns: 240px minmax(0, 1fr);\n  min-height: 760px;\n  /* clip (not hidden) so position: sticky descendants (paint vehicle stage,\n     docked summary panel) track the window scroll instead of a dead\n     scroll container */\n  overflow: clip;\n}\n\n.step-rail {\n  border-right: 1px solid var(--hairline);\n  background: var(--panel);\n  padding: 14px 12px;\n}\n\n.step-link {\n  display: grid;\n  grid-template-columns: 26px 1fr;\n  align-items: center;\n  gap: 8px;\n  width: 100%;\n  min-height: 42px;\n  margin-bottom: 3px;\n  padding: 0 8px;\n  border: 1px solid transparent;\n  border-radius: 7px;\n  background: transparent;\n  color: var(--dim);\n  text-align: left;\n  font-size: 13px;\n  font-weight: 750;\n  letter-spacing: 0;\n  text-transform: none;\n  box-shadow: none;\n  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;\n}\n\n.step-link:hover {\n  background: rgba(255, 255, 255, 0.04);\n  filter: none;\n}\n\n.step-link.complete {\n  color: #cfd3d6;\n}\n\n.step-link.active {\n  border-color: var(--hairline-strong);\n  background: rgba(255, 255, 255, 0.05);\n  color: var(--accent);\n}\n\n.step-index {\n  display: inline-grid;\n  place-items: center;\n  width: 22px;\n  height: 22px;\n  border-radius: 50%;\n  background: rgba(255, 255, 255, 0.08);\n  color: var(--dim);\n  font-size: 11px;\n  font-weight: 850;\n}\n\n.step-link.complete .step-index {\n  background: var(--ok-bg);\n  color: var(--ok);\n}\n\n.step-link.active .step-index {\n  background: var(--accent);\n  color: var(--on-accent);\n}\n\n.choice-panel {\n  min-width: 0;\n  padding: 16px 28px 28px;\n  /* signature 1a carbon checker`... 44661 more characters,
+    expected: /\.summary-panel\s*\{[\s\S]*padding:\s*8px;/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests/stingray-form-regression.test.mjs:742:1
+✖ shell containers share one spacing and radius rhythm (0.690666ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /--shell-radius:\s*8px/. Input:
+  
+  '/* ============================================================\n' +
+    '   2027 Corvette Order Form — Option 1a "Full Carbon" theme.\n' +
+    '   Normative sources: export-page/form-style-1a/SPEC.md and\n' +
+    '   export-page/form-style-1a/reference/1a-reference.html.\n' +
+    '   Accent variables are dynamic — app.js re-themes --accent /\n' +
+    '   --accent-dark / --on-accent / --accent-glow to follow the\n' +
+    '   selected exterior paint.\n' +
+    '   ============================================================ */\n' +
+    ':root {\n' +
+    '  color-scheme: dark;\n' +
+    '  --bg: #0c0e0f;\n' +
+    '  --panel: #101315;\n' +
+    '  --panel-strong: #14181b;\n' +
+    '  --ink: #f4f1eb;\n' +
+    '  --muted: #a9aeb1;\n' +
+    '  --dim: #8b9094;\n' +
+    '  --line: #262c31;\n' +
+    '  --hairline: rgba(255, 255, 255, 0.07);\n' +
+    '  --hairline-strong: rgba(255, 255, 255, 0.12);\n' +
+    '  --accent: #d0425a;\n' +
+    '  --accent-dark: #b22234;\n' +
+    '  --on-accent: #ffffff;\n' +
+    '  --accent-glow: rgba(208, 66, 90, 0.4);\n' +
+    '  --ok: #35b85d;\n' +
+    '  --ok-bg: rgba(53, 184, 93, 0.16);\n' +
+    '  --warn: #e8a13c;\n' +
+    '  --disabled: #5c6166;\n' +
+    '  --choice-bg: #14181b;\n' +
+    '  --choice-hover: #181d20;\n' +
+    '  --choice-hover-border: #3a4248;\n' +
+    '  --choice-hover-shadow: 6px 6px 0 rgba(38, 44, 49, 0.95);\n' +
+    '  --control-bg: rgba(255, 255, 255, 0.06);\n' +
+    '  --control-border: rgba(255, 255, 255, 0.14);\n' +
+    '  --control-hover: rgba(255, 255, 255, 0.1);\n' +
+    '  --ghost-border: rgba(255, 255, 255, 0.24);\n' +
+    '  --ghost-hover-bg: rgba(255, 255, 255, 0.05);\n' +
+    '  --shadow: 0 18px 48px rgba(0, 0, 0, 0.55);\n' +
+    '  --shell-gap: 12px;\n' +
+    '}\n' +
+    '\n' +
+    '* {\n' +
+    '  box-sizing: border-box;\n' +
+    '}\n' +
+    '\n' +
+    'body {\n' +
+    '  margin: 0;\n' +
+    '  min-width: 320px;\n' +
+    '  /* full-page carbon checker to match the homepage (stingray-homepage index.html) */\n' +
+    '  background-color: var(--bg);\n' +
+    '  background-image:\n' +
+    '    linear-gradient(45deg, #181c1f 25%, transparent 25%, transparent 75%, #181c1f 75%),\n' +
+    '    linear-gradient(45deg, #181c1f 25%, transparent 25%, transparent 75%, #181c1f 75%);\n' +
+    '  background-size: 6px 6px;\n' +
+    '  background-position: 0 0, 3px 3px;\n' +
+    '  color: var(--ink);\n' +
+    '  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;\n' +
+    '  -webkit-font-smoothing: antialiased;\n' +
+    '}\n' +
+    '\n' +
+    'button,\n' +
+    'select,\n' +
+    'input,\n' +
+    'textarea {\n' +
+    '  font: inherit;\n' +
+    '}\n' +
+    '\n' +
+    '.app-shell {\n' +
+    '  display: grid;\n' +
+    '  gap: 0;\n' +
+    '  /* full-bleed like the homepage: body carries the carbon background, the\n' +
+    '     shell is layout-only (no desk margin, border, radius, or own background).\n' +
+    '     clip (not hidden) avoids creating a scroll container, so the paint\n' +
+    "     step's sticky vehicle stage tracks the window */\n" +
+    '  width: 100%;\n' +
+    '  margin: 0;\n' +
+    '  overflow: clip;\n' +
+    '}\n' +
+    '\n' +
+    '.accent-stripe {\n' +
+    '  height: 3px;\n' +
+    '  background: linear-gradient(90deg, var(--accent-dark), var(--accent), var(--accent-dark));\n' +
+    '}\n' +
+    '\n' +
+    '.topbar {\n' +
+    '  display: flex;\n' +
+    '  align-items: center;\n' +
+    '  justify-content: space-between;\n' +
+    '  gap: 18px;\n' +
+    '  padding: 12px 24px;\n' +
+    '  background: rgba(11, 13, 14, 0.92);\n' +
+    '  border-bottom: 1px solid var(--hairline);\n' +
+    '}\n' +
+    '\n' +
+    '.topbar > div:first-of-type,\n' +
+    '.brand-block > div {\n' +
+    '  min-width: 0;\n' +
+    '}\n' +
+    '\n' +
+    '.brand-block {\n' +
+    '  display: flex;\n' +
+    '  align-items: center;\n' +
+    '  gap: 14px;\n' +
+    '  min-width: 0;\n' +
+    '}\n' +
+    '\n' +
+    '.brand-block .brand-crossflags {\n' +
+    '  height: 26px;\n' +
+    '  width: auto;\n' +
+    '  opacity: 0.95;\n' +
+    '}\n' +
+    '\n' +
+    '.brand-block .brand-wordmark {\n' +
+    '  height: 30px;\n' +
+    '  width: auto;\n' +
+    '}\n' +
+    '\n' +
+    '.brand-divider {\n' +
+    '  width: 1px;\n' +
+    '  height: 36px;\n' +
+    '  margin: 0 8px;\n' +
+    '  background: var(--hairline-strong);\n' +
+    '}\n' +
+    '\n' +
+    '.eyebrow {\n' +
+    '  margin: 0 0 4px;\n' +
+    '  color: var(--accent);\n' +
+    '  font-size: 11px;\n' +
+    '  font-weight: 800;\n' +
+    '  letter-spacing: 0.14em;\n' +
+    '  text-transform: uppercase;\n' +
+    '}\n' +
+    '\n' +
+    'h1,\n' +
+    'h2,\n' +
+    'h3 {\n' +
+    '  margin: 0;\n' +
+    '  letter-spacing: 0;\n' +
+    '}\n' +
+    '\n' +
+    'h1 {\n' +
+    '  font-size: 21px;\n' +
+    '  font-weight: 850;\n' +
+    '  letter-spacing: 0.02em;\n' +
+    '  line-height: 1.15;\n' +
+    '  text-transform: uppercase;\n' +
+    '}\n' +
+    '\n' +
+    'h2 {\n' +
+    '  font-size: 22px;\n' +
+    '}\n' +
+    '\n' +
+    'h3 {\n' +
+    '  font-size: 16px;\n' +
+    '}\n' +
+    '\n' +
+    '.toolbar {\n' +
+    '  display: flex;\n' +
+    '  flex-wrap: wrap;\n' +
+    '  align-items: center;\n' +
+    '  justify-content: flex-end;\n' +
+    '  gap: 10px;\n' +
+    '}\n' +
+    '\n' +
+    '.toolbar-action-group {\n' +
+    '  display: flex;\n' +
+    '  align-items: center;\n' +
+    '  justify-content: flex-end;\n' +
+    '  gap: 8px;\n' +
+    '}\n' +
+    '\n' +
+    '.toolbar-build-group {\n' +
+    '  padding-left: 10px;\n' +
+    '  border-left: 1px solid var(--hairline-strong);\n' +
+    '}\n' +
+    '\n' +
+    '.model-picker {\n' +
+    '  display: grid;\n' +
+    '  gap: 4px;\n' +
+    '  min-width: 150px;\n' +
+    '  color: var(--muted);\n' +
+    '  font-size: 12px;\n' +
+    '  font-weight: 800;\n' +
+    '  text-transform: uppercase;\n' +
+    '}\n' +
+    '\n' +
+    '.model-picker select {\n' +
+    '  min-height: 42px;\n' +
+    '}\n' +
+    '\n' +
+    'button {\n' +
+    '  min-height: 44px;\n' +
+    '  border: 0;\n' +
+    '  border-radius: 7px;\n' +
+    '  padding: 0 16px;\n' +
+    '  background: var(--accent);\n' +
+    '  color: var(--on-accent);\n' +
+    '  cursor: pointer;\n' +
+    '  font-size: 12.5px;\n' +
+    '  font-weight: 800;\n' +
+    '  letter-spacing: 0.04em;\n' +
+    '  text-transform: uppercase;\n' +
+    '  box-shadow: 0 8px 24px var(--accent-glow);\n' +
+    '  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, color 140ms ease, filter 140ms ease;\n' +
+    '}\n' +
+    '\n' +
+    'button:hover {\n' +
+    '  filter: brightness(1.08);\n' +
+    '}\n' +
+    '\n' +
+    'button:disabled {\n' +
+    '  border-color: transparent;\n' +
+    '  background: var(--disabled);\n' +
+    '  color: #1a1d1f;\n' +
+    '  box-shadow: none;\n' +
+    '  cursor: not-allowed;\n' +
+    '  filter: none;\n' +
+    '}\n' +
+    '\n' +
+    '.ghost-button {\n' +
+    '  background: transparent;\n' +
+    '  border: 1px solid var(--ghost-border);\n' +
+    '  color: var(--ink);\n' +
+    '  box-shadow: none;\n' +
+    '}\n' +
+    '\n' +
+    '.ghost-button:hover {\n' +
+    '  border-color: var(--accent);\n' +
+    '  background: var(--ghost-hover-bg);\n' +
+    '  filter: none;\n' +
+    '}\n' +
+    '\n' +
+    '.reset-icon-button,\n' +
+    '.download-icon-button {\n' +
+    '  display: inline-grid;\n' +
+    '  place-items: center;\n' +
+    '  width: 44px;\n' +
+    '  min-width: 44px;\n' +
+    '  padding: 0;\n' +
+    '  background: var(--control-bg);\n' +
+    '  border: 1px solid var(--control-border);\n' +
+    '  border-radius: 8px;\n' +
+    '  color: #cfd3d6;\n' +
+    '  box-shadow: none;\n' +
+    '}\n' +
+    '\n' +
+    '.reset-icon-button:hover,\n' +
+    '.download-icon-button:hover {\n' +
+    '  border-color: rgba(255, 255, 255, 0.3);\n' +
+    '  background: var(--control-bg);\n' +
+    '  color: #ffffff;\n' +
+    '  filter: none;\n' +
+    '}\n' +
+    '\n' +
+    '.reset-icon,\n' +
+    '.download-icon {\n' +
+    '  width: 22px;\n' +
+    '  height: 22px;\n' +
+    '  fill: none;\n' +
+    '  stroke: currentColor;\n' +
+    '  stroke-linecap: round;\n' +
+    '  stroke-linejoin: round;\n' +
+    '  stroke-width: 2.4;\n' +
+    '}\n' +
+    '\n' +
+    '.reset-label,\n' +
+    '.download-label {\n' +
+    '  position: absolute;\n' +
+    '  width: 1px;\n' +
+    '  height: 1px;\n' +
+    '  overflow: hidden;\n' +
+    '  clip: rect(0 0 0 0);\n' +
+    '  white-space: nowrap;\n' +
+    '}\n' +
+    '\n' +
+    'label {\n' +
+    '  display: grid;\n' +
+    '  gap: 6px;\n' +
+    '  color: var(--muted);\n' +
+    '  font-size: 12px;\n' +
+    '  font-weight: 800;\n' +
+    '  text-transform: uppercase;\n' +
+    '}\n' +
+    '\n' +
+    'select,\n' +
+    'input,\n' +
+    'textarea {\n' +
+    '  width: 100%;\n' +
+    '  min-height: 44px;\n' +
+    '  border: 1px solid var(--line);\n' +
+    '  border-radius: 6px;\n' +
+    '  padding: 0 12px;\n' +
+    '  background: var(--panel-strong);\n' +
+    '  color: var(--ink);\n' +
+    '  font-weight: 700;\n' +
+    '}\n' +
+    '\n' +
+    'select:focus-visible,\n' +
+    'input:focus-visible,\n' +
+    'textarea:focus-visible {\n' +
+    '  outline: none;\n' +
+    '  border-color: var(--accent);\n' +
+    '  box-shadow: 0 0 0 3px var(--accent-glow);\n' +
+    '}\n' +
+    '\n' +
+    'textarea {\n' +
+    '  min-height: 108px;\n' +
+    '  padding: 10px 12px;\n' +
+    '  resize: vertical;\n' +
+    '}\n' +
+    '\n' +
+    '.alert-region {\n' +
+    '  display: grid;\n' +
+    '  gap: 8px;\n' +
+    '  margin: 12px 16px 0;\n' +
+    '}\n' +
+    '\n' +
+    '.alert-region:empty {\n' +
+    '  display: none;\n' +
+    '}\n' +
+    '\n' +
+    '.alert {\n' +
+    '  border: 1px solid rgba(232, 161, 60, 0.4);\n' +
+    '  border-radius: 6px;\n' +
+    '  padding: 12px 14px;\n' +
+    '  background: rgba(232, 161, 60, 0.12);\n' +
+    '  color: #f0c07a;\n' +
+    '  font-weight: 650;\n' +
+    '}\n' +
+    '\n' +
+    '.toast-region {\n' +
+    '  position: fixed;\n' +
+    '  bottom: 16px;\n' +
+    '  left: 50%;\n' +
+    '  transform: translateX(-50%);\n' +
+    '  display: grid;\n' +
+    '  gap: 8px;\n' +
+    '  z-index: 60;\n' +
+    '  width: min(480px, calc(100vw - 24px));\n' +
+    '  pointer-events: none;\n' +
+    '}\n' +
+    '\n' +
+    '.toast-region:empty {\n' +
+    '  display: none;\n' +
+    '}\n' +
+    '\n' +
+    '.toast {\n' +
+    '  display: flex;\n' +
+    '  align-items: flex-start;\n' +
+    '  gap: 10px;\n' +
+    '  border: 1px solid rgba(255, 255, 255, 0.16);\n' +
+    '  border-radius: 8px;\n' +
+    '  padding: 12px 14px;\n' +
+    '  background: var(--panel-strong);\n' +
+    '  color: var(--ink);\n' +
+    '  font-weight: 600;\n' +
+    '  box-shadow: var(--shadow);\n' +
+    '  pointer-events: auto;\n' +
+    '}\n' +
+    '\n' +
+    '.toast-message {\n' +
+    '  flex: 1;\n' +
+    '  min-width: 0;\n' +
+    '}\n' +
+    '\n' +
+    '.toast-dismiss {\n' +
+    '  flex: none;\n' +
+    '  height: 24px;\n' +
+    '  min-width: 24px;\n' +
+    '  min-height: 0;\n' +
+    '  padding: 0 6px;\n' +
+    '  border: none;\n' +
+    '  border-radius: 4px;\n' +
+    '  background: transparent;\n' +
+    '  color: inherit;\n' +
+    '  font-size: 16px;\n' +
+    '  font-weight: 700;\n' +
+    '  letter-spacing: 0;\n' +
+    '  line-height: 1;\n' +
+    '  text-transform: none;\n' +
+    '  box-shadow: none;\n' +
+    '  cursor: pointer;\n' +
+    '}\n' +
+    '\n' +
+    '.toast-dismiss:hover {\n' +
+    '  background: rgba(255, 255, 255, 0.12);\n' +
+    '  filter: none;\n' +
+    '}\n' +
+    '\n' +
+    '.mobile-summary-bar,\n' +
+    '.mobile-progress {\n' +
+    '  display: none;\n' +
+    '}\n' +
+    '\n' +
+    '.mobile-drawer-button,\n' +
+    '.mobile-drawer-header,\n' +
+    '.mobile-drawer-backdrop {\n' +
+    '  display: none;\n' +
+    '}\n' +
+    '\n' +
+    '.mobile-drawer-button-right {\n' +
+    '  display: none;\n' +
+    '  align-items: center;\n' +
+    '  justify-content: center;\n' +
+    '  gap: 8px;\n' +
+    '  min-width: 0;\n' +
+    '  border: 1px solid var(--ghost-border);\n' +
+    '  background: transparent;\n' +
+    '  color: var(--ink);\n' +
+    '  box-shadow: none;\n' +
+    '}\n' +
+    '\n' +
+    '.toolbar .mobile-drawer-button-right {\n' +
+    '  display: inline-flex;\n' +
+    '  min-height: 44px;\n' +
+    '  padding: 0 14px;\n' +
+    '  font-size: 12.5px;\n' +
+    '}\n' +
+    '\n' +
+    '.mobile-drawer-button-right:hover,\n' +
+    '.mobile-drawer-button-right:focus-visible,\n' +
+    '.mobile-drawer-button-right[aria-expanded="true"] {\n' +
+    '  border-color: var(--accent);\n' +
+    '  background: var(--ghost-hover-bg);\n' +
+    '  color: var(--ink);\n' +
+    '  filter: none;\n' +
+    '}\n' +
+    '\n' +
+    '.summary-drawer-icon {\n' +
+    '  font-size: 16px;\n' +
+    '  line-height: 1;\n' +
+    '}\n' +
+    '\n' +
+    '.workspace {\n' +
+    '  display: grid;\n' +
+    '  grid-template-columns: 240px minmax(0, 1fr);\n' +
+    '  min-height: 760px;\n' +
+    '  /* clip (not hidden) so position: sticky descendants (paint vehicle stage,\n' +
+    '     docked summary panel) track the window scroll instead of a dead\n' +
+    '     scroll container */\n' +
+    '  overflow: clip;\n' +
+    '}\n' +
+    '\n' +
+    '.step-rail {\n' +
+    '  border-right: 1px solid var(--hairline);\n' +
+    '  background: var(--panel);\n' +
+    '  padding: 14px 12px;\n' +
+    '}\n' +
+    '\n' +
+    '.step-link {\n' +
+    '  display: grid;\n' +
+    '  grid-template-columns: 26px 1fr;\n' +
+    '  align-items: center;\n' +
+    '  gap: 8px;\n' +
+    '  width: 100%;\n' +
+    '  min-height: 42px;\n' +
+    '  margin-bottom: 3px;\n' +
+    '  padding: 0 8px;\n' +
+    '  border: 1px solid transparent;\n' +
+    '  border-radius: 7px;\n' +
+    '  background: transparent;\n' +
+    '  color: var(--dim);\n' +
+    '  text-align: left;\n' +
+    '  font-size: 13px;\n' +
+    '  font-weight: 750;\n' +
+    '  letter-spacing: 0;\n' +
+    '  text-transform: none;\n' +
+    '  box-shadow: none;\n' +
+    '  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;\n' +
+    '}\n' +
+    '\n' +
+    '.step-link:hover {\n' +
+    '  background: rgba(255, 255, 255, 0.04);\n' +
+    '  filter: none;\n' +
+    '}\n' +
+    '\n' +
+    '.step-link.complete {\n' +
+    '  color: #cfd3d6;\n' +
+    '}\n' +
+    '\n' +
+    '.step-link.active {\n' +
+    '  border-color: var(--hairline-strong);\n' +
+    '  background: rgba(255, 255, 255, 0.05);\n' +
+    '  color: var(--accent);\n' +
+    '}\n' +
+    '\n' +
+    '.step-index {\n' +
+    '  display: inline-grid;\n' +
+    '  place-items: center;\n' +
+    '  width: 22px;\n' +
+    '  height: 22px;\n' +
+    '  border-radius: 50%;\n' +
+    '  background: rgba(255, 255, 255, 0.08);\n' +
+    '  color: var(--dim);\n' +
+    '  font-size: 11px;\n' +
+    '  font-weight: 850;\n' +
+    '}\n' +
+    '\n' +
+    '.step-link.complete .step-index {\n' +
+    '  background: var(--ok-bg);\n' +
+    '  color: var(--ok);\n' +
+    '}\n' +
+    '\n' +
+    '.step-link.active .step-index {\n' +
+    '  background: var(--accent);\n' +
+    '  color: var(--on-accent);\n' +
+    '}\n' +
+    '\n' +
+    '.choice-panel {\n' +
+    '  min-width: 0;\n' +
+    '  padding: 16px 28px 28px;\n' +
+    '  /* signature 1a carbon checker'... 44661 more characters
+  
+      at TestContext.<anonymous> (file:///Users/seandm/Projects/27vette/.claude/worktrees/reverent-keller-6ce2fe/tests/stingray-form-regression.test.mjs:744:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: `/* ============================================================\n   2027 Corvette Order Form — Option 1a "Full Carbon" theme.\n   Normative sources: export-page/form-style-1a/SPEC.md and\n   export-page/form-style-1a/reference/1a-reference.html.\n   Accent variables are dynamic — app.js re-themes --accent /\n   --accent-dark / --on-accent / --accent-glow to follow the\n   selected exterior paint.\n   ============================================================ */\n:root {\n  color-scheme: dark;\n  --bg: #0c0e0f;\n  --panel: #101315;\n  --panel-strong: #14181b;\n  --ink: #f4f1eb;\n  --muted: #a9aeb1;\n  --dim: #8b9094;\n  --line: #262c31;\n  --hairline: rgba(255, 255, 255, 0.07);\n  --hairline-strong: rgba(255, 255, 255, 0.12);\n  --accent: #d0425a;\n  --accent-dark: #b22234;\n  --on-accent: #ffffff;\n  --accent-glow: rgba(208, 66, 90, 0.4);\n  --ok: #35b85d;\n  --ok-bg: rgba(53, 184, 93, 0.16);\n  --warn: #e8a13c;\n  --disabled: #5c6166;\n  --choice-bg: #14181b;\n  --choice-hover: #181d20;\n  --choice-hover-border: #3a4248;\n  --choice-hover-shadow: 6px 6px 0 rgba(38, 44, 49, 0.95);\n  --control-bg: rgba(255, 255, 255, 0.06);\n  --control-border: rgba(255, 255, 255, 0.14);\n  --control-hover: rgba(255, 255, 255, 0.1);\n  --ghost-border: rgba(255, 255, 255, 0.24);\n  --ghost-hover-bg: rgba(255, 255, 255, 0.05);\n  --shadow: 0 18px 48px rgba(0, 0, 0, 0.55);\n  --shell-gap: 12px;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody {\n  margin: 0;\n  min-width: 320px;\n  /* full-page carbon checker to match the homepage (stingray-homepage index.html) */\n  background-color: var(--bg);\n  background-image:\n    linear-gradient(45deg, #181c1f 25%, transparent 25%, transparent 75%, #181c1f 75%),\n    linear-gradient(45deg, #181c1f 25%, transparent 25%, transparent 75%, #181c1f 75%);\n  background-size: 6px 6px;\n  background-position: 0 0, 3px 3px;\n  color: var(--ink);\n  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;\n  -webkit-font-smoothing: antialiased;\n}\n\nbutton,\nselect,\ninput,\ntextarea {\n  font: inherit;\n}\n\n.app-shell {\n  display: grid;\n  gap: 0;\n  /* full-bleed like the homepage: body carries the carbon background, the\n     shell is layout-only (no desk margin, border, radius, or own background).\n     clip (not hidden) avoids creating a scroll container, so the paint\n     step's sticky vehicle stage tracks the window */\n  width: 100%;\n  margin: 0;\n  overflow: clip;\n}\n\n.accent-stripe {\n  height: 3px;\n  background: linear-gradient(90deg, var(--accent-dark), var(--accent), var(--accent-dark));\n}\n\n.topbar {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 18px;\n  padding: 12px 24px;\n  background: rgba(11, 13, 14, 0.92);\n  border-bottom: 1px solid var(--hairline);\n}\n\n.topbar > div:first-of-type,\n.brand-block > div {\n  min-width: 0;\n}\n\n.brand-block {\n  display: flex;\n  align-items: center;\n  gap: 14px;\n  min-width: 0;\n}\n\n.brand-block .brand-crossflags {\n  height: 26px;\n  width: auto;\n  opacity: 0.95;\n}\n\n.brand-block .brand-wordmark {\n  height: 30px;\n  width: auto;\n}\n\n.brand-divider {\n  width: 1px;\n  height: 36px;\n  margin: 0 8px;\n  background: var(--hairline-strong);\n}\n\n.eyebrow {\n  margin: 0 0 4px;\n  color: var(--accent);\n  font-size: 11px;\n  font-weight: 800;\n  letter-spacing: 0.14em;\n  text-transform: uppercase;\n}\n\nh1,\nh2,\nh3 {\n  margin: 0;\n  letter-spacing: 0;\n}\n\nh1 {\n  font-size: 21px;\n  font-weight: 850;\n  letter-spacing: 0.02em;\n  line-height: 1.15;\n  text-transform: uppercase;\n}\n\nh2 {\n  font-size: 22px;\n}\n\nh3 {\n  font-size: 16px;\n}\n\n.toolbar {\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  justify-content: flex-end;\n  gap: 10px;\n}\n\n.toolbar-action-group {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  gap: 8px;\n}\n\n.toolbar-build-group {\n  padding-left: 10px;\n  border-left: 1px solid var(--hairline-strong);\n}\n\n.model-picker {\n  display: grid;\n  gap: 4px;\n  min-width: 150px;\n  color: var(--muted);\n  font-size: 12px;\n  font-weight: 800;\n  text-transform: uppercase;\n}\n\n.model-picker select {\n  min-height: 42px;\n}\n\nbutton {\n  min-height: 44px;\n  border: 0;\n  border-radius: 7px;\n  padding: 0 16px;\n  background: var(--accent);\n  color: var(--on-accent);\n  cursor: pointer;\n  font-size: 12.5px;\n  font-weight: 800;\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n  box-shadow: 0 8px 24px var(--accent-glow);\n  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, color 140ms ease, filter 140ms ease;\n}\n\nbutton:hover {\n  filter: brightness(1.08);\n}\n\nbutton:disabled {\n  border-color: transparent;\n  background: var(--disabled);\n  color: #1a1d1f;\n  box-shadow: none;\n  cursor: not-allowed;\n  filter: none;\n}\n\n.ghost-button {\n  background: transparent;\n  border: 1px solid var(--ghost-border);\n  color: var(--ink);\n  box-shadow: none;\n}\n\n.ghost-button:hover {\n  border-color: var(--accent);\n  background: var(--ghost-hover-bg);\n  filter: none;\n}\n\n.reset-icon-button,\n.download-icon-button {\n  display: inline-grid;\n  place-items: center;\n  width: 44px;\n  min-width: 44px;\n  padding: 0;\n  background: var(--control-bg);\n  border: 1px solid var(--control-border);\n  border-radius: 8px;\n  color: #cfd3d6;\n  box-shadow: none;\n}\n\n.reset-icon-button:hover,\n.download-icon-button:hover {\n  border-color: rgba(255, 255, 255, 0.3);\n  background: var(--control-bg);\n  color: #ffffff;\n  filter: none;\n}\n\n.reset-icon,\n.download-icon {\n  width: 22px;\n  height: 22px;\n  fill: none;\n  stroke: currentColor;\n  stroke-linecap: round;\n  stroke-linejoin: round;\n  stroke-width: 2.4;\n}\n\n.reset-label,\n.download-label {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  overflow: hidden;\n  clip: rect(0 0 0 0);\n  white-space: nowrap;\n}\n\nlabel {\n  display: grid;\n  gap: 6px;\n  color: var(--muted);\n  font-size: 12px;\n  font-weight: 800;\n  text-transform: uppercase;\n}\n\nselect,\ninput,\ntextarea {\n  width: 100%;\n  min-height: 44px;\n  border: 1px solid var(--line);\n  border-radius: 6px;\n  padding: 0 12px;\n  background: var(--panel-strong);\n  color: var(--ink);\n  font-weight: 700;\n}\n\nselect:focus-visible,\ninput:focus-visible,\ntextarea:focus-visible {\n  outline: none;\n  border-color: var(--accent);\n  box-shadow: 0 0 0 3px var(--accent-glow);\n}\n\ntextarea {\n  min-height: 108px;\n  padding: 10px 12px;\n  resize: vertical;\n}\n\n.alert-region {\n  display: grid;\n  gap: 8px;\n  margin: 12px 16px 0;\n}\n\n.alert-region:empty {\n  display: none;\n}\n\n.alert {\n  border: 1px solid rgba(232, 161, 60, 0.4);\n  border-radius: 6px;\n  padding: 12px 14px;\n  background: rgba(232, 161, 60, 0.12);\n  color: #f0c07a;\n  font-weight: 650;\n}\n\n.toast-region {\n  position: fixed;\n  bottom: 16px;\n  left: 50%;\n  transform: translateX(-50%);\n  display: grid;\n  gap: 8px;\n  z-index: 60;\n  width: min(480px, calc(100vw - 24px));\n  pointer-events: none;\n}\n\n.toast-region:empty {\n  display: none;\n}\n\n.toast {\n  display: flex;\n  align-items: flex-start;\n  gap: 10px;\n  border: 1px solid rgba(255, 255, 255, 0.16);\n  border-radius: 8px;\n  padding: 12px 14px;\n  background: var(--panel-strong);\n  color: var(--ink);\n  font-weight: 600;\n  box-shadow: var(--shadow);\n  pointer-events: auto;\n}\n\n.toast-message {\n  flex: 1;\n  min-width: 0;\n}\n\n.toast-dismiss {\n  flex: none;\n  height: 24px;\n  min-width: 24px;\n  min-height: 0;\n  padding: 0 6px;\n  border: none;\n  border-radius: 4px;\n  background: transparent;\n  color: inherit;\n  font-size: 16px;\n  font-weight: 700;\n  letter-spacing: 0;\n  line-height: 1;\n  text-transform: none;\n  box-shadow: none;\n  cursor: pointer;\n}\n\n.toast-dismiss:hover {\n  background: rgba(255, 255, 255, 0.12);\n  filter: none;\n}\n\n.mobile-summary-bar,\n.mobile-progress {\n  display: none;\n}\n\n.mobile-drawer-button,\n.mobile-drawer-header,\n.mobile-drawer-backdrop {\n  display: none;\n}\n\n.mobile-drawer-button-right {\n  display: none;\n  align-items: center;\n  justify-content: center;\n  gap: 8px;\n  min-width: 0;\n  border: 1px solid var(--ghost-border);\n  background: transparent;\n  color: var(--ink);\n  box-shadow: none;\n}\n\n.toolbar .mobile-drawer-button-right {\n  display: inline-flex;\n  min-height: 44px;\n  padding: 0 14px;\n  font-size: 12.5px;\n}\n\n.mobile-drawer-button-right:hover,\n.mobile-drawer-button-right:focus-visible,\n.mobile-drawer-button-right[aria-expanded="true"] {\n  border-color: var(--accent);\n  background: var(--ghost-hover-bg);\n  color: var(--ink);\n  filter: none;\n}\n\n.summary-drawer-icon {\n  font-size: 16px;\n  line-height: 1;\n}\n\n.workspace {\n  display: grid;\n  grid-template-columns: 240px minmax(0, 1fr);\n  min-height: 760px;\n  /* clip (not hidden) so position: sticky descendants (paint vehicle stage,\n     docked summary panel) track the window scroll instead of a dead\n     scroll container */\n  overflow: clip;\n}\n\n.step-rail {\n  border-right: 1px solid var(--hairline);\n  background: var(--panel);\n  padding: 14px 12px;\n}\n\n.step-link {\n  display: grid;\n  grid-template-columns: 26px 1fr;\n  align-items: center;\n  gap: 8px;\n  width: 100%;\n  min-height: 42px;\n  margin-bottom: 3px;\n  padding: 0 8px;\n  border: 1px solid transparent;\n  border-radius: 7px;\n  background: transparent;\n  color: var(--dim);\n  text-align: left;\n  font-size: 13px;\n  font-weight: 750;\n  letter-spacing: 0;\n  text-transform: none;\n  box-shadow: none;\n  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;\n}\n\n.step-link:hover {\n  background: rgba(255, 255, 255, 0.04);\n  filter: none;\n}\n\n.step-link.complete {\n  color: #cfd3d6;\n}\n\n.step-link.active {\n  border-color: var(--hairline-strong);\n  background: rgba(255, 255, 255, 0.05);\n  color: var(--accent);\n}\n\n.step-index {\n  display: inline-grid;\n  place-items: center;\n  width: 22px;\n  height: 22px;\n  border-radius: 50%;\n  background: rgba(255, 255, 255, 0.08);\n  color: var(--dim);\n  font-size: 11px;\n  font-weight: 850;\n}\n\n.step-link.complete .step-index {\n  background: var(--ok-bg);\n  color: var(--ok);\n}\n\n.step-link.active .step-index {\n  background: var(--accent);\n  color: var(--on-accent);\n}\n\n.choice-panel {\n  min-width: 0;\n  padding: 16px 28px 28px;\n  /* signature 1a carbon checker`... 44661 more characters,
+    expected: /--shell-radius:\s*8px/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests/stingray-form-regression.test.mjs:753:1
+✖ summary drawer is callable from desktop and condensed at smaller breakpoints (0.761875ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /\.reset-icon-button,\n\.download-icon-button\s*\{[\s\S]*width:\s*42px/. Input:
+  
+  '/* ============================================================\n' +
+    '   2027 Corvette Order Form — Option 1a "Full Carbon" theme.\n' +
+    '   Normative sources: export-page/form-style-1a/SPEC.md and\n' +
+    '   export-page/form-style-1a/reference/1a-reference.html.\n' +
+    '   Accent variables are dynamic — app.js re-themes --accent /\n' +
+    '   --accent-dark / --on-accent / --accent-glow to follow the\n' +
+    '   selected exterior paint.\n' +
+    '   ============================================================ */\n' +
+    ':root {\n' +
+    '  color-scheme: dark;\n' +
+    '  --bg: #0c0e0f;\n' +
+    '  --panel: #101315;\n' +
+    '  --panel-strong: #14181b;\n' +
+    '  --ink: #f4f1eb;\n' +
+    '  --muted: #a9aeb1;\n' +
+    '  --dim: #8b9094;\n' +
+    '  --line: #262c31;\n' +
+    '  --hairline: rgba(255, 255, 255, 0.07);\n' +
+    '  --hairline-strong: rgba(255, 255, 255, 0.12);\n' +
+    '  --accent: #d0425a;\n' +
+    '  --accent-dark: #b22234;\n' +
+    '  --on-accent: #ffffff;\n' +
+    '  --accent-glow: rgba(208, 66, 90, 0.4);\n' +
+    '  --ok: #35b85d;\n' +
+    '  --ok-bg: rgba(53, 184, 93, 0.16);\n' +
+    '  --warn: #e8a13c;\n' +
+    '  --disabled: #5c6166;\n' +
+    '  --choice-bg: #14181b;\n' +
+    '  --choice-hover: #181d20;\n' +
+    '  --choice-hover-border: #3a4248;\n' +
+    '  --choice-hover-shadow: 6px 6px 0 rgba(38, 44, 49, 0.95);\n' +
+    '  --control-bg: rgba(255, 255, 255, 0.06);\n' +
+    '  --control-border: rgba(255, 255, 255, 0.14);\n' +
+    '  --control-hover: rgba(255, 255, 255, 0.1);\n' +
+    '  --ghost-border: rgba(255, 255, 255, 0.24);\n' +
+    '  --ghost-hover-bg: rgba(255, 255, 255, 0.05);\n' +
+    '  --shadow: 0 18px 48px rgba(0, 0, 0, 0.55);\n' +
+    '  --shell-gap: 12px;\n' +
+    '}\n' +
+    '\n' +
+    '* {\n' +
+    '  box-sizing: border-box;\n' +
+    '}\n' +
+    '\n' +
+    'body {\n' +
+    '  margin: 0;\n' +
+    '  min-width: 320px;\n' +
+    '  /* full-page carbon checker to match the homepage (stingray-homepage index.html) */\n' +
+    '  background-color: var(--bg);\n' +
+    '  background-image:\n' +
+    '    linear-gradient(45deg, #181c1f 25%, transparent 25%, transparent 75%, #181c1f 75%),\n' +
+    '    linear-gradient(45deg, #181c1f 25%, transparent 25%, transparent 75%, #181c1f 75%);\n' +
+    '  background-size: 6px 6px;\n' +
+    '  background-position: 0 0, 3px 3px;\n' +
+    '  color: var(--ink);\n' +
+    '  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;\n' +
+    '  -webkit-font-smoothing: antialiased;\n' +
+    '}\n' +
+    '\n' +
+    'button,\n' +
+    'select,\n' +
+    'input,\n' +
+    'textarea {\n' +
+    '  font: inherit;\n' +
+    '}\n' +
+    '\n' +
+    '.app-shell {\n' +
+    '  display: grid;\n' +
+    '  gap: 0;\n' +
+    '  /* full-bleed like the homepage: body carries the carbon background, the\n' +
+    '     shell is layout-only (no desk margin, border, radius, or own background).\n' +
+    '     clip (not hidden) avoids creating a scroll container, so the paint\n' +
+    "     step's sticky vehicle stage tracks the window */\n" +
+    '  width: 100%;\n' +
+    '  margin: 0;\n' +
+    '  overflow: clip;\n' +
+    '}\n' +
+    '\n' +
+    '.accent-stripe {\n' +
+    '  height: 3px;\n' +
+    '  background: linear-gradient(90deg, var(--accent-dark), var(--accent), var(--accent-dark));\n' +
+    '}\n' +
+    '\n' +
+    '.topbar {\n' +
+    '  display: flex;\n' +
+    '  align-items: center;\n' +
+    '  justify-content: space-between;\n' +
+    '  gap: 18px;\n' +
+    '  padding: 12px 24px;\n' +
+    '  background: rgba(11, 13, 14, 0.92);\n' +
+    '  border-bottom: 1px solid var(--hairline);\n' +
+    '}\n' +
+    '\n' +
+    '.topbar > div:first-of-type,\n' +
+    '.brand-block > div {\n' +
+    '  min-width: 0;\n' +
+    '}\n' +
+    '\n' +
+    '.brand-block {\n' +
+    '  display: flex;\n' +
+    '  align-items: center;\n' +
+    '  gap: 14px;\n' +
+    '  min-width: 0;\n' +
+    '}\n' +
+    '\n' +
+    '.brand-block .brand-crossflags {\n' +
+    '  height: 26px;\n' +
+    '  width: auto;\n' +
+    '  opacity: 0.95;\n' +
+    '}\n' +
+    '\n' +
+    '.brand-block .brand-wordmark {\n' +
+    '  height: 30px;\n' +
+    '  width: auto;\n' +
+    '}\n' +
+    '\n' +
+    '.brand-divider {\n' +
+    '  width: 1px;\n' +
+    '  height: 36px;\n' +
+    '  margin: 0 8px;\n' +
+    '  background: var(--hairline-strong);\n' +
+    '}\n' +
+    '\n' +
+    '.eyebrow {\n' +
+    '  margin: 0 0 4px;\n' +
+    '  color: var(--accent);\n' +
+    '  font-size: 11px;\n' +
+    '  font-weight: 800;\n' +
+    '  letter-spacing: 0.14em;\n' +
+    '  text-transform: uppercase;\n' +
+    '}\n' +
+    '\n' +
+    'h1,\n' +
+    'h2,\n' +
+    'h3 {\n' +
+    '  margin: 0;\n' +
+    '  letter-spacing: 0;\n' +
+    '}\n' +
+    '\n' +
+    'h1 {\n' +
+    '  font-size: 21px;\n' +
+    '  font-weight: 850;\n' +
+    '  letter-spacing: 0.02em;\n' +
+    '  line-height: 1.15;\n' +
+    '  text-transform: uppercase;\n' +
+    '}\n' +
+    '\n' +
+    'h2 {\n' +
+    '  font-size: 22px;\n' +
+    '}\n' +
+    '\n' +
+    'h3 {\n' +
+    '  font-size: 16px;\n' +
+    '}\n' +
+    '\n' +
+    '.toolbar {\n' +
+    '  display: flex;\n' +
+    '  flex-wrap: wrap;\n' +
+    '  align-items: center;\n' +
+    '  justify-content: flex-end;\n' +
+    '  gap: 10px;\n' +
+    '}\n' +
+    '\n' +
+    '.toolbar-action-group {\n' +
+    '  display: flex;\n' +
+    '  align-items: center;\n' +
+    '  justify-content: flex-end;\n' +
+    '  gap: 8px;\n' +
+    '}\n' +
+    '\n' +
+    '.toolbar-build-group {\n' +
+    '  padding-left: 10px;\n' +
+    '  border-left: 1px solid var(--hairline-strong);\n' +
+    '}\n' +
+    '\n' +
+    '.model-picker {\n' +
+    '  display: grid;\n' +
+    '  gap: 4px;\n' +
+    '  min-width: 150px;\n' +
+    '  color: var(--muted);\n' +
+    '  font-size: 12px;\n' +
+    '  font-weight: 800;\n' +
+    '  text-transform: uppercase;\n' +
+    '}\n' +
+    '\n' +
+    '.model-picker select {\n' +
+    '  min-height: 42px;\n' +
+    '}\n' +
+    '\n' +
+    'button {\n' +
+    '  min-height: 44px;\n' +
+    '  border: 0;\n' +
+    '  border-radius: 7px;\n' +
+    '  padding: 0 16px;\n' +
+    '  background: var(--accent);\n' +
+    '  color: var(--on-accent);\n' +
+    '  cursor: pointer;\n' +
+    '  font-size: 12.5px;\n' +
+    '  font-weight: 800;\n' +
+    '  letter-spacing: 0.04em;\n' +
+    '  text-transform: uppercase;\n' +
+    '  box-shadow: 0 8px 24px var(--accent-glow);\n' +
+    '  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, color 140ms ease, filter 140ms ease;\n' +
+    '}\n' +
+    '\n' +
+    'button:hover {\n' +
+    '  filter: brightness(1.08);\n' +
+    '}\n' +
+    '\n' +
+    'button:disabled {\n' +
+    '  border-color: transparent;\n' +
+    '  background: var(--disabled);\n' +
+    '  color: #1a1d1f;\n' +
+    '  box-shadow: none;\n' +
+    '  cursor: not-allowed;\n' +
+    '  filter: none;\n' +
+    '}\n' +
+    '\n' +
+    '.ghost-button {\n' +
+    '  background: transparent;\n' +
+    '  border: 1px solid var(--ghost-border);\n' +
+    '  color: var(--ink);\n' +
+    '  box-shadow: none;\n' +
+    '}\n' +
+    '\n' +
+    '.ghost-button:hover {\n' +
+    '  border-color: var(--accent);\n' +
+    '  background: var(--ghost-hover-bg);\n' +
+    '  filter: none;\n' +
+    '}\n' +
+    '\n' +
+    '.reset-icon-button,\n' +
+    '.download-icon-button {\n' +
+    '  display: inline-grid;\n' +
+    '  place-items: center;\n' +
+    '  width: 44px;\n' +
+    '  min-width: 44px;\n' +
+    '  padding: 0;\n' +
+    '  background: var(--control-bg);\n' +
+    '  border: 1px solid var(--control-border);\n' +
+    '  border-radius: 8px;\n' +
+    '  color: #cfd3d6;\n' +
+    '  box-shadow: none;\n' +
+    '}\n' +
+    '\n' +
+    '.reset-icon-button:hover,\n' +
+    '.download-icon-button:hover {\n' +
+    '  border-color: rgba(255, 255, 255, 0.3);\n' +
+    '  background: var(--control-bg);\n' +
+    '  color: #ffffff;\n' +
+    '  filter: none;\n' +
+    '}\n' +
+    '\n' +
+    '.reset-icon,\n' +
+    '.download-icon {\n' +
+    '  width: 22px;\n' +
+    '  height: 22px;\n' +
+    '  fill: none;\n' +
+    '  stroke: currentColor;\n' +
+    '  stroke-linecap: round;\n' +
+    '  stroke-linejoin: round;\n' +
+    '  stroke-width: 2.4;\n' +
+    '}\n' +
+    '\n' +
+    '.reset-label,\n' +
+    '.download-label {\n' +
+    '  position: absolute;\n' +
+    '  width: 1px;\n' +
+    '  height: 1px;\n' +
+    '  overflow: hidden;\n' +
+    '  clip: rect(0 0 0 0);\n' +
+    '  white-space: nowrap;\n' +
+    '}\n' +
+    '\n' +
+    'label {\n' +
+    '  display: grid;\n' +
+    '  gap: 6px;\n' +
+    '  color: var(--muted);\n' +
+    '  font-size: 12px;\n' +
+    '  font-weight: 800;\n' +
+    '  text-transform: uppercase;\n' +
+    '}\n' +
+    '\n' +
+    'select,\n' +
+    'input,\n' +
+    'textarea {\n' +
+    '  width: 100%;\n' +
+    '  min-height: 44px;\n' +
+    '  border: 1px solid var(--line);\n' +
+    '  border-radius: 6px;\n' +
+    '  padding: 0 12px;\n' +
+    '  background: var(--panel-strong);\n' +
+    '  color: var(--ink);\n' +
+    '  font-weight: 700;\n' +
+    '}\n' +
+    '\n' +
+    'select:focus-visible,\n' +
+    'input:focus-visible,\n' +
+    'textarea:focus-visible {\n' +
+    '  outline: none;\n' +
+    '  border-color: var(--accent);\n' +
+    '  box-shadow: 0 0 0 3px var(--accent-glow);\n' +
+    '}\n' +
+    '\n' +
+    'textarea {\n' +
+    '  min-height: 108px;\n' +
+    '  padding: 10px 12px;\n' +
+    '  resize: vertical;\n' +
+    '}\n' +
+    '\n' +
+    '.alert-region {\n' +
+    '  display: grid;\n' +
+    '  gap: 8px;\n' +
+    '  margin: 12px 16px 0;\n' +
+    '}\n' +
+    '\n' +
+    '.alert-region:empty {\n' +
+    '  display: none;\n' +
+    '}\n' +
+    '\n' +
+    '.alert {\n' +
+    '  border: 1px solid rgba(232, 161, 60, 0.4);\n' +
+    '  border-radius: 6px;\n' +
+    '  padding: 12px 14px;\n' +
+    '  background: rgba(232, 161, 60, 0.12);\n' +
+    '  color: #f0c07a;\n' +
+    '  font-weight: 650;\n' +
+    '}\n' +
+    '\n' +
+    '.toast-region {\n' +
+    '  position: fixed;\n' +
+    '  bottom: 16px;\n' +
+    '  left: 50%;\n' +
+    '  transform: translateX(-50%);\n' +
+    '  display: grid;\n' +
+    '  gap: 8px;\n' +
+    '  z-index: 60;\n' +
+    '  width: min(480px, calc(100vw - 24px));\n' +
+    '  pointer-events: none;\n' +
+    '}\n' +
+    '\n' +
+    '.toast-region:empty {\n' +
+    '  display: none;\n' +
+    '}\n' +
+    '\n' +
+    '.toast {\n' +
+    '  display: flex;\n' +
+    '  align-items: flex-start;\n' +
+    '  gap: 10px;\n' +
+    '  border: 1px solid rgba(255, 255, 255, 0.16);\n' +
+    '  border-radius: 8px;\n' +
+    '  padding: 12px 14px;\n' +
+    '  background: var(--panel-strong);\n' +
+    '  color: var(--ink);\n' +
+    '  font-weight: 600;\n' +
+    '  box-shadow: var(--shadow);\n' +
+    '  pointer-events: auto;\n' +
+    '}\n' +
+    '\n' +
+    '.toast-message {\n' +
+    '  flex: 1;\n' +
+    '  min-width: 0;\n' +
+    '}\n' +
+    '\n' +
+    '.toast-dismiss {\n' +
+    '  flex: none;\n' +
+    '  height: 24px;\n' +
+    '  min-width: 24px;\n' +
+    '  min-height: 0;\n' +
+    '  padding: 0 6px;\n' +
+    '  border: none;\n' +
+    '  border-radius: 4px;\n' +
+    '  background: transparent;\n' +
+    '  color: inherit;\n' +
+    '  font-size: 16px;\n' +
+    '  font-weight: 700;\n' +
+    '  letter-spacing: 0;\n' +
+    '  line-height: 1;\n' +
+    '  text-transform: none;\n' +
+    '  box-shadow: none;\n' +
+    '  cursor: pointer;\n' +
+    '}\n' +
+    '\n' +
+    '.toast-dismiss:hover {\n' +
+    '  background: rgba(255, 255, 255, 0.12);\n' +
+    '  filter: none;\n' +
+    '}\n' +
+    '\n' +
+    '.mobile-summary-bar,\n' +
+    '.mobile-progress {\n' +
+    '  display: none;\n' +
+    '}\n' +
+    '\n' +
+    '.mobile-drawer-button,\n' +
+    '.mobile-drawer-header,\n' +
+    '.mobile-drawer-backdrop {\n' +
+    '  display: none;\n' +
+    '}\n' +
+    '\n' +
+    '.mobile-drawer-button-right {\n' +
+    '  display: none;\n' +
+    '  align-items: center;\n' +
+    '  justify-content: center;\n' +
+    '  gap: 8px;\n' +
+    '  min-width: 0;\n' +
+    '  border: 1px solid var(--ghost-border);\n' +
+    '  background: transparent;\n' +
+    '  color: var(--ink);\n' +
+    '  box-shadow: none;\n' +
+    '}\n' +
+    '\n' +
+    '.toolbar .mobile-drawer-button-right {\n' +
+    '  display: inline-flex;\n' +
+    '  min-height: 44px;\n' +
+    '  padding: 0 14px;\n' +
+    '  font-size: 12.5px;\n' +
+    '}\n' +
+    '\n' +
+    '.mobile-drawer-button-right:hover,\n' +
+    '.mobile-drawer-button-right:focus-visible,\n' +
+    '.mobile-drawer-button-right[aria-expanded="true"] {\n' +
+    '  border-color: var(--accent);\n' +
+    '  background: var(--ghost-hover-bg);\n' +
+    '  color: var(--ink);\n' +
+    '  filter: none;\n' +
+    '}\n' +
+    '\n' +
+    '.summary-drawer-icon {\n' +
+    '  font-size: 16px;\n' +
+    '  line-height: 1;\n' +
+    '}\n' +
+    '\n' +
+    '.workspace {\n' +
+    '  display: grid;\n' +
+    '  grid-template-columns: 240px minmax(0, 1fr);\n' +
+    '  min-height: 760px;\n' +
+    '  /* clip (not hidden) so position: sticky descendants (paint vehicle stage,\n' +
+    '     docked summary panel) track the window scroll instead of a dead\n' +
+    '     scroll container */\n' +
+    '  overflow: clip;\n' +
+    '}\n' +
+    '\n' +
+    '.step-rail {\n' +
+    '  border-right: 1px solid var(--hairline);\n' +
+    '  background: var(--panel);\n' +
+    '  padding: 14px 12px;\n' +
+    '}\n' +
+    '\n' +
+    '.step-link {\n' +
+    '  display: grid;\n' +
+    '  grid-template-columns: 26px 1fr;\n' +
+    '  align-items: center;\n' +
+    '  gap: 8px;\n' +
+    '  width: 100%;\n' +
+    '  min-height: 42px;\n' +
+    '  margin-bottom: 3px;\n' +
+    '  padding: 0 8px;\n' +
+    '  border: 1px solid transparent;\n' +
+    '  border-radius: 7px;\n' +
+    '  background: transparent;\n' +
+    '  color: var(--dim);\n' +
+    '  text-align: left;\n' +
+    '  font-size: 13px;\n' +
+    '  font-weight: 750;\n' +
+    '  letter-spacing: 0;\n' +
+    '  text-transform: none;\n' +
+    '  box-shadow: none;\n' +
+    '  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;\n' +
+    '}\n' +
+    '\n' +
+    '.step-link:hover {\n' +
+    '  background: rgba(255, 255, 255, 0.04);\n' +
+    '  filter: none;\n' +
+    '}\n' +
+    '\n' +
+    '.step-link.complete {\n' +
+    '  color: #cfd3d6;\n' +
+    '}\n' +
+    '\n' +
+    '.step-link.active {\n' +
+    '  border-color: var(--hairline-strong);\n' +
+    '  background: rgba(255, 255, 255, 0.05);\n' +
+    '  color: var(--accent);\n' +
+    '}\n' +
+    '\n' +
+    '.step-index {\n' +
+    '  display: inline-grid;\n' +
+    '  place-items: center;\n' +
+    '  width: 22px;\n' +
+    '  height: 22px;\n' +
+    '  border-radius: 50%;\n' +
+    '  background: rgba(255, 255, 255, 0.08);\n' +
+    '  color: var(--dim);\n' +
+    '  font-size: 11px;\n' +
+    '  font-weight: 850;\n' +
+    '}\n' +
+    '\n' +
+    '.step-link.complete .step-index {\n' +
+    '  background: var(--ok-bg);\n' +
+    '  color: var(--ok);\n' +
+    '}\n' +
+    '\n' +
+    '.step-link.active .step-index {\n' +
+    '  background: var(--accent);\n' +
+    '  color: var(--on-accent);\n' +
+    '}\n' +
+    '\n' +
+    '.choice-panel {\n' +
+    '  min-width: 0;\n' +
+    '  padding: 16px 28px 28px;\n' +
+    '  /* signature 1a carbon checker'... 32525 more characters
+  
+      at TestContext.<anonymous> (file:///Users/seandm/Projects/27vette/.claude/worktrees/reverent-keller-6ce2fe/tests/stingray-form-regression.test.mjs:766:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: `/* ============================================================\n   2027 Corvette Order Form — Option 1a "Full Carbon" theme.\n   Normative sources: export-page/form-style-1a/SPEC.md and\n   export-page/form-style-1a/reference/1a-reference.html.\n   Accent variables are dynamic — app.js re-themes --accent /\n   --accent-dark / --on-accent / --accent-glow to follow the\n   selected exterior paint.\n   ============================================================ */\n:root {\n  color-scheme: dark;\n  --bg: #0c0e0f;\n  --panel: #101315;\n  --panel-strong: #14181b;\n  --ink: #f4f1eb;\n  --muted: #a9aeb1;\n  --dim: #8b9094;\n  --line: #262c31;\n  --hairline: rgba(255, 255, 255, 0.07);\n  --hairline-strong: rgba(255, 255, 255, 0.12);\n  --accent: #d0425a;\n  --accent-dark: #b22234;\n  --on-accent: #ffffff;\n  --accent-glow: rgba(208, 66, 90, 0.4);\n  --ok: #35b85d;\n  --ok-bg: rgba(53, 184, 93, 0.16);\n  --warn: #e8a13c;\n  --disabled: #5c6166;\n  --choice-bg: #14181b;\n  --choice-hover: #181d20;\n  --choice-hover-border: #3a4248;\n  --choice-hover-shadow: 6px 6px 0 rgba(38, 44, 49, 0.95);\n  --control-bg: rgba(255, 255, 255, 0.06);\n  --control-border: rgba(255, 255, 255, 0.14);\n  --control-hover: rgba(255, 255, 255, 0.1);\n  --ghost-border: rgba(255, 255, 255, 0.24);\n  --ghost-hover-bg: rgba(255, 255, 255, 0.05);\n  --shadow: 0 18px 48px rgba(0, 0, 0, 0.55);\n  --shell-gap: 12px;\n}\n\n* {\n  box-sizing: border-box;\n}\n\nbody {\n  margin: 0;\n  min-width: 320px;\n  /* full-page carbon checker to match the homepage (stingray-homepage index.html) */\n  background-color: var(--bg);\n  background-image:\n    linear-gradient(45deg, #181c1f 25%, transparent 25%, transparent 75%, #181c1f 75%),\n    linear-gradient(45deg, #181c1f 25%, transparent 25%, transparent 75%, #181c1f 75%);\n  background-size: 6px 6px;\n  background-position: 0 0, 3px 3px;\n  color: var(--ink);\n  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;\n  -webkit-font-smoothing: antialiased;\n}\n\nbutton,\nselect,\ninput,\ntextarea {\n  font: inherit;\n}\n\n.app-shell {\n  display: grid;\n  gap: 0;\n  /* full-bleed like the homepage: body carries the carbon background, the\n     shell is layout-only (no desk margin, border, radius, or own background).\n     clip (not hidden) avoids creating a scroll container, so the paint\n     step's sticky vehicle stage tracks the window */\n  width: 100%;\n  margin: 0;\n  overflow: clip;\n}\n\n.accent-stripe {\n  height: 3px;\n  background: linear-gradient(90deg, var(--accent-dark), var(--accent), var(--accent-dark));\n}\n\n.topbar {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 18px;\n  padding: 12px 24px;\n  background: rgba(11, 13, 14, 0.92);\n  border-bottom: 1px solid var(--hairline);\n}\n\n.topbar > div:first-of-type,\n.brand-block > div {\n  min-width: 0;\n}\n\n.brand-block {\n  display: flex;\n  align-items: center;\n  gap: 14px;\n  min-width: 0;\n}\n\n.brand-block .brand-crossflags {\n  height: 26px;\n  width: auto;\n  opacity: 0.95;\n}\n\n.brand-block .brand-wordmark {\n  height: 30px;\n  width: auto;\n}\n\n.brand-divider {\n  width: 1px;\n  height: 36px;\n  margin: 0 8px;\n  background: var(--hairline-strong);\n}\n\n.eyebrow {\n  margin: 0 0 4px;\n  color: var(--accent);\n  font-size: 11px;\n  font-weight: 800;\n  letter-spacing: 0.14em;\n  text-transform: uppercase;\n}\n\nh1,\nh2,\nh3 {\n  margin: 0;\n  letter-spacing: 0;\n}\n\nh1 {\n  font-size: 21px;\n  font-weight: 850;\n  letter-spacing: 0.02em;\n  line-height: 1.15;\n  text-transform: uppercase;\n}\n\nh2 {\n  font-size: 22px;\n}\n\nh3 {\n  font-size: 16px;\n}\n\n.toolbar {\n  display: flex;\n  flex-wrap: wrap;\n  align-items: center;\n  justify-content: flex-end;\n  gap: 10px;\n}\n\n.toolbar-action-group {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;\n  gap: 8px;\n}\n\n.toolbar-build-group {\n  padding-left: 10px;\n  border-left: 1px solid var(--hairline-strong);\n}\n\n.model-picker {\n  display: grid;\n  gap: 4px;\n  min-width: 150px;\n  color: var(--muted);\n  font-size: 12px;\n  font-weight: 800;\n  text-transform: uppercase;\n}\n\n.model-picker select {\n  min-height: 42px;\n}\n\nbutton {\n  min-height: 44px;\n  border: 0;\n  border-radius: 7px;\n  padding: 0 16px;\n  background: var(--accent);\n  color: var(--on-accent);\n  cursor: pointer;\n  font-size: 12.5px;\n  font-weight: 800;\n  letter-spacing: 0.04em;\n  text-transform: uppercase;\n  box-shadow: 0 8px 24px var(--accent-glow);\n  transition: background 140ms ease, border-color 140ms ease, box-shadow 140ms ease, color 140ms ease, filter 140ms ease;\n}\n\nbutton:hover {\n  filter: brightness(1.08);\n}\n\nbutton:disabled {\n  border-color: transparent;\n  background: var(--disabled);\n  color: #1a1d1f;\n  box-shadow: none;\n  cursor: not-allowed;\n  filter: none;\n}\n\n.ghost-button {\n  background: transparent;\n  border: 1px solid var(--ghost-border);\n  color: var(--ink);\n  box-shadow: none;\n}\n\n.ghost-button:hover {\n  border-color: var(--accent);\n  background: var(--ghost-hover-bg);\n  filter: none;\n}\n\n.reset-icon-button,\n.download-icon-button {\n  display: inline-grid;\n  place-items: center;\n  width: 44px;\n  min-width: 44px;\n  padding: 0;\n  background: var(--control-bg);\n  border: 1px solid var(--control-border);\n  border-radius: 8px;\n  color: #cfd3d6;\n  box-shadow: none;\n}\n\n.reset-icon-button:hover,\n.download-icon-button:hover {\n  border-color: rgba(255, 255, 255, 0.3);\n  background: var(--control-bg);\n  color: #ffffff;\n  filter: none;\n}\n\n.reset-icon,\n.download-icon {\n  width: 22px;\n  height: 22px;\n  fill: none;\n  stroke: currentColor;\n  stroke-linecap: round;\n  stroke-linejoin: round;\n  stroke-width: 2.4;\n}\n\n.reset-label,\n.download-label {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  overflow: hidden;\n  clip: rect(0 0 0 0);\n  white-space: nowrap;\n}\n\nlabel {\n  display: grid;\n  gap: 6px;\n  color: var(--muted);\n  font-size: 12px;\n  font-weight: 800;\n  text-transform: uppercase;\n}\n\nselect,\ninput,\ntextarea {\n  width: 100%;\n  min-height: 44px;\n  border: 1px solid var(--line);\n  border-radius: 6px;\n  padding: 0 12px;\n  background: var(--panel-strong);\n  color: var(--ink);\n  font-weight: 700;\n}\n\nselect:focus-visible,\ninput:focus-visible,\ntextarea:focus-visible {\n  outline: none;\n  border-color: var(--accent);\n  box-shadow: 0 0 0 3px var(--accent-glow);\n}\n\ntextarea {\n  min-height: 108px;\n  padding: 10px 12px;\n  resize: vertical;\n}\n\n.alert-region {\n  display: grid;\n  gap: 8px;\n  margin: 12px 16px 0;\n}\n\n.alert-region:empty {\n  display: none;\n}\n\n.alert {\n  border: 1px solid rgba(232, 161, 60, 0.4);\n  border-radius: 6px;\n  padding: 12px 14px;\n  background: rgba(232, 161, 60, 0.12);\n  color: #f0c07a;\n  font-weight: 650;\n}\n\n.toast-region {\n  position: fixed;\n  bottom: 16px;\n  left: 50%;\n  transform: translateX(-50%);\n  display: grid;\n  gap: 8px;\n  z-index: 60;\n  width: min(480px, calc(100vw - 24px));\n  pointer-events: none;\n}\n\n.toast-region:empty {\n  display: none;\n}\n\n.toast {\n  display: flex;\n  align-items: flex-start;\n  gap: 10px;\n  border: 1px solid rgba(255, 255, 255, 0.16);\n  border-radius: 8px;\n  padding: 12px 14px;\n  background: var(--panel-strong);\n  color: var(--ink);\n  font-weight: 600;\n  box-shadow: var(--shadow);\n  pointer-events: auto;\n}\n\n.toast-message {\n  flex: 1;\n  min-width: 0;\n}\n\n.toast-dismiss {\n  flex: none;\n  height: 24px;\n  min-width: 24px;\n  min-height: 0;\n  padding: 0 6px;\n  border: none;\n  border-radius: 4px;\n  background: transparent;\n  color: inherit;\n  font-size: 16px;\n  font-weight: 700;\n  letter-spacing: 0;\n  line-height: 1;\n  text-transform: none;\n  box-shadow: none;\n  cursor: pointer;\n}\n\n.toast-dismiss:hover {\n  background: rgba(255, 255, 255, 0.12);\n  filter: none;\n}\n\n.mobile-summary-bar,\n.mobile-progress {\n  display: none;\n}\n\n.mobile-drawer-button,\n.mobile-drawer-header,\n.mobile-drawer-backdrop {\n  display: none;\n}\n\n.mobile-drawer-button-right {\n  display: none;\n  align-items: center;\n  justify-content: center;\n  gap: 8px;\n  min-width: 0;\n  border: 1px solid var(--ghost-border);\n  background: transparent;\n  color: var(--ink);\n  box-shadow: none;\n}\n\n.toolbar .mobile-drawer-button-right {\n  display: inline-flex;\n  min-height: 44px;\n  padding: 0 14px;\n  font-size: 12.5px;\n}\n\n.mobile-drawer-button-right:hover,\n.mobile-drawer-button-right:focus-visible,\n.mobile-drawer-button-right[aria-expanded="true"] {\n  border-color: var(--accent);\n  background: var(--ghost-hover-bg);\n  color: var(--ink);\n  filter: none;\n}\n\n.summary-drawer-icon {\n  font-size: 16px;\n  line-height: 1;\n}\n\n.workspace {\n  display: grid;\n  grid-template-columns: 240px minmax(0, 1fr);\n  min-height: 760px;\n  /* clip (not hidden) so position: sticky descendants (paint vehicle stage,\n     docked summary panel) track the window scroll instead of a dead\n     scroll container */\n  overflow: clip;\n}\n\n.step-rail {\n  border-right: 1px solid var(--hairline);\n  background: var(--panel);\n  padding: 14px 12px;\n}\n\n.step-link {\n  display: grid;\n  grid-template-columns: 26px 1fr;\n  align-items: center;\n  gap: 8px;\n  width: 100%;\n  min-height: 42px;\n  margin-bottom: 3px;\n  padding: 0 8px;\n  border: 1px solid transparent;\n  border-radius: 7px;\n  background: transparent;\n  color: var(--dim);\n  text-align: left;\n  font-size: 13px;\n  font-weight: 750;\n  letter-spacing: 0;\n  text-transform: none;\n  box-shadow: none;\n  transition: background 140ms ease, border-color 140ms ease, color 140ms ease;\n}\n\n.step-link:hover {\n  background: rgba(255, 255, 255, 0.04);\n  filter: none;\n}\n\n.step-link.complete {\n  color: #cfd3d6;\n}\n\n.step-link.active {\n  border-color: var(--hairline-strong);\n  background: rgba(255, 255, 255, 0.05);\n  color: var(--accent);\n}\n\n.step-index {\n  display: inline-grid;\n  place-items: center;\n  width: 22px;\n  height: 22px;\n  border-radius: 50%;\n  background: rgba(255, 255, 255, 0.08);\n  color: var(--dim);\n  font-size: 11px;\n  font-weight: 850;\n}\n\n.step-link.complete .step-index {\n  background: var(--ok-bg);\n  color: var(--ok);\n}\n\n.step-link.active .step-index {\n  background: var(--accent);\n  color: var(--on-accent);\n}\n\n.choice-panel {\n  min-width: 0;\n  padding: 16px 28px 28px;\n  /* signature 1a carbon checker`... 32525 more characters,
+    expected: /\.reset-icon-button,\n\.download-icon-button\s*\{[\s\S]*width:\s*42px/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at tests/stingray-form-regression.test.mjs:896:1
+✖ vehicle setup exposes paced readability hooks without changing option step content (2.6385ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /outline:\s*2px solid transparent/. Input:
+  
+  '.choice-card {\n  gap: 6px;\n  min-height: 0;\n  padding: 9px;\n}'
+  
+      at TestContext.<anonymous> (file:///Users/seandm/Projects/27vette/.claude/worktrees/reverent-keller-6ce2fe/tests/stingray-form-regression.test.mjs:946:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '.choice-card {\n  gap: 6px;\n  min-height: 0;\n  padding: 9px;\n}',
+    expected: /outline:\s*2px solid transparent/,
+    operator: 'match',
+    diff: 'simple'
+  }

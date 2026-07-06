@@ -1,0 +1,38 @@
+== validate_fable5_loop ==
+Fable 5 loop validation passed (see run log)
+
+== validate_workbook_schema stingray_master.xlsx ==
+status valid, issue_count 0
+
+== node gates (serial, node --test tests/<name>.test.mjs) ==
+stingray-form-regression: tests 88 pass 84 fail 4
+stingray-generator-stability: tests 15 pass 15 fail 0
+grand-sport-contract-preview: ℹ tests 6 ℹ pass 6 ℹ fail 0 
+grand-sport-draft-data: ℹ tests 19 ℹ pass 19 ℹ fail 0 
+z06-contract-preview: ℹ tests 3 ℹ pass 3 ℹ fail 0 
+z06-form-data-draft: ℹ tests 24 ℹ pass 24 ℹ fail 0 
+z06-interior-accessory-cleanup: ℹ tests 7 ℹ pass 7 ℹ fail 0 
+z06-performance-package-interactions: ℹ tests 21 ℹ pass 21 ℹ fail 0 
+z06-runtime-rule-corrections: ℹ tests 15 ℹ pass 15 ℹ fail 0 
+z06-runtime-promotion: ℹ tests 5 ℹ pass 5 ℹ fail 0 
+multi-model-runtime-switching: ℹ tests 46 ℹ pass 45 ℹ fail 1 
+workbook-schema-standardization: ℹ tests 9 ℹ pass 9 ℹ fail 0 
+workbook-visual-copy-standardization: ℹ tests 8 ℹ pass 8 ℹ fail 0 
+
+== pytest gate (PYTHONPATH=scripts) ==
+tests/test_model_config_metadata.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py tests/test_rule_derivation.py: 75 passed
+
+== gate-induced churn (restored via git restore) ==
+form-app/data.js + form-output/runtime/{grand-sport,z06}-runtime-contract.json: timestamp-only (3 generated_at lines); z06-runtime-promotion.test.mjs:157 runs generate_registry.py
+
+== failing test details ==
+stingray failures: 'mobile shell exposes compact progress and summary targets', 'shell containers share one spacing and radius rhythm', 'summary drawer is callable from desktop and condensed at smaller breakpoints', 'vehicle setup exposes paced readability hooks without changing option step content' — all old-theme CSS assertions vs Full Carbon styles.css (afa36fb 2026-07-03)
+switching failure: 'runtime progressively advances vehicle setup panels before exterior paint' — expects 'ready' setup stage removed by bf4576a 2026-07-04 (app.js:104 vehicleSetupStages = [model, body_style, trim_level])
+
+== implementation phase (post-approval, 2026-07-05 evening) ==
+node --test tests/stingray-form-regression.test.mjs: tests 88 pass 88 fail 0
+node --test tests/multi-model-runtime-switching.test.mjs: tests 46 pass 46 fail 0
+node --test tests/grand-sport-draft-data.test.mjs (canary): tests 19 pass 19 fail 0
+node --test tests/z06-runtime-promotion.test.mjs (canary): tests 5 pass 5 fail 0
+gate churn (data.js + runtime contracts, timestamp-only) restored via git restore; git status -- form-output form-app clean
+implementation verifier: PASS (scope, diff quality, 12/12 deleted assertions confirmed stale, 158/158 gate evidence)

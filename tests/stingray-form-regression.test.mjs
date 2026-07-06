@@ -53,7 +53,9 @@ function cssOrderFor(selector, source = stylesSource) {
 
 function cssBlock(selector, source = stylesSource) {
   const escapedSelector = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return source.match(new RegExp(`${escapedSelector}\\s*\\{[\\s\\S]*?\\}`))?.[0] || "";
+  // anchor to line start so scoped overrides (e.g. "#stepContent[...] .choice-card")
+  // earlier in the sheet cannot shadow the base block
+  return source.match(new RegExp(`(?:^|\\n)${escapedSelector}\\s*\\{[\\s\\S]*?\\}`))?.[0] || "";
 }
 
 function makeElement() {
@@ -731,19 +733,21 @@ test("mobile shell exposes compact progress and summary targets", () => {
   assert.match(htmlSource, /id="summaryDrawer"/);
   assert.match(htmlSource, /<h3 id="variantName">Stingray<\/h3>/);
   assert.doesNotMatch(htmlSource, /<h2 id="variantName"/);
-  assert.match(stylesSource, /\.summary-panel\s*\{[\s\S]*padding:\s*8px;/);
-  assert.match(stylesSource, /\.summary-card\s*\{[\s\S]*margin-bottom:\s*8px;[\s\S]*padding:\s*14px;/);
+  assert.match(cssBlock(".summary-panel"), /padding:\s*14px 12px;/);
+  assert.match(cssBlock(".summary-card"), /margin-bottom:\s*10px;[\s\S]*padding:\s*14px;/);
   assert.equal(cssOrderFor("#summaryOverviewCard"), 1);
   assert.equal(cssOrderFor("#requirementsCard"), 2);
   assert.equal(cssOrderFor("#selectedRposCard"), 3);
   assert.equal(cssOrderFor("#autoAddedCard"), 4);
 });
 
-test("shell containers share one spacing and radius rhythm", () => {
-  assert.match(stylesSource, /--shell-gap:\s*12px/);
-  assert.match(stylesSource, /--shell-radius:\s*8px/);
-  assert.match(stylesSource, /\.app-shell\s*\{[\s\S]*display:\s*grid;[\s\S]*gap:\s*var\(--shell-gap\)/);
-  assert.match(stylesSource, /\.topbar,\n\.workspace\s*\{[\s\S]*border-radius:\s*var\(--shell-radius\)/);
+test("shell containers stay full-bleed without the retired desk rhythm", () => {
+  const appShellBlock = cssBlock(".app-shell");
+  assert.match(appShellBlock, /display:\s*grid;/);
+  assert.match(appShellBlock, /gap:\s*0;/);
+  assert.match(appShellBlock, /overflow:\s*clip;/);
+  assert.doesNotMatch(stylesSource, /--shell-radius/);
+  assert.doesNotMatch(stylesSource, /gap:\s*var\(--shell-gap\)/);
   assert.match(stylesSource, /\.alert-region:empty\s*\{\s*display:\s*none;\s*\}/);
   assert.doesNotMatch(stylesSource, /\.vehicle-bar/);
   assert.doesNotMatch(stylesSource, /border-radius:\s*8px 8px 0 0/);
@@ -754,7 +758,9 @@ test("summary drawer is callable from desktop and condensed at smaller breakpoin
   const baseStyles = stylesSource.slice(0, stylesSource.indexOf("@media (max-width: 1120px)"));
   const middleStart = stylesSource.indexOf("@media (max-width: 1120px)");
   const narrowDesktopStart = stylesSource.indexOf("@media (min-width: 761px) and (max-width: 887px)");
-  const mobileStart = stylesSource.indexOf("@media (max-width: 760px)");
+  // the paint step adds an earlier scoped 760px block; the shell mobile
+  // breakpoint is the one after the narrow-desktop breakpoint
+  const mobileStart = stylesSource.indexOf("@media (max-width: 760px)", narrowDesktopStart);
   const reducedMotionStart = stylesSource.indexOf("@media (prefers-reduced-motion: reduce)");
   const middleBreakpoint = stylesSource.slice(middleStart, narrowDesktopStart);
   const narrowDesktopBreakpoint = stylesSource.slice(narrowDesktopStart, mobileStart);
@@ -763,7 +769,7 @@ test("summary drawer is callable from desktop and condensed at smaller breakpoin
   assert.match(baseStyles, /grid-template-columns:\s*240px minmax\(0, 1fr\)/);
   assert.match(baseStyles, /@media \(min-width: 1121px\)\s*\{[\s\S]*grid-template-columns:\s*240px minmax\(0, 1fr\) 340px[\s\S]*\.summary-panel\s*\{[\s\S]*position:\s*sticky/);
   assert.match(baseStyles, /\.toolbar \.mobile-drawer-button-right\s*\{[\s\S]*display:\s*inline-flex/);
-  assert.match(baseStyles, /\.reset-icon-button,\n\.download-icon-button\s*\{[\s\S]*width:\s*42px/);
+  assert.match(baseStyles, /\.reset-icon-button,\n\.download-icon-button\s*\{[\s\S]*width:\s*44px/);
   assert.match(baseStyles, /\.reset-icon,\n\.download-icon\s*\{[\s\S]*stroke-linecap:\s*round/);
   assert.match(baseStyles, /\.toolbar-build-group\s*\{[\s\S]*border-left:\s*1px/);
   assert.match(baseStyles, /\.summary-panel\s*\{[\s\S]*position:\s*fixed;[\s\S]*transform:\s*translateX\(100%\)/);
@@ -790,7 +796,7 @@ test("summary drawer is callable from desktop and condensed at smaller breakpoin
   assert.match(mobileBreakpoint, /\.mobile-summary-bar > span:last-child\s*\{[\s\S]*width:\s*36px/);
   assert.doesNotMatch(mobileBreakpoint, /\.mobile-summary-bar > span:last-child::after/);
   assert.match(mobileBreakpoint, /\.mobile-progress\[data-has-next="false"\]\s*\{[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\)/);
-  assert.match(mobileBreakpoint, /\.toolbar\s*\{[\s\S]*grid-template-columns:\s*42px 42px minmax\(0, 1fr\)/);
+  assert.match(mobileBreakpoint, /\.toolbar\s*\{[\s\S]*grid-template-columns:\s*44px 44px minmax\(0, 1fr\)/);
   assert.match(mobileBreakpoint, /\.toolbar #downloadBuildButton\s*\{[\s\S]*grid-column:\s*2/);
   assert.match(mobileBreakpoint, /\.toolbar #submitDealerButton\s*\{[\s\S]*grid-column:\s*3/);
   assert.match(mobileBreakpoint, /\.setup-choice-grid,\n\s*\.trim-setup-group \.setup-choice-grid\s*\{[\s\S]*grid-template-columns:\s*1fr/);
@@ -948,12 +954,12 @@ test("vehicle setup exposes paced readability hooks without changing option step
   assert.match(cssBlock(".choice-card"), /outline-color 140ms ease/);
   assert.match(cssBlock(".choice-card.selected"), /outline-color:\s*var\(--accent\)/);
   assert.doesNotMatch(cssBlock(".choice-card.selected"), /border-color|background-image|box-shadow|inset/);
-  assert.match(cssBlock(".choice-card.selected:hover"), /outline-color:\s*var\(--accent-dark\)/);
+  assert.match(cssBlock(".choice-card.selected:hover"), /outline-color:\s*var\(--accent\)/);
   assert.doesNotMatch(cssBlock(".choice-card.selected:hover"), /background-image|inset/);
   assert.match(cssBlock(".choice-card.auto"), /outline-color:\s*var\(--ok\)/);
   assert.doesNotMatch(cssBlock(".choice-card.selected.auto"), /background-image|box-shadow|inset/);
   assert.match(cssBlock(".choice-card:focus-visible"), /outline-color:\s*transparent/);
-  assert.match(cssBlock(".choice-card:focus-visible"), /box-shadow:\s*0 0 0 3px rgba\(178, 34, 52, 0\.35\)/);
+  assert.match(cssBlock(".choice-card:focus-visible"), /box-shadow:\s*0 0 0 3px var\(--accent-glow\)/);
   assert.match(cssBlock(".choice-availability"), /min-height:\s*24px/);
   assert.match(stylesSource, /\.vehicle-setup-equipment-disclosure\s*\{/);
   assert.match(stylesSource, /\.vehicle-setup-next-action\s*\{[\s\S]*justify-content:\s*space-between/);
@@ -991,12 +997,14 @@ test("vehicle setup exposes paced readability hooks without changing option step
   assert.doesNotMatch(trimSetupHtml, /<details class="vehicle-setup-equipment-disclosure" open/);
   assert.doesNotMatch(trimSetupHtml, /sets the comfort and finish level/);
 
+  assert.match(trimSetupHtml, /data-setup-stage="body_style" data-setup-chip-state="complete"/);
+  assert.match(trimSetupHtml, /<span>✓<\/span>\s*<strong>Body Style<\/strong>/);
+  assert.match(trimSetupHtml, /class="vehicle-setup-chip active" type="button" data-setup-stage="trim_level"/);
+
+  // the review ("ready") stage is retired; unknown stages normalize back to model
   runtime.state.vehicleSetupStage = "ready";
   runtime.render();
-  const readySetupHtml = runtime.elements.get("#stepContent").innerHTML;
-  assert.match(readySetupHtml, /data-setup-stage="trim_level" data-setup-chip-state="complete"/);
-  assert.match(readySetupHtml, /<span>✓<\/span>\s*<strong>Trim<\/strong>/);
-  assert.doesNotMatch(readySetupHtml, /class="vehicle-setup-chip active" type="button" data-setup-stage="trim_level"/);
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /data-vehicle-setup-stage="model"/);
 
   runtime.activateStep("body_style");
   assert.equal(runtime.elements.get("#stepContent").dataset.activeStep, "model");
