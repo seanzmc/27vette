@@ -1,0 +1,34 @@
+{
+  "id": "2026-07-06-pass-b3-review-refinements",
+  "started_at": "2026-07-06T12:00:00-04:00",
+  "completed_at": "2026-07-06T14:00:00-04:00",
+  "objective": "Address Sean's 11 checkpoint-2 field notes on the review stage: marker-aware copy splitting, price filter + wholesale single-match accept, exclusive pool picker, in-file duplicate lane, standard-equipment scoping, status-nuance clarity, copy-bar/label/redundancy fixes, deferral suggestions, presentation explanations, section provenance.",
+  "changed_surface": "wizard tooling/UI/tests: copy_split.py (marker-aware), decisions.py (status_needs_review, duplicate_rpo_groups, standardBehavior), session.py (lane scoping, filters, suggestions, sectionDecisions), ingest_wizard_server.py (priceMatch param), visualizer/ingest-wizard/*, tests (76 green)",
+  "outcome_rubric": "fable5loop/runs/2026-07-06-pass-b3-review-refinements/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-06-pass-b3-review-refinements/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-06-pass-b3-review-refinements/validation-output.txt",
+  "state_updates": [
+    {"section": "Verified facts", "evidence": "fable5loop/runs/2026-07-06-pass-b3-review-refinements/verifier-report.md"},
+    {"section": "Last session", "evidence": "fable5loop/runs/2026-07-06-pass-b3-review-refinements/validation-output.txt"}
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-06-pass-b3-review-refinements/verifier-report.md",
+    "detail": "Rubric-metric lesson: criteria must name a measurable metric instead of adverbs like 'materially'; verifier before/after reproduction via git show HEAD: into scratchpad modules recorded as standard probe."
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 1,
+    "pattern": "adversarial-verification",
+    "cycle1": "pass - all 11 criteria; advisory materiality caveat on splitter flag counts (length heuristics dominate residual queue); every checkable number independently reproduced"
+  },
+  "boundaries_preserved": [
+    "workbook (read-only opens only; clean before/after)",
+    "generated artifacts (tracked form-output clean; run dirs gitignored)",
+    "runtime app (untouched)",
+    "dealer submission (untouched)"
+  ]
+}

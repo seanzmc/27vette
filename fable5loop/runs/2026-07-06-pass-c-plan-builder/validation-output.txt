@@ -1,0 +1,39 @@
+=== Pass C validation · 2026-07-06 ===
+
+== suites ==
+128 passed in 54.70s (13 files: 6 plan-flow, 6 editor extension, all wizard suites, editor_ops apply/meta regressions; earlier full editor server suites 69 passed)
+wizard.js syntax OK
+
+== real-data end-to-end proof (repo root store; live workbook read-only + scratch copy) ==
+run 20260706-130958-1ea3ca: all three models decisions completed programmatically (bulk-equivalent), mark_complete true
+build_apply_plan: state plan_built; dry-run ok; stage1 validated (live extract), stage1Scratch applied (temp copy), stage2 validated with schemaErrors=0 on scratch carrying all three models
+plan: 52 scaffolding ops + 4,473 data ops; cleared scaffold rows incl. zr1_options 213 / zr1_ovs 852 / zr1x_options 214 / zr1x_ovs 856 + rule/exclusive rows; unreviewed splits gsx 148 / zr1 106 / zr1x 106; uncovered approved decisions 0; gaps 0
+approve_plan('smoke-proof'): plan_approved; plan-approval.json written; LIVE WORKBOOK BYTE-IDENTICAL before/after; protected surfaces clean
+plan GET endpoint returns full detail (verified via browser fetch: approvedBy, clearedRows, unreviewedSplits)
+
+== defects caught by the real-data dry run (fixed + tested) ==
+1. add-after-delete duplicate key: new option ids now seeded against existing scaffold ids (editor_ops rejects re-using a deleted key in-batch)
+2. collapsed duplicate occurrences left their decisions uncovered: coverage now maps them to the primary option op
+3. extension tests leaked into tracked form-output/workbook-edit-log.jsonl via DEFAULT_LOG_PATH: tests now pass tempdir log_path; tracked log restored
+
+== not browser-verified ==
+stage-6 UI render not walked visually end-to-end (module-scoped state blocks synthetic render; API payload verified; render code covered by same suites) — walk it in the next real review session
+
+(protected surfaces empty = clean)
+
+=== post-verifier conditions + advisories (applied) ===
+condition 1: test_editor_lints.py 3 real-workbook failures recorded here + STATE: pre-existing at HEAD (stale expectations from dc9f442 raw import; verifier proved byte-identical on pristine HEAD; same class as the c7939f0 fix); NOT a Pass C regression; verifier spawned a re-anchor task chip
+condition 2: stage-6 visual browser walk carried into Pass D rubric as a mandatory pre-apply gate item (STATE next-action)
+advisory a: rubric label deviation noted — plan reports unreviewed script splits under report.unreviewedSplits (+ md section), not a literal script_split_unreviewed string
+advisory b: approve_plan now compares workbook sha256, not just mtimeNs
+advisory c: new test test_workbook_change_blocks_approval (mtime-preserving byte change rejected)
+advisory d: fixture scaffold id changed to opt_pdb_001 — locks the add-after-delete seeding fix as a committed regression test
+suites after fixes: 89 passed in 3.77s
+(protected surfaces empty = clean)
+
+=== closeout: loop validator ===
+Fable 5 loop validation failed:
+- fable5loop/runs/2026-07-06-pass-c-plan-builder verifier report missing required section: File Edit Statement
+exit=1
+Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.
+exit=0

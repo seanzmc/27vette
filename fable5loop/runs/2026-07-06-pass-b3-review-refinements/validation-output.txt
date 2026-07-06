@@ -1,0 +1,22 @@
+=== Pass B.3 validation · 2026-07-06 ===
+
+== suites ==
+76 passed in 2.32s (marker-aware splitter tests reworked; duplicate lane now group-keyed)
+wizard.js syntax OK (node --check)
+
+== protected surfaces ==
+(empty = clean)
+
+== browser proof (real 28-sheet export) ==
+finding 2: select-all/clear-selection bulk buttons removed; header checkbox owns select-all (note in bulk bar)
+finding 3: copy bar reads 'Copy zr1's finished decisions to grand_sport_x' + 'also replace decisions I've already made here' (default off)
+finding 4: price-state filter visible on price lane; bulk 'Accept 248 single-price matches (all filtered, undecided)' needs no checking; checked rows narrow it
+finding 5: exclusive pool picker renders 298 checkable options with assigned-section + pick-one-section note; group built from checked
+finding 6: splitter matches numbered in-cell disclosure lines to status markers (SiriusXM A1 case verified in unit tests); flagged exception rows 156 -> 148 and disclosures now populated from numbered lines
+finding 7: status-nuance queue only genuinely ambiguous rows (GSX 174 -> 98) with per-status plain-language explanation ('A/D' -> parsed available; dealer-installed nuance)
+finding 8: duplicate lane = in-file RPO collisions grouped per RPO, one decision per group; explains workbook matching is the reference line's job
+finding 9: standard-equipment lane = 93 no-RPO rows (+ any candidates assigned to standard-behavior sections); no orderable options stranded
+finding 10: deferrals lane pre-seeds 3 concrete suggested items per model with one-click record + purpose explanation
+finding 11: presentation lane shows friendly names (Form steps, Section display, ...) + purpose per sheet + go-live requirement explanation
+finding 1 (question): sections sourced from workbook section_master — now stated in the lane description
+console errors: none
