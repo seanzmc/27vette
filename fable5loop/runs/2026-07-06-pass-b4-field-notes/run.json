@@ -1,0 +1,34 @@
+{
+  "id": "2026-07-06-pass-b4-field-notes",
+  "started_at": "2026-07-06T17:30:00-04:00",
+  "completed_at": "2026-07-06T19:00:00-04:00",
+  "objective": "Address Sean's 16 second-round field notes (several blocked him from reaching stage 6): skip-without-section + completeness/plan exemption, actionable variant reconciliation with new-model framing, comma-rule copy splitting with exception flags, source-group filter fallback, model-scoped standard-equipment gate, selectable/active flags into the plan, bulk reference-section assign, group-decision edit/clear, review layout + invisible-text fixes, and plain-language answers to the five question findings.",
+  "changed_surface": "wizard tooling/UI/tests/docs: copy_split.py (comma rule), decisions.py (skip exemption, model-scoped availability, workbookHasScaffold), session.py (SE filter, source groups, duplicate-name flag, reconciliation decisions), plan_builder.py (skip-inert coverage, selectable/active, no_variants_mapped), visualizer/ingest-wizard/*, fixtures + 3 test files (105 green), ingest docs",
+  "outcome_rubric": "fable5loop/runs/2026-07-06-pass-b4-field-notes/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-06-pass-b4-field-notes/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-06-pass-b4-field-notes/validation-output.txt",
+  "state_updates": [
+    {"section": "Verified facts", "evidence": "fable5loop/runs/2026-07-06-pass-b4-field-notes/verifier-report.md"},
+    {"section": "Last session", "evidence": "fable5loop/runs/2026-07-06-pass-b4-field-notes/validation-output.txt"}
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-06-pass-b4-field-notes/validation-output.txt",
+    "detail": "Two durable lessons: (1) user reports of 'empty/never populates' controls can be contrast bugs — the reference-model dropdown had full data behind a #555-on-#111214 label; verify computed styles, not just DOM/payload presence. (2) Duplicate detection must key on the domain's identity (distinct RPOs), not surface strings — candidate-count dedup flagged 298/298 because GM legitimately lists every RPO on two sheets."
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 1,
+    "pattern": "adversarial-verification",
+    "cycle1": "pass - all 10 criteria; verifier reproduced suites (104+69), every real-export number (298 orderable, 174/174 markers, 97 duplicate flags from 13 distinct-RPO collisions, SE exclusions incl. BC7), confirmed selectable/active survive apply via live sheet headers; 2 recommended follow-ups (NEW!+ regex, full-scope duplicate flag) applied post-verdict + regression test"
+  },
+  "boundaries_preserved": [
+    "workbook (read-only opens only; byte-identical after all proofs)",
+    "generated artifacts (tracked form-output clean; run dirs gitignored)",
+    "runtime app (untouched)",
+    "dealer submission (untouched)"
+  ]
+}

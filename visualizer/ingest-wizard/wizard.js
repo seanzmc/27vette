@@ -432,12 +432,15 @@ async function loadModels() {
     }
   }
   renderModels();
+  if (payload.selection) {
+    // Returning to this stage after a selection: restore the reconciliation
+    // panel (and its pending mandatory decisions) instead of hiding it.
+    reloadReconciliation().catch(() => {});
+  }
 }
 
 function renderModels() {
-  const comparatorChoices = modelState.options
-    .filter((m) => !m.isDefaultTarget)
-    .map((m) => m.modelKey);
+  const comparatorChoices = modelState.options.filter((m) => !m.isDefaultTarget);
   $("#model-cards").innerHTML = modelState.options
     .map((model) => {
       const isTarget = modelState.targets.has(model.modelKey);
@@ -448,8 +451,8 @@ function renderModels() {
               <option value="">none</option>
               ${comparatorChoices
                 .map(
-                  (key) =>
-                    `<option value="${escapeHtml(key)}" ${key === comparator ? "selected" : ""}>${escapeHtml(key)}</option>`
+                  (choice) =>
+                    `<option value="${escapeHtml(choice.modelKey)}" ${choice.modelKey === comparator ? "selected" : ""}>${escapeHtml(choice.label)}</option>`
                 )
                 .join("")}
             </select></label>`
@@ -515,18 +518,89 @@ function renderReconciliation() {
     const rows = entry.exportVariants
       .map((v) => `<span class="vchip">${escapeHtml(v.modelCode)} ${escapeHtml(v.trim)} ${escapeHtml(v.bodyStyle)}</span>`)
       .join("");
-    const verdict = entry.agrees
-      ? '<span class="conf conf-high">matches workbook scaffold</span>'
-      : `<span class="conf conf-low">disagrees — ${entry.exportOnly.length} export-only, ${entry.workbookOnly.length} workbook-only (mandatory decision)</span>`;
+    let verdict;
+    if (entry.agrees) {
+      verdict = '<span class="conf conf-high">matches workbook scaffold</span>';
+    } else if (!entry.workbookHasScaffold) {
+      verdict = `<span class="conf conf-medium">new model — no workbook variants yet; confirm the export's ${entry.exportVariants.length}</span>`;
+    } else {
+      verdict = `<span class="conf conf-low">disagrees — ${entry.exportOnly.length} export-only, ${entry.workbookOnly.length} workbook-only</span>`;
+    }
+    let actions = "";
+    if (!entry.agrees) {
+      if (entry.decision) {
+        actions = `<div class="card-stats">
+          <span class="conf conf-high">decided — ${escapeHtml(labelFor(ACTION_LABELS, entry.decision.action))} (${escapeHtml(labelFor(RESOLUTION_LABELS, entry.decision.resolution))})</span>
+          <button class="ghost recon-clear" data-decision-id="${escapeHtml(entry.decision.decisionId)}">Clear</button>
+        </div>`;
+      } else {
+        const explain = entry.workbookHasScaffold
+          ? "The export and the workbook scaffold disagree. Pick one before decisions can complete:"
+          : "This model has no variant rows in the workbook yet — that's expected for a new model. Confirm the export's variants:";
+        actions = `<div class="card-stats">${escapeHtml(explain)}</div>
+          <div class="sheet-actions">
+            <button class="primary recon-accept" data-model="${escapeHtml(key)}">Accept the export's variants</button>
+            <button class="ghost recon-question" data-model="${escapeHtml(key)}">Record a business question</button>
+          </div>`;
+      }
+    }
     return `<div class="card"><div class="card-head"><span class="card-title">${escapeHtml(key)}</span>${verdict}</div>
-      <div class="variant-chips">${rows}</div></div>`;
+      <div class="variant-chips">${rows}</div>${actions}</div>`;
   });
   $("#reconciliation").innerHTML = blocks.length
-    ? `<h2 class="sub-h">Variant reconciliation</h2><div class="cards">${blocks.join("")}</div>
+    ? `<h2 class="sub-h">Variant reconciliation</h2>
+       <p class="hint">The export's variant columns vs the workbook's variant rows. A mismatch is a mandatory call — decide it here (it used to hide in the review lanes).</p>
+       <div class="cards">${blocks.join("")}</div>
        <div class="sheet-actions"><button id="to-review-btn" class="primary">Start decision review</button></div>`
     : "";
   const toReview = $("#to-review-btn");
   if (toReview) toReview.addEventListener("click", () => enterReview());
+  document.querySelectorAll(".recon-accept, .recon-question").forEach((button) =>
+    button.addEventListener("click", async () => {
+      clearError();
+      const question = button.classList.contains("recon-question");
+      try {
+        await postJSON(`/api/wizard/sessions/${state.session.runId}/decisions`, {
+          decisions: [
+            {
+              model: button.dataset.model,
+              lane: "relationship",
+              groupKey: "variant_reconciliation",
+              action: question ? "needs_product_decision" : "confirm_export_variants",
+              payload: {
+                exportVariants: (models[button.dataset.model] || {}).exportVariants || [],
+              },
+              resolution: question ? "hold_for_question" : "approved_for_plan",
+              reviewerNote: question ? "Variant lineup needs a business answer." : "",
+            },
+          ],
+        });
+        await reloadReconciliation();
+      } catch (error) {
+        showError(error.message);
+      }
+    })
+  );
+  document.querySelectorAll(".recon-clear").forEach((button) =>
+    button.addEventListener("click", async () => {
+      clearError();
+      try {
+        await postJSON(`/api/wizard/sessions/${state.session.runId}/decisions/delete`, {
+          decisionIds: [button.dataset.decisionId],
+        });
+        await reloadReconciliation();
+      } catch (error) {
+        showError(error.message);
+      }
+    })
+  );
+}
+
+async function reloadReconciliation() {
+  modelState.reconciliation = await getJSON(
+    `/api/wizard/sessions/${state.session.runId}/reconciliation`
+  );
+  renderReconciliation();
 }
 
 $("#to-models-btn").addEventListener("click", async () => {
@@ -573,26 +647,33 @@ const ACTION_LABELS = {
   defer_price_extractor: ["Defer — fix price source later", "Price stays empty in the plan until decided."],
   create_exclusive_group: ["Create pick-one group", "Members can't be ordered together."],
   create_relationship_candidate: ["Record relationship", "Requires/includes/excludes between options."],
-  needs_product_decision: ["Flag for product call", "Needs a business answer before the plan."],
+  needs_product_decision: [
+    "Record business question",
+    "Saves the open question into the plan report — no rule or row is written until it's answered.",
+  ],
+  confirm_export_variants: ["Accept export variants", "The export's variant lineup is the right one for this model."],
   split_copy: ["Set customer copy", "Name / description / fine print for the form."],
   confirm_status: ["Confirm as parsed", "The parsed availability status is right."],
   mark_unresolved_blocked: ["Can't resolve — block it", "Status can't be determined from the source."],
   classify_duplicate_source: ["Classify duplicate", "Same option or different by context?"],
   include_standard_equipment: ["Include as standard", "Shows as standard equipment for this model."],
-  exclude_row: ["Leave out", "Row won't be carried into the workbook."],
+  exclude_row: [
+    "Leave out — don't write this row",
+    "The row is not carried into the workbook. Nothing that already exists is deleted.",
+  ],
   defer_item: ["Defer for later", "Named item to handle in the apply pass."],
   approve_presentation_rows: ["Approve rows", "Approves this sheet's presentation rows."],
 };
 
 const LANE_DESCRIPTIONS = {
-  section: "Pick where each option lives in the form. Sections come from the workbook's section_master sheet — the same sections live models use.",
-  price: "Settle every option's price. Filter by price state; single matches can be accepted wholesale.",
-  exclusive_group: "Group options the customer must pick only one of. Rarely needed for options already in a pick-one section.",
-  relationship: "Record requires / includes / not-available-with rules between options.",
-  copy_split: "The script split every row into name / description / fine print (footnote digits on statuses matched to their numbered lines) — fix only the flagged ones.",
+  section: "Pick where each option lives in the form. Sections come from the workbook's section_master sheet — the same sections live models use. Skip — don't carry over saves without a section and drops the row from the plan.",
+  price: "Settle every option's price. Filter by price state; single matches can be accepted wholesale. A typed reviewed $ overrides the discovered price. Rows you skipped in Section assignment don't need a price.",
+  exclusive_group: "Group options the customer must pick only one of. Rarely needed for options already in a pick-one section (listed below) — the section already enforces it.",
+  relationship: "Record requires / includes / not-available-with rules between options. \"Record business question\" saves an open question instead of a rule.",
+  copy_split: "Names follow your comma rule: text before the first comma (LPO rows use the part between the first and second comma); the rest is description; footnote-numbered lines are fine print. Fix only the flagged exceptions — one-word names, duplicates, unmatched footnotes.",
   status_nuance: "Only rows with genuinely ambiguous availability symbols (□ upgradeable, D dealer-install, unknown) — confirm the parsed reading or block the row.",
   duplicate: "Same RPO on more than one source sheet in this ingest file — one option or context-distinct?",
-  standard_equipment: "Rows without an orderable RPO, plus anything you assigned to a standard section — decide what shows as standard equipment.",
+  standard_equipment: "Rows without an orderable RPO, plus anything you assigned to a standard section. Rows that are available-to-order on this model (A statuses) are options, not standard equipment — they're excluded automatically.",
   interior_media_deferral: "Record named to-dos the wizard can't parse (interiors, colors, images) so the apply plan carries them as open items.",
   presentation: "Approve the form's skeleton for this model — steps, section display, order summary. Required before the model can go live.",
 };
@@ -626,6 +707,7 @@ const reviewState = {
   checked: new Set(),
   queueKey: "",
   lastBatch: null, // {batchId, count, queueKey}
+  lastBulkNote: "",
   splitShowAll: false,
 };
 
@@ -696,7 +778,7 @@ function populateSourceSections() {
   const current = select.value;
   const sections = reviewState.payload.sourceSections || [];
   select.innerHTML =
-    '<option value="">All source sections</option>' +
+    '<option value="">All source groups</option>' +
     sections
       .map((label) => `<option value="${escapeHtml(label)}" ${label === current ? "selected" : ""}>${escapeHtml(label)}</option>`)
       .join("");
@@ -786,7 +868,9 @@ function laneRowControls(lane, candidate) {
       reference && reference.sectionId
         ? `<button class="ref-use-section ghost" data-section="${escapeHtml(reference.sectionId)}" title="${escapeHtml(reference.sectionName || reference.sectionId)}">Use ${escapeHtml(reference.modelKey)}'s section</button>`
         : "";
-    controls = `${sectionSelect(payload.sectionId || "")}${useReference}`;
+    controls = `${sectionSelect(payload.sectionId || "")}${useReference}
+      <label class="dec-inline" title="Row is written but can't be picked — display/reference only."><input type="checkbox" class="dec-not-selectable" ${payload.selectable === false ? "checked" : ""}> not selectable</label>
+      <label class="dec-inline" title="Row is written with active = false — hidden from the form until turned on."><input type="checkbox" class="dec-inactive" ${payload.active === false ? "checked" : ""}> inactive</label>`;
   } else if (lane === "price") {
     const exact = candidate.priceMatch === "exact";
     const rows = (candidate.priceRows || [])
@@ -798,7 +882,7 @@ function laneRowControls(lane, candidate) {
     controls = `
       ${exact ? `<label class="dec-inline"><input type="checkbox" class="dec-price-exact" ${!decision || decision.action === "accept_exact_price" ? "checked" : ""}> accept ${fmtPrice(candidate.listPrice ?? (candidate.priceRows[0] || {}).listPrice)}</label>` : ""}
       ${rows ? `<select class="dec-price-row"><option value="">— pick price row —</option>${rows}</select>` : ""}
-      <input class="dec-price-manual" type="number" step="0.01" placeholder="reviewed $" value="${payload.reviewedPrice ?? ""}">
+      <input class="dec-price-manual" type="number" step="0.01" placeholder="reviewed $" title="Overrides the discovered price — the plan writes this value." value="${payload.reviewedPrice ?? ""}">
       <label class="dec-inline"><input type="checkbox" class="dec-price-none" ${decision && decision.action === "confirm_no_price" ? "checked" : ""}> no price</label>
       <label class="dec-inline"><input type="checkbox" class="dec-price-defer" ${decision && decision.action === "defer_price_extractor" ? "checked" : ""}> defer</label>`;
   } else if (lane === "copy_split") {
@@ -843,7 +927,7 @@ function laneRowControls(lane, candidate) {
   return `
     ${controls}
     <select class="dec-resolution">${resolutionOptions(decision ? decision.resolution : "approved_for_plan")}</select>
-    <input class="dec-note" placeholder="note" value="${escapeHtml(decision ? decision.reviewerNote : "")}">
+    <input class="dec-note" placeholder="note" title="Saved with the decision — shows on recorded decisions, the holds report, and the plan's holds list. Never written to the workbook." value="${escapeHtml(decision ? decision.reviewerNote : "")}">
     <button class="dec-save primary" data-id="${escapeHtml(candidate.candidateId)}">Save</button>
     ${decision ? '<span class="conf conf-high">saved</span>' : ""}`;
 }
@@ -854,9 +938,19 @@ function collectRowDecision(lane, row, candidateId) {
   let action = "";
   let payload = {};
   if (lane === "section") {
-    action = "assign_section";
-    payload = { sectionId: row.querySelector(".dec-section").value };
-    if (!payload.sectionId) throw new Error("Pick a section first.");
+    const sectionId = row.querySelector(".dec-section").value;
+    if (sectionId) {
+      action = "assign_section";
+      payload = { sectionId };
+      if (row.querySelector(".dec-not-selectable").checked) payload.selectable = false;
+      if (row.querySelector(".dec-inactive").checked) payload.active = false;
+    } else if (resolution === "not_needed") {
+      // Skip — don't carry over: valid without a section; the row stays out
+      // of the plan and owes no price decision.
+      action = "exclude_row";
+    } else {
+      throw new Error("Pick a section, or choose “Skip — don't carry over” to drop the row.");
+    }
   } else if (lane === "price") {
     const exact = row.querySelector(".dec-price-exact");
     const rowSelect = row.querySelector(".dec-price-row");
@@ -1051,7 +1145,7 @@ function groupFormFields(lane) {
       ${selectControl("group-kind-select", RELATIONSHIP_KINDS, "", "— kind —").replace('class="group-kind-select"', 'class="group-kind-select" id="group-kind"')}
       <input id="group-source" placeholder="source RPO">
       <input id="group-targets" placeholder="target RPOs, comma-separated">
-      <label class="dec-inline"><input type="checkbox" id="group-product-decision"> needs product decision</label>`;
+      <label class="dec-inline" title="Saves an open question into the plan report instead of writing a rule — use when the right rule needs a business answer first."><input type="checkbox" id="group-product-decision"> record as business question (no rule written)</label>`;
   }
   return `
     <input id="group-key" placeholder="deferral name (e.g. gsx-interior-scope)">
@@ -1065,9 +1159,11 @@ function renderGroupLane(lane) {
       (decision) => `
       <tr class="cand-row">
         <td class="rpo">${escapeHtml(decision.groupKey)}</td>
-        <td class="desc">${escapeHtml(decision.action.replaceAll("_", " "))} · ${escapeHtml(groupPayloadSummary(decision))}</td>
-        <td>${escapeHtml(decision.resolution.replaceAll("_", " "))}</td>
+        <td class="desc">${escapeHtml(labelFor(ACTION_LABELS, decision.action))} · ${escapeHtml(groupPayloadSummary(decision))}</td>
+        <td>${escapeHtml(labelFor(RESOLUTION_LABELS, decision.resolution))}</td>
         <td>${escapeHtml(decision.reviewerNote)}${decision.copiedFrom ? ` <span class="cell-sub">copied from ${escapeHtml(decision.copiedFrom)}</span>` : ""}</td>
+        <td><button class="group-edit ghost" data-decision-id="${escapeHtml(decision.decisionId)}">Edit</button>
+            <button class="group-clear ghost" data-decision-id="${escapeHtml(decision.decisionId)}">Clear</button></td>
       </tr>`
     )
     .join("");
@@ -1085,9 +1181,14 @@ function renderGroupLane(lane) {
           )
           .join("")
       : "";
+  const pickOneSections = (reviewState.payload.sections || [])
+    .filter((section) => String(section.selectionMode || "").startsWith("single"))
+    .map((section) => section.sectionName);
   const exclusiveExtras =
     lane === "exclusive_group"
-      ? `<p class="hint">Check the options that belong together, name the group, save. Options already in a <b>pick-one section</b> usually don't need an exclusive group — the section enforces it. Use the search box above to narrow the pool.</p>${exclusivePoolTable()}`
+      ? `<p class="hint">Check the options that belong together, name the group, save. Options already in a <b>pick-one section</b> usually don't need an exclusive group — the section enforces it. Use the search box above to narrow the pool.</p>
+         ${pickOneSections.length ? `<p class="hint">Pick-one sections in this workbook: <b>${pickOneSections.map(escapeHtml).join(", ")}</b>.</p>` : ""}
+         ${exclusivePoolTable()}`
       : "";
   const deferralExtras =
     lane === "interior_media_deferral"
@@ -1141,6 +1242,45 @@ function renderGroupLane(lane) {
       showError(error.message);
     }
   });
+  document.querySelectorAll(".group-clear").forEach((button) =>
+    button.addEventListener("click", async () => {
+      clearError();
+      try {
+        await postJSON(`/api/wizard/sessions/${state.session.runId}/decisions/delete`, {
+          decisionIds: [button.dataset.decisionId],
+        });
+        await refreshReview();
+      } catch (error) {
+        showError(error.message);
+      }
+    })
+  );
+  document.querySelectorAll(".group-edit").forEach((button) =>
+    button.addEventListener("click", () => {
+      // Prefill the form from the recorded decision; saving under the same
+      // name replaces it (decision ids are model:lane:groupKey).
+      const decision = decisions.find((d) => d.decisionId === button.dataset.decisionId);
+      if (!decision) return;
+      const payload = decision.payload || {};
+      $("#group-key").value = decision.groupKey;
+      $("#group-resolution").value = decision.resolution;
+      $("#group-note").value = decision.reviewerNote || "";
+      if (lane === "relationship") {
+        $("#group-product-decision").checked = decision.action === "needs_product_decision";
+        $("#group-kind").value = payload.kind || "";
+        $("#group-source").value = payload.sourceRpo || "";
+        $("#group-targets").value = (payload.targetRpos || []).join(", ");
+      } else if (lane === "exclusive_group") {
+        const members = new Set(payload.members || []);
+        document.querySelectorAll(".pool-check").forEach((box) => {
+          box.checked = members.has(box.dataset.rpo);
+        });
+      } else if (lane === "interior_media_deferral") {
+        $("#deferral-kind").value = payload.kind || "";
+      }
+      $("#group-key").scrollIntoView({ behavior: "smooth", block: "center" });
+    })
+  );
 }
 
 function collectGroupDecision(lane) {
@@ -1214,6 +1354,7 @@ function renderDuplicateLane() {
         <div class="group-form">
           ${selectControl("dup-class", ["same_option", "distinct_by_context"], decision ? (decision.payload || {}).classification : "", "— same option or different? —").replace('class="dup-class"', `class="dup-class" data-rpo="${escapeHtml(group.rpo)}"`)}
           <button class="primary dup-save" data-rpo="${escapeHtml(group.rpo)}">Save</button>
+          ${decision ? `<button class="ghost dup-clear" data-decision-id="${escapeHtml(decision.decisionId)}">Clear</button>` : ""}
         </div>
       </div>`;
     })
@@ -1221,6 +1362,19 @@ function renderDuplicateLane() {
   $("#review-queue").innerHTML = `
     <p class="hint">Same RPO on more than one source sheet <b>in this ingest file</b>. Decide whether the rows describe one option (rows merge in the plan) or context-distinct entries. Workbook matches show in the reference lines of other lanes — that's separate.</p>
     ${blocks}`;
+  document.querySelectorAll(".dup-clear").forEach((button) =>
+    button.addEventListener("click", async () => {
+      clearError();
+      try {
+        await postJSON(`/api/wizard/sessions/${state.session.runId}/decisions/delete`, {
+          decisionIds: [button.dataset.decisionId],
+        });
+        await refreshReview();
+      } catch (error) {
+        showError(error.message);
+      }
+    })
+  );
   document.querySelectorAll(".dup-save").forEach((button) =>
     button.addEventListener("click", async () => {
       clearError();
@@ -1411,9 +1565,17 @@ function renderBulkBar() {
   const disabled = n === 0 ? "disabled" : "";
   let controls = "";
   if (lane === "section") {
+    const refModel = ((modelState.selection || {}).comparators || {})[$("#review-model").value] || "";
+    const withRef = checked.filter(
+      (c) => ((((reviewState.payload || {}).workbookReference || {})[c.rpo] || [])[0] || {}).sectionId
+    ).length;
+    const refButton = refModel
+      ? `<button id="bulk-ref-section" class="ghost" ${withRef ? "" : "disabled"} title="Each checked row takes the section its RPO already has on ${escapeHtml(refModel)} in the workbook. Rows without a match are left undecided. Every row stays editable afterwards.">Use ${escapeHtml(refModel)}'s section for ${withRef} of ${n} checked</button>`
+      : "";
     controls = `
       ${sectionSelect("").replace('class="dec-section"', 'id="bulk-section"')}
-      <button id="bulk-assign-section" class="primary" ${disabled}>Put ${n} checked row${n === 1 ? "" : "s"} in this section</button>`;
+      <button id="bulk-assign-section" class="primary" ${disabled}>Put ${n} checked row${n === 1 ? "" : "s"} in this section</button>
+      ${refButton}`;
   } else if (lane === "price") {
     // Single-price matches are safe to accept wholesale — no checking needed
     // (still one batch, still undoable). Checked rows narrow it if any.
@@ -1437,10 +1599,15 @@ function renderBulkBar() {
     reviewState.lastBatch && reviewState.lastBatch.queueKey === reviewState.queueKey
       ? `<button id="bulk-undo" class="ghost">Undo last bulk (${reviewState.lastBatch.count} row${reviewState.lastBatch.count === 1 ? "" : "s"})</button>`
       : "";
+  const note =
+    reviewState.lastBulkNote && reviewState.lastBatch && reviewState.lastBatch.queueKey === reviewState.queueKey
+      ? `<span class="status-note">${escapeHtml(reviewState.lastBulkNote)}</span>`
+      : "";
   $("#bulk-bar").innerHTML = `
     <span class="status-note"><b>${n}</b> checked <span class="cell-sub">(header checkbox selects all filtered)</span></span>
     ${controls}
-    ${undo}`;
+    ${undo}
+    ${note}`;
   bindBulk(lane);
 }
 
@@ -1457,13 +1624,14 @@ function bindBulk(lane) {
     const el = document.querySelector(id);
     if (el) el.addEventListener("click", handler);
   };
-  const bulkSave = async (rows, builder) => {
+  const bulkSave = async (rows, builder, note = "") => {
     clearError();
     try {
       const decisions = rows.map(builder);
       if (!decisions.length) return;
       const batchId = await saveDecisions(decisions, { isBulk: true });
       reviewState.lastBatch = { batchId, count: decisions.length, queueKey: reviewState.queueKey };
+      reviewState.lastBulkNote = note;
       renderBulkBar();
     } catch (error) {
       showError(error.message);
@@ -1476,6 +1644,24 @@ function bindBulk(lane) {
       return;
     }
     bulkSave(checkedCandidates(), (candidate) => ({ ...base(candidate), action: "assign_section", payload: { sectionId } }));
+  });
+  on("#bulk-ref-section", () => {
+    const checked = checkedCandidates();
+    const rows = checked
+      .map((candidate) => ({
+        candidate,
+        ref: (((reviewState.payload || {}).workbookReference || {})[candidate.rpo] || [])[0],
+      }))
+      .filter((entry) => entry.ref && entry.ref.sectionId);
+    bulkSave(
+      rows,
+      ({ candidate, ref }) => ({
+        ...base(candidate),
+        action: "assign_section",
+        payload: { sectionId: ref.sectionId },
+      }),
+      `${rows.length} assigned from the reference model · ${checked.length - rows.length} left undecided (no workbook match)`
+    );
   });
   on("#bulk-accept-exact", () => {
     const checked = checkedCandidates();

@@ -240,6 +240,9 @@ def build_plan(
     deferrals: list[dict[str, Any]] = []
     unreviewed_splits: dict[str, list[str]] = {}
     cleared_rows: dict[str, int] = {}
+    # Rows whose section decision is skip/hold produce no ops on purpose;
+    # their other approved lane decisions must not count as uncovered.
+    inert_candidates: set[tuple[str, str]] = set()
     op_index = 0
 
     def op(stage: list, item: dict[str, Any], decision_ids: list[str], rule: str = "") -> None:
@@ -282,6 +285,16 @@ def build_plan(
                 )
 
         variant_map = _variant_map(context, model)
+        if orderable and not variant_map:
+            # Options without any OVS rows are unusable — fail at plan time.
+            gaps.append(
+                {
+                    "model": model,
+                    "kind": "no_variants_mapped",
+                    "detail": "no variant_master/model_variants rows resolve for this model",
+                    "decisionId": "",
+                }
+            )
         model_code_suffixes = sorted({(s.get("modelCode") or "")[-2:] for c in scoped for s in c["statuses"]})
 
         # ---------------------------------------------------------- stage 1
@@ -505,19 +518,30 @@ def build_plan(
                             coverage.setdefault(record["decisionId"], []).append(primary_ref)
                 continue
             section_decision = by_candidate_lane.get(("section", candidate["candidateId"]))
-            price_decision = by_candidate_lane.get(("price", candidate["candidateId"]))
-            if section_decision is None or price_decision is None:
+            if section_decision is None:
                 gaps.append(
                     {
                         "model": model,
                         "kind": "missing_mandatory_decision",
-                        "detail": f"{rpo or candidate['candidateId']} lacks section or price decision",
+                        "detail": f"{rpo or candidate['candidateId']} lacks a section decision",
                         "decisionId": "",
                     }
                 )
                 continue
             if section_decision["resolution"] != "approved_for_plan":
-                continue  # held/skipped rows stay out of the plan; holds are reported
+                inert_candidates.add((model, candidate["candidateId"]))
+                continue  # held/skipped rows stay out of the plan (no price owed); holds are reported
+            price_decision = by_candidate_lane.get(("price", candidate["candidateId"]))
+            if price_decision is None:
+                gaps.append(
+                    {
+                        "model": model,
+                        "kind": "missing_mandatory_decision",
+                        "detail": f"{rpo or candidate['candidateId']} lacks a price decision",
+                        "decisionId": "",
+                    }
+                )
+                continue
             split_decision = by_candidate_lane.get(("copy_split", candidate["candidateId"]))
             if split_decision and split_decision["resolution"] == "approved_for_plan":
                 split = split_decision.get("payload") or {}
@@ -557,6 +581,7 @@ def build_plan(
             decision_ids = [section_decision["decisionId"], price_decision["decisionId"], *split_ids]
             if duplicate:
                 decision_ids.append(duplicate["decisionId"])
+            section_payload = section_decision.get("payload") or {}
             row = {
                 "option_id": oid,
                 "rpo": rpo,
@@ -564,10 +589,14 @@ def build_plan(
                 "option_name": split.get("name") or candidate["description"].split("\n")[0],
                 "description": split.get("description") or None,
                 "detail_raw": split.get("detailRaw") or candidate["description"],
-                "section_id": (section_decision.get("payload") or {}).get("sectionId"),
+                "section_id": section_payload.get("sectionId"),
                 "display_order": display_order,
-                "active": True,
+                # Reviewer-set flags (field note 7): display-only rows carry
+                # selectable=False; inactive rows are written but hidden.
+                "active": section_payload.get("active", True),
             }
+            if section_payload.get("selectable") is False:
+                row["selectable"] = False
             op(stage2, {"action": "add", "sheet": options_sheet, "key": {"option_id": oid}, "row": row}, decision_ids)
             primary_ref_by_rpo[rpo] = stage2[-1]["_planRef"]
             display_order += 10
@@ -780,6 +809,7 @@ def build_plan(
         if not refs
         and decisions[decision_id]["resolution"] == "approved_for_plan"
         and decisions[decision_id]["lane"] not in ("interior_media_deferral", "status_nuance", "duplicate", "relationship")
+        and (decisions[decision_id]["model"], decisions[decision_id].get("candidateId", "")) not in inert_candidates
     )
 
     per_sheet: dict[str, dict[str, int]] = {}
@@ -788,8 +818,13 @@ def build_plan(
         sheet_counts[item["action"]] = sheet_counts.get(item["action"], 0) + 1
 
     # Presentation gaps are hard failures (runtime_metadata requirement moved
-    # to plan time per the approved spec).
-    blocking = [gap for gap in gaps if gap["kind"] in ("presentation_missing", "missing_mandatory_decision")]
+    # to plan time per the approved spec); a model with no resolvable variants
+    # would write options with zero OVS rows, so it blocks too.
+    blocking = [
+        gap
+        for gap in gaps
+        if gap["kind"] in ("presentation_missing", "missing_mandatory_decision", "no_variants_mapped")
+    ]
 
     return {
         "schemaVersion": SCHEMA_VERSION_C,

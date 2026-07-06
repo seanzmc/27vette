@@ -62,9 +62,20 @@ def build_raw_export(path: Path) -> Path:
         "ZR1 and ZR1X",
         ZR1_VARIANTS,
         [
+            # Before any section-label row: sectionLabel stays empty, so the
+            # review source-group filter must fall back to the sheet name.
+            ["CC3", "", "Roof panel, transparent", "A", "A"],
             ["Equipment Groups"],
             ["PDB", "", "Carbon Wheel Package", "A", "A"],
             ["C2Z", "", "ZR1 only cosmetic pack", "A", "--"],
+            # Same comma-rule name as CC3 ("Roof panel") — must be flagged as
+            # a duplicate proposal in the copy-split queue.
+            ["CC2", "", "Roof panel, painted body color", "A", "A"],
+            # Ref-only with an available status on ZR1 but not ZR1X: excluded
+            # from ZR1's standard-equipment queue, included in ZR1X's.
+            ["", "XFR", "Tires, high performance, ref only", "A", "--"],
+            # Ref-only standard on both: legitimate standard-equipment row.
+            ["", "AJ7", "Airbags, ref only", "S", "S"],
         ],
     )
     matrix_sheet(

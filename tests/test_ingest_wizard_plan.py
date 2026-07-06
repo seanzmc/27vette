@@ -198,6 +198,80 @@ class PlanFlowTest(unittest.TestCase):
         se_rows = [i for i in adds if i["row"].get("selectable") is False]
         self.assertEqual(len(se_rows), len(extra))
 
+    def test_skipped_row_stays_out_of_plan_and_plan_stays_valid(self) -> None:
+        # Full review first, then the reviewer flips one row to Skip: the row
+        # must produce no ops and not strand its already-approved price
+        # decision as "uncovered".
+        self.complete_all()
+        skipped = self.store.review_queue(self.run_id, "zr1", "section")["candidates"][0]
+        self.store.save_decisions(
+            self.run_id,
+            [
+                {
+                    "model": "zr1",
+                    "lane": "section",
+                    "candidateId": skipped["candidateId"],
+                    "action": "exclude_row",
+                    "payload": {},
+                    "resolution": "not_needed",
+                }
+            ],
+        )
+        plan = build_plan(**self.plan_inputs())
+        self.assertTrue(plan["valid"], plan["report"]["blockingGaps"] or plan["coverage"]["uncoveredApprovedDecisions"])
+        self.assertEqual(plan["coverage"]["uncoveredApprovedDecisions"], [])
+        zr1_adds = [
+            i["row"]["rpo"]
+            for i in plan["stage2"]["items"]
+            if i["sheet"] == "zr1_options" and i["action"] == "add"
+        ]
+        self.assertNotIn(skipped["rpo"], zr1_adds)
+
+    def test_selectable_and_active_flags_flow_into_option_rows(self) -> None:
+        self.complete_all()
+        target = self.store.review_queue(self.run_id, "zr1", "section")["candidates"][0]
+        self.store.save_decisions(
+            self.run_id,
+            [
+                {
+                    "model": "zr1",
+                    "lane": "section",
+                    "candidateId": target["candidateId"],
+                    "action": "assign_section",
+                    "payload": {"sectionId": "sec_whee_001", "selectable": False, "active": False},
+                    "resolution": "approved_for_plan",
+                }
+            ],
+        )
+        plan = build_plan(**self.plan_inputs())
+        row = next(
+            i["row"]
+            for i in plan["stage2"]["items"]
+            if i["sheet"] == "zr1_options" and i["action"] == "add" and i["row"]["rpo"] == target["rpo"]
+        )
+        self.assertIs(row["selectable"], False)
+        self.assertIs(row["active"], False)
+
+    def test_unresolvable_variants_block_the_plan(self) -> None:
+        self.complete_all()
+        # Same decisions against a workbook with no variant rows at all: the
+        # plan must fail closed instead of writing options without OVS rows.
+        import shutil
+
+        from openpyxl import load_workbook
+
+        crippled = self.root / "master-no-variants.xlsx"
+        shutil.copy2(self.master, crippled)
+        wb = load_workbook(crippled)
+        for sheet in ("model_variants", "variant_master"):
+            ws = wb[sheet]
+            if ws.max_row > 1:
+                ws.delete_rows(2, ws.max_row - 1)
+        wb.save(crippled)
+        plan = build_plan(**{**self.plan_inputs(), "workbook_path": crippled})
+        self.assertFalse(plan["valid"])
+        self.assertIn("no_variants_mapped", {g["kind"] for g in plan["report"]["blockingGaps"]})
+
     def test_store_flow_build_approve_and_invalidation(self) -> None:
         self.complete_all()
         before = self.master.read_bytes()

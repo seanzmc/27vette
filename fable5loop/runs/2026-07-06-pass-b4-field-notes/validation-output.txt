@@ -1,0 +1,86 @@
+# Validation — 2026-07-06 Pass B.4 (second field-notes round, 16 findings)
+
+## Test suites (worktree, .venv/bin/python -m pytest)
+
+Wizard + plan + parser/profiler/joiner/server + editor_ops extension:
+  tests/test_ingest_wizard_copy_split.py tests/test_ingest_wizard_decisions.py
+  tests/test_ingest_wizard_plan.py tests/test_ingest_wizard_server_pass_b.py
+  tests/test_ingest_wizard_session.py tests/test_ingest_wizard_hints.py
+  tests/test_ingest_wizard_parser.py tests/test_ingest_wizard_profiler.py
+  tests/test_ingest_wizard_joiner.py tests/test_ingest_wizard_server.py
+  tests/test_editor_ops_global_families.py
+  → 104 passed in 4.44s
+
+Editor regression net (unchanged surfaces):
+  tests/test_editor_ops_apply.py tests/test_editor_ops_meta.py
+  tests/test_editor_server_write_api.py tests/test_editor_server_payload.py
+  tests/test_editor_server_ingest_review.py
+  → 69 passed in 144.94s
+
+New tests this pass: 8 comma-rule splitter tests (LPO, one-word flag, NEW! strip,
+marker regression), 5 store tests (skip exemption, model-scoped SE availability,
+sheet-name source-group fallback + filter, reconciliation scaffold flag + decision
+attach, duplicate-name flag), 3 plan tests (skipped row valid + coverage-inert,
+selectable/active flags on option rows, no_variants_mapped blocks).
+
+## Real-export reproduction (read-only, scratchpad script)
+
+- Finding 2: detect_model_options returns grand_sport/stingray/z06 as non-targets
+  (391/401/400 counts) — backend was never the gap. Browser (below) confirmed the
+  dropdown populates; the .cmp-label text was #555-on-#111214, effectively invisible.
+- Finding 4: sectionLabel non-empty only on Equipment Groups sheets ('Additional
+  Options' / 'Equipment Groups'); Exterior/Interior/Mechanical sheets: zero labels.
+- Finding 16: 6 GSX ref-only rows carry available statuses (R9L CFX TR7 DRG XFR BC7);
+  BC7 mixed S/A across models → model-scoped statuses required.
+- Finding 14: comma rule vs prior names differ on 233 GSX rows; live-workbook names
+  match the comma rule on 73/262 shared RPOs (rest are human-inverted names — the
+  flag classes below are the human queue).
+
+## Browser proof (dev server 8041, real 28-sheet export, runs 20260706-175622/-175932)
+
+- Models stage: reference dropdown options ["none","Grand Sport","Stingray","Z06"];
+  label color rgb(154,155,161) (readable).
+- Reconciliation: GSX card verdict "new model — no workbook variants yet; confirm the
+  export's 6" with Accept/Record-question buttons; Accept → "decided — Accept export
+  variants" + Clear; ZR1/ZR1X "matches workbook scaffold".
+- Review filters: source groups = [Additional Options, Equipment Groups, Exterior 3,
+  Interior 3, Mechanical 3]; actions-bar border-top 1px (separator below filters).
+- Section lane: Skip saved with no section, no error, saved chip; not-selectable +
+  inactive checkboxes present; per-row "Use grand_sport's section" button present.
+- Bulk: "Use grand_sport's section for 2 of 3 checked" → 2 assigned · 1 left
+  undecided (no workbook match), Undo last bulk (2 rows) present.
+- Completeness live: Section 3/298 while Price required dropped 298 → 297 (skip
+  exemption observed in the progress chips).
+- Copy split (via API on the run): 298 orderable, flagged 121 — duplicate_proposed_name
+  97 (distinct-RPO collisions only: Seats, Wheels, Seat belt color, Ground effects…),
+  one_word_name 51, name_over_60 18, no_sentence_break 12; status-marker
+  reconciliation 174/174 rows matched (100%, unchanged from B.3).
+  NOTE: first implementation counted candidates, flagging 298/298 (GM lists each RPO
+  on a category sheet AND Additional Options); fixed to count distinct RPOs per name.
+- Standard equipment lane (GSX): 89 rows; R9L/CFX/TR7/DRG/XFR all absent.
+- Exclusive lane: pick-one section legend rendered with real section names.
+- Relationship lane: record → Edit prefills (key/kind/source/targets) → Clear deletes
+  (2 rows → 1, reconciliation decision untouched).
+- Duplicate lane: 148 in-file collision groups on GSX; save then Clear works.
+- Console: zero errors. Layout screenshot inspected (summary → filters → separator →
+  actions → lane help → bulk bar).
+
+## Boundaries
+
+git status --porcelain after all proofs: only the 13 intended source/test/doc files
+modified (11 code/test + 2 docs; verifier corrected the earlier "11" recording) +
+the new receipt dir; no stingray_master.xlsx change (wizard reads read-only), no
+tracked form-output/ or form-app/ churn; run artifacts under gitignored
+form-output/ingest-wizard/.
+
+## Post-verdict follow-ups applied (verifier recommendations)
+
+- NEW_MARKER_RE tightened `NEW!*` → `NEW!+` (a plain leading word "New" is never
+  stripped) + regression test test_plain_word_new_is_not_a_marker.
+- duplicate_proposed_name now computed over the FULL model lane scope, not the
+  filtered view, so active filters can't hide cross-group collisions.
+- Accepted as-is (recorded): one_word_name intentionally silent when the name is
+  the entire cell (nothing to recover); held (hold_for_question) rows still owe a
+  price decision in completeness even though the plan omits them — a hold is an
+  open answer, and the row re-enters the plan once resolved.
+- Re-run after follow-ups: 105 passed (wizard/plan/extension sweep incl. new test).

@@ -24,7 +24,9 @@ from corvette_form_generator.ingest.wizard.decisions import (
     LANES,
     SCHEMA_VERSION_B,
     SCHEMA_VERSION_B2,
+    VARIANT_RECONCILIATION_KEY,
     artifact_fingerprint,
+    candidate_is_availability_row,
     candidate_needs_status_review,
     completeness,
     copy_decisions,
@@ -39,7 +41,7 @@ from corvette_form_generator.ingest.wizard.decisions import (
     workbook_option_reference,
     workbook_sections,
 )
-from corvette_form_generator.ingest.wizard.copy_split import propose_copy_split
+from corvette_form_generator.ingest.wizard.copy_split import FLAG_DUPLICATE_NAME, propose_copy_split
 from corvette_form_generator.ingest.wizard.hints import scan_candidates
 from corvette_form_generator.ingest.wizard.plan_builder import (
     artifact_sha,
@@ -385,12 +387,45 @@ class WizardSessionStore:
         self._write_decisions(run_id, state["decisions"], selection)
         session["state"] = STATE_MODELS_SELECTED if not state["decisions"] else STATE_DECISIONS_IN_PROGRESS
         write_json(run_dir / "session.json", session)
-        return {"session": session, "selection": selection, "reconciliation": reconciliation}
+        return {
+            "session": session,
+            "selection": selection,
+            "reconciliation": self._attach_reconciliation_decisions(dict(reconciliation), state["decisions"]),
+        }
+
+    def _attach_reconciliation_decisions(
+        self, reconciliation: dict[str, Any], decisions: dict[str, dict[str, Any]]
+    ) -> dict[str, Any]:
+        """Show, per model, the recorded variant_reconciliation decision (any
+        lane — completeness accepts any group decision with that key)."""
+
+        for model, entry in (reconciliation.get("models") or {}).items():
+            record = next(
+                (
+                    r
+                    for r in decisions.values()
+                    if r["model"] == model and r.get("groupKey") == VARIANT_RECONCILIATION_KEY
+                ),
+                None,
+            )
+            entry["decision"] = (
+                {
+                    "decisionId": record["decisionId"],
+                    "action": record["action"],
+                    "resolution": record["resolution"],
+                    "reviewerNote": record.get("reviewerNote", ""),
+                }
+                if record
+                else None
+            )
+        return reconciliation
 
     def reconciliation(self, run_id: str) -> dict[str, Any]:
-        _, candidates_file, _ = self._parsed_candidates(run_id)
-        self._load_selection(run_id, candidates_file)
-        return read_json(self.run_dir(run_id) / "variant-reconciliation.json")
+        _, candidates_file, candidates = self._parsed_candidates(run_id)
+        selection = self._load_selection(run_id, candidates_file)
+        state = self._decision_state(run_id, candidates, selection)
+        reconciliation = read_json(self.run_dir(run_id) / "variant-reconciliation.json")
+        return self._attach_reconciliation_decisions(reconciliation, state["decisions"])
 
     # ---------------------------------------------------- pass b: decisions
     def _decision_state(
@@ -446,6 +481,8 @@ class WizardSessionStore:
         if lane == "standard_equipment":
             # Rows without an orderable RPO, plus rows the reviewer assigned to
             # a standard-behavior section — never plain selectable options.
+            # Ref-only rows that are available-to-order on THIS model's own
+            # variant columns (A statuses) are options, not standard equipment.
             standard_sections = {
                 s["sectionId"] for s in workbook_sections(self._require_workbook()) if s["standardBehavior"]
             }
@@ -457,16 +494,26 @@ class WizardSessionStore:
                 and (record.get("payload") or {}).get("sectionId") in standard_sections
             }
             scoped = [
-                c for c in scoped if c["rowKind"] == "ref_only" or c["candidateId"] in standard_assigned
+                c
+                for c in scoped
+                if (c["rowKind"] == "ref_only" and not candidate_is_availability_row(c, model))
+                or c["candidateId"] in standard_assigned
             ]
         else:
             scoped = [c for c in scoped if c["rowKind"] == "orderable"]
         if lane == "status_nuance":
             # Only rows whose availability symbols actually need a human read.
             scoped = [c for c in scoped if candidate_needs_status_review(c)]
-        source_sections = sorted({c["sectionLabel"] for c in scoped if c["sectionLabel"]})
+
+        # Source group = the export's own section label where one exists, the
+        # sheet name otherwise (Interior/Exterior/Mechanical sheets carry no
+        # section-label rows — field note 4).
+        def source_group(candidate: dict[str, Any]) -> str:
+            return candidate["sectionLabel"] or candidate["sheetName"]
+
+        source_sections = sorted({source_group(c) for c in scoped})
         if source_section:
-            scoped = [c for c in scoped if c["sectionLabel"] == source_section]
+            scoped = [c for c in scoped if source_group(c) == source_section]
         if price_match:
             scoped = [c for c in scoped if (c.get("priceMatch") or "") == price_match]
         if query:
@@ -519,6 +566,22 @@ class WizardSessionStore:
         if lane == "copy_split":
             for candidate in scoped:
                 candidate["proposedSplit"] = propose_copy_split(candidate)
+            # Name collisions ("Seats" — one per seat option) need a human
+            # rebuild. Count distinct RPOs per name over the FULL model lane
+            # scope (not the filtered view, or filters would hide collisions);
+            # GM lists the same RPO on two sheets (category sheet + Additional
+            # Options) — same-RPO pairs are expected, not collisions.
+            rpos_by_name: dict[str, set[str]] = {}
+            for candidate in scope_candidates(candidates, model):
+                if candidate["rowKind"] != "orderable":
+                    continue
+                key = propose_copy_split(candidate)["name"].strip().lower()
+                if key:
+                    rpos_by_name.setdefault(key, set()).add(candidate["rpo"] or candidate["refOnlyRpo"])
+            for candidate in scoped:
+                split = candidate["proposedSplit"]
+                if len(rpos_by_name.get(split["name"].strip().lower(), set())) > 1:
+                    split["flags"].append(FLAG_DUPLICATE_NAME)
         if lane == "duplicate":
             payload["duplicateGroups"] = duplicate_rpo_groups(scoped)
         if lane == "interior_media_deferral":

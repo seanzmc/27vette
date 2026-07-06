@@ -619,6 +619,117 @@ class PassBStoreTest(unittest.TestCase):
         with self.assertRaises(WizardError):
             self.store.copy_model_decisions(self.run_id, "zr1", "stingray")
 
+    # ------------------------------------------------- b.4: field-note fixes
+    def test_skip_section_saves_without_section_and_exempts_price(self) -> None:
+        self.select_defaults()
+        ids = self.zr1_candidate_ids()
+        skipped_id = ids[0]
+        # Skip — don't carry over: no sectionId, no price decision owed.
+        self.store.save_decisions(
+            self.run_id,
+            [
+                {
+                    "model": "zr1",
+                    "lane": "section",
+                    "candidateId": skipped_id,
+                    "action": "exclude_row",
+                    "payload": {},
+                    "resolution": "not_needed",
+                }
+            ],
+        )
+        for candidate_id in ids[1:]:
+            self.store.save_decisions(
+                self.run_id,
+                [
+                    {
+                        "model": "zr1",
+                        "lane": "section",
+                        "candidateId": candidate_id,
+                        "action": "assign_section",
+                        "payload": {"sectionId": "sec_whee_001"},
+                        "resolution": "approved_for_plan",
+                    },
+                    {
+                        "model": "zr1",
+                        "lane": "price",
+                        "candidateId": candidate_id,
+                        "action": "confirm_no_price",
+                        "payload": {},
+                        "resolution": "approved_for_plan",
+                    },
+                ],
+            )
+        progress = self.store.progress(self.run_id)
+        zr1 = progress["models"]["zr1"]
+        self.assertEqual(zr1["lanes"]["price"]["required"], len(ids) - 1)
+        self.assertNotIn(
+            skipped_id,
+            [b.get("candidateId") for b in zr1["blockers"] if b["lane"] == "price"],
+        )
+
+    def test_se_queue_uses_model_scoped_availability(self) -> None:
+        self.select_defaults()
+        zr1_rpos = {
+            c["refOnlyRpo"]
+            for c in self.store.review_queue(self.run_id, "zr1", "standard_equipment")["candidates"]
+        }
+        zr1x_rpos = {
+            c["refOnlyRpo"]
+            for c in self.store.review_queue(self.run_id, "zr1x", "standard_equipment")["candidates"]
+        }
+        # XFR is available on ZR1 (an option, not SE) but not on ZR1X.
+        self.assertNotIn("XFR", zr1_rpos)
+        self.assertIn("XFR", zr1x_rpos)
+        # AJ7 is standard on both — legitimate SE row.
+        self.assertIn("AJ7", zr1_rpos)
+        self.assertIn("AJ7", zr1x_rpos)
+
+    def test_source_groups_fall_back_to_sheet_name(self) -> None:
+        self.select_defaults()
+        queue = self.store.review_queue(self.run_id, "zr1", "section")
+        self.assertIn("Equipment Groups", queue["sourceSections"])
+        # CC3 sits above any section-label row: it groups under the sheet name.
+        self.assertIn("Equipment Groups 4", queue["sourceSections"])
+        filtered = self.store.review_queue(
+            self.run_id, "zr1", "section", source_section="Equipment Groups 4"
+        )
+        self.assertEqual([c["rpo"] for c in filtered["candidates"]], ["CC3"])
+
+    def test_reconciliation_carries_scaffold_flag_and_decision(self) -> None:
+        self.select_defaults()
+        payload = self.store.reconciliation(self.run_id)
+        zr1 = payload["models"]["zr1"]
+        self.assertTrue(zr1["workbookHasScaffold"])
+        self.assertIsNone(zr1["decision"])
+        self.store.save_decisions(
+            self.run_id,
+            [
+                {
+                    "model": "zr1",
+                    "lane": "relationship",
+                    "groupKey": "variant_reconciliation",
+                    "action": "confirm_export_variants",
+                    "payload": {},
+                    "resolution": "approved_for_plan",
+                }
+            ],
+        )
+        decided = self.store.reconciliation(self.run_id)["models"]["zr1"]["decision"]
+        self.assertEqual(decided["action"], "confirm_export_variants")
+        self.assertEqual(decided["decisionId"], "zr1:relationship:variant_reconciliation")
+
+    def test_duplicate_proposed_names_flagged_in_split_queue(self) -> None:
+        self.select_defaults()
+        queue = self.store.review_queue(self.run_id, "zr1", "copy_split")
+        by_rpo = {c["rpo"]: c["proposedSplit"] for c in queue["candidates"]}
+        # CC3 and CC2 both propose "Roof panel" under the comma rule.
+        self.assertEqual(by_rpo["CC3"]["name"], "Roof panel")
+        self.assertEqual(by_rpo["CC2"]["name"], "Roof panel")
+        self.assertIn("duplicate_proposed_name", by_rpo["CC3"]["flags"])
+        self.assertIn("duplicate_proposed_name", by_rpo["CC2"]["flags"])
+        self.assertNotIn("duplicate_proposed_name", by_rpo["PDB"]["flags"])
+
     def test_workbook_opened_read_only_and_untouched(self) -> None:
         before = self.master.read_bytes()
         self.select_defaults()

@@ -15,6 +15,7 @@ from corvette_form_generator.ingest.wizard.copy_split import (  # noqa: E402
     FLAG_ALL_DISCLOSURE,
     FLAG_NAME_OVER_60,
     FLAG_NO_SENTENCE_BREAK,
+    FLAG_ONE_WORD_NAME,
     FLAG_UNMATCHED_FOOTNOTE,
     propose_copy_split,
 )
@@ -86,6 +87,56 @@ class CopySplitTest(unittest.TestCase):
     def test_deterministic(self) -> None:
         text = "Front Lift. Not available with (PDB)."
         self.assertEqual(split(text), split(text))
+
+    # -------------------------------------------- b.4: comma naming rule
+    def test_name_is_text_before_first_comma(self) -> None:
+        result = split("Seats, GT2 bucket")
+        self.assertEqual(result["name"], "Seats")
+        self.assertEqual(result["description"], "GT2 bucket")
+        # One-word names are GM's inverted style — flagged for a human rebuild.
+        self.assertIn(FLAG_ONE_WORD_NAME, result["flags"])
+
+    def test_multiword_comma_name_is_clean(self) -> None:
+        result = split("Stealth Interior Trim Package, dark finish aluminum trim")
+        self.assertEqual(result["name"], "Stealth Interior Trim Package")
+        self.assertEqual(result["description"], "dark finish aluminum trim")
+        self.assertEqual(result["flags"], [])
+
+    def test_lpo_name_between_first_and_second_comma(self) -> None:
+        result = split("LPO, Cargo net set, Genuine Corvette Accessory")
+        self.assertEqual(result["name"], "Cargo net set")
+        self.assertEqual(result["description"], "Genuine Corvette Accessory")
+        self.assertEqual(result["flags"], [])
+
+    def test_lpo_without_second_comma_takes_rest(self) -> None:
+        result = split("LPO, Visible Carbon Fiber sill plates")
+        self.assertEqual(result["name"], "Visible Carbon Fiber sill plates")
+        self.assertEqual(result["description"], "")
+
+    def test_fa5_style_one_word_name_flags(self) -> None:
+        result = split("Trim, interior, carbon fiber cluster-surround and console/door switch plates")
+        self.assertEqual(result["name"], "Trim")
+        self.assertIn(FLAG_ONE_WORD_NAME, result["flags"])
+        self.assertIn("interior", result["description"])
+
+    def test_new_marker_stripped_from_name(self) -> None:
+        result = split("NEW!  Ground effects, extended front splitter")
+        self.assertEqual(result["name"], "Ground effects")
+        self.assertEqual(result["description"], "extended front splitter")
+
+    def test_plain_word_new_is_not_a_marker(self) -> None:
+        result = split("New Vehicle Prep Package, dealer installed")
+        self.assertEqual(result["name"], "New Vehicle Prep Package")
+
+    def test_comma_rule_keeps_marker_disclosures(self) -> None:
+        result = split(
+            "Front lift adjustable height with memory, includes (TR7) automatic headlamp leveling\n"
+            "1. Not available with (PDB).",
+            markers=["1"],
+        )
+        self.assertEqual(result["name"], "Front lift adjustable height with memory")
+        self.assertIn("includes (TR7)", result["disclosure"] + result["description"])
+        self.assertEqual(result["matchedMarkers"], ["1"])
 
 
 if __name__ == "__main__":
