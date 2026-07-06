@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Local dev server for the interactive ingest wizard (Pass A).
+"""Local dev server for the interactive ingest wizard (Passes A and B).
 
 Read-only toward the canonical workbook and raw exports; writes only
-run-scoped JSON under form-output/ingest-wizard/. See
-docs/ingest/pass-a/interactive-ingest-wizard-pass-a-spec.md.
+run-scoped JSON under form-output/ingest-wizard/. Pass A: profile, roles,
+parse, candidates. Pass B: model selection, decision lanes, completeness.
+See docs/ingest/pass-a/interactive-ingest-wizard-pass-a-spec.md and
+docs/ingest/ingest-wizard-end-to-end-completion-spec.md (Pass B).
 """
 
 from __future__ import annotations
@@ -106,6 +108,27 @@ class WizardHandler(BaseHTTPRequestHandler):
                         query=(query.get("q") or [""])[0],
                     )
                 )
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/models"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/models")]
+                self._send_json(self.store.model_options(run_id))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/reconciliation"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/reconciliation")]
+                self._send_json(self.store.reconciliation(run_id))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/review"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/review")]
+                self._send_json(
+                    self.store.review_queue(
+                        run_id,
+                        (query.get("model") or [""])[0],
+                        (query.get("lane") or [""])[0],
+                        query=(query.get("q") or [""])[0],
+                        template=(query.get("template") or [""])[0],
+                        source_section=(query.get("sourceSection") or [""])[0],
+                    )
+                )
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/progress"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/progress")]
+                self._send_json(self.store.progress(run_id))
             elif path.startswith("/api/wizard/sessions/"):
                 run_id = path[len("/api/wizard/sessions/"):]
                 self._send_json(self.store.session_detail(run_id))
@@ -141,6 +164,51 @@ class WizardHandler(BaseHTTPRequestHandler):
                 run_id = path[len("/api/wizard/sessions/"):-len("/parse")]
                 self._json_body()  # accept and ignore an empty JSON body
                 self._send_json(self.store.run_parse(run_id))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/models"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/models")]
+                payload = self._json_body()
+                targets = payload.get("targets")
+                comparators = payload.get("comparators") or {}
+                if not isinstance(targets, list) or not isinstance(comparators, dict):
+                    raise WizardError("Request body must carry targets (list) and comparators (object).")
+                self._send_json(self.store.select_models(run_id, [str(t) for t in targets], comparators))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/decisions/delete"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/decisions/delete")]
+                payload = self._json_body()
+                decision_ids = payload.get("decisionIds")
+                batch_id = str(payload.get("batchId") or "")
+                if decision_ids is not None and not isinstance(decision_ids, list):
+                    raise WizardError("decisionIds must be a list when present.")
+                self._send_json(
+                    self.store.delete_decisions(
+                        run_id,
+                        decision_ids=[str(d) for d in decision_ids] if decision_ids else None,
+                        batch_id=batch_id,
+                    )
+                )
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/decisions"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/decisions")]
+                payload = self._json_body()
+                decisions = payload.get("decisions")
+                if not isinstance(decisions, list):
+                    raise WizardError("Request body must carry a decisions list.")
+                self._send_json(self.store.save_decisions(run_id, decisions))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/copy-decisions"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/copy-decisions")]
+                payload = self._json_body()
+                from_model = str(payload.get("fromModel") or "")
+                to_model = str(payload.get("toModel") or "")
+                if not from_model or not to_model:
+                    raise WizardError("Request body must carry fromModel and toModel.")
+                self._send_json(
+                    self.store.copy_model_decisions(
+                        run_id, from_model, to_model, overwrite=bool(payload.get("overwrite"))
+                    )
+                )
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/complete"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/complete")]
+                self._json_body()  # accept and ignore an empty JSON body
+                self._send_json(self.store.mark_complete(run_id))
             else:
                 self._send_error_json("Not found.", 404)
         except WizardError as exc:

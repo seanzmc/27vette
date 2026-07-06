@@ -3,19 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ingest Wizard — Pass A</title>
+<title>Ingest Wizard</title>
 <link rel="stylesheet" href="/wizard.css">
 </head>
 <body>
 <header class="topbar">
   <div class="brand">
     <span class="brand-title">Ingest Wizard</span>
-    <span class="brand-sub">raw order-guide intake · Pass A · read-only</span>
+    <span class="brand-sub">raw order-guide intake · workbook stays read-only</span>
   </div>
   <nav class="stepper" id="stepper">
     <span class="step" data-stage="files">1 · Choose file</span>
     <span class="step" data-stage="sheets">2 · Sheet roles</span>
     <span class="step" data-stage="candidates">3 · Candidates</span>
+    <span class="step" data-stage="models">4 · Models</span>
+    <span class="step" data-stage="review">5 · Review</span>
   </nav>
   <div class="runinfo" id="run-info"></div>
 </header>
@@ -60,8 +62,45 @@
       </select>
       <input type="search" id="filter-q" placeholder="Search RPO or description…">
       <button id="back-to-sheets" class="ghost">Back to sheet roles</button>
+      <button id="to-models-btn" class="primary">Continue to model selection</button>
     </div>
     <div id="candidate-table"></div>
+  </section>
+
+  <section id="stage-models" class="stage hidden">
+    <h1>Select target models</h1>
+    <p class="hint">Targets get decision capture. Each target picks a reference model — a live model whose workbook data prefills presentation metadata and shows "In workbook" comparisons during review. Defaults follow the approved end-to-end spec.</p>
+    <div id="model-cards" class="cards"></div>
+    <div class="sheet-actions">
+      <button id="confirm-models-btn" class="primary">Confirm model selection</button>
+      <button id="back-to-candidates" class="ghost">Back to candidates</button>
+      <span id="models-status" class="status-note"></span>
+    </div>
+    <div id="reconciliation"></div>
+  </section>
+
+  <section id="stage-review" class="stage hidden">
+    <h1>Review decisions</h1>
+    <div id="progress-chips" class="summary"></div>
+    <div class="filters">
+      <select id="review-model"></select>
+      <select id="review-lane"></select>
+      <select id="review-source-section"><option value="">All source sections</option></select>
+      <input type="search" id="review-q" placeholder="Search RPO or description…">
+      <button id="back-to-models" class="ghost">Back to models</button>
+      <button id="mark-complete-btn" class="primary">Mark decisions complete</button>
+    </div>
+    <div class="filters copy-bar">
+      <span class="status-note">Copy decisions from</span>
+      <select id="copy-from-model"></select>
+      <label class="status-note"><input type="checkbox" id="copy-overwrite"> overwrite existing</label>
+      <button id="copy-decisions-btn" class="ghost">Copy into current model</button>
+      <span id="copy-report" class="status-note"></span>
+    </div>
+    <div id="lane-help" class="lane-help"></div>
+    <div id="bulk-bar" class="filters"></div>
+    <div id="review-blockers"></div>
+    <div id="review-queue"></div>
   </section>
 </main>
 

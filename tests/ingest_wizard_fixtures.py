@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Compact raw GM order-guide fixture workbook for wizard Pass A tests."""
+"""Compact fixture workbooks for wizard tests: a raw GM order-guide export
+(Pass A) and a canonical-workbook stand-in (Pass B read-only pickers)."""
 
 from __future__ import annotations
 
@@ -83,5 +84,102 @@ def build_raw_export(path: Path) -> Path:
     ws.append(["Recommended"])
     ws.append(["Some", "unrelated", "layout"])
 
+    wb.save(path)
+    return path
+
+
+def _table(wb: Workbook, name: str, headers: list[str], rows: list[list[object]]) -> None:
+    ws = wb.create_sheet(name)
+    ws.append(headers)
+    for row in rows:
+        ws.append(row)
+
+
+def build_master_workbook(path: Path) -> Path:
+    """Canonical-workbook stand-in for Pass B: model metadata, section picker,
+    and z06 presentation rows used as the template model. Read-only in tests."""
+
+    wb = Workbook()
+    wb.remove(wb.active)
+    _table(
+        wb,
+        "variant_master",
+        ["variant_id", "model_year", "trim_level", "body_style", "display_name", "base_price", "display_order", "active"],
+        [
+            ["1lz_r07", 2027, "1lz", "coupe", "Corvette ZR1 Coupe 1LZ", 197195, 25, False],
+            ["3lz_r67", 2027, "3lz", "convertible", "Corvette ZR1 Convertible 3LZ", 218195, 28, False],
+            ["1lz_s07", 2027, "1lz", "coupe", "Corvette ZR1X Coupe 1LZ", 227395, 29, False],
+        ],
+    )
+    _table(
+        wb,
+        "model_variants",
+        ["model_key", "variant_id", "display_order", "active", "notes"],
+        [
+            ["zr1", "1lz_r07", 1, False, ""],
+            ["zr1", "3lz_r67", 2, False, ""],
+            ["zr1x", "1lz_s07", 1, False, ""],
+        ],
+    )
+    _table(
+        wb,
+        "model_workbook_sources",
+        ["model_key", "source_role", "sheet_name", "active", "notes"],
+        [
+            ["z06", "source_option_sheet", "z06_options", True, ""],
+            ["zr1", "source_option_sheet", "zr1_options", False, "inactive scaffold, must be ignored"],
+        ],
+    )
+    _table(
+        wb,
+        "z06_options",
+        ["option_id", "rpo", "price", "option_name", "description", "detail_raw", "section_id", "active"],
+        [
+            ["opt_pdb_001", "PDB", 16000, "Carbon Fiber Wheel Package", "Visible carbon", "", "sec_whee_001", True],
+        ],
+    )
+    # The inactive source's sheet must actually exist with a conflicting row,
+    # so the active-flag filter is the only thing excluding it.
+    _table(
+        wb,
+        "zr1_options",
+        ["option_id", "rpo", "price", "option_name", "description", "detail_raw", "section_id", "active"],
+        [
+            ["opt_pdb_999", "PDB", 99999, "WRONG Scaffold Package", "must never surface", "", "sec_pain_001", True],
+        ],
+    )
+    _table(
+        wb,
+        "section_master",
+        ["section_id", "section_name", "selection_mode", "is_required", "display_order", "standard_behavior", "step_key"],
+        [
+            ["sec_pain_001", "Exterior Color", "single", True, 1, "", "paint"],
+            ["sec_whee_001", "Wheels", "single", True, 2, "", "wheels"],
+        ],
+    )
+    presentation_rows = {
+        "runtime_steps": (
+            ["model_key", "step_key", "step_label", "step_order"],
+            [["z06", "paint", "Paint", 1], ["z06", "wheels", "Wheels", 2]],
+        ),
+        "section_presentation": (
+            ["model_key", "section_id", "display_mode"],
+            [["z06", "sec_pain_001", "swatch"]],
+        ),
+        "context_section_master": (
+            ["model_key", "context_key", "context_label"],
+            [["z06", "ctx_body", "Body"]],
+        ),
+        "order_summary_sections": (
+            ["model_key", "summary_key", "summary_label", "display_order"],
+            [["z06", "sum_paint", "Exterior", 1]],
+        ),
+        "step_order_summary_map": (
+            ["model_key", "step_key", "summary_key"],
+            [["z06", "paint", "sum_paint"]],
+        ),
+    }
+    for sheet, (headers, rows) in presentation_rows.items():
+        _table(wb, sheet, headers, rows)
     wb.save(path)
     return path
