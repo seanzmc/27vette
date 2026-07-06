@@ -37,7 +37,8 @@ FLAG_ALL_DISCLOSURE = "all_text_matched_disclosure"
 
 SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+")
 TRAILING_MARKER_RE = re.compile(r"\s*\(?\d{1,2}\)?\s*$")
-FOOTNOTE_MARKER_RE = re.compile(r"\(\d{1,2}\)|(?<=[a-z])\d{1,2}\b")
+# In-cell disclosure definition line: "1. Requires …" / "2) Not available …".
+DISCLOSURE_LINE_RE = re.compile(r"^\s*(\d{1,2})[.):-]\s+(\S.*)$")
 
 
 def _is_disclosure_sentence(sentence: str) -> bool:
@@ -47,19 +48,48 @@ def _is_disclosure_sentence(sentence: str) -> bool:
     return any(pattern.search(sentence) for pattern in BOILERPLATE_PATTERNS)
 
 
+def candidate_disclosure_markers(candidate: dict[str, Any]) -> set[str]:
+    markers: set[str] = set()
+    for status in candidate.get("statuses", []):
+        marker = str(status.get("disclosureMarker") or "").strip()
+        if marker.isdigit():
+            markers.add(marker)
+    return markers
+
+
 def propose_copy_split(candidate: dict[str, Any]) -> dict[str, Any]:
-    """Deterministic name/description/disclosure proposal for one candidate."""
+    """Deterministic name/description/disclosure proposal for one candidate.
+
+    GM exports embed disclosure text as numbered lines inside the description
+    cell ("1. Requires …"), keyed by the digits fused onto status cells
+    (A1/S2). Those lines split deterministically; phrase patterns cover
+    unnumbered disclosure sentences.
+    """
 
     raw = str(candidate.get("description") or "").strip()
     flags: list[str] = []
+    markers = candidate_disclosure_markers(candidate)
 
-    first_line = raw.split("\n", 1)[0].split(" / ", 1)[0].strip()
-    sentences = [s.strip() for s in SENTENCE_SPLIT_RE.split(raw.replace("\n", " ")) if s.strip()]
-    if len(sentences) <= 1 and len(raw) > 60:
+    # Peel numbered in-cell disclosure lines out first.
+    body_lines: list[str] = []
+    numbered: dict[str, str] = {}
+    for line in raw.split("\n"):
+        match = DISCLOSURE_LINE_RE.match(line)
+        if match:
+            numbered[match.group(1)] = match.group(2).strip()
+        elif line.strip():
+            body_lines.append(line.strip())
+    disclosure_parts: list[str] = [numbered[n] for n in sorted(numbered, key=int)]
+    matched_markers = markers & set(numbered)
+
+    body = " ".join(body_lines)
+    first_line = (body_lines[0] if body_lines else "").split(" / ", 1)[0].strip()
+    sentences = [s.strip() for s in SENTENCE_SPLIT_RE.split(body) if s.strip()]
+    if len(sentences) <= 1 and len(body) > 60:
         flags.append(FLAG_NO_SENTENCE_BREAK)
 
     name = sentences[0] if sentences else first_line
-    if "\n" in raw or " / " in raw:
+    if len(body_lines) > 1 or " / " in (body_lines[0] if body_lines else ""):
         name = first_line
     name = TRAILING_MARKER_RE.sub("", name.rstrip(".")).strip()
     if len(name) > 60:
@@ -67,7 +97,6 @@ def propose_copy_split(candidate: dict[str, Any]) -> dict[str, Any]:
 
     rest = sentences[1:] if sentences and name.startswith(sentences[0].rstrip(".")[:20]) else sentences
     description_parts: list[str] = []
-    disclosure_parts: list[str] = []
     for sentence in rest:
         (disclosure_parts if _is_disclosure_sentence(sentence) else description_parts).append(sentence)
 
@@ -76,9 +105,9 @@ def propose_copy_split(candidate: dict[str, Any]) -> dict[str, Any]:
     if raw and not description_parts and disclosure_parts and _is_disclosure_sentence(name):
         flags.append(FLAG_ALL_DISCLOSURE)
 
-    # Footnote markers in the raw text should be reconciled to disclosures;
-    # markers with no disclosure sentence are a review flag, never dropped.
-    if FOOTNOTE_MARKER_RE.search(raw) and not disclosure_parts:
+    # Status markers must reconcile to a numbered disclosure line (or at least
+    # phrase-matched disclosure text); unreconciled markers are a review flag.
+    if markers and not matched_markers and not disclosure_parts:
         flags.append(FLAG_UNMATCHED_FOOTNOTE)
 
     return {
@@ -86,5 +115,7 @@ def propose_copy_split(candidate: dict[str, Any]) -> dict[str, Any]:
         "description": " ".join(description_parts),
         "disclosure": " ".join(disclosure_parts),
         "detailRaw": raw,
+        "markers": sorted(markers),
+        "matchedMarkers": sorted(matched_markers),
         "flags": flags,
     }

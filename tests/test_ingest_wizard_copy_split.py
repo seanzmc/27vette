@@ -20,8 +20,9 @@ from corvette_form_generator.ingest.wizard.copy_split import (  # noqa: E402
 )
 
 
-def split(text: str) -> dict:
-    return propose_copy_split({"description": text})
+def split(text: str, markers: list[str] | None = None) -> dict:
+    statuses = [{"disclosureMarker": marker} for marker in markers or []]
+    return propose_copy_split({"description": text, "statuses": statuses})
 
 
 class CopySplitTest(unittest.TestCase):
@@ -54,13 +55,24 @@ class CopySplitTest(unittest.TestCase):
         self.assertIn(FLAG_NO_SENTENCE_BREAK, result["flags"])
         self.assertIn(FLAG_NAME_OVER_60, result["flags"])
 
-    def test_trailing_footnote_marker_stripped_from_name(self) -> None:
-        result = split("Performance exhaust 1. Includes bright tips.")
-        self.assertEqual(result["name"], "Performance exhaust")
+    def test_numbered_disclosure_lines_match_status_markers(self) -> None:
+        result = split(
+            "3 Years SiriusXM\n1. Requires SiriusXM. Not available with a FGO order type.",
+            markers=["1"],
+        )
+        self.assertEqual(result["name"], "3 Years SiriusXM")
+        self.assertIn("Requires SiriusXM", result["disclosure"])
+        self.assertEqual(result["matchedMarkers"], ["1"])
+        self.assertEqual(result["flags"], [])
 
-    def test_footnote_marker_without_disclosure_flags(self) -> None:
-        result = split("Engine appearance package (3). Adds painted covers.")
+    def test_status_marker_without_disclosure_text_flags(self) -> None:
+        result = split("Engine appearance package. Adds painted covers.", markers=["3"])
         self.assertIn(FLAG_UNMATCHED_FOOTNOTE, result["flags"])
+
+    def test_numbered_line_without_marker_still_goes_to_disclosure(self) -> None:
+        result = split("Roof panel\n2. Late availability.")
+        self.assertIn("Late availability.", result["disclosure"])
+        self.assertEqual(result["name"], "Roof panel")
 
     def test_boilerplate_goes_to_disclosure(self) -> None:
         result = split("OnStar services. Requires paid plan, terms and conditions apply. See dealer for details.")

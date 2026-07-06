@@ -169,3 +169,5 @@ tr.evidence-row td { background: var(--panel-2); }
 .ref-use-section { font-size: 11px; padding: 2px 8px; }
 .dec-clear { font-size: 11px; padding: 2px 8px; }
 .row-check { transform: scale(1.15); }
+.plan-list { font-size: 13px; margin: 4px 0 12px 18px; }
+#plan-approver { font-size: 13px; padding: 5px 8px; }

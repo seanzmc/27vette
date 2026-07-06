@@ -149,6 +149,92 @@ EDITOR_SHEET_META: dict[str, dict] = {
         "enums": {},
         "refs": {"section_id": "sections", "included_option_id": "options"},
     },
+    # ── Global (model-metadata and presentation) families ─────────────
+    # Reachable only through explicit sheet names in GLOBAL_SHEET_FAMILIES;
+    # the model registry (and therefore the workbook-editor UI and lints)
+    # never resolves to these, so existing editor behavior is unchanged.
+    "model_master": {
+        "key": ("model_key",),
+        "types": {"expected_variant_count": "int", "default_model": "bool", "active": "bool"},
+        "enums": {},
+        "refs": {},
+    },
+    "model_variants": {
+        "key": ("model_key", "variant_id"),
+        "types": {"display_order": "int", "active": "bool"},
+        "enums": {},
+        "refs": {},
+    },
+    "variant_master": {
+        "key": ("variant_id",),
+        "types": {"model_year": "int", "base_price": "int", "display_order": "int", "active": "bool"},
+        "enums": {},
+        "refs": {},
+    },
+    "model_workbook_sources": {
+        "key": ("model_key", "source_role"),
+        "types": {"active": "bool"},
+        "enums": {"source_role": tuple(SOURCE_ROLE_FAMILIES)},
+        "refs": {},
+    },
+    "model_registry_promotion": {
+        "key": ("model_key",),
+        "types": {"promoted_to_runtime": "bool", "default_model": "bool", "active": "bool", "display_order": "int"},
+        "enums": {},
+        "refs": {},
+    },
+    "model_interior_scope": {
+        "key": ("model_key", "interior_id", "trim_level"),
+        "types": {"active": "bool"},
+        "enums": {},
+        "refs": {},
+    },
+    "runtime_steps_meta": {
+        "key": ("model_key", "step_key"),
+        "types": {"runtime_order": "int", "active": "bool"},
+        "enums": {},
+        "refs": {},
+    },
+    "section_presentation_meta": {
+        "key": ("model_key", "section_id"),
+        "types": {"section_display_order": "int", "active": "bool"},
+        "enums": {},
+        "refs": {"section_id": "sections"},
+    },
+    "context_section_master_meta": {
+        "key": ("model_key", "context_type", "section_id"),
+        "types": {"is_required": "bool", "section_display_order": "int", "active": "bool"},
+        "enums": {},
+        "refs": {},
+    },
+    "order_summary_sections_meta": {
+        "key": ("model_key", "section_key"),
+        "types": {"display_order": "int", "active": "bool"},
+        "enums": {},
+        "refs": {},
+    },
+    "step_order_summary_map_meta": {
+        "key": ("model_key", "step_key", "section_key"),
+        "types": {"active": "bool"},
+        "enums": {},
+        "refs": {},
+    },
+}
+
+# Fixed sheet-name -> family mapping for global sheets. Kept out of
+# model_sheet_registry on purpose: only batch preparation/apply consult it.
+GLOBAL_SHEET_FAMILIES: dict[str, str] = {
+    "model_master": "model_master",
+    "model_variants": "model_variants",
+    "variant_master": "variant_master",
+    "model_workbook_sources": "model_workbook_sources",
+    "model_registry_promotion": "model_registry_promotion",
+    "model_interior_scope": "model_interior_scope",
+    "runtime_steps": "runtime_steps_meta",
+    "section_presentation": "section_presentation_meta",
+    "context_section_master": "context_section_master_meta",
+    "order_summary_sections": "order_summary_sections_meta",
+    "step_order_summary_map": "step_order_summary_map_meta",
 }
 
 
@@ -372,9 +458,43 @@ def _ref_domain(extract, maps, batch_adds, sheet, refkind):
 def _prepare_batch(extract, batch):
     errors: list[str] = []
     warnings: list[dict] = []
-    ops = coalesce_ops(flatten_items(batch.get("items") or []))
+    flat = flatten_items(batch.get("items") or [])
+    creates = [o for o in flat if o.get("action") == "create_sheet"]
+    ops = coalesce_ops([o for o in flat if o.get("action") != "create_sheet"])
     maps = _registry_maps(extract)
     _registry, sheet_family, models_by_sheet, by_model_family = maps
+    sheet_family = {**GLOBAL_SHEET_FAMILIES, **sheet_family}
+
+    prepared_creates: list[dict] = []
+    for i, o in enumerate(creates):
+        sheet = str(o.get("sheet") or "").strip()
+        family = str(o.get("family") or "").strip()
+        template = str(o.get("headersFrom") or "").strip()
+        ctx = f"create_sheet[{i}] {sheet}"
+        if not sheet or sheet.startswith("form_"):
+            errors.append(f"{ctx}: invalid sheet name")
+            continue
+        if sheet in extract["sheets"]:
+            errors.append(f"{ctx}: sheet already exists")
+            continue
+        if family not in EDITOR_SHEET_META:
+            errors.append(f"{ctx}: unknown family {family!r}")
+            continue
+        template_data = extract["sheets"].get(template)
+        if template_data is None:
+            errors.append(f"{ctx}: headersFrom sheet not found: {template!r}")
+            continue
+        headers = list(template_data["headers"])
+        missing_keys = [k for k in EDITOR_SHEET_META[family]["key"] if k not in headers]
+        if missing_keys:
+            errors.append(f"{ctx}: template headers lack key column(s) {missing_keys}")
+            continue
+        # Register the new sheet so later ops in this batch validate against it.
+        extract["sheets"][sheet] = {"headers": headers, "rows": []}
+        sheet_family[sheet] = family
+        prepared_creates.append(
+            {"action": "create_sheet", "sheet": sheet, "_family": family, "_headers": headers}
+        )
     promoted = {r.get("model_key"): workbook_truthy(r.get("promoted_to_runtime"))
                 for r in rows_of(extract, "model_registry_promotion")}
 
@@ -467,6 +587,7 @@ def _prepare_batch(extract, batch):
         o["_kt"] = kt
         prepared.append(o)
 
+    prepared = prepared_creates + prepared
     if errors:
         return errors, warnings, prepared
 
@@ -504,7 +625,7 @@ def _prepare_batch(extract, batch):
 
     # display-order collision warnings
     for o in prepared:
-        if o["action"] == "delete":
+        if o["action"] not in ("add", "update"):
             continue
         group_col = _DORDER_GROUP_COL.get(o["_family"])
         dorder = o["_coerced_row"].get("display_order")
@@ -603,13 +724,22 @@ def gate_reminders(models: set[str]) -> list[str]:
 
 def apply_ops_to_workbook(wb, prepared_ops, sheet_family) -> set[str]:
     touched: set[str] = set()
+    for o in (x for x in prepared_ops if x["action"] == "create_sheet"):
+        ws = wb.create_sheet(title=o["sheet"])
+        ws.append(o["_headers"])
+        touched.add(o["sheet"])
     by_sheet: dict[str, list] = {}
     for o in prepared_ops:
+        if o["action"] == "create_sheet":
+            continue
         by_sheet.setdefault(o["sheet"], []).append(o)
     for sheet, sheet_ops in by_sheet.items():
         ws = wb[sheet]
         col_of = {str(c.value): i + 1 for i, c in enumerate(ws[1]) if c.value is not None}
-        keycols = list(EDITOR_SHEET_META[sheet_family[sheet]]["key"])
+        # Ops carry their resolved family (global sheets and batch-created
+        # sheets aren't in the model registry's sheet_family map).
+        family = sheet_ops[0].get("_family") or sheet_family[sheet]
+        keycols = list(EDITOR_SHEET_META[family]["key"])
 
         def key_at(r):
             return tuple(str(ws.cell(row=r, column=col_of[k]).value or "").strip() for k in keycols)
