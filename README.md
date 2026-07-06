@@ -178,7 +178,7 @@ Python metadata gates:
 .venv/bin/python -m pytest tests/test_model_config_metadata.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py tests/test_rule_derivation.py -q
 ```
 
-Full default validation = schema gate + all rows of the table + the pytest gate. Choose gates by changed surface per AGENTS.md §9.
+Full default validation = schema gate + all rows of the table + the pytest gate. Choose gates by changed surface per AGENTS.md §10.
 
 ## Workbook Safety
 

@@ -62,7 +62,11 @@ Classify the change: styling-only, behavior-only, data-only, or mixed. For behav
 
 Edge workflow for new-model intake or broad source refresh — never routine maintenance. Preflight is read-only evidence gathering: preserve raw evidence and provenance, invent nothing, keep candidate artifacts transient, and never mutate the workbook, generated artifacts, or `form-app/data.js`. Applying reviewed output later is a separate approved workbook pass with full §5 safety, regeneration, and gates. Detail: `Order-Guide_IngestPrompt.md` and `docs/ingest/`.
 
-## 9. Validation Strategy
+## 9. Fable 5 Loop Workflows
+
+Fable 5 loop artifacts under `fable5loop/` are orchestration/memory infrastructure for large, multi-stage work; they do not override this guide's spec, workbook, generated-artifact, runtime, styling, dealer, or ingest boundaries. For any Fable 5 run, start from `fable5loop/README.md`, preserve run receipts/state updates, and run the loop validator when loop artifacts change. Use `docs/fable-ex-tasks.md` as routing guidance for when the loop is appropriate; keep routine model/workbook/runtime edits on the normal repo path unless a task explicitly needs the loop.
+
+## 10. Validation Strategy
 
 Choose gates by changed surface and risk — don't run irrelevant gates from old plans, don't skip relevant ones because a change looked small. Commands live in README ("Workbook And Generator Workflows", "Validation").
 
@@ -76,15 +80,15 @@ Choose gates by changed surface and risk — don't run irrelevant gates from old
 
 Report every check run with its result, and every relevant gate not run with the reason. Never claim validation passed without real tool output.
 
-## 10. Companion-File Impact
+## 11. Companion-File Impact
 
 Proportional to risk. Per changed surface, inspect the companions that may co-change: workbook/data → artifacts, registry, contract tests, docs; generator → outputs, schema tests, script docs, runtime consumers; runtime → generated fields, tests, workflows, dealer flow, docs; styling → HTML/JS state hooks, responsive behavior; tests/gates → workflow docs and tests encoding the old contract; docs → README consistency, no stale references. Report each relevant companion as updated, inspected-no-change, or n/a.
 
-## 11. Handoff Requirements
+## 12. Handoff Requirements
 
 - [ ] What changed: files, sheets, artifacts, docs, tests, behavior impact.
 - [ ] What did not change: preserved behavior, contracts, schemas, deployment paths, dealer boundaries, excluded work.
-- [ ] Companion-file impact per §10.
+- [ ] Companion-file impact per §11.
 - [ ] Validation: checks run and outcomes; gates not run and why; manual verification still pending.
 - [ ] Residual risks and follow-up (say "none implied" rather than inventing work).
 
