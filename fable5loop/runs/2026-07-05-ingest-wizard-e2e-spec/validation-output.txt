@@ -1,0 +1,67 @@
+=== git status --porcelain (docs-only pass; protected surfaces must be clean) ===
+ M docs/ingest/README.md
+?? .venv
+?? docs/ingest/ingest-wizard-end-to-end-completion-spec.md
+?? fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec/
+
+=== git status protected surfaces (stingray_master.xlsx form-output form-app) ===
+(empty = clean)
+
+=== git diff --stat (tracked changes) ===
+ docs/ingest/README.md | 1 +
+ 1 file changed, 1 insertion(+)
+
+=== .venv/bin/python scripts/validate_fable5_loop.py (post-receipt) ===
+Fable 5 loop validation failed:
+- fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec/run.json state_updates must be a non-empty list
+- fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec/run.json skill_update.evidence path does not exist: None
+- fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec/run.json verifier.required must be true
+- fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec/run.json verifier.independent_context must be true
+- fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec verifier report missing required section: Verdict
+- fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec verifier report missing required section: Criteria
+- fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec verifier report missing required section: Evidence inspected
+- fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec verifier report missing required section: Validation Output Inspected
+- fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec verifier report missing required section: Required Fixes Before Pass
+- fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec verifier report missing required section: Durable Lesson Candidates
+- fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec verifier report missing required section: File Edit Statement
+exit=1
+
+=== final git status --porcelain ===
+ M docs/ingest/README.md
+ M fable5loop/STATE.md
+ M fable5loop/skills/27vette-fable5-compounding.md
+?? .venv
+?? docs/ingest/ingest-wizard-end-to-end-completion-spec.md
+?? fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec/
+
+=== .venv/bin/python scripts/validate_fable5_loop.py (rerun after verifier-report reformat) ===
+Fable 5 loop validation failed:
+- fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec/run.json state_updates must be a non-empty list
+- fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec/run.json skill_update.evidence path does not exist: None
+- fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec/run.json verifier.required must be true
+- fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec/run.json verifier.independent_context must be true
+exit=1
+
+=== .venv/bin/python scripts/validate_fable5_loop.py (final) ===
+Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.
+exit=0
+
+=== final git status --porcelain ===
+ M docs/ingest/README.md
+ M fable5loop/STATE.md
+ M fable5loop/skills/27vette-fable5-compounding.md
+?? .venv
+?? docs/ingest/ingest-wizard-end-to-end-completion-spec.md
+?? fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec/
+
+=== pytest tests/test_fable5_loop_contract.py (loop artifacts changed) ===
+=========================== short test summary info ============================
+FAILED tests/test_fable5_loop_contract.py::test_validator_rejects_stale_last_session_pointer
+1 failed, 12 passed in 0.20s
+
+=== pre-existing check: same test against pristine git-archive HEAD snapshot ===
+FAILED tests/test_fable5_loop_contract.py::test_validator_rejects_stale_last_session_pointer -- 1 failed, 12 passed (identical at HEAD; pre-existing, recorded in STATE.md Open failures)
+
+=== validate_fable5_loop.py after Open-failures STATE update (final confirm) ===
+Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.
+exit=0

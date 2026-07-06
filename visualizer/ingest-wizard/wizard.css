@@ -132,3 +132,40 @@ tr.evidence-row td { background: var(--panel-2); }
 .evidence td { border: 1px solid var(--line); padding: 3px 8px; font-size: 12px; }
 .evidence td.coord { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--muted); }
 .empty-note { color: var(--muted); padding: 24px; text-align: center; }
+
+/* ------------------------------------------------------------- pass b */
+.card-target { border-color: #2f6f4f; box-shadow: 0 0 0 1px #2f6f4f inset; }
+.cmp-label { display: block; margin-top: 8px; font-size: 12px; color: #555; }
+.cmp-select { margin-left: 6px; }
+.sub-h { font-size: 15px; margin: 18px 0 6px; }
+.dec-cell { min-width: 340px; }
+.dec-cell select, .dec-cell input { margin: 2px 4px 2px 0; max-width: 170px; font-size: 12px; }
+.dec-cell .dec-note { max-width: 120px; }
+.dec-save { padding: 3px 10px; font-size: 12px; }
+.group-form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0; }
+.group-form input, .group-form select { font-size: 12px; padding: 4px 6px; }
+#group-payload { min-width: 320px; }
+.hints { margin-top: 4px; }
+.hints .sum-chip { font-size: 11px; }
+.pres-sheet { margin-bottom: 18px; }
+.pres-sheet .desc { font-size: 12px; word-break: break-all; }
+#review-blockers .empty-note { margin: 8px 0; }
+@media (max-width: 900px) {
+  .dec-cell select, .dec-cell input { max-width: 100%; }
+  .group-form { flex-direction: column; align-items: stretch; }
+}
+.pres-edit { width: 100%; font-size: 12px; font-family: monospace; padding: 3px 6px; box-sizing: border-box; }
+.copy-bar { border-top: 1px solid rgba(128,128,128,0.25); padding-top: 8px; }
+.dec-inline { font-size: 12px; white-space: nowrap; margin-right: 6px; }
+.pres-table th { font-size: 11px; text-transform: none; }
+.pres-table .pres-cell { width: 100%; min-width: 70px; font-size: 12px; padding: 2px 4px; box-sizing: border-box; }
+.hint-accept { cursor: pointer; border: 1px dashed currentColor; }
+#bulk-bar:empty { display: none; }
+.lane-help { display: flex; gap: 14px; align-items: baseline; font-size: 13px; color: #666; margin: 6px 0; }
+.lane-help .glossary summary { cursor: pointer; font-size: 12px; }
+.lane-help .glossary ul { font-size: 12px; margin: 4px 0 0 16px; }
+.ref-line { color: #3d7a5d; }
+.ref-line.ref-new { color: #9a7b2f; }
+.ref-use-section { font-size: 11px; padding: 2px 8px; }
+.dec-clear { font-size: 11px; padding: 2px 8px; }
+.row-check { transform: scale(1.15); }

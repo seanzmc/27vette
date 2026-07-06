@@ -1,0 +1,8 @@
+=== Pass B.2 spec run · 2026-07-06 · docs-only ===
+changed: docs/ingest/pass-b/pass-b2-review-finetune-spec.md (new), docs/ingest/README.md (+1 pointer line)
+
+(protected surfaces empty = clean)
+
+=== loop validator (post-receipt) ===
+Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.
+exit=0

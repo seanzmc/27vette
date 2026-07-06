@@ -1,0 +1,33 @@
+=== Pass B.1 validation · 2026-07-06 ===
+
+== wizard suites (all) ==
+........................................................                 [100%]
+56 passed in 2.01s
+
+full pytest not re-run this pass: changed surface confined to wizard modules + wizard UI; grep confirms no non-wizard imports of ingest.wizard; full suite ran green-minus-known-failures in Pass B closeout same worktree
+
+== wizard.js syntax ==
+OK
+
+== protected surfaces ==
+(empty = clean)
+
+== browser proof (real 28-sheet export, port 8041) ==
+zero raw-JSON payload inputs on review stage (querySelector count 0)
+bulk section assign: GSX section lane 0/298 -> 298/298 in one action (respects filters)
+bulk accept exact prices: ZR1 price lane 'Accept all 188 exact price matches' -> 188/214
+hint accept: chip click prefilled relationship form (kind=includes, source=R6P), saved as create_relationship_candidate
+hint numeric-token leak found in browser (targets 866,635,2349) -> fixed (bare all-digit tokens excluded), re-verified numericTokenLeaks=0, new unit test
+copy zr1->zr1x: 189 copied (price 188, relationship 1), 0 skipped; zr1x price lane 0/214 -> 188/214; copiedFrom provenance on records
+presentation lane: per-column editable cell table (model_key readonly), no JSON
+source-section filter + copy bar rendered; console errors: none; screenshot taken
+
+=== cycle 2 fixes (verifier-required) ===
+fix 1: five direct copy_decisions unit tests for the RPO-identity branch (CopyRpoIdentityBranchTest): exactly-one match copies with re-derived fingerprint/decisionId; zero matches skip no_unique_rpo_match matches=0; ambiguous skip matches=2; source_candidate_missing skip; NEW within-batch duplicate-target guard (produced_ids set in copy_decisions) with duplicate_target_in_batch skip reason — verifier's collision observation implemented.
+fix 2: transient proof-run cleanup — removed 2 pre-fix numeric-leak relationship records (zr1/zr1x r6p-includes) from 20260706-001036-06b8d2/decisions.json (674 remain), cleanup noted in decisions-log.jsonl.
+suites after fixes: 61 passed in 2.00s
+(protected surfaces empty = clean; run dir gitignored)
+
+=== closeout: loop validator ===
+Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.
+exit=0

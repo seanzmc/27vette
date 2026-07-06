@@ -1,0 +1,41 @@
+{
+  "id": "2026-07-05-pass-b-decision-capture",
+  "started_at": "2026-07-05T22:30:00-04:00",
+  "completed_at": "2026-07-05T23:30:00-04:00",
+  "objective": "Implement Pass B of the approved ingest-wizard end-to-end spec: model selection with structure-only comparators, variant reconciliation, ten reviewer decision lanes with persistence and fingerprint invalidation, and the decisions_complete gate.",
+  "changed_surface": "tooling/UI/tests/docs: scripts/corvette_form_generator/ingest/wizard/{decisions,hints}.py (new), session.py + scripts/ingest_wizard_server.py (extended), visualizer/ingest-wizard/* (stages 4-5), tests (3 new suites + fixture builder), .claude/launch.json (dev port), docs (spec status, ingest README, ingest prompt)",
+  "outcome_rubric": "fable5loop/runs/2026-07-05-pass-b-decision-capture/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-05-pass-b-decision-capture/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-05-pass-b-decision-capture/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-05-pass-b-decision-capture/verifier-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-05-pass-b-decision-capture/validation-output.txt"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-05-pass-b-decision-capture/verifier-report.md",
+    "detail": "Added 'Surfaced-but-not-enforced review findings' known failure mode from the verifier's cycle-1 catch: gate functions must consume mandatory findings, disagreeing fixture cases double as regression tests, and completion-test helpers resolve new blocker types explicitly."
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 2,
+    "pattern": "adversarial-verification",
+    "cycle1": "fail — variant-reconciliation disagreements surfaced in UI/report but not enforced by completeness gate; lane-10 rows lacked per-row edit",
+    "cycle2": "pass — blocker enforcement + editable rows verified in code, tests (50 green, verifier-reproduced), and on-disk artifacts of real browser runs"
+  },
+  "boundaries_preserved": [
+    "workbook (stingray_master.xlsx opened read-only only; byte-compare test; git status clean)",
+    "generated artifacts (form-output tracked files clean; pytest timestamp churn restored; wizard artifacts under gitignored form-output/ingest-wizard/)",
+    "runtime app (form-app/ untouched)",
+    "dealer submission (untouched)"
+  ]
+}

@@ -8,6 +8,12 @@
       "port": 8040
     },
     {
+      "name": "ingest-wizard-dev",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": ["scripts/ingest_wizard_server.py", "--port", "8041"],
+      "port": 8041
+    },
+    {
       "name": "form-app",
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "4173", "--directory", "form-app"],

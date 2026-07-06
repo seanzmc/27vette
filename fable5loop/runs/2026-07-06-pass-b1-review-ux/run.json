@@ -1,0 +1,41 @@
+{
+  "id": "2026-07-06-pass-b1-review-ux",
+  "started_at": "2026-07-06T00:00:00-04:00",
+  "completed_at": "2026-07-06T01:00:00-04:00",
+  "objective": "User-directed Pass B review-stage usability correction: remove raw-JSON payload inputs, add per-lane bulk actions, one-click relationship-hint prefill, and cross-model decision copying.",
+  "changed_surface": "tooling/UI/tests/docs: decisions.py (copy engine + batch guard), hints.py (numeric-token rule), session.py (copy method, sourceSection filter), ingest_wizard_server.py (/copy-decisions, sourceSection), visualizer/ingest-wizard/* (lane forms, bulk bar, copy bar, presentation cell tables), tests (+11 to 61), spec B.1 status note",
+  "outcome_rubric": "fable5loop/runs/2026-07-06-pass-b1-review-ux/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-06-pass-b1-review-ux/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-06-pass-b1-review-ux/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-06-pass-b1-review-ux/verifier-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-06-pass-b1-review-ux/validation-output.txt"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-06-pass-b1-review-ux/verifier-report.md",
+    "detail": "Added 'Fixture-shadowed branches' known failure mode: force fallback branches with fixtures/synthetic inputs and grep for skip-reason strings as the coverage check; re-create artifacts persisted by pre-fix code after mid-proof fixes."
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 2,
+    "pattern": "adversarial-verification",
+    "cycle1": "fail — RPO-identity copy branch had zero coverage (fixture and real export both mixed-sheet); pre-fix numeric-leak records persisted in proof run",
+    "cycle2": "pass — 5 direct branch tests + within-batch duplicate guard verified (61 suites green, verifier-reproduced); proof run cleaned with audit log entry"
+  },
+  "boundaries_preserved": [
+    "workbook (read-only opens only; git status clean)",
+    "generated artifacts (tracked form-output clean; only gitignored form-output/ingest-wizard run dirs written)",
+    "runtime app (form-app/ untouched)",
+    "dealer submission (untouched)"
+  ]
+}

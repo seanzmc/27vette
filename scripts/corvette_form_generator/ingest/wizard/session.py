@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Run-state persistence and fail-closed state machine for the ingest wizard.
 
-States: profiled -> roles_confirmed -> parsed. Every transition persists JSON
-artifacts under form-output/ingest-wizard/<run-id>/ so a run can be reopened
-and later passes can consume the output. The canonical workbook and the raw
+States: profiled -> roles_confirmed -> parsed (Pass A), then
+models_selected -> decisions_in_progress -> decisions_complete (Pass B).
+Every transition persists JSON artifacts under
+form-output/ingest-wizard/<run-id>/ so a run can be reopened and later passes
+can consume the output. The canonical workbook is opened read-only for
+pickers, variant reconciliation, and presentation prefill; it and the raw
 source file are never written.
 """
 
@@ -17,6 +20,25 @@ import uuid
 from pathlib import Path
 from typing import Any
 
+from corvette_form_generator.ingest.wizard.decisions import (
+    LANES,
+    SCHEMA_VERSION_B,
+    SCHEMA_VERSION_B2,
+    artifact_fingerprint,
+    completeness,
+    copy_decisions,
+    detect_model_options,
+    load_decision_state,
+    presentation_prefill,
+    scope_candidates,
+    validate_decision,
+    validate_selection,
+    variant_reconciliation,
+    workbook_option_reference,
+    workbook_sections,
+)
+from corvette_form_generator.ingest.wizard.copy_split import propose_copy_split
+from corvette_form_generator.ingest.wizard.hints import scan_candidates
 from corvette_form_generator.ingest.wizard.joiner import join_prices
 from corvette_form_generator.ingest.wizard.parser import parse_confirmed_sheets
 from corvette_form_generator.ingest.wizard.profiler import (
@@ -32,6 +54,10 @@ from corvette_form_generator.ingest.wizard.profiler import (
 STATE_PROFILED = "profiled"
 STATE_ROLES_CONFIRMED = "roles_confirmed"
 STATE_PARSED = "parsed"
+STATE_MODELS_SELECTED = "models_selected"
+STATE_DECISIONS_IN_PROGRESS = "decisions_in_progress"
+STATE_DECISIONS_COMPLETE = "decisions_complete"
+DECISION_STATES = (STATE_MODELS_SELECTED, STATE_DECISIONS_IN_PROGRESS, STATE_DECISIONS_COMPLETE)
 VALID_ROLES = {ROLE_OPTIONS, ROLE_PRICE, ROLE_EXCLUDE}
 RUN_ID_RE = re.compile(r"^[0-9]{8}-[0-9]{6}-[0-9a-f]{6}$")
 PARSE_ARTIFACTS = ("option-candidates.json", "price-rows.json", "join-report.json")
@@ -60,10 +86,27 @@ def file_fingerprint(path: Path) -> dict[str, Any]:
 
 
 class WizardSessionStore:
-    def __init__(self, root: Path) -> None:
+    def __init__(self, root: Path, workbook_path: Path | None = None) -> None:
         self.root = Path(root)
         self.base = self.root / "form-output" / "ingest-wizard"
         self.uploads = self.base / "uploads"
+        self.workbook_path = Path(workbook_path) if workbook_path else self.root / "stingray_master.xlsx"
+        self._reference_cache: tuple[int, dict] | None = None
+
+    def _option_reference(self) -> dict:
+        path = self._require_workbook()
+        mtime = path.stat().st_mtime_ns
+        if self._reference_cache is None or self._reference_cache[0] != mtime:
+            self._reference_cache = (mtime, workbook_option_reference(path))
+        return self._reference_cache[1]
+
+    def _require_workbook(self) -> Path:
+        if not self.workbook_path.is_file():
+            raise WizardError(
+                f"Canonical workbook not found (read-only pickers need it): {self.workbook_path.name}",
+                status=409,
+            )
+        return self.workbook_path
 
     # ------------------------------------------------------------- files
     def list_source_files(self) -> list[dict[str, Any]]:
@@ -153,11 +196,13 @@ class WizardSessionStore:
         run_dir = self.run_dir(run_id)
         roles_file = run_dir / "sheet-roles.json"
         report_file = run_dir / "join-report.json"
+        selection_file = run_dir / "model-selection.json"
         return {
             "session": self.load_session(run_id, verify_source=False),
             "profile": read_json(run_dir / "sheet-profile.json"),
             "roles": read_json(roles_file)["roles"] if roles_file.is_file() else None,
             "joinReport": read_json(report_file) if report_file.is_file() else None,
+            "modelSelection": read_json(selection_file) if selection_file.is_file() else None,
         }
 
     # ------------------------------------------------------------- roles
@@ -201,7 +246,7 @@ class WizardSessionStore:
     # ------------------------------------------------------------- parse
     def run_parse(self, run_id: str) -> dict[str, Any]:
         session = self.load_session(run_id)
-        if session["state"] not in (STATE_ROLES_CONFIRMED, STATE_PARSED):
+        if session["state"] not in (STATE_ROLES_CONFIRMED, STATE_PARSED) + DECISION_STATES:
             raise WizardError("Confirm sheet roles before parsing.")
         run_dir = self.run_dir(run_id)
         roles = read_json(run_dir / "sheet-roles.json")["roles"]
@@ -240,7 +285,7 @@ class WizardSessionStore:
         query: str = "",
     ) -> dict[str, Any]:
         session = self.load_session(run_id, verify_source=False)
-        if session["state"] != STATE_PARSED:
+        if session["state"] not in (STATE_PARSED,) + DECISION_STATES:
             raise WizardError("Run the parse before requesting candidates.")
         run_dir = self.run_dir(run_id)
         payload = read_json(run_dir / "option-candidates.json")
@@ -269,3 +314,305 @@ class WizardSessionStore:
             "skippedRows": payload["skippedRows"],
             "unmatchedPriceRows": report["unmatchedPriceRows"],
         }
+
+    # ------------------------------------------------- pass b: model scoping
+    def _parsed_candidates(self, run_id: str) -> tuple[dict[str, Any], Path, list[dict[str, Any]]]:
+        session = self.load_session(run_id, verify_source=False)
+        if session["state"] not in (STATE_PARSED,) + DECISION_STATES:
+            raise WizardError("Run the parse before Pass B model selection.")
+        candidates_file = self.run_dir(run_id) / "option-candidates.json"
+        return session, candidates_file, read_json(candidates_file)["candidates"]
+
+    def _load_selection(self, run_id: str, candidates_file: Path) -> dict[str, Any]:
+        selection_file = self.run_dir(run_id) / "model-selection.json"
+        if not selection_file.is_file():
+            raise WizardError("Select target models before reviewing decisions.")
+        selection = read_json(selection_file)
+        if selection.get("candidatesFingerprint") != artifact_fingerprint(candidates_file):
+            raise WizardError(
+                "Candidates were re-parsed after model selection; re-select target models. "
+                "Existing decisions with matching evidence fingerprints will be kept.",
+                status=409,
+            )
+        return selection
+
+    def model_options(self, run_id: str) -> dict[str, Any]:
+        session, _, candidates = self._parsed_candidates(run_id)
+        run_dir = self.run_dir(run_id)
+        selection_file = run_dir / "model-selection.json"
+        return {
+            "session": session,
+            "models": detect_model_options(candidates),
+            "selection": read_json(selection_file) if selection_file.is_file() else None,
+        }
+
+    def select_models(self, run_id: str, targets: list[str], comparators: dict[str, str]) -> dict[str, Any]:
+        session, candidates_file, candidates = self._parsed_candidates(run_id)
+        try:
+            validate_selection(candidates, targets, comparators)
+        except ValueError as exc:
+            raise WizardError(str(exc)) from exc
+        run_dir = self.run_dir(run_id)
+        selection = {
+            "schemaVersion": SCHEMA_VERSION_B,
+            "targets": list(targets),
+            "comparators": dict(comparators),
+            "sourceFingerprint": session["fingerprint"],
+            "candidatesFingerprint": artifact_fingerprint(candidates_file),
+            "selectedAt": time.strftime("%Y-%m-%dT%H:%M:%S"),
+        }
+        write_json(run_dir / "model-selection.json", selection)
+        reconciliation = variant_reconciliation(self._require_workbook(), candidates, list(targets))
+        write_json(run_dir / "variant-reconciliation.json", reconciliation)
+        # Keep only decisions that still resolve: in-target model and matching
+        # candidate evidence fingerprint (re-parse invalidation, spec B2).
+        state = self._decision_state(run_id, candidates, selection, prune_to_targets=True)
+        self._write_decisions(run_id, state["decisions"], selection)
+        session["state"] = STATE_MODELS_SELECTED if not state["decisions"] else STATE_DECISIONS_IN_PROGRESS
+        write_json(run_dir / "session.json", session)
+        return {"session": session, "selection": selection, "reconciliation": reconciliation}
+
+    def reconciliation(self, run_id: str) -> dict[str, Any]:
+        _, candidates_file, _ = self._parsed_candidates(run_id)
+        self._load_selection(run_id, candidates_file)
+        return read_json(self.run_dir(run_id) / "variant-reconciliation.json")
+
+    # ---------------------------------------------------- pass b: decisions
+    def _decision_state(
+        self,
+        run_id: str,
+        candidates: list[dict[str, Any]],
+        selection: dict[str, Any],
+        *,
+        prune_to_targets: bool = False,
+    ) -> dict[str, Any]:
+        decisions_file = self.run_dir(run_id) / "decisions.json"
+        snapshot = read_json(decisions_file) if decisions_file.is_file() else None
+        candidates_by_id = {c["candidateId"]: c for c in candidates}
+        state = load_decision_state(snapshot, candidates_by_id)
+        if prune_to_targets:
+            targets = set(selection["targets"])
+            state["decisions"] = {
+                key: record for key, record in state["decisions"].items() if record["model"] in targets
+            }
+        return state
+
+    def _write_decisions(
+        self, run_id: str, decisions: dict[str, dict[str, Any]], selection: dict[str, Any]
+    ) -> None:
+        write_json(
+            self.run_dir(run_id) / "decisions.json",
+            {
+                "schemaVersion": SCHEMA_VERSION_B2,
+                "candidatesFingerprint": selection["candidatesFingerprint"],
+                "decisions": sorted(decisions.values(), key=lambda record: record["decisionId"]),
+            },
+        )
+
+    def review_queue(
+        self,
+        run_id: str,
+        model: str,
+        lane: str,
+        *,
+        query: str = "",
+        template: str = "",
+        source_section: str = "",
+    ) -> dict[str, Any]:
+        session, candidates_file, candidates = self._parsed_candidates(run_id)
+        selection = self._load_selection(run_id, candidates_file)
+        if model not in selection["targets"]:
+            raise WizardError(f"Model {model} is not a selected target.")
+        if lane not in {entry["lane"] for entry in LANES}:
+            raise WizardError(f"Unknown lane: {lane}")
+        state = self._decision_state(run_id, candidates, selection)
+        scoped = scope_candidates(candidates, model)
+        if lane != "standard_equipment":
+            scoped = [c for c in scoped if c["rowKind"] == "orderable"]
+        else:
+            scoped = [c for c in scoped if c["rowKind"] == "ref_only"]
+        source_sections = sorted({c["sectionLabel"] for c in scoped if c["sectionLabel"]})
+        if source_section:
+            scoped = [c for c in scoped if c["sectionLabel"] == source_section]
+        if query:
+            needle = query.lower()
+            scoped = [
+                c
+                for c in scoped
+                if needle in c["rpo"].lower()
+                or needle in c["refOnlyRpo"].lower()
+                or needle in c["description"].lower()
+            ]
+        payload: dict[str, Any] = {
+            "session": session,
+            "model": model,
+            "lane": lane,
+            "sourceSections": source_sections,
+            "candidates": scoped,
+            "decisions": [
+                record
+                for record in state["decisions"].values()
+                if record["model"] == model and record["lane"] == lane
+            ],
+            "invalidated": [
+                record
+                for record in state["invalidated"]
+                if record.get("model") == model and record.get("lane") == lane
+            ],
+        }
+        lane_config = next(entry for entry in LANES if entry["lane"] == lane)
+        if lane_config["perCandidate"]:
+            reference = self._option_reference()
+            preferred = selection["comparators"].get(model, "")
+            payload["workbookReference"] = {
+                rpo: sorted(rows, key=lambda row: row["modelKey"] != preferred)
+                for rpo in {c["rpo"] for c in scoped if c["rpo"]}
+                if (rows := reference.get(rpo))
+            }
+        if lane == "section":
+            payload["sections"] = workbook_sections(self._require_workbook())
+        if lane == "relationship":
+            payload["hints"] = scan_candidates(scoped)
+        if lane == "copy_split":
+            for candidate in scoped:
+                candidate["proposedSplit"] = propose_copy_split(candidate)
+        if lane == "presentation":
+            template_model = template or selection["comparators"].get(model, "")
+            if not template_model:
+                raise WizardError("Presentation prefill needs a template model.")
+            payload["prefill"] = presentation_prefill(self._require_workbook(), template_model, model)
+        return payload
+
+    def save_decisions(self, run_id: str, decisions: list[dict[str, Any]]) -> dict[str, Any]:
+        session, candidates_file, candidates = self._parsed_candidates(run_id)
+        selection = self._load_selection(run_id, candidates_file)
+        if not isinstance(decisions, list) or not decisions:
+            raise WizardError("Request must carry a non-empty decisions list.")
+        candidates_by_id = {c["candidateId"]: c for c in candidates}
+        state = self._decision_state(run_id, candidates, selection)
+        batch_id = uuid.uuid4().hex[:12]
+        accepted: list[dict[str, Any]] = []
+        for decision in decisions:
+            try:
+                record = validate_decision(decision, candidates_by_id)
+            except ValueError as exc:
+                raise WizardError(str(exc)) from exc
+            if record["model"] not in selection["targets"]:
+                raise WizardError(f"Decision targets non-selected model: {record['model']}")
+            record["batchId"] = batch_id
+            state["decisions"][record["decisionId"]] = record
+            accepted.append(record)
+        run_dir = self.run_dir(run_id)
+        with (run_dir / "decisions-log.jsonl").open("a", encoding="utf-8") as log:
+            for record in accepted:
+                log.write(json.dumps(record, ensure_ascii=False) + "\n")
+        self._write_decisions(run_id, state["decisions"], selection)
+        if session["state"] in (STATE_MODELS_SELECTED, STATE_DECISIONS_COMPLETE):
+            session["state"] = STATE_DECISIONS_IN_PROGRESS
+            write_json(run_dir / "session.json", session)
+        return {
+            "session": session,
+            "batchId": batch_id,
+            "accepted": [record["decisionId"] for record in accepted],
+        }
+
+    def delete_decisions(
+        self,
+        run_id: str,
+        *,
+        decision_ids: list[str] | None = None,
+        batch_id: str = "",
+    ) -> dict[str, Any]:
+        session, candidates_file, candidates = self._parsed_candidates(run_id)
+        selection = self._load_selection(run_id, candidates_file)
+        if not decision_ids and not batch_id:
+            raise WizardError("Delete needs decisionIds or a batchId.")
+        state = self._decision_state(run_id, candidates, selection)
+        targets = set(decision_ids or [])
+        deleted: list[str] = []
+        for key, record in list(state["decisions"].items()):
+            if key in targets or (batch_id and record.get("batchId") == batch_id):
+                del state["decisions"][key]
+                deleted.append(key)
+        if deleted:
+            run_dir = self.run_dir(run_id)
+            with (run_dir / "decisions-log.jsonl").open("a", encoding="utf-8") as log:
+                log.write(
+                    json.dumps(
+                        {
+                            "deleted": deleted,
+                            "batchId": batch_id or None,
+                            "at": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                        },
+                        ensure_ascii=False,
+                    )
+                    + "\n"
+                )
+            self._write_decisions(run_id, state["decisions"], selection)
+            if session["state"] == STATE_DECISIONS_COMPLETE:
+                session["state"] = STATE_DECISIONS_IN_PROGRESS
+                write_json(run_dir / "session.json", session)
+        return {"session": session, "deleted": deleted}
+
+    def copy_model_decisions(
+        self, run_id: str, from_model: str, to_model: str, *, overwrite: bool = False
+    ) -> dict[str, Any]:
+        session, candidates_file, candidates = self._parsed_candidates(run_id)
+        selection = self._load_selection(run_id, candidates_file)
+        if from_model not in selection["targets"] or to_model not in selection["targets"]:
+            raise WizardError("Copy source and target must both be selected target models.")
+        state = self._decision_state(run_id, candidates, selection)
+        try:
+            report = copy_decisions(
+                state["decisions"], candidates, from_model, to_model, overwrite=overwrite
+            )
+        except ValueError as exc:
+            raise WizardError(str(exc)) from exc
+        run_dir = self.run_dir(run_id)
+        batch_id = uuid.uuid4().hex[:12]
+        if report["copied"]:
+            for record in report["copied"]:
+                record["batchId"] = batch_id
+                state["decisions"][record["decisionId"]] = record
+            with (run_dir / "decisions-log.jsonl").open("a", encoding="utf-8") as log:
+                for record in report["copied"]:
+                    log.write(json.dumps(record, ensure_ascii=False) + "\n")
+            self._write_decisions(run_id, state["decisions"], selection)
+            if session["state"] in (STATE_MODELS_SELECTED, STATE_DECISIONS_COMPLETE):
+                session["state"] = STATE_DECISIONS_IN_PROGRESS
+                write_json(run_dir / "session.json", session)
+        return {
+            "session": session,
+            "batchId": batch_id if report["copied"] else None,
+            "copied": len(report["copied"]),
+            "copiedByLane": report["copiedByLane"],
+            "skipped": report["skipped"],
+        }
+
+    def progress(self, run_id: str) -> dict[str, Any]:
+        session, candidates_file, candidates = self._parsed_candidates(run_id)
+        selection = self._load_selection(run_id, candidates_file)
+        state = self._decision_state(run_id, candidates, selection)
+        reconciliation_file = self.run_dir(run_id) / "variant-reconciliation.json"
+        reconciliation = read_json(reconciliation_file) if reconciliation_file.is_file() else None
+        report = completeness(candidates, selection["targets"], state["decisions"], reconciliation)
+        report["session"] = session
+        report["invalidatedDecisions"] = len(state["invalidated"])
+        return report
+
+    def mark_complete(self, run_id: str) -> dict[str, Any]:
+        report = self.progress(run_id)
+        if not report["allComplete"]:
+            blockers = {
+                model: entry["blockers"] for model, entry in report["models"].items() if entry["blockers"]
+            }
+            raise WizardError(
+                "Decisions are not complete; blocking items remain: " + json.dumps(blockers)[:2000],
+                status=409,
+            )
+        run_dir = self.run_dir(run_id)
+        session = self.load_session(run_id, verify_source=False)
+        session["state"] = STATE_DECISIONS_COMPLETE
+        write_json(run_dir / "session.json", session)
+        report["session"] = session
+        return report
