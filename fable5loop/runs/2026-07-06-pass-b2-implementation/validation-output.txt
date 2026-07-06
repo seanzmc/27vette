@@ -1,0 +1,32 @@
+=== Pass B.2 validation · 2026-07-06 ===
+
+== wizard suites (9 files) ==
+74 passed in 2.35s (new: test_ingest_wizard_copy_split.py 8; decisions +5 delete/batch/reference; server +1 delete endpoint; fixture gained model_workbook_sources + z06_options reference rows)
+
+== wizard.js syntax ==
+OK
+
+== protected surfaces ==
+(empty = clean)
+
+== python smoke (real export + live workbook, read-only) ==
+propose_copy_split on real GM-style text: clean name/description/disclosure split, flags empty; GSX reference index 130 RPOs matched with grand_sport-first ordering; 298 proposals, 156 flagged; batch save -> delete-by-batch round trip
+
+== browser proof (real 28-sheet export, port 8041) ==
+stage-4 label: 'Reference model (workbook data used for prefill and comparisons)'
+checked 5 rows -> bulk button 'Put 5 checked rows in this section' -> Section assignment 5/298 -> Undo last bulk -> 0/298
+reference lines: 262 in-workbook + 36 'New to workbook' on GSX section lane; 'Use grand_sport's section' click filled the row's section select
+resolution dropdown first option: 'Approve — write to workbook'; lane help line rendered
+copy-split lane: 'Showing flagged rows only' default (156 rows), name prefilled from script proposal, checked 3 -> 'Accept script copy for 3 checked' -> Copy split: 3 decided
+console errors: none; screenshot taken
+
+=== post-verifier follow-ups (recommended, applied) ===
+1. fixture now materializes zr1_options sheet with conflicting PDB row (active-flag filter is the only excluder); reference test asserts exactly 1 match
+2. stale stage-4 comparator copy in index.html replaced with reference-model explanation
+3. FLAG_ALL_DISCLOSURE now fires when the proposed name itself reads as disclosure and nothing is left for description; unit test added
+suites after follow-ups: 75 passed in 2.35s
+(protected surfaces empty = clean)
+
+=== closeout: loop validator ===
+Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.
+exit=0

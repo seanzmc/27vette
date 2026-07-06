@@ -1,0 +1,41 @@
+{
+  "id": "2026-07-05-ingest-wizard-e2e-spec",
+  "started_at": "2026-07-05T21:20:00-04:00",
+  "completed_at": "2026-07-05T23:30:00-04:00",
+  "objective": "Write the full development spec completing the raw order-guide ingest wizard end to end: ingest Grand Sport X, ZR1, ZR1X from the official order-guide export; review/resolve human-owned decisions; safe workbook apply; regeneration; runtime promotion via the same workbook-to-generator-to-runtime pipeline as live models.",
+  "changed_surface": "docs (new spec docs/ingest/ingest-wizard-end-to-end-completion-spec.md + docs/ingest/README.md pointer) + loop artifacts (run receipt, STATE.md, skill known-failure-mode addition)",
+  "outcome_rubric": "fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec/verifier-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec/validation-output.txt"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-05-ingest-wizard-e2e-spec/verifier-report.md",
+    "detail": "Added 'Model-scoped long-tail sheet gap' known failure mode: new-model plans and their verifiers must probe per-model_key row coverage across every model_key-scoped sheet (presentation sheets included), not just the model-metadata quintet; runtime_metadata.py rejects fallback metadata for promoted models. Verified by independent verifier probe in this run."
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 2,
+    "pattern": "adversarial-verification",
+    "cycle1": "fail — missing presentation-metadata lane/ops (runtime_steps, section_presentation, context_section_master, order_summary_sections, step_order_summary_map); fixed in spec (lane 10, B3 gate, Pass C ops, Pass E discovery fact)",
+    "cycle2": "pass — all six criteria; no required fixes; two cosmetic nits fixed post-verdict"
+  },
+  "boundaries_preserved": [
+    "workbook (stingray_master.xlsx untouched; read-only openpyxl probes only)",
+    "generated artifacts (form-output/ tracked files untouched; no churn-inducing gates run)",
+    "runtime app (form-app/ untouched)",
+    "dealer submission (untouched)"
+  ]
+}

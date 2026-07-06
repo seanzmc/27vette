@@ -1,0 +1,40 @@
+{
+  "id": "2026-07-06-pass-b2-implementation",
+  "started_at": "2026-07-06T09:00:00-04:00",
+  "completed_at": "2026-07-06T11:00:00-04:00",
+  "objective": "Implement the approved Pass B.2 spec: selection-scoped bulk actions with batch undo and audited deletion, script-owned copy splitting with exception queue, workbook reference replacing the export comparator, plain-language decision labels.",
+  "changed_surface": "tooling/UI/tests/docs: copy_split.py (new), decisions.py (reference index, batch guard context), session.py (batchId, delete_decisions, queue attachments, reference cache), ingest_wizard_server.py (/decisions/delete), visualizer/ingest-wizard/* (checkboxes, undo/clear, exception queue, reference lines, labels/glossary, relabel), tests (+14 to 75 incl. new copy_split suite), parent spec + ingest prompt + README docs",
+  "outcome_rubric": "fable5loop/runs/2026-07-06-pass-b2-implementation/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-06-pass-b2-implementation/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-06-pass-b2-implementation/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-06-pass-b2-implementation/verifier-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-06-pass-b2-implementation/validation-output.txt"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-06-pass-b2-implementation/verifier-report.md",
+    "detail": "Extended the 'Fixture-shadowed branches' known failure mode with the negative-path-filter variant: excluded/polluting fixture data must actually exist so the filter under test is the only excluder (verifier's inactive-source probe)."
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 1,
+    "pattern": "adversarial-verification",
+    "cycle1": "pass — all seven criteria; two non-blocking follow-ups (fixture materialization, stale static-HTML comparator copy) + one cosmetic (FLAG_ALL_DISCLOSURE reachability) applied by maker post-verdict, suites 75 green"
+  },
+  "boundaries_preserved": [
+    "workbook (read-only opens only; clean before/after maker and verifier runs)",
+    "generated artifacts (tracked form-output clean; run dirs gitignored)",
+    "runtime app (form-app/ untouched)",
+    "dealer submission (untouched)"
+  ]
+}

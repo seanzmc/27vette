@@ -1,0 +1,36 @@
+{
+  "id": "2026-07-06-pass-b2-spec",
+  "started_at": "2026-07-06T01:10:00-04:00",
+  "completed_at": "2026-07-06T01:40:00-04:00",
+  "objective": "Spec the Pass B.2 review-stage fine-tune (selection-scoped bulk with undo, script-owned copy split, workbook reference, plain-language labels) and define Pass B closeout.",
+  "changed_surface": "docs only: docs/ingest/pass-b/pass-b2-review-finetune-spec.md (new) + docs/ingest/README.md pointer",
+  "outcome_rubric": "fable5loop/runs/2026-07-06-pass-b2-spec/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-06-pass-b2-spec/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-06-pass-b2-spec/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-06-pass-b2-spec/validation-output.txt"
+    }
+  ],
+  "skill_update": {
+    "decision": "not_applicable",
+    "evidence": "fable5loop/runs/2026-07-06-pass-b2-spec/verifier-report.md",
+    "detail": "Spec-only run; verifier reported no new durable lesson candidates — established grounding-probe pattern reused."
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 1,
+    "pattern": "adversarial-verification",
+    "cycle1": "pass — all four criteria; one non-blocking wording nit (hints.py phrase-set attribution) fixed post-verdict"
+  },
+  "boundaries_preserved": [
+    "workbook (read-only probes only)",
+    "generated artifacts (untouched)",
+    "runtime app (untouched)",
+    "dealer submission (untouched)"
+  ]
+}

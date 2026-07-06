@@ -1,0 +1,41 @@
+=== Pass B validation · 2026-07-05 ===
+
+== new suites ==
+.....................                                                    [100%]
+21 passed in 1.13s
+
+== existing wizard suites ==
+............................                                             [100%]
+28 passed in 0.75s
+
+== full pytest (run earlier this session) ==
+6 failed, 323 passed in 148.28s
+failures: test_editor_lints x3 (pre-existing live-workbook-state, STATE.md 2026-07-05), test_fable5_loop_contract::test_repository_... (Pass B receipt incomplete at run time; green after closeout), test_fable5_loop_contract::test_validator_rejects_stale_last_session_pointer (pre-existing, STATE Open failures), test_source_assembly_characterization (pre-existing on base per Pass A closeout; no source-assembly changes in this pass)
+form-output churn from full pytest was timestamp-only (git diff --numstat 1/1 per file, only generated_at lines); restored via git restore form-output
+
+== wizard.js syntax ==
+OK
+
+== protected surfaces ==
+(empty = clean)
+
+== browser proof (preview server, port 8041, real 28-sheet export) ==
+profile 28 cards -> roles -> parse: 1915 candidates / 1212 exact / 80 ambiguous / 124 no-price / 9 unmatched / 135 skipped
+models stage: GSX 391 / ZR1 332 / ZR1X 332 candidates, targets pre-selected, comparators grand_sport|z06|z06 (resolved decision 3)
+reconciliation: grand_sport_x disagrees (6 export-only, 0 workbook-only, mandatory decision); zr1 + zr1x match scaffolds
+review: section decision saved (1/298), price lane controls, relationship form + 176 hint chips, presentation prefill 14/8/2/12/14 rows, standard-equipment 118 rows, runtime_steps approved (1/5)
+server-restart resume: fresh process + fresh page; state decisions_in_progress, targets intact, gsx section 1/298, zr1 presentation 1/5, runtime_steps decision present
+console errors: none
+
+=== cycle 2 fixes (verifier-required) ===
+fix 1: completeness() consumes variant-reconciliation.json — disagreeing model blocked (reason variant_reconciliation_disagreement_undecided) until a group decision with groupKey variant_reconciliation recorded; enforced in progress()/mark_complete(). New test test_variant_reconciliation_disagreement_blocks_completion; complete_model helper now resolves disagreements explicitly.
+fix 2: lane-10 per-row JSON edit input (.pres-edit) before approval; approve collects edited values.
+wizard suites after fixes: 50 passed in 1.88s
+browser (real export, port 8041): real run 20260705-230008-deb30d progress shows gsxReconBlocker=1 zr1ReconBlocker=0; fresh run 20260705-231139-17805f: edited runtime_steps row (step_label='Edited Label') present in saved decision payload (14 rows); console errors: none
+(protected surfaces empty = clean)
+
+=== closeout: loop validator + contract tests ===
+Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.
+validator exit=0
+FAILED tests/test_fable5_loop_contract.py::test_validator_rejects_stale_last_session_pointer
+1 failed, 12 passed in 0.21s
