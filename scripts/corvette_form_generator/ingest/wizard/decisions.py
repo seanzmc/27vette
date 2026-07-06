@@ -127,6 +127,30 @@ def candidate_model_keys(candidate: dict[str, Any]) -> list[str]:
     return keys
 
 
+def model_scoped_statuses(candidate: dict[str, Any], model_key: str) -> list[dict[str, Any]]:
+    """Only the status cells belonging to `model_key`'s own variant columns.
+
+    Mixed sheets carry every model's columns; per-model reads (like the
+    standard-equipment gate) must not judge a row by another model's cells.
+    """
+
+    return [
+        status
+        for status in candidate.get("statuses", [])
+        if MODEL_CODE_PREFIXES.get(str(status.get("modelCode") or "")[:3]) == model_key
+    ]
+
+
+def candidate_is_availability_row(candidate: dict[str, Any], model_key: str) -> bool:
+    """True when any of the model's own statuses parse as orderable-available
+    (A / A-with-footnote / A/D). Such rows are options, never standard
+    equipment (field note 16, 2026-07-06)."""
+
+    return any(
+        status.get("status") == "available" for status in model_scoped_statuses(candidate, model_key)
+    )
+
+
 def scope_candidates(candidates: list[dict[str, Any]], model_key: str) -> list[dict[str, Any]]:
     return [c for c in candidates if model_key in candidate_model_keys(c)]
 
@@ -319,6 +343,9 @@ def variant_reconciliation(
             "exportOnly": export_only,
             "workbookOnly": workbook_only,
             "agrees": not export_only and not workbook_only,
+            # New models have no model_variants scaffold yet; the UI frames
+            # that as "confirm the export's variants", not as an error.
+            "workbookHasScaffold": bool(workbook_rows),
         }
     return {"schemaVersion": SCHEMA_VERSION_B, "models": models}
 
@@ -560,6 +587,13 @@ def completeness(
     models: dict[str, Any] = {}
     for target in targets:
         scoped = [c for c in scope_candidates(candidates, target) if c["rowKind"] == "orderable"]
+        # A skipped section decision (resolution not_needed) means the row is
+        # not carried into the plan — no price or status read is owed for it.
+        skipped_ids = {
+            d.get("candidateId")
+            for d in decisions.values()
+            if d["model"] == target and d["lane"] == "section" and d["resolution"] == "not_needed"
+        }
         blockers: list[dict[str, Any]] = []
         holds_report: list[dict[str, Any]] = []
         lanes: dict[str, Any] = {}
@@ -569,14 +603,21 @@ def completeness(
             holds = [d for d in lane_decisions if d["resolution"] == "hold_for_question"]
             entry: dict[str, Any] = {"decisions": len(lane_decisions), "holds": len(holds)}
             if lane in MANDATORY_CANDIDATE_LANES:
+                required = (
+                    scoped if lane == "section" else [c for c in scoped if c["candidateId"] not in skipped_ids]
+                )
                 decided_ids = {d.get("candidateId") for d in lane_decisions}
-                missing = [c["candidateId"] for c in scoped if c["candidateId"] not in decided_ids]
-                entry["required"] = len(scoped)
+                missing = [c["candidateId"] for c in required if c["candidateId"] not in decided_ids]
+                entry["required"] = len(required)
                 entry["missing"] = len(missing)
                 for candidate_id in missing:
                     blockers.append({"lane": lane, "candidateId": candidate_id, "reason": "no_decision"})
             if lane == "status_nuance":
-                flagged = [c for c in scoped if candidate_needs_status_review(c)]
+                flagged = [
+                    c
+                    for c in scoped
+                    if candidate_needs_status_review(c) and c["candidateId"] not in skipped_ids
+                ]
                 decided_ids = {d.get("candidateId") for d in lane_decisions}
                 missing = [c["candidateId"] for c in flagged if c["candidateId"] not in decided_ids]
                 entry["required"] = len(flagged)

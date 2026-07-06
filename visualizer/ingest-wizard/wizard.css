@@ -94,13 +94,16 @@ button.ghost { background: transparent; }
 .sum-none b { color: var(--muted); }
 .sum-warn b { color: var(--red); }
 
-.filters { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.filters { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
 .filters select, .filters input {
   background: var(--panel); color: var(--text); border: 1px solid var(--line);
   border-radius: 6px; padding: 7px 10px; font: inherit;
 }
 .filters input { flex: 1; min-width: 220px; }
-.filters .ghost { margin-left: auto; }
+#stage-candidates .filters .ghost { margin-left: auto; }
+/* Review actions sit below summary + filters, behind one separator line. */
+.actions-bar { border-top: 1px solid var(--line); padding-top: 12px; }
+.actions-bar #mark-complete-btn { margin-left: auto; }
 
 table.cand { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
 table.cand th, table.cand td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
@@ -135,7 +138,7 @@ tr.evidence-row td { background: var(--panel-2); }
 
 /* ------------------------------------------------------------- pass b */
 .card-target { border-color: #2f6f4f; box-shadow: 0 0 0 1px #2f6f4f inset; }
-.cmp-label { display: block; margin-top: 8px; font-size: 12px; color: #555; }
+.cmp-label { display: block; margin-top: 8px; font-size: 12px; color: var(--muted); }
 .cmp-select { margin-left: 6px; }
 .sub-h { font-size: 15px; margin: 18px 0 6px; }
 .dec-cell { min-width: 340px; }
@@ -155,13 +158,12 @@ tr.evidence-row td { background: var(--panel-2); }
   .group-form { flex-direction: column; align-items: stretch; }
 }
 .pres-edit { width: 100%; font-size: 12px; font-family: monospace; padding: 3px 6px; box-sizing: border-box; }
-.copy-bar { border-top: 1px solid rgba(128,128,128,0.25); padding-top: 8px; }
 .dec-inline { font-size: 12px; white-space: nowrap; margin-right: 6px; }
 .pres-table th { font-size: 11px; text-transform: none; }
 .pres-table .pres-cell { width: 100%; min-width: 70px; font-size: 12px; padding: 2px 4px; box-sizing: border-box; }
 .hint-accept { cursor: pointer; border: 1px dashed currentColor; }
 #bulk-bar:empty { display: none; }
-.lane-help { display: flex; gap: 14px; align-items: baseline; font-size: 13px; color: #666; margin: 6px 0; }
+.lane-help { display: flex; gap: 14px; align-items: baseline; font-size: 13px; color: var(--muted); margin: 6px 0; }
 .lane-help .glossary summary { cursor: pointer; font-size: 12px; }
 .lane-help .glossary ul { font-size: 12px; margin: 4px 0 0 16px; }
 .ref-line { color: #3d7a5d; }
