@@ -124,11 +124,15 @@ class WizardHandler(BaseHTTPRequestHandler):
                         query=(query.get("q") or [""])[0],
                         template=(query.get("template") or [""])[0],
                         source_section=(query.get("sourceSection") or [""])[0],
+                        price_match=(query.get("priceMatch") or [""])[0],
                     )
                 )
             elif path.startswith("/api/wizard/sessions/") and path.endswith("/progress"):
                 run_id = path[len("/api/wizard/sessions/"):-len("/progress")]
                 self._send_json(self.store.progress(run_id))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/plan"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/plan")]
+                self._send_json(self.store.plan_detail(run_id))
             elif path.startswith("/api/wizard/sessions/"):
                 run_id = path[len("/api/wizard/sessions/"):]
                 self._send_json(self.store.session_detail(run_id))
@@ -209,6 +213,14 @@ class WizardHandler(BaseHTTPRequestHandler):
                 run_id = path[len("/api/wizard/sessions/"):-len("/complete")]
                 self._json_body()  # accept and ignore an empty JSON body
                 self._send_json(self.store.mark_complete(run_id))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/plan"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/plan")]
+                self._json_body()  # accept and ignore an empty JSON body
+                self._send_json(self.store.build_apply_plan(run_id))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/plan/approve"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/plan/approve")]
+                payload = self._json_body()
+                self._send_json(self.store.approve_plan(run_id, str(payload.get("approver") or "")))
             else:
                 self._send_error_json("Not found.", 404)
         except WizardError as exc:

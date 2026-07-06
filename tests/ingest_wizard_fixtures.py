@@ -103,6 +103,24 @@ def build_master_workbook(path: Path) -> Path:
     wb.remove(wb.active)
     _table(
         wb,
+        "model_master",
+        ["model_key", "registry_key", "model_label", "model_year", "dataset_name", "export_slug", "expected_variant_count", "default_model", "active", "notes"],
+        [
+            ["z06", "z06", "Z06", 2027, "z06 dataset", "z06", 1, False, True, ""],
+            ["zr1", "zr1", "ZR1", 2027, "zr1 scaffold", "zr1", 2, False, False, ""],
+        ],
+    )
+    _table(
+        wb,
+        "model_registry_promotion",
+        ["model_key", "registry_key", "promoted_to_runtime", "default_model", "artifact_path", "artifact_type", "legacy_alias", "active", "display_order", "notes"],
+        [
+            ["z06", "z06", True, False, "form-output/runtime/z06-runtime-contract.json", "runtime_contract", "", True, 1, ""],
+            ["zr1", "zr1", False, False, "", "", "", False, 2, ""],
+        ],
+    )
+    _table(
+        wb,
         "variant_master",
         ["variant_id", "model_year", "trim_level", "body_style", "display_name", "base_price", "display_order", "active"],
         [
@@ -130,22 +148,27 @@ def build_master_workbook(path: Path) -> Path:
             ["zr1", "source_option_sheet", "zr1_options", False, "inactive scaffold, must be ignored"],
         ],
     )
+    option_headers = ["option_id", "rpo", "price", "option_name", "description", "detail_raw", "section_id", "selectable", "display_order", "active", "display_behavior"]
     _table(
         wb,
         "z06_options",
-        ["option_id", "rpo", "price", "option_name", "description", "detail_raw", "section_id", "active"],
+        option_headers,
         [
-            ["opt_pdb_001", "PDB", 16000, "Carbon Fiber Wheel Package", "Visible carbon", "", "sec_whee_001", True],
+            ["opt_pdb_001", "PDB", 16000, "Carbon Fiber Wheel Package", "Visible carbon", "", "sec_whee_001", "", 10, True, ""],
         ],
     )
+    _table(wb, "z06_ovs", ["option_id", "variant_id", "status"], [["opt_pdb_001", "1lz_h07", "available"]])
     # The inactive source's sheet must actually exist with a conflicting row,
     # so the active-flag filter is the only thing excluding it.
     _table(
         wb,
         "zr1_options",
-        ["option_id", "rpo", "price", "option_name", "description", "detail_raw", "section_id", "active"],
+        option_headers,
         [
-            ["opt_pdb_999", "PDB", 99999, "WRONG Scaffold Package", "must never surface", "", "sec_pain_001", True],
+            # Deliberately uses the id the plan builder would mint first for
+            # PDB: locks in the add-after-delete seeding fix (new ids must
+            # avoid keys that exist pre-batch even when deleted in-batch).
+            ["opt_pdb_001", "PDB", 99999, "WRONG Scaffold Package", "must never surface", "", "sec_pain_001", "", 10, True, ""],
         ],
     )
     _table(
@@ -157,26 +180,27 @@ def build_master_workbook(path: Path) -> Path:
             ["sec_whee_001", "Wheels", "single", True, 2, "", "wheels"],
         ],
     )
+    # Headers mirror the live workbook (probe 2026-07-06).
     presentation_rows = {
         "runtime_steps": (
-            ["model_key", "step_key", "step_label", "step_order"],
-            [["z06", "paint", "Paint", 1], ["z06", "wheels", "Wheels", 2]],
+            ["model_key", "step_key", "step_label", "runtime_order", "source", "active", "notes"],
+            [["z06", "paint", "Paint", 1, "", True, ""], ["z06", "wheels", "Wheels", 2, "", True, ""]],
         ),
         "section_presentation": (
-            ["model_key", "section_id", "display_mode"],
-            [["z06", "sec_pain_001", "swatch"]],
+            ["model_key", "section_id", "display_label", "step_key", "display_behavior", "section_display_order", "standard_equipment_bucket", "standard_equipment_group_type", "auto_added_bucket", "active", "notes"],
+            [["z06", "sec_pain_001", "Exterior Color", "paint", "", 1, "", "", "", True, ""]],
         ),
         "context_section_master": (
-            ["model_key", "context_key", "context_label"],
-            [["z06", "ctx_body", "Body"]],
+            ["model_key", "context_type", "section_id", "section_name", "selection_mode", "choice_mode", "is_required", "standard_behavior", "section_display_order", "step_key", "step_label", "active", "notes"],
+            [["z06", "body", "ctx_body", "Body", "single", "", True, "", 1, "body", "Body", True, ""]],
         ),
         "order_summary_sections": (
-            ["model_key", "summary_key", "summary_label", "display_order"],
-            [["z06", "sum_paint", "Exterior", 1]],
+            ["model_key", "section_key", "section_label", "display_order", "active", "notes"],
+            [["z06", "sum_paint", "Exterior", 1, True, ""]],
         ),
         "step_order_summary_map": (
-            ["model_key", "step_key", "summary_key"],
-            [["z06", "paint", "sum_paint"]],
+            ["model_key", "step_key", "section_key", "active", "notes"],
+            [["z06", "paint", "sum_paint", True, ""]],
         ),
     }
     for sheet, (headers, rows) in presentation_rows.items():

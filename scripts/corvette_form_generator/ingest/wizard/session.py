@@ -25,9 +25,11 @@ from corvette_form_generator.ingest.wizard.decisions import (
     SCHEMA_VERSION_B,
     SCHEMA_VERSION_B2,
     artifact_fingerprint,
+    candidate_needs_status_review,
     completeness,
     copy_decisions,
     detect_model_options,
+    duplicate_rpo_groups,
     load_decision_state,
     presentation_prefill,
     scope_candidates,
@@ -39,6 +41,11 @@ from corvette_form_generator.ingest.wizard.decisions import (
 )
 from corvette_form_generator.ingest.wizard.copy_split import propose_copy_split
 from corvette_form_generator.ingest.wizard.hints import scan_candidates
+from corvette_form_generator.ingest.wizard.plan_builder import (
+    artifact_sha,
+    plan_markdown,
+    plan_summary,
+)
 from corvette_form_generator.ingest.wizard.joiner import join_prices
 from corvette_form_generator.ingest.wizard.parser import parse_confirmed_sheets
 from corvette_form_generator.ingest.wizard.profiler import (
@@ -57,7 +64,15 @@ STATE_PARSED = "parsed"
 STATE_MODELS_SELECTED = "models_selected"
 STATE_DECISIONS_IN_PROGRESS = "decisions_in_progress"
 STATE_DECISIONS_COMPLETE = "decisions_complete"
-DECISION_STATES = (STATE_MODELS_SELECTED, STATE_DECISIONS_IN_PROGRESS, STATE_DECISIONS_COMPLETE)
+STATE_PLAN_BUILT = "plan_built"
+STATE_PLAN_APPROVED = "plan_approved"
+DECISION_STATES = (
+    STATE_MODELS_SELECTED,
+    STATE_DECISIONS_IN_PROGRESS,
+    STATE_DECISIONS_COMPLETE,
+    STATE_PLAN_BUILT,
+    STATE_PLAN_APPROVED,
+)
 VALID_ROLES = {ROLE_OPTIONS, ROLE_PRICE, ROLE_EXCLUDE}
 RUN_ID_RE = re.compile(r"^[0-9]{8}-[0-9]{6}-[0-9a-f]{6}$")
 PARSE_ARTIFACTS = ("option-candidates.json", "price-rows.json", "join-report.json")
@@ -418,6 +433,7 @@ class WizardSessionStore:
         query: str = "",
         template: str = "",
         source_section: str = "",
+        price_match: str = "",
     ) -> dict[str, Any]:
         session, candidates_file, candidates = self._parsed_candidates(run_id)
         selection = self._load_selection(run_id, candidates_file)
@@ -427,13 +443,32 @@ class WizardSessionStore:
             raise WizardError(f"Unknown lane: {lane}")
         state = self._decision_state(run_id, candidates, selection)
         scoped = scope_candidates(candidates, model)
-        if lane != "standard_equipment":
-            scoped = [c for c in scoped if c["rowKind"] == "orderable"]
+        if lane == "standard_equipment":
+            # Rows without an orderable RPO, plus rows the reviewer assigned to
+            # a standard-behavior section — never plain selectable options.
+            standard_sections = {
+                s["sectionId"] for s in workbook_sections(self._require_workbook()) if s["standardBehavior"]
+            }
+            standard_assigned = {
+                record.get("candidateId")
+                for record in state["decisions"].values()
+                if record["model"] == model
+                and record["lane"] == "section"
+                and (record.get("payload") or {}).get("sectionId") in standard_sections
+            }
+            scoped = [
+                c for c in scoped if c["rowKind"] == "ref_only" or c["candidateId"] in standard_assigned
+            ]
         else:
-            scoped = [c for c in scoped if c["rowKind"] == "ref_only"]
+            scoped = [c for c in scoped if c["rowKind"] == "orderable"]
+        if lane == "status_nuance":
+            # Only rows whose availability symbols actually need a human read.
+            scoped = [c for c in scoped if candidate_needs_status_review(c)]
         source_sections = sorted({c["sectionLabel"] for c in scoped if c["sectionLabel"]})
         if source_section:
             scoped = [c for c in scoped if c["sectionLabel"] == source_section]
+        if price_match:
+            scoped = [c for c in scoped if (c.get("priceMatch") or "") == price_match]
         if query:
             needle = query.lower()
             scoped = [
@@ -469,13 +504,44 @@ class WizardSessionStore:
                 for rpo in {c["rpo"] for c in scoped if c["rpo"]}
                 if (rows := reference.get(rpo))
             }
-        if lane == "section":
+        if lane in ("section", "exclusive_group"):
             payload["sections"] = workbook_sections(self._require_workbook())
+        if lane == "exclusive_group":
+            # Pool picker context: each option's decided section, so the UI can
+            # show selection modes and group accurately.
+            payload["sectionDecisions"] = {
+                record["candidateId"]: (record.get("payload") or {}).get("sectionId", "")
+                for record in state["decisions"].values()
+                if record["model"] == model and record["lane"] == "section" and record.get("candidateId")
+            }
         if lane == "relationship":
             payload["hints"] = scan_candidates(scoped)
         if lane == "copy_split":
             for candidate in scoped:
                 candidate["proposedSplit"] = propose_copy_split(candidate)
+        if lane == "duplicate":
+            payload["duplicateGroups"] = duplicate_rpo_groups(scoped)
+        if lane == "interior_media_deferral":
+            payload["suggestedDeferrals"] = [
+                {
+                    "groupKey": f"{model}-interior-scope",
+                    "kind": "interior",
+                    "label": "Interior scope rows",
+                    "why": "Color & Trim sheets aren't parsed; model_interior_scope rows must be authored in the apply pass.",
+                },
+                {
+                    "groupKey": f"{model}-color-overrides",
+                    "kind": "color",
+                    "label": "Color overrides check",
+                    "why": "Confirm shared color_overrides rows cover this model or record what's missing.",
+                },
+                {
+                    "groupKey": f"{model}-asset-images",
+                    "kind": "asset",
+                    "label": "Asset images (asset_map)",
+                    "why": "Not a go-live blocker (resolved decision 5) — record so it stays on the list after promotion.",
+                },
+            ]
         if lane == "presentation":
             template_model = template or selection["comparators"].get(model, "")
             if not template_model:
@@ -507,7 +573,7 @@ class WizardSessionStore:
             for record in accepted:
                 log.write(json.dumps(record, ensure_ascii=False) + "\n")
         self._write_decisions(run_id, state["decisions"], selection)
-        if session["state"] in (STATE_MODELS_SELECTED, STATE_DECISIONS_COMPLETE):
+        if session["state"] in (STATE_MODELS_SELECTED, STATE_DECISIONS_COMPLETE, STATE_PLAN_BUILT, STATE_PLAN_APPROVED):
             session["state"] = STATE_DECISIONS_IN_PROGRESS
             write_json(run_dir / "session.json", session)
         return {
@@ -549,7 +615,7 @@ class WizardSessionStore:
                     + "\n"
                 )
             self._write_decisions(run_id, state["decisions"], selection)
-            if session["state"] == STATE_DECISIONS_COMPLETE:
+            if session["state"] in (STATE_DECISIONS_COMPLETE, STATE_PLAN_BUILT, STATE_PLAN_APPROVED):
                 session["state"] = STATE_DECISIONS_IN_PROGRESS
                 write_json(run_dir / "session.json", session)
         return {"session": session, "deleted": deleted}
@@ -599,6 +665,131 @@ class WizardSessionStore:
         report["session"] = session
         report["invalidatedDecisions"] = len(state["invalidated"])
         return report
+
+    # ------------------------------------------------------ pass c: plan
+    def build_apply_plan(self, run_id: str, *, schema_validation: bool = True) -> dict[str, Any]:
+        """Build the two-stage op plan and dry-run it. Stage 1 validates
+        against the live extract; stage 2 against a scratch copy with stage 1
+        applied. The live workbook is never written here.
+
+        schema_validation=False exists for fixture-scale tests whose compact
+        workbooks are not schema-complete; real runs keep it on."""
+
+        import shutil
+        import tempfile
+
+        from corvette_form_generator.editor_ops import apply_batch
+        from corvette_form_generator.ingest.wizard.plan_builder import build_plan
+
+        session = self.load_session(run_id, verify_source=False)
+        if session["state"] not in (STATE_DECISIONS_COMPLETE, STATE_PLAN_BUILT, STATE_PLAN_APPROVED):
+            raise WizardError("Mark decisions complete before building the apply plan.", status=409)
+        run_dir = self.run_dir(run_id)
+        _, candidates_file, candidates = self._parsed_candidates(run_id)
+        selection = self._load_selection(run_id, candidates_file)
+        state = self._decision_state(run_id, candidates, selection)
+        workbook = self._require_workbook()
+        plan = build_plan(
+            workbook_path=workbook,
+            selection=selection,
+            candidates=candidates,
+            decisions=state["decisions"],
+            candidates_fingerprint=selection["candidatesFingerprint"],
+        )
+
+        def summarize(result: dict[str, Any]) -> dict[str, Any]:
+            return {
+                "ok": result.get("ok", False),
+                "status": result.get("status", ""),
+                "errors": result.get("errors", []),
+                "warnings": result.get("warnings", []),
+                "opCount": result.get("opCount"),
+                "schemaErrors": (result.get("schemaResult") or {}).get("error_count"),
+            }
+
+        dry_run: dict[str, Any] = {}
+        stage1_batch = {
+            "workbookMtimeNs": str(workbook.stat().st_mtime_ns),
+            "items": plan["stage1"]["items"],
+        }
+        dry_run["stage1"] = summarize(
+            apply_batch(workbook, stage1_batch, write=False, run_schema_validation=False)
+        )
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            scratch = Path(tmp_dir) / workbook.name
+            shutil.copy2(workbook, scratch)
+            stage1_scratch = dict(stage1_batch, workbookMtimeNs=str(scratch.stat().st_mtime_ns))
+            applied = apply_batch(
+                scratch, stage1_scratch, write=True, run_schema_validation=False,
+                confirmed_warnings=[w["id"] for w in dry_run["stage1"]["warnings"]],
+                log_path=run_dir / "scratch-apply-log.jsonl",
+            )
+            dry_run["stage1Scratch"] = summarize(applied)
+            if applied.get("ok"):
+                stage2_batch = {
+                    "workbookMtimeNs": str(scratch.stat().st_mtime_ns),
+                    "items": plan["stage2"]["items"],
+                }
+                dry_run["stage2"] = summarize(
+                    apply_batch(scratch, stage2_batch, write=False, run_schema_validation=schema_validation)
+                )
+            else:
+                dry_run["stage2"] = {"ok": False, "status": "skipped", "errors": ["stage 1 scratch apply failed"], "warnings": []}
+        dry_run["ok"] = bool(
+            plan["valid"] and dry_run["stage1"]["ok"] and dry_run["stage1Scratch"]["ok"] and dry_run["stage2"]["ok"]
+        )
+
+        write_json(run_dir / "apply-plan.json", plan)
+        write_json(run_dir / "apply-plan-dryrun.json", dry_run)
+        (run_dir / "apply-plan.md").write_text(plan_markdown(plan, dry_run), encoding="utf-8")
+        session["state"] = STATE_PLAN_BUILT if dry_run["ok"] else STATE_DECISIONS_COMPLETE
+        write_json(run_dir / "session.json", session)
+        return {"session": session, "plan": plan_summary(plan), "dryRun": dry_run}
+
+    def plan_detail(self, run_id: str) -> dict[str, Any]:
+        run_dir = self.run_dir(run_id)
+        plan_file = run_dir / "apply-plan.json"
+        if not plan_file.is_file():
+            raise WizardError("Build the apply plan first.", status=404)
+        plan = read_json(plan_file)
+        dry_file = run_dir / "apply-plan-dryrun.json"
+        approval_file = run_dir / "plan-approval.json"
+        return {
+            "session": self.load_session(run_id, verify_source=False),
+            "plan": plan_summary(plan),
+            "dryRun": read_json(dry_file) if dry_file.is_file() else None,
+            "approval": read_json(approval_file) if approval_file.is_file() else None,
+        }
+
+    def approve_plan(self, run_id: str, approver: str) -> dict[str, Any]:
+        session = self.load_session(run_id, verify_source=False)
+        if session["state"] != STATE_PLAN_BUILT:
+            raise WizardError("Plan must be built (and dry-run clean) before approval.", status=409)
+        if not str(approver or "").strip():
+            raise WizardError("Approval needs a reviewer name.")
+        run_dir = self.run_dir(run_id)
+        plan = read_json(run_dir / "apply-plan.json")
+        # Fail closed if anything shifted since the plan was built.
+        _, candidates_file, candidates = self._parsed_candidates(run_id)
+        selection = self._load_selection(run_id, candidates_file)
+        state = self._decision_state(run_id, candidates, selection)
+        if plan["decisionsFingerprint"] != artifact_sha(state["decisions"]):
+            raise WizardError("Decisions changed after the plan was built; rebuild the plan.", status=409)
+        workbook = self._require_workbook()
+        if plan["workbookFingerprint"]["mtimeNs"] != str(workbook.stat().st_mtime_ns) or plan[
+            "workbookFingerprint"
+        ]["sha256"] != hashlib.sha256(workbook.read_bytes()).hexdigest():
+            raise WizardError("Workbook changed after the plan was built; rebuild the plan.", status=409)
+        approval = {
+            "schemaVersion": plan["schemaVersion"],
+            "approvedBy": str(approver).strip(),
+            "approvedAt": time.strftime("%Y-%m-%dT%H:%M:%S"),
+            "planSha": hashlib.sha256((run_dir / "apply-plan.json").read_bytes()).hexdigest(),
+        }
+        write_json(run_dir / "plan-approval.json", approval)
+        session["state"] = STATE_PLAN_APPROVED
+        write_json(run_dir / "session.json", session)
+        return {"session": session, "approval": approval}
 
     def mark_complete(self, run_id: str) -> dict[str, Any]:
         report = self.progress(run_id)

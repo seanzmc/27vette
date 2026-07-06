@@ -54,7 +54,7 @@ function clearError() {
   $("#error-banner").classList.add("hidden");
 }
 
-const STAGES = ["files", "sheets", "candidates", "models", "review"];
+const STAGES = ["files", "sheets", "candidates", "models", "review", "plan"];
 
 function setStage(stage) {
   clearError();
@@ -585,16 +585,16 @@ const ACTION_LABELS = {
 };
 
 const LANE_DESCRIPTIONS = {
-  section: "Pick where each option lives in the form.",
-  price: "Settle every option's price — matched, entered, none, or deferred.",
-  exclusive_group: "Group options the customer must pick only one of.",
+  section: "Pick where each option lives in the form. Sections come from the workbook's section_master sheet — the same sections live models use.",
+  price: "Settle every option's price. Filter by price state; single matches can be accepted wholesale.",
+  exclusive_group: "Group options the customer must pick only one of. Rarely needed for options already in a pick-one section.",
   relationship: "Record requires / includes / not-available-with rules between options.",
-  copy_split: "The script proposed customer copy for every row — fix only the flagged ones.",
-  status_nuance: "Confirm rows whose availability symbols need a human read.",
-  duplicate: "Same RPO on several sheets — same option or different by context?",
-  standard_equipment: "Decide which no-RPO rows show as standard equipment.",
-  interior_media_deferral: "Name interior / color / image work to handle in the apply pass.",
-  presentation: "Approve the form's steps, sections, and summary layout for this model.",
+  copy_split: "The script split every row into name / description / fine print (footnote digits on statuses matched to their numbered lines) — fix only the flagged ones.",
+  status_nuance: "Only rows with genuinely ambiguous availability symbols (□ upgradeable, D dealer-install, unknown) — confirm the parsed reading or block the row.",
+  duplicate: "Same RPO on more than one source sheet in this ingest file — one option or context-distinct?",
+  standard_equipment: "Rows without an orderable RPO, plus anything you assigned to a standard section — decide what shows as standard equipment.",
+  interior_media_deferral: "Record named to-dos the wizard can't parse (interiors, colors, images) so the apply plan carries them as open items.",
+  presentation: "Approve the form's skeleton for this model — steps, section display, order summary. Required before the model can go live.",
 };
 
 function labelFor(map, value) {
@@ -657,6 +657,8 @@ async function refreshReview() {
   const params = new URLSearchParams({ model, lane });
   if ($("#review-q").value.trim()) params.set("q", $("#review-q").value.trim());
   if ($("#review-source-section").value) params.set("sourceSection", $("#review-source-section").value);
+  $("#review-price-state").classList.toggle("hidden", lane !== "price");
+  if (lane === "price" && $("#review-price-state").value) params.set("priceMatch", $("#review-price-state").value);
   reviewState.payload = await getJSON(
     `/api/wizard/sessions/${state.session.runId}/review?${params}`
   );
@@ -708,7 +710,13 @@ function populateCopyBar() {
   select.innerHTML = others
     .map((key) => `<option value="${escapeHtml(key)}" ${key === previous ? "selected" : ""}>${escapeHtml(key)}</option>`)
     .join("");
+  $("#copy-from-label").textContent = select.value || others[0] || "";
+  $("#copy-to-label").textContent = current;
 }
+
+$("#copy-from-model").addEventListener("change", () => {
+  $("#copy-from-label").textContent = $("#copy-from-model").value;
+});
 
 function renderProgress() {
   const model = $("#review-model").value;
@@ -801,18 +809,30 @@ function laneRowControls(lane, candidate) {
       <input class="dec-copy-disc" placeholder="fine print / disclosure" value="${escapeHtml(payload.disclosure ?? proposal.disclosure ?? "")}">
       ${(proposal.flags || []).map((flag) => `<span class="sum-chip sum-warn">${escapeHtml(flag.replaceAll("_", " "))}</span>`).join("")}`;
   } else if (lane === "status_nuance") {
-    controls = selectControl(
+    const explanations = (candidate.statuses || [])
+      .filter((status) => {
+        const flags = status.flags || [];
+        const raw = String(status.raw || "").replace(/\d+$/, "");
+        return (
+          flags.includes("unknown_status_symbol") ||
+          flags.includes("upgradeable_equipment_group_review") ||
+          status.status === "unresolved" ||
+          raw === "D" || raw === "A/D"
+        );
+      })
+      .map((status) => {
+        const raw = String(status.raw || "").replace(/\d+$/, "");
+        let why = "couldn't parse this symbol — needs a call";
+        if (raw === "□") why = "□ upgradeable group — standard here, upgradeable elsewhere; confirm it reads as standard";
+        else if (raw === "D" || raw === "A/D") why = "dealer-installed nuance — parsed as available; confirm";
+        return `<div class="cell-sub">“${escapeHtml(status.raw)}” on ${escapeHtml(status.modelCode)} ${escapeHtml(status.trim)} → parsed <b>${escapeHtml(status.status)}</b>; ${escapeHtml(why)}</div>`;
+      })
+      .join("");
+    controls = `${explanations}${selectControl(
       "dec-status-action",
       ["confirm_status", "mark_unresolved_blocked"],
       decision ? decision.action : "confirm_status"
-    );
-  } else if (lane === "duplicate") {
-    controls = selectControl(
-      "dec-dup-class",
-      ["same_option", "distinct_by_context"],
-      payload.classification || "",
-      "— classification —"
-    );
+    )}`;
   } else if (lane === "standard_equipment") {
     controls = selectControl(
       "dec-se-action",
@@ -866,10 +886,6 @@ function collectRowDecision(lane, row, candidateId) {
     if (!payload.name) throw new Error("Customer-facing name is required.");
   } else if (lane === "status_nuance") {
     action = row.querySelector(".dec-status-action").value;
-  } else if (lane === "duplicate") {
-    action = "classify_duplicate_source";
-    payload = { classification: row.querySelector(".dec-dup-class").value };
-    if (!payload.classification) throw new Error("Pick a duplicate classification.");
   } else if (lane === "standard_equipment") {
     action = row.querySelector(".dec-se-action").value;
   }
@@ -925,6 +941,10 @@ function renderQueue() {
   const lane = $("#review-lane").value;
   if (lane === "presentation") {
     renderPresentationQueue();
+    return;
+  }
+  if (lane === "duplicate") {
+    renderDuplicateLane();
     return;
   }
   if (lane === "exclusive_group" || lane === "relationship" || lane === "interior_media_deferral") {
@@ -992,11 +1012,38 @@ function groupPayloadSummary(decision) {
     .join(" · ");
 }
 
+function exclusivePoolTable() {
+  const sections = Object.fromEntries((reviewState.payload.sections || []).map((s) => [s.sectionId, s]));
+  const sectionDecisions = reviewState.payload.sectionDecisions || {};
+  const query = ($("#review-q").value || "").trim().toLowerCase();
+  const pool = (reviewState.payload.candidates || []).filter(
+    (candidate) =>
+      candidate.rpo &&
+      (!query || candidate.rpo.toLowerCase().includes(query) || candidate.description.toLowerCase().includes(query))
+  );
+  const rows = pool
+    .map((candidate) => {
+      const sectionId = sectionDecisions[candidate.candidateId] || "";
+      const section = sections[sectionId];
+      const single = section && String(section.selectionMode || "").startsWith("single");
+      const sectionNote = section
+        ? `${escapeHtml(section.sectionName)}${single ? ' <span class="conf conf-high">pick-one section already</span>' : ""}`
+        : '<span class="cell-sub">no section yet</span>';
+      return `
+      <tr class="cand-row">
+        <td><input type="checkbox" class="pool-check" data-rpo="${escapeHtml(candidate.rpo)}"></td>
+        <td class="rpo">${escapeHtml(candidate.rpo)}</td>
+        <td class="desc">${escapeHtml(candidate.description.split("\n")[0])}</td>
+        <td>${sectionNote}</td>
+      </tr>`;
+    })
+    .join("");
+  return `<table class="cand"><thead><tr><th></th><th>RPO</th><th>Option</th><th>Assigned section</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
 function groupFormFields(lane) {
   if (lane === "exclusive_group") {
-    return `
-      <input id="group-key" placeholder="exclusive group name (e.g. roof-panels)">
-      <input id="group-members" placeholder="member RPOs, comma-separated (e.g. C2Q, CC3)">`;
+    return `<input id="group-key" placeholder="exclusive group name (e.g. roof-panels)">`;
   }
   if (lane === "relationship") {
     return `
@@ -1038,15 +1085,54 @@ function renderGroupLane(lane) {
           )
           .join("")
       : "";
+  const exclusiveExtras =
+    lane === "exclusive_group"
+      ? `<p class="hint">Check the options that belong together, name the group, save. Options already in a <b>pick-one section</b> usually don't need an exclusive group — the section enforces it. Use the search box above to narrow the pool.</p>${exclusivePoolTable()}`
+      : "";
+  const deferralExtras =
+    lane === "interior_media_deferral"
+      ? `<p class="hint">This lane records named to-dos the wizard can't parse (Color &amp; Trim isn't ingested). Each recorded item is carried into the Pass C plan report as an open work item instead of silently missing.</p>
+         <div class="cards">${(reviewState.payload.suggestedDeferrals || [])
+           .map(
+             (item) => `
+             <div class="card"><div class="card-head"><span class="card-title">${escapeHtml(item.label)}</span></div>
+               <div class="card-stats">${escapeHtml(item.why)}</div>
+               <button class="primary defer-suggest" data-key="${escapeHtml(item.groupKey)}" data-kind="${escapeHtml(item.kind)}" data-label="${escapeHtml(item.label)}">Record this deferral</button>
+             </div>`
+           )
+           .join("")}</div>`
+      : "";
   $("#review-queue").innerHTML = `
+    ${exclusiveExtras}
+    ${deferralExtras}
     <div class="group-form">
       ${groupFormFields(lane)}
       <select id="group-resolution">${resolutionOptions("approved_for_plan")}</select>
       <input id="group-note" placeholder="note">
-      <button id="group-save" class="primary">Save decision</button>
+      <button id="group-save" class="primary">${lane === "exclusive_group" ? "Create group from checked options" : "Save decision"}</button>
     </div>
     ${existing ? `<h2 class="sub-h">Recorded decisions</h2><table class="cand"><tbody>${existing}</tbody></table>` : ""}
     ${hintRows ? `<h2 class="sub-h">Candidates with relationship hints — click a hint to prefill the form</h2><table class="cand"><tbody>${hintRows}</tbody></table>` : ""}`;
+  document.querySelectorAll(".defer-suggest").forEach((button) =>
+    button.addEventListener("click", async () => {
+      clearError();
+      try {
+        await saveDecisions([
+          {
+            model: $("#review-model").value,
+            lane: "interior_media_deferral",
+            groupKey: button.dataset.key,
+            action: "defer_item",
+            payload: { kind: button.dataset.kind, note: button.dataset.label },
+            resolution: "approved_for_plan",
+            reviewerNote: "",
+          },
+        ]);
+      } catch (error) {
+        showError(error.message);
+      }
+    })
+  );
   $("#group-save").addEventListener("click", async () => {
     clearError();
     try {
@@ -1073,8 +1159,8 @@ function collectGroupDecision(lane) {
       .map((token) => token.trim().toUpperCase())
       .filter(Boolean);
   if (lane === "exclusive_group") {
-    const members = csv($("#group-members").value);
-    if (members.length < 2) throw new Error("An exclusive group needs at least two member RPOs.");
+    const members = [...document.querySelectorAll(".pool-check:checked")].map((box) => box.dataset.rpo);
+    if (members.length < 2) throw new Error("Check at least two options for the group.");
     return { ...base, action: "create_exclusive_group", payload: { members } };
   }
   if (lane === "relationship") {
@@ -1093,6 +1179,80 @@ function collectGroupDecision(lane) {
   if (!kind) throw new Error("Pick a deferral kind.");
   return { ...base, action: "defer_item", payload: { kind, note: $("#group-note").value } };
 }
+
+function renderDuplicateLane() {
+  const groups = reviewState.payload.duplicateGroups || [];
+  const decisions = reviewState.payload.decisions || [];
+  const decidedByRpo = Object.fromEntries(decisions.map((decision) => [decision.groupKey, decision]));
+  const byId = Object.fromEntries((reviewState.payload.candidates || []).map((c) => [c.candidateId, c]));
+  if (!groups.length) {
+    $("#review-queue").innerHTML =
+      '<div class="empty-note">No in-file RPO collisions for this model — the same RPO never appears on more than one source sheet. Nothing to do here.</div>';
+    return;
+  }
+  const blocks = groups
+    .map((group) => {
+      const decision = decidedByRpo[group.rpo];
+      const rows = group.candidateIds
+        .map((id) => byId[id])
+        .filter(Boolean)
+        .map(
+          (candidate) => `
+          <tr class="cand-row">
+            <td class="rpo">${escapeHtml(candidate.rpo)}</td>
+            <td class="desc">${escapeHtml(candidate.description)}
+              <div class="cell-sub">${escapeHtml(candidate.sheetName)} · row ${candidate.rowIndex}</div></td>
+            <td><div class="stchips">${statusChips(candidate)}</div></td>
+          </tr>`
+        )
+        .join("");
+      return `
+      <div class="pres-sheet">
+        <h2 class="sub-h">${escapeHtml(group.rpo)} appears on ${group.sheets.length} sheets
+          ${decision ? '<span class="conf conf-high">decided</span>' : '<span class="conf conf-low">needs a call</span>'}</h2>
+        <table class="cand"><tbody>${rows}</tbody></table>
+        <div class="group-form">
+          ${selectControl("dup-class", ["same_option", "distinct_by_context"], decision ? (decision.payload || {}).classification : "", "— same option or different? —").replace('class="dup-class"', `class="dup-class" data-rpo="${escapeHtml(group.rpo)}"`)}
+          <button class="primary dup-save" data-rpo="${escapeHtml(group.rpo)}">Save</button>
+        </div>
+      </div>`;
+    })
+    .join("");
+  $("#review-queue").innerHTML = `
+    <p class="hint">Same RPO on more than one source sheet <b>in this ingest file</b>. Decide whether the rows describe one option (rows merge in the plan) or context-distinct entries. Workbook matches show in the reference lines of other lanes — that's separate.</p>
+    ${blocks}`;
+  document.querySelectorAll(".dup-save").forEach((button) =>
+    button.addEventListener("click", async () => {
+      clearError();
+      try {
+        const rpo = button.dataset.rpo;
+        const select = document.querySelector(`.dup-class[data-rpo="${CSS.escape(rpo)}"]`);
+        if (!select.value) throw new Error("Pick same option or different by context first.");
+        await saveDecisions([
+          {
+            model: $("#review-model").value,
+            lane: "duplicate",
+            groupKey: rpo,
+            action: "classify_duplicate_source",
+            payload: { classification: select.value },
+            resolution: "approved_for_plan",
+            reviewerNote: "",
+          },
+        ]);
+      } catch (error) {
+        showError(error.message);
+      }
+    })
+  );
+}
+
+const PRESENTATION_SHEET_INFO = {
+  runtime_steps: ["Form steps", "The ordered steps of the build form (Paint, Wheels, …)."],
+  section_presentation: ["Section display", "How each section renders inside its step (labels, order, behavior)."],
+  context_section_master: ["Context sections", "Body-style / trim chooser sections at the top of the form."],
+  order_summary_sections: ["Order summary sections", "The buckets on the final order summary."],
+  step_order_summary_map: ["Step → summary mapping", "Which step's choices land in which summary bucket."],
+};
 
 function renderPresentationQueue() {
   const prefill = reviewState.payload.prefill;
@@ -1117,16 +1277,18 @@ function renderPresentationQueue() {
           </tr>`
         )
         .join("");
+      const [friendly, purpose] = PRESENTATION_SHEET_INFO[sheet] || [sheet, ""];
       return `
       <div class="pres-sheet">
-        <h2 class="sub-h">${escapeHtml(sheet)} ${decided ? '<span class="conf conf-high">approved</span>' : `<span class="conf conf-low">${proposals.length} template rows pending</span>`}</h2>
+        <h2 class="sub-h">${escapeHtml(friendly)} <span class="cell-sub">(${escapeHtml(sheet)})</span> ${decided ? '<span class="conf conf-high">approved</span>' : `<span class="conf conf-low">${proposals.length} template rows pending</span>`}</h2>
+        <div class="cell-sub">${escapeHtml(purpose)}</div>
         <table class="cand pres-table"><thead>${header}</thead><tbody>${rows}</tbody></table>
-        <button class="primary pres-approve" data-sheet="${escapeHtml(sheet)}">Approve checked rows for ${escapeHtml(sheet)}</button>
+        <button class="primary pres-approve" data-sheet="${escapeHtml(sheet)}">Approve checked rows for ${escapeHtml(friendly)}</button>
       </div>`;
     })
     .join("");
   $("#review-queue").innerHTML = `
-    <p class="hint">Rows are template-derived proposals from <b>${escapeHtml(prefill.templateModel)}</b> — edit any cell, uncheck rows to drop, then approve. All five sheets need an approved row set.</p>
+    <p class="hint">This lane builds the form's skeleton for the new model — steps, section display, and the order summary. It's a hard go-live requirement: the runtime refuses a promoted model without these rows. Everything is prefilled from <b>${escapeHtml(prefill.templateModel)}</b>'s live rows — edit any cell, uncheck rows to drop, then approve each sheet.</p>
     ${blocks}`;
   document.querySelectorAll(".pres-approve").forEach((button) =>
     button.addEventListener("click", async () => {
@@ -1253,8 +1415,11 @@ function renderBulkBar() {
       ${sectionSelect("").replace('class="dec-section"', 'id="bulk-section"')}
       <button id="bulk-assign-section" class="primary" ${disabled}>Put ${n} checked row${n === 1 ? "" : "s"} in this section</button>`;
   } else if (lane === "price") {
-    const exactChecked = checked.filter((c) => c.priceMatch === "exact").length;
-    controls = `<button id="bulk-accept-exact" class="primary" ${exactChecked ? "" : "disabled"}>Use matched price for ${exactChecked} checked row${exactChecked === 1 ? "" : "s"}</button>`;
+    // Single-price matches are safe to accept wholesale — no checking needed
+    // (still one batch, still undoable). Checked rows narrow it if any.
+    const pool = n ? checked : visibleQueueCandidates().filter((c) => !decisionFor(c.candidateId));
+    const exactCount = pool.filter((c) => c.priceMatch === "exact").length;
+    controls = `<button id="bulk-accept-exact" class="primary" ${exactCount ? "" : "disabled"}>Accept ${exactCount} single-price match${exactCount === 1 ? "" : "es"} ${n ? "(checked)" : "(all filtered, undecided)"}</button>`;
   } else if (lane === "status_nuance") {
     controls = `<button id="bulk-confirm-status" class="primary" ${disabled}>Confirm parsed status for ${n} checked</button>`;
   } else if (lane === "standard_equipment") {
@@ -1273,9 +1438,7 @@ function renderBulkBar() {
       ? `<button id="bulk-undo" class="ghost">Undo last bulk (${reviewState.lastBatch.count} row${reviewState.lastBatch.count === 1 ? "" : "s"})</button>`
       : "";
   $("#bulk-bar").innerHTML = `
-    <span class="status-note"><b>${n}</b> checked</span>
-    <button id="bulk-select-all" class="ghost">Select all filtered</button>
-    <button id="bulk-select-none" class="ghost">Clear selection</button>
+    <span class="status-note"><b>${n}</b> checked <span class="cell-sub">(header checkbox selects all filtered)</span></span>
     ${controls}
     ${undo}`;
   bindBulk(lane);
@@ -1306,16 +1469,6 @@ function bindBulk(lane) {
       showError(error.message);
     }
   };
-  on("#bulk-select-all", () => {
-    for (const candidate of visibleQueueCandidates()) reviewState.checked.add(candidate.candidateId);
-    renderBulkBar();
-    renderQueue();
-  });
-  on("#bulk-select-none", () => {
-    reviewState.checked = new Set();
-    renderBulkBar();
-    renderQueue();
-  });
   on("#bulk-assign-section", () => {
     const sectionId = $("#bulk-section").value;
     if (!sectionId) {
@@ -1324,12 +1477,16 @@ function bindBulk(lane) {
     }
     bulkSave(checkedCandidates(), (candidate) => ({ ...base(candidate), action: "assign_section", payload: { sectionId } }));
   });
-  on("#bulk-accept-exact", () =>
+  on("#bulk-accept-exact", () => {
+    const checked = checkedCandidates();
+    const pool = checked.length
+      ? checked
+      : visibleQueueCandidates().filter((candidate) => !decisionFor(candidate.candidateId));
     bulkSave(
-      checkedCandidates().filter((candidate) => candidate.priceMatch === "exact"),
+      pool.filter((candidate) => candidate.priceMatch === "exact"),
       (candidate) => ({ ...base(candidate), action: "accept_exact_price", payload: {} })
-    )
-  );
+    );
+  });
   on("#bulk-confirm-status", () =>
     bulkSave(checkedCandidates(), (candidate) => ({ ...base(candidate), action: "confirm_status", payload: {} }))
   );
@@ -1391,7 +1548,8 @@ $("#mark-complete-btn").addEventListener("click", async () => {
   try {
     const payload = await postJSON(`/api/wizard/sessions/${state.session.runId}/complete`, {});
     state.session = payload.session;
-    $("#review-blockers").innerHTML = '<div class="status-note">Decisions complete for all selected targets.</div>';
+    $("#review-blockers").innerHTML = '<div class="status-note">Decisions complete for all selected targets — build the apply plan when ready.</div>';
+    $("#to-plan-btn").classList.remove("hidden");
     await refreshReview();
   } catch (error) {
     showError(error.message);
@@ -1408,9 +1566,12 @@ $("#mark-complete-btn").addEventListener("click", async () => {
   }
 });
 
-for (const id of ["#review-model", "#review-lane", "#review-source-section"]) {
+for (const id of ["#review-model", "#review-lane", "#review-source-section", "#review-price-state"]) {
   $(id).addEventListener("change", () => {
-    if (id !== "#review-source-section") $("#review-source-section").value = "";
+    if (id === "#review-model" || id === "#review-lane") {
+      $("#review-source-section").value = "";
+      $("#review-price-state").value = "";
+    }
     refreshReview().catch((error) => showError(error.message));
   });
 }
@@ -1418,6 +1579,89 @@ let reviewTimer = null;
 $("#review-q").addEventListener("input", () => {
   clearTimeout(reviewTimer);
   reviewTimer = setTimeout(() => refreshReview().catch((error) => showError(error.message)), 250);
+});
+
+/* ------------------------------------------------------------- stage: plan */
+
+function planBlock(title, entries, formatter) {
+  if (!entries || !entries.length) return "";
+  return `<h2 class="sub-h">${escapeHtml(title)}</h2><ul class="plan-list">${entries.map((e) => `<li>${formatter(e)}</li>`).join("")}</ul>`;
+}
+
+function renderPlan(detail) {
+  const plan = detail.plan;
+  const dryRun = detail.dryRun || {};
+  const report = plan.report;
+  const sheets = Object.entries(report.perSheetCounts)
+    .map(
+      ([sheet, counts]) =>
+        `<tr class="cand-row"><td class="rpo">${escapeHtml(sheet)}</td><td>${escapeHtml(
+          Object.entries(counts)
+            .map(([action, count]) => `${action.replaceAll("_", " ")} ${count}`)
+            .join(" · ")
+        )}</td></tr>`
+    )
+    .join("");
+  const stageChip = (label, entry) =>
+    `<span class="sum-chip ${entry && entry.ok ? "sum-exact" : "sum-warn"}"><b>${escapeHtml(label)}</b>: ${escapeHtml((entry || {}).status || "—")}${entry && entry.errors && entry.errors.length ? ` — ${escapeHtml(entry.errors[0])}` : ""}</span>`;
+  $("#plan-summary").innerHTML = `
+    <div class="summary">
+      <span class="sum-chip ${plan.valid ? "sum-exact" : "sum-warn"}"><b>plan ${plan.valid ? "valid" : "has blockers"}</b></span>
+      <span class="sum-chip"><b>${plan.stage1Count}</b> scaffolding ops</span>
+      <span class="sum-chip"><b>${plan.stage2Count}</b> data ops</span>
+      ${stageChip("dry run: live check", dryRun.stage1)}
+      ${stageChip("dry run: scratch apply", dryRun.stage1Scratch)}
+      ${stageChip("dry run: data + schema", dryRun.stage2)}
+      ${detail.approval ? `<span class="sum-chip sum-exact"><b>approved by ${escapeHtml(detail.approval.approvedBy)}</b> ${escapeHtml(detail.approval.approvedAt)}</span>` : ""}
+    </div>
+    <table class="cand"><thead><tr><th>Sheet</th><th>Ops</th></tr></thead><tbody>${sheets}</tbody></table>
+    ${planBlock("Scaffold rows cleared (clean reprocess)", Object.entries(report.clearedRows), ([sheet, count]) => `${escapeHtml(sheet)}: ${count} rows replaced`)}
+    ${planBlock("Script splits carried unreviewed", Object.entries(report.unreviewedSplits), ([model, rpos]) => `${escapeHtml(model)}: ${rpos.length} options (${escapeHtml(rpos.slice(0, 10).join(", "))}${rpos.length > 10 ? "…" : ""})`)}
+    ${planBlock("Holds — answers still owed", report.holds, (h) => `${escapeHtml(h.model)} · ${escapeHtml(h.decisionId)} — ${escapeHtml(h.note)}`)}
+    ${planBlock("Deferred work items", report.deferrals, (d) => `${escapeHtml(d.model)} · ${escapeHtml(d.groupKey)}`)}
+    ${planBlock("Gaps", report.gaps, (g) => `[${escapeHtml(g.kind.replaceAll("_", " "))}] ${escapeHtml(g.model)}: ${escapeHtml(g.detail)}`)}`;
+  $("#approve-plan-btn").disabled = !(state.session.state === "plan_built");
+  $("#plan-status").textContent =
+    state.session.state === "plan_approved"
+      ? "Approved — ready for the Pass D apply step."
+      : state.session.state === "plan_built"
+        ? "Dry run clean — approve to sign off for apply."
+        : "Plan has blockers or the dry run failed; fix and rebuild.";
+}
+
+async function buildPlan() {
+  clearError();
+  const button = $("#to-plan-btn");
+  button.disabled = true;
+  button.textContent = "Building plan…";
+  try {
+    const payload = await postJSON(`/api/wizard/sessions/${state.session.runId}/plan`, {});
+    state.session = payload.session;
+    renderPlan({ plan: payload.plan, dryRun: payload.dryRun, approval: null });
+    setStage("plan");
+  } catch (error) {
+    showError(error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Build apply plan";
+  }
+}
+
+$("#to-plan-btn").addEventListener("click", buildPlan);
+$("#rebuild-plan-btn").addEventListener("click", buildPlan);
+$("#back-to-review").addEventListener("click", () => setStage("review"));
+$("#approve-plan-btn").addEventListener("click", async () => {
+  clearError();
+  try {
+    const payload = await postJSON(`/api/wizard/sessions/${state.session.runId}/plan/approve`, {
+      approver: $("#plan-approver").value,
+    });
+    state.session = payload.session;
+    const detail = await getJSON(`/api/wizard/sessions/${state.session.runId}/plan`);
+    renderPlan(detail);
+  } catch (error) {
+    showError(error.message);
+  }
 });
 
 /* ------------------------------------------------------------------- init */

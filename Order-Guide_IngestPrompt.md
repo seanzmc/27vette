@@ -24,7 +24,9 @@ Passes 0–5 below are the superseded legacy entry path, kept as parsing/review 
 - Pass 4 — reduced Ingest Review UI: Pass 3 artifacts become the default browser review queue; Pass 1 candidates stay as drill-down/debug; exports versioned decisions; creates no workbook operations.
 - Pass 5 — focused-model workbook-build review: after Pass 0 header/variant profiling, select target models before Pass 1/3 expansion. Default controlled scope `zr1,zr1x,z06` (ZR1/ZR1X primary, Z06 comparator only). Replaces broad all-model review and abstract decisions with workbook-destination lanes (option rows, OVS rows, relationship candidates, price gaps, duplicate-source classification, blocked extractor gaps). No dry-run apply planning until this review shape is usable.
 
-Canonical workbook writes require separate reviewed apply-planning/apply passes after expert interpretation and human/product review.
+- Pass C — decision export + dry-run apply plan (implemented 2026-07-06, same wizard/server): after `decisions_complete`, builds a deterministic two-stage editor-ops plan (stage 1 scaffolding: missing model sheets via `create_sheet`, model-metadata rows, source-role activation; stage 2 data: options/OVS/rules/exclusives/presentation rows plus clean-reprocess deletes of ZR1/ZR1X scaffold rows), dry-runs stage 1 against the live extract and stage 2 against a scratch copy (schema validation included), and gates on explicit reviewer approval. Artifacts: `apply-plan.json`, `apply-plan-dryrun.json`, `apply-plan.md`, `plan-approval.json`. Still zero live-workbook writes.
+
+Canonical workbook writes require the separate Pass D apply (dry-run by default, `--write` behind the approved plan) per `docs/ingest/ingest-wizard-end-to-end-completion-spec.md`.
 
 ## Hard guardrails
 

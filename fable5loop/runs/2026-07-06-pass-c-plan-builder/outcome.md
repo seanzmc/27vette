@@ -1,0 +1,15 @@
+# Outcome rubric · 2026-07-06 · Pass C — decision export + dry-run apply plan
+
+Rubric = parent spec Pass C section (`docs/ingest/ingest-wizard-end-to-end-completion-spec.md`), still read-only toward the live workbook. Graded criteria:
+
+1. **editor_ops extensions are additive and regression-safe**: new global sheet families (model_master `model_key`; model_variants `model_key,variant_id`; variant_master `variant_id`; model_workbook_sources `model_key,source_role`; model_registry_promotion `model_key`; model_interior_scope `model_key,interior_id,trim_level`; runtime_steps `model_key,step_key`; section_presentation `model_key,section_id`; context_section_master `model_key,context_type,section_id`; order_summary_sections `model_key,section_key`; step_order_summary_map `model_key,step_key,section_key` — keys per 2026-07-06 header probe) plus a `create_sheet` op (headers cloned from a template sheet, batch-created sheets valid targets for later ops in the same batch); every existing `test_editor_*` suite stays green.
+2. **Plan builder is deterministic** (same decisions → byte-identical plan, no timestamps in op payloads) and produces a two-stage plan: stage 1 scaffolding (GSX sheets + metadata rows; zr1/zr1x rule-mapping sheets + source-row activation), stage 2 data (options/ovs/rules/exclusives/prices/presentation adds; zr1/zr1x clear-and-rebuild deletes of all scaffold data rows, counts recorded).
+3. **Join identity is stable IDs** (RPO/variant_id/section_id/option_id convention `opt_<rpo>_NNN`), never row numbers; blank decision fields never overwrite non-blank existing values on shared sheets; unreviewed copy-splits enter as script proposals explicitly labeled `script_split_unreviewed` in the plan report.
+4. **Bidirectional coverage**: every `approved_for_plan` decision maps to ≥1 op and every op traces back to a decision or a named scaffolding rule; holds and deferrals carried into the report as open items; zero rows in any of the five presentation sheets for a target model fails plan validation.
+5. **Dry-run is real and never touches the live workbook**: stage 1 validated against the live extract; stage 2 validated against a scratch copy with stage 1 applied; all scratch work under the run dir or scratchpad.
+6. **Approval gate**: `plan_built → plan_approved` states; `plan-approval.json` records reviewer/when; plan invalidated (fail-closed) on decisions or workbook fingerprint change after build.
+7. **Validation real**: new pytest suites green (plan determinism, coverage invariants, editor_ops extensions incl. create_sheet + batch-created-target case, fixture dry-run both stages); all existing wizard + editor suites green; browser proof: build plan on real decisions, see per-sheet counts + cleared-row counts + labeled unreviewed splits, approve, fingerprint-invalidation on a new decision.
+8. **Boundaries**: live workbook byte-identical throughout; tracked form-output/form-app clean; no dealer surface.
+9. **Verifier PASS + loop closeout.**
+
+Stop: criteria 1–8 gradable from artifacts; verifier pass; STATE updated; max 3 cycles.

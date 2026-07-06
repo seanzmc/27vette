@@ -126,6 +126,8 @@ Decision records: `{candidateFingerprint, lane, action (Pass 5 vocabulary, exten
 
 ## Pass C — decision export + apply plan (dry-run only)
 
+**Status: implemented 2026-07-06.** Changed files: `scripts/corvette_form_generator/editor_ops.py` (additive: 11 global sheet families — model metadata + the five presentation sheets — reachable only via `GLOBAL_SHEET_FAMILIES`, plus a `create_sheet` op whose batch-created sheets validate later ops in the same batch; model registry and editor UI/lints resolution untouched, 69 editor regression tests green), `scripts/corvette_form_generator/ingest/wizard/plan_builder.py` (new: deterministic two-stage plan, coverage, report, markdown), `session.py` (`build_apply_plan`/`plan_detail`/`approve_plan`, states `plan_built`/`plan_approved`, plan invalidation on decision changes), server plan routes, UI stage 6 (plan report + approval), suites `test_ingest_wizard_plan.py` + `test_editor_ops_global_families.py`. Real-data proof (run `20260706-130958-1ea3ca`): all three models' decisions completed programmatically → plan 52 scaffolding + 4,473 data ops, zr1/zr1x clean-reprocess deletes recorded (213+852 / 214+856 rows), dry-run green incl. **schemaErrors=0** on the scratch workbook carrying all three models, 0 uncovered decisions, live workbook byte-identical, approval gate → `plan_approved`. Receipt: `fable5loop/runs/2026-07-06-pass-c-plan-builder/`. Known residual: stage-6 UI render verified via API payload + suites, not a full visual browser walk — cover in the next real review session.
+
 **Surface:** tooling/UI/tests/docs. Still read-only toward the workbook. Risk: medium-high (this is where decisions become concrete workbook rows; errors here become Pass D writes).
 
 ### C1 — plan builder

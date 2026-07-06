@@ -69,7 +69,7 @@ LANES: tuple[dict[str, Any], ...] = (
     {"lane": "relationship", "label": "Rule groups / relationships", "perCandidate": False},
     {"lane": "copy_split", "label": "Copy split", "perCandidate": True},
     {"lane": "status_nuance", "label": "Status nuances", "perCandidate": True},
-    {"lane": "duplicate", "label": "Duplicates / cross-sheet", "perCandidate": True},
+    {"lane": "duplicate", "label": "Duplicates / cross-sheet", "perCandidate": False},
     {"lane": "standard_equipment", "label": "Standard equipment", "perCandidate": True},
     {"lane": "interior_media_deferral", "label": "Interiors / colors / media", "perCandidate": False},
     {"lane": "presentation", "label": "Presentation metadata", "perCandidate": False},
@@ -95,6 +95,24 @@ def candidate_fingerprint(candidate: dict[str, Any]) -> str:
 
 def artifact_fingerprint(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def status_needs_review(status: dict[str, Any]) -> bool:
+    """True when an availability symbol needs a human read: unknown symbols,
+    □ upgradeable-group rows, unresolved parses, and D / A/D dealer-install
+    nuance. Plain footnote digits (A1/S2) are the copy-split lane's job."""
+
+    flags = status.get("flags") or []
+    if "unknown_status_symbol" in flags or "upgradeable_equipment_group_review" in flags:
+        return True
+    if status.get("status") == "unresolved":
+        return True
+    base = str(status.get("raw") or "").rstrip("0123456789")
+    return base in ("D", "A/D")
+
+
+def candidate_needs_status_review(candidate: dict[str, Any]) -> bool:
+    return any(status_needs_review(status) for status in candidate.get("statuses", []))
 
 
 def candidate_model_keys(candidate: dict[str, Any]) -> list[str]:
@@ -219,9 +237,34 @@ def workbook_sections(workbook_path: Path) -> list[dict[str, Any]]:
                 "sectionName": row.get("section_name", ""),
                 "stepKey": row.get("step_key", ""),
                 "selectionMode": row.get("selection_mode", ""),
+                "standardBehavior": row.get("standard_behavior", ""),
             }
         )
     return sections
+
+
+def duplicate_rpo_groups(scoped: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """In-file RPO collisions: the same orderable RPO on >1 source sheet
+    within the selected model scope. Workbook comparison is the reference
+    line's job, not this lane's."""
+
+    by_rpo: dict[str, list[dict[str, Any]]] = {}
+    for candidate in scoped:
+        if candidate["rowKind"] == "orderable" and candidate["rpo"]:
+            by_rpo.setdefault(candidate["rpo"], []).append(candidate)
+    groups = []
+    for rpo in sorted(by_rpo):
+        occurrences = by_rpo[rpo]
+        sheets = {c["sheetName"] for c in occurrences}
+        if len(occurrences) > 1 and len(sheets) > 1:
+            groups.append(
+                {
+                    "rpo": rpo,
+                    "candidateIds": [c["candidateId"] for c in occurrences],
+                    "sheets": sorted(sheets),
+                }
+            )
+    return groups
 
 
 def variant_reconciliation(
@@ -533,11 +576,7 @@ def completeness(
                 for candidate_id in missing:
                     blockers.append({"lane": lane, "candidateId": candidate_id, "reason": "no_decision"})
             if lane == "status_nuance":
-                flagged = [
-                    c
-                    for c in scoped
-                    if any(s.get("flags") or s.get("status") == "unresolved" for s in c["statuses"])
-                ]
+                flagged = [c for c in scoped if candidate_needs_status_review(c)]
                 decided_ids = {d.get("candidateId") for d in lane_decisions}
                 missing = [c["candidateId"] for c in flagged if c["candidateId"] not in decided_ids]
                 entry["required"] = len(flagged)

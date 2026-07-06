@@ -18,6 +18,7 @@
     <span class="step" data-stage="candidates">3 · Candidates</span>
     <span class="step" data-stage="models">4 · Models</span>
     <span class="step" data-stage="review">5 · Review</span>
+    <span class="step" data-stage="plan">6 · Plan</span>
   </nav>
   <div class="runinfo" id="run-info"></div>
 </header>
@@ -86,21 +87,41 @@
       <select id="review-model"></select>
       <select id="review-lane"></select>
       <select id="review-source-section"><option value="">All source sections</option></select>
+      <select id="review-price-state" class="hidden">
+        <option value="">All price states</option>
+        <option value="exact">Single price match</option>
+        <option value="ambiguous">Multiple prices</option>
+        <option value="none">No price</option>
+      </select>
       <input type="search" id="review-q" placeholder="Search RPO or description…">
       <button id="back-to-models" class="ghost">Back to models</button>
       <button id="mark-complete-btn" class="primary">Mark decisions complete</button>
+      <button id="to-plan-btn" class="primary hidden">Build apply plan</button>
     </div>
     <div class="filters copy-bar">
-      <span class="status-note">Copy decisions from</span>
-      <select id="copy-from-model"></select>
-      <label class="status-note"><input type="checkbox" id="copy-overwrite"> overwrite existing</label>
-      <button id="copy-decisions-btn" class="ghost">Copy into current model</button>
+      <span class="status-note">Reuse work between the models you're ingesting:</span>
+      <button id="copy-decisions-btn" class="ghost">Copy <span id="copy-from-label"></span>'s finished decisions to <span id="copy-to-label"></span></button>
+      <select id="copy-from-model" title="Which model's decisions to copy from"></select>
+      <label class="status-note" title="Off = rows you've already decided here are left alone."><input type="checkbox" id="copy-overwrite"> also replace decisions I've already made here</label>
       <span id="copy-report" class="status-note"></span>
     </div>
     <div id="lane-help" class="lane-help"></div>
     <div id="bulk-bar" class="filters"></div>
     <div id="review-blockers"></div>
     <div id="review-queue"></div>
+  </section>
+
+  <section id="stage-plan" class="stage hidden">
+    <h1>Apply plan</h1>
+    <p class="hint">The plan is what Pass D will write into the workbook — nothing has been written yet. Review the numbers, the dry-run result, and the open items; approving is your sign-off for the write step.</p>
+    <div id="plan-summary"></div>
+    <div class="sheet-actions">
+      <button id="rebuild-plan-btn" class="ghost">Rebuild plan</button>
+      <input id="plan-approver" placeholder="your name">
+      <button id="approve-plan-btn" class="primary">Approve plan for apply</button>
+      <button id="back-to-review" class="ghost">Back to review</button>
+      <span id="plan-status" class="status-note"></span>
+    </div>
   </section>
 </main>
 
