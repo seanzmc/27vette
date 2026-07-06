@@ -1,0 +1,40 @@
+{
+  "id": "2026-07-05-cross-model-regression-hardening",
+  "started_at": "2026-07-05T19:35:00-04:00",
+  "completed_at": "2026-07-05T20:12:00-04:00",
+  "objective": "Report-first cross-model regression hardening pass: prove Stingray/Grand Sport/Z06/registry/contracts/switching validation surface coherent after simplification cleanup; classify all gate failures; propose smallest hardening fix.",
+  "changed_surface": "tests (stingray-form-regression, multi-model-runtime-switching re-anchored per approved spec) + docs/tooling (spec, run receipt, loop memory); no workbook, generated-artifact, runtime, styling, dealer, or ingest changes",
+  "outcome_rubric": "fable5loop/runs/2026-07-05-cross-model-regression-hardening/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-05-cross-model-regression-hardening/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-05-cross-model-regression-hardening/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-05-cross-model-regression-hardening/verifier-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-05-cross-model-regression-hardening/validation-output.txt"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-05-cross-model-regression-hardening/verifier-report.md",
+    "note": "Extended 'Gate-induced artifact churn' failure mode: z06-runtime-promotion gate runs generate_registry.py and rewrites form-app/data.js, not only runtime contracts. Added 'Order-dependent CSS-regex test helpers' failure mode: first-match cssBlock() helpers bind to scoped overrides added earlier in the stylesheet, failing assertions whose target style is intact — grep the stylesheet before classifying as a missing style."
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 0
+  },
+  "boundaries_preserved": [
+    "stingray_master.xlsx untouched",
+    "form-output/ untouched (gate timestamp churn restored via git restore, verified clean)",
+    "form-app/data.js and runtime JS/CSS untouched (gate churn restored)",
+    "dealer submission untouched, behavior preserved",
+    "ingest surfaces untouched"
+  ],
+  "notes": "Failure classification: 0 real regressions; 5 stale test expectations (4 stingray-form-regression, 1 multi-model-runtime-switching; one is cssBlock() helper order-dependence from ab878eb); generated-artifact drift limited to timestamp provenance between committed data.js and runtime contracts (content in sync, no action). Spec approved and implemented same day: both test files re-anchored, gates 88/88 + 46/46 + canaries 19/19 + 5/5, implementation verifier PASS (second verifier cycle, 0 fixes). Residual risk: none implied; timestamp provenance mismatch remains (cosmetic)."
+}

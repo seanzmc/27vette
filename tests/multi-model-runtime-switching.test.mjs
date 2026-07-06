@@ -579,11 +579,7 @@ test("runtime progressively advances vehicle setup panels before exterior paint"
   assert.doesNotMatch(trimSetupHtml, /<details class="standard-group"/);
   assert.doesNotMatch(trimSetupHtml, /<details class="vehicle-setup-equipment-disclosure" open/);
   assert.doesNotMatch(trimSetupHtml, /sets the comfort and finish level/);
-  assert.doesNotMatch(trimSetupHtml, /Continue to Exterior Paint/);
-
-  runtime.goToNextStep();
-  assert.equal(runtime.state.vehicleSetupStage, "ready");
-  assert.match(runtime.elements.get("#stepContent").innerHTML, /Continue to Exterior Paint/);
+  assert.match(trimSetupHtml, /Continue to Exterior Paint/);
 
   runtime.goToNextStep();
   assert.equal(runtime.state.activeStep, "paint");
