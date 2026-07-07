@@ -17,6 +17,7 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 from corvette_form_generator.ingest.source_profiler import (  # noqa: E402
+    parse_status,
     profile_order_guide,
     validate_output_dir,
 )
@@ -176,6 +177,16 @@ def raw_export_fixture(path: Path) -> None:
 
 
 class OrderGuideIngestProfilerTests(unittest.TestCase):
+    def test_status_parser_maps_availability_and_unavailable_variants(self) -> None:
+        for raw in ("A/D", "A/D1", "a/d", "A / D", "A-D2"):
+            parsed = parse_status(raw)
+            self.assertEqual(parsed["parsed_base_status"], "available", raw)
+            self.assertIn("dealer_installed_or_adi", parsed["status_flags"], raw)
+
+        for raw in ("--", "--1", "—", "–", "- -"):
+            parsed = parse_status(raw)
+            self.assertEqual(parsed["parsed_base_status"], "unavailable", raw)
+
     def test_profiles_source_layout_variants_rows_and_disclosures(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)

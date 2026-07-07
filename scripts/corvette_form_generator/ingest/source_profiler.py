@@ -32,7 +32,8 @@ VALID_BASE_STATUSES = {
     "■": "standard",
 }
 UNRESOLVED_BASE_STATUSES = {"□"}
-STATUS_RE = re.compile(r"^(A/D|--|[SAD■□])(\d*)$")
+STATUS_RE = re.compile(r"^(A/D|--|[SAD■□])(\d*)$", re.IGNORECASE)
+STATUS_MARKER_SUFFIX_RE = re.compile(r"^(.*?)(\d*)$")
 RPO_RE = re.compile(r"^[A-Z0-9]{2,4}$")
 DISCLOSURE_MARKER_RE = re.compile(r"(?:^|[\s/])(\d+)\.\s*")
 RELATIONSHIP_HINTS = (
@@ -508,17 +509,18 @@ def section_lookup(section_rows: list[dict[str, Any]], max_row: int) -> dict[int
 
 
 def parse_status(raw_status: str) -> dict[str, Any]:
-    match = STATUS_RE.fullmatch(raw_status)
-    if not match:
+    symbol, marker = normalized_status_symbol(raw_status)
+    if not symbol:
         return {
             "parsed_base_status": "unresolved",
             "status_marker": "",
             "status_flags": ["unknown_status_symbol"],
         }
-    symbol, marker = match.groups()
     flags = []
     if marker:
         flags.append("status_disclosure_marker")
+    if symbol in {"D", "A/D"}:
+        flags.append("dealer_installed_or_adi")
     if symbol in UNRESOLVED_BASE_STATUSES:
         flags.append("upgradeable_equipment_group_review")
     return {
@@ -526,6 +528,24 @@ def parse_status(raw_status: str) -> dict[str, Any]:
         "status_marker": marker,
         "status_flags": flags,
     }
+
+
+def normalized_status_symbol(raw_status: str) -> tuple[str, str]:
+    text = clean(raw_status)
+    match = STATUS_MARKER_SUFFIX_RE.fullmatch(text)
+    body = match.group(1) if match else text
+    marker = match.group(2) if match else ""
+    compact = re.sub(r"\s+", "", body).upper()
+    compact = compact.replace("—", "-").replace("–", "-").replace("−", "-")
+    if compact in {"A/D", "A-D", "AD"}:
+        return "A/D", marker
+    if compact in {"--", "-"}:
+        return "--", marker
+    match = STATUS_RE.fullmatch(compact + marker)
+    if match:
+        symbol, parsed_marker = match.groups()
+        return symbol.upper(), parsed_marker
+    return "", ""
 
 
 def primary_rpo_candidate(orderable: str, ref_only: str) -> str:

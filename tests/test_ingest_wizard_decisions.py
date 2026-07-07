@@ -29,6 +29,7 @@ from corvette_form_generator.ingest.wizard.session import (  # noqa: E402
 from corvette_form_generator.ingest.wizard.decisions import (  # noqa: E402
     candidate_fingerprint,
     copy_decisions,
+    status_needs_review,
 )
 from ingest_wizard_fixtures import build_master_workbook, build_raw_export  # noqa: E402
 
@@ -61,6 +62,11 @@ def _decision(model: str, lane: str, candidate: dict, payload: dict) -> dict:
 
 class CopyRpoIdentityBranchTest(unittest.TestCase):
     """Model-exclusive sheets: copy must match by RPO identity, fail closed."""
+
+    def test_adi_variants_are_parsed_available_without_status_review(self) -> None:
+        for raw in ("A/D", "A/D1", "a/d", "A / D", "A-D2"):
+            status = {"raw": raw, "status": "available", "flags": ["dealer_installed_or_adi"]}
+            self.assertFalse(status_needs_review(status), raw)
 
     def test_exactly_one_rpo_match_copies_with_new_fingerprint(self) -> None:
         source = _candidate("zr1 sheet:5", "1YR07", "AAA")
@@ -281,6 +287,15 @@ class PassBStoreTest(unittest.TestCase):
             [section["sectionId"] for section in section_queue["sections"]],
             ["sec_pain_001", "sec_whee_001"],
         )
+        section_ref_only = {candidate["refOnlyRpo"] for candidate in section_queue["candidates"] if candidate["refOnlyRpo"]}
+        self.assertIn("XFR", section_ref_only)
+        self.assertIn("AJ7", section_ref_only)
+        price_ref_only = {
+            candidate["refOnlyRpo"]
+            for candidate in self.store.review_queue(self.run_id, "zr1", "price")["candidates"]
+            if candidate["refOnlyRpo"]
+        }
+        self.assertEqual(price_ref_only, set())
         relationship_queue = self.store.review_queue(self.run_id, "zr1", "relationship")
         self.assertIn("hints", relationship_queue)
         prefill = self.store.review_queue(self.run_id, "zr1", "presentation")["prefill"]
@@ -330,6 +345,7 @@ class PassBStoreTest(unittest.TestCase):
                     "resolution": "approved_for_plan",
                 }
             )
+        for candidate in self.store.review_queue(self.run_id, model, "price")["candidates"]:
             decisions.append(
                 {
                     "model": model,
@@ -656,18 +672,23 @@ class PassBStoreTest(unittest.TestCase):
                 }
             ],
         )
+        price_ids = {
+            candidate["candidateId"]
+            for candidate in self.store.review_queue(self.run_id, "zr1", "price")["candidates"]
+        }
         for candidate_id in ids[1:]:
-            self.store.save_decisions(
-                self.run_id,
-                [
-                    {
-                        "model": "zr1",
-                        "lane": "section",
-                        "candidateId": candidate_id,
-                        "action": "assign_section",
-                        "payload": {"sectionId": "sec_whee_001"},
-                        "resolution": "approved_for_plan",
-                    },
+            decisions = [
+                {
+                    "model": "zr1",
+                    "lane": "section",
+                    "candidateId": candidate_id,
+                    "action": "assign_section",
+                    "payload": {"sectionId": "sec_whee_001"},
+                    "resolution": "approved_for_plan",
+                }
+            ]
+            if candidate_id in price_ids:
+                decisions.append(
                     {
                         "model": "zr1",
                         "lane": "price",
@@ -675,13 +696,13 @@ class PassBStoreTest(unittest.TestCase):
                         "action": "confirm_no_price",
                         "payload": {},
                         "resolution": "approved_for_plan",
-                    },
-                ],
-            )
+                    }
+                )
+            self.store.save_decisions(self.run_id, decisions)
         progress = self.store.progress(self.run_id)
         zr1 = progress["models"]["zr1"]
-        self.assertEqual(zr1["lanes"]["price"]["required"], len(ids) - 1)
-        self.assertEqual(zr1["lanes"]["price"]["decisions"], len(ids) - 1)
+        self.assertEqual(zr1["lanes"]["price"]["required"], len(price_ids))
+        self.assertEqual(zr1["lanes"]["price"]["decisions"], len(price_ids))
         self.assertEqual(zr1["lanes"]["price"]["holds"], 0)
         self.assertEqual(zr1["lanes"]["copy_split"]["holds"], 0)
         self.assertNotIn(skipped_id, [hold.get("candidateId") for hold in zr1["holds"]])
@@ -706,6 +727,13 @@ class PassBStoreTest(unittest.TestCase):
         # AJ7 is standard on both — legitimate SE row.
         self.assertIn("AJ7", zr1_rpos)
         self.assertIn("AJ7", zr1x_rpos)
+        zr1_section_ref_only = {
+            c["refOnlyRpo"]
+            for c in self.store.review_queue(self.run_id, "zr1", "section")["candidates"]
+            if c["refOnlyRpo"]
+        }
+        self.assertIn("XFR", zr1_section_ref_only)
+        self.assertIn("AJ7", zr1_section_ref_only)
 
     def test_source_groups_fall_back_to_sheet_name(self) -> None:
         self.select_defaults()

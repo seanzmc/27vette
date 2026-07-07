@@ -28,6 +28,7 @@ from corvette_form_generator.ingest.wizard.decisions import (
     VARIANT_RECONCILIATION_KEY,
     artifact_fingerprint,
     candidate_is_availability_row,
+    candidate_needs_section_decision,
     candidate_needs_status_review,
     completeness,
     copy_decisions,
@@ -509,6 +510,8 @@ class WizardSessionStore:
                 if (c["rowKind"] == "ref_only" and not candidate_is_availability_row(c, model))
                 or c["candidateId"] in standard_assigned
             ]
+        elif lane == "section":
+            scoped = [c for c in scoped if candidate_needs_section_decision(c)]
         else:
             scoped = [c for c in scoped if c["rowKind"] == "orderable"]
         if lane != "section" and skipped_section_ids:

@@ -45,9 +45,16 @@ class PlanFlowTest(unittest.TestCase):
     def tearDown(self) -> None:
         self._tmp.cleanup()
 
-    def complete_model(self, model: str, *, extra: list[dict] | None = None) -> None:
+    def complete_model(
+        self,
+        model: str,
+        *,
+        extra: list[dict] | None = None,
+        skip_section_ids: set[str] | None = None,
+    ) -> None:
         queue = self.store.review_queue(self.run_id, model, "section")
         decisions = []
+        skip_section_ids = skip_section_ids or set()
         reconciliation = self.store.reconciliation(self.run_id)["models"].get(model, {})
         if not reconciliation.get("agrees", True):
             decisions.append(
@@ -61,6 +68,8 @@ class PlanFlowTest(unittest.TestCase):
                 }
             )
         for candidate in queue["candidates"]:
+            if candidate["candidateId"] in skip_section_ids:
+                continue
             decisions.append(
                 {
                     "model": model,
@@ -71,6 +80,7 @@ class PlanFlowTest(unittest.TestCase):
                     "resolution": "approved_for_plan",
                 }
             )
+        for candidate in self.store.review_queue(self.run_id, model, "price")["candidates"]:
             action = "accept_exact_price" if candidate["priceMatch"] == "exact" else "confirm_no_price"
             decisions.append(
                 {
@@ -179,24 +189,67 @@ class PlanFlowTest(unittest.TestCase):
         members = [i for i in items if i["sheet"] == "zr1_exclusive_members" and i["action"] == "add"]
         self.assertEqual(len(members), 2)
 
-    def test_standard_equipment_inclusion_becomes_standard_option(self) -> None:
+    def test_legacy_standard_equipment_inclusion_becomes_standard_option(self) -> None:
         se_queue = self.store.review_queue(self.run_id, "zr1", "standard_equipment")
+        target = se_queue["candidates"][0]
         extra = [
             {
                 "model": "zr1",
                 "lane": "standard_equipment",
-                "candidateId": candidate["candidateId"],
+                "candidateId": target["candidateId"],
                 "action": "include_standard_equipment",
                 "payload": {},
                 "resolution": "approved_for_plan",
             }
-            for candidate in se_queue["candidates"][:1]
         ]
-        self.complete_all(zr1_extra=extra)
+        self.complete_model("zr1", extra=extra, skip_section_ids={target["candidateId"]})
+        self.complete_model("zr1x")
         plan = build_plan(**self.plan_inputs())
+        self.assertTrue(plan["valid"], plan["report"]["blockingGaps"] or plan["coverage"]["uncoveredApprovedDecisions"])
         adds = [i for i in plan["stage2"]["items"] if i["sheet"] == "zr1_options" and i["action"] == "add"]
-        se_rows = [i for i in adds if i["row"].get("selectable") is False]
-        self.assertEqual(len(se_rows), len(extra))
+        se_row = next(i["row"] for i in adds if i["row"]["rpo"] == target["refOnlyRpo"])
+        self.assertIs(se_row["selectable"], False)
+        self.assertIsNone(se_row["section_id"])
+
+    def test_ref_only_section_assignment_becomes_sectioned_option(self) -> None:
+        self.complete_all()
+        target = next(
+            candidate
+            for candidate in self.store.review_queue(self.run_id, "zr1", "section")["candidates"]
+            if candidate["refOnlyRpo"] == "XFR"
+        )
+        self.store.save_decisions(
+            self.run_id,
+            [
+                {
+                    "model": "zr1",
+                    "lane": "section",
+                    "candidateId": target["candidateId"],
+                    "action": "assign_section",
+                    "payload": {"sectionId": "sec_pain_001", "selectable": False},
+                    "resolution": "approved_for_plan",
+                }
+            ],
+        )
+        plan = build_plan(**self.plan_inputs())
+        self.assertTrue(plan["valid"], plan["report"]["blockingGaps"] or plan["coverage"]["uncoveredApprovedDecisions"])
+        row = next(
+            i["row"]
+            for i in plan["stage2"]["items"]
+            if i["sheet"] == "zr1_options" and i["action"] == "add" and i["row"]["rpo"] == "XFR"
+        )
+        self.assertIsNone(row["price"])
+        self.assertEqual(row["section_id"], "sec_pain_001")
+        self.assertIs(row["selectable"], False)
+        ovs_rows = [
+            i["row"]
+            for i in plan["stage2"]["items"]
+            if i["sheet"] == "zr1_ovs" and i["action"] == "add" and i["row"]["option_id"] == row["option_id"]
+        ]
+        self.assertEqual(
+            {ovs["variant_id"]: ovs["status"] for ovs in ovs_rows},
+            {"1lz_r07": "available", "3lz_r67": "unavailable"},
+        )
 
     def test_skipped_row_stays_out_of_plan_and_plan_stays_valid(self) -> None:
         # Full review first, then the reviewer flips one row to Skip: the row

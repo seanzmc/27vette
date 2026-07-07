@@ -71,6 +71,17 @@ def fixture_workbook(path: Path) -> None:
                 "default_model": False,
                 "active": False,
             },
+            {
+                "model_key": "zr1x",
+                "registry_key": "zr1x",
+                "model_label": "ZR1X",
+                "model_year": "2027",
+                "dataset_name": "Fixture ZR1X",
+                "export_slug": "zr1x",
+                "expected_variant_count": 1,
+                "default_model": False,
+                "active": False,
+            },
         ],
     )
     append_sheet(
@@ -98,6 +109,16 @@ def fixture_workbook(path: Path) -> None:
                 "display_order": 2,
                 "active": False,
             },
+            {
+                "variant_id": "1lz_s07",
+                "model_year": "2027",
+                "trim_level": "1lz",
+                "body_style": "coupe",
+                "display_name": "Corvette ZR1X Coupe 1LZ",
+                "base_price": 227395,
+                "display_order": 3,
+                "active": False,
+            },
         ],
     )
     append_sheet(
@@ -107,6 +128,7 @@ def fixture_workbook(path: Path) -> None:
         [
             {"model_key": "stingray", "variant_id": "1lt_c07", "display_order": 1, "active": True},
             {"model_key": "zr1", "variant_id": "1lz_r07", "display_order": 1, "active": False},
+            {"model_key": "zr1x", "variant_id": "1lz_s07", "display_order": 1, "active": False},
         ],
     )
     append_sheet(
@@ -239,15 +261,16 @@ def raw_export_fixture(path: Path) -> None:
     ws.append(["", "EYT", "Carbon Flash Exterior Badge Package", "S"])
 
     ws = wb.create_sheet("Exterior 4")
-    ws.append(["ZR1", "", "", ""])
-    ws.append(["", "", "S = Standard Equipment  A = Available  -- = Not Available", ""])
+    ws.append(["ZR1 and ZR1X", "", "", "", ""])
+    ws.append(["", "", "S = Standard Equipment  A = Available  -- = Not Available", "", ""])
     ws.append([
         "Orderable RPO Code",
         "Ref. Only RPO Code",
         "Description",
         "ZR1 Coupe / 1YR07 / 1LZ",
+        "ZR1X Coupe / 1YS07 / 1LZ",
     ])
-    ws.append(["TOM", "", "Carbon Fiber Aero Package", "A"])
+    ws.append(["TOM", "", "Carbon Fiber Aero Package", "A", "--"])
 
     ws = wb.create_sheet("Color and Trim 1")
     ws.append(["Recommended", "", "", "", ""])
@@ -320,6 +343,12 @@ class OrderGuideCandidateNormalizerTests(unittest.TestCase):
             self.assertEqual(eri_ovs["normalized_values"]["normalized_status_candidate"], "available")
             self.assertEqual(eri_ovs["normalized_values"]["status_marker"], "1")
             self.assertEqual(eri_ovs["normalized_values"]["source_cell"], "D5")
+            tom_ovs_by_variant = {
+                row["normalized_values"]["variant_id"]: row["normalized_values"]["normalized_status_candidate"]
+                for row in ovs
+                if row["normalized_values"]["candidate_option_ref"] == "candopt-exterior-4-row-4-tom"
+            }
+            self.assertEqual(tom_ovs_by_variant, {"1lz_r07": "available", "1lz_s07": "unavailable"})
 
             rules = json.loads((output_dir / "candidate-rules.json").read_text())
             requires = next(row for row in rules if row["normalized_values"]["marker"] == "1")

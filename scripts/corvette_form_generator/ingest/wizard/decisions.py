@@ -18,6 +18,7 @@ from typing import Any
 
 from openpyxl import load_workbook
 
+from corvette_form_generator.ingest.source_profiler import normalized_status_symbol
 from corvette_form_generator.workbook import rows_from_sheet, workbook_truthy
 
 SCHEMA_VERSION_B = "pass-b-1"
@@ -99,16 +100,17 @@ def artifact_fingerprint(path: Path) -> str:
 
 def status_needs_review(status: dict[str, Any]) -> bool:
     """True when an availability symbol needs a human read: unknown symbols,
-    □ upgradeable-group rows, unresolved parses, and D / A/D dealer-install
-    nuance. Plain footnote digits (A1/S2) are the copy-split lane's job."""
+    □ upgradeable-group rows, unresolved parses, and standalone D dealer-install
+    nuance. A/D-style markers are parsed as available automatically. Plain
+    footnote digits (A1/S2) are the copy-split lane's job."""
 
     flags = status.get("flags") or []
     if "unknown_status_symbol" in flags or "upgradeable_equipment_group_review" in flags:
         return True
     if status.get("status") == "unresolved":
         return True
-    base = str(status.get("raw") or "").rstrip("0123456789")
-    return base in ("D", "A/D")
+    base, _marker = normalized_status_symbol(str(status.get("raw") or ""))
+    return base == "D"
 
 
 def candidate_needs_status_review(candidate: dict[str, Any]) -> bool:
@@ -149,6 +151,18 @@ def candidate_is_availability_row(candidate: dict[str, Any], model_key: str) -> 
     return any(
         status.get("status") == "available" for status in model_scoped_statuses(candidate, model_key)
     )
+
+
+def candidate_needs_section_decision(candidate: dict[str, Any]) -> bool:
+    """Rows the reviewer must either place in a workbook section or skip.
+
+    Ref-only RPO rows can become real option rows after review; Section
+    assignment owns that section/selectable/active decision. Price remains
+    orderable-only until a future pass explicitly adds reviewed prices for
+    ref-only rows.
+    """
+
+    return candidate.get("rowKind") in {"orderable", "ref_only"}
 
 
 def scope_candidates(candidates: list[dict[str, Any]], model_key: str) -> list[dict[str, Any]]:
@@ -587,6 +601,7 @@ def completeness(
     models: dict[str, Any] = {}
     for target in targets:
         scoped = [c for c in scope_candidates(candidates, target) if c["rowKind"] == "orderable"]
+        section_scoped = [c for c in scope_candidates(candidates, target) if candidate_needs_section_decision(c)]
         # A skipped section decision (resolution not_needed) means the row is
         # not carried into the plan — no price or status read is owed for it.
         skipped_ids = {
@@ -602,12 +617,13 @@ def completeness(
             lane_decisions = [d for d in decisions.values() if d["model"] == target and d["lane"] == lane]
             if lane != "section" and lane_config["perCandidate"]:
                 lane_decisions = [d for d in lane_decisions if d.get("candidateId") not in skipped_ids]
+            if lane == "price":
+                price_candidate_ids = {c["candidateId"] for c in scoped}
+                lane_decisions = [d for d in lane_decisions if d.get("candidateId") in price_candidate_ids]
             holds = [d for d in lane_decisions if d["resolution"] == "hold_for_question"]
             entry: dict[str, Any] = {"decisions": len(lane_decisions), "holds": len(holds)}
             if lane in MANDATORY_CANDIDATE_LANES:
-                required = (
-                    scoped if lane == "section" else [c for c in scoped if c["candidateId"] not in skipped_ids]
-                )
+                required = section_scoped if lane == "section" else [c for c in scoped if c["candidateId"] not in skipped_ids]
                 decided_ids = {d.get("candidateId") for d in lane_decisions}
                 missing = [c["candidateId"] for c in required if c["candidateId"] not in decided_ids]
                 entry["required"] = len(required)

@@ -1,7 +1,7 @@
 # Pass B.7 — ref-only rows in section assignment
 
 Date: 2026-07-07
-Status: DRAFT — awaiting Sean approval before implementation.
+Status: Implemented and verified 2026-07-07.
 Parent: `docs/ingest/ingest-wizard-end-to-end-completion-spec.md` Pass B review stage.
 
 ## Diagnosis
@@ -117,8 +117,31 @@ git status --short --branch
 
 If `wizard.js` text only changes, `node --check` is enough; no browser smoke required unless controls/rendering code changes.
 
-## Approval question
+## Closeout
 
-Approve Pass B.7 as scoped above?
+Implemented behavior:
 
-Recommendation: approve. It is the smallest tooling-only correction that makes ref-only rows section-authorable without changing the workbook, generated runtime data, or Pass D boundaries.
+- Section assignment includes both `orderable` and `ref_only` scoped candidates.
+- Ref-only rows still do not appear in Price review and do not create price blockers.
+- Approved ref-only Section decisions write normal option rows using `refOnlyRpo` as `rpo`, with Section-owned `section_id`, `selectable`, and `active` flags.
+- Legacy Standard equipment include decisions remain supported for ref-only rows without Section decisions.
+- Section-skipped rows still suppress later review lanes/progress per B.6.
+
+Validation:
+
+```sh
+.venv/bin/python -m pytest tests/test_ingest_wizard_decisions.py tests/test_ingest_wizard_plan.py -q
+# 45 passed in 2.84s
+
+.venv/bin/python -m pytest tests/test_ingest_wizard_server_pass_b.py tests/test_ingest_wizard_session.py -q
+# 14 passed in 0.90s
+```
+
+Final gate:
+
+```sh
+.venv/bin/python -m pytest tests/test_ingest_wizard_decisions.py tests/test_ingest_wizard_server_pass_b.py tests/test_ingest_wizard_plan.py tests/test_ingest_wizard_session.py -q && node --check visualizer/ingest-wizard/wizard.js && git diff --check && git status --short --branch
+# 59 passed in 3.43s; node syntax and diff whitespace checks passed; git status showed only the expected B.7 modified files.
+```
+
+Preserved surfaces: no workbook writes, no generated artifacts, no `form-app/` runtime changes, no dealer-submission changes, and no Pass D apply path.

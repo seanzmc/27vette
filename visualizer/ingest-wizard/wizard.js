@@ -671,7 +671,7 @@ const LANE_DESCRIPTIONS = {
   exclusive_group: "Group options the customer must pick only one of. Rarely needed for options already in a pick-one section (listed below) — the section already enforces it.",
   relationship: "Record requires / includes / not-available-with rules between options. \"Record business question\" saves an open question instead of a rule.",
   copy_split: "Names follow your comma rule: text before the first comma (LPO rows use the part between the first and second comma); the rest is description; footnote-numbered lines are fine print. Fix only the flagged exceptions — one-word names, duplicates, unmatched footnotes.",
-  status_nuance: "Only rows with genuinely ambiguous availability symbols (□ upgradeable, D dealer-install, unknown) — confirm the parsed reading or block the row.",
+  status_nuance: "Only rows with genuinely ambiguous availability symbols (□ upgradeable, standalone D dealer-install, unknown) — A/D is parsed as available automatically.",
   duplicate: "Same RPO on more than one source sheet in this ingest file — one option or context-distinct?",
   standard_equipment: "Rows without an orderable RPO, plus anything you assigned to a standard section. Rows that are available-to-order on this model (A statuses) are options, not standard equipment — they're excluded automatically.",
   interior_media_deferral: "Record named to-dos the wizard can't parse (interiors, colors, images) so the apply plan carries them as open items.",
@@ -681,6 +681,14 @@ const LANE_DESCRIPTIONS = {
 function labelFor(map, value) {
   const entry = map[value];
   return entry ? entry[0] : value.replaceAll("_", " ");
+}
+
+function normalizedStatusBase(raw) {
+  return String(raw || "")
+    .replace(/\d+$/, "")
+    .replace(/[—–−]/g, "-")
+    .replace(/\s+/g, "")
+    .toUpperCase();
 }
 
 function titleFor(map, value) {
@@ -870,7 +878,8 @@ function laneRowControls(lane, candidate) {
   const payload = (decision && decision.payload) || {};
   let controls = "";
   if (lane === "section") {
-    const reference = ((reviewState.payload.workbookReference || {})[candidate.rpo] || [])[0];
+    const workbookRpo = candidate.rpo || candidate.refOnlyRpo;
+    const reference = ((reviewState.payload.workbookReference || {})[workbookRpo] || [])[0];
     const useReference =
       reference && reference.sectionId
         ? `<button class="ref-use-section ghost" data-section="${escapeHtml(reference.sectionId)}" title="${escapeHtml(reference.sectionName || reference.sectionId)}">Use ${escapeHtml(reference.modelKey)}'s section</button>`
@@ -903,19 +912,19 @@ function laneRowControls(lane, candidate) {
     const explanations = (candidate.statuses || [])
       .filter((status) => {
         const flags = status.flags || [];
-        const raw = String(status.raw || "").replace(/\d+$/, "");
+        const raw = normalizedStatusBase(status.raw);
         return (
           flags.includes("unknown_status_symbol") ||
           flags.includes("upgradeable_equipment_group_review") ||
           status.status === "unresolved" ||
-          raw === "D" || raw === "A/D"
+          raw === "D"
         );
       })
       .map((status) => {
-        const raw = String(status.raw || "").replace(/\d+$/, "");
+        const raw = normalizedStatusBase(status.raw);
         let why = "couldn't parse this symbol — needs a call";
         if (raw === "□") why = "□ upgradeable group — standard here, upgradeable elsewhere; confirm it reads as standard";
-        else if (raw === "D" || raw === "A/D") why = "dealer-installed nuance — parsed as available; confirm";
+        else if (raw === "D") why = "dealer-installed nuance — parsed as available; confirm";
         return `<div class="cell-sub">“${escapeHtml(status.raw)}” on ${escapeHtml(status.modelCode)} ${escapeHtml(status.trim)} → parsed <b>${escapeHtml(status.status)}</b>; ${escapeHtml(why)}</div>`;
       })
       .join("");
@@ -1018,8 +1027,9 @@ function hintBlock(candidate, clickable = false) {
 }
 
 function referenceLine(candidate) {
-  const rows = (reviewState.payload.workbookReference || {})[candidate.rpo];
-  if (!candidate.rpo) return "";
+  const workbookRpo = candidate.rpo || candidate.refOnlyRpo;
+  const rows = (reviewState.payload.workbookReference || {})[workbookRpo];
+  if (!workbookRpo) return "";
   if (!rows || !rows.length) {
     return '<div class="cell-sub ref-line ref-new">New to workbook — no reference</div>';
   }

@@ -23,6 +23,7 @@ from corvette_form_generator.ingest.wizard.decisions import (
     MODEL_LABELS,
     PRESENTATION_SHEETS,
     canonical_json,
+    candidate_needs_section_decision,
     scope_candidates,
 )
 from corvette_form_generator.workbook import rows_from_sheet, workbook_truthy
@@ -271,6 +272,7 @@ def build_plan(
         model_decisions = {k: d for k, d in decisions.items() if d["model"] == model}
         scoped = [c for c in scope_candidates(candidates, model)]
         orderable = [c for c in scoped if c["rowKind"] == "orderable"]
+        section_candidates = [c for c in scoped if candidate_needs_section_decision(c)]
         by_candidate_lane: dict[tuple[str, str], dict[str, Any]] = {}
         for record in model_decisions.values():
             if record.get("candidateId"):
@@ -502,8 +504,8 @@ def build_plan(
             return oid
 
         display_order = 10
-        for candidate in orderable:
-            rpo = candidate["rpo"]
+        for candidate in section_candidates:
+            rpo = candidate["rpo"] or candidate["refOnlyRpo"]
             duplicate = duplicate_decision_by_rpo.get(rpo)
             if rpo in planned_rpos and (
                 duplicate is None or (duplicate.get("payload") or {}).get("classification") == "same_option"
@@ -519,6 +521,18 @@ def build_plan(
                 continue
             section_decision = by_candidate_lane.get(("section", candidate["candidateId"]))
             if section_decision is None:
+                standard_record = by_candidate_lane.get(("standard_equipment", candidate["candidateId"]))
+                if (
+                    candidate["rowKind"] == "ref_only"
+                    and standard_record
+                    and standard_record["resolution"] == "approved_for_plan"
+                    and standard_record["action"] == "include_standard_equipment"
+                ):
+                    # Legacy Pass B/C decisions included ref-only rows through
+                    # Standard equipment before Section assignment owned them.
+                    # Keep those plans valid; new reviews should prefer a
+                    # section decision so selectable/section placement is known.
+                    continue
                 gaps.append(
                     {
                         "model": model,
@@ -532,7 +546,7 @@ def build_plan(
                 inert_candidates.add((model, candidate["candidateId"]))
                 continue  # held/skipped rows stay out of the plan (no price owed); holds are reported
             price_decision = by_candidate_lane.get(("price", candidate["candidateId"]))
-            if price_decision is None:
+            if candidate["rowKind"] == "orderable" and price_decision is None:
                 gaps.append(
                     {
                         "model": model,
@@ -551,9 +565,10 @@ def build_plan(
                 split_ids = []
                 unreviewed_splits.setdefault(model, []).append(rpo)
             price_value = None
-            price_action = price_decision.get("action")
-            price_payload = price_decision.get("payload") or {}
-            if price_decision["resolution"] == "approved_for_plan":
+            price_action = price_decision.get("action") if price_decision else ""
+            price_payload = price_decision.get("payload") if price_decision else {}
+            price_payload = price_payload or {}
+            if price_decision and price_decision["resolution"] == "approved_for_plan":
                 if price_action == "accept_exact_price":
                     price_value = candidate.get("listPrice")
                     if price_value is None and len(candidate.get("priceRows") or []) == 1:
@@ -578,7 +593,9 @@ def build_plan(
             oid = option_id_for(rpo)
             option_id_by_rpo.setdefault(rpo, oid)
             planned_rpos.add(rpo)
-            decision_ids = [section_decision["decisionId"], price_decision["decisionId"], *split_ids]
+            decision_ids = [section_decision["decisionId"], *split_ids]
+            if price_decision:
+                decision_ids.append(price_decision["decisionId"])
             if duplicate:
                 decision_ids.append(duplicate["decisionId"])
             section_payload = section_decision.get("payload") or {}
@@ -634,6 +651,9 @@ def build_plan(
                 continue
             record = by_candidate_lane.get(("standard_equipment", candidate["candidateId"]))
             if not record or record["resolution"] != "approved_for_plan" or record["action"] != "include_standard_equipment":
+                continue
+            section_record = by_candidate_lane.get(("section", candidate["candidateId"]))
+            if section_record and section_record["resolution"] != "approved_for_plan":
                 continue
             rpo = candidate["refOnlyRpo"]
             if rpo in planned_rpos:
