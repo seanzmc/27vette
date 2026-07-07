@@ -2,12 +2,13 @@
 """Run-state persistence and fail-closed state machine for the ingest wizard.
 
 States: profiled -> roles_confirmed -> parsed (Pass A), then
-models_selected -> decisions_in_progress -> decisions_complete (Pass B).
+models_selected -> decisions_in_progress -> decisions_complete (Pass B), then
+plan_built -> plan_approved (Pass C).
 Every transition persists JSON artifacts under
 form-output/ingest-wizard/<run-id>/ so a run can be reopened and later passes
 can consume the output. The canonical workbook is opened read-only for
-pickers, variant reconciliation, and presentation prefill; it and the raw
-source file are never written.
+pickers, variant reconciliation, presentation prefill, and Pass C dry-runs;
+it and the raw source file are never written by this store.
 """
 
 from __future__ import annotations

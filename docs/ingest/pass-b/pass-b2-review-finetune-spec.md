@@ -1,7 +1,7 @@
 # Pass B.2 — review-stage fine-tune: selection-scoped bulk with undo, script-owned copy split, workbook reference, plain-language labels
 
 Date: 2026-07-06
-Status: Draft — awaiting Sean's approval (checkpoint: this spec closes out Pass B once implemented and verified).
+Status: Implemented 2026-07-06. Verifier-passed in `fable5loop/runs/2026-07-06-pass-b2-implementation/`; parent Pass B later received B.3/B.4 field-note refinements recorded in `docs/ingest/ingest-wizard-end-to-end-completion-spec.md`.
 Parent: `docs/ingest/ingest-wizard-end-to-end-completion-spec.md` (Pass B). Supersedes nothing; corrects the B/B.1 review stage per Sean's 2026-07-06 feedback.
 
 ## Feedback being fixed (verbatim intent)

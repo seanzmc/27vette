@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Local dev server for the interactive ingest wizard (Passes A and B).
+"""Local dev server for the interactive ingest wizard (Passes A through C).
 
 Read-only toward the canonical workbook and raw exports; writes only
 run-scoped JSON under form-output/ingest-wizard/. Pass A: profile, roles,
 parse, candidates. Pass B: model selection, decision lanes, completeness.
+Pass C: dry-run apply plan and reviewer approval gate.
 See docs/ingest/pass-a/interactive-ingest-wizard-pass-a-spec.md and
-docs/ingest/ingest-wizard-end-to-end-completion-spec.md (Pass B).
+docs/ingest/ingest-wizard-end-to-end-completion-spec.md (Passes B-F).
 """
 
 from __future__ import annotations
