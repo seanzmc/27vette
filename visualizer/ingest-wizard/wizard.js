@@ -669,7 +669,7 @@ const LANE_DESCRIPTIONS = {
   section: "Pick where each option lives in the form. Sections come from the workbook's section_master sheet — the same sections live models use. Skip — don't carry over saves without a section and drops the row from the plan.",
   price: "Settle every option's price. Filter by price state; single matches can be accepted wholesale. A typed reviewed $ overrides the discovered price. Rows you skipped in Section assignment don't need a price.",
   exclusive_group: "Group options the customer must pick only one of. Rarely needed for options already in a pick-one section (listed below) — the section already enforces it.",
-  relationship: "Record requires / includes / not-available-with rules between options. \"Record business question\" saves an open question instead of a rule.",
+  relationship: "Record workbook-safe option rules: Requires, Includes / auto-adds, or Not available with. Hints can prefill the form; save writes the relationship to the Pass C plan.",
   copy_split: "Names follow your comma rule: text before the first comma (LPO rows use the part between the first and second comma); the rest is description; footnote-numbered lines are fine print. Fix only the flagged exceptions — one-word names, duplicates, unmatched footnotes.",
   status_nuance: "Only rows with genuinely ambiguous availability symbols (□ upgradeable, standalone D dealer-install, unknown) — A/D is parsed as available automatically.",
   duplicate: "Same RPO on more than one source sheet in this ingest file — one option or context-distinct?",
@@ -696,18 +696,67 @@ function titleFor(map, value) {
   return entry ? entry[1] : "";
 }
 
-const RELATIONSHIP_KINDS = [
-  "requires",
-  "not_available_with",
-  "only_available_with",
-  "included_with",
-  "includes",
-  "requires_additional_equipment",
-  "deletes",
-  "replaces",
-  "upgradeable_to",
-  "other",
+const RELATIONSHIP_KIND_CHOICES = [
+  {
+    value: "requires",
+    label: "Requires",
+    help: "Source can be selected only when the target is also selected.",
+  },
+  {
+    value: "includes",
+    label: "Includes / auto-adds",
+    help: "Selecting the source adds the target option automatically.",
+  },
+  {
+    value: "not_available_with",
+    label: "Not available with",
+    help: "Source and target cannot be selected together.",
+  },
 ];
+const RELATIONSHIP_KINDS = RELATIONSHIP_KIND_CHOICES.map((choice) => choice.value);
+const RELATIONSHIP_KIND_ALIASES = {
+  only_available_with: "requires",
+  requires_additional_equipment: "requires",
+  included_with: "includes",
+};
+const RELATIONSHIP_KIND_LABELS = Object.fromEntries(RELATIONSHIP_KIND_CHOICES.map((choice) => [choice.value, choice.label]));
+
+function canonicalRelationshipKind(kind) {
+  const raw = String(kind || "").trim();
+  return RELATIONSHIP_KINDS.includes(raw) ? raw : RELATIONSHIP_KIND_ALIASES[raw] || "";
+}
+
+function relationshipKindLabel(kind) {
+  const canonical = canonicalRelationshipKind(kind);
+  if (canonical) return RELATIONSHIP_KIND_LABELS[canonical];
+  return kind ? `Needs manual handling: ${String(kind).replaceAll("_", " ")}` : "Needs manual handling";
+}
+
+function relationshipKindControl(current = "") {
+  const selected = canonicalRelationshipKind(current);
+  return `<div class="rel-kind-options" id="group-kind" role="radiogroup" aria-label="Relationship rule type">
+    ${RELATIONSHIP_KIND_CHOICES.map(
+      (choice) => `
+        <label class="rel-kind-choice">
+          <input type="radio" name="group-kind" value="${escapeHtml(choice.value)}"${choice.value === selected ? " checked" : ""}>
+          <span><b>${escapeHtml(choice.label)}</b><small>${escapeHtml(choice.help)}</small></span>
+        </label>`
+    ).join("")}
+  </div>`;
+}
+
+function selectedRelationshipKind() {
+  const selected = document.querySelector('input[name="group-kind"]:checked');
+  return selected ? selected.value : "";
+}
+
+function setRelationshipKind(kind) {
+  const canonical = canonicalRelationshipKind(kind);
+  document.querySelectorAll('input[name="group-kind"]').forEach((input) => {
+    input.checked = input.value === canonical;
+  });
+  return canonical;
+}
 
 const reviewState = {
   payload: null,
@@ -1015,7 +1064,7 @@ function hintBlock(candidate, clickable = false) {
   if (!hints.length) return "";
   const chips = hints
     .map((hint) => {
-      const label = `${escapeHtml(hint.kind.replaceAll("_", " "))}${hint.rpoTokens.length ? ` → ${escapeHtml(hint.rpoTokens.join(", "))}` : ""}`;
+      const label = `${escapeHtml(relationshipKindLabel(hint.kind))}${hint.rpoTokens.length ? ` → ${escapeHtml(hint.rpoTokens.join(", "))}` : ""}`;
       if (!clickable) return `<span class="sum-chip" title="${escapeHtml(hint.snippet)}">${label}</span>`;
       return `<button class="sum-chip hint-accept" title="${escapeHtml(hint.snippet)}"
         data-kind="${escapeHtml(hint.kind)}"
@@ -1110,7 +1159,10 @@ function renderQueue() {
 function groupPayloadSummary(decision) {
   const payload = decision.payload || {};
   if (decision.lane === "relationship") {
-    return `${payload.kind || ""}: ${payload.sourceRpo || ""} → ${(payload.targetRpos || []).join(", ")}${payload.note ? ` — ${payload.note}` : ""}`;
+    if (decision.action === "needs_product_decision") {
+      return `Open question${payload.note ? `: ${payload.note}` : ""}`;
+    }
+    return `${relationshipKindLabel(payload.kind)}: ${payload.sourceRpo || ""} → ${(payload.targetRpos || []).join(", ")}${payload.note ? ` — ${payload.note}` : ""}`;
   }
   if (decision.lane === "exclusive_group") {
     return `members: ${(payload.members || []).join(", ")}`;
@@ -1158,11 +1210,11 @@ function groupFormFields(lane) {
   }
   if (lane === "relationship") {
     return `
+      <p class="hint rel-help">Choose the workbook rule this creates. If a phrase hint used a synonym, the wizard normalizes it to one of these three rule types before saving.</p>
       <input id="group-key" placeholder="relationship name (e.g. Z51-requires-E60)">
-      ${selectControl("group-kind-select", RELATIONSHIP_KINDS, "", "— kind —").replace('class="group-kind-select"', 'class="group-kind-select" id="group-kind"')}
+      ${relationshipKindControl()}
       <input id="group-source" placeholder="source RPO">
-      <input id="group-targets" placeholder="target RPOs, comma-separated">
-      <label class="dec-inline" title="Saves an open question into the plan report instead of writing a rule — use when the right rule needs a business answer first."><input type="checkbox" id="group-product-decision"> record as business question (no rule written)</label>`;
+      <input id="group-targets" placeholder="target RPOs, comma-separated">`;
   }
   return `
     <input id="group-key" placeholder="deferral name (e.g. gsx-interior-scope)">
@@ -1220,14 +1272,16 @@ function renderGroupLane(lane) {
            )
            .join("")}</div>`
       : "";
+  const resolutionControl = lane === "relationship" ? "" : `<select id="group-resolution">${resolutionOptions("approved_for_plan")}</select>`;
+  const saveLabel = lane === "exclusive_group" ? "Create group from checked options" : lane === "relationship" ? "Save relationship" : "Save decision";
   $("#review-queue").innerHTML = `
     ${exclusiveExtras}
     ${deferralExtras}
     <div class="group-form">
       ${groupFormFields(lane)}
-      <select id="group-resolution">${resolutionOptions("approved_for_plan")}</select>
+      ${resolutionControl}
       <input id="group-note" placeholder="note">
-      <button id="group-save" class="primary">${lane === "exclusive_group" ? "Create group from checked options" : "Save decision"}</button>
+      <button id="group-save" class="primary">${saveLabel}</button>
     </div>
     ${existing ? `<h2 class="sub-h">Recorded decisions</h2><table class="cand"><tbody>${existing}</tbody></table>` : ""}
     ${hintRows ? `<h2 class="sub-h">Candidates with relationship hints — click a hint to prefill the form</h2><table class="cand"><tbody>${hintRows}</tbody></table>` : ""}`;
@@ -1280,11 +1334,11 @@ function renderGroupLane(lane) {
       if (!decision) return;
       const payload = decision.payload || {};
       $("#group-key").value = decision.groupKey;
-      $("#group-resolution").value = decision.resolution;
+      const resolution = $("#group-resolution");
+      if (resolution) resolution.value = decision.resolution;
       $("#group-note").value = decision.reviewerNote || "";
       if (lane === "relationship") {
-        $("#group-product-decision").checked = decision.action === "needs_product_decision";
-        $("#group-kind").value = payload.kind || "";
+        setRelationshipKind(payload.kind || "");
         $("#group-source").value = payload.sourceRpo || "";
         $("#group-targets").value = (payload.targetRpos || []).join(", ");
       } else if (lane === "exclusive_group") {
@@ -1307,7 +1361,7 @@ function collectGroupDecision(lane) {
     model: $("#review-model").value,
     lane,
     groupKey,
-    resolution: $("#group-resolution").value,
+    resolution: lane === "relationship" ? "approved_for_plan" : $("#group-resolution").value,
     reviewerNote: $("#group-note").value,
   };
   const csv = (value) =>
@@ -1321,14 +1375,11 @@ function collectGroupDecision(lane) {
     return { ...base, action: "create_exclusive_group", payload: { members } };
   }
   if (lane === "relationship") {
-    if ($("#group-product-decision").checked) {
-      return { ...base, action: "needs_product_decision", payload: { note: $("#group-note").value } };
-    }
-    const kind = $("#group-kind").value;
+    const kind = selectedRelationshipKind();
     const sourceRpo = $("#group-source").value.trim().toUpperCase();
     const targetRpos = csv($("#group-targets").value);
     if (!kind || !sourceRpo || !targetRpos.length) {
-      throw new Error("Relationship needs a kind, a source RPO, and at least one target RPO.");
+      throw new Error("Relationship needs one of the three rule types, a source RPO, and at least one target RPO.");
     }
     return { ...base, action: "create_relationship_candidate", payload: { kind, sourceRpo, targetRpos } };
   }
@@ -1551,10 +1602,10 @@ $("#review-queue").addEventListener("click", async (event) => {
   const hint = event.target.closest(".hint-accept");
   if (hint) {
     // Prefill the relationship form from the hint; reviewer edits then saves.
-    $("#group-kind").value = RELATIONSHIP_KINDS.includes(hint.dataset.kind) ? hint.dataset.kind : "other";
+    const canonicalKind = setRelationshipKind(hint.dataset.kind);
     $("#group-source").value = hint.dataset.source;
     $("#group-targets").value = hint.dataset.targets;
-    $("#group-key").value = `${hint.dataset.source}-${hint.dataset.kind}`.toLowerCase();
+    $("#group-key").value = `${hint.dataset.source}-${canonicalKind || hint.dataset.kind}`.toLowerCase();
     $("#group-key").scrollIntoView({ behavior: "smooth", block: "center" });
     return;
   }

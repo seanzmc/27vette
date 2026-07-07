@@ -147,6 +147,15 @@ tr.evidence-row td { background: var(--panel-2); }
 .dec-save { padding: 3px 10px; font-size: 12px; }
 .group-form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0; }
 .group-form input, .group-form select { font-size: 12px; padding: 4px 6px; }
+.group-form .rel-help { flex-basis: 100%; margin: 0 0 2px; }
+.rel-kind-options { display: flex; flex-wrap: wrap; gap: 6px; flex-basis: 100%; }
+.rel-kind-choice {
+  display: flex; align-items: flex-start; gap: 6px; max-width: 260px;
+  border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px;
+  background: var(--panel-2); font-size: 12px;
+}
+.rel-kind-choice input { margin-top: 2px; }
+.rel-kind-choice small { display: block; color: var(--muted); line-height: 1.3; }
 #group-payload { min-width: 320px; }
 .hints { margin-top: 4px; }
 .hints .sum-chip { font-size: 11px; }
