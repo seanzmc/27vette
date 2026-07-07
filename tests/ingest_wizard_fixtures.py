@@ -166,6 +166,7 @@ def build_master_workbook(path: Path) -> Path:
         option_headers,
         [
             ["opt_pdb_001", "PDB", 16000, "Carbon Fiber Wheel Package", "Visible carbon", "", "sec_whee_001", "", 10, True, ""],
+            ["opt_xfr_001", "XFR", "", "High Performance Tires", "Reference-only tires", "", "sec_whee_001", False, 20, True, ""],
         ],
     )
     _table(wb, "z06_ovs", ["option_id", "variant_id", "status"], [["opt_pdb_001", "1lz_h07", "available"]])

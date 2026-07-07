@@ -1084,8 +1084,10 @@ function referenceLine(candidate) {
   }
   const top = rows[0];
   const price = top.price ? ` · ${fmtPrice(Number(top.price))}` : "";
+  const selectable = top.selectable === false ? " · not selectable" : "";
+  const section = top.sectionName || top.sectionId || "no section";
   const more = rows.length > 1 ? ` (+${rows.length - 1} more)` : "";
-  return `<div class="cell-sub ref-line">In workbook: <b>${escapeHtml(top.modelKey)}</b> “${escapeHtml(top.optionName)}” · ${escapeHtml(top.sectionName || top.sectionId)}${price}${more}</div>`;
+  return `<div class="cell-sub ref-line">In workbook: <b>${escapeHtml(top.modelKey)}</b> “${escapeHtml(top.optionName || workbookRpo)}” · ${escapeHtml(section)}${price}${selectable}${more}</div>`;
 }
 
 function visibleQueueCandidates() {
@@ -1635,7 +1637,7 @@ function renderBulkBar() {
   if (lane === "section") {
     const refModel = ((modelState.selection || {}).comparators || {})[$("#review-model").value] || "";
     const withRef = checked.filter(
-      (c) => ((((reviewState.payload || {}).workbookReference || {})[c.rpo] || [])[0] || {}).sectionId
+      (c) => ((((reviewState.payload || {}).workbookReference || {})[c.rpo || c.refOnlyRpo] || [])[0] || {}).sectionId
     ).length;
     const refButton = refModel
       ? `<button id="bulk-ref-section" class="ghost" ${withRef ? "" : "disabled"} title="Each checked row takes the section its RPO already has on ${escapeHtml(refModel)} in the workbook. Rows without a match are left undecided. Every row stays editable afterwards.">Use ${escapeHtml(refModel)}'s section for ${withRef} of ${n} checked</button>`
@@ -1719,7 +1721,7 @@ function bindBulk(lane) {
     const rows = checked
       .map((candidate) => ({
         candidate,
-        ref: (((reviewState.payload || {}).workbookReference || {})[candidate.rpo] || [])[0],
+        ref: (((reviewState.payload || {}).workbookReference || {})[candidate.rpo || candidate.refOnlyRpo] || [])[0],
       }))
       .filter((entry) => entry.ref && entry.ref.sectionId);
     bulkSave(

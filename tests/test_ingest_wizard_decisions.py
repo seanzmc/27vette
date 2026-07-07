@@ -546,6 +546,12 @@ class PassBStoreTest(unittest.TestCase):
         self.assertEqual(reference["modelKey"], "z06")
         self.assertEqual(reference["sectionName"], "Wheels")
         self.assertEqual(reference["optionName"], "Carbon Fiber Wheel Package")
+        self.assertIn("XFR", queue["workbookReference"])
+        ref_only_reference = queue["workbookReference"]["XFR"][0]
+        self.assertEqual(ref_only_reference["modelKey"], "z06")
+        self.assertEqual(ref_only_reference["sectionName"], "Wheels")
+        self.assertEqual(ref_only_reference["optionName"], "High Performance Tires")
+        self.assertIs(ref_only_reference["selectable"], False)
         splits = self.store.review_queue(self.run_id, "zr1", "copy_split")
         for candidate in splits["candidates"]:
             self.assertIn("proposedSplit", candidate)

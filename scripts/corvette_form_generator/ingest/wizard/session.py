@@ -579,7 +579,7 @@ class WizardSessionStore:
             preferred = selection["comparators"].get(model, "")
             payload["workbookReference"] = {
                 rpo: sorted(rows, key=lambda row: row["modelKey"] != preferred)
-                for rpo in {c["rpo"] for c in scoped if c["rpo"]}
+                for rpo in {c["rpo"] or c["refOnlyRpo"] for c in scoped if c["rpo"] or c["refOnlyRpo"]}
                 if (rows := reference.get(rpo))
             }
         if lane in ("section", "exclusive_group"):
