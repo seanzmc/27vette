@@ -929,13 +929,20 @@ function laneRowControls(lane, candidate) {
   if (lane === "section") {
     const workbookRpo = candidate.rpo || candidate.refOnlyRpo;
     const reference = ((reviewState.payload.workbookReference || {})[workbookRpo] || [])[0];
+    const payloadHasSelectable = Object.prototype.hasOwnProperty.call(payload, "selectable");
+    const payloadHasActive = Object.prototype.hasOwnProperty.call(payload, "active");
+    const effectiveSelectable = payloadHasSelectable ? payload.selectable : reference ? reference.selectable : undefined;
+    const effectiveActive = payloadHasActive ? payload.active : reference ? reference.active : undefined;
+    const referenceStateAttrs = reference
+      ? `${reference.selectable === undefined || reference.selectable === null ? "" : ` data-selectable="${reference.selectable ? "true" : "false"}"`}${reference.active === undefined || reference.active === null ? "" : ` data-active="${reference.active ? "true" : "false"}"`}`
+      : "";
     const useReference =
       reference && reference.sectionId
-        ? `<button class="ref-use-section ghost" data-section="${escapeHtml(reference.sectionId)}" title="${escapeHtml(reference.sectionName || reference.sectionId)}">Use ${escapeHtml(reference.modelKey)}'s section</button>`
+        ? `<button class="ref-use-section ghost" data-section="${escapeHtml(reference.sectionId)}"${referenceStateAttrs} title="${escapeHtml(reference.sectionName || reference.sectionId)}">Use ${escapeHtml(reference.modelKey)}'s section</button>`
         : "";
     controls = `${sectionSelect(payload.sectionId || "")}${useReference}
-      <label class="dec-inline" title="Row is written but can't be picked — display/reference only."><input type="checkbox" class="dec-not-selectable" ${payload.selectable === false ? "checked" : ""}> not selectable</label>
-      <label class="dec-inline" title="Row is written with active = false — hidden from the form until turned on."><input type="checkbox" class="dec-inactive" ${payload.active === false ? "checked" : ""}> inactive</label>`;
+      <label class="dec-inline" title="Row is written but can't be picked — display/reference only."><input type="checkbox" class="dec-not-selectable" ${effectiveSelectable === false ? "checked" : ""}> not selectable</label>
+      <label class="dec-inline" title="Row is written with active = false — hidden from the form until turned on."><input type="checkbox" class="dec-inactive" ${effectiveActive === false ? "checked" : ""}> inactive</label>`;
   } else if (lane === "price") {
     const exact = candidate.priceMatch === "exact";
     const rows = (candidate.priceRows || [])
@@ -1085,9 +1092,10 @@ function referenceLine(candidate) {
   const top = rows[0];
   const price = top.price ? ` · ${fmtPrice(Number(top.price))}` : "";
   const selectable = top.selectable === false ? " · not selectable" : "";
+  const active = top.active === false ? " · inactive" : "";
   const section = top.sectionName || top.sectionId || "no section";
   const more = rows.length > 1 ? ` (+${rows.length - 1} more)` : "";
-  return `<div class="cell-sub ref-line">In workbook: <b>${escapeHtml(top.modelKey)}</b> “${escapeHtml(top.optionName || workbookRpo)}” · ${escapeHtml(section)}${price}${selectable}${more}</div>`;
+  return `<div class="cell-sub ref-line">In workbook: <b>${escapeHtml(top.modelKey)}</b> “${escapeHtml(top.optionName || workbookRpo)}” · ${escapeHtml(section)}${price}${selectable}${active}${more}</div>`;
 }
 
 function visibleQueueCandidates() {
@@ -1182,12 +1190,14 @@ function exclusivePoolTable() {
   const sectionDecisions = reviewState.payload.sectionDecisions || {};
   const query = ($("#review-q").value || "").trim().toLowerCase();
   const pool = (reviewState.payload.candidates || []).filter(
-    (candidate) =>
-      candidate.rpo &&
-      (!query || candidate.rpo.toLowerCase().includes(query) || candidate.description.toLowerCase().includes(query))
+    (candidate) => {
+      const rpo = candidate.rpo || candidate.refOnlyRpo;
+      return rpo && (!query || rpo.toLowerCase().includes(query) || candidate.description.toLowerCase().includes(query));
+    }
   );
   const rows = pool
     .map((candidate) => {
+      const rpo = candidate.rpo || candidate.refOnlyRpo;
       const sectionId = sectionDecisions[candidate.candidateId] || "";
       const section = sections[sectionId];
       const single = section && String(section.selectionMode || "").startsWith("single");
@@ -1196,8 +1206,8 @@ function exclusivePoolTable() {
         : '<span class="cell-sub">no section yet</span>';
       return `
       <tr class="cand-row">
-        <td><input type="checkbox" class="pool-check" data-rpo="${escapeHtml(candidate.rpo)}"></td>
-        <td class="rpo">${escapeHtml(candidate.rpo)}</td>
+        <td><input type="checkbox" class="pool-check" data-rpo="${escapeHtml(rpo)}"></td>
+        <td class="rpo">${escapeHtml(rpo)}</td>
         <td class="desc">${escapeHtml(candidate.description.split("\n")[0])}</td>
         <td>${sectionNote}</td>
       </tr>`;
@@ -1599,6 +1609,10 @@ $("#review-queue").addEventListener("click", async (event) => {
   if (useRef) {
     const select = useRef.closest("tr").querySelector(".dec-section");
     if (select) select.value = useRef.dataset.section;
+    const notSelectable = useRef.closest("tr").querySelector(".dec-not-selectable");
+    if (notSelectable && useRef.dataset.selectable) notSelectable.checked = useRef.dataset.selectable === "false";
+    const inactive = useRef.closest("tr").querySelector(".dec-inactive");
+    if (inactive && useRef.dataset.active) inactive.checked = useRef.dataset.active === "false";
     return;
   }
   const hint = event.target.closest(".hint-accept");
@@ -1729,7 +1743,11 @@ function bindBulk(lane) {
       ({ candidate, ref }) => ({
         ...base(candidate),
         action: "assign_section",
-        payload: { sectionId: ref.sectionId },
+        payload: {
+          sectionId: ref.sectionId,
+          ...(ref.selectable === false ? { selectable: false } : {}),
+          ...(ref.active === false ? { active: false } : {}),
+        },
       }),
       `${rows.length} assigned from the reference model · ${checked.length - rows.length} left undecided (no workbook match)`
     );

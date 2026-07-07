@@ -552,10 +552,55 @@ class PassBStoreTest(unittest.TestCase):
         self.assertEqual(ref_only_reference["sectionName"], "Wheels")
         self.assertEqual(ref_only_reference["optionName"], "High Performance Tires")
         self.assertIs(ref_only_reference["selectable"], False)
+        self.assertIs(ref_only_reference["active"], False)
         splits = self.store.review_queue(self.run_id, "zr1", "copy_split")
         for candidate in splits["candidates"]:
             self.assertIn("proposedSplit", candidate)
             self.assertIn("flags", candidate["proposedSplit"])
+
+    def test_exclusive_group_pool_uses_sectioned_selectable_rows(self) -> None:
+        self.select_defaults()
+        section_queue = self.store.review_queue(self.run_id, "zr1", "section")
+        pdb = next(candidate for candidate in section_queue["candidates"] if candidate["rpo"] == "PDB")
+        aj7 = next(candidate for candidate in section_queue["candidates"] if candidate["refOnlyRpo"] == "AJ7")
+        xfr = next(candidate for candidate in section_queue["candidates"] if candidate["refOnlyRpo"] == "XFR")
+        self.store.save_decisions(
+            self.run_id,
+            [
+                {
+                    "model": "zr1",
+                    "lane": "section",
+                    "candidateId": pdb["candidateId"],
+                    "action": "assign_section",
+                    "payload": {"sectionId": "sec_whee_001"},
+                    "resolution": "approved_for_plan",
+                },
+                {
+                    "model": "zr1",
+                    "lane": "section",
+                    "candidateId": aj7["candidateId"],
+                    "action": "assign_section",
+                    "payload": {"sectionId": "sec_safe_001"},
+                    "resolution": "approved_for_plan",
+                },
+                {
+                    "model": "zr1",
+                    "lane": "section",
+                    "candidateId": xfr["candidateId"],
+                    "action": "assign_section",
+                    "payload": {"sectionId": "sec_whee_001", "selectable": False},
+                    "resolution": "approved_for_plan",
+                },
+            ],
+        )
+
+        queue = self.store.review_queue(self.run_id, "zr1", "exclusive_group")
+        pool_rpos = {candidate["rpo"] or candidate["refOnlyRpo"] for candidate in queue["candidates"]}
+        self.assertIn("PDB", pool_rpos)
+        self.assertIn("AJ7", pool_rpos)
+        self.assertNotIn("XFR", pool_rpos)
+        self.assertEqual(queue["sectionDecisions"][pdb["candidateId"]], "sec_whee_001")
+        self.assertEqual(queue["sectionDecisions"][aj7["candidateId"]], "sec_safe_001")
 
     # ------------------------------------------------------------ copying
     def test_copy_decisions_same_candidate_and_provenance(self) -> None:

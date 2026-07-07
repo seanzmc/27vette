@@ -512,6 +512,24 @@ class WizardSessionStore:
             ]
         elif lane == "section":
             scoped = [c for c in scoped if candidate_needs_section_decision(c)]
+        elif lane == "exclusive_group":
+            selectable_section_ids = {
+                record.get("candidateId")
+                for record in state["decisions"].values()
+                if record["model"] == model
+                and record["lane"] == "section"
+                and record["resolution"] == "approved_for_plan"
+                and record.get("action") == "assign_section"
+                and (record.get("payload") or {}).get("sectionId")
+                and (record.get("payload") or {}).get("selectable", True) is not False
+                and (record.get("payload") or {}).get("active", True) is not False
+            }
+            scoped = [
+                c
+                for c in scoped
+                if (c["rpo"] or c["refOnlyRpo"])
+                and c["candidateId"] in selectable_section_ids
+            ]
         else:
             scoped = [c for c in scoped if c["rowKind"] == "orderable"]
         if lane != "section" and skipped_section_ids:

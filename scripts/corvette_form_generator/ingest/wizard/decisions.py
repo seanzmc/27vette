@@ -243,6 +243,7 @@ def workbook_option_reference(workbook_path: Path) -> dict[str, list[dict[str, A
                 if not rpo:
                     continue
                 selectable_cell = row.get("selectable", "")
+                active_cell = row.get("active", "")
                 by_rpo.setdefault(rpo, []).append(
                     {
                         "modelKey": model_key,
@@ -250,6 +251,7 @@ def workbook_option_reference(workbook_path: Path) -> dict[str, list[dict[str, A
                         "sectionId": row.get("section_id", ""),
                         "sectionName": section_names.get(row.get("section_id", ""), ""),
                         "selectable": None if selectable_cell in ("", None) else workbook_truthy(selectable_cell),
+                        "active": None if active_cell in ("", None) else workbook_truthy(active_cell),
                         "price": row.get("price", ""),
                         "description": row.get("description", ""),
                     }
