@@ -88,6 +88,11 @@
       <select id="review-model" title="Which target model you're reviewing"></select>
       <select id="review-lane" title="Which kind of decision"></select>
       <select id="review-source-section" title="Filter by where the row came from in the export"><option value="">All source groups</option></select>
+      <select id="review-decision-state" class="hidden" title="Filter by whether this lane already has a saved decision">
+        <option value="">All decision states</option>
+        <option value="undecided">Needs decision</option>
+        <option value="decided">Already decided</option>
+      </select>
       <select id="review-price-state" class="hidden">
         <option value="">All price states</option>
         <option value="exact">Single price match</option>

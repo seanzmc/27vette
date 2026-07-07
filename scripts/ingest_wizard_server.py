@@ -126,6 +126,7 @@ class WizardHandler(BaseHTTPRequestHandler):
                         template=(query.get("template") or [""])[0],
                         source_section=(query.get("sourceSection") or [""])[0],
                         price_match=(query.get("priceMatch") or [""])[0],
+                        decision_state=(query.get("decisionState") or [""])[0],
                     )
                 )
             elif path.startswith("/api/wizard/sessions/") and path.endswith("/progress"):

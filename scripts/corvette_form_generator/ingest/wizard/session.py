@@ -470,6 +470,7 @@ class WizardSessionStore:
         template: str = "",
         source_section: str = "",
         price_match: str = "",
+        decision_state: str = "",
     ) -> dict[str, Any]:
         session, candidates_file, candidates = self._parsed_candidates(run_id)
         selection = self._load_selection(run_id, candidates_file)
@@ -517,6 +518,31 @@ class WizardSessionStore:
             scoped = [c for c in scoped if source_group(c) == source_section]
         if price_match:
             scoped = [c for c in scoped if (c.get("priceMatch") or "") == price_match]
+        if decision_state:
+            if decision_state not in {"undecided", "decided"}:
+                raise WizardError(f"Invalid decision state filter: {decision_state}")
+            lane_decided_ids = {
+                record.get("candidateId")
+                for record in state["decisions"].values()
+                if record["model"] == model and record["lane"] == lane and record.get("candidateId")
+            }
+            skipped_section_ids = {
+                record.get("candidateId")
+                for record in state["decisions"].values()
+                if record["model"] == model
+                and record["lane"] == "section"
+                and record["resolution"] == "not_needed"
+                and record.get("candidateId")
+            }
+            if decision_state == "decided":
+                scoped = [c for c in scoped if c["candidateId"] in lane_decided_ids]
+            else:
+                scoped = [
+                    c
+                    for c in scoped
+                    if c["candidateId"] not in lane_decided_ids
+                    and not (lane == "price" and c["candidateId"] in skipped_section_ids)
+                ]
         if query:
             needle = query.lower()
             scoped = [

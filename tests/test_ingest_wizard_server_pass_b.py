@@ -173,6 +173,95 @@ class WizardServerPassBTest(unittest.TestCase):
         self.assertEqual(status, 400)
         self.assertIn("toModel", payload["error"])
 
+    def test_review_decision_state_filter_and_section_skip(self) -> None:
+        run_id = self.start_parsed_run()
+        self.post_json(
+            f"/api/wizard/sessions/{run_id}/models",
+            {"targets": ["zr1", "zr1x"], "comparators": {"zr1": "z06", "zr1x": "z06"}},
+        )
+        status, queue = self.request(
+            "GET", f"/api/wizard/sessions/{run_id}/review?model=zr1&lane=section"
+        )
+        self.assertEqual(status, 200)
+        ids = [candidate["candidateId"] for candidate in queue["candidates"][:2]]
+        self.assertEqual(len(ids), 2)
+
+        status, saved = self.post_json(
+            f"/api/wizard/sessions/{run_id}/decisions",
+            {
+                "decisions": [
+                    {
+                        "model": "zr1",
+                        "lane": "section",
+                        "candidateId": ids[0],
+                        "action": "exclude_row",
+                        "payload": {},
+                        "resolution": "not_needed",
+                    },
+                    {
+                        "model": "zr1",
+                        "lane": "section",
+                        "candidateId": ids[1],
+                        "action": "assign_section",
+                        "payload": {"sectionId": "sec_whee_001"},
+                        "resolution": "approved_for_plan",
+                    },
+                    {
+                        "model": "zr1",
+                        "lane": "price",
+                        "candidateId": ids[1],
+                        "action": "confirm_no_price",
+                        "payload": {},
+                        "resolution": "approved_for_plan",
+                    },
+                ]
+            },
+        )
+        self.assertEqual(status, 200)
+        self.assertTrue(saved["batchId"])
+
+        status, undecided_section = self.request(
+            "GET",
+            f"/api/wizard/sessions/{run_id}/review?model=zr1&lane=section&decisionState=undecided",
+        )
+        self.assertEqual(status, 200)
+        undecided_section_ids = {candidate["candidateId"] for candidate in undecided_section["candidates"]}
+        self.assertNotIn(ids[0], undecided_section_ids)
+        self.assertNotIn(ids[1], undecided_section_ids)
+
+        status, decided_section = self.request(
+            "GET",
+            f"/api/wizard/sessions/{run_id}/review?model=zr1&lane=section&decisionState=decided",
+        )
+        self.assertEqual(status, 200)
+        decided_section_ids = {candidate["candidateId"] for candidate in decided_section["candidates"]}
+        self.assertLessEqual(set(ids), decided_section_ids)
+
+        status, undecided_price = self.request(
+            "GET",
+            f"/api/wizard/sessions/{run_id}/review?model=zr1&lane=price&decisionState=undecided",
+        )
+        self.assertEqual(status, 200)
+        undecided_price_ids = {candidate["candidateId"] for candidate in undecided_price["candidates"]}
+        self.assertNotIn(ids[0], undecided_price_ids)  # skipped in section, no price decision owed
+        self.assertNotIn(ids[1], undecided_price_ids)  # has a price decision
+
+        status, decided_price = self.request(
+            "GET",
+            f"/api/wizard/sessions/{run_id}/review?model=zr1&lane=price&decisionState=decided",
+        )
+        self.assertEqual(status, 200)
+        decided_price_ids = {candidate["candidateId"] for candidate in decided_price["candidates"]}
+        self.assertNotIn(ids[0], decided_price_ids)
+        self.assertIn(ids[1], decided_price_ids)
+
+        status, payload = self.request(
+            "GET",
+            f"/api/wizard/sessions/{run_id}/review?model=zr1&lane=section&decisionState=nope",
+        )
+        self.assertEqual(status, 400)
+        self.assertIn("Invalid decision state", payload["error"])
+
     def test_delete_endpoint_and_batch_undo(self) -> None:
         run_id = self.start_parsed_run()
         self.post_json(

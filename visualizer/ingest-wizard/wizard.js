@@ -717,6 +717,8 @@ function currentQueueKey() {
     $("#review-lane").value,
     $("#review-q").value.trim(),
     $("#review-source-section").value,
+    $("#review-decision-state").value,
+    $("#review-price-state").value,
   ].join("|");
 }
 
@@ -739,6 +741,11 @@ async function refreshReview() {
   const params = new URLSearchParams({ model, lane });
   if ($("#review-q").value.trim()) params.set("q", $("#review-q").value.trim());
   if ($("#review-source-section").value) params.set("sourceSection", $("#review-source-section").value);
+  const hasDecisionFilter = lane === "section" || lane === "price";
+  $("#review-decision-state").classList.toggle("hidden", !hasDecisionFilter);
+  if (hasDecisionFilter && $("#review-decision-state").value) {
+    params.set("decisionState", $("#review-decision-state").value);
+  }
   $("#review-price-state").classList.toggle("hidden", lane !== "price");
   if (lane === "price" && $("#review-price-state").value) params.set("priceMatch", $("#review-price-state").value);
   reviewState.payload = await getJSON(
@@ -1575,6 +1582,7 @@ function renderBulkBar() {
     controls = `
       ${sectionSelect("").replace('class="dec-section"', 'id="bulk-section"')}
       <button id="bulk-assign-section" class="primary" ${disabled}>Put ${n} checked row${n === 1 ? "" : "s"} in this section</button>
+      <button id="bulk-section-skip" class="ghost" ${disabled}>Skip — don't carry over ${n} checked</button>
       ${refButton}`;
   } else if (lane === "price") {
     // Single-price matches are safe to accept wholesale — no checking needed
@@ -1661,6 +1669,19 @@ function bindBulk(lane) {
         payload: { sectionId: ref.sectionId },
       }),
       `${rows.length} assigned from the reference model · ${checked.length - rows.length} left undecided (no workbook match)`
+    );
+  });
+  on("#bulk-section-skip", () => {
+    bulkSave(
+      checkedCandidates(),
+      (candidate) => ({
+        ...base(candidate),
+        action: "exclude_row",
+        payload: {},
+        resolution: "not_needed",
+        reviewerNote: "bulk skip",
+      }),
+      "Skipped rows stay out of the plan and do not need price decisions."
     );
   });
   on("#bulk-accept-exact", () => {
@@ -1752,10 +1773,11 @@ $("#mark-complete-btn").addEventListener("click", async () => {
   }
 });
 
-for (const id of ["#review-model", "#review-lane", "#review-source-section", "#review-price-state"]) {
+for (const id of ["#review-model", "#review-lane", "#review-source-section", "#review-decision-state", "#review-price-state"]) {
   $(id).addEventListener("change", () => {
     if (id === "#review-model" || id === "#review-lane") {
       $("#review-source-section").value = "";
+      $("#review-decision-state").value = "";
       $("#review-price-state").value = "";
     }
     refreshReview().catch((error) => showError(error.message));
