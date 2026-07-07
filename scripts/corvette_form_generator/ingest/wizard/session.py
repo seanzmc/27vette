@@ -479,6 +479,14 @@ class WizardSessionStore:
         if lane not in {entry["lane"] for entry in LANES}:
             raise WizardError(f"Unknown lane: {lane}")
         state = self._decision_state(run_id, candidates, selection)
+        skipped_section_ids = {
+            record.get("candidateId")
+            for record in state["decisions"].values()
+            if record["model"] == model
+            and record["lane"] == "section"
+            and record["resolution"] == "not_needed"
+            and record.get("candidateId")
+        }
         scoped = scope_candidates(candidates, model)
         if lane == "standard_equipment":
             # Rows without an orderable RPO, plus rows the reviewer assigned to
@@ -503,6 +511,8 @@ class WizardSessionStore:
             ]
         else:
             scoped = [c for c in scoped if c["rowKind"] == "orderable"]
+        if lane != "section" and skipped_section_ids:
+            scoped = [c for c in scoped if c["candidateId"] not in skipped_section_ids]
         if lane == "status_nuance":
             # Only rows whose availability symbols actually need a human read.
             scoped = [c for c in scoped if candidate_needs_status_review(c)]
@@ -526,14 +536,6 @@ class WizardSessionStore:
                 for record in state["decisions"].values()
                 if record["model"] == model and record["lane"] == lane and record.get("candidateId")
             }
-            skipped_section_ids = {
-                record.get("candidateId")
-                for record in state["decisions"].values()
-                if record["model"] == model
-                and record["lane"] == "section"
-                and record["resolution"] == "not_needed"
-                and record.get("candidateId")
-            }
             if decision_state == "decided":
                 scoped = [c for c in scoped if c["candidateId"] in lane_decided_ids]
             else:
@@ -541,7 +543,6 @@ class WizardSessionStore:
                     c
                     for c in scoped
                     if c["candidateId"] not in lane_decided_ids
-                    and not (lane == "price" and c["candidateId"] in skipped_section_ids)
                 ]
         if query:
             needle = query.lower()
@@ -601,6 +602,8 @@ class WizardSessionStore:
             rpos_by_name: dict[str, set[str]] = {}
             for candidate in scope_candidates(candidates, model):
                 if candidate["rowKind"] != "orderable":
+                    continue
+                if candidate["candidateId"] in skipped_section_ids:
                     continue
                 key = propose_copy_split(candidate)["name"].strip().lower()
                 if key:

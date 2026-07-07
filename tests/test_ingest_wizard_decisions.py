@@ -635,6 +635,24 @@ class PassBStoreTest(unittest.TestCase):
                     "action": "exclude_row",
                     "payload": {},
                     "resolution": "not_needed",
+                },
+                {
+                    "model": "zr1",
+                    "lane": "price",
+                    "candidateId": skipped_id,
+                    "action": "defer_price_extractor",
+                    "payload": {},
+                    "resolution": "hold_for_question",
+                    "reviewerNote": "stale hold before section skip",
+                },
+                {
+                    "model": "zr1",
+                    "lane": "copy_split",
+                    "candidateId": skipped_id,
+                    "action": "split_copy",
+                    "payload": {"name": "Stale skipped row split"},
+                    "resolution": "hold_for_question",
+                    "reviewerNote": "stale split before section skip",
                 }
             ],
         )
@@ -663,6 +681,10 @@ class PassBStoreTest(unittest.TestCase):
         progress = self.store.progress(self.run_id)
         zr1 = progress["models"]["zr1"]
         self.assertEqual(zr1["lanes"]["price"]["required"], len(ids) - 1)
+        self.assertEqual(zr1["lanes"]["price"]["decisions"], len(ids) - 1)
+        self.assertEqual(zr1["lanes"]["price"]["holds"], 0)
+        self.assertEqual(zr1["lanes"]["copy_split"]["holds"], 0)
+        self.assertNotIn(skipped_id, [hold.get("candidateId") for hold in zr1["holds"]])
         self.assertNotIn(
             skipped_id,
             [b.get("candidateId") for b in zr1["blockers"] if b["lane"] == "price"],

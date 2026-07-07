@@ -209,6 +209,14 @@ class WizardServerPassBTest(unittest.TestCase):
                     {
                         "model": "zr1",
                         "lane": "price",
+                        "candidateId": ids[0],
+                        "action": "confirm_no_price",
+                        "payload": {},
+                        "resolution": "approved_for_plan",
+                    },
+                    {
+                        "model": "zr1",
+                        "lane": "price",
                         "candidateId": ids[1],
                         "action": "confirm_no_price",
                         "payload": {},
@@ -254,6 +262,14 @@ class WizardServerPassBTest(unittest.TestCase):
         decided_price_ids = {candidate["candidateId"] for candidate in decided_price["candidates"]}
         self.assertNotIn(ids[0], decided_price_ids)
         self.assertIn(ids[1], decided_price_ids)
+
+        for lane in ("price", "copy_split", "relationship", "duplicate"):
+            status, later_queue = self.request(
+                "GET", f"/api/wizard/sessions/{run_id}/review?model=zr1&lane={lane}"
+            )
+            self.assertEqual(status, 200, lane)
+            later_ids = {candidate["candidateId"] for candidate in later_queue["candidates"]}
+            self.assertNotIn(ids[0], later_ids, lane)
 
         status, payload = self.request(
             "GET",

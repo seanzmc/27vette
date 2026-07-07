@@ -600,6 +600,8 @@ def completeness(
         for lane_config in LANES:
             lane = lane_config["lane"]
             lane_decisions = [d for d in decisions.values() if d["model"] == target and d["lane"] == lane]
+            if lane != "section" and lane_config["perCandidate"]:
+                lane_decisions = [d for d in lane_decisions if d.get("candidateId") not in skipped_ids]
             holds = [d for d in lane_decisions if d["resolution"] == "hold_for_question"]
             entry: dict[str, Any] = {"decisions": len(lane_decisions), "holds": len(holds)}
             if lane in MANDATORY_CANDIDATE_LANES:
