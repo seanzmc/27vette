@@ -1008,7 +1008,6 @@ def build_plan(
                             "rule_type": rule_type,
                             "source_id": source_oid,
                             "target_id": target_oid,
-                            "active": True,
                         },
                     },
                     [record["decisionId"]],
@@ -1047,7 +1046,7 @@ def build_plan(
                     "action": "add",
                     "sheet": excl_groups_sheet,
                     "key": {"group_id": gid},
-                    "row": {"group_id": gid, "group_name": record["groupKey"], "selection_mode": "single_within_group", "active": True},
+                    "row": {"group_id": gid, "selection_mode": "single_within_group", "active": True, "notes": f"Review group: {record['groupKey']}"},
                 },
                 [record["decisionId"]],
             )

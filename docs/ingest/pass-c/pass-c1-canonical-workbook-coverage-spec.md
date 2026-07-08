@@ -1,6 +1,6 @@
 # Pass C.1 — Canonical workbook coverage gaps in dry-run apply plan
 
-Status: implemented 2026-07-08 after Sean approval. Dry-run plan coverage only; no workbook writes, generated artifacts, runtime promotion, or Pass D writer.
+Status: implemented 2026-07-08 after Sean approval. C.2 follow-up completed 2026-07-08 to close the real-data dry-run row-shape blocker (`rule_mapping.active` removed; `exclusive_groups.group_name` remapped to `notes`) and rebuild run `20260707-193441-ea9e4c` to `plan_built` with `stage2.ok=true`. Dry-run plan coverage only; no workbook writes, generated artifacts, runtime promotion, or Pass D writer.
 
 ## Diagnosis
 

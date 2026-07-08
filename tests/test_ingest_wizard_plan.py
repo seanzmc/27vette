@@ -189,6 +189,49 @@ class PlanFlowTest(unittest.TestCase):
         members = [i for i in items if i["sheet"] == "zr1_exclusive_members" and i["action"] == "add"]
         self.assertEqual(len(members), 2)
 
+    def test_relationship_and_exclusive_ops_dry_run_against_live_like_headers(self) -> None:
+        from openpyxl import load_workbook
+
+        extra = [
+            {
+                "model": "zr1",
+                "lane": "relationship",
+                "groupKey": "pdb-excludes-c2z",
+                "action": "create_relationship_candidate",
+                "payload": {"kind": "not_available_with", "sourceRpo": "PDB", "targetRpos": ["C2Z"]},
+                "resolution": "approved_for_plan",
+            },
+            {
+                "model": "zr1",
+                "lane": "exclusive_group",
+                "groupKey": "zr1-wheel-pack",
+                "action": "create_exclusive_group",
+                "payload": {"members": ["PDB", "C2Z"]},
+                "resolution": "approved_for_plan",
+            },
+        ]
+        self.complete_all(zr1_extra=extra)
+
+        wb = load_workbook(self.master, read_only=True, data_only=True)
+        try:
+            rule_headers = [cell.value for cell in wb["z06_rule_mapping"][1]]
+            group_headers = [cell.value for cell in wb["z06_exclusive_groups"][1]]
+        finally:
+            wb.close()
+        self.assertNotIn("active", rule_headers)
+        self.assertNotIn("group_name", group_headers)
+        self.assertIn("notes", group_headers)
+
+        result = self.store.build_apply_plan(self.run_id, schema_validation=False)
+        self.assertTrue(result["dryRun"]["stage2"]["ok"], result["dryRun"]["stage2"]["errors"])
+        self.assertEqual(result["session"]["state"], "plan_built")
+        plan = read_json(self.store.run_dir(self.run_id) / "apply-plan.json")
+        rule = next(i for i in plan["stage2"]["items"] if i["sheet"] == "zr1_rule_mapping" and i["action"] == "add")
+        group = next(i for i in plan["stage2"]["items"] if i["sheet"] == "zr1_exclusive_groups" and i["action"] == "add")
+        self.assertNotIn("active", rule["row"])
+        self.assertNotIn("group_name", group["row"])
+        self.assertEqual(group["row"]["notes"], "Review group: zr1-wheel-pack")
+
     def test_default_selection_rule_emits_from_reviewed_exclusive_payload(self) -> None:
         extra = [
             {
