@@ -27,6 +27,7 @@ from corvette_form_generator.ingest.wizard.decisions import (
     SCHEMA_VERSION_B2,
     VARIANT_RECONCILIATION_KEY,
     artifact_fingerprint,
+    candidate_has_price,
     candidate_is_availability_row,
     candidate_needs_section_decision,
     candidate_needs_status_review,
@@ -472,6 +473,9 @@ class WizardSessionStore:
         source_section: str = "",
         price_match: str = "",
         decision_state: str = "",
+        price_presence: str = "",
+        workbook_ref: str = "",
+        section_state: str = "",
     ) -> dict[str, Any]:
         session, candidates_file, candidates = self._parsed_candidates(run_id)
         selection = self._load_selection(run_id, candidates_file)
@@ -494,21 +498,30 @@ class WizardSessionStore:
             # a standard-behavior section — never plain selectable options.
             # Ref-only rows that are available-to-order on THIS model's own
             # variant columns (A statuses) are options, not standard equipment.
+            # Priced rows (joined price rows or a list price) are options or
+            # price problems, never standard equipment (spec B9).
             standard_sections = {
                 s["sectionId"] for s in workbook_sections(self._require_workbook()) if s["standardBehavior"]
             }
+            # Same approved-assignment predicate as the sectionState filter —
+            # a held/skipped section decision is not an assignment yet.
             standard_assigned = {
                 record.get("candidateId")
                 for record in state["decisions"].values()
                 if record["model"] == model
                 and record["lane"] == "section"
+                and record["resolution"] == "approved_for_plan"
+                and record.get("action") == "assign_section"
                 and (record.get("payload") or {}).get("sectionId") in standard_sections
             }
             scoped = [
                 c
                 for c in scoped
-                if (c["rowKind"] == "ref_only" and not candidate_is_availability_row(c, model))
-                or c["candidateId"] in standard_assigned
+                if not candidate_has_price(c)
+                and (
+                    (c["rowKind"] == "ref_only" and not candidate_is_availability_row(c, model))
+                    or c["candidateId"] in standard_assigned
+                )
             ]
         elif lane == "section":
             scoped = [c for c in scoped if candidate_needs_section_decision(c)]
@@ -549,6 +562,37 @@ class WizardSessionStore:
             scoped = [c for c in scoped if source_group(c) == source_section]
         if price_match:
             scoped = [c for c in scoped if (c.get("priceMatch") or "") == price_match]
+        if price_presence:
+            if price_presence not in {"priced", "unpriced"}:
+                raise WizardError(f"Invalid price presence filter: {price_presence}")
+            want_priced = price_presence == "priced"
+            scoped = [c for c in scoped if candidate_has_price(c) == want_priced]
+        if workbook_ref:
+            if workbook_ref not in {"in_workbook", "new"}:
+                raise WizardError(f"Invalid workbook reference filter: {workbook_ref}")
+            reference_index = self._option_reference()
+            want_known = workbook_ref == "in_workbook"
+            scoped = [
+                c
+                for c in scoped
+                if bool(reference_index.get(c["rpo"] or c["refOnlyRpo"])) == want_known
+            ]
+        if section_state:
+            if section_state not in {"assigned", "unassigned"}:
+                raise WizardError(f"Invalid section state filter: {section_state}")
+            assigned_ids = {
+                record.get("candidateId")
+                for record in state["decisions"].values()
+                if record["model"] == model
+                and record["lane"] == "section"
+                and record["resolution"] == "approved_for_plan"
+                and record.get("action") == "assign_section"
+                and record.get("candidateId")
+            }
+            if section_state == "assigned":
+                scoped = [c for c in scoped if c["candidateId"] in assigned_ids]
+            else:
+                scoped = [c for c in scoped if c["candidateId"] not in assigned_ids]
         if decision_state:
             if decision_state not in {"undecided", "decided"}:
                 raise WizardError(f"Invalid decision state filter: {decision_state}")

@@ -153,6 +153,16 @@ def candidate_is_availability_row(candidate: dict[str, Any], model_key: str) -> 
     )
 
 
+def candidate_has_price(candidate: dict[str, Any]) -> bool:
+    """True when the price join attached any price row or a list price.
+
+    Priced rows are options (or price problems), never standard equipment —
+    the SE lane and the price-presence filter both key on this (spec B9).
+    """
+
+    return bool(candidate.get("priceRows")) or candidate.get("listPrice") not in (None, "")
+
+
 def candidate_needs_section_decision(candidate: dict[str, Any]) -> bool:
     """Rows the reviewer must either place in a workbook section or skip.
 
@@ -599,7 +609,26 @@ def completeness(
     decisions: dict[str, dict[str, Any]],
     reconciliation: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Spec B3: per-model, per-lane progress plus the blocking report."""
+    """Spec B3: per-model, per-lane progress plus the blocking report.
+
+    Candidate blockers carry row identity (rpo/description/sheet) so the
+    review UI can link each blocker to its row instead of showing bare ids
+    (spec B9).
+    """
+
+    candidates_by_id = {c["candidateId"]: c for c in candidates}
+
+    def candidate_blocker(lane: str, candidate_id: str, reason: str) -> dict[str, Any]:
+        candidate = candidates_by_id.get(candidate_id, {})
+        description = str(candidate.get("description") or "").split("\n")[0]
+        return {
+            "lane": lane,
+            "candidateId": candidate_id,
+            "reason": reason,
+            "rpo": candidate.get("rpo") or candidate.get("refOnlyRpo") or "",
+            "description": description[:120],
+            "sheetName": candidate.get("sheetName", ""),
+        }
 
     reconciliation_models = (reconciliation or {}).get("models", {})
     models: dict[str, Any] = {}
@@ -633,7 +662,7 @@ def completeness(
                 entry["required"] = len(required)
                 entry["missing"] = len(missing)
                 for candidate_id in missing:
-                    blockers.append({"lane": lane, "candidateId": candidate_id, "reason": "no_decision"})
+                    blockers.append(candidate_blocker(lane, candidate_id, "no_decision"))
             if lane == "status_nuance":
                 flagged = [
                     c
@@ -645,7 +674,7 @@ def completeness(
                 entry["required"] = len(flagged)
                 entry["missing"] = len(missing)
                 for candidate_id in missing:
-                    blockers.append({"lane": lane, "candidateId": candidate_id, "reason": "flagged_status_undecided"})
+                    blockers.append(candidate_blocker(lane, candidate_id, "flagged_status_undecided"))
             if lane == "presentation":
                 approved_sheets = {
                     d["groupKey"]

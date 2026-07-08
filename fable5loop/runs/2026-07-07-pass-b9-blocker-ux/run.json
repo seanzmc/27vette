@@ -1,0 +1,34 @@
+{
+  "id": "2026-07-07-pass-b9-blocker-ux",
+  "started_at": "2026-07-07T22:00:00-04:00",
+  "completed_at": "2026-07-07T23:15:00-04:00",
+  "objective": "Pass B.9 review continuity / blocker UX per Sean's approved scope: exclude priced rows from the Standard Equipment lane; extend decision-state filtering to all per-candidate lanes and add price-presence, workbook-reference, and section-assigned filters; replace the after-the-fact blocker error dump with an always-visible actionable blocker panel that links each blocker to its model/lane/row and refreshes as decisions save. No workbook writes, no generated artifacts, no Pass D.",
+  "changed_surface": "wizard tooling/UI/tests/docs: decisions.py (candidate_has_price, blocker row identity), session.py (SE priced exclusion + approved-assignment predicate, pricePresence/workbookRef/sectionState filters), ingest_wizard_server.py (new query params), visualizer/ingest-wizard (index.html filter selects, wizard.js blocker panel + jump handlers + filter wiring, wizard.css panel styles), fixtures + decisions tests (70 green), pass-b9 spec + ingest README",
+  "outcome_rubric": "fable5loop/runs/2026-07-07-pass-b9-blocker-ux/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-07-pass-b9-blocker-ux/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-07-pass-b9-blocker-ux/validation-output.txt",
+  "state_updates": [
+    {"section": "Verified facts", "evidence": "fable5loop/runs/2026-07-07-pass-b9-blocker-ux/verifier-report.md"},
+    {"section": "Last session", "evidence": "fable5loop/runs/2026-07-07-pass-b9-blocker-ux/validation-output.txt"}
+  ],
+  "skill_update": {
+    "decision": "not_applicable",
+    "evidence": "fable5loop/runs/2026-07-07-pass-b9-blocker-ux/verifier-report.md",
+    "detail": "Clean single-cycle pass with no new failure mode: the work applied existing skill lessons (measurable rubric, independent verifier, full-scope filters, fail-closed params) rather than producing a durable new procedural lesson. The verifier's predicate-consistency observation is a code-level fix, not a reusable loop rule."
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 1,
+    "pattern": "adversarial-verification",
+    "cycle1": "pass - all 8 code criteria plus API-level confirmation of the browser-proven flow on the real export (SE 111/0 priced, price lane 214=158+56 workbookRef partition, 546/546 enriched blockers, fail-closed filter params, escapeHtml on every panel sink); 2 non-blocking follow-ups (standard_assigned predicate alignment, .blocker-more CSS) applied post-verdict with regression test test_held_section_decision_does_not_feed_se_queue - final sweep 70 green"
+  },
+  "boundaries_preserved": [
+    "workbook (read-only opens only)",
+    "generated artifacts (tracked form-output/form-app clean; proof run dirs gitignored and deleted)",
+    "runtime app (untouched)",
+    "dealer submission (untouched)"
+  ]
+}

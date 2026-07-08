@@ -285,7 +285,7 @@ class PassBStoreTest(unittest.TestCase):
         section_queue = self.store.review_queue(self.run_id, "zr1", "section")
         self.assertEqual(
             [section["sectionId"] for section in section_queue["sections"]],
-            ["sec_pain_001", "sec_whee_001"],
+            ["sec_pain_001", "sec_whee_001", "sec_std_001"],
         )
         section_ref_only = {candidate["refOnlyRpo"] for candidate in section_queue["candidates"] if candidate["refOnlyRpo"]}
         self.assertIn("XFR", section_ref_only)
@@ -785,6 +785,177 @@ class PassBStoreTest(unittest.TestCase):
         }
         self.assertIn("XFR", zr1_section_ref_only)
         self.assertIn("AJ7", zr1_section_ref_only)
+
+    def _assign_section(self, model: str, candidate_id: str, section_id: str) -> None:
+        self.store.save_decisions(
+            self.run_id,
+            [
+                {
+                    "model": model,
+                    "lane": "section",
+                    "candidateId": candidate_id,
+                    "action": "assign_section",
+                    "payload": {"sectionId": section_id},
+                    "resolution": "approved_for_plan",
+                }
+            ],
+        )
+
+    def test_se_queue_excludes_priced_rows(self) -> None:
+        """Spec B9: priced rows are options, never standard equipment — even
+        when the reviewer assigns them to a standard-behavior section."""
+
+        self.select_defaults()
+        ids = {
+            c["rpo"]: c["candidateId"]
+            for c in self.store.review_queue(self.run_id, "zr1", "section")["candidates"]
+            if c["rpo"]
+        }
+        # PDB carries two joined price rows; C2Z has no price at all.
+        self._assign_section("zr1", ids["PDB"], "sec_std_001")
+        self._assign_section("zr1", ids["C2Z"], "sec_std_001")
+        se_rpos = {
+            c["rpo"] or c["refOnlyRpo"]
+            for c in self.store.review_queue(self.run_id, "zr1", "standard_equipment")["candidates"]
+        }
+        self.assertIn("C2Z", se_rpos)
+        self.assertIn("AJ7", se_rpos)
+        self.assertNotIn("PDB", se_rpos)
+
+    def test_held_section_decision_does_not_feed_se_queue(self) -> None:
+        """Only approved assign_section decisions count as standard-section
+        assignments — a held question naming a standard section is not one."""
+
+        self.select_defaults()
+        ids = {
+            c["rpo"]: c["candidateId"]
+            for c in self.store.review_queue(self.run_id, "zr1", "section")["candidates"]
+            if c["rpo"]
+        }
+        self.store.save_decisions(
+            self.run_id,
+            [
+                {
+                    "model": "zr1",
+                    "lane": "section",
+                    "candidateId": ids["C2Z"],
+                    "action": "assign_section",
+                    "payload": {"sectionId": "sec_std_001"},
+                    "resolution": "hold_for_question",
+                    "reviewerNote": "is this really standard?",
+                }
+            ],
+        )
+        se_rpos = {
+            c["rpo"] or c["refOnlyRpo"]
+            for c in self.store.review_queue(self.run_id, "zr1", "standard_equipment")["candidates"]
+        }
+        self.assertNotIn("C2Z", se_rpos)
+
+    def test_decision_state_filter_on_standard_equipment(self) -> None:
+        self.select_defaults()
+        target = next(
+            c
+            for c in self.store.review_queue(self.run_id, "zr1", "standard_equipment")["candidates"]
+            if c["refOnlyRpo"] == "AJ7"
+        )
+        self.store.save_decisions(
+            self.run_id,
+            [
+                {
+                    "model": "zr1",
+                    "lane": "standard_equipment",
+                    "candidateId": target["candidateId"],
+                    "action": "include_standard_equipment",
+                    "payload": {},
+                    "resolution": "approved_for_plan",
+                }
+            ],
+        )
+        decided = self.store.review_queue(
+            self.run_id, "zr1", "standard_equipment", decision_state="decided"
+        )["candidates"]
+        self.assertEqual([c["candidateId"] for c in decided], [target["candidateId"]])
+        undecided = self.store.review_queue(
+            self.run_id, "zr1", "standard_equipment", decision_state="undecided"
+        )["candidates"]
+        self.assertNotIn(target["candidateId"], [c["candidateId"] for c in undecided])
+
+    def test_price_presence_filter(self) -> None:
+        self.select_defaults()
+        priced = {
+            c["rpo"] or c["refOnlyRpo"]
+            for c in self.store.review_queue(self.run_id, "zr1", "section", price_presence="priced")["candidates"]
+        }
+        self.assertIn("PDB", priced)
+        self.assertNotIn("C2Z", priced)
+        self.assertNotIn("AJ7", priced)
+        unpriced = {
+            c["rpo"] or c["refOnlyRpo"]
+            for c in self.store.review_queue(self.run_id, "zr1", "section", price_presence="unpriced")["candidates"]
+        }
+        self.assertIn("C2Z", unpriced)
+        self.assertIn("AJ7", unpriced)
+        self.assertNotIn("PDB", unpriced)
+        with self.assertRaises(WizardError):
+            self.store.review_queue(self.run_id, "zr1", "section", price_presence="sometimes")
+
+    def test_workbook_ref_filter(self) -> None:
+        self.select_defaults()
+        # z06_options (the only active source sheet) carries PDB and XFR.
+        known = {
+            c["rpo"] or c["refOnlyRpo"]
+            for c in self.store.review_queue(self.run_id, "zr1", "section", workbook_ref="in_workbook")["candidates"]
+        }
+        self.assertEqual(known, {"PDB", "XFR"})
+        new = {
+            c["rpo"] or c["refOnlyRpo"]
+            for c in self.store.review_queue(self.run_id, "zr1", "section", workbook_ref="new")["candidates"]
+        }
+        self.assertNotIn("PDB", new)
+        self.assertNotIn("XFR", new)
+        for rpo in ("CC3", "C2Z", "CC2", "AJ7"):
+            self.assertIn(rpo, new)
+        with self.assertRaises(WizardError):
+            self.store.review_queue(self.run_id, "zr1", "section", workbook_ref="maybe")
+
+    def test_section_state_filter(self) -> None:
+        self.select_defaults()
+        ids = {
+            c["rpo"]: c["candidateId"]
+            for c in self.store.review_queue(self.run_id, "zr1", "section")["candidates"]
+            if c["rpo"]
+        }
+        self._assign_section("zr1", ids["CC3"], "sec_whee_001")
+        assigned = [
+            c["rpo"]
+            for c in self.store.review_queue(self.run_id, "zr1", "price", section_state="assigned")["candidates"]
+        ]
+        self.assertEqual(assigned, ["CC3"])
+        unassigned = {
+            c["rpo"]
+            for c in self.store.review_queue(self.run_id, "zr1", "price", section_state="unassigned")["candidates"]
+        }
+        self.assertIn("PDB", unassigned)
+        self.assertNotIn("CC3", unassigned)
+        with self.assertRaises(WizardError):
+            self.store.review_queue(self.run_id, "zr1", "price", section_state="kinda")
+
+    def test_blockers_carry_row_identity(self) -> None:
+        """Spec B9: candidate blockers name their row so the UI can link
+        straight to it instead of showing bare candidate ids."""
+
+        self.select_defaults()
+        zr1 = self.store.progress(self.run_id)["models"]["zr1"]
+        section_blockers = [b for b in zr1["blockers"] if b["lane"] == "section"]
+        self.assertTrue(section_blockers)
+        self.assertIn("PDB", {b["rpo"] for b in section_blockers})
+        for blocker in section_blockers:
+            self.assertIn("description", blocker)
+            self.assertIn("sheetName", blocker)
+        presentation = [b for b in zr1["blockers"] if b["lane"] == "presentation"]
+        self.assertTrue(presentation)
+        self.assertTrue(all(b.get("groupKey") for b in presentation))
 
     def test_source_groups_fall_back_to_sheet_name(self) -> None:
         self.select_defaults()

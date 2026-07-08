@@ -190,6 +190,9 @@ def build_master_workbook(path: Path) -> Path:
         [
             ["sec_pain_001", "Exterior Color", "single", True, 1, "", "paint"],
             ["sec_whee_001", "Wheels", "single", True, 2, "", "wheels"],
+            # Standard-behavior section: rows assigned here feed the
+            # standard-equipment queue (unless they carry a price — spec B9).
+            ["sec_std_001", "Standard Equipment", "informational", False, 3, "included", "standard"],
         ],
     )
     # Headers mirror the live workbook (probe 2026-07-06).

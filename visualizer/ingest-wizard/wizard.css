@@ -162,6 +162,20 @@ tr.evidence-row td { background: var(--panel-2); }
 .pres-sheet { margin-bottom: 18px; }
 .pres-sheet .desc { font-size: 12px; word-break: break-all; }
 #review-blockers .empty-note { margin: 8px 0; }
+.blocker-panel {
+  border: 1px solid var(--line); border-left: 3px solid var(--red);
+  border-radius: 8px; background: var(--panel); padding: 10px 14px;
+  margin: 8px 0 14px; display: flex; flex-direction: column; gap: 8px;
+}
+.blocker-panel-ok { border-left-color: var(--green); }
+.blocker-head { font-size: 13px; }
+.blocker-group { font-size: 13px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.blocker-chips { display: flex; flex-wrap: wrap; gap: 4px; width: 100%; }
+.blocker-row, .blocker-switch-model { font-size: 11px; padding: 2px 8px; max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.blocker-more { width: 100%; }
+.blocker-more summary { cursor: pointer; font-size: 12px; color: var(--muted); }
+.blocker-more[open] { display: flex; flex-wrap: wrap; gap: 4px; }
+.blocker-more[open] summary { width: 100%; }
 @media (max-width: 900px) {
   .dec-cell select, .dec-cell input { max-width: 100%; }
   .group-form { flex-direction: column; align-items: stretch; }

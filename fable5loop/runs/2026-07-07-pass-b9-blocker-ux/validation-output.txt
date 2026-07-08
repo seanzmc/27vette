@@ -1,0 +1,6 @@
+== Pass B.9 validation · 2026-07-07 (final, post-verifier follow-ups) ==
+-- wizard suites --
+......................................................................   [100%]
+70 passed in 3.19s
+-- generated surfaces --
+(empty = untouched)

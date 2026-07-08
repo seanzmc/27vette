@@ -99,6 +99,21 @@
         <option value="ambiguous">Multiple prices</option>
         <option value="none">No price</option>
       </select>
+      <select id="review-price-presence" class="hidden" title="Filter by whether the export attached any price to the row">
+        <option value="">Priced or not</option>
+        <option value="unpriced">No price</option>
+        <option value="priced">Has price</option>
+      </select>
+      <select id="review-workbook-ref" class="hidden" title="Filter by whether the RPO already exists on a live workbook model">
+        <option value="">Workbook: all</option>
+        <option value="in_workbook">Already in workbook</option>
+        <option value="new">New to workbook</option>
+      </select>
+      <select id="review-section-state" class="hidden" title="Filter by whether you've already put the row in a form section">
+        <option value="">Section: all</option>
+        <option value="assigned">Section assigned</option>
+        <option value="unassigned">No section yet</option>
+      </select>
       <input type="search" id="review-q" placeholder="Search RPO or description…">
     </div>
     <div class="filters actions-bar">

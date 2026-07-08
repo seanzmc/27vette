@@ -673,7 +673,7 @@ const LANE_DESCRIPTIONS = {
   copy_split: "Names follow your comma rule: text before the first comma (LPO rows use the part between the first and second comma); the rest is description; footnote-numbered lines are fine print. Fix only the flagged exceptions — one-word names, duplicates, unmatched footnotes.",
   status_nuance: "Only rows with genuinely ambiguous availability symbols (□ upgradeable, standalone D dealer-install, unknown) — A/D is parsed as available automatically.",
   duplicate: "Same RPO on more than one source sheet in this ingest file — one option or context-distinct?",
-  standard_equipment: "Rows without an orderable RPO, plus anything you assigned to a standard section. Rows that are available-to-order on this model (A statuses) are options, not standard equipment — they're excluded automatically.",
+  standard_equipment: "Rows without an orderable RPO, plus anything you assigned to a standard section. Rows that are available-to-order on this model (A statuses) or that carry any price are options, not standard equipment — both are excluded automatically.",
   interior_media_deferral: "Record named to-dos the wizard can't parse (interiors, colors, images) so the apply plan carries them as open items.",
   presentation: "Approve the form's skeleton for this model — steps, section display, order summary. Required before the model can go live.",
 };
@@ -768,6 +768,10 @@ const reviewState = {
   splitShowAll: false,
 };
 
+/* Lanes whose queue is one row per candidate — they share the row-level
+   filters (decision state, workbook reference, section state). */
+const PER_CANDIDATE_LANES = ["section", "price", "copy_split", "status_nuance", "standard_equipment"];
+
 function currentQueueKey() {
   return [
     $("#review-model").value,
@@ -776,6 +780,9 @@ function currentQueueKey() {
     $("#review-source-section").value,
     $("#review-decision-state").value,
     $("#review-price-state").value,
+    $("#review-price-presence").value,
+    $("#review-workbook-ref").value,
+    $("#review-section-state").value,
   ].join("|");
 }
 
@@ -798,13 +805,26 @@ async function refreshReview() {
   const params = new URLSearchParams({ model, lane });
   if ($("#review-q").value.trim()) params.set("q", $("#review-q").value.trim());
   if ($("#review-source-section").value) params.set("sourceSection", $("#review-source-section").value);
-  const hasDecisionFilter = lane === "section" || lane === "price";
-  $("#review-decision-state").classList.toggle("hidden", !hasDecisionFilter);
-  if (hasDecisionFilter && $("#review-decision-state").value) {
+  const perCandidate = PER_CANDIDATE_LANES.includes(lane);
+  $("#review-decision-state").classList.toggle("hidden", !perCandidate);
+  if (perCandidate && $("#review-decision-state").value) {
     params.set("decisionState", $("#review-decision-state").value);
   }
   $("#review-price-state").classList.toggle("hidden", lane !== "price");
   if (lane === "price" && $("#review-price-state").value) params.set("priceMatch", $("#review-price-state").value);
+  $("#review-price-presence").classList.toggle("hidden", lane !== "standard_equipment");
+  if (lane === "standard_equipment" && $("#review-price-presence").value) {
+    params.set("pricePresence", $("#review-price-presence").value);
+  }
+  $("#review-workbook-ref").classList.toggle("hidden", !perCandidate);
+  if (perCandidate && $("#review-workbook-ref").value) {
+    params.set("workbookRef", $("#review-workbook-ref").value);
+  }
+  const hasSectionFilter = perCandidate && lane !== "section";
+  $("#review-section-state").classList.toggle("hidden", !hasSectionFilter);
+  if (hasSectionFilter && $("#review-section-state").value) {
+    params.set("sectionState", $("#review-section-state").value);
+  }
   reviewState.payload = await getJSON(
     `/api/wizard/sessions/${state.session.runId}/review?${params}`
   );
@@ -882,8 +902,139 @@ function renderProgress() {
     ? '<span class="sum-chip sum-exact"><b>complete</b></span>'
     : `<span class="sum-chip sum-warn"><b>${entry.blockers.length}</b> blockers</span>`;
   $("#progress-chips").innerHTML = stateChip + chips;
-  $("#review-blockers").innerHTML = "";
+  renderBlockerPanel();
 }
+
+/* ---------------------------------------------------------- blocker panel */
+
+const LANE_LABELS = Object.fromEntries(LANES);
+
+const BLOCKER_REASON_LABELS = {
+  no_decision: "still need a decision",
+  flagged_status_undecided: "have a flagged status that needs a call",
+  presentation_sheet_unapproved: "still need approval",
+  variant_reconciliation_disagreement_undecided: "needs a decision",
+};
+
+const BLOCKER_CHIP_LIMIT = 15;
+
+function blockerRowChip(blocker) {
+  const rpo = blocker.rpo || "";
+  const label = rpo
+    ? `${rpo}${blocker.description ? ` — ${blocker.description.slice(0, 60)}` : ""}`
+    : blocker.description || blocker.candidateId;
+  return `<button class="blocker-row ghost" data-lane="${escapeHtml(blocker.lane)}" data-rpo="${escapeHtml(rpo)}"
+    title="Open the ${escapeHtml(LANE_LABELS[blocker.lane] || blocker.lane)} lane filtered to this row">${escapeHtml(label)}</button>`;
+}
+
+function renderBlockerPanel() {
+  const container = $("#review-blockers");
+  const progress = reviewState.progress;
+  if (!progress) {
+    container.innerHTML = "";
+    return;
+  }
+  const currentModel = $("#review-model").value;
+  const otherModelButtons = Object.entries(progress.models || {})
+    .filter(([model, entry]) => model !== currentModel && (entry.blockers || []).length)
+    .map(
+      ([model, entry]) =>
+        `<button class="blocker-switch-model ghost" data-model="${escapeHtml(model)}">${escapeHtml(model)}: ${entry.blockers.length} blocker${entry.blockers.length === 1 ? "" : "s"}</button>`
+    )
+    .join(" ");
+  const entry = (progress.models || {})[currentModel];
+  const blockers = (entry || {}).blockers || [];
+  if (!blockers.length) {
+    container.innerHTML = otherModelButtons
+      ? `<div class="blocker-panel blocker-panel-ok"><span class="status-note"><b>${escapeHtml(currentModel)}</b> has no blockers — other models still do:</span> ${otherModelButtons}</div>`
+      : "";
+    return;
+  }
+  const groups = new Map();
+  for (const blocker of blockers) {
+    const key = `${blocker.lane}|${blocker.reason}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(blocker);
+  }
+  const blocks = [...groups.entries()].map(([key, items]) => {
+    const [lane, reason] = key.split("|");
+    if (reason === "variant_reconciliation_disagreement_undecided") {
+      return `<div class="blocker-group">
+        <span>Variant reconciliation ${escapeHtml(BLOCKER_REASON_LABELS[reason])} — the export's variant lineup disagrees with the workbook.</span>
+        <button class="blocker-models primary">Decide on the Models step</button>
+      </div>`;
+    }
+    if (reason === "presentation_sheet_unapproved") {
+      const chips = items
+        .map((blocker) => {
+          const [friendly] = PRESENTATION_SHEET_INFO[blocker.groupKey] || [blocker.groupKey];
+          return `<button class="blocker-row ghost" data-lane="presentation" data-rpo="">${escapeHtml(friendly)}</button>`;
+        })
+        .join(" ");
+      return `<div class="blocker-group">
+        <span><b>${items.length}</b> presentation sheet${items.length === 1 ? "" : "s"} ${escapeHtml(BLOCKER_REASON_LABELS[reason])}:</span>
+        ${chips}
+      </div>`;
+    }
+    const laneLabel = LANE_LABELS[lane] || lane;
+    const reasonLabel = BLOCKER_REASON_LABELS[reason] || reason.replaceAll("_", " ");
+    const inline = items.slice(0, BLOCKER_CHIP_LIMIT).map(blockerRowChip).join(" ");
+    const rest = items.slice(BLOCKER_CHIP_LIMIT);
+    const overflow = rest.length
+      ? `<details class="blocker-more"><summary>Show ${rest.length} more</summary>${rest.map(blockerRowChip).join(" ")}</details>`
+      : "";
+    return `<div class="blocker-group">
+      <span><b>${items.length}</b> ${escapeHtml(laneLabel)} row${items.length === 1 ? "" : "s"} ${escapeHtml(reasonLabel)}.</span>
+      <button class="blocker-jump-lane ghost" data-lane="${escapeHtml(lane)}" title="Open the lane showing only rows without a decision">Review these</button>
+      <div class="blocker-chips">${inline}${overflow}</div>
+    </div>`;
+  });
+  container.innerHTML = `<div class="blocker-panel">
+    <div class="blocker-head"><b>${blockers.length}</b> item${blockers.length === 1 ? "" : "s"} block${blockers.length === 1 ? "s" : ""} completion for <b>${escapeHtml(currentModel)}</b> — click any item to jump to it. The list refreshes as you save decisions.</div>
+    ${blocks.join("")}
+    ${otherModelButtons ? `<div class="blocker-head">Other models with blockers: ${otherModelButtons}</div>` : ""}
+  </div>`;
+}
+
+async function jumpToLane(lane, { rpo = "" } = {}) {
+  $("#review-lane").value = lane;
+  resetReviewFilters();
+  $("#review-q").value = rpo;
+  if (!rpo && PER_CANDIDATE_LANES.includes(lane)) {
+    $("#review-decision-state").value = "undecided";
+  }
+  if (lane === "copy_split") reviewState.splitShowAll = true;
+  await refreshReview();
+}
+
+$("#review-blockers").addEventListener("click", async (event) => {
+  clearError();
+  try {
+    const switchModel = event.target.closest(".blocker-switch-model");
+    if (switchModel) {
+      $("#review-model").value = switchModel.dataset.model;
+      resetReviewFilters();
+      $("#review-q").value = "";
+      await refreshReview();
+      return;
+    }
+    const models = event.target.closest(".blocker-models");
+    if (models) {
+      await loadModels();
+      setStage("models");
+      return;
+    }
+    const row = event.target.closest(".blocker-row");
+    if (row) {
+      await jumpToLane(row.dataset.lane, { rpo: row.dataset.rpo || "" });
+      return;
+    }
+    const laneJump = event.target.closest(".blocker-jump-lane");
+    if (laneJump) await jumpToLane(laneJump.dataset.lane);
+  } catch (error) {
+    showError(error.message);
+  }
+});
 
 function decisionFor(candidateId) {
   return (reviewState.payload.decisions || []).find((d) => d.candidateId === candidateId);
@@ -1836,31 +1987,37 @@ $("#mark-complete-btn").addEventListener("click", async () => {
   try {
     const payload = await postJSON(`/api/wizard/sessions/${state.session.runId}/complete`, {});
     state.session = payload.session;
+    await refreshReview();
+    // The blocker panel is empty when complete, so this note survives it.
     $("#review-blockers").innerHTML = '<div class="status-note">Decisions complete for all selected targets — build the apply plan when ready.</div>';
     $("#to-plan-btn").classList.remove("hidden");
-    await refreshReview();
   } catch (error) {
-    showError(error.message);
-    reviewState.progress = await getJSON(`/api/wizard/sessions/${state.session.runId}/progress`);
-    renderProgress();
-    const model = $("#review-model").value;
-    const blockers = (reviewState.progress.models[model] || {}).blockers || [];
-    $("#review-blockers").innerHTML = blockers.length
-      ? `<div class="empty-note">Blocking (${model}): ${blockers
-          .slice(0, 20)
-          .map((blocker) => escapeHtml(`${blocker.lane}:${blocker.candidateId || blocker.groupKey}`))
-          .join(", ")}${blockers.length > 20 ? " …" : ""}</div>`
-      : "";
+    // The blocker panel below carries the actionable detail; keep the banner short.
+    showError(
+      error.message.startsWith("Decisions are not complete")
+        ? "Decisions are not complete — the blocker list below links to every open item."
+        : error.message
+    );
+    await refreshReview().catch(() => {});
   }
 });
 
-for (const id of ["#review-model", "#review-lane", "#review-source-section", "#review-decision-state", "#review-price-state"]) {
+const REVIEW_FILTER_IDS = [
+  "#review-source-section",
+  "#review-decision-state",
+  "#review-price-state",
+  "#review-price-presence",
+  "#review-workbook-ref",
+  "#review-section-state",
+];
+
+function resetReviewFilters() {
+  for (const id of REVIEW_FILTER_IDS) $(id).value = "";
+}
+
+for (const id of ["#review-model", "#review-lane", ...REVIEW_FILTER_IDS]) {
   $(id).addEventListener("change", () => {
-    if (id === "#review-model" || id === "#review-lane") {
-      $("#review-source-section").value = "";
-      $("#review-decision-state").value = "";
-      $("#review-price-state").value = "";
-    }
+    if (id === "#review-model" || id === "#review-lane") resetReviewFilters();
     refreshReview().catch((error) => showError(error.message));
   });
 }
