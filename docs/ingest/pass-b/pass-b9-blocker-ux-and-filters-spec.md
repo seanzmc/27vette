@@ -2,6 +2,11 @@
 
 Status: approved by Sean 2026-07-07 (chat message enumerating scope); implemented same day.
 
+Follow-up: Sean's 2026-07-07 field test found the live blocker panel useful but
+too visually persistent. The panel is now a collapsible `<details>` element and
+remembers collapsed/open state across review refreshes while decisions are being
+saved.
+
 Sean's testing friction after B.5–B.8: the Standard Equipment lane still showed
 priced rows, the review filters were too thin to work a big lane down, and
 blockers only surfaced as an error string after pressing "Mark decisions
@@ -40,6 +45,8 @@ complete" — with no way to jump to the offending row.
      models stage. Other selected models with blockers get a switch link.
    - Every decision save already refetches progress (`refreshReview`), so a
      resolved blocker disappears without further action.
+   - 2026-07-07 follow-up: the panel can be collapsed/expanded so it does not
+     dominate the review layout while working through a lane.
 
 ## Non-goals
 

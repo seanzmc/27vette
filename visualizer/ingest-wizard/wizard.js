@@ -766,6 +766,7 @@ const reviewState = {
   lastBatch: null, // {batchId, count, queueKey}
   lastBulkNote: "",
   splitShowAll: false,
+  blockerCollapsed: false,
 };
 
 /* Lanes whose queue is one row per candidate — they share the row-level
@@ -989,11 +990,18 @@ function renderBlockerPanel() {
       <div class="blocker-chips">${inline}${overflow}</div>
     </div>`;
   });
-  container.innerHTML = `<div class="blocker-panel">
-    <div class="blocker-head"><b>${blockers.length}</b> item${blockers.length === 1 ? "" : "s"} block${blockers.length === 1 ? "s" : ""} completion for <b>${escapeHtml(currentModel)}</b> — click any item to jump to it. The list refreshes as you save decisions.</div>
-    ${blocks.join("")}
-    ${otherModelButtons ? `<div class="blocker-head">Other models with blockers: ${otherModelButtons}</div>` : ""}
-  </div>`;
+  const openAttr = reviewState.blockerCollapsed ? "" : " open";
+  container.innerHTML = `<details class="blocker-panel"${openAttr}>
+    <summary class="blocker-summary">
+      <span><b>${blockers.length}</b> item${blockers.length === 1 ? "" : "s"} block${blockers.length === 1 ? "s" : ""} completion for <b>${escapeHtml(currentModel)}</b></span>
+      <span class="blocker-toggle-hint">click to ${reviewState.blockerCollapsed ? "show" : "hide"}</span>
+    </summary>
+    <div class="blocker-body">
+      <div class="blocker-head">Click any item to jump to it. The list refreshes as you save decisions.</div>
+      ${blocks.join("")}
+      ${otherModelButtons ? `<div class="blocker-head">Other models with blockers: ${otherModelButtons}</div>` : ""}
+    </div>
+  </details>`;
 }
 
 async function jumpToLane(lane, { rpo = "" } = {}) {
@@ -1010,6 +1018,14 @@ async function jumpToLane(lane, { rpo = "" } = {}) {
 $("#review-blockers").addEventListener("click", async (event) => {
   clearError();
   try {
+    const summary = event.target.closest(".blocker-summary");
+    if (summary) {
+      window.setTimeout(() => {
+        const panel = summary.closest(".blocker-panel");
+        if (panel) reviewState.blockerCollapsed = !panel.open;
+      }, 0);
+      return;
+    }
     const switchModel = event.target.closest(".blocker-switch-model");
     if (switchModel) {
       $("#review-model").value = switchModel.dataset.model;

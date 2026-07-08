@@ -165,9 +165,13 @@ tr.evidence-row td { background: var(--panel-2); }
 .blocker-panel {
   border: 1px solid var(--line); border-left: 3px solid var(--red);
   border-radius: 8px; background: var(--panel); padding: 10px 14px;
-  margin: 8px 0 14px; display: flex; flex-direction: column; gap: 8px;
+  margin: 8px 0 14px;
 }
 .blocker-panel-ok { border-left-color: var(--green); }
+.blocker-summary { cursor: pointer; display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.blocker-summary::marker { color: var(--muted); }
+.blocker-toggle-hint { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.blocker-body { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
 .blocker-head { font-size: 13px; }
 .blocker-group { font-size: 13px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .blocker-chips { display: flex; flex-wrap: wrap; gap: 4px; width: 100%; }
