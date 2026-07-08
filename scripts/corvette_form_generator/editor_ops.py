@@ -189,6 +189,20 @@ EDITOR_SHEET_META: dict[str, dict] = {
         "enums": {},
         "refs": {},
     },
+    "default_selection_rules": {
+        "key": ("model_key", "rule_id"),
+        "types": {"priority": "int", "active": "bool"},
+        "enums": {
+            "condition_type": (
+                "always",
+                "unless_selected_rpo",
+                "unless_selected_section",
+                "when_selected_unless_selected_section",
+            ),
+            "display_behavior": ("", "default_selected"),
+        },
+        "refs": {},
+    },
     "runtime_steps_meta": {
         "key": ("model_key", "step_key"),
         "types": {"runtime_order": "int", "active": "bool"},
@@ -230,6 +244,7 @@ GLOBAL_SHEET_FAMILIES: dict[str, str] = {
     "model_workbook_sources": "model_workbook_sources",
     "model_registry_promotion": "model_registry_promotion",
     "model_interior_scope": "model_interior_scope",
+    "default_selection_rules": "default_selection_rules",
     "runtime_steps": "runtime_steps_meta",
     "section_presentation": "section_presentation_meta",
     "context_section_master": "context_section_master_meta",

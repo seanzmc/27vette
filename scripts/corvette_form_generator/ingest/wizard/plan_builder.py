@@ -96,6 +96,26 @@ RELATIONSHIP_KIND_TO_RULE_TYPE = {
     "included_with": "includes",
 }
 
+BLOCKING_GAP_KINDS = {
+    "presentation_missing",
+    "missing_mandatory_decision",
+    "no_variants_mapped",
+    "option_display_order_missing",
+    "option_display_order_collision",
+    "price_rule_unresolved_required",
+    "rule_group_unresolved_required",
+    "relationship_option_identity_unresolved",
+    "relationship_target_missing",
+    "relationship_unmappable",
+    "exclusive_members_missing",
+    "exterior_paint_rows_missing_required",
+    "model_interior_scope_missing_required",
+    "model_interior_scope_conflict",
+    "default_selection_rules_missing",
+    "default_selection_rule_unresolved_required",
+    "missing_template",
+}
+
 
 class PlanGap:
     """Named open item the plan cannot express — carried, never silent."""
@@ -115,6 +135,15 @@ def slug_rpo(rpo: str) -> str:
 def _workbook_context(workbook_path: Path, targets: list[str]) -> dict[str, Any]:
     wb = load_workbook(workbook_path, read_only=True, data_only=True)
     try:
+        global_sheets = {
+            "asset_map",
+            "color_overrides",
+            "default_selection_rules",
+            "interior_components",
+            "model_interior_scope",
+        }
+        for target in targets:
+            global_sheets.add(MODEL_PLAN_CONFIG[target]["interiorSheet"])
         context: dict[str, Any] = {
             "sheetnames": list(wb.sheetnames),
             "model_master": rows_from_sheet(wb, "model_master"),
@@ -123,7 +152,11 @@ def _workbook_context(workbook_path: Path, targets: list[str]) -> dict[str, Any]
             "model_workbook_sources": rows_from_sheet(wb, "model_workbook_sources"),
             "model_registry_promotion": rows_from_sheet(wb, "model_registry_promotion"),
             "existing_rows": {},
+            "global_rows": {},
         }
+        for sheet in sorted(global_sheets):
+            if sheet in wb.sheetnames:
+                context["global_rows"][sheet] = rows_from_sheet(wb, sheet)
         for target in targets:
             config = MODEL_PLAN_CONFIG[target]
             for _, suffix in MODEL_SHEET_ROLES:
@@ -163,6 +196,55 @@ def _status_for_variant(candidate: dict[str, Any], model_code_suffix: str, trim:
             value = status.get("status")
             return value if value in ("standard", "available", "unavailable") else None
     return None
+
+
+def _clean(value: Any) -> str:
+    return str(value or "").strip()
+
+
+def _norm(value: Any) -> str:
+    if isinstance(value, bool):
+        return "True" if value else "False"
+    return _clean(value)
+
+
+def _intish(value: Any, default: int = 0) -> int:
+    if isinstance(value, bool):
+        return default
+    if isinstance(value, int):
+        return value
+    text = _clean(value)
+    return int(text) if text.lstrip("-").isdigit() else default
+
+
+def _rpo_token(value: Any) -> str:
+    return _clean(value).upper()
+
+
+def _listish(value: Any) -> list[Any]:
+    if value in (None, ""):
+        return []
+    if isinstance(value, list):
+        return value
+    if isinstance(value, tuple):
+        return list(value)
+    return [value]
+
+
+def _planned_relationship_rpos(records: dict[str, dict[str, Any]]) -> set[str]:
+    rpos: set[str] = set()
+    for record in records.values():
+        if record.get("resolution") != "approved_for_plan":
+            continue
+        payload = record.get("payload") or {}
+        if record.get("lane") == "relationship" and record.get("action") == "create_relationship_candidate":
+            source = _rpo_token(payload.get("sourceRpo"))
+            if source:
+                rpos.add(source)
+            rpos.update(_rpo_token(rpo) for rpo in payload.get("targetRpos") or [] if _rpo_token(rpo))
+        if record.get("lane") == "exclusive_group" and record.get("action") == "create_exclusive_group":
+            rpos.update(_rpo_token(rpo) for rpo in payload.get("members") or [] if _rpo_token(rpo))
+    return rpos
 
 
 def plan_summary(plan: dict[str, Any]) -> dict[str, Any]:
@@ -285,8 +367,44 @@ def build_plan(
                 deferrals.append(
                     {"model": model, "groupKey": record.get("groupKey", ""), "payload": record.get("payload", {})}
                 )
+                kind = (record.get("payload") or {}).get("kind")
+                group_key = record.get("groupKey", "")
+                if kind == "color" or "color-overrides" in group_key:
+                    gaps.append(
+                        {"model": model, "kind": "color_overrides_deferred", "detail": group_key, "decisionId": record["decisionId"]}
+                    )
+                elif kind == "asset" or "asset-images" in group_key:
+                    gaps.append(
+                        {"model": model, "kind": "asset_map_deferred", "detail": group_key, "decisionId": record["decisionId"]}
+                    )
+                elif kind == "component" or "components" in group_key:
+                    gaps.append(
+                        {"model": model, "kind": "interior_components_deferred", "detail": group_key, "decisionId": record["decisionId"]}
+                    )
 
         variant_map = _variant_map(context, model)
+        options_sheet = config["sheetPrefix"] + "options"
+        ovs_sheet = config["sheetPrefix"] + "ovs"
+        existing_options = context["existing_rows"].get(options_sheet, [])
+        existing_option_by_rpo = {
+            _rpo_token(row.get("rpo")): row
+            for row in existing_options
+            if _rpo_token(row.get("rpo")) and row.get("option_id")
+        }
+        approved_planned_rpos = {
+            _rpo_token(candidate["rpo"] or candidate["refOnlyRpo"])
+            for candidate in section_candidates
+            if (
+                by_candidate_lane.get(("section", candidate["candidateId"]))
+                and by_candidate_lane[("section", candidate["candidateId"])]["resolution"] == "approved_for_plan"
+            )
+        }
+        relationship_rpos = _planned_relationship_rpos(model_decisions)
+        retained_existing_option_ids = {
+            _clean(existing_option_by_rpo[rpo].get("option_id"))
+            for rpo in relationship_rpos - approved_planned_rpos
+            if rpo in existing_option_by_rpo
+        }
         if orderable and not variant_map:
             # Options without any OVS rows are unusable — fail at plan time.
             gaps.append(
@@ -463,6 +581,10 @@ def build_plan(
                 key = {k: row.get(k, "") for k in keycols}
                 if not all(str(v).strip() for v in key.values()):
                     continue
+                if suffix == "options" and _clean(row.get("option_id")) in retained_existing_option_ids:
+                    continue
+                if suffix == "ovs" and _clean(row.get("option_id")) in retained_existing_option_ids:
+                    continue
                 op(
                     stage2,
                     {"action": "delete", "sheet": sheet, "key": key},
@@ -480,9 +602,17 @@ def build_plan(
             for record in model_decisions.values()
             if record["lane"] == "duplicate" and record.get("groupKey")
         }
-        options_sheet = config["sheetPrefix"] + "options"
-        ovs_sheet = config["sheetPrefix"] + "ovs"
         option_id_by_rpo: dict[str, str] = {}
+        for rpo, row in existing_option_by_rpo.items():
+            option_id = _clean(row.get("option_id"))
+            if option_id and option_id in retained_existing_option_ids:
+                option_id_by_rpo[rpo] = option_id
+        existing_default_rule_ids = {
+            _clean(row.get("rule_id"))
+            for row in context["global_rows"].get("default_selection_rules", [])
+            if row.get("model_key") == model and row.get("rule_id")
+        }
+        used_default_rule_ids = set(existing_default_rule_ids)
         # Seed with ids already on the scaffold sheets: editor_ops rejects an
         # add whose key still exists at validation time, even with a delete of
         # that key in the same batch — new rows must take fresh ids.
@@ -503,7 +633,85 @@ def build_plan(
             used_option_ids.add(oid)
             return oid
 
-        display_order = 10
+        def resolve_option_id_by_rpo(rpo: Any, record: dict[str, Any], role: str) -> str | None:
+            token = _rpo_token(rpo)
+            if not token:
+                gaps.append(
+                    {
+                        "model": model,
+                        "kind": "relationship_option_identity_unresolved",
+                        "detail": f"{record['groupKey']}: blank {role} RPO",
+                        "decisionId": record["decisionId"],
+                    }
+                )
+                return None
+            option_id = option_id_by_rpo.get(token)
+            if option_id:
+                return option_id
+            detail = f"{record['groupKey']}: {role} RPO {token} is not in planned options"
+            if token in existing_option_by_rpo:
+                detail += " and its existing row is not retained in this plan"
+            gaps.append(
+                {
+                    "model": model,
+                    "kind": "relationship_option_identity_unresolved",
+                    "detail": detail,
+                    "decisionId": record["decisionId"],
+                }
+            )
+            return None
+
+        def default_rule_id_for(rpo: str) -> str:
+            base = f"default_{slug_rpo(rpo)}"
+            candidate = base
+            n = 1
+            while candidate in used_default_rule_ids:
+                n += 1
+                candidate = f"{base}_{n:03d}"
+            used_default_rule_ids.add(candidate)
+            return candidate
+
+        used_display_orders: set[tuple[str, int]] = set()
+        next_display_order_by_section: dict[str, int] = {}
+        for existing in existing_options:
+            section_id = _clean(existing.get("section_id"))
+            order = _intish(existing.get("display_order"), 0)
+            if section_id and order:
+                used_display_orders.add((section_id, order))
+                next_display_order_by_section[section_id] = max(
+                    next_display_order_by_section.get(section_id, 0), order
+                )
+
+        def allocate_display_order(section_id: str, requested: Any = None) -> int:
+            if requested not in (None, ""):
+                return _intish(requested, 0)
+            current = next_display_order_by_section.get(section_id, 0)
+            return ((current // 10) + 1) * 10
+
+        def reserve_display_order(section_id: str, order: int, decision_id: str) -> None:
+            if not section_id or not order:
+                gaps.append(
+                    {
+                        "model": model,
+                        "kind": "option_display_order_missing",
+                        "detail": f"section={section_id!r} order={order!r}",
+                        "decisionId": decision_id,
+                    }
+                )
+                return
+            if (section_id, order) in used_display_orders:
+                gaps.append(
+                    {
+                        "model": model,
+                        "kind": "option_display_order_collision",
+                        "detail": f"{options_sheet}: {section_id} display_order {order}",
+                        "decisionId": decision_id,
+                    }
+                )
+                return
+            used_display_orders.add((section_id, order))
+            next_display_order_by_section[section_id] = max(next_display_order_by_section.get(section_id, 0), order)
+
         for candidate in section_candidates:
             rpo = candidate["rpo"] or candidate["refOnlyRpo"]
             duplicate = duplicate_decision_by_rpo.get(rpo)
@@ -599,6 +807,9 @@ def build_plan(
             if duplicate:
                 decision_ids.append(duplicate["decisionId"])
             section_payload = section_decision.get("payload") or {}
+            section_id = _clean(section_payload.get("sectionId"))
+            display_order = allocate_display_order(section_id, section_payload.get("displayOrder"))
+            reserve_display_order(section_id, display_order, section_decision["decisionId"])
             row = {
                 "option_id": oid,
                 "rpo": rpo,
@@ -606,7 +817,7 @@ def build_plan(
                 "option_name": split.get("name") or candidate["description"].split("\n")[0],
                 "description": split.get("description") or None,
                 "detail_raw": split.get("detailRaw") or candidate["description"],
-                "section_id": section_payload.get("sectionId"),
+                "section_id": section_id,
                 "display_order": display_order,
                 # Reviewer-set flags (field note 7): display-only rows carry
                 # selectable=False; inactive rows are written but hidden.
@@ -616,7 +827,6 @@ def build_plan(
                 row["selectable"] = False
             op(stage2, {"action": "add", "sheet": options_sheet, "key": {"option_id": oid}, "row": row}, decision_ids)
             primary_ref_by_rpo[rpo] = stage2[-1]["_planRef"]
-            display_order += 10
             status_ids = []
             status_decision = by_candidate_lane.get(("status_nuance", candidate["candidateId"]))
             if status_decision:
@@ -694,6 +904,72 @@ def build_plan(
                     [record["decisionId"]],
                 )
 
+        # Global model interior scope rows are keyed rows, not clean-reprocess
+        # model sheets. Compare existing rows and emit only add/update/no-op.
+        interior_sheet = config["interiorSheet"]
+        interior_rows = context["global_rows"].get(interior_sheet, [])
+        scope_rows = context["global_rows"].get("model_interior_scope", [])
+        if not interior_rows:
+            gaps.append(
+                {
+                    "model": model,
+                    "kind": "model_interior_scope_missing_required",
+                    "detail": f"{interior_sheet} has no rows available for scope planning",
+                    "decisionId": "",
+                }
+            )
+        else:
+            trims = {trim.upper() for trim, _body in variant_map}
+            existing_scope_by_key = {
+                (_clean(row.get("model_key")), _clean(row.get("interior_id")), _clean(row.get("trim_level"))): row
+                for row in scope_rows
+                if row.get("model_key") and row.get("interior_id") and row.get("trim_level")
+            }
+            template_scope_by_key = {
+                (_clean(row.get("interior_id")), _clean(row.get("trim_level"))): row
+                for row in scope_rows
+                if row.get("interior_id") and row.get("trim_level")
+            }
+            for interior in interior_rows:
+                interior_id = _clean(interior.get("interior_id"))
+                trim_level = _clean(interior.get("Trim") or interior.get("trim_level"))
+                if not interior_id or not trim_level or (trims and trim_level.upper() not in trims):
+                    continue
+                template = template_scope_by_key.get((interior_id, trim_level))
+                if not template:
+                    gaps.append(
+                        {
+                            "model": model,
+                            "kind": "model_interior_scope_missing_required",
+                            "detail": f"{interior_sheet}: no model_interior_scope template for {interior_id} / {trim_level}",
+                            "decisionId": "",
+                        }
+                    )
+                    continue
+                desired = dict(template)
+                desired.update(
+                    {
+                        "model_key": model,
+                        "interior_id": interior_id,
+                        "trim_level": trim_level,
+                        "active": True,
+                        "requires_option_id": interior.get("included_option_id") or template.get("requires_option_id"),
+                        "notes": template.get("notes") or "Workbook-owned interior trim scope metadata.",
+                    }
+                )
+                key = {"model_key": model, "interior_id": interior_id, "trim_level": trim_level}
+                existing = existing_scope_by_key.get((model, interior_id, trim_level))
+                if existing is None:
+                    op(stage2, {"action": "add", "sheet": "model_interior_scope", "key": key, "row": desired}, [])
+                    continue
+                changed = {
+                    column: value
+                    for column, value in desired.items()
+                    if column not in key and _norm(existing.get(column)) != _norm(value)
+                }
+                if changed:
+                    op(stage2, {"action": "update", "sheet": "model_interior_scope", "key": key, "row": changed}, [])
+
         # Relationships -> rule_mapping rows.
         rule_sheet = config["sheetPrefix"] + "rule_mapping"
         rule_counter = 1
@@ -704,7 +980,7 @@ def build_plan(
                 continue  # needs_product_decision / reconciliation notes are report items
             payload = record.get("payload") or {}
             rule_type = RELATIONSHIP_KIND_TO_RULE_TYPE.get(payload.get("kind", ""))
-            source_oid = option_id_by_rpo.get(str(payload.get("sourceRpo") or "").upper())
+            source_oid = resolve_option_id_by_rpo(payload.get("sourceRpo"), record, "source")
             if rule_type is None or source_oid is None:
                 gaps.append(
                     {
@@ -716,16 +992,8 @@ def build_plan(
                 )
                 continue
             for target_rpo in payload.get("targetRpos") or []:
-                target_oid = option_id_by_rpo.get(str(target_rpo).upper())
+                target_oid = resolve_option_id_by_rpo(target_rpo, record, "target")
                 if target_oid is None:
-                    gaps.append(
-                        {
-                            "model": model,
-                            "kind": "relationship_target_missing",
-                            "detail": f"{record['groupKey']}: target {target_rpo} not in planned options",
-                            "decisionId": record["decisionId"],
-                        }
-                    )
                     continue
                 rid = f"rule_{slug_rpo(payload.get('sourceRpo', ''))}_{rule_counter:03d}"
                 rule_counter += 1
@@ -753,7 +1021,7 @@ def build_plan(
             if record["lane"] != "exclusive_group" or record["resolution"] != "approved_for_plan":
                 continue
             payload = record.get("payload") or {}
-            members = [option_id_by_rpo.get(str(m).upper()) for m in payload.get("members") or []]
+            members = [resolve_option_id_by_rpo(m, record, "exclusive member") for m in payload.get("members") or []]
             missing = [m for m, oid in zip(payload.get("members") or [], members) if oid is None]
             members = [m for m in members if m]
             if missing or len(members) < 2:
@@ -791,6 +1059,65 @@ def build_plan(
                         "sheet": excl_members_sheet,
                         "key": {"group_id": gid, "option_id": member},
                         "row": {"group_id": gid, "option_id": member, "display_order": order, "active": True},
+                    },
+                    [record["decisionId"]],
+                )
+            default_rpos = _listish(payload.get("defaultRpos") or payload.get("defaultSelectedRpos"))
+            if payload.get("defaultRpo"):
+                default_rpos = [*default_rpos, payload.get("defaultRpo")]
+            if payload.get("requiresDefaultSelection") and not default_rpos:
+                gaps.append(
+                    {
+                        "model": model,
+                        "kind": "default_selection_rules_missing",
+                        "detail": f"{record['groupKey']}: default selection required but no default RPO supplied",
+                        "decisionId": record["decisionId"],
+                    }
+                )
+                continue
+            if default_rpos and "default_selection_rules" not in sheetnames:
+                gaps.append(
+                    {
+                        "model": model,
+                        "kind": "default_selection_rules_missing",
+                        "detail": "default_selection_rules sheet is absent",
+                        "decisionId": record["decisionId"],
+                    }
+                )
+                continue
+            for default_rpo in default_rpos:
+                target_oid = resolve_option_id_by_rpo(default_rpo, record, "default selection target")
+                if target_oid is None:
+                    gaps.append(
+                        {
+                            "model": model,
+                            "kind": "default_selection_rule_unresolved_required",
+                            "detail": f"{record['groupKey']}: default RPO {default_rpo} did not resolve to an option_id",
+                            "decisionId": record["decisionId"],
+                        }
+                    )
+                    continue
+                rid = default_rule_id_for(_rpo_token(default_rpo))
+                op(
+                    stage2,
+                    {
+                        "action": "add",
+                        "sheet": "default_selection_rules",
+                        "key": {"model_key": model, "rule_id": rid},
+                        "row": {
+                            "model_key": model,
+                            "rule_id": rid,
+                            "target_option_id": target_oid,
+                            "condition_type": "always",
+                            "condition_id": None,
+                            "body_style_scope": "*",
+                            "trim_level_scope": "*",
+                            "variant_scope": "*",
+                            "priority": 10,
+                            "active": True,
+                            "notes": f"Default selection from ingest review group {record['groupKey']}.",
+                            "display_behavior": "default_selected",
+                        },
                     },
                     [record["decisionId"]],
                 )
@@ -837,14 +1164,7 @@ def build_plan(
         sheet_counts = per_sheet.setdefault(item["sheet"], {})
         sheet_counts[item["action"]] = sheet_counts.get(item["action"], 0) + 1
 
-    # Presentation gaps are hard failures (runtime_metadata requirement moved
-    # to plan time per the approved spec); a model with no resolvable variants
-    # would write options with zero OVS rows, so it blocks too.
-    blocking = [
-        gap
-        for gap in gaps
-        if gap["kind"] in ("presentation_missing", "missing_mandatory_decision", "no_variants_mapped")
-    ]
+    blocking = [gap for gap in gaps if gap["kind"] in BLOCKING_GAP_KINDS]
 
     return {
         "schemaVersion": SCHEMA_VERSION_C,

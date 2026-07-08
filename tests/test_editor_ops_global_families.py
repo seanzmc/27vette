@@ -83,6 +83,57 @@ class GlobalFamilyOpsTest(unittest.TestCase):
         )
         self.assertTrue(result["ok"], result)
 
+    def test_default_selection_rules_global_family_add(self) -> None:
+        result = self.run_batch(
+            [
+                {
+                    "action": "add",
+                    "sheet": "default_selection_rules",
+                    "key": {"model_key": "zr1", "rule_id": "default_pdb"},
+                    "row": {
+                        "model_key": "zr1",
+                        "rule_id": "default_pdb",
+                        "target_option_id": "opt_pdb_001",
+                        "condition_type": "always",
+                        "body_style_scope": "*",
+                        "trim_level_scope": "*",
+                        "variant_scope": "*",
+                        "priority": 10,
+                        "active": True,
+                        "display_behavior": "default_selected",
+                    },
+                }
+            ],
+            write=True,
+        )
+        self.assertTrue(result["ok"], result)
+        wb = load_workbook(self.path, read_only=True)
+        rows = list(wb["default_selection_rules"].iter_rows(values_only=True))
+        wb.close()
+        self.assertIn("default_pdb", [row[1] for row in rows])
+
+    def test_default_selection_rules_rejects_bad_display_behavior(self) -> None:
+        result = self.run_batch(
+            [
+                {
+                    "action": "add",
+                    "sheet": "default_selection_rules",
+                    "key": {"model_key": "zr1", "rule_id": "bad_default"},
+                    "row": {
+                        "model_key": "zr1",
+                        "rule_id": "bad_default",
+                        "target_option_id": "opt_pdb_001",
+                        "condition_type": "always",
+                        "priority": 10,
+                        "active": True,
+                        "display_behavior": "default-selected",
+                    },
+                }
+            ]
+        )
+        self.assertFalse(result["ok"])
+        self.assertTrue(any("display_behavior" in error for error in result["errors"]))
+
     def test_global_family_key_and_type_enforcement(self) -> None:
         result = self.run_batch(
             [

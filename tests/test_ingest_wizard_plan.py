@@ -189,6 +189,97 @@ class PlanFlowTest(unittest.TestCase):
         members = [i for i in items if i["sheet"] == "zr1_exclusive_members" and i["action"] == "add"]
         self.assertEqual(len(members), 2)
 
+    def test_default_selection_rule_emits_from_reviewed_exclusive_payload(self) -> None:
+        extra = [
+            {
+                "model": "zr1",
+                "lane": "exclusive_group",
+                "groupKey": "zr1-wheel-pack",
+                "action": "create_exclusive_group",
+                "payload": {"members": ["PDB", "C2Z"], "defaultRpo": "PDB"},
+                "resolution": "approved_for_plan",
+            }
+        ]
+        self.complete_all(zr1_extra=extra)
+        plan = build_plan(**self.plan_inputs())
+        self.assertTrue(plan["valid"], plan["report"]["blockingGaps"])
+        row = next(
+            item["row"]
+            for item in plan["stage2"]["items"]
+            if item["sheet"] == "default_selection_rules" and item["action"] == "add"
+        )
+        self.assertEqual(row["model_key"], "zr1")
+        self.assertEqual(row["target_option_id"], "opt_pdb_002")
+        self.assertEqual(row["condition_type"], "always")
+        self.assertEqual(row["display_behavior"], "default_selected")
+
+    def test_required_default_selection_without_default_blocks_plan(self) -> None:
+        extra = [
+            {
+                "model": "zr1",
+                "lane": "exclusive_group",
+                "groupKey": "zr1-wheel-pack",
+                "action": "create_exclusive_group",
+                "payload": {"members": ["PDB", "C2Z"], "requiresDefaultSelection": True},
+                "resolution": "approved_for_plan",
+            }
+        ]
+        self.complete_all(zr1_extra=extra)
+        plan = build_plan(**self.plan_inputs())
+        self.assertFalse(plan["valid"])
+        self.assertIn("default_selection_rules_missing", {gap["kind"] for gap in plan["report"]["blockingGaps"]})
+
+    def test_relationship_resolves_against_retained_existing_option_rows(self) -> None:
+        from openpyxl import load_workbook
+
+        wb = load_workbook(self.master)
+        wb["zr1_options"].append(["opt_tyz_001", "TYZ", "", "Existing target", "", "", "sec_whee_001", "", 30, True, ""])
+        wb.save(self.master)
+        wb.close()
+        extra = [
+            {
+                "model": "zr1",
+                "lane": "relationship",
+                "groupKey": "pdb-excludes-tyz",
+                "action": "create_relationship_candidate",
+                "payload": {"kind": "not_available_with", "sourceRpo": "PDB", "targetRpos": ["TYZ"]},
+                "resolution": "approved_for_plan",
+            }
+        ]
+        self.complete_all(zr1_extra=extra)
+        plan = build_plan(**self.plan_inputs())
+        self.assertTrue(plan["valid"], plan["report"]["blockingGaps"])
+        deletes = [
+            item
+            for item in plan["stage2"]["items"]
+            if item["sheet"] == "zr1_options" and item["action"] == "delete" and item["key"].get("option_id") == "opt_tyz_001"
+        ]
+        self.assertEqual(deletes, [])
+        rule = next(item for item in plan["stage2"]["items"] if item["sheet"] == "zr1_rule_mapping" and item["action"] == "add")
+        self.assertEqual(rule["row"]["target_id"], "opt_tyz_001")
+
+    def test_model_interior_scope_uses_existing_row_strategy(self) -> None:
+        self.complete_all()
+        plan = build_plan(**self.plan_inputs())
+        scope_ops = [item for item in plan["stage2"]["items"] if item["sheet"] == "model_interior_scope"]
+        self.assertFalse(
+            any(item["key"] == {"model_key": "zr1", "interior_id": "1LZ_AQ9_HTA", "trim_level": "1LZ"} for item in scope_ops)
+        )
+        self.assertTrue(
+            any(
+                item["action"] == "add"
+                and item["key"] == {"model_key": "zr1", "interior_id": "3LZ_AQ9_HTA", "trim_level": "3LZ"}
+                for item in scope_ops
+            )
+        )
+        self.assertTrue(
+            any(
+                item["action"] == "add"
+                and item["key"] == {"model_key": "zr1x", "interior_id": "1LZ_AQ9_HTA", "trim_level": "1LZ"}
+                for item in scope_ops
+            )
+        )
+
     def test_legacy_standard_equipment_inclusion_becomes_standard_option(self) -> None:
         se_queue = self.store.review_queue(self.run_id, "zr1", "standard_equipment")
         target = se_queue["candidates"][0]

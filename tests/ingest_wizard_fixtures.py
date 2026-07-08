@@ -170,6 +170,13 @@ def build_master_workbook(path: Path) -> Path:
         ],
     )
     _table(wb, "z06_ovs", ["option_id", "variant_id", "status"], [["opt_pdb_001", "1lz_h07", "available"]])
+    _table(wb, "z06_rule_mapping", ["rule_id", "source_id", "rule_type", "target_id", "original_detail_raw", "body_style_scope", "runtime_action", "disabled_reason"], [])
+    _table(wb, "z06_price_rules", ["price_rule_id", "condition_option_id", "price_rule_type", "target_option_id", "price_value", "body_style_scope", "trim_level_scope", "notes"], [])
+    _table(wb, "z06_rule_groups", ["group_id", "group_type", "source_id", "body_style_scope", "trim_level_scope", "variant_scope", "disabled_reason", "active", "notes"], [])
+    _table(wb, "z06_rule_group_members", ["group_id", "target_id", "display_order", "active"], [])
+    _table(wb, "z06_exclusive_groups", ["group_id", "selection_mode", "active", "notes"], [])
+    _table(wb, "z06_exclusive_members", ["group_id", "option_id", "display_order", "active"], [])
+    _table(wb, "z06_variant_overrides", ["option_id", "variant_id", "selectable", "display_behavior", "section_id", "active", "note"], [])
     # The inactive source's sheet must actually exist with a conflicting row,
     # so the active-flag filter is the only thing excluding it.
     _table(
@@ -194,6 +201,43 @@ def build_master_workbook(path: Path) -> Path:
             # standard-equipment queue (unless they carry a price — spec B9).
             ["sec_std_001", "Standard Equipment", "informational", False, 3, "included", "standard"],
         ],
+    )
+    interior_headers = [
+        "interior_id", "Interior Name", "Material", "Price", "Detail from Disclosure", "Color Overrides",
+        "Trim", "Seat", "Interior Code", "Suede", "Stitch", "Two Tone", "section_id",
+        "active_for_stingray", "requires_r6x", "included_option_id",
+    ]
+    _table(
+        wb,
+        "LZ_Interiors",
+        interior_headers,
+        [
+            ["1LZ_AQ9_HTA", "Jet Black", "Mulan leather", 0, "", "", "1LZ", "AQ9", "HTA", "", "", "", "sec_lzint_001", False, False, ""],
+            ["3LZ_AQ9_HTA", "Jet Black", "Napa leather", 0, "", "", "3LZ", "AQ9", "HTA", "", "", "", "sec_lzint_001", False, False, ""],
+        ],
+    )
+    scope_headers = [
+        "model_key", "interior_id", "trim_level", "active", "requires_option_id", "notes",
+        "interior_seat_label", "interior_color_family", "interior_material_family", "interior_variant_label",
+        "interior_group_display_order", "interior_material_display_order", "interior_choice_display_order",
+        "interior_hierarchy_levels", "interior_parent_group_label", "interior_leaf_label", "interior_reference_order",
+        "grouping_source",
+    ]
+    _table(
+        wb,
+        "model_interior_scope",
+        scope_headers,
+        [
+            ["z06", "1LZ_AQ9_HTA", "1LZ", "True", "", "Workbook-owned interior trim scope metadata.", "AQ9 GT1 Bucket Seats", "HTA Jet Black", "Mulan leather", "HTA Jet Black", 1, 1, 1, '["1LZ", "AQ9 GT1 Bucket Seats", "HTA Jet Black"]', "AQ9 GT1 Bucket Seats", "HTA Jet Black", 1, "fixture"],
+            ["z06", "3LZ_AQ9_HTA", "3LZ", "True", "", "Workbook-owned interior trim scope metadata.", "AQ9 GT1 Bucket Seats", "HTA Jet Black", "Napa leather", "HTA Jet Black", 2, 2, 2, '["3LZ", "AQ9 GT1 Bucket Seats", "HTA Jet Black"]', "AQ9 GT1 Bucket Seats", "HTA Jet Black", 2, "fixture"],
+            ["zr1", "1LZ_AQ9_HTA", "1LZ", "True", "", "Workbook-owned interior trim scope metadata.", "AQ9 GT1 Bucket Seats", "HTA Jet Black", "Mulan leather", "HTA Jet Black", 1, 1, 1, '["1LZ", "AQ9 GT1 Bucket Seats", "HTA Jet Black"]', "AQ9 GT1 Bucket Seats", "HTA Jet Black", 1, "fixture"],
+        ],
+    )
+    _table(
+        wb,
+        "default_selection_rules",
+        ["model_key", "rule_id", "target_option_id", "condition_type", "condition_id", "body_style_scope", "trim_level_scope", "variant_scope", "priority", "active", "notes", "display_behavior"],
+        [],
     )
     # Headers mirror the live workbook (probe 2026-07-06).
     presentation_rows = {
