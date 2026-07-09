@@ -1,6 +1,6 @@
 # Canonical-row compiler and exception queue — production design
 
-Status: Proposed for Sean review. Direction approved 2026-07-09; implementation and any workbook write remain unapproved. Reasoning level for the implementation plan: high.
+Status: Direction approved 2026-07-09. Milestone 0 safety closure was implemented and proved on 2026-07-09; Milestone 1 is the next checkpoint. No workbook write, runtime publication, or model promotion is approved. Reasoning level for the implementation plan: high.
 
 ## 0. Decision summary
 
@@ -1039,6 +1039,28 @@ Non-goals for this design implementation:
 
 ## 18. Review gate
 
-Sean's review of this written design is the next checkpoint.
+Sean approved this production design and authorized implementation beginning with the independently reviewable Milestone 0 safety closure.
 
-After approval, create a separate test-first implementation plan beginning with Milestone 0 safety closure. Do not combine the safety closure and the compiler into one unreviewed implementation batch, and do not run a live workbook write as part of either implementation milestone.
+Milestone 0 is complete. The next checkpoint is Milestone 1: the headless canonical-row compiler plus comparator evidence index. Do not combine that compiler work with the exception-queue browser flow, and do not run a live workbook write as part of Milestone 1.
+
+## 19. Milestone 0 implementation closure — 2026-07-09
+
+Milestone 0 closed the current writer before compiler work. The implemented surfaces are the canonical operation/reference/warning/readback path in `scripts/corvette_form_generator/editor_ops.py`; scoped approvals, pre-write authority, and diagnostic eligibility in `scripts/corvette_form_generator/ingest/wizard/session.py`; diagnostic-only CLI/server/browser exposure; model-variant promotion/discovery parity in `scripts/promote_model.py`; and their focused regression suites. `README.md` now includes the promotion test in the Python metadata gate. No dependencies were added.
+
+Fresh real-data proof:
+
+- Historical D.2 run `20260709-003524-650cae` remained immutable (`0a44e44df4cdb5b057fbe2c891863b63369fb4d6b844a9a96391693a62e52b14` tree digest before and after).
+- Fresh ignored run `20260709-184223-960eb1` cloned only D.2 source/profile/selection/decision artifacts, reset to `decisions_complete`, rebuilt the current `pass-c-2` plan, and received only `plan-approval-2` with `scope=dry_run_evidence`.
+- The default CLI dry-run emitted `pass-d-2`, `ok=true`, `status=validated_write_blocked`, and `writeEligibility.eligible=false`. It enumerated the permanently diagnostic plan schema, blank option semantics, option-ID churn, referenced deletes, unconfirmable scaffold warnings, and missing price-rule/rule-group product coverage.
+- Exact temporary-workbook proof covered all 5,771 raw operations and checked all 5,771 prepared effects. `verification.ok=true`, with no readback errors.
+- `stingray_master.xlsx` remained byte-identical and retained the same mtime (`03e8c9671185f238dde7f4bc8e7003da0f74d842d9cc2f76126f938cbb7b54d6`). The run created no `write-approval.json`, `apply-report.json`, workbook edit log, backup, registry publication, runtime publication, or promotion.
+- `form-app/data.js` remained `dd60534734c1330085ea74602515e1ab75aa964d3134c230abe0f26217b79e78`; the tracked generated-artifact tree returned to and finished at `fcafc9f18f4dfc7740eec392319510d487cedb413beca093ef031d185a85c124`. README Node tests temporarily regenerated tracked artifacts as an expected test side effect; those test-created files were restored exactly to `HEAD` and were not committed.
+
+Validation:
+
+- Focused Milestone 0 pytest gate: 221 passed plus 7 subtests in 145.37 seconds.
+- Full Python suite: 492 passed, 6 failed, plus 7 subtests in 272.35 seconds. The six failures reproduce together from the clean task base in 1.83 seconds and are unrelated baseline drift: the present `asset_map-Sync/` legacy directory, three real-workbook lint/compare expectations, one stale Fable last-session fixture expectation, and one Stingray `display_behavior` characterization expectation. This checkpoint did not rewrite those unrelated tests or data.
+- Wizard JavaScript syntax check plus every README Node test surface: 267 passed in 65.31 seconds.
+- Workbook package validation: valid, zero issues. Workbook schema validation: valid, zero errors and zero warnings.
+
+Residual risks are the blockers the safety report intentionally detects rather than repairs: current broad-plan blank flags, identity churn, references, and product coverage. Milestone 1 must replace that plan construction with a deterministic headless compiler and comparator evidence index; it must keep the live workbook and tracked publication surfaces untouched.

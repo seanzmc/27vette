@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-Status: In progress. Approved by Sean on 2026-07-09 through the parent production design. This milestone authorizes safety tooling, tests, and documentation only; it does not authorize any workbook write or model promotion.
+Status: Completed 2026-07-09. Approved by Sean through the parent production design. The completed milestone contains safety tooling, tests, documentation, and read-only evidence only; it did not authorize or perform any workbook write or model promotion.
 
 **Goal:** Make every current pre-production ingest plan diagnostic-only, prove the exact temporary-workbook effects, classify all writer blockers, and close the promotion/discovery parity gap before canonical compiler work begins.
 
@@ -172,7 +172,7 @@ Status: In progress. Approved by Sean on 2026-07-09 through the parent productio
 - Inspect/update if needed: `README.md`
 - Transient only: a fresh ignored run under `form-output/ingest-wizard/`
 
-- [ ] Run all focused Milestone 0 suites:
+- [x] Run all focused Milestone 0 suites:
 
   ```sh
   .venv/bin/python -m pytest \
@@ -190,15 +190,15 @@ Status: In progress. Approved by Sean on 2026-07-09 through the parent productio
     tests/test_schema_validation_metadata.py -q
   ```
 
-- [ ] Run the full Python test suite and relevant Node/static UI tests from the live README. Record every command and result; do not claim a gate without actual output.
+- [x] Run the full Python test suite and relevant Node/static UI tests from the live README. Record every command and result; do not claim a gate without actual output.
 
-- [ ] Create a fresh D.2-equivalent diagnostic run without mutating the historical D.2 artifacts. Approve it only as `dry_run_evidence`, execute the default CLI dry-run against `stingray_master.xlsx`, and capture workbook SHA before/after.
+- [x] Create a fresh D.2-equivalent diagnostic run without mutating the historical D.2 artifacts. Approve it only as `dry_run_evidence`, execute the default CLI dry-run against `stingray_master.xlsx`, and capture workbook SHA before/after.
 
-- [ ] Verify the fresh report has `schemaVersion=pass-d-2`, `ok=true`, `status=validated_write_blocked`, `writeEligibility.eligible=false`, explicit plan/flag/identity/reference/product blockers, exact readback counts, and byte-identical workbook fingerprints. Confirm there is no write approval, apply report, edit log, backup, generated runtime refresh, registry publication, or promotion.
+- [x] Verify the fresh report has `schemaVersion=pass-d-2`, `ok=true`, `status=validated_write_blocked`, `writeEligibility.eligible=false`, explicit plan/flag/identity/reference/product blockers, exact readback counts, and byte-identical workbook fingerprints. Confirm there is no write approval, apply report, edit log, backup, generated runtime refresh, registry publication, or promotion.
 
-- [ ] Update the parent design and this plan with completion date, exact changed surfaces, validation results, residual risks, and the next checkpoint: headless compiler plus comparator evidence index. Remove no historical evidence.
+- [x] Update the parent design and this plan with completion date, exact changed surfaces, validation results, residual risks, and the next checkpoint: headless compiler plus comparator evidence index. Remove no historical evidence.
 
-- [ ] Request a final code review, resolve only in-scope findings, rerun affected gates, and commit the checkpoint with message: `docs(ingest): close milestone zero safety proof`.
+- [x] Request a final code review, resolve only in-scope findings, rerun affected gates, and commit the checkpoint with message: `docs(ingest): close milestone zero safety proof`.
 
 ## Non-goals and Deferred Work
 
@@ -206,3 +206,17 @@ Status: In progress. Approved by Sean on 2026-07-09 through the parent productio
 - Do not repair current D.2 option semantics, identity churn, references, price/rule coverage, or deployment blockers; detect and report them.
 - Do not authorize or exercise live workbook write, generation publication, runtime registry publication, or model promotion.
 - Do not change customer runtime or dealer behavior.
+
+## Completion evidence — 2026-07-09
+
+- Base and branch: `c4ca65babfa580e99e5b5fdbb85f4557e5b7be29` on `ingest-wizard`; clean before proof.
+- Focused gate: exact Task 6 pytest command above -> 221 passed, 7 subtests passed in 145.37 seconds.
+- Full Python gate: `.venv/bin/python -m pytest -q` -> 492 passed, 6 failed, 7 subtests passed in 272.35 seconds. A focused replay of the six failures from the restored clean base reproduced all six in 1.83 seconds: one legacy asset-map directory assertion, three live-workbook lint/compare assertions, one Fable latest-session fixture assertion, and one Stingray source-assembly characterization assertion. They pre-exist this milestone and were not changed.
+- Static/runtime gate: `node --check visualizer/ingest-wizard/wizard.js` plus all 13 README Node test files -> 267 passed in 65.31 seconds.
+- Workbook gates: `validate_workbook_package.py` -> valid/0 issues; `validate_workbook_schema.py` -> valid/0 errors/0 warnings.
+- Fresh proof run: `20260709-184223-960eb1`, cloned from immutable D.2 run `20260709-003524-650cae` using the D.2 allowlist only. Source SHA `6ac9538d5bb8a823ade9afea70b2654057b793e1cf27c081c088545aa3add8a1`; decisions SHA `c948688a3a8a0fabb20d9bb37a6def0c5bca5cfcad493242fd1781be6a73d1f8`; plan SHA `0dfdc9cd408a613eaf0b634fe9f0681adc222d494663e9b89b0cbd39ecd2ca99`.
+- Approval: `plan-approval-2`, `scope=dry_run_evidence`; approval transitioned the session to `dry_run_approved`, and the completed diagnostic transitioned it to final state `dry_run_validated_write_blocked`. No write approval exists.
+- CLI dry-run: `pass-d-2`, `ok=true`, `validated_write_blocked`, eligibility false. Blocker kinds include `plan_schema_not_writable`, `blank_option_semantics`, `identity_churn`, `referenced_delete`, `scaffold_warning_not_confirmable`, `price_rules_required_for_runtime`, and `rule_groups_required_for_runtime`.
+- Exact proof: raw count/covered 5,771/5,771; prepared count/checked 5,771/5,771; readback clean. Workbook SHA before/after `03e8c9671185f238dde7f4bc8e7003da0f74d842d9cc2f76126f938cbb7b54d6`, with unchanged mtime.
+- Publication safety: no `write-approval.json`, `apply-report.json`, workbook edit log, backup, runtime/registry publication, or promotion. `form-app/data.js` and the tracked generated tree finished at their pre-proof hashes. README/full-suite tests did transiently rewrite tracked generated files; the files were restored exactly to `HEAD` and were not staged.
+- Residual risk: the detected flag, identity, reference, and product-coverage blockers remain intentionally unresolved. The next checkpoint is Milestone 1: headless canonical-row compiler plus comparator evidence index, still without a live workbook write.
