@@ -124,15 +124,31 @@ class ApplyFlowTest(unittest.TestCase):
         self.store.approve_plan(self.run_id, "sean")
         return self.store.run_dir(self.run_id)
 
-    def future_write_authority(self, *, approve: bool = True) -> tuple[Path, dict]:
+    def future_write_authority(
+        self,
+        *,
+        approve: bool = True,
+        deferrals: list[dict] | None = None,
+        compile_deferrals: list[dict] | None = None,
+    ) -> tuple[Path, dict]:
         """Build stored pass-c-3-shaped proof without invoking a live write."""
 
+        deferrals = list(deferrals or [])
+        compile_deferrals = list(compile_deferrals or [])
         run_dir = self.approve_plan()
         self.store.apply_approved_plan(self.run_id, schema_validation=False)
         plan = read_json(run_dir / "apply-plan.json")
+        for item in [*plan["stage1"]["items"], *plan["stage2"]["items"]]:
+            if item.get("action") in {"add", "update"} and str(item.get("sheet") or "").endswith("options"):
+                item.setdefault("row", {})["selectable"] = True
+                item["row"]["active"] = True
         for filename, payload, field in (
             ("canonical-row-manifest.json", {"schemaVersion": "canonical-rows-1"}, "canonicalManifestSha"),
-            ("compile-report.json", {"schemaVersion": "compile-report-1"}, "compileReportSha"),
+            (
+                "compile-report.json",
+                {"schemaVersion": "compile-report-1", "deferrals": compile_deferrals},
+                "compileReportSha",
+            ),
             ("exception-resolutions.json", {"schemaVersion": "exception-resolutions-1"}, "exceptionResolutionsSha"),
         ):
             write_json(run_dir / filename, payload)
@@ -172,9 +188,17 @@ class ApplyFlowTest(unittest.TestCase):
                 "writeEligibility": {
                     "eligible": True,
                     "blockers": [],
-                    "deferrals": [],
+                    "deferrals": deferrals,
                     "targets": {
-                        model: {"eligible": True, "blockers": [], "deferrals": []}
+                        model: {
+                            "eligible": True,
+                            "blockers": [],
+                            "deferrals": [
+                                item
+                                for item in deferrals
+                                if item.get("model", targets[0]) == model
+                            ],
+                        }
                         for model in targets
                     },
                     "acceptedWarningIds": [],
@@ -250,6 +274,27 @@ class ApplyFlowTest(unittest.TestCase):
                 apply_mock.assert_not_called()
 
         self.assert_refusal_preserves_evidence(run_dir, refuse)
+
+    def deferral(self, deferral_id: str, kind: str) -> dict:
+        return {
+            "deferralId": deferral_id,
+            "kind": kind,
+            "model": "zr1",
+            "disposition": "allowed_deferral",
+        }
+
+    def assert_forbidden_deferral_refuses(self, kind: str) -> None:
+        row = self.deferral(f"def_{kind}", kind)
+        run_dir, _ = self.future_write_authority(
+            approve=False,
+            deferrals=[row],
+            compile_deferrals=[row],
+        )
+
+        with self.assertRaisesRegex(WizardError, "deferral"):
+            self.store.approve_write(self.run_id, "sean")
+
+        self.assertFalse((run_dir / "write-approval.json").exists())
 
     def test_default_dry_run_writes_report_and_leaves_workbook_unchanged(self) -> None:
         run_dir = self.approve_plan()
@@ -599,6 +644,38 @@ class ApplyFlowTest(unittest.TestCase):
                 apply_mock.assert_not_called()
 
         self.assert_refusal_preserves_evidence(run_dir, refuse)
+
+    def test_asset_map_deferred_is_forbidden(self) -> None:
+        self.assert_forbidden_deferral_refuses("asset_map_deferred")
+
+    def test_color_overrides_deferred_is_forbidden(self) -> None:
+        self.assert_forbidden_deferral_refuses("color_overrides_deferred")
+
+    def test_interior_components_deferred_is_forbidden(self) -> None:
+        self.assert_forbidden_deferral_refuses("interior_components_deferred")
+
+    def test_asset_media_deferral_requires_compile_report_id(self) -> None:
+        row = self.deferral("def_media_missing", "asset_map_media_missing")
+        run_dir, _ = self.future_write_authority(
+            approve=False,
+            deferrals=[row],
+            compile_deferrals=[self.deferral("def_other", "asset_map_media_missing")],
+        )
+
+        with self.assertRaisesRegex(WizardError, "compile report"):
+            self.store.approve_write(self.run_id, "sean")
+
+        self.assertFalse((run_dir / "write-approval.json").exists())
+
+    def test_asset_media_deferral_with_bound_compile_id_is_approvable(self) -> None:
+        row = self.deferral("def_media_missing", "asset_map_media_missing")
+        run_dir, _ = self.future_write_authority(
+            deferrals=[row],
+            compile_deferrals=[row],
+        )
+
+        approval = read_json(run_dir / "write-approval.json")
+        self.assertEqual(approval["allowedDeferrals"], [row])
 
     def test_live_apply_reuses_approved_probe_without_post_mutation_reapply(self) -> None:
         run_dir, eligible_report = self.future_write_authority()
