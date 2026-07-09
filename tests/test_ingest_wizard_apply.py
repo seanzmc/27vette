@@ -129,6 +129,7 @@ class ApplyFlowTest(unittest.TestCase):
         report = read_json(run_dir / "apply-dry-run-report.json")
         plan = read_json(run_dir / "apply-plan.json")
         self.assertEqual(report["schemaVersion"], "pass-d-1")
+        self.assertEqual(report["planSchemaVersion"], "pass-c-2")
         self.assertIn("startedAt", report)
         self.assertIn("completedAt", report)
         self.assertEqual(report["approvedBy"], "sean")
@@ -139,6 +140,19 @@ class ApplyFlowTest(unittest.TestCase):
         self.assertGreater(report["opCounts"]["stage2"], 0)
         self.assertEqual(report["opCounts"]["combined"], len(plan["stage1"]["items"]) + len(plan["stage2"]["items"]))
         self.assertGreater(report["perSheetCounts"].get("model_workbook_sources", 0), 0)
+        self.assertGreater(report["perSheetActionCounts"]["model_workbook_sources"]["add"], 0)
+        self.assertEqual(report["boolHygieneResult"]["error_count"], 0)
+        self.assertEqual(report["deploymentContinuity"]["zr1"]["status"], "not_deployment_ready")
+        self.assertIn("registryLoadable", report["deploymentContinuity"]["zr1"])
+        self.assertIn("registryError", report["deploymentContinuity"]["zr1"])
+        self.assertIn(
+            "price_rules_required_for_runtime",
+            {item["kind"] for item in report["deploymentContinuity"]["zr1"]["deploymentBlockers"]},
+        )
+        self.assertEqual(
+            report["deploymentContinuity"]["zr1"]["sourceCoverage"]["priceRuleAddOrUpdateCount"],
+            0,
+        )
         self.assertEqual(report["applyResult"]["status"], "validated")
         self.assertEqual(report["workbookBefore"], report["workbookAfter"])
         self.assertIsNone(report["backupPath"])
@@ -165,6 +179,23 @@ class ApplyFlowTest(unittest.TestCase):
         write_json(run_dir / "plan-approval.json", approval)
         with self.assertRaisesRegex(WizardError, "Workbook changed"):
             self.store.apply_approved_plan(self.run_id, schema_validation=False)
+
+    def test_write_refuses_superseded_pass_c1_plan(self) -> None:
+        run_dir = self.approve_plan()
+        plan = read_json(run_dir / "apply-plan.json")
+        plan["schemaVersion"] = "pass-c-1"
+        write_json(run_dir / "apply-plan.json", plan)
+        approval = read_json(run_dir / "plan-approval.json")
+        approval["planSha"] = __import__("hashlib").sha256((run_dir / "apply-plan.json").read_bytes()).hexdigest()
+        write_json(run_dir / "plan-approval.json", approval)
+
+        with self.assertRaisesRegex(WizardError, "superseded"):
+            self.store.apply_approved_plan(
+                self.run_id,
+                write=True,
+                confirm_plan_warnings=True,
+                schema_validation=False,
+            )
 
     def test_write_requires_warning_confirmation(self) -> None:
         self.approve_plan()

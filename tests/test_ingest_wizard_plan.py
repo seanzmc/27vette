@@ -145,6 +145,7 @@ class PlanFlowTest(unittest.TestCase):
         inputs = self.plan_inputs()
         plan_a = build_plan(**inputs)
         plan_b = build_plan(**inputs)
+        self.assertEqual(plan_a["schemaVersion"], "pass-c-2")
         self.assertEqual(json.dumps(plan_a, sort_keys=True), json.dumps(plan_b, sort_keys=True))
         self.assertTrue(plan_a["valid"], plan_a["report"]["blockingGaps"])
         self.assertEqual(plan_a["coverage"]["uncoveredApprovedDecisions"], [])
@@ -153,11 +154,25 @@ class PlanFlowTest(unittest.TestCase):
         # Presentation rows land as adds on all five sheets.
         for sheet in ("runtime_steps", "section_presentation", "context_section_master", "order_summary_sections", "step_order_summary_map"):
             self.assertIn("add", plan_a["report"]["perSheetCounts"].get(sheet, {}), sheet)
+            self.assertIn("add", plan_a["report"]["perSheetActionCounts"].get(sheet, {}), sheet)
         # No timestamps anywhere in the plan payload (determinism guard).
         import re
 
         payload = json.dumps(plan_a)
         self.assertIsNone(re.search(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}", payload))
+
+    def test_grand_sport_x_registry_key_uses_runtime_metadata_key(self) -> None:
+        inputs = self.plan_inputs()
+        inputs["selection"] = {**inputs["selection"], "targets": ["grand_sport_x"]}
+        plan = build_plan(**inputs)
+        rows = [
+            item["row"]
+            for item in plan["stage1"]["items"]
+            if item.get("sheet") in {"model_master", "model_registry_promotion"}
+        ]
+
+        self.assertTrue(rows)
+        self.assertTrue(all(row["registry_key"] == "grand_sport_x" for row in rows))
 
     def test_relationship_and_exclusive_ops(self) -> None:
         extra = [

@@ -199,6 +199,93 @@ class GlobalFamilyOpsTest(unittest.TestCase):
         self.assertEqual(rows[0][0], "option_id")
         self.assertEqual(rows[1][0], "opt_zzz_001")
 
+    def test_existing_text_bool_convention_is_preserved_on_write(self) -> None:
+        wb = load_workbook(self.path)
+        headers = [cell.value for cell in wb["context_section_master"][1]]
+        is_required_col = headers.index("is_required") + 1
+        active_col = headers.index("active") + 1
+        wb["context_section_master"].cell(row=2, column=is_required_col, value="True")
+        wb["context_section_master"].cell(row=2, column=active_col, value="True")
+        wb.save(self.path)
+        wb.close()
+
+        result = self.run_batch(
+            [
+                {
+                    "action": "add",
+                    "sheet": "context_section_master",
+                    "key": {"model_key": "zr1", "context_type": "body", "section_id": "ctx_body"},
+                    "row": {
+                        "model_key": "zr1",
+                        "context_type": "body",
+                        "section_id": "ctx_body",
+                        "section_name": "Body",
+                        "is_required": True,
+                        "active": True,
+                    },
+                }
+            ],
+            write=True,
+        )
+
+        self.assertTrue(result["ok"], result)
+        self.assertEqual(result["boolHygieneResult"]["error_count"], 0)
+        wb = load_workbook(self.path, read_only=True, data_only=True)
+        rows = list(wb["context_section_master"].iter_rows(values_only=True))
+        wb.close()
+        added = next(row for row in rows[1:] if row[0] == "zr1")
+        self.assertEqual(added[6], "True")
+        self.assertEqual(added[11], "True")
+
+    def test_new_sheet_inherits_text_bool_convention_from_template(self) -> None:
+        wb = load_workbook(self.path)
+        headers = [cell.value for cell in wb["z06_options"][1]]
+        selectable_col = headers.index("selectable") + 1
+        active_col = headers.index("active") + 1
+        for row in range(2, wb["z06_options"].max_row + 1):
+            wb["z06_options"].cell(row=row, column=selectable_col, value="True")
+            wb["z06_options"].cell(row=row, column=active_col, value="True")
+        wb.save(self.path)
+        wb.close()
+
+        items = [
+            {"action": "create_sheet", "sheet": "grandSportX_options", "family": "options", "headersFrom": "z06_options"},
+            {
+                "action": "add",
+                "sheet": "model_workbook_sources",
+                "key": {"model_key": "grand_sport_x", "source_role": "source_option_sheet"},
+                "row": {
+                    "model_key": "grand_sport_x",
+                    "source_role": "source_option_sheet",
+                    "sheet_name": "grandSportX_options",
+                    "active": True,
+                },
+            },
+            {
+                "action": "add",
+                "sheet": "grandSportX_options",
+                "key": {"option_id": "opt_yyy_001"},
+                "row": {
+                    "option_id": "opt_yyy_001",
+                    "rpo": "YYY",
+                    "option_name": "Template Bool Test",
+                    "section_id": "sec_whee_001",
+                    "selectable": True,
+                    "active": True,
+                },
+            },
+        ]
+        preview = self.run_batch(items, write=True)
+        result = self.run_batch(items, write=True, confirmed=tuple(warning["id"] for warning in preview["warnings"]))
+
+        self.assertTrue(result["ok"], result)
+        self.assertEqual(result["boolHygieneResult"]["error_count"], 0)
+        wb = load_workbook(self.path, read_only=True, data_only=True)
+        rows = list(wb["grandSportX_options"].iter_rows(values_only=True))
+        wb.close()
+        self.assertEqual(rows[1][7], "True")
+        self.assertEqual(rows[1][9], "True")
+
     def test_create_sheet_failures(self) -> None:
         result = self.run_batch(
             [{"action": "create_sheet", "sheet": "z06_options", "family": "options", "headersFrom": "z06_options"}]

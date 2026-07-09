@@ -26,6 +26,11 @@ from corvette_form_generator.workbook import (
     save_workbook_safely,
     workbook_truthy,
 )
+from corvette_form_generator.workbook_bool_hygiene import (
+    BOOL_TEXT_VALUES,
+    compare_bool_like_workbooks,
+    result_payload as bool_hygiene_result_payload,
+)
 from corvette_form_generator.workbook_package import assert_valid_workbook_package
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -362,7 +367,59 @@ def coalesce_ops(ops: list[dict]) -> list[dict]:
     return [op for op in result if op is not None]
 
 
-def coerce_value(family: str, column: str, value):
+def _bool_storage_for_sheet(extract: dict, sheet: str, family: str) -> dict[str, dict]:
+    meta = EDITOR_SHEET_META[family]
+    bool_columns = {column for column, kind in meta.get("types", {}).items() if kind == "bool"}
+    result: dict[str, dict] = {}
+    if not bool_columns:
+        return result
+    rows = extract["sheets"].get(sheet, {}).get("rows", [])
+    for column in bool_columns:
+        family_counts: dict[str, int] = {}
+        true_text_counts: dict[str, int] = {}
+        false_text_counts: dict[str, int] = {}
+        for row in rows:
+            value = row.get(column)
+            if isinstance(value, bool):
+                family_counts["excel_boolean"] = family_counts.get("excel_boolean", 0) + 1
+                continue
+            if isinstance(value, str) and value in BOOL_TEXT_VALUES:
+                family_counts["text"] = family_counts.get("text", 0) + 1
+                if value.lower() == "true":
+                    true_text_counts[value] = true_text_counts.get(value, 0) + 1
+                else:
+                    false_text_counts[value] = false_text_counts.get(value, 0) + 1
+        if len(family_counts) != 1:
+            continue
+        storage_family = next(iter(family_counts))
+        entry = {"storageFamily": storage_family}
+        if storage_family == "text":
+            entry["trueText"] = max(true_text_counts, key=lambda key: true_text_counts[key]) if true_text_counts else "True"
+            entry["falseText"] = max(false_text_counts, key=lambda key: false_text_counts[key]) if false_text_counts else "False"
+        result[column] = entry
+    return result
+
+
+def _bool_storage_conventions(extract: dict, sheet_family: dict[str, str], created_templates: dict[str, str]) -> dict[tuple[str, str], dict]:
+    conventions: dict[tuple[str, str], dict] = {}
+    for sheet, family in sheet_family.items():
+        source_sheet = created_templates.get(sheet, sheet)
+        for column, convention in _bool_storage_for_sheet(extract, source_sheet, family).items():
+            conventions[(sheet, column)] = convention
+    return conventions
+
+
+def _parse_bool_value(column: str, value) -> bool | None:
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str) and value.strip().lower() in ("true", "false"):
+        return value.strip().lower() == "true"
+    raise ValueError(f"{column}: expected True/False, got {value!r}")
+
+
+def coerce_value(family: str, column: str, value, *, bool_storage: dict | None = None):
     meta = EDITOR_SHEET_META[family]
     if value == "":
         value = None
@@ -387,13 +444,12 @@ def coerce_value(family: str, column: str, value):
             return int(text)
         raise ValueError(f"{column}: expected integer, got {value!r}")
     if kind == "bool":
-        if value is None:
+        logical = _parse_bool_value(column, value)
+        if logical is None:
             return None
-        if isinstance(value, bool):
-            return value
-        if isinstance(value, str) and value.strip() in ("True", "False"):
-            return value.strip() == "True"
-        raise ValueError(f"{column}: expected True/False, got {value!r}")
+        if bool_storage and bool_storage.get("storageFamily") == "text":
+            return bool_storage.get("trueText", "True") if logical else bool_storage.get("falseText", "False")
+        return logical
     if value is None:
         return None
     return str(value).strip() or None
@@ -481,6 +537,7 @@ def _prepare_batch(extract, batch):
     sheet_family = {**GLOBAL_SHEET_FAMILIES, **sheet_family}
 
     prepared_creates: list[dict] = []
+    created_templates: dict[str, str] = {}
     for i, o in enumerate(creates):
         sheet = str(o.get("sheet") or "").strip()
         family = str(o.get("family") or "").strip()
@@ -507,9 +564,12 @@ def _prepare_batch(extract, batch):
         # Register the new sheet so later ops in this batch validate against it.
         extract["sheets"][sheet] = {"headers": headers, "rows": []}
         sheet_family[sheet] = family
+        created_templates[sheet] = template
         prepared_creates.append(
             {"action": "create_sheet", "sheet": sheet, "_family": family, "_headers": headers}
         )
+
+    bool_storage = _bool_storage_conventions(extract, sheet_family, created_templates)
 
     # A scaffold plan can activate/register model_workbook_sources and then
     # write to those sheets in the same combined batch. Reflect those pending
@@ -586,7 +646,7 @@ def _prepare_batch(extract, batch):
         bad = False
         for col, val in row.items():
             try:
-                coerced[col] = coerce_value(family, col, val)
+                coerced[col] = coerce_value(family, col, val, bool_storage=bool_storage.get((str(sheet), str(col))))
             except ValueError as exc:
                 errors.append(f"{ctx}: {exc}")
                 bad = True
@@ -841,6 +901,7 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
 
     _registry, sheet_family, models_by_sheet, _bmf = _registry_maps(extract)
     schema_result = None
+    bool_hygiene_result = None
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp = Path(tmp_dir) / path.name
         shutil.copy2(path, tmp)
@@ -851,6 +912,14 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
         remove_table_sheet_auto_filters(wb_tmp)
         wb_tmp.save(tmp)
         assert_valid_workbook_package(tmp)
+        bool_issues = compare_bool_like_workbooks(path, tmp)
+        bool_hygiene_result = bool_hygiene_result_payload(path, tmp, bool_issues)
+        bool_hygiene_result["issues"] = bool_hygiene_result["issues"][:20]
+        if bool_hygiene_result["error_count"]:
+            return {"ok": False, "status": "bool_hygiene_failed",
+                    "errors": [f"dry-run bool hygiene failed with "
+                               f"{bool_hygiene_result['error_count']} error(s)"],
+                    "warnings": warnings, "boolHygieneResult": bool_hygiene_result}
         if run_schema_validation:
             issues = validate_workbook_schema(str(tmp), check_live_contract=False)
             schema_result = result_payload(str(tmp), issues)
@@ -862,7 +931,8 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
 
     models_touched = {m for s in touched for m in models_by_sheet.get(s, set())}
     base = {"opCount": len(prepared), "sheets": sorted(touched), "warnings": warnings,
-            "schemaResult": schema_result, "gateReminders": gate_reminders(models_touched)}
+            "schemaResult": schema_result, "boolHygieneResult": bool_hygiene_result,
+            "gateReminders": gate_reminders(models_touched)}
     if not write:
         return {"ok": True, "status": "validated", "errors": [], **base}
 

@@ -1,10 +1,10 @@
 # Pass D — Approved workbook apply CLI
 
-Status: Implemented 2026-07-08 for CLI/tests/docs and real-run dry-run evidence. Live workbook `--write` is still pending separate explicit approval. Reasoning level for Sean/Codex: high.
+Status: Implemented 2026-07-08 for CLI/tests/docs and real-run dry-run evidence. Pass D.1 has landed, but live workbook `--write` remains blocked until the approved `pass-c-1` plan is rebuilt as `pass-c-2`, the rebuilt dry-run proves bool hygiene and deployment-continuity diagnostics, and Sean explicitly approves the rebuilt write command. Reasoning level for Sean/Codex: high.
 
 ## 0. Diagnosis and current evidence
 
-Pass C.2 closed the real-data dry-run blocker and the approved run is ready for a controlled workbook apply, but there is still no Pass D apply entrypoint.
+Historical diagnosis before Pass D.1 review: Pass C.2 closed the then-known real-data dry-run blocker and this spec built the missing Pass D apply entrypoint. Pass D.1 later superseded the live-write readiness conclusion for run `20260707-193441-ea9e4c`; that run is diagnostic evidence only until the Pass C plan is rebuilt as `pass-c-2` and re-approved.
 
 Current evidence inspected:
 
@@ -42,11 +42,11 @@ Change type: tooling/tests/docs first, then an explicitly gated workbook write. 
 
 ### D.1 Build a CLI-only apply path
 
-Create a CLI entrypoint:
+Create a CLI entrypoint. These examples document the implemented Pass D CLI shape; the old run id is superseded for live write by Pass D.1 and must be replaced by a rebuilt/re-approved run before any `--write`:
 
 ```sh
 .venv/bin/python scripts/ingest_wizard_apply.py --run 20260707-193441-ea9e4c
-.venv/bin/python scripts/ingest_wizard_apply.py --run 20260707-193441-ea9e4c --write --confirm-plan-warnings
+.venv/bin/python scripts/ingest_wizard_apply.py --run <rebuilt-pass-c-2-run-id> --write --confirm-plan-warnings
 ```
 
 Pinned decisions:
@@ -172,10 +172,10 @@ Any mismatch sets report status `failed_verification`, exits non-zero, and does 
 This spec has two approval levels:
 
 1. Approval to implement the CLI/tests/docs. This allows fixture workbook writes and real-run dry-runs only.
-2. Separate explicit approval to run:
+2. Separate explicit approval to run a rebuilt Pass C/D.1 plan, not the superseded `20260707-193441-ea9e4c` `pass-c-1` run:
 
 ```sh
-.venv/bin/python scripts/ingest_wizard_apply.py --run 20260707-193441-ea9e4c --write --confirm-plan-warnings
+.venv/bin/python scripts/ingest_wizard_apply.py --run <rebuilt-pass-c-2-run-id> --write --confirm-plan-warnings
 ```
 
 Do not treat approval of this spec as approval for the live workbook `--write` unless Sean states that explicitly.
@@ -301,15 +301,15 @@ Live write validation only after separate explicit approval:
 # Pre-write status and lock check.
 git status --short --branch
 .venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
-.venv/bin/python scripts/ingest_wizard_apply.py --run 20260707-193441-ea9e4c
+.venv/bin/python scripts/ingest_wizard_apply.py --run <rebuilt-pass-c-2-run-id>
 
-# Write only after Sean explicitly approves this exact command.
-.venv/bin/python scripts/ingest_wizard_apply.py --run 20260707-193441-ea9e4c --write --confirm-plan-warnings
+# Write only after Sean explicitly approves the rebuilt Pass C/D.1 command.
+.venv/bin/python scripts/ingest_wizard_apply.py --run <rebuilt-pass-c-2-run-id> --write --confirm-plan-warnings
 
 # Post-write gates.
 .venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
 .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
-python3 -m json.tool form-output/ingest-wizard/20260707-193441-ea9e4c/apply-report.json >/tmp/pass-d-apply-report.pretty.json
+python3 -m json.tool form-output/ingest-wizard/<rebuilt-pass-c-2-run-id>/apply-report.json >/tmp/pass-d-apply-report.pretty.json
 git status --short --branch
 git diff --stat -- stingray_master.xlsx form-output/workbook-edit-log.jsonl
 ```
@@ -362,14 +362,10 @@ Gates not run in this implementation checkpoint:
 - Live workbook `--write` and post-write package/schema validation: not run; still requires separate explicit approval.
 - Generation, registry, runtime/browser, and dealer gates: out of Pass D scope; Pass E/F own those surfaces.
 
-## 11. Approval prompt
+## 11. Historical approval prompt — superseded by Pass D.1
 
-Approve the separate live workbook write checkpoint?
+Pass D's original separate live workbook write checkpoint is no longer active for run `20260707-193441-ea9e4c`.
 
-The exact command remains:
+The former command targeted run `20260707-193441-ea9e4c`; it is intentionally omitted here because that `pass-c-1` run must not be live-written.
 
-```sh
-.venv/bin/python scripts/ingest_wizard_apply.py --run 20260707-193441-ea9e4c --write --confirm-plan-warnings
-```
-
-Approval of this implementation closeout does not by itself authorize that live `--write`.
+Pass D.1 now owns the next approval question: implement bool-storage parity, the Grand Sport X `grand_sport_x` registry-key fix, action-aware coverage, deployment-continuity probing, then rebuild the plan as `pass-c-2` and seek fresh approval for the rebuilt write.

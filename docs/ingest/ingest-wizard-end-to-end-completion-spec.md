@@ -49,11 +49,11 @@ Risk level: high overall (workbook writes + registry publication + runtime chang
 
 | Model | `model_key` | `registry_key` | `export_slug` | sheet prefix | variants | interiors |
 |---|---|---|---|---|---|---|
-| Grand Sport X | `grand_sport_x` | `grandSportX` | `grand-sport-x` | `grandSportX_` | 6 (`1lt_g07`…`3lt_g67`, already in `variant_master`) | `lt_interiors` (LT trims) + `model_interior_scope` rows |
+| Grand Sport X | `grand_sport_x` | `grand_sport_x` | `grand-sport-x` | `grandSportX_` | 6 (`1lt_g07`…`3lt_g67`, already in `variant_master`) | `lt_interiors` (LT trims) + `model_interior_scope` rows |
 | ZR1 | `zr1` (existing) | `zr1` | `zr1` | `zr1_` | 4 (`1lz_r*`) — **must reconcile against export headers** | `LZ_Interiors` |
 | ZR1X | `zr1x` (existing) | `zr1x` | `zr1x` | `zr1x_` | 4 (`1lz_s*`) — **must reconcile against export headers** | `LZ_Interiors` |
 
-Naming follows the existing `grandSport_*`/`zr1_*` conventions. `expected_variant_count` must be set from reconciled export variant headers, not assumed; if the export shows a different trim/body matrix (e.g. 2LZ rows), that is a reviewer decision surfaced in Pass B, and `variant_master`/`model_variants` scaffolds are corrected in Pass D — never silently.
+Naming follows the existing `grandSport_*`/`zr1_*` sheet-prefix conventions, while Grand Sport X registry metadata follows the runtime metadata contract for new model keys: `grand_sport_x`, not a camelCase alias. `expected_variant_count` must be set from reconciled export variant headers, not assumed; if the export shows a different trim/body matrix (e.g. 2LZ rows), that is a reviewer decision surfaced in Pass B, and `variant_master`/`model_variants` scaffolds are corrected in Pass D — never silently.
 
 ## Architecture
 
@@ -172,7 +172,7 @@ Deterministic translation of `decisions.json` into an ordered workbook operation
 
 **Surface:** workbook/data (protected — AGENTS.md §5). Risk: high. **Human approval checkpoint: explicit approval of the child Pass D spec plus the in-wizard `plan_approved` record are both required before any `--write`; approval to implement the CLI is still separate from approval to run a live workbook write.**
 
-Child spec: `docs/ingest/pass-d/pass-d-approved-workbook-apply-spec.md` (implemented 2026-07-08 for CLI/tests/docs and real-run dry-run evidence). It pins Pass D to a CLI-only, dry-run-default apply path; no UI apply button in the first apply pass; live workbook `--write` remains a separate explicit checkpoint.
+Child specs: `docs/ingest/pass-d/pass-d-approved-workbook-apply-spec.md` (implemented 2026-07-08 for CLI/tests/docs and real-run dry-run evidence) plus `docs/ingest/pass-d/pass-d1-export-continuity-and-deployment-readiness-spec.md` (implemented 2026-07-08 blocker-closure pass). Pass D.1 supersedes the old run's live-write readiness: run `20260707-193441-ea9e4c` is diagnostic evidence only, and any live write requires a rebuilt `pass-c-2` plan plus fresh approval.
 
 - Apply path: `apply_workbook_ops.py`-style invocation of `editor_ops.apply_batch(..., write=True)` wrapped by `scripts/ingest_wizard_apply.py --run <run-id> [--write]`; dry-run by default, `--write` required, refuses unless session is `plan_approved` and the plan's workbook fingerprint (mtime_ns + sha256 captured at plan build) still matches the live file.
 - Final live write uses a single combined batch (`stage1.items + stage2.items`) so stage-1 scaffolding and stage-2 data are saved atomically through one `save_workbook_safely()` call, rather than writing stage 1 and then risking a stage-2 failure.
@@ -181,7 +181,7 @@ Child spec: `docs/ingest/pass-d/pass-d-approved-workbook-apply-spec.md` (impleme
 - Models remain **inactive/unpromoted** after apply — `model_master.active` stays False for all three; activation is Pass F's `promote_model.py` job. This keeps generation/registry behavior unchanged until promotion is explicitly run.
 - Failure handling: any invariant failure aborts before `--write`; a failed safe-save leaves the original file untouched (temp-file protocol); the run stays in `plan_approved` for retry after cause analysis. Restoring from the timestamped backup is the rollback path and is documented in the apply report.
 
-**Implementation checkpoint:** CLI/tests/docs complete and real approved run dry-run passes with `apply-dry-run-report.json` (`write=false`, 5,771 combined ops, 41 warnings, 0 errors, workbook fingerprint unchanged). **Live-write exit criteria after separate approval:** `applied` state with `apply-report.json` showing zero mismatches; workbook verified on disk; backup exists; no generated runtime or `form-app/` changes yet.
+**Implementation checkpoint:** CLI/tests/docs complete and the old approved run produced a dry-run report (`write=false`, 5,771 combined ops, 41 warnings, 0 apply errors, workbook fingerprint unchanged), but Pass D.1 found that this dry-run did not mirror the real write path's bool-storage guard and that the export shape is not deployment-continuous. Pass D.1 is implemented; **current live-write exit criteria** are now: rebuild the plan as `pass-c-2`, prove bool-hygiene and deployment-continuity checks in the rebuilt dry-run, then seek fresh approval for that rebuilt run before any `--write`.
 
 **Files:** `scripts/ingest_wizard_apply.py` (new), `session.py`, `tests/test_ingest_wizard_apply.py` (fixture workbooks, never the live one); docs updates. No server endpoint or UI stage-7/apply button in this pass; the first apply path is CLI-only.
 
@@ -272,7 +272,7 @@ Per pass as specified above; program-level before "done": full README validation
 
 ## Open product decisions — resolved 2026-07-05 (Sean)
 
-1. GSX naming set: **confirmed** — `grand_sport_x` / `grandSportX` / `grand-sport-x` / `grandSportX_*` prefix.
+1. GSX naming set: **revised by Pass D.1** — `grand_sport_x` / `grand_sport_x` registry key / `grand-sport-x` / `grandSportX_*` sheet prefix.
 2. ZR1/ZR1X variant matrices: **confirmed 4 each** — 1LZ and 3LZ, coupe and convertible (matches existing `variant_master`/`model_variants` scaffolds). Pass B variant reconciliation still runs; any export-header disagreement still surfaces as a blocking decision rather than silently trusting either side.
 3. Comparator model: **per target** — `grand_sport` for GSX, `z06` for ZR1/ZR1X (matches lane-10 template defaults).
 4. Promotion order: **GSX first, then ZR1, then ZR1X** (staggered, per-model go/no-go at checkpoint 5 unchanged).

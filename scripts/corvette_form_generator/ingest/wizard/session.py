@@ -969,6 +969,289 @@ class WizardSessionStore:
             "items": [*plan["stage1"]["items"], *plan["stage2"]["items"]],
         }
 
+    def _per_sheet_action_counts(self, items: list[dict[str, Any]]) -> dict[str, dict[str, int]]:
+        counts: dict[str, dict[str, int]] = {}
+        for item in items:
+            sheet = item.get("sheet")
+            action = item.get("action")
+            if not sheet or not action:
+                continue
+            sheet_counts = counts.setdefault(str(sheet), {})
+            sheet_counts[str(action)] = sheet_counts.get(str(action), 0) + 1
+        return {sheet: dict(sorted(actions.items())) for sheet, actions in sorted(counts.items())}
+
+    def _deployment_continuity_from_plan(self, plan: dict[str, Any]) -> dict[str, Any]:
+        """Action-aware source-coverage diagnostic for the dry-run report.
+
+        The temp generation probe added by Pass D.1 can enrich these entries;
+        this source-op layer is intentionally conservative and never treats
+        create/delete-only sheet activity as runtime coverage.
+        """
+
+        report = plan.get("report") or {}
+        plan_continuity = report.get("runtimeContinuity") or {}
+        output: dict[str, Any] = {}
+        for model in plan.get("targets") or []:
+            source_ops = (plan_continuity.get(model) or {}).get("sourceOps") or {}
+            price_adds = sum((source_ops.get("priceRules") or {}).get(action, 0) for action in ("add", "update"))
+            rule_group_adds = sum((source_ops.get("ruleGroups") or {}).get(action, 0) for action in ("add", "update"))
+            color_adds = sum((source_ops.get("colorOverrides") or {}).get(action, 0) for action in ("add", "update"))
+            component_adds = sum((source_ops.get("interiorComponents") or {}).get(action, 0) for action in ("add", "update"))
+            asset_adds = sum((source_ops.get("assetMap") or {}).get(action, 0) for action in ("add", "update"))
+            blockers: list[dict[str, str]] = []
+            deferrals: list[dict[str, str]] = []
+            if model in {"zr1", "zr1x"} and price_adds == 0:
+                blockers.append({"kind": "price_rules_required_for_runtime", "detail": "no price-rule add/update ops"})
+            if model in {"zr1", "zr1x"} and rule_group_adds == 0:
+                blockers.append({"kind": "rule_groups_required_for_runtime", "detail": "no rule-group add/update ops"})
+            if color_adds == 0:
+                deferrals.append({"kind": "color_overrides_deferred", "detail": "no color override add/update ops"})
+            if component_adds == 0:
+                deferrals.append({"kind": "interior_components_deferred", "detail": "no interior component add/update ops"})
+            if asset_adds == 0:
+                deferrals.append({"kind": "asset_map_deferred", "detail": "no asset_map add/update ops"})
+            output[model] = {
+                "status": "not_deployment_ready" if blockers else "source_ops_diagnostic",
+                "registryLoadable": None,
+                "registryLoadableNote": "temp generation probe not run in source-op diagnostic layer",
+                "sourceOps": source_ops,
+                "sourceCoverage": {
+                    "priceRuleAddOrUpdateCount": price_adds,
+                    "ruleGroupAddOrUpdateCount": rule_group_adds,
+                    "colorOverrideAddOrUpdateCount": color_adds,
+                    "interiorComponentAddOrUpdateCount": component_adds,
+                    "assetMapAddOrUpdateCount": asset_adds,
+                },
+                "deploymentBlockers": blockers,
+                "deploymentDeferrals": deferrals,
+            }
+        return output
+
+    def _activate_probe_models(self, workbook: Path, models: list[str]) -> None:
+        from openpyxl import load_workbook
+
+        wb = load_workbook(workbook)
+        try:
+            targets = set(models)
+            variant_ids: set[str] = set()
+            if "model_variants" in wb.sheetnames:
+                ws = wb["model_variants"]
+                headers = {str(cell.value): index + 1 for index, cell in enumerate(ws[1]) if cell.value is not None}
+                model_col = headers.get("model_key")
+                variant_col = headers.get("variant_id")
+                if model_col and variant_col:
+                    for row in range(2, ws.max_row + 1):
+                        model_key = str(ws.cell(row=row, column=model_col).value or "").strip().lower()
+                        if model_key in targets:
+                            variant_id = str(ws.cell(row=row, column=variant_col).value or "").strip()
+                            if variant_id:
+                                variant_ids.add(variant_id)
+            for sheet_name, fields in {
+                "model_master": {"active": True},
+                "model_variants": {"active": True},
+                "model_workbook_sources": {"active": True},
+                "model_registry_promotion": {"active": True, "promoted_to_runtime": True},
+            }.items():
+                if sheet_name not in wb.sheetnames:
+                    continue
+                ws = wb[sheet_name]
+                headers = {str(cell.value): index + 1 for index, cell in enumerate(ws[1]) if cell.value is not None}
+                model_col = headers.get("model_key")
+                if not model_col:
+                    continue
+                for row in range(2, ws.max_row + 1):
+                    model_key = str(ws.cell(row=row, column=model_col).value or "").strip().lower()
+                    if model_key not in targets:
+                        if sheet_name == "model_master" and "active" in headers:
+                            ws.cell(row=row, column=headers["active"], value=False)
+                        continue
+                    for column, value in fields.items():
+                        if column in headers:
+                            ws.cell(row=row, column=headers[column], value=value)
+                    if sheet_name == "model_registry_promotion":
+                        if "artifact_type" in headers:
+                            ws.cell(row=row, column=headers["artifact_type"], value="runtime_contract")
+                        if "artifact_path" in headers:
+                            ws.cell(
+                                row=row,
+                                column=headers["artifact_path"],
+                                value=f"form-output/runtime/{model_key.replace('_', '-')}-runtime-contract.json",
+                            )
+            if variant_ids and "variant_master" in wb.sheetnames:
+                ws = wb["variant_master"]
+                headers = {str(cell.value): index + 1 for index, cell in enumerate(ws[1]) if cell.value is not None}
+                variant_col = headers.get("variant_id")
+                active_col = headers.get("active")
+                if variant_col and active_col:
+                    for row in range(2, ws.max_row + 1):
+                        variant_id = str(ws.cell(row=row, column=variant_col).value or "").strip()
+                        if variant_id in variant_ids:
+                            ws.cell(row=row, column=active_col, value=True)
+            wb.save(workbook)
+        finally:
+            wb.close()
+
+    def _source_count(self, payload: dict[str, Any], key: str) -> int:
+        value = payload.get(key)
+        return len(value) if isinstance(value, list) else 0
+
+    def _deployment_continuity_probe(
+        self,
+        workbook: Path,
+        batch: dict[str, Any],
+        plan: dict[str, Any],
+        *,
+        schema_validation: bool,
+    ) -> dict[str, Any]:
+        """Apply the plan to a temp workbook and run temp-only generation probes."""
+
+        import shutil
+        import tempfile
+
+        from corvette_form_generator.contract import ASSET_IMAGE_FIELDS
+        from corvette_form_generator.editor_ops import apply_batch
+        from corvette_form_generator.model_configs import discover_generation_model_configs
+        from corvette_form_generator.source_assembly import assemble_model_source
+
+        targets = [str(model) for model in plan.get("targets") or []]
+        continuity = self._deployment_continuity_from_plan(plan)
+        if not targets:
+            return continuity
+        with tempfile.TemporaryDirectory(prefix="ingest-d1-deployment-") as tmp_dir:
+            tmp_root = Path(tmp_dir)
+            tmp_workbook = tmp_root / workbook.name
+            shutil.copy2(workbook, tmp_workbook)
+            temp_batch = dict(batch, workbookMtimeNs=str(tmp_workbook.stat().st_mtime_ns))
+            preview = apply_batch(tmp_workbook, temp_batch, write=False, run_schema_validation=schema_validation)
+            confirmed = [warning["id"] for warning in preview.get("warnings", [])]
+            applied = apply_batch(
+                tmp_workbook,
+                temp_batch,
+                write=True,
+                confirmed_warnings=confirmed,
+                source="ingest_wizard_deployment_probe",
+                log_path=tmp_root / "probe-edit-log.jsonl",
+                run_schema_validation=schema_validation,
+            )
+            if not applied.get("ok"):
+                error = "; ".join(applied.get("errors", [])) or str(applied.get("status"))
+                for model in targets:
+                    entry = continuity.setdefault(model, {})
+                    blockers = list(entry.get("deploymentBlockers") or [])
+                    blockers.append({"kind": "deployment_probe_apply_failed", "detail": error})
+                    entry.update(
+                        {
+                            "status": "probe_apply_failed",
+                            "registryLoadable": False,
+                            "registryError": error,
+                            "deploymentBlockers": blockers,
+                        }
+                    )
+                return continuity
+
+            self._activate_probe_models(tmp_workbook, targets)
+            try:
+                configs = discover_generation_model_configs(tmp_workbook)
+            except Exception as exc:
+                configs = {}
+                discovery_error = str(exc)
+            else:
+                discovery_error = ""
+
+            for model in targets:
+                entry = continuity.setdefault(model, {})
+                blockers = list(entry.get("deploymentBlockers") or [])
+                deferrals = list(entry.get("deploymentDeferrals") or [])
+                config = configs.get(model)
+                if config is None:
+                    error = discovery_error or f"model {model!r} was not discoverable after temp activation"
+                    blockers.append({"kind": "registry_load_failed", "detail": error})
+                    entry.update(
+                        {
+                            "status": "not_deployment_ready",
+                            "registryLoadable": False,
+                            "registryError": error,
+                            "deploymentBlockers": blockers,
+                            "deploymentDeferrals": deferrals,
+                        }
+                    )
+                    continue
+
+                config = config.with_overrides(
+                    workbook_path=tmp_workbook,
+                    output_dir=tmp_root / "form-output",
+                    app_dir=tmp_root / "form-app",
+                )
+                try:
+                    assembly = assemble_model_source(config)
+                except Exception as exc:
+                    blockers.append({"kind": "registry_load_failed", "detail": str(exc)})
+                    entry.update(
+                        {
+                            "status": "not_deployment_ready",
+                            "registryLoadable": False,
+                            "registryError": str(exc),
+                            "deploymentBlockers": blockers,
+                            "deploymentDeferrals": deferrals,
+                        }
+                    )
+                    continue
+
+                source = assembly.source_data
+                raw_validation = source.get("validation")
+                validation: list[dict[str, Any]] = raw_validation if isinstance(raw_validation, list) else []
+                pricing_deferred = any(row.get("check_id") == "pricing_deferred" for row in validation if isinstance(row, dict))
+                raw_choices = source.get("choices")
+                choices: list[dict[str, Any]] = raw_choices if isinstance(raw_choices, list) else []
+                raw_interiors = source.get("interiors")
+                interiors: list[dict[str, Any]] = raw_interiors if isinstance(raw_interiors, list) else []
+                media_count = sum(
+                    1
+                    for choice in choices
+                    if isinstance(choice, dict) and any(choice.get(field) for field in ASSET_IMAGE_FIELDS)
+                )
+                component_count = sum(
+                    len(interior.get("interior_components") or [])
+                    for interior in interiors
+                    if isinstance(interior, dict) and isinstance(interior.get("interior_components"), list)
+                )
+                counts = {
+                    "choices": len(choices),
+                    "directRules": self._source_count(source, "rules"),
+                    "ruleGroups": self._source_count(source, "ruleGroups"),
+                    "exclusiveGroups": self._source_count(source, "exclusiveGroups"),
+                    "priceRules": self._source_count(source, "priceRules"),
+                    "pricingDeferred": pricing_deferred,
+                    "colorOverrides": self._source_count(source, "colorOverrides"),
+                    "interiors": len(interiors),
+                    "interiorComponentLineItems": component_count,
+                    "optionMediaCoveredChoices": media_count,
+                    "optionMediaTotalChoices": len(choices),
+                    "validationWarnings": sum(1 for row in validation if isinstance(row, dict) and row.get("severity") == "warning"),
+                    "validationErrors": sum(1 for row in validation if isinstance(row, dict) and row.get("severity") == "error"),
+                }
+                if model in {"zr1", "zr1x"} and counts["priceRules"] == 0 and pricing_deferred:
+                    blockers.append({"kind": "price_rules_required_for_runtime", "detail": "generated contract has pricing_deferred and zero priceRules"})
+                if model in {"zr1", "zr1x"} and counts["ruleGroups"] == 0:
+                    blockers.append({"kind": "rule_groups_required_for_runtime", "detail": "generated contract has zero ruleGroups"})
+                if counts["colorOverrides"] == 0:
+                    deferrals.append({"kind": "color_overrides_deferred", "detail": "generated contract has zero colorOverrides"})
+                if counts["interiorComponentLineItems"] == 0:
+                    deferrals.append({"kind": "interior_components_deferred", "detail": "generated contract has zero interior component line items"})
+                if counts["optionMediaCoveredChoices"] == 0:
+                    deferrals.append({"kind": "asset_map_deferred", "detail": "generated choices have zero option/card asset fields"})
+                entry.update(
+                    {
+                        "status": "not_deployment_ready" if blockers else "deployment_probe_passed",
+                        "registryLoadable": True,
+                        "registryError": "",
+                        "counts": counts,
+                        "deploymentBlockers": blockers,
+                        "deploymentDeferrals": deferrals,
+                    }
+                )
+            return continuity
+
     def _verify_applied_ops(self, workbook: Path, batch: dict[str, Any]) -> dict[str, Any]:
         from corvette_form_generator.editor_ops import extract_workbook
 
@@ -1040,6 +1323,12 @@ class WizardSessionStore:
             raise WizardError("Plan approval hash does not match apply-plan.json; rebuild and re-approve.", status=409)
         if not plan.get("valid"):
             raise WizardError("Apply plan is not valid; rebuild before applying.", status=409)
+        plan_schema = plan.get("schemaVersion")
+        if write and plan_schema != "pass-c-2":
+            raise WizardError(
+                f"Plan schema {plan_schema!r} is superseded for live write; rebuild as pass-c-2 and re-approve.",
+                status=409,
+            )
 
         _, candidates_file, candidates = self._parsed_candidates(run_id)
         selection = self._load_selection(run_id, candidates_file)
@@ -1057,6 +1346,7 @@ class WizardSessionStore:
             raise WizardError("Workbook changed after the plan was approved; rebuild the plan.", status=409)
 
         batch = self._combined_plan_batch(plan, workbook)
+        per_sheet_action_counts = self._per_sheet_action_counts(batch["items"])
         per_sheet_counts: dict[str, int] = {}
         for item in batch["items"]:
             sheet = item.get("sheet")
@@ -1082,8 +1372,21 @@ class WizardSessionStore:
         after = file_fingerprint(workbook)
         completed_at = datetime.now().isoformat(timespec="seconds")
         verification = self._verify_applied_ops(workbook, batch) if write else {"checked": 0, "mismatches": []}
+        deployment_continuity = self._deployment_continuity_probe(
+            workbook,
+            batch,
+            plan,
+            schema_validation=schema_validation,
+        )
         report = {
             "schemaVersion": SCHEMA_VERSION_D,
+            "planSchemaVersion": plan.get("schemaVersion"),
+            "planSupersededForWrite": plan.get("schemaVersion") != "pass-c-2",
+            "liveWriteBlockedReason": (
+                None
+                if plan.get("schemaVersion") == "pass-c-2"
+                else "Plan must be rebuilt as pass-c-2 and re-approved before live write."
+            ),
             "runId": run_id,
             "startedAt": started_at,
             "completedAt": completed_at,
@@ -1101,6 +1404,9 @@ class WizardSessionStore:
                 "combined": len(batch["items"]),
             },
             "perSheetCounts": dict(sorted(per_sheet_counts.items())),
+            "perSheetActionCounts": per_sheet_action_counts,
+            "runtimeContinuity": (plan.get("report") or {}).get("runtimeContinuity", {}),
+            "deploymentContinuity": deployment_continuity,
             "workbookBefore": before,
             "workbookAfter": after,
             "warnings": result.get("warnings", []),
@@ -1108,6 +1414,7 @@ class WizardSessionStore:
             "warningsConfirmed": confirmed_warnings,
             "applyResult": result,
             "schemaResult": result.get("schemaResult"),
+            "boolHygieneResult": result.get("boolHygieneResult"),
             "gateReminders": result.get("gateReminders", []),
             "sheets": result.get("sheets", []),
             "backupPath": result.get("backupPath"),

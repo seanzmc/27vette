@@ -28,14 +28,14 @@ from corvette_form_generator.ingest.wizard.decisions import (
 )
 from corvette_form_generator.workbook import rows_from_sheet, workbook_truthy
 
-SCHEMA_VERSION_C = "pass-c-1"
+SCHEMA_VERSION_C = "pass-c-2"
 
 # Per-model identity, per the approved end-to-end spec (resolved decisions).
 MODEL_PLAN_CONFIG: dict[str, dict[str, Any]] = {
     "grand_sport_x": {
         "sheetPrefix": "grandSportX_",
         "templatePrefix": "grandSport_",
-        "registryKey": "grandSportX",
+        "registryKey": "grand_sport_x",
         "exportSlug": "grand-sport-x",
         "label": "Grand Sport X",
         "interiorSheet": "lt_interiors",
@@ -1163,6 +1163,25 @@ def build_plan(
         sheet_counts = per_sheet.setdefault(item["sheet"], {})
         sheet_counts[item["action"]] = sheet_counts.get(item["action"], 0) + 1
 
+    runtime_continuity: dict[str, dict[str, Any]] = {}
+    for model in targets:
+        config = MODEL_PLAN_CONFIG[model]
+        model_counts: dict[str, Any] = {"sourceOps": {}}
+        for surface, suffix in (
+            ("priceRules", "price_rules"),
+            ("ruleGroups", "rule_groups"),
+            ("ruleGroupMembers", "rule_group_members"),
+            ("exclusiveGroups", "exclusive_groups"),
+            ("exclusiveMembers", "exclusive_members"),
+            ("options", "options"),
+        ):
+            sheet = config["sheetPrefix"] + suffix
+            model_counts["sourceOps"][surface] = dict(per_sheet.get(sheet, {}))
+        model_counts["sourceOps"]["colorOverrides"] = dict(per_sheet.get("color_overrides", {}))
+        model_counts["sourceOps"]["interiorComponents"] = dict(per_sheet.get("interior_components", {}))
+        model_counts["sourceOps"]["assetMap"] = dict(per_sheet.get("asset_map", {}))
+        runtime_continuity[model] = model_counts
+
     blocking = [gap for gap in gaps if gap["kind"] in BLOCKING_GAP_KINDS]
 
     return {
@@ -1179,6 +1198,8 @@ def build_plan(
         "coverage": {"decisionToOps": coverage, "uncoveredApprovedDecisions": uncovered},
         "report": {
             "perSheetCounts": per_sheet,
+            "perSheetActionCounts": per_sheet,
+            "runtimeContinuity": runtime_continuity,
             "clearedRows": cleared_rows,
             "holds": holds,
             "deferrals": deferrals,
