@@ -1,0 +1,63 @@
+{
+  "id": "2026-07-08-pass-d-apply-cli-spec",
+  "started_at": "2026-07-08T14:50:00-04:00",
+  "completed_at": "2026-07-08T14:57:15-04:00",
+  "objective": "Write and verify the Pass D approved workbook apply CLI child spec after C.2 plan approval, with CLI-only dry-run-default implementation scope and separate live workbook --write approval.",
+  "changed_surface": "docs + loop artifacts only; no code implementation, workbook write, generated artifact refresh, runtime change, or dealer-submission change",
+  "primary_artifacts": [
+    "docs/ingest/pass-d/pass-d-approved-workbook-apply-spec.md",
+    "docs/ingest/README.md",
+    "docs/ingest/ingest-wizard-end-to-end-completion-spec.md"
+  ],
+  "outcome_rubric": "fable5loop/runs/2026-07-08-pass-d-apply-cli-spec/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-08-pass-d-apply-cli-spec/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-08-pass-d-apply-cli-spec/validation-output.txt",
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "delegation_id": "deleg_09d874bf",
+    "verdict": "pass",
+    "initial_verdict": "fail",
+    "final_verdict": "pass_after_required_fix",
+    "cycles": 1,
+    "pattern": "independent-verification-plus-parent-fix",
+    "required_fix": "Remove stale server endpoint/UI stage-7 allowance from docs/ingest/ingest-wizard-end-to-end-completion-spec.md Pass D file list and align with CLI-only child spec.",
+    "fix_applied": true
+  },
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-08-pass-d-apply-cli-spec/verifier-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-08-pass-d-apply-cli-spec/validation-output.txt"
+    }
+  ],
+  "skill_update": {
+    "decision": "not_applicable",
+    "evidence": "fable5loop/runs/2026-07-08-pass-d-apply-cli-spec/verifier-report.md",
+    "reason": "No new reusable procedural lesson; existing Fable verifier-fix-closeout rule was sufficient."
+  },
+  "boundaries_preserved": [
+    "stingray_master.xlsx untouched",
+    "no generated runtime artifacts refreshed",
+    "form-app/data.js untouched",
+    "runtime/dealer submission untouched",
+    "no Pass D implementation or live --write started"
+  ],
+  "validation": [
+    {
+      "command": "git diff --check",
+      "result": "pass"
+    },
+    {
+      "command": ".venv/bin/python scripts/validate_fable5_loop.py",
+      "result": "pass"
+    },
+    {
+      "command": "spec content guardrail check",
+      "result": "pass"
+    }
+  ]
+}

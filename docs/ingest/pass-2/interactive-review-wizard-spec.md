@@ -424,7 +424,7 @@ Manual smoke setup:
 ```sh
 rm -rf /tmp/27vette-pass2-evidence /tmp/27vette-pass2-candidates
 .venv/bin/python scripts/order_guide_ingest_profiler.py \
-  --raw-export "2027 Chevrolet Car Corvette Export_RAW.xlsx" \
+  --raw-export "<raw_export>.xlsx" \
   --workbook stingray_master.xlsx \
   --run-id pass2-smoke-evidence \
   --output-dir /tmp/27vette-pass2-evidence

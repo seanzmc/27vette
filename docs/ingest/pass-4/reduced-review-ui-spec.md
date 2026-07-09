@@ -448,7 +448,7 @@ Manual smoke after tests:
 rm -rf /tmp/27vette-pass4-evidence /tmp/27vette-pass4-candidates /tmp/27vette-pass4-interpretation
 
 .venv/bin/python scripts/order_guide_ingest_profiler.py \
-  --raw-export "2027 Chevrolet Car Corvette Export_RAW.xlsx" \
+  --raw-export "<raw_export>.xlsx" \
   --workbook stingray_master.xlsx \
   --run-id pass4-smoke-evidence \
   --output-dir /tmp/27vette-pass4-evidence

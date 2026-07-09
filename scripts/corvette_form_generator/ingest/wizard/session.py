@@ -18,6 +18,7 @@ import json
 import re
 import time
 import uuid
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -71,12 +72,15 @@ STATE_DECISIONS_IN_PROGRESS = "decisions_in_progress"
 STATE_DECISIONS_COMPLETE = "decisions_complete"
 STATE_PLAN_BUILT = "plan_built"
 STATE_PLAN_APPROVED = "plan_approved"
+STATE_APPLIED = "applied"
+SCHEMA_VERSION_D = "pass-d-1"
 DECISION_STATES = (
     STATE_MODELS_SELECTED,
     STATE_DECISIONS_IN_PROGRESS,
     STATE_DECISIONS_COMPLETE,
     STATE_PLAN_BUILT,
     STATE_PLAN_APPROVED,
+    STATE_APPLIED,
 )
 VALID_ROLES = {ROLE_OPTIONS, ROLE_PRICE, ROLE_EXCLUDE}
 RUN_ID_RE = re.compile(r"^[0-9]{8}-[0-9]{6}-[0-9a-f]{6}$")
@@ -225,6 +229,10 @@ class WizardSessionStore:
             "modelSelection": read_json(selection_file) if selection_file.is_file() else None,
         }
 
+    def _refuse_if_applied(self, session: dict[str, Any]) -> None:
+        if session.get("state") == STATE_APPLIED:
+            raise WizardError("Run already applied; start a new run for further changes.", status=409)
+
     # ------------------------------------------------------------- roles
     def confirm_roles(self, run_id: str, roles: dict[str, str]) -> dict[str, Any]:
         session = self.load_session(run_id)
@@ -368,6 +376,7 @@ class WizardSessionStore:
 
     def select_models(self, run_id: str, targets: list[str], comparators: dict[str, str]) -> dict[str, Any]:
         session, candidates_file, candidates = self._parsed_candidates(run_id)
+        self._refuse_if_applied(session)
         try:
             validate_selection(candidates, targets, comparators)
         except ValueError as exc:
@@ -709,6 +718,7 @@ class WizardSessionStore:
 
     def save_decisions(self, run_id: str, decisions: list[dict[str, Any]]) -> dict[str, Any]:
         session, candidates_file, candidates = self._parsed_candidates(run_id)
+        self._refuse_if_applied(session)
         selection = self._load_selection(run_id, candidates_file)
         if not isinstance(decisions, list) or not decisions:
             raise WizardError("Request must carry a non-empty decisions list.")
@@ -748,6 +758,7 @@ class WizardSessionStore:
         batch_id: str = "",
     ) -> dict[str, Any]:
         session, candidates_file, candidates = self._parsed_candidates(run_id)
+        self._refuse_if_applied(session)
         selection = self._load_selection(run_id, candidates_file)
         if not decision_ids and not batch_id:
             raise WizardError("Delete needs decisionIds or a batchId.")
@@ -782,6 +793,7 @@ class WizardSessionStore:
         self, run_id: str, from_model: str, to_model: str, *, overwrite: bool = False
     ) -> dict[str, Any]:
         session, candidates_file, candidates = self._parsed_candidates(run_id)
+        self._refuse_if_applied(session)
         selection = self._load_selection(run_id, candidates_file)
         if from_model not in selection["targets"] or to_model not in selection["targets"]:
             raise WizardError("Copy source and target must both be selected target models.")
@@ -840,6 +852,7 @@ class WizardSessionStore:
         from corvette_form_generator.ingest.wizard.plan_builder import build_plan
 
         session = self.load_session(run_id, verify_source=False)
+        self._refuse_if_applied(session)
         if session["state"] not in (STATE_DECISIONS_COMPLETE, STATE_PLAN_BUILT, STATE_PLAN_APPROVED):
             raise WizardError("Mark decisions complete before building the apply plan.", status=409)
         run_dir = self.run_dir(run_id)
@@ -921,7 +934,7 @@ class WizardSessionStore:
 
     def approve_plan(self, run_id: str, approver: str) -> dict[str, Any]:
         session = self.load_session(run_id, verify_source=False)
-        if session["state"] != STATE_PLAN_BUILT:
+        if session["state"] not in (STATE_PLAN_BUILT, STATE_PLAN_APPROVED):
             raise WizardError("Plan must be built (and dry-run clean) before approval.", status=409)
         if not str(approver or "").strip():
             raise WizardError("Approval needs a reviewer name.")
@@ -949,7 +962,172 @@ class WizardSessionStore:
         write_json(run_dir / "session.json", session)
         return {"session": session, "approval": approval}
 
+    # ------------------------------------------------------ pass d: apply
+    def _combined_plan_batch(self, plan: dict[str, Any], workbook: Path) -> dict[str, Any]:
+        return {
+            "workbookMtimeNs": str(workbook.stat().st_mtime_ns),
+            "items": [*plan["stage1"]["items"], *plan["stage2"]["items"]],
+        }
+
+    def _verify_applied_ops(self, workbook: Path, batch: dict[str, Any]) -> dict[str, Any]:
+        from corvette_form_generator.editor_ops import extract_workbook
+
+        extract = extract_workbook(workbook)
+        mismatches: list[str] = []
+        checked = 0
+        for item in batch.get("items") or []:
+            action = item.get("action")
+            if action == "create_sheet":
+                checked += 1
+                if item.get("sheet") not in extract["sheets"]:
+                    mismatches.append(f"missing created sheet {item.get('sheet')}")
+                continue
+            sheet = item.get("sheet")
+            key = item.get("key") or {}
+            rows = extract["sheets"].get(sheet, {}).get("rows", [])
+            found = next(
+                (
+                    row
+                    for row in rows
+                    if all(
+                        str(row.get(column) or "").strip() == str(value or "").strip()
+                        for column, value in key.items()
+                    )
+                ),
+                None,
+            )
+            checked += 1
+            if action in ("add", "update") and found is None:
+                mismatches.append(f"missing {sheet} {key}")
+            if action == "delete" and found is not None:
+                mismatches.append(f"delete still present {sheet} {key}")
+        return {"checked": checked, "mismatches": mismatches}
+
+    def apply_approved_plan(
+        self,
+        run_id: str,
+        *,
+        write: bool = False,
+        confirm_plan_warnings: bool = False,
+        schema_validation: bool = True,
+    ) -> dict[str, Any]:
+        """Apply the approved Pass C plan as one combined Pass D batch.
+
+        Default is dry-run/report only. Real writes require the run to be in
+        ``plan_approved`` and all approval, source, decision, and workbook
+        fingerprints to still match the built plan.
+        """
+
+        from corvette_form_generator.editor_ops import apply_batch
+
+        started_at = datetime.now().isoformat(timespec="seconds")
+        session = self.load_session(run_id)
+        if session["state"] == STATE_APPLIED:
+            raise WizardError("Run already applied; start a new run for further changes.", status=409)
+        if session["state"] != STATE_PLAN_APPROVED:
+            raise WizardError("Apply requires an approved plan.", status=409)
+
+        run_dir = self.run_dir(run_id)
+        plan_file = run_dir / "apply-plan.json"
+        approval_file = run_dir / "plan-approval.json"
+        if not plan_file.is_file() or not approval_file.is_file():
+            raise WizardError("Apply requires apply-plan.json and plan-approval.json.", status=409)
+
+        plan = read_json(plan_file)
+        approval = read_json(approval_file)
+        plan_sha = hashlib.sha256(plan_file.read_bytes()).hexdigest()
+        if approval.get("planSha") != plan_sha:
+            raise WizardError("Plan approval hash does not match apply-plan.json; rebuild and re-approve.", status=409)
+        if not plan.get("valid"):
+            raise WizardError("Apply plan is not valid; rebuild before applying.", status=409)
+
+        _, candidates_file, candidates = self._parsed_candidates(run_id)
+        selection = self._load_selection(run_id, candidates_file)
+        state = self._decision_state(run_id, candidates, selection)
+        if plan["decisionsFingerprint"] != artifact_sha(state["decisions"]):
+            raise WizardError("Decisions changed after the plan was approved; rebuild the plan.", status=409)
+        source_fingerprint = (plan.get("sourceFingerprint") or selection.get("sourceFingerprint") or {})
+        if source_fingerprint.get("sha256") != session["fingerprint"].get("sha256"):
+            raise WizardError("Source fingerprint changed after the plan was approved; start a new run.", status=409)
+
+        workbook = self._require_workbook()
+        before = file_fingerprint(workbook)
+        expected = plan["workbookFingerprint"]
+        if expected.get("mtimeNs") != str(before["mtimeNs"]) or expected.get("sha256") != before["sha256"]:
+            raise WizardError("Workbook changed after the plan was approved; rebuild the plan.", status=409)
+
+        batch = self._combined_plan_batch(plan, workbook)
+        per_sheet_counts: dict[str, int] = {}
+        for item in batch["items"]:
+            sheet = item.get("sheet")
+            if sheet:
+                per_sheet_counts[str(sheet)] = per_sheet_counts.get(str(sheet), 0) + 1
+        confirmed_warnings: list[str] = []
+        if write and confirm_plan_warnings:
+            preview = apply_batch(workbook, batch, write=False, run_schema_validation=schema_validation)
+            confirmed_warnings = [warning["id"] for warning in preview.get("warnings", [])]
+        log_path = run_dir / "apply-workbook-edit-log.jsonl"
+        result = apply_batch(
+            workbook,
+            batch,
+            write=write,
+            source="ingest_wizard_apply",
+            confirmed_warnings=confirmed_warnings,
+            log_path=log_path,
+            run_schema_validation=schema_validation,
+        )
+        if not result.get("ok"):
+            return result
+
+        after = file_fingerprint(workbook)
+        completed_at = datetime.now().isoformat(timespec="seconds")
+        verification = self._verify_applied_ops(workbook, batch) if write else {"checked": 0, "mismatches": []}
+        report = {
+            "schemaVersion": SCHEMA_VERSION_D,
+            "runId": run_id,
+            "startedAt": started_at,
+            "completedAt": completed_at,
+            "appliedAt": completed_at,
+            "write": write,
+            "status": result["status"],
+            "ok": result["ok"],
+            "planSha": plan_sha,
+            "approvedBy": approval.get("approvedBy"),
+            "approvedAt": approval.get("approvedAt"),
+            "approval": approval,
+            "opCounts": {
+                "stage1": len(plan["stage1"]["items"]),
+                "stage2": len(plan["stage2"]["items"]),
+                "combined": len(batch["items"]),
+            },
+            "perSheetCounts": dict(sorted(per_sheet_counts.items())),
+            "workbookBefore": before,
+            "workbookAfter": after,
+            "warnings": result.get("warnings", []),
+            "confirmedWarnings": confirmed_warnings,
+            "warningsConfirmed": confirmed_warnings,
+            "applyResult": result,
+            "schemaResult": result.get("schemaResult"),
+            "gateReminders": result.get("gateReminders", []),
+            "sheets": result.get("sheets", []),
+            "backupPath": result.get("backupPath"),
+            "workbookEditLogPath": result.get("logPath"),
+            "verification": verification,
+        }
+        report_path = run_dir / ("apply-report.json" if write else "apply-dry-run-report.json")
+        write_json(report_path, report)
+        if write:
+            session["state"] = STATE_APPLIED
+            session["appliedAt"] = report["appliedAt"]
+            session["applyReport"] = "apply-report.json"
+            write_json(run_dir / "session.json", session)
+        result["reportPath"] = str(report_path)
+        result["verification"] = verification
+        return result
+
     def mark_complete(self, run_id: str) -> dict[str, Any]:
+        session = self.load_session(run_id, verify_source=False)
+        self._refuse_if_applied(session)
         report = self.progress(run_id)
         if not report["allComplete"]:
             blockers = {

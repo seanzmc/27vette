@@ -412,7 +412,7 @@ Manual smoke:
 
 ```sh
 .venv/bin/python scripts/order_guide_ingest_profiler.py \
-  --raw-export "2027 Chevrolet Car Corvette Export_RAW.xlsx" \
+  --raw-export "<raw_export>.xlsx" \
   --workbook stingray_master.xlsx \
   --run-id pass1-smoke-evidence \
   --output-dir /tmp/27vette-pass1-smoke-evidence
@@ -500,7 +500,7 @@ Validation evidence:
 # 3 passed
 
 .venv/bin/python scripts/order_guide_ingest_profiler.py \
-  --raw-export "2027 Chevrolet Car Corvette Export_RAW.xlsx" \
+  --raw-export "<prior_23_sheet_raw_export>.xlsx" \
   --workbook stingray_master.xlsx \
   --run-id pass1-smoke-evidence \
   --output-dir /tmp/27vette-pass1-smoke-evidence

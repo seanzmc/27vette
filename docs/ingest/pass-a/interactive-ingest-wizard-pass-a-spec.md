@@ -127,7 +127,7 @@ Evidence inspected before this spec:
   and ingest review endpoints welded to Pass 1/3/5 artifacts (fail-closed on
   model-selection and fingerprint checks); reused as a server-shape template,
   not extended.
-- `2027 Chevrolet Car Corvette Export_RAW.xlsx` — 23 sheets. Deterministic
+- The original Pass A raw export had 23 sheets. Deterministic
   signals verified by direct scan on 2026-07-03:
   - Options-matrix sheets (`Equipment Groups|Interior|Exterior|Mechanical 1–4`)
     carry the model family name in cell A1 (`Stingray`, `Grand Sport`, `Z06`,
@@ -365,7 +365,7 @@ same RPO across model-family sheets; integration into the workbook editor UI.
 - `pytest tests/test_ingest_wizard_profiler.py tests/test_ingest_wizard_parser.py tests/test_ingest_wizard_server.py` — new coverage: sheet-type/family/confidence detection, role validation (fail-closed cases), options/price extraction incl. status parsing and skipped rows, join exact/ambiguous/none/unmatched cases, session state machine, upload sanitization.
 - Full `pytest tests/` to prove no regression in existing ingest/editor suites.
 - Manual proof of success in the browser against
-  `2027 Chevrolet Car Corvette Export_RAW.xlsx`: choose file → sheet cards
+  the original Pass A raw export: choose file → sheet cards
   (23 sheets: 16 options matrices incl. 4 standard-equipment subtypes, 1 price
   sheet, 2 unsupported Color and Trim) → confirm roles → parse → candidate
   table shows candidates with exact price matches (e.g. `BV4` at 395) and an
@@ -394,7 +394,7 @@ Validation:
   `test_source_assembly_characterization.py` ×1) are pre-existing on the base
   commit: `git diff afa36fb` shows zero changes to those test files or their
   source surfaces on this branch.
-- Browser proof of success against `2027 Chevrolet Car Corvette Export_RAW.xlsx`
+- Browser proof of success against the original Pass A raw export
   (server on 127.0.0.1:8040): 23 sheet cards — 20 options matrices (16
   recommended `options`, 4 standard-equipment subtypes recommended `exclude`),
   1 price sheet (230 option price rows, 32 base-model rows, high confidence),

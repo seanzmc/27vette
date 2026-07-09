@@ -24,7 +24,7 @@ Evidence inspected: `docs/ingest/pass-a/interactive-ingest-wizard-pass-a-spec.md
 ### What exists
 
 - **Pass A (implemented 2026-07-03)** — browser wizard at `scripts/ingest_wizard_server.py` (port 8040): choose/upload file → sheet cards → role confirmation → deterministic parse → exact 1-to-1 price join → read-only candidate table. Session states `profiled → roles_confirmed → parsed`, artifacts under `form-output/ingest-wizard/<run-id>/` (`session.json`, `sheet-profile.json`, `sheet-roles.json`, `option-candidates.json`, `price-rows.json`, `join-report.json`), all `schemaVersion: "pass-a-1"`, fail-closed transitions, source-file fingerprinting.
-- **New raw export** (`2027 Chevrolet Car Corvette Export (4) (1).xlsx`, commit `dc9f442`): 28 sheets — `Equipment Groups|Interior|Exterior|Mechanical|Standard Equipment 1–5`, `Price Schedule`, `Color and Trim 1–2`. Contains Grand Sport X: `1YG07`/`1YG67` model codes in Price Schedule base-model rows and equipment-sheet variant headers, alongside `1YC` (Stingray), `1YE` (Grand Sport), `1YH` (Z06), `1YR` (ZR1), ZR1X codes. The older 23-sheet `..._RAW.xlsx` stays as reference.
+- **New raw export** (`2027 Chevrolet Car Corvette Export (4) (1).xlsx`, commit `dc9f442`): 28 sheets — `Equipment Groups|Interior|Exterior|Mechanical|Standard Equipment 1–5`, `Price Schedule`, `Color and Trim 1–2`. Contains Grand Sport X: `1YG07`/`1YG67` model codes in Price Schedule base-model rows and equipment-sheet variant headers, alongside `1YC` (Stingray), `1YE` (Grand Sport), `1YH` (Z06), `1YR` (ZR1), ZR1X codes.
 - **Workbook model metadata** (read-only probe 2026-07-05):
   - `model_master`: `stingray`, `grand_sport`, `z06` active; `zr1`, `zr1x` inactive scaffolds (`expected_variant_count` 4). **No `grand_sport_x` row.**
   - `variant_master`: 6 inactive GSX variant rows already exist (`1lt_g07`…`3lt_g67`, with prices); 4 ZR1 (`1lz_r07/3lz_r07/1lz_r67/3lz_r67`) and 4 ZR1X (`1lz_s07/3lz_s07/1lz_s67/3lz_s67`) inactive rows.
@@ -170,17 +170,20 @@ Deterministic translation of `decisions.json` into an ordered workbook operation
 
 ## Pass D — approved workbook apply
 
-**Surface:** workbook/data (protected — AGENTS.md §5). Risk: high. **Human approval checkpoint: explicit approval of this spec's Pass D plus the in-wizard `plan_approved` record are both required before any `--write`.**
+**Surface:** workbook/data (protected — AGENTS.md §5). Risk: high. **Human approval checkpoint: explicit approval of the child Pass D spec plus the in-wizard `plan_approved` record are both required before any `--write`; approval to implement the CLI is still separate from approval to run a live workbook write.**
 
-- Apply path: `apply_workbook_ops.py`-style invocation of `editor_ops.apply_batch(..., write=True)` wrapped by a new wizard endpoint/CLI `scripts/ingest_wizard_apply.py --run <run-id> [--write]`; dry-run by default, `--write` required, refuses unless session is `plan_approved` and the plan's workbook fingerprint (mtime_ns + sha256 captured at plan build) still matches the live file.
+Child spec: `docs/ingest/pass-d/pass-d-approved-workbook-apply-spec.md` (implemented 2026-07-08 for CLI/tests/docs and real-run dry-run evidence). It pins Pass D to a CLI-only, dry-run-default apply path; no UI apply button in the first apply pass; live workbook `--write` remains a separate explicit checkpoint.
+
+- Apply path: `apply_workbook_ops.py`-style invocation of `editor_ops.apply_batch(..., write=True)` wrapped by `scripts/ingest_wizard_apply.py --run <run-id> [--write]`; dry-run by default, `--write` required, refuses unless session is `plan_approved` and the plan's workbook fingerprint (mtime_ns + sha256 captured at plan build) still matches the live file.
+- Final live write uses a single combined batch (`stage1.items + stage2.items`) so stage-1 scaffolding and stage-2 data are saved atomically through one `save_workbook_safely()` call, rather than writing stage 1 and then risking a stage-2 failure.
 - All writes flow through `save_workbook_safely()`: Excel-lock refusal (`~$stingray_master.xlsx`), mtime-change refusal, temp-copy package validation, timestamped backup, atomic replace.
-- Post-write verification (scripted, not claimed): reload workbook read-only; assert per-sheet row counts match the plan; assert a sampled set of ops landed cell-exact; write `apply-report.json` (+ append to `form-output/workbook-edit-log.jsonl`).
+- Post-write verification (scripted, not claimed): reload workbook read-only; assert per-sheet row counts match the plan; assert planned add/update/delete/create_sheet effects landed cell-exact; write `apply-report.json` (+ append to `form-output/workbook-edit-log.jsonl`).
 - Models remain **inactive/unpromoted** after apply — `model_master.active` stays False for all three; activation is Pass F's `promote_model.py` job. This keeps generation/registry behavior unchanged until promotion is explicitly run.
 - Failure handling: any invariant failure aborts before `--write`; a failed safe-save leaves the original file untouched (temp-file protocol); the run stays in `plan_approved` for retry after cause analysis. Restoring from the timestamped backup is the rollback path and is documented in the apply report.
 
-**Exit criteria:** `applied` state with `apply-report.json` showing zero mismatches; workbook verified on disk; backup exists; no `form-output/` or `form-app/` changes yet.
+**Implementation checkpoint:** CLI/tests/docs complete and real approved run dry-run passes with `apply-dry-run-report.json` (`write=false`, 5,771 combined ops, 41 warnings, 0 errors, workbook fingerprint unchanged). **Live-write exit criteria after separate approval:** `applied` state with `apply-report.json` showing zero mismatches; workbook verified on disk; backup exists; no generated runtime or `form-app/` changes yet.
 
-**Files:** `scripts/ingest_wizard_apply.py` (new), `session.py`, server endpoint + UI stage 7 (apply is allowed to be CLI-only if the UI button adds risk — decision at implementation, both paths must enforce the same gates), `tests/test_ingest_wizard_apply.py` (fixture workbooks, never the live one); docs updates.
+**Files:** `scripts/ingest_wizard_apply.py` (new), `session.py`, `tests/test_ingest_wizard_apply.py` (fixture workbooks, never the live one); docs updates. No server endpoint or UI stage-7/apply button in this pass; the first apply path is CLI-only.
 
 **Validation:** apply tests on fixture workbooks (refusal cases: lock file, mtime drift, unapproved plan, fingerprint mismatch; success case: counts + cell samples); then the real apply, followed immediately by `pytest tests/test_editor_lints.py`-class schema/package validation and a manual diff review of the workbook (openpyxl-based sheet diff against the pre-apply backup, included in `apply-report.json`).
 

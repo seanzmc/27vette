@@ -35,11 +35,12 @@ class GlobalFamilyOpsTest(unittest.TestCase):
     def tearDown(self) -> None:
         self._tmp.cleanup()
 
-    def run_batch(self, items: list[dict], *, write: bool = False) -> dict:
+    def run_batch(self, items: list[dict], *, write: bool = False, confirmed: tuple[str, ...] = ()) -> dict:
         return apply_batch(
             self.path,
             batch(self.path, items),
             write=write,
+            confirmed_warnings=confirmed,
             run_schema_validation=False,
             log_path=Path(self._tmp.name) / "edit-log.jsonl",
         )
@@ -154,8 +155,7 @@ class GlobalFamilyOpsTest(unittest.TestCase):
         self.assertTrue(any("key must be exactly" in e for e in result["errors"]))
 
     def test_create_sheet_then_add_rows_in_same_batch(self) -> None:
-        result = self.run_batch(
-            [
+        items = [
                 {
                     "action": "create_sheet",
                     "sheet": "grandSportX_options",
@@ -187,9 +187,10 @@ class GlobalFamilyOpsTest(unittest.TestCase):
                         "active": True,
                     },
                 },
-            ],
-            write=True,
-        )
+            ]
+        result = self.run_batch(items, write=True)
+        self.assertEqual(result["status"], "needs_confirmation", result)
+        result = self.run_batch(items, write=True, confirmed=tuple(warning["id"] for warning in result["warnings"]))
         self.assertTrue(result["ok"], result)
         wb = load_workbook(self.path, read_only=True)
         self.assertIn("grandSportX_options", wb.sheetnames)

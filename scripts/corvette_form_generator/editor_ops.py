@@ -185,7 +185,7 @@ EDITOR_SHEET_META: dict[str, dict] = {
     },
     "model_interior_scope": {
         "key": ("model_key", "interior_id", "trim_level"),
-        "types": {"active": "bool"},
+        "types": {},
         "enums": {},
         "refs": {},
     },
@@ -510,6 +510,30 @@ def _prepare_batch(extract, batch):
         prepared_creates.append(
             {"action": "create_sheet", "sheet": sheet, "_family": family, "_headers": headers}
         )
+
+    # A scaffold plan can activate/register model_workbook_sources and then
+    # write to those sheets in the same combined batch. Reflect those pending
+    # source rows in the registry maps before validating subsequent ops.
+    source_keycols = EDITOR_SHEET_META["model_workbook_sources"]["key"]
+    source_index = _sheet_key_index(extract, "model_workbook_sources", source_keycols)
+    for o in ops:
+        if o.get("sheet") != "model_workbook_sources" or o.get("action") not in ("add", "update"):
+            continue
+        key = o.get("key") or {}
+        row = dict(source_index.get(_key_tuple(key, source_keycols), {}))
+        row.update(key)
+        row.update(o.get("row") or {})
+        if not workbook_truthy(row.get("active")):
+            continue
+        model_key = str(row.get("model_key") or "").strip()
+        source_role = str(row.get("source_role") or "").strip()
+        sheet_name = str(row.get("sheet_name") or "").strip()
+        family = SOURCE_ROLE_FAMILIES.get(source_role)
+        if not (model_key and sheet_name and family):
+            continue
+        sheet_family.setdefault(sheet_name, family)
+        models_by_sheet.setdefault(sheet_name, set()).add(model_key)
+        by_model_family[(model_key, family)] = sheet_name
     promoted = {r.get("model_key"): workbook_truthy(r.get("promoted_to_runtime"))
                 for r in rows_of(extract, "model_registry_promotion")}
 
@@ -657,7 +681,7 @@ def _prepare_batch(extract, batch):
                     str(row2.get("display_order") or "").strip() == str(dorder):
                 clash = True
         for p in prepared:
-            if p is o or p["sheet"] != sheet or p["action"] == "delete":
+            if p is o or p["sheet"] != sheet or p["action"] in ("create_sheet", "delete"):
                 continue
             p_group = p["_coerced_row"].get(group_col)
             if p_group is None:

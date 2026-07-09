@@ -32,7 +32,7 @@ Evidence inspected before this spec:
 - `scripts/corvette_form_generator/model_configs.py` — `REQUIRED_GENERATION_SOURCE_ROLES` and `OPTIONAL_GENERATION_SOURCE_ROLES` define the current source-role contract. `variant_option_overrides_sheet` is an optional source role and must be explicitly handled as review-required when candidates touch that surface.
 - `scripts/corvette_form_generator/schema_validation.py` — schema validator already checks model topology, source-role headers, source booleans/prices/RPO columns, and live-contract provenance leakage.
 - `scripts/workbook_editor_server.py` — existing local workbook editor already derives models, per-model sheet registries, schemas, and reference domains from the workbook. Later UI work should reuse this metadata shape rather than inventing a parallel workbook map.
-- `2027 Chevrolet Car Corvette Export_RAW.xlsx` — current raw export has 23 sheets. Most order-guide tabs use a row-3 matrix shape with columns 1–3 as `Orderable RPO Code`, `Ref. Only RPO Code`, and `Description`, then variant columns from column 4 onward. `ZR1 and ZR1X` tabs carry eight variant columns in one raw sheet. `Price Schedule` and `Color and Trim` use different layouts.
+- The original Pass 0 raw export had 23 sheets. Most order-guide tabs use a row-3 matrix shape with columns 1–3 as `Orderable RPO Code`, `Ref. Only RPO Code`, and `Description`, then variant columns from column 4 onward. `ZR1 and ZR1X` tabs carry eight variant columns in one raw sheet. `Price Schedule` and `Color and Trim` use different layouts.
 - `.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx` — current workbook schema validates with 0 errors and 0 warnings.
 
 Risk level: medium. This pass is read-only, but it defines the contract later writer/review passes will rely on. A weak evidence model here would recreate the prior convolution problem.
@@ -76,7 +76,7 @@ Command shape:
 
 ```sh
 .venv/bin/python scripts/order_guide_ingest_profiler.py \
-  --raw-export "2027 Chevrolet Car Corvette Export_RAW.xlsx" \
+  --raw-export "<raw_export>.xlsx" \
   --workbook stingray_master.xlsx \
   --run-id <run-id> \
   --output-dir form-output/ingest/<run-id>
@@ -285,7 +285,7 @@ If a raw source item cannot map to an existing family, Pass 0 reports the gap. I
    - Mitigation: artifacts are transient, run-scoped JSON/Markdown. Canonical workbook families stay unchanged.
 
 5. Fixture brittleness against real GM export quirks.
-   - Mitigation: use compact fixtures that encode shape classes, plus an optional manual smoke against `2027 Chevrolet Car Corvette Export_RAW.xlsx`.
+   - Mitigation: use compact fixtures that encode shape classes, plus an optional manual smoke against the current official raw export.
 
 6. Accidentally producing generated/runtime churn.
    - Mitigation: tests and handoff must include a guard over all tracked `form-output` files, `form-app/data.js`, and `stingray_master.xlsx`. Do not limit the guard to `form-output/runtime`.
@@ -304,7 +304,7 @@ During implementation:
 ```sh
 .venv/bin/python -m pytest tests/test_order_guide_ingest_profiler.py
 .venv/bin/python scripts/order_guide_ingest_profiler.py \
-  --raw-export "2027 Chevrolet Car Corvette Export_RAW.xlsx" \
+  --raw-export "<raw_export>.xlsx" \
   --workbook stingray_master.xlsx \
   --run-id manual-smoke \
   --output-dir /tmp/27vette-ingest-manual-smoke
@@ -357,7 +357,7 @@ Implemented behavior:
 
 ```sh
 .venv/bin/python scripts/order_guide_ingest_profiler.py \
-  --raw-export "2027 Chevrolet Car Corvette Export_RAW.xlsx" \
+  --raw-export "<prior_23_sheet_raw_export>.xlsx" \
   --workbook stingray_master.xlsx \
   --run-id manual-smoke \
   --output-dir /tmp/27vette-ingest-manual-smoke
@@ -382,7 +382,7 @@ Gate results:
 # 3 passed
 
 .venv/bin/python scripts/order_guide_ingest_profiler.py \
-  --raw-export "2027 Chevrolet Car Corvette Export_RAW.xlsx" \
+  --raw-export "<prior_23_sheet_raw_export>.xlsx" \
   --workbook stingray_master.xlsx \
   --run-id manual-smoke \
   --output-dir /tmp/27vette-ingest-manual-smoke
