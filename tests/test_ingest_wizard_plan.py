@@ -13,6 +13,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 for entry in (ROOT / "scripts", ROOT / "tests"):
@@ -31,6 +32,11 @@ from ingest_wizard_fixtures import build_master_workbook, build_raw_export  # no
 class PlanFlowTest(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()
+        self._schema_patch = patch(
+            "corvette_form_generator.editor_ops.validate_workbook_schema",
+            return_value=[],
+        )
+        self._schema_patch.start()
         self.root = Path(self._tmp.name)
         build_raw_export(self.root / "raw.xlsx")
         self.master = build_master_workbook(self.root / "master.xlsx")
@@ -43,6 +49,7 @@ class PlanFlowTest(unittest.TestCase):
         self.store.select_models(self.run_id, ["zr1", "zr1x"], {"zr1": "z06", "zr1x": "z06"})
 
     def tearDown(self) -> None:
+        self._schema_patch.stop()
         self._tmp.cleanup()
 
     def complete_model(
@@ -485,8 +492,30 @@ class PlanFlowTest(unittest.TestCase):
         self.assertTrue((run_dir / "apply-plan.md").is_file())
 
         approved = self.store.approve_plan(self.run_id, "sean")
-        self.assertEqual(approved["session"]["state"], "plan_approved")
+        self.assertEqual(approved["session"]["state"], "dry_run_approved")
         self.assertTrue((run_dir / "plan-approval.json").is_file())
+        approval = read_json(run_dir / "plan-approval.json")
+        plan = read_json(run_dir / "apply-plan.json")
+        session = read_json(run_dir / "session.json")
+        self.assertEqual(approval["schemaVersion"], "plan-approval-2")
+        self.assertEqual(approval["scope"], "dry_run_evidence")
+        self.assertEqual(approval["runId"], self.run_id)
+        self.assertEqual(approval["targets"], ["zr1", "zr1x"])
+        self.assertEqual(approval["planSchemaVersion"], "pass-c-2")
+        self.assertEqual(
+            approval["planSha"],
+            __import__("hashlib").sha256((run_dir / "apply-plan.json").read_bytes()).hexdigest(),
+        )
+        self.assertEqual(approval["workbookFingerprint"], plan["workbookFingerprint"])
+        self.assertEqual(approval["sourceFingerprint"], session["fingerprint"])
+        self.assertEqual(approval["candidatesFingerprint"], plan["candidatesFingerprint"])
+        self.assertEqual(approval["decisionsFingerprint"], plan["decisionsFingerprint"])
+        self.assertEqual(
+            approval["modelSelectionSha"],
+            __import__("hashlib").sha256((run_dir / "model-selection.json").read_bytes()).hexdigest(),
+        )
+        for unavailable in ("canonicalManifestSha", "compileReportSha", "exceptionResolutionsSha"):
+            self.assertNotIn(unavailable, approval)
 
         # A new decision reopens the run and invalidates the plan.
         candidate = self.store.review_queue(self.run_id, "zr1", "section")["candidates"][0]
