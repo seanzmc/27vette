@@ -569,8 +569,6 @@ def _prepare_batch(extract, batch):
             {"action": "create_sheet", "sheet": sheet, "_family": family, "_headers": headers}
         )
 
-    bool_storage = _bool_storage_conventions(extract, sheet_family, created_templates)
-
     # A scaffold plan can activate/register model_workbook_sources and then
     # write to those sheets in the same combined batch. Reflect those pending
     # source rows in the registry maps before validating subsequent ops.
@@ -594,6 +592,7 @@ def _prepare_batch(extract, batch):
         sheet_family.setdefault(sheet_name, family)
         models_by_sheet.setdefault(sheet_name, set()).add(model_key)
         by_model_family[(model_key, family)] = sheet_name
+    bool_storage = _bool_storage_conventions(extract, sheet_family, created_templates)
     promoted = {r.get("model_key"): workbook_truthy(r.get("promoted_to_runtime"))
                 for r in rows_of(extract, "model_registry_promotion")}
 

@@ -13,6 +13,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from openpyxl import load_workbook
 
@@ -196,6 +197,34 @@ class ApplyFlowTest(unittest.TestCase):
                 confirm_plan_warnings=True,
                 schema_validation=False,
             )
+
+    def test_dry_run_failure_still_writes_report(self) -> None:
+        run_dir = self.approve_plan()
+        before = self.master.read_bytes()
+
+        with patch(
+            "corvette_form_generator.editor_ops.apply_batch",
+            return_value={
+                "ok": False,
+                "status": "bool_hygiene_failed",
+                "errors": ["dry-run bool hygiene failed with 1 error(s)"],
+                "warnings": [],
+                "boolHygieneResult": {"error_count": 1},
+            },
+        ):
+            result = self.store.apply_approved_plan(self.run_id, schema_validation=False)
+
+        self.assertFalse(result["ok"])
+        self.assertEqual(result["status"], "bool_hygiene_failed")
+        self.assertEqual(self.master.read_bytes(), before)
+        report = read_json(run_dir / "apply-dry-run-report.json")
+        self.assertFalse(report["write"])
+        self.assertEqual(report["status"], "bool_hygiene_failed")
+        self.assertEqual(report["applyResult"]["status"], "bool_hygiene_failed")
+        self.assertEqual(report["boolHygieneResult"]["error_count"], 1)
+        self.assertEqual(report["workbookBefore"], report["workbookAfter"])
+        self.assertEqual(report["deploymentContinuity"], {})
+        self.assertEqual(read_json(run_dir / "session.json")["state"], "plan_approved")
 
     def test_write_requires_warning_confirmation(self) -> None:
         self.approve_plan()

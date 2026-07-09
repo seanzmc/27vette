@@ -286,6 +286,54 @@ class GlobalFamilyOpsTest(unittest.TestCase):
         self.assertEqual(rows[1][7], "True")
         self.assertEqual(rows[1][9], "True")
 
+    def test_pending_registered_existing_sheet_preserves_text_bool_convention(self) -> None:
+        wb = load_workbook(self.path)
+        ws = wb["zr1_options"]
+        source_headers = [cell.value for cell in ws[1]]
+        selectable_col = source_headers.index("selectable") + 1
+        active_col = source_headers.index("active") + 1
+        ws.cell(row=2, column=selectable_col, value="False")
+        ws.cell(row=2, column=active_col, value="True")
+        wb.save(self.path)
+        wb.close()
+
+        items = [
+            {
+                "action": "update",
+                "sheet": "model_workbook_sources",
+                "key": {"model_key": "zr1", "source_role": "source_option_sheet"},
+                "row": {
+                    "sheet_name": "zr1_options",
+                    "active": True,
+                },
+            },
+            {
+                "action": "add",
+                "sheet": "zr1_options",
+                "key": {"option_id": "opt_zzz_001"},
+                "row": {
+                    "option_id": "opt_zzz_001",
+                    "rpo": "ZZZ",
+                    "option_name": "Pending Registry Bool Test",
+                    "section_id": "sec_whee_001",
+                    "selectable": False,
+                    "active": True,
+                },
+            },
+        ]
+
+        preview = self.run_batch(items, write=True)
+        result = self.run_batch(items, write=True, confirmed=tuple(warning["id"] for warning in preview["warnings"]))
+
+        self.assertTrue(result["ok"], result)
+        self.assertEqual(result["boolHygieneResult"]["error_count"], 0)
+        wb = load_workbook(self.path, read_only=True, data_only=True)
+        rows = list(wb["zr1_options"].iter_rows(values_only=True))
+        wb.close()
+        added = next(row for row in rows[1:] if row[0] == "opt_zzz_001")
+        self.assertEqual(added[7], "False")
+        self.assertEqual(added[9], "True")
+
     def test_create_sheet_failures(self) -> None:
         result = self.run_batch(
             [{"action": "create_sheet", "sheet": "z06_options", "family": "options", "headersFrom": "z06_options"}]

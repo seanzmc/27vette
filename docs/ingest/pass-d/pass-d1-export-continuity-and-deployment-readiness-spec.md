@@ -1,6 +1,6 @@
 # Pass D.1 — Export continuity and deployment-readiness blocker closure
 
-Status: Implemented 2026-07-08 after Sean approval. Tooling/tests/docs landed for bool-storage parity, `pass-c-2` plan schema, Grand Sport X registry-key correction, action-aware continuity reporting, and dry-run deployment-continuity diagnostics. Live workbook write remains unapproved until a rebuilt `pass-c-2` run is dry-run validated and separately approved. Reasoning level for Sean/Codex: high.
+Status: Implemented 2026-07-08 after Sean approval. Tooling/tests/docs landed for bool-storage parity, `pass-c-2` plan schema, Grand Sport X registry-key correction, action-aware continuity reporting, and dry-run deployment-continuity diagnostics. Follow-up Pass D.2 completed 2026-07-09 with rebuilt run `20260709-003524-650cae`; live workbook write remains separately unapproved. Reasoning level for Sean/Codex: high.
 
 ## 0. Decision summary
 
@@ -348,4 +348,4 @@ After a live write, the next separate generation/promotion pass must regenerate 
 
 ## 8. Closure
 
-Pass D.1 is implemented. The next approval checkpoint is not a live workbook write; it is a rebuilt `pass-c-2` dry-run report review. Only after that report proves bool hygiene and explicitly labels any deployment blockers/deferrals should Sean approve or reject a specific `--write` command for the rebuilt run.
+Pass D.1 is implemented. Pass D.2 (`docs/ingest/pass-d/pass-d2-rebuilt-dry-run-evidence-spec.md`) completed the required rebuilt all-target `pass-c-2` dry-run evidence pass on 2026-07-09. The result does not approve live write: bool hygiene is clean and the workbook stayed unchanged, but ZR1/ZR1X remain explicitly `not_deployment_ready` because price-rule and rule-group blockers remain. The next decision must separately choose no write, a non-deployment scaffold write for run `20260709-003524-650cae`, or a follow-up source/tooling pass before any write.

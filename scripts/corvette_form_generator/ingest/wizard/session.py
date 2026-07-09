@@ -1366,17 +1366,20 @@ class WizardSessionStore:
             log_path=log_path,
             run_schema_validation=schema_validation,
         )
-        if not result.get("ok"):
+        if write and not result.get("ok"):
             return result
-
         after = file_fingerprint(workbook)
         completed_at = datetime.now().isoformat(timespec="seconds")
         verification = self._verify_applied_ops(workbook, batch) if write else {"checked": 0, "mismatches": []}
-        deployment_continuity = self._deployment_continuity_probe(
-            workbook,
-            batch,
-            plan,
-            schema_validation=schema_validation,
+        deployment_continuity = (
+            self._deployment_continuity_probe(
+                workbook,
+                batch,
+                plan,
+                schema_validation=schema_validation,
+            )
+            if result.get("ok")
+            else {}
         )
         report = {
             "schemaVersion": SCHEMA_VERSION_D,
@@ -1423,6 +1426,10 @@ class WizardSessionStore:
         }
         report_path = run_dir / ("apply-report.json" if write else "apply-dry-run-report.json")
         write_json(report_path, report)
+        if not result.get("ok"):
+            result["reportPath"] = str(report_path)
+            result["verification"] = verification
+            return result
         if write:
             session["state"] = STATE_APPLIED
             session["appliedAt"] = report["appliedAt"]
