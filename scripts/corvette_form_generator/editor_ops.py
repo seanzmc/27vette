@@ -621,6 +621,8 @@ def _final_rows_by_sheet(extract: dict, prepared: list[dict]) -> dict[str, list[
         sheet: [dict(row) for row in data.get("rows", [])]
         for sheet, data in extract["sheets"].items()
     }
+    row_indexes: dict[str, dict[tuple[str, ...], dict]] = {}
+    deleted_row_ids: dict[str, set[int]] = {}
     for operation in prepared:
         if operation["action"] == "create_sheet":
             final_rows.setdefault(operation["sheet"], [])
@@ -630,77 +632,103 @@ def _final_rows_by_sheet(extract: dict, prepared: list[dict]) -> dict[str, list[
         keycols = EDITOR_SHEET_META[family]["key"]
         key = operation["_kt"]
         rows = final_rows.setdefault(sheet, [])
-        match = next(
-            (index for index, row in enumerate(rows)
-             if tuple(str(row.get(column) or "").strip() for column in keycols) == key),
-            None,
-        )
+        if sheet not in row_indexes:
+            row_indexes[sheet] = {
+                tuple(str(row.get(column) or "").strip() for column in keycols): row
+                for row in rows
+            }
+        row_index = row_indexes[sheet]
+        match = row_index.get(key)
         if operation["action"] == "delete":
             if match is not None:
-                rows.pop(match)
+                deleted_row_ids.setdefault(sheet, set()).add(id(match))
             continue
         if operation["action"] == "update":
             if match is not None:
-                rows[match].update(operation["_coerced_row"])
+                match.update(operation["_coerced_row"])
             continue
         row = dict(operation.get("key") or {})
         row.update(operation["_coerced_row"])
         rows.append(row)
+        row_index[key] = row
+    for sheet, deleted_ids in deleted_row_ids.items():
+        final_rows[sheet] = [row for row in final_rows[sheet] if id(row) not in deleted_ids]
     return final_rows
 
 
-def _row_matches_models(row: dict, sheet: str, maps, target_models: set[str]) -> bool:
+def _reference_row_models(row: dict, sheet: str, maps) -> set[str]:
     _registry, _sheet_family, models_by_sheet, _by_model_family = maps
     if sheet in GLOBAL_SHEET_FAMILIES:
         model_key = str(row.get("model_key") or "").strip()
-        return model_key == "*" or model_key in target_models
-    return bool(set(models_by_sheet.get(sheet, set())) & target_models)
+        return {model_key} if model_key else set()
+    return set(models_by_sheet.get(sheet, set()))
 
 
-def _incoming_references(
-    extract: dict,
+def _build_reverse_reference_index(
+    final_rows: dict[str, list[dict]],
     maps,
     sheet_family: dict[str, str],
-    prepared: list[dict],
-    *,
-    deleted_sheet: str,
-    deleted_family: str,
-    target_id: str,
-) -> list[str]:
-    final_rows = _final_rows_by_sheet(extract, prepared)
-    _registry, _registered_families, models_by_sheet, _by_model_family = maps
-    target_models = set(models_by_sheet.get(deleted_sheet, set()))
-    target_values = {deleted_family: target_id}
-    if deleted_family == "options":
-        source_row = next(
-            (
-                row
-                for row in rows_of(extract, deleted_sheet)
-                if str(row.get("option_id") or "").strip() == target_id
-            ),
-            {},
-        )
-        target_rpo = str(source_row.get("rpo") or "").strip()
-        if target_rpo:
-            target_values["option_rpos"] = target_rpo
-    references: set[str] = set()
+) -> tuple[dict[tuple[str, str, str], set[str]], dict[str, set[str]]]:
+    reverse_index: dict[tuple[str, str, str], set[str]] = {}
     for sheet, family in sheet_family.items():
         meta = EDITOR_SHEET_META.get(family)
         if not meta:
             continue
         for row in final_rows.get(sheet, []):
-            if target_models and not _row_matches_models(row, sheet, maps, target_models):
+            models = _reference_row_models(row, sheet, maps)
+            if not models:
                 continue
             for column, refkind in _meta_ref_items(meta):
                 value = str(row.get(column) or "").strip()
-                if any(value == target_values[kind] for kind in _ref_kinds(refkind) if kind in target_values):
-                    references.add(f"{sheet}.{column}")
+                if not value:
+                    continue
+                for model in models:
+                    for kind in _ref_kinds(refkind):
+                        reverse_index.setdefault((model, kind, value), set()).add(f"{sheet}.{column}")
             conditional = _conditional_ref_spec(meta, row)
             if conditional is None:
                 continue
             column, refkind = conditional
-            if refkind in target_values and str(row.get(column) or "").strip() == target_values[refkind]:
-                references.add(f"{sheet}.{column}")
+            value = str(row.get(column) or "").strip()
+            if refkind is None or not value:
+                continue
+            for model in models:
+                reverse_index.setdefault((model, refkind, value), set()).add(f"{sheet}.{column}")
+
+    _registry, _sheet_family, _models_by_sheet, by_model_family = maps
+    option_rpos: dict[str, set[str]] = {}
+    option_models = {model for model, family in by_model_family if family == "options"}
+    for model in option_models:
+        option_sheet = by_model_family.get((model, "options"))
+        if not option_sheet:
+            continue
+        option_rpos[model] = {
+            str(row.get("rpo") or "").strip()
+            for row in final_rows.get(option_sheet, [])
+            if str(row.get("rpo") or "").strip()
+        }
+    return reverse_index, option_rpos
+
+
+def _incoming_references(
+    reverse_index: dict[tuple[str, str, str], set[str]],
+    final_option_rpos: dict[str, set[str]],
+    maps,
+    *,
+    deleted_sheet: str,
+    deleted_family: str,
+    target_id: str,
+    target_rpo: str = "",
+) -> list[str]:
+    _registry, _registered_families, models_by_sheet, _by_model_family = maps
+    target_models = set(models_by_sheet.get(deleted_sheet, set()))
+    references: set[str] = set()
+    for model in target_models:
+        references.update(reverse_index.get((model, deleted_family, target_id), set()))
+        references.update(reverse_index.get(("*", deleted_family, target_id), set()))
+        if deleted_family == "options" and target_rpo and target_rpo not in final_option_rpos.get(model, set()):
+            references.update(reverse_index.get((model, "option_rpos", target_rpo), set()))
+            references.update(reverse_index.get(("*", "option_rpos", target_rpo), set()))
     return sorted(references)
 
 
@@ -833,6 +861,8 @@ def _prepare_batch(extract, batch):
         effective_row.update(key)
         effective_row.update(coerced)
         for col, refkind in _meta_ref_items(meta):
+            if action == "delete":
+                continue
             if action != "add" and col not in coerced and col not in key:
                 continue
             value = effective_row.get(col)
@@ -844,7 +874,7 @@ def _prepare_batch(extract, batch):
         conditional_meta = meta.get("conditional_ref") or {}
         conditional_column = conditional_meta.get("column")
         discriminator_column = conditional_meta.get("discriminator")
-        if conditional_column and (
+        if action != "delete" and conditional_column and (
             action == "add"
             or conditional_column in coerced
             or discriminator_column in coerced
@@ -967,19 +997,26 @@ def _prepare_batch(extract, batch):
                                         f"in {group_col}={group_val}"})
 
     # referenced-delete warnings
-    for o in prepared:
-        if o["action"] != "delete":
-            continue
-        family, sheet = o["_family"], o["sheet"]
-        target_id = o["_kt"][0]
-        referencing = _incoming_references(
-            extract,
+    delete_ops = [operation for operation in prepared if operation["action"] == "delete"]
+    if delete_ops:
+        final_rows = _final_rows_by_sheet(extract, prepared)
+        reverse_references, final_option_rpos = _build_reverse_reference_index(
+            final_rows,
             maps,
             sheet_family,
-            prepared,
+        )
+    for o in delete_ops:
+        family, sheet = o["_family"], o["sheet"]
+        target_id = o["_kt"][0]
+        source_row = key_indexes.get(sheet, {}).get(o["_kt"], {})
+        referencing = _incoming_references(
+            reverse_references,
+            final_option_rpos,
+            maps,
             deleted_sheet=sheet,
             deleted_family=family,
             target_id=target_id,
+            target_rpo=str(source_row.get("rpo") or "").strip(),
         )
         if referencing:
             warnings.append({"id": f"refdel:{sheet}:{'+'.join(o['_kt'])}",

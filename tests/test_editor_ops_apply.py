@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 import shutil
 import sys
@@ -374,6 +375,27 @@ class ValidateBatchTest(OpsFixtureBase):
                                           {"option_id": "opt_ghost_001", "variant_id": "1lt"},
                                           {"option_id": "opt_ghost_001", "variant_id": "1lt", "status": "available"})))
 
+    def test_delete_does_not_validate_its_own_orphaned_outgoing_reference(self):
+        orphaned = copy.deepcopy(self.extract)
+        orphaned["sheets"]["stingray_options"]["rows"] = [
+            row
+            for row in orphaned["sheets"]["stingray_options"]["rows"]
+            if row.get("option_id") != "opt_one_001"
+        ]
+
+        result = validate_batch(
+            orphaned,
+            batch(
+                op(
+                    "delete",
+                    "stingray_ovs",
+                    {"option_id": "opt_one_001", "variant_id": "1lt"},
+                )
+            ),
+        )
+
+        self.assertEqual(result["errors"], [], result)
+
     def test_direct_and_price_endpoints_accept_option_or_interior_entities(self):
         result = validate_batch(
             self.extract,
@@ -543,6 +565,40 @@ class ValidateBatchTest(OpsFixtureBase):
             "interior_components.interior_id",
         ):
             self.assertIn(reference, interior_warning["message"])
+
+    def test_rpo_reference_survives_one_duplicate_rpo_option_delete(self):
+        duplicate_rpo = copy.deepcopy(self.extract)
+        duplicate_rpo["sheets"]["stingray_options"]["rows"].append(
+            option_row("opt_thr_002", "THR", "sec_b", 30)
+        )
+
+        warning = next(
+            warning
+            for warning in validate_batch(
+                duplicate_rpo,
+                batch(op("delete", "stingray_options", {"option_id": "opt_thr_001"})),
+            )["warnings"]
+            if warning["id"] == "refdel:stingray_options:opt_thr_001"
+        )
+
+        self.assertNotIn("default_selection_rules.condition_id", warning["message"])
+
+    def test_final_reference_state_is_built_once_for_multiple_deletes(self):
+        with patch.object(
+            editor_ops,
+            "_final_rows_by_sheet",
+            wraps=editor_ops._final_rows_by_sheet,
+        ) as final_state_builder:
+            result = validate_batch(
+                self.extract,
+                batch(
+                    op("delete", "stingray_options", {"option_id": "opt_thr_001"}),
+                    op("delete", "stingray_options", {"option_id": "opt_rem_001"}),
+                ),
+            )
+
+        self.assertEqual(result["errors"], [], result)
+        self.assertEqual(final_state_builder.call_count, 1)
 
     def test_same_batch_reference_remap_closes_delete_warning(self):
         warnings = self.warnings_of(

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Pass C editor_ops extensions: global sheet families + create_sheet ops.
 
-Fixture workbooks only; schema validation is disabled because the compact
-fixture is not a schema-complete workbook. The live workbook is never used.
+Fixture workbooks only. Write tests keep schema validation enabled while
+mocking a successful schema issue scan for the compact workbook; the live
+workbook is never used.
 """
 
 from __future__ import annotations
