@@ -313,7 +313,11 @@ class WizardSessionStore:
                     )
         return current
 
-    def _compile_report_allowed_deferrals(self, run_dir: Path) -> list[dict[str, Any]]:
+    def _compile_report_allowed_deferrals(
+        self,
+        run_dir: Path,
+        targets: list[str],
+    ) -> list[dict[str, Any]]:
         """Return the closed-policy deferrals declared by the bound compile report."""
 
         report_file = run_dir / "compile-report.json"
@@ -325,6 +329,7 @@ class WizardSessionStore:
             raise WizardError("Compile report deferrals must be a list.", status=409)
         allowed: list[dict[str, Any]] = []
         seen_ids: set[str] = set()
+        target_set = set(targets)
         for item in declared:
             if not isinstance(item, dict) or item.get("disposition") != "allowed_deferral":
                 continue
@@ -336,9 +341,9 @@ class WizardSessionStore:
                     f"Compile report contains non-allowlisted deferral kind {kind!r}.",
                     status=409,
                 )
-            if not model:
+            if model not in target_set:
                 raise WizardError(
-                    "Compile report allowed deferrals require an exact target model.",
+                    "Compile report allowed deferrals require an exact selected target model.",
                     status=409,
                 )
             if not deferral_id or deferral_id in seen_ids:
@@ -402,7 +407,10 @@ class WizardSessionStore:
         report_file = run_dir / "compile-report.json"
         if not report_file.is_file():
             raise WizardError("Write eligibility requires the current compile report.", status=409)
-        models = read_json(report_file).get("models")
+        report = read_json(report_file)
+        if report.get("schemaVersion") != "compile-report-1":
+            raise WizardError("Write eligibility requires compile-report-1.", status=409)
+        models = report.get("models")
         if not isinstance(models, dict) or set(models) != set(targets):
             raise WizardError(
                 "Compile report readiness must cover the exact selected target set.",
@@ -418,8 +426,8 @@ class WizardSessionStore:
                     f"Compile report target {model} is not ready: {', '.join(missing)}.",
                     status=409,
                 )
-            blockers = entry.get("blockers") or []
-            if not isinstance(blockers, list) or blockers:
+            blockers = entry.get("blockers")
+            if not isinstance(blockers, list) or blockers != []:
                 raise WizardError(
                     f"Compile report target {model} still contains blockers.",
                     status=409,
@@ -430,12 +438,13 @@ class WizardSessionStore:
         self,
         run_dir: Path,
         deferrals: list[dict[str, Any]],
+        targets: list[str],
     ) -> list[dict[str, Any]]:
         """Require every report deferral to be an exact compile-report declaration."""
 
         declared = {
             str(item["deferralId"]): item
-            for item in self._compile_report_allowed_deferrals(run_dir)
+            for item in self._compile_report_allowed_deferrals(run_dir, targets)
         }
         validated: list[dict[str, Any]] = []
         seen_ids: set[str] = set()
@@ -1798,7 +1807,8 @@ class WizardSessionStore:
                     targets,
                 )
                 compile_deferrals = self._compile_report_allowed_deferrals(
-                    self.run_dir(str(approval["runId"]))
+                    self.run_dir(str(approval["runId"])),
+                    targets,
                 )
                 not_applicable_families = self._compile_report_not_applicable_families(
                     self.run_dir(str(approval["runId"])),
@@ -2019,7 +2029,7 @@ class WizardSessionStore:
             raise WizardError("Dry-run target deferrals do not match the atomic plan total.", status=409)
         self._require_compile_report_readiness(run_dir, targets)
         self._compile_report_not_applicable_families(run_dir, targets)
-        self._validate_report_deferrals(run_dir, deferrals)
+        self._validate_report_deferrals(run_dir, deferrals, targets)
 
     def approve_write(self, run_id: str, approver: str) -> dict[str, Any]:
         """Create write authority solely from current stored proof artifacts."""
@@ -2145,7 +2155,11 @@ class WizardSessionStore:
         approved_deferrals = write_approval.get("allowedDeferrals") or []
         if approved_deferrals != (eligibility.get("deferrals") or []):
             raise WizardError("Allowed deferral set drifted after write approval.", status=409)
-        self._validate_report_deferrals(run_dir, approved_deferrals)
+        self._validate_report_deferrals(
+            run_dir,
+            approved_deferrals,
+            [str(model) for model in plan.get("targets") or []],
+        )
 
         batch = self._combined_plan_batch(plan, workbook)
         preview = apply_batch(

@@ -132,6 +132,7 @@ class ApplyFlowTest(unittest.TestCase):
         compile_deferrals: list[dict] | None = None,
         source_feature_coverage: list[dict] | None = None,
         compile_models: dict[str, dict] | None = None,
+        compile_schema_version: str = "compile-report-1",
         explicit_option_semantics: bool = True,
     ) -> tuple[Path, dict]:
         """Build stored pass-c-3-shaped proof without invoking a live write."""
@@ -163,7 +164,7 @@ class ApplyFlowTest(unittest.TestCase):
             (
                 "compile-report.json",
                 {
-                    "schemaVersion": "compile-report-1",
+                    "schemaVersion": compile_schema_version,
                     "deferrals": compile_deferrals,
                     "sourceFeatureCoverage": source_feature_coverage,
                     "models": compile_models,
@@ -698,6 +699,35 @@ class ApplyFlowTest(unittest.TestCase):
 
         self.assertFalse((run_dir / "write-approval.json").exists())
 
+    def test_compile_report_requires_exact_schema(self) -> None:
+        run_dir, _ = self.future_write_authority(
+            approve=False,
+            compile_schema_version="compile-report-0",
+        )
+
+        with self.assertRaisesRegex(WizardError, "compile-report-1"):
+            self.store.approve_write(self.run_id, "sean")
+
+        self.assertFalse((run_dir / "write-approval.json").exists())
+
+    def test_compile_report_requires_explicit_empty_blockers(self) -> None:
+        models = {
+            model: {
+                "compileReady": True,
+                "planReady": True,
+                "writeReady": True,
+                "deploymentReady": True,
+                **({"blockers": []} if model == "zr1x" else {}),
+            }
+            for model in ("zr1", "zr1x")
+        }
+        run_dir, _ = self.future_write_authority(approve=False, compile_models=models)
+
+        with self.assertRaisesRegex(WizardError, "contains blockers"):
+            self.store.approve_write(self.run_id, "sean")
+
+        self.assertFalse((run_dir / "write-approval.json").exists())
+
     def test_compile_report_requires_exact_target_set(self) -> None:
         models = {
             "zr1": {
@@ -761,6 +791,19 @@ class ApplyFlowTest(unittest.TestCase):
 
         approval = read_json(run_dir / "write-approval.json")
         self.assertEqual(approval["allowedDeferrals"], [row])
+
+    def test_allowed_deferral_must_bind_selected_target(self) -> None:
+        row = self.deferral("def_media_missing", "asset_map_media_missing")
+        row["model"] = "stingray"
+        run_dir, _ = self.future_write_authority(
+            approve=False,
+            compile_deferrals=[row],
+        )
+
+        with self.assertRaisesRegex(WizardError, "selected target model"):
+            self.store.approve_write(self.run_id, "sean")
+
+        self.assertFalse((run_dir / "write-approval.json").exists())
 
     def test_scaffold_warning_is_accepted_only_as_a_warning(self) -> None:
         from corvette_form_generator.editor_ops import classify_warnings
