@@ -11,6 +11,7 @@ See workbook-editor-phase2-spec.md.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
 import tempfile
@@ -87,6 +88,10 @@ EDITOR_SHEET_META: dict[str, dict] = {
             "source_id": "options",
             "target_id": "options",
         },
+        "ref_unions": {
+            "source_id": ("options", "interiors"),
+            "target_id": ("options", "interiors"),
+        },
     },
     "rule_groups": {
         "key": ("group_id",),
@@ -124,6 +129,10 @@ EDITOR_SHEET_META: dict[str, dict] = {
             "condition_option_id": "options",
             "target_option_id": "options",
         },
+        "ref_unions": {
+            "condition_option_id": ("options", "interiors"),
+            "target_option_id": ("options", "interiors"),
+        },
     },
     "variant_overrides": {
         "key": ("option_id", "variant_id"),
@@ -142,7 +151,11 @@ EDITOR_SHEET_META: dict[str, dict] = {
         "key": ("interior_id", "option_id"),
         "types": {},
         "enums": {"rule_type": ("requires",)},
-        "refs": {"interior_id": "interiors", "option_id": "options"},
+        "refs": {
+            "interior_id": "interiors",
+            "option_id": "options",
+            "adds_rpo": "options",
+        },
     },
     "interiors": {
         "key": ("interior_id",),
@@ -190,9 +203,9 @@ EDITOR_SHEET_META: dict[str, dict] = {
     },
     "model_interior_scope": {
         "key": ("model_key", "interior_id", "trim_level"),
-        "types": {},
+        "types": {"active": "bool"},
         "enums": {},
-        "refs": {},
+        "refs": {"interior_id": "interiors", "requires_option_id": "options"},
     },
     "default_selection_rules": {
         "key": ("model_key", "rule_id"),
@@ -206,7 +219,28 @@ EDITOR_SHEET_META: dict[str, dict] = {
             ),
             "display_behavior": ("", "default_selected"),
         },
+        "refs": {"target_option_id": "options"},
+        "conditional_ref": {"discriminator": "condition_type", "column": "condition_id"},
+        "conditional_refs": {
+            "always": None,
+            "unless_selected_rpo": "option_rpos",
+            "unless_selected_section": "sections",
+            "when_selected_unless_selected_section": "options",
+        },
+    },
+    "asset_map": {
+        "key": ("model_key", "target_type", "target_id"),
+        "types": {"active": "bool"},
+        "enums": {},
         "refs": {},
+        "conditional_ref": {"discriminator": "target_type", "column": "target_id"},
+        "conditional_refs": {"option": "options"},
+    },
+    "interior_components": {
+        "key": ("model_key", "interior_id", "rpo", "component_type"),
+        "types": {"display_order": "int", "active": "bool"},
+        "enums": {},
+        "refs": {"interior_id": "interiors"},
     },
     "runtime_steps_meta": {
         "key": ("model_key", "step_key"),
@@ -250,6 +284,8 @@ GLOBAL_SHEET_FAMILIES: dict[str, str] = {
     "model_registry_promotion": "model_registry_promotion",
     "model_interior_scope": "model_interior_scope",
     "default_selection_rules": "default_selection_rules",
+    "asset_map": "asset_map",
+    "interior_components": "interior_components",
     "runtime_steps": "runtime_steps_meta",
     "section_presentation": "section_presentation_meta",
     "context_section_master": "context_section_master_meta",
@@ -459,17 +495,6 @@ def coerce_value(family: str, column: str, value, *, bool_storage: dict | None =
 # Batch validation (non-breaking writes only)
 # ─────────────────────────────────────────────────────────────
 
-CHILD_REFS_BY_FAMILY = {
-    "options": [("ovs", "option_id"), ("rule_mapping", "source_id"), ("rule_mapping", "target_id"),
-                ("rule_group_members", "target_id"), ("exclusive_members", "option_id"),
-                ("price_rules", "condition_option_id"), ("price_rules", "target_option_id"),
-                ("color_overrides", "option_id"), ("variant_overrides", "option_id"),
-                ("interiors", "included_option_id")],
-    "rule_groups": [("rule_group_members", "group_id")],
-    "exclusive_groups": [("exclusive_members", "group_id")],
-    "interiors": [("color_overrides", "interior_id")],
-}
-
 _REF_FAMILY = {"options": ("options", "option_id"), "rule_groups": ("rule_groups", "group_id"),
                "exclusive_groups": ("exclusive_groups", "group_id"),
                "interiors": ("interiors", "interior_id")}
@@ -502,9 +527,25 @@ def _sheet_key_index(extract, sheet, keycols):
     return index
 
 
-def _ref_domain(extract, maps, batch_adds, sheet, refkind):
+def _ref_kinds(refkind) -> tuple[str, ...]:
+    if isinstance(refkind, (tuple, list)):
+        return tuple(str(kind) for kind in refkind)
+    return (str(refkind),)
+
+
+def _reference_models(maps, sheet: str, row: dict | None = None) -> set[str]:
+    _registry, _sheet_family, models_by_sheet, _by_model_family = maps
+    model_key = str((row or {}).get("model_key") or "").strip()
+    if model_key == "*":
+        return set(_registry)
+    if model_key:
+        return {model_key}
+    return set(models_by_sheet.get(sheet, set()))
+
+
+def _single_ref_domain(extract, maps, batch_adds, sheet, refkind, *, models=None):
     _registry, _sheet_family, models_by_sheet, by_model_family = maps
-    models = models_by_sheet.get(sheet, set())
+    models = set(models) if models is not None else set(models_by_sheet.get(sheet, set()))
     if refkind == "sections":
         return {str(r.get("section_id")).strip()
                 for r in rows_of(extract, "section_master") if r.get("section_id")}
@@ -514,6 +555,19 @@ def _ref_domain(extract, maps, batch_adds, sheet, refkind):
                if r.get("model_key") in models and workbook_truthy(r.get("active"))}
         return ids or {str(r.get("variant_id")).strip()
                        for r in rows_of(extract, "variant_master") if r.get("variant_id")}
+    if refkind == "option_rpos":
+        rpos = set()
+        for model in models:
+            src = by_model_family.get((model, "options"))
+            if not src:
+                continue
+            rpos |= {str(r.get("rpo")).strip() for r in rows_of(extract, src) if r.get("rpo")}
+            rpos |= {
+                str((o.get("row") or {}).get("rpo")).strip()
+                for o in batch_adds.get(src, [])
+                if (o.get("row") or {}).get("rpo")
+            }
+        return rpos
     family, id_col = _REF_FAMILY[refkind]
     ids = set()
     for model in models:
@@ -524,6 +578,130 @@ def _ref_domain(extract, maps, batch_adds, sheet, refkind):
         ids |= {str((o.get("row") or {}).get(id_col)).strip()
                 for o in batch_adds.get(src, []) if (o.get("row") or {}).get(id_col)}
     return ids
+
+
+def _ref_domain(extract, maps, batch_adds, sheet, refkind, *, row=None):
+    models = _reference_models(maps, sheet, row)
+    domain: set[str] = set()
+    for kind in _ref_kinds(refkind):
+        domain |= _single_ref_domain(
+            extract,
+            maps,
+            batch_adds,
+            sheet,
+            kind,
+            models=models,
+        )
+    return domain
+
+
+def _ref_label(refkind) -> str:
+    return " or ".join(_ref_kinds(refkind))
+
+
+def _meta_ref_items(meta: dict):
+    refs = dict(meta.get("refs", {}))
+    refs.update(meta.get("ref_unions", {}))
+    return refs.items()
+
+
+def _conditional_ref_spec(meta: dict, row: dict) -> tuple[str, str | None] | None:
+    spec = meta.get("conditional_ref")
+    if not spec:
+        return None
+    discriminator = str(row.get(spec["discriminator"]) or "").strip().lower()
+    domains = meta.get("conditional_refs", {})
+    if discriminator not in domains:
+        return None
+    return spec["column"], domains[discriminator]
+
+
+def _final_rows_by_sheet(extract: dict, prepared: list[dict]) -> dict[str, list[dict]]:
+    final_rows = {
+        sheet: [dict(row) for row in data.get("rows", [])]
+        for sheet, data in extract["sheets"].items()
+    }
+    for operation in prepared:
+        if operation["action"] == "create_sheet":
+            final_rows.setdefault(operation["sheet"], [])
+            continue
+        sheet = operation["sheet"]
+        family = operation["_family"]
+        keycols = EDITOR_SHEET_META[family]["key"]
+        key = operation["_kt"]
+        rows = final_rows.setdefault(sheet, [])
+        match = next(
+            (index for index, row in enumerate(rows)
+             if tuple(str(row.get(column) or "").strip() for column in keycols) == key),
+            None,
+        )
+        if operation["action"] == "delete":
+            if match is not None:
+                rows.pop(match)
+            continue
+        if operation["action"] == "update":
+            if match is not None:
+                rows[match].update(operation["_coerced_row"])
+            continue
+        row = dict(operation.get("key") or {})
+        row.update(operation["_coerced_row"])
+        rows.append(row)
+    return final_rows
+
+
+def _row_matches_models(row: dict, sheet: str, maps, target_models: set[str]) -> bool:
+    _registry, _sheet_family, models_by_sheet, _by_model_family = maps
+    if sheet in GLOBAL_SHEET_FAMILIES:
+        model_key = str(row.get("model_key") or "").strip()
+        return model_key == "*" or model_key in target_models
+    return bool(set(models_by_sheet.get(sheet, set())) & target_models)
+
+
+def _incoming_references(
+    extract: dict,
+    maps,
+    sheet_family: dict[str, str],
+    prepared: list[dict],
+    *,
+    deleted_sheet: str,
+    deleted_family: str,
+    target_id: str,
+) -> list[str]:
+    final_rows = _final_rows_by_sheet(extract, prepared)
+    _registry, _registered_families, models_by_sheet, _by_model_family = maps
+    target_models = set(models_by_sheet.get(deleted_sheet, set()))
+    target_values = {deleted_family: target_id}
+    if deleted_family == "options":
+        source_row = next(
+            (
+                row
+                for row in rows_of(extract, deleted_sheet)
+                if str(row.get("option_id") or "").strip() == target_id
+            ),
+            {},
+        )
+        target_rpo = str(source_row.get("rpo") or "").strip()
+        if target_rpo:
+            target_values["option_rpos"] = target_rpo
+    references: set[str] = set()
+    for sheet, family in sheet_family.items():
+        meta = EDITOR_SHEET_META.get(family)
+        if not meta:
+            continue
+        for row in final_rows.get(sheet, []):
+            if target_models and not _row_matches_models(row, sheet, maps, target_models):
+                continue
+            for column, refkind in _meta_ref_items(meta):
+                value = str(row.get(column) or "").strip()
+                if any(value == target_values[kind] for kind in _ref_kinds(refkind) if kind in target_values):
+                    references.add(f"{sheet}.{column}")
+            conditional = _conditional_ref_spec(meta, row)
+            if conditional is None:
+                continue
+            column, refkind = conditional
+            if refkind in target_values and str(row.get(column) or "").strip() == target_values[refkind]:
+                references.add(f"{sheet}.{column}")
+    return sorted(references)
 
 
 def _prepare_batch(extract, batch):
@@ -597,12 +775,9 @@ def _prepare_batch(extract, batch):
                 for r in rows_of(extract, "model_registry_promotion")}
 
     batch_adds: dict[str, list] = {}
-    deleted_keys: set[tuple] = set()
     for o in ops:
         if o.get("action") == "add":
             batch_adds.setdefault(o.get("sheet"), []).append(o)
-        if o.get("action") == "delete":
-            deleted_keys.add(_key_id(o))
 
     key_indexes: dict[str, dict] = {}
     seen_adds: set = set()
@@ -651,17 +826,55 @@ def _prepare_batch(extract, batch):
                 bad = True
         if bad:
             continue
-        for col, refkind in meta.get("refs", {}).items():
-            if coerced.get(col) is not None:
-                domain = _ref_domain(extract, maps, batch_adds, sheet, refkind)
-                if str(coerced[col]) not in domain:
-                    errors.append(f"{ctx}: {col}={coerced[col]!r} not found in {refkind}")
-                    bad = True
-        if bad:
-            continue
         if sheet not in key_indexes:
             key_indexes[sheet] = _sheet_key_index(extract, sheet, keycols)
         kt = _key_tuple(key, keycols)
+        effective_row = dict(key_indexes[sheet].get(kt, {}))
+        effective_row.update(key)
+        effective_row.update(coerced)
+        for col, refkind in _meta_ref_items(meta):
+            if action != "add" and col not in coerced and col not in key:
+                continue
+            value = effective_row.get(col)
+            if value is not None and str(value).strip():
+                domain = _ref_domain(extract, maps, batch_adds, sheet, refkind, row=effective_row)
+                if str(value) not in domain:
+                    errors.append(f"{ctx}: {col}={value!r} not found in {_ref_label(refkind)}")
+                    bad = True
+        conditional_meta = meta.get("conditional_ref") or {}
+        conditional_column = conditional_meta.get("column")
+        discriminator_column = conditional_meta.get("discriminator")
+        if conditional_column and (
+            action == "add"
+            or conditional_column in coerced
+            or discriminator_column in coerced
+            or conditional_column in key
+            or discriminator_column in key
+        ):
+            conditional = _conditional_ref_spec(meta, effective_row)
+            if conditional is not None:
+                column, refkind = conditional
+                value = str(effective_row.get(column) or "").strip()
+                if refkind is None:
+                    if value:
+                        errors.append(
+                            f"{ctx}: {column} must be blank for "
+                            f"{discriminator_column}={effective_row.get(discriminator_column)!r}"
+                        )
+                        bad = True
+                elif not value:
+                    errors.append(
+                        f"{ctx}: {column} is required for "
+                        f"{discriminator_column}={effective_row.get(discriminator_column)!r}"
+                    )
+                    bad = True
+                else:
+                    domain = _ref_domain(extract, maps, batch_adds, sheet, refkind, row=effective_row)
+                    if value not in domain:
+                        errors.append(f"{ctx}: {column}={value!r} not found in {_ref_label(refkind)}")
+                        bad = True
+        if bad:
+            continue
         if action == "add":
             if any(str(coerced.get(k) or "").strip() != kt[idx] for idx, k in enumerate(keycols)):
                 errors.append(f"{ctx}: add row must include key columns matching the key")
@@ -758,30 +971,19 @@ def _prepare_batch(extract, batch):
         if o["action"] != "delete":
             continue
         family, sheet = o["_family"], o["sheet"]
-        child_specs = CHILD_REFS_BY_FAMILY.get(family)
-        if not child_specs:
-            continue
         target_id = o["_kt"][0]
-        models = models_by_sheet.get(sheet, set())
-        referencing = []
-        for child_family, ref_col in child_specs:
-            for model in models:
-                child_sheet = by_model_family.get((model, child_family))
-                if not child_sheet:
-                    continue
-                child_keycols = list(EDITOR_SHEET_META[child_family]["key"])
-                for row in rows_of(extract, child_sheet):
-                    if str(row.get(ref_col) or "").strip() != target_id:
-                        continue
-                    child_kt = tuple(str(row.get(k) or "").strip() for k in child_keycols)
-                    child_kid = (child_sheet, tuple(sorted(zip((str(k) for k in child_keycols), child_kt))))
-                    if child_kid not in deleted_keys:
-                        referencing.append(f"{child_sheet}.{ref_col}")
+        referencing = _incoming_references(
+            extract,
+            maps,
+            sheet_family,
+            prepared,
+            deleted_sheet=sheet,
+            deleted_family=family,
+            target_id=target_id,
+        )
         if referencing:
             warnings.append({"id": f"refdel:{sheet}:{'+'.join(o['_kt'])}",
-                             "message": f"delete {target_id}: still referenced by {sorted(set(referencing))} "
-                                        f"(rule deletes are allowed for runtime-skipped rows after contract comparison; "
-                                        f"active references still require review)"})
+                             "message": f"delete {target_id}: still referenced by {referencing}"})
     return errors, warnings, prepared
 
 
@@ -808,6 +1010,41 @@ GATE_COMMANDS = {
             "node --test tests/z06-contract-preview.test.mjs",
             "node --test tests/z06-form-data-draft.test.mjs"],
 }
+
+CONFIRMABLE_WARNING_KINDS = {"scaffold"}
+
+
+def warning_kind(warning_id: str) -> str:
+    return str(warning_id or "").partition(":")[0].strip()
+
+
+def warning_fingerprint(warnings) -> str:
+    warning_ids = sorted({str(warning.get("id") or "") for warning in warnings})
+    payload = json.dumps(warning_ids, separators=(",", ":"), ensure_ascii=True)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def classify_warnings(warnings) -> dict:
+    warning_list = list(warnings)
+    confirmable_ids: list[str] = []
+    blocking_ids: list[str] = []
+    unknown_ids: list[str] = []
+    known_kinds = CONFIRMABLE_WARNING_KINDS | {"dorder", "refdel"}
+    for warning in warning_list:
+        warning_id = str(warning.get("id") or "")
+        kind = warning_kind(warning_id)
+        if kind in CONFIRMABLE_WARNING_KINDS:
+            confirmable_ids.append(warning_id)
+        else:
+            blocking_ids.append(warning_id)
+            if kind not in known_kinds:
+                unknown_ids.append(warning_id)
+    return {
+        "confirmableIds": sorted(set(confirmable_ids)),
+        "blockingIds": sorted(set(blocking_ids)),
+        "unknownIds": sorted(set(unknown_ids)),
+        "fingerprint": warning_fingerprint(warning_list),
+    }
 
 
 def gate_reminders(models: set[str]) -> list[str]:
@@ -877,6 +1114,13 @@ def resize_sheet_tables(ws) -> None:
 def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli",
                 log_path=None, allow_stale=False, run_schema_validation=True) -> dict:
     path = Path(path)
+    if write and not run_schema_validation:
+        return {
+            "ok": False,
+            "status": "schema_validation_required",
+            "errors": ["live workbook writes require schema validation"],
+            "warnings": [],
+        }
     lock = excel_lock_path(path)
     if lock.exists():
         return {"ok": False, "status": "locked",
@@ -894,9 +1138,35 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
     if not prepared:
         return {"ok": False, "status": "empty", "errors": ["batch contains no operations"], "warnings": []}
     confirmed = set(confirmed_warnings or ())
-    unconfirmed = [w for w in warnings if w["id"] not in confirmed]
-    if write and unconfirmed:
-        return {"ok": False, "status": "needs_confirmation", "errors": [], "warnings": unconfirmed}
+    warning_policy = classify_warnings(warnings)
+    emitted_ids = {str(warning.get("id") or "") for warning in warnings}
+    stale_confirmations = sorted(confirmed - emitted_ids)
+    if write and stale_confirmations:
+        return {
+            "ok": False,
+            "status": "warning_confirmation_mismatch",
+            "errors": [f"confirmed warning IDs were not emitted: {stale_confirmations}"],
+            "warnings": warnings,
+            "warningPolicy": warning_policy,
+        }
+    if write and warning_policy["blockingIds"]:
+        return {
+            "ok": False,
+            "status": "warning_blocked",
+            "errors": ["batch emitted unconfirmable warning IDs"],
+            "warnings": warnings,
+            "warningPolicy": warning_policy,
+        }
+    unconfirmed_ids = set(warning_policy["confirmableIds"]) - confirmed
+    if write and unconfirmed_ids:
+        unconfirmed = [warning for warning in warnings if warning["id"] in unconfirmed_ids]
+        return {
+            "ok": False,
+            "status": "needs_confirmation",
+            "errors": [],
+            "warnings": unconfirmed,
+            "warningPolicy": warning_policy,
+        }
 
     _registry, sheet_family, models_by_sheet, _bmf = _registry_maps(extract)
     schema_result = None
@@ -930,6 +1200,7 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
 
     models_touched = {m for s in touched for m in models_by_sheet.get(s, set())}
     base = {"opCount": len(prepared), "sheets": sorted(touched), "warnings": warnings,
+            "warningPolicy": warning_policy,
             "schemaResult": schema_result, "boolHygieneResult": bool_hygiene_result,
             "gateReminders": gate_reminders(models_touched)}
     if not write:

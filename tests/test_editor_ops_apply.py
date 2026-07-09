@@ -9,6 +9,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.table import Table
@@ -18,6 +19,7 @@ SCRIPTS_DIR = ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
+import corvette_form_generator.editor_ops as editor_ops  # noqa: E402
 from corvette_form_generator.editor_ops import (  # noqa: E402
     apply_batch,
     coalesce_ops,
@@ -173,11 +175,15 @@ def build_ops_fixture() -> Workbook:
     src = [
         ("stingray", "source_option_sheet", "stingray_options"),
         ("stingray", "status_sheet", "stingray_ovs"),
+        ("stingray", "rule_mapping_sheet", "rule_mapping"),
         ("stingray", "rule_groups_sheet", "rule_groups"),
         ("stingray", "rule_group_members_sheet", "rule_group_members"),
         ("stingray", "exclusive_groups_sheet", "exclusive_groups"),
         ("stingray", "exclusive_group_members_sheet", "exclusive_group_members"),
         ("stingray", "price_rules_sheet", "price_rules"),
+        ("stingray", "variant_option_overrides_sheet", "variant_overrides"),
+        ("stingray", "color_overrides_sheet", "color_overrides"),
+        ("stingray", "interior_source_sheet", "lt_interiors"),
         ("zr1", "source_option_sheet", "zr1_options"),
         ("zr1", "status_sheet", "zr1_ovs"),
     ]
@@ -198,12 +204,25 @@ def build_ops_fixture() -> Workbook:
     ws = append_sheet(wb, "stingray_options", OPTION_HEADERS,
                       [option_row("opt_one_001", "ONE", "sec_a", 10),
                        option_row("opt_two_001", "TWO", "sec_a", 20),
-                       option_row("opt_thr_001", "THR", "sec_b", 10)])
-    # deliberately stale table ref: data goes to row 4, ref claims row 3
+                       option_row("opt_thr_001", "THR", "sec_b", 10),
+                       option_row("opt_rem_001", "REM", "sec_b", 20)])
+    # Deliberately stale table ref: data goes to row 5, ref claims row 3.
     ws.add_table(Table(displayName="tbl_fixture_options", ref="A1:K3"))
     append_sheet(wb, "stingray_ovs", ["option_id", "variant_id", "status"],
                  [{"option_id": "opt_one_001", "variant_id": "1lt", "status": "available"},
                   {"option_id": "opt_one_001", "variant_id": "2lt", "status": "standard"}])
+    append_sheet(
+        wb,
+        "rule_mapping",
+        ["rule_id", "source_id", "rule_type", "target_id", "original_detail_raw",
+         "body_style_scope", "runtime_action", "disabled_reason"],
+        [
+            {"rule_id": "rule_int", "source_id": "int_one_001", "rule_type": "requires",
+             "target_id": "opt_thr_001"},
+            {"rule_id": "rule_remap", "source_id": "opt_one_001", "rule_type": "requires",
+             "target_id": "opt_rem_001"},
+        ],
+    )
     append_sheet(wb, "rule_groups", ["group_id", "group_type", "source_id", "active", "notes"],
                  [{"group_id": "grp_one", "group_type": "requires_any", "source_id": "opt_one_001", "active": True}])
     append_sheet(wb, "rule_group_members", ["group_id", "target_id", "display_order", "active"],
@@ -215,7 +234,72 @@ def build_ops_fixture() -> Workbook:
                   {"group_id": "excl_one", "option_id": "opt_two_001", "display_order": 20, "active": True}])
     append_sheet(wb, "price_rules",
                  ["price_rule_id", "condition_option_id", "price_rule_type", "target_option_id",
-                  "price_value", "body_style_scope", "trim_level_scope", "notes"], [])
+                  "price_value", "body_style_scope", "trim_level_scope", "notes"],
+                 [{"price_rule_id": "price_int", "condition_option_id": "int_one_001",
+                   "price_rule_type": "override", "target_option_id": "opt_thr_001",
+                   "price_value": 100}])
+    append_sheet(
+        wb,
+        "variant_overrides",
+        ["option_id", "variant_id", "selectable", "display_behavior", "section_id", "active", "note"],
+        [],
+    )
+    append_sheet(
+        wb,
+        "lt_interiors",
+        ["interior_id", "Interior Name", "Material", "Price", "Detail from Disclosure",
+         "Color Overrides", "Trim", "Seat", "Interior Code", "Suede", "Stitch", "Two Tone",
+         "section_id", "active_for_stingray", "requires_r6x", "included_option_id"],
+        [{"interior_id": "int_one_001", "Interior Name": "Jet Black", "Price": 0,
+          "section_id": "sec_b", "active_for_stingray": True,
+          "requires_r6x": False, "included_option_id": "opt_two_001"}],
+    )
+    append_sheet(
+        wb,
+        "color_overrides",
+        ["interior_id", "option_id", "rule_type", "adds_rpo"],
+        [{"interior_id": "int_one_001", "option_id": "opt_thr_001",
+          "rule_type": "requires", "adds_rpo": "opt_two_001"}],
+    )
+    append_sheet(
+        wb,
+        "model_interior_scope",
+        ["model_key", "interior_id", "trim_level", "active", "requires_option_id", "notes"],
+        [{"model_key": "stingray", "interior_id": "int_one_001", "trim_level": "1lt",
+          "active": True, "requires_option_id": "opt_thr_001"}],
+    )
+    append_sheet(
+        wb,
+        "default_selection_rules",
+        ["model_key", "rule_id", "target_option_id", "condition_type", "condition_id",
+         "body_style_scope", "trim_level_scope", "variant_scope", "priority", "active", "notes",
+         "display_behavior"],
+        [
+            {"model_key": "stingray", "rule_id": "default_target", "target_option_id": "opt_thr_001",
+             "condition_type": "always", "priority": 1, "active": True},
+            {"model_key": "stingray", "rule_id": "default_condition", "target_option_id": "opt_one_001",
+             "condition_type": "when_selected_unless_selected_section", "condition_id": "opt_two_001",
+             "priority": 2, "active": True},
+            {"model_key": "stingray", "rule_id": "default_rpo_reference", "target_option_id": "opt_two_001",
+             "condition_type": "unless_selected_rpo", "condition_id": "THR",
+             "priority": 3, "active": True},
+        ],
+    )
+    append_sheet(
+        wb,
+        "asset_map",
+        ["model_key", "target_type", "target_id", "image_url", "active", "notes"],
+        [{"model_key": "stingray", "target_type": "option", "target_id": "opt_thr_001",
+          "image_url": "https://example.test/thr.png", "active": True}],
+    )
+    append_sheet(
+        wb,
+        "interior_components",
+        ["model_key", "interior_id", "rpo", "component_type", "label", "price_ref_type",
+         "price_ref_code", "price_trim_scope", "display_order", "active", "notes"],
+        [{"model_key": "stingray", "interior_id": "int_one_001", "rpo": "AQ9",
+          "component_type": "seat", "label": "GT1 seat", "display_order": 1, "active": True}],
+    )
     append_sheet(wb, "zr1_options", OPTION_HEADERS, [option_row("opt_zzz_001", "ZZZ", "sec_a", 10)])
     append_sheet(wb, "zr1_ovs", ["option_id", "variant_id", "status"],
                  [{"option_id": "opt_zzz_001", "variant_id": "zr1_c", "status": "available"}])
@@ -290,6 +374,107 @@ class ValidateBatchTest(OpsFixtureBase):
                                           {"option_id": "opt_ghost_001", "variant_id": "1lt"},
                                           {"option_id": "opt_ghost_001", "variant_id": "1lt", "status": "available"})))
 
+    def test_direct_and_price_endpoints_accept_option_or_interior_entities(self):
+        result = validate_batch(
+            self.extract,
+            batch(
+                op(
+                    "add",
+                    "rule_mapping",
+                    {"rule_id": "rule_union"},
+                    {"rule_id": "rule_union", "source_id": "opt_one_001", "rule_type": "requires",
+                     "target_id": "int_one_001"},
+                ),
+                op(
+                    "add",
+                    "price_rules",
+                    {"price_rule_id": "price_union"},
+                    {"price_rule_id": "price_union", "condition_option_id": "int_one_001",
+                     "price_rule_type": "override", "target_option_id": "int_one_001", "price_value": 50},
+                ),
+            ),
+        )
+
+        self.assertEqual(result["errors"], [], result)
+
+    def test_model_scoped_and_conditional_global_option_refs_are_validated(self):
+        valid_items = [
+            op(
+                "update",
+                "model_interior_scope",
+                {"model_key": "stingray", "interior_id": "int_one_001", "trim_level": "1lt"},
+                {"requires_option_id": "opt_two_001"},
+            ),
+            op(
+                "add",
+                "default_selection_rules",
+                {"model_key": "stingray", "rule_id": "default_rpo"},
+                {"model_key": "stingray", "rule_id": "default_rpo", "target_option_id": "opt_one_001",
+                 "condition_type": "unless_selected_rpo", "condition_id": "TWO", "priority": 3, "active": True},
+            ),
+            op(
+                "add",
+                "default_selection_rules",
+                {"model_key": "stingray", "rule_id": "default_section"},
+                {"model_key": "stingray", "rule_id": "default_section", "target_option_id": "opt_one_001",
+                 "condition_type": "unless_selected_section", "condition_id": "sec_b", "priority": 4,
+                 "active": True},
+            ),
+            op(
+                "update",
+                "color_overrides",
+                {"interior_id": "int_one_001", "option_id": "opt_thr_001"},
+                {"adds_rpo": "opt_one_001"},
+            ),
+            op(
+                "add",
+                "asset_map",
+                {"model_key": "stingray", "target_type": "context_choice", "target_id": "body_style__coupe"},
+                {"model_key": "stingray", "target_type": "context_choice", "target_id": "body_style__coupe",
+                 "image_url": "https://example.test/coupe.png", "active": True},
+            ),
+        ]
+        self.assertEqual(self.errors_of(*valid_items), [])
+
+        invalid_items = [
+            op(
+                "update",
+                "model_interior_scope",
+                {"model_key": "stingray", "interior_id": "int_one_001", "trim_level": "1lt"},
+                {"requires_option_id": "opt_missing"},
+            ),
+            op(
+                "add",
+                "default_selection_rules",
+                {"model_key": "stingray", "rule_id": "bad_target"},
+                {"model_key": "stingray", "rule_id": "bad_target", "target_option_id": "opt_missing",
+                 "condition_type": "always", "priority": 5, "active": True},
+            ),
+            op(
+                "add",
+                "default_selection_rules",
+                {"model_key": "stingray", "rule_id": "bad_always"},
+                {"model_key": "stingray", "rule_id": "bad_always", "target_option_id": "opt_one_001",
+                 "condition_type": "always", "condition_id": "opt_two_001", "priority": 6, "active": True},
+            ),
+            op(
+                "update",
+                "color_overrides",
+                {"interior_id": "int_one_001", "option_id": "opt_thr_001"},
+                {"adds_rpo": "opt_missing"},
+            ),
+            op(
+                "add",
+                "asset_map",
+                {"model_key": "stingray", "target_type": "option", "target_id": "opt_missing"},
+                {"model_key": "stingray", "target_type": "option", "target_id": "opt_missing",
+                 "image_url": "https://example.test/missing.png", "active": True},
+            ),
+        ]
+        for item in invalid_items:
+            with self.subTest(item=item):
+                self.assertTrue(self.errors_of(item))
+
     def test_ovs_coverage_enforced(self):
         partial = add_option_composite(statuses=("available", None))  # missing 2lt
         errors = self.errors_of(partial)
@@ -318,9 +503,54 @@ class ValidateBatchTest(OpsFixtureBase):
                  op("delete", "rule_groups", {"group_id": "grp_one"}),
                  op("delete", "rule_group_members", {"group_id": "grp_one", "target_id": "opt_two_001"}),
                  op("delete", "exclusive_group_members", {"group_id": "excl_one", "option_id": "opt_one_001"}),
+                 op("delete", "rule_mapping", {"rule_id": "rule_remap"}),
+                 op("delete", "default_selection_rules", {"model_key": "stingray", "rule_id": "default_condition"}),
                  op("delete", "stingray_options", {"option_id": "opt_one_001"})]
         warnings = self.warnings_of(*items)
         self.assertFalse(any(w["id"] == "refdel:stingray_options:opt_one_001" for w in warnings))
+
+    def test_complete_option_and_interior_incoming_reference_surfaces_warn(self):
+        option_warning = next(
+            warning
+            for warning in self.warnings_of(
+                op("delete", "stingray_options", {"option_id": "opt_thr_001"})
+            )
+            if warning["id"] == "refdel:stingray_options:opt_thr_001"
+        )
+        for reference in (
+            "rule_mapping.target_id",
+            "price_rules.target_option_id",
+            "color_overrides.option_id",
+            "model_interior_scope.requires_option_id",
+            "default_selection_rules.target_option_id",
+            "default_selection_rules.condition_id",
+            "asset_map.target_id",
+        ):
+            self.assertIn(reference, option_warning["message"])
+
+        interior_warning = next(
+            warning
+            for warning in self.warnings_of(
+                op("delete", "lt_interiors", {"interior_id": "int_one_001"})
+            )
+            if warning["id"] == "refdel:lt_interiors:int_one_001"
+        )
+        for reference in (
+            "rule_mapping.source_id",
+            "price_rules.condition_option_id",
+            "color_overrides.interior_id",
+            "model_interior_scope.interior_id",
+            "interior_components.interior_id",
+        ):
+            self.assertIn(reference, interior_warning["message"])
+
+    def test_same_batch_reference_remap_closes_delete_warning(self):
+        warnings = self.warnings_of(
+            op("update", "rule_mapping", {"rule_id": "rule_remap"}, {"target_id": "opt_two_001"}),
+            op("delete", "stingray_options", {"option_id": "opt_rem_001"}),
+        )
+
+        self.assertFalse(any(w["id"] == "refdel:stingray_options:opt_rem_001" for w in warnings), warnings)
 
     def test_scaffold_model_warns(self):
         warnings = self.warnings_of(op("update", "zr1_options", {"option_id": "opt_zzz_001"}, {"price": 1}))
@@ -339,8 +569,11 @@ class ApplyBatchTest(unittest.TestCase):
 
     def run_batch(self, *items, write=True, confirmed=(), allow_stale=False, mtime=None):
         b = batch(*items, mtime=self.path.stat().st_mtime_ns if mtime is None else mtime)
-        return apply_batch(self.path, b, write=write, confirmed_warnings=confirmed,
-                           log_path=self.log, run_schema_validation=False, allow_stale=allow_stale)
+        schema_enabled = bool(write)
+        with patch("corvette_form_generator.editor_ops.validate_workbook_schema", return_value=[]):
+            return apply_batch(self.path, b, write=write, confirmed_warnings=confirmed,
+                               log_path=self.log, run_schema_validation=schema_enabled,
+                               allow_stale=allow_stale)
 
     def test_add_option_round_trip_and_table_heal(self):
         result = self.run_batch(add_option_composite())
@@ -352,7 +585,7 @@ class ApplyBatchTest(unittest.TestCase):
         r = rows["opt_new_001"]
         self.assertIsInstance(ws.cell(row=r, column=3).value, int)   # price typed
         self.assertIsInstance(ws.cell(row=r, column=8).value, bool)  # selectable typed
-        self.assertEqual(ws.tables["tbl_fixture_options"].ref, "A1:K5")  # healed 3 -> 5
+        self.assertEqual(ws.tables["tbl_fixture_options"].ref, "A1:K6")  # healed 3 -> 6
         self.assertEqual(wb["stingray_ovs"].max_row, 5)  # 2 ovs rows added
         wb.close()
         self.assertTrue(self.log.exists())
@@ -396,13 +629,76 @@ class ApplyBatchTest(unittest.TestCase):
         self.assertFalse(self.log.exists())
 
     def test_warning_requires_confirmation(self):
-        item = op("update", "stingray_options", {"option_id": "opt_two_001"}, {"display_order": 10})
+        item = op("update", "zr1_options", {"option_id": "opt_zzz_001"}, {"price": 1})
         result = self.run_batch(item)
         self.assertFalse(result["ok"])
         self.assertEqual(result["status"], "needs_confirmation")
         wid = result["warnings"][0]["id"]
         result = self.run_batch(item, confirmed=(wid,))
         self.assertTrue(result["ok"], result)
+
+    def test_unconfirmable_and_stale_warning_ids_cannot_reach_write(self):
+        cases = [
+            (
+                op("update", "stingray_options", {"option_id": "opt_two_001"}, {"display_order": 10}),
+                "dorder:",
+            ),
+            (op("delete", "stingray_options", {"option_id": "opt_thr_001"}), "refdel:"),
+        ]
+        for item, prefix in cases:
+            with self.subTest(prefix=prefix):
+                before = self.path.read_bytes()
+                preview = self.run_batch(item, write=False)
+                warning_id = next(w["id"] for w in preview["warnings"] if w["id"].startswith(prefix))
+                result = self.run_batch(item, confirmed=(warning_id,))
+                self.assertFalse(result["ok"], result)
+                self.assertEqual(result["status"], "warning_blocked")
+                self.assertEqual(self.path.read_bytes(), before)
+
+        clean_item = op("update", "stingray_options", {"option_id": "opt_thr_001"}, {"price": 1})
+        result = self.run_batch(clean_item, confirmed=("scaffold:stale_sheet",))
+        self.assertFalse(result["ok"], result)
+        self.assertEqual(result["status"], "warning_confirmation_mismatch")
+
+    def test_unknown_warning_kind_blocks_write(self):
+        item = op("update", "stingray_options", {"option_id": "opt_thr_001"}, {"price": 1})
+        prepared = [{"action": "update", "sheet": "stingray_options"}]
+        with patch(
+            "corvette_form_generator.editor_ops._prepare_batch",
+            return_value=([], [{"id": "mystery:stingray_options", "message": "unknown"}], prepared),
+        ):
+            result = self.run_batch(item, confirmed=("mystery:stingray_options",))
+        self.assertFalse(result["ok"], result)
+        self.assertEqual(result["status"], "warning_blocked")
+
+    def test_schema_disabled_write_is_refused_before_mutation(self):
+        item = op("update", "stingray_options", {"option_id": "opt_thr_001"}, {"price": 1})
+        before = self.path.read_bytes()
+        result = apply_batch(
+            self.path,
+            batch(item, mtime=self.path.stat().st_mtime_ns),
+            write=True,
+            run_schema_validation=False,
+            log_path=self.log,
+        )
+        self.assertFalse(result["ok"], result)
+        self.assertEqual(result["status"], "schema_validation_required")
+        self.assertEqual(self.path.read_bytes(), before)
+        self.assertFalse(self.log.exists())
+
+    def test_warning_classification_and_fingerprint_are_finite_and_stable(self):
+        warnings = [
+            {"id": "scaffold:zr1_options", "message": "scaffold"},
+            {"id": "refdel:stingray_options:opt_one_001", "message": "reference"},
+        ]
+        self.assertEqual(editor_ops.CONFIRMABLE_WARNING_KINDS, {"scaffold"})
+        classified = editor_ops.classify_warnings(warnings)
+        self.assertEqual(classified["confirmableIds"], ["scaffold:zr1_options"])
+        self.assertEqual(classified["blockingIds"], ["refdel:stingray_options:opt_one_001"])
+        self.assertEqual(
+            editor_ops.warning_fingerprint(reversed(warnings)),
+            editor_ops.warning_fingerprint(warnings),
+        )
 
     def test_invalid_batch_refused(self):
         result = self.run_batch(op("update", "stingray_options", {"option_id": "opt_one_001"},

@@ -11,6 +11,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from openpyxl import load_workbook
 
@@ -31,19 +32,80 @@ class GlobalFamilyOpsTest(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()
         self.path = build_master_workbook(Path(self._tmp.name) / "master.xlsx")
+        wb = load_workbook(self.path)
+        wb["model_workbook_sources"].append(
+            ["z06", "interior_source_sheet", "LZ_Interiors", True, "test registration"]
+        )
+        asset_map = wb.create_sheet("asset_map")
+        asset_map.append(
+            ["model_key", "target_type", "target_id", "image_url", "image_alt", "image_fit",
+             "image_position", "hover_image_url", "hover_image_alt", "hover_image_position", "active", "notes"]
+        )
+        components = wb.create_sheet("interior_components")
+        components.append(
+            ["model_key", "interior_id", "rpo", "component_type", "label", "price_ref_type",
+             "price_ref_code", "price_trim_scope", "display_order", "active", "notes"]
+        )
+        wb.save(self.path)
+        wb.close()
 
     def tearDown(self) -> None:
         self._tmp.cleanup()
 
     def run_batch(self, items: list[dict], *, write: bool = False, confirmed: tuple[str, ...] = ()) -> dict:
-        return apply_batch(
-            self.path,
-            batch(self.path, items),
-            write=write,
-            confirmed_warnings=confirmed,
-            run_schema_validation=False,
-            log_path=Path(self._tmp.name) / "edit-log.jsonl",
+        with patch("corvette_form_generator.editor_ops.validate_workbook_schema", return_value=[]):
+            return apply_batch(
+                self.path,
+                batch(self.path, items),
+                write=write,
+                confirmed_warnings=confirmed,
+                run_schema_validation=write,
+                log_path=Path(self._tmp.name) / "edit-log.jsonl",
+            )
+
+    def test_asset_map_and_interior_components_accept_canonical_operations(self) -> None:
+        result = self.run_batch(
+            [
+                {
+                    "action": "add",
+                    "sheet": "asset_map",
+                    "key": {"model_key": "z06", "target_type": "option", "target_id": "opt_pdb_001"},
+                    "row": {
+                        "model_key": "z06",
+                        "target_type": "option",
+                        "target_id": "opt_pdb_001",
+                        "image_url": "https://example.test/pdb.png",
+                        "active": True,
+                    },
+                },
+                {
+                    "action": "add",
+                    "sheet": "interior_components",
+                    "key": {
+                        "model_key": "z06",
+                        "interior_id": "1LZ_AQ9_HTA",
+                        "rpo": "AQ9",
+                        "component_type": "seat",
+                    },
+                    "row": {
+                        "model_key": "z06",
+                        "interior_id": "1LZ_AQ9_HTA",
+                        "rpo": "AQ9",
+                        "component_type": "seat",
+                        "label": "GT1 Bucket Seats",
+                        "display_order": 1,
+                        "active": True,
+                    },
+                },
+            ],
+            write=True,
         )
+
+        self.assertTrue(result["ok"], result)
+        wb = load_workbook(self.path, read_only=True, data_only=True)
+        self.assertEqual(wb["asset_map"][2][2].value, "opt_pdb_001")
+        self.assertEqual(wb["interior_components"][2][1].value, "1LZ_AQ9_HTA")
+        wb.close()
 
     def test_model_master_add_via_global_family(self) -> None:
         result = self.run_batch(
@@ -90,9 +152,9 @@ class GlobalFamilyOpsTest(unittest.TestCase):
                 {
                     "action": "add",
                     "sheet": "default_selection_rules",
-                    "key": {"model_key": "zr1", "rule_id": "default_pdb"},
+                    "key": {"model_key": "z06", "rule_id": "default_pdb"},
                     "row": {
-                        "model_key": "zr1",
+                        "model_key": "z06",
                         "rule_id": "default_pdb",
                         "target_option_id": "opt_pdb_001",
                         "condition_type": "always",
