@@ -3,6 +3,7 @@ from pathlib import Path
 
 WIZARD_JS = Path("visualizer/ingest-wizard/wizard.js")
 WIZARD_CSS = Path("visualizer/ingest-wizard/wizard.css")
+WIZARD_HTML = Path("visualizer/ingest-wizard/index.html")
 
 
 def test_blocker_panel_is_collapsible_and_stateful() -> None:
@@ -37,3 +38,13 @@ def test_browser_does_not_offer_live_write_authority() -> None:
     source = WIZARD_JS.read_text(encoding="utf-8")
     assert "/write/approve" not in source
     assert "live-write" not in source
+
+
+def test_static_plan_stage_copy_is_diagnostic_only() -> None:
+    source = WIZARD_HTML.read_text(encoding="utf-8")
+    assert "Diagnostic plan" in source
+    assert "dry-run evidence only" in source
+    assert "Approve for dry-run evidence" in source
+    assert "Apply plan" not in source
+    assert "sign-off for the write step" not in source
+    assert "Approve plan for apply" not in source
