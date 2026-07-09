@@ -121,23 +121,23 @@ Status: In progress. Approved by Sean on 2026-07-09 through the parent productio
 - Modify: `tests/test_ingest_wizard_server.py`
 - Modify: `tests/test_ingest_wizard_ui_blockers.py`
 
-- [ ] Add failing CLI tests proving a blocked diagnostic dry-run exits zero, any blocked `--write` exits nonzero without mutation, `--no-schema-validation --write` is refused, and the obsolete blanket `--confirm-plan-warnings` flag cannot confer authority.
+- [x] Add failing CLI tests proving a blocked diagnostic dry-run exits zero, any blocked `--write` exits nonzero without mutation, `--no-schema-validation --write` is refused, and the obsolete blanket `--confirm-plan-warnings` flag cannot confer authority.
 
-- [ ] Add failing HTTP tests proving `/plan/approve` returns the scoped diagnostic approval and `/write/approve` returns 409 without creating `write-approval.json` for a pre-`pass-c-3` or ineligible run.
+- [x] Add failing HTTP tests proving `/plan/approve` returns the scoped diagnostic approval and `/write/approve` returns 409 without creating `write-approval.json` for a pre-`pass-c-3` or ineligible run.
 
-- [ ] Add a static UI regression assertion that approval copy says “dry-run evidence” and never says plan approval is ready for workbook apply.
+- [x] Add a static UI regression assertion that approval copy says “dry-run evidence” and never says plan approval is ready for workbook apply.
 
-- [ ] Run the focused red gate:
+- [x] Run the focused red gate:
 
   ```sh
   .venv/bin/python -m pytest tests/test_ingest_wizard_apply.py tests/test_ingest_wizard_server.py tests/test_ingest_wizard_ui_blockers.py -q
   ```
 
-- [ ] Retire blanket warning confirmation in the CLI, add the write-approval endpoint, and update browser state/copy for diagnostic approval. The browser must not offer live write in Milestone 0.
+- [x] Retire blanket warning confirmation in the CLI, add the write-approval endpoint, and update browser state/copy for diagnostic approval. The browser must not offer live write in Milestone 0.
 
-- [ ] Re-run the focused gate and manually inspect the rendered approval status strings for legacy and new diagnostic states.
+- [x] Re-run the focused gate and manually inspect the rendered approval status strings for legacy and new diagnostic states.
 
-- [ ] Commit the task with message: `fix(ingest): expose diagnostic approval scope`.
+- [x] Commit the task with message: `fix(ingest): expose diagnostic approval scope`.
 
 ### Task 5: Make promotion activation match generator discovery
 
