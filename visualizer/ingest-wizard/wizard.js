@@ -2050,6 +2050,22 @@ function planBlock(title, entries, formatter) {
   return `<h2 class="sub-h">${escapeHtml(title)}</h2><ul class="plan-list">${entries.map((e) => `<li>${formatter(e)}</li>`).join("")}</ul>`;
 }
 
+const PLAN_APPROVAL_STATUS = {
+  "plan_approved": "Legacy plan approval — diagnostic dry-run evidence only.",
+  "dry_run_approved": "Approved for dry-run evidence — no workbook write authority.",
+  "dry_run_validated_write_blocked": "Diagnostic dry run complete — workbook write remains blocked.",
+  "dry_run_validated_write_eligible": "Diagnostic dry run is write-eligible; deployment-ready approval remains separate and is not offered here.",
+  "write_approved": "Deployment-ready approval exists; this browser does not offer live workbook write.",
+};
+
+function planApprovalStatus(sessionState) {
+  if (PLAN_APPROVAL_STATUS[sessionState]) return PLAN_APPROVAL_STATUS[sessionState];
+  if (sessionState === "plan_built") {
+    return "Plan checks passed — approve only for dry-run evidence.";
+  }
+  return "Plan has blockers or its checks failed; fix and rebuild.";
+}
+
 function renderPlan(detail) {
   const plan = detail.plan;
   const dryRun = detail.dryRun || {};
@@ -2074,7 +2090,7 @@ function renderPlan(detail) {
       ${stageChip("dry run: live check", dryRun.stage1)}
       ${stageChip("dry run: scratch apply", dryRun.stage1Scratch)}
       ${stageChip("dry run: data + schema", dryRun.stage2)}
-      ${detail.approval ? `<span class="sum-chip sum-exact"><b>approved by ${escapeHtml(detail.approval.approvedBy)}</b> ${escapeHtml(detail.approval.approvedAt)}</span>` : ""}
+      ${detail.approval ? `<span class="sum-chip sum-exact"><b>approved for dry-run evidence by ${escapeHtml(detail.approval.approvedBy)}</b> ${escapeHtml(detail.approval.approvedAt)}</span>` : ""}
     </div>
     <table class="cand"><thead><tr><th>Sheet</th><th>Ops</th></tr></thead><tbody>${sheets}</tbody></table>
     ${planBlock("Scaffold rows cleared (clean reprocess)", Object.entries(report.clearedRows), ([sheet, count]) => `${escapeHtml(sheet)}: ${count} rows replaced`)}
@@ -2082,13 +2098,11 @@ function renderPlan(detail) {
     ${planBlock("Holds — answers still owed", report.holds, (h) => `${escapeHtml(h.model)} · ${escapeHtml(h.decisionId)} — ${escapeHtml(h.note)}`)}
     ${planBlock("Deferred work items", report.deferrals, (d) => `${escapeHtml(d.model)} · ${escapeHtml(d.groupKey)}`)}
     ${planBlock("Gaps", report.gaps, (g) => `[${escapeHtml(g.kind.replaceAll("_", " "))}] ${escapeHtml(g.model)}: ${escapeHtml(g.detail)}`)}`;
+  $("#stage-plan > .hint").textContent =
+    "Review this diagnostic plan and its checks. Approval authorizes dry-run evidence only; it never authorizes a workbook write.";
+  $("#approve-plan-btn").textContent = "Approve for dry-run evidence";
   $("#approve-plan-btn").disabled = !(state.session.state === "plan_built");
-  $("#plan-status").textContent =
-    state.session.state === "plan_approved"
-      ? "Approved — ready for the Pass D apply step."
-      : state.session.state === "plan_built"
-        ? "Dry run clean — approve to sign off for apply."
-        : "Plan has blockers or the dry run failed; fix and rebuild.";
+  $("#plan-status").textContent = planApprovalStatus(state.session.state);
 }
 
 async function buildPlan() {

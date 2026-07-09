@@ -12,6 +12,7 @@ import urllib.error
 import urllib.request
 from http.server import ThreadingHTTPServer
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 for entry in (ROOT / "scripts", ROOT / "tests"):
@@ -19,7 +20,10 @@ for entry in (ROOT / "scripts", ROOT / "tests"):
         sys.path.insert(0, str(entry))
 
 import ingest_wizard_server as srv  # noqa: E402
-from corvette_form_generator.ingest.wizard.session import WizardSessionStore  # noqa: E402
+from corvette_form_generator.ingest.wizard.session import (  # noqa: E402
+    WizardSessionStore,
+    write_json,
+)
 from ingest_wizard_fixtures import build_raw_export  # noqa: E402
 
 
@@ -116,6 +120,48 @@ class WizardServerTest(unittest.TestCase):
             "POST", "/api/wizard/upload?filename=..%2Fevil.xlsx", b"x"
         )
         self.assertEqual(status, 400)
+
+    def test_plan_approval_endpoint_returns_dry_run_evidence_scope(self) -> None:
+        run_id = "20260709-120000-abcdef"
+        expected = {
+            "session": {"runId": run_id, "state": "dry_run_approved"},
+            "approval": {
+                "schemaVersion": "plan-approval-2",
+                "scope": "dry_run_evidence",
+                "approvedBy": "sean",
+            },
+        }
+        with patch.object(self.server.RequestHandlerClass.store, "approve_plan", return_value=expected) as approve:
+            status, payload = self.post_json(
+                f"/api/wizard/sessions/{run_id}/plan/approve",
+                {"approver": "sean", "scope": "deployment_ready_write"},
+            )
+
+        self.assertEqual(status, 200)
+        self.assertEqual(payload["approval"]["schemaVersion"], "plan-approval-2")
+        self.assertEqual(payload["approval"]["scope"], "dry_run_evidence")
+        approve.assert_called_once_with(run_id, "sean")
+
+    def test_write_approval_endpoint_refuses_pre_c3_without_artifact(self) -> None:
+        status, created = self.post_json("/api/wizard/sessions", {"file": "raw.xlsx"})
+        self.assertEqual(status, 200)
+        run_id = created["session"]["runId"]
+        run_dir = self.root / "form-output" / "ingest-wizard" / run_id
+        write_json(run_dir / "apply-plan.json", {"schemaVersion": "pass-c-2"})
+        write_json(run_dir / "plan-approval.json", {})
+        write_json(run_dir / "apply-dry-run-report.json", {})
+
+        store = self.server.RequestHandlerClass.store
+        with patch.object(store, "approve_write", wraps=store.approve_write) as approve:
+            status, payload = self.post_json(
+                f"/api/wizard/sessions/{run_id}/write/approve",
+                {"approver": "sean", "acceptedWarningIds": ["mystery:override"]},
+            )
+
+        self.assertEqual(status, 409)
+        self.assertIn("pass-c-3", payload["error"])
+        approve.assert_called_once_with(run_id, "sean")
+        self.assertFalse((run_dir / "write-approval.json").exists())
 
 
 if __name__ == "__main__":

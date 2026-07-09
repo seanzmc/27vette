@@ -1178,6 +1178,87 @@ class ApplyFlowTest(unittest.TestCase):
         self.assertEqual(payload["status"], "validated_write_blocked")
         self.assertTrue((run_dir / "apply-dry-run-report.json").is_file())
 
+    def test_cli_blocked_write_exits_nonzero_without_mutation(self) -> None:
+        run_dir = self.approve_plan()
+        before = self.master.read_bytes()
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts" / "ingest_wizard_apply.py"),
+                "--root",
+                str(self.root),
+                "--workbook",
+                str(self.master),
+                "--run",
+                self.run_id,
+                "--write",
+            ],
+            check=False,
+            text=True,
+            capture_output=True,
+        )
+
+        self.assertNotEqual(completed.returncode, 0, completed.stdout)
+        self.assertIn("pass-c-3", completed.stderr)
+        self.assertEqual(self.master.read_bytes(), before)
+        self.assertFalse((run_dir / "write-approval.json").exists())
+        self.assertFalse((run_dir / "apply-report.json").exists())
+
+    def test_cli_schema_disabled_write_is_refused_without_mutation(self) -> None:
+        run_dir = self.approve_plan()
+        before = self.master.read_bytes()
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts" / "ingest_wizard_apply.py"),
+                "--root",
+                str(self.root),
+                "--workbook",
+                str(self.master),
+                "--run",
+                self.run_id,
+                "--write",
+                "--no-schema-validation",
+            ],
+            check=False,
+            text=True,
+            capture_output=True,
+        )
+
+        self.assertNotEqual(completed.returncode, 0, completed.stdout)
+        self.assertIn("schema validation", completed.stderr)
+        self.assertEqual(self.master.read_bytes(), before)
+        self.assertFalse((run_dir / "apply-report.json").exists())
+
+    def test_cli_blanket_warning_confirmation_flag_is_retired(self) -> None:
+        run_dir = self.approve_plan()
+        before = self.master.read_bytes()
+
+        completed = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts" / "ingest_wizard_apply.py"),
+                "--root",
+                str(self.root),
+                "--workbook",
+                str(self.master),
+                "--run",
+                self.run_id,
+                "--write",
+                "--confirm-plan-warnings",
+            ],
+            check=False,
+            text=True,
+            capture_output=True,
+        )
+
+        self.assertNotEqual(completed.returncode, 0, completed.stdout)
+        self.assertIn("unrecognized arguments: --confirm-plan-warnings", completed.stderr)
+        self.assertEqual(self.master.read_bytes(), before)
+        self.assertFalse((run_dir / "apply-report.json").exists())
+
 
 if __name__ == "__main__":
     unittest.main()

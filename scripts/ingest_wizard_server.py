@@ -226,6 +226,10 @@ class WizardHandler(BaseHTTPRequestHandler):
                 run_id = path[len("/api/wizard/sessions/"):-len("/plan/approve")]
                 payload = self._json_body()
                 self._send_json(self.store.approve_plan(run_id, str(payload.get("approver") or "")))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/write/approve"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/write/approve")]
+                payload = self._json_body()
+                self._send_json(self.store.approve_write(run_id, str(payload.get("approver") or "")))
             else:
                 self._send_error_json("Not found.", 404)
         except WizardError as exc:

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Apply an approved ingest-wizard plan.
+"""Validate an approved ingest-wizard plan or execute separate write authority.
 
-Default mode is dry-run/report only. Passing --write applies to the workbook,
-but only after the run is already plan_approved and all fingerprints still
-match the approved plan. This CLI never promotes generated runtime artifacts.
+Default mode produces diagnostic dry-run evidence. Passing --write reaches the
+workbook only when the run has a current pass-c-3 plan, scoped plan approval,
+eligible dry-run report, and separate deployment-ready write approval. This CLI
+never promotes generated runtime artifacts.
 """
 
 from __future__ import annotations
@@ -31,14 +32,9 @@ def main() -> int:
     parser.add_argument("--workbook", default=str(ROOT / "stingray_master.xlsx"), help="canonical workbook path")
     parser.add_argument("--write", action="store_true", help="write the workbook; default is dry-run/report only")
     parser.add_argument(
-        "--confirm-plan-warnings",
-        action="store_true",
-        help="confirm all apply_batch warnings from the approved plan during --write",
-    )
-    parser.add_argument(
         "--no-schema-validation",
         action="store_true",
-        help="disable schema validation for fixture tests only; real runs should leave it enabled",
+        help="disable schema validation for fixture/debug dry-runs only; incompatible with --write",
     )
     args = parser.parse_args()
 
@@ -47,7 +43,6 @@ def main() -> int:
         result = store.apply_approved_plan(
             args.run,
             write=args.write,
-            confirm_plan_warnings=args.confirm_plan_warnings,
             schema_validation=not args.no_schema_validation,
         )
     except WizardError as exc:
