@@ -86,11 +86,7 @@ WRITE_APPROVAL_SCHEMA = "write-approval-1"
 WRITE_APPROVAL_SCOPE = "deployment_ready_write"
 SCHEMA_VERSION_D = "pass-d-2"
 WRITABLE_PLAN_SCHEMA = "pass-c-3"
-ALLOWED_WRITE_DEFERRAL_KINDS = {
-    "asset_map_deferred",
-    "color_overrides_deferred",
-    "interior_components_deferred",
-}
+ALLOWED_WRITE_DEFERRAL_KINDS = {"asset_map_media_missing"}
 COMPILER_ARTIFACT_BINDINGS = (
     ("canonical-row-manifest.json", "canonicalManifestSha"),
     ("compile-report.json", "compileReportSha"),
@@ -304,6 +300,104 @@ class WizardSessionStore:
                         status=409,
                     )
         return current
+
+    def _compile_report_allowed_deferrals(self, run_dir: Path) -> list[dict[str, Any]]:
+        """Return the closed-policy deferrals declared by the bound compile report."""
+
+        report_file = run_dir / "compile-report.json"
+        if not report_file.is_file():
+            raise WizardError("Write eligibility requires the current compile report.", status=409)
+        report = read_json(report_file)
+        declared = report.get("deferrals") or []
+        if not isinstance(declared, list):
+            raise WizardError("Compile report deferrals must be a list.", status=409)
+        allowed: list[dict[str, Any]] = []
+        seen_ids: set[str] = set()
+        for item in declared:
+            if not isinstance(item, dict) or item.get("disposition") != "allowed_deferral":
+                continue
+            kind = str(item.get("kind") or "")
+            deferral_id = str(item.get("deferralId") or "")
+            model = str(item.get("model") or "")
+            if kind not in ALLOWED_WRITE_DEFERRAL_KINDS:
+                raise WizardError(
+                    f"Compile report contains non-allowlisted deferral kind {kind!r}.",
+                    status=409,
+                )
+            if not model:
+                raise WizardError(
+                    "Compile report allowed deferrals require an exact target model.",
+                    status=409,
+                )
+            if not deferral_id or deferral_id in seen_ids:
+                raise WizardError(
+                    "Compile report allowed deferrals require unique stable deferralId values.",
+                    status=409,
+                )
+            seen_ids.add(deferral_id)
+            allowed.append(dict(item))
+        return allowed
+
+    def _compile_report_not_applicable_families(
+        self,
+        run_dir: Path,
+    ) -> set[tuple[str, str]]:
+        """Return model/family pairs whose zero-row result is explicitly proven complete."""
+
+        report_file = run_dir / "compile-report.json"
+        if not report_file.is_file():
+            return set()
+        coverage = read_json(report_file).get("sourceFeatureCoverage") or []
+        if not isinstance(coverage, list):
+            raise WizardError("Compile report sourceFeatureCoverage must be a list.", status=409)
+        result: set[tuple[str, str]] = set()
+        for item in coverage:
+            if not isinstance(item, dict) or item.get("disposition") != "resolved_not_applicable":
+                continue
+            model = str(item.get("model") or "")
+            family = str(item.get("family") or "")
+            evidence_ids = item.get("evidenceIds") or []
+            if model and family and isinstance(evidence_ids, list) and evidence_ids:
+                result.add((model, family))
+        return result
+
+    def _validate_report_deferrals(
+        self,
+        run_dir: Path,
+        deferrals: list[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        """Require every report deferral to be an exact compile-report declaration."""
+
+        declared = {
+            str(item["deferralId"]): item
+            for item in self._compile_report_allowed_deferrals(run_dir)
+        }
+        validated: list[dict[str, Any]] = []
+        seen_ids: set[str] = set()
+        for item in deferrals:
+            if not isinstance(item, dict):
+                raise WizardError("Dry-run deferrals must be structured records.", status=409)
+            kind = str(item.get("kind") or "")
+            deferral_id = str(item.get("deferralId") or "")
+            if kind not in ALLOWED_WRITE_DEFERRAL_KINDS:
+                raise WizardError(
+                    f"Dry-run report contains unapproved deferral kind {kind!r}.",
+                    status=409,
+                )
+            if not deferral_id or deferral_id in seen_ids:
+                raise WizardError(
+                    "Dry-run deferrals require unique stable deferralId values.",
+                    status=409,
+                )
+            expected = declared.get(deferral_id)
+            if expected != item:
+                raise WizardError(
+                    f"Dry-run deferral {deferral_id!r} does not match the bound compile report.",
+                    status=409,
+                )
+            seen_ids.add(deferral_id)
+            validated.append(dict(item))
+        return validated
 
     def _approval_bindings(
         self,
@@ -1085,6 +1179,13 @@ class WizardSessionStore:
             raise WizardError("Workbook changed after the plan was built; rebuild the plan.", status=409)
         if plan.get("schemaVersion") == WRITABLE_PLAN_SCHEMA:
             self._require_compiler_bindings(run_dir, plan)
+            semantic_blockers = self._option_semantic_blockers(plan)
+            if semantic_blockers:
+                raise WizardError(
+                    f"{WRITABLE_PLAN_SCHEMA} plan approval requires explicit typed "
+                    "selectable and active values on every emitted option row.",
+                    status=409,
+                )
         approval = {
             "schemaVersion": PLAN_APPROVAL_SCHEMA,
             "scope": PLAN_APPROVAL_SCOPE,
@@ -1141,12 +1242,6 @@ class WizardSessionStore:
                 blockers.append({"kind": "price_rules_required_for_runtime", "detail": "no price-rule add/update ops"})
             if model in {"zr1", "zr1x"} and rule_group_adds == 0:
                 blockers.append({"kind": "rule_groups_required_for_runtime", "detail": "no rule-group add/update ops"})
-            if color_adds == 0:
-                deferrals.append({"kind": "color_overrides_deferred", "detail": "no color override add/update ops"})
-            if component_adds == 0:
-                deferrals.append({"kind": "interior_components_deferred", "detail": "no interior component add/update ops"})
-            if asset_adds == 0:
-                deferrals.append({"kind": "asset_map_deferred", "detail": "no asset_map add/update ops"})
             output[model] = {
                 "status": "not_deployment_ready" if blockers else "source_ops_diagnostic",
                 "registryLoadable": None,
@@ -1384,11 +1479,29 @@ class WizardSessionStore:
                 if model in {"zr1", "zr1x"} and counts["ruleGroups"] == 0:
                     blockers.append({"kind": "rule_groups_required_for_runtime", "detail": "generated contract has zero ruleGroups"})
                 if counts["colorOverrides"] == 0:
-                    deferrals.append({"kind": "color_overrides_deferred", "detail": "generated contract has zero colorOverrides"})
+                    blockers.append(
+                        {
+                            "kind": "color_overrides_missing_or_unproven",
+                            "detail": "generated contract has zero colorOverrides without not-applicable proof",
+                        }
+                    )
                 if counts["interiorComponentLineItems"] == 0:
-                    deferrals.append({"kind": "interior_components_deferred", "detail": "generated contract has zero interior component line items"})
+                    blockers.append(
+                        {
+                            "kind": "interior_components_missing_or_unproven",
+                            "detail": (
+                                "generated contract has zero interior component line items "
+                                "without not-applicable proof"
+                            ),
+                        }
+                    )
                 if counts["optionMediaCoveredChoices"] == 0:
-                    deferrals.append({"kind": "asset_map_deferred", "detail": "generated choices have zero option/card asset fields"})
+                    blockers.append(
+                        {
+                            "kind": "asset_map_media_missing",
+                            "detail": "generated choices have zero option/card asset fields",
+                        }
+                    )
                 entry.update(
                     {
                         "status": "not_deployment_ready" if blockers else "deployment_probe_passed",
@@ -1569,6 +1682,8 @@ class WizardSessionStore:
         target_deferrals: dict[str, list[dict[str, Any]]] = {
             str(model): [] for model in plan.get("targets") or []
         }
+        compile_deferrals: list[dict[str, Any]] = []
+        not_applicable_families: set[tuple[str, str]] = set()
         if not schema_validation or result.get("schemaResult") is None:
             global_blockers.append(
                 {
@@ -1604,6 +1719,26 @@ class WizardSessionStore:
                     global_blockers.append(
                         {"kind": "compiler_binding_missing", "detail": f"{field} is absent or stale"}
                     )
+            try:
+                compile_deferrals = self._compile_report_allowed_deferrals(
+                    self.run_dir(str(approval["runId"]))
+                )
+                not_applicable_families = self._compile_report_not_applicable_families(
+                    self.run_dir(str(approval["runId"]))
+                )
+            except WizardError as exc:
+                global_blockers.append(
+                    {"kind": "compile_deferral_policy_invalid", "detail": str(exc)}
+                )
+
+        def media_deferral_for(model: str) -> dict[str, Any] | None:
+            matches = [
+                item
+                for item in compile_deferrals
+                if item.get("kind") == "asset_map_media_missing"
+                and str(item.get("model") or "") == model
+            ]
+            return dict(matches[0]) if len(matches) == 1 else None
 
         semantic_blockers = self._option_semantic_blockers(plan) + self._identity_churn_blockers(workbook, plan)
         for blocker in semantic_blockers:
@@ -1648,17 +1783,17 @@ class WizardSessionStore:
             entry = deployment.get(matched_model) or {}
             if (
                 matched_model
-                and not (entry.get("deploymentBlockers") or [])
-                and entry.get("status") == "deployment_probe_passed"
+                and not [
+                    blocker
+                    for blocker in (entry.get("deploymentBlockers") or [])
+                    if not (
+                        blocker.get("kind") == "asset_map_media_missing"
+                        and media_deferral_for(matched_model) is not None
+                    )
+                ]
+                and entry.get("registryLoadable") is True
             ):
                 accepted_warning_ids.append(str(warning_id))
-                target_deferrals[matched_model].append(
-                    {
-                        "kind": "scaffold",
-                        "warningId": str(warning_id),
-                        "detail": "inactive target scaffold verified in scratch",
-                    }
-                )
             else:
                 global_blockers.append(
                     {
@@ -1671,6 +1806,19 @@ class WizardSessionStore:
         for model in target_blockers:
             entry = deployment.get(model) or {}
             for blocker in entry.get("deploymentBlockers") or []:
+                not_applicable_family = {
+                    "color_overrides_missing_or_unproven": "color_overrides",
+                    "interior_components_missing_or_unproven": "interior_components",
+                    "asset_map_media_missing": "asset_map",
+                }.get(str(blocker.get("kind") or ""))
+                if not_applicable_family and (model, not_applicable_family) in not_applicable_families:
+                    continue
+                if blocker.get("kind") == "asset_map_media_missing":
+                    media_deferral = media_deferral_for(model)
+                    if media_deferral is not None:
+                        if media_deferral not in target_deferrals[model]:
+                            target_deferrals[model].append(media_deferral)
+                        continue
                 target_blockers[model].append(
                     {
                         "kind": str(blocker.get("kind") or "deployment_blocked"),
@@ -1679,21 +1827,13 @@ class WizardSessionStore:
                     }
                 )
             for deferral in entry.get("deploymentDeferrals") or []:
-                normalized = {
-                    "kind": str(deferral.get("kind") or ""),
-                    "model": model,
-                    "detail": str(deferral.get("detail") or ""),
-                }
-                if normalized["kind"] not in ALLOWED_WRITE_DEFERRAL_KINDS:
-                    target_blockers[model].append(
-                        {
-                            "kind": "unknown_deferral",
-                            "model": model,
-                            "detail": normalized["kind"],
-                        }
-                    )
-                else:
-                    target_deferrals[model].append(normalized)
+                target_blockers[model].append(
+                    {
+                        "kind": "unknown_deferral",
+                        "model": model,
+                        "detail": str(deferral.get("kind") or ""),
+                    }
+                )
 
         targets: dict[str, Any] = {}
         all_blockers = list(global_blockers)
@@ -1801,13 +1941,7 @@ class WizardSessionStore:
             )
         if normalized(deferrals) != normalized(nested_deferrals):
             raise WizardError("Dry-run target deferrals do not match the atomic plan total.", status=409)
-        unknown = sorted(
-            {str(item.get("kind") or "") for item in deferrals}
-            - ALLOWED_WRITE_DEFERRAL_KINDS
-            - {"scaffold"}
-        )
-        if unknown:
-            raise WizardError(f"Dry-run report contains unapproved deferral kinds: {unknown}", status=409)
+        self._validate_report_deferrals(run_dir, deferrals)
 
     def approve_write(self, run_id: str, approver: str) -> dict[str, Any]:
         """Create write authority solely from current stored proof artifacts."""
@@ -1933,11 +2067,7 @@ class WizardSessionStore:
         approved_deferrals = write_approval.get("allowedDeferrals") or []
         if approved_deferrals != (eligibility.get("deferrals") or []):
             raise WizardError("Allowed deferral set drifted after write approval.", status=409)
-        if any(
-            str(item.get("kind") or "") not in ALLOWED_WRITE_DEFERRAL_KINDS | {"scaffold"}
-            for item in approved_deferrals
-        ):
-            raise WizardError("Write approval contains a non-allowlisted deferral.", status=409)
+        self._validate_report_deferrals(run_dir, approved_deferrals)
 
         batch = self._combined_plan_batch(plan, workbook)
         preview = apply_batch(
@@ -1983,7 +2113,7 @@ class WizardSessionStore:
     ) -> dict[str, Any]:
         """Produce bound dry-run evidence or execute separately approved write authority."""
 
-        from corvette_form_generator.editor_ops import apply_batch
+        from corvette_form_generator.editor_ops import apply_batch, flatten_items
 
         started_at = datetime.now().isoformat(timespec="seconds")
         session = self.load_session(run_id)
@@ -2136,8 +2266,8 @@ class WizardSessionStore:
             "approvedAt": approval.get("approvedAt"),
             "approval": approval,
             "opCounts": {
-                "stage1": len(plan["stage1"]["items"]),
-                "stage2": len(plan["stage2"]["items"]),
+                "stage1": len(flatten_items(plan["stage1"]["items"])),
+                "stage2": len(flatten_items(plan["stage2"]["items"])),
                 "combinedRaw": (result.get("operationCoverage") or {}).get("rawCount", 0),
                 "prepared": (result.get("operationCoverage") or {}).get(
                     "preparedCount", 0

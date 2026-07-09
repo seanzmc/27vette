@@ -130,23 +130,31 @@ class ApplyFlowTest(unittest.TestCase):
         approve: bool = True,
         deferrals: list[dict] | None = None,
         compile_deferrals: list[dict] | None = None,
+        source_feature_coverage: list[dict] | None = None,
+        explicit_option_semantics: bool = True,
     ) -> tuple[Path, dict]:
         """Build stored pass-c-3-shaped proof without invoking a live write."""
 
         deferrals = list(deferrals or [])
         compile_deferrals = list(compile_deferrals or [])
+        source_feature_coverage = list(source_feature_coverage or [])
         run_dir = self.approve_plan()
         self.store.apply_approved_plan(self.run_id, schema_validation=False)
         plan = read_json(run_dir / "apply-plan.json")
-        for item in [*plan["stage1"]["items"], *plan["stage2"]["items"]]:
-            if item.get("action") in {"add", "update"} and str(item.get("sheet") or "").endswith("options"):
-                item.setdefault("row", {})["selectable"] = True
-                item["row"]["active"] = True
+        if explicit_option_semantics:
+            for item in [*plan["stage1"]["items"], *plan["stage2"]["items"]]:
+                if item.get("action") in {"add", "update"} and str(item.get("sheet") or "").endswith("options"):
+                    item.setdefault("row", {})["selectable"] = True
+                    item["row"]["active"] = True
         for filename, payload, field in (
             ("canonical-row-manifest.json", {"schemaVersion": "canonical-rows-1"}, "canonicalManifestSha"),
             (
                 "compile-report.json",
-                {"schemaVersion": "compile-report-1", "deferrals": compile_deferrals},
+                {
+                    "schemaVersion": "compile-report-1",
+                    "deferrals": compile_deferrals,
+                    "sourceFeatureCoverage": source_feature_coverage,
+                },
                 "compileReportSha",
             ),
             ("exception-resolutions.json", {"schemaVersion": "exception-resolutions-1"}, "exceptionResolutionsSha"),
@@ -386,6 +394,10 @@ class ApplyFlowTest(unittest.TestCase):
         unflattened_count = len(plan["stage1"]["items"]) + len(plan["stage2"]["items"])
         self.assertEqual(report["operationCoverage"]["rawCount"], unflattened_count + 1)
         self.assertEqual(report["opCounts"]["combinedRaw"], unflattened_count + 1)
+        self.assertEqual(
+            report["opCounts"]["stage1"] + report["opCounts"]["stage2"],
+            report["opCounts"]["combinedRaw"],
+        )
         self.assertEqual(
             report["opCounts"]["prepared"],
             report["operationCoverage"]["preparedCount"],
@@ -648,6 +660,13 @@ class ApplyFlowTest(unittest.TestCase):
     def test_asset_map_deferred_is_forbidden(self) -> None:
         self.assert_forbidden_deferral_refuses("asset_map_deferred")
 
+    def test_pass_c3_plan_approval_refuses_blank_option_semantics(self) -> None:
+        with self.assertRaisesRegex(WizardError, "selectable and active"):
+            self.future_write_authority(
+                approve=False,
+                explicit_option_semantics=False,
+            )
+
     def test_color_overrides_deferred_is_forbidden(self) -> None:
         self.assert_forbidden_deferral_refuses("color_overrides_deferred")
 
@@ -676,6 +695,94 @@ class ApplyFlowTest(unittest.TestCase):
 
         approval = read_json(run_dir / "write-approval.json")
         self.assertEqual(approval["allowedDeferrals"], [row])
+
+    def test_scaffold_warning_is_accepted_only_as_a_warning(self) -> None:
+        from corvette_form_generator.editor_ops import classify_warnings
+
+        run_dir, report = self.future_write_authority(approve=False)
+        plan = read_json(run_dir / "apply-plan.json")
+        approval = read_json(run_dir / "plan-approval.json")
+        warning = {"id": "scaffold:zr1_options", "message": "target remains inactive"}
+        warning_policy = classify_warnings([warning])
+        result = {
+            **report["applyResult"],
+            "warnings": [warning],
+            "warningPolicy": warning_policy,
+        }
+        deployment = {
+            model: {
+                "status": "deployment_probe_passed",
+                "registryLoadable": True,
+                "deploymentBlockers": [],
+                "deploymentDeferrals": [],
+            }
+            for model in plan["targets"]
+        }
+
+        eligibility = self.store._write_eligibility(
+            workbook=self.master,
+            plan=plan,
+            approval=approval,
+            legacy_approval=False,
+            schema_validation=True,
+            result=result,
+            deployment=deployment,
+        )
+
+        self.assertEqual(eligibility["deferrals"], [])
+        self.assertEqual(eligibility["acceptedWarningIds"], ["scaffold:zr1_options"])
+
+    def test_resolved_not_applicable_proof_closes_zero_row_family_blockers(self) -> None:
+        coverage = [
+            {
+                "model": "zr1",
+                "family": family,
+                "disposition": "resolved_not_applicable",
+                "evidenceIds": [f"evidence:{family}"],
+            }
+            for family in ("color_overrides", "interior_components", "asset_map")
+        ]
+        run_dir, report = self.future_write_authority(
+            approve=False,
+            source_feature_coverage=coverage,
+        )
+        plan = read_json(run_dir / "apply-plan.json")
+        approval = read_json(run_dir / "plan-approval.json")
+        deployment = {
+            model: {
+                "status": "not_deployment_ready" if model == "zr1" else "deployment_probe_passed",
+                "registryLoadable": True,
+                "deploymentBlockers": (
+                    [
+                        {"kind": "color_overrides_missing_or_unproven", "detail": "fixture"},
+                        {"kind": "interior_components_missing_or_unproven", "detail": "fixture"},
+                        {"kind": "asset_map_media_missing", "detail": "fixture"},
+                    ]
+                    if model == "zr1"
+                    else []
+                ),
+                "deploymentDeferrals": [],
+            }
+            for model in plan["targets"]
+        }
+
+        eligibility = self.store._write_eligibility(
+            workbook=self.master,
+            plan=plan,
+            approval=approval,
+            legacy_approval=False,
+            schema_validation=True,
+            result=report["applyResult"],
+            deployment=deployment,
+        )
+
+        blocker_kinds = {
+            item["kind"] for item in eligibility["targets"]["zr1"]["blockers"]
+        }
+        self.assertNotIn("color_overrides_missing_or_unproven", blocker_kinds)
+        self.assertNotIn("interior_components_missing_or_unproven", blocker_kinds)
+        self.assertNotIn("asset_map_media_missing", blocker_kinds)
+        self.assertEqual(eligibility["targets"]["zr1"]["deferrals"], [])
 
     def test_live_apply_reuses_approved_probe_without_post_mutation_reapply(self) -> None:
         run_dir, eligible_report = self.future_write_authority()
