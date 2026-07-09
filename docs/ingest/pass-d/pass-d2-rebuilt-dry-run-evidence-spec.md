@@ -1,6 +1,6 @@
 # Pass D.2 — Rebuilt pass-c-2 dry-run evidence and write-decision checkpoint
 
-Status: Implemented 2026-07-09 after Sean approval. Fresh all-target run `20260709-003524-650cae` was rebuilt as `pass-c-2`, approved for D.2 dry-run evidence only, and validated through the Pass D apply CLI without `--write`. Reasoning level for Sean/Codex: high.
+Status: Implemented 2026-07-09 after Sean approval. Fresh all-target run `20260709-003524-650cae` was rebuilt as `pass-c-2`, approved for D.2 dry-run evidence only, and validated through the Pass D apply CLI without `--write`. Post-checkpoint decision 2026-07-09: Sean selected the source/tooling follow-up in `docs/ingest/canonical-row-compiler-exception-queue-design.md`; no scaffold or live write is approved. Reasoning level for Sean/Codex: high.
 
 ## 0. Decision summary
 
@@ -474,4 +474,4 @@ Decision result:
 
 - D.2 evidence is complete.
 - The rebuilt run is **not deployment-ready** for the full selected target set because ZR1/ZR1X carry explicit price-rule and rule-group blockers.
-- A live workbook write is still not approved by this spec. The next approval, if any, must explicitly choose either no write, a non-deployment scaffold write for run `20260709-003524-650cae`, or a follow-up source/tooling pass to resolve deployment blockers before any write.
+- A live workbook write is still not approved by this spec. Sean selected the follow-up source/tooling path on 2026-07-09: complete the safety closure first, then implement the canonical-row compiler and typed exception queue. Run `20260709-003524-650cae` remains immutable dry-run evidence and is not a scaffold-write candidate under the selected direction.

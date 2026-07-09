@@ -4,7 +4,7 @@ Edge raw-ingest workflow only: adding a model not in the form, or a broad GM ord
 
 ## Contract and inputs
 
-Staged workflow docs: `docs/ingest/README.md` and `docs/ingest/pass-{0..5}/*.md`.
+Current workflow docs: `docs/ingest/README.md` and `docs/ingest/canonical-row-compiler-exception-queue-design.md`. Older pass specs remain implementation/history records and do not override the current production direction.
 
 Inputs: `<raw_export>.xlsx` (official GM order-guide export), `stingray_master.xlsx` (read-only schema/example reference), optional official price schedule. Never overwrite the raw export or the master workbook during preflight.
 
@@ -13,7 +13,8 @@ All ingest passes write only run-scoped transient artifacts under `form-output/i
 ## Pass sequence and artifacts
 
 - Pass A — interactive ingest wizard (current entry path): browser-first upload/choose → sheet-card profiling → user sheet-role confirmation → deterministic option/price parse → exact 1-to-1 price joins → read-only candidate table. Artifacts under `form-output/ingest-wizard/<run-id>/`: `session.json`, `sheet-profile.json`, `sheet-roles.json`, `option-candidates.json`, `price-rows.json`, `join-report.json`. No apply planning or workbook writes. Run: `.venv/bin/python scripts/ingest_wizard_server.py`.
-- Pass B — model scoping + decision capture (implemented 2026-07-05, same wizard/server): target-model selection with structure-only comparators → variant reconciliation vs workbook scaffolds → ten reviewer decision lanes (sections, prices, exclusive groups, relationships with advisory phrase-scan hints, script-proposed copy splits with an exception queue, status nuances, duplicates, standard equipment, interior/media deferrals, presentation metadata prefilled from a live template model) → completeness gate. Review ergonomics (B.1–B.8): selection-scoped bulk actions with batch undo and audited decision deletion, cross-model decision copy with provenance, per-row workbook-reference display (live `*_options` data, never another ingested sheet), plain-language decision labels over unchanged stored vocabulary, decision-state filtering for section/price queues, checked-row bulk `Skip — don't carry over` for section assignment, suppression of skipped rows from later review lanes/progress, Section assignment for ref-only RPO rows while price review stays orderable-only, and relationship authoring simplified to workbook-safe Requires / Includes / Not available with choices. Additional artifacts: `model-selection.json`, `variant-reconciliation.json`, `decisions.json` (`pass-b-2`), `decisions-log.jsonl`. Workbook opened read-only for pickers/prefill only; still no apply planning or workbook writes. Program spec for Passes B–F: `docs/ingest/ingest-wizard-end-to-end-completion-spec.md`.
+- Production continuation — canonical-row compiler + typed exception queue (direction approved 2026-07-09; implementation pending written-design review): after target/comparator selection, compile every derivable canonical row, index comparator relationships as corroborating/prefill evidence, ask the user only for typed non-derivable exceptions, reconcile stable target identities, then mechanically project a ready manifest to `pass-c-3`. Mandatory live-write containment lands first. No old plan or approval is writable; the full flow stops at a deployment-ready temporary-workbook report for separate approval. Owning design: `docs/ingest/canonical-row-compiler-exception-queue-design.md`.
+- Pass B — historical implemented decision-capture path (2026-07-05 through 2026-07-07): target-model selection, ten broad reviewer lanes, cross-model decision copy, and `decisions.json`. It remains available for historical/debug runs but is superseded for future production implementation by the compiler/exception-queue path. Do not extend its broad lane or cross-model-copy architecture.
 
 Passes 0–5 below are the superseded legacy entry path, kept as parsing/review libraries and reference until later passes retire them explicitly. Their artifact paths are under `form-output/ingest/<run-id>/`.
 
@@ -24,16 +25,16 @@ Passes 0–5 below are the superseded legacy entry path, kept as parsing/review 
 - Pass 4 — reduced Ingest Review UI: Pass 3 artifacts become the default browser review queue; Pass 1 candidates stay as drill-down/debug; exports versioned decisions; creates no workbook operations.
 - Pass 5 — focused-model workbook-build review: after Pass 0 header/variant profiling, select target models before Pass 1/3 expansion. Default controlled scope `zr1,zr1x,z06` (ZR1/ZR1X primary, Z06 comparator only). Replaces broad all-model review and abstract decisions with workbook-destination lanes (option rows, OVS rows, relationship candidates, price gaps, duplicate-source classification, blocked extractor gaps). No dry-run apply planning until this review shape is usable.
 
-- Pass C — decision export + dry-run apply plan (implemented 2026-07-06, same wizard/server): after `decisions_complete`, builds a deterministic two-stage editor-ops plan (stage 1 scaffolding: missing model sheets via `create_sheet`, model-metadata rows, source-role activation; stage 2 data: options/OVS/rules/exclusives/presentation rows plus clean-reprocess deletes of ZR1/ZR1X scaffold rows), dry-runs stage 1 against the live extract and stage 2 against a scratch copy (schema validation included), and gates on explicit reviewer approval. Artifacts: `apply-plan.json`, `apply-plan-dryrun.json`, `apply-plan.md`, `plan-approval.json`. Still zero live-workbook writes.
+- Pass C/D.2 — historical implemented decision-to-plan/dry-run path. D.2 run `20260709-003524-650cae` is immutable evidence that the plan mechanics execute but the output is not production-ready. Its `pass-c-2` plan, broad decisions, wholesale scaffold deletes, and approval are permanently non-writable under the selected production direction.
 
-Canonical workbook writes require the separate Pass D apply (dry-run by default, `--write` behind the approved plan) per `docs/ingest/ingest-wizard-end-to-end-completion-spec.md`.
+Canonical workbook writes require the compiler design's safety/readiness contract, a ready `pass-c-3` manifest projection, and a separate machine-scoped deployment-ready approval. No workbook write is approved by this prompt.
 
 ## Hard guardrails
 
 1. Preserve raw values: original sheet names, row spans, RPO cells, descriptions, status symbols, footnotes, price candidates. Normalized fields sit alongside raw fields, never replacing them.
 2. Do not invent data: never invent an RPO, price, name, section, rule, variant, or availability value. Blank/unresolved beats guessed; report ambiguity explicitly.
 3. Keep generated/runtime surfaces untouched; do not promote a model to runtime as part of raw ingest.
-4. Keep ZR1/ZR1X clean for reprocessing: current workbook rows are inactive historical scaffolds, not canonical expected output. Parse export ZR1/ZR1X data into fresh transient artifacts through Pass 5 model selection; compare only after a separate approved reprocess/apply spec. A comparator (e.g. Z06) verifies source structure but never supplies ZR1/ZR1X product data.
+4. Keep ZR1/ZR1X safe for reprocessing: inactive scaffold contents are not canonical product truth, but their existing IDs and incoming references are operational evidence. Never clear/recreate matched rows wholesale. Reconcile stable identities and block unresolved referenced deletes. A comparator (for example Z06) may corroborate or prefill a target relationship/group proposal, but it never independently supplies target product data, IDs, prices, defaults, copy, or scope.
 5. Stop on invariant failure: no silent parser repair. Report the source tab, row/span, failing invariant, observed value, and the decision needed.
 
 ## Source layout expectations
@@ -48,7 +49,7 @@ Status: preserve every raw status cell exactly. Normalized values are limited to
 
 RPOs: preserve orderable and reference-only cells. A primary candidate RPO must appear in the source cells after known-format cleanup. RPO-like tokens longer than the valid format require review — no phantom RPOs from fused footnote digits. Standard-equipment rows may legitimately lack an RPO.
 
-Descriptions/disclosures: preserve full raw text. Candidate parsing may split customer-facing name, description, disclosure, and source-detail text; the final split is a review decision before apply — never destroy source detail during preflight.
+Descriptions/disclosures: preserve full raw text. The compiler may split customer-facing name, description, disclosure, and source-detail text only when the source structure/rules determine the split. Ambiguous copy becomes one typed exception before apply — never destroy source detail during preflight.
 
 ## Candidate normalized families
 
@@ -64,4 +65,4 @@ Final reconciliation: total in-scope source rows; candidate rows by family and p
 
 ## Canonical apply is a later pass
 
-The approved apply pass must: default to dry-run and require `--write`; join by stable IDs/keys, not row numbers; preserve existing workbook-authored values when candidate fields are blank; follow the full workbook-safety rules in AGENTS.md §5 (lock refusal, `save_workbook_safely()`, on-disk verification); then regenerate affected model artifacts and run targeted schema/generator/runtime gates.
+The approved apply path must: accept only a ready `pass-c-3` canonical manifest projection; default to temporary-workbook proof; require separate machine-readable dry-run and deployment-ready approvals; join by stable semantic IDs/keys, not row numbers; preserve existing workbook-authored values when source fields are blank; refuse blank option flags, identity churn, unresolved references, stale fingerprints, disabled schema validation, unknown warnings, or deployment blockers before live mutation; follow AGENTS.md §5; then regenerate affected model artifacts and run targeted schema/generator/runtime gates.
