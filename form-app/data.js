@@ -10,7 +10,7 @@ window.CORVETTE_FORM_DATA = {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
           "source_workbook": "stingray_master.xlsx",
-          "generated_at": "2026-07-02T20:32:23+00:00"
+          "generated_at": "2026-07-02T14:10:04+00:00"
         },
         "variants": [
           {
@@ -51003,7 +51003,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-07-02T20:34:21+00:00",
+          "generated_at": "2026-07-09T15:49:12+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -92905,11 +92905,12 @@ window.CORVETTE_FORM_DATA = {
             "group_id": "gs_excl_performance_aero",
             "option_ids": [
               "opt_t0e_001",
-              "opt_t0f_001"
+              "opt_t0f_001",
+              "opt_5zv_001"
             ],
             "selection_mode": "required_single_within_group",
             "active": "True",
-            "notes": "Grand Sport aero choices require one active aero selection; FEY-included T0F replaces the T0E default through generic group metadata."
+            "notes": "Grand Sport aero choices require one active aero selection; T0E, T0F, and 5ZV are alternate aero choices, while FEY-included T0F replaces the T0E default through generic group metadata."
           }
         ],
         "rules": [
@@ -103836,7 +103837,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-07-02T20:34:26+00:00",
+          "generated_at": "2026-07-02T20:42:07+00:00",
           "status": "runtime_active"
         },
         "variants": [
