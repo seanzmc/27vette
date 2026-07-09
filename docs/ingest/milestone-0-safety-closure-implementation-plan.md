@@ -88,27 +88,27 @@ Status: In progress. Approved by Sean on 2026-07-09 through the parent productio
 - Modify: `tests/test_ingest_wizard_plan.py`
 - Modify: `tests/test_ingest_wizard_apply.py`
 
-- [ ] Add failing tests for `plan-approval-2` with `scope=dry_run_evidence`, run/target/plan/workbook bindings, and omission of unavailable compiler hashes. Add state coverage for new diagnostic approval while accepting historical `plan_approved` only for legacy dry-run evidence.
+- [x] Add failing tests for `plan-approval-2` with `scope=dry_run_evidence`, run/target/plan/workbook bindings, and omission of unavailable compiler hashes. Add state coverage for new diagnostic approval while accepting historical `plan_approved` only for legacy dry-run evidence.
 
-- [ ] Add failing refusal tests proving `pass-c-1`, `pass-c-2`, legacy approvals, missing/wrong `write-approval-1`, wrong scope, disabled schema validation, stale report SHA, warning drift, unknown warnings, mixed-target ineligibility, and already-applied replay all stop before `apply_batch(write=True)`. Assert workbook bytes, dry-run report, and absence of apply report/log/backup remain unchanged.
+- [x] Add failing refusal tests proving `pass-c-1`, `pass-c-2`, legacy approvals, missing/wrong `write-approval-1`, wrong scope, disabled schema validation, stale report SHA, warning drift, unknown warnings, mixed-target ineligibility, and already-applied replay all stop before `apply_batch(write=True)`. Assert workbook bytes, dry-run report, and absence of apply report/log/backup remain unchanged.
 
-- [ ] Run the focused red gate:
+- [x] Run the focused red gate:
 
   ```sh
   .venv/bin/python -m pytest tests/test_ingest_wizard_plan.py tests/test_ingest_wizard_apply.py -q
   ```
 
-- [ ] Introduce explicit approval/report schema constants: `plan-approval-2`, `write-approval-1`, and `pass-d-2`. `approve_plan()` creates diagnostic authority only. `approve_write()` derives all bindings from stored artifacts and refuses until an exact `pass-c-3` plan has a current `pass-d-2` report with `ok=true`, `status=validated_write_eligible`, and `writeEligibility.eligible=true`.
+- [x] Introduce explicit approval/report schema constants: `plan-approval-2`, `write-approval-1`, and `pass-d-2`. `approve_plan()` creates diagnostic authority only. `approve_write()` derives all bindings from stored artifacts and refuses until an exact `pass-c-3` plan has a current `pass-d-2` report with `ok=true`, `status=validated_write_eligible`, and `writeEligibility.eligible=true`.
 
-- [ ] Put one pre-write authority function before the first possible live mutation. It must validate both approval scopes/schemas, plan/report/input hashes, workbook mtime/SHA and lock state, schema validation, exact warning acceptance/fingerprint, allowed deferrals, atomic target eligibility, and replay state.
+- [x] Put one pre-write authority function before the first possible live mutation. It must validate both approval scopes/schemas, plan/report/input hashes, workbook mtime/SHA and lock state, schema validation, exact warning acceptance/fingerprint, allowed deferrals, atomic target eligibility, and replay state.
 
-- [ ] Compute diagnostic blockers from the mechanically validated result before any mutation: non-writable plan/approval schema, blank option `selectable`/`active`, delete/re-add identity churn, unresolved/unconfirmable warnings/references, operation coverage/readback, and deployment-continuity blockers. A clean-but-ineligible dry-run returns `ok=true`, `status=validated_write_blocked`, structured `writeEligibility`, and `liveWriteBlockedReason`; execution failures remain `ok=false`.
+- [x] Compute diagnostic blockers from the mechanically validated result before any mutation: non-writable plan/approval schema, blank option `selectable`/`active`, delete/re-add identity churn, unresolved/unconfirmable warnings/references, operation coverage/readback, and deployment-continuity blockers. A clean-but-ineligible dry-run returns `ok=true`, `status=validated_write_blocked`, structured `writeEligibility`, and `liveWriteBlockedReason`; execution failures remain `ok=false`.
 
-- [ ] Make the report's `verification` and operation counts come from `editor_ops` prepared effects. Preserve atomic multi-target semantics: one blocked target makes top-level eligibility false.
+- [x] Make the report's `verification` and operation counts come from `editor_ops` prepared effects. Preserve atomic multi-target semantics: one blocked target makes top-level eligibility false.
 
-- [ ] Re-run the focused gate and confirm no test invokes a live workbook write from a pre-`pass-c-3` plan.
+- [x] Re-run the focused gate and confirm no test invokes a live workbook write from a pre-`pass-c-3` plan.
 
-- [ ] Commit the task with message: `fix(ingest): require scoped prewrite authority`.
+- [x] Commit the task with message: `fix(ingest): require scoped prewrite authority`.
 
 ### Task 4: Expose diagnostic-only approval in the CLI, server, and browser
 
