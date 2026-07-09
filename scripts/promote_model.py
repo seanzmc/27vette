@@ -6,9 +6,10 @@ Usage:
 
 All promotion values derive from workbook metadata: ``model_master`` supplies
 the label, year, registry key, and export slug; ``model_variants`` supplies
-the variant ids whose ``variant_master`` rows are activated; the draft
-artifact path derives from the export slug. Without ``--write`` the script
-reports the changes it would make and leaves the workbook untouched.
+the exact membership rows and variant ids whose membership and
+``variant_master`` active flags are activated; the draft artifact path derives
+from the export slug. Without ``--write`` the script reports the changes it
+would make and leaves the workbook untouched.
 """
 
 from __future__ import annotations
@@ -20,7 +21,7 @@ from typing import Any
 
 from openpyxl import load_workbook
 
-from corvette_form_generator.model_configs import WORKBOOK_PATH
+from corvette_form_generator.model_configs import WORKBOOK_PATH, discover_generation_model_configs
 from corvette_form_generator.registry_promotion import export_slug, registry_model_key, runtime_contract_artifact_path
 from corvette_form_generator.workbook import clean, excel_lock_path, rows_from_sheet, save_workbook_safely
 
@@ -42,6 +43,27 @@ def row_by_key(ws, key_column: str, key_value: str) -> int:
         raise ValueError(f"{ws.title} is missing {key_column}={key_value!r}")
     if len(matches) > 1:
         raise ValueError(f"{ws.title} has duplicate {key_column}={key_value!r} rows: {matches}")
+    return matches[0]
+
+
+def row_by_membership(ws, model_key: str, variant_id: str) -> int:
+    headers = headers_for(ws)
+    required = {"model_key", "variant_id"}
+    missing = sorted(required - set(headers))
+    if missing:
+        raise ValueError(f"{ws.title} is missing required columns: {', '.join(missing)}")
+    matches: list[int] = []
+    for row_idx in range(2, ws.max_row + 1):
+        row_model = clean(ws.cell(row_idx, headers["model_key"]).value).lower()
+        row_variant = clean(ws.cell(row_idx, headers["variant_id"]).value)
+        if row_model == model_key.lower() and row_variant == variant_id:
+            matches.append(row_idx)
+    if not matches:
+        raise ValueError(f"{ws.title} is missing model_key={model_key!r}, variant_id={variant_id!r}")
+    if len(matches) > 1:
+        raise ValueError(
+            f"{ws.title} has duplicate model_key={model_key!r}, variant_id={variant_id!r} rows: {matches}"
+        )
     return matches[0]
 
 
@@ -122,6 +144,12 @@ def promote_model(wb, model_key: str, plan: dict[str, Any]) -> list[dict[str, An
         variant_row = row_by_key(variant_ws, "variant_id", variant_id)
         set_cell(variant_ws, variant_row, variant_headers, "active", True, changes)
 
+    membership_ws = wb["model_variants"]
+    membership_headers = headers_for(membership_ws)
+    for variant_id in plan["variant_ids"]:
+        membership_row = row_by_membership(membership_ws, model_key, variant_id)
+        set_cell(membership_ws, membership_row, membership_headers, "active", True, changes)
+
     return changes
 
 
@@ -131,9 +159,17 @@ def verify_workbook(path: Path, model_key: str, plan: dict[str, Any]) -> dict[st
         models = {row["model_key"]: row for row in rows_from_sheet(wb, "model_master")}
         promotions = {row["model_key"]: row for row in rows_from_sheet(wb, "model_registry_promotion")}
         variants = {row["variant_id"]: row for row in rows_from_sheet(wb, "variant_master")}
+        memberships = {
+            clean(row.get("variant_id")): row
+            for row in rows_from_sheet(wb, "model_variants")
+            if clean(row.get("model_key")).lower() == model_key.lower()
+        }
         model = models.get(model_key) or {}
         promotion = promotions.get(model_key) or {}
         variant_status = {variant_id: (variants.get(variant_id) or {}).get("active") for variant_id in plan["variant_ids"]}
+        membership_status = {
+            variant_id: (memberships.get(variant_id) or {}).get("active") for variant_id in plan["variant_ids"]
+        }
         failures: list[str] = []
         if model.get("active") != "True":
             failures.append(f"model_master {model_key} active is not True")
@@ -155,14 +191,53 @@ def verify_workbook(path: Path, model_key: str, plan: dict[str, Any]) -> dict[st
         for variant_id, active in variant_status.items():
             if active != "True":
                 failures.append(f"variant_master {variant_id} active expected 'True', found {active!r}")
-        return {
-            f"model_master_{model_key}": model,
-            f"model_registry_promotion_{model_key}": promotion,
-            "variant_active": variant_status,
-            "failures": failures,
-        }
+        for variant_id, active in membership_status.items():
+            if active != "True":
+                failures.append(
+                    f"model_variants {model_key}/{variant_id} active expected 'True', found {active!r}"
+                )
     finally:
         wb.close()
+
+    expected_variant_ids = list(plan["variant_ids"])
+    discovery: dict[str, Any] = {
+        "ok": False,
+        "model_key": model_key,
+        "expected_variant_ids": expected_variant_ids,
+        "discovered_model_keys": [],
+        "variant_ids": [],
+        "error": None,
+    }
+    try:
+        configs = discover_generation_model_configs(path)
+        discovery["discovered_model_keys"] = list(configs)
+        config = configs.get(model_key)
+        if config is None:
+            failures.append(f"generator discovery did not return target model {model_key!r}")
+        else:
+            discovered_variant_ids = list(config.variant_ids)
+            discovery["variant_ids"] = discovered_variant_ids
+            if set(discovered_variant_ids) != set(expected_variant_ids) or len(discovered_variant_ids) != len(
+                expected_variant_ids
+            ):
+                failures.append(
+                    f"generator discovery variants for {model_key!r} expected {expected_variant_ids!r}, "
+                    f"found {discovered_variant_ids!r}"
+                )
+            else:
+                discovery["ok"] = True
+    except Exception as exc:  # noqa: BLE001 - verification must preserve discovery evidence
+        discovery["error"] = {"type": type(exc).__name__, "message": str(exc)}
+        failures.append(f"generator discovery failed for {model_key!r}: {type(exc).__name__}: {exc}")
+
+    return {
+        f"model_master_{model_key}": model,
+        f"model_registry_promotion_{model_key}": promotion,
+        "variant_active": variant_status,
+        "model_variant_active": membership_status,
+        "discovery": discovery,
+        "failures": failures,
+    }
 
 
 def main() -> None:

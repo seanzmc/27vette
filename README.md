@@ -175,7 +175,7 @@ Test-to-surface map (run each with `node --test tests/<name>.test.mjs`):
 Python metadata gates:
 
 ```sh
-.venv/bin/python -m pytest tests/test_model_config_metadata.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py tests/test_rule_derivation.py -q
+.venv/bin/python -m pytest tests/test_model_config_metadata.py tests/test_promote_model.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py tests/test_rule_derivation.py -q
 ```
 
 Full default validation = schema gate + all rows of the table + the pytest gate. Choose gates by changed surface per AGENTS.md §10.
