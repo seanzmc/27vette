@@ -87,6 +87,18 @@ WRITE_APPROVAL_SCOPE = "deployment_ready_write"
 SCHEMA_VERSION_D = "pass-d-2"
 WRITABLE_PLAN_SCHEMA = "pass-c-3"
 ALLOWED_WRITE_DEFERRAL_KINDS = {"asset_map_media_missing"}
+COMPILE_READINESS_FIELDS = (
+    "compileReady",
+    "planReady",
+    "writeReady",
+    "deploymentReady",
+)
+NOT_APPLICABLE_DEPLOYMENT_FAMILIES = {
+    "asset_map",
+    "color_overrides",
+    "interiors",
+    "interior_components",
+}
 COMPILER_ARTIFACT_BINDINGS = (
     ("canonical-row-manifest.json", "canonicalManifestSha"),
     ("compile-report.json", "compileReportSha"),
@@ -341,6 +353,7 @@ class WizardSessionStore:
     def _compile_report_not_applicable_families(
         self,
         run_dir: Path,
+        targets: list[str],
     ) -> set[tuple[str, str]]:
         """Return model/family pairs whose zero-row result is explicitly proven complete."""
 
@@ -351,15 +364,67 @@ class WizardSessionStore:
         if not isinstance(coverage, list):
             raise WizardError("Compile report sourceFeatureCoverage must be a list.", status=409)
         result: set[tuple[str, str]] = set()
+        target_set = set(targets)
         for item in coverage:
             if not isinstance(item, dict) or item.get("disposition") != "resolved_not_applicable":
                 continue
             model = str(item.get("model") or "")
             family = str(item.get("family") or "")
             evidence_ids = item.get("evidenceIds") or []
-            if model and family and isinstance(evidence_ids, list) and evidence_ids:
-                result.add((model, family))
+            valid_evidence = (
+                isinstance(evidence_ids, list)
+                and bool(evidence_ids)
+                and all(isinstance(value, str) and value.strip() for value in evidence_ids)
+                and len(set(evidence_ids)) == len(evidence_ids)
+            )
+            if model not in target_set or family not in NOT_APPLICABLE_DEPLOYMENT_FAMILIES:
+                raise WizardError(
+                    "Compile report resolved_not_applicable coverage must bind a selected target "
+                    "and known deployment family.",
+                    status=409,
+                )
+            if not valid_evidence:
+                raise WizardError(
+                    "Compile report resolved_not_applicable coverage requires unique nonblank "
+                    "string evidenceIds.",
+                    status=409,
+                )
+            result.add((model, family))
         return result
+
+    def _require_compile_report_readiness(
+        self,
+        run_dir: Path,
+        targets: list[str],
+    ) -> dict[str, dict[str, Any]]:
+        """Require exact per-target compiler readiness and an empty blocker set."""
+
+        report_file = run_dir / "compile-report.json"
+        if not report_file.is_file():
+            raise WizardError("Write eligibility requires the current compile report.", status=409)
+        models = read_json(report_file).get("models")
+        if not isinstance(models, dict) or set(models) != set(targets):
+            raise WizardError(
+                "Compile report readiness must cover the exact selected target set.",
+                status=409,
+            )
+        for model in targets:
+            entry = models.get(model)
+            if not isinstance(entry, dict):
+                raise WizardError(f"Compile report readiness is missing for {model}.", status=409)
+            missing = [field for field in COMPILE_READINESS_FIELDS if entry.get(field) is not True]
+            if missing:
+                raise WizardError(
+                    f"Compile report target {model} is not ready: {', '.join(missing)}.",
+                    status=409,
+                )
+            blockers = entry.get("blockers") or []
+            if not isinstance(blockers, list) or blockers:
+                raise WizardError(
+                    f"Compile report target {model} still contains blockers.",
+                    status=409,
+                )
+        return {str(model): dict(models[model]) for model in targets}
 
     def _validate_report_deferrals(
         self,
@@ -1485,6 +1550,13 @@ class WizardSessionStore:
                             "detail": "generated contract has zero colorOverrides without not-applicable proof",
                         }
                     )
+                if counts["interiors"] == 0:
+                    blockers.append(
+                        {
+                            "kind": "interiors_missing_or_unproven",
+                            "detail": "generated contract has zero interiors without not-applicable proof",
+                        }
+                    )
                 if counts["interiorComponentLineItems"] == 0:
                     blockers.append(
                         {
@@ -1720,11 +1792,17 @@ class WizardSessionStore:
                         {"kind": "compiler_binding_missing", "detail": f"{field} is absent or stale"}
                     )
             try:
+                targets = [str(model) for model in plan.get("targets") or []]
+                self._require_compile_report_readiness(
+                    self.run_dir(str(approval["runId"])),
+                    targets,
+                )
                 compile_deferrals = self._compile_report_allowed_deferrals(
                     self.run_dir(str(approval["runId"]))
                 )
                 not_applicable_families = self._compile_report_not_applicable_families(
-                    self.run_dir(str(approval["runId"]))
+                    self.run_dir(str(approval["runId"])),
+                    targets,
                 )
             except WizardError as exc:
                 global_blockers.append(
@@ -1768,6 +1846,43 @@ class WizardSessionStore:
             }.get(warning_kind, "unknown_warning")
             global_blockers.append({"kind": kind, "detail": str(warning_id), "warningId": str(warning_id)})
 
+        effective_deployment_blockers: dict[str, list[dict[str, Any]]] = {
+            model: [] for model in target_blockers
+        }
+        for model in target_blockers:
+            entry = deployment.get(model) or {}
+            for blocker in entry.get("deploymentBlockers") or []:
+                not_applicable_family = {
+                    "color_overrides_missing_or_unproven": "color_overrides",
+                    "interiors_missing_or_unproven": "interiors",
+                    "interior_components_missing_or_unproven": "interior_components",
+                    "asset_map_media_missing": "asset_map",
+                }.get(str(blocker.get("kind") or ""))
+                if not_applicable_family and (model, not_applicable_family) in not_applicable_families:
+                    continue
+                if blocker.get("kind") == "asset_map_media_missing":
+                    media_deferral = media_deferral_for(model)
+                    if media_deferral is not None:
+                        if media_deferral not in target_deferrals[model]:
+                            target_deferrals[model].append(media_deferral)
+                        continue
+                effective_deployment_blockers[model].append(
+                    {
+                        "kind": str(blocker.get("kind") or "deployment_blocked"),
+                        "model": model,
+                        "detail": str(blocker.get("detail") or "deployment continuity failed"),
+                    }
+                )
+            for deferral in entry.get("deploymentDeferrals") or []:
+                effective_deployment_blockers[model].append(
+                    {
+                        "kind": "unknown_deferral",
+                        "model": model,
+                        "detail": str(deferral.get("kind") or ""),
+                    }
+                )
+            target_blockers[model].extend(effective_deployment_blockers[model])
+
         accepted_warning_ids: list[str] = []
         for warning_id in warning_policy.get("confirmableIds") or []:
             matched_model = next(
@@ -1783,14 +1898,7 @@ class WizardSessionStore:
             entry = deployment.get(matched_model) or {}
             if (
                 matched_model
-                and not [
-                    blocker
-                    for blocker in (entry.get("deploymentBlockers") or [])
-                    if not (
-                        blocker.get("kind") == "asset_map_media_missing"
-                        and media_deferral_for(matched_model) is not None
-                    )
-                ]
+                and not effective_deployment_blockers.get(matched_model)
                 and entry.get("registryLoadable") is True
             ):
                 accepted_warning_ids.append(str(warning_id))
@@ -1800,38 +1908,6 @@ class WizardSessionStore:
                         "kind": "scaffold_warning_not_confirmable",
                         "detail": f"{warning_id} lacks a clean target scratch-generation probe",
                         "warningId": str(warning_id),
-                    }
-                )
-
-        for model in target_blockers:
-            entry = deployment.get(model) or {}
-            for blocker in entry.get("deploymentBlockers") or []:
-                not_applicable_family = {
-                    "color_overrides_missing_or_unproven": "color_overrides",
-                    "interior_components_missing_or_unproven": "interior_components",
-                    "asset_map_media_missing": "asset_map",
-                }.get(str(blocker.get("kind") or ""))
-                if not_applicable_family and (model, not_applicable_family) in not_applicable_families:
-                    continue
-                if blocker.get("kind") == "asset_map_media_missing":
-                    media_deferral = media_deferral_for(model)
-                    if media_deferral is not None:
-                        if media_deferral not in target_deferrals[model]:
-                            target_deferrals[model].append(media_deferral)
-                        continue
-                target_blockers[model].append(
-                    {
-                        "kind": str(blocker.get("kind") or "deployment_blocked"),
-                        "model": model,
-                        "detail": str(blocker.get("detail") or "deployment continuity failed"),
-                    }
-                )
-            for deferral in entry.get("deploymentDeferrals") or []:
-                target_blockers[model].append(
-                    {
-                        "kind": "unknown_deferral",
-                        "model": model,
-                        "detail": str(deferral.get("kind") or ""),
                     }
                 )
 
@@ -1941,6 +2017,8 @@ class WizardSessionStore:
             )
         if normalized(deferrals) != normalized(nested_deferrals):
             raise WizardError("Dry-run target deferrals do not match the atomic plan total.", status=409)
+        self._require_compile_report_readiness(run_dir, targets)
+        self._compile_report_not_applicable_families(run_dir, targets)
         self._validate_report_deferrals(run_dir, deferrals)
 
     def approve_write(self, run_id: str, approver: str) -> dict[str, Any]:

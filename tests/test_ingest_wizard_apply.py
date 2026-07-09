@@ -131,6 +131,7 @@ class ApplyFlowTest(unittest.TestCase):
         deferrals: list[dict] | None = None,
         compile_deferrals: list[dict] | None = None,
         source_feature_coverage: list[dict] | None = None,
+        compile_models: dict[str, dict] | None = None,
         explicit_option_semantics: bool = True,
     ) -> tuple[Path, dict]:
         """Build stored pass-c-3-shaped proof without invoking a live write."""
@@ -141,6 +142,17 @@ class ApplyFlowTest(unittest.TestCase):
         run_dir = self.approve_plan()
         self.store.apply_approved_plan(self.run_id, schema_validation=False)
         plan = read_json(run_dir / "apply-plan.json")
+        if compile_models is None:
+            compile_models = {
+                model: {
+                    "compileReady": True,
+                    "planReady": True,
+                    "writeReady": True,
+                    "deploymentReady": True,
+                    "blockers": [],
+                }
+                for model in plan["targets"]
+            }
         if explicit_option_semantics:
             for item in [*plan["stage1"]["items"], *plan["stage2"]["items"]]:
                 if item.get("action") in {"add", "update"} and str(item.get("sheet") or "").endswith("options"):
@@ -154,6 +166,7 @@ class ApplyFlowTest(unittest.TestCase):
                     "schemaVersion": "compile-report-1",
                     "deferrals": compile_deferrals,
                     "sourceFeatureCoverage": source_feature_coverage,
+                    "models": compile_models,
                 },
                 "compileReportSha",
             ),
@@ -667,6 +680,59 @@ class ApplyFlowTest(unittest.TestCase):
                 explicit_option_semantics=False,
             )
 
+    def test_compile_report_requires_all_readiness_flags(self) -> None:
+        models = {
+            model: {
+                "compileReady": True,
+                "planReady": True,
+                "writeReady": model != "zr1",
+                "deploymentReady": True,
+                "blockers": [],
+            }
+            for model in ("zr1", "zr1x")
+        }
+        run_dir, _ = self.future_write_authority(approve=False, compile_models=models)
+
+        with self.assertRaisesRegex(WizardError, "not ready"):
+            self.store.approve_write(self.run_id, "sean")
+
+        self.assertFalse((run_dir / "write-approval.json").exists())
+
+    def test_compile_report_requires_exact_target_set(self) -> None:
+        models = {
+            "zr1": {
+                "compileReady": True,
+                "planReady": True,
+                "writeReady": True,
+                "deploymentReady": True,
+                "blockers": [],
+            }
+        }
+        run_dir, _ = self.future_write_authority(approve=False, compile_models=models)
+
+        with self.assertRaisesRegex(WizardError, "exact selected target set"):
+            self.store.approve_write(self.run_id, "sean")
+
+        self.assertFalse((run_dir / "write-approval.json").exists())
+
+    def test_compile_report_blockers_prevent_write_approval(self) -> None:
+        models = {
+            model: {
+                "compileReady": True,
+                "planReady": True,
+                "writeReady": True,
+                "deploymentReady": True,
+                "blockers": ([{"kind": "fixture_blocker"}] if model == "zr1" else []),
+            }
+            for model in ("zr1", "zr1x")
+        }
+        run_dir, _ = self.future_write_authority(approve=False, compile_models=models)
+
+        with self.assertRaisesRegex(WizardError, "contains blockers"):
+            self.store.approve_write(self.run_id, "sean")
+
+        self.assertFalse((run_dir / "write-approval.json").exists())
+
     def test_color_overrides_deferred_is_forbidden(self) -> None:
         self.assert_forbidden_deferral_refuses("color_overrides_deferred")
 
@@ -699,7 +765,19 @@ class ApplyFlowTest(unittest.TestCase):
     def test_scaffold_warning_is_accepted_only_as_a_warning(self) -> None:
         from corvette_form_generator.editor_ops import classify_warnings
 
-        run_dir, report = self.future_write_authority(approve=False)
+        coverage = [
+            {
+                "model": "zr1",
+                "family": family,
+                "disposition": "resolved_not_applicable",
+                "evidenceIds": [f"evidence:{family}"],
+            }
+            for family in ("color_overrides", "interiors", "interior_components")
+        ]
+        run_dir, report = self.future_write_authority(
+            approve=False,
+            source_feature_coverage=coverage,
+        )
         plan = read_json(run_dir / "apply-plan.json")
         approval = read_json(run_dir / "plan-approval.json")
         warning = {"id": "scaffold:zr1_options", "message": "target remains inactive"}
@@ -711,9 +789,17 @@ class ApplyFlowTest(unittest.TestCase):
         }
         deployment = {
             model: {
-                "status": "deployment_probe_passed",
+                "status": "not_deployment_ready" if model == "zr1" else "deployment_probe_passed",
                 "registryLoadable": True,
-                "deploymentBlockers": [],
+                "deploymentBlockers": (
+                    [
+                        {"kind": "color_overrides_missing_or_unproven", "detail": "fixture"},
+                        {"kind": "interiors_missing_or_unproven", "detail": "fixture"},
+                        {"kind": "interior_components_missing_or_unproven", "detail": "fixture"},
+                    ]
+                    if model == "zr1"
+                    else []
+                ),
                 "deploymentDeferrals": [],
             }
             for model in plan["targets"]
@@ -740,7 +826,7 @@ class ApplyFlowTest(unittest.TestCase):
                 "disposition": "resolved_not_applicable",
                 "evidenceIds": [f"evidence:{family}"],
             }
-            for family in ("color_overrides", "interior_components", "asset_map")
+            for family in ("color_overrides", "interiors", "interior_components", "asset_map")
         ]
         run_dir, report = self.future_write_authority(
             approve=False,
@@ -755,6 +841,7 @@ class ApplyFlowTest(unittest.TestCase):
                 "deploymentBlockers": (
                     [
                         {"kind": "color_overrides_missing_or_unproven", "detail": "fixture"},
+                        {"kind": "interiors_missing_or_unproven", "detail": "fixture"},
                         {"kind": "interior_components_missing_or_unproven", "detail": "fixture"},
                         {"kind": "asset_map_media_missing", "detail": "fixture"},
                     ]
@@ -780,9 +867,29 @@ class ApplyFlowTest(unittest.TestCase):
             item["kind"] for item in eligibility["targets"]["zr1"]["blockers"]
         }
         self.assertNotIn("color_overrides_missing_or_unproven", blocker_kinds)
+        self.assertNotIn("interiors_missing_or_unproven", blocker_kinds)
         self.assertNotIn("interior_components_missing_or_unproven", blocker_kinds)
         self.assertNotIn("asset_map_media_missing", blocker_kinds)
         self.assertEqual(eligibility["targets"]["zr1"]["deferrals"], [])
+
+    def test_malformed_not_applicable_evidence_cannot_suppress_blockers(self) -> None:
+        coverage = [
+            {
+                "model": "zr1",
+                "family": "interiors",
+                "disposition": "resolved_not_applicable",
+                "evidenceIds": [""],
+            }
+        ]
+        run_dir, _ = self.future_write_authority(
+            approve=False,
+            source_feature_coverage=coverage,
+        )
+
+        with self.assertRaisesRegex(WizardError, "evidenceIds"):
+            self.store.approve_write(self.run_id, "sean")
+
+        self.assertFalse((run_dir / "write-approval.json").exists())
 
     def test_live_apply_reuses_approved_probe_without_post_mutation_reapply(self) -> None:
         run_dir, eligible_report = self.future_write_authority()
