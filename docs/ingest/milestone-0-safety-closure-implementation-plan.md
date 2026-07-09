@@ -60,25 +60,25 @@ Status: In progress. Approved by Sean on 2026-07-09 through the parent productio
 - Modify: `tests/test_editor_ops_apply.py`
 - Modify: `tests/test_editor_ops_global_families.py`
 
-- [ ] Add failing tests for coalesced update coverage, add/update field equality after Boolean/integer coercion, delete absence, exact created-sheet headers, and a deliberately tampered scratch workbook producing `readback_failed`.
+- [x] Add failing tests for coalesced update coverage, add/update field equality after Boolean/integer coercion, delete absence, exact created-sheet headers, and a deliberately tampered scratch workbook producing `readback_failed`.
 
-- [ ] Require the result contract to include `operationCoverage.rawCount`, `operationCoverage.rawCovered`, `operationCoverage.preparedCount`, and `verification.preparedChecked`; assert raw coverage equals the flattened batch count and prepared checks equal the prepared-operation count.
+- [x] Require the result contract to include `operationCoverage.rawCount`, `operationCoverage.rawCovered`, `operationCoverage.preparedCount`, and `verification.preparedChecked`; assert raw coverage equals the flattened batch count and prepared checks equal the prepared-operation count.
 
-- [ ] Run the focused red gate:
+- [x] Run the focused red gate:
 
   ```sh
   .venv/bin/python -m pytest tests/test_editor_ops_apply.py tests/test_editor_ops_global_families.py tests/test_editor_ops_meta.py -q
   ```
 
-- [ ] Track the contributing raw operation indices/effects through flattening and coalescing. Reject contradictory or dropped raw effects instead of silently reporting full coverage.
+- [x] Track the contributing raw operation indices/effects through flattening and coalescing. Reject contradictory or dropped raw effects instead of silently reporting full coverage.
 
-- [ ] After saving the temporary workbook, reopen it and verify every prepared effect: exact headers for creates, exact canonical key and every coerced planned field for add/update, and absence for deletes. Return `readback_failed` on any mismatch before a live mutation is possible.
+- [x] After saving the temporary workbook, reopen it and verify every prepared effect: exact headers for creates, exact canonical key and every coerced planned field for add/update, and absence for deletes. Return `readback_failed` on any mismatch before a live mutation is possible.
 
-- [ ] Reuse the same verifier after a future safe live save; expose the failure state contract `apply_verification_failed` without making any current plan writable.
+- [x] Reuse the same verifier after a future safe live save; expose the failure state contract `apply_verification_failed` without making any current plan writable.
 
-- [ ] Re-run the focused gate and review that dry-run keeps the source workbook byte-identical.
+- [x] Re-run the focused gate and review that dry-run keeps the source workbook byte-identical.
 
-- [ ] Commit the task with message: `fix(ingest): verify exact prepared workbook effects`.
+- [x] Commit the task with message: `fix(ingest): verify exact prepared workbook effects`.
 
 ### Task 3: Scope approvals and close live-write authority before mutation
 
