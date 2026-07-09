@@ -21,6 +21,7 @@ for entry in (ROOT / "scripts", ROOT / "tests"):
     if str(entry) not in sys.path:
         sys.path.insert(0, str(entry))
 
+import corvette_form_generator.editor_ops as editor_ops  # noqa: E402
 from corvette_form_generator.editor_ops import apply_batch  # noqa: E402
 from ingest_wizard_fixtures import build_master_workbook  # noqa: E402
 
@@ -261,6 +262,45 @@ class GlobalFamilyOpsTest(unittest.TestCase):
         wb.close()
         self.assertEqual(rows[0][0], "option_id")
         self.assertEqual(rows[1][0], "opt_zzz_001")
+
+    def test_create_sheet_headers_are_verified_exactly_in_scratch_copy(self) -> None:
+        before = self.path.read_bytes()
+        item = {
+            "action": "create_sheet",
+            "sheet": "new_asset_map",
+            "family": "asset_map",
+            "headersFrom": "asset_map",
+        }
+
+        result = self.run_batch([item])
+        self.assertTrue(result["ok"], result)
+        self.assertEqual(result["operationCoverage"], {
+            "rawCount": 1,
+            "rawCovered": 1,
+            "preparedCount": 1,
+        })
+        self.assertEqual(result["verification"]["preparedChecked"], 1)
+        self.assertEqual(self.path.read_bytes(), before)
+
+        def save_and_tamper_header(workbook, scratch_path):
+            workbook.save(scratch_path)
+            tampered = load_workbook(scratch_path)
+            tampered["new_asset_map"].cell(row=1, column=1, value="wrong_header")
+            tampered.save(scratch_path)
+            tampered.close()
+
+        with patch.object(
+            editor_ops,
+            "_save_scratch_workbook",
+            side_effect=save_and_tamper_header,
+            create=True,
+        ):
+            result = self.run_batch([item])
+
+        self.assertFalse(result["ok"], result)
+        self.assertEqual(result["status"], "readback_failed")
+        self.assertTrue(any("exact headers" in error for error in result["errors"]), result)
+        self.assertEqual(self.path.read_bytes(), before)
 
     def test_existing_text_bool_convention_is_preserved_on_write(self) -> None:
         wb = load_workbook(self.path)

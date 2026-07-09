@@ -48,6 +48,9 @@ class FlattenTest(unittest.TestCase):
             op("add", "s", {"option_id": "a"}, {"option_id": "a"})]}]
         flat = flatten_items(items)
         self.assertEqual(flat[0]["_composite"], "Add XYZ")
+        self.assertEqual(flat[0]["_raw_effects"], [
+            {"index": 0, "action": "add", "fields": ["option_id"]},
+        ])
 
     def test_plain_ops_pass_through(self):
         flat = flatten_items([op("delete", "s", {"option_id": "a"})])
@@ -57,37 +60,62 @@ class FlattenTest(unittest.TestCase):
 class CoalesceTest(unittest.TestCase):
     K = {"option_id": "a"}
 
-    def test_update_update_merges_later_wins(self):
+    def test_update_update_merges_but_marks_replaced_effect(self):
         out = coalesce_ops([op("update", "s", self.K, {"price": 1, "rpo": "X"}),
                             op("update", "s", self.K, {"price": 2})])
         self.assertEqual(len(out), 1)
         self.assertEqual(out[0]["row"], {"price": 2, "rpo": "X"})
+        self.assertTrue(any("contradictory raw effects" in error for error in out[0]["_coverage_errors"]))
 
-    def test_add_update_merges_into_add(self):
+    def test_add_update_merges_but_marks_replaced_effect(self):
         out = coalesce_ops([op("add", "s", self.K, {"option_id": "a", "price": 1}),
                             op("update", "s", self.K, {"price": 2})])
         self.assertEqual(out[0]["action"], "add")
         self.assertEqual(out[0]["row"]["price"], 2)
+        self.assertTrue(any("contradictory raw effects" in error for error in out[0]["_coverage_errors"]))
 
-    def test_add_delete_cancels(self):
+    def test_add_delete_is_retained_as_a_dropped_effect_error(self):
         out = coalesce_ops([op("add", "s", self.K, {"option_id": "a"}),
                             op("delete", "s", self.K)])
-        self.assertEqual(out, [])
+        self.assertEqual(out[0]["_raw_indices"], [0, 1])
+        self.assertTrue(any("dropped raw effects" in error for error in out[0]["_coverage_errors"]))
 
     def test_update_delete_becomes_delete(self):
         out = coalesce_ops([op("update", "s", self.K, {"price": 1}),
                             op("delete", "s", self.K)])
         self.assertEqual([o["action"] for o in out], ["delete"])
+        self.assertTrue(any("dropped raw effect" in error for error in out[0]["_coverage_errors"]))
 
     def test_delete_is_a_barrier(self):
         out = coalesce_ops([op("delete", "s", self.K),
                             op("add", "s", self.K, {"option_id": "a"})])
         self.assertEqual([o["action"] for o in out], ["delete", "add"])
 
+    def test_delete_followed_by_update_is_a_dropped_effect_error(self):
+        out = coalesce_ops([op("delete", "s", self.K),
+                            op("update", "s", self.K, {"price": 1})])
+        self.assertTrue(any("delete followed by update" in error for error in out[0]["_coverage_errors"]))
+
+    def test_repeated_delete_is_a_dropped_effect_error(self):
+        out = coalesce_ops([op("delete", "s", self.K),
+                            op("delete", "s", self.K)])
+        self.assertTrue(any("delete followed by delete" in error for error in out[0]["_coverage_errors"]))
+
     def test_different_keys_untouched(self):
         out = coalesce_ops([op("update", "s", {"option_id": "a"}, {"price": 1}),
                             op("update", "s", {"option_id": "b"}, {"price": 2})])
         self.assertEqual(len(out), 2)
+
+    def test_disjoint_updates_preserve_each_raw_effect(self):
+        out = coalesce_ops([
+            op("update", "s", self.K, {"price": 1}),
+            op("update", "s", self.K, {"description": "x"}),
+        ])
+
+        self.assertEqual(out[0]["_raw_effects"], [
+            {"index": 0, "action": "update", "fields": ["price"]},
+            {"index": 1, "action": "update", "fields": ["description"]},
+        ])
 
 
 class CoerceTest(unittest.TestCase):
@@ -684,6 +712,161 @@ class ApplyBatchTest(unittest.TestCase):
         self.assertEqual(self.path.stat().st_mtime_ns, before)
         self.assertFalse(self.log.exists())
 
+    def test_coalesced_updates_report_complete_raw_coverage_and_exact_readback(self):
+        before = self.path.read_bytes()
+        result = self.run_batch(
+            op("update", "stingray_options", {"option_id": "opt_thr_001"}, {"price": "777"}),
+            op("update", "stingray_options", {"option_id": "opt_thr_001"}, {"description": "  exact  "}),
+            write=False,
+        )
+
+        self.assertTrue(result["ok"], result)
+        self.assertEqual(
+            result["operationCoverage"],
+            {"rawCount": 2, "rawCovered": 2, "preparedCount": 1},
+        )
+        self.assertTrue(result["verification"]["ok"], result)
+        self.assertEqual(result["verification"]["preparedChecked"], 1)
+        self.assertEqual(result["verification"]["preparedCount"], 1)
+        self.assertEqual(self.path.read_bytes(), before)
+
+    def test_composite_members_each_count_as_raw_operations(self):
+        composite = add_option_composite()
+        composite["ops"][0]["row"].update(
+            {"price": "42", "selectable": "False", "display_order": "30", "active": "True"}
+        )
+        result = self.run_batch(composite, write=False)
+
+        self.assertTrue(result["ok"], result)
+        self.assertEqual(result["operationCoverage"]["rawCount"], 3)
+        self.assertEqual(result["operationCoverage"]["rawCovered"], 3)
+        self.assertEqual(result["operationCoverage"]["preparedCount"], 3)
+        self.assertEqual(result["verification"]["preparedChecked"], 3)
+
+    def test_contradictory_coalesced_effects_are_invalid(self):
+        result = self.run_batch(
+            op("update", "stingray_options", {"option_id": "opt_thr_001"}, {"price": 1}),
+            op("update", "stingray_options", {"option_id": "opt_thr_001"}, {"price": 2}),
+            write=False,
+        )
+
+        self.assertFalse(result["ok"], result)
+        self.assertEqual(result["status"], "invalid")
+        self.assertTrue(any("contradictory raw effects" in error for error in result["errors"]), result)
+
+    def test_dropped_update_effect_is_invalid(self):
+        result = self.run_batch(
+            op("update", "stingray_options", {"option_id": "opt_thr_001"}, {"price": 1}),
+            op("delete", "stingray_options", {"option_id": "opt_thr_001"}),
+            write=False,
+        )
+
+        self.assertFalse(result["ok"], result)
+        self.assertEqual(result["status"], "invalid")
+        self.assertTrue(any("dropped raw effect" in error for error in result["errors"]), result)
+
+    def test_tampered_scratch_fields_fail_exact_readback_before_live_mutation(self):
+        before = self.path.read_bytes()
+
+        def save_and_tamper(workbook, scratch_path):
+            workbook.save(scratch_path)
+            tampered = load_workbook(scratch_path)
+            ws = tampered["stingray_options"]
+            headers = {cell.value: cell.column for cell in ws[1]}
+            row = next(
+                row_number
+                for row_number in range(2, ws.max_row + 1)
+                if ws.cell(row=row_number, column=headers["option_id"]).value == "opt_thr_001"
+            )
+            ws.cell(row=row, column=headers["price"], value=778)
+            ws.cell(row=row, column=headers["selectable"], value="False")
+            tampered.save(scratch_path)
+            tampered.close()
+
+        item = op(
+            "update",
+            "stingray_options",
+            {"option_id": "opt_thr_001"},
+            {"price": "777", "selectable": "False"},
+        )
+        with patch.object(editor_ops, "_save_scratch_workbook", side_effect=save_and_tamper, create=True):
+            result = self.run_batch(item, write=False)
+
+        self.assertFalse(result["ok"], result)
+        self.assertEqual(result["status"], "readback_failed")
+        self.assertTrue(any("price" in error for error in result["errors"]), result)
+        self.assertTrue(any("selectable" in error for error in result["errors"]), result)
+        self.assertLess(result["verification"]["preparedChecked"], result["operationCoverage"]["preparedCount"])
+        self.assertEqual(self.path.read_bytes(), before)
+
+    def test_tampered_scratch_delete_fails_absence_readback(self):
+        before = self.path.read_bytes()
+
+        def save_and_restore_deleted_row(workbook, scratch_path):
+            workbook.save(scratch_path)
+            tampered = load_workbook(scratch_path)
+            tampered["stingray_ovs"].append(["opt_one_001", "2lt", "standard"])
+            tampered.save(scratch_path)
+            tampered.close()
+
+        item = op(
+            "delete",
+            "stingray_ovs",
+            {"option_id": "opt_one_001", "variant_id": "2lt"},
+        )
+        with patch.object(
+            editor_ops,
+            "_save_scratch_workbook",
+            side_effect=save_and_restore_deleted_row,
+            create=True,
+        ):
+            result = self.run_batch(item, write=False)
+
+        self.assertFalse(result["ok"], result)
+        self.assertEqual(result["status"], "readback_failed")
+        self.assertTrue(any("delete" in error and "still exists" in error for error in result["errors"]), result)
+        self.assertEqual(self.path.read_bytes(), before)
+
+    def test_tampered_live_save_exposes_apply_verification_failed(self):
+        real_safe_save = editor_ops.save_workbook_safely
+
+        def save_and_tamper_live(workbook, workbook_path, *, loaded_mtime_ns):
+            backup_path = real_safe_save(
+                workbook,
+                workbook_path,
+                loaded_mtime_ns=loaded_mtime_ns,
+            )
+            tampered = load_workbook(workbook_path)
+            ws = tampered["stingray_options"]
+            headers = {cell.value: cell.column for cell in ws[1]}
+            row = next(
+                row_number
+                for row_number in range(2, ws.max_row + 1)
+                if ws.cell(row=row_number, column=headers["option_id"]).value == "opt_thr_001"
+            )
+            ws.cell(row=row, column=headers["price"], value=999)
+            tampered.save(workbook_path)
+            tampered.close()
+            return backup_path
+
+        item = op(
+            "update",
+            "stingray_options",
+            {"option_id": "opt_thr_001"},
+            {"price": 777},
+        )
+        with patch(
+            "corvette_form_generator.editor_ops.save_workbook_safely",
+            side_effect=save_and_tamper_live,
+        ):
+            result = self.run_batch(item, write=True)
+
+        self.assertFalse(result["ok"], result)
+        self.assertEqual(result["status"], "apply_verification_failed")
+        self.assertTrue(Path(result["backupPath"]).exists())
+        self.assertTrue(any("price" in error for error in result["errors"]), result)
+        self.assertFalse(self.log.exists())
+
     def test_warning_requires_confirmation(self):
         item = op("update", "zr1_options", {"option_id": "opt_zzz_001"}, {"price": 1})
         result = self.run_batch(item)
@@ -718,7 +901,13 @@ class ApplyBatchTest(unittest.TestCase):
 
     def test_unknown_warning_kind_blocks_write(self):
         item = op("update", "stingray_options", {"option_id": "opt_thr_001"}, {"price": 1})
-        prepared = [{"action": "update", "sheet": "stingray_options"}]
+        prepared = [{
+            "action": "update",
+            "sheet": "stingray_options",
+            "_raw_indices": [0],
+            "_raw_effects": [{"index": 0, "action": "update", "fields": ["price"]}],
+            "_coerced_row": {"price": 1},
+        }]
         with patch(
             "corvette_form_generator.editor_ops._prepare_batch",
             return_value=([], [{"id": "mystery:stingray_options", "message": "unknown"}], prepared),

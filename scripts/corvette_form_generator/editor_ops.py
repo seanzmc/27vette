@@ -358,17 +358,37 @@ def model_sheet_registry(extract: dict) -> tuple[dict, dict]:
 # Op primitives: flatten, coalesce, coerce
 # ─────────────────────────────────────────────────────────────
 
+def _raw_effect(operation: dict, raw_index: int) -> dict:
+    return {
+        "index": raw_index,
+        "action": operation.get("action"),
+        "fields": sorted(
+            str(column)
+            for column in (operation.get("row") or {})
+            if not str(column).startswith("_")
+        ),
+    }
+
+
 def flatten_items(items) -> list[dict]:
     ops: list[dict] = []
+    raw_index = 0
     for item in items or []:
         if isinstance(item, dict) and item.get("kind") == "composite":
             label = item.get("label") or item.get("compositeType") or "composite"
             for member in item.get("ops", []):
                 member = dict(member)
                 member["_composite"] = label
+                member["_raw_indices"] = [raw_index]
+                member["_raw_effects"] = [_raw_effect(member, raw_index)]
                 ops.append(member)
+                raw_index += 1
         else:
-            ops.append(dict(item))
+            operation = dict(item)
+            operation["_raw_indices"] = [raw_index]
+            operation["_raw_effects"] = [_raw_effect(operation, raw_index)]
+            ops.append(operation)
+            raw_index += 1
     return ops
 
 
@@ -380,26 +400,72 @@ def _key_id(op: dict) -> tuple:
 def coalesce_ops(ops: list[dict]) -> list[dict]:
     result: list[dict | None] = []
     last_live: dict[tuple, int] = {}
-    for op in ops:
+    for raw_index, original in enumerate(ops):
+        op = dict(original)
+        op["_raw_indices"] = list(op.get("_raw_indices") or [raw_index])
+        op["_raw_effects"] = list(
+            op.get("_raw_effects") or [_raw_effect(op, op["_raw_indices"][0])]
+        )
+        op["_coverage_errors"] = list(op.get("_coverage_errors") or [])
         kid = _key_id(op)
         pos = last_live.get(kid)
         prev = result[pos] if pos is not None else None
         action = op.get("action")
-        if prev is None or prev.get("action") == "delete":
+        if prev is None:
             last_live[kid] = len(result)
             result.append(dict(op))
             continue
+        if prev.get("action") == "delete":
+            if action == "add":
+                last_live[kid] = len(result)
+                result.append(dict(op))
+                continue
+            prev["_raw_indices"].extend(op["_raw_indices"])
+            prev["_raw_effects"].extend(op["_raw_effects"])
+            prev["_coverage_errors"].extend(op["_coverage_errors"])
+            prev["_coverage_errors"].append(
+                f"dropped raw effect for {_key_id(op)!r}: delete followed by {action}"
+            )
+            continue
         prev_action = prev.get("action")
         if action == "update" and prev_action in ("add", "update"):
+            overlapping = set(prev.get("row") or {}) & set(op.get("row") or {})
+            contradictions = sorted(
+                column
+                for column in overlapping
+                if (prev.get("row") or {}).get(column) != (op.get("row") or {}).get(column)
+            )
+            if contradictions:
+                prev["_coverage_errors"].append(
+                    f"contradictory raw effects for {_key_id(op)!r}: "
+                    f"later {action} replaces {contradictions}"
+                )
             prev["row"] = {**(prev.get("row") or {}), **(op.get("row") or {})}
+            prev["_raw_indices"].extend(op["_raw_indices"])
+            prev["_raw_effects"].extend(op["_raw_effects"])
+            prev["_coverage_errors"].extend(op["_coverage_errors"])
         elif action == "delete" and prev_action == "add":
-            result[pos] = None
+            prev["_raw_indices"].extend(op["_raw_indices"])
+            prev["_raw_effects"].extend(op["_raw_effects"])
+            prev["_coverage_errors"].extend(op["_coverage_errors"])
+            prev["_coverage_errors"].append(
+                f"dropped raw effects for {_key_id(op)!r}: add followed by delete"
+            )
+            prev["_coverage_only"] = True
             last_live.pop(kid, None)
         elif action == "delete" and prev_action == "update":
-            result[pos] = dict(op)
+            replacement = dict(op)
+            replacement["_raw_indices"] = prev["_raw_indices"] + op["_raw_indices"]
+            replacement["_raw_effects"] = prev["_raw_effects"] + op["_raw_effects"]
+            replacement["_coverage_errors"] = (
+                list(prev.get("_coverage_errors") or [])
+                + list(op.get("_coverage_errors") or [])
+                + [f"dropped raw effect for {_key_id(op)!r}: update followed by delete"]
+            )
+            result[pos] = replacement
         else:  # e.g. add after add/update — leave both; validation flags it
             last_live[kid] = len(result)
-            result.append(dict(op))
+            result.append(op)
     return [op for op in result if op is not None]
 
 
@@ -738,6 +804,13 @@ def _prepare_batch(extract, batch):
     flat = flatten_items(batch.get("items") or [])
     creates = [o for o in flat if o.get("action") == "create_sheet"]
     ops = coalesce_ops([o for o in flat if o.get("action") != "create_sheet"])
+    coalescing_errors = [
+        error
+        for operation in ops
+        for error in operation.get("_coverage_errors", [])
+    ]
+    if coalescing_errors:
+        return coalescing_errors, warnings, []
     maps = _registry_maps(extract)
     _registry, sheet_family, models_by_sheet, by_model_family = maps
     sheet_family = {**GLOBAL_SHEET_FAMILIES, **sheet_family}
@@ -772,7 +845,14 @@ def _prepare_batch(extract, batch):
         sheet_family[sheet] = family
         created_templates[sheet] = template
         prepared_creates.append(
-            {"action": "create_sheet", "sheet": sheet, "_family": family, "_headers": headers}
+            {
+                "action": "create_sheet",
+                "sheet": sheet,
+                "_family": family,
+                "_headers": headers,
+                "_raw_indices": list(o.get("_raw_indices") or []),
+                "_raw_effects": list(o.get("_raw_effects") or []),
+            }
         )
 
     # A scaffold plan can activate/register model_workbook_sources and then
@@ -1029,6 +1109,79 @@ def validate_batch(extract, batch):
     return {"errors": errors, "warnings": warnings}
 
 
+def _operation_coverage(batch: dict, prepared: list[dict]) -> tuple[dict, list[str]]:
+    raw_count = len(flatten_items(batch.get("items") or []))
+    expected = set(range(raw_count))
+    occurrences: dict[int, int] = {}
+    invalid_indices: set[int] = set()
+    unknown: list[str] = []
+    errors: list[str] = []
+    for prepared_index, operation in enumerate(prepared):
+        raw_indices = list(operation.get("_raw_indices") or [])
+        effects = list(operation.get("_raw_effects") or [])
+        effect_indices = [effect.get("index") for effect in effects]
+        if raw_indices != effect_indices:
+            errors.append(
+                f"prepared operation {prepared_index} raw provenance differs: "
+                f"indices {raw_indices!r}, effects {effect_indices!r}"
+            )
+            invalid_indices.update(index for index in raw_indices if isinstance(index, int))
+            invalid_indices.update(index for index in effect_indices if isinstance(index, int))
+        for effect in effects:
+            raw_index = effect.get("index")
+            if not isinstance(raw_index, int) or raw_index not in expected:
+                unknown.append(repr(raw_index))
+                continue
+            occurrences[raw_index] = occurrences.get(raw_index, 0) + 1
+            raw_action = effect.get("action")
+            prepared_action = operation.get("action")
+            action_matches = (
+                raw_action == prepared_action
+                or (raw_action == "update" and prepared_action == "add")
+            )
+            if not action_matches:
+                errors.append(
+                    f"raw operation {raw_index} action {raw_action!r} does not map to "
+                    f"prepared action {prepared_action!r}"
+                )
+                invalid_indices.add(raw_index)
+            missing_fields = sorted(
+                set(effect.get("fields") or {})
+                - set(operation.get("_coerced_row") or {})
+            )
+            if missing_fields:
+                errors.append(
+                    f"raw operation {raw_index} fields are absent from its prepared effect: "
+                    f"{missing_fields}"
+                )
+                invalid_indices.add(raw_index)
+    duplicated = sorted(raw_index for raw_index, count in occurrences.items() if count > 1)
+    invalid_indices.update(duplicated)
+    covered = {
+        raw_index
+        for raw_index, count in occurrences.items()
+        if count == 1 and raw_index not in invalid_indices
+    }
+    missing = sorted(expected - covered)
+    if missing:
+        errors.append(f"raw operation coverage missing indices {missing}")
+    if duplicated:
+        errors.append(f"raw operation coverage duplicated indices {duplicated}")
+    if unknown:
+        errors.append(f"raw operation coverage contains unknown indices {sorted(unknown)}")
+    coverage = {
+        "rawCount": raw_count,
+        "rawCovered": len(covered),
+        "preparedCount": len(prepared),
+    }
+    if coverage["rawCovered"] != coverage["rawCount"]:
+        errors.append(
+            "raw operation coverage gate failed: "
+            f"{coverage['rawCovered']} != {coverage['rawCount']}"
+        )
+    return coverage, errors
+
+
 # ─────────────────────────────────────────────────────────────
 # Apply pipeline
 # ─────────────────────────────────────────────────────────────
@@ -1148,6 +1301,111 @@ def resize_sheet_tables(ws) -> None:
         table.ref = f"A1:{letters}{last}"
 
 
+def _save_scratch_workbook(workbook, path: Path) -> None:
+    """Single scratch-save seam so tests can corrupt the saved copy before readback."""
+    workbook.save(path)
+
+
+def _canonical_readback_key(values, columns: dict[str, int], key_columns) -> tuple[str, ...]:
+    return tuple(
+        str(values[columns[column]] or "").strip()
+        for column in key_columns
+    )
+
+
+def verify_prepared_workbook(path: Path, prepared: list[dict]) -> dict:
+    """Reopen ``path`` and verify every prepared effect exactly as saved."""
+    errors: list[str] = []
+    prepared_checked = 0
+    workbook = load_workbook(path, read_only=True, data_only=False)
+    try:
+        for index, operation in enumerate(prepared):
+            action = operation.get("action")
+            sheet = str(operation.get("sheet") or "")
+            context = f"prepared[{index}] {action} {sheet}"
+            if action == "create_sheet":
+                if sheet not in workbook.sheetnames:
+                    errors.append(f"{context}: created sheet is absent")
+                    continue
+                actual_headers = [cell.value for cell in workbook[sheet][1]]
+                expected_headers = list(operation.get("_headers") or [])
+                if actual_headers != expected_headers:
+                    errors.append(
+                        f"{context}: exact headers differ; "
+                        f"expected {expected_headers!r}, got {actual_headers!r}"
+                    )
+                    continue
+                prepared_checked += 1
+                continue
+
+            if sheet not in workbook.sheetnames:
+                errors.append(f"{context}: target sheet is absent")
+                continue
+            worksheet = workbook[sheet]
+            headers = [cell.value for cell in worksheet[1]]
+            columns = {
+                str(header): column_index
+                for column_index, header in enumerate(headers)
+                if header is not None
+            }
+            family = operation.get("_family")
+            key_columns = tuple(EDITOR_SHEET_META.get(family, {}).get("key") or ())
+            missing_key_columns = [column for column in key_columns if column not in columns]
+            if missing_key_columns:
+                errors.append(f"{context}: key columns are absent: {missing_key_columns}")
+                continue
+            matches = []
+            for values in worksheet.iter_rows(min_row=2, values_only=True):
+                if _canonical_readback_key(values, columns, key_columns) == operation.get("_kt"):
+                    matches.append(values)
+            if action == "delete":
+                if matches:
+                    errors.append(
+                        f"{context}: delete key {operation.get('_kt')!r} still exists "
+                        f"in {len(matches)} row(s)"
+                    )
+                    continue
+                prepared_checked += 1
+                continue
+            if action not in ("add", "update"):
+                errors.append(f"{context}: unsupported prepared action")
+                continue
+            if len(matches) != 1:
+                errors.append(
+                    f"{context}: key {operation.get('_kt')!r} matched {len(matches)} row(s), expected 1"
+                )
+                continue
+            actual_row = matches[0]
+            field_errors = []
+            for column, expected in (operation.get("_coerced_row") or {}).items():
+                if column not in columns:
+                    field_errors.append(f"field {column} is absent")
+                    continue
+                actual = actual_row[columns[column]]
+                if actual != expected:
+                    field_errors.append(
+                        f"field {column} expected {expected!r}, got {actual!r}"
+                    )
+            if field_errors:
+                errors.extend(f"{context}: {error}" for error in field_errors)
+                continue
+            prepared_checked += 1
+    finally:
+        workbook.close()
+    prepared_count = len(prepared)
+    if prepared_checked != prepared_count:
+        errors.append(
+            "prepared operation verification gate failed: "
+            f"{prepared_checked} != {prepared_count}"
+        )
+    return {
+        "ok": not errors,
+        "preparedChecked": prepared_checked,
+        "preparedCount": prepared_count,
+        "errors": errors,
+    }
+
+
 def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli",
                 log_path=None, allow_stale=False, run_schema_validation=True) -> dict:
     path = Path(path)
@@ -1170,10 +1428,23 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
                 "warnings": []}
     extract = extract_workbook(path)
     errors, warnings, prepared = _prepare_batch(extract, batch)
-    if errors:
-        return {"ok": False, "status": "invalid", "errors": errors, "warnings": warnings}
+    operation_coverage, coverage_errors = _operation_coverage(batch, prepared)
+    if errors or coverage_errors:
+        return {
+            "ok": False,
+            "status": "invalid",
+            "errors": errors + coverage_errors,
+            "warnings": warnings,
+            "operationCoverage": operation_coverage,
+        }
     if not prepared:
-        return {"ok": False, "status": "empty", "errors": ["batch contains no operations"], "warnings": []}
+        return {
+            "ok": False,
+            "status": "empty",
+            "errors": ["batch contains no operations"],
+            "warnings": [],
+            "operationCoverage": operation_coverage,
+        }
     confirmed = set(confirmed_warnings or ())
     warning_policy = classify_warnings(warnings)
     emitted_ids = {str(warning.get("id") or "") for warning in warnings}
@@ -1185,6 +1456,7 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
             "errors": [f"confirmed warning IDs were not emitted: {stale_confirmations}"],
             "warnings": warnings,
             "warningPolicy": warning_policy,
+            "operationCoverage": operation_coverage,
         }
     if write and warning_policy["blockingIds"]:
         return {
@@ -1193,6 +1465,7 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
             "errors": ["batch emitted unconfirmable warning IDs"],
             "warnings": warnings,
             "warningPolicy": warning_policy,
+            "operationCoverage": operation_coverage,
         }
     unconfirmed_ids = set(warning_policy["confirmableIds"]) - confirmed
     if write and unconfirmed_ids:
@@ -1203,11 +1476,13 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
             "errors": [],
             "warnings": unconfirmed,
             "warningPolicy": warning_policy,
+            "operationCoverage": operation_coverage,
         }
 
     _registry, sheet_family, models_by_sheet, _bmf = _registry_maps(extract)
     schema_result = None
     bool_hygiene_result = None
+    verification = None
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp = Path(tmp_dir) / path.name
         shutil.copy2(path, tmp)
@@ -1216,7 +1491,19 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
         for name in touched:
             resize_sheet_tables(wb_tmp[name])
         remove_table_sheet_auto_filters(wb_tmp)
-        wb_tmp.save(tmp)
+        _save_scratch_workbook(wb_tmp, tmp)
+        wb_tmp.close()
+        verification = verify_prepared_workbook(tmp, prepared)
+        if not verification["ok"]:
+            return {
+                "ok": False,
+                "status": "readback_failed",
+                "errors": verification["errors"],
+                "warnings": warnings,
+                "warningPolicy": warning_policy,
+                "operationCoverage": operation_coverage,
+                "verification": verification,
+            }
         assert_valid_workbook_package(tmp)
         bool_issues = compare_bool_like_workbooks(path, tmp)
         bool_hygiene_result = bool_hygiene_result_payload(path, tmp, bool_issues)
@@ -1225,7 +1512,8 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
             return {"ok": False, "status": "bool_hygiene_failed",
                     "errors": [f"dry-run bool hygiene failed with "
                                f"{bool_hygiene_result['error_count']} error(s)"],
-                    "warnings": warnings, "boolHygieneResult": bool_hygiene_result}
+                    "warnings": warnings, "boolHygieneResult": bool_hygiene_result,
+                    "operationCoverage": operation_coverage, "verification": verification}
         if run_schema_validation:
             issues = validate_workbook_schema(str(tmp), check_live_contract=False)
             schema_result = result_payload(str(tmp), issues)
@@ -1233,11 +1521,13 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
                 return {"ok": False, "status": "schema_failed",
                         "errors": [f"dry-run schema validation failed with "
                                    f"{schema_result['error_count']} error(s)"],
-                        "warnings": warnings, "schemaResult": schema_result}
+                        "warnings": warnings, "schemaResult": schema_result,
+                        "operationCoverage": operation_coverage, "verification": verification}
 
     models_touched = {m for s in touched for m in models_by_sheet.get(s, set())}
     base = {"opCount": len(prepared), "sheets": sorted(touched), "warnings": warnings,
             "warningPolicy": warning_policy,
+            "operationCoverage": operation_coverage, "verification": verification,
             "schemaResult": schema_result, "boolHygieneResult": bool_hygiene_result,
             "gateReminders": gate_reminders(models_touched)}
     if not write:
@@ -1249,6 +1539,16 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
     for name in touched:
         resize_sheet_tables(wb[name])
     backup_path = save_workbook_safely(wb, path, loaded_mtime_ns=loaded_mtime)
+    live_verification = verify_prepared_workbook(path, prepared)
+    if not live_verification["ok"]:
+        return {
+            "ok": False,
+            "status": "apply_verification_failed",
+            "errors": live_verification["errors"],
+            "backupPath": str(backup_path),
+            **base,
+            "verification": live_verification,
+        }
     log_file = Path(log_path) if log_path else DEFAULT_LOG_PATH
     log_file.parent.mkdir(parents=True, exist_ok=True)
     entry = {"ts": datetime.now().isoformat(timespec="seconds"), "source": source,
@@ -1260,4 +1560,5 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
     with log_file.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(entry) + "\n")
     return {"ok": True, "status": "applied", "errors": [], "applied": len(prepared),
-            "backupPath": str(backup_path), "logPath": str(log_file), **base}
+            "backupPath": str(backup_path), "logPath": str(log_file), **base,
+            "verification": live_verification}
