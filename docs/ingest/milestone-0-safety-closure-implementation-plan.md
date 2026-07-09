@@ -147,21 +147,21 @@ Status: In progress. Approved by Sean on 2026-07-09 through the parent productio
 - Create: `tests/test_promote_model.py`
 - Modify: `README.md`
 
-- [ ] Add failing tests proving promotion activates every exact target `(model_key, variant_id)` membership, keeps unrelated memberships unchanged, verifies both `variant_master.active` and `model_variants.active`, fails verification for incomplete discovery metadata, discovers a complete promoted fixture with the expected variants, and is idempotent.
+- [x] Add failing tests proving promotion activates every exact target `(model_key, variant_id)` membership, keeps unrelated memberships unchanged, verifies both `variant_master.active` and `model_variants.active`, fails verification for incomplete discovery metadata, discovers a complete promoted fixture with the expected variants, and is idempotent.
 
-- [ ] Run the focused red gate:
+- [x] Run the focused red gate:
 
   ```sh
   .venv/bin/python -m pytest tests/test_promote_model.py tests/test_model_config_metadata.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py -q
   ```
 
-- [ ] Extend the promotion plan/apply path to activate target membership rows. Extend on-disk verification to call `discover_generation_model_configs()` and require the target config and expected variants. Return structured discovery failure evidence; do not weaken the existing discovery contract.
+- [x] Extend the promotion plan/apply path to activate target membership rows. Extend on-disk verification to call `discover_generation_model_configs()` and require the target config and expected variants. Return structured discovery failure evidence; do not weaken the existing discovery contract.
 
-- [ ] Add `tests/test_promote_model.py` to the README Python metadata gate. Do not change generator logic, workbook data, registry publication, or runtime code.
+- [x] Add `tests/test_promote_model.py` to the README Python metadata gate. Do not change generator logic, workbook data, registry publication, or runtime code.
 
-- [ ] Re-run the focused gate. Then run `scripts/promote_model.py --model zr1` without `--write` and compare the workbook SHA before/after to prove no mutation.
+- [x] Re-run the focused gate. Then run `scripts/promote_model.py --model zr1` without `--write` and compare the workbook SHA before/after to prove no mutation.
 
-- [ ] Commit the task with message: `fix(promotion): activate discoverable memberships`.
+- [x] Commit the task with message: `fix(promotion): activate discoverable memberships`.
 
 ### Task 6: Run the Milestone 0 safety proof and close the checkpoint
 
