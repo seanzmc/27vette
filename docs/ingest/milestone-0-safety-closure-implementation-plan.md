@@ -32,25 +32,25 @@ Status: In progress. Approved by Sean on 2026-07-09 through the parent productio
 - Modify: `tests/test_editor_ops_global_families.py`
 - Modify: `tests/test_editor_ops_meta.py`
 
-- [ ] Add failing tests proving option/interior union endpoints validate for direct and price rules; global option references are detected in `model_interior_scope.requires_option_id`, `default_selection_rules.target_option_id`, condition-aware `condition_id`, `color_overrides.adds_rpo`, and option-typed `asset_map.target_id`; non-option asset targets do not create false option references; interior references include `model_interior_scope`, `interior_components`, direct/price unions, and color overrides; `asset_map` and `interior_components` accept canonical operations.
+- [x] Add failing tests proving option/interior union endpoints validate for direct and price rules; global option references are detected in `model_interior_scope.requires_option_id`, `default_selection_rules.target_option_id`, condition-aware `condition_id`, `color_overrides.adds_rpo`, and option-typed `asset_map.target_id`; non-option asset targets do not create false option references; interior references include `model_interior_scope`, `interior_components`, direct/price unions, and color overrides; `asset_map` and `interior_components` accept canonical operations.
 
-- [ ] Run the focused red gate and confirm the new assertions fail for missing registration/reference behavior:
+- [x] Run the focused red gate and confirm the new assertions fail for missing registration/reference behavior:
 
   ```sh
   .venv/bin/python -m pytest tests/test_editor_ops_apply.py tests/test_editor_ops_global_families.py tests/test_editor_ops_meta.py -q
   ```
 
-- [ ] Extend `EDITOR_SHEET_META`, `GLOBAL_SHEET_FAMILIES`, and reference helpers with explicit typed/conditional rules. Resolve global references within each row's `model_key`; resolve direct/price endpoints against the target model's option-or-interior entity universe. Do not infer types from column names.
+- [x] Extend `EDITOR_SHEET_META`, `GLOBAL_SHEET_FAMILIES`, and reference helpers with explicit typed/conditional rules. Resolve global references within each row's `model_key`; resolve direct/price endpoints against the target model's option-or-interior entity universe. Do not infer types from column names.
 
-- [ ] Add `CONFIRMABLE_WARNING_KINDS = {"scaffold"}` and warning classification/fingerprinting helpers. Make `refdel`, `dorder`, and unknown warning kinds unconfirmable at the writer boundary. Confirmation may contain only currently emitted, allowlisted IDs; stale or extra IDs fail closed.
+- [x] Add `CONFIRMABLE_WARNING_KINDS = {"scaffold"}` and warning classification/fingerprinting helpers. Make `refdel`, `dorder`, and unknown warning kinds unconfirmable at the writer boundary. Confirmation may contain only currently emitted, allowlisted IDs; stale or extra IDs fail closed.
 
-- [ ] Add failing then green tests proving a surviving reference emits `refdel`, same-batch delete/remap closes it, only `scaffold` can be explicitly confirmed, and `dorder`/`refdel`/unknown or stale confirmations cannot reach a write.
+- [x] Add failing then green tests proving a surviving reference emits `refdel`, same-batch delete/remap closes it, only `scaffold` can be explicitly confirmed, and `dorder`/`refdel`/unknown or stale confirmations cannot reach a write.
 
-- [ ] Add failing then green tests proving `apply_batch(write=True, run_schema_validation=False)` is refused before mutation. Adapt compact fixture write tests by mocking a successful schema validation result; do not add an unsafe production flag.
+- [x] Add failing then green tests proving `apply_batch(write=True, run_schema_validation=False)` is refused before mutation. Adapt compact fixture write tests by mocking a successful schema validation result; do not add an unsafe production flag.
 
-- [ ] Re-run the focused gate and review the diff for model-generic behavior only.
+- [x] Re-run the focused gate and review the diff for model-generic behavior only.
 
-- [ ] Commit the task with message: `fix(ingest): close reference and warning gaps`.
+- [x] Commit the task with message: `fix(ingest): close reference and warning gaps`.
 
 ### Task 2: Prove raw-operation coverage and exact temporary-workbook readback
 
