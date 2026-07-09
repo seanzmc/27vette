@@ -14,7 +14,8 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from types import SimpleNamespace
+from unittest.mock import MagicMock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 for entry in (ROOT / "scripts", ROOT / "tests"):
@@ -208,6 +209,11 @@ class ApplyFlowTest(unittest.TestCase):
     def assert_refusal_preserves_evidence(self, run_dir: Path, action) -> None:
         before_workbook = self.master.read_bytes()
         before_report = (run_dir / "apply-dry-run-report.json").read_bytes()
+        protected_artifacts = {
+            filename: (run_dir / filename).read_bytes()
+            for filename in ("apply-plan.json", "plan-approval.json", "write-approval.json")
+            if (run_dir / filename).is_file()
+        }
         backup_dir = self.master.parent / "backups"
         before_backups = (
             sorted(path.name for path in backup_dir.glob("*") if path.is_file())
@@ -219,6 +225,8 @@ class ApplyFlowTest(unittest.TestCase):
 
         self.assertEqual(self.master.read_bytes(), before_workbook)
         self.assertEqual((run_dir / "apply-dry-run-report.json").read_bytes(), before_report)
+        for filename, before_bytes in protected_artifacts.items():
+            self.assertEqual((run_dir / filename).read_bytes(), before_bytes)
         self.assertFalse((run_dir / "apply-report.json").exists())
         self.assertFalse((run_dir / "apply-workbook-edit-log.jsonl").exists())
         after_backups = (
@@ -227,6 +235,21 @@ class ApplyFlowTest(unittest.TestCase):
             else []
         )
         self.assertEqual(after_backups, before_backups)
+
+    def assert_deleted_compiler_artifact_refuses(self, filename: str) -> None:
+        run_dir, _ = self.future_write_authority()
+        (run_dir / filename).unlink()
+
+        def refuse() -> None:
+            with patch(
+                "corvette_form_generator.editor_ops.apply_batch",
+                side_effect=AssertionError("missing compiler artifact reached writer"),
+            ) as apply_mock:
+                with self.assertRaisesRegex(WizardError, filename):
+                    self.store.apply_approved_plan(self.run_id, write=True, schema_validation=True)
+                apply_mock.assert_not_called()
+
+        self.assert_refusal_preserves_evidence(run_dir, refuse)
 
     def test_default_dry_run_writes_report_and_leaves_workbook_unchanged(self) -> None:
         run_dir = self.approve_plan()
@@ -291,6 +314,124 @@ class ApplyFlowTest(unittest.TestCase):
         self.assertEqual(read_json(run_dir / "session.json")["state"], "dry_run_validated_write_blocked")
         self.assertFalse((run_dir / "write-approval.json").exists())
         self.assertFalse((run_dir / "apply-report.json").exists())
+
+    def test_report_operation_counts_use_flattened_editor_coverage(self) -> None:
+        run_dir = self.approve_plan()
+        plan = read_json(run_dir / "apply-plan.json")
+        stage2 = list(plan["stage2"]["items"])
+        self.assertGreaterEqual(len(stage2), 2)
+        plan["stage2"]["items"] = [
+            {
+                "kind": "composite",
+                "label": "fixture-composite",
+                "ops": stage2[:2],
+            },
+            *stage2[2:],
+        ]
+        write_json(run_dir / "apply-plan.json", plan)
+        session = read_json(run_dir / "session.json")
+        session["state"] = "plan_built"
+        write_json(run_dir / "session.json", session)
+        self.store.approve_plan(self.run_id, "sean")
+
+        result = self.store.apply_approved_plan(self.run_id, schema_validation=False)
+
+        self.assertTrue(result["ok"], result)
+        report = read_json(run_dir / "apply-dry-run-report.json")
+        unflattened_count = len(plan["stage1"]["items"]) + len(plan["stage2"]["items"])
+        self.assertEqual(report["operationCoverage"]["rawCount"], unflattened_count + 1)
+        self.assertEqual(report["opCounts"]["combinedRaw"], unflattened_count + 1)
+        self.assertEqual(
+            report["opCounts"]["prepared"],
+            report["operationCoverage"]["preparedCount"],
+        )
+
+    def test_scratch_generated_validation_errors_block_deployment_readiness(self) -> None:
+        config = MagicMock()
+        config.with_overrides.return_value = config
+        assembly = SimpleNamespace(
+            source_data={
+                "validation": [
+                    {
+                        "severity": "error",
+                        "check_id": "fixture_contract_error",
+                        "message": "generated contract is invalid",
+                    }
+                ],
+                "choices": [],
+                "interiors": [],
+                "rules": [],
+                "ruleGroups": [],
+                "exclusiveGroups": [],
+                "priceRules": [],
+                "colorOverrides": [],
+            }
+        )
+        batch = {"workbookMtimeNs": str(self.master.stat().st_mtime_ns), "items": []}
+        plan = {"targets": ["stingray"], "report": {"runtimeContinuity": {}}}
+
+        with (
+            patch(
+                "corvette_form_generator.editor_ops.apply_batch",
+                side_effect=[
+                    {"ok": True, "status": "validated", "warnings": []},
+                    {"ok": True, "status": "applied", "warnings": []},
+                ],
+            ),
+            patch.object(self.store, "_activate_probe_models"),
+            patch(
+                "corvette_form_generator.model_configs.discover_generation_model_configs",
+                return_value={"stingray": config},
+            ),
+            patch(
+                "corvette_form_generator.source_assembly.assemble_model_source",
+                return_value=assembly,
+            ),
+        ):
+            continuity = self.store._deployment_continuity_probe(
+                self.master,
+                batch,
+                plan,
+                schema_validation=True,
+            )
+
+        entry = continuity["stingray"]
+        self.assertEqual(entry["counts"]["validationErrors"], 1)
+        self.assertEqual(entry["status"], "not_deployment_ready")
+        self.assertIn(
+            "generated_validation_errors",
+            {item["kind"] for item in entry["deploymentBlockers"]},
+        )
+
+    def test_option_semantic_blockers_read_add_and_update_rows(self) -> None:
+        def blockers(action: str, row: dict) -> list[dict]:
+            return self.store._option_semantic_blockers(
+                {
+                    "schemaVersion": "pass-c-3",
+                    "targets": ["zr1"],
+                    "stage1": {"items": []},
+                    "stage2": {
+                        "items": [
+                            {
+                                "action": action,
+                                "sheet": "zr1_options",
+                                "key": {"option_id": "opt_fixture_001"},
+                                "row": row,
+                            }
+                        ]
+                    },
+                }
+            )
+
+        complete = {"selectable": True, "active": False}
+        self.assertEqual(blockers("add", complete), [])
+        self.assertEqual(blockers("update", complete), [])
+        self.assertEqual(blockers("update", {"active": True})[0]["examples"][0]["fields"], ["selectable"])
+        self.assertEqual(blockers("update", {"selectable": False})[0]["examples"][0]["fields"], ["active"])
+        self.assertEqual(
+            blockers("update", {})[0]["examples"][0]["fields"],
+            ["selectable", "active"],
+        )
 
     def test_apply_refuses_stale_or_unapproved_inputs(self) -> None:
         with self.assertRaisesRegex(WizardError, "approved"):
@@ -458,6 +599,53 @@ class ApplyFlowTest(unittest.TestCase):
                 apply_mock.assert_not_called()
 
         self.assert_refusal_preserves_evidence(run_dir, refuse)
+
+    def test_live_apply_reuses_approved_probe_without_post_mutation_reapply(self) -> None:
+        run_dir, eligible_report = self.future_write_authority()
+        preview = {
+            **eligible_report["applyResult"],
+            "schemaResult": {"error_count": 0},
+        }
+        applied = {
+            **preview,
+            "status": "applied",
+            "backupPath": str(self.root / "synthetic-backup.xlsx"),
+            "logPath": str(run_dir / "apply-workbook-edit-log.jsonl"),
+        }
+
+        with (
+            patch(
+                "corvette_form_generator.editor_ops.apply_batch",
+                side_effect=[preview, applied],
+            ) as apply_mock,
+            patch.object(
+                self.store,
+                "_deployment_continuity_probe",
+                side_effect=AssertionError("deployment probe reran after live mutation"),
+            ) as deployment_probe,
+        ):
+            result = self.store.apply_approved_plan(
+                self.run_id,
+                write=True,
+                schema_validation=True,
+            )
+
+        self.assertTrue(result["ok"], result)
+        self.assertEqual(result["status"], "applied")
+        self.assertEqual([call.kwargs["write"] for call in apply_mock.call_args_list], [False, True])
+        deployment_probe.assert_not_called()
+        report = read_json(run_dir / "apply-report.json")
+        self.assertEqual(report["deploymentContinuity"], eligible_report["deploymentContinuity"])
+        self.assertEqual(report["writeEligibility"], eligible_report["writeEligibility"])
+
+    def test_deleted_canonical_manifest_refuses_before_writer(self) -> None:
+        self.assert_deleted_compiler_artifact_refuses("canonical-row-manifest.json")
+
+    def test_deleted_compile_report_refuses_before_writer(self) -> None:
+        self.assert_deleted_compiler_artifact_refuses("compile-report.json")
+
+    def test_deleted_exception_resolutions_refuses_before_writer(self) -> None:
+        self.assert_deleted_compiler_artifact_refuses("exception-resolutions.json")
 
     def assert_wrong_write_approval_refuses(self, field: str, value: str, message: str) -> None:
         run_dir, _ = self.future_write_authority()

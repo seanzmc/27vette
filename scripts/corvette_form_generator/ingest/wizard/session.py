@@ -91,6 +91,11 @@ ALLOWED_WRITE_DEFERRAL_KINDS = {
     "color_overrides_deferred",
     "interior_components_deferred",
 }
+COMPILER_ARTIFACT_BINDINGS = (
+    ("canonical-row-manifest.json", "canonicalManifestSha"),
+    ("compile-report.json", "compileReportSha"),
+    ("exception-resolutions.json", "exceptionResolutionsSha"),
+)
 DECISION_STATES = (
     STATE_MODELS_SELECTED,
     STATE_DECISIONS_IN_PROGRESS,
@@ -268,15 +273,37 @@ class WizardSessionStore:
         """
 
         bindings: dict[str, str] = {}
-        for filename, field in (
-            ("canonical-row-manifest.json", "canonicalManifestSha"),
-            ("compile-report.json", "compileReportSha"),
-            ("exception-resolutions.json", "exceptionResolutionsSha"),
-        ):
+        for filename, field in COMPILER_ARTIFACT_BINDINGS:
             path = run_dir / filename
             if path.is_file():
                 bindings[field] = hashlib.sha256(path.read_bytes()).hexdigest()
         return bindings
+
+    def _require_compiler_bindings(
+        self,
+        run_dir: Path,
+        plan: dict[str, Any],
+        *approvals: tuple[str, dict[str, Any]],
+    ) -> dict[str, str]:
+        current: dict[str, str] = {}
+        for filename, field in COMPILER_ARTIFACT_BINDINGS:
+            path = run_dir / filename
+            if not path.is_file():
+                raise WizardError(
+                    f"{WRITABLE_PLAN_SCHEMA} requires current {filename}.",
+                    status=409,
+                )
+            sha = hashlib.sha256(path.read_bytes()).hexdigest()
+            current[field] = sha
+            if plan.get(field) != sha:
+                raise WizardError(f"Plan compiler binding {field} is absent or stale.", status=409)
+            for label, approval in approvals:
+                if approval.get(field) != sha:
+                    raise WizardError(
+                        f"{label} compiler binding {field} is absent or stale.",
+                        status=409,
+                    )
+        return current
 
     def _approval_bindings(
         self,
@@ -1056,6 +1083,8 @@ class WizardSessionStore:
             "workbookFingerprint"
         ]["sha256"] != hashlib.sha256(workbook.read_bytes()).hexdigest():
             raise WizardError("Workbook changed after the plan was built; rebuild the plan.", status=409)
+        if plan.get("schemaVersion") == WRITABLE_PLAN_SCHEMA:
+            self._require_compiler_bindings(run_dir, plan)
         approval = {
             "schemaVersion": PLAN_APPROVAL_SCHEMA,
             "scope": PLAN_APPROVAL_SCOPE,
@@ -1341,6 +1370,15 @@ class WizardSessionStore:
                     "validationWarnings": sum(1 for row in validation if isinstance(row, dict) and row.get("severity") == "warning"),
                     "validationErrors": sum(1 for row in validation if isinstance(row, dict) and row.get("severity") == "error"),
                 }
+                if counts["validationErrors"]:
+                    blockers.append(
+                        {
+                            "kind": "generated_validation_errors",
+                            "detail": (
+                                f"generated contract has {counts['validationErrors']} validation error(s)"
+                            ),
+                        }
+                    )
                 if model in {"zr1", "zr1x"} and counts["priceRules"] == 0 and pricing_deferred:
                     blockers.append({"kind": "price_rules_required_for_runtime", "detail": "generated contract has pricing_deferred and zero priceRules"})
                 if model in {"zr1", "zr1x"} and counts["ruleGroups"] == 0:
@@ -1438,8 +1476,7 @@ class WizardSessionStore:
             for item in items:
                 if item.get("sheet") != options_sheet or item.get("action") not in {"add", "update"}:
                     continue
-                values = item.get("row") if item.get("action") == "add" else item.get("fields")
-                values = values or {}
+                values = item.get("row") or {}
                 absent = [field for field in ("selectable", "active") if not isinstance(values.get(field), bool)]
                 if absent:
                     missing.append(
@@ -1797,10 +1834,11 @@ class WizardSessionStore:
         )
         workbook, before = self._validate_current_plan_inputs(run_id, session, plan)
         del workbook
-        compiler = self._compiler_artifact_bindings(run_dir)
-        for field in ("canonicalManifestSha", "compileReportSha", "exceptionResolutionsSha"):
-            if not compiler.get(field) or plan.get(field) != compiler[field]:
-                raise WizardError(f"Write approval requires current compiler binding {field}.", status=409)
+        self._require_compiler_bindings(
+            run_dir,
+            plan,
+            (PLAN_APPROVAL_SCHEMA, plan_approval),
+        )
         report = read_json(report_file)
         if report.get("approval") != plan_approval:
             raise WizardError("Dry-run report does not bind the current plan approval.", status=409)
@@ -1835,7 +1873,7 @@ class WizardSessionStore:
         run_dir: Path,
         *,
         schema_validation: bool,
-    ) -> tuple[Path, dict[str, Any], dict[str, Any], dict[str, Any]]:
+    ) -> tuple[Path, dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
         """Repeat every refusal check before the first possible live mutation."""
 
         from corvette_form_generator.editor_ops import apply_batch, classify_warnings
@@ -1864,6 +1902,12 @@ class WizardSessionStore:
             raise WizardError(f"Live write requires {WRITE_APPROVAL_SCHEMA}.", status=409)
         if write_approval.get("scope") != WRITE_APPROVAL_SCOPE:
             raise WizardError("Write approval scope must be deployment_ready_write.", status=409)
+        self._require_compiler_bindings(
+            run_dir,
+            plan,
+            (PLAN_APPROVAL_SCHEMA, plan_approval),
+            (WRITE_APPROVAL_SCHEMA, write_approval),
+        )
         expected_bindings = self._approval_bindings(run_id, session, plan, run_dir)
         for field, value in expected_bindings.items():
             if write_approval.get(field) != value:
@@ -1927,7 +1971,7 @@ class WizardSessionStore:
             raise WizardError("Pre-write raw operation coverage is incomplete.", status=409)
         if not verification.get("ok") or verification.get("preparedChecked") != coverage.get("preparedCount"):
             raise WizardError("Pre-write prepared readback is incomplete.", status=409)
-        return workbook, before, write_approval, preview
+        return workbook, before, write_approval, preview, report
 
     def apply_approved_plan(
         self,
@@ -1983,7 +2027,7 @@ class WizardSessionStore:
             allow_legacy=not write,
         )
         if write:
-            workbook, before, write_approval, _preview = self._prewrite_authority(
+            workbook, before, write_approval, _preview, approved_report = self._prewrite_authority(
                 run_id,
                 session,
                 plan,
@@ -1994,6 +2038,7 @@ class WizardSessionStore:
         else:
             workbook, before = self._validate_current_plan_inputs(run_id, session, plan)
             write_approval = None
+            approved_report = None
 
         batch = self._combined_plan_batch(plan, workbook)
         per_sheet_action_counts = self._per_sheet_action_counts(batch["items"])
@@ -2024,26 +2069,30 @@ class WizardSessionStore:
             "preparedCount": 0,
             "errors": ["editor result did not include prepared readback"],
         }
-        deployment_continuity = (
-            self._deployment_continuity_probe(
+        if result.get("ok") and write:
+            deployment_continuity = dict((approved_report or {}).get("deploymentContinuity") or {})
+        elif result.get("ok"):
+            deployment_continuity = self._deployment_continuity_probe(
                 workbook,
                 batch,
                 plan,
                 schema_validation=schema_validation,
             )
-            if result.get("ok")
-            else {}
-        )
+        else:
+            deployment_continuity = {}
         if result.get("ok"):
-            write_eligibility = self._write_eligibility(
-                workbook=workbook,
-                plan=plan,
-                approval=approval,
-                legacy_approval=legacy_approval,
-                schema_validation=schema_validation,
-                result=result,
-                deployment=deployment_continuity,
-            )
+            if write:
+                write_eligibility = dict((approved_report or {}).get("writeEligibility") or {})
+            else:
+                write_eligibility = self._write_eligibility(
+                    workbook=workbook,
+                    plan=plan,
+                    approval=approval,
+                    legacy_approval=legacy_approval,
+                    schema_validation=schema_validation,
+                    result=result,
+                    deployment=deployment_continuity,
+                )
         else:
             execution_blocker = {
                 "kind": "mechanical_validation_failed",
@@ -2089,8 +2138,10 @@ class WizardSessionStore:
             "opCounts": {
                 "stage1": len(plan["stage1"]["items"]),
                 "stage2": len(plan["stage2"]["items"]),
-                "combinedRaw": len(batch["items"]),
-                "prepared": result.get("opCount", 0),
+                "combinedRaw": (result.get("operationCoverage") or {}).get("rawCount", 0),
+                "prepared": (result.get("operationCoverage") or {}).get(
+                    "preparedCount", 0
+                ),
             },
             "perSheetCounts": dict(sorted(per_sheet_counts.items())),
             "perSheetActionCounts": per_sheet_action_counts,

@@ -25,6 +25,7 @@ from corvette_form_generator.ingest.wizard.session import (  # noqa: E402
     WizardError,
     WizardSessionStore,
     read_json,
+    write_json,
 )
 from ingest_wizard_fixtures import build_master_workbook, build_raw_export  # noqa: E402
 
@@ -557,6 +558,19 @@ class PlanFlowTest(unittest.TestCase):
         self.store.build_apply_plan(self.run_id, schema_validation=False)
         with self.assertRaises(WizardError):
             self.store.approve_plan(self.run_id, "")
+
+    def test_pass_c3_plan_approval_requires_all_compiler_artifacts(self) -> None:
+        self.complete_all()
+        self.store.build_apply_plan(self.run_id, schema_validation=False)
+        run_dir = self.store.run_dir(self.run_id)
+        plan = read_json(run_dir / "apply-plan.json")
+        plan["schemaVersion"] = "pass-c-3"
+        write_json(run_dir / "apply-plan.json", plan)
+
+        with self.assertRaisesRegex(WizardError, "canonical-row-manifest.json"):
+            self.store.approve_plan(self.run_id, "sean")
+
+        self.assertFalse((run_dir / "plan-approval.json").exists())
 
 
 if __name__ == "__main__":
