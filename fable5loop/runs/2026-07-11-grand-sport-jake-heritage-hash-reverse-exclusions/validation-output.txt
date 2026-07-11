@@ -1,0 +1,45 @@
+=== workbook schema ===
+{
+  "workbook": "stingray_master.xlsx",
+  "status": "valid",
+  "issue_count": 0,
+  "error_count": 0,
+  "warning_count": 0,
+  "issues": []
+}
+=== grand-sport node gates ===
+✔ Grand Sport draft applies active option assets from asset_map (0.223208ms)
+✔ Grand Sport draft section placement follows section_master step_key (0.099791ms)
+✔ Grand Sport draft standard equipment grouping is workbook-owned (0.071291ms)
+✔ Grand Sport and Z06 workbook place rear hash graphics outside the stripe radio section (664.960042ms)
+✔ Grand Sport wheel choices keep new aluminum wheels in the existing workbook section (0.31975ms)
+✔ Grand Sport Jake graphics are selectable choices with rear hash graphics in the hash section (0.390209ms)
+✔ Grand Sport draft preserves rule hot spots and normalization metadata for later phases (0.051875ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2643.802833
+=== multi-model-runtime-switching ===
+✔ runtime defaults to Stingray and switches models with a clean build reset (25.233375ms)
+✔ model-specific build downloads keep customer-facing Markdown and filenames (30.230958ms)
+✔ Grand Sport dealer submission payload stays model-scoped when posted (26.540583ms)
+✔ Grand Sport Markdown export includes audited sections and auto-added options (202.42225ms)
+✔ Grand Sport interiors are model-scoped and export selected interior identity (45.037666ms)
+✔ Grand Sport 3LT interiors auto-add included color seatbelts from workbook rules (97.512416ms)
+✔ Grand Sport and Z06 stripe runtime allows rear hash graphics with dual stripes and PDA auto-adds package graphics (142.7185ms)
+ℹ tests 47
+ℹ suites 0
+ℹ pass 47
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2446.10525
+=== pytest metadata ===
+........................................................................ [ 98%]
+.                                                                        [100%]
+73 passed, 337 deselected in 1.35s

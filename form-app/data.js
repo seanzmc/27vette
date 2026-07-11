@@ -51003,7 +51003,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-07-11T16:10:20+00:00",
+          "generated_at": "2026-07-11T16:50:06+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -93097,6 +93097,106 @@ window.CORVETTE_FORM_DATA = {
             "disabled_reason": "DZX blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
             "active": "True",
             "notes": "Reverse exclusion for stripe vs Z15/heritage hash conflict; mirrors gs_group_z15_excludes_non_center_stripes. Spec: .hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md"
+          },
+          {
+            "group_id": "gs_group_sht_excludes_heritage_hash_and_z15",
+            "group_type": "excludes_any",
+            "source_id": "opt_sht_001",
+            "target_ids": [
+              "opt_z15_001",
+              "opt_17a_001",
+              "opt_20a_001",
+              "opt_55a_001",
+              "opt_75a_001",
+              "opt_97a_001",
+              "opt_dx4_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "SHT blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+            "active": "True",
+            "notes": "Jake-graphics/heritage-hash reverse exclusion gap (see .hermes/plans/grand-sport-jake-heritage-hash-reverse-exclusions-spec.md)."
+          },
+          {
+            "group_id": "gs_group_pda_excludes_heritage_hash_and_z15",
+            "group_type": "excludes_any",
+            "source_id": "opt_pda_001",
+            "target_ids": [
+              "opt_z15_001",
+              "opt_17a_001",
+              "opt_20a_001",
+              "opt_55a_001",
+              "opt_75a_001",
+              "opt_97a_001",
+              "opt_dx4_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "PDA blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+            "active": "True",
+            "notes": "Jake-graphics/heritage-hash reverse exclusion gap (see .hermes/plans/grand-sport-jake-heritage-hash-reverse-exclusions-spec.md)."
+          },
+          {
+            "group_id": "gs_group_sne_excludes_heritage_hash_and_z15",
+            "group_type": "excludes_any",
+            "source_id": "opt_sne_001",
+            "target_ids": [
+              "opt_z15_001",
+              "opt_17a_001",
+              "opt_20a_001",
+              "opt_55a_001",
+              "opt_75a_001",
+              "opt_97a_001",
+              "opt_dx4_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "SNE blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+            "active": "True",
+            "notes": "Jake-graphics/heritage-hash reverse exclusion gap (see .hermes/plans/grand-sport-jake-heritage-hash-reverse-exclusions-spec.md)."
+          },
+          {
+            "group_id": "gs_group_vpo_excludes_heritage_hash_and_z15",
+            "group_type": "excludes_any",
+            "source_id": "opt_vpo_001",
+            "target_ids": [
+              "opt_z15_001",
+              "opt_17a_001",
+              "opt_20a_001",
+              "opt_55a_001",
+              "opt_75a_001",
+              "opt_97a_001",
+              "opt_dx4_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "VPO blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+            "active": "True",
+            "notes": "Jake-graphics/heritage-hash reverse exclusion gap (see .hermes/plans/grand-sport-jake-heritage-hash-reverse-exclusions-spec.md)."
+          },
+          {
+            "group_id": "gs_group_vpw_excludes_heritage_hash_and_z15",
+            "group_type": "excludes_any",
+            "source_id": "opt_vpw_001",
+            "target_ids": [
+              "opt_z15_001",
+              "opt_17a_001",
+              "opt_20a_001",
+              "opt_55a_001",
+              "opt_75a_001",
+              "opt_97a_001",
+              "opt_dx4_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "VPW blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+            "active": "True",
+            "notes": "Jake-graphics/heritage-hash reverse exclusion gap (see .hermes/plans/grand-sport-jake-heritage-hash-reverse-exclusions-spec.md)."
           }
         ],
         "exclusiveGroups": [
