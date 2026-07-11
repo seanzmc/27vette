@@ -103,6 +103,19 @@ textarea {
   min-width: 0;
 }
 
+.brand-home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  flex: 0 0 auto;
+  border-radius: 4px;
+}
+
+.brand-home-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
 .brand-block .brand-crossflags {
   height: 26px;
   width: auto;
