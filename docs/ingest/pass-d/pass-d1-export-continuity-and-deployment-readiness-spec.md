@@ -75,7 +75,7 @@ Root causes:
 - Generated artifacts and `form-app/data.js` remain outputs. This pass may generate temp/scratch artifacts for verification, but it must not hand-edit generated runtime files.
 - Runtime JavaScript must not gain model/RPO-specific exceptions for these findings.
 - Grand Sport X must use the current registry metadata contract for new model keys: `model_key = "grand_sport_x"`, `registry_key = "grand_sport_x"`. Do not add a runtime alias unless a separate compatibility spec approves it.
-- Standing constraints from `AGENTS.md` apply, especially source boundaries (§3), spec-first expectations (§4), workbook safety (§5), dealer boundary (§6), validation (§10), and handoff (§12).
+- Standing constraints from `AGENTS.md` apply, especially source boundaries (§3), autonomy and approval gates (§4), workbook safety (§5), dealer boundary (§6), validation (§10), and handoff (§12).
 
 ## 3. Scope
 

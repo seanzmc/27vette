@@ -57,7 +57,7 @@ Root cause / current blocker:
 - Run artifacts are evidence and approval records, not product-rule sources. Rebuilt artifacts must be reproducible from persisted source/selection/decision state.
 - Generated runtime contracts and `form-app/data.js` remain outputs. This pass must not publish or hand-edit runtime artifacts.
 - Deployment-continuity diagnostics are a gate for the next decision. They do not authorize runtime promotion.
-- Standing constraints from `AGENTS.md` apply, especially source boundaries (§3), spec-first expectations (§4), workbook safety (§5), dealer boundary (§6), validation (§10), and handoff (§12).
+- Standing constraints from `AGENTS.md` apply, especially source boundaries (§3), autonomy and approval gates (§4), workbook safety (§5), dealer boundary (§6), validation (§10), and handoff (§12).
 
 ## 3. Scope
 

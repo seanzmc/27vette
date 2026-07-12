@@ -30,25 +30,77 @@ Runtime JavaScript — consumes generated data; renders, manages interaction, ge
 
 CSS — presentation only. Styling changes must preserve data contracts, runtime state, validation semantics, payloads, and behavior; never use styling to hide broken data or logic.
 
-## 4. Spec-First Expectations
+## 4. Autonomy and Approval Gates
 
-Non-trivial tasks require an approved spec before edits. Non-trivial: multiple surfaces, runtime-behavior change, workbook writes, generated-contract change, test/gate/script/workflow-doc change, dealer-submission change, broad UI/UX change, or new dependencies/build assumptions.
+User review is required for unresolved decisions, not for every non-trivial edit.
 
-A spec must include:
+When the user has requested implementation and the intended outcome is already established by the request, workbook data, existing runtime behavior, tests, documentation, or another authoritative repository source, the agent may proceed through inspection, implementation, validation, and handoff without intermediate approval.
 
-- [ ] Diagnosis: root cause / current-state evidence, files/sheets/symbols inspected, risk level, change class.
-- [ ] Exact files, sheets, artifacts, or docs expected to change.
-- [ ] Source-of-truth decision (workbook / generator / artifact / runtime / styling / docs / tooling).
-- [ ] Companion-file impact: updated, inspected-no-change, or n/a per relevant surface.
-- [ ] Constraints: no unrelated refactor; no new dependencies unless approved; generated files not source; workbook owns rules where possible; dealer boundaries preserved.
-- [ ] Risks and non-goals.
-- [ ] Validation plan matched to changed surfaces and risk.
+Before non-trivial edits, create a concise working definition of done that identifies:
 
-Wait for approval unless the user asked for analysis only. Small isolated docs/typo fixes: lightweight checklist, but still inspect current files and report validation honestly.
+- Current diagnosis and supporting repository evidence.
+- Intended outcome and affected surfaces.
+- Source-of-truth owner.
+- Expected files, sheets, and generated artifacts.
+- Important constraints and preserved behavior.
+- Validation and rollback plan.
+
+This working definition may be reported in a progress update or recorded in an existing task/spec file. Do not create a new spec file solely to satisfy process when the work is otherwise clear and bounded.
+
+### Proceed Without Additional Approval
+
+Proceed autonomously when all of the following are true:
+
+- The user requested implementation rather than analysis or review only.
+- The intended product behavior is already defined.
+- Repository evidence supports a single safe implementation direction.
+- The change uses existing architecture, schemas, write paths, and dependencies.
+- The work remains within the requested scope.
+- The change is reversible and can be validated through existing gates.
+- No protected boundary below is crossed.
+
+This includes narrow bug fixes, parity restoration, implementation corrections, generated-artifact refreshes from an approved source change, and workbook corrections whose intended business outcome is already defined.
+
+### Require User Approval
+
+Stop and request approval before proceeding when the work requires:
+
+- Choosing or inventing product/business behavior, including availability, pricing, defaults, relationships, customer-facing rules, or other ordering decisions not already established by an authoritative source.
+- Changing the dealer-submission endpoint, payload, model scoping, security/Turnstile behavior, or submission UX.
+- Introducing a new dependency, schema, public interface, generated-data contract, security boundary, deployment path, or build-system assumption.
+- Making a destructive or difficult-to-reverse change.
+- Materially expanding the requested scope.
+- Choosing between approaches with meaningful architectural or customer-facing tradeoffs.
+- Proceeding despite repository evidence that contradicts the requested assumption or intended outcome.
+
+Do not stop merely because a task is non-trivial, spans multiple files, changes implementation logic, or requires several validation steps. Pause only when new decision authority is required.
+
+Analysis-only, review-only, and spec-writing requests never authorize implementation.
 
 ## 5. Workbook Safety
 
-`stingray_master.xlsx` writes require: task approved and owning surface identified; Excel closed (lock file `~$stingray_master.xlsx` is an active-risk signal — confirm stale before removing); write through approved tooling / `save_workbook_safely()` in `scripts/corvette_form_generator/workbook.py` (validates a temp copy, refuses on mtime change or lock file); verify the saved workbook on disk before claiming the change landed; regenerate affected artifacts and published data; run surface-appropriate gates. Do not recreate or hand-edit generated workbook sheets — change source rows or generic generator logic, then regenerate.
+A workbook write does not require separate user approval when the user requested implementation, the intended business outcome is already defined, and the change can be expressed through existing workbook structures and approved write tooling.
+
+Before writing `stingray_master.xlsx`:
+
+- Confirm the owning workbook surface and exact intended row-level change.
+- Record the current workbook state and ensure a recoverable backup or equivalent rollback point will be created.
+- Confirm Excel is closed. Treat `~$stingray_master.xlsx` as an active-risk signal; never remove it without establishing that it is stale.
+- Use approved tooling and `save_workbook_safely()` in `scripts/corvette_form_generator/workbook.py`.
+- Preserve lock, mtime, temporary-copy validation, package validation, schema validation, and atomic replacement protections.
+
+After writing:
+
+- Verify the backup exists and the saved workbook can be reopened from disk.
+- Run package and schema validation.
+- Regenerate all affected artifacts and published data.
+- Review workbook and generated diffs for unintended changes.
+- Run the primary tests for every affected surface.
+- If validation fails, do not leave an unverified workbook in place. Correct the failure only when the fix remains within the authorized outcome; otherwise restore the backup and request direction.
+
+Separate approval is still required when the workbook edit would create or choose product/business behavior rather than implement an already-established decision.
+
+Do not recreate or hand-edit generated workbook sheets. Change source rows or generic generator logic, then regenerate.
 
 ## 6. Dealer Submission (protected boundary)
 

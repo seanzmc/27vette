@@ -36,7 +36,7 @@ Change type: tooling/tests/docs first, then an explicitly gated workbook write. 
 - `apply-plan.json` and `plan-approval.json` are approval artifacts, not a second source of truth after apply.
 - The apply CLI must not reinterpret product decisions. It applies the exact approved plan, verifies it, and records evidence.
 - Generated artifacts remain outputs. Pass D does not run `generate_form.py`, `generate_registry.py`, or edit `form-output/runtime/*` / `form-app/data.js`.
-- Standing constraints from `AGENTS.md` apply, especially source boundaries (§3), spec-first expectations (§4), workbook safety (§5), validation (§10), and handoff (§12).
+- Standing constraints from `AGENTS.md` apply, especially source boundaries (§3), autonomy and approval gates (§4), workbook safety (§5), validation (§10), and handoff (§12).
 
 ## 2. Scope
 
