@@ -62,9 +62,15 @@ Classify the change: styling-only, behavior-only, data-only, or mixed. For behav
 
 Edge workflow for new-model intake or broad source refresh — never routine maintenance. Preflight is read-only evidence gathering: preserve raw evidence and provenance, invent nothing, keep candidate artifacts transient, and never mutate the workbook, generated artifacts, or `form-app/data.js`. Applying reviewed output later is a separate approved workbook pass with full §5 safety, regeneration, and gates. Detail: `Order-Guide_IngestPrompt.md` and `docs/ingest/`.
 
+Current ingest direction is browser-first for source intake, then compiler/exception driven for production continuation. The current entry path is `scripts/ingest_wizard_server.py`; the production direction is the canonical-row compiler plus typed exception queue in `docs/ingest/canonical-row-compiler-exception-queue-design.md`. Historical Pass B broad review lanes and Pass C/D.2 decision-to-plan artifacts remain evidence/debug surfaces, not production write authority.
+
+`scripts/ingest_wizard_apply.py` is diagnostic dry-run/report-only by default and never promotes runtime artifacts. A live workbook write requires the current compiler/readiness contract: a `pass-c-3` plan, scoped dry-run approval, eligible temporary-workbook proof, separate deployment-ready write approval, current hashes/fingerprints, schema validation enabled, no Excel lock/mtime drift, exact readback, and no deployment blockers. Older `pass-c-1`/`pass-c-2` plans or historical approvals are permanently non-writable even if a label sounds approved.
+
 ## 9. Fable 5 Loop Workflows
 
 Fable 5 loop artifacts under `fable5loop/` are orchestration/memory infrastructure for large, multi-stage work; they do not override this guide's spec, workbook, generated-artifact, runtime, styling, dealer, or ingest boundaries. For any Fable 5 run, start from `fable5loop/README.md`, preserve run receipts/state updates, and run the loop validator when loop artifacts change. Use `docs/fable-ex-tasks.md` as routing guidance for when the loop is appropriate; keep routine model/workbook/runtime edits on the normal repo path unless a task explicitly needs the loop.
+
+Claude Code project files under `.claude/` are thin launch/wrapper surfaces for this repo. They may point agents into `AGENTS.md` and `fable5loop/`, but durable workflow procedure belongs in the repo-owned guides and Fable loop files, not duplicated in `.claude/` wrappers.
 
 ## 10. Validation Strategy
 
