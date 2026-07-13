@@ -63,6 +63,17 @@ class IdentityContractTest(unittest.TestCase):
         self.assertEqual(result[0]["status"], "ambiguous")
         self.assertEqual(result[0]["candidateIds"], ["opt_pdb_001", "opt_pdb_002"])
 
+    def test_no_rpo_standard_row_matches_unique_existing_copy_identity(self) -> None:
+        candidate = self.candidate("", "Air filtration system with pollen filter")
+        candidate["rowKind"] = "standard_no_rpo"
+        existing = self.existing("opt_509", "", "Air filtration system with pollen filter")
+
+        result = match_option_occurrences([candidate], [existing])
+
+        self.assertEqual(result[0]["status"], "matched")
+        self.assertEqual(result[0]["optionId"], "opt_509")
+        self.assertEqual(result[0]["matchStage"], "no_rpo_copy_identity")
+
     def test_matching_stages_apply_globally_before_weaker_candidates(self) -> None:
         exact = self.candidate("PDB", "Carbon wheel package", price=16000)
         weaker = self.candidate("PDB", "Different copy", price=16000)
@@ -85,6 +96,20 @@ class IdentityContractTest(unittest.TestCase):
         by_signature = lambda rows: {row["semanticSignature"]: row["allocatedId"] for row in rows}
         self.assertEqual(by_signature(first), by_signature(second))
         self.assertEqual(set(by_signature(first).values()), {"opt_pdb_002", "opt_pdb_003"})
+
+    def test_new_no_rpo_standard_ids_are_deterministic_and_order_invariant(self) -> None:
+        candidates = [
+            {**self.candidate("", "Air filtration system"), "rowKind": "standard_no_rpo"},
+            {**self.candidate("", "Carpeted floor mats"), "rowKind": "standard_no_rpo"},
+        ]
+
+        first = allocate_ids("options", "grand_sport_x", candidates)
+        second = allocate_ids("options", "grand_sport_x", list(reversed(candidates)))
+        by_signature = lambda rows: {row["semanticSignature"]: row["allocatedId"] for row in rows}
+
+        self.assertEqual(by_signature(first), by_signature(second))
+        self.assertTrue(all(identifier.startswith("opt_std_") for identifier in by_signature(first).values()))
+        self.assertEqual(len(set(by_signature(first).values())), 2)
 
     def test_non_option_id_format_is_stable_and_model_local(self) -> None:
         first = deterministic_family_id("rule_mapping", "zr1", {"sourceRpo": "PDB", "ruleType": "requires", "targetRpo": "PEF"})

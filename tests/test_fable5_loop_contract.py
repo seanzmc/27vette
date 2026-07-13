@@ -128,9 +128,15 @@ def test_validator_rejects_state_fact_without_timestamped_evidence(tmp_path: Pat
 def test_validator_rejects_stale_last_session_pointer(tmp_path: Path) -> None:
     copy_scaffold(tmp_path)
     state = tmp_path / "fable5loop" / "STATE.md"
+    latest_run = sorted(
+        path
+        for path in (tmp_path / "fable5loop" / "runs").iterdir()
+        if path.is_dir() and (path / "run.json").is_file()
+    )[-1]
+    latest_relative = latest_run.relative_to(tmp_path).as_posix()
     state.write_text(
         state.read_text(encoding="utf-8").replace(
-            "fable5loop/runs/2026-07-05-scaffold-hardening-review",
+            latest_relative,
             "fable5loop/runs/2026-07-04-stale-run",
         ),
         encoding="utf-8",

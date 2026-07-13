@@ -62,6 +62,7 @@ class RelationshipCompilerTest(unittest.TestCase):
         )
         self.assertEqual(compiled["rows"], [])
         self.assertEqual(compiled["exceptions"][0]["reasonCode"], "unresolved_relationship_endpoint")
+        self.assertEqual(compiled["exceptions"][0]["allowedActions"], [])
 
     def test_replaces_without_active_representation_is_exception(self) -> None:
         compiled = compile_relationships(
@@ -79,6 +80,43 @@ class RelationshipCompilerTest(unittest.TestCase):
             target_rpos={"BV4"},
         )
         self.assertEqual(compiled["dispositions"][0]["disposition"], "resolved_not_a_workbook_fact")
+
+    def test_phrase_without_a_product_endpoint_is_context_not_a_reviewer_task(self) -> None:
+        compiled = compile_relationships(
+            [
+                {
+                    "candidateId": "row:context",
+                    "rpo": "BV4",
+                    "description": "Custom leather includes seats, doors and console.",
+                }
+            ],
+            self.phrases,
+            target_rpos={"BV4"},
+        )
+        self.assertEqual(compiled["exceptions"], [])
+        self.assertEqual(
+            compiled["dispositions"][0]["disposition"],
+            "resolved_not_a_workbook_fact",
+        )
+
+    def test_standard_no_rpo_copy_does_not_create_relationship_tasks(self) -> None:
+        compiled = compile_relationships(
+            [
+                {
+                    "candidateId": "row:standard-copy",
+                    "rowKind": "standard_no_rpo",
+                    "rpo": "",
+                    "description": "Air filtration system includes pollen filter.",
+                }
+            ],
+            self.phrases,
+            target_rpos=set(),
+        )
+        self.assertEqual(compiled["exceptions"], [])
+        self.assertEqual(
+            compiled["dispositions"][0]["disposition"],
+            "resolved_not_a_workbook_fact",
+        )
 
     def test_comparator_only_fact_is_prefilled_exception_never_ready_row(self) -> None:
         compiled = compile_relationships(

@@ -13,7 +13,10 @@ for entry in (ROOT / "scripts", ROOT / "tests"):
     if str(entry) not in sys.path:
         sys.path.insert(0, str(entry))
 
-from corvette_form_generator.ingest.wizard.parser import parse_confirmed_sheets  # noqa: E402
+from corvette_form_generator.ingest.wizard.parser import (  # noqa: E402
+    extract_option_candidates,
+    parse_confirmed_sheets,
+)
 from ingest_wizard_fixtures import build_raw_export  # noqa: E402
 
 ROLES = {
@@ -73,6 +76,41 @@ class WizardParserTest(unittest.TestCase):
         self.assertEqual(len(skipped), 1)
         self.assertEqual(skipped[0]["rowIndex"], 9)
         self.assertEqual(skipped[0]["reason"], "no_rpo_on_content_row")
+
+    def test_status_bearing_no_rpo_row_is_preserved_as_standard_candidate(self) -> None:
+        values = [
+            ["ZR1"],
+            ["Legend"],
+            ["Orderable RPO Code", "Ref. Only RPO Code", "Description", "ZR1 Coupe"],
+            ["", "", "Air filtration system with pollen filter", "S"],
+        ]
+        card = {
+            "sheetType": "options_matrix",
+            "headerRow": 3,
+            "modelFamily": "ZR1",
+            "modelFamilies": ["ZR1"],
+            "variantColumns": [
+                {
+                    "columnIndex": 4,
+                    "columnLetter": "D",
+                    "label": "ZR1 Coupe",
+                    "modelCode": "1YR07",
+                    "trim": "1LZ",
+                    "bodyStyle": "coupe",
+                }
+            ],
+        }
+
+        candidates, skipped = extract_option_candidates("Interior 5", values, card)
+
+        self.assertEqual(skipped, [])
+        self.assertEqual(len(candidates), 1)
+        candidate = candidates[0]
+        self.assertEqual(candidate["rowKind"], "standard_no_rpo")
+        self.assertEqual(candidate["rpo"], "")
+        self.assertEqual(candidate["refOnlyRpo"], "")
+        self.assertEqual(candidate["statuses"][0]["status"], "standard")
+        self.assertEqual(candidate["sourceEvidence"]["cells"]["C4"], "Air filtration system with pollen filter")
 
     def test_price_rows(self) -> None:
         rows = self.parsed["priceRows"]

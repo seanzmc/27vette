@@ -730,15 +730,31 @@ function exceptionActionFields(item, action) {
     case "retain_existing":
       return `<label>Established target occurrence ${optionSelect("existingId", choices.existingOptions, "Choose existing target ID")}</label>`;
     case "provide_typed_value":
-      if (subject.reasonCode.startsWith("comparator_only_")) {
+      if (subject.reasonCode === "comparator_only_rule_group_proposal") {
         return '<input type="hidden" name="decision" value="confirm_proposal"><div class="status-note">Confirm the exact comparator-backed proposal shown above for this target.</div>';
       }
+      if (subject.reasonCode === "comparator_only_exclusive_group_proposal") {
+        return `<input type="hidden" name="decision" value="confirm_proposal"><label>Target selection behavior
+          <select name="selectionMode" required><option value="">Choose target behavior</option>${(choices.exclusiveSelectionModes || []).map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value.replaceAll("_", " "))}</option>`).join("")}</select>
+        </label>`;
+      }
+      if (subject.reasonCode === "comparator_only_default_selection_proposal") {
+        return `<input type="hidden" name="decision" value="confirm_proposal"><div class="typed-grid">
+          <label>Target priority <input name="priority" type="number" min="0" step="1" required></label>
+          <label>Target display behavior <select name="defaultDisplayBehavior" required>
+            <option value="">Choose target display behavior</option>
+            <option value="default_selected">Default selected</option>
+            <option value="__blank__">Normal display</option>
+          </select></label>
+        </div>`;
+      }
       return `<div class="typed-grid">
+        ${subject.reasonCode === "comparator_only_price_rule_proposal" ? '<input type="hidden" name="decision" value="confirm_proposal">' : ""}
         <label>Target price scope <select name="priceScope" required>
           <option value="">Choose one target variant scope</option>
-          ${(choices.priceScopes || []).map((scope) => `<option value="${escapeHtml(JSON.stringify({ bodyStyleScope: scope.bodyStyleScope, trimLevelScope: scope.trimLevelScope }))}">${escapeHtml(scope.label)}</option>`).join("")}
+          ${(choices.priceScopes || []).map((scope) => `<option value="${escapeHtml(JSON.stringify({ bodyStyleScope: scope.bodyStyleScope, trimLevelScope: scope.trimLevelScope, variantScope: scope.variantScope }))}">${escapeHtml(scope.label)}</option>`).join("")}
         </select></label>
-        <label>Whole-dollar price <input name="priceValue" type="number" step="1" ${subject.reasonCode === "unresolved_price_scope" ? "required" : ""}></label>
+        <label>Whole-dollar price <input name="priceValue" type="number" step="1" ${["unresolved_price_scope", "comparator_only_price_rule_proposal"].includes(subject.reasonCode) ? "required" : ""}></label>
       </div>`;
     case "approve_removal":
       return '<label>Why reference impact is cleared <input name="reason" required></label>';
@@ -933,11 +949,24 @@ function resolutionPayload(form, action, reasonCode) {
     case "retain_existing":
       return { existingId: data.get("existingId") };
     case "provide_typed_value": {
-      if (reasonCode.startsWith("comparator_only_")) return { decision: "confirm_proposal" };
+      if (reasonCode === "comparator_only_rule_group_proposal") return { decision: "confirm_proposal" };
+      if (reasonCode === "comparator_only_exclusive_group_proposal") {
+        return { decision: "confirm_proposal", selectionMode: data.get("selectionMode") };
+      }
+      if (reasonCode === "comparator_only_default_selection_proposal") {
+        const displayBehavior = data.get("defaultDisplayBehavior");
+        return {
+          decision: "confirm_proposal",
+          priority: Number(data.get("priority")),
+          displayBehavior: displayBehavior === "__blank__" ? "" : displayBehavior,
+        };
+      }
       const selectedScope = JSON.parse(data.get("priceScope"));
       const result = {};
+      if (reasonCode === "comparator_only_price_rule_proposal") result.decision = "confirm_proposal";
       if (selectedScope.bodyStyleScope) result.bodyStyleScope = selectedScope.bodyStyleScope;
       if (selectedScope.trimLevelScope) result.trimLevelScope = selectedScope.trimLevelScope;
+      if (selectedScope.variantScope) result.variantScope = selectedScope.variantScope;
       if (data.get("priceValue") !== "") result.priceValue = Number(data.get("priceValue"));
       return result;
     }

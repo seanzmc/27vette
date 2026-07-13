@@ -91,6 +91,24 @@ def extract_option_candidates(
         rpo = first.upper() if RPO_RE.fullmatch(first.upper()) else ""
         ref_only = second.upper() if RPO_RE.fullmatch(second.upper()) else ""
         if not rpo and not ref_only:
+            if third and any(status.get("status") == "standard" for status in statuses):
+                candidates.append(
+                    {
+                        "candidateId": f"{sheet_name}:{row_number}",
+                        "sheetName": sheet_name,
+                        "rowIndex": row_number,
+                        "modelFamily": card["modelFamily"],
+                        "modelFamilies": card["modelFamilies"],
+                        "sectionLabel": section_label,
+                        "rowKind": "standard_no_rpo",
+                        "rpo": "",
+                        "refOnlyRpo": "",
+                        "description": third,
+                        "statuses": statuses,
+                        "sourceEvidence": row_evidence(sheet_name, row_number, row),
+                    }
+                )
+                continue
             skipped.append(
                 {"rowIndex": row_number, "reason": "no_rpo_on_content_row", "description": third}
             )

@@ -46,9 +46,10 @@ REASON_ACTIONS = {
     "missing_price_scope": {"provide_typed_value"},
     "unresolved_price_scope": {"provide_typed_value"},
     "missing_section": {"choose_section"},
-    "unresolved_relationship_endpoint": {"choose_relationship"},
-    "unsupported_relationship_type": {"choose_relationship"},
-    "unsupported_relationship_direction": {"choose_relationship"},
+    "unresolved_relationship_endpoint": {"choose_relationship", "mark_not_applicable"},
+    "unresolved_relationship_identity": {"choose_relationship", "mark_not_applicable"},
+    "unsupported_relationship_type": {"choose_relationship", "mark_not_applicable"},
+    "unsupported_relationship_direction": {"choose_relationship", "mark_not_applicable"},
     "comparator_only_relationship_proposal": {"choose_relationship", "mark_not_applicable"},
     "comparator_only_rule_group_proposal": {"provide_typed_value", "mark_not_applicable"},
     "comparator_only_exclusive_group_proposal": {"provide_typed_value", "mark_not_applicable"},
@@ -143,7 +144,7 @@ def validate_resolution(resolution: Mapping[str, Any], subject: Mapping[str, Any
         if payload["ruleType"] not in {"requires", "includes", "excludes", "replaces"}:
             raise ValueError("choose_relationship ruleType is not supported.")
     elif action == "provide_typed_value" and reason_code in {"missing_price_scope", "unresolved_price_scope"}:
-        allowed = {"bodyStyleScope", "trimLevelScope", "priceValue"}
+        allowed = {"bodyStyleScope", "trimLevelScope", "variantScope", "priceValue"}
         if not payload or set(payload) - allowed:
             raise ValueError("Price-scope resolution contains unsupported fields.")
         if reason_code == "unresolved_price_scope" and "priceValue" not in payload:
@@ -157,12 +158,44 @@ def validate_resolution(resolution: Mapping[str, Any], subject: Mapping[str, Any
             raise ValueError("priceValue must be a whole-dollar integer.")
     elif action == "provide_typed_value" and reason_code in {
         "comparator_only_rule_group_proposal",
-        "comparator_only_exclusive_group_proposal",
-        "comparator_only_price_rule_proposal",
-        "comparator_only_default_selection_proposal",
     }:
         if payload != {"decision": "confirm_proposal"}:
             raise ValueError("Comparator proposal confirmation requires decision=confirm_proposal.")
+    elif action == "provide_typed_value" and reason_code == "comparator_only_exclusive_group_proposal":
+        if set(payload) != {"decision", "selectionMode"} or payload.get("decision") != "confirm_proposal":
+            raise ValueError(
+                "Comparator exclusive-group confirmation requires decision and selectionMode."
+            )
+        if payload.get("selectionMode") not in {
+            "single_within_group",
+            "required_single_within_group",
+        }:
+            raise ValueError("Comparator exclusive-group selectionMode is not supported.")
+    elif action == "provide_typed_value" and reason_code == "comparator_only_price_rule_proposal":
+        required = {"decision", "priceValue", "bodyStyleScope", "trimLevelScope", "variantScope"}
+        if set(payload) != required or payload.get("decision") != "confirm_proposal":
+            raise ValueError(
+                "Comparator price confirmation requires decision, priceValue, bodyStyleScope, trimLevelScope, and variantScope."
+            )
+        if isinstance(payload.get("priceValue"), bool) or not isinstance(payload.get("priceValue"), (int, float)):
+            raise ValueError("priceValue must be numeric.")
+        if not float(payload["priceValue"]).is_integer():
+            raise ValueError("priceValue must be a whole-dollar integer.")
+        for key in ("bodyStyleScope", "trimLevelScope", "variantScope"):
+            if not isinstance(payload.get(key), str) or not payload[key].strip():
+                raise ValueError(f"Comparator price {key} must be a non-empty target scope.")
+    elif action == "provide_typed_value" and reason_code == "comparator_only_default_selection_proposal":
+        required = {"decision", "priority", "displayBehavior"}
+        if set(payload) != required or payload.get("decision") != "confirm_proposal":
+            raise ValueError(
+                "Comparator default confirmation requires decision, priority, and displayBehavior."
+            )
+        if isinstance(payload.get("priority"), bool) or not isinstance(payload.get("priority"), int):
+            raise ValueError("Comparator default priority must be an integer.")
+        if payload["priority"] < 0:
+            raise ValueError("Comparator default priority must be non-negative.")
+        if payload.get("displayBehavior") not in {"", "default_selected"}:
+            raise ValueError("Comparator default displayBehavior is not supported.")
     elif action == "provide_typed_value":
         raise ValueError(f"provide_typed_value has no typed payload contract for {reason_code!r}.")
     elif action == "retain_existing":

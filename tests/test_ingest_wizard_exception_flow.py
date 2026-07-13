@@ -320,7 +320,7 @@ class ExceptionFlowTest(unittest.TestCase):
         finally:
             os.utime(self.master, ns=(stat.st_atime_ns, stat.st_mtime_ns))
 
-    def test_nonprojectable_row_action_is_not_exposed(self) -> None:
+    def test_compiler_complete_row_actions_are_exposed(self) -> None:
         subject = {
             "reasonCode": "comparator_only_rule_group_proposal",
             "allowedActions": ["provide_typed_value", "mark_not_applicable"],
@@ -329,6 +329,29 @@ class ExceptionFlowTest(unittest.TestCase):
             self.store._projectable_exception_actions(subject),
             [],
         )
+        catalog_subject = {
+            **subject,
+            "proposedRows": [
+                {
+                    "sourceRpo": "DPC",
+                    "memberRpos": ["SHT", "SNE"],
+                }
+            ],
+        }
+        self.assertEqual(
+            self.store._projectable_exception_actions(
+                catalog_subject,
+                {"DPC", "SHT"},
+            ),
+            [],
+        )
+        self.assertEqual(
+            self.store._projectable_exception_actions(
+                catalog_subject,
+                {"DPC", "SHT", "SNE"},
+            ),
+            ["provide_typed_value", "mark_not_applicable"],
+        )
         self.assertEqual(
             self.store._projectable_exception_actions(
                 {
@@ -336,7 +359,86 @@ class ExceptionFlowTest(unittest.TestCase):
                     "allowedActions": ["retain_existing"],
                 }
             ),
+            ["retain_existing"],
+        )
+        for reason in (
+            "unresolved_relationship_endpoint",
+            "unresolved_relationship_identity",
+        ):
+            self.assertEqual(
+                self.store._projectable_exception_actions(
+                    {
+                        "reasonCode": reason,
+                        "allowedActions": [
+                            "choose_relationship",
+                            "mark_not_applicable",
+                        ],
+                    }
+                ),
+                [],
+            )
+        self.assertEqual(
+            self.store._projectable_exception_actions(
+                {
+                    "reasonCode": "asset_map_media_missing",
+                    "allowedActions": ["record_allowed_deferral"],
+                }
+            ),
             [],
+        )
+
+    def test_mutation_rejects_action_hidden_by_current_projectability_view(self) -> None:
+        item = self.store.exception_queue_view(
+            self.run_id,
+            reason="missing_section",
+            state="open",
+            actionable="yes",
+            limit=100,
+        )["items"][0]
+        subject = item["subject"]
+        before = self.store._snapshot_run_files(
+            self.store.run_dir(self.run_id),
+            COMPILER_MUTATION_FILES,
+        )
+
+        original_view = self.store._exception_queue_view_locked
+
+        def view_with_hidden_action(*args, **kwargs):
+            view = original_view(*args, **kwargs)
+            for current in view["items"]:
+                if current["subject"]["subjectId"] == subject["subjectId"]:
+                    current["availableActions"] = []
+            return view
+
+        with mock.patch.object(self.store, "_exception_queue_view_locked", side_effect=view_with_hidden_action):
+            with self.assertRaisesRegex(WizardError, "not yet projectable"):
+                self.store.resolve_exception(
+                    self.run_id,
+                    subject_id=subject["subjectId"],
+                    subject_version=subject["subjectVersion"],
+                    action="choose_section",
+                    payload={"sectionId": "sec_whee_001"},
+                    reviewer="sean",
+                )
+
+        self.assertEqual(
+            self.store._snapshot_run_files(
+                self.store.run_dir(self.run_id),
+                COMPILER_MUTATION_FILES,
+            ),
+            before,
+        )
+
+    def test_duplicate_ready_rpo_is_not_a_unique_comparator_endpoint(self) -> None:
+        options = [
+            {"optionId": "opt_dpc_001", "rpo": "DPC"},
+            {"optionId": "opt_dpc_002", "rpo": "DPC"},
+            {"optionId": "opt_sht_001", "rpo": "SHT"},
+            {"optionId": "opt_sne_001", "rpo": "SNE"},
+        ]
+        self.assertEqual(
+            self.store._unique_option_rpos(options),
+            {"SHT", "SNE"},
         )
 
     def test_price_resolution_uses_only_finite_target_scope_choices(self) -> None:
@@ -352,6 +454,9 @@ class ExceptionFlowTest(unittest.TestCase):
         self.assertTrue(
             all(scope["label"] for scope in item["choices"]["priceScopes"])
         )
+        self.assertTrue(
+            all(scope["variantScope"] for scope in item["choices"]["priceScopes"])
+        )
         subject = item["subject"]
         with self.assertRaisesRegex(WizardError, "current target variant"):
             self.store.resolve_exception(
@@ -362,6 +467,7 @@ class ExceptionFlowTest(unittest.TestCase):
                 payload={
                     "bodyStyleScope": "coupe",
                     "trimLevelScope": "NOT_A_REAL_TARGET_VARIANT",
+                    "variantScope": "*",
                     "priceValue": 1234,
                 },
                 reviewer="sean",

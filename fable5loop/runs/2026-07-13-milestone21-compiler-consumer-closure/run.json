@@ -1,0 +1,113 @@
+{
+  "id": "2026-07-13-milestone21-compiler-consumer-closure",
+  "objective": "Close every currently reviewer-resolvable ingest exception with a finite validated compiler consumer while leaving genuine source and tooling gaps fail-closed.",
+  "changed_surface": [
+    "ingest parser",
+    "canonical compiler",
+    "typed exception API",
+    "browser UI and CSS",
+    "tests",
+    "ingest docs",
+    "Fable evidence"
+  ],
+  "outcome_rubric": "fable5loop/runs/2026-07-13-milestone21-compiler-consumer-closure/outcome.md",
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-13-milestone21-compiler-consumer-closure/validation-output.txt"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-13-milestone21-compiler-consumer-closure/verifier-report.md"
+    }
+  ],
+  "boundaries_preserved": [
+    "live workbook unchanged",
+    "raw source unchanged",
+    "no pass-c-3 projection",
+    "no runtime publication or registry promotion",
+    "no deployment or dealer-submission change"
+  ],
+  "run_id": "2026-07-13-milestone21-compiler-consumer-closure",
+  "task": "Close every currently reviewer-resolvable ingest exception with a finite validated compiler consumer while leaving genuine source and tooling gaps fail-closed.",
+  "started_at": "2026-07-13T22:59:13Z",
+  "completed_at": "2026-07-13T23:12:49Z",
+  "status": "passed",
+  "max_iterations": 3,
+  "iterations_used": 3,
+  "source_guidance": "fable5loop/source-guidance.md",
+  "outcome_file": "fable5loop/runs/2026-07-13-milestone21-compiler-consumer-closure/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-13-milestone21-compiler-consumer-closure/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-13-milestone21-compiler-consumer-closure/validation-output.txt",
+  "artifact_evidence": [
+    "fable5loop/runs/2026-07-13-milestone21-compiler-consumer-closure/real-source-proof.json",
+    "form-output/ingest-wizard/20260713-181910-7dc5bb"
+  ],
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "method": "independent delegate-task exact-snapshot review followed by bounded independent session and mobile final-delta re-verification",
+    "verdict": "pass",
+    "cycles": [
+      {
+        "id": "deleg_03910873",
+        "verdict": "block",
+        "disposition": "Comparator endpoint, source-disposition, no-RPO lifecycle, and price-scope findings repaired test-first."
+      },
+      {
+        "id": "deleg_db6d9493",
+        "verdict": "block",
+        "disposition": "GET/mutation projectability and duplicate-ready-RPO findings repaired test-first."
+      },
+      {
+        "ids": [
+          "deleg_37da6841",
+          "deleg_7a565068"
+        ],
+        "verdict": "pass",
+        "disposition": "Exact session/API and mobile CSS final deltas independently passed with no edits."
+      }
+    ]
+  },
+  "validation": {
+    "status": "pass",
+    "focused": "84 passed, 12 subtests passed in 6.72s",
+    "broad_affected": "307 passed, 16 subtests passed in 101.74s",
+    "full_repository_pre_final_delta": "600 passed, 23 subtests passed, 5 classified failures in 281.55s",
+    "session_final_delta": "15 passed in 2.77s",
+    "mobile_final_delta": "6 passed in 0.01s",
+    "fable_contract": "13 passed in 0.45s; loop validator passed",
+    "fresh_source": "5093 canonical rows, 0 physical duplicate keys, 711 subjects, 257 actionable, 454 actionless, same-run byte-identical recompile",
+    "browser": "desktop price resolve/recompile/reopen 399->398->399 with no console errors; 390x844 document/queue/card/control overflow all zero",
+    "protected_surfaces": "workbook, raw source, retained proof, runtime publication, registry, deployment, dealer, and pass-c-3 surfaces unchanged"
+  },
+  "state_update": {
+    "updated": true,
+    "evidence": "fable5loop/STATE.md"
+  },
+  "skill_update": {
+    "decision": "updated",
+    "skill": "27vette-fable5-compounding",
+    "evidence": "fable5loop/runs/2026-07-13-milestone21-compiler-consumer-closure/verifier-report.md"
+  },
+  "human_acceptance": {
+    "required": false,
+    "accepted_by": null,
+    "accepted_at": null
+  },
+  "protected_boundaries": {
+    "live_workbook_write": false,
+    "raw_source_mutation": false,
+    "pass_c_3_projection": false,
+    "runtime_publication": false,
+    "registry_promotion": false,
+    "deployment": false,
+    "dealer_submission_change": false
+  },
+  "next_pass": {
+    "label": "Milestone 2.2 — Typed Endpoint and Metadata Compiler Closure",
+    "status": "recommended_not_approved",
+    "scope": "396 typed relationship endpoints, 37 incomplete comparator catalogs, 19 metadata-family blockers, and 2 Color/Trim parser blockers",
+    "milestone_3_status": "blocked_unapproved"
+  }
+}

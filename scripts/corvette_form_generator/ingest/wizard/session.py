@@ -1086,6 +1086,13 @@ class WizardSessionStore:
 
         manifest_actions: Counter[str] = Counter()
         manifest_statuses: Counter[str] = Counter()
+        ready_option_rpos: dict[str, set[str]] = defaultdict(set)
+        for row in detail["manifest"].get("rows") or []:
+            if row.get("family") != "options" or row.get("status") != "ready":
+                continue
+            rpo = str((row.get("values") or {}).get("rpo") or "").upper()
+            if rpo:
+                ready_option_rpos[str(row.get("model") or "")].add(rpo)
         for key, count in (report.get("manifestCounts") or {}).items():
             parts = str(key).split("|", 3)
             if len(parts) != 4:
@@ -1120,7 +1127,12 @@ class WizardSessionStore:
             else:
                 item_state = "open"
             exception_states[item_state] += 1
-            actionable_count += bool(self._projectable_exception_actions(subject))
+            actionable_count += bool(
+                self._projectable_exception_actions(
+                    subject,
+                    ready_option_rpos.get(str(subject.get("model") or ""), set()),
+                )
+            )
         freshness = self._compiler_freshness(run_id, report)
         return {
             "session": detail["session"],
@@ -1161,28 +1173,87 @@ class WizardSessionStore:
         }
 
     @staticmethod
-    def _projectable_exception_actions(subject: dict[str, Any]) -> list[str]:
+    def _projectable_exception_actions(
+        subject: dict[str, Any],
+        available_option_rpos: set[str] | None = None,
+    ) -> list[str]:
         """Expose only actions whose typed outcome is complete after recompilation."""
 
         reason = str(subject.get("reasonCode") or "")
+        required_proposal_rpos = {
+            str(value).upper()
+            for row in subject.get("proposedRows") or []
+            for value in (
+                row.get("sourceRpo"),
+                row.get("targetRpo"),
+                row.get("conditionRpo"),
+                *(row.get("memberRpos") or []),
+            )
+            if str(value or "")
+        }
+        comparator_reasons = {
+            "comparator_only_relationship_proposal",
+            "comparator_only_rule_group_proposal",
+            "comparator_only_exclusive_group_proposal",
+            "comparator_only_price_rule_proposal",
+            "comparator_only_default_selection_proposal",
+        }
+        proposal_catalog_complete = (
+            reason not in comparator_reasons
+            or (
+                bool(required_proposal_rpos)
+                and available_option_rpos is not None
+                and required_proposal_rpos <= available_option_rpos
+            )
+        )
         projectable: list[str] = []
         unsupported_row_actions: list[str] = []
         for raw_action in subject.get("allowedActions") or []:
             action = str(raw_action)
             if action == "choose_section":
                 projectable.append(action)
-            elif action == "provide_typed_value" and reason in {
-                "missing_price_scope",
-                "unresolved_price_scope",
-            }:
+            elif action == "choose_relationship" and reason in {
+                "unsupported_relationship_type",
+                "unsupported_relationship_direction",
+                "comparator_only_relationship_proposal",
+            } and proposal_catalog_complete:
                 projectable.append(action)
-            elif action in {"record_allowed_deferral", "mark_not_applicable"}:
+            elif action == "retain_existing" and reason == "ambiguous_existing_identity":
+                projectable.append(action)
+            elif action == "provide_typed_value" and reason in {
+                "unresolved_price_scope",
+                "comparator_only_rule_group_proposal",
+                "comparator_only_exclusive_group_proposal",
+                "comparator_only_price_rule_proposal",
+                "comparator_only_default_selection_proposal",
+            } and proposal_catalog_complete:
+                projectable.append(action)
+            elif action == "mark_not_applicable" and reason in {
+                "unsupported_relationship_type",
+                "unsupported_relationship_direction",
+                "comparator_only_relationship_proposal",
+                "comparator_only_rule_group_proposal",
+                "comparator_only_exclusive_group_proposal",
+                "comparator_only_price_rule_proposal",
+                "comparator_only_default_selection_proposal",
+            } and proposal_catalog_complete:
                 projectable.append(action)
             else:
                 unsupported_row_actions.append(action)
         if unsupported_row_actions:
             return []
         return projectable
+
+    @staticmethod
+    def _unique_option_rpos(options: list[dict[str, Any]]) -> set[str]:
+        """Return RPOs backed by exactly one ready target option identity."""
+
+        counts = Counter(
+            str(option.get("rpo") or "").upper()
+            for option in options
+            if str(option.get("rpo") or "")
+        )
+        return {rpo for rpo, count in counts.items() if count == 1}
 
     def _compiler_freshness(self, run_id: str, report: dict[str, Any]) -> dict[str, Any]:
         """Compare current compiler inputs to the authority bound into the report."""
@@ -1283,6 +1354,7 @@ class WizardSessionStore:
         run_dir = self.run_dir(run_id)
         candidates_payload = read_json(run_dir / "option-candidates.json")
         selection = read_json(run_dir / "model-selection.json")
+        manifest_rows = list(detail["manifest"].get("rows") or [])
         raw_candidates: dict[tuple[str, str], list[dict[str, Any]]] = {}
         target_variant_pairs: dict[str, set[tuple[str, str]]] = {}
         for target in selection.get("targets") or []:
@@ -1303,21 +1375,35 @@ class WizardSessionStore:
         target_price_scopes: dict[str, list[dict[str, str]]] = {}
         for target in selection.get("targets") or []:
             pairs = target_variant_pairs.get(str(target), set())
-            scope_pairs = {("*", "*")}
-            scope_pairs.update(pairs)
-            scope_pairs.update((body_style, "") for body_style, _ in pairs if body_style)
-            scope_pairs.update(("", trim_level) for _, trim_level in pairs if trim_level)
+            scope_triples = {("*", "*", "*")}
+            scope_triples.update((body_style or "*", trim_level or "*", "*") for body_style, trim_level in pairs)
+            scope_triples.update((body_style, "*", "*") for body_style, _ in pairs if body_style)
+            scope_triples.update(("*", trim_level, "*") for _, trim_level in pairs if trim_level)
+            scope_triples.update(
+                (
+                    str(values.get("body_style") or "*"),
+                    str(values.get("trim_level") or "*"),
+                    str(values.get("variant_id") or "*"),
+                )
+                for row in manifest_rows
+                if row.get("model") == target
+                and row.get("family") == "variant_master"
+                and row.get("status") == "ready"
+                for values in [row.get("values") or {}]
+                if str(values.get("variant_id") or "")
+            )
             target_price_scopes[str(target)] = [
                 {
                     "bodyStyleScope": body_style,
                     "trimLevelScope": trim_level,
+                    "variantScope": variant_scope,
                     "label": (
                         "All target variants (*)"
-                        if (body_style, trim_level) == ("*", "*")
-                        else " · ".join(value for value in (body_style, trim_level) if value)
+                        if (body_style, trim_level, variant_scope) == ("*", "*", "*")
+                        else " · ".join(value for value in (body_style, trim_level, variant_scope) if value != "*")
                     ),
                 }
-                for body_style, trim_level in sorted(scope_pairs)
+                for body_style, trim_level, variant_scope in sorted(scope_triples)
             ]
         sections = workbook_sections(self._require_workbook())
         comparator_facts = {
@@ -1325,21 +1411,14 @@ class WizardSessionStore:
             for entry in (detail["comparatorEvidence"].get("targets") or {}).values()
             for fact in entry.get("facts") or []
         }
-        manifest_rows = list(detail["manifest"].get("rows") or [])
-        from corvette_form_generator.editor_ops import extract_workbook, rows_of
-
-        workbook_path = self._require_workbook()
-        extract = extract_workbook(workbook_path)
-        registry = build_family_registry(workbook_path, selection.get("targets") or [])
         target_options: dict[str, list[dict[str, Any]]] = {}
         for target in selection.get("targets") or []:
-            option_sheet = registry[str(target)]["source_option_sheet"]["sheetName"]
-            option_rows = [dict(row) for row in rows_of(extract, option_sheet)]
-            option_rows.extend(
+            option_rows = [
                 dict(row.get("values") or {})
                 for row in manifest_rows
                 if row.get("model") == target and row.get("family") == "options"
-            )
+                and row.get("status") == "ready"
+            ]
             by_id: dict[str, dict[str, Any]] = {}
             for row in option_rows:
                 option_id = str(row.get("option_id") or "")
@@ -1347,10 +1426,19 @@ class WizardSessionStore:
                     by_id[option_id] = {
                         "optionId": option_id,
                         "rpo": str(row.get("rpo") or ""),
-                        "name": str(row.get("name") or row.get("description") or ""),
+                        "name": str(
+                            row.get("name")
+                            or row.get("option_name")
+                            or row.get("description")
+                            or ""
+                        ),
                         "sectionId": str(row.get("section_id") or ""),
                     }
             target_options[str(target)] = [by_id[key] for key in sorted(by_id)]
+        target_unique_option_rpos = {
+            target: self._unique_option_rpos(options)
+            for target, options in target_options.items()
+        }
         valid_by_subject = {
             str(entry.get("subjectId") or ""): dict(entry)
             for entry in detail["resolutions"].get("validEntries") or []
@@ -1382,7 +1470,11 @@ class WizardSessionStore:
                 item_state = "stale_reopened"
             else:
                 item_state = "open"
-            available_actions = self._projectable_exception_actions(subject)
+            model_options = target_options.get(str(subject.get("model") or ""), [])
+            available_actions = self._projectable_exception_actions(
+                subject,
+                target_unique_option_rpos.get(str(subject.get("model") or ""), set()),
+            )
             item = {
                 "subject": dict(subject),
                 "state": item_state,
@@ -1439,12 +1531,6 @@ class WizardSessionStore:
                 ),
             }
             allowed_actions = set(subject.get("allowedActions") or [])
-            evidence_rpos = {
-                str(candidate.get("rpo") or candidate.get("refOnlyRpo") or "").upper()
-                for candidate in raw_rows
-                if candidate.get("rpo") or candidate.get("refOnlyRpo")
-            }
-            model_options = target_options.get(str(subject.get("model") or ""), [])
             item["choices"] = {
                 "sections": list(sections) if "choose_section" in allowed_actions else [],
                 "relationshipRuleTypes": (
@@ -1454,8 +1540,28 @@ class WizardSessionStore:
                 ),
                 "targetOptions": model_options if "choose_relationship" in allowed_actions else [],
                 "existingOptions": (
-                    [option for option in model_options if option["rpo"].upper() in evidence_rpos]
+                    [
+                        option
+                        for option in model_options
+                        if option["optionId"]
+                        in {
+                            str(row.get("existingId") or "")
+                            for row in subject.get("proposedRows") or []
+                        }
+                    ]
                     if "retain_existing" in allowed_actions
+                    else []
+                ),
+                "exclusiveSelectionModes": (
+                    ["single_within_group", "required_single_within_group"]
+                    if subject.get("reasonCode") == "comparator_only_exclusive_group_proposal"
+                    and "provide_typed_value" in available_actions
+                    else []
+                ),
+                "defaultDisplayBehaviors": (
+                    ["default_selected", ""]
+                    if subject.get("reasonCode") == "comparator_only_default_selection_proposal"
+                    and "provide_typed_value" in available_actions
                     else []
                 ),
                 "deferralKinds": (
@@ -1562,7 +1668,22 @@ class WizardSessionStore:
                 + ", ".join(freshness["reasons"]),
                 status=409,
             )
-        if action not in self._projectable_exception_actions(subject):
+        current_view = self._exception_queue_view_locked(
+            run_id,
+            query=str(subject_id),
+            limit=100,
+        )
+        subject_view = next(
+            (
+                item
+                for item in current_view["items"]
+                if item["subject"].get("subjectId") == subject_id
+            ),
+            None,
+        )
+        if subject_view is None:
+            raise WizardError("Exception subject is not current; reload the queue.", status=409)
+        if action not in subject_view["availableActions"]:
             raise WizardError(
                 "This typed action is not yet projectable into a complete canonical outcome.",
                 status=409,
@@ -1597,43 +1718,27 @@ class WizardSessionStore:
             }
             if resolution["payload"]["sectionId"] not in allowed_sections:
                 raise WizardError("Section is not a current canonical workbook choice.")
-        if action == "provide_typed_value":
-            view = self.exception_queue_view(run_id, query=str(subject_id), limit=100)
-            subject_view = next(
-                (
-                    item
-                    for item in view["items"]
-                    if item["subject"].get("subjectId") == subject_id
-                ),
-                None,
-            )
-            if subject_view is None:
-                raise WizardError("Exception subject is not current; reload the queue.", status=409)
+        if action == "provide_typed_value" and subject.get("reasonCode") in {
+            "missing_price_scope",
+            "unresolved_price_scope",
+            "comparator_only_price_rule_proposal",
+        }:
             allowed_scopes = {
                 (
                     str(scope.get("bodyStyleScope") or ""),
                     str(scope.get("trimLevelScope") or ""),
+                    str(scope.get("variantScope") or ""),
                 )
                 for scope in subject_view["choices"].get("priceScopes") or []
             }
             requested_scope = (
                 str(resolution["payload"].get("bodyStyleScope") or ""),
                 str(resolution["payload"].get("trimLevelScope") or ""),
+                str(resolution["payload"].get("variantScope") or ""),
             )
             if requested_scope not in allowed_scopes:
                 raise WizardError("Price scope is not a current target variant or canonical wildcard choice.")
         if action in {"choose_relationship", "retain_existing"}:
-            view = self.exception_queue_view(run_id, query=str(subject_id), limit=100)
-            subject_view = next(
-                (
-                    item
-                    for item in view["items"]
-                    if item["subject"].get("subjectId") == subject_id
-                ),
-                None,
-            )
-            if subject_view is None:
-                raise WizardError("Exception subject is not current; reload the queue.", status=409)
             choices = subject_view["choices"]
             if action == "choose_relationship":
                 allowed_ids = {

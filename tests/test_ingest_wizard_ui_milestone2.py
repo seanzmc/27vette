@@ -38,6 +38,7 @@ def test_compile_summary_uses_compact_api_and_separate_readiness_gates() -> None
 def test_exception_cards_use_typed_controls_evidence_and_lifecycle_api() -> None:
     html = WIZARD_HTML.read_text(encoding="utf-8")
     js = WIZARD_JS.read_text(encoding="utf-8")
+    css = WIZARD_CSS.read_text(encoding="utf-8")
 
     assert "async function enterExceptions()" in js
     assert "async function loadExceptions(" in js
@@ -69,8 +70,18 @@ def test_exception_cards_use_typed_controls_evidence_and_lifecycle_api() -> None
     assert 'q: $("#exception-q").value.trim()' in js
     assert 'name="priceScope"' in js
     assert "choices.priceScopes" in js
+    assert "variantScope: scope.variantScope" in js
+    assert "result.variantScope = selectedScope.variantScope" in js
+    assert ".exception-card .card-head > div" in css
+    assert "overflow-wrap: anywhere" in css
     assert 'name="bodyStyleScope"' not in js
     assert 'name="trimLevelScope"' not in js
+    assert 'name="selectionMode"' in js
+    assert "choices.exclusiveSelectionModes" in js
+    assert 'name="priority" type="number" min="0" step="1" required' in js
+    assert 'name="defaultDisplayBehavior"' in js
+    assert 'displayBehavior: displayBehavior === "__blank__" ? "" : displayBehavior' in js
+    assert 'reasonCode === "comparator_only_price_rule_proposal"' in js
 
 
 def test_exception_layout_has_mobile_single_column_fallback() -> None:

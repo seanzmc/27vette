@@ -168,6 +168,9 @@ def compile_relationships(
                 {"optionOccurrenceSignature": stable_candidate_id, "description": description}
             ),
         }
+        if candidate.get("rowKind") == "standard_no_rpo":
+            dispositions.append({"featureId": f"relationship:{feature_candidate_id}", "disposition": "resolved_not_a_workbook_fact", "evidenceIds": [candidate_dep["evidenceId"]]})
+            continue
         hits = scan_text(description, phrase_rows)
         if not hits:
             dispositions.append({"featureId": f"relationship:{feature_candidate_id}", "disposition": "resolved_not_a_workbook_fact", "evidenceIds": [candidate_dep["evidenceId"]]})
@@ -177,23 +180,20 @@ def compile_relationships(
             dependencies = [candidate_dep, phrase_dep]
             if not hit["rpoTokens"]:
                 feature_id = f"relationship:{feature_candidate_id}:{hit['phraseKey']}:{hit['startOffset']}:missing-endpoint"
-                exceptions.append(
-                    _exception(candidate, reason="unresolved_relationship_endpoint", family="rule_mapping", dependencies=dependencies, evidence_references=[stable_candidate_id], identity_values=[hit["phraseKey"], hit["startOffset"], "missing"], question="Identify the exact relationship endpoint.")
-                )
-                dispositions.append({"featureId": feature_id, "disposition": "blocked_exception", "evidenceIds": [value["evidenceId"] for value in dependencies]})
+                dispositions.append({"featureId": feature_id, "disposition": "resolved_not_a_workbook_fact", "evidenceIds": [value["evidenceId"] for value in dependencies]})
                 continue
             for mentioned_rpo in hit["rpoTokens"]:
                 feature_id = f"relationship:{feature_candidate_id}:{hit['phraseKey']}:{hit['startOffset']}:{mentioned_rpo}"
                 if source_rpo not in target_set or mentioned_rpo not in target_set:
                     exceptions.append(
-                        _exception(candidate, reason="unresolved_relationship_endpoint", family="rule_mapping", dependencies=dependencies, evidence_references=[stable_candidate_id], identity_values=[mentioned_rpo], question=f"Resolve endpoint {mentioned_rpo} to an active target option.")
+                        _exception(candidate, reason="unresolved_relationship_endpoint", family="rule_mapping", dependencies=dependencies, evidence_references=[stable_candidate_id, feature_id], identity_values=[mentioned_rpo], allowed_actions=(), question=f"Resolve endpoint {mentioned_rpo} to an active typed target before offering a reviewer action.")
                     )
                     dispositions.append({"featureId": feature_id, "disposition": "blocked_exception", "evidenceIds": [value["evidenceId"] for value in dependencies]})
                     continue
                 rule_type = hit["ruleType"]
                 if rule_type not in active_types:
                     exceptions.append(
-                        _exception(candidate, reason="unsupported_relationship_type", family="rule_mapping", dependencies=dependencies, evidence_references=[stable_candidate_id], identity_values=[rule_type, mentioned_rpo], question=f"Represent {rule_type} through an active workbook rule type.")
+                        _exception(candidate, reason="unsupported_relationship_type", family="rule_mapping", dependencies=dependencies, evidence_references=[stable_candidate_id, feature_id], identity_values=[rule_type, mentioned_rpo], allowed_actions=("choose_relationship", "mark_not_applicable"), question=f"Represent {rule_type} through an active workbook rule type.")
                     )
                     dispositions.append({"featureId": feature_id, "disposition": "blocked_exception", "evidenceIds": [value["evidenceId"] for value in dependencies]})
                     continue
@@ -203,7 +203,7 @@ def compile_relationships(
                     relationship_source, relationship_target = source_rpo, mentioned_rpo
                 else:
                     exceptions.append(
-                        _exception(candidate, reason="unsupported_relationship_direction", family="rule_mapping", dependencies=dependencies, evidence_references=[stable_candidate_id], identity_values=[hit["direction"], mentioned_rpo], question="Choose the exact relationship direction.")
+                        _exception(candidate, reason="unsupported_relationship_direction", family="rule_mapping", dependencies=dependencies, evidence_references=[stable_candidate_id, feature_id], identity_values=[hit["direction"], mentioned_rpo], allowed_actions=("choose_relationship", "mark_not_applicable"), question="Choose the exact relationship direction.")
                     )
                     dispositions.append({"featureId": feature_id, "disposition": "blocked_exception", "evidenceIds": [value["evidenceId"] for value in dependencies]})
                     continue

@@ -17,6 +17,10 @@ def _clean_text(value: Any) -> str:
     return _COPY_RE.sub(" ", str(value or "").strip()).lower()
 
 
+def _copy_identity(row: Mapping[str, Any]) -> str:
+    return _clean_text(row.get("description") or row.get("option_name"))
+
+
 def _status_vector(row: Mapping[str, Any]) -> list[dict[str, str]]:
     result = []
     for status in row.get("statuses") or row.get("statusVector") or []:
@@ -76,6 +80,15 @@ def match_option_occurrences(candidates: Sequence[Mapping[str, Any]], existing_r
         (
             "full_occurrence_signature",
             lambda candidate, row: option_occurrence_signature(row) == option_occurrence_signature(candidate),
+        ),
+        (
+            "no_rpo_copy_identity",
+            lambda candidate, row: (
+                not str(candidate.get("rpo") or candidate.get("refOnlyRpo") or "").strip()
+                and not str(row.get("rpo") or "").strip()
+                and bool(_copy_identity(candidate))
+                and _copy_identity(candidate) == _copy_identity(row)
+            ),
         ),
         (
             "rpo_section_status_price",
@@ -146,11 +159,25 @@ def allocate_ids(family: str, model: str, rows: Sequence[Mapping[str, Any]], *, 
     reserved = set(str(value) for value in reserved_ids)
     by_rpo: dict[str, list[tuple[str, Mapping[str, Any]]]] = defaultdict(list)
     for row in rows:
-        rpo = normalize_token(row.get("rpo") or row.get("refOnlyRpo"))
+        raw_rpo = str(row.get("rpo") or row.get("refOnlyRpo") or "").strip()
+        rpo = normalize_token(raw_rpo) if raw_rpo else ""
         signature = option_occurrence_signature(row)
         by_rpo[rpo].append((signature, row))
     allocated: list[dict[str, Any]] = []
     for rpo, entries in sorted(by_rpo.items()):
+        if not rpo:
+            for signature, row in sorted(entries, key=lambda item: item[0]):
+                base = f"opt_std_{signature[:16]}"
+                identifier = base
+                suffix = 2
+                while identifier in reserved:
+                    identifier = f"{base}_{suffix}"
+                    suffix += 1
+                reserved.add(identifier)
+                allocated.append(
+                    {**dict(row), "semanticSignature": signature, "allocatedId": identifier}
+                )
+            continue
         used_numbers = {
             parts[1]
             for identifier in reserved

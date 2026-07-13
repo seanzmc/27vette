@@ -1,6 +1,6 @@
 # Canonical-row compiler and exception queue — production design
 
-Status: Direction approved 2026-07-09. Milestone 0 safety closure was implemented and proved on 2026-07-09. Milestone 1 headless compilation and Milestone 2's read-only compiler/typed-exception browser flow were implemented and independently verified on 2026-07-13. Milestone 3 plan projection, workbook write, runtime publication, and model promotion remain unapproved. Reasoning level for implementation: high.
+Status: Direction approved 2026-07-09. Milestone 0 safety closure was implemented and proved on 2026-07-09. Milestone 1 headless compilation, Milestone 2's read-only compiler/typed-exception browser flow, and Milestone 2.1 compiler-consumer closure were implemented and independently verified on 2026-07-13. Milestone 3 plan projection, workbook write, runtime publication, and model promotion remain unapproved. Reasoning level for implementation: high.
 
 ## 0. Decision summary
 
@@ -906,6 +906,8 @@ Replace broad review lanes in the forward wizard with compile summary, typed exc
 
 Implemented 2026-07-13 under `milestone-2-exception-queue-browser-flow-implementation-plan.md`. The browser and API expose only actions that the current compiler can project to a complete canonical outcome; unsupported row-producing actions remain explicit source/tooling blockers rather than being recorded as resolved. The milestone remains read-only with respect to the canonical workbook, runtime publication, and promotion.
 
+Milestone 2.1 closed the current action/consumer gap under `milestone-2-1-compiler-consumer-closure-implementation-plan.md`: status-bearing no-RPO standards compile canonically; exact identity, relationship, group, exclusive, price, default, and explicit no-row outcomes have consumers; comparator endpoints require one ready target identity; and GET/mutation projectability is identical. Fresh proof remains fail-closed at 711 subjects (257 actionable, 454 actionless), so a separately approved Milestone 2.2 typed-endpoint/Color-Trim/metadata compiler pass must precede Milestone 3.
+
 ### Milestone 3 — mechanical plan and deployment proof
 
 Project a ready manifest to `pass-c-3`, apply to a temporary workbook, run generator/registry/contract checks for GSX and ZR1, and repeat on ZR1X.
@@ -1043,7 +1045,7 @@ Non-goals for this design implementation:
 
 Sean approved this production design and authorized implementation beginning with the independently reviewable Milestone 0 safety closure.
 
-Milestone 0 is complete. Milestone 1—the headless canonical-row compiler plus comparator evidence index—is approved under `milestone-1-headless-compiler-comparator-evidence-implementation-plan.md`. Do not combine that compiler work with the exception-queue browser flow, and do not run a live workbook write as part of Milestone 1.
+Milestones 0, 1, 2, and 2.1 are complete and independently verified. The current canonical manifest is not ready; Milestone 3 remains unapproved and no live workbook write, generation, publication, promotion, deployment, or dealer authority exists.
 
 ## 19. Milestone 0 implementation closure — 2026-07-09
 

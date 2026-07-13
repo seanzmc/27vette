@@ -17,6 +17,7 @@ from corvette_form_generator.ingest.wizard.exceptions import (  # noqa: E402
     classify_resolutions,
     exception_subject,
     validate_resolution,
+    validate_subject_action_contract,
 )
 
 
@@ -56,6 +57,130 @@ class ExceptionContractTest(unittest.TestCase):
         garbage = dict(resolution, payload={"garbage": [1, 2, 3]})
         with self.assertRaisesRegex(ValueError, "unsupported fields"):
             validate_resolution(garbage, self.subject)
+
+    def test_current_identity_and_relationship_reasons_have_exact_action_contracts(self) -> None:
+        contracts = {
+            "ambiguous_existing_identity": ("retain_existing",),
+            "unresolved_relationship_endpoint": ("choose_relationship", "mark_not_applicable"),
+            "unresolved_relationship_identity": ("choose_relationship", "mark_not_applicable"),
+            "unsupported_relationship_type": ("choose_relationship", "mark_not_applicable"),
+            "unsupported_relationship_direction": ("choose_relationship", "mark_not_applicable"),
+        }
+        for reason, actions in contracts.items():
+            with self.subTest(reason=reason):
+                subject = dict(self.subject, reasonCode=reason, allowedActions=list(actions))
+                validate_subject_action_contract(reason, actions)
+
+    def test_comparator_proposal_payloads_require_target_owned_values(self) -> None:
+        group_subject = dict(
+            self.subject,
+            reasonCode="comparator_only_rule_group_proposal",
+            allowedActions=["provide_typed_value", "mark_not_applicable"],
+        )
+        validate_resolution(
+            {
+                "subjectId": group_subject["subjectId"],
+                "subjectVersion": group_subject["subjectVersion"],
+                "action": "provide_typed_value",
+                "payload": {"decision": "confirm_proposal"},
+                "disposition": "resolved",
+            },
+            group_subject,
+        )
+
+        exclusive_subject = dict(
+            self.subject,
+            reasonCode="comparator_only_exclusive_group_proposal",
+            allowedActions=["provide_typed_value", "mark_not_applicable"],
+        )
+        with self.assertRaisesRegex(ValueError, "selectionMode"):
+            validate_resolution(
+                {
+                    "subjectId": exclusive_subject["subjectId"],
+                    "subjectVersion": exclusive_subject["subjectVersion"],
+                    "action": "provide_typed_value",
+                    "payload": {"decision": "confirm_proposal"},
+                    "disposition": "resolved",
+                },
+                exclusive_subject,
+            )
+        validate_resolution(
+            {
+                "subjectId": exclusive_subject["subjectId"],
+                "subjectVersion": exclusive_subject["subjectVersion"],
+                "action": "provide_typed_value",
+                "payload": {
+                    "decision": "confirm_proposal",
+                    "selectionMode": "single_within_group",
+                },
+                "disposition": "resolved",
+            },
+            exclusive_subject,
+        )
+
+        price_subject = dict(
+            self.subject,
+            reasonCode="comparator_only_price_rule_proposal",
+            allowedActions=["provide_typed_value", "mark_not_applicable"],
+        )
+        with self.assertRaisesRegex(ValueError, "priceValue"):
+            validate_resolution(
+                {
+                    "subjectId": price_subject["subjectId"],
+                    "subjectVersion": price_subject["subjectVersion"],
+                    "action": "provide_typed_value",
+                    "payload": {"decision": "confirm_proposal"},
+                    "disposition": "resolved",
+                },
+                price_subject,
+            )
+        validate_resolution(
+            {
+                "subjectId": price_subject["subjectId"],
+                "subjectVersion": price_subject["subjectVersion"],
+                "action": "provide_typed_value",
+                "payload": {
+                    "decision": "confirm_proposal",
+                    "priceValue": 995,
+                    "bodyStyleScope": "*",
+                    "trimLevelScope": "*",
+                    "variantScope": "*",
+                },
+                "disposition": "resolved",
+            },
+            price_subject,
+        )
+
+        default_subject = dict(
+            self.subject,
+            reasonCode="comparator_only_default_selection_proposal",
+            allowedActions=["provide_typed_value", "mark_not_applicable"],
+        )
+        with self.assertRaisesRegex(ValueError, "priority"):
+            validate_resolution(
+                {
+                    "subjectId": default_subject["subjectId"],
+                    "subjectVersion": default_subject["subjectVersion"],
+                    "action": "provide_typed_value",
+                    "payload": {"decision": "confirm_proposal"},
+                    "disposition": "resolved",
+                },
+                default_subject,
+            )
+        validate_resolution(
+            {
+                "subjectId": default_subject["subjectId"],
+                "subjectVersion": default_subject["subjectVersion"],
+                "action": "provide_typed_value",
+                "payload": {
+                    "decision": "confirm_proposal",
+                    "priority": 10,
+                    "displayBehavior": "default_selected",
+                },
+                "disposition": "resolved",
+            },
+            default_subject,
+        )
 
     def test_generic_approve_and_skip_are_rejected(self) -> None:
         for action in ("approve", "skip"):
