@@ -1,6 +1,6 @@
 # Canonical-row compiler and exception queue — production design
 
-Status: Direction approved 2026-07-09. Milestone 0 safety closure was implemented and proved on 2026-07-09; Milestone 1 is the next checkpoint. No workbook write, runtime publication, or model promotion is approved. Reasoning level for the implementation plan: high.
+Status: Direction approved 2026-07-09. Milestone 0 safety closure was implemented and proved on 2026-07-09. The Milestone 1 headless compiler implementation spec was approved on 2026-07-12; no workbook write, runtime publication, or model promotion is approved. Reasoning level for implementation: high.
 
 ## 0. Decision summary
 
@@ -640,7 +640,7 @@ There is no generic Approve/Skip control and no raw JSON input. The user sees th
 
 ### 8.3 Identity and lifecycle
 
-`subjectId` is stable across evidence revisions and is deterministic from target model, exception type, and affected semantic identities. `exceptionId` is stable for that subject; a separate `subjectVersion` fingerprint identifies the current raw/workbook/comparator/phrase-map evidence.
+`subjectId` is stable across evidence revisions and is deterministic from target model, exception type, and affected semantic identities. `exceptionId` is stable for that subject. A separate `subjectVersion` hashes only that subject's sorted stable raw/workbook/comparator/phrase-map evidence dependencies plus compiler policy/schema version; it does not hash the run-wide authority envelope.
 
 Lifecycle:
 
@@ -654,7 +654,7 @@ open -> resolved -> consumed by recompile
 
 A resolution records reviewer, time, typed payload, `subjectId`, `subjectVersion`, and evidence references in `exception-resolutions.json` and append-only `exception-log.jsonl`.
 
-If evidence or the proposed canonical shape changes while the semantic subject remains the same, `subjectVersion` changes, the old resolution becomes stale, and the same exception reopens. If the semantic subject itself changes, the old exception is closed as `superseded` and links to a new `exceptionId`. A resolution is never copied to another model; the compiler may independently reach the same result from equivalent evidence.
+If a listed evidence dependency or the proposed canonical shape changes while the semantic subject remains the same, `subjectVersion` changes, the old resolution becomes stale, and the same exception reopens. An unrelated evidence or run-authority change triggers a coherent artifact rebuild but leaves the unaffected `subjectVersion` and matching resolution valid. If the semantic subject itself changes, the old exception is closed as `superseded` and links to a new `exceptionId`. A resolution is never copied to another model; the compiler may independently reach the same result from equivalent evidence.
 
 ### 8.4 Grouped review without hidden bulk copying
 
@@ -712,7 +712,7 @@ Contains stable subject/exception IDs, current `subjectVersion`, supersession li
 
 ### 9.4 `exception-resolutions.json` and `exception-log.jsonl`
 
-The JSON file is current typed state; JSONL is the append-only audit trail. Both bind the queue/subject fingerprints.
+The JSON file is current typed state; JSONL is the append-only audit trail. The resolution-file envelope binds the current queue fingerprint for coherent readback, while each resolution entry binds its own `subjectId` and `subjectVersion`. A changed queue envelope does not stale entries whose subject version is unchanged. Each JSONL event binds the subject/version and relevant queue fingerprint at the lifecycle transition.
 
 ### 9.5 `compile-report.json`
 
@@ -1041,7 +1041,7 @@ Non-goals for this design implementation:
 
 Sean approved this production design and authorized implementation beginning with the independently reviewable Milestone 0 safety closure.
 
-Milestone 0 is complete. The next checkpoint is Milestone 1: the headless canonical-row compiler plus comparator evidence index. Do not combine that compiler work with the exception-queue browser flow, and do not run a live workbook write as part of Milestone 1.
+Milestone 0 is complete. Milestone 1—the headless canonical-row compiler plus comparator evidence index—is approved under `milestone-1-headless-compiler-comparator-evidence-implementation-plan.md`. Do not combine that compiler work with the exception-queue browser flow, and do not run a live workbook write as part of Milestone 1.
 
 ## 19. Milestone 0 implementation closure — 2026-07-09
 
