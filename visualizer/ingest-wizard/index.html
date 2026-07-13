@@ -12,24 +12,29 @@
     <span class="brand-title">Ingest Wizard</span>
     <span class="brand-sub">raw order-guide intake · workbook stays read-only</span>
   </div>
-  <nav class="stepper" id="stepper">
-    <span class="step" data-stage="files">1 · Choose file</span>
-    <span class="step" data-stage="sheets">2 · Sheet roles</span>
-    <span class="step" data-stage="candidates">3 · Candidates</span>
-    <span class="step" data-stage="models">4 · Models</span>
-    <span class="step" data-stage="review">5 · Review</span>
-    <span class="step" data-stage="plan">6 · Plan</span>
+  <nav aria-label="Ingest progress">
+    <ol class="stepper" id="stepper">
+      <li class="step" data-stage="files">1 · Choose file</li>
+      <li class="step" data-stage="sheets">2 · Sheet roles</li>
+      <li class="step" data-stage="candidates">3 · Candidates</li>
+      <li class="step" data-stage="models">4 · Models</li>
+      <li class="step" data-stage="compile">5 · Compile</li>
+      <li class="step" data-stage="exceptions">6 · Exceptions</li>
+    </ol>
   </nav>
   <div class="runinfo" id="run-info"></div>
 </header>
 
-<div id="error-banner" class="error-banner hidden"></div>
+<div id="error-banner" class="error-banner hidden" role="alert"></div>
 
 <main>
   <section id="stage-files" class="stage">
     <h1>Choose a raw GM order-guide export</h1>
     <p class="hint">Pick a workbook to profile. The file is never modified; the canonical workbook is never a source.</p>
     <div id="file-list" class="file-list"></div>
+    <h2 class="sub-h">Resume a saved run</h2>
+    <p class="hint">Resume returns to the current compiler or exception step. Historical decision runs remain available only through their original debug screens.</p>
+    <div id="run-list" class="file-list"></div>
     <div class="file-actions">
       <label class="upload-label">
         Upload .xlsx
@@ -52,7 +57,7 @@
 
   <section id="stage-candidates" class="stage hidden">
     <h1>Option candidates</h1>
-    <p class="hint">Read-only audit step — nothing to decide here. Check that the parse looks right (counts, prices, skipped rows); if something is off, fix the sheet roles. Decisions start at step 5.</p>
+    <p class="hint">Read-only audit step — nothing to decide here. Check that the parse looks right (counts, prices, skipped rows); if something is off, fix the sheet roles. Canonical compilation starts at step 5.</p>
     <div id="summary-chips" class="summary"></div>
     <div class="filters">
       <select id="filter-sheet"><option value="">All sheets</option></select>
@@ -71,7 +76,7 @@
 
   <section id="stage-models" class="stage hidden">
     <h1>Select target models</h1>
-    <p class="hint">Targets get decision capture. Each target picks a reference model — a live model whose workbook data prefills presentation metadata and shows "In workbook" comparisons during review. Defaults follow the approved end-to-end spec.</p>
+    <p class="hint">Each target picks one live comparator model. Comparator facts are context and corroboration only; they never supply target prices, IDs, copy, sections, defaults, or availability.</p>
     <div id="model-cards" class="cards"></div>
     <div class="sheet-actions">
       <button id="confirm-models-btn" class="primary">Confirm model selection</button>
@@ -81,6 +86,53 @@
     <div id="reconciliation"></div>
   </section>
 
+  <section id="stage-compile" class="stage hidden">
+    <h1>Compile canonical rows</h1>
+    <p class="hint">The compiler derives every supported workbook row and turns only unresolved product facts into typed exceptions. The workbook and raw export stay read-only.</p>
+    <div id="compile-summary"></div>
+    <div class="sheet-actions">
+      <button id="compile-btn" class="primary">Compile canonical rows</button>
+      <button id="review-exceptions-btn" class="primary hidden">Review open exceptions</button>
+      <button id="compile-back-models" class="ghost">Back to models</button>
+      <span id="compile-status" class="status-note" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <section id="stage-exceptions" class="stage hidden">
+    <h1>Typed exception review</h1>
+    <p class="hint">Only answer what the compiler cannot derive. Every control writes one exact typed resolution; resolving or reopening recompiles the run automatically.</p>
+    <div id="exception-readiness" class="summary"></div>
+    <div class="filters exception-filters">
+      <select id="exception-model" aria-label="Filter exceptions by target model"><option value="">All models</option></select>
+      <select id="exception-family" aria-label="Filter exceptions by workbook family"><option value="">All workbook families</option></select>
+      <select id="exception-reason" aria-label="Filter exceptions by reason"><option value="">All reasons</option></select>
+      <select id="exception-severity" aria-label="Filter exceptions by severity"><option value="">All severities</option></select>
+      <select id="exception-state" aria-label="Filter exceptions by resolution state">
+        <option value="open">Open</option>
+        <option value="resolved">Resolved</option>
+        <option value="resolved_pending_projection">Answer saved, compiler projection missing</option>
+        <option value="stale_reopened">Reopened after evidence changed</option>
+        <option value="">Open and resolved</option>
+      </select>
+      <select id="exception-actionable" aria-label="Filter actionable exceptions">
+        <option value="yes">Needs my answer</option>
+        <option value="no">Missing source or tooling</option>
+        <option value="">All exception types</option>
+      </select>
+      <input id="exception-q" type="search" placeholder="Search model, family, reason, or question…" aria-label="Search exceptions">
+    </div>
+    <div class="filters actions-bar">
+      <label class="status-note" for="exception-reviewer">Reviewer</label>
+      <input id="exception-reviewer" autocomplete="name" placeholder="your name">
+      <button id="exceptions-recompile-btn" class="ghost">Recompile</button>
+      <button id="exceptions-back-compile" class="ghost">Back to compile summary</button>
+      <span id="exception-status" class="status-note" aria-live="polite"></span>
+    </div>
+    <div id="exception-queue"></div>
+    <div id="exception-pagination" class="sheet-actions"></div>
+  </section>
+
+  <!-- Historical broad-decision and plan screens remain debug/resume compatibility only. -->
   <section id="stage-review" class="stage hidden">
     <h1>Review decisions</h1>
     <div id="progress-chips" class="summary"></div>

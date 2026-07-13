@@ -1,0 +1,79 @@
+{
+  "id": "2026-07-13-milestone2-exception-browser-flow",
+  "started_at": "2026-07-13T12:08:00Z",
+  "completed_at": "2026-07-13T18:31:58Z",
+  "objective": "Implement and independently verify the read-only Milestone 2 compile and typed-exception browser/API workflow over the Milestone 1 canonical-row compiler.",
+  "changed_surface": "wizard session and localhost API, ingest-wizard browser UI/CSS, focused tests, ingest workflow docs, and Fable receipts; no canonical workbook/source write, pass-c-3 projection, runtime publication, promotion, deployment, or dealer change",
+  "primary_artifacts": [
+    "scripts/corvette_form_generator/ingest/wizard/session.py",
+    "scripts/ingest_wizard_server.py",
+    "visualizer/ingest-wizard/index.html",
+    "visualizer/ingest-wizard/wizard.js",
+    "visualizer/ingest-wizard/wizard.css",
+    "tests/test_ingest_wizard_exception_flow.py",
+    "tests/test_ingest_wizard_server_milestone2.py",
+    "tests/test_ingest_wizard_ui_milestone2.py",
+    "docs/ingest/milestone-2-exception-queue-browser-flow-implementation-plan.md"
+  ],
+  "outcome_rubric": "fable5loop/runs/2026-07-13-milestone2-exception-browser-flow/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-13-milestone2-exception-browser-flow/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-13-milestone2-exception-browser-flow/validation-output.txt",
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "delegation_id": "deleg_2b1796e4 + deleg_13c72781",
+    "verdict": "pass",
+    "cycles": 2,
+    "pattern": "exact-snapshot bounded review followed by two-file final-delta re-verification"
+  },
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-13-milestone2-exception-browser-flow/validation-output.txt"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-13-milestone2-exception-browser-flow/verifier-report.md"
+    }
+  ],
+  "skill_update": {
+    "decision": "not_applicable",
+    "evidence": "fable5loop/runs/2026-07-13-milestone2-exception-browser-flow/verifier-report.md",
+    "reason": "The existing 27vette-fable5-compounding Milestone 2 acceptance reference already covers the durable action-consumer, freshness, serialization, rollback, real-evidence, lifecycle, and mobile-proof procedure exercised by this run."
+  },
+  "boundaries_preserved": [
+    "stingray_master.xlsx unchanged",
+    "raw source export unchanged",
+    "retained Milestone 1 compiler artifacts unchanged",
+    "no pass-c-3 projection or apply plan",
+    "generated runtime and form-app/data.js not refreshed",
+    "publication and promotion not run",
+    "dealer submission untouched"
+  ],
+  "validation": [
+    {
+      "command": "focused Milestone 2 syntax and pytest gate",
+      "result": "pass: 23 passed; Python and JavaScript syntax plus git diff check passed"
+    },
+    {
+      "command": "broad ingest/runtime/editor metadata pytest gate",
+      "result": "pass: 298 passed, 6 subtests passed"
+    },
+    {
+      "command": "full repository pytest suite before receipt closure",
+      "result": "584 passed, 13 subtests passed, 5 failures: four documented pre-existing failures and one expected open-receipt Fable contract failure"
+    },
+    {
+      "command": "safe fixture and retained-real-run browser proof",
+      "result": "pass: resolve/reopen 25 to 24 to 25, deterministic 92-subject projectable queue, finite price controls, q/severity filters, semantic evidence rendering, mobile single-column proof, no protected writes"
+    },
+    {
+      "command": "independent exact-snapshot plus final-delta verification",
+      "result": "pass: all eight criteria passed; final strict blank-query delta 4 passed in 1.43s"
+    },
+    {
+      "command": "workbook package and schema validation",
+      "result": "pass: valid with zero issues/errors/warnings"
+    }
+  ]
+}

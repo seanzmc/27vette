@@ -70,8 +70,26 @@ class WizardHandler(BaseHTTPRequestHandler):
         except (UnicodeDecodeError, json.JSONDecodeError) as exc:
             raise WizardError(f"Invalid JSON body: {exc}") from exc
         if not isinstance(payload, dict):
-            raise WizardError("JSON body must be an object.")
+            raise WizardError("Request body must be a JSON object.")
         return payload
+
+    @staticmethod
+    def _require_exact_fields(payload: dict, fields: set[str], label: str) -> None:
+        unknown = sorted(set(payload) - fields)
+        missing = sorted(fields - set(payload))
+        if unknown:
+            raise WizardError(f"{label} has unknown fields: {', '.join(unknown)}.")
+        if missing:
+            raise WizardError(f"{label} is missing fields: {', '.join(missing)}.")
+
+    @staticmethod
+    def _require_query_fields(query: dict[str, list[str]], allowed: set[str], label: str) -> None:
+        unknown = sorted(set(query) - allowed)
+        duplicates = sorted(key for key, values in query.items() if len(values) != 1)
+        if unknown or duplicates:
+            raise WizardError(
+                f"{label} query is invalid; unknown={unknown}, duplicate={duplicates}."
+            )
 
     def _serve_static(self, path: str) -> None:
         name, content_type = STATIC_FILES[path]
@@ -90,7 +108,7 @@ class WizardHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:  # noqa: N802 - stdlib naming
         split = urlsplit(self.path)
         path = unquote(split.path)
-        query = parse_qs(split.query)
+        query = parse_qs(split.query, keep_blank_values=True)
         try:
             if path in STATIC_FILES:
                 self._serve_static(path)
@@ -135,6 +153,31 @@ class WizardHandler(BaseHTTPRequestHandler):
             elif path.startswith("/api/wizard/sessions/") and path.endswith("/progress"):
                 run_id = path[len("/api/wizard/sessions/"):-len("/progress")]
                 self._send_json(self.store.progress(run_id))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/compile"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/compile")]
+                self._require_query_fields(query, set(), "Compile")
+                self._send_json(self.store.compiler_summary(run_id))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/exceptions"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/exceptions")]
+                self._require_query_fields(
+                    query,
+                    {"model", "family", "reason", "severity", "state", "actionable", "q", "offset", "limit"},
+                    "Exceptions",
+                )
+                self._send_json(
+                    self.store.exception_queue_view(
+                        run_id,
+                        model=(query.get("model") or [""])[0],
+                        family=(query.get("family") or [""])[0],
+                        reason=(query.get("reason") or [""])[0],
+                        severity=(query.get("severity") or [""])[0],
+                        state=(query.get("state") or [""])[0],
+                        actionable=(query.get("actionable") or [""])[0],
+                        query=(query.get("q") or [""])[0],
+                        offset=(query.get("offset") or [0])[0],
+                        limit=(query.get("limit") or [50])[0],
+                    )
+                )
             elif path.startswith("/api/wizard/sessions/") and path.endswith("/plan"):
                 run_id = path[len("/api/wizard/sessions/"):-len("/plan")]
                 self._send_json(self.store.plan_detail(run_id))
@@ -181,6 +224,49 @@ class WizardHandler(BaseHTTPRequestHandler):
                 if not isinstance(targets, list) or not isinstance(comparators, dict):
                     raise WizardError("Request body must carry targets (list) and comparators (object).")
                 self._send_json(self.store.select_models(run_id, [str(t) for t in targets], comparators))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/compile"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/compile")]
+                payload = self._json_body()
+                self._require_exact_fields(payload, set(), "Compile request")
+                self.store.compile_canonical_rows(run_id)
+                self._send_json(self.store.compiler_summary(run_id))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/exceptions/resolve"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/exceptions/resolve")]
+                payload = self._json_body()
+                self._require_exact_fields(
+                    payload,
+                    {"subjectId", "subjectVersion", "action", "payload", "reviewer"},
+                    "Exception resolution request",
+                )
+                typed_payload = payload.get("payload")
+                if not isinstance(typed_payload, dict):
+                    raise WizardError("Exception resolution payload must be an object.")
+                self._send_json(
+                    self.store.resolve_exception(
+                        run_id,
+                        subject_id=str(payload.get("subjectId") or ""),
+                        subject_version=str(payload.get("subjectVersion") or ""),
+                        action=str(payload.get("action") or ""),
+                        payload=typed_payload,
+                        reviewer=str(payload.get("reviewer") or ""),
+                    )
+                )
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/exceptions/reopen"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/exceptions/reopen")]
+                payload = self._json_body()
+                self._require_exact_fields(
+                    payload,
+                    {"subjectId", "subjectVersion", "reviewer"},
+                    "Exception reopen request",
+                )
+                self._send_json(
+                    self.store.reopen_exception(
+                        run_id,
+                        subject_id=str(payload.get("subjectId") or ""),
+                        subject_version=str(payload.get("subjectVersion") or ""),
+                        reviewer=str(payload.get("reviewer") or ""),
+                    )
+                )
             elif path.startswith("/api/wizard/sessions/") and path.endswith("/decisions/delete"):
                 run_id = path[len("/api/wizard/sessions/"):-len("/decisions/delete")]
                 payload = self._json_body()

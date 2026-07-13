@@ -1,6 +1,6 @@
 # Canonical-row compiler and exception queue — production design
 
-Status: Direction approved 2026-07-09. Milestone 0 safety closure was implemented and proved on 2026-07-09. Milestone 1 headless compilation was implemented and independently verified on 2026-07-13. No workbook write, runtime publication, model promotion, or browser/API exception workflow is approved. Reasoning level for implementation: high.
+Status: Direction approved 2026-07-09. Milestone 0 safety closure was implemented and proved on 2026-07-09. Milestone 1 headless compilation and Milestone 2's read-only compiler/typed-exception browser flow were implemented and independently verified on 2026-07-13. Milestone 3 plan projection, workbook write, runtime publication, and model promotion remain unapproved. Reasoning level for implementation: high.
 
 ## 0. Decision summary
 
@@ -903,6 +903,8 @@ Implement artifacts, feature coverage, identity reconciliation, phrase direction
 ### Milestone 2 — exception queue browser flow
 
 Replace broad review lanes in the forward wizard with compile summary, typed exception cards, recompile, resume, and readiness screens. Legacy debug routes remain.
+
+Implemented 2026-07-13 under `milestone-2-exception-queue-browser-flow-implementation-plan.md`. The browser and API expose only actions that the current compiler can project to a complete canonical outcome; unsupported row-producing actions remain explicit source/tooling blockers rather than being recorded as resolved. The milestone remains read-only with respect to the canonical workbook, runtime publication, and promotion.
 
 ### Milestone 3 — mechanical plan and deployment proof
 

@@ -54,17 +54,21 @@ function clearError() {
   $("#error-banner").classList.add("hidden");
 }
 
-const STAGES = ["files", "sheets", "candidates", "models", "review", "plan"];
+const STAGES = ["files", "sheets", "candidates", "models", "compile", "exceptions"];
+const LEGACY_STAGES = ["review", "plan"];
+const ALL_STAGES = [...STAGES, ...LEGACY_STAGES];
 
 function setStage(stage) {
   clearError();
-  for (const name of STAGES) {
+  for (const name of ALL_STAGES) {
     $(`#stage-${name}`).classList.toggle("hidden", name !== stage);
   }
   const reached = STAGES.indexOf(stage);
   document.querySelectorAll("#stepper .step").forEach((el, index) => {
     el.classList.toggle("active", index === reached);
     el.classList.toggle("done", index < reached);
+    if (index === reached) el.setAttribute("aria-current", "step");
+    else el.removeAttribute("aria-current");
   });
   $("#run-info").textContent = state.session
     ? `${state.session.sourceFile} · run ${state.session.runId}`
@@ -77,7 +81,101 @@ async function loadFiles() {
   const payload = await getJSON("/api/wizard/files");
   state.files = payload.files;
   renderFiles();
+  await loadSessions();
 }
+
+async function loadSessions() {
+  const payload = await getJSON("/api/wizard/sessions");
+  const sessions = payload.sessions || [];
+  $("#run-list").innerHTML = sessions.length
+    ? sessions
+        .slice(0, 12)
+        .map(
+          (session) => `<div class="file-row">
+            <div><b>${escapeHtml(session.sourceFile)}</b><div class="cell-sub">${escapeHtml(session.runId)} · ${escapeHtml(session.state)}</div></div>
+            <button class="primary resume-run" data-run-id="${escapeHtml(session.runId)}">Resume</button>
+          </div>`
+        )
+        .join("")
+    : '<div class="empty-note">No saved runs yet.</div>';
+}
+
+async function resumeSession(runId) {
+  clearError();
+  const detail = await getJSON(`/api/wizard/sessions/${runId}`);
+  state.session = detail.session;
+  state.profile = detail.profile;
+  state.roles = detail.roles || {};
+  state.joinReport = detail.joinReport;
+  state.selectedFile = detail.session.sourceFile;
+  if (!Object.keys(state.roles).length) {
+    for (const card of state.profile.sheets) state.roles[card.sheetName] = card.recommendedRole;
+  }
+  compilerState.summary = null;
+  const prepareModels = async () => {
+    await loadModels();
+    modelState.targets = new Set((detail.modelSelection || {}).targets || []);
+    modelState.comparators = { ...((detail.modelSelection || {}).comparators || {}) };
+  };
+  switch (detail.session.state) {
+    case "profiled":
+      $("#run-parse-btn").classList.add("hidden");
+      renderSheets();
+      setStage("sheets");
+      break;
+    case "roles_confirmed":
+      renderSheets();
+      $("#roles-status").textContent = "Roles confirmed — ready to parse.";
+      $("#run-parse-btn").classList.remove("hidden");
+      setStage("sheets");
+      break;
+    case "parsed":
+      populateSheetFilter();
+      await loadCandidates();
+      setStage("candidates");
+      break;
+    case "models_selected":
+      await prepareModels();
+      await enterCompile();
+      break;
+    case "compiled_ready":
+      await prepareModels();
+      await enterCompile();
+      break;
+    case "compiled_with_exceptions":
+      await prepareModels();
+      await enterExceptions();
+      break;
+    case "decisions_in_progress":
+    case "decisions_complete":
+      await prepareModels();
+      await enterReview();
+      break;
+    case "plan_built":
+    case "plan_approved":
+    case "dry_run_approved":
+    case "dry_run_validated_write_blocked":
+    case "dry_run_validated_write_eligible":
+    case "write_approved": {
+      const plan = await getJSON(`/api/wizard/sessions/${runId}/plan`);
+      renderPlan(plan);
+      setStage("plan");
+      break;
+    }
+    default:
+      throw new Error(`Run state ${detail.session.state} has no safe browser resume route.`);
+  }
+}
+
+$("#run-list").addEventListener("click", (event) => {
+  const button = event.target.closest(".resume-run");
+  if (!button) return;
+  button.disabled = true;
+  resumeSession(button.dataset.runId).catch((error) => {
+    button.disabled = false;
+    showError(error.message);
+  });
+});
 
 function renderFiles() {
   const list = $("#file-list");
@@ -87,11 +185,11 @@ function renderFiles() {
     list.innerHTML = state.files
       .map(
         (file) => `
-        <div class="file-row ${state.selectedFile === file.name ? "selected" : ""}" data-file="${escapeHtml(file.name)}">
+        <button type="button" class="file-row file-choice ${state.selectedFile === file.name ? "selected" : ""}" data-file="${escapeHtml(file.name)}" aria-pressed="${state.selectedFile === file.name}">
           <span class="file-name">${escapeHtml(file.name)}</span>
           <span class="badge">${escapeHtml(file.origin)}</span>
           <span class="file-meta">${(file.sizeBytes / 1024).toFixed(0)} KB</span>
-        </div>`
+        </button>`
       )
       .join("");
   }
@@ -432,11 +530,6 @@ async function loadModels() {
     }
   }
   renderModels();
-  if (payload.selection) {
-    // Returning to this stage after a selection: restore the reconciliation
-    // panel (and its pending mandatory decisions) instead of hiding it.
-    reloadReconciliation().catch(() => {});
-  }
 }
 
 function renderModels() {
@@ -446,7 +539,7 @@ function renderModels() {
       const isTarget = modelState.targets.has(model.modelKey);
       const comparator = modelState.comparators[model.modelKey] || "";
       const comparatorSelect = isTarget
-        ? `<label class="cmp-label">Reference model (workbook data used for prefill and comparisons)
+        ? `<label class="cmp-label">Comparator model (corroborating context only)
             <select class="cmp-select" data-model="${escapeHtml(model.modelKey)}">
               <option value="">none</option>
               ${comparatorChoices
@@ -506,11 +599,432 @@ $("#confirm-models-btn").addEventListener("click", async () => {
     modelState.selection = payload.selection;
     modelState.reconciliation = payload.reconciliation;
     $("#models-status").textContent = "Selection saved.";
-    renderReconciliation();
+    await enterCompile();
   } catch (error) {
     showError(error.message);
   }
 });
+
+/* -------------------------------------------------------- stage: compiler */
+
+const compilerState = {
+  summary: null,
+};
+
+function readinessLabel(value) {
+  return value ? "ready" : "blocked";
+}
+
+function renderCompilerSummary(summary) {
+  compilerState.summary = summary;
+  state.session = summary.session;
+  const manifest = summary.counts.manifest;
+  const exceptions = summary.counts.exceptions;
+  const actionCounts = Object.entries(manifest.byAction || {})
+    .map(([action, count]) => `<span class="sum-chip"><b>${escapeHtml(count)}</b> ${escapeHtml(action)}</span>`)
+    .join("");
+  const modelCards = Object.entries(summary.models || {})
+    .map(([model, entry]) => {
+      const gates = ["compileReady", "planReady", "writeReady", "deploymentReady"]
+        .map(
+          (gate) =>
+            `<span class="gate-chip ${entry[gate] ? "gate-ready" : "gate-blocked"}"><b>${escapeHtml(gate)}</b> ${readinessLabel(entry[gate])}</span>`
+        )
+        .join("");
+      return `<div class="card readiness-card">
+        <div class="card-head"><span class="card-title">${escapeHtml(model)}</span><span class="type-badge">${escapeHtml(entry.mode || "target")}</span></div>
+        <div class="gate-grid">${gates}</div>
+        <div class="card-stats">${escapeHtml(entry.blockerCount)} blockers · ${escapeHtml(entry.deferralCount)} deferrals</div>
+      </div>`;
+    })
+    .join("");
+  $("#compile-summary").innerHTML = `
+    <div class="summary">
+      <span class="sum-chip"><b>${escapeHtml(manifest.total)}</b> proposed rows</span>
+      ${actionCounts}
+      <span class="sum-chip ${exceptions.byState.open ? "sum-warn" : "sum-exact"}"><b>${escapeHtml(exceptions.byState.open || 0)}</b> open exceptions</span>
+      <span class="sum-chip"><b>${escapeHtml(exceptions.byState.resolved || 0)}</b> resolved</span>
+      <span class="sum-chip ${exceptions.byState.resolved_pending_projection ? "sum-warn" : ""}"><b>${escapeHtml(exceptions.byState.resolved_pending_projection || 0)}</b> awaiting compiler projection</span>
+      <span class="sum-chip"><b>${escapeHtml(exceptions.actionable || 0)}</b> reviewer-answerable</span>
+    </div>
+    <div class="cards">${modelCards}</div>`;
+  $("#compile-btn").textContent = "Recompile canonical rows";
+  $("#review-exceptions-btn").classList.toggle("hidden", !exceptions.total);
+  $("#compile-status").textContent = summary.freshness.stale
+    ? `Inputs changed after compile: ${summary.freshness.reasons.join("; ")}. Recompile required.`
+    : `Compiler state: ${summary.session.state}. No workbook write performed.`;
+}
+
+async function enterCompile() {
+  setStage("compile");
+  if (state.session && ["compiled_ready", "compiled_with_exceptions"].includes(state.session.state)) {
+    const summary = await getJSON(`/api/wizard/sessions/${state.session.runId}/compile`);
+    renderCompilerSummary(summary);
+  } else {
+    compilerState.summary = null;
+    $("#compile-summary").innerHTML = '<div class="empty-note">Model selection is saved. Compile to derive canonical rows and the exact exception queue.</div>';
+    $("#compile-btn").textContent = "Compile canonical rows";
+    $("#review-exceptions-btn").classList.add("hidden");
+    $("#compile-status").textContent = "Inputs stay read-only.";
+  }
+}
+
+async function runCompile() {
+  clearError();
+  const button = $("#compile-btn");
+  button.disabled = true;
+  button.textContent = "Compiling…";
+  try {
+    const summary = await postJSON(`/api/wizard/sessions/${state.session.runId}/compile`, {});
+    renderCompilerSummary(summary);
+  } catch (error) {
+    showError(error.message);
+  } finally {
+    button.disabled = false;
+    if (!compilerState.summary) button.textContent = "Compile canonical rows";
+  }
+}
+
+$("#compile-btn").addEventListener("click", runCompile);
+$("#review-exceptions-btn").addEventListener("click", enterExceptions);
+$("#compile-back-models").addEventListener("click", async () => {
+  await loadModels();
+  setStage("models");
+});
+
+/* ------------------------------------------------------- stage: exceptions */
+
+const exceptionState = {
+  payload: null,
+  offset: 0,
+  limit: 20,
+};
+
+function optionSelect(name, options, placeholder) {
+  return `<select name="${escapeHtml(name)}" required>
+    <option value="">${escapeHtml(placeholder)}</option>
+    ${(options || [])
+      .map(
+        (option) =>
+          `<option value="${escapeHtml(option.optionId)}">${escapeHtml(option.rpo || "—")} · ${escapeHtml(option.name || option.optionId)} · ${escapeHtml(option.optionId)}</option>`
+      )
+      .join("")}
+  </select>`;
+}
+
+function exceptionActionFields(item, action) {
+  const subject = item.subject;
+  const choices = item.choices || {};
+  switch (action) {
+    case "choose_section":
+      return `<label>Canonical section
+        <select name="sectionId" required><option value="">Choose one workbook section</option>
+          ${(choices.sections || []).map((section) => `<option value="${escapeHtml(section.sectionId)}">${escapeHtml(section.sectionName)} · ${escapeHtml(section.sectionId)}</option>`).join("")}
+        </select></label>`;
+    case "choose_relationship":
+      return `<div class="typed-grid">
+        <label>Source option ${optionSelect("sourceOptionId", choices.targetOptions, "Choose exact source option")}</label>
+        <label>Relationship <select name="ruleType" required><option value="">Choose rule type</option>${(choices.relationshipRuleTypes || []).map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}</select></label>
+        <label>Target option ${optionSelect("targetOptionId", choices.targetOptions, "Choose exact target option")}</label>
+      </div>`;
+    case "retain_existing":
+      return `<label>Established target occurrence ${optionSelect("existingId", choices.existingOptions, "Choose existing target ID")}</label>`;
+    case "provide_typed_value":
+      if (subject.reasonCode.startsWith("comparator_only_")) {
+        return '<input type="hidden" name="decision" value="confirm_proposal"><div class="status-note">Confirm the exact comparator-backed proposal shown above for this target.</div>';
+      }
+      return `<div class="typed-grid">
+        <label>Target price scope <select name="priceScope" required>
+          <option value="">Choose one target variant scope</option>
+          ${(choices.priceScopes || []).map((scope) => `<option value="${escapeHtml(JSON.stringify({ bodyStyleScope: scope.bodyStyleScope, trimLevelScope: scope.trimLevelScope }))}">${escapeHtml(scope.label)}</option>`).join("")}
+        </select></label>
+        <label>Whole-dollar price <input name="priceValue" type="number" step="1" ${subject.reasonCode === "unresolved_price_scope" ? "required" : ""}></label>
+      </div>`;
+    case "approve_removal":
+      return '<label>Why reference impact is cleared <input name="reason" required></label>';
+    case "mark_not_applicable":
+      return '<label>Why this target fact is not applicable <input name="reason" required></label>';
+    case "record_allowed_deferral":
+      return `<div class="typed-grid"><label>Allowed deferral kind
+        <select name="kind" required><option value="">Choose allowlisted kind</option>${(choices.deferralKinds || []).map((kind) => `<option value="${escapeHtml(kind)}">${escapeHtml(kind)}</option>`).join("")}</select>
+        </label><label>Reason <input name="reason" required></label></div>`;
+    default:
+      return "";
+  }
+}
+
+function actionLabel(action, reasonCode) {
+  if (action === "provide_typed_value" && reasonCode.startsWith("comparator_only_")) {
+    return "Confirm exact proposal";
+  }
+  return {
+    choose_section: "Use this section",
+    choose_relationship: "Save exact relationship",
+    retain_existing: "Keep selected existing row",
+    provide_typed_value: "Save typed value",
+    approve_removal: "Approve exact removal",
+    mark_not_applicable: "Record not applicable",
+    record_allowed_deferral: "Record allowed deferral",
+  }[action] || action.replaceAll("_", " ");
+}
+
+function exceptionActionForm(item) {
+  if (item.resolution) {
+    const label = item.state === "resolved_pending_projection"
+      ? "Answer saved — compiler projection still required"
+      : "Resolved";
+    return `<div class="exception-resolution"><b>${escapeHtml(label)}:</b> ${escapeHtml(item.resolution.action)} by ${escapeHtml(item.resolution.reviewer || "unknown reviewer")}
+      <button class="ghost exception-reopen" data-subject-id="${escapeHtml(item.subject.subjectId)}" data-subject-version="${escapeHtml(item.subject.subjectVersion)}">Reopen</button></div>`;
+  }
+  const actions = item.availableActions || [];
+  if (!actions.length) {
+    return '<div class="source-blocker">No workbook-writable answer is available. This remains blocked until source evidence or compiler support is added.</div>';
+  }
+  return `<div class="exception-actions">${actions
+    .map(
+      (action) => `<form class="exception-resolution-form" data-action="${escapeHtml(action)}" data-subject-id="${escapeHtml(item.subject.subjectId)}" data-subject-version="${escapeHtml(item.subject.subjectVersion)}" data-reason-code="${escapeHtml(item.subject.reasonCode)}">
+        ${exceptionActionFields(item, action)}
+        <button class="primary" type="submit">${escapeHtml(actionLabel(action, item.subject.reasonCode))}</button>
+      </form>`
+    )
+    .join("")}</div>`;
+}
+
+function sourceEvidenceView(candidate) {
+  const evidence = candidate.sourceEvidence || {};
+  const rawCells = evidence.cells || {};
+  const normalizedCells = Array.isArray(rawCells)
+    ? rawCells
+    : Object.entries(rawCells).map(([coordinate, value]) => ({ coordinate, value }));
+  const cells = normalizedCells
+    .map((cell) => `<li><code>${escapeHtml(cell.coordinate || "cell")}</code> ${escapeHtml(cell.value)}</li>`)
+    .join("");
+  return `<div class="evidence-entry"><b>${escapeHtml(candidate.rpo || candidate.refOnlyRpo || "source row")}</b> — ${escapeHtml(candidate.description || "")}
+    <div class="cell-sub">${escapeHtml(evidence.sheetName || candidate.sheetName || "source")} · ${escapeHtml(candidate.sectionLabel || "no source section")}</div>
+    <ul class="evidence-cells">${cells}</ul></div>`;
+}
+
+function displayEvidenceValue(value) {
+  return value && typeof value === "object" ? JSON.stringify(value) : value;
+}
+
+function evidenceValues(record, preferredKeys = []) {
+  for (const key of preferredKeys) {
+    const values = record[key];
+    if (values && typeof values === "object" && Object.keys(values).length) return values;
+  }
+  return Object.fromEntries(
+    Object.entries(record).filter(([key]) => !["evidenceId", "evidenceDependencies", "evidenceReferences", "proposedRows"].includes(key))
+  );
+}
+
+function canonicalRowView(row) {
+  const values = Object.entries(evidenceValues(row, ["values", "signature"]))
+    .filter(([, value]) => value !== "" && value !== null && value !== undefined)
+    .slice(0, 10)
+    .map(([key, value]) => `<span><b>${escapeHtml(key)}</b>: ${escapeHtml(displayEvidenceValue(value))}</span>`)
+    .join("");
+  return `<div class="evidence-entry"><b>${escapeHtml(row.family || "row")}</b> · ${escapeHtml(row.action || row.sheet || "proposed")}
+    <div class="row-values">${values || "No populated preview fields."}</div></div>`;
+}
+
+function comparatorEvidenceView(fact) {
+  const values = evidenceValues(fact, ["values", "payload", "signature"]);
+  return `<div class="evidence-entry"><b>${escapeHtml(fact.comparator || fact.model || "comparator")}</b> · ${escapeHtml(fact.kind || fact.family || "fact")}
+    <div class="row-values">${Object.entries(values).slice(0, 10).map(([key, value]) => `<span><b>${escapeHtml(key)}</b>: ${escapeHtml(displayEvidenceValue(value))}</span>`).join("") || escapeHtml(fact.evidenceId || "")}</div></div>`;
+}
+
+function evidenceColumn(title, entries, formatter) {
+  return `<section class="evidence-column"><h3>${escapeHtml(title)}</h3>${entries.length ? entries.map(formatter).join("") : '<div class="empty-note">No directly joined evidence for this subject.</div>'}</section>`;
+}
+
+function renderExceptionCard(item) {
+  const subject = item.subject;
+  const raw = item.evidence.raw || [];
+  const targetRows = item.evidence.targetRows || [];
+  const comparator = item.evidence.comparator || [];
+  const proposed = subject.proposedRows || [];
+  const stale = (item.history.stale || []).length;
+  return `<article class="exception-card ${item.state === "resolved" ? "exception-resolved" : ""}">
+    <div class="card-head">
+      <div><span class="card-title">${escapeHtml(subject.model)} · ${escapeHtml(subject.family)}</span>
+        <div class="cell-sub">${escapeHtml(subject.reasonCode)} · ${escapeHtml(subject.subjectId)}</div></div>
+      <span class="type-badge ${subject.severity === "blocker" ? "type-unsupported" : ""}">${escapeHtml(subject.severity)} · ${escapeHtml(item.state)}</span>
+    </div>
+    <p class="exception-question">${escapeHtml(subject.question)}</p>
+    ${stale ? `<div class="status-note">${stale} prior answer${stale === 1 ? "" : "s"} became stale when evidence changed.</div>` : ""}
+    <div class="evidence-grid">
+      ${evidenceColumn("Raw source evidence", raw, sourceEvidenceView)}
+      ${evidenceColumn("Target workbook state", targetRows, canonicalRowView)}
+      ${evidenceColumn("Comparator context", comparator, comparatorEvidenceView)}
+      ${evidenceColumn("Proposed canonical rows", proposed, canonicalRowView)}
+    </div>
+    <div class="gate-impact"><b>Gate impact:</b> ${escapeHtml(subject.severity)} — unresolved keeps ${escapeHtml(subject.model)} compileReady blocked.</div>
+    ${exceptionActionForm(item)}
+  </article>`;
+}
+
+function fillExceptionFilter(id, values, allLabel) {
+  const select = $(id);
+  const current = select.value;
+  select.innerHTML = `<option value="">${escapeHtml(allLabel)}</option>${(values || []).map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value.replaceAll("_", " "))}</option>`).join("")}`;
+  if ([...select.options].some((option) => option.value === current)) select.value = current;
+}
+
+function renderExceptionReadiness(summary) {
+  $("#exception-readiness").innerHTML = Object.entries(summary.models || {})
+    .map(([model, entry]) => `<span class="sum-chip ${entry.compileReady ? "sum-exact" : "sum-warn"}"><b>${escapeHtml(model)}</b>: compile ${readinessLabel(entry.compileReady)} · ${escapeHtml(entry.blockerCount)} blockers</span>`)
+    .join("");
+}
+
+function renderExceptionPage(payload) {
+  exceptionState.payload = payload;
+  exceptionState.offset = payload.offset;
+  fillExceptionFilter("#exception-model", payload.filters.models, "All models");
+  fillExceptionFilter("#exception-family", payload.filters.families, "All workbook families");
+  fillExceptionFilter("#exception-reason", payload.filters.reasons, "All reasons");
+  fillExceptionFilter("#exception-severity", payload.filters.severities, "All severities");
+  $("#exception-queue").innerHTML = payload.items.length
+    ? payload.items.map(renderExceptionCard).join("")
+    : '<div class="empty-note">No exceptions match these filters.</div>';
+  const first = payload.total ? payload.offset + 1 : 0;
+  const last = Math.min(payload.total, payload.offset + payload.items.length);
+  $("#exception-pagination").innerHTML = `
+    <button id="exceptions-prev" class="ghost" ${payload.offset <= 0 ? "disabled" : ""}>Previous</button>
+    <span class="status-note">Showing ${first}–${last} of ${payload.total}</span>
+    <button id="exceptions-next" class="ghost" ${last >= payload.total ? "disabled" : ""}>Next</button>`;
+  $("#exceptions-prev").addEventListener("click", () => loadExceptions(Math.max(0, payload.offset - payload.limit)));
+  $("#exceptions-next").addEventListener("click", () => loadExceptions(payload.offset + payload.limit));
+}
+
+async function loadExceptions(offset = 0) {
+  const params = new URLSearchParams({
+    model: $("#exception-model").value,
+    family: $("#exception-family").value,
+    reason: $("#exception-reason").value,
+    severity: $("#exception-severity").value,
+    state: $("#exception-state").value,
+    actionable: $("#exception-actionable").value,
+    q: $("#exception-q").value.trim(),
+    offset: String(offset),
+    limit: String(exceptionState.limit),
+  });
+  const payload = await getJSON(`/api/wizard/sessions/${state.session.runId}/exceptions?${params}`);
+  renderExceptionPage(payload);
+}
+
+async function enterExceptions() {
+  setStage("exceptions");
+  if (!compilerState.summary) {
+    compilerState.summary = await getJSON(`/api/wizard/sessions/${state.session.runId}/compile`);
+    state.session = compilerState.summary.session;
+  }
+  renderExceptionReadiness(compilerState.summary);
+  await loadExceptions(0);
+}
+
+function resolutionPayload(form, action, reasonCode) {
+  const data = new FormData(form);
+  switch (action) {
+    case "choose_section":
+      return { sectionId: data.get("sectionId") };
+    case "choose_relationship":
+      return { sourceOptionId: data.get("sourceOptionId"), ruleType: data.get("ruleType"), targetOptionId: data.get("targetOptionId") };
+    case "retain_existing":
+      return { existingId: data.get("existingId") };
+    case "provide_typed_value": {
+      if (reasonCode.startsWith("comparator_only_")) return { decision: "confirm_proposal" };
+      const selectedScope = JSON.parse(data.get("priceScope"));
+      const result = {};
+      if (selectedScope.bodyStyleScope) result.bodyStyleScope = selectedScope.bodyStyleScope;
+      if (selectedScope.trimLevelScope) result.trimLevelScope = selectedScope.trimLevelScope;
+      if (data.get("priceValue") !== "") result.priceValue = Number(data.get("priceValue"));
+      return result;
+    }
+    case "approve_removal":
+    case "mark_not_applicable":
+      return { reason: data.get("reason") };
+    case "record_allowed_deferral":
+      return { kind: data.get("kind"), reason: data.get("reason") };
+    default:
+      return {};
+  }
+}
+
+$("#exception-queue").addEventListener("submit", async (event) => {
+  const form = event.target.closest(".exception-resolution-form");
+  if (!form) return;
+  event.preventDefault();
+  clearError();
+  const reviewer = $("#exception-reviewer").value.trim();
+  if (!reviewer) {
+    showError("Enter the reviewer name before saving an exception answer.");
+    $("#exception-reviewer").focus();
+    return;
+  }
+  const button = form.querySelector('button[type="submit"]');
+  button.disabled = true;
+  try {
+    const result = await postJSON(`/api/wizard/sessions/${state.session.runId}/exceptions/resolve`, {
+      subjectId: form.dataset.subjectId,
+      subjectVersion: form.dataset.subjectVersion,
+      action: form.dataset.action,
+      payload: resolutionPayload(form, form.dataset.action, form.dataset.reasonCode),
+      reviewer,
+    });
+    compilerState.summary = result.summary;
+    state.session = result.summary.session;
+    renderExceptionReadiness(result.summary);
+    $("#exception-status").textContent = "Resolution saved and compiler rerun completed.";
+    await loadExceptions(exceptionState.offset);
+  } catch (error) {
+    showError(error.message);
+  } finally {
+    button.disabled = false;
+  }
+});
+
+$("#exception-queue").addEventListener("click", async (event) => {
+  const button = event.target.closest(".exception-reopen");
+  if (!button) return;
+  clearError();
+  const reviewer = $("#exception-reviewer").value.trim();
+  if (!reviewer) {
+    showError("Enter the reviewer name before reopening an answer.");
+    return;
+  }
+  button.disabled = true;
+  try {
+    const result = await postJSON(`/api/wizard/sessions/${state.session.runId}/exceptions/reopen`, {
+      subjectId: button.dataset.subjectId,
+      subjectVersion: button.dataset.subjectVersion,
+      reviewer,
+    });
+    compilerState.summary = result.summary;
+    state.session = result.summary.session;
+    renderExceptionReadiness(result.summary);
+    $("#exception-status").textContent = "Resolution reopened and compiler rerun completed.";
+    await loadExceptions(exceptionState.offset);
+  } catch (error) {
+    showError(error.message);
+  } finally {
+    button.disabled = false;
+  }
+});
+
+for (const id of ["#exception-model", "#exception-family", "#exception-reason", "#exception-severity", "#exception-state", "#exception-actionable"]) {
+  $(id).addEventListener("change", () => loadExceptions(0).catch((error) => showError(error.message)));
+}
+let exceptionSearchTimer = null;
+$("#exception-q").addEventListener("input", () => {
+  clearTimeout(exceptionSearchTimer);
+  exceptionSearchTimer = setTimeout(() => loadExceptions(0).catch((error) => showError(error.message)), 250);
+});
+$("#exceptions-recompile-btn").addEventListener("click", async () => {
+  await runCompile();
+  if (compilerState.summary) await enterExceptions();
+});
+$("#exceptions-back-compile").addEventListener("click", enterCompile);
 
 function renderReconciliation() {
   const models = (modelState.reconciliation || {}).models || {};

@@ -17,8 +17,10 @@ import hashlib
 import json
 import os
 import re
+import threading
 import time
 import uuid
+from collections import Counter, defaultdict
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -38,6 +40,7 @@ from corvette_form_generator.ingest.wizard.decisions import (
     detect_model_options,
     duplicate_rpo_groups,
     load_decision_state,
+    model_scoped_statuses,
     presentation_prefill,
     scope_candidates,
     validate_decision,
@@ -54,9 +57,19 @@ from corvette_form_generator.ingest.wizard.canonical_rows import (
     validate_artifact_graph,
 )
 from corvette_form_generator.ingest.wizard.comparator_evidence import build_comparator_evidence
-from corvette_form_generator.ingest.wizard.compiler import compile_canonical_rows as run_canonical_compiler
-from corvette_form_generator.ingest.wizard.exceptions import append_audit_event_once, build_audit_event
+from corvette_form_generator.ingest.wizard.compiler import (
+    build_family_registry,
+    compile_canonical_rows as run_canonical_compiler,
+)
+from corvette_form_generator.ingest.wizard.exceptions import (
+    ACTION_DISPOSITIONS,
+    ALLOWED_DEFERRAL_KINDS,
+    append_audit_event_once,
+    build_audit_event,
+    validate_resolution,
+)
 from corvette_form_generator.ingest.wizard.hints import scan_candidates
+from corvette_form_generator.ingest.wizard.identity import option_occurrence_signature
 from corvette_form_generator.ingest.wizard.plan_builder import (
     artifact_sha,
     plan_markdown,
@@ -143,6 +156,7 @@ COMPILER_ARTIFACTS = (
 COMPILER_CACHE_ARTIFACTS = tuple(
     name for name in COMPILER_ARTIFACTS if name != "exception-resolutions.json"
 )
+COMPILER_MUTATION_FILES = (*COMPILER_ARTIFACTS, "exception-log.jsonl", "session.json")
 COMPILER_STATES = (STATE_COMPILED, STATE_COMPILED_WITH_EXCEPTIONS)
 COMPILER_DOWNSTREAM_ARTIFACTS = (
     "apply-plan.json",
@@ -232,6 +246,7 @@ class WizardSessionStore:
         self.uploads = self.base / "uploads"
         self.workbook_path = Path(workbook_path) if workbook_path else self.root / "stingray_master.xlsx"
         self._reference_cache: tuple[int, dict] | None = None
+        self._run_locks: defaultdict[str, threading.RLock] = defaultdict(threading.RLock)
 
     def _option_reference(self) -> dict:
         path = self._require_workbook()
@@ -311,6 +326,26 @@ class WizardSessionStore:
         if not (run_dir / "session.json").is_file():
             raise WizardError(f"Unknown run: {run_id}", status=404)
         return run_dir
+
+    @staticmethod
+    def _snapshot_run_files(run_dir: Path, names: tuple[str, ...]) -> dict[str, bytes | None]:
+        return {
+            name: (run_dir / name).read_bytes() if (run_dir / name).is_file() else None
+            for name in names
+        }
+
+    @staticmethod
+    def _restore_run_files(run_dir: Path, snapshot: dict[str, bytes | None]) -> None:
+        """Atomically restore one coherent pre-mutation file snapshot."""
+
+        for name, content in snapshot.items():
+            path = run_dir / name
+            if content is None:
+                path.unlink(missing_ok=True)
+                continue
+            temp = path.with_name(f".{path.name}.{uuid.uuid4().hex}.restore")
+            temp.write_bytes(content)
+            os.replace(temp, path)
 
     def load_session(self, run_id: str, *, verify_source: bool = True) -> dict[str, Any]:
         session = read_json(self.run_dir(run_id) / "session.json")
@@ -596,6 +631,10 @@ class WizardSessionStore:
 
     # ------------------------------------------------------------- roles
     def confirm_roles(self, run_id: str, roles: dict[str, str]) -> dict[str, Any]:
+        with self._run_locks[run_id]:
+            return self._confirm_roles_locked(run_id, roles)
+
+    def _confirm_roles_locked(self, run_id: str, roles: dict[str, str]) -> dict[str, Any]:
         session = self.load_session(run_id)
         run_dir = self.run_dir(run_id)
         profile = read_json(run_dir / "sheet-profile.json")
@@ -635,6 +674,10 @@ class WizardSessionStore:
 
     # ------------------------------------------------------------- parse
     def run_parse(self, run_id: str) -> dict[str, Any]:
+        with self._run_locks[run_id]:
+            return self._run_parse_locked(run_id)
+
+    def _run_parse_locked(self, run_id: str) -> dict[str, Any]:
         session = self.load_session(run_id)
         if session["state"] not in (STATE_ROLES_CONFIRMED, STATE_PARSED) + DECISION_STATES + COMPILER_STATES:
             raise WizardError("Confirm sheet roles before parsing.")
@@ -741,6 +784,15 @@ class WizardSessionStore:
         }
 
     def select_models(self, run_id: str, targets: list[str], comparators: dict[str, str]) -> dict[str, Any]:
+        with self._run_locks[run_id]:
+            return self._select_models_locked(run_id, targets, comparators)
+
+    def _select_models_locked(
+        self,
+        run_id: str,
+        targets: list[str],
+        comparators: dict[str, str],
+    ) -> dict[str, Any]:
         session, candidates_file, candidates = self._parsed_candidates(run_id, allow_compiled=True)
         self._refuse_if_applied(session)
         try:
@@ -773,6 +825,12 @@ class WizardSessionStore:
         }
 
     def compile_canonical_rows(self, run_id: str) -> dict[str, Any]:
+        """Compile one run while serializing all compiler artifact mutations."""
+
+        with self._run_locks[run_id]:
+            return self._compile_canonical_rows_locked(run_id)
+
+    def _compile_canonical_rows_locked(self, run_id: str) -> dict[str, Any]:
         """Compile one selected run without mutating the canonical workbook."""
 
         session = self.load_session(run_id)
@@ -950,6 +1008,12 @@ class WizardSessionStore:
         }
 
     def compiler_detail(self, run_id: str) -> dict[str, Any]:
+        """Load one coherent compiler snapshot while mutations are excluded."""
+
+        with self._run_locks[run_id]:
+            return self._compiler_detail_locked(run_id)
+
+    def _compiler_detail_locked(self, run_id: str) -> dict[str, Any]:
         """Load and cross-validate one coherent compiled artifact set."""
 
         session = self.load_session(run_id, verify_source=False)
@@ -995,6 +1059,731 @@ class WizardSessionStore:
             "resolutions": resolutions,
             "compileReport": report,
         }
+
+    def compiler_summary(self, run_id: str) -> dict[str, Any]:
+        """Return one coherent compact summary while mutations are excluded."""
+
+        with self._run_locks[run_id]:
+            return self._compiler_summary_locked(run_id)
+
+    def _compiler_summary_locked(self, run_id: str) -> dict[str, Any]:
+        """Return the compact browser summary for one validated compiler run."""
+
+        detail = self.compiler_detail(run_id)
+        report = detail["compileReport"]
+        queue = detail["exceptionQueue"]
+        resolutions = detail["resolutions"]
+        valid_subjects = {
+            str(entry.get("subjectId") or "")
+            for entry in resolutions.get("validEntries") or []
+        }
+        subjects = list(queue.get("subjects") or [])
+        blocker_subjects = {
+            str(blocker.get("subjectId") or "")
+            for model in (report.get("models") or {}).values()
+            for blocker in model.get("blockers") or []
+        }
+
+        manifest_actions: Counter[str] = Counter()
+        manifest_statuses: Counter[str] = Counter()
+        for key, count in (report.get("manifestCounts") or {}).items():
+            parts = str(key).split("|", 3)
+            if len(parts) != 4:
+                continue
+            _model, _family, action, status = parts
+            manifest_actions[action] += int(count)
+            manifest_statuses[status] += int(count)
+
+        models = {}
+        for model, entry in sorted((report.get("models") or {}).items()):
+            models[model] = {
+                "mode": entry.get("mode"),
+                "compileReady": bool(entry.get("compileReady")),
+                "planReady": bool(entry.get("planReady")),
+                "writeReady": bool(entry.get("writeReady")),
+                "deploymentReady": bool(entry.get("deploymentReady")),
+                "blockerCount": len(entry.get("blockers") or []),
+                "deferralCount": len(entry.get("deferrals") or []),
+                "boundaryReasons": list(entry.get("boundaryReasons") or []),
+            }
+
+        exception_states = Counter()
+        actionable_count = 0
+        for subject in subjects:
+            subject_id_value = str(subject.get("subjectId") or "")
+            if subject_id_value in valid_subjects:
+                item_state = (
+                    "resolved_pending_projection"
+                    if subject_id_value in blocker_subjects
+                    else "resolved"
+                )
+            else:
+                item_state = "open"
+            exception_states[item_state] += 1
+            actionable_count += bool(self._projectable_exception_actions(subject))
+        freshness = self._compiler_freshness(run_id, report)
+        return {
+            "session": detail["session"],
+            "compiler": dict(detail["session"].get("compiler") or {}),
+            "models": models,
+            "counts": {
+                "manifest": {
+                    "total": sum(int(value) for value in (report.get("manifestCounts") or {}).values()),
+                    "byAction": dict(sorted(manifest_actions.items())),
+                    "byStatus": dict(sorted(manifest_statuses.items())),
+                    "byFamily": dict(sorted((report.get("familyCounts") or {}).items())),
+                },
+                "exceptions": {
+                    "total": len(subjects),
+                    "byState": dict(sorted(exception_states.items())),
+                    "actionable": actionable_count,
+                    "byReason": dict(sorted(Counter(str(subject.get("reasonCode") or "") for subject in subjects).items())),
+                    "byFamily": dict(sorted(Counter(str(subject.get("family") or "") for subject in subjects).items())),
+                },
+                "sourceFeatures": dict(
+                    sorted(
+                        Counter(
+                            str(item.get("disposition") or "")
+                            for item in report.get("sourceFeatureCoverage") or []
+                        ).items()
+                    )
+                ),
+                "familyCoverage": dict(
+                    sorted(
+                        Counter(
+                            str(item.get("disposition") or "")
+                            for item in report.get("familyCoverage") or []
+                        ).items()
+                    )
+                ),
+            },
+            "freshness": freshness,
+        }
+
+    @staticmethod
+    def _projectable_exception_actions(subject: dict[str, Any]) -> list[str]:
+        """Expose only actions whose typed outcome is complete after recompilation."""
+
+        reason = str(subject.get("reasonCode") or "")
+        projectable: list[str] = []
+        unsupported_row_actions: list[str] = []
+        for raw_action in subject.get("allowedActions") or []:
+            action = str(raw_action)
+            if action == "choose_section":
+                projectable.append(action)
+            elif action == "provide_typed_value" and reason in {
+                "missing_price_scope",
+                "unresolved_price_scope",
+            }:
+                projectable.append(action)
+            elif action in {"record_allowed_deferral", "mark_not_applicable"}:
+                projectable.append(action)
+            else:
+                unsupported_row_actions.append(action)
+        if unsupported_row_actions:
+            return []
+        return projectable
+
+    def _compiler_freshness(self, run_id: str, report: dict[str, Any]) -> dict[str, Any]:
+        """Compare current compiler inputs to the authority bound into the report."""
+
+        run_dir = self.run_dir(run_id)
+        session = self.load_session(run_id, verify_source=False)
+        paths = {
+            "source": Path(session["sourcePath"]),
+            "workbook": self.workbook_path,
+            "sheetRoles": run_dir / "sheet-roles.json",
+            "optionCandidates": run_dir / "option-candidates.json",
+            "priceRows": run_dir / "price-rows.json",
+            "joinReport": run_dir / "join-report.json",
+            "modelSelection": run_dir / "model-selection.json",
+        }
+        expected = (
+            report.get("runAuthorityFingerprint", {})
+            .get("bindings", {})
+            .get("files", {})
+        )
+        reasons = []
+        for label, path in paths.items():
+            if not path.is_file():
+                reasons.append(f"{label} is missing")
+                continue
+            if expected.get(label) != file_fingerprint(path):
+                reasons.append(f"{label} changed after compile")
+        return {
+            "stale": bool(reasons),
+            "recompileRequired": bool(reasons),
+            "reasons": reasons,
+        }
+
+    def exception_queue_view(
+        self,
+        run_id: str,
+        *,
+        model: str = "",
+        family: str = "",
+        reason: str = "",
+        severity: str = "",
+        state: str = "",
+        actionable: str = "",
+        query: str = "",
+        offset: int = 0,
+        limit: int = 50,
+    ) -> dict[str, Any]:
+        """Return one coherent exception page while mutations are excluded."""
+
+        with self._run_locks[run_id]:
+            return self._exception_queue_view_locked(
+                run_id,
+                model=model,
+                family=family,
+                reason=reason,
+                severity=severity,
+                state=state,
+                actionable=actionable,
+                query=query,
+                offset=offset,
+                limit=limit,
+            )
+
+    def _exception_queue_view_locked(
+        self,
+        run_id: str,
+        *,
+        model: str = "",
+        family: str = "",
+        reason: str = "",
+        severity: str = "",
+        state: str = "",
+        actionable: str = "",
+        query: str = "",
+        offset: int = 0,
+        limit: int = 50,
+    ) -> dict[str, Any]:
+        """Return one deterministic browser page of validated exception subjects."""
+
+        if state not in {"", "open", "resolved", "resolved_pending_projection", "stale_reopened"}:
+            raise WizardError(f"Unknown exception state filter: {state}")
+        if actionable not in {"", "yes", "no"}:
+            raise WizardError(f"Unknown actionable filter: {actionable}")
+        try:
+            offset = max(0, int(offset))
+            limit = min(100, max(1, int(limit)))
+        except (TypeError, ValueError) as exc:
+            raise WizardError("Exception offset and limit must be integers.") from exc
+
+        detail = self.compiler_detail(run_id)
+        freshness = self._compiler_freshness(run_id, detail["compileReport"])
+        if freshness["stale"]:
+            raise WizardError(
+                "Compiler inputs changed after this run was compiled. Recompile before reviewing exceptions.",
+                status=409,
+            )
+        subjects = list(detail["exceptionQueue"].get("subjects") or [])
+        run_dir = self.run_dir(run_id)
+        candidates_payload = read_json(run_dir / "option-candidates.json")
+        selection = read_json(run_dir / "model-selection.json")
+        raw_candidates: dict[tuple[str, str], list[dict[str, Any]]] = {}
+        target_variant_pairs: dict[str, set[tuple[str, str]]] = {}
+        for target in selection.get("targets") or []:
+            for candidate in scope_candidates(candidates_payload.get("candidates") or [], str(target)):
+                scoped = {
+                    **candidate,
+                    "statuses": model_scoped_statuses(candidate, str(target)),
+                }
+                for status_entry in scoped["statuses"]:
+                    body_style = str(status_entry.get("bodyStyle") or "").strip()
+                    trim_level = str(status_entry.get("trim") or "").strip()
+                    if body_style or trim_level:
+                        target_variant_pairs.setdefault(str(target), set()).add(
+                            (body_style, trim_level)
+                        )
+                signature = option_occurrence_signature(scoped)
+                raw_candidates.setdefault((str(target), signature), []).append(dict(candidate))
+        target_price_scopes: dict[str, list[dict[str, str]]] = {}
+        for target in selection.get("targets") or []:
+            pairs = target_variant_pairs.get(str(target), set())
+            scope_pairs = {("*", "*")}
+            scope_pairs.update(pairs)
+            scope_pairs.update((body_style, "") for body_style, _ in pairs if body_style)
+            scope_pairs.update(("", trim_level) for _, trim_level in pairs if trim_level)
+            target_price_scopes[str(target)] = [
+                {
+                    "bodyStyleScope": body_style,
+                    "trimLevelScope": trim_level,
+                    "label": (
+                        "All target variants (*)"
+                        if (body_style, trim_level) == ("*", "*")
+                        else " · ".join(value for value in (body_style, trim_level) if value)
+                    ),
+                }
+                for body_style, trim_level in sorted(scope_pairs)
+            ]
+        sections = workbook_sections(self._require_workbook())
+        comparator_facts = {
+            str(fact.get("evidenceId") or ""): dict(fact)
+            for entry in (detail["comparatorEvidence"].get("targets") or {}).values()
+            for fact in entry.get("facts") or []
+        }
+        manifest_rows = list(detail["manifest"].get("rows") or [])
+        from corvette_form_generator.editor_ops import extract_workbook, rows_of
+
+        workbook_path = self._require_workbook()
+        extract = extract_workbook(workbook_path)
+        registry = build_family_registry(workbook_path, selection.get("targets") or [])
+        target_options: dict[str, list[dict[str, Any]]] = {}
+        for target in selection.get("targets") or []:
+            option_sheet = registry[str(target)]["source_option_sheet"]["sheetName"]
+            option_rows = [dict(row) for row in rows_of(extract, option_sheet)]
+            option_rows.extend(
+                dict(row.get("values") or {})
+                for row in manifest_rows
+                if row.get("model") == target and row.get("family") == "options"
+            )
+            by_id: dict[str, dict[str, Any]] = {}
+            for row in option_rows:
+                option_id = str(row.get("option_id") or "")
+                if option_id:
+                    by_id[option_id] = {
+                        "optionId": option_id,
+                        "rpo": str(row.get("rpo") or ""),
+                        "name": str(row.get("name") or row.get("description") or ""),
+                        "sectionId": str(row.get("section_id") or ""),
+                    }
+            target_options[str(target)] = [by_id[key] for key in sorted(by_id)]
+        valid_by_subject = {
+            str(entry.get("subjectId") or ""): dict(entry)
+            for entry in detail["resolutions"].get("validEntries") or []
+        }
+        blocker_subjects = {
+            str(blocker.get("subjectId") or "")
+            for model_entry in (detail["compileReport"].get("models") or {}).values()
+            for blocker in model_entry.get("blockers") or []
+        }
+        stale_by_subject: dict[str, list[dict[str, Any]]] = {}
+        superseded_by_subject: dict[str, list[dict[str, Any]]] = {}
+        for field, target in (
+            ("staleEntries", stale_by_subject),
+            ("supersededEntries", superseded_by_subject),
+        ):
+            for entry in detail["resolutions"].get(field) or []:
+                target.setdefault(str(entry.get("subjectId") or ""), []).append(dict(entry))
+
+        items = []
+        for subject in sorted(subjects, key=lambda item: str(item.get("subjectId") or "")):
+            subject_id_value = str(subject.get("subjectId") or "")
+            if subject_id_value in valid_by_subject:
+                item_state = (
+                    "resolved_pending_projection"
+                    if subject_id_value in blocker_subjects
+                    else "resolved"
+                )
+            elif stale_by_subject.get(subject_id_value):
+                item_state = "stale_reopened"
+            else:
+                item_state = "open"
+            available_actions = self._projectable_exception_actions(subject)
+            item = {
+                "subject": dict(subject),
+                "state": item_state,
+                "availableActions": available_actions,
+                "resolution": valid_by_subject.get(subject_id_value),
+                "history": {
+                    "stale": stale_by_subject.get(subject_id_value, []),
+                    "superseded": superseded_by_subject.get(subject_id_value, []),
+                },
+            }
+            evidence_ids = {
+                str(dependency.get("evidenceId") or "")
+                for dependency in subject.get("evidenceDependencies") or []
+            }
+            evidence_references = {
+                str(reference) for reference in subject.get("evidenceReferences") or []
+            }
+            candidate_signatures = set(evidence_references)
+            candidate_signatures.update(
+                evidence_id.split(":candidate:", 1)[1]
+                for evidence_id in evidence_ids
+                if ":candidate:" in evidence_id
+            )
+            raw_rows: list[dict[str, Any]] = []
+            seen_candidates: set[str] = set()
+            for signature in sorted(candidate_signatures):
+                for candidate in raw_candidates.get((str(subject.get("model") or ""), signature), []):
+                    candidate_id = str(candidate.get("candidateId") or "")
+                    if candidate_id not in seen_candidates:
+                        seen_candidates.add(candidate_id)
+                        raw_rows.append(candidate)
+            target_rows = [
+                row
+                for row in manifest_rows
+                if row.get("model") in {subject.get("model"), "*"}
+                and evidence_ids
+                & {
+                    str(dependency.get("evidenceId") or "")
+                    for dependency in row.get("evidenceDependencies") or []
+                }
+            ]
+            item["evidence"] = {
+                "raw": raw_rows,
+                "targetRows": target_rows,
+                "comparator": [
+                    comparator_facts[evidence_id]
+                    for evidence_id in sorted(evidence_ids | evidence_references)
+                    if evidence_id in comparator_facts
+                ],
+                "workbookReferences": sorted(
+                    evidence_id
+                    for evidence_id in evidence_ids
+                    if evidence_id.startswith("workbook:")
+                ),
+            }
+            allowed_actions = set(subject.get("allowedActions") or [])
+            evidence_rpos = {
+                str(candidate.get("rpo") or candidate.get("refOnlyRpo") or "").upper()
+                for candidate in raw_rows
+                if candidate.get("rpo") or candidate.get("refOnlyRpo")
+            }
+            model_options = target_options.get(str(subject.get("model") or ""), [])
+            item["choices"] = {
+                "sections": list(sections) if "choose_section" in allowed_actions else [],
+                "relationshipRuleTypes": (
+                    ["requires", "includes", "excludes", "replaces"]
+                    if "choose_relationship" in allowed_actions
+                    else []
+                ),
+                "targetOptions": model_options if "choose_relationship" in allowed_actions else [],
+                "existingOptions": (
+                    [option for option in model_options if option["rpo"].upper() in evidence_rpos]
+                    if "retain_existing" in allowed_actions
+                    else []
+                ),
+                "deferralKinds": (
+                    sorted(ALLOWED_DEFERRAL_KINDS)
+                    if "record_allowed_deferral" in allowed_actions
+                    else []
+                ),
+                "priceScopes": (
+                    target_price_scopes.get(str(subject.get("model") or ""), [])
+                    if "provide_typed_value" in available_actions
+                    else []
+                ),
+            }
+            if model and subject.get("model") != model:
+                continue
+            if family and subject.get("family") != family:
+                continue
+            if reason and subject.get("reasonCode") != reason:
+                continue
+            if severity and subject.get("severity") != severity:
+                continue
+            if state and item_state != state:
+                continue
+            is_actionable = bool(available_actions)
+            if actionable == "yes" and not is_actionable:
+                continue
+            if actionable == "no" and is_actionable:
+                continue
+            needle = str(query or "").strip().lower()
+            if needle:
+                haystack = " ".join(
+                    str(subject.get(field) or "")
+                    for field in ("subjectId", "model", "family", "reasonCode", "question")
+                ).lower()
+                if needle not in haystack:
+                    continue
+            items.append(item)
+
+        filters = {
+            "models": sorted({str(subject.get("model") or "") for subject in subjects}),
+            "families": sorted({str(subject.get("family") or "") for subject in subjects}),
+            "reasons": sorted({str(subject.get("reasonCode") or "") for subject in subjects}),
+            "severities": sorted({str(subject.get("severity") or "") for subject in subjects}),
+        }
+        return {
+            "runId": run_id,
+            "queueSubjectFingerprint": detail["exceptionQueue"].get("queueSubjectFingerprint"),
+            "freshness": freshness,
+            "total": len(items),
+            "offset": offset,
+            "limit": limit,
+            "items": items[offset : offset + limit],
+            "filters": filters,
+        }
+
+    def resolve_exception(
+        self,
+        run_id: str,
+        *,
+        subject_id: str,
+        subject_version: str,
+        action: str,
+        payload: dict[str, Any],
+        reviewer: str,
+    ) -> dict[str, Any]:
+        """Serialize one exact resolution with the aggregate compiler rewrite."""
+
+        with self._run_locks[run_id]:
+            return self._resolve_exception_locked(
+                run_id,
+                subject_id=subject_id,
+                subject_version=subject_version,
+                action=action,
+                payload=payload,
+                reviewer=reviewer,
+            )
+
+    def _resolve_exception_locked(
+        self,
+        run_id: str,
+        *,
+        subject_id: str,
+        subject_version: str,
+        action: str,
+        payload: dict[str, Any],
+        reviewer: str,
+    ) -> dict[str, Any]:
+        """Record one exact typed resolution and recompile the coherent run."""
+
+        detail = self.compiler_detail(run_id)
+        subjects = {
+            str(subject.get("subjectId") or ""): subject
+            for subject in detail["exceptionQueue"].get("subjects") or []
+        }
+        subject = subjects.get(str(subject_id))
+        if subject is None:
+            raise WizardError("Exception subject is not current; reload the queue.", status=409)
+        if str(subject.get("subjectVersion") or "") != str(subject_version):
+            raise WizardError("Exception subject version is stale; reload the queue.", status=409)
+        freshness = self._compiler_freshness(run_id, detail["compileReport"])
+        if freshness["stale"]:
+            raise WizardError(
+                "Compiler inputs changed; recompile before resolving exceptions: "
+                + ", ".join(freshness["reasons"]),
+                status=409,
+            )
+        if action not in self._projectable_exception_actions(subject):
+            raise WizardError(
+                "This typed action is not yet projectable into a complete canonical outcome.",
+                status=409,
+            )
+        reviewer = str(reviewer or "").strip()
+        if not reviewer:
+            raise WizardError("Exception resolution needs a reviewer name.")
+        if any(
+            entry.get("subjectId") == subject_id
+            and entry.get("subjectVersion") == subject_version
+            for entry in detail["resolutions"].get("validEntries") or []
+        ):
+            raise WizardError("Exception is already resolved; reopen it before replacing the answer.", status=409)
+        resolution = {
+            "subjectId": str(subject_id),
+            "subjectVersion": str(subject_version),
+            "action": str(action),
+            "payload": dict(payload or {}),
+            "disposition": ACTION_DISPOSITIONS.get(str(action), ""),
+            "reviewer": reviewer,
+            "resolvedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "evidenceReferences": list(subject.get("evidenceReferences") or []),
+        }
+        try:
+            resolution = validate_resolution(resolution, subject)
+        except ValueError as exc:
+            raise WizardError(f"Invalid exception resolution: {exc}") from exc
+        if action == "choose_section":
+            allowed_sections = {
+                str(section.get("sectionId") or "")
+                for section in workbook_sections(self._require_workbook())
+            }
+            if resolution["payload"]["sectionId"] not in allowed_sections:
+                raise WizardError("Section is not a current canonical workbook choice.")
+        if action == "provide_typed_value":
+            view = self.exception_queue_view(run_id, query=str(subject_id), limit=100)
+            subject_view = next(
+                (
+                    item
+                    for item in view["items"]
+                    if item["subject"].get("subjectId") == subject_id
+                ),
+                None,
+            )
+            if subject_view is None:
+                raise WizardError("Exception subject is not current; reload the queue.", status=409)
+            allowed_scopes = {
+                (
+                    str(scope.get("bodyStyleScope") or ""),
+                    str(scope.get("trimLevelScope") or ""),
+                )
+                for scope in subject_view["choices"].get("priceScopes") or []
+            }
+            requested_scope = (
+                str(resolution["payload"].get("bodyStyleScope") or ""),
+                str(resolution["payload"].get("trimLevelScope") or ""),
+            )
+            if requested_scope not in allowed_scopes:
+                raise WizardError("Price scope is not a current target variant or canonical wildcard choice.")
+        if action in {"choose_relationship", "retain_existing"}:
+            view = self.exception_queue_view(run_id, query=str(subject_id), limit=100)
+            subject_view = next(
+                (
+                    item
+                    for item in view["items"]
+                    if item["subject"].get("subjectId") == subject_id
+                ),
+                None,
+            )
+            if subject_view is None:
+                raise WizardError("Exception subject is not current; reload the queue.", status=409)
+            choices = subject_view["choices"]
+            if action == "choose_relationship":
+                allowed_ids = {
+                    str(option.get("optionId") or "")
+                    for option in choices.get("targetOptions") or []
+                }
+                if (
+                    resolution["payload"]["sourceOptionId"] not in allowed_ids
+                    or resolution["payload"]["targetOptionId"] not in allowed_ids
+                    or resolution["payload"]["ruleType"]
+                    not in set(choices.get("relationshipRuleTypes") or [])
+                ):
+                    raise WizardError("Relationship resolution is not made from current target choices.")
+            if action == "retain_existing":
+                allowed_ids = {
+                    str(option.get("optionId") or "")
+                    for option in choices.get("existingOptions") or []
+                }
+                if resolution["payload"]["existingId"] not in allowed_ids:
+                    raise WizardError("Existing row is not a current target identity choice.")
+
+        run_dir = self.run_dir(run_id)
+        resolution_path = run_dir / "exception-resolutions.json"
+        snapshot = self._snapshot_run_files(run_dir, COMPILER_MUTATION_FILES)
+        current = read_json(resolution_path)
+        current["entries"] = [
+            *(current.get("entries") or []),
+            resolution,
+        ]
+        try:
+            replace_json_artifact_set(run_dir, {"exception-resolutions.json": current})
+            self.compile_canonical_rows(run_id)
+            refreshed = self.exception_queue_view(run_id, query=str(subject_id), limit=100)
+            subject_view = next(
+                (
+                    item
+                    for item in refreshed["items"]
+                    if item["subject"].get("subjectId") == subject_id
+                ),
+                None,
+            )
+            if subject_view is None:
+                raise WizardError("Resolved subject disappeared from the current queue.", status=409)
+            result = {"summary": self.compiler_summary(run_id), "subject": subject_view}
+        except Exception:
+            self._restore_run_files(run_dir, snapshot)
+            raise
+        return result
+
+    def reopen_exception(
+        self,
+        run_id: str,
+        *,
+        subject_id: str,
+        subject_version: str,
+        reviewer: str,
+    ) -> dict[str, Any]:
+        """Serialize one reopen with the aggregate compiler rewrite."""
+
+        with self._run_locks[run_id]:
+            return self._reopen_exception_locked(
+                run_id,
+                subject_id=subject_id,
+                subject_version=subject_version,
+                reviewer=reviewer,
+            )
+
+    def _reopen_exception_locked(
+        self,
+        run_id: str,
+        *,
+        subject_id: str,
+        subject_version: str,
+        reviewer: str,
+    ) -> dict[str, Any]:
+        """Remove one exact current resolution, recompile, and audit the reopen."""
+
+        detail = self.compiler_detail(run_id)
+        subjects = {
+            str(subject.get("subjectId") or ""): subject
+            for subject in detail["exceptionQueue"].get("subjects") or []
+        }
+        subject = subjects.get(str(subject_id))
+        if subject is None or str(subject.get("subjectVersion") or "") != str(subject_version):
+            raise WizardError("Exception subject is stale or no longer current; reload the queue.", status=409)
+        freshness = self._compiler_freshness(run_id, detail["compileReport"])
+        if freshness["stale"]:
+            raise WizardError(
+                "Compiler inputs changed; recompile before reopening exceptions: "
+                + ", ".join(freshness["reasons"]),
+                status=409,
+            )
+        reviewer = str(reviewer or "").strip()
+        if not reviewer:
+            raise WizardError("Reopening an exception needs a reviewer name.")
+        matches = [
+            dict(entry)
+            for entry in detail["resolutions"].get("validEntries") or []
+            if entry.get("subjectId") == subject_id
+            and entry.get("subjectVersion") == subject_version
+        ]
+        if len(matches) != 1:
+            raise WizardError("Exception is not currently resolved.", status=409)
+        previous_resolution = matches[0]
+
+        run_dir = self.run_dir(run_id)
+        resolution_path = run_dir / "exception-resolutions.json"
+        snapshot = self._snapshot_run_files(run_dir, COMPILER_MUTATION_FILES)
+        current = read_json(resolution_path)
+        for field in ("entries", "validEntries", "staleEntries", "supersededEntries"):
+            current[field] = [
+                entry
+                for entry in current.get(field) or []
+                if not (
+                    entry.get("subjectId") == subject_id
+                    and entry.get("subjectVersion") == subject_version
+                )
+            ]
+        try:
+            replace_json_artifact_set(run_dir, {"exception-resolutions.json": current})
+            self.compile_canonical_rows(run_id)
+            refreshed_detail = self.compiler_detail(run_id)
+            event = build_audit_event(
+                queue_subject_fingerprint=refreshed_detail["exceptionQueue"]["queueSubjectFingerprint"],
+                subject_id_value=str(subject_id),
+                subject_version_value=str(subject_version),
+                event_type="resolution_reopened",
+                prior_state="resolved",
+                next_state="open",
+                cause_fingerprint=semantic_hash(previous_resolution),
+                resolution_entry_semantic_sha=semantic_hash(previous_resolution),
+                reviewer=reviewer,
+            )
+            append_audit_event_once(run_dir / "exception-log.jsonl", event)
+            refreshed = self.exception_queue_view(run_id, query=str(subject_id), limit=100)
+            subject_view = next(
+                (
+                    item
+                    for item in refreshed["items"]
+                    if item["subject"].get("subjectId") == subject_id
+                ),
+                None,
+            )
+            if subject_view is None:
+                raise WizardError("Reopened subject disappeared from the current queue.", status=409)
+            result = {"summary": self.compiler_summary(run_id), "subject": subject_view}
+        except Exception:
+            self._restore_run_files(run_dir, snapshot)
+            raise
+        return result
 
     def _attach_reconciliation_decisions(
         self, reconciliation: dict[str, Any], decisions: dict[str, dict[str, Any]]
