@@ -798,6 +798,29 @@ def _incoming_references(
     return sorted(references)
 
 
+def reference_graph_summary(extract: dict) -> dict:
+    """Build the canonical reverse-reference graph without preparing writes."""
+
+    maps = _registry_maps(extract)
+    _registry, sheet_family, _models_by_sheet, _by_model_family = maps
+    sheet_family = {**GLOBAL_SHEET_FAMILIES, **sheet_family}
+    final_rows = {
+        sheet: [dict(row) for row in (payload.get("rows") or [])]
+        for sheet, payload in (extract.get("sheets") or {}).items()
+    }
+    reverse_index, option_rpos = _build_reverse_reference_index(
+        final_rows,
+        maps,
+        sheet_family,
+    )
+    return {
+        "graphBuilt": True,
+        "referenceKeys": len(reverse_index),
+        "referenceEdges": sum(len(locations) for locations in reverse_index.values()),
+        "models": sorted(option_rpos),
+    }
+
+
 def _prepare_batch(extract, batch):
     errors: list[str] = []
     warnings: list[dict] = []

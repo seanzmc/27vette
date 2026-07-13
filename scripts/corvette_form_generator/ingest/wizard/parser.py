@@ -169,6 +169,30 @@ def numeric_columns(row: list[Any], row_number: int, start_index: int) -> dict[s
     return columns
 
 
+def price_column_evidence(
+    row: list[Any],
+    row_number: int,
+    start_index: int,
+    header_row: list[Any],
+    header_row_number: int,
+) -> list[dict[str, Any]]:
+    evidence: list[dict[str, Any]] = []
+    for index in range(start_index, len(row)):
+        number = numeric_value(row[index])
+        if number is None:
+            continue
+        column_letter = get_column_letter(index + 1)
+        evidence.append(
+            {
+                "cellCoordinate": f"{column_letter}{row_number}",
+                "value": number,
+                "headerCoordinate": f"{column_letter}{header_row_number}",
+                "headerText": cell_text(header_row, index),
+            }
+        )
+    return evidence
+
+
 def extract_price_rows(
     sheet_name: str,
     values: list[list[Any]],
@@ -180,6 +204,16 @@ def extract_price_rows(
     base_rows: list[dict[str, Any]] = []
     skipped: list[dict[str, Any]] = []
     if base_start:
+        base_header_number = base_start + 1
+        base_header = values[base_header_number - 1] if base_header_number <= len(values) else []
+        destination_index = next(
+            (
+                index
+                for index in range(len(base_header))
+                if cell_text(base_header, index).strip().upper() == "DFC"
+            ),
+            None,
+        )
         base_end = options_start - 1 if options_start > base_start else len(values)
         for row_number in range(base_start + 1, base_end + 1):
             row = values[row_number - 1]
@@ -197,10 +231,30 @@ def extract_price_rows(
                     "modelCode": code,
                     "description": cell_text(row, 2),
                     "listPrice": next(iter(price_columns.values())),
+                    "destinationCharge": (
+                        float(row[destination_index])
+                        if destination_index is not None
+                        and destination_index < len(row)
+                        and isinstance(row[destination_index], (int, float))
+                        else 0.0
+                    ),
+                    "destinationColumnEvidence": (
+                        {
+                            "headerCoordinate": f"{get_column_letter(destination_index + 1)}{base_header_number}",
+                            "headerText": cell_text(base_header, destination_index),
+                        }
+                        if destination_index is not None
+                        else None
+                    ),
+                    "priceColumnEvidence": price_column_evidence(
+                        row, row_number, 3, base_header, base_header_number
+                    ),
                     "sourceEvidence": row_evidence(sheet_name, row_number, row),
                 }
             )
     if options_start:
+        options_header_number = options_start + 1
+        options_header = values[options_header_number - 1] if options_header_number <= len(values) else []
         for row_number in range(options_start + 1, len(values) + 1):
             row = values[row_number - 1]
             if cell_text(row, 0) in (PRICE_SECTION_BASE, PRICE_SECTION_OPTIONS):
@@ -227,6 +281,9 @@ def extract_price_rows(
                     "qualifier": qualifier,
                     "listPrice": next(iter(price_columns.values())),
                     "priceColumns": price_columns,
+                    "priceColumnEvidence": price_column_evidence(
+                        row, row_number, 3, options_header, options_header_number
+                    ),
                     "sourceEvidence": row_evidence(sheet_name, row_number, row),
                 }
             )

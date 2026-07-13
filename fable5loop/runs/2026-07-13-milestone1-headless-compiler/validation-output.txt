@@ -1,0 +1,188 @@
+# Validation output · Milestone 1 headless compiler
+
+Execution date: 2026-07-13 UTC
+Repository branch: `ingest-wizard`
+
+## Focused compiler contracts
+
+Command:
+
+    .venv/bin/python -m pytest \
+      tests/test_ingest_wizard_canonical_rows.py \
+      tests/test_ingest_wizard_exceptions.py \
+      tests/test_ingest_wizard_identity.py \
+      tests/test_ingest_wizard_comparator_evidence.py \
+      tests/test_ingest_wizard_relationship_compiler.py \
+      tests/test_ingest_wizard_canonical_compiler.py \
+      tests/test_ingest_wizard_compiler_session.py -q
+
+Observed:
+
+    68 passed, 6 subtests passed in 5.42s
+
+## Broad Milestone 1 gate
+
+Command:
+
+    .venv/bin/python -m pytest tests/test_ingest_wizard*.py \
+      tests/test_runtime_metadata_guards.py \
+      tests/test_editor_ops_global_families.py \
+      tests/test_editor_ops_meta.py -q
+
+Observed:
+
+    275 passed, 6 subtests passed in 99.09s
+
+## Syntax and diff integrity
+
+Command:
+
+    .venv/bin/python -m py_compile \
+      scripts/corvette_form_generator/ingest/wizard/canonical_rows.py \
+      scripts/corvette_form_generator/ingest/wizard/exceptions.py \
+      scripts/corvette_form_generator/ingest/wizard/identity.py \
+      scripts/corvette_form_generator/ingest/wizard/comparator_evidence.py \
+      scripts/corvette_form_generator/ingest/wizard/relationship_compiler.py \
+      scripts/corvette_form_generator/ingest/wizard/compiler.py \
+      scripts/corvette_form_generator/ingest/wizard/session.py && \
+    git diff --check
+
+Observed: exit 0, no output.
+
+## Workbook package and schema
+
+Commands:
+
+    .venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
+    .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+
+Observed:
+
+    package status=valid issue_count=0
+    schema status=valid issue_count=0 error_count=0 warning_count=0
+
+## Mandatory ignored current-export proof
+
+Run: `form-output/ingest-wizard/20260712-215133-64bfad`
+Selections:
+
+- `grand_sport_x -> grand_sport`
+- `zr1 -> z06`
+- `zr1x -> z06`
+
+Observed:
+
+- State: `compiled_with_exceptions`.
+- Canonical rows: 5,101.
+- Typed exception subjects: 800.
+- Source features dispositioned: 17,208.
+- Canonical family coverage entries: 75.
+- Duplicate canonical keys: 0.
+- Duplicate option payload groups within a target model: 0.
+- Untyped option `active`/`selectable` values: 0.
+- Manifest actions: add=1,274, update=408, noop=3,419, delete=0.
+- Materialized families include options, OVS, relationships, groups/members, exclusive groups/members, price rules, defaults, variants/memberships, interiors/components/scope, colors, assets, and model metadata where canonical rows exist.
+- Duplicate relationship semantic groups: 0.
+- Comparator proposal/report mismatches: 0 across 120 proposal references.
+- Reverse-reference graph: 2,030 keys / 3,920 edges; no deletions proposed.
+- Evidence partitions: 3 distinct nonempty target hashes and 2,405 normalized workbook-only evidence entries; the workbook partition joins exactly to its declared dependencies and contains no `target:*` dependency.
+- Canonical integer, Boolean, and enum violations: 0.
+- Status ledger: 4,250 compiled statuses exactly equal the source-bound ready OVS dependency set; 752 selected non-emitted status features are `exception_open`.
+- Comparator corroboration: all 66 `corroborated_target_match` claims have an exact ready manifest semantic signature; false claims=0.
+- Real-payload candidate-coordinate renumbering preserves manifest, queue, report, and target evidence semantic hashes, including repeated UQT source rows.
+- Artifact readback rejects invalid payloads and conflicting current resolution pairs even when hashes/bindings are coherent.
+- Artifact readback rejects top-level queue-to-resolution reverse dependencies; the report builder rejects `compileReady=true` with blocker lists or blocking source/family coverage.
+- Authority envelopes recompute their fingerprint from bindings, and `compiler_detail()` rejects a coherently rebound artifact set whose authority is not the session authority.
+- Queue construction/readback and resolution validation enforce the closed reason-code/action cross-product.
+- A valid `unresolved_price_scope` resolution with `priceValue` is consumed into a typed ready option/price-rule row and clears only its own blocker.
+- Comparator-fact reversal preserves `compileReportSemanticSha`.
+- Model modes: Grand Sport X `greenfield`; ZR1/ZR1X `reprocess`.
+- Artifact graph and all subject/derivation versions validated.
+
+- Incoming-reference result: `no_deletions_proposed`.
+- `join-report.json` exact/ambiguous/missing counts agree with parsed candidate price-match evidence; drift is rejected by a focused regression test.
+- Unchanged recompilation preserved bytes and inodes for all five JSON artifacts and the audit log.
+- Audit log remained empty because no resolutions were supplied.
+- Proof directory is ignored by `.gitignore`.
+
+Artifact SHA-256:
+
+- comparator-evidence.json: `277a103d838dbec73899ad308cfd8ed5835130950c79a1abf82b68b7954613f8`
+- canonical-row-manifest.json: `fcf262936422f5372f4ea925a7b03a300f89830896f7f277f35f850e9a2e0f18`
+- exception-queue.json: `1adf5d0a9e4a7945cf230d8d28f4d5ad58591c70d72436aea16270f66bfc2a3a`
+- exception-resolutions.json: `4e43ee06b02dde0d74fcd182fb7cba6aa62340a76eed4a3da6ae54d34d215882`
+- compile-report.json: `93e60d28af3769ca6292fa4b2efaad7e3bc76e156d17a74a7ffc1980a4117a5b`
+- exception-log.jsonl: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`
+
+Input SHA-256 before and after both compiles:
+
+- `stingray_master.xlsx`: `03e8c9671185f238dde7f4bc8e7003da0f74d842d9cc2f76126f938cbb7b54d6`
+- `2027 Chevrolet Car Corvette Export (4) (1).xlsx`: `6ac9538d5bb8a823ade9afea70b2654057b793e1cf27c081c088545aa3add8a1`
+
+An additional compile recorded unchanged filesystem identity:
+
+- workbook `mtime_ns=1783533702592245069`, `size=446684` before and after;
+- source export `mtime_ns=1783533702348168859`, `size=1619319` before and after;
+- no `~$stingray_master.xlsx` lock file;
+- no plan, approval, apply, backup, or edit-log artifact in the proof run.
+
+Machine-readable evidence:
+
+- `real-source-summary.json`
+- `recompile-summary.json`
+- `artifact-audit-summary.json`
+- `no-write-summary.json`
+
+## Protected surfaces
+
+Command checked tracked diffs for:
+
+- `stingray_master.xlsx`
+- `form-output/runtime/**`
+- `form-app/data.js`
+- `form-app/app.js`
+- `form-app/index.html`
+- `form-app/styles.css`
+
+Observed: no tracked changes. No workbook write, plan projection/application, generation, publication, promotion, browser/API workflow, or dealer-submission change occurred.
+
+## Full repository suite
+
+Command:
+
+    .venv/bin/python -m pytest -q
+
+Observed after receipt completion:
+
+    5 failed, 561 passed, 13 subtests passed in 250.81s
+
+Failure classification:
+
+Five failures predate Milestone 1. Four were reproduced byte-for-byte in an isolated `git archive HEAD` checkout during this run, and the stale-pointer failure is already independently reproduced at HEAD in `fable5loop/STATE.md`:
+   - `RealWorkbookLintTest::test_d1_rwj_wks_collision`
+   - `RealWorkbookCompareTest::test_c2_cj2_stingray_name_deviator`
+   - `RealWorkbookCompareTest::test_r3_drz_pending_review`
+   - `test_validator_rejects_stale_last_session_pointer`
+   - `test_shared_assembler_preserves_stingray_runtime_drift_surfaces`
+
+Isolated HEAD reproduction observed `4 failed in 1.72s` with the same assertions.
+
+The Milestone 1 receipt gate passed in this final full-suite run; standalone Fable validation also passed.
+
+An earlier full run also encountered an untracked `asset_map-Sync/__pycache__/asset_map_sync.cpython-314.pyc` smoke artifact. It was removed without changing tracked source. Post-cleanup guard rerun:
+
+    tests/test_asset_map_sync.py::test_legacy_entrypoint_stays_removed
+    1 passed in 0.08s
+
+## Independent verification
+
+Bound implementation/test snapshot digest: `ce510eafc6aaa24c2841e2a036ed8132aec41db1bbdde0635e5de7790bd75ead`.
+
+Final bounded independent review batch: `deleg_4b8ff2b9`.
+
+Observed: three PASS verdicts against the bound implementation/proof snapshot.
+
+- Artifact acceptance: 5,101 unique rows, 800 unique subjects, 4,250/4,250 status-to-ready-OVS parity, 3 nonempty target partitions, 2,405/2,405 workbook-evidence join, 120/120 proposal parity, 66 valid corroborations, zero type/enum/key/relationship/delete violations.
+- Integrity remediation: 45 passed, 6 subtests passed in 3.28s; all five previously blocking remediation seams passed review.
+- Approved-spec compliance: 59 focused tests and 6 subtests passed; headless/no-write, coverage, comparator, phrase, identity, resolution, lifecycle, determinism, and downstream-refusal criteria passed.
+- Reviewer file edits: none.

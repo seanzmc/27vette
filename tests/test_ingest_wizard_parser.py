@@ -80,15 +80,25 @@ class WizardParserTest(unittest.TestCase):
         bv4 = rows[0]
         self.assertEqual(bv4["listPrice"], 395.0)
         self.assertEqual(bv4["qualifier"], "")
+        self.assertEqual(bv4["priceColumnEvidence"][0]["headerText"], "List")
         pdb = rows[1]
         self.assertEqual(pdb["qualifier"], "with ROY wheels")
         self.assertEqual(pdb["listPrice"], 16000.0)
+        self.assertEqual(pdb["priceColumnEvidence"][0]["cellCoordinate"], "E12")
+        self.assertEqual(pdb["priceColumnEvidence"][0]["headerCoordinate"], "E9")
+        self.assertEqual(pdb["priceColumnEvidence"][0]["headerText"], "Factory")
         self.assertTrue(bv4["sourceEvidence"]["cells"])
+        base = next(row for row in self.parsed["baseModelPriceRows"] if row["modelCode"] == "1YR07")
+        self.assertEqual(base["destinationCharge"], 2495.0)
+        self.assertEqual(base["destinationColumnEvidence"]["headerCoordinate"], "J4")
+        self.assertEqual(base["destinationColumnEvidence"]["headerText"], "DFC")
 
     def test_base_model_price_rows(self) -> None:
         base = self.parsed["baseModelPriceRows"]
         self.assertEqual([r["modelCode"] for r in base], ["1YC07", "1YR07"])
         self.assertEqual(base[0]["listPrice"], 71000.0)
+        self.assertEqual(base[0]["priceColumnEvidence"][0]["headerCoordinate"], "D4")
+        self.assertEqual(base[0]["priceColumnEvidence"][0]["headerText"], "List")
 
 
 if __name__ == "__main__":

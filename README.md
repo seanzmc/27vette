@@ -94,7 +94,7 @@ Do not commit `.venv/`. Always run Python tooling with `.venv/bin/python` or the
 
 ## Ingest Wizard Workflow
 
-`scripts/ingest_wizard_server.py` serves a localhost-only UI for raw order-guide intake. Current implemented scope is Pass A through Pass C: choose/upload a raw export, confirm detected sheet roles, run deterministic option/price parsing, select target models, capture reviewer decisions, build a dry-run apply plan, and record plan approval. It is still read-only toward the canonical workbook; run artifacts land under `form-output/ingest-wizard/<run-id>/`. Workbook writes remain a separate future Pass D. Detail: `docs/ingest/`.
+`scripts/ingest_wizard_server.py` serves a localhost-only UI for raw order-guide intake. The historical browser path covers Pass A through approved-plan review, and the separately gated Pass D CLI is dry-run by default. The production continuation now includes the read-only Milestone 1 headless compiler through `WizardSessionStore.compile_canonical_rows(run_id)`: it emits comparator evidence, canonical-row manifests, typed exception queues/resolutions, and compile reports under `form-output/ingest-wizard/<run-id>/`. No compiler browser route, plan projection, workbook write, generation, publication, or promotion is part of Milestone 1. Detail: `docs/ingest/`.
 
 ```sh
 .venv/bin/python scripts/ingest_wizard_server.py [--port 8040]

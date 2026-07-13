@@ -1,6 +1,6 @@
 # Canonical-row compiler and exception queue — production design
 
-Status: Direction approved 2026-07-09. Milestone 0 safety closure was implemented and proved on 2026-07-09. The Milestone 1 headless compiler implementation spec was approved on 2026-07-12; no workbook write, runtime publication, or model promotion is approved. Reasoning level for implementation: high.
+Status: Direction approved 2026-07-09. Milestone 0 safety closure was implemented and proved on 2026-07-09. Milestone 1 headless compilation was implemented and independently verified on 2026-07-13. No workbook write, runtime publication, model promotion, or browser/API exception workflow is approved. Reasoning level for implementation: high.
 
 ## 0. Decision summary
 

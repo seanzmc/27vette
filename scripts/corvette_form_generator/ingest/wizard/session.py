@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import time
 import uuid
@@ -46,6 +47,15 @@ from corvette_form_generator.ingest.wizard.decisions import (
     workbook_sections,
 )
 from corvette_form_generator.ingest.wizard.copy_split import FLAG_DUPLICATE_NAME, propose_copy_split
+from corvette_form_generator.ingest.wizard.canonical_rows import (
+    COMPILER_POLICY_VERSION,
+    canonical_bytes,
+    semantic_hash,
+    validate_artifact_graph,
+)
+from corvette_form_generator.ingest.wizard.comparator_evidence import build_comparator_evidence
+from corvette_form_generator.ingest.wizard.compiler import compile_canonical_rows as run_canonical_compiler
+from corvette_form_generator.ingest.wizard.exceptions import append_audit_event_once, build_audit_event
 from corvette_form_generator.ingest.wizard.hints import scan_candidates
 from corvette_form_generator.ingest.wizard.plan_builder import (
     artifact_sha,
@@ -68,6 +78,9 @@ STATE_PROFILED = "profiled"
 STATE_ROLES_CONFIRMED = "roles_confirmed"
 STATE_PARSED = "parsed"
 STATE_MODELS_SELECTED = "models_selected"
+STATE_COMPILED_READY = "compiled_ready"
+STATE_COMPILED = STATE_COMPILED_READY
+STATE_COMPILED_WITH_EXCEPTIONS = "compiled_with_exceptions"
 STATE_DECISIONS_IN_PROGRESS = "decisions_in_progress"
 STATE_DECISIONS_COMPLETE = "decisions_complete"
 STATE_PLAN_BUILT = "plan_built"
@@ -120,6 +133,30 @@ DECISION_STATES = (
 VALID_ROLES = {ROLE_OPTIONS, ROLE_PRICE, ROLE_EXCLUDE}
 RUN_ID_RE = re.compile(r"^[0-9]{8}-[0-9]{6}-[0-9a-f]{6}$")
 PARSE_ARTIFACTS = ("option-candidates.json", "price-rows.json", "join-report.json")
+COMPILER_ARTIFACTS = (
+    "comparator-evidence.json",
+    "canonical-row-manifest.json",
+    "exception-queue.json",
+    "exception-resolutions.json",
+    "compile-report.json",
+)
+COMPILER_CACHE_ARTIFACTS = tuple(
+    name for name in COMPILER_ARTIFACTS if name != "exception-resolutions.json"
+)
+COMPILER_STATES = (STATE_COMPILED, STATE_COMPILED_WITH_EXCEPTIONS)
+COMPILER_DOWNSTREAM_ARTIFACTS = (
+    "apply-plan.json",
+    "apply-plan-dryrun.json",
+    "apply-plan.md",
+    "plan-approval.json",
+    "apply-dry-run-report.json",
+    "dry-run-approval.json",
+    "write-approval.json",
+    "apply-report.json",
+    "scratch-apply-log.jsonl",
+    "apply-workbook-edit-log.jsonl",
+    "approval-log.jsonl",
+)
 
 
 class WizardError(ValueError):
@@ -132,6 +169,50 @@ class WizardError(ValueError):
 
 def write_json(path: Path, payload: Any) -> None:
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def replace_json_artifact_set(run_dir: Path, payloads: dict[str, Any]) -> None:
+    """Validate then replace only changed JSON artifacts with rollback."""
+
+    token = uuid.uuid4().hex
+    temporary: dict[str, Path] = {}
+    originals: dict[str, bytes | None] = {}
+    replaced: list[str] = []
+    try:
+        for filename, payload in payloads.items():
+            encoded = json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True) + "\n"
+            json.loads(encoded)
+            target = run_dir / filename
+            encoded_bytes = encoded.encode("utf-8")
+            if target.is_file() and target.read_bytes() == encoded_bytes:
+                continue
+            temp = run_dir / f".{filename}.{token}.tmp"
+            with temp.open("wb") as handle:
+                handle.write(encoded_bytes)
+                handle.flush()
+                os.fsync(handle.fileno())
+            temporary[filename] = temp
+            originals[filename] = target.read_bytes() if target.is_file() else None
+        for filename in sorted(temporary):
+            os.replace(temporary[filename], run_dir / filename)
+            replaced.append(filename)
+        directory_fd = os.open(run_dir, os.O_RDONLY)
+        try:
+            os.fsync(directory_fd)
+        finally:
+            os.close(directory_fd)
+    except Exception:
+        for filename in replaced:
+            target = run_dir / filename
+            original = originals[filename]
+            if original is None:
+                target.unlink(missing_ok=True)
+            else:
+                target.write_bytes(original)
+        raise
+    finally:
+        for temp in temporary.values():
+            temp.unlink(missing_ok=True)
 
 
 def read_json(path: Path) -> Any:
@@ -272,6 +353,19 @@ class WizardSessionStore:
                 "The last apply failed verification; restore or reconcile it before continuing.",
                 status=409,
             )
+
+    def _invalidate_compiler_artifacts(self, run_dir: Path, *, changed: str) -> None:
+        """Evict only transitive dependents; preserve resolutions and audit history."""
+
+        dependents = {
+            "source": COMPILER_CACHE_ARTIFACTS,
+            "selection": COMPILER_CACHE_ARTIFACTS,
+            "workbook": COMPILER_CACHE_ARTIFACTS,
+        }
+        if changed not in dependents:
+            raise ValueError(f"Unknown compiler dependency node: {changed}")
+        for filename in dependents[changed]:
+            (run_dir / filename).unlink(missing_ok=True)
 
     def _compiler_artifact_bindings(self, run_dir: Path) -> dict[str, str]:
         """Return only compiler hashes that actually exist for this run.
@@ -531,6 +625,7 @@ class WizardSessionStore:
             raise WizardError("Confirm at least one options sheet.")
         if len(price) != 1:
             raise WizardError("Confirm exactly one price sheet.")
+        self._invalidate_compiler_artifacts(run_dir, changed="source")
         write_json(run_dir / "sheet-roles.json", {"schemaVersion": SCHEMA_VERSION, "roles": confirmed})
         for stale in PARSE_ARTIFACTS:
             (run_dir / stale).unlink(missing_ok=True)
@@ -541,12 +636,13 @@ class WizardSessionStore:
     # ------------------------------------------------------------- parse
     def run_parse(self, run_id: str) -> dict[str, Any]:
         session = self.load_session(run_id)
-        if session["state"] not in (STATE_ROLES_CONFIRMED, STATE_PARSED) + DECISION_STATES:
+        if session["state"] not in (STATE_ROLES_CONFIRMED, STATE_PARSED) + DECISION_STATES + COMPILER_STATES:
             raise WizardError("Confirm sheet roles before parsing.")
         run_dir = self.run_dir(run_id)
         roles = read_json(run_dir / "sheet-roles.json")["roles"]
         parsed = parse_confirmed_sheets(Path(session["sourcePath"]), roles)
         report = join_prices(parsed["candidates"], parsed["priceRows"])
+        self._invalidate_compiler_artifacts(run_dir, changed="source")
         write_json(
             run_dir / "option-candidates.json",
             {
@@ -580,7 +676,7 @@ class WizardSessionStore:
         query: str = "",
     ) -> dict[str, Any]:
         session = self.load_session(run_id, verify_source=False)
-        if session["state"] not in (STATE_PARSED,) + DECISION_STATES:
+        if session["state"] not in (STATE_PARSED,) + DECISION_STATES + COMPILER_STATES:
             raise WizardError("Run the parse before requesting candidates.")
         run_dir = self.run_dir(run_id)
         payload = read_json(run_dir / "option-candidates.json")
@@ -611,9 +707,12 @@ class WizardSessionStore:
         }
 
     # ------------------------------------------------- pass b: model scoping
-    def _parsed_candidates(self, run_id: str) -> tuple[dict[str, Any], Path, list[dict[str, Any]]]:
+    def _parsed_candidates(
+        self, run_id: str, *, allow_compiled: bool = False
+    ) -> tuple[dict[str, Any], Path, list[dict[str, Any]]]:
         session = self.load_session(run_id, verify_source=False)
-        if session["state"] not in (STATE_PARSED,) + DECISION_STATES:
+        allowed = (STATE_PARSED,) + DECISION_STATES + (COMPILER_STATES if allow_compiled else ())
+        if session["state"] not in allowed:
             raise WizardError("Run the parse before Pass B model selection.")
         candidates_file = self.run_dir(run_id) / "option-candidates.json"
         return session, candidates_file, read_json(candidates_file)["candidates"]
@@ -632,7 +731,7 @@ class WizardSessionStore:
         return selection
 
     def model_options(self, run_id: str) -> dict[str, Any]:
-        session, _, candidates = self._parsed_candidates(run_id)
+        session, _, candidates = self._parsed_candidates(run_id, allow_compiled=True)
         run_dir = self.run_dir(run_id)
         selection_file = run_dir / "model-selection.json"
         return {
@@ -642,13 +741,14 @@ class WizardSessionStore:
         }
 
     def select_models(self, run_id: str, targets: list[str], comparators: dict[str, str]) -> dict[str, Any]:
-        session, candidates_file, candidates = self._parsed_candidates(run_id)
+        session, candidates_file, candidates = self._parsed_candidates(run_id, allow_compiled=True)
         self._refuse_if_applied(session)
         try:
             validate_selection(candidates, targets, comparators)
         except ValueError as exc:
             raise WizardError(str(exc)) from exc
         run_dir = self.run_dir(run_id)
+        self._invalidate_compiler_artifacts(run_dir, changed="selection")
         selection = {
             "schemaVersion": SCHEMA_VERSION_B,
             "targets": list(targets),
@@ -670,6 +770,230 @@ class WizardSessionStore:
             "session": session,
             "selection": selection,
             "reconciliation": self._attach_reconciliation_decisions(dict(reconciliation), state["decisions"]),
+        }
+
+    def compile_canonical_rows(self, run_id: str) -> dict[str, Any]:
+        """Compile one selected run without mutating the canonical workbook."""
+
+        session = self.load_session(run_id)
+        if session["state"] not in (STATE_MODELS_SELECTED,) + COMPILER_STATES:
+            raise WizardError("Select target and comparator models before compiling.", status=409)
+        run_dir = self.run_dir(run_id)
+        downstream_name = re.compile(
+            r"apply|plan|approval|dry[-_]?run|write|backup|edit[-_]?log|promotion",
+            re.IGNORECASE,
+        )
+        downstream = sorted(
+            {
+                *(name for name in COMPILER_DOWNSTREAM_ARTIFACTS if (run_dir / name).exists()),
+                *(path.name for path in run_dir.glob("apply-plan*")),
+                *(path.name for path in run_dir.iterdir() if downstream_name.search(path.name)),
+            }
+        )
+        if session.get("dryRunReport") or session.get("applyReport"):
+            downstream.append("session downstream report binding")
+        decisions_file = run_dir / "decisions.json"
+        if decisions_file.is_file() and (read_json(decisions_file).get("decisions") or []):
+            downstream.append("nonempty decisions.json")
+        if downstream:
+            raise WizardError(
+                "Compiler refuses a run with downstream plan/apply evidence; start a fresh run: "
+                + ", ".join(downstream),
+                status=409,
+            )
+        candidates_file = run_dir / "option-candidates.json"
+        selection = self._load_selection(run_id, candidates_file)
+        workbook = self._require_workbook()
+        input_paths = {
+            "source": Path(session["sourcePath"]),
+            "workbook": workbook,
+            "sheetRoles": run_dir / "sheet-roles.json",
+            "optionCandidates": candidates_file,
+            "priceRows": run_dir / "price-rows.json",
+            "joinReport": run_dir / "join-report.json",
+            "modelSelection": run_dir / "model-selection.json",
+        }
+        missing = [label for label, path in input_paths.items() if not path.is_file()]
+        if missing:
+            raise WizardError(f"Compiler inputs are missing: {', '.join(missing)}.", status=409)
+        before = {label: file_fingerprint(path) for label, path in input_paths.items()}
+        from corvette_form_generator.editor_ops import extract_workbook, rows_of
+        from corvette_form_generator.ingest.wizard.relationship_compiler import load_compiler_phrase_map
+
+        workbook_extract = extract_workbook(workbook)
+        selected_models = {
+            *[str(model) for model in selection.get("targets") or []],
+            *[str(model) for model in (selection.get("comparators") or {}).values()],
+        }
+        source_role_rows = sorted(
+            (
+                {str(key): value for key, value in row.items()}
+                for row in rows_of(workbook_extract, "model_workbook_sources")
+                if str(row.get("model_key") or "") in selected_models
+            ),
+            key=lambda row: (
+                str(row.get("model_key") or ""),
+                str(row.get("source_role") or ""),
+                str(row.get("sheet_name") or ""),
+            ),
+        )
+        phrase_rows = load_compiler_phrase_map(workbook)
+        authority_bindings = {
+            "compilerPolicyVersion": COMPILER_POLICY_VERSION,
+            "files": before,
+            "modelWorkbookSources": source_role_rows,
+            "rulePhraseMap": phrase_rows,
+        }
+        run_authority = {
+            "fingerprint": hashlib.sha256(canonical_bytes(authority_bindings)).hexdigest(),
+            "bindings": authority_bindings,
+        }
+        resolution_entries: list[dict[str, Any]] = []
+        resolution_file = run_dir / "exception-resolutions.json"
+        if resolution_file.is_file():
+            previous_resolutions = read_json(resolution_file)
+            seen: set[str] = set()
+            for field in ("entries", "validEntries", "staleEntries", "supersededEntries"):
+                for entry in previous_resolutions.get(field) or []:
+                    identity = semantic_hash(entry)
+                    if identity not in seen:
+                        seen.add(identity)
+                        resolution_entries.append(dict(entry))
+        try:
+            comparator = build_comparator_evidence(
+                workbook,
+                selection["comparators"],
+                run_authority_fingerprint=run_authority,
+            )
+            artifacts = run_canonical_compiler(
+                workbook_path=workbook,
+                option_payload=read_json(input_paths["optionCandidates"]),
+                price_payload=read_json(input_paths["priceRows"]),
+                join_report=read_json(input_paths["joinReport"]),
+                roles_payload=read_json(input_paths["sheetRoles"]),
+                selection=selection,
+                comparator_artifact=comparator,
+                run_authority_fingerprint=run_authority,
+                resolution_entries=resolution_entries,
+            )
+        except (ValueError, KeyError) as exc:
+            raise WizardError(f"Compiler refused the run: {exc}", status=409) from exc
+        after = {label: file_fingerprint(path) for label, path in input_paths.items()}
+        if before != after:
+            raise WizardError("Compiler input changed during compilation; no artifacts were replaced.", status=409)
+        payloads = {name: artifacts[name] for name in COMPILER_ARTIFACTS}
+        replace_json_artifact_set(run_dir, payloads)
+        log_path = run_dir / "exception-log.jsonl"
+        log_path.touch(exist_ok=True)
+        queue = artifacts["exception-queue.json"]
+        resolution_artifact = artifacts["exception-resolutions.json"]
+        current_subjects = {item["subjectId"]: item for item in queue.get("subjects") or []}
+        for valid in resolution_artifact.get("validEntries") or []:
+            disposition = str(valid.get("disposition") or "resolved")
+            next_state = disposition if disposition != "resolved" else "resolved_pending_projection"
+            event = build_audit_event(
+                queue_subject_fingerprint=queue["queueSubjectFingerprint"],
+                subject_id_value=str(valid.get("subjectId") or ""),
+                subject_version_value=str(valid.get("subjectVersion") or ""),
+                event_type="resolution_recorded",
+                prior_state="open",
+                next_state=next_state,
+                cause_fingerprint=semantic_hash(valid),
+                resolution_entry_semantic_sha=semantic_hash(valid),
+                reviewer=str(valid.get("reviewer") or ""),
+            )
+            append_audit_event_once(log_path, event)
+        for stale in resolution_artifact.get("staleEntries") or []:
+            current = current_subjects.get(str(stale.get("subjectId") or ""))
+            cause = str(current.get("subjectVersion") if current else "subject_removed")
+            event = build_audit_event(
+                queue_subject_fingerprint=queue["queueSubjectFingerprint"],
+                subject_id_value=str(stale.get("subjectId") or ""),
+                subject_version_value=str(stale.get("subjectVersion") or ""),
+                event_type="resolution_became_stale",
+                prior_state="resolved",
+                next_state="stale",
+                cause_fingerprint=cause,
+                resolution_entry_semantic_sha=semantic_hash(stale),
+                reviewer=str(stale.get("reviewer") or ""),
+            )
+            append_audit_event_once(log_path, event)
+        for superseded in resolution_artifact.get("supersededEntries") or []:
+            event = build_audit_event(
+                queue_subject_fingerprint=queue["queueSubjectFingerprint"],
+                subject_id_value=str(superseded.get("subjectId") or ""),
+                subject_version_value=str(superseded.get("subjectVersion") or ""),
+                event_type="resolution_superseded",
+                prior_state="resolved",
+                next_state="superseded",
+                cause_fingerprint="subject_removed",
+                resolution_entry_semantic_sha=semantic_hash(superseded),
+                reviewer=str(superseded.get("reviewer") or ""),
+            )
+            append_audit_event_once(log_path, event)
+        report = artifacts["compile-report.json"]
+        has_blockers = any(entry.get("blockers") for entry in report["models"].values())
+        session["state"] = STATE_COMPILED_WITH_EXCEPTIONS if has_blockers else STATE_COMPILED
+        session["compiler"] = {
+            "runAuthorityFingerprint": run_authority["fingerprint"],
+            "manifestSemanticSha": artifacts["canonical-row-manifest.json"]["manifestSemanticSha"],
+            "queueSubjectFingerprint": queue["queueSubjectFingerprint"],
+            "resolutionSemanticSha": artifacts["exception-resolutions.json"]["resolutionSemanticSha"],
+        }
+        replace_json_artifact_set(run_dir, {"session.json": session})
+        return {
+            "session": session,
+            "compileReport": report,
+            "manifest": artifacts["canonical-row-manifest.json"],
+            "exceptionQueue": queue,
+            "resolutions": artifacts["exception-resolutions.json"],
+        }
+
+    def compiler_detail(self, run_id: str) -> dict[str, Any]:
+        """Load and cross-validate one coherent compiled artifact set."""
+
+        session = self.load_session(run_id, verify_source=False)
+        if session.get("state") not in COMPILER_STATES:
+            raise WizardError("Compile canonical rows first.", status=404)
+        run_dir = self.run_dir(run_id)
+        missing = [name for name in COMPILER_ARTIFACTS if not (run_dir / name).is_file()]
+        if missing:
+            raise WizardError(f"Compiled artifact set is incomplete: {', '.join(missing)}.", status=409)
+        comparator = read_json(run_dir / "comparator-evidence.json")
+        manifest = read_json(run_dir / "canonical-row-manifest.json")
+        queue = read_json(run_dir / "exception-queue.json")
+        resolutions = read_json(run_dir / "exception-resolutions.json")
+        report = read_json(run_dir / "compile-report.json")
+        try:
+            validate_artifact_graph(manifest, report, comparator, queue, resolutions)
+        except ValueError as exc:
+            raise WizardError(f"Compiler artifact graph is invalid: {exc}", status=409) from exc
+        compiler_state = session.get("compiler") or {}
+        expected = {
+            "runAuthorityFingerprint": str(
+                (manifest.get("runAuthorityFingerprint") or {}).get("fingerprint") or ""
+            ),
+            "manifestSemanticSha": manifest.get("manifestSemanticSha"),
+            "queueSubjectFingerprint": queue.get("queueSubjectFingerprint"),
+            "resolutionSemanticSha": resolutions.get("resolutionSemanticSha"),
+        }
+        if any(compiler_state.get(key) != value for key, value in expected.items()):
+            raise WizardError("Compiled artifact bindings do not match session state.", status=409)
+        if report.get("manifestSemanticSha") != manifest.get("manifestSemanticSha"):
+            raise WizardError("Compile report does not bind the current manifest.", status=409)
+        if manifest.get("queueSubjectFingerprint") != queue.get("queueSubjectFingerprint"):
+            raise WizardError("Manifest does not bind the current exception queue.", status=409)
+        if manifest.get("resolutionSemanticSha") != resolutions.get("resolutionSemanticSha"):
+            raise WizardError("Manifest does not bind the current resolutions.", status=409)
+        if manifest.get("comparatorEvidenceSemanticSha") != comparator.get("comparatorEvidenceSemanticSha"):
+            raise WizardError("Manifest does not bind the current comparator evidence.", status=409)
+        return {
+            "session": session,
+            "comparatorEvidence": comparator,
+            "manifest": manifest,
+            "exceptionQueue": queue,
+            "resolutions": resolutions,
+            "compileReport": report,
         }
 
     def _attach_reconciliation_decisions(

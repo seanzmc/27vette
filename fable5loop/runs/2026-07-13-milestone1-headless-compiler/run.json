@@ -1,0 +1,83 @@
+{
+  "id": "2026-07-13-milestone1-headless-compiler",
+  "started_at": "2026-07-13T01:50:26Z",
+  "completed_at": "2026-07-13T06:29:07Z",
+  "objective": "Implement and verify the approved read-only Milestone 1 canonical-row compiler, comparator evidence, typed exception contracts, and WizardSessionStore lifecycle.",
+  "changed_surface": "ingest compiler Python modules, additive parser evidence, wizard session lifecycle, Python tests, ingest docs, and Fable closeout artifacts; no workbook write, browser/API compiler workflow, apply plan, generation, publication, promotion, or dealer-submission change",
+  "primary_artifacts": [
+    "scripts/corvette_form_generator/editor_ops.py",
+    "scripts/corvette_form_generator/ingest/wizard/canonical_rows.py",
+    "scripts/corvette_form_generator/ingest/wizard/exceptions.py",
+    "scripts/corvette_form_generator/ingest/wizard/identity.py",
+    "scripts/corvette_form_generator/ingest/wizard/comparator_evidence.py",
+    "scripts/corvette_form_generator/ingest/wizard/relationship_compiler.py",
+    "scripts/corvette_form_generator/ingest/wizard/compiler.py",
+    "scripts/corvette_form_generator/ingest/wizard/session.py",
+    "scripts/corvette_form_generator/ingest/wizard/parser.py",
+    "tests/test_ingest_wizard_canonical_rows.py",
+    "tests/test_ingest_wizard_exceptions.py",
+    "tests/test_ingest_wizard_identity.py",
+    "tests/test_ingest_wizard_comparator_evidence.py",
+    "tests/test_ingest_wizard_relationship_compiler.py",
+    "tests/test_ingest_wizard_canonical_compiler.py",
+    "tests/test_ingest_wizard_compiler_session.py",
+    "docs/ingest/milestone-1-headless-compiler-comparator-evidence-implementation-plan.md"
+  ],
+  "outcome_rubric": "fable5loop/runs/2026-07-13-milestone1-headless-compiler/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-13-milestone1-headless-compiler/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-13-milestone1-headless-compiler/validation-output.txt",
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "delegation_id": "deleg_4b8ff2b9",
+    "verdict": "pass",
+    "cycles": 9,
+    "pattern": "bounded three-lane exact-snapshot verification"
+  },
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-13-milestone1-headless-compiler/validation-output.txt"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-13-milestone1-headless-compiler/validation-output.txt"
+    }
+  ],
+  "skill_update": {
+    "decision": "not_applicable",
+    "evidence": "fable5loop/runs/2026-07-13-milestone1-headless-compiler/verifier-report.md",
+    "reason": "The run applied existing Fable, workbook-source, and independent-verification procedures; implementation lessons were encoded in compiler contracts and tests rather than a new reusable loop procedure."
+  },
+  "boundaries_preserved": [
+    "stingray_master.xlsx byte-identical",
+    "current source export byte-identical",
+    "no apply plan projection or application",
+    "generated runtime artifacts not refreshed",
+    "form-app/data.js and browser assets untouched",
+    "model promotion not run",
+    "dealer submission untouched"
+  ],
+  "validation": [
+    {
+      "command": "focused Milestone 1 pytest suite",
+      "result": "pass: 68 passed, 6 subtests passed"
+    },
+    {
+      "command": "broad ingest/runtime/editor metadata pytest gate",
+      "result": "pass: 275 passed, 6 subtests passed"
+    },
+    {
+      "command": "mandatory current-export compile and unchanged recompile",
+      "result": "pass: compiled_with_exceptions; 5101 rows across 19 materialized families; 800 typed subjects; graph, authority, 3 distinct nonempty target partitions, 2405 normalized workbook-only evidence entries with exact dependency join, canonical types/enums, global keys, comparator proposal parity, and reverse references valid; GSX greenfield, ZR1/ZR1X reprocess; stable bytes/inodes; workbook and source unchanged"
+    },
+    {
+      "command": "workbook package and schema validation",
+      "result": "pass: valid with 0 issues"
+    },
+    {
+      "command": "full repository pytest suite",
+      "result": "561 passed, 13 subtests passed, 5 pre-existing failures; Milestone 1 receipt contract passed; four failures reproduced in isolated HEAD and stale-pointer failure previously reproduced at HEAD"
+    }
+  ]
+}

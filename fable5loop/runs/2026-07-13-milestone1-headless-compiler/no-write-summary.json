@@ -1,0 +1,25 @@
+{
+  "before": {
+    "stingray_master.xlsx": {
+      "mtime_ns": 1783533702592245069,
+      "size": 446684
+    },
+    "2027 Chevrolet Car Corvette Export (4) (1).xlsx": {
+      "mtime_ns": 1783533702348168859,
+      "size": 1619319
+    }
+  },
+  "after": {
+    "stingray_master.xlsx": {
+      "mtime_ns": 1783533702592245069,
+      "size": 446684
+    },
+    "2027 Chevrolet Car Corvette Export (4) (1).xlsx": {
+      "mtime_ns": 1783533702348168859,
+      "size": 1619319
+    }
+  },
+  "mtimeAndSizeUnchanged": true,
+  "excelLockExists": false,
+  "forbiddenRunArtifacts": []
+}

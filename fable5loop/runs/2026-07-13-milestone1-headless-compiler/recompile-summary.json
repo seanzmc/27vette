@@ -1,0 +1,36 @@
+{
+  "artifacts": {
+    "canonical-row-manifest.json": {
+      "inode": 337699137,
+      "sha256": "fcf262936422f5372f4ea925a7b03a300f89830896f7f277f35f850e9a2e0f18",
+      "size": 8790342
+    },
+    "comparator-evidence.json": {
+      "inode": 336870070,
+      "sha256": "277a103d838dbec73899ad308cfd8ed5835130950c79a1abf82b68b7954613f8",
+      "size": 809894
+    },
+    "compile-report.json": {
+      "inode": 337699140,
+      "sha256": "93e60d28af3769ca6292fa4b2efaad7e3bc76e156d17a74a7ffc1980a4117a5b",
+      "size": 7577982
+    },
+    "exception-log.jsonl": {
+      "inode": 336499523,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    "exception-queue.json": {
+      "inode": 337699138,
+      "sha256": "1adf5d0a9e4a7945cf230d8d28f4d5ad58591c70d72436aea16270f66bfc2a3a",
+      "size": 1331837
+    },
+    "exception-resolutions.json": {
+      "inode": 337699139,
+      "sha256": "4e43ee06b02dde0d74fcd182fb7cba6aa62340a76eed4a3da6ae54d34d215882",
+      "size": 348
+    }
+  },
+  "auditBytes": 0,
+  "byteAndInodeStableRecompile": true
+}
