@@ -165,7 +165,7 @@ def build_master_workbook(path: Path) -> Path:
             ["z06", "rule_group_members_sheet", "z06_rule_group_members", True, ""],
             ["z06", "exclusive_groups_sheet", "z06_exclusive_groups", True, ""],
             ["z06", "exclusive_group_members_sheet", "z06_exclusive_members", True, ""],
-            ["z06", "color_overrides_sheet", "z06_color_overrides", True, ""],
+            ["z06", "color_overrides_sheet", "color_overrides", True, ""],
             ["z06", "interior_source_sheet", "LZ_Interiors", True, ""],
             ["z06", "variant_option_overrides_sheet", "z06_variant_overrides", True, ""],
             ["zr1", "source_option_sheet", "zr1_options", False, "inactive scaffold, must be ignored"],
@@ -177,11 +177,20 @@ def build_master_workbook(path: Path) -> Path:
         "z06_options",
         option_headers,
         [
+            ["opt_gba_001", "GBA", 0, "Black", "Touch-Up Paint Number WA-8555", "", "sec_pain_001", True, 5, True, ""],
             ["opt_pdb_001", "PDB", 16000, "Carbon Fiber Wheel Package", "Visible carbon", "", "sec_whee_001", "", 10, True, ""],
             ["opt_xfr_001", "XFR", "", "High Performance Tires", "Reference-only tires", "", "sec_whee_001", False, 20, False, ""],
         ],
     )
-    _table(wb, "z06_ovs", ["option_id", "variant_id", "status"], [["opt_pdb_001", "1lz_h07", "available"]])
+    _table(
+        wb,
+        "z06_ovs",
+        ["option_id", "variant_id", "status"],
+        [
+            ["opt_gba_001", "1lz_h07", "available"],
+            ["opt_pdb_001", "1lz_h07", "available"],
+        ],
+    )
     _table(wb, "z06_rule_mapping", ["rule_id", "source_id", "rule_type", "target_id", "original_detail_raw", "body_style_scope", "runtime_action", "disabled_reason"], [["z06_rule_pdb_requires_bv4", "opt_pdb_001", "requires", "opt_bv4_001", "", "", "block", ""]])
     _table(wb, "z06_price_rules", ["price_rule_id", "condition_option_id", "price_rule_type", "target_option_id", "price_value", "body_style_scope", "trim_level_scope", "variant_scope", "notes"], [["z06_pr_pdb_bv4", "opt_pdb_001", "override", "opt_bv4_001", 500, "coupe", "1lz", "", ""]])
     _table(wb, "z06_rule_groups", ["group_id", "group_type", "source_id", "body_style_scope", "trim_level_scope", "variant_scope", "disabled_reason", "active", "notes"], [["z06_group_pdb", "requires_any", "opt_pdb_001", "", "", "", "", True, ""]])
@@ -189,7 +198,12 @@ def build_master_workbook(path: Path) -> Path:
     _table(wb, "z06_exclusive_groups", ["group_id", "selection_mode", "active", "notes"], [["z06_excl_wheels", "single", True, ""]])
     _table(wb, "z06_exclusive_members", ["group_id", "option_id", "display_order", "active"], [["z06_excl_wheels", "opt_pdb_001", 1, True], ["z06_excl_wheels", "opt_bv4_001", 2, True]])
     _table(wb, "z06_variant_overrides", ["option_id", "variant_id", "selectable", "display_behavior", "section_id", "active", "note"], [])
-    _table(wb, "z06_color_overrides", ["option_id", "interior_id", "status", "active", "notes"], [])
+    _table(
+        wb,
+        "color_overrides",
+        ["interior_id", "option_id", "rule_type", "adds_rpo"],
+        [["3LZ_AQ9_HTA", "opt_gba_001", "requires", ""]],
+    )
     # The inactive source's sheet must actually exist with a conflicting row,
     # so the active-flag filter is the only thing excluding it.
     _table(
@@ -256,6 +270,19 @@ def build_master_workbook(path: Path) -> Path:
             ["z06", "1LZ_AQ9_HTA", "1LZ", "True", "", "Workbook-owned interior trim scope metadata.", "AQ9 GT1 Bucket Seats", "HTA Jet Black", "Mulan leather", "HTA Jet Black", 1, 1, 1, '["1LZ", "AQ9 GT1 Bucket Seats", "HTA Jet Black"]', "AQ9 GT1 Bucket Seats", "HTA Jet Black", 1, "fixture"],
             ["z06", "3LZ_AQ9_HTA", "3LZ", "True", "", "Workbook-owned interior trim scope metadata.", "AQ9 GT1 Bucket Seats", "HTA Jet Black", "Napa leather", "HTA Jet Black", 2, 2, 2, '["3LZ", "AQ9 GT1 Bucket Seats", "HTA Jet Black"]', "AQ9 GT1 Bucket Seats", "HTA Jet Black", 2, "fixture"],
             ["zr1", "1LZ_AQ9_HTA", "1LZ", "True", "", "Workbook-owned interior trim scope metadata.", "AQ9 GT1 Bucket Seats", "HTA Jet Black", "Mulan leather", "HTA Jet Black", 1, 1, 1, '["1LZ", "AQ9 GT1 Bucket Seats", "HTA Jet Black"]', "AQ9 GT1 Bucket Seats", "HTA Jet Black", 1, "fixture"],
+        ],
+    )
+    _table(
+        wb,
+        "interior_components",
+        [
+            "model_key", "interior_id", "rpo", "component_type", "label",
+            "price_ref_type", "price_ref_code", "price_trim_scope",
+            "display_order", "active", "notes",
+        ],
+        [
+            ["z06", "1LZ_AQ9_HTA", "HTA", "base_color", "Jet Black", "", "", "1LZ", 10, True, "fixture"],
+            ["z06", "3LZ_AQ9_HTA", "HTA", "base_color", "Jet Black", "", "", "3LZ", 10, True, "fixture"],
         ],
     )
     _table(

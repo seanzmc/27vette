@@ -1,0 +1,61 @@
+Milestone 2.2 validation evidence — 2026-07-14
+
+TDD evidence
+- RED: the new comparator Color/Trim/profile compiler test failed before profile compilation existed.
+- RED: typed interior endpoint, multi-interior one-of refusal, and profile-effect relationship tests failed before relationship compiler changes.
+- GREEN: PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_ingest_wizard_relationship_compiler.py tests/test_ingest_wizard_profile_compiler.py tests/test_ingest_wizard_canonical_compiler.py -q --maxfail=3
+  Result: 40 passed, 5 subtests passed in 4.56s.
+- GREEN: PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_ingest_wizard*.py -q --maxfail=5
+  Result: 289 passed, 16 subtests passed in 9.14s.
+
+Static and workbook gates
+- .venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
+  Result: valid, issue_count=0.
+- .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+  Result: valid, issue_count=0, error_count=0, warning_count=0.
+- .venv/bin/python -m compileall -q scripts/corvette_form_generator/ingest/wizard scripts/ingest_wizard_server.py
+  Result: passed.
+- git diff --check
+  Result: passed.
+
+Broad gates
+- PYTHONPATH=scripts .venv/bin/python -m pytest tests -q
+  Result: 608 passed, 23 subtests passed, 5 failed in 272.38s.
+  Classification: one expected open-receipt failure in test_repository_fable5_loop_contract_passes; four unrelated failures reproduced byte-for-byte at pristine origin/ingest-wizard commit 1b3c337 in a detached temporary worktree:
+  * tests/test_editor_lints.py::RealWorkbookLintTest::test_d1_rwj_wks_collision
+  * tests/test_editor_lints.py::RealWorkbookCompareTest::test_c2_cj2_stingray_name_deviator
+  * tests/test_editor_lints.py::RealWorkbookCompareTest::test_r3_drz_pending_review
+  * tests/test_source_assembly_characterization.py::test_shared_assembler_preserves_stingray_runtime_drift_surfaces
+- README JavaScript surface map (13 node test files in one node --test invocation)
+  Result: 267 passed, 0 failed in 60.39s.
+- Generated timestamp churn from the Node gates was restored. Final protected hashes for stingray_master.xlsx, tracked form-app files, and form-output/runtime files match the pre-gate baseline.
+
+Fresh real-source proof
+- Source: 2027 Chevrolet Car Corvette Export (4) (1).xlsx
+- Source SHA-256: 6ac9538d5bb8a823ade9afea70b2654057b793e1cf27c081c088545aa3add8a1
+- Run: form-output/ingest-wizard/20260714-103915-f8310c
+- Selection: grand_sport_x -> grand_sport; zr1 -> z06; zr1x -> z06.
+- Manifest: 5,774 rows; 5,757 ready; 17 blocked.
+- Exceptions: 374 total; 257 actionable; 117 actionless.
+- Actionless: 80 unresolved_relationship_identity subjects for unsupported multi-interior one-of/group semantics; 37 incomplete comparator proposals whose current ready target catalogs are not complete/unique.
+- Closed residuals: unsupported_color_trim_source=0; supported metadata family blockers=0; unresolved_relationship_endpoint=0.
+- Profile counts: each target has 10 shared paint options. Grand Sport X has 132 interior-scope rows and 198 component rows; ZR1/ZR1X each have 90 scope rows and 127 component rows.
+- Each target profile contains 15 R6X interior-scope rows; the shared `color_overrides` family contributes 382 ready canonical rows.
+- Grand Sport X has exactly 3LT_AE4_EL9 and 3LT_AH2_EL9, both requiring opt_z25_001.
+- Same-run recompile was byte-stable for canonical-row-manifest.json, exception-queue.json, exception-resolutions.json, compile-report.json, and comparator-evidence.json.
+- milestone-2-2-proof-audit.json passed: zero physical/semantic duplicates, header/key/type/enum errors, source-feature duplicate/disposition errors, evidence-partition errors, empty target partitions, comparator proposal/report mismatches, retention gaps, authority errors, or relationship endpoint errors.
+
+Lifecycle and browser proof
+- Resolve -> automatic recompile -> reopen lifecycle on subject:grand_sport_x:missing_section:0437efbd34d02107 restored the exact manifest semantic SHA and queue subject fingerprint. Evidence: milestone-2-2-lifecycle-proof.json.
+- Desktop Chrome/CDP: 1280x800, fresh run resumed, actionless + unresolved_relationship_identity filters selected, 20 typed blocker cards rendered, zero horizontal overflow, zero application console errors.
+- Mobile Chrome/CDP: 390x844, same fresh run/filter proof, 20 typed blocker cards rendered, zero horizontal overflow, zero application console errors.
+- Evidence: milestone-2-2-desktop-browser-proof.json, milestone-2-2-mobile-browser-proof.json, and corresponding PNG screenshots in the fresh run folder.
+
+Protected boundaries
+- stingray_master.xlsx SHA-256 remained 03e8c9671185f238dde7f4bc8e7003da0f74d842d9cc2f76126f938cbb7b54d6.
+- Raw source SHA-256 remained 6ac9538d5bb8a823ade9afea70b2654057b793e1cf27c081c088545aa3add8a1.
+- No pass-c-3 plan, workbook write, generated publication, registry promotion, deployment, or dealer-submission change occurred.
+- Added-line static scan found no hardcoded secrets, `os.system`, `shell=True`, `eval`/`exec`, or pickle deserialization.
+
+Final receipt gate
+- Pending independent verifier result and final Fable receipt/STATE update.

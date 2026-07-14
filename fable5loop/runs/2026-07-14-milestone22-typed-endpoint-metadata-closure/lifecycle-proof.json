@@ -1,0 +1,14 @@
+{
+  "action": "choose_section",
+  "manifestSemanticShaAfter": "39c536d0a0bc22e80b33ed9333f3ed1006b140a3b858e1e19eebda31a705330c",
+  "manifestSemanticShaBefore": "39c536d0a0bc22e80b33ed9333f3ed1006b140a3b858e1e19eebda31a705330c",
+  "queueSubjectFingerprintAfter": "a3702f303f8268730c29359d271f6a6d3237f2da49240161d5e5d191c1d2e46e",
+  "queueSubjectFingerprintBefore": "a3702f303f8268730c29359d271f6a6d3237f2da49240161d5e5d191c1d2e46e",
+  "reopenedState": "open",
+  "resolvedState": "resolved",
+  "restored": true,
+  "runId": "20260714-103915-f8310c",
+  "schemaVersion": "milestone-2-2-lifecycle-proof-1",
+  "sectionId": "sec_lpow_001",
+  "subjectId": "subject:grand_sport_x:missing_section:0437efbd34d02107"
+}

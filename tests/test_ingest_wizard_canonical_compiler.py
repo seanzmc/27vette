@@ -123,6 +123,93 @@ class CanonicalCompilerTest(unittest.TestCase):
         self.assertEqual(registry["zr1"]["source_option_sheet"]["headers"][0], "option_id")
         self.assertIn("rule_group_members_sheet", registry["zr1"])
 
+    def test_selected_comparator_compiles_shared_color_interior_and_presentation_profiles(self) -> None:
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(self.master)
+        workbook.save(self.master)
+        workbook.close()
+
+        result = self.compile()
+        rows = result["canonical-row-manifest.json"]["rows"]
+        subjects = result["exception-queue.json"]["subjects"]
+
+        paint = next(
+            row
+            for row in rows
+            if row["model"] == "zr1"
+            and row["family"] == "options"
+            and row["values"].get("rpo") == "GBA"
+        )
+        self.assertEqual(paint["values"]["option_id"], "opt_gba_001")
+        self.assertEqual(
+            {
+                row["values"]["variant_id"]
+                for row in rows
+                if row["model"] == "zr1"
+                and row["family"] == "ovs"
+                and row["values"].get("option_id") == "opt_gba_001"
+            },
+            {"1lz_r07", "3lz_r67"},
+        )
+        self.assertEqual(
+            {
+                (row["values"]["interior_id"], row["values"]["trim_level"])
+                for row in rows
+                if row["model"] == "zr1" and row["family"] == "model_interior_scope"
+            },
+            {("1LZ_AQ9_HTA", "1LZ"), ("3LZ_AQ9_HTA", "3LZ")},
+        )
+        self.assertEqual(
+            {
+                row["values"]["interior_id"]
+                for row in rows
+                if row["model"] == "zr1" and row["family"] == "interior_components"
+            },
+            {"1LZ_AQ9_HTA", "3LZ_AQ9_HTA"},
+        )
+        color_override = next(
+            row
+            for row in rows
+            if row["family"] == "color_overrides"
+            and row["values"].get("interior_id") == "3LZ_AQ9_HTA"
+        )
+        self.assertEqual(color_override["values"]["option_id"], "opt_gba_001")
+        self.assertEqual(color_override["values"]["rule_type"], "requires")
+        for family in (
+            "runtime_steps_meta",
+            "section_presentation_meta",
+            "context_section_master_meta",
+            "order_summary_sections_meta",
+            "step_order_summary_map_meta",
+        ):
+            self.assertTrue(
+                any(row["model"] == "zr1" and row["family"] == family for row in rows),
+                family,
+            )
+        self.assertFalse(
+            any(subject["reasonCode"] == "unsupported_color_trim_source" for subject in subjects)
+        )
+        compiled_global_families = {
+            "model_master",
+            "model_workbook_sources",
+            "model_interior_scope",
+            "interior_components",
+            "runtime_steps_meta",
+            "section_presentation_meta",
+            "context_section_master_meta",
+            "order_summary_sections_meta",
+            "step_order_summary_map_meta",
+        }
+        self.assertFalse(
+            any(
+                subject["reasonCode"] == "unsupported_global_family"
+                and subject["model"] == "zr1"
+                and subject["family"] in compiled_global_families
+                for subject in subjects
+            )
+        )
+
     def test_existing_option_id_is_reused_and_no_family_is_cleared(self) -> None:
         result = self.compile()
         rows = result["canonical-row-manifest.json"]["rows"]
@@ -839,16 +926,19 @@ class CanonicalCompilerTest(unittest.TestCase):
                 "unsupported_blocker",
             }
         )
-        self.assertTrue(any("Color and Trim 1" in item["featureId"] and item["disposition"] == "exception_open" for item in report["sourceFeatureCoverage"]))
+        self.assertTrue(
+            any(
+                "Color and Trim 1" in item["featureId"]
+                and item["disposition"] == "compiled"
+                for item in report["sourceFeatureCoverage"]
+            )
+        )
         color_subjects = [
             subject
             for subject in result["exception-queue.json"]["subjects"]
             if "Color and Trim 1" in subject.get("evidenceReferences", [])
         ]
-        self.assertEqual(
-            [subject["reasonCode"] for subject in color_subjects],
-            ["unsupported_color_trim_source"],
-        )
+        self.assertEqual(color_subjects, [])
         family_ids = [item["featureId"] for item in report["familyCoverage"]]
         self.assertEqual(len(family_ids), len(set(family_ids)))
         self.assertTrue(any(item["family"] == "interiors" for item in report["familyCoverage"]))

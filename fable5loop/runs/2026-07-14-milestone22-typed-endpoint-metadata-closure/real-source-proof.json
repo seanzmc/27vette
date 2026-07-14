@@ -1,0 +1,51 @@
+{
+  "actionableSubjects": 257,
+  "actionlessReasons": [
+    {"count": 2, "family": "exclusive_groups", "model": "grand_sport_x", "reasonCode": "comparator_only_exclusive_group_proposal"},
+    {"count": 13, "family": "price_rules", "model": "grand_sport_x", "reasonCode": "comparator_only_price_rule_proposal"},
+    {"count": 1, "family": "rule_groups", "model": "grand_sport_x", "reasonCode": "comparator_only_rule_group_proposal"},
+    {"count": 15, "family": "rule_mapping", "model": "grand_sport_x", "reasonCode": "comparator_only_relationship_proposal"},
+    {"count": 44, "family": "rule_mapping", "model": "grand_sport_x", "reasonCode": "unresolved_relationship_identity"},
+    {"count": 3, "family": "price_rules", "model": "zr1", "reasonCode": "comparator_only_price_rule_proposal"},
+    {"count": 18, "family": "rule_mapping", "model": "zr1", "reasonCode": "unresolved_relationship_identity"},
+    {"count": 3, "family": "price_rules", "model": "zr1x", "reasonCode": "comparator_only_price_rule_proposal"},
+    {"count": 18, "family": "rule_mapping", "model": "zr1x", "reasonCode": "unresolved_relationship_identity"}
+  ],
+  "actionlessSubjects": 117,
+  "ambiguousInteriorOneOf": 80,
+  "byteStableRecompile": {
+    "canonical-row-manifest.json": true,
+    "comparator-evidence.json": true,
+    "compile-report.json": true,
+    "exception-queue.json": true,
+    "exception-resolutions.json": true
+  },
+  "comparators": {"grand_sport_x": "grand_sport", "zr1": "z06", "zr1x": "z06"},
+  "compileReady": {"grand_sport_x": false, "zr1": false, "zr1x": false},
+  "exceptionSubjects": 374,
+  "manifestRows": 5774,
+  "manifestSemanticSha": "39c536d0a0bc22e80b33ed9333f3ed1006b140a3b858e1e19eebda31a705330c",
+  "profileCounts": {
+    "grand_sport_x": {"interiorComponents": 198, "interiorScope": 132, "paintOptions": 10},
+    "zr1": {"interiorComponents": 127, "interiorScope": 90, "paintOptions": 10},
+    "zr1x": {"interiorComponents": 127, "interiorScope": 90, "paintOptions": 10}
+  },
+  "queueSubjectFingerprint": "a3702f303f8268730c29359d271f6a6d3237f2da49240161d5e5d191c1d2e46e",
+  "reasonCounts": {
+    "ambiguous_existing_identity": 10,
+    "comparator_only_default_selection_proposal": 4,
+    "comparator_only_exclusive_group_proposal": 21,
+    "comparator_only_price_rule_proposal": 49,
+    "comparator_only_relationship_proposal": 25,
+    "comparator_only_rule_group_proposal": 21,
+    "missing_section": 147,
+    "unresolved_price_scope": 17,
+    "unresolved_relationship_identity": 80
+  },
+  "runId": "20260714-103915-f8310c",
+  "sourceSha256": "6ac9538d5bb8a823ade9afea70b2654057b793e1cf27c081c088545aa3add8a1",
+  "targets": ["grand_sport_x", "zr1", "zr1x"],
+  "unresolvedRawEndpoints": 0,
+  "unsupportedColorTrim": 0,
+  "unsupportedMetadataFamilies": 0
+}

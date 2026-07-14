@@ -47,6 +47,7 @@ from corvette_form_generator.ingest.wizard.identity import (
     reconcile_rows,
 )
 from corvette_form_generator.ingest.wizard.relationship_compiler import compile_relationships, load_compiler_phrase_map
+from corvette_form_generator.ingest.wizard.profile_compiler import build_target_profile
 from corvette_form_generator.model_configs import (
     OPTIONAL_GENERATION_SOURCE_ROLES,
     REQUIRED_GENERATION_SOURCE_ROLES,
@@ -1034,6 +1035,7 @@ def _relationship_rows(
     registry: Mapping[str, Mapping[str, Any]],
     rpo_ids: Mapping[str, str],
     option_ids: set[str],
+    endpoint_ids: set[str],
     relationship_result: Mapping[str, Any],
     resolution_entries: Iterable[Mapping[str, Any]],
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], set[str], dict[str, str]]:
@@ -1157,16 +1159,20 @@ def _relationship_rows(
         return True
 
     for source in relationship_result.get("rows") or []:
-        source_id = rpo_ids.get(str(source.get("sourceRpo") or ""))
-        target_id = rpo_ids.get(str(source.get("targetRpo") or ""))
+        source_id = str(source.get("sourceId") or "") or rpo_ids.get(
+            str(source.get("sourceRpo") or "")
+        )
+        target_id = str(source.get("targetId") or "") or rpo_ids.get(
+            str(source.get("targetRpo") or "")
+        )
         dependencies = list(source["evidenceDependencies"])
         subject = None
         resolution = None
         if (
             not source_id
             or not target_id
-            or source_id not in option_ids
-            or target_id not in option_ids
+            or source_id not in endpoint_ids
+            or target_id not in endpoint_ids
         ):
             # This relationship depends on an upstream option identity/section
             # blocker. Recompute it after that owning subject is resolved instead
@@ -1175,8 +1181,8 @@ def _relationship_rows(
             continue
         else:
             rule_type = str(source["ruleType"])
-        if source_id not in option_ids or target_id not in option_ids:
-            raise ValueError("Resolved relationship endpoints are not current emitted target options.")
+        if source_id not in endpoint_ids or target_id not in endpoint_ids:
+            raise ValueError("Resolved relationship endpoints are not current emitted target identities.")
         emitted = emit_rule(
             source_id=str(source_id),
             target_id=str(target_id),
@@ -1691,11 +1697,21 @@ def _source_feature_ledger(
     compiled_status_features: set[str],
     status_feature_index: Mapping[str, Mapping[str, list[str]]],
     candidate_feature_index: Mapping[str, str],
+    *,
+    color_trim_profiled: bool = False,
 ) -> list[dict[str, Any]]:
     ledger: list[dict[str, Any]] = []
     for sheet_name, role in sorted((roles_payload.get("roles") or {}).items()):
         if role == "exclude":
-            disposition = "exception_open" if "color" in sheet_name.lower() and "trim" in sheet_name.lower() else "resolved_not_applicable"
+            disposition = (
+                "compiled"
+                if color_trim_profiled
+                and "color" in sheet_name.lower()
+                and "trim" in sheet_name.lower()
+                else "exception_open"
+                if "color" in sheet_name.lower() and "trim" in sheet_name.lower()
+                else "resolved_not_applicable"
+            )
             ledger.append({"featureId": f"source-sheet:{sheet_name}", "model": "*", "family": "source_sheet", "disposition": disposition, "evidenceIds": [f"sheet-role:{sheet_name}"]})
     candidates = option_payload.get("candidates") or []
     for candidate in candidates:
@@ -2098,6 +2114,7 @@ def compile_canonical_rows(
     consumed_resolution_subjects: set[str] = set()
     compiled_base_price_rows: set[str] = set()
     compiled_status_features: set[str] = set()
+    profiled_targets: set[str] = set()
     candidates = [dict(candidate) for candidate in option_payload.get("candidates") or []]
     candidate_feature_index = _candidate_feature_index(candidates)
     status_feature_index = _status_feature_index(candidates)
@@ -2143,6 +2160,74 @@ def compile_canonical_rows(
             resolution_entries,
             status_feature_index,
         )
+        profile_variants_by_id = {
+            str(row.get("variant_id") or ""): dict(row)
+            for row in _target_variant_rows(extract, target)
+            if str(row.get("variant_id") or "")
+        }
+        profile_variants_by_id.update(
+            {
+                str(row.get("variant_id") or ""): dict(row)
+                for row in variants
+                if str(row.get("variant_id") or "")
+            }
+        )
+        profile = build_target_profile(
+            extract,
+            registry[target],
+            target=target,
+            comparator=comparators[target],
+            variants=profile_variants_by_id.values(),
+        )
+        registry[target]["interior_source_sheet"] = {
+            **registry[target]["interior_source_sheet"],
+            "sheetName": profile["interiorSheet"],
+            "headers": _headers(extract, profile["interiorSheet"]),
+        }
+        profile_rows = [
+            _manifest_row(
+                model=str(row["model"]),
+                family=str(row["family"]),
+                sheet=str(row["sheet"]),
+                action=str(row["action"]),
+                key=row["key"],
+                values=row["values"],
+                signature=row["semanticSignature"],
+                dependencies=row["evidenceDependencies"],
+                status="ready",
+            )
+            for row in profile["rows"]
+        ]
+        profile_rpos = {str(rpo).upper() for rpo in profile["optionRpoIds"]}
+        profile_option_ids = {
+            str(option_id) for option_id in profile["optionRpoIds"].values()
+        }
+        option_rows = [
+            row
+            for row in option_rows
+            if not (
+                row["family"] == "options"
+                and str(row["values"].get("rpo") or "").upper() in profile_rpos
+            )
+            and not (
+                row["family"] == "ovs"
+                and str(row["values"].get("option_id") or "") in profile_option_ids
+            )
+        ]
+        option_rows.extend(
+            row for row in profile_rows if row["family"] in {"options", "ovs"}
+        )
+        manifest_rows.extend(
+            row for row in profile_rows if row["family"] not in {"options", "ovs"}
+        )
+        for rpo, option_id in profile["optionRpoIds"].items():
+            existing_id = rpo_ids.get(str(rpo))
+            if existing_id and existing_id != option_id:
+                raise ValueError(
+                    f"Target {target} profile RPO {rpo} conflicts with compiled option identity."
+                )
+            rpo_ids[str(rpo)] = str(option_id)
+        profiled_targets.add(target)
         consumed_resolution_subjects.update(consumed)
         compiled_status_features.update(compiled_statuses)
         manifest_rows.extend(option_rows)
@@ -2162,17 +2247,52 @@ def compile_canonical_rows(
             for candidate in scoped
         }
         target_rpo_index[target] = target_rpos
-        relationship_result = compile_relationships(scoped, phrase_rows, target_rpos=target_rpos, comparator_facts=comparator_facts)
+        rpo_by_option_id = {
+            str(option_id): str(rpo).upper()
+            for rpo, option_id in rpo_ids.items()
+            if str(option_id)
+        }
+        endpoint_catalog = {
+            token: [
+                {
+                    "endpointType": "interior",
+                    "endpointId": interior_id,
+                    "profileRequiredRpo": rpo_by_option_id.get(
+                        str(profile["interiorRequirements"].get(interior_id) or ""),
+                        "",
+                    ),
+                }
+                for interior_id in interior_ids
+            ]
+            for token, interior_ids in profile["interiorCodeIds"].items()
+        }
+        ignored_endpoint_tokens = {
+            "GT1",
+            "GT2",
+            target.upper().replace("_", ""),
+            comparators[target].upper().replace("_", ""),
+            *(str(model).upper().replace("_", "") for model in targets),
+        }
+        relationship_result = compile_relationships(
+            scoped,
+            phrase_rows,
+            target_rpos=target_rpos,
+            comparator_facts=comparator_facts,
+            endpoint_catalog=endpoint_catalog,
+            ignored_endpoint_tokens=ignored_endpoint_tokens,
+        )
+        ready_option_ids = {
+            str(row["values"].get("option_id") or "")
+            for row in option_rows
+            if row.get("family") == "options" and row.get("status") == "ready"
+        }
         relationship_rows, relationship_identity_exceptions, consumed, disposition_overrides = _relationship_rows(
             extract,
             target,
             registry[target],
             rpo_ids,
-            {
-                str(row["values"].get("option_id") or "")
-                for row in option_rows
-                if row.get("family") == "options" and row.get("status") == "ready"
-            },
+            ready_option_ids,
+            ready_option_ids | set(profile["interiorIds"]),
             relationship_result,
             resolution_entries,
         )
@@ -2245,9 +2365,10 @@ def compile_canonical_rows(
     # generic source-feature blocker.
     for sheet_name, role in sorted((roles_payload.get("roles") or {}).items()):
         if role == "exclude" and "color" in sheet_name.lower() and "trim" in sheet_name.lower():
-            exceptions.append(
-                _typed_exception("*", "source_sheet", "unsupported_color_trim_source", [sheet_name], [_dependency(f"sheet-role:{sheet_name}", {"sheet": sheet_name, "role": role})], evidence_references=[sheet_name], question="Add a deterministic Color and Trim parser before compiling this source.")
-            )
+            if profiled_targets != set(targets):
+                exceptions.append(
+                    _typed_exception("*", "source_sheet", "unsupported_color_trim_source", [sheet_name], [_dependency(f"sheet-role:{sheet_name}", {"sheet": sheet_name, "role": role})], evidence_references=[sheet_name], question="Add a deterministic Color and Trim parser before compiling this source.")
+                )
     feature_coverage = _source_feature_ledger(
         targets,
         option_payload,
@@ -2260,6 +2381,7 @@ def compile_canonical_rows(
         compiled_status_features,
         status_feature_index,
         candidate_feature_index,
+        color_trim_profiled=profiled_targets == set(targets),
     )
     for feature in feature_coverage:
         if feature.get("disposition") != "unsupported_blocker":

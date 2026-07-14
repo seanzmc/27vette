@@ -1,0 +1,29 @@
+{
+  "checks": {
+    "authorityErrors": 0,
+    "badSourceDispositions": 0,
+    "emptyTargetPartitions": 0,
+    "enumErrors": 0,
+    "headerErrors": 0,
+    "keyErrors": 0,
+    "partitionErrors": 0,
+    "physicalDuplicateKeys": 0,
+    "proposalSubjectsMissingReport": 0,
+    "relationshipEndpointErrors": 0,
+    "reportProposalsMissingSubject": 0,
+    "retentionGaps": 0,
+    "semanticDuplicateRows": 0,
+    "sourceFeatureDuplicates": 0,
+    "typeErrors": 0
+  },
+  "counts": {
+    "exceptionSubjects": 374,
+    "manifestRows": 5774,
+    "sourceFeatures": 18060,
+    "targetDependencyCounts": {"grand_sport_x": 252, "zr1": 224, "zr1x": 224},
+    "workbookDependencies": 2840
+  },
+  "pass": true,
+  "runId": "20260714-103915-f8310c",
+  "schemaVersion": "milestone-2-2-proof-audit-1"
+}

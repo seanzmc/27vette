@@ -149,8 +149,17 @@ def compile_relationships(
     target_rpos: Iterable[str],
     comparator_facts: Iterable[Mapping[str, Any]] = (),
     active_rule_types: Iterable[str] = ("requires", "includes", "excludes"),
+    endpoint_catalog: Mapping[str, Iterable[Mapping[str, Any]]] | None = None,
+    ignored_endpoint_tokens: Iterable[str] = (),
 ) -> dict[str, list[dict[str, Any]]]:
     target_set = {str(value).upper() for value in target_rpos if str(value)}
+    typed_endpoints = {
+        str(token).upper(): [dict(endpoint) for endpoint in endpoints]
+        for token, endpoints in (endpoint_catalog or {}).items()
+    }
+    ignored_tokens = {
+        str(value).upper() for value in ignored_endpoint_tokens if str(value)
+    }
     active_types = {str(value).lower() for value in active_rule_types}
     rows: list[dict[str, Any]] = []
     exceptions: list[dict[str, Any]] = []
@@ -184,7 +193,21 @@ def compile_relationships(
                 continue
             for mentioned_rpo in hit["rpoTokens"]:
                 feature_id = f"relationship:{feature_candidate_id}:{hit['phraseKey']}:{hit['startOffset']}:{mentioned_rpo}"
-                if source_rpo not in target_set or mentioned_rpo not in target_set:
+                if mentioned_rpo in ignored_tokens:
+                    dispositions.append(
+                        {
+                            "featureId": feature_id,
+                            "disposition": "resolved_not_a_workbook_fact",
+                            "evidenceIds": [value["evidenceId"] for value in dependencies],
+                        }
+                    )
+                    continue
+                mentioned_endpoints = (
+                    [{"endpointType": "option", "endpointId": ""}]
+                    if mentioned_rpo in target_set
+                    else typed_endpoints.get(mentioned_rpo, [])
+                )
+                if source_rpo not in target_set or not mentioned_endpoints:
                     exceptions.append(
                         _exception(candidate, reason="unresolved_relationship_endpoint", family="rule_mapping", dependencies=dependencies, evidence_references=[stable_candidate_id, feature_id], identity_values=[mentioned_rpo], allowed_actions=(), question=f"Resolve endpoint {mentioned_rpo} to an active typed target before offering a reviewer action.")
                     )
@@ -197,35 +220,104 @@ def compile_relationships(
                     )
                     dispositions.append({"featureId": feature_id, "disposition": "blocked_exception", "evidenceIds": [value["evidenceId"] for value in dependencies]})
                     continue
-                if hit["direction"] == "mentioned_to_source":
-                    relationship_source, relationship_target = mentioned_rpo, source_rpo
-                elif hit["direction"] == "source_to_mentioned":
-                    relationship_source, relationship_target = source_rpo, mentioned_rpo
-                else:
+                profile_effect = (
+                    hit["direction"] == "source_to_mentioned"
+                    and rule_type == "includes"
+                    and bool(mentioned_endpoints)
+                    and all(
+                        str(endpoint.get("profileRequiredRpo") or "").upper()
+                        == source_rpo
+                        for endpoint in mentioned_endpoints
+                    )
+                )
+                if profile_effect:
+                    dispositions.append(
+                        {
+                            "featureId": feature_id,
+                            "disposition": "compiled_profile_effect",
+                            "evidenceIds": [value["evidenceId"] for value in dependencies],
+                        }
+                    )
+                    continue
+                ambiguous_multi_interior = (
+                    hit["direction"] == "source_to_mentioned"
+                    and rule_type in {"requires", "includes"}
+                    and len(mentioned_endpoints) > 1
+                    and any(
+                        endpoint.get("endpointType") == "interior"
+                        for endpoint in mentioned_endpoints
+                    )
+                )
+                if ambiguous_multi_interior:
+                    exceptions.append(
+                        _exception(
+                            candidate,
+                            reason="unresolved_relationship_identity",
+                            family="rule_mapping",
+                            dependencies=dependencies,
+                            evidence_references=[stable_candidate_id, feature_id],
+                            identity_values=[rule_type, mentioned_rpo, "multi_interior_one_of"],
+                            allowed_actions=(),
+                            question=(
+                                f"Endpoint {mentioned_rpo} resolves to multiple interiors; "
+                                "a one-of/group compiler is required instead of direct rules."
+                            ),
+                        )
+                    )
+                    dispositions.append(
+                        {
+                            "featureId": feature_id,
+                            "disposition": "blocked_exception",
+                            "evidenceIds": [value["evidenceId"] for value in dependencies],
+                        }
+                    )
+                    continue
+                if hit["direction"] not in {"mentioned_to_source", "source_to_mentioned"}:
                     exceptions.append(
                         _exception(candidate, reason="unsupported_relationship_direction", family="rule_mapping", dependencies=dependencies, evidence_references=[stable_candidate_id, feature_id], identity_values=[hit["direction"], mentioned_rpo], allowed_actions=("choose_relationship", "mark_not_applicable"), question="Choose the exact relationship direction.")
                     )
                     dispositions.append({"featureId": feature_id, "disposition": "blocked_exception", "evidenceIds": [value["evidenceId"] for value in dependencies]})
                     continue
-                semantic_signature = {
-                    "sourceRpo": relationship_source,
-                    "ruleType": rule_type,
-                    "targetRpo": relationship_target,
-                    "bodyStyleScope": "*",
-                    "trimLevelScope": "*",
-                    "variantScope": "*",
+                source_endpoint = {
+                    "endpointType": "option",
+                    "endpointId": "",
+                    "rpo": source_rpo,
                 }
-                signature_hash = semantic_hash(semantic_signature)
-                explicit_signatures.add(signature_hash)
-                rows.append(
-                    {
-                        **semantic_signature,
-                        "semanticSignature": signature_hash,
-                        "evidenceDependencies": dependencies,
-                        "derivationVersion": derivation_version(semantic_signature, dependencies),
-                        "sourceFeatureId": feature_id,
+                for mentioned_endpoint in mentioned_endpoints:
+                    mentioned_endpoint = {
+                        **mentioned_endpoint,
+                        "rpo": mentioned_rpo,
                     }
-                )
+                    if hit["direction"] == "mentioned_to_source":
+                        relationship_source, relationship_target = mentioned_endpoint, source_endpoint
+                    else:
+                        relationship_source, relationship_target = source_endpoint, mentioned_endpoint
+                    semantic_signature = {
+                        "sourceRpo": relationship_source["rpo"],
+                        "ruleType": rule_type,
+                        "targetRpo": relationship_target["rpo"],
+                        "bodyStyleScope": "*",
+                        "trimLevelScope": "*",
+                        "variantScope": "*",
+                    }
+                    for prefix, endpoint in (
+                        ("source", relationship_source),
+                        ("target", relationship_target),
+                    ):
+                        if endpoint.get("endpointType") != "option":
+                            semantic_signature[f"{prefix}Type"] = str(endpoint.get("endpointType") or "")
+                            semantic_signature[f"{prefix}Id"] = str(endpoint.get("endpointId") or "")
+                    signature_hash = semantic_hash(semantic_signature)
+                    explicit_signatures.add(signature_hash)
+                    rows.append(
+                        {
+                            **semantic_signature,
+                            "semanticSignature": signature_hash,
+                            "evidenceDependencies": dependencies,
+                            "derivationVersion": derivation_version(semantic_signature, dependencies),
+                            "sourceFeatureId": feature_id,
+                        }
+                    )
                 dispositions.append({"featureId": feature_id, "disposition": "compiled_ready", "evidenceIds": [value["evidenceId"] for value in dependencies]})
     candidates_by_rpo = {
         str(candidate.get("rpo") or candidate.get("refOnlyRpo") or "").upper(): candidate

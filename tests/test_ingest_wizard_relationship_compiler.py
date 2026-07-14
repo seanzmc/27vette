@@ -64,6 +64,111 @@ class RelationshipCompilerTest(unittest.TestCase):
         self.assertEqual(compiled["exceptions"][0]["reasonCode"], "unresolved_relationship_endpoint")
         self.assertEqual(compiled["exceptions"][0]["allowedActions"], [])
 
+    def test_interior_code_expands_to_typed_canonical_interior_endpoints(self) -> None:
+        compiled = compile_relationships(
+            [
+                {
+                    "candidateId": "row:interior",
+                    "rpo": "3M9",
+                    "description": "Not available with (HU2) Adrenaline Red interiors.",
+                }
+            ],
+            self.phrases,
+            target_rpos={"3M9"},
+            endpoint_catalog={
+                "HU2": [
+                    {"endpointType": "interior", "endpointId": "3LZ_AH2_HU2"},
+                    {"endpointType": "interior", "endpointId": "3LZ_AE4_HU2"},
+                ]
+            },
+        )
+        self.assertEqual(compiled["exceptions"], [])
+        self.assertEqual(
+            {row["targetId"] for row in compiled["rows"]},
+            {"3LZ_AH2_HU2", "3LZ_AE4_HU2"},
+        )
+        self.assertEqual(
+            {row["targetType"] for row in compiled["rows"]},
+            {"interior"},
+        )
+
+    def test_descriptive_model_and_seat_aliases_are_not_product_endpoints(self) -> None:
+        compiled = compile_relationships(
+            [
+                {
+                    "candidateId": "row:aliases",
+                    "rpo": "TU7",
+                    "description": "Requires (AH2) GT2 seats on ZR1 and ZR1X.",
+                }
+            ],
+            self.phrases,
+            target_rpos={"TU7", "AH2"},
+            ignored_endpoint_tokens={"GT2", "ZR1", "ZR1X"},
+        )
+        self.assertEqual(compiled["exceptions"], [])
+        self.assertEqual(
+            [(row["sourceRpo"], row["targetRpo"]) for row in compiled["rows"]],
+            [("TU7", "AH2")],
+        )
+
+    def test_multi_interior_requires_stays_a_typed_tooling_blocker(self) -> None:
+        compiled = compile_relationships(
+            [
+                {
+                    "candidateId": "row:requires-interior",
+                    "rpo": "N26",
+                    "description": "Requires (HU6) Sky Cool Gray Suede interiors.",
+                }
+            ],
+            self.phrases,
+            target_rpos={"N26"},
+            endpoint_catalog={
+                "HU6": [
+                    {"endpointType": "interior", "endpointId": "2LT_AH2_HU6_N26"},
+                    {"endpointType": "interior", "endpointId": "2LT_AE4_HU6_N26"},
+                ]
+            },
+        )
+        self.assertEqual(compiled["rows"], [])
+        self.assertEqual(
+            [item["reasonCode"] for item in compiled["exceptions"]],
+            ["unresolved_relationship_identity"],
+        )
+        self.assertEqual(compiled["exceptions"][0]["allowedActions"], [])
+
+    def test_profile_requirement_consumes_multi_interior_include_without_direct_rules(self) -> None:
+        compiled = compile_relationships(
+            [
+                {
+                    "candidateId": "row:profile-include",
+                    "rpo": "Z25",
+                    "description": "Includes (EL9) Santorini Blue Dipped interior.",
+                }
+            ],
+            self.phrases,
+            target_rpos={"Z25"},
+            endpoint_catalog={
+                "EL9": [
+                    {
+                        "endpointType": "interior",
+                        "endpointId": "3LT_AE4_EL9",
+                        "profileRequiredRpo": "Z25",
+                    },
+                    {
+                        "endpointType": "interior",
+                        "endpointId": "3LT_AH2_EL9",
+                        "profileRequiredRpo": "Z25",
+                    },
+                ]
+            },
+        )
+        self.assertEqual(compiled["exceptions"], [])
+        self.assertEqual(compiled["rows"], [])
+        self.assertEqual(
+            compiled["dispositions"][0]["disposition"],
+            "compiled_profile_effect",
+        )
+
     def test_replaces_without_active_representation_is_exception(self) -> None:
         compiled = compile_relationships(
             [{"candidateId": "row:3", "rpo": "BV4", "description": "Replaces (PDB)."}],
