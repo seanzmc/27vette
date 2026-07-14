@@ -77,6 +77,7 @@ SOURCE_FEATURE_DISPOSITIONS = {
 def _source_disposition(value: Any) -> str:
     aliases = {
         "compiled_ready": "compiled",
+        "compiled_profile_effect": "compiled",
         "blocked_exception": "exception_open",
         "proposed_exception": "exception_open",
         "resolved_not_selected_target": "resolved_not_applicable",
@@ -224,6 +225,196 @@ def _header_price(row: Mapping[str, Any]) -> int | float | None:
         if header in normalized:
             return _int_price(normalized[header])
     return None
+
+
+def _profile_reconciled_price(
+    candidate: Mapping[str, Any],
+    precedent: Mapping[str, Any] | None,
+) -> tuple[int | float, list[dict[str, str]]] | None:
+    """Resolve a source base price only when canonical rules cover every alternative."""
+
+    if not precedent:
+        return None
+    base_price = _int_price(precedent.get("basePrice"))
+    price_rows = [dict(row) for row in candidate.get("priceRows") or []]
+    if base_price is None or len(price_rows) < 2:
+        return None
+    rows_by_price: dict[int | float, list[dict[str, Any]]] = defaultdict(list)
+    for row in price_rows:
+        value = _header_price(row)
+        if value is None:
+            return None
+        rows_by_price[value].append(row)
+    if base_price not in rows_by_price:
+        return None
+    alternate_prices = set(rows_by_price) - {base_price}
+    if not alternate_prices:
+        return None
+    rules = [dict(rule) for rule in precedent.get("conditionalPriceRules") or []]
+    matched_rules: list[dict[str, Any]] = []
+    for alternate_price in sorted(alternate_prices):
+        price_rules = [
+            rule
+            for rule in rules
+            if _int_price(rule.get("priceValue")) == alternate_price
+            and str(rule.get("conditionRpo") or "")
+        ]
+        if not price_rules:
+            return None
+        qualifier = " ".join(
+            str(row.get("qualifier") or "").upper()
+            for row in rows_by_price[alternate_price]
+        )
+        if any(
+            str(rule.get("conditionRpo") or "").upper() not in qualifier
+            for rule in price_rules
+        ):
+            return None
+        matched_rules.extend(price_rules)
+    dependencies = [
+        _dependency(f"price:{candidate.get('rpo')}:{semantic_hash(row)}", row)
+        for row in price_rows
+    ]
+    dependencies.extend(
+        _dependency(str(rule["evidenceId"]), rule.get("source") or rule)
+        for rule in matched_rules
+    )
+    return base_price, dependencies
+
+
+def _source_supported_default_rows(
+    *,
+    extract: Mapping[str, Any],
+    target: str,
+    comparator_artifact: Mapping[str, Any],
+    target_rows: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Compile a comparator default only when target source statuses make it deterministic."""
+
+    headers = headers_of(extract, "default_selection_rules")
+    if not headers:
+        return []
+    option_id_by_rpo = {
+        str(values.get("rpo") or "").upper(): str(values.get("option_id") or "")
+        for row in target_rows
+        if row.get("model") == target
+        and row.get("family") == "options"
+        and row.get("status") == "ready"
+        for values in [row.get("values") or {}]
+        if str(values.get("rpo") or "") and str(values.get("option_id") or "")
+    }
+    statuses_by_option: dict[str, dict[str, str]] = defaultdict(dict)
+    ovs_rows_by_option: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in target_rows:
+        if row.get("model") != target or row.get("family") != "ovs":
+            continue
+        values = row.get("values") or {}
+        option_id = str(values.get("option_id") or "")
+        variant_id = str(values.get("variant_id") or "")
+        status = str(values.get("status") or "").lower()
+        if option_id and variant_id:
+            statuses_by_option[option_id][variant_id] = status
+            ovs_rows_by_option[option_id].append(row)
+
+    existing = [
+        row
+        for row in rows_of(extract, "default_selection_rules")
+        if str(row.get("model_key") or "").lower() == target
+        and workbook_truthy(row.get("active", True))
+    ]
+    result: list[dict[str, Any]] = []
+    facts = (comparator_artifact.get("targets") or {}).get(target, {}).get("facts") or []
+    for fact in facts:
+        if fact.get("factType") != "default_selection":
+            continue
+        signature = dict(fact.get("signature") or {})
+        if any(
+            _scope_value(signature.get(scope)) != "*"
+            for scope in ("bodyStyleScope", "trimLevelScope", "variantScope")
+        ):
+            continue
+        condition_type = str(signature.get("conditionType") or "").lower()
+        if condition_type not in {"always", "when_selected"}:
+            continue
+        target_option_id = option_id_by_rpo.get(
+            str(signature.get("targetRpo") or "").upper(), ""
+        )
+        target_statuses = statuses_by_option.get(target_option_id, {})
+        if not target_option_id or not target_statuses or set(target_statuses.values()) != {"standard"}:
+            continue
+        condition_option_id = ""
+        if condition_type == "when_selected":
+            condition_option_id = option_id_by_rpo.get(
+                str(signature.get("conditionRpo") or "").upper(), ""
+            )
+            condition_statuses = statuses_by_option.get(condition_option_id, {})
+            if (
+                not condition_option_id
+                or set(condition_statuses.values()) != {"standard"}
+                or set(condition_statuses) != set(target_statuses)
+            ):
+                continue
+        if any(
+            str(row.get("target_option_id") or "") == target_option_id
+            and str(row.get("condition_type") or "").lower() == condition_type
+            and str(row.get("condition_id") or "") == condition_option_id
+            and _scope_value(row.get("body_style_scope")) == "*"
+            and _scope_value(row.get("trim_level_scope")) == "*"
+            and _scope_value(row.get("variant_scope")) == "*"
+            for row in existing
+        ):
+            continue
+        fact_context = dict(fact.get("context") or {})
+        rule_signature = {
+            "modelKey": target,
+            "targetOptionId": target_option_id,
+            "conditionType": condition_type,
+            "conditionId": condition_option_id,
+            "bodyStyleScope": "*",
+            "trimLevelScope": "*",
+            "variantScope": "*",
+        }
+        rule_id = deterministic_family_id(
+            "default_selection_rules", target, rule_signature
+        )
+        values = _complete_values(
+            headers,
+            {
+                "model_key": target,
+                "rule_id": rule_id,
+                "target_option_id": target_option_id,
+                "condition_type": condition_type,
+                "condition_id": condition_option_id,
+                "body_style_scope": "*",
+                "trim_level_scope": "*",
+                "variant_scope": "*",
+                "priority": fact_context.get("priority") or 100,
+                "active": True,
+                "notes": "Target standard-status default corroborated by selected comparator.",
+                "display_behavior": signature.get("displayBehavior") or "",
+            },
+        )
+        dependencies = [_dependency(str(fact.get("evidenceId") or ""), fact)]
+        for option_id in {target_option_id, condition_option_id} - {""}:
+            dependencies.extend(
+                dependency
+                for ovs_row in ovs_rows_by_option[option_id]
+                for dependency in ovs_row.get("evidenceDependencies") or []
+            )
+        result.append(
+            _manifest_row(
+                model=target,
+                family="default_selection_rules",
+                sheet="default_selection_rules",
+                action="add",
+                key={"model_key": target, "rule_id": rule_id},
+                values=values,
+                signature=rule_signature,
+                dependencies=dependencies,
+                status="ready",
+            )
+        )
+    return result
 
 
 def _existing_section(existing_options: Iterable[Mapping[str, Any]], rpo: str) -> str:
@@ -543,6 +734,8 @@ def _compile_target_options(
     variants: list[dict[str, Any]],
     resolution_entries: Iterable[Mapping[str, Any]],
     status_feature_index: Mapping[str, Mapping[str, list[str]]],
+    profile_required_options: Mapping[str, Mapping[str, Any]] | None = None,
+    profile_option_precedents: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, str], dict[str, str], set[str], set[str]]:
     entry = registry["source_option_sheet"]
     existing_options = _rows(extract, entry["sheetName"])
@@ -597,11 +790,21 @@ def _compile_target_options(
     price_rule_rows: list[dict[str, Any]] = []
     existing_by_id = {str(row.get("option_id") or ""): row for row in existing_options}
     used_existing: set[str] = set()
+    required_by_rpo = {
+        str(rpo).upper(): dict(requirement)
+        for rpo, requirement in (profile_required_options or {}).items()
+    }
+    precedents_by_rpo = {
+        str(rpo).upper(): dict(precedent)
+        for rpo, precedent in (profile_option_precedents or {}).items()
+    }
     for match in matches:
         candidate = dict(match["candidate"])
         candidate_id = str(candidate.get("candidateId") or "")
         stable_candidate_id = option_occurrence_signature(candidate)
         rpo = str(candidate.get("rpo") or candidate.get("refOnlyRpo") or "").upper()
+        profile_requirement = required_by_rpo.get(rpo)
+        profile_precedent = precedents_by_rpo.get(rpo)
         dependencies = [
             _dependency(
                 f"target:{target}:candidate:{stable_candidate_id}",
@@ -671,14 +874,38 @@ def _compile_target_options(
             used_existing.add(option_id)
             dependencies.append(_dependency(f"workbook:{entry['sheetName']}:{option_id}", existing))
         else:
-            signature = option_occurrence_signature(candidate)
-            option_id = new_ids[signature].pop(0)
+            if profile_requirement:
+                option_id = str(profile_requirement.get("optionId") or "")
+                if not option_id:
+                    raise ValueError(f"Profile-required option {rpo} lacks an option identity.")
+            else:
+                signature = option_occurrence_signature(candidate)
+                option_id = new_ids[signature].pop(0)
             existing = {}
+        if profile_requirement:
+            required_option_id = str(profile_requirement.get("optionId") or "")
+            if option_id != required_option_id:
+                raise ValueError(
+                    f"Target {target} profile-required option {rpo} resolves to {option_id}, "
+                    f"not shared identity {required_option_id}."
+                )
+            evidence_id = str(profile_requirement.get("evidenceId") or "")
+            source = profile_requirement.get("source") or {}
+            if evidence_id and source:
+                dependencies.append(_dependency(evidence_id, source))
         section_id = _existing_section(existing_options, rpo)
         if not section_id:
             section_id = _section_by_source_label(extract, str(candidate.get("sectionLabel") or ""))
+        if not section_id and profile_precedent:
+            section_id = str(profile_precedent.get("sectionId") or "")
+            evidence_id = str(profile_precedent.get("evidenceId") or "")
+            source = profile_precedent.get("source") or {}
+            if section_id and evidence_id and source:
+                dependencies.append(_dependency(evidence_id, source))
         if not section_id:
             section_id = _precedent_section(extract, target, rpo)
+        if not section_id and profile_requirement:
+            section_id = str(profile_requirement.get("sectionId") or "")
         if not section_id:
             subject = _typed_exception(
                 target,
@@ -717,7 +944,17 @@ def _compile_target_options(
             raise ValueError(f"Resolved section_id is absent from section_master: {section_id}")
         dependencies.append(_dependency(f"workbook:section_master:{section_id}", section_row))
         price_match = candidate.get("priceMatch")
-        if price_match == "ambiguous":
+        profile_price = (
+            _profile_reconciled_price(candidate, profile_precedent)
+            if price_match == "ambiguous"
+            else None
+        )
+        if profile_price is not None:
+            price, price_dependencies = profile_price
+            dependencies.extend(price_dependencies)
+            row_status = "ready"
+            candidate_disposition[candidate_id] = "compiled_ready"
+        elif price_match == "ambiguous":
             price_subject = _typed_exception(
                 target,
                 "price_rules",
@@ -818,6 +1055,10 @@ def _compile_target_options(
         elif price_match == "exact":
             price_rows = candidate.get("priceRows") or []
             price = _header_price(price_rows[0]) if len(price_rows) == 1 else None
+            if len(price_rows) == 1:
+                dependencies.append(
+                    _dependency(f"price:{rpo}:{semantic_hash(price_rows[0])}", price_rows[0])
+                )
             if price is None:
                 exceptions.append(
                     _typed_exception(
@@ -840,12 +1081,41 @@ def _compile_target_options(
             price = _int_price(existing.get("price"))
             row_status = "ready"
             candidate_disposition[candidate_id] = "compiled_ready"
+        price_allocation = (
+            dict(profile_requirement.get("priceAllocation") or {})
+            if profile_requirement
+            else {}
+        )
+        if price_allocation:
+            assert profile_requirement is not None
+            source_total = _int_price(price)
+            expected_total = _int_price(price_allocation.get("totalPrice"))
+            option_presentation_price = _int_price(price_allocation.get("optionPrice"))
+            if (
+                source_total is None
+                or expected_total is None
+                or option_presentation_price is None
+                or source_total != expected_total
+            ):
+                raise ValueError(
+                    f"Target {target} profile price allocation for {rpo} does not "
+                    "match the target source total."
+                )
+            price = option_presentation_price
+            dependencies.append(
+                _dependency(
+                    f"{profile_requirement['evidenceId']}:price-allocation",
+                    price_allocation,
+                )
+            )
         statuses = model_scoped_statuses(candidate, target)
         selectable = candidate.get("rowKind") == "orderable" and any(status.get("status") == "available" for status in statuses)
+        source_active = any(
+            status.get("status") in {"available", "standard"} for status in statuses
+        )
         active = (
             True
-            if candidate.get("rowKind") == "standard_no_rpo"
-            and any(status.get("status") == "standard" for status in statuses)
+            if source_active
             else bool(workbook_truthy(existing.get("active")))
             if existing
             else bool(candidate.get("rowKind") == "orderable" and statuses)
@@ -1685,11 +1955,19 @@ def _status_feature_index(
     return index
 
 
+def _source_authority_sha(run_authority: Mapping[str, Any]) -> str:
+    bindings = run_authority.get("bindings") or {}
+    files = bindings.get("files") or {}
+    source = files.get("source") or {}
+    return str(source.get("sha256") or bindings.get("sourceSha256") or "")
+
+
 def _source_feature_ledger(
     targets: list[str],
     option_payload: Mapping[str, Any],
     price_payload: Mapping[str, Any],
     roles_payload: Mapping[str, Any],
+    sheet_profile: Mapping[str, Any],
     candidate_dispositions: Mapping[tuple[str, str], str],
     relationship_dispositions: Iterable[Mapping[str, Any]],
     comparator_artifact: Mapping[str, Any],
@@ -1699,20 +1977,37 @@ def _source_feature_ledger(
     candidate_feature_index: Mapping[str, str],
     *,
     color_trim_profiled: bool = False,
+    source_content_sha: str = "",
 ) -> list[dict[str, Any]]:
     ledger: list[dict[str, Any]] = []
+    profiled_sheets = {
+        str(item.get("sheetName") or ""): dict(item)
+        for item in sheet_profile.get("sheets") or []
+        if isinstance(item, Mapping) and str(item.get("sheetName") or "")
+    }
     for sheet_name, role in sorted((roles_payload.get("roles") or {}).items()):
-        if role == "exclude":
-            disposition = (
-                "compiled"
-                if color_trim_profiled
-                and "color" in sheet_name.lower()
-                and "trim" in sheet_name.lower()
-                else "exception_open"
-                if "color" in sheet_name.lower() and "trim" in sheet_name.lower()
-                else "resolved_not_applicable"
+        is_color_trim = "color" in sheet_name.lower() and "trim" in sheet_name.lower()
+        if role != "exclude" and not is_color_trim:
+            continue
+        sheet_evidence = profiled_sheets.get(sheet_name)
+        disposition = (
+            "resolved_not_a_workbook_fact"
+            if color_trim_profiled
+            and is_color_trim
+            and role == "exclude"
+            and source_content_sha
+            and sheet_evidence is not None
+            else "exception_open"
+            if is_color_trim
+            else "resolved_not_applicable"
+        )
+        evidence_ids = [f"sheet-role:{sheet_name}"]
+        if role == "exclude" and source_content_sha and sheet_evidence is not None:
+            evidence_ids.append(
+                f"source-sheet-content:{sheet_name}:profile-{semantic_hash(sheet_evidence)}:"
+                f"source-file-{source_content_sha}"
             )
-            ledger.append({"featureId": f"source-sheet:{sheet_name}", "model": "*", "family": "source_sheet", "disposition": disposition, "evidenceIds": [f"sheet-role:{sheet_name}"]})
+        ledger.append({"featureId": f"source-sheet:{sheet_name}", "model": "*", "family": "source_sheet", "disposition": disposition, "evidenceIds": evidence_ids})
     candidates = option_payload.get("candidates") or []
     for candidate in candidates:
         candidate_id = str(candidate.get("candidateId") or "")
@@ -1958,6 +2253,211 @@ def _retained_existing_rows(
     return retained
 
 
+def _scope_value(value: Any) -> str:
+    return str(value or "*").strip().lower() or "*"
+
+
+def _reconcile_represented_comparator_facts(
+    manifest_rows: list[dict[str, Any]],
+    exceptions: list[dict[str, Any]],
+    comparator_artifact: Mapping[str, Any],
+    targets: Iterable[str],
+) -> tuple[list[dict[str, Any]], set[tuple[str, str]], dict[str, set[str]]]:
+    """Close comparator questions already represented by exact canonical rows."""
+
+    matched_evidence: set[tuple[str, str]] = set()
+    matched_fact_keys: dict[str, set[str]] = defaultdict(set)
+    dependencies_by_row: dict[int, list[dict[str, str]]] = defaultdict(list)
+
+    for target in targets:
+        relevant = [
+            row
+            for row in manifest_rows
+            if str(row.get("model") or "") in {str(target), "*"}
+            and row.get("status") == "ready"
+        ]
+        option_id_to_rpo = {
+            str(values.get("option_id") or ""): str(values.get("rpo") or "").upper()
+            for row in relevant
+            if row.get("family") == "options"
+            for values in [row.get("values") or {}]
+            if str(values.get("option_id") or "") and str(values.get("rpo") or "")
+        }
+        family_rows: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        for row in relevant:
+            family_rows[str(row.get("family") or "")].append(row)
+
+        def option_rpo(option_id: Any) -> str:
+            return option_id_to_rpo.get(str(option_id or ""), "")
+
+        def default_matches(signature: Mapping[str, Any]) -> list[dict[str, Any]]:
+            matches = []
+            for row in family_rows["default_selection_rules"]:
+                values = row.get("values") or {}
+                condition_id = str(values.get("condition_id") or "")
+                condition_rpo = option_rpo(condition_id) if condition_id else ""
+                row_signature = {
+                    "targetRpo": option_rpo(values.get("target_option_id")),
+                    "conditionType": str(values.get("condition_type") or "").lower(),
+                    "conditionRpo": condition_rpo,
+                    "bodyStyleScope": _scope_value(values.get("body_style_scope")),
+                    "trimLevelScope": _scope_value(values.get("trim_level_scope")),
+                    "variantScope": _scope_value(values.get("variant_scope")),
+                    "displayBehavior": str(values.get("display_behavior") or ""),
+                }
+                if row_signature == dict(signature):
+                    matches.append(row)
+            return matches
+
+        def price_matches(
+            signature: Mapping[str, Any], context: Mapping[str, Any]
+        ) -> list[dict[str, Any]]:
+            expected_price = _int_price(context.get("priceValue"))
+            matches = []
+            for row in family_rows["price_rules"]:
+                values = row.get("values") or {}
+                row_signature = {
+                    "conditionRpo": option_rpo(values.get("condition_option_id")),
+                    "priceRuleType": str(values.get("price_rule_type") or "").lower(),
+                    "targetRpo": option_rpo(values.get("target_option_id")),
+                    "bodyStyleScope": _scope_value(values.get("body_style_scope")),
+                    "trimLevelScope": _scope_value(values.get("trim_level_scope")),
+                    "variantScope": _scope_value(values.get("variant_scope")),
+                }
+                if row_signature == dict(signature) and _int_price(
+                    values.get("price_value")
+                ) == expected_price:
+                    matches.append(row)
+            return matches
+
+        def direct_matches(signature: Mapping[str, Any]) -> list[dict[str, Any]]:
+            matches = []
+            for row in family_rows["rule_mapping"]:
+                values = row.get("values") or {}
+                row_signature = {
+                    "sourceRpo": option_rpo(values.get("source_id")),
+                    "ruleType": str(values.get("rule_type") or "").lower(),
+                    "targetRpo": option_rpo(values.get("target_id")),
+                    "bodyStyleScope": _scope_value(values.get("body_style_scope")),
+                    "trimLevelScope": _scope_value(values.get("trim_level_scope")),
+                    "variantScope": _scope_value(values.get("variant_scope")),
+                }
+                if row_signature == dict(signature):
+                    matches.append(row)
+            return matches
+
+        def exclusive_matches(signature: Mapping[str, Any]) -> list[dict[str, Any]]:
+            matches = []
+            members = family_rows["exclusive_group_members"]
+            for parent in family_rows["exclusive_groups"]:
+                values = parent.get("values") or {}
+                group_id = str(values.get("group_id") or "")
+                member_rows = [
+                    row
+                    for row in members
+                    if str((row.get("values") or {}).get("group_id") or "") == group_id
+                ]
+                member_rpos = sorted(
+                    option_rpo((row.get("values") or {}).get("option_id"))
+                    for row in member_rows
+                )
+                if (
+                    str(values.get("selection_mode") or "").lower()
+                    == str(signature.get("selectionMode") or "").lower()
+                    and member_rpos == sorted(signature.get("memberRpos") or [])
+                ):
+                    matches.extend([parent, *member_rows])
+            return matches
+
+        def group_matches(signature: Mapping[str, Any]) -> list[dict[str, Any]]:
+            matches = []
+            members = family_rows["rule_group_members"]
+            for parent in family_rows["rule_groups"]:
+                values = parent.get("values") or {}
+                group_id = str(values.get("group_id") or "")
+                member_rows = [
+                    row
+                    for row in members
+                    if str((row.get("values") or {}).get("group_id") or "") == group_id
+                ]
+                row_signature = {
+                    "sourceRpo": option_rpo(values.get("source_id")),
+                    "groupType": str(values.get("group_type") or "").lower(),
+                    "memberRpos": sorted(
+                        option_rpo((row.get("values") or {}).get("target_id"))
+                        for row in member_rows
+                    ),
+                    "bodyStyleScope": _scope_value(values.get("body_style_scope")),
+                    "trimLevelScope": _scope_value(values.get("trim_level_scope")),
+                    "variantScope": _scope_value(values.get("variant_scope")),
+                }
+                expected = dict(signature)
+                expected["memberRpos"] = sorted(expected.get("memberRpos") or [])
+                if row_signature == expected:
+                    matches.extend([parent, *member_rows])
+            return matches
+
+        matcher_by_type = {
+            "default_selection": lambda signature, _context: default_matches(signature),
+            "price_rule": price_matches,
+            "direct_rule": lambda signature, _context: direct_matches(signature),
+            "exclusive_group": lambda signature, _context: exclusive_matches(signature),
+            "rule_group": lambda signature, _context: group_matches(signature),
+        }
+        target_facts = (comparator_artifact.get("targets") or {}).get(target, {}).get("facts") or []
+        for fact in target_facts:
+            if fact.get("disposition") != "corroborating_context_only":
+                continue
+            fact_type = str(fact.get("factType") or "")
+            matcher = matcher_by_type.get(fact_type)
+            if matcher is None:
+                continue
+            signature = dict(fact.get("signature") or {})
+            matches = matcher(signature, fact.get("context") or {})
+            if not matches:
+                continue
+            evidence_id = str(fact.get("evidenceId") or "")
+            matched_evidence.add((str(target), evidence_id))
+            matched_fact_keys[str(target)].add(
+                semantic_hash({"factType": fact_type, "signature": signature})
+            )
+            dependency = _dependency(evidence_id, fact)
+            for row in matches:
+                dependencies_by_row[id(row)].append(dependency)
+
+    for row in manifest_rows:
+        additions = dependencies_by_row.get(id(row), [])
+        if not additions:
+            continue
+        by_id = {
+            dependency["evidenceId"]: dependency
+            for dependency in [*(row.get("evidenceDependencies") or []), *additions]
+        }
+        dependencies = [by_id[key] for key in sorted(by_id)]
+        row["evidenceDependencies"] = dependencies
+        row["derivationVersion"] = derivation_version(
+            row.get("semanticSignature") or {}, dependencies
+        )
+
+    filtered = []
+    for subject in exceptions:
+        if not str(subject.get("reasonCode") or "").startswith("comparator_only_"):
+            filtered.append(subject)
+            continue
+        references = {
+            str(reference)
+            for reference in subject.get("evidenceReferences") or []
+            if str(reference).startswith("comparator:")
+        }
+        if references and all(
+            (str(subject.get("model") or ""), reference) in matched_evidence
+            for reference in references
+        ):
+            continue
+        filtered.append(subject)
+    return filtered, matched_evidence, matched_fact_keys
+
+
 def _family_coverage(
     extract: Mapping[str, Any],
     targets: list[str],
@@ -2087,6 +2587,7 @@ def compile_canonical_rows(
     price_payload: Mapping[str, Any],
     join_report: Mapping[str, Any],
     roles_payload: Mapping[str, Any],
+    sheet_profile: Mapping[str, Any],
     selection: Mapping[str, Any],
     comparator_artifact: Mapping[str, Any],
     run_authority_fingerprint: Mapping[str, Any],
@@ -2151,15 +2652,6 @@ def compile_canonical_rows(
         manifest_rows.extend(variant_rows)
         exceptions.extend(variant_exceptions)
         compiled_base_price_rows.update(compiled_prices)
-        option_rows, option_exceptions, dispositions, rpo_ids, consumed, compiled_statuses = _compile_target_options(
-            extract,
-            registry[target],
-            target,
-            candidates,
-            variants,
-            resolution_entries,
-            status_feature_index,
-        )
         profile_variants_by_id = {
             str(row.get("variant_id") or ""): dict(row)
             for row in _target_variant_rows(extract, target)
@@ -2178,6 +2670,17 @@ def compile_canonical_rows(
             target=target,
             comparator=comparators[target],
             variants=profile_variants_by_id.values(),
+        )
+        option_rows, option_exceptions, dispositions, rpo_ids, consumed, compiled_statuses = _compile_target_options(
+            extract,
+            registry[target],
+            target,
+            candidates,
+            variants,
+            resolution_entries,
+            status_feature_index,
+            profile_required_options=profile["requiredOptions"],
+            profile_option_precedents=profile["optionPrecedents"],
         )
         registry[target]["interior_source_sheet"] = {
             **registry[target]["interior_source_sheet"],
@@ -2198,10 +2701,45 @@ def compile_canonical_rows(
             )
             for row in profile["rows"]
         ]
-        profile_rpos = {str(rpo).upper() for rpo in profile["optionRpoIds"]}
-        profile_option_ids = {
-            str(option_id) for option_id in profile["optionRpoIds"].values()
+        profile_rpos = {
+            str(row["values"].get("rpo") or "").upper()
+            for row in profile_rows
+            if row["family"] == "options"
         }
+        profile_option_ids = {
+            str(row["values"].get("option_id") or "")
+            for row in profile_rows
+            if row["family"] == "options"
+        }
+        required_option_rpos = {
+            str(rpo).upper() for rpo in profile["requiredOptionRpoIds"]
+        }
+        for candidate in scope_candidates(candidates, target):
+            rpo = str(candidate.get("rpo") or candidate.get("refOnlyRpo") or "").upper()
+            if rpo not in required_option_rpos:
+                continue
+            expected_statuses = profile["requiredOptions"][rpo]["statusByVariant"]
+            source_statuses = model_scoped_statuses(candidate, target)
+            if not source_statuses:
+                raise ValueError(
+                    f"Target {target} source evidence for profile-owned {rpo} lacks statuses."
+                )
+            actual_statuses: dict[str, str] = {}
+            for status in source_statuses:
+                variant_id = _resolve_variant(status, variants)
+                actual_status = str(status.get("status") or "")
+                expected_status = expected_statuses.get(variant_id or "")
+                if not variant_id or expected_status != actual_status:
+                    raise ValueError(
+                        f"Target {target} source status for profile-owned {rpo} does not "
+                        f"match the canonical interior requirement profile."
+                    )
+                actual_statuses[variant_id] = actual_status
+            if set(actual_statuses) != set(expected_statuses):
+                raise ValueError(
+                    f"Target {target} source evidence for profile-owned {rpo} does not "
+                    "cover every target variant."
+                )
         option_rows = [
             row
             for row in option_rows
@@ -2220,7 +2758,14 @@ def compile_canonical_rows(
         manifest_rows.extend(
             row for row in profile_rows if row["family"] not in {"options", "ovs"}
         )
-        for rpo, option_id in profile["optionRpoIds"].items():
+        emitted_profile_options = {
+            str(row["values"].get("rpo") or "").upper(): str(
+                row["values"].get("option_id") or ""
+            )
+            for row in profile_rows
+            if row["family"] == "options"
+        }
+        for rpo, option_id in emitted_profile_options.items():
             existing_id = rpo_ids.get(str(rpo))
             if existing_id and existing_id != option_id:
                 raise ValueError(
@@ -2247,9 +2792,22 @@ def compile_canonical_rows(
             for candidate in scoped
         }
         target_rpo_index[target] = target_rpos
+        ready_rpo_ids: dict[str, str] = {}
+        for row in option_rows:
+            if row.get("family") != "options" or row.get("status") != "ready":
+                continue
+            values = row.get("values") or {}
+            rpo = str(values.get("rpo") or "").upper()
+            option_id = str(values.get("option_id") or "")
+            if not rpo or not option_id:
+                continue
+            if rpo in ready_rpo_ids and ready_rpo_ids[rpo] != option_id:
+                ready_rpo_ids[rpo] = ""
+            elif rpo not in ready_rpo_ids:
+                ready_rpo_ids[rpo] = option_id
         rpo_by_option_id = {
             str(option_id): str(rpo).upper()
-            for rpo, option_id in rpo_ids.items()
+            for rpo, option_id in ready_rpo_ids.items()
             if str(option_id)
         }
         endpoint_catalog = {
@@ -2297,19 +2855,6 @@ def compile_canonical_rows(
             resolution_entries,
         )
         consumed_resolution_subjects.update(consumed)
-        ready_rpo_ids: dict[str, str] = {}
-        for row in option_rows:
-            if row.get("family") != "options" or row.get("status") != "ready":
-                continue
-            values = row.get("values") or {}
-            rpo = str(values.get("rpo") or "").upper()
-            option_id = str(values.get("option_id") or "")
-            if not rpo or not option_id:
-                continue
-            if rpo in ready_rpo_ids and ready_rpo_ids[rpo] != option_id:
-                ready_rpo_ids[rpo] = ""
-            elif rpo not in ready_rpo_ids:
-                ready_rpo_ids[rpo] = option_id
         proposal_rows, proposal_consumed, proposal_dispositions, proposal_fact_keys = _comparator_proposal_rows(
             extract,
             target,
@@ -2358,22 +2903,43 @@ def compile_canonical_rows(
         )
     manifest_rows.extend(_retained_existing_rows(extract, targets, registry, manifest_rows))
     manifest_rows = _merge_manifest_rows(manifest_rows)
+    (
+        exceptions,
+        represented_comparator_evidence,
+        represented_comparator_fact_keys,
+    ) = _reconcile_represented_comparator_facts(
+        manifest_rows,
+        exceptions,
+        comparator_artifact,
+        targets,
+    )
+    for target, evidence_id in represented_comparator_evidence:
+        comparator_effect_dispositions[(target, evidence_id)] = "compiled_ready"
+    for target, fact_keys in represented_comparator_fact_keys.items():
+        compiled_comparator_fact_keys[target].update(fact_keys)
+    relationship_dispositions = [
+        {
+            **item,
+            "disposition": (
+                "compiled_ready"
+                if (
+                    str(item.get("model") or ""),
+                    str(item.get("featureId") or ""),
+                )
+                in represented_comparator_evidence
+                else item.get("disposition")
+            ),
+        }
+        for item in relationship_dispositions
+    ]
     family_coverage, family_blockers = _family_coverage(extract, targets, registry, manifest_rows)
     exceptions.extend(family_blockers)
-    # Source-sheet exclusions are evidence too. Color/Trim is known applicable but
-    # unparsed, so each source sheet gets one primary blocker rather than a mirrored
-    # generic source-feature blocker.
-    for sheet_name, role in sorted((roles_payload.get("roles") or {}).items()):
-        if role == "exclude" and "color" in sheet_name.lower() and "trim" in sheet_name.lower():
-            if profiled_targets != set(targets):
-                exceptions.append(
-                    _typed_exception("*", "source_sheet", "unsupported_color_trim_source", [sheet_name], [_dependency(f"sheet-role:{sheet_name}", {"sheet": sheet_name, "role": role})], evidence_references=[sheet_name], question="Add a deterministic Color and Trim parser before compiling this source.")
-                )
     feature_coverage = _source_feature_ledger(
         targets,
         option_payload,
         price_payload,
         roles_payload,
+        sheet_profile,
         candidate_dispositions,
         relationship_dispositions,
         comparator_artifact,
@@ -2382,7 +2948,30 @@ def compile_canonical_rows(
         status_feature_index,
         candidate_feature_index,
         color_trim_profiled=profiled_targets == set(targets),
+        source_content_sha=_source_authority_sha(run_authority_fingerprint),
     )
+    for feature in feature_coverage:
+        if (
+            feature.get("family") == "source_sheet"
+            and feature.get("disposition") == "exception_open"
+            and "color" in str(feature.get("featureId") or "").lower()
+            and "trim" in str(feature.get("featureId") or "").lower()
+        ):
+            sheet_name = str(feature["featureId"]).removeprefix("source-sheet:")
+            exceptions.append(
+                _typed_exception(
+                    "*",
+                    "source_sheet",
+                    "unsupported_color_trim_source",
+                    [sheet_name],
+                    [_dependency(str(feature["featureId"]), feature)],
+                    evidence_references=list(feature.get("evidenceIds") or []),
+                    question=(
+                        "Capture content-bound Color and Trim evidence and build all "
+                        "target profiles before closing this source."
+                    ),
+                )
+            )
     for feature in feature_coverage:
         if feature.get("disposition") != "unsupported_blocker":
             continue

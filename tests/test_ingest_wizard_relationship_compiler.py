@@ -111,6 +111,25 @@ class RelationshipCompilerTest(unittest.TestCase):
             [("TU7", "AH2")],
         )
 
+    def test_real_target_rpo_takes_precedence_over_descriptive_alias(self) -> None:
+        compiled = compile_relationships(
+            [
+                {
+                    "candidateId": "row:real-gt2",
+                    "rpo": "TU7",
+                    "description": "Requires (GT2).",
+                }
+            ],
+            self.phrases,
+            target_rpos={"TU7", "GT2"},
+            ignored_endpoint_tokens={"GT2"},
+        )
+        self.assertEqual(compiled["exceptions"], [])
+        self.assertEqual(
+            [(row["sourceRpo"], row["targetRpo"]) for row in compiled["rows"]],
+            [("TU7", "GT2")],
+        )
+
     def test_multi_interior_requires_stays_a_typed_tooling_blocker(self) -> None:
         compiled = compile_relationships(
             [

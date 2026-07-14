@@ -21,6 +21,7 @@ from corvette_form_generator.ingest.wizard.decisions import model_scoped_statuse
 from corvette_form_generator.ingest.wizard.identity import option_occurrence_signature  # noqa: E402
 from corvette_form_generator.ingest.wizard.joiner import join_prices  # noqa: E402
 from corvette_form_generator.ingest.wizard.parser import parse_confirmed_sheets  # noqa: E402
+from corvette_form_generator.ingest.wizard.profiler import profile_workbook  # noqa: E402
 from ingest_wizard_fixtures import build_master_workbook, build_raw_export  # noqa: E402
 
 ROLES = {
@@ -50,10 +51,15 @@ class CanonicalCompilerTest(unittest.TestCase):
         master_wb.close()
         parsed = parse_confirmed_sheets(self.raw, ROLES)
         report = join_prices(parsed["candidates"], parsed["priceRows"])
-        self.option_payload = {"schemaVersion": "pass-a-1", "candidates": parsed["candidates"], "skippedRows": parsed["skippedRows"]}
+        self.option_payload = {
+            "schemaVersion": "pass-a-1",
+            "candidates": parsed["candidates"],
+            "skippedRows": parsed["skippedRows"],
+        }
         self.price_payload = {"schemaVersion": "pass-a-1", "priceRows": parsed["priceRows"], "baseModelPriceRows": parsed["baseModelPriceRows"], "skippedPriceRows": parsed["skippedPriceRows"]}
         self.join_report = report
         self.roles_payload = {"schemaVersion": "pass-a-1", "roles": ROLES}
+        self.sheet_profile = profile_workbook(self.raw)
         self.selection = {"targets": ["zr1"], "comparators": {"zr1": "z06"}}
         authority_bindings = {"sourceSha256": "a" * 64, "workbookSha256": "b" * 64, "compilerPolicyVersion": "milestone-1-v1"}
         self.authority = {
@@ -72,6 +78,7 @@ class CanonicalCompilerTest(unittest.TestCase):
             "price_payload": self.price_payload,
             "join_report": self.join_report,
             "roles_payload": self.roles_payload,
+            "sheet_profile": self.sheet_profile,
             "selection": self.selection,
             "comparator_artifact": self.comparator,
             "run_authority_fingerprint": self.authority,
@@ -209,6 +216,476 @@ class CanonicalCompilerTest(unittest.TestCase):
                 for subject in subjects
             )
         )
+
+    def test_target_status_comparator_placement_and_existing_default_are_not_false_blockers(self) -> None:
+        from openpyxl import load_workbook
+
+        raw = load_workbook(self.raw)
+        raw["Equipment Groups 4"].append(
+            ["SEC", "", "Comparator-placed target option", "A", "A"]
+        )
+        raw["Equipment Groups 4"].append(
+            ["CON", "", "Standard condition", "S", "S"]
+        )
+        raw["Equipment Groups 4"].append(
+            ["DFT", "", "Standard dependent default", "S", "S"]
+        )
+        raw.save(self.raw)
+        raw.close()
+
+        workbook = load_workbook(self.master)
+        workbook["z06_options"].append(
+            [
+                "opt_sec_001", "SEC", 0, "Comparator-placed option",
+                "Fixture canonical placement", "", "sec_whee_001",
+                True, 30, True, "",
+            ]
+        )
+        workbook["z06_options"].append(
+            [
+                "opt_con_001", "CON", 0, "Standard condition", "", "",
+                "sec_whee_001", False, 31, True, "",
+            ]
+        )
+        workbook["z06_options"].append(
+            [
+                "opt_dft_001", "DFT", 0, "Standard dependent default", "", "",
+                "sec_whee_001", False, 32, True, "",
+            ]
+        )
+        workbook["default_selection_rules"].append(
+            [
+                "z06", "z06_default_bv4", "opt_bv4_001", "always", "",
+                "*", "*", "*", 5, True, "Fixture comparator default", "",
+            ]
+        )
+        workbook["default_selection_rules"].append(
+            [
+                "zr1", "zr1_default_bv4", "opt_bv4_001", "always", "",
+                "*", "*", "*", 105, True, "Existing target default", "",
+            ]
+        )
+        workbook["default_selection_rules"].append(
+            [
+                "z06", "z06_default_dft_with_con", "opt_dft_001",
+                "when_selected", "opt_con_001", "*", "*", "*", 6, True,
+                "Fixture source-supported default", "",
+            ]
+        )
+        model_variants = workbook["model_variants"]
+        for row_index in range(model_variants.max_row, 1, -1):
+            if (
+                model_variants.cell(row_index, 1).value == "zr1"
+                and model_variants.cell(row_index, 2).value == "3lz_r67"
+            ):
+                model_variants.delete_rows(row_index)
+        workbook.save(self.master)
+        workbook.close()
+
+        parsed = parse_confirmed_sheets(self.raw, ROLES)
+        option_payload = {
+            "schemaVersion": "pass-a-1",
+            "candidates": parsed["candidates"],
+            "skippedRows": parsed["skippedRows"],
+        }
+        price_payload = {
+            "schemaVersion": "pass-a-1",
+            "priceRows": parsed["priceRows"],
+            "baseModelPriceRows": parsed["baseModelPriceRows"],
+            "skippedPriceRows": parsed["skippedPriceRows"],
+        }
+        comparator = build_comparator_evidence(
+            self.master,
+            self.selection["comparators"],
+            run_authority_fingerprint=self.authority,
+        )
+        result = self.compile(
+            option_payload=option_payload,
+            price_payload=price_payload,
+            join_report=join_prices(parsed["candidates"], parsed["priceRows"]),
+            comparator_artifact=comparator,
+        )
+        rows = result["canonical-row-manifest.json"]["rows"]
+        subjects = result["exception-queue.json"]["subjects"]
+
+        sec = next(
+            row
+            for row in rows
+            if row["model"] == "zr1"
+            and row["family"] == "options"
+            and row["values"].get("rpo") == "SEC"
+        )
+        self.assertEqual(sec["values"]["section_id"], "sec_whee_001")
+        self.assertFalse(
+            any(
+                subject["reasonCode"] == "missing_section"
+                and "SEC" in str(subject)
+                for subject in subjects
+            )
+        )
+
+        bv4 = next(
+            row
+            for row in rows
+            if row["model"] == "zr1"
+            and row["family"] == "options"
+            and row["values"].get("rpo") == "BV4"
+        )
+        self.assertTrue(bv4["values"]["active"])
+        self.assertFalse(
+            any(
+                subject["reasonCode"] == "comparator_only_default_selection_proposal"
+                and subject["model"] == "zr1"
+                and subject["proposedRows"][0].get("targetRpo") == "BV4"
+                for subject in subjects
+            )
+        )
+        retained_default = next(
+            row
+            for row in rows
+            if row["family"] == "default_selection_rules"
+            and row["values"].get("rule_id") == "zr1_default_bv4"
+        )
+        self.assertTrue(
+            any(
+                dependency["evidenceId"].startswith("comparator:default_selection:")
+                for dependency in retained_default["evidenceDependencies"]
+            )
+        )
+        source_supported_default = next(
+            row
+            for row in rows
+            if row["model"] == "zr1"
+            and row["family"] == "default_selection_rules"
+            and row["values"].get("target_option_id") == "opt_dft_001"
+        )
+        self.assertEqual(
+            source_supported_default["values"]["condition_id"], "opt_con_001"
+        )
+        self.assertFalse(
+            any(
+                subject["reasonCode"] == "comparator_only_default_selection_proposal"
+                and subject["model"] == "zr1"
+                and subject["proposedRows"][0].get("targetRpo") == "DFT"
+                for subject in subjects
+            )
+        )
+
+    def test_ambiguous_target_price_uses_raw_base_and_canonical_conditional_rules(self) -> None:
+        from openpyxl import load_workbook
+
+        raw = load_workbook(self.raw)
+        raw["Equipment Groups 4"].append(
+            ["CND", "", "Conditional price trigger", "A", "A"]
+        )
+        raw["Equipment Groups 4"].append(
+            ["ALT", "", "Conditionally priced option", "A", "A"]
+        )
+        raw["Price Schedule"].cell(row=9, column=4, value="Qualifier")
+        raw["Price Schedule"].cell(row=9, column=5, value="List")
+        raw["Price Schedule"].cell(row=9, column=6, value="Factory")
+        raw["Price Schedule"].cell(row=9, column=7, value="MSRP(c)")
+        raw["Price Schedule"].append(
+            ["", "ALT", "Conditionally priced option", "with CND", 75, 0, 75]
+        )
+        raw["Price Schedule"].append(
+            ["", "ALT", "Conditionally priced option", "without CND", 100, 0, 100]
+        )
+        raw.save(self.raw)
+        raw.close()
+
+        workbook = load_workbook(self.master)
+        workbook["z06_options"].append(
+            [
+                "opt_cnd_001", "CND", 0, "Conditional price trigger", "", "",
+                "sec_whee_001", True, 31, True, "",
+            ]
+        )
+        workbook["z06_options"].append(
+            [
+                "opt_alt_001", "ALT", 100, "Conditionally priced option", "", "",
+                "sec_whee_001", True, 32, True, "",
+            ]
+        )
+        workbook["z06_price_rules"].append(
+            [
+                "z06_pr_cnd_alt", "opt_cnd_001", "override", "opt_alt_001",
+                75, "", "", "", "Fixture conditional price",
+            ]
+        )
+        workbook.save(self.master)
+        workbook.close()
+
+        parsed = parse_confirmed_sheets(self.raw, ROLES)
+        result = self.compile(
+            option_payload={
+                "schemaVersion": "pass-a-1",
+                "candidates": parsed["candidates"],
+                "skippedRows": parsed["skippedRows"],
+            },
+            price_payload={
+                "schemaVersion": "pass-a-1",
+                "priceRows": parsed["priceRows"],
+                "baseModelPriceRows": parsed["baseModelPriceRows"],
+                "skippedPriceRows": parsed["skippedPriceRows"],
+            },
+            join_report=join_prices(parsed["candidates"], parsed["priceRows"]),
+            comparator_artifact=build_comparator_evidence(
+                self.master,
+                self.selection["comparators"],
+                run_authority_fingerprint=self.authority,
+            ),
+        )
+        option = next(
+            row
+            for row in result["canonical-row-manifest.json"]["rows"]
+            if row["model"] == "zr1"
+            and row["family"] == "options"
+            and row["values"].get("rpo") == "ALT"
+        )
+        self.assertEqual(option["values"]["price"], 100)
+        self.assertFalse(
+            any(
+                subject["reasonCode"] == "unresolved_price_scope"
+                and "ALT" in str(subject)
+                for subject in result["exception-queue.json"]["subjects"]
+            )
+        )
+
+    def test_profile_effect_relationship_compiles_through_source_ledger(self) -> None:
+        from openpyxl import load_workbook
+
+        raw = load_workbook(self.raw)
+        raw["Equipment Groups 4"].append(
+            ["Z25", "", "Includes (HTA) Jet Black interior.", "A", "A"]
+        )
+        raw["Price Schedule"].append(
+            ["", "Z25", "Launch Edition", 1995, 0, 1995]
+        )
+        raw.save(self.raw)
+        raw.close()
+
+        workbook = load_workbook(self.master)
+        workbook["z06_options"].append(
+            [
+                "opt_z25_001", "Z25", 0, "Launch Edition",
+                "Includes Jet Black interior.", "", "sec_whee_001",
+                True, 30, True, "",
+            ]
+        )
+        workbook["z06_ovs"].append(["opt_z25_001", "1lz_h07", "available"])
+        scope_sheet = workbook["model_interior_scope"]
+        for row in scope_sheet.iter_rows(min_row=2):
+            if row[0].value == "z06":
+                scope_sheet[f"E{row[0].row}"] = "opt_z25_001"
+        interior_sheet = workbook["LZ_Interiors"]
+        for row_index in range(2, interior_sheet.max_row + 1):
+            interior_sheet.cell(row=row_index, column=4, value=1995)
+        model_variants = workbook["model_variants"]
+        for row_index in range(model_variants.max_row, 1, -1):
+            if (
+                model_variants.cell(row_index, 1).value == "zr1"
+                and model_variants.cell(row_index, 2).value == "3lz_r67"
+            ):
+                model_variants.delete_rows(row_index)
+        workbook.save(self.master)
+        workbook.close()
+
+        parsed = parse_confirmed_sheets(self.raw, ROLES)
+        report = join_prices(parsed["candidates"], parsed["priceRows"])
+        option_payload = {
+            "schemaVersion": "pass-a-1",
+            "candidates": parsed["candidates"],
+            "skippedRows": parsed["skippedRows"],
+        }
+        price_payload = {
+            "schemaVersion": "pass-a-1",
+            "priceRows": parsed["priceRows"],
+            "baseModelPriceRows": parsed["baseModelPriceRows"],
+            "skippedPriceRows": parsed["skippedPriceRows"],
+        }
+        comparator = build_comparator_evidence(
+            self.master,
+            self.selection["comparators"],
+            run_authority_fingerprint=self.authority,
+        )
+        result = self.compile(
+            option_payload=option_payload,
+            price_payload=price_payload,
+            join_report=report,
+            comparator_artifact=comparator,
+        )
+        self.assertTrue(
+            any(
+                item["family"] == "rule_mapping"
+                and item["disposition"] == "compiled"
+                for item in result["compile-report.json"]["sourceFeatureCoverage"]
+            )
+        )
+        rows = result["canonical-row-manifest.json"]["rows"]
+        z25_option = next(
+            row
+            for row in rows
+            if row["model"] == "zr1"
+            and row["family"] == "options"
+            and row["values"].get("rpo") == "Z25"
+            and row["status"] == "ready"
+        )
+        self.assertEqual(z25_option["values"]["price"], 0)
+        self.assertTrue(
+            any(
+                dependency["evidenceId"].startswith("price:Z25:")
+                for dependency in z25_option["evidenceDependencies"]
+            )
+        )
+        self.assertTrue(
+            any(
+                dependency["evidenceId"].endswith(":price-allocation")
+                for dependency in z25_option["evidenceDependencies"]
+            )
+        )
+        self.assertEqual(
+            {
+                row["values"]["Price"]
+                for row in rows
+                if row["model"] == "zr1"
+                and row["family"] == "interiors"
+                and row["values"].get("interior_id")
+                in {"1LZ_AQ9_HTA", "3LZ_AQ9_HTA"}
+            },
+            {1995},
+        )
+        z25_ovs = [
+            row
+            for row in rows
+            if row["model"] == "zr1"
+            and row["family"] == "ovs"
+            and row["values"].get("option_id") == "opt_z25_001"
+        ]
+        self.assertTrue(z25_ovs)
+        self.assertTrue(
+            all(
+                any(
+                    dependency["evidenceId"].startswith("status:")
+                    for dependency in row["evidenceDependencies"]
+                )
+                for row in z25_ovs
+            )
+        )
+        self.assertEqual(
+            {
+                row["values"]["variant_id"]
+                for row in rows
+                if row["model"] == "zr1"
+                and row["family"] == "ovs"
+                and row["values"].get("option_id") == "opt_z25_001"
+                and row["values"].get("status") == "available"
+            },
+            {"1lz_r07"},
+        )
+        z25_signatures = {
+            option_occurrence_signature(candidate)
+            for candidate in parsed["candidates"]
+            if candidate.get("rpo") == "Z25"
+        }
+        self.assertFalse(
+            any(
+                subject["reasonCode"] == "missing_section"
+                and z25_signatures.intersection(subject["evidenceReferences"])
+                for subject in result["exception-queue.json"]["subjects"]
+            )
+        )
+
+    def test_color_trim_source_requires_source_authority_and_tracks_its_fingerprint(self) -> None:
+        result = self.compile()
+        coverage = next(
+            item
+            for item in result["compile-report.json"]["sourceFeatureCoverage"]
+            if item["featureId"] == "source-sheet:Color and Trim 1"
+        )
+        self.assertEqual(coverage["disposition"], "resolved_not_a_workbook_fact")
+        self.assertTrue(
+            any(
+                evidence_id.startswith("source-sheet-content:Color and Trim 1:")
+                for evidence_id in coverage["evidenceIds"]
+            )
+        )
+
+        missing_bindings = copy.deepcopy(self.authority["bindings"])
+        del missing_bindings["sourceSha256"]
+        missing_authority = {
+            "fingerprint": hashlib.sha256(canonical_bytes(missing_bindings)).hexdigest(),
+            "bindings": missing_bindings,
+        }
+        missing_comparator = build_comparator_evidence(
+            self.master,
+            self.selection["comparators"],
+            run_authority_fingerprint=missing_authority,
+        )
+        missing_result = self.compile(
+            run_authority_fingerprint=missing_authority,
+            comparator_artifact=missing_comparator,
+        )
+        self.assertTrue(
+            any(
+                subject["reasonCode"] == "unsupported_color_trim_source"
+                for subject in missing_result["exception-queue.json"]["subjects"]
+            )
+        )
+
+        changed_bindings = copy.deepcopy(self.authority["bindings"])
+        changed_bindings["sourceSha256"] = "c" * 64
+        changed_authority = {
+            "fingerprint": hashlib.sha256(canonical_bytes(changed_bindings)).hexdigest(),
+            "bindings": changed_bindings,
+        }
+        changed_comparator = build_comparator_evidence(
+            self.master,
+            self.selection["comparators"],
+            run_authority_fingerprint=changed_authority,
+        )
+        changed_result = self.compile(
+            run_authority_fingerprint=changed_authority,
+            comparator_artifact=changed_comparator,
+        )
+        changed_coverage = next(
+            item
+            for item in changed_result["compile-report.json"]["sourceFeatureCoverage"]
+            if item["featureId"] == "source-sheet:Color and Trim 1"
+        )
+        self.assertNotEqual(coverage["evidenceIds"], changed_coverage["evidenceIds"])
+
+    def test_color_trim_policy_does_not_close_a_nonexistent_excluded_sheet(self) -> None:
+        cases = (
+            ("Color and Trim Ghost", "exclude"),
+            ("Color and Trim 1", "options"),
+        )
+        for sheet_name, role in cases:
+            with self.subTest(sheet_name=sheet_name, role=role):
+                roles_payload = copy.deepcopy(self.roles_payload)
+                roles_payload["roles"][sheet_name] = role
+
+                result = self.compile(roles_payload=roles_payload)
+                coverage = next(
+                    item
+                    for item in result["compile-report.json"]["sourceFeatureCoverage"]
+                    if item["featureId"] == f"source-sheet:{sheet_name}"
+                )
+
+                self.assertEqual(coverage["disposition"], "exception_open")
+                self.assertFalse(
+                    any(
+                        evidence_id.startswith(f"source-sheet-content:{sheet_name}:")
+                        for evidence_id in coverage["evidenceIds"]
+                    )
+                )
+                self.assertTrue(
+                    any(
+                        subject["reasonCode"] == "unsupported_color_trim_source"
+                        and f"sheet-role:{sheet_name}" in subject["evidenceReferences"]
+                        for subject in result["exception-queue.json"]["subjects"]
+                    )
+                )
 
     def test_existing_option_id_is_reused_and_no_family_is_cleared(self) -> None:
         result = self.compile()
@@ -929,7 +1406,11 @@ class CanonicalCompilerTest(unittest.TestCase):
         self.assertTrue(
             any(
                 "Color and Trim 1" in item["featureId"]
-                and item["disposition"] == "compiled"
+                and item["disposition"] == "resolved_not_a_workbook_fact"
+                and any(
+                    evidence_id.startswith("source-sheet-content:Color and Trim 1:")
+                    for evidence_id in item["evidenceIds"]
+                )
                 for item in report["sourceFeatureCoverage"]
             )
         )

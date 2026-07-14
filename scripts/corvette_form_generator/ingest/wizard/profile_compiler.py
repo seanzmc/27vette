@@ -38,6 +38,13 @@ def _complete(headers: Iterable[str], source: Mapping[str, Any]) -> dict[str, An
     return {str(header): source.get(str(header), "") for header in headers}
 
 
+def _number(value: Any) -> int | float | None:
+    if value in (None, ""):
+        return None
+    number = float(value)
+    return int(number) if number.is_integer() else number
+
+
 def _typed_values(family: str, values: Mapping[str, Any]) -> dict[str, Any]:
     result = dict(values)
     for column, kind in EDITOR_SHEET_META[family].get("types", {}).items():
@@ -159,20 +166,26 @@ def build_target_profile(
     comparator_option_sheet = comparator_sources.get("source_option_sheet")
     if not comparator_option_sheet:
         raise ValueError(f"Comparator {comparator} lacks an active option source.")
+    comparator_status_sheet = comparator_sources.get("status_sheet")
+    if not comparator_status_sheet:
+        raise ValueError(f"Comparator {comparator} lacks an active status source.")
 
     target_option_sheet = str(registry["source_option_sheet"]["sheetName"])
     target_ovs_sheet = str(registry["status_sheet"]["sheetName"])
-    paint_sections = {
-        str(row.get("section_id") or "")
-        for row in _rows(extract, "section_master")
-        if str(row.get("step_key") or "").strip().lower() == "paint"
-    }
-    if not paint_sections:
-        raise ValueError("Shared paint profile requires a workbook-owned paint section.")
+    paint_section = next(
+        (
+            row
+            for row in _rows(extract, "section_master")
+            if str(row.get("section_id") or "") == "sec_pain_001"
+        ),
+        None,
+    )
+    if paint_section is None:
+        raise ValueError("Shared paint profile requires canonical section sec_pain_001.")
     paint_rows = [
         row
         for row in _rows(extract, comparator_option_sheet)
-        if str(row.get("section_id") or "") in paint_sections
+        if str(row.get("section_id") or "") == "sec_pain_001"
         and workbook_truthy(row.get("active", True))
     ]
     by_rpo: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -182,6 +195,42 @@ def build_target_profile(
             by_rpo[rpo].append(row)
     if not by_rpo or any(len(rows) != 1 for rows in by_rpo.values()):
         raise ValueError(f"Comparator {comparator} paint RPO identities must be non-empty and unique.")
+
+    comparator_variant_ids = {
+        str(row.get("variant_id") or "")
+        for row in _rows(extract, "model_variants")
+        if str(row.get("model_key") or "").strip().lower() == comparator
+        and workbook_truthy(row.get("active", True))
+        and str(row.get("variant_id") or "")
+    }
+    if not comparator_variant_ids:
+        raise ValueError(
+            f"Comparator {comparator} paint availability requires active comparator variants."
+        )
+    paint_option_ids = {
+        str(group[0].get("option_id") or "") for group in by_rpo.values()
+    }
+    paint_statuses: dict[str, dict[str, str]] = defaultdict(dict)
+    for row in _rows(extract, comparator_status_sheet):
+        option_id = str(row.get("option_id") or "")
+        variant_id = str(row.get("variant_id") or "")
+        status = str(row.get("status") or "").strip().lower()
+        if option_id not in paint_option_ids or variant_id not in comparator_variant_ids:
+            continue
+        if variant_id in paint_statuses[option_id]:
+            raise ValueError(
+                f"Comparator {comparator} paint availability has duplicate status "
+                f"for {option_id}/{variant_id}."
+            )
+        paint_statuses[option_id][variant_id] = status
+    for rpo, rows in sorted(by_rpo.items()):
+        option_id = str(rows[0].get("option_id") or "")
+        statuses = paint_statuses.get(option_id, {})
+        if set(statuses) != comparator_variant_ids or set(statuses.values()) != {"available"}:
+            raise ValueError(
+                f"Comparator {comparator} paint availability for {rpo} must be available "
+                f"on every active comparator variant."
+            )
 
     records: list[dict[str, Any]] = []
     option_rpo_ids: dict[str, str] = {}
@@ -281,6 +330,7 @@ def build_target_profile(
             f"missing={missing[:5]!r} extra={extra[:5]!r}."
         )
     interior_requirements: dict[str, str] = {}
+    required_option_trims: dict[str, set[str]] = defaultdict(set)
     for source in sorted(scope_rows, key=lambda row: (str(row.get("interior_id")), str(row.get("trim_level")))):
         target_source = {**source, "model_key": target}
         interior_id = str(source.get("interior_id") or "")
@@ -288,6 +338,7 @@ def build_target_profile(
         requires_option_id = str(source.get("requires_option_id") or "")
         if requires_option_id:
             interior_requirements[interior_id] = requires_option_id
+            required_option_trims[requires_option_id].add(trim)
         records.append(
             _row_record(
                 extract=extract,
@@ -299,6 +350,142 @@ def build_target_profile(
                 evidence_id=f"workbook:shared-profile:{comparator}:model_interior_scope:{interior_id}:{trim}",
             )
         )
+
+    required_option_rpo_ids: dict[str, str] = {}
+    required_options: dict[str, dict[str, Any]] = {}
+    comparator_options = _rows(extract, comparator_option_sheet)
+    live_section_ids = {
+        str(row.get("section_id") or "") for row in _rows(extract, "section_master")
+    }
+    comparator_options_by_rpo: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in comparator_options:
+        rpo = str(row.get("rpo") or "").strip().upper()
+        if rpo and workbook_truthy(row.get("active", True)):
+            comparator_options_by_rpo[rpo].append(row)
+    option_precedents: dict[str, dict[str, Any]] = {}
+    for rpo, matches in sorted(comparator_options_by_rpo.items()):
+        if len(matches) != 1:
+            continue
+        source = dict(matches[0])
+        section_id = str(source.get("section_id") or "")
+        if section_id not in live_section_ids:
+            continue
+        option_id = str(source.get("option_id") or "")
+        option_precedents[rpo] = {
+            "sectionId": section_id,
+            "basePrice": _number(source.get("price")),
+            "evidenceId": (
+                f"workbook:comparator-placement:{comparator}:{comparator_option_sheet}:"
+                f"{option_id or rpo}"
+            ),
+            "source": source,
+            "conditionalPriceRules": [],
+        }
+    comparator_rpo_by_option_id = {
+        str(row.get("option_id") or ""): str(row.get("rpo") or "").strip().upper()
+        for row in comparator_options
+        if str(row.get("option_id") or "") and str(row.get("rpo") or "")
+    }
+    comparator_price_sheet = comparator_sources.get("price_rules_sheet")
+    if comparator_price_sheet:
+        for row in _rows(extract, comparator_price_sheet):
+            target_rpo = comparator_rpo_by_option_id.get(
+                str(row.get("target_option_id") or ""), ""
+            )
+            condition_rpo = comparator_rpo_by_option_id.get(
+                str(row.get("condition_option_id") or ""), ""
+            )
+            if not target_rpo or not condition_rpo or target_rpo not in option_precedents:
+                continue
+            price_value = _number(row.get("price_value"))
+            if price_value is None:
+                continue
+            rule_id = str(row.get("price_rule_id") or "")
+            option_precedents[target_rpo]["conditionalPriceRules"].append(
+                {
+                    "conditionRpo": condition_rpo,
+                    "priceValue": price_value,
+                    "priceRuleType": str(row.get("price_rule_type") or "").lower(),
+                    "bodyStyleScope": str(row.get("body_style_scope") or "*"),
+                    "trimLevelScope": str(row.get("trim_level_scope") or "*"),
+                    "variantScope": str(row.get("variant_scope") or "*"),
+                    "evidenceId": (
+                        f"workbook:comparator-price:{comparator}:{comparator_price_sheet}:"
+                        f"{rule_id}"
+                    ),
+                    "source": dict(row),
+                }
+            )
+    for option_id, required_trims in sorted(required_option_trims.items()):
+        matches = [
+            row
+            for row in comparator_options
+            if str(row.get("option_id") or "") == option_id
+            and workbook_truthy(row.get("active", True))
+        ]
+        if len(matches) != 1:
+            raise ValueError(
+                f"Comparator {comparator} must provide one active required option {option_id}."
+            )
+        source = dict(matches[0])
+        rpo = str(source.get("rpo") or "").strip().upper()
+        section_id = str(source.get("section_id") or "")
+        if not rpo or section_id not in live_section_ids:
+            raise ValueError(
+                f"Comparator required option {option_id} lacks a valid RPO/section identity."
+            )
+        existing = target_existing_by_rpo.get(rpo, [])
+        if len(existing) > 1:
+            raise ValueError(f"Target {target} has duplicate required-option RPO {rpo}.")
+        if existing and str(existing[0].get("option_id") or "") != option_id:
+            raise ValueError(
+                f"Target {target} required option {rpo} does not use shared canonical ID {option_id}."
+            )
+        if rpo in option_rpo_ids and option_rpo_ids[rpo] != option_id:
+            raise ValueError(f"Profile RPO {rpo} resolves to conflicting option identities.")
+        option_rpo_ids[rpo] = option_id
+        required_option_rpo_ids[rpo] = option_id
+        required_interior_prices = {
+            _number(interior.get("Price"))
+            for interior in source_interiors
+            if interior_requirements.get(str(interior.get("interior_id") or ""))
+            == option_id
+        }
+        required_interior_prices.discard(None)
+        option_presentation_price = _number(source.get("price"))
+        price_allocation = None
+        if len(required_interior_prices) == 1 and option_presentation_price is not None:
+            interior_presentation_price = next(iter(required_interior_prices))
+            assert interior_presentation_price is not None
+            price_allocation = {
+                "optionPrice": option_presentation_price,
+                "interiorPrice": interior_presentation_price,
+                "totalPrice": option_presentation_price + interior_presentation_price,
+                "interiorIds": sorted(
+                    interior_id
+                    for interior_id, required_option_id in interior_requirements.items()
+                    if required_option_id == option_id
+                ),
+            }
+        required_options[rpo] = {
+            "optionId": option_id,
+            "sectionId": section_id,
+            "requiredTrims": sorted(required_trims),
+            "statusByVariant": {
+                str(variant.get("variant_id") or ""): (
+                    "available"
+                    if str(variant.get("trim_level") or "").strip().upper() in required_trims
+                    else "unavailable"
+                )
+                for variant in variant_rows
+            },
+            "evidenceId": (
+                f"workbook:shared-profile:{comparator}:{comparator_option_sheet}:"
+                f"required-option:{option_id}"
+            ),
+            "source": source,
+            "priceAllocation": price_allocation,
+        }
 
     component_rows = [
         row
@@ -379,6 +566,18 @@ def build_target_profile(
         ]
         if not source_rows:
             raise ValueError(f"Comparator {comparator} has no active {sheet} profile.")
+        if sheet == "section_presentation":
+            invalid_sections = sorted(
+                {
+                    str(row.get("section_id") or "")
+                    for row in source_rows
+                    if str(row.get("section_id") or "") not in live_section_ids
+                }
+            )
+            if invalid_sections:
+                raise ValueError(
+                    f"Comparator presentation section references are invalid: {invalid_sections}."
+                )
         key_columns = tuple(EDITOR_SHEET_META[presentation_family]["key"])
         for source in source_rows:
             target_source = {**source, "model_key": target}
@@ -407,24 +606,25 @@ def build_target_profile(
     if len(model_years) != 1:
         raise ValueError(f"Target {target} variants do not establish one model year.")
     label = target.replace("_", " ").title()
+    existing_model = existing_models[0] if existing_models else {}
     model_source = {
-        **(existing_models[0] if existing_models else {}),
+        **existing_model,
         "model_key": target,
-        "registry_key": target,
-        "model_label": label,
+        "registry_key": existing_model.get("registry_key") or target,
+        "model_label": existing_model.get("model_label") or label,
         "model_year": next(iter(model_years)),
         "dataset_name": (
-            (existing_models[0].get("dataset_name") if existing_models else "")
+            existing_model.get("dataset_name")
             or f"{next(iter(model_years))} Corvette {label} operational form"
         ),
-        "export_slug": target.replace("_", "-"),
+        "export_slug": existing_model.get("export_slug") or target.replace("_", "-"),
         "expected_variant_count": len(variant_rows),
         "default_model": bool(
-            workbook_truthy((existing_models[0] if existing_models else {}).get("default_model"))
+            workbook_truthy(existing_model.get("default_model"))
         ),
-        "active": bool(workbook_truthy((existing_models[0] if existing_models else {}).get("active"))),
+        "active": bool(workbook_truthy(existing_model.get("active"))),
         "notes": (
-            (existing_models[0].get("notes") if existing_models else "")
+            existing_model.get("notes")
             or "Inactive metadata compiled from selected target and comparator profile."
         ),
     }
@@ -475,6 +675,9 @@ def build_target_profile(
     return {
         "rows": records,
         "optionRpoIds": option_rpo_ids,
+        "requiredOptionRpoIds": required_option_rpo_ids,
+        "requiredOptions": required_options,
+        "optionPrecedents": option_precedents,
         "interiorCodeIds": {
             code: sorted(interior_ids) for code, interior_ids in sorted(interior_code_ids.items())
         },
@@ -483,11 +686,4 @@ def build_target_profile(
         "trimFamily": family,
         "targetTrims": sorted(target_trims),
         "interiorSheet": interior_sheet,
-        "colorTrimDisposition": {
-            "disposition": "compiled",
-            "evidenceIds": [
-                f"workbook:shared-profile:{comparator}:paint",
-                f"workbook:shared-profile:{comparator}:{interior_sheet}",
-            ],
-        },
     }

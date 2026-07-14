@@ -1,6 +1,6 @@
 # Ingest Milestone 2.2 Typed Endpoint and Metadata Compiler Closure Implementation Plan
 
-Status: IMPLEMENTED WITH PARENT PROOF 2026-07-14; independent verification is the remaining closeout gate. Sean authorized this pass with “Time for milestone 2.2” and supplied the Color/Trim transfer rules below. No Milestone 3, workbook-write, generation, publication, promotion, deployment, or dealer authority is implied.
+Status: IMPLEMENTED AND INDEPENDENTLY VERIFIED 2026-07-14. Final exact-current verifier `deleg_30b5e24d` passed the code and real-source artifact lanes without edits. Sean authorized this pass with “Time for milestone 2.2” and supplied the Color/Trim transfer rules below. No Milestone 3, workbook-write, generation, publication, promotion, deployment, or dealer authority is implied.
 
 Recommended reasoning level: high.
 
@@ -60,7 +60,7 @@ Standing constraints from `AGENTS.md` apply, especially §§3–6 and §§8–12
 4. Interior source family derives only from target trim names. Unknown/mixed trim families fail closed.
 5. `model_interior_scope` and `interior_components` copy only comparator rows whose trim/interior IDs belong to the target family. GSX includes the two EL9 rows and their `opt_z25_001` requirement.
 6. Shared `color_overrides` rows remain exact canonical rows and every referenced paint/interior/override option identity resolves in the target desired state.
-7. The two Color/Trim source sheets receive explicit compiled/shared-profile ledger dispositions; no `unsupported_color_trim_source` remains.
+7. The two excluded Color/Trim source sheets retain content-bound evidence from their real authority-bound `sheet-profile.json` entries plus the raw-source SHA and receive explicit `resolved_not_a_workbook_fact` ledger dispositions because the approved comparator profile—not those layouts—owns the canonical output. A missing sheet profile, missing source authority, nonexistent sheet role, or role other than exact `exclude` remains `exception_open` with `unsupported_color_trim_source`.
 8. Relationship scanning uses a finite typed catalog: target options by RPO, interiors by source interior code, and explicit non-RPO labels. Model names and seat labels such as `ZR1`, `ZR1X`, and `GT2` do not become workbook relationships.
 9. Paint endpoints compile through ordinary option relationships. Interior endpoint evidence is consumed only through a canonical target interior effect or a proven comparator-profile relationship; it is never coerced into an option ID.
 10. Duplicate interior-code matches expand only where the canonical direct-rule effect is semantically valid. Any unsupported one-of/group semantics remain one explicit tooling blocker rather than emitting impossible AND requirements.

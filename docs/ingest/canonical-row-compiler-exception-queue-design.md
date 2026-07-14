@@ -1,6 +1,6 @@
 # Canonical-row compiler and exception queue — production design
 
-Status: Direction approved 2026-07-09. Milestone 0 safety closure was implemented and proved on 2026-07-09. Milestone 1 headless compilation, Milestone 2's read-only compiler/typed-exception browser flow, and Milestone 2.1 compiler-consumer closure were implemented and independently verified on 2026-07-13. Milestone 2.2 typed endpoint, Color/Trim, and metadata profile compilation was implemented with fresh parent proof on 2026-07-14 and is pending independent closeout. Milestone 3 plan projection, workbook write, runtime publication, and model promotion remain unapproved. Reasoning level for implementation: high.
+Status: Direction approved 2026-07-09. Milestone 0 safety closure was implemented and proved on 2026-07-09. Milestone 1 headless compilation, Milestone 2's read-only compiler/typed-exception browser flow, and Milestone 2.1 compiler-consumer closure were implemented and independently verified on 2026-07-13. Milestone 2.2 typed endpoint, Color/Trim, and metadata profile compilation was implemented and independently verified on 2026-07-14. Milestone 3 plan projection remains unapproved; production compiler output remains read-only.
 
 ## 0. Decision summary
 
@@ -908,7 +908,7 @@ Implemented 2026-07-13 under `milestone-2-exception-queue-browser-flow-implement
 
 Milestone 2.1 closed the current action/consumer gap under `milestone-2-1-compiler-consumer-closure-implementation-plan.md`: status-bearing no-RPO standards compile canonically; exact identity, relationship, group, exclusive, price, default, and explicit no-row outcomes have consumers; comparator endpoints require one ready target identity; and GET/mutation projectability is identical.
 
-Milestone 2.2 is implemented under `milestone-2-2-typed-endpoint-metadata-compiler-implementation-plan.md` with fresh parent proof pending independent closeout. Comparator selection now drives shared paint, LT/LZ interior, shared color-override, and presentation profiles; typed relationship catalogs distinguish options, interiors, and descriptive aliases. Fresh proof remains fail-closed at 374 subjects (257 actionable, 117 actionless). The 80 multi-interior one-of/group semantics and 37 incomplete comparator catalogs remain explicit tooling/catalog blockers, so Milestone 3 remains blocked and unapproved.
+Milestone 2.2 is implemented and independently verified under `milestone-2-2-typed-endpoint-metadata-compiler-implementation-plan.md`. Comparator selection now drives exact `sec_pain_001` paint, LT/LZ interior, target-source required-option, shared color-override, and validated presentation profiles; typed relationship catalogs distinguish options, interiors, and descriptive aliases. Fresh proof remains fail-closed at 371 subjects (256 actionable, 115 actionless), including 78 genuine multi-interior one-of/group blockers rather than impossible direct rules. Milestone 3 remains blocked and unapproved.
 
 ### Milestone 3 — mechanical plan and deployment proof
 

@@ -1,0 +1,140 @@
+{
+  "id": "2026-07-14-milestone22-typed-endpoint-metadata-closure",
+  "objective": "Compile approved comparator-driven Color/Trim, trim-family interior, presentation/metadata, and typed relationship profiles while leaving unsupported one-of and incomplete catalog semantics fail-closed.",
+  "changed_surface": [
+    "canonical compiler",
+    "profile compiler",
+    "relationship compiler",
+    "run-authority bindings",
+    "compiler tests",
+    "ingest docs",
+    "Fable evidence"
+  ],
+  "outcome_rubric": "fable5loop/runs/2026-07-14-milestone22-typed-endpoint-metadata-closure/outcome.md",
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-14-milestone22-typed-endpoint-metadata-closure/verifier-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-14-milestone22-typed-endpoint-metadata-closure/verifier-report.md"
+    }
+  ],
+  "boundaries_preserved": [
+    "live workbook unchanged",
+    "raw source unchanged",
+    "no pass-c-3 projection",
+    "no runtime publication or registry promotion",
+    "no deployment or dealer-submission change"
+  ],
+  "run_id": "2026-07-14-milestone22-typed-endpoint-metadata-closure",
+  "task": "Close Milestone 2.2 typed endpoint, shared Color/Trim, trim-family interior, required-option, and metadata profile compilation against the current raw export.",
+  "started_at": "2026-07-14T14:09:31Z",
+  "completed_at": "2026-07-14T18:00:56Z",
+  "status": "passed",
+  "max_iterations": 5,
+  "iterations_used": 5,
+  "source_guidance": "fable5loop/source-guidance.md",
+  "outcome_file": "fable5loop/runs/2026-07-14-milestone22-typed-endpoint-metadata-closure/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-14-milestone22-typed-endpoint-metadata-closure/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-14-milestone22-typed-endpoint-metadata-closure/validation-output.txt",
+  "artifact_evidence": [
+    "fable5loop/runs/2026-07-14-milestone22-typed-endpoint-metadata-closure/real-source-proof.json",
+    "fable5loop/runs/2026-07-14-milestone22-typed-endpoint-metadata-closure/proof-audit.json",
+    "fable5loop/runs/2026-07-14-milestone22-typed-endpoint-metadata-closure/lifecycle-proof.json",
+    "fable5loop/runs/2026-07-14-milestone22-typed-endpoint-metadata-closure/desktop-browser-proof.json",
+    "fable5loop/runs/2026-07-14-milestone22-typed-endpoint-metadata-closure/mobile-browser-proof.json",
+    "form-output/ingest-wizard/20260714-133532-f9811b"
+  ],
+  "verification_sentinel": {
+    "delegation_id": "deleg_30b5e24d",
+    "diff_sha256": "032a81ae8ccb60ed3c394c5b3c72133a794c5759e8e59d8bd5d612c53a370191",
+    "manifest_rows": 5782,
+    "exception_subjects": 371,
+    "implementation_sha256": {
+      "compiler.py": "9284ac829d0abba3ddc289f284d6fff65c135c28deefa354f8e551f9fc43fc78",
+      "profile_compiler.py": "79f6b201d0febbdc1e7add4a6c4213460864da094477ee24b2e25d3e68fc1f31",
+      "relationship_compiler.py": "4cb6be12aabba36d42d9b0953176572b43366d488e472175a56f1b4ce547011c",
+      "session.py": "8e3095bd4e05b130f7517d02243575f1bdb0f1fe8740b5bb2a36899938da6b1c"
+    },
+    "focused_test_sha256": {
+      "test_ingest_wizard_canonical_compiler.py": "72169a96f613f35b075430a0450857d539aa0bbbaf839394a6bc08299203e17a",
+      "test_ingest_wizard_profile_compiler.py": "32f6e0ebcb51587727fef2ffadffb144b030d3025c882d45a4ef7e94571ab773",
+      "test_ingest_wizard_relationship_compiler.py": "ac90ed45e5b59ba474fecc5fcc1afd905af380a57797dc042f4d7c78068be44a"
+    }
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "method": "iterative independent blocker review followed by exact-current bounded code and artifact verification",
+    "verdict": "pass",
+    "cycles": [
+      {
+        "id": "deleg_18326345",
+        "verdict": "block",
+        "disposition": "Public source disposition, comparator paint status, and Color/Trim coverage findings repaired test-first."
+      },
+      {
+        "id": "deleg_6542ec4e",
+        "verdict": "block",
+        "disposition": "Metadata identity, section validation, real-RPO precedence, exact paint scope, and required-option closure findings repaired test-first."
+      },
+      {
+        "id": "deleg_e9d8fae5",
+        "verdict": "block",
+        "disposition": "Ghost-sheet acceptance and comparator Z25 price/status substitution repaired test-first."
+      },
+      {
+        "id": "deleg_96e2ed07",
+        "verdict": "pass",
+        "disposition": "Classified stale-after-diff because it verified the pre-final implementation and proof run."
+      },
+      {
+        "id": "deleg_30b5e24d",
+        "verdict": "pass",
+        "disposition": "Exact-current code and artifact lanes passed with stable sentinels and no edits."
+      }
+    ]
+  },
+  "validation": {
+    "status": "pass",
+    "focused": "48 passed, 7 subtests passed; independent rerun 6.58s",
+    "broad_affected": "299 passed, 18 subtests passed in 111.31s",
+    "full_repository_pre_final_guard": "616 passed, 23 subtests passed, 5 classified failures in 288.93s",
+    "node_serial": "275 passed, 0 failed",
+    "fable_contract": "loop validator passed; 13 Fable contract tests passed",
+    "fresh_source": "5782 canonical rows, 371 unique subjects, 256 actionable, 115 actionless, same-run byte-stable recompile",
+    "browser": "desktop 1280x633 and mobile 390x844; 20 tooling cards, no horizontal overflow or application console errors",
+    "protected_surfaces": "all 60 saved protected checksums passed after generated timestamp restoration"
+  },
+  "state_update": {
+    "updated": true,
+    "evidence": "fable5loop/STATE.md"
+  },
+  "skill_update": {
+    "decision": "updated",
+    "skill": "27vette-fable5-compounding",
+    "evidence": "fable5loop/runs/2026-07-14-milestone22-typed-endpoint-metadata-closure/verifier-report.md"
+  },
+  "human_acceptance": {
+    "required": false,
+    "accepted_by": null,
+    "accepted_at": null
+  },
+  "protected_boundaries": {
+    "live_workbook_write": false,
+    "raw_source_mutation": false,
+    "pass_c_3_projection": false,
+    "runtime_publication": false,
+    "registry_promotion": false,
+    "deployment": false,
+    "dealer_submission_change": false
+  },
+  "next_pass": {
+    "label": "Milestone 3 — Canonical Plan Projection",
+    "status": "blocked_unapproved",
+    "scope": "Resolve or explicitly defer the remaining 371 typed subjects before any plan projection; 115 are incomplete-catalog or multi-interior tooling blockers.",
+    "milestone_3_status": "blocked_unapproved"
+  }
+}

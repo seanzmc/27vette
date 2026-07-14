@@ -193,7 +193,11 @@ def compile_relationships(
                 continue
             for mentioned_rpo in hit["rpoTokens"]:
                 feature_id = f"relationship:{feature_candidate_id}:{hit['phraseKey']}:{hit['startOffset']}:{mentioned_rpo}"
-                if mentioned_rpo in ignored_tokens:
+                if (
+                    mentioned_rpo in ignored_tokens
+                    and mentioned_rpo not in target_set
+                    and not typed_endpoints.get(mentioned_rpo)
+                ):
                     dispositions.append(
                         {
                             "featureId": feature_id,

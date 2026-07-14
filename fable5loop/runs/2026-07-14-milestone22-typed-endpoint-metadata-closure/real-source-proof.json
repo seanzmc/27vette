@@ -1,18 +1,18 @@
 {
-  "actionableSubjects": 257,
+  "actionableSubjects": 256,
   "actionlessReasons": [
     {"count": 2, "family": "exclusive_groups", "model": "grand_sport_x", "reasonCode": "comparator_only_exclusive_group_proposal"},
     {"count": 13, "family": "price_rules", "model": "grand_sport_x", "reasonCode": "comparator_only_price_rule_proposal"},
     {"count": 1, "family": "rule_groups", "model": "grand_sport_x", "reasonCode": "comparator_only_rule_group_proposal"},
     {"count": 15, "family": "rule_mapping", "model": "grand_sport_x", "reasonCode": "comparator_only_relationship_proposal"},
-    {"count": 44, "family": "rule_mapping", "model": "grand_sport_x", "reasonCode": "unresolved_relationship_identity"},
+    {"count": 42, "family": "rule_mapping", "model": "grand_sport_x", "reasonCode": "unresolved_relationship_identity"},
     {"count": 3, "family": "price_rules", "model": "zr1", "reasonCode": "comparator_only_price_rule_proposal"},
     {"count": 18, "family": "rule_mapping", "model": "zr1", "reasonCode": "unresolved_relationship_identity"},
     {"count": 3, "family": "price_rules", "model": "zr1x", "reasonCode": "comparator_only_price_rule_proposal"},
     {"count": 18, "family": "rule_mapping", "model": "zr1x", "reasonCode": "unresolved_relationship_identity"}
   ],
-  "actionlessSubjects": 117,
-  "ambiguousInteriorOneOf": 80,
+  "actionlessSubjects": 115,
+  "ambiguousInteriorOneOf": 78,
   "byteStableRecompile": {
     "canonical-row-manifest.json": true,
     "comparator-evidence.json": true,
@@ -22,15 +22,37 @@
   },
   "comparators": {"grand_sport_x": "grand_sport", "zr1": "z06", "zr1x": "z06"},
   "compileReady": {"grand_sport_x": false, "zr1": false, "zr1x": false},
-  "exceptionSubjects": 374,
-  "manifestRows": 5774,
-  "manifestSemanticSha": "39c536d0a0bc22e80b33ed9333f3ed1006b140a3b858e1e19eebda31a705330c",
-  "profileCounts": {
-    "grand_sport_x": {"interiorComponents": 198, "interiorScope": 132, "paintOptions": 10},
-    "zr1": {"interiorComponents": 127, "interiorScope": 90, "paintOptions": 10},
-    "zr1x": {"interiorComponents": 127, "interiorScope": 90, "paintOptions": 10}
+  "colorTrimCoverage": {
+    "Color and Trim 1": {"disposition": "resolved_not_a_workbook_fact", "sheetProfileSha256": "14e2530857533b1977a36dd71ec116dec3187fab93cb082ba9008866ff467886", "sourceAuthoritySha256": "6ac9538d5bb8a823ade9afea70b2654057b793e1cf27c081c088545aa3add8a1"},
+    "Color and Trim 2": {"disposition": "resolved_not_a_workbook_fact", "sheetProfileSha256": "203617293c9a7b23a529c0410804f7f4b84cf9051f7c527286d0527ac18d2417", "sourceAuthoritySha256": "6ac9538d5bb8a823ade9afea70b2654057b793e1cf27c081c088545aa3add8a1"}
   },
-  "queueSubjectFingerprint": "a3702f303f8268730c29359d271f6a6d3237f2da49240161d5e5d191c1d2e46e",
+  "deterministicArtifactSha256": {
+    "canonical-row-manifest.json": "85f4092797c0ce508ffe2937773dd594c28d3d0cef7c065843cd195bab50063f",
+    "comparator-evidence.json": "3b86f8296162f9eb14d82aa618f654f0b98d221052adb12cdd5c6ca4aca436a6",
+    "compile-report.json": "1167ae79def7e8ba0ffa85c0da0cee3ccc304a4a6f014b862dfe74d4969c83a4",
+    "exception-queue.json": "f9e081a5a49f7a9a2ce9753788dae3223a9732957ebd1fd751ccbf7ebf03ec37",
+    "exception-resolutions.json": "bec555e0ccb915727fab5d8dac9693385d645ac0ceb6ae34e71247ddfc8550a7"
+  },
+  "exceptionSubjects": 371,
+  "grandSportXZ25Closure": {
+    "availableVariants": ["3lt_g07", "3lt_g67"],
+    "compiledRelationshipEvidence": 4,
+    "optionId": "opt_z25_001",
+    "optionRows": 1,
+    "price": 1995,
+    "sourceStatusDependencies": 12,
+    "sourceStatusFeaturesCompiled": 12,
+    "unavailableVariants": ["1lt_g07", "1lt_g67", "2lt_g07", "2lt_g67"]
+  },
+  "manifestRows": 5782,
+  "manifestSemanticSha": "53fde170bd6d3d7382cdec61df7b3e12b3f8b1978d09b401ffa6e5fc106da483",
+  "modelLabels": {"grand_sport_x": "Grand Sport X", "zr1": "ZR1", "zr1x": "ZR1X"},
+  "profileCounts": {
+    "grand_sport_x": {"interiorComponents": 198, "interiorScope": 132, "paintOptions": 10, "r6xScope": 15, "requiredProfileOptions": 1},
+    "zr1": {"interiorComponents": 127, "interiorScope": 90, "paintOptions": 10, "r6xScope": 15, "requiredProfileOptions": 0},
+    "zr1x": {"interiorComponents": 127, "interiorScope": 90, "paintOptions": 10, "r6xScope": 15, "requiredProfileOptions": 0}
+  },
+  "queueSubjectFingerprint": "a6ef884c9c82ea1750cf41d1ff613491d1b9a9df0cd104afa1bcb64befdfe3b5",
   "reasonCounts": {
     "ambiguous_existing_identity": 10,
     "comparator_only_default_selection_proposal": 4,
@@ -38,13 +60,14 @@
     "comparator_only_price_rule_proposal": 49,
     "comparator_only_relationship_proposal": 25,
     "comparator_only_rule_group_proposal": 21,
-    "missing_section": 147,
+    "missing_section": 146,
     "unresolved_price_scope": 17,
-    "unresolved_relationship_identity": 80
+    "unresolved_relationship_identity": 78
   },
-  "runId": "20260714-103915-f8310c",
+  "runId": "20260714-133532-f9811b",
   "sourceSha256": "6ac9538d5bb8a823ade9afea70b2654057b793e1cf27c081c088545aa3add8a1",
   "targets": ["grand_sport_x", "zr1", "zr1x"],
+  "typedRelationshipRows": 296,
   "unresolvedRawEndpoints": 0,
   "unsupportedColorTrim": 0,
   "unsupportedMetadataFamilies": 0
