@@ -1,0 +1,82 @@
+Milestone 2.3 source-boundary correction validation
+Refreshed: 2026-07-15
+Exact-current proof: form-output/ingest-wizard/20260715-035235-12e239
+
+User correction audit
+- Canonical option families: Interior N, Exterior N, Mechanical N only.
+- Equipment Groups: profiler exclude; session API assignment rejected by canonical eligibility; browser Options disabled; exact-run role exclude.
+- Color and Trim: profiler exclude; session API assignment rejected; browser Options disabled; exact-run role exclude.
+- J6D: Grand Sport X, ZR1, and ZR1X all ready, price 0, section sec_cali_001, selectable=true. Comparator section row is single_select_req/is_required=true and comparator J6D selectable=true.
+- Target module scope: Grand Sport X, ZR1, and ZR1X with Grand Sport/Z06 comparators; docs explicitly disclaim arbitrary-model/general model-agnostic support.
+
+Failing-first regression
+PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_ingest_wizard_relationship_compiler.py::RelationshipCompilerTest::test_interior_metadata_disambiguates_shared_code_to_exact_compatible_ids -q
+- Before repair: 1 failed; mixed shared-code endpoint metadata produced unresolved_relationship_identity.
+- After repair: relationship compiler file 16 passed.
+- Zero-match profile metadata continues to fail closed through test_multi_interior_requires_stays_a_typed_tooling_blocker.
+
+Affected gate
+PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_ingest_wizard_canonical_rows.py tests/test_ingest_wizard_profile_compiler.py tests/test_ingest_wizard_relationship_compiler.py tests/test_ingest_wizard_canonical_compiler.py -q
+- 71 passed, 7 subtests passed in 6.95s.
+
+Complete ingest gate
+PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_ingest_wizard_*.py -q
+- 314 passed, 18 subtests passed in 99.16s.
+
+Static gates
+- PYTHONPATH=scripts .venv/bin/python -m compileall -q scripts/corvette_form_generator/ingest scripts/ingest_wizard_server.py: passed.
+- node --check visualizer/ingest-wizard/wizard.js: passed.
+- git diff --check: passed.
+
+Fresh real-source proof
+- Run: 20260715-035235-12e239.
+- State: compiled_with_exceptions.
+- Manifest rows: 5,999 = 5,994 ready + 5 blocked.
+- Subjects: 213 = 203 actionable + 10 non-actionable.
+- Model subjects: Grand Sport X 95, ZR1 59, ZR1X 59.
+- Source features: 11,297 = 3,970 compiled + 906 exception-open + 508 resolved non-workbook facts + 5,913 not applicable.
+- Compiled relationship features: 447; zero material dependency gaps.
+- Compiled target-price features: 330; zero material dependency gaps.
+- unresolved_relationship_identity subjects: zero.
+- Remaining unresolved price scopes: CFV, ROY, ROZ, STZ, VPW for GSX.
+
+Semantic hashes
+- manifest: 1b7d99ba4567e0eb350d5652aff82578669ab7819aa21ec688b8736680813b95
+- queue: a1fe8d7dce167c4ae619027c854e8eb5e981f5146a8b4db894fcf8b11ed9498e
+- report: ae4ef6292f4f84d847e81277fbee9d5c37701ae5d67f520fb307846f0320c9a0
+- resolutions: c5a5ba71d49e3591fb1e4fb134a6ccd62e1f1bbd532bddebeac1e0d3de9c4c2b
+
+Artifact SHA-256 after deterministic recompilation
+- comparator-evidence.json: 1bc0ce5f4341e3ae603532c998c33295b6343f011e5744ae51d5fc2a33abe5b9
+- canonical-row-manifest.json: 8a6beb77a7771ca3ee98c681b63cc56be2be955e2125fc5bb3da9a4eb82d22da
+- exception-queue.json: 1038e1af60c9bdd6f2002a25c3cb4bfe764f88795034549fae47c971f90dc2e1
+- exception-resolutions.json: 3f418d9b08431a6e607948f3c1b2a4fc14037445dc3c5df275b2870662df43ae
+- compile-report.json: faf9352f863fd1b57eddc3c2e32747a315e45c5cb72785637ccc8145e5ad191e
+- session.json: 0dc13c85aa282d3ccf7cf54460a226cc3701ce86903fb21a54e3bc1127a8266d
+- Same-run deterministic recompilation: stable True.
+
+Browser/API
+- Compile API: compiled_with_exceptions.
+- API: actionable yes 203; actionable no 10; unresolved_relationship_identity 0.
+- Current browser summary: 95/59/59 subjects; no unresolved_relationship_identity reason option; zero JavaScript errors/messages.
+- Fresh profile-stage proof: Equipment Groups 1 and Color and Trim 1 Options disabled and Exclude active; Interior 1, Exterior 1, and Mechanical 1 Options active. Transient profile-only run removed after proof.
+
+Protected SHA-256
+- stingray_master.xlsx: 03e8c9671185f238dde7f4bc8e7003da0f74d842d9cc2f76126f938cbb7b54d6
+- form-app/data.js: dd60534734c1330085ea74602515e1ab75aa964d3134c230abe0f26217b79e78
+- grand-sport runtime: 2caa2d64b406bc18fb7f41ba4d8eb6380c4f2711944ca0c574113eada2907e00
+- stingray runtime: f4cbc7a5f2f01b9473ec55f273a617e889eeee6e5ad63a0e32ff455e8e3105af
+- z06 runtime: a4fc825b78b4069cfae0dafac964573b8e98ad04a88fb708e28b5b839fda48e6
+
+Independent verification
+- deleg_fa5626eb source-boundary lane: PASS. Verified exact profiler/API/browser/artifact source scope, GSX/ZR1/ZR1X J6D semantics, exact LT/LZ unique-interior materiality, mixed-code filtering, zero-match fail-closed behavior, and targeted-module docs. Focused verifier gates: 71 passed plus 7 subtests; 17 profiler/API tests passed; JavaScript syntax passed. No files edited.
+- deleg_fa5626eb artifact lane: PASS. Independently reproduced producer bindings and two in-memory compiles; validated the graph, exact counts/hashes, 447/447 relationship materiality, 330/330 target-price materiality, zero unresolved relationship identities, J6D/R8E facts, five GSX price blockers, and protected hashes. No files edited.
+
+Fable closeout
+- PYTHONPATH=scripts .venv/bin/python scripts/validate_fable5_loop.py: passed.
+- .venv/bin/python -m pytest tests/test_fable5_loop_contract.py -q: 13 passed in 0.43s.
+- Receipt JSON parsing and git diff --check: passed.
+
+Protected boundary
+- No workbook/raw source write, pass-c-3 projection, publication, promotion, deployment, or dealer change.
+- No commit or push.

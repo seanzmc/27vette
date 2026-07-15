@@ -84,6 +84,7 @@ from corvette_form_generator.ingest.wizard.profiler import (
     SCHEMA_VERSION,
     SHEET_TYPE_OPTIONS,
     SHEET_TYPE_PRICE,
+    canonical_option_sheet_eligible,
     profile_workbook,
 )
 
@@ -653,6 +654,10 @@ class WizardSessionStore:
             if role == ROLE_OPTIONS and sheet_type != SHEET_TYPE_OPTIONS:
                 raise WizardError(
                     f"{sheet} was not detected as an options matrix; it cannot take the options role."
+                )
+            if role == ROLE_OPTIONS and not canonical_option_sheet_eligible(sheet):
+                raise WizardError(
+                    f"{sheet} is not a canonical option source; choose an Interior, Exterior, or Mechanical sheet."
                 )
             if role == ROLE_PRICE and sheet_type != SHEET_TYPE_PRICE:
                 raise WizardError(

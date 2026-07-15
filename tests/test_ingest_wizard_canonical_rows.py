@@ -203,6 +203,59 @@ class CanonicalRowsContractTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Duplicate canonical workbook keys"):
             build_manifest(self.authority, "c" * 64, "q" * 64, "r" * 64, rows)
 
+    def test_artifact_graph_rejects_conflicting_evidence_identity(self) -> None:
+        rows = []
+        for index, fingerprint in enumerate(("1" * 64, "2" * 64), start=1):
+            signature = {"family": "options", "index": index}
+            dependencies = [
+                {
+                    "evidenceId": "workbook:shared-profile:z06:runtime_steps:shared",
+                    "semanticFingerprint": fingerprint,
+                }
+            ]
+            rows.append(
+                {
+                    "model": "zr1" if index == 1 else "zr1x",
+                    "family": "options",
+                    "sheet": "z06_options",
+                    "action": "add",
+                    "key": {"option_id": f"opt_{index}"},
+                    "values": {"option_id": f"opt_{index}", "rpo": f"R{index}"},
+                    "semanticSignature": signature,
+                    "evidenceDependencies": dependencies,
+                    "derivationVersion": derivation_version(signature, dependencies),
+                    "status": "ready",
+                }
+            )
+        manifest = build_manifest(
+            self.authority,
+            "c" * 64,
+            "q" * 64,
+            "r" * 64,
+            rows,
+        )
+        report = build_compile_report(
+            self.authority,
+            "c" * 64,
+            "q" * 64,
+            "r" * 64,
+            manifest["manifestSemanticSha"],
+            {
+                model: {
+                    "compileReady": False,
+                    "planReady": False,
+                    "writeReady": False,
+                    "deploymentReady": False,
+                    "blockers": [],
+                }
+                for model in ("zr1", "zr1x")
+            },
+            [],
+            [],
+        )
+        with self.assertRaisesRegex(ValueError, "Conflicting evidence identity"):
+            validate_artifact_graph(manifest, report)
+
     def test_semantic_hash_excludes_authority_and_audit_fields(self) -> None:
         base = {"values": {"rpo": "PDB"}, "runAuthorityFingerprint": "x", "generatedAt": "a", "reviewer": "one", "rowIndex": 10, "columnLetter": "D"}
         changed = {"values": {"rpo": "PDB"}, "runAuthorityFingerprint": "y", "generatedAt": "b", "reviewer": "two", "rowIndex": 99, "columnLetter": "Z"}

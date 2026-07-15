@@ -71,7 +71,7 @@ class WizardServerTest(unittest.TestCase):
 
         status, _ = self.post_json(
             f"/api/wizard/sessions/{run_id}/roles",
-            {"roles": {"Equipment Groups 1": "options", "Price Schedule": "price"}},
+            {"roles": {"Exterior 1": "options", "Price Schedule": "price"}},
         )
         self.assertEqual(status, 200)
 

@@ -6,6 +6,7 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping
 from pathlib import Path
+import re
 from typing import Any
 
 from corvette_form_generator.editor_ops import (
@@ -227,16 +228,129 @@ def _header_price(row: Mapping[str, Any]) -> int | float | None:
     return None
 
 
+def _qualifier_trim_scopes(value: Any) -> set[str]:
+    qualifier = str(value or "").strip().upper()
+    scopes = set(re.findall(r"\b[123](?:LT|LZ)\b", qualifier))
+    for family in re.findall(r"\b([123])LT/LZ\b", qualifier):
+        scopes.update({f"{family}LT", f"{family}LZ"})
+    return scopes
+
+
+def _qualifier_body_scopes(value: Any) -> set[str]:
+    qualifier = str(value or "").strip().upper()
+    scopes: set[str] = set()
+    if re.search(r"\bCOUPES?\b", qualifier):
+        scopes.add("coupe")
+    if re.search(r"\b(?:CONVERTIBLES?|CONV)\b", qualifier):
+        scopes.add("convertible")
+    return scopes
+
+
+def _qualifier_variant_scopes(
+    value: Any,
+    variants: Iterable[Mapping[str, Any]],
+) -> set[str]:
+    qualifier = str(value or "").strip().upper()
+    return {
+        str(variant.get("variant_id") or "").strip().lower()
+        for variant in variants
+        if str(variant.get("variant_id") or "").strip()
+        and re.search(
+            rf"\b{re.escape(str(variant.get('variant_id') or '').strip().upper())}\b",
+            qualifier,
+        )
+    }
+
+
+def _qualified_scope_value(scopes: set[str], available: set[str]) -> str | None:
+    if not scopes:
+        return "*"
+    relevant = scopes.intersection(available) if available else set(scopes)
+    if not relevant:
+        return None
+    if available and relevant == available:
+        return "*"
+    if len(relevant) == 1:
+        return next(iter(relevant)).lower()
+    return None
+
+
+def _qualifier_model_scopes(value: Any) -> set[str]:
+    qualifier = " ".join(str(value or "").strip().upper().split())
+    scopes: set[str] = set()
+    remainder = qualifier
+    for label, model in (
+        ("GRAND SPORT X", "grand_sport_x"),
+        ("ZR1X", "zr1x"),
+        ("GRAND SPORT", "grand_sport"),
+        ("STINGRAY", "stingray"),
+        ("ZR1", "zr1"),
+        ("Z06", "z06"),
+    ):
+        if re.search(rf"\b{re.escape(label)}\b", remainder):
+            scopes.add(model)
+            remainder = re.sub(rf"\b{re.escape(label)}\b", " ", remainder)
+    return scopes
+
+
+def _target_scoped_price_rows(
+    candidate: Mapping[str, Any],
+    target: str,
+    variants: Iterable[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    variants = list(variants)
+    target_trims = {
+        str(variant.get("trim_level") or "").strip().upper()
+        for variant in variants
+        if str(variant.get("trim_level") or "").strip()
+    }
+    target_bodies = {
+        str(variant.get("body_style") or "").strip().lower()
+        for variant in variants
+        if str(variant.get("body_style") or "").strip()
+    }
+    target_variant_ids = {
+        str(variant.get("variant_id") or "").strip().lower()
+        for variant in variants
+        if str(variant.get("variant_id") or "").strip()
+    }
+    price_rows: list[dict[str, Any]] = []
+    for source_row in candidate.get("priceRows") or []:
+        row = dict(source_row)
+        qualifier = row.get("qualifier")
+        qualifier_models = _qualifier_model_scopes(qualifier)
+        if qualifier_models and target not in qualifier_models:
+            continue
+        qualifier_trims = _qualifier_trim_scopes(qualifier)
+        if qualifier_trims and target_trims and not qualifier_trims.intersection(target_trims):
+            continue
+        qualifier_bodies = _qualifier_body_scopes(qualifier)
+        if qualifier_bodies and target_bodies and not qualifier_bodies.intersection(target_bodies):
+            continue
+        qualifier_variants = _qualifier_variant_scopes(qualifier, variants)
+        if (
+            qualifier_variants
+            and target_variant_ids
+            and not qualifier_variants.intersection(target_variant_ids)
+        ):
+            continue
+        price_rows.append(row)
+    return price_rows
+
+
 def _profile_reconciled_price(
     candidate: Mapping[str, Any],
     precedent: Mapping[str, Any] | None,
-) -> tuple[int | float, list[dict[str, str]]] | None:
+    target: str,
+    variants: Iterable[Mapping[str, Any]],
+) -> tuple[int | float, list[dict[str, str]], list[dict[str, Any]]] | None:
     """Resolve a source base price only when canonical rules cover every alternative."""
 
     if not precedent:
         return None
+    variant_list = [dict(variant) for variant in variants]
     base_price = _int_price(precedent.get("basePrice"))
-    price_rows = [dict(row) for row in candidate.get("priceRows") or []]
+    price_rows = _target_scoped_price_rows(candidate, target, variant_list)
     if base_price is None or len(price_rows) < 2:
         return None
     rows_by_price: dict[int | float, list[dict[str, Any]]] = defaultdict(list)
@@ -252,25 +366,77 @@ def _profile_reconciled_price(
         return None
     rules = [dict(rule) for rule in precedent.get("conditionalPriceRules") or []]
     matched_rules: list[dict[str, Any]] = []
+    inferred_self_trim_rules: list[dict[str, Any]] = []
+    candidate_rpo = str(candidate.get("rpo") or candidate.get("refOnlyRpo") or "").upper()
+    target_trims = {
+        str(variant.get("trim_level") or "").strip().upper()
+        for variant in variant_list
+        if str(variant.get("trim_level") or "").strip()
+    }
+    target_bodies = {
+        str(variant.get("body_style") or "").strip().lower()
+        for variant in variant_list
+        if str(variant.get("body_style") or "").strip()
+    }
+    target_variant_ids = {
+        str(variant.get("variant_id") or "").strip().lower()
+        for variant in variant_list
+        if str(variant.get("variant_id") or "").strip()
+    }
     for alternate_price in sorted(alternate_prices):
         price_rules = [
             rule
             for rule in rules
             if _int_price(rule.get("priceValue")) == alternate_price
             and str(rule.get("conditionRpo") or "")
+            and str(rule.get("targetRpo") or "").upper() == candidate_rpo
+            and str(rule.get("priceRuleType") or "").strip().lower() == "override"
         ]
-        if not price_rules:
-            return None
-        qualifier = " ".join(
-            str(row.get("qualifier") or "").upper()
-            for row in rows_by_price[alternate_price]
-        )
-        if any(
-            str(rule.get("conditionRpo") or "").upper() not in qualifier
-            for rule in price_rules
-        ):
-            return None
-        matched_rules.extend(price_rules)
+        for row in rows_by_price[alternate_price]:
+            qualifier = str(row.get("qualifier") or "").upper()
+            qualifier_clauses = [
+                clause.strip()
+                for clause in qualifier.split(";")
+                if clause.strip()
+            ] or [""]
+            for clause in qualifier_clauses:
+                trim_scope = _qualified_scope_value(
+                    _qualifier_trim_scopes(clause),
+                    target_trims,
+                )
+                body_scope = _qualified_scope_value(
+                    _qualifier_body_scopes(clause),
+                    target_bodies,
+                )
+                variant_scope = _qualified_scope_value(
+                    _qualifier_variant_scopes(clause, variant_list),
+                    target_variant_ids,
+                )
+                if None in {trim_scope, body_scope, variant_scope}:
+                    return None
+                clause_matches: list[dict[str, Any]] = []
+                for rule in price_rules:
+                    if (
+                        _scope_value(rule.get("trimLevelScope")) != trim_scope
+                        or _scope_value(rule.get("bodyStyleScope")) != body_scope
+                        or _scope_value(rule.get("variantScope")) != variant_scope
+                    ):
+                        continue
+                    condition_rpo = str(rule.get("conditionRpo") or "").upper()
+                    self_trim_match = (
+                        trim_scope != "*" and condition_rpo == candidate_rpo
+                    )
+                    condition_match = bool(
+                        re.search(rf"\b{re.escape(condition_rpo)}\b", clause)
+                    )
+                    if not (self_trim_match or condition_match):
+                        continue
+                    clause_matches.append(rule)
+                    if self_trim_match:
+                        inferred_self_trim_rules.append(rule)
+                if not clause_matches:
+                    return None
+                matched_rules.extend(clause_matches)
     dependencies = [
         _dependency(f"price:{candidate.get('rpo')}:{semantic_hash(row)}", row)
         for row in price_rows
@@ -279,7 +445,11 @@ def _profile_reconciled_price(
         _dependency(str(rule["evidenceId"]), rule.get("source") or rule)
         for rule in matched_rules
     )
-    return base_price, dependencies
+    inferred_by_evidence = {
+        str(rule.get("evidenceId") or semantic_hash(rule)): rule
+        for rule in inferred_self_trim_rules
+    }
+    return base_price, dependencies, list(inferred_by_evidence.values())
 
 
 def _source_supported_default_rows(
@@ -288,10 +458,11 @@ def _source_supported_default_rows(
     target: str,
     comparator_artifact: Mapping[str, Any],
     target_rows: list[dict[str, Any]],
+    variants: Iterable[Mapping[str, Any]],
 ) -> list[dict[str, Any]]:
     """Compile a comparator default only when target source statuses make it deterministic."""
 
-    headers = headers_of(extract, "default_selection_rules")
+    headers = _headers(extract, "default_selection_rules")
     if not headers:
         return []
     option_id_by_rpo = {
@@ -315,10 +486,15 @@ def _source_supported_default_rows(
         if option_id and variant_id:
             statuses_by_option[option_id][variant_id] = status
             ovs_rows_by_option[option_id].append(row)
+    variant_by_id = {
+        str(variant.get("variant_id") or ""): dict(variant)
+        for variant in variants
+        if str(variant.get("variant_id") or "")
+    }
 
     existing = [
         row
-        for row in rows_of(extract, "default_selection_rules")
+        for row in _rows(extract, "default_selection_rules")
         if str(row.get("model_key") or "").lower() == target
         and workbook_truthy(row.get("active", True))
     ]
@@ -328,39 +504,59 @@ def _source_supported_default_rows(
         if fact.get("factType") != "default_selection":
             continue
         signature = dict(fact.get("signature") or {})
-        if any(
-            _scope_value(signature.get(scope)) != "*"
-            for scope in ("bodyStyleScope", "trimLevelScope", "variantScope")
-        ):
+        body_scope = _scope_value(signature.get("bodyStyleScope"))
+        trim_scope = _scope_value(signature.get("trimLevelScope"))
+        variant_scope = _scope_value(signature.get("variantScope"))
+        scoped_variant_ids = {
+            variant_id
+            for variant_id, variant in variant_by_id.items()
+            if (
+                body_scope == "*"
+                or str(variant.get("body_style") or "").lower() == body_scope
+            )
+            and (
+                trim_scope == "*"
+                or str(variant.get("trim_level") or "").lower() == trim_scope
+            )
+            and (variant_scope == "*" or variant_id.lower() == variant_scope)
+        }
+        if not scoped_variant_ids:
             continue
         condition_type = str(signature.get("conditionType") or "").lower()
-        if condition_type not in {"always", "when_selected"}:
+        if condition_type not in {"always", "when_selected_unless_selected_section"}:
             continue
         target_option_id = option_id_by_rpo.get(
             str(signature.get("targetRpo") or "").upper(), ""
         )
         target_statuses = statuses_by_option.get(target_option_id, {})
-        if not target_option_id or not target_statuses or set(target_statuses.values()) != {"standard"}:
+        scoped_target_statuses = {
+            variant_id: target_statuses.get(variant_id)
+            for variant_id in scoped_variant_ids
+        }
+        if not target_option_id or set(scoped_target_statuses.values()) != {"standard"}:
             continue
         condition_option_id = ""
-        if condition_type == "when_selected":
+        if condition_type == "when_selected_unless_selected_section":
             condition_option_id = option_id_by_rpo.get(
                 str(signature.get("conditionRpo") or "").upper(), ""
             )
             condition_statuses = statuses_by_option.get(condition_option_id, {})
+            scoped_condition_statuses = {
+                variant_id: condition_statuses.get(variant_id)
+                for variant_id in scoped_variant_ids
+            }
             if (
                 not condition_option_id
-                or set(condition_statuses.values()) != {"standard"}
-                or set(condition_statuses) != set(target_statuses)
+                or set(scoped_condition_statuses.values()) != {"standard"}
             ):
                 continue
         if any(
             str(row.get("target_option_id") or "") == target_option_id
             and str(row.get("condition_type") or "").lower() == condition_type
             and str(row.get("condition_id") or "") == condition_option_id
-            and _scope_value(row.get("body_style_scope")) == "*"
-            and _scope_value(row.get("trim_level_scope")) == "*"
-            and _scope_value(row.get("variant_scope")) == "*"
+            and _scope_value(row.get("body_style_scope")) == body_scope
+            and _scope_value(row.get("trim_level_scope")) == trim_scope
+            and _scope_value(row.get("variant_scope")) == variant_scope
             for row in existing
         ):
             continue
@@ -370,9 +566,9 @@ def _source_supported_default_rows(
             "targetOptionId": target_option_id,
             "conditionType": condition_type,
             "conditionId": condition_option_id,
-            "bodyStyleScope": "*",
-            "trimLevelScope": "*",
-            "variantScope": "*",
+            "bodyStyleScope": body_scope,
+            "trimLevelScope": trim_scope,
+            "variantScope": variant_scope,
         }
         rule_id = deterministic_family_id(
             "default_selection_rules", target, rule_signature
@@ -385,9 +581,9 @@ def _source_supported_default_rows(
                 "target_option_id": target_option_id,
                 "condition_type": condition_type,
                 "condition_id": condition_option_id,
-                "body_style_scope": "*",
-                "trim_level_scope": "*",
-                "variant_scope": "*",
+                "body_style_scope": body_scope,
+                "trim_level_scope": trim_scope,
+                "variant_scope": variant_scope,
                 "priority": fact_context.get("priority") or 100,
                 "active": True,
                 "notes": "Target standard-status default corroborated by selected comparator.",
@@ -401,6 +597,12 @@ def _source_supported_default_rows(
                 for ovs_row in ovs_rows_by_option[option_id]
                 for dependency in ovs_row.get("evidenceDependencies") or []
             )
+        dependencies = list(
+            {
+                dependency["evidenceId"]: dependency
+                for dependency in dependencies
+            }.values()
+        )
         result.append(
             _manifest_row(
                 model=target,
@@ -736,7 +938,18 @@ def _compile_target_options(
     status_feature_index: Mapping[str, Mapping[str, list[str]]],
     profile_required_options: Mapping[str, Mapping[str, Any]] | None = None,
     profile_option_precedents: Mapping[str, Mapping[str, Any]] | None = None,
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, str], dict[str, str], set[str], set[str]]:
+) -> tuple[
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    dict[str, str],
+    dict[str, str],
+    set[str],
+    set[str],
+    set[str],
+    set[str],
+    set[str],
+    set[str],
+]:
     entry = registry["source_option_sheet"]
     existing_options = _rows(extract, entry["sheetName"])
     scoped_source = [
@@ -780,6 +993,10 @@ def _compile_target_options(
     exceptions: list[dict[str, Any]] = []
     consumed_resolution_subjects: set[str] = set()
     compiled_status_features: set[str] = set()
+    profile_consumed_status_features: set[str] = set()
+    compiled_price_rows: set[str] = set()
+    open_price_rows: set[str] = set()
+    profile_consumed_price_rows: set[str] = set()
     resolution_entries_by_subject: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
     for resolution in resolution_entries:
         resolution_entries_by_subject[str(resolution.get("subjectId") or "")].append(resolution)
@@ -797,6 +1014,11 @@ def _compile_target_options(
     precedents_by_rpo = {
         str(rpo).upper(): dict(precedent)
         for rpo, precedent in (profile_option_precedents or {}).items()
+    }
+    section_contracts = {
+        str(row.get("section_id") or ""): row
+        for row in _rows(extract, "section_master")
+        if str(row.get("section_id") or "")
     }
     for match in matches:
         candidate = dict(match["candidate"])
@@ -944,14 +1166,114 @@ def _compile_target_options(
             raise ValueError(f"Resolved section_id is absent from section_master: {section_id}")
         dependencies.append(_dependency(f"workbook:section_master:{section_id}", section_row))
         price_match = candidate.get("priceMatch")
+        applicable_price_rows = _target_scoped_price_rows(candidate, target, variants)
+        if price_match == "exact" and len(applicable_price_rows) != 1:
+            price_match = "ambiguous"
+        direct_target_price = None
+        if (
+            price_match == "ambiguous"
+            and applicable_price_rows
+        ):
+            scoped_prices = [
+                _int_price(row.get("listPrice")) for row in applicable_price_rows
+            ]
+            if all(value is not None for value in scoped_prices) and len(set(scoped_prices)) == 1:
+                direct_target_price = scoped_prices[0]
         profile_price = (
-            _profile_reconciled_price(candidate, profile_precedent)
-            if price_match == "ambiguous"
+            _profile_reconciled_price(candidate, profile_precedent, target, variants)
+            if price_match == "ambiguous" and direct_target_price is None
             else None
         )
-        if profile_price is not None:
-            price, price_dependencies = profile_price
+        if direct_target_price is not None:
+            price = direct_target_price
+            dependencies.extend(
+                _dependency(f"price:{rpo}:{semantic_hash(row)}", row)
+                for row in applicable_price_rows
+            )
+            compiled_price_rows.update(semantic_hash(row) for row in applicable_price_rows)
+            row_status = "ready"
+            candidate_disposition[candidate_id] = "compiled_ready"
+        elif profile_price is not None:
+            price, price_dependencies, inferred_trim_rules = profile_price
             dependencies.extend(price_dependencies)
+            compiled_price_rows.update(semantic_hash(row) for row in applicable_price_rows)
+            price_entry = registry["price_rules_sheet"]
+            existing_price_rules = _rows(extract, price_entry["sheetName"])
+            for inferred_rule in inferred_trim_rules:
+                body_scope = _scope_value(inferred_rule.get("bodyStyleScope"))
+                trim_scope = (
+                    str(inferred_rule.get("trimLevelScope") or "*").strip().upper()
+                    or "*"
+                )
+                variant_scope = _scope_value(inferred_rule.get("variantScope"))
+                price_value = _int_price(inferred_rule.get("priceValue"))
+                if trim_scope == "*" or price_value is None:
+                    raise ValueError("Inferred source-qualified price rule lacks a trim scope or price.")
+                signature = {
+                    "conditionOptionId": option_id,
+                    "targetOptionId": option_id,
+                    "priceRuleType": "override",
+                    "bodyStyleScope": body_scope,
+                    "trimLevelScope": trim_scope,
+                    "variantScope": variant_scope,
+                    "priceValue": price_value,
+                }
+                semantic_matches = [
+                    row
+                    for row in existing_price_rules
+                    if str(row.get("condition_option_id") or "") == option_id
+                    and str(row.get("target_option_id") or "") == option_id
+                    and str(row.get("price_rule_type") or "").lower() == "override"
+                    and _scope_value(row.get("body_style_scope")) == body_scope
+                    and _scope_value(row.get("trim_level_scope")) == _scope_value(trim_scope)
+                    and _scope_value(row.get("variant_scope")) == variant_scope
+                ]
+                if len(semantic_matches) > 1:
+                    raise ValueError(
+                        f"Target {target} has duplicate self-price rules for {rpo} / {trim_scope}."
+                    )
+                existing_rule = semantic_matches[0] if semantic_matches else {}
+                price_rule_id = str(
+                    existing_rule.get("price_rule_id")
+                    or deterministic_family_id("price_rules", target, signature)
+                )
+                price_values = _complete_values(
+                    price_entry["headers"],
+                    {
+                        **existing_rule,
+                        "price_rule_id": price_rule_id,
+                        "condition_option_id": option_id,
+                        "price_rule_type": "override",
+                        "target_option_id": option_id,
+                        "price_value": price_value,
+                        "body_style_scope": "" if body_scope == "*" else body_scope,
+                        "trim_level_scope": trim_scope,
+                        "variant_scope": "" if variant_scope == "*" else variant_scope,
+                        "notes": "Ingest source-qualified comparator-corroborated price",
+                    },
+                )
+                price_rule_rows.append(
+                    _manifest_row(
+                        model=target,
+                        family="price_rules",
+                        sheet=price_entry["sheetName"],
+                        action=(
+                            "add"
+                            if not existing_rule
+                            else "noop"
+                            if all(
+                                existing_rule.get(header, "") == price_values.get(header, "")
+                                for header in price_entry["headers"]
+                            )
+                            else "update"
+                        ),
+                        key={"price_rule_id": price_rule_id},
+                        values=price_values,
+                        signature=signature,
+                        dependencies=dependencies,
+                        status="ready",
+                    )
+                )
             row_status = "ready"
             candidate_disposition[candidate_id] = "compiled_ready"
         elif price_match == "ambiguous":
@@ -979,6 +1301,7 @@ def _compile_target_options(
                 price = _int_price(existing.get("price"))
                 row_status = "blocked"
                 candidate_disposition[candidate_id] = "blocked_exception"
+                open_price_rows.update(semantic_hash(row) for row in applicable_price_rows)
             else:
                 payload = typed_resolution["payload"]
                 resolved_price = _int_price(payload.get("priceValue"))
@@ -1012,6 +1335,9 @@ def _compile_target_options(
                         price = _int_price(existing.get("price"))
                         row_status = "blocked"
                         candidate_disposition[candidate_id] = "blocked_exception"
+                        open_price_rows.update(
+                            semantic_hash(row) for row in applicable_price_rows
+                        )
                     else:
                         existing_rule = semantic_matches[0] if semantic_matches else {}
                         price_rule_id = str(existing_rule.get("price_rule_id") or deterministic_family_id("price_rules", target, signature))
@@ -1046,15 +1372,25 @@ def _compile_target_options(
                         price = _int_price(existing.get("price"))
                         row_status = "ready"
                         candidate_disposition[candidate_id] = "compiled_ready"
+                        compiled_price_rows.update(
+                            semantic_hash(row) for row in applicable_price_rows
+                        )
                         consumed_resolution_subjects.add(price_subject["subjectId"])
                 else:
                     price = resolved_price
                     row_status = "ready"
                     candidate_disposition[candidate_id] = "compiled_ready"
+                    compiled_price_rows.update(
+                        semantic_hash(row) for row in applicable_price_rows
+                    )
                     consumed_resolution_subjects.add(price_subject["subjectId"])
         elif price_match == "exact":
-            price_rows = candidate.get("priceRows") or []
-            price = _header_price(price_rows[0]) if len(price_rows) == 1 else None
+            price_rows = applicable_price_rows
+            price = (
+                _int_price(price_rows[0].get("listPrice"))
+                if len(price_rows) == 1
+                else None
+            )
             if len(price_rows) == 1:
                 dependencies.append(
                     _dependency(f"price:{rpo}:{semantic_hash(price_rows[0])}", price_rows[0])
@@ -1074,9 +1410,11 @@ def _compile_target_options(
                 price = _int_price(existing.get("price"))
                 row_status = "blocked"
                 candidate_disposition[candidate_id] = "blocked_exception"
+                open_price_rows.update(semantic_hash(row) for row in price_rows)
             else:
                 row_status = "ready"
                 candidate_disposition[candidate_id] = "compiled_ready"
+                compiled_price_rows.update(semantic_hash(row) for row in price_rows)
         else:
             price = _int_price(existing.get("price"))
             row_status = "ready"
@@ -1109,7 +1447,28 @@ def _compile_target_options(
                 )
             )
         statuses = model_scoped_statuses(candidate, target)
-        selectable = candidate.get("rowKind") == "orderable" and any(status.get("status") == "available" for status in statuses)
+        if (
+            price is None
+            and statuses
+            and {str(status.get("status") or "") for status in statuses} == {"standard"}
+        ):
+            price = 0
+        section_contract = section_contracts.get(section_id, {})
+        canonical_source = existing or ((profile_precedent or {}).get("source") or {})
+        canonical_selectable = workbook_truthy(canonical_source.get("selectable"))
+        profile_owns_selectability = bool(profile_requirement and profile_precedent)
+        standard_in_required_single = (
+            any(status.get("status") == "standard" for status in statuses)
+            and str(section_contract.get("selection_mode") or "").strip().lower()
+            in {"single", "single_select", "single-select", "single_select_req"}
+            and workbook_truthy(section_contract.get("is_required"))
+            and canonical_selectable
+        )
+        selectable = (
+            candidate.get("rowKind") == "orderable"
+            and any(status.get("status") == "available" for status in statuses)
+            and (canonical_selectable if profile_owns_selectability else True)
+        ) or standard_in_required_single
         source_active = any(
             status.get("status") in {"available", "standard"} for status in statuses
         )
@@ -1132,7 +1491,7 @@ def _compile_target_options(
             "selectable": bool(selectable),
             "display_order": display_order,
             "active": bool(active),
-            "display_behavior": existing.get("display_behavior", ""),
+            "display_behavior": canonical_source.get("display_behavior", ""),
         }
         values = _complete_values(entry["headers"], known)
         signature_payload = {"family": "options", "model": target, "occurrence": option_occurrence_signature({**candidate, "section_id": section_id})}
@@ -1296,6 +1655,10 @@ def _compile_target_options(
         rpo_ids,
         consumed_resolution_subjects,
         compiled_status_features,
+        profile_consumed_status_features,
+        compiled_price_rows,
+        open_price_rows,
+        profile_consumed_price_rows,
     )
 
 
@@ -1973,6 +2336,10 @@ def _source_feature_ledger(
     comparator_artifact: Mapping[str, Any],
     compiled_base_price_rows: set[str],
     compiled_status_features: set[str],
+    profile_consumed_status_features: set[str],
+    compiled_option_price_rows: set[tuple[str, str]],
+    open_option_price_rows: set[tuple[str, str]],
+    profile_consumed_price_rows: set[tuple[str, str]],
     status_feature_index: Mapping[str, Mapping[str, list[str]]],
     candidate_feature_index: Mapping[str, str],
     *,
@@ -2037,7 +2404,9 @@ def _source_feature_ledger(
             model = selected_models[0] if len(selected_models) == 1 else "*"
             for feature_id in status_feature_index.get(candidate_id, {}).get(status_signature, []):
                 disposition = (
-                    "compiled"
+                    "resolved_not_a_workbook_fact"
+                    if feature_id in profile_consumed_status_features
+                    else "compiled"
                     if feature_id in compiled_status_features
                     else "exception_open"
                     if selected_models
@@ -2048,27 +2417,45 @@ def _source_feature_ledger(
         for item in rows:
             row_index = item.get("rowIndex")
             ledger.append({"featureId": f"skipped-option:{sheet}:{row_index}:{item.get('reason')}", "model": "*", "family": "options", "disposition": "unsupported_blocker" if item.get("reason") != "sheet_not_options_matrix" else "resolved_not_applicable", "evidenceIds": [f"{sheet}:{row_index}"]})
-    selected_candidates = [
-        candidate
-        for candidate in candidates
-        if any((target, str(candidate.get("candidateId") or "")) in candidate_dispositions for target in targets)
-    ]
-    selected_price_dispositions: dict[str, set[str]] = defaultdict(set)
-    for candidate in selected_candidates:
-        candidate_id = str(candidate.get("candidateId") or "")
-        candidate_blocked = any(
-            candidate_dispositions.get((target, candidate_id)) == "blocked_exception"
-            for target in targets
-        )
-        disposition = "compiled" if candidate.get("priceMatch") == "exact" and not candidate_blocked else "exception_open"
-        for price_row in candidate.get("priceRows") or []:
-            selected_price_dispositions[semantic_hash(price_row)].add(disposition)
     for row in sorted(price_payload.get("priceRows") or [], key=semantic_hash):
         rpo = str(row.get("rpo") or "")
         row_hash = semantic_hash(row)
-        row_dispositions = selected_price_dispositions.get(semantic_hash(row), set())
-        disposition = "exception_open" if "exception_open" in row_dispositions else "compiled" if "compiled" in row_dispositions else "resolved_not_applicable"
-        ledger.append({"featureId": f"price:{rpo}:{row_hash}", "model": "*", "family": "price_rules", "disposition": disposition, "evidenceIds": [str((row.get("sourceEvidence") or {}).get("sheetName") or "price")]})
+        explicit_models = _qualifier_model_scopes(row.get("qualifier"))
+        disposition_models = {
+            model
+            for model, disposition_hash in (
+                compiled_option_price_rows
+                | open_option_price_rows
+                | profile_consumed_price_rows
+            )
+            if disposition_hash == row_hash
+        }
+        row_models = sorted(explicit_models | disposition_models) or ["*"]
+        for model in row_models:
+            key = (model, row_hash)
+            disposition = (
+                "exception_open"
+                if key in open_option_price_rows
+                else "compiled"
+                if key in compiled_option_price_rows
+                else "resolved_not_a_workbook_fact"
+                if key in profile_consumed_price_rows
+                else "resolved_not_applicable"
+            )
+            ledger.append(
+                {
+                    "featureId": f"price:{model}:{rpo}:{row_hash}",
+                    "model": model,
+                    "family": "price_rules",
+                    "disposition": disposition,
+                    "evidenceIds": [
+                        str(
+                            (row.get("sourceEvidence") or {}).get("sheetName")
+                            or "price"
+                        )
+                    ],
+                }
+            )
     for row in sorted(price_payload.get("baseModelPriceRows") or [], key=semantic_hash):
         model = MODEL_CODE_PREFIXES.get(str(row.get("modelCode") or "")[:3], "*")
         row_hash = semantic_hash(row)
@@ -2257,6 +2644,12 @@ def _scope_value(value: Any) -> str:
     return str(value or "*").strip().lower() or "*"
 
 
+def _scope_covers(existing: Any, proposed: Any) -> bool:
+    existing_scope = _scope_value(existing)
+    proposed_scope = _scope_value(proposed)
+    return existing_scope == "*" or existing_scope == proposed_scope
+
+
 def _reconcile_represented_comparator_facts(
     manifest_rows: list[dict[str, Any]],
     exceptions: list[dict[str, Any]],
@@ -2283,6 +2676,7 @@ def _reconcile_represented_comparator_facts(
             for values in [row.get("values") or {}]
             if str(values.get("option_id") or "") and str(values.get("rpo") or "")
         }
+        option_id_by_rpo = {rpo: option_id for option_id, rpo in option_id_to_rpo.items()}
         family_rows: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for row in relevant:
             family_rows[str(row.get("family") or "")].append(row)
@@ -2324,7 +2718,16 @@ def _reconcile_represented_comparator_facts(
                     "trimLevelScope": _scope_value(values.get("trim_level_scope")),
                     "variantScope": _scope_value(values.get("variant_scope")),
                 }
-                if row_signature == dict(signature) and _int_price(
+                expected_signature = dict(signature)
+                same_rule = all(
+                    row_signature.get(key) == expected_signature.get(key)
+                    for key in ("conditionRpo", "priceRuleType", "targetRpo")
+                )
+                covered_scope = all(
+                    _scope_covers(row_signature.get(key), expected_signature.get(key))
+                    for key in ("bodyStyleScope", "trimLevelScope", "variantScope")
+                )
+                if same_rule and covered_scope and _int_price(
                     values.get("price_value")
                 ) == expected_price:
                     matches.append(row)
@@ -2348,7 +2751,7 @@ def _reconcile_represented_comparator_facts(
 
         def exclusive_matches(signature: Mapping[str, Any]) -> list[dict[str, Any]]:
             matches = []
-            members = family_rows["exclusive_group_members"]
+            members = family_rows["exclusive_members"]
             for parent in family_rows["exclusive_groups"]:
                 values = parent.get("values") or {}
                 group_id = str(values.get("group_id") or "")
@@ -2361,9 +2764,11 @@ def _reconcile_represented_comparator_facts(
                     option_rpo((row.get("values") or {}).get("option_id"))
                     for row in member_rows
                 )
+                selection_mode = str(values.get("selection_mode") or "").lower()
+                if selection_mode == "single":
+                    selection_mode = "single_within_group"
                 if (
-                    str(values.get("selection_mode") or "").lower()
-                    == str(signature.get("selectionMode") or "").lower()
+                    selection_mode == str(signature.get("selectionMode") or "").lower()
                     and member_rpos == sorted(signature.get("memberRpos") or [])
                 ):
                     matches.extend([parent, *member_rows])
@@ -2414,6 +2819,47 @@ def _reconcile_represented_comparator_facts(
                 continue
             signature = dict(fact.get("signature") or {})
             matches = matcher(signature, fact.get("context") or {})
+            if (
+                not matches
+                and fact_type == "direct_rule"
+                and str(signature.get("ruleType") or "").lower() == "requires"
+                and all(
+                    _scope_value(signature.get(scope)) == "*"
+                    for scope in ("bodyStyleScope", "trimLevelScope", "variantScope")
+                )
+            ):
+                target_option_id = option_id_by_rpo.get(
+                    str(signature.get("targetRpo") or "").upper(), ""
+                )
+                expected_variants = {
+                    str((row.get("values") or {}).get("variant_id") or "")
+                    for row in family_rows["model_variants"]
+                    if str((row.get("values") or {}).get("model_key") or "").lower()
+                    == str(target).lower()
+                } - {""}
+                target_ovs = [
+                    row
+                    for row in family_rows["ovs"]
+                    if str((row.get("values") or {}).get("option_id") or "")
+                    == target_option_id
+                ]
+                target_statuses = {
+                    str((row.get("values") or {}).get("variant_id") or ""):
+                    str((row.get("values") or {}).get("status") or "").lower()
+                    for row in target_ovs
+                }
+                if (
+                    target_option_id
+                    and expected_variants
+                    and set(target_statuses) == expected_variants
+                    and set(target_statuses.values()) == {"standard"}
+                ):
+                    matches = [
+                        row
+                        for row in family_rows["options"]
+                        if str((row.get("values") or {}).get("option_id") or "")
+                        == target_option_id
+                    ] + target_ovs
             if not matches:
                 continue
             evidence_id = str(fact.get("evidenceId") or "")
@@ -2609,12 +3055,17 @@ def compile_canonical_rows(
     exceptions: list[dict[str, Any]] = []
     candidate_dispositions: dict[tuple[str, str], str] = {}
     relationship_dispositions: list[dict[str, Any]] = []
+    pending_profile_effects: list[dict[str, Any]] = []
     target_rpo_index: dict[str, set[str]] = {}
     compiled_comparator_fact_keys: dict[str, set[str]] = defaultdict(set)
     comparator_effect_dispositions: dict[tuple[str, str], str] = {}
     consumed_resolution_subjects: set[str] = set()
     compiled_base_price_rows: set[str] = set()
     compiled_status_features: set[str] = set()
+    profile_consumed_status_features: set[str] = set()
+    compiled_option_price_rows: set[tuple[str, str]] = set()
+    open_option_price_rows: set[tuple[str, str]] = set()
+    profile_consumed_price_rows: set[tuple[str, str]] = set()
     profiled_targets: set[str] = set()
     candidates = [dict(candidate) for candidate in option_payload.get("candidates") or []]
     candidate_feature_index = _candidate_feature_index(candidates)
@@ -2645,6 +3096,20 @@ def compile_canonical_rows(
     )
     if reported_unmatched_rows != expected_unmatched_rows:
         raise ValueError("Join report unmatchedPriceRows do not match parsed price evidence.")
+    price_rows_by_rpo: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in price_payload.get("priceRows") or []:
+        rpo = str(row.get("rpo") or "").strip().upper()
+        if rpo:
+            price_rows_by_rpo[rpo].append(dict(row))
+    for candidate in candidates:
+        ref_only_rpo = str(candidate.get("refOnlyRpo") or "").strip().upper()
+        if candidate.get("priceRows") or not ref_only_rpo:
+            continue
+        matching_rows = price_rows_by_rpo.get(ref_only_rpo, [])
+        if not matching_rows:
+            continue
+        candidate["priceRows"] = [dict(row) for row in matching_rows]
+        candidate["priceMatch"] = "exact" if len(matching_rows) == 1 else "ambiguous"
     for target in targets:
         variant_rows, variant_exceptions, variants, compiled_prices = _compile_target_variants(
             extract, target, price_payload
@@ -2671,7 +3136,18 @@ def compile_canonical_rows(
             comparator=comparators[target],
             variants=profile_variants_by_id.values(),
         )
-        option_rows, option_exceptions, dispositions, rpo_ids, consumed, compiled_statuses = _compile_target_options(
+        (
+            option_rows,
+            option_exceptions,
+            dispositions,
+            rpo_ids,
+            consumed,
+            compiled_statuses,
+            profile_consumed_statuses,
+            compiled_option_prices,
+            open_prices,
+            profile_consumed_prices,
+        ) = _compile_target_options(
             extract,
             registry[target],
             target,
@@ -2775,7 +3251,24 @@ def compile_canonical_rows(
         profiled_targets.add(target)
         consumed_resolution_subjects.update(consumed)
         compiled_status_features.update(compiled_statuses)
+        profile_consumed_status_features.update(profile_consumed_statuses)
+        compiled_option_price_rows.update(
+            (target, row_hash) for row_hash in compiled_option_prices
+        )
+        open_option_price_rows.update((target, row_hash) for row_hash in open_prices)
+        profile_consumed_price_rows.update(
+            (target, row_hash) for row_hash in profile_consumed_prices
+        )
         manifest_rows.extend(option_rows)
+        manifest_rows.extend(
+            _source_supported_default_rows(
+                extract=extract,
+                target=target,
+                comparator_artifact=comparator_artifact,
+                target_rows=option_rows,
+                variants=variants,
+            )
+        )
         exceptions.extend(option_exceptions)
         candidate_dispositions.update({(target, key): value for key, value in dispositions.items()})
         comparator_facts = list((comparator_artifact.get("targets") or {}).get(target, {}).get("facts") or [])
@@ -2815,12 +3308,17 @@ def compile_canonical_rows(
                 {
                     "endpointType": "interior",
                     "endpointId": interior_id,
+                    "profileCompatibleRpos": profile["interiorCompatibilityRpos"].get(
+                        interior_id,
+                        [],
+                    ),
                     "profileRequiredRpo": rpo_by_option_id.get(
                         str(profile["interiorRequirements"].get(interior_id) or ""),
                         "",
                     ),
                 }
                 for interior_id in interior_ids
+                if interior_id in profile["interiorIds"]
             ]
             for token, interior_ids in profile["interiorCodeIds"].items()
         }
@@ -2839,6 +3337,29 @@ def compile_canonical_rows(
             endpoint_catalog=endpoint_catalog,
             ignored_endpoint_tokens=ignored_endpoint_tokens,
         )
+        for disposition in relationship_result["dispositions"]:
+            if disposition.get("disposition") != "compiled_profile_effect":
+                continue
+            endpoint_ids = {
+                str(endpoint_id)
+                for endpoint_id in disposition.get("profileEffectEndpointIds") or []
+                if str(endpoint_id)
+            }
+            effect_family = (
+                "model_interior_scope"
+                if disposition.get("profileEffectKind") == "required_option"
+                else "interiors"
+            )
+            pending_profile_effects.append(
+                {
+                    "target": target,
+                    "family": effect_family,
+                    "endpointIds": endpoint_ids,
+                    "evidenceDependencies": list(
+                        disposition.get("evidenceDependencies") or []
+                    ),
+                }
+            )
         ready_option_ids = {
             str(row["values"].get("option_id") or "")
             for row in option_rows
@@ -2902,6 +3423,48 @@ def compile_canonical_rows(
             for item in relationship_result["dispositions"]
         )
     manifest_rows.extend(_retained_existing_rows(extract, targets, registry, manifest_rows))
+    for effect in pending_profile_effects:
+        target = str(effect["target"])
+        effect_family = str(effect["family"])
+        endpoint_ids = set(effect["endpointIds"])
+        material_rows = [
+            row
+            for row in manifest_rows
+            if row.get("model") in {target, "*"}
+            and row.get("family") == effect_family
+            and str((row.get("values") or {}).get("interior_id") or "")
+            in endpoint_ids
+        ]
+        if not material_rows:
+            available_endpoint_ids = sorted(
+                {
+                    str((row.get("values") or {}).get("interior_id") or "")
+                    for row in manifest_rows
+                    if row.get("model") in {target, "*"}
+                    and row.get("family") == effect_family
+                    and str((row.get("values") or {}).get("interior_id") or "")
+                }
+            )
+            raise ValueError(
+                f"Target {target} profile effect has no material {effect_family} row: "
+                f"{sorted(endpoint_ids)}; available={available_endpoint_ids}"
+            )
+        for row in material_rows:
+            dependencies_by_id = {
+                str(dependency["evidenceId"]): dict(dependency)
+                for dependency in [
+                    *(row.get("evidenceDependencies") or []),
+                    *(effect.get("evidenceDependencies") or []),
+                ]
+            }
+            row["evidenceDependencies"] = [
+                dependencies_by_id[evidence_id]
+                for evidence_id in sorted(dependencies_by_id)
+            ]
+            row["derivationVersion"] = derivation_version(
+                row["semanticSignature"],
+                row["evidenceDependencies"],
+            )
     manifest_rows = _merge_manifest_rows(manifest_rows)
     (
         exceptions,
@@ -2945,6 +3508,10 @@ def compile_canonical_rows(
         comparator_artifact,
         compiled_base_price_rows,
         compiled_status_features,
+        profile_consumed_status_features,
+        compiled_option_price_rows,
+        open_option_price_rows,
+        profile_consumed_price_rows,
         status_feature_index,
         candidate_feature_index,
         color_trim_profiled=profiled_targets == set(targets),

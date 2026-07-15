@@ -300,11 +300,36 @@ def build_target_profile(
     if not source_interior_ids:
         raise ValueError(f"Target {target} has no {family} interior rows for trims {sorted(target_trims)}.")
     interior_code_ids: dict[str, set[str]] = defaultdict(set)
+    comparator_rpo_by_option_id = {
+        str(row.get("option_id") or ""): str(row.get("rpo") or "").strip().upper()
+        for row in _rows(extract, comparator_option_sheet)
+        if str(row.get("option_id") or "") and str(row.get("rpo") or "")
+    }
+    interior_compatibility_rpos: dict[str, list[str]] = {}
+    interior_component_rpos: set[str] = set()
     for row in source_interiors:
         code = str(row.get("Interior Code") or "").strip().upper()
         interior_id = str(row.get("interior_id") or "")
         if code and interior_id:
             interior_code_ids[code].add(interior_id)
+        compatibility_rpos = {
+            str(row.get(column) or "").strip().upper()
+            for column in ("Seat", "Suede", "Stitch", "Two Tone")
+            if str(row.get(column) or "").strip()
+        }
+        interior_component_rpos.update(
+            str(row.get(column) or "").strip().upper()
+            for column in ("Suede", "Stitch", "Two Tone")
+            if str(row.get(column) or "").strip()
+        )
+        included_option_rpo = comparator_rpo_by_option_id.get(
+            str(row.get("included_option_id") or ""),
+            "",
+        )
+        if included_option_rpo:
+            compatibility_rpos.add(included_option_rpo)
+        if interior_id:
+            interior_compatibility_rpos[interior_id] = sorted(compatibility_rpos)
 
     scope_rows = [
         row
@@ -347,7 +372,10 @@ def build_target_profile(
                 sheet="model_interior_scope",
                 source=target_source,
                 key={"model_key": target, "interior_id": interior_id, "trim_level": trim},
-                evidence_id=f"workbook:shared-profile:{comparator}:model_interior_scope:{interior_id}:{trim}",
+                evidence_id=(
+                    f"workbook:shared-profile:{comparator}:target:{target}:"
+                    f"model_interior_scope:{interior_id}:{trim}"
+                ),
             )
         )
 
@@ -404,6 +432,7 @@ def build_target_profile(
             option_precedents[target_rpo]["conditionalPriceRules"].append(
                 {
                     "conditionRpo": condition_rpo,
+                    "targetRpo": target_rpo,
                     "priceValue": price_value,
                     "priceRuleType": str(row.get("price_rule_type") or "").lower(),
                     "bodyStyleScope": str(row.get("body_style_scope") or "*"),
@@ -591,7 +620,8 @@ def build_target_profile(
                     source=target_source,
                     key=key,
                     evidence_id=(
-                        f"workbook:shared-profile:{comparator}:{sheet}:{semantic_hash(source)}"
+                        f"workbook:shared-profile:{comparator}:target:{target}:"
+                        f"{sheet}:{semantic_hash(source)}"
                     ),
                 )
             )
@@ -683,6 +713,8 @@ def build_target_profile(
         },
         "interiorIds": sorted(source_interior_ids),
         "interiorRequirements": interior_requirements,
+        "interiorCompatibilityRpos": interior_compatibility_rpos,
+        "interiorComponentRpos": sorted(interior_component_rpos),
         "trimFamily": family,
         "targetTrims": sorted(target_trims),
         "interiorSheet": interior_sheet,

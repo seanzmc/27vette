@@ -281,12 +281,14 @@ function renderSheets() {
       const roleButton = (value, label) => {
         const allowed =
           value === "exclude" ||
-          (value === "options" && card.sheetType === "options_matrix") ||
+          (value === "options" && card.sheetType === "options_matrix" && card.canonicalOptionSource === true) ||
           (value === "price" && card.sheetType === "price_sheet");
         return `<button class="role-btn ${role === value ? "active" : ""}" data-sheet="${escapeHtml(card.sheetName)}" data-role="${value}" ${allowed ? "" : "disabled"}>${label}</button>`;
       };
       const subtypeNote =
-        card.contentSubtype === "standard_equipment"
+        card.sheetType === "options_matrix" && card.canonicalOptionSource !== true
+          ? '<div class="card-note">Excluded from canonical processing — use Interior, Exterior, or Mechanical sheets</div>'
+          : card.contentSubtype === "standard_equipment"
           ? '<div class="card-note">Standard-equipment content — excluded by default</div>'
           : "";
       const reasons = card.confidenceReasons.length

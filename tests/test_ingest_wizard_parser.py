@@ -20,8 +20,8 @@ from corvette_form_generator.ingest.wizard.parser import (  # noqa: E402
 from ingest_wizard_fixtures import build_raw_export  # noqa: E402
 
 ROLES = {
-    "Equipment Groups 1": "options",
-    "Equipment Groups 4": "options",
+    "Exterior 1": "options",
+    "Mechanical 4": "options",
     "Price Schedule": "price",
     "Standard Equipment 1": "exclude",
     "Color and Trim 1": "exclude",
@@ -42,10 +42,10 @@ class WizardParserTest(unittest.TestCase):
 
     def test_only_confirmed_options_sheets_produce_candidates(self) -> None:
         sheets = {c["sheetName"] for c in self.parsed["candidates"]}
-        self.assertEqual(sheets, {"Equipment Groups 1", "Equipment Groups 4"})
+        self.assertEqual(sheets, {"Exterior 1", "Mechanical 4"})
 
     def test_orderable_candidate_fields(self) -> None:
-        candidate = self.by_id["Equipment Groups 1:6"]
+        candidate = self.by_id["Exterior 1:6"]
         self.assertEqual(candidate["rpo"], "BV4")
         self.assertEqual(candidate["refOnlyRpo"], "")
         self.assertEqual(candidate["rowKind"], "orderable")
@@ -60,19 +60,19 @@ class WizardParserTest(unittest.TestCase):
         self.assertEqual(candidate["sourceEvidence"]["cells"]["A6"], "BV4")
 
     def test_ref_only_candidate(self) -> None:
-        candidate = self.by_id["Equipment Groups 1:5"]
+        candidate = self.by_id["Exterior 1:5"]
         self.assertEqual(candidate["rowKind"], "ref_only")
         self.assertEqual(candidate["refOnlyRpo"], "UQH")
         self.assertEqual(candidate["rpo"], "")
 
     def test_unknown_status_symbol_is_unresolved(self) -> None:
-        candidate = self.by_id["Equipment Groups 1:8"]
+        candidate = self.by_id["Exterior 1:8"]
         by_letter = {s["columnLetter"]: s for s in candidate["statuses"]}
         self.assertEqual(by_letter["D"]["status"], "unresolved")
         self.assertIn("unknown_status_symbol", by_letter["D"]["flags"])
 
     def test_no_rpo_content_row_is_skipped_with_reason(self) -> None:
-        skipped = self.parsed["skippedRows"]["Equipment Groups 1"]
+        skipped = self.parsed["skippedRows"]["Exterior 1"]
         self.assertEqual(len(skipped), 1)
         self.assertEqual(skipped[0]["rowIndex"], 9)
         self.assertEqual(skipped[0]["reason"], "no_rpo_on_content_row")

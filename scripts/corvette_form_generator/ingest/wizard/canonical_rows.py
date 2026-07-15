@@ -387,6 +387,21 @@ def validate_artifact_graph(
         (_validate_manifest_row(row) for row in manifest.get("rows") or []),
         key=lambda item: (item["model"], item["family"], item["sheet"], canonical_text(item["key"])),
     )
+    evidence_identities: dict[str, str] = {}
+
+    def record_evidence_identities(items: Iterable[Mapping[str, Any]]) -> None:
+        for item in items:
+            for dependency in item.get("evidenceDependencies") or []:
+                evidence_id = str(dependency.get("evidenceId") or "")
+                fingerprint = str(dependency.get("semanticFingerprint") or "")
+                previous = evidence_identities.setdefault(evidence_id, fingerprint)
+                if previous != fingerprint:
+                    raise ValueError(
+                        f"Conflicting evidence identity {evidence_id}: "
+                        f"{previous} != {fingerprint}."
+                    )
+
+    record_evidence_identities(normalized_rows)
     from corvette_form_generator.editor_ops import EDITOR_SHEET_META
 
     for row in normalized_rows:
@@ -484,6 +499,7 @@ def validate_artifact_graph(
             (_validate_subject(subject) for subject in queue.get("subjects") or []),
             key=lambda item: item["subjectId"],
         )
+        record_evidence_identities(normalized_subjects)
         for subject in normalized_subjects:
             validate_subject_action_contract(subject["reasonCode"], subject["allowedActions"])
         expected_queue_sha = semantic_hash(

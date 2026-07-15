@@ -199,6 +199,46 @@ class ProfileCompilerTest(unittest.TestCase):
         self.assertEqual(model["values"]["model_label"], "ZR1")
         self.assertEqual(model["values"]["registry_key"], "zr1")
 
+    def test_target_transformed_profile_dependencies_have_unique_evidence_ids(self) -> None:
+        extract = extract_workbook(self.workbook)
+        registry = build_family_registry(self.workbook, ["zr1", "zr1x"])
+        profiles = [
+            build_target_profile(
+                extract,
+                registry[target],
+                target=target,
+                comparator="z06",
+                variants=[
+                    {
+                        "variant_id": f"1lz_{suffix}07",
+                        "model_year": 2027,
+                        "trim_level": "1lz",
+                        "body_style": "coupe",
+                    },
+                    {
+                        "variant_id": f"3lz_{suffix}67",
+                        "model_year": 2027,
+                        "trim_level": "3lz",
+                        "body_style": "convertible",
+                    },
+                ],
+            )
+            for target, suffix in (("zr1", "r"), ("zr1x", "s"))
+        ]
+        fingerprints_by_id: dict[str, set[str]] = {}
+        for profile in profiles:
+            for row in profile["rows"]:
+                for dependency in row["evidenceDependencies"]:
+                    fingerprints_by_id.setdefault(dependency["evidenceId"], set()).add(
+                        dependency["semanticFingerprint"]
+                    )
+        conflicts = {
+            evidence_id: sorted(fingerprints)
+            for evidence_id, fingerprints in fingerprints_by_id.items()
+            if len(fingerprints) != 1
+        }
+        self.assertEqual(conflicts, {})
+
     def test_invalid_presentation_section_reference_fails_closed(self) -> None:
         from openpyxl import load_workbook
 

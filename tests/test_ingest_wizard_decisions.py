@@ -962,9 +962,9 @@ class PassBStoreTest(unittest.TestCase):
         queue = self.store.review_queue(self.run_id, "zr1", "section")
         self.assertIn("Equipment Groups", queue["sourceSections"])
         # CC3 sits above any section-label row: it groups under the sheet name.
-        self.assertIn("Equipment Groups 4", queue["sourceSections"])
+        self.assertIn("Mechanical 4", queue["sourceSections"])
         filtered = self.store.review_queue(
-            self.run_id, "zr1", "section", source_section="Equipment Groups 4"
+            self.run_id, "zr1", "section", source_section="Mechanical 4"
         )
         self.assertEqual([c["rpo"] for c in filtered["candidates"]], ["CC3"])
 

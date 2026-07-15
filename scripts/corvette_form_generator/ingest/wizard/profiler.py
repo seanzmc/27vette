@@ -38,6 +38,13 @@ MODEL_CODE_RE = re.compile(r"^1Y[A-Z]\d{2}$")
 # Observed 2027 export: Standard Equipment sheets have S-share >= 0.80, every
 # other options matrix <= 0.47 (spec "Diagnosis"). 0.60 splits with margin.
 STANDARD_EQUIPMENT_S_SHARE = 0.60
+CANONICAL_OPTION_SHEET_RE = re.compile(r"^(Interior|Exterior|Mechanical)\s+\d+$", re.IGNORECASE)
+
+
+def canonical_option_sheet_eligible(sheet_name: str) -> bool:
+    """Return whether a raw matrix is an approved canonical option source."""
+
+    return bool(CANONICAL_OPTION_SHEET_RE.fullmatch(str(sheet_name or "").strip()))
 
 
 def profile_workbook(path: Path) -> dict[str, Any]:
@@ -103,7 +110,11 @@ def matrix_card(sheet_name: str, values: list[list[Any]], header_row: int) -> di
         else SUBTYPE_ORDERABLE
     )
     confidence, reasons = matrix_confidence(variant_columns, vocabulary)
-    if subtype == SUBTYPE_STANDARD:
+    canonical_option_source = canonical_option_sheet_eligible(sheet_name)
+    if not canonical_option_source:
+        role = ROLE_EXCLUDE
+        reason = "Canonical processing uses only Interior, Exterior, and Mechanical sheets."
+    elif subtype == SUBTYPE_STANDARD:
         role = ROLE_EXCLUDE
         reason = "Mostly standard-equipment rows (S statuses); include manually if needed."
     elif not stats["orderableRpoRows"]:
@@ -126,6 +137,7 @@ def matrix_card(sheet_name: str, values: list[list[Any]], header_row: int) -> di
         "confidenceReasons": reasons,
         "recommendedRole": role,
         "recommendedReason": reason,
+        "canonicalOptionSource": canonical_option_source,
     }
 
 

@@ -1,14 +1,16 @@
 # Canonical-row compiler and exception queue — production design
 
-Status: Direction approved 2026-07-09. Milestone 0 safety closure was implemented and proved on 2026-07-09. Milestone 1 headless compilation, Milestone 2's read-only compiler/typed-exception browser flow, and Milestone 2.1 compiler-consumer closure were implemented and independently verified on 2026-07-13. Milestone 2.2 typed endpoint, Color/Trim, and metadata profile compilation was implemented and independently verified on 2026-07-14. Milestone 3 plan projection remains unapproved; production compiler output remains read-only.
+Status: Direction approved 2026-07-09. Milestone 0 safety closure was implemented and proved on 2026-07-09. Milestone 1 headless compilation, Milestone 2's read-only compiler/typed-exception browser flow, and Milestone 2.1 compiler-consumer closure were implemented and independently verified on 2026-07-13. Milestone 2.2 typed endpoint and metadata profile compilation was implemented and independently verified on 2026-07-14. Milestone 2.3 targeted source-boundary and target/comparator reconciliation was implemented and independently verified on 2026-07-15 against exact run `20260715-035235-12e239`. Milestone 3 plan projection remains unapproved; production compiler output remains read-only.
 
 ## 0. Decision summary
 
 The production ingest wizard will stop asking the user to manufacture a complete workbook through broad review lanes.
 
-The script will compile every target fact that is deterministically supported by the raw import, the canonical workbook contract, and safe target-workbook reconciliation. The user will see only a typed exception queue for facts the script cannot derive without product judgment.
+The script will compile every target fact that is deterministically supported by the approved raw-source scope, the canonical workbook contract, and safe target-workbook reconciliation. For the current Grand Sport X/ZR1/ZR1X profile, raw canonical candidates come only from `Interior N`, `Exterior N`, and `Mechanical N`; `Price Schedule` supplies price evidence. Equipment Groups, Standard Equipment, and Color and Trim are excluded from canonical candidate processing.
 
-Comparator-model relationships become a first-class evidence layer. They may corroborate a target interpretation, reveal a likely missing relationship, and prebuild a focused relationship or exclusive-group proposal. They may not independently establish a target-model fact, and comparator IDs, prices, copy, sections, defaults, or group names may never be copied into target rows.
+Comparator-model relationships become a first-class evidence layer. They may corroborate a target interpretation, reveal a likely missing relationship, and prebuild a focused relationship or exclusive-group proposal. Within an explicitly approved target/comparator profile they may also supply an existing canonical identity, section placement, or metadata profile when the target RPO/status evidence is exact and the comparator occurrence is unique. They may not override target status or target price evidence, and broader rule/default/group copying remains prohibited without target confirmation.
+
+The current implementation is deliberately targeted to Grand Sport X, ZR1, and ZR1X with their approved Grand Sport/Z06 comparators. Shared compiler machinery is still required, but this milestone is not evidence of arbitrary-model support or a generally model-agnostic ingest engine.
 
 Implementation is intentionally ordered:
 
@@ -39,7 +41,7 @@ raw order-guide import
 
 The ingest wizard is production-ready only when all of the following are true:
 
-- Every in-scope raw feature has a recorded disposition: compiled, retained existing data, explicitly not a workbook fact, explicitly deferred under an allowed policy, or represented by an open exception.
+- Every in-scope raw feature from Interior/Exterior/Mechanical sheets has a recorded disposition: compiled, retained existing data, explicitly not a workbook fact, explicitly deferred under an allowed policy, or represented by an open exception.
 - Every target canonical row has complete live-workbook headers, typed values, stable identity, target evidence, and a derivation record.
 - Zero blocking exceptions remain before plan approval.
 - Comparator facts loaded for the selected target/comparator pair have explicit dispositions; no comparator behavior leaks into the target silently.
@@ -814,7 +816,7 @@ Saving a resolution or changing any fingerprint invalidates downstream plan/dry-
 
 ### 11.3 ZR1X — repeatability proof
 
-ZR1X uses the same reprocess implementation and comparator policy as ZR1. It is proof of generic repeatability, not a separate code path or model-specific exception.
+ZR1X uses the same targeted reprocess implementation and comparator policy as ZR1. It proves repeatability inside the approved Z-family profile; it does not by itself prove arbitrary-model support.
 
 ## 12. Expected implementation surfaces
 
@@ -909,6 +911,8 @@ Implemented 2026-07-13 under `milestone-2-exception-queue-browser-flow-implement
 Milestone 2.1 closed the current action/consumer gap under `milestone-2-1-compiler-consumer-closure-implementation-plan.md`: status-bearing no-RPO standards compile canonically; exact identity, relationship, group, exclusive, price, default, and explicit no-row outcomes have consumers; comparator endpoints require one ready target identity; and GET/mutation projectability is identical.
 
 Milestone 2.2 is implemented and independently verified under `milestone-2-2-typed-endpoint-metadata-compiler-implementation-plan.md`. Comparator selection now drives exact `sec_pain_001` paint, LT/LZ interior, target-source required-option, shared color-override, and validated presentation profiles; typed relationship catalogs distinguish options, interiors, and descriptive aliases. Fresh proof remains fail-closed at 371 subjects (256 actionable, 115 actionless), including 78 genuine multi-interior one-of/group blockers rather than impossible direct rules. Milestone 3 remains blocked and unapproved.
+
+Milestone 2.3 is implemented and independently verified under `milestone-2-3-target-evidence-reconciliation-presentation-pricing-plan.md`. Canonical candidates come only from numbered Interior, Exterior, and Mechanical sheets; Equipment Groups and raw Color and Trim sheets are excluded. LT/LZ metadata disambiguates profile-owned seat/suede/stitch/two-tone prose to exact unique `interior_id` rows while zero-match metadata remains fail-closed. Exact run `20260715-035235-12e239` has 5,999 rows and 213 subjects with zero `unresolved_relationship_identity`; all 447 compiled relationship features are materially represented. The module remains targeted to Grand Sport X, ZR1, and ZR1X, not generally model-agnostic.
 
 ### Milestone 3 — mechanical plan and deployment proof
 

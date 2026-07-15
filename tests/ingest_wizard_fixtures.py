@@ -44,7 +44,7 @@ def build_raw_export(path: Path) -> Path:
 
     matrix_sheet(
         wb,
-        "Equipment Groups 1",
+        "Exterior 1",
         "Stingray",
         STINGRAY_VARIANTS,
         [
@@ -58,7 +58,7 @@ def build_raw_export(path: Path) -> Path:
     )
     matrix_sheet(
         wb,
-        "Equipment Groups 4",
+        "Mechanical 4",
         "ZR1 and ZR1X",
         ZR1_VARIANTS,
         [
@@ -223,7 +223,7 @@ def build_master_workbook(path: Path) -> Path:
         ["section_id", "section_name", "selection_mode", "is_required", "display_order", "standard_behavior", "step_key"],
         [
             ["sec_pain_001", "Exterior Color", "single", True, 1, "", "paint"],
-            ["sec_whee_001", "Wheels", "single", True, 2, "", "wheels"],
+            ["sec_whee_001", "Wheels", "single_select_req", True, 2, "", "wheels"],
             # Standard-behavior section: rows assigned here feed the
             # standard-equipment queue (unless they carry a price — spec B9).
             ["sec_std_001", "Standard Equipment", "informational", False, 3, "included", "standard"],
@@ -251,7 +251,7 @@ def build_master_workbook(path: Path) -> Path:
         "LZ_Interiors",
         interior_headers,
         [
-            ["1LZ_AQ9_HTA", "Jet Black", "Mulan leather", 0, "", "", "1LZ", "AQ9", "HTA", "", "", "", "sec_lzint_001", False, False, ""],
+            ["1LZ_AQ9_HTA", "Jet Black", "Mulan leather", 0, "", "", "1LZ", "AQ9", "HTA", "N2Z", "", "", "sec_lzint_001", False, False, ""],
             ["3LZ_AQ9_HTA", "Jet Black", "Napa leather", 0, "", "", "3LZ", "AQ9", "HTA", "", "", "", "sec_lzint_001", False, False, ""],
         ],
     )

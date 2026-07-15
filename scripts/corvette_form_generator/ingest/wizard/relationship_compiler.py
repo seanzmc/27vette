@@ -224,22 +224,64 @@ def compile_relationships(
                     )
                     dispositions.append({"featureId": feature_id, "disposition": "blocked_exception", "evidenceIds": [value["evidenceId"] for value in dependencies]})
                     continue
-                profile_effect = (
+                required_option_profile_effect = (
                     hit["direction"] == "source_to_mentioned"
-                    and rule_type == "includes"
+                    and rule_type in {"requires", "includes"}
                     and bool(mentioned_endpoints)
+                    and rule_type == "includes"
                     and all(
                         str(endpoint.get("profileRequiredRpo") or "").upper()
                         == source_rpo
                         for endpoint in mentioned_endpoints
                     )
                 )
+                compatible_profile_endpoints = [
+                    endpoint
+                    for endpoint in mentioned_endpoints
+                    if endpoint.get("endpointType") == "interior"
+                    and source_rpo
+                    in {
+                        str(rpo).upper()
+                        for rpo in endpoint.get("profileCompatibleRpos") or ()
+                    }
+                ]
+                compatibility_profile_effect = (
+                    hit["direction"] == "source_to_mentioned"
+                    and rule_type in {"requires", "includes"}
+                    and bool(mentioned_endpoints)
+                    and all(
+                        endpoint.get("endpointType") == "interior"
+                        for endpoint in mentioned_endpoints
+                    )
+                    and bool(compatible_profile_endpoints)
+                )
+                profile_effect = (
+                    required_option_profile_effect or compatibility_profile_effect
+                )
                 if profile_effect:
+                    profile_effect_endpoints = (
+                        mentioned_endpoints
+                        if required_option_profile_effect
+                        else compatible_profile_endpoints
+                    )
                     dispositions.append(
                         {
                             "featureId": feature_id,
                             "disposition": "compiled_profile_effect",
                             "evidenceIds": [value["evidenceId"] for value in dependencies],
+                            "evidenceDependencies": dependencies,
+                            "profileEffectEndpointIds": sorted(
+                                {
+                                    str(endpoint.get("endpointId") or "")
+                                    for endpoint in profile_effect_endpoints
+                                    if str(endpoint.get("endpointId") or "")
+                                }
+                            ),
+                            "profileEffectKind": (
+                                "required_option"
+                                if required_option_profile_effect
+                                else "compatibility"
+                            ),
                         }
                     )
                     continue

@@ -24,8 +24,8 @@ from corvette_form_generator.ingest.wizard.session import (  # noqa: E402
 from ingest_wizard_fixtures import build_master_workbook, build_raw_export  # noqa: E402
 
 ROLES = {
-    "Equipment Groups 1": "exclude",
-    "Equipment Groups 4": "options",
+    "Exterior 1": "exclude",
+    "Mechanical 4": "options",
     "Price Schedule": "price",
     "Standard Equipment 1": "exclude",
     "Color and Trim 1": "exclude",

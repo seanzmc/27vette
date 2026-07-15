@@ -1,0 +1,139 @@
+{
+  "id": "2026-07-15-milestone23-target-evidence-presentation-pricing",
+  "started_at": "2026-07-15T00:51:14Z",
+  "completed_at": "2026-07-15T08:08:44Z",
+  "objective": "Reconcile target-owned option, relationship, and presentation-price evidence against approved comparator semantics without allowing comparator/profile metadata to replace or suppress target facts.",
+  "changed_surface": [
+    "canonical compiler",
+    "profile compiler",
+    "relationship compiler",
+    "artifact graph validation",
+    "compiler tests",
+    "ingest documentation",
+    "Fable evidence"
+  ],
+  "outcome_rubric": "fable5loop/runs/2026-07-15-milestone23-target-evidence-presentation-pricing/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-15-milestone23-target-evidence-presentation-pricing/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-15-milestone23-target-evidence-presentation-pricing/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-15-milestone23-target-evidence-presentation-pricing/verifier-report.md"
+    },
+    {
+      "section": "Lessons learned",
+      "evidence": "fable5loop/runs/2026-07-15-milestone23-target-evidence-presentation-pricing/verifier-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-15-milestone23-target-evidence-presentation-pricing/verifier-report.md"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "skill": "27vette-fable5-compounding",
+    "evidence": "fable5loop/skills/27vette-fable5-compounding.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "method": "iterative adversarial blocker review followed by exact-current bounded code and artifact verification",
+    "cycles": [
+      {
+        "id": "deleg_c32ddde6",
+        "verdict": "blocked",
+        "disposition": "Stale-run review; valid condition-RPO, endpoint-compatibility, and receipt concerns were carried forward."
+      },
+      {
+        "id": "deleg_3113b90e",
+        "verdict": "blocked",
+        "disposition": "Comparator rule-type and material profile-effect dependency defects were reproduced and repaired test-first."
+      },
+      {
+        "id": "deleg_c92b2efd",
+        "verdict": "blocked",
+        "disposition": "Body/target price identity, target-scoped ledger, and raw R8E materiality defects were reproduced and repaired test-first."
+      },
+      {
+        "id": "deleg_4da78dad",
+        "verdict": "pass",
+        "disposition": "Price-boundary code and artifact lanes passed with frozen sentinels and no edits."
+      },
+      {
+        "id": "deleg_fa5626eb",
+        "verdict": "pass",
+        "disposition": "Final exact-current source-boundary and artifact lanes passed after LT/LZ unique-interior closure; no files edited."
+      }
+    ]
+  },
+  "boundaries_preserved": [
+    "live workbook unchanged",
+    "raw source unchanged",
+    "no pass-c-3 projection",
+    "no runtime publication or registry promotion",
+    "no deployment or dealer-submission change",
+    "no commit or push"
+  ],
+  "status": "passed",
+  "max_iterations": 5,
+  "iterations_used": 5,
+  "source_guidance": "fable5loop/source-guidance.md",
+  "artifact_evidence": [
+    "fable5loop/runs/2026-07-15-milestone23-target-evidence-presentation-pricing/proof-audit.json",
+    "fable5loop/runs/2026-07-15-milestone23-target-evidence-presentation-pricing/browser-proof.json",
+    "form-output/ingest-wizard/20260715-035235-12e239"
+  ],
+  "verification_sentinel": {
+    "delegation_id": "deleg_fa5626eb",
+    "manifest_rows": 5999,
+    "exception_subjects": 213,
+    "source_features": 11297,
+    "compiled_relationship_features": 447,
+    "compiled_target_price_features": 330,
+    "manifest_semantic_sha256": "1b7d99ba4567e0eb350d5652aff82578669ab7819aa21ec688b8736680813b95",
+    "queue_subject_sha256": "a1fe8d7dce167c4ae619027c854e8eb5e981f5146a8b4db894fcf8b11ed9498e",
+    "compile_report_semantic_sha256": "ae4ef6292f4f84d847e81277fbee9d5c37701ae5d67f520fb307846f0320c9a0",
+    "implementation_sha256": {
+      "compiler.py": "b036099949fc94008615a9d78ae2cdbab8f5881a524cf65007c2c3e57fb623e0",
+      "profile_compiler.py": "4b8ebd059b16d6c9f7be1205da0d15836efc42ce77a094a4f4d04ea0f1fa87a8",
+      "relationship_compiler.py": "94537f64475cef2192db4eea27f57546565a0ba0e4d71afb61f0bbe9c16e265c",
+      "canonical_rows.py": "db332b59277f4259bdde463c7546ed92f9ca630d87d0e76688a44c9295b6afba"
+    },
+    "focused_test_sha256": {
+      "test_ingest_wizard_canonical_compiler.py": "604aa46f933f4f04666e941d34e0a9d23be2ac8229e3e5b13b1776ab92a3adfe",
+      "test_ingest_wizard_profile_compiler.py": "0fbbc3f9d50f05e5f7249b305706c9c56072d28f1874a5f9132ba14963005b32",
+      "test_ingest_wizard_relationship_compiler.py": "11c051359ebe1876daac739874360acd72f5a977b23ed165ccf9ba8b8067afd5",
+      "test_ingest_wizard_canonical_rows.py": "42419822f6b5993329eddb991b34fcc1c3a33534d66afffb2ca37bce5c67c386"
+    }
+  },
+  "validation": {
+    "status": "pass",
+    "focused": "71 passed, 7 subtests passed in 6.95s",
+    "complete_ingest": "314 passed, 18 subtests passed in 99.16s",
+    "final_independent_probe": "71 passed plus 7 subtests; profiler/API boundary gate 17 passed",
+    "mapped_node": "267 passed, 0 failed",
+    "metadata_python": "80 passed",
+    "workbook_validation": "valid; zero issues, errors, or warnings",
+    "fable_contract": "loop validator passed; 13 Fable contract tests passed",
+    "fresh_source": "5999 rows, 213 subjects, 11297 target-scoped source features, 447 materially bound relationships, zero unresolved relationship identities, byte-stable recompilation",
+    "browser": "current-run resume/filter and source-role controls passed with zero JavaScript errors",
+    "protected_surfaces": "recorded hashes unchanged"
+  },
+  "protected_boundaries": {
+    "live_workbook_write": false,
+    "raw_source_mutation": false,
+    "pass_c_3_projection": false,
+    "runtime_publication": false,
+    "registry_promotion": false,
+    "deployment": false,
+    "dealer_submission_change": false
+  },
+  "next_pass": {
+    "label": "Milestone 3 — Canonical Plan Projection",
+    "status": "blocked_unapproved",
+    "scope": "Resolve or explicitly defer the 213 retained typed subjects before any separately approved plan projection.",
+    "milestone_3_status": "blocked_unapproved"
+  }
+}

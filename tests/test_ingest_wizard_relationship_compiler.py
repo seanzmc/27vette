@@ -155,6 +155,76 @@ class RelationshipCompilerTest(unittest.TestCase):
         )
         self.assertEqual(compiled["exceptions"][0]["allowedActions"], [])
 
+    def test_interior_metadata_consumes_ancillary_compatibility_without_direct_rules(self) -> None:
+        compiled = compile_relationships(
+            [
+                {
+                    "candidateId": "row:metadata-owned-interior",
+                    "rpo": "N26",
+                    "description": "Requires (HU6) Sky Cool Gray Suede interiors.",
+                }
+            ],
+            self.phrases,
+            target_rpos={"N26"},
+            endpoint_catalog={
+                "HU6": [
+                    {
+                        "endpointType": "interior",
+                        "endpointId": "2LT_AH2_HU6_N26",
+                        "profileCompatibleRpos": ["AH2", "HU6", "N26"],
+                    },
+                    {
+                        "endpointType": "interior",
+                        "endpointId": "2LT_AE4_HU6_N26",
+                        "profileCompatibleRpos": ["AE4", "HU6", "N26"],
+                    },
+                ]
+            },
+        )
+        self.assertEqual(compiled["exceptions"], [])
+        self.assertEqual(compiled["rows"], [])
+        self.assertEqual(
+            compiled["dispositions"][0]["disposition"],
+            "compiled_profile_effect",
+        )
+
+    def test_interior_metadata_disambiguates_shared_code_to_exact_compatible_ids(self) -> None:
+        compiled = compile_relationships(
+            [
+                {
+                    "candidateId": "row:partially-metadata-owned-interior",
+                    "rpo": "N26",
+                    "description": "Requires (HU6) Sky Cool Gray Suede interiors.",
+                }
+            ],
+            self.phrases,
+            target_rpos={"N26"},
+            endpoint_catalog={
+                "HU6": [
+                    {
+                        "endpointType": "interior",
+                        "endpointId": "2LT_AH2_HU6_N26",
+                        "profileCompatibleRpos": ["AH2", "HU6", "N26"],
+                    },
+                    {
+                        "endpointType": "interior",
+                        "endpointId": "2LT_AE4_HU6",
+                        "profileCompatibleRpos": ["AE4", "HU6"],
+                    },
+                ]
+            },
+        )
+        self.assertEqual(compiled["exceptions"], [])
+        self.assertEqual(compiled["rows"], [])
+        self.assertEqual(
+            compiled["dispositions"][0]["disposition"],
+            "compiled_profile_effect",
+        )
+        self.assertEqual(
+            compiled["dispositions"][0]["profileEffectEndpointIds"],
+            ["2LT_AH2_HU6_N26"],
+        )
+
     def test_profile_requirement_consumes_multi_interior_include_without_direct_rules(self) -> None:
         compiled = compile_relationships(
             [
