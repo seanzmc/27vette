@@ -57,17 +57,35 @@ def test_exception_cards_use_typed_controls_evidence_and_lifecycle_api() -> None
     assert "/exceptions/resolve`" in js
     assert "/exceptions/reopen`" in js
     assert "Raw source evidence" in js
-    assert "Target workbook state" in js
+    assert "Existing workbook rows" in js
+    assert "Already-derived rows" in js
+    assert "Shared context — not written by this decision" in js
+    assert "Exact decision effect" in js
     assert "Comparator context" in js
-    assert "Proposed canonical rows" in js
+    assert "Proposal to evaluate — not workbook rows" in js
+    assert "Target workbook state" not in js
+    assert "Proposed canonical rows" not in js
     assert "Gate impact" in js
     assert '$("#exception-reviewer").value.trim()' in js
     assert "Object.entries(rawCells)" in js
     assert 'evidenceValues(row, ["values", "signature"])' in js
     assert 'evidenceValues(fact, ["values", "payload", "signature"])' in js
-    assert 'id="exception-severity"' in html
-    assert 'severity: $("#exception-severity").value' in js
+    assert 'id="exception-decision"' in html
+    assert 'id="exception-sheet"' in html
+    assert 'id="exception-family"' not in html
+    assert 'id="exception-reason"' not in html
+    assert 'id="exception-severity"' not in html
+    assert 'decisionType: $("#exception-decision").value' in js
+    assert 'sheet: $("#exception-sheet").value' in js
+    assert 'reviewState: $("#exception-review-state").value' in js
+    assert 'id="exception-review-state"' in html
     assert 'q: $("#exception-q").value.trim()' in js
+    assert "/exceptions/preview`" in js
+    assert "Preview exact workbook effect" in js
+    assert "Confirm and save this exact effect" in js
+    assert "Reject entire proposal — write no rows" in js
+    assert 'name="rejectWholeProposal" required' in js
+    assert "Why this target fact is not applicable" not in js
     assert 'name="priceScope"' in js
     assert "choices.priceScopes" in js
     assert "variantScope: scope.variantScope" in js

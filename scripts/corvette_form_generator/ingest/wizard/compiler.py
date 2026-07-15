@@ -2650,14 +2650,471 @@ def _scope_covers(existing: Any, proposed: Any) -> bool:
     return existing_scope == "*" or existing_scope == proposed_scope
 
 
+def _apply_comparator_semantic_gate(
+    manifest_rows: list[dict[str, Any]],
+    exceptions: list[dict[str, Any]],
+    comparator_artifact: Mapping[str, Any],
+    targets: Iterable[str],
+) -> tuple[
+    list[dict[str, Any]],
+    list[dict[str, Any]],
+    set[str],
+    set[tuple[str, str]],
+]:
+    """Fail closed when a comparator proposal overlaps target-owned semantics.
+
+    Physical workbook-key uniqueness cannot identify a newly allocated subgroup
+    that narrows an existing target group.  This gate compares proposal meaning
+    against rows that do not depend on the proposal's own resolution and removes
+    any historical resolution effect when the target already owns an overlapping
+    fact.
+    """
+
+    target_set = {str(target) for target in targets}
+    base_rows = [
+        row
+        for row in manifest_rows
+        if not any(
+            str(dependency.get("evidenceId") or "").startswith("resolution:")
+            for dependency in row.get("evidenceDependencies") or []
+        )
+    ]
+    facts_by_evidence = {
+        (str(target), str(fact.get("evidenceId") or "")): fact
+        for target, payload in (comparator_artifact.get("targets") or {}).items()
+        if str(target) in target_set
+        for fact in payload.get("facts") or []
+    }
+    conflicts_by_subject: dict[str, dict[str, Any]] = {}
+    conflicted_evidence: set[tuple[str, str]] = set()
+
+    for subject in exceptions:
+        if subject.get("reasonCode") != "comparator_only_exclusive_group_proposal":
+            continue
+        model = str(subject.get("model") or "")
+        proposed_rows = list(subject.get("proposedRows") or [])
+        if len(proposed_rows) != 1:
+            continue
+        proposal = proposed_rows[0]
+        proposed_members = {
+            str(value or "").upper()
+            for value in proposal.get("memberRpos") or []
+            if str(value or "")
+        }
+        if not proposed_members:
+            continue
+        proposed_mode = str(proposal.get("selectionMode") or "").lower()
+        if proposed_mode == "single":
+            proposed_mode = "single_within_group"
+
+        option_rpos = {
+            str((row.get("values") or {}).get("option_id") or ""):
+            str((row.get("values") or {}).get("rpo") or "").upper()
+            for row in base_rows
+            if str(row.get("model") or "") in {model, "*"}
+            and row.get("family") == "options"
+        }
+        relevant = [
+            row
+            for row in base_rows
+            if str(row.get("model") or "") in {model, "*"}
+            and row.get("status") == "ready"
+        ]
+        member_rows = [
+            row
+            for row in relevant
+            if row.get("family") in {"exclusive_members", "exclusive_group_members"}
+        ]
+        for parent in relevant:
+            if parent.get("family") != "exclusive_groups":
+                continue
+            values = parent.get("values") or {}
+            group_id = str(values.get("group_id") or "")
+            members = [
+                row
+                for row in member_rows
+                if str((row.get("values") or {}).get("group_id") or "") == group_id
+            ]
+            existing_member_ids = {
+                str((row.get("values") or {}).get("option_id") or "")
+                for row in members
+                if str((row.get("values") or {}).get("option_id") or "")
+            }
+            existing_members = {
+                option_rpos.get(option_id, "") for option_id in existing_member_ids
+            } - {""}
+            proposed_tokens = {f"rpo:{rpo}" for rpo in proposed_members}
+            existing_tokens = {
+                f"rpo:{option_rpos[option_id]}"
+                if option_rpos.get(option_id)
+                else f"option_id:{option_id}"
+                for option_id in existing_member_ids
+            }
+            if not proposed_members.intersection(existing_members):
+                continue
+            existing_mode = str(values.get("selection_mode") or "").lower()
+            if existing_mode == "single":
+                existing_mode = "single_within_group"
+            if proposed_tokens == existing_tokens and proposed_mode == existing_mode:
+                continue
+            if proposed_tokens < existing_tokens:
+                overlap_kind = "proposed_subset"
+            elif proposed_tokens > existing_tokens:
+                overlap_kind = "proposed_superset"
+            elif proposed_tokens == existing_tokens:
+                overlap_kind = "same_members_different_mode"
+            else:
+                overlap_kind = "partial_overlap"
+            conflicting_rows = [parent, *members]
+            affected_sheets = sorted(
+                {str(row.get("sheet") or "") for row in conflicting_rows if str(row.get("sheet") or "")}
+            )
+            identities = [
+                str(subject.get("subjectId") or ""),
+                overlap_kind,
+                group_id,
+                *sorted(proposed_members),
+                *sorted(existing_members),
+            ]
+            dependencies = [
+                *(subject.get("evidenceDependencies") or []),
+                *(
+                    _dependency(
+                        f"semantic-conflict:{model}:{row.get('sheet')}:{canonical_text(row.get('key') or {})}",
+                        {"sheet": row.get("sheet"), "key": row.get("key"), "values": row.get("values")},
+                    )
+                    for row in conflicting_rows
+                ),
+            ]
+            conflict = _typed_exception(
+                model,
+                str(subject.get("family") or "exclusive_groups"),
+                "semantic_group_overlap",
+                identities,
+                dependencies,
+                evidence_references=subject.get("evidenceReferences") or [],
+                proposed_rows=proposed_rows,
+                allowed_actions=[],
+                question=(
+                    "The proposed exclusive group overlaps an existing target-owned group. "
+                    "Target evidence must resolve the complete member set and selection mode."
+                ),
+            )
+            conflict["originalReasonCode"] = str(subject.get("reasonCode") or "")
+            conflict["semanticConflict"] = {
+                "overlapKind": overlap_kind,
+                "affectedSheets": affected_sheets,
+                "proposedMemberRpos": sorted(proposed_members),
+                "existingMemberRpos": sorted(existing_members),
+                "existingGroupId": group_id,
+                "conflictingRows": [
+                    {
+                        "model": row.get("model"),
+                        "family": row.get("family"),
+                        "sheet": row.get("sheet"),
+                        "action": row.get("action"),
+                        "key": row.get("key"),
+                        "values": row.get("values"),
+                    }
+                    for row in conflicting_rows
+                ],
+            }
+            conflicts_by_subject[str(subject.get("subjectId") or "")] = conflict
+            for reference in subject.get("evidenceReferences") or []:
+                key = (model, str(reference))
+                if key in facts_by_evidence:
+                    conflicted_evidence.add(key)
+            break
+
+    for subject in exceptions:
+        if subject.get("reasonCode") != "comparator_only_relationship_proposal":
+            continue
+        subject_id_value = str(subject.get("subjectId") or "")
+        if subject_id_value in conflicts_by_subject:
+            continue
+        model = str(subject.get("model") or "")
+        proposed_rows = list(subject.get("proposedRows") or [])
+        if len(proposed_rows) != 1:
+            continue
+        proposal = proposed_rows[0]
+        proposed_source = str(proposal.get("sourceRpo") or "").upper()
+        proposed_target = str(proposal.get("targetRpo") or "").upper()
+        proposed_type = str(proposal.get("ruleType") or "").lower()
+        option_rpos = {
+            str((row.get("values") or {}).get("option_id") or ""):
+            str((row.get("values") or {}).get("rpo") or "").upper()
+            for row in base_rows
+            if str(row.get("model") or "") in {model, "*"}
+            and row.get("family") == "options"
+        }
+        conflicting_rows: list[dict[str, Any]] = []
+        overlap_kinds: list[str] = []
+        for row in base_rows:
+            if (
+                str(row.get("model") or "") not in {model, "*"}
+                or row.get("family") != "rule_mapping"
+                or row.get("status") != "ready"
+            ):
+                continue
+            values = row.get("values") or {}
+            existing_source = option_rpos.get(str(values.get("source_id") or ""), "")
+            existing_target = option_rpos.get(str(values.get("target_id") or ""), "")
+            existing_type = str(values.get("rule_type") or "").lower()
+            if str(values.get("runtime_action") or "").lower() == "replace":
+                existing_type = "replaces"
+            scopes_overlap = all(
+                _scope_value(values.get(column)) == "*"
+                or _scope_value(proposal.get(field)) == "*"
+                or _scope_value(values.get(column)) == _scope_value(proposal.get(field))
+                for column, field in (
+                    ("body_style_scope", "bodyStyleScope"),
+                    ("trim_level_scope", "trimLevelScope"),
+                    ("variant_scope", "variantScope"),
+                )
+            )
+            if not scopes_overlap:
+                continue
+            if (
+                existing_source == proposed_source
+                and existing_target == proposed_target
+                and existing_type != proposed_type
+            ):
+                conflicting_rows.append(row)
+                overlap_kinds.append("same_direction_different_type")
+                continue
+            if existing_source == proposed_target and existing_target == proposed_source:
+                conflicting_rows.append(row)
+                overlap_kinds.append(
+                    "reverse_direction"
+                    if existing_type == proposed_type
+                    else "reverse_direction_different_type"
+                )
+        if not conflicting_rows:
+            continue
+        conflict_dependencies = [
+            _dependency(
+                f"semantic-conflict:{model}:{row.get('sheet')}:{canonical_text(row.get('key') or {})}",
+                {
+                    "sheet": row.get("sheet"),
+                    "key": row.get("key"),
+                    "values": row.get("values"),
+                },
+            )
+            for row in conflicting_rows
+        ]
+        conflict = _typed_exception(
+            model,
+            str(subject.get("family") or "rule_mapping"),
+            "semantic_relationship_conflict",
+            [
+                subject_id_value,
+                *sorted(overlap_kinds),
+                proposed_source,
+                proposed_type,
+                proposed_target,
+            ],
+            [*(subject.get("evidenceDependencies") or []), *conflict_dependencies],
+            evidence_references=subject.get("evidenceReferences") or [],
+            proposed_rows=proposed_rows,
+            allowed_actions=[],
+            question=(
+                "The proposed relationship conflicts with target-owned relationship semantics. "
+                "Target evidence must establish the correct direction and relationship type."
+            ),
+        )
+        conflict["originalReasonCode"] = str(subject.get("reasonCode") or "")
+        conflict["semanticConflict"] = {
+            "overlapKind": overlap_kinds[0] if len(set(overlap_kinds)) == 1 else "multiple_conflicts",
+            "overlapKinds": sorted(set(overlap_kinds)),
+            "affectedSheets": sorted(
+                {str(row.get("sheet") or "") for row in conflicting_rows if str(row.get("sheet") or "")}
+            ),
+            "proposedRelationship": dict(proposal),
+            "conflictingRows": [
+                {
+                    "model": row.get("model"),
+                    "family": row.get("family"),
+                    "sheet": row.get("sheet"),
+                    "action": row.get("action"),
+                    "key": row.get("key"),
+                    "values": row.get("values"),
+                    "conflictKind": overlap_kinds[index],
+                }
+                for index, row in enumerate(conflicting_rows)
+            ],
+        }
+        conflicts_by_subject[subject_id_value] = conflict
+        for reference in subject.get("evidenceReferences") or []:
+            key = (model, str(reference))
+            if key in facts_by_evidence:
+                conflicted_evidence.add(key)
+
+    for subject in exceptions:
+        if subject.get("reasonCode") != "comparator_only_rule_group_proposal":
+            continue
+        subject_id_value = str(subject.get("subjectId") or "")
+        model = str(subject.get("model") or "")
+        proposed_rows = list(subject.get("proposedRows") or [])
+        if len(proposed_rows) != 1:
+            continue
+        proposal = proposed_rows[0]
+        proposed_source = str(proposal.get("sourceRpo") or "").upper()
+        proposed_type = str(proposal.get("groupType") or "").lower()
+        proposed_members = {
+            str(value or "").upper()
+            for value in proposal.get("memberRpos") or []
+            if str(value or "")
+        }
+        option_rpos = {
+            str((row.get("values") or {}).get("option_id") or ""):
+            str((row.get("values") or {}).get("rpo") or "").upper()
+            for row in base_rows
+            if str(row.get("model") or "") in {model, "*"}
+            and row.get("family") == "options"
+        }
+        relevant = [
+            row
+            for row in base_rows
+            if str(row.get("model") or "") in {model, "*"}
+            and row.get("status") == "ready"
+        ]
+        member_rows = [row for row in relevant if row.get("family") == "rule_group_members"]
+        for parent in relevant:
+            if parent.get("family") != "rule_groups":
+                continue
+            values = parent.get("values") or {}
+            existing_source = option_rpos.get(str(values.get("source_id") or ""), "")
+            existing_type = str(values.get("group_type") or "").lower()
+            if existing_source != proposed_source or existing_type != proposed_type:
+                continue
+            scopes_overlap = all(
+                _scope_value(values.get(column)) == "*"
+                or _scope_value(proposal.get(field)) == "*"
+                or _scope_value(values.get(column)) == _scope_value(proposal.get(field))
+                for column, field in (
+                    ("body_style_scope", "bodyStyleScope"),
+                    ("trim_level_scope", "trimLevelScope"),
+                    ("variant_scope", "variantScope"),
+                )
+            )
+            if not scopes_overlap:
+                continue
+            group_id = str(values.get("group_id") or "")
+            members = [
+                row
+                for row in member_rows
+                if str((row.get("values") or {}).get("group_id") or "") == group_id
+            ]
+            existing_member_ids = {
+                str((row.get("values") or {}).get("target_id") or "")
+                for row in members
+                if str((row.get("values") or {}).get("target_id") or "")
+            }
+            existing_members = {
+                option_rpos.get(option_id, "") for option_id in existing_member_ids
+            } - {""}
+            proposed_tokens = {f"rpo:{rpo}" for rpo in proposed_members}
+            existing_tokens = {
+                f"rpo:{option_rpos[option_id]}"
+                if option_rpos.get(option_id)
+                else f"option_id:{option_id}"
+                for option_id in existing_member_ids
+            }
+            if proposed_tokens == existing_tokens:
+                continue
+            overlap_kind = "member_set_mismatch"
+            conflicting_rows = [parent, *members]
+            dependencies = [
+                *(subject.get("evidenceDependencies") or []),
+                *(
+                    _dependency(
+                        f"semantic-conflict:{model}:{row.get('sheet')}:{canonical_text(row.get('key') or {})}",
+                        {"sheet": row.get("sheet"), "key": row.get("key"), "values": row.get("values")},
+                    )
+                    for row in conflicting_rows
+                ),
+            ]
+            conflict = _typed_exception(
+                model,
+                str(subject.get("family") or "rule_groups"),
+                "semantic_group_overlap",
+                [
+                    subject_id_value,
+                    overlap_kind,
+                    group_id,
+                    proposed_source,
+                    proposed_type,
+                    *sorted(proposed_members),
+                    *sorted(existing_members),
+                ],
+                dependencies,
+                evidence_references=subject.get("evidenceReferences") or [],
+                proposed_rows=proposed_rows,
+                allowed_actions=[],
+                question=(
+                    "The proposed rule group overlaps a target-owned group with a different member set. "
+                    "Target evidence must establish the complete group."
+                ),
+            )
+            conflict["originalReasonCode"] = str(subject.get("reasonCode") or "")
+            conflict["semanticConflict"] = {
+                "overlapKind": overlap_kind,
+                "affectedSheets": sorted(
+                    {str(row.get("sheet") or "") for row in conflicting_rows if str(row.get("sheet") or "")}
+                ),
+                "proposedMemberRpos": sorted(proposed_members),
+                "existingMemberRpos": sorted(existing_members),
+                "existingGroupId": group_id,
+                "conflictingRows": [
+                    {
+                        "model": row.get("model"),
+                        "family": row.get("family"),
+                        "sheet": row.get("sheet"),
+                        "action": row.get("action"),
+                        "key": row.get("key"),
+                        "values": row.get("values"),
+                    }
+                    for row in conflicting_rows
+                ],
+            }
+            conflicts_by_subject[subject_id_value] = conflict
+            for reference in subject.get("evidenceReferences") or []:
+                key = (model, str(reference))
+                if key in facts_by_evidence:
+                    conflicted_evidence.add(key)
+            break
+
+    if not conflicts_by_subject:
+        return manifest_rows, exceptions, set(), conflicted_evidence
+
+    conflict_subject_ids = set(conflicts_by_subject)
+    filtered_rows = [
+        row
+        for row in manifest_rows
+        if not any(
+            str(dependency.get("evidenceId") or "").removeprefix("resolution:")
+            in conflict_subject_ids
+            for dependency in row.get("evidenceDependencies") or []
+            if str(dependency.get("evidenceId") or "").startswith("resolution:")
+        )
+    ]
+    gated_subjects = [
+        conflicts_by_subject.get(str(subject.get("subjectId") or ""), subject)
+        for subject in exceptions
+    ]
+    return filtered_rows, gated_subjects, conflict_subject_ids, conflicted_evidence
+
+
 def _reconcile_represented_comparator_facts(
     manifest_rows: list[dict[str, Any]],
     exceptions: list[dict[str, Any]],
     comparator_artifact: Mapping[str, Any],
     targets: Iterable[str],
+    excluded_evidence: set[tuple[str, str]] | None = None,
 ) -> tuple[list[dict[str, Any]], set[tuple[str, str]], dict[str, set[str]]]:
     """Close comparator questions already represented by exact canonical rows."""
 
+    excluded_evidence = excluded_evidence or set()
     matched_evidence: set[tuple[str, str]] = set()
     matched_fact_keys: dict[str, set[str]] = defaultdict(set)
     dependencies_by_row: dict[int, list[dict[str, str]]] = defaultdict(list)
@@ -2811,6 +3268,8 @@ def _reconcile_represented_comparator_facts(
         }
         target_facts = (comparator_artifact.get("targets") or {}).get(target, {}).get("facts") or []
         for fact in target_facts:
+            if (str(target), str(fact.get("evidenceId") or "")) in excluded_evidence:
+                continue
             if fact.get("disposition") != "corroborating_context_only":
                 continue
             fact_type = str(fact.get("factType") or "")
@@ -3060,6 +3519,8 @@ def compile_canonical_rows(
     compiled_comparator_fact_keys: dict[str, set[str]] = defaultdict(set)
     comparator_effect_dispositions: dict[tuple[str, str], str] = {}
     consumed_resolution_subjects: set[str] = set()
+    semantic_conflict_subject_ids: set[str] = set()
+    semantic_conflict_evidence: set[tuple[str, str]] = set()
     compiled_base_price_rows: set[str] = set()
     compiled_status_features: set[str] = set()
     profile_consumed_status_features: set[str] = set()
@@ -3365,6 +3826,24 @@ def compile_canonical_rows(
             for row in option_rows
             if row.get("family") == "options" and row.get("status") == "ready"
         }
+        comparator_subject_ids = {
+            str(subject.get("subjectId") or "")
+            for subject in relationship_result["exceptions"]
+            if str(subject.get("reasonCode") or "").startswith("comparator_only_")
+        }
+        source_relationship_result = {
+            **relationship_result,
+            "exceptions": [
+                subject
+                for subject in relationship_result["exceptions"]
+                if str(subject.get("subjectId") or "") not in comparator_subject_ids
+            ],
+        }
+        source_resolution_entries = [
+            entry
+            for entry in resolution_entries
+            if str(entry.get("subjectId") or "") not in comparator_subject_ids
+        ]
         relationship_rows, relationship_identity_exceptions, consumed, disposition_overrides = _relationship_rows(
             extract,
             target,
@@ -3372,17 +3851,62 @@ def compile_canonical_rows(
             rpo_ids,
             ready_option_ids,
             ready_option_ids | set(profile["interiorIds"]),
-            relationship_result,
-            resolution_entries,
+            source_relationship_result,
+            source_resolution_entries,
         )
         consumed_resolution_subjects.update(consumed)
+        manifest_rows.extend(relationship_rows)
+        retained_for_guard = _retained_existing_rows(
+            extract, [target], registry, manifest_rows
+        )
+        _, guarded_subjects, conflict_ids, conflict_evidence = (
+            _apply_comparator_semantic_gate(
+                _merge_manifest_rows([*manifest_rows, *retained_for_guard]),
+                relationship_result["exceptions"],
+                comparator_artifact,
+                [target],
+            )
+        )
+        semantic_conflict_subject_ids.update(conflict_ids)
+        semantic_conflict_evidence.update(conflict_evidence)
+        projectable_subject_ids = {
+            str(subject.get("subjectId") or "")
+            for subject in guarded_subjects
+            if str(subject.get("reasonCode") or "").startswith("comparator_only_")
+        }
+        comparator_relationship_result = {
+            **relationship_result,
+            "rows": [],
+            "exceptions": [
+                subject
+                for subject in guarded_subjects
+                if str(subject.get("subjectId") or "") in projectable_subject_ids
+            ],
+        }
+        comparator_resolution_entries = [
+            entry
+            for entry in resolution_entries
+            if str(entry.get("subjectId") or "") in projectable_subject_ids
+        ]
+        comparator_relationship_rows, comparator_identity_exceptions, comparator_consumed, comparator_dispositions = _relationship_rows(
+            extract,
+            target,
+            registry[target],
+            rpo_ids,
+            ready_option_ids,
+            ready_option_ids | set(profile["interiorIds"]),
+            comparator_relationship_result,
+            comparator_resolution_entries,
+        )
+        consumed_resolution_subjects.update(comparator_consumed)
+        disposition_overrides.update(comparator_dispositions)
         proposal_rows, proposal_consumed, proposal_dispositions, proposal_fact_keys = _comparator_proposal_rows(
             extract,
             target,
             registry[target],
             ready_rpo_ids,
-            relationship_result,
-            resolution_entries,
+            comparator_relationship_result,
+            comparator_resolution_entries,
         )
         consumed_resolution_subjects.update(proposal_consumed)
         disposition_overrides.update(proposal_dispositions)
@@ -3396,13 +3920,14 @@ def compile_canonical_rows(
         compiled_comparator_fact_keys[target].update(proposal_fact_keys)
         compiled_comparator_fact_keys[target].update(
             semantic_hash({"factType": "direct_rule", "signature": row["semanticSignature"]})
-            for row in relationship_rows
+            for row in [*relationship_rows, *comparator_relationship_rows]
             if row.get("status") == "ready"
         )
-        manifest_rows.extend(relationship_rows)
+        manifest_rows.extend(comparator_relationship_rows)
         manifest_rows.extend(proposal_rows)
         exceptions.extend(relationship_identity_exceptions)
-        exceptions.extend(relationship_result["exceptions"])
+        exceptions.extend(comparator_identity_exceptions)
+        exceptions.extend(guarded_subjects)
         identity_blocked_features = {
             reference
             for item in relationship_identity_exceptions
@@ -3466,6 +3991,24 @@ def compile_canonical_rows(
                 row["evidenceDependencies"],
             )
     manifest_rows = _merge_manifest_rows(manifest_rows)
+    consumed_resolution_subjects.difference_update(semantic_conflict_subject_ids)
+    for key in semantic_conflict_evidence:
+        comparator_effect_dispositions[key] = "semantic_conflict_blocker"
+    relationship_dispositions = [
+        {
+            **item,
+            "disposition": (
+                "blocked_exception"
+                if (
+                    str(item.get("model") or ""),
+                    str(item.get("featureId") or ""),
+                )
+                in semantic_conflict_evidence
+                else item.get("disposition")
+            ),
+        }
+        for item in relationship_dispositions
+    ]
     (
         exceptions,
         represented_comparator_evidence,
@@ -3475,6 +4018,7 @@ def compile_canonical_rows(
         exceptions,
         comparator_artifact,
         targets,
+        semantic_conflict_evidence,
     )
     for target, evidence_id in represented_comparator_evidence:
         comparator_effect_dispositions[(target, evidence_id)] = "compiled_ready"
@@ -3638,6 +4182,7 @@ def compile_canonical_rows(
         (str(subject.get("model") or ""), str(reference))
         for subject in subjects
         if str(subject.get("reasonCode") or "").startswith("comparator_only_")
+        or str(subject.get("reasonCode") or "").startswith("semantic_")
         for reference in subject.get("evidenceReferences") or []
         if str(reference).startswith("comparator:")
     }
@@ -3673,6 +4218,8 @@ def compile_canonical_rows(
                 disposition = "resolved_not_applicable"
             elif comparator_effect_dispositions.get((target, evidence_id)) == "compiled_ready":
                 disposition = "corroborated_target_match"
+            elif comparator_effect_dispositions.get((target, evidence_id)) == "semantic_conflict_blocker":
+                disposition = "semantic_conflict_blocker"
             elif (target, evidence_id) in proposed_comparator_ids:
                 disposition = "target_proposal_exception"
             elif fact_key in compiled_comparator_fact_keys.get(target, set()):

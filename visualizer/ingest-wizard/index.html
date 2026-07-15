@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+  <meta charset="utf-8">
+  <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ingest Wizard</title>
 <link rel="stylesheet" href="/wizard.css">
@@ -100,26 +101,23 @@
 
   <section id="stage-exceptions" class="stage hidden">
     <h1>Typed exception review</h1>
-    <p class="hint">Only answer what the compiler cannot derive. Every control writes one exact typed resolution; resolving or reopening recompiles the run automatically.</p>
+    <p class="hint">Review one target-workbook fact at a time. Preview shows every physical row before anything is saved. Conflict and prerequisite cards remain read-only.</p>
     <div id="exception-readiness" class="summary"></div>
     <div class="filters exception-filters">
       <select id="exception-model" aria-label="Filter exceptions by target model"><option value="">All models</option></select>
-      <select id="exception-family" aria-label="Filter exceptions by workbook family"><option value="">All workbook families</option></select>
-      <select id="exception-reason" aria-label="Filter exceptions by reason"><option value="">All reasons</option></select>
-      <select id="exception-severity" aria-label="Filter exceptions by severity"><option value="">All severities</option></select>
-      <select id="exception-state" aria-label="Filter exceptions by resolution state">
-        <option value="open">Open</option>
+      <select id="exception-decision" aria-label="Filter exceptions by decision type"><option value="">All decision types</option></select>
+      <select id="exception-sheet" aria-label="Filter exceptions by affected workbook sheet"><option value="">All affected sheets</option></select>
+      <select id="exception-review-state" aria-label="Filter exceptions by concrete review state">
+        <option value="needs_decision">Needs reviewer decision</option>
+        <option value="prerequisite_blocked">Blocked by missing or ambiguous target identity</option>
+        <option value="semantic_conflict">Blocked by semantic conflict</option>
+        <option value="source_or_tooling_blocked">Blocked by source evidence or compiler support</option>
         <option value="resolved">Resolved</option>
-        <option value="resolved_pending_projection">Answer saved, compiler projection missing</option>
+        <option value="pending_projection">Answer saved — still blocked</option>
         <option value="stale_reopened">Reopened after evidence changed</option>
-        <option value="">Open and resolved</option>
+        <option value="">All review states</option>
       </select>
-      <select id="exception-actionable" aria-label="Filter actionable exceptions">
-        <option value="yes">Needs my answer</option>
-        <option value="no">Missing source or tooling</option>
-        <option value="">All exception types</option>
-      </select>
-      <input id="exception-q" type="search" placeholder="Search model, family, reason, or question…" aria-label="Search exceptions">
+      <input id="exception-q" type="search" placeholder="Search RPO, copy, stable ID, or workbook sheet…" aria-label="Search exceptions">
     </div>
     <div class="filters actions-bar">
       <label class="status-note" for="exception-reviewer">Reviewer</label>

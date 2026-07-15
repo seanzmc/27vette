@@ -761,7 +761,7 @@ function exceptionActionFields(item, action) {
     case "approve_removal":
       return '<label>Why reference impact is cleared <input name="reason" required></label>';
     case "mark_not_applicable":
-      return '<label>Why this target fact is not applicable <input name="reason" required></label>';
+      return '<fieldset class="proposal-rejection"><legend>Reject entire proposal — write no rows</legend><div class="source-blocker">Do not use rejection for a partial disagreement. If one member, direction, scope, or field is wrong, leave this subject blocked.</div><label><input type="checkbox" name="rejectWholeProposal" required> I understand this rejects the complete proposal, not one member, direction, scope, or field.</label><label>Optional audit note <input name="reason" placeholder="Target evidence that rejects the complete proposal"></label></fieldset>';
     case "record_allowed_deferral":
       return `<div class="typed-grid"><label>Allowed deferral kind
         <select name="kind" required><option value="">Choose allowlisted kind</option>${(choices.deferralKinds || []).map((kind) => `<option value="${escapeHtml(kind)}">${escapeHtml(kind)}</option>`).join("")}</select>
@@ -781,7 +781,7 @@ function actionLabel(action, reasonCode) {
     retain_existing: "Keep selected existing row",
     provide_typed_value: "Save typed value",
     approve_removal: "Approve exact removal",
-    mark_not_applicable: "Record not applicable",
+    mark_not_applicable: "Reject entire proposal — write no rows",
     record_allowed_deferral: "Record allowed deferral",
   }[action] || action.replaceAll("_", " ");
 }
@@ -796,13 +796,19 @@ function exceptionActionForm(item) {
   }
   const actions = item.availableActions || [];
   if (!actions.length) {
-    return '<div class="source-blocker">No workbook-writable answer is available. This remains blocked until source evidence or compiler support is added.</div>';
+    const conflict = item.subject.semanticConflict || {};
+    const prerequisites = item.prerequisites || {};
+    const detail = conflict.overlapKind
+      ? `Semantic conflict: ${conflict.overlapKind.replaceAll("_", " ")}. Affected sheets: ${(item.affectedSheets || []).join(", ") || "not yet projectable"}.`
+      : prerequisites.message || "No complete workbook-writable answer is available from the current source and compiler.";
+    return `<div class="source-blocker"><b>Blocked — no decision control is available.</b> ${escapeHtml(detail)}</div>`;
   }
   return `<div class="exception-actions">${actions
     .map(
       (action) => `<form class="exception-resolution-form" data-action="${escapeHtml(action)}" data-subject-id="${escapeHtml(item.subject.subjectId)}" data-subject-version="${escapeHtml(item.subject.subjectVersion)}" data-reason-code="${escapeHtml(item.subject.reasonCode)}">
         ${exceptionActionFields(item, action)}
-        <button class="primary" type="submit">${escapeHtml(actionLabel(action, item.subject.reasonCode))}</button>
+        <section class="decision-preview" aria-live="polite"><h3>Exact decision effect</h3><div class="empty-note">Complete the fields, then preview every physical workbook row before saving.</div></section>
+        <button class="primary" type="submit">Preview exact workbook effect</button>
       </form>`
     )
     .join("")}</div>`;
@@ -839,10 +845,11 @@ function evidenceValues(record, preferredKeys = []) {
 function canonicalRowView(row) {
   const values = Object.entries(evidenceValues(row, ["values", "signature"]))
     .filter(([, value]) => value !== "" && value !== null && value !== undefined)
-    .slice(0, 10)
     .map(([key, value]) => `<span><b>${escapeHtml(key)}</b>: ${escapeHtml(displayEvidenceValue(value))}</span>`)
     .join("");
-  return `<div class="evidence-entry"><b>${escapeHtml(row.family || "row")}</b> · ${escapeHtml(row.action || row.sheet || "proposed")}
+  const key = row.key && typeof row.key === "object" ? JSON.stringify(row.key) : "";
+  return `<div class="evidence-entry"><b>${escapeHtml(row.sheet || row.family || "row")}</b> · ${escapeHtml(row.action || "proposal signature")}
+    ${key ? `<div class="cell-sub">Key: ${escapeHtml(key)}</div>` : ""}
     <div class="row-values">${values || "No populated preview fields."}</div></div>`;
 }
 
@@ -856,27 +863,48 @@ function evidenceColumn(title, entries, formatter) {
   return `<section class="evidence-column"><h3>${escapeHtml(title)}</h3>${entries.length ? entries.map(formatter).join("") : '<div class="empty-note">No directly joined evidence for this subject.</div>'}</section>`;
 }
 
+function decisionEffectView(preview) {
+  const effect = preview.decisionEffect || {};
+  const rows = effect.rows || [];
+  const rowHtml = rows.length
+    ? rows.map((entry) => `<div class="effect-row"><span class="type-badge">${escapeHtml(entry.effect)}</span>${canonicalRowView(entry.after || entry.before || {})}</div>`).join("")
+    : '<div class="empty-note">This decision writes zero physical rows.</div>';
+  const cleared = effect.removedBlockerSubjectIds || [];
+  const added = effect.addedBlockerSubjectIds || [];
+  const suppressed = effect.suppressedProposalRows || [];
+  const suppressedHtml = suppressed.length
+    ? `<div class="source-blocker"><b>Rows written: 0.</b> The complete proposal below will be suppressed, not partially edited.${suppressed.map(canonicalRowView).join("")}</div>`
+    : "";
+  return `<h3 tabindex="-1">Exact decision effect</h3>${rowHtml}${suppressedHtml}
+    <div class="cell-sub">Rows written: ${escapeHtml(effect.writesRows ? rows.length : 0)}. Clears ${escapeHtml(cleared.length)} blocker${cleared.length === 1 ? "" : "s"}; adds ${escapeHtml(added.length)} blocker${added.length === 1 ? "" : "s"}. Live workbook write: no.</div>`;
+}
+
 function renderExceptionCard(item) {
   const subject = item.subject;
-  const raw = item.evidence.raw || [];
-  const targetRows = item.evidence.targetRows || [];
+  const raw = item.evidence.sourceEvidence || [];
+  const existingRows = item.evidence.existingWorkbookRows || [];
+  const derivedRows = item.evidence.alreadyDerivedRows || [];
+  const sharedContext = item.evidence.sharedContext || [];
   const comparator = item.evidence.comparator || [];
   const proposed = subject.proposedRows || [];
   const stale = (item.history.stale || []).length;
   return `<article class="exception-card ${item.state === "resolved" ? "exception-resolved" : ""}">
     <div class="card-head">
-      <div><span class="card-title">${escapeHtml(subject.model)} · ${escapeHtml(subject.family)}</span>
-        <div class="cell-sub">${escapeHtml(subject.reasonCode)} · ${escapeHtml(subject.subjectId)}</div></div>
+      <div><span class="card-title">${escapeHtml(subject.model)} · ${escapeHtml(item.decisionType || subject.family)}</span>
+        <div class="cell-sub">Affects ${(item.affectedSheets || []).map(escapeHtml).join(", ") || "no writable sheet yet"}</div></div>
       <span class="type-badge ${subject.severity === "blocker" ? "type-unsupported" : ""}">${escapeHtml(subject.severity)} · ${escapeHtml(item.state)}</span>
     </div>
     <p class="exception-question">${escapeHtml(subject.question)}</p>
+    <details class="debug-detail"><summary>Compiler details</summary><code>${escapeHtml(subject.reasonCode)} · ${escapeHtml(subject.subjectId)}</code></details>
     ${stale ? `<div class="status-note">${stale} prior answer${stale === 1 ? "" : "s"} became stale when evidence changed.</div>` : ""}
     <div class="evidence-grid">
       ${evidenceColumn("Raw source evidence", raw, sourceEvidenceView)}
-      ${evidenceColumn("Target workbook state", targetRows, canonicalRowView)}
+      ${evidenceColumn("Existing workbook rows", existingRows, canonicalRowView)}
+      ${evidenceColumn("Already-derived rows", derivedRows, canonicalRowView)}
       ${evidenceColumn("Comparator context", comparator, comparatorEvidenceView)}
-      ${evidenceColumn("Proposed canonical rows", proposed, canonicalRowView)}
+      ${evidenceColumn("Proposal to evaluate — not workbook rows", proposed, canonicalRowView)}
     </div>
+    <details class="shared-context"><summary>Shared context — not written by this decision (${sharedContext.length})</summary>${sharedContext.length ? sharedContext.map(canonicalRowView).join("") : '<div class="empty-note">No shared context.</div>'}</details>
     <div class="gate-impact"><b>Gate impact:</b> ${escapeHtml(subject.severity)} — unresolved keeps ${escapeHtml(subject.model)} compileReady blocked.</div>
     ${exceptionActionForm(item)}
   </article>`;
@@ -899,9 +927,8 @@ function renderExceptionPage(payload) {
   exceptionState.payload = payload;
   exceptionState.offset = payload.offset;
   fillExceptionFilter("#exception-model", payload.filters.models, "All models");
-  fillExceptionFilter("#exception-family", payload.filters.families, "All workbook families");
-  fillExceptionFilter("#exception-reason", payload.filters.reasons, "All reasons");
-  fillExceptionFilter("#exception-severity", payload.filters.severities, "All severities");
+  fillExceptionFilter("#exception-decision", payload.filters.decisionTypes, "All decision types");
+  fillExceptionFilter("#exception-sheet", payload.filters.affectedSheets, "All affected sheets");
   $("#exception-queue").innerHTML = payload.items.length
     ? payload.items.map(renderExceptionCard).join("")
     : '<div class="empty-note">No exceptions match these filters.</div>';
@@ -918,11 +945,9 @@ function renderExceptionPage(payload) {
 async function loadExceptions(offset = 0) {
   const params = new URLSearchParams({
     model: $("#exception-model").value,
-    family: $("#exception-family").value,
-    reason: $("#exception-reason").value,
-    severity: $("#exception-severity").value,
-    state: $("#exception-state").value,
-    actionable: $("#exception-actionable").value,
+    decisionType: $("#exception-decision").value,
+    sheet: $("#exception-sheet").value,
+    reviewState: $("#exception-review-state").value,
     q: $("#exception-q").value.trim(),
     offset: String(offset),
     limit: String(exceptionState.limit),
@@ -974,7 +999,7 @@ function resolutionPayload(form, action, reasonCode) {
     }
     case "approve_removal":
     case "mark_not_applicable":
-      return { reason: data.get("reason") };
+      return { reason: data.get("reason") || "Reviewer rejected the entire proposal; no rows should be written." };
     case "record_allowed_deferral":
       return { kind: data.get("kind"), reason: data.get("reason") };
     default:
@@ -987,20 +1012,41 @@ $("#exception-queue").addEventListener("submit", async (event) => {
   if (!form) return;
   event.preventDefault();
   clearError();
-  const reviewer = $("#exception-reviewer").value.trim();
-  if (!reviewer) {
-    showError("Enter the reviewer name before saving an exception answer.");
-    $("#exception-reviewer").focus();
-    return;
-  }
   const button = form.querySelector('button[type="submit"]');
   button.disabled = true;
   try {
+    const payload = resolutionPayload(form, form.dataset.action, form.dataset.reasonCode);
+    const previewToken = JSON.stringify({
+      subjectId: form.dataset.subjectId,
+      subjectVersion: form.dataset.subjectVersion,
+      action: form.dataset.action,
+      payload,
+    });
+    if (form.dataset.previewToken !== previewToken) {
+      const preview = await postJSON(`/api/wizard/sessions/${state.session.runId}/exceptions/preview`, {
+        subjectId: form.dataset.subjectId,
+        subjectVersion: form.dataset.subjectVersion,
+        action: form.dataset.action,
+        payload,
+      });
+      form.dataset.previewToken = previewToken;
+      form.querySelector(".decision-preview").innerHTML = decisionEffectView(preview);
+      form.querySelector(".decision-preview h3").focus();
+      button.textContent = "Confirm and save this exact effect";
+      $("#exception-status").textContent = "Preview complete. Review every row, then confirm to save.";
+      return;
+    }
+    const reviewer = $("#exception-reviewer").value.trim();
+    if (!reviewer) {
+      showError("Enter the reviewer name before saving an exception answer.");
+      $("#exception-reviewer").focus();
+      return;
+    }
     const result = await postJSON(`/api/wizard/sessions/${state.session.runId}/exceptions/resolve`, {
       subjectId: form.dataset.subjectId,
       subjectVersion: form.dataset.subjectVersion,
       action: form.dataset.action,
-      payload: resolutionPayload(form, form.dataset.action, form.dataset.reasonCode),
+      payload,
       reviewer,
     });
     compilerState.summary = result.summary;
@@ -1013,6 +1059,14 @@ $("#exception-queue").addEventListener("submit", async (event) => {
   } finally {
     button.disabled = false;
   }
+});
+
+$("#exception-queue").addEventListener("input", (event) => {
+  const form = event.target.closest(".exception-resolution-form");
+  if (!form || !form.dataset.previewToken) return;
+  form.dataset.previewToken = "";
+  form.querySelector(".decision-preview").innerHTML = '<h3>Exact decision effect</h3><div class="empty-note">Inputs changed. Preview the exact rows again before saving.</div>';
+  form.querySelector('button[type="submit"]').textContent = "Preview exact workbook effect";
 });
 
 $("#exception-queue").addEventListener("click", async (event) => {
@@ -1043,7 +1097,7 @@ $("#exception-queue").addEventListener("click", async (event) => {
   }
 });
 
-for (const id of ["#exception-model", "#exception-family", "#exception-reason", "#exception-severity", "#exception-state", "#exception-actionable"]) {
+for (const id of ["#exception-model", "#exception-decision", "#exception-sheet", "#exception-review-state"]) {
   $(id).addEventListener("change", () => loadExceptions(0).catch((error) => showError(error.message)));
 }
 let exceptionSearchTimer = null;

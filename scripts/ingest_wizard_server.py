@@ -161,13 +161,16 @@ class WizardHandler(BaseHTTPRequestHandler):
                 run_id = path[len("/api/wizard/sessions/"):-len("/exceptions")]
                 self._require_query_fields(
                     query,
-                    {"model", "family", "reason", "severity", "state", "actionable", "q", "offset", "limit"},
+                    {"model", "decisionType", "decision", "sheet", "reviewState", "family", "reason", "severity", "state", "actionable", "q", "offset", "limit"},
                     "Exceptions",
                 )
                 self._send_json(
                     self.store.exception_queue_view(
                         run_id,
                         model=(query.get("model") or [""])[0],
+                        decision_type=(query.get("decisionType") or query.get("decision") or [""])[0],
+                        affected_sheet=(query.get("sheet") or [""])[0],
+                        review_state=(query.get("reviewState") or [""])[0],
                         family=(query.get("family") or [""])[0],
                         reason=(query.get("reason") or [""])[0],
                         severity=(query.get("severity") or [""])[0],
@@ -230,6 +233,26 @@ class WizardHandler(BaseHTTPRequestHandler):
                 self._require_exact_fields(payload, set(), "Compile request")
                 self.store.compile_canonical_rows(run_id)
                 self._send_json(self.store.compiler_summary(run_id))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/exceptions/preview"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/exceptions/preview")]
+                payload = self._json_body()
+                self._require_exact_fields(
+                    payload,
+                    {"subjectId", "subjectVersion", "action", "payload"},
+                    "Exception preview request",
+                )
+                typed_payload = payload.get("payload")
+                if not isinstance(typed_payload, dict):
+                    raise WizardError("Exception preview payload must be an object.")
+                self._send_json(
+                    self.store.preview_exception(
+                        run_id,
+                        subject_id=str(payload.get("subjectId") or ""),
+                        subject_version=str(payload.get("subjectVersion") or ""),
+                        action=str(payload.get("action") or ""),
+                        payload=typed_payload,
+                    )
+                )
             elif path.startswith("/api/wizard/sessions/") and path.endswith("/exceptions/resolve"):
                 run_id = path[len("/api/wizard/sessions/"):-len("/exceptions/resolve")]
                 payload = self._json_body()

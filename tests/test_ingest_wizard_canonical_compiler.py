@@ -15,6 +15,7 @@ for entry in (ROOT / "scripts", ROOT / "tests"):
 
 from corvette_form_generator.editor_ops import EDITOR_SHEET_META  # noqa: E402
 from corvette_form_generator.ingest.wizard.canonical_rows import canonical_bytes, semantic_hash, validate_artifact_graph  # noqa: E402
+from corvette_form_generator.ingest.wizard import compiler as compiler_module  # noqa: E402
 from corvette_form_generator.ingest.wizard.comparator_evidence import build_comparator_evidence  # noqa: E402
 from corvette_form_generator.ingest.wizard.compiler import (  # noqa: E402
     _candidate_feature_index,
@@ -313,6 +314,180 @@ class CanonicalCompilerTest(unittest.TestCase):
         )
         self.assertEqual(filtered, [])
         self.assertEqual(matched, {("zr1", evidence_id)})
+
+    def test_semantic_gate_blocks_exclusive_subset_and_removes_historical_resolution_rows(self) -> None:
+        result = self.compile()
+        manifest_rows = copy.deepcopy(result["canonical-row-manifest.json"]["rows"])
+        subjects = copy.deepcopy(result["exception-queue.json"]["subjects"])
+        subject = next(
+            item
+            for item in subjects
+            if item["reasonCode"] == "comparator_only_exclusive_group_proposal"
+        )
+        option_ids = {
+            str(row["values"].get("rpo") or "").upper(): str(row["values"].get("option_id") or "")
+            for row in manifest_rows
+            if row["model"] == "zr1" and row["family"] == "options"
+        }
+        retained_group = "target_excl_wheels"
+        manifest_rows.extend(
+            [
+                {
+                    "model": "zr1", "family": "exclusive_groups", "status": "ready",
+                    "sheet": "zr1_exclusive_groups", "action": "noop",
+                    "key": {"group_id": retained_group},
+                    "values": {"group_id": retained_group, "selection_mode": "single", "active": True, "notes": ""},
+                    "semanticSignature": {}, "evidenceDependencies": [],
+                },
+                *[
+                    {
+                        "model": "zr1", "family": "exclusive_members", "status": "ready",
+                        "sheet": "zr1_exclusive_members", "action": "noop",
+                        "key": {"group_id": retained_group, "option_id": option_ids[rpo]},
+                        "values": {"group_id": retained_group, "option_id": option_ids[rpo], "display_order": order, "active": True},
+                        "semanticSignature": {}, "evidenceDependencies": [],
+                    }
+                    for order, rpo in enumerate(("PDB", "BV4", "GBA"), 1)
+                ],
+                {
+                    "model": "zr1", "family": "exclusive_groups", "status": "ready",
+                    "sheet": "zr1_exclusive_groups", "action": "add",
+                    "key": {"group_id": "historical_subgroup"},
+                    "values": {"group_id": "historical_subgroup", "selection_mode": "single", "active": True, "notes": ""},
+                    "semanticSignature": {},
+                    "evidenceDependencies": [{"evidenceId": f"resolution:{subject['subjectId']}", "evidenceVersion": "fixture"}],
+                },
+            ]
+        )
+
+        filtered_rows, gated_subjects, conflict_subject_ids, _ = (
+            compiler_module._apply_comparator_semantic_gate(
+                manifest_rows,
+                subjects,
+                self.comparator,
+                self.selection["targets"],
+            )
+        )
+
+        conflict = next(
+            item
+            for item in gated_subjects
+            if item.get("originalReasonCode") == "comparator_only_exclusive_group_proposal"
+        )
+        self.assertEqual(conflict["reasonCode"], "semantic_group_overlap")
+        self.assertEqual(conflict["semanticConflict"]["overlapKind"], "proposed_subset")
+        self.assertEqual(conflict["semanticConflict"]["affectedSheets"], ["zr1_exclusive_groups", "zr1_exclusive_members"])
+        self.assertEqual(conflict["allowedActions"], [])
+        self.assertIn(subject["subjectId"], conflict_subject_ids)
+        self.assertFalse(
+            any(
+                dependency["evidenceId"] == f"resolution:{subject['subjectId']}"
+                for row in filtered_rows
+                for dependency in row.get("evidenceDependencies") or []
+            )
+        )
+
+    def test_semantic_gate_blocks_same_direction_different_relationship_type(self) -> None:
+        _, _, _, result, subject = self.compile_with_ready_comparator_relationship()
+        manifest_rows = copy.deepcopy(result["canonical-row-manifest.json"]["rows"])
+        option_ids = {
+            str(row["values"].get("rpo") or "").upper(): str(row["values"].get("option_id") or "")
+            for row in manifest_rows
+            if row["model"] == "zr1" and row["family"] == "options"
+        }
+        proposal = subject["proposedRows"][0]
+        manifest_rows.append(
+            {
+                "model": "zr1", "family": "rule_mapping", "status": "ready",
+                "sheet": "zr1_rule_mapping", "action": "noop",
+                "key": {"rule_id": "target_conflicting_rule"},
+                "values": {
+                    "rule_id": "target_conflicting_rule",
+                    "source_id": option_ids[proposal["sourceRpo"]],
+                    "rule_type": "includes",
+                    "target_id": option_ids[proposal["targetRpo"]],
+                    "original_detail_raw": "", "body_style_scope": "",
+                    "runtime_action": "auto_add", "disabled_reason": "",
+                },
+                "semanticSignature": {}, "evidenceDependencies": [],
+            }
+        )
+
+        _, gated_subjects, conflict_subject_ids, _ = compiler_module._apply_comparator_semantic_gate(
+            manifest_rows,
+            copy.deepcopy(result["exception-queue.json"]["subjects"]),
+            self.comparator,
+            self.selection["targets"],
+        )
+
+        conflict = next(
+            item
+            for item in gated_subjects
+            if item.get("originalReasonCode") == "comparator_only_relationship_proposal"
+        )
+        self.assertEqual(conflict["reasonCode"], "semantic_relationship_conflict")
+        self.assertEqual(conflict["semanticConflict"]["overlapKind"], "same_direction_different_type")
+        self.assertEqual(conflict["allowedActions"], [])
+        self.assertIn(subject["subjectId"], conflict_subject_ids)
+
+    def test_semantic_gate_blocks_rule_group_member_mismatch(self) -> None:
+        result = self.compile()
+        manifest_rows = copy.deepcopy(result["canonical-row-manifest.json"]["rows"])
+        subjects = copy.deepcopy(result["exception-queue.json"]["subjects"])
+        subject = next(
+            item
+            for item in subjects
+            if item["reasonCode"] == "comparator_only_rule_group_proposal"
+        )
+        option_ids = {
+            str(row["values"].get("rpo") or "").upper(): str(row["values"].get("option_id") or "")
+            for row in manifest_rows
+            if row["model"] == "zr1" and row["family"] == "options"
+        }
+        group_id = "target_requires_any"
+        manifest_rows.extend(
+            [
+                {
+                    "model": "zr1", "family": "rule_groups", "status": "ready",
+                    "sheet": "zr1_rule_groups", "action": "noop",
+                    "key": {"group_id": group_id},
+                    "values": {
+                        "group_id": group_id, "group_type": "requires_any",
+                        "source_id": option_ids["PDB"], "body_style_scope": "",
+                        "trim_level_scope": "", "variant_scope": "",
+                        "disabled_reason": "", "active": True, "notes": "",
+                    },
+                    "semanticSignature": {}, "evidenceDependencies": [],
+                },
+                *[
+                    {
+                        "model": "zr1", "family": "rule_group_members", "status": "ready",
+                        "sheet": "zr1_rule_group_members", "action": "noop",
+                        "key": {"group_id": group_id, "target_id": option_ids[rpo]},
+                        "values": {"group_id": group_id, "target_id": option_ids[rpo], "display_order": order, "active": True},
+                        "semanticSignature": {}, "evidenceDependencies": [],
+                    }
+                    for order, rpo in enumerate(("BV4", "GBA"), 1)
+                ],
+            ]
+        )
+
+        _, gated_subjects, conflict_subject_ids, _ = compiler_module._apply_comparator_semantic_gate(
+            manifest_rows,
+            subjects,
+            self.comparator,
+            self.selection["targets"],
+        )
+
+        conflict = next(
+            item
+            for item in gated_subjects
+            if item.get("originalReasonCode") == "comparator_only_rule_group_proposal"
+        )
+        self.assertEqual(conflict["reasonCode"], "semantic_group_overlap")
+        self.assertEqual(conflict["semanticConflict"]["overlapKind"], "member_set_mismatch")
+        self.assertEqual(conflict["allowedActions"], [])
+        self.assertIn(subject["subjectId"], conflict_subject_ids)
 
     def test_requirement_for_target_standard_on_every_variant_is_not_a_rule_question(self) -> None:
         rows = [

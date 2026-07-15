@@ -53,6 +53,7 @@ from corvette_form_generator.ingest.wizard.copy_split import FLAG_DUPLICATE_NAME
 from corvette_form_generator.ingest.wizard.canonical_rows import (
     COMPILER_POLICY_VERSION,
     canonical_bytes,
+    canonical_text,
     semantic_hash,
     validate_artifact_graph,
 )
@@ -1299,6 +1300,9 @@ class WizardSessionStore:
         run_id: str,
         *,
         model: str = "",
+        decision_type: str = "",
+        affected_sheet: str = "",
+        review_state: str = "",
         family: str = "",
         reason: str = "",
         severity: str = "",
@@ -1314,6 +1318,9 @@ class WizardSessionStore:
             return self._exception_queue_view_locked(
                 run_id,
                 model=model,
+                decision_type=decision_type,
+                affected_sheet=affected_sheet,
+                review_state=review_state,
                 family=family,
                 reason=reason,
                 severity=severity,
@@ -1329,6 +1336,9 @@ class WizardSessionStore:
         run_id: str,
         *,
         model: str = "",
+        decision_type: str = "",
+        affected_sheet: str = "",
+        review_state: str = "",
         family: str = "",
         reason: str = "",
         severity: str = "",
@@ -1344,6 +1354,17 @@ class WizardSessionStore:
             raise WizardError(f"Unknown exception state filter: {state}")
         if actionable not in {"", "yes", "no"}:
             raise WizardError(f"Unknown actionable filter: {actionable}")
+        if review_state not in {
+            "",
+            "needs_decision",
+            "prerequisite_blocked",
+            "semantic_conflict",
+            "source_or_tooling_blocked",
+            "resolved",
+            "pending_projection",
+            "stale_reopened",
+        }:
+            raise WizardError(f"Unknown review state filter: {review_state}")
         try:
             offset = max(0, int(offset))
             limit = min(100, max(1, int(limit)))
@@ -1368,6 +1389,7 @@ class WizardSessionStore:
             for candidate in scope_candidates(candidates_payload.get("candidates") or [], str(target)):
                 scoped = {
                     **candidate,
+                    "targetModel": str(target),
                     "statuses": model_scoped_statuses(candidate, str(target)),
                 }
                 for status_entry in scoped["statuses"]:
@@ -1377,8 +1399,12 @@ class WizardSessionStore:
                         target_variant_pairs.setdefault(str(target), set()).add(
                             (body_style, trim_level)
                         )
-                signature = option_occurrence_signature(scoped)
-                raw_candidates.setdefault((str(target), signature), []).append(dict(candidate))
+                signatures = {
+                    option_occurrence_signature(candidate),
+                    option_occurrence_signature(scoped),
+                }
+                for signature in signatures:
+                    raw_candidates.setdefault((str(target), signature), []).append(dict(candidate))
         target_price_scopes: dict[str, list[dict[str, str]]] = {}
         for target in selection.get("targets") or []:
             pairs = target_variant_pairs.get(str(target), set())
@@ -1446,6 +1472,19 @@ class WizardSessionStore:
             target: self._unique_option_rpos(options)
             for target, options in target_options.items()
         }
+        registry = build_family_registry(self._require_workbook(), selection.get("targets") or [])
+        family_sheets: dict[tuple[str, str], set[str]] = defaultdict(set)
+        for target, entries in registry.items():
+            for entry in entries.values():
+                family_sheets[(str(target), str(entry.get("family") or ""))].add(
+                    str(entry.get("sheetName") or "")
+                )
+        family_sheets.update(
+            {
+                (str(target), "default_selection_rules"): {"default_selection_rules"}
+                for target in selection.get("targets") or []
+            }
+        )
         valid_by_subject = {
             str(entry.get("subjectId") or ""): dict(entry)
             for entry in detail["resolutions"].get("validEntries") or []
@@ -1465,6 +1504,9 @@ class WizardSessionStore:
                 target.setdefault(str(entry.get("subjectId") or ""), []).append(dict(entry))
 
         items = []
+        decision_type_catalog: set[str] = set()
+        affected_sheet_catalog: set[str] = set()
+        review_state_catalog: set[str] = set()
         for subject in sorted(subjects, key=lambda item: str(item.get("subjectId") or "")):
             subject_id_value = str(subject.get("subjectId") or "")
             if subject_id_value in valid_by_subject:
@@ -1499,7 +1541,11 @@ class WizardSessionStore:
             evidence_references = {
                 str(reference) for reference in subject.get("evidenceReferences") or []
             }
-            candidate_signatures = set(evidence_references)
+            candidate_signatures = {
+                evidence_id.removeprefix("candidate:")
+                for evidence_id in evidence_ids
+                if evidence_id.startswith("candidate:")
+            }
             candidate_signatures.update(
                 evidence_id.split(":candidate:", 1)[1]
                 for evidence_id in evidence_ids
@@ -1523,9 +1569,34 @@ class WizardSessionStore:
                     for dependency in row.get("evidenceDependencies") or []
                 }
             ]
+            conflict_rows = list((subject.get("semanticConflict") or {}).get("conflictingRows") or [])
+            conflict_keys = {
+                (str(row.get("sheet") or ""), canonical_text(row.get("key") or {}))
+                for row in conflict_rows
+            }
+            existing_rows = [
+                row
+                for row in conflict_rows
+                if (
+                    row.get("action") == "noop"
+                    or row.get("disposition") == "retained_existing"
+                )
+            ]
+            already_derived_rows = [
+                row
+                for row in conflict_rows
+                if row not in existing_rows
+            ]
+            shared_context = [
+                row
+                for row in target_rows
+                if (str(row.get("sheet") or ""), canonical_text(row.get("key") or {})) not in conflict_keys
+            ]
             item["evidence"] = {
-                "raw": raw_rows,
-                "targetRows": target_rows,
+                "sourceEvidence": raw_rows,
+                "existingWorkbookRows": existing_rows,
+                "alreadyDerivedRows": already_derived_rows,
+                "sharedContext": shared_context,
                 "comparator": [
                     comparator_facts[evidence_id]
                     for evidence_id in sorted(evidence_ids | evidence_references)
@@ -1535,6 +1606,68 @@ class WizardSessionStore:
                     evidence_id
                     for evidence_id in evidence_ids
                     if evidence_id.startswith("workbook:")
+                ),
+            }
+            reason_code = str(subject.get("reasonCode") or "")
+            if reason_code in {"missing_section"}:
+                decision_name = "section"
+                effect_families = {"options"}
+            elif reason_code == "ambiguous_existing_identity":
+                decision_name = "identity"
+                effect_families = {"options"}
+            elif "exclusive_group" in reason_code or (
+                reason_code == "semantic_group_overlap"
+                and str(subject.get("originalReasonCode") or "").endswith("exclusive_group_proposal")
+            ):
+                decision_name = "exclusive_group"
+                effect_families = {"exclusive_groups", "exclusive_members"}
+            elif "rule_group" in reason_code or reason_code == "semantic_group_overlap":
+                decision_name = "rule_group"
+                effect_families = {"rule_groups", "rule_group_members"}
+            elif "relationship" in reason_code or reason_code == "semantic_relationship_conflict":
+                decision_name = "relationship"
+                effect_families = {"rule_mapping"}
+            elif "price" in reason_code:
+                decision_name = "price"
+                effect_families = {"price_rules" if "price_rule" in reason_code else "options"}
+            elif "default" in reason_code:
+                decision_name = "default"
+                effect_families = {"default_selection_rules"}
+            else:
+                decision_name = "source_or_tooling"
+                effect_families = {str(subject.get("family") or "")}
+            affected_sheets = {
+                str(value)
+                for value in (subject.get("semanticConflict") or {}).get("affectedSheets") or []
+                if str(value)
+            }
+            for effect_family in effect_families:
+                affected_sheets.update(
+                    family_sheets.get((str(subject.get("model") or ""), effect_family), set())
+                )
+            required_rpos = {
+                str(value).upper()
+                for row in subject.get("proposedRows") or []
+                for value in (
+                    row.get("sourceRpo"),
+                    row.get("targetRpo"),
+                    row.get("conditionRpo"),
+                    *(row.get("memberRpos") or []),
+                )
+                if str(value or "")
+            }
+            missing_or_ambiguous = sorted(
+                required_rpos
+                - target_unique_option_rpos.get(str(subject.get("model") or ""), set())
+            )
+            item["decisionType"] = decision_name
+            item["affectedSheets"] = sorted(affected_sheets)
+            item["prerequisites"] = {
+                "missingOrAmbiguousRpos": missing_or_ambiguous,
+                "message": (
+                    "Resolve a unique ready target option for: " + ", ".join(missing_or_ambiguous)
+                    if missing_or_ambiguous
+                    else ""
                 ),
             }
             allowed_actions = set(subject.get("allowedActions") or [])
@@ -1582,7 +1715,30 @@ class WizardSessionStore:
                     else []
                 ),
             }
+            if item["state"] == "resolved":
+                item["reviewState"] = "resolved"
+            elif item["state"] == "resolved_pending_projection":
+                item["reviewState"] = "pending_projection"
+            elif item["state"] == "stale_reopened":
+                item["reviewState"] = "stale_reopened"
+            elif str(subject.get("reasonCode") or "").startswith("semantic_"):
+                item["reviewState"] = "semantic_conflict"
+            elif not available_actions and missing_or_ambiguous:
+                item["reviewState"] = "prerequisite_blocked"
+            elif not available_actions:
+                item["reviewState"] = "source_or_tooling_blocked"
+            else:
+                item["reviewState"] = "needs_decision"
+            decision_type_catalog.add(item["decisionType"])
+            affected_sheet_catalog.update(item["affectedSheets"])
+            review_state_catalog.add(item["reviewState"])
             if model and subject.get("model") != model:
+                continue
+            if decision_type and item["decisionType"] != decision_type:
+                continue
+            if affected_sheet and affected_sheet not in item["affectedSheets"]:
+                continue
+            if review_state and item["reviewState"] != review_state:
                 continue
             if family and subject.get("family") != family:
                 continue
@@ -1599,16 +1755,24 @@ class WizardSessionStore:
                 continue
             needle = str(query or "").strip().lower()
             if needle:
-                haystack = " ".join(
-                    str(subject.get(field) or "")
-                    for field in ("subjectId", "model", "family", "reasonCode", "question")
-                ).lower()
+                search_item = {
+                    **item,
+                    "evidence": {
+                        key: value
+                        for key, value in (item.get("evidence") or {}).items()
+                        if key != "sharedContext"
+                    },
+                }
+                haystack = canonical_text(search_item).lower()
                 if needle not in haystack:
                     continue
             items.append(item)
 
         filters = {
             "models": sorted({str(subject.get("model") or "") for subject in subjects}),
+            "decisionTypes": sorted(decision_type_catalog),
+            "affectedSheets": sorted(affected_sheet_catalog),
+            "reviewStates": sorted(review_state_catalog),
             "families": sorted({str(subject.get("family") or "") for subject in subjects}),
             "reasons": sorted({str(subject.get("reasonCode") or "") for subject in subjects}),
             "severities": sorted({str(subject.get("severity") or "") for subject in subjects}),
@@ -1623,6 +1787,240 @@ class WizardSessionStore:
             "items": items[offset : offset + limit],
             "filters": filters,
         }
+
+    def _validated_exception_resolution_locked(
+        self,
+        run_id: str,
+        *,
+        subject_id: str,
+        subject_version: str,
+        action: str,
+        payload: dict[str, Any],
+        reviewer: str,
+    ) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
+        """Validate one current typed choice for both preview and persistence."""
+
+        detail = self.compiler_detail(run_id)
+        subjects = {
+            str(subject.get("subjectId") or ""): subject
+            for subject in detail["exceptionQueue"].get("subjects") or []
+        }
+        subject = subjects.get(str(subject_id))
+        if subject is None:
+            raise WizardError("Exception subject is not current; reload the queue.", status=409)
+        if str(subject.get("subjectVersion") or "") != str(subject_version):
+            raise WizardError("Exception subject version is stale; reload the queue.", status=409)
+        freshness = self._compiler_freshness(run_id, detail["compileReport"])
+        if freshness["stale"]:
+            raise WizardError(
+                "Compiler inputs changed; recompile before resolving exceptions: "
+                + ", ".join(freshness["reasons"]),
+                status=409,
+            )
+        current_view = self._exception_queue_view_locked(
+            run_id,
+            query=str(subject_id),
+            limit=100,
+        )
+        subject_view = next(
+            (
+                item
+                for item in current_view["items"]
+                if item["subject"].get("subjectId") == subject_id
+            ),
+            None,
+        )
+        if subject_view is None:
+            raise WizardError("Exception subject is not current; reload the queue.", status=409)
+        if action not in subject_view["availableActions"]:
+            raise WizardError(
+                "This typed action is not yet projectable into a complete canonical outcome.",
+                status=409,
+            )
+        reviewer = str(reviewer or "").strip()
+        if not reviewer:
+            raise WizardError("Exception resolution needs a reviewer name.")
+        if any(
+            entry.get("subjectId") == subject_id
+            and entry.get("subjectVersion") == subject_version
+            for entry in detail["resolutions"].get("validEntries") or []
+        ):
+            raise WizardError("Exception is already resolved; reopen it before replacing the answer.", status=409)
+        resolution = {
+            "subjectId": str(subject_id),
+            "subjectVersion": str(subject_version),
+            "action": str(action),
+            "payload": dict(payload or {}),
+            "disposition": ACTION_DISPOSITIONS.get(str(action), ""),
+            "reviewer": reviewer,
+            "resolvedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "evidenceReferences": list(subject.get("evidenceReferences") or []),
+        }
+        try:
+            resolution = validate_resolution(resolution, subject)
+        except ValueError as exc:
+            raise WizardError(f"Invalid exception resolution: {exc}") from exc
+        if action == "choose_section":
+            allowed_sections = {
+                str(section.get("sectionId") or "")
+                for section in workbook_sections(self._require_workbook())
+            }
+            if resolution["payload"]["sectionId"] not in allowed_sections:
+                raise WizardError("Section is not a current canonical workbook choice.")
+        if action == "provide_typed_value" and subject.get("reasonCode") in {
+            "missing_price_scope",
+            "unresolved_price_scope",
+            "comparator_only_price_rule_proposal",
+        }:
+            allowed_scopes = {
+                (
+                    str(scope.get("bodyStyleScope") or ""),
+                    str(scope.get("trimLevelScope") or ""),
+                    str(scope.get("variantScope") or ""),
+                )
+                for scope in subject_view["choices"].get("priceScopes") or []
+            }
+            requested_scope = (
+                str(resolution["payload"].get("bodyStyleScope") or ""),
+                str(resolution["payload"].get("trimLevelScope") or ""),
+                str(resolution["payload"].get("variantScope") or ""),
+            )
+            if requested_scope not in allowed_scopes:
+                raise WizardError("Price scope is not a current target variant or canonical wildcard choice.")
+        if action in {"choose_relationship", "retain_existing"}:
+            choices = subject_view["choices"]
+            if action == "choose_relationship":
+                allowed_ids = {
+                    str(option.get("optionId") or "")
+                    for option in choices.get("targetOptions") or []
+                }
+                if (
+                    resolution["payload"]["sourceOptionId"] not in allowed_ids
+                    or resolution["payload"]["targetOptionId"] not in allowed_ids
+                    or resolution["payload"]["ruleType"]
+                    not in set(choices.get("relationshipRuleTypes") or [])
+                ):
+                    raise WizardError("Relationship resolution is not made from current target choices.")
+            if action == "retain_existing":
+                allowed_ids = {
+                    str(option.get("optionId") or "")
+                    for option in choices.get("existingOptions") or []
+                }
+                if resolution["payload"]["existingId"] not in allowed_ids:
+                    raise WizardError("Existing row is not a current target identity choice.")
+        return detail, subject, subject_view, resolution
+
+    def preview_exception(
+        self,
+        run_id: str,
+        *,
+        subject_id: str,
+        subject_version: str,
+        action: str,
+        payload: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Compile a typed choice in memory and return its exact physical delta."""
+
+        with self._run_locks[run_id]:
+            detail, subject, subject_view, resolution = self._validated_exception_resolution_locked(
+                run_id,
+                subject_id=subject_id,
+                subject_version=subject_version,
+                action=action,
+                payload=payload,
+                reviewer="preview",
+            )
+            run_dir = self.run_dir(run_id)
+            selection = read_json(run_dir / "model-selection.json")
+            existing_entries: list[dict[str, Any]] = []
+            seen: set[str] = set()
+            for field in ("entries", "validEntries", "staleEntries", "supersededEntries"):
+                for entry in detail["resolutions"].get(field) or []:
+                    identity = semantic_hash(entry)
+                    if identity not in seen:
+                        seen.add(identity)
+                        existing_entries.append(dict(entry))
+            try:
+                staged = run_canonical_compiler(
+                    workbook_path=self._require_workbook(),
+                    option_payload=read_json(run_dir / "option-candidates.json"),
+                    price_payload=read_json(run_dir / "price-rows.json"),
+                    join_report=read_json(run_dir / "join-report.json"),
+                    roles_payload=read_json(run_dir / "sheet-roles.json"),
+                    sheet_profile=read_json(run_dir / "sheet-profile.json"),
+                    selection=selection,
+                    comparator_artifact=detail["comparatorEvidence"],
+                    run_authority_fingerprint=detail["manifest"]["runAuthorityFingerprint"],
+                    resolution_entries=[*existing_entries, resolution],
+                )
+            except (ValueError, KeyError) as exc:
+                raise WizardError(f"Compiler refused the preview: {exc}", status=409) from exc
+
+            def row_map(rows: list[dict[str, Any]]) -> dict[tuple[str, str], dict[str, Any]]:
+                return {
+                    (str(row.get("sheet") or ""), canonical_text(row.get("key") or {})): row
+                    for row in rows
+                }
+
+            before_rows = row_map(list(detail["manifest"].get("rows") or []))
+            after_rows = row_map(list(staged["canonical-row-manifest.json"].get("rows") or []))
+            row_effects = []
+            for key in sorted(set(before_rows) | set(after_rows)):
+                before_row = before_rows.get(key)
+                after_row = after_rows.get(key)
+                if before_row == after_row:
+                    continue
+                effect = "added" if before_row is None else "removed" if after_row is None else "changed"
+                row_effects.append({"effect": effect, "before": before_row, "after": after_row})
+
+            def blocker_ids(report: dict[str, Any]) -> set[str]:
+                return {
+                    str(blocker.get("subjectId") or "")
+                    for model in (report.get("models") or {}).values()
+                    for blocker in model.get("blockers") or []
+                }
+
+            before_blockers = blocker_ids(detail["compileReport"])
+            after_blockers = blocker_ids(staged["compile-report.json"])
+            removed_blockers = sorted(before_blockers - after_blockers)
+            added_blockers = sorted(after_blockers - before_blockers)
+            model = str(subject.get("model") or "")
+            return {
+                "runId": str(run_id),
+                "subjectId": str(subject["subjectId"]),
+                "subjectVersion": str(subject["subjectVersion"]),
+                "action": action,
+                "projectable": True,
+                "affectedSheets": list(subject_view.get("affectedSheets") or []),
+                "conflicts": list(subject.get("semanticConflicts") or []),
+                "prerequisites": dict(subject_view.get("prerequisites") or {}),
+                "decisionEffect": {
+                    "writesRows": bool(row_effects),
+                    "rows": row_effects,
+                    "suppressedProposalRows": (
+                        list(subject.get("proposedRows") or [])
+                        if action == "mark_not_applicable"
+                        else []
+                    ),
+                    "blockers": {
+                        "removed": removed_blockers,
+                        "added": added_blockers,
+                        "changed": [],
+                    },
+                    "readiness": {
+                        "before": dict(
+                            (detail["compileReport"].get("models") or {}).get(model) or {}
+                        ),
+                        "after": dict(
+                            (staged["compile-report.json"].get("models") or {}).get(model) or {}
+                        ),
+                    },
+                    "dispositions": {"changed": []},
+                    "removedBlockerSubjectIds": removed_blockers,
+                    "addedBlockerSubjectIds": added_blockers,
+                    "writesWorkbook": False,
+                },
+            }
 
     def resolve_exception(
         self,

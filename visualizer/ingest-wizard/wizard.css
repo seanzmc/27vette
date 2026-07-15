@@ -206,7 +206,12 @@ tr.evidence-row td { background: var(--panel-2); }
 .gate-chip { border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; font-size: 12px; }
 .gate-ready { border-color: var(--green); color: var(--green); }
 .gate-blocked { border-color: var(--red); color: var(--red); }
-.exception-filters { grid-template-columns: repeat(5, minmax(130px, 1fr)) minmax(180px, 2fr); }
+.filters.exception-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(150px, 1fr)) minmax(220px, 2fr);
+  align-items: stretch;
+}
+.exception-filters > * { min-width: 0; max-width: 100%; }
 .exception-card {
   border: 1px solid var(--line); border-left: 4px solid var(--red); border-radius: 10px;
   background: var(--panel); padding: 14px; margin: 14px 0;
@@ -223,6 +228,16 @@ tr.evidence-row td { background: var(--panel-2); }
 .evidence-entry:first-of-type { border-top: 0; }
 .evidence-cells { margin: 5px 0 0 18px; padding: 0; color: var(--muted); }
 .row-values { display: flex; flex-wrap: wrap; gap: 5px 10px; margin-top: 5px; color: var(--muted); }
+.decision-preview, .shared-context, .debug-detail, .proposal-rejection {
+  min-width: 0; max-width: 100%; overflow-wrap: anywhere;
+}
+.decision-preview { border: 1px solid var(--accent); border-radius: 8px; padding: 10px; margin-top: 10px; }
+.decision-preview h3 { margin: 0 0 8px; }
+.effect-row { min-width: 0; border-top: 1px solid var(--line); padding-top: 8px; margin-top: 8px; }
+.shared-context { border: 1px dashed var(--line); border-radius: 8px; padding: 8px 10px; margin: 10px 0; }
+.proposal-rejection { border: 1px solid var(--red); border-radius: 8px; padding: 10px; }
+.proposal-rejection label { display: flex; gap: 8px; align-items: flex-start; margin-top: 8px; }
+.proposal-rejection input[type="checkbox"] { width: auto; flex: 0 0 auto; }
 .typed-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .typed-grid label, .exception-resolution-form > label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
 .typed-grid input, .typed-grid select, .exception-resolution-form input, .exception-resolution-form select { width: 100%; box-sizing: border-box; }
@@ -239,14 +254,17 @@ tr.evidence-row td { background: var(--panel-2); }
 button:focus-visible, input:focus-visible, select:focus-visible {
   outline: 3px solid var(--accent); outline-offset: 2px;
 }
-.resume-run, .exception-resolution-form button, .exception-reopen,
+.resume-run, #stage-exceptions button, #stage-exceptions select, #stage-exceptions input,
 #compile-btn, #review-exceptions-btn, #exceptions-recompile-btn { min-height: 44px; }
 
 @media (max-width: 720px) {
   .topbar nav, .topbar .runinfo { width: 100%; margin-left: 0; }
   .stepper { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .step { border-radius: 12px; text-align: center; }
-  .evidence-grid, .typed-grid, .gate-grid, .exception-filters { grid-template-columns: 1fr; }
+  .evidence-grid, .typed-grid, .gate-grid, .filters.exception-filters { grid-template-columns: 1fr; }
   .exception-card { padding: 10px; }
   .actions-bar { align-items: stretch; }
+  #stage-exceptions button, #stage-exceptions select, #stage-exceptions input { width: 100%; max-width: 100%; }
+  .exception-card .card-head > .type-badge { flex: 1 1 100%; }
+  .exception-card, .evidence-column, .exception-resolution-form, .decision-preview { overflow-x: hidden; }
 }

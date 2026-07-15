@@ -36,8 +36,23 @@ class ExceptionFlowTest(unittest.TestCase):
     def setUp(self) -> None:
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name)
-        build_raw_export(self.root / "raw.xlsx")
+        raw = build_raw_export(self.root / "raw.xlsx")
         self.master = build_master_workbook(self.root / "stingray_master.xlsx")
+        from openpyxl import load_workbook
+
+        raw_wb = load_workbook(raw)
+        raw_wb["Mechanical 4"].append(["BV4", "", "Personalized Plaque", "A", "A"])
+        raw_wb.save(raw)
+        raw_wb.close()
+        master_wb = load_workbook(self.master)
+        master_wb["z06_options"].append(
+            ["opt_bv4_001", "BV4", 395, "Personalized Plaque", "Fixture endpoint", "", "sec_whee_001", True, 15, True, ""]
+        )
+        master_wb["zr1_options"].append(
+            ["opt_bv4_001", "BV4", 395, "Personalized Plaque", "Existing target identity", "", "sec_whee_001", True, 20, False, ""]
+        )
+        master_wb.save(self.master)
+        master_wb.close()
         self.store = WizardSessionStore(self.root)
         self.run_id = self.store.create_session("raw.xlsx")["session"]["runId"]
         self.store.confirm_roles(self.run_id, ROLES)
@@ -125,14 +140,75 @@ class ExceptionFlowTest(unittest.TestCase):
         self.assertGreater(payload["total"], 0)
         item = payload["items"][0]
         self.assertEqual(item["subject"]["allowedActions"], ["choose_section"])
-        self.assertTrue(item["evidence"]["raw"])
-        raw = item["evidence"]["raw"][0]
+        self.assertTrue(item["evidence"]["sourceEvidence"])
+        raw = item["evidence"]["sourceEvidence"][0]
         self.assertTrue(raw["sourceEvidence"]["cells"])
         self.assertTrue(raw["sourceEvidence"]["sheetName"])
         sections = item["choices"]["sections"]
         self.assertIn("sec_whee_001", {section["sectionId"] for section in sections})
         self.assertTrue(all(section["sectionName"] for section in sections))
         self.assertEqual(item["choices"]["relationshipRuleTypes"], [])
+
+    def test_exception_view_separates_source_existing_derived_and_shared_context(self) -> None:
+        payload = self.store.exception_queue_view(
+            self.run_id,
+            reason="comparator_only_exclusive_group_proposal",
+            state="open",
+            limit=10,
+        )
+
+        self.assertEqual(payload["total"], 1)
+        item = payload["items"][0]
+        self.assertEqual(
+            set(item["evidence"]),
+            {
+                "sourceEvidence",
+                "existingWorkbookRows",
+                "alreadyDerivedRows",
+                "sharedContext",
+                "comparator",
+                "workbookReferences",
+            },
+        )
+        self.assertTrue(item["evidence"]["sourceEvidence"])
+        self.assertNotIn("targetRows", item["evidence"])
+        self.assertEqual(item["decisionType"], "exclusive_group")
+        self.assertTrue(item["affectedSheets"])
+        self.assertIn("decisionTypes", payload["filters"])
+        self.assertIn("affectedSheets", payload["filters"])
+
+    def test_exception_search_indexes_proposed_rpos_evidence_and_affected_sheets(self) -> None:
+        proposal = self.store.exception_queue_view(
+            self.run_id,
+            reason="comparator_only_exclusive_group_proposal",
+            limit=1,
+        )["items"][0]
+        rpo = proposal["subject"]["proposedRows"][0]["memberRpos"][0]
+        sheet = proposal["affectedSheets"][0]
+
+        by_rpo = self.store.exception_queue_view(self.run_id, query=rpo, limit=100)
+        by_sheet = self.store.exception_queue_view(self.run_id, query=sheet, limit=100)
+
+        self.assertIn(
+            proposal["subject"]["subjectId"],
+            {item["subject"]["subjectId"] for item in by_rpo["items"]},
+        )
+        self.assertIn(
+            proposal["subject"]["subjectId"],
+            {item["subject"]["subjectId"] for item in by_sheet["items"]},
+        )
+
+    def test_non_actionable_comparator_card_names_missing_endpoint_prerequisites(self) -> None:
+        payload = self.store.exception_queue_view(
+            self.run_id,
+            reason="comparator_only_relationship_proposal",
+            actionable="no",
+            limit=10,
+        )
+        self.assertEqual(payload["total"], 1)
+        prerequisites = payload["items"][0]["prerequisites"]
+        self.assertTrue(prerequisites["missingOrAmbiguousRpos"])
+        self.assertIn("PDB", prerequisites["missingOrAmbiguousRpos"])
 
     def test_resolve_section_validates_and_recompiles_current_subject(self) -> None:
         item = self.store.exception_queue_view(
@@ -162,6 +238,81 @@ class ExceptionFlowTest(unittest.TestCase):
         self.assertIn("resolvedAt", resolution)
         self.assertEqual(result["summary"]["session"]["runId"], self.run_id)
         self.assertFalse((self.store.run_dir(self.run_id) / "apply-plan.json").exists())
+
+    def test_exception_preview_is_side_effect_free_and_returns_exact_physical_effects(self) -> None:
+        item = self.store.exception_queue_view(
+            self.run_id,
+            reason="missing_section",
+            state="open",
+            actionable="yes",
+            limit=1,
+        )["items"][0]
+        subject = item["subject"]
+        run_dir = self.store.run_dir(self.run_id)
+        before = {
+            path.name: path.read_bytes()
+            for path in run_dir.iterdir()
+            if path.is_file()
+        }
+
+        preview = self.store.preview_exception(
+            self.run_id,
+            subject_id=subject["subjectId"],
+            subject_version=subject["subjectVersion"],
+            action="choose_section",
+            payload={"sectionId": "sec_whee_001"},
+        )
+
+        self.assertEqual(preview["subjectId"], subject["subjectId"])
+        self.assertEqual(preview["subjectVersion"], subject["subjectVersion"])
+        self.assertTrue(preview["projectable"])
+        self.assertTrue(preview["decisionEffect"]["writesRows"])
+        self.assertEqual(preview["decisionEffect"]["suppressedProposalRows"], [])
+        self.assertTrue(preview["decisionEffect"]["rows"])
+        self.assertIn(subject["subjectId"], preview["decisionEffect"]["removedBlockerSubjectIds"])
+        self.assertTrue(
+            all(
+                set(row) == {"effect", "before", "after"}
+                for row in preview["decisionEffect"]["rows"]
+            )
+        )
+        self.assertEqual(
+            preview["decisionEffect"]["blockers"]["removed"],
+            preview["decisionEffect"]["removedBlockerSubjectIds"],
+        )
+        self.assertFalse(preview["decisionEffect"]["writesWorkbook"])
+        after = {
+            path.name: path.read_bytes()
+            for path in run_dir.iterdir()
+            if path.is_file()
+        }
+        self.assertEqual(after, before)
+
+    def test_exception_preview_refuses_stale_subject_without_mutation(self) -> None:
+        subject = self.store.exception_queue_view(
+            self.run_id,
+            reason="missing_section",
+            state="open",
+            actionable="yes",
+            limit=1,
+        )["items"][0]["subject"]
+        run_dir = self.store.run_dir(self.run_id)
+        before = {path.name: path.read_bytes() for path in run_dir.iterdir() if path.is_file()}
+
+        with self.assertRaisesRegex(WizardError, "version is stale"):
+            self.store.preview_exception(
+                self.run_id,
+                subject_id=subject["subjectId"],
+                subject_version="stale",
+                action="choose_section",
+                payload={"sectionId": "sec_whee_001"},
+            )
+
+        self.assertEqual(
+            {path.name: path.read_bytes() for path in run_dir.iterdir() if path.is_file()},
+            before,
+        )
+
 
     def test_reopen_resolution_recompiles_and_logs_once(self) -> None:
         subject = self.store.exception_queue_view(
