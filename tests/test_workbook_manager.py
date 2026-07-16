@@ -24,10 +24,13 @@ for p in (str(BACKEND), str(REPO_ROOT / "scripts")):
         sys.path.insert(0, p)
 
 from app import db as dbmod                     # noqa: E402
-from app import importer, naming, staging, sync as syncmod  # noqa: E402
+from app import naming, staging, sync as syncmod  # noqa: E402
 from app.specs import SPEC_BY_TABLE, TABLE_SPECS  # noqa: E402
 from app.staging import StagingError            # noqa: E402
 from app.validation import find_dependents      # noqa: E402
+from tests.workbook_manager.legacy_import_helper import (  # noqa: E402
+    import_workbook_for_legacy_tests,
+)
 
 WORKBOOK = REPO_ROOT / "stingray_master.xlsx"
 
@@ -55,7 +58,7 @@ class ImportedWorkbookCase(unittest.TestCase):
     def setUpClass(cls):
         cls.tmpdir = Path(tempfile.mkdtemp(prefix="wbm-test-"))
         cls.conn = fresh_db(cls.tmpdir)
-        cls.report = importer.import_workbook(cls.conn, WORKBOOK)
+        cls.report = import_workbook_for_legacy_tests(cls.conn, WORKBOOK)
 
     @classmethod
     def tearDownClass(cls):
@@ -443,13 +446,24 @@ class TestApi(unittest.TestCase):
         cls.tmpdir = Path(tempfile.mkdtemp(prefix="wbm-api-"))
         os.environ["WBM_DB"] = str(cls.tmpdir / "api.sqlite3")
         os.environ["WBM_VAR_DIR"] = str(cls.tmpdir / "var")
+        # Force a FULL re-import of the app package so config re-reads the
+        # env vars above. The bare "app" entry must be deleted too: leaving
+        # the package object in sys.modules makes `from . import staging`
+        # resolve to the stale module via the package attribute while
+        # `from .staging import StagingError` re-imports a fresh copy —
+        # two StagingError classes, and main.py's `except StagingError`
+        # misses the raise (500 instead of 422).
         for mod in list(sys.modules):
-            if mod.startswith("app."):
+            if mod == "app" or mod.startswith("app."):
                 del sys.modules[mod]
+        from app import db as api_db
+        api_conn = api_db.connect(Path(os.environ["WBM_DB"]))
+        api_db.init_schema(api_conn)
+        import_workbook_for_legacy_tests(api_conn, WORKBOOK)
+        api_conn.close()
         from fastapi.testclient import TestClient
         from app.main import app as fastapi_app
         cls.client = TestClient(fastapi_app)
-        cls.client.post("/api/import")
 
     @classmethod
     def tearDownClass(cls):

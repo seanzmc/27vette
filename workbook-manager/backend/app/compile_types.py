@@ -107,6 +107,15 @@ class LineageEntry:
 
 
 @dataclass(frozen=True)
+class SourceRowInventory:
+    source_row: int
+    values: Mapping[str, object]
+    disposition: str = "emission_required"
+    reason: str = "Canonical source row must emit lineage or be classified."
+    evidence: Mapping[str, object] = field(default_factory=_empty_mapping)
+
+
+@dataclass(frozen=True)
 class SourceSheet:
     source_sheet: str
     disposition: str
@@ -114,6 +123,7 @@ class SourceSheet:
     row_count: int
     destination_tables: tuple[str, ...]
     reason: str
+    rows: tuple[SourceRowInventory, ...] = ()
 
 
 @dataclass(frozen=True)

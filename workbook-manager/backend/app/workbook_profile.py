@@ -11,7 +11,13 @@ from typing import Iterable
 from openpyxl import load_workbook
 
 from .catalog import LIVE_MODELS, MODEL_TABLE_ROLES, physical_table
-from .compile_types import Finding, SourceSheet, WorkbookProfile
+from .compile_types import (
+    Finding,
+    SourceRowInventory,
+    SourceSheet,
+    WorkbookProfile,
+    freeze_mapping,
+)
 
 
 _CONTROL_SHEETS = (
@@ -468,6 +474,57 @@ def profile_workbook(path: Path) -> WorkbookProfile:
                     row_count=len(rows),
                     destination_tables=destination_tables,
                     reason=reason,
+                    rows=tuple(
+                        SourceRowInventory(
+                            source_row=row_number,
+                            values=freeze_mapping(row),
+                            disposition=(
+                                "inactive_future_source"
+                                if disposition == "inactive_future_source"
+                                else "metadata"
+                                if sheet_name in {
+                                    "model_workbook_sources",
+                                    "context_choice_copy",
+                                }
+                                else "inactive"
+                                if "active" in headers
+                                and not _truthy(row.get("active"))
+                                else "inactive_future_metadata"
+                                if sheet_name
+                                in {
+                                    "model_master",
+                                    "model_registry_promotion",
+                                    "model_variants",
+                                }
+                                and str(row.get("model_key") or "").strip().lower()
+                                not in active_models
+                                else "emission_required"
+                            ),
+                            reason=(
+                                "Sheet is registered only to inactive future models."
+                                if disposition == "inactive_future_source"
+                                else "Compiler control metadata has no one-to-one row output."
+                                if sheet_name in {
+                                    "model_workbook_sources",
+                                    "context_choice_copy",
+                                }
+                                else "Workbook row is explicitly inactive."
+                                if "active" in headers
+                                and not _truthy(row.get("active"))
+                                else "Row belongs to a known non-live model."
+                                if sheet_name
+                                in {
+                                    "model_master",
+                                    "model_registry_promotion",
+                                    "model_variants",
+                                }
+                                and str(row.get("model_key") or "").strip().lower()
+                                not in active_models
+                                else "Canonical source row must emit lineage or be classified."
+                            ),
+                        )
+                        for row_number, row in rows
+                    ),
                 )
             )
 

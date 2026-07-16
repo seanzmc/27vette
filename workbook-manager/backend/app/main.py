@@ -95,17 +95,10 @@ def status():
 
 @app.post("/api/import")
 def run_import():
-    conn = get_conn()
     if not config.DEFAULT_WORKBOOK.exists():
         raise HTTPException(404, f"workbook not found: "
                                  f"{config.DEFAULT_WORKBOOK}")
-    staged = conn.execute(
-        "SELECT COUNT(*) c FROM pending_changes WHERE status='staged'"
-    ).fetchone()["c"]
-    if staged:
-        raise HTTPException(409, "staged changes exist; commit or discard "
-                                 "them before re-importing")
-    return importer.import_workbook(conn, config.DEFAULT_WORKBOOK)
+    return importer.import_workbook(config.DEFAULT_DB, config.DEFAULT_WORKBOOK)
 
 
 @app.get("/api/import/latest")

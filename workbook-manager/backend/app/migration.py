@@ -12,6 +12,7 @@ import json
 import os
 import sqlite3
 import uuid
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING, Mapping
@@ -22,6 +23,31 @@ from .compile_types import Finding
 
 if TYPE_CHECKING:
     from .importer import CompiledWorkbook
+
+
+@dataclass(frozen=True)
+class DestinationSnapshot:
+    exists: bool
+    content_sha256: str = ""
+    stat_signature: tuple[int, int, int, int] = ()
+    sidecars: tuple[tuple[str, str, int, int], ...] = ()
+    staged_changes: int = 0
+    unsynced_history: int = 0
+    logical_fingerprint: str = ""
+    user_version: int = 0
+    findings: tuple[Finding, ...] = ()
+
+
+class DestinationChanged(RuntimeError):
+    pass
+
+
+class CandidateCheckpointError(RuntimeError):
+    pass
+
+
+class BackupVerificationError(RuntimeError):
+    pass
 
 
 _MODEL_LOAD_ORDER = (
@@ -74,77 +100,166 @@ def _table_names(conn: sqlite3.Connection) -> set[str]:
     }
 
 
-def audit_legacy_destination(destination: Path) -> tuple[Finding, ...]:
-    """Read legacy edit state without creating or mutating destination files."""
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _integrity_errors(conn: sqlite3.Connection) -> list[dict]:
+    rows = [row[0] for row in conn.execute("PRAGMA integrity_check")]
+    return [] if rows == ["ok"] else [
+        {"code": "sqlite_integrity_check_failed", "results": rows}
+    ]
+
+
+def _logical_fingerprint(conn: sqlite3.Connection) -> str:
+    digest = hashlib.sha256()
+    user_version = conn.execute("PRAGMA user_version").fetchone()[0]
+    digest.update(f"user_version:{user_version}\n".encode())
+    schema = tuple(
+        conn.execute(
+            "SELECT type, name, tbl_name, COALESCE(sql, '') AS sql "
+            "FROM sqlite_master WHERE name NOT LIKE 'sqlite_%' "
+            "ORDER BY type, name"
+        )
+    )
+    for row in schema:
+        digest.update(repr(tuple(row)).encode("utf-8"))
+        digest.update(b"\n")
+    for table in sorted(_table_names(conn) - {"sqlite_sequence"}):
+        columns = [
+            row["name"]
+            for row in conn.execute(f"PRAGMA table_info({_quote(table)})")
+        ]
+        if not columns:
+            continue
+        order = ",".join(_quote(column) for column in columns)
+        for row in conn.execute(
+            f"SELECT * FROM {_quote(table)} ORDER BY {order}"
+        ):
+            digest.update(repr(tuple(row)).encode("utf-8"))
+            digest.update(b"\n")
+    return digest.hexdigest()
+
+
+def capture_destination_snapshot(destination: Path) -> DestinationSnapshot:
     path = Path(destination)
     if not path.exists():
-        return ()
-    sidecars = tuple(
-        artifact.name
-        for artifact in (Path(str(path) + "-wal"), Path(str(path) + "-shm"))
-        if artifact.exists()
-    )
+        return DestinationSnapshot(exists=False)
+    try:
+        stat = path.stat()
+        content_sha256 = _file_sha256(path)
+        sidecars = tuple(
+            (
+                artifact.name,
+                _file_sha256(artifact),
+                artifact.stat().st_size,
+                artifact.stat().st_mtime_ns,
+            )
+            for artifact in (
+                Path(str(path) + "-wal"),
+                Path(str(path) + "-shm"),
+            )
+            if artifact.exists()
+        )
+    except OSError as error:
+        return DestinationSnapshot(
+            exists=True,
+            findings=(
+                Finding(
+                    severity="error",
+                    status="decision_required",
+                    code="legacy_destination_audit_failed",
+                    message=str(error),
+                ),
+            ),
+        )
+    findings: list[Finding] = []
     if sidecars:
-        return (
+        findings.append(
             Finding(
                 severity="error",
                 status="decision_required",
                 code="legacy_destination_sidecars",
                 message=(
                     "The destination has SQLite WAL/SHM sidecars. Close its "
-                    "owner and checkpoint it before atomic replacement; the "
-                    "importer will not guess whether these files are stale."
+                    "owner and checkpoint it before atomic replacement."
                 ),
-                value={"sidecars": sidecars},
-            ),
+                value={"sidecars": tuple(item[0] for item in sidecars)},
+            )
         )
-    conn = db.connect_readonly(path)
+    staged = 0
+    unsynced = 0
+    logical = ""
+    user_version = 0
     try:
-        tables = _table_names(conn)
-        findings: list[Finding] = []
-        if "pending_changes" in tables:
-            count = conn.execute(
-                "SELECT COUNT(*) FROM pending_changes WHERE status='staged'"
-            ).fetchone()[0]
-            if count:
-                findings.append(
-                    Finding(
-                        severity="error",
-                        status="decision_required",
-                        code="legacy_pending_changes",
-                        message=(
-                            "The destination contains staged legacy changes; "
-                            "resolve them before canonical replacement."
-                        ),
-                        value={"count": count},
-                    )
-                )
-        if "change_history" in tables:
-            columns = {
+        conn = db.connect_readonly(path)
+        try:
+            tables = _table_names(conn)
+            if "pending_changes" in tables:
+                staged = conn.execute(
+                    "SELECT COUNT(*) FROM pending_changes WHERE status='staged'"
+                ).fetchone()[0]
+            if "change_history" in tables and "sync_status" in {
                 row["name"]
                 for row in conn.execute("PRAGMA table_info(change_history)")
-            }
-            if "sync_status" in columns:
-                count = conn.execute(
+            }:
+                unsynced = conn.execute(
                     "SELECT COUNT(*) FROM change_history "
                     "WHERE sync_status NOT IN ('synced', 'n/a')"
                 ).fetchone()[0]
-                if count:
-                    findings.append(
-                        Finding(
-                            severity="error",
-                            status="decision_required",
-                            code="legacy_unsynced_change_history",
-                            message=(
-                                "The destination contains unsynced legacy history; "
-                                "resolve it before canonical replacement."
-                            ),
-                            value={"count": count},
-                        )
-                    )
-        return tuple(findings)
-    finally:
-        conn.close()
+            user_version = conn.execute("PRAGMA user_version").fetchone()[0]
+            logical = _logical_fingerprint(conn)
+        finally:
+            conn.close()
+    except (OSError, sqlite3.DatabaseError) as error:
+        findings.append(
+            Finding(
+                severity="error",
+                status="decision_required",
+                code="legacy_destination_audit_failed",
+                message=str(error),
+            )
+        )
+    if staged:
+        findings.append(
+            Finding(
+                severity="error",
+                status="decision_required",
+                code="legacy_pending_changes",
+                message="Resolve staged legacy changes before replacement.",
+                value={"count": staged},
+            )
+        )
+    if unsynced:
+        findings.append(
+            Finding(
+                severity="error",
+                status="decision_required",
+                code="legacy_unsynced_change_history",
+                message="Resolve unsynced legacy history before replacement.",
+                value={"count": unsynced},
+            )
+        )
+    return DestinationSnapshot(
+        exists=True,
+        content_sha256=content_sha256,
+        stat_signature=(stat.st_dev, stat.st_ino, stat.st_size, stat.st_mtime_ns),
+        sidecars=sidecars,
+        staged_changes=staged,
+        unsynced_history=unsynced,
+        logical_fingerprint=logical,
+        user_version=user_version,
+        findings=tuple(findings),
+    )
+
+
+def audit_legacy_destination(destination: Path) -> tuple[Finding, ...]:
+    """Read legacy edit state without creating or mutating destination files."""
+    return capture_destination_snapshot(destination).findings
 
 
 def _ordered_tables(compiled: "CompiledWorkbook"):
@@ -203,31 +318,6 @@ def _registry_rows(compiled: "CompiledWorkbook"):
             )
 
 
-def _source_reconciliation(compiled: "CompiledWorkbook") -> dict[str, dict]:
-    lineage_rows: dict[str, set[int]] = {}
-    for entry in compiled.lineage:
-        lineage_rows.setdefault(entry.source_sheet, set()).add(entry.source_row)
-    finding_rows: dict[str, set[int]] = {}
-    for finding in compiled.findings:
-        if finding.source_row is not None:
-            finding_rows.setdefault(finding.source_sheet, set()).add(
-                finding.source_row
-            )
-    result = {}
-    for source in compiled.source_catalog:
-        emitted = lineage_rows.get(source.source_sheet, set())
-        findings = finding_rows.get(source.source_sheet, set()) - emitted
-        explicitly_disposed = source.row_count - len(emitted) - len(findings)
-        result[source.source_sheet] = {
-            "source_rows": source.row_count,
-            "lineage_source_rows": len(emitted),
-            "finding_rows": len(findings),
-            "catalog_disposition_rows": explicitly_disposed,
-            "disposition": source.disposition,
-        }
-    return result
-
-
 def _run_counts(compiled: "CompiledWorkbook") -> dict:
     mapping_tables: dict[str, int] = {}
     for mapping in compiled.schema_mappings:
@@ -239,7 +329,20 @@ def _run_counts(compiled: "CompiledWorkbook") -> dict:
         "tables": {table.name: len(table.rows) for table in compiled.tables},
         "mapping_count": len(compiled.schema_mappings),
         "mapping_tables": mapping_tables,
-        "sources": _source_reconciliation(compiled),
+        "required_destination_columns": {
+            table.name: sorted(
+                {
+                    column
+                    for row in table.rows
+                    for column in row.values.keys()
+                }
+            )
+            for table in compiled.tables
+        },
+        "source_inventory": {
+            source.source_sheet: [row.source_row for row in source.rows]
+            for source in compiled.source_catalog
+        },
     }
 
 
@@ -364,6 +467,30 @@ def load_candidate(
                 ),
             )
             conn.executemany(
+                "INSERT INTO source_row_disposition("
+                "import_run_id, source_sheet, source_row, disposition, "
+                "destinations_json, reason, evidence_json"
+                ") VALUES(?,?,?,?,?,?,?)",
+                (
+                    (
+                        run_id,
+                        source.source_sheet,
+                        row.source_row,
+                        row.disposition,
+                        _json(row.evidence.get("destinations", ())),
+                        row.reason,
+                        _json(
+                            {
+                                "source_values": row.values,
+                                **dict(row.evidence),
+                            }
+                        ),
+                    )
+                    for source in compiled.source_catalog
+                    for row in source.rows
+                ),
+            )
+            conn.executemany(
                 "INSERT INTO import_issues("
                 "run_id, severity, category, sheet, src_row, table_name, "
                 "model_id, entity_key, field, message) VALUES(?,?,?,?,?,?,?,?,?,?)",
@@ -414,46 +541,71 @@ def reconcile_source_counts(conn: sqlite3.Connection) -> list[dict]:
             {"code": "lineage_count_mismatch", "expected": counts.get("compiled_rows"),
              "actual": lineage_count}
         )
+    expected_inventory = {
+        (sheet, int(source_row))
+        for sheet, rows in counts.get("source_inventory", {}).items()
+        for source_row in rows
+    }
+    actual_inventory = {
+        (row["source_sheet"], row["source_row"])
+        for row in conn.execute(
+            "SELECT source_sheet, source_row FROM source_row_disposition"
+        )
+    }
+    if actual_inventory != expected_inventory:
+        errors.append(
+            {
+                "code": "source_row_reconciliation_mismatch",
+                "missing": sorted(expected_inventory - actual_inventory),
+                "unexpected": sorted(actual_inventory - expected_inventory),
+            }
+        )
     catalog = {
         row["source_sheet"]: row["row_count"]
-        for row in conn.execute("SELECT source_sheet, row_count FROM source_table_catalog")
+        for row in conn.execute(
+            "SELECT source_sheet, row_count FROM source_table_catalog"
+        )
     }
-    actual_lineage_rows = {
+    disposition_counts = {
         row["source_sheet"]: row["count"]
         for row in conn.execute(
-            "SELECT source_sheet, COUNT(DISTINCT source_row) AS count "
-            "FROM import_lineage GROUP BY source_sheet"
+            "SELECT source_sheet, COUNT(*) AS count "
+            "FROM source_row_disposition GROUP BY source_sheet"
         )
     }
-    actual_finding_rows = {
-        row["sheet"]: row["count"]
-        for row in conn.execute(
-            "SELECT sheet, COUNT(DISTINCT src_row) AS count FROM import_issues "
-            "WHERE src_row IS NOT NULL AND NOT EXISTS ("
-            "SELECT 1 FROM import_lineage WHERE source_sheet=import_issues.sheet "
-            "AND source_row=import_issues.src_row) GROUP BY sheet"
-        )
+    normalized_disposition_counts = {
+        sheet: disposition_counts.get(sheet, 0) for sheet in catalog
     }
-    for sheet, expected in counts.get("sources", {}).items():
-        reconciled = (
-            expected["lineage_source_rows"]
-            + expected["finding_rows"]
-            + expected["catalog_disposition_rows"]
-        )
-        if (
-            catalog.get(sheet) != expected["source_rows"]
-            or reconciled != expected["source_rows"]
-            or expected["catalog_disposition_rows"] < 0
-            or actual_lineage_rows.get(sheet, 0) != expected["lineage_source_rows"]
-            or actual_finding_rows.get(sheet, 0) != expected["finding_rows"]
-        ):
-            errors.append(
-                {"code": "source_row_reconciliation_mismatch", "source_sheet": sheet,
-                 "expected": expected["source_rows"], "actual": reconciled,
-                 "catalog": catalog.get(sheet)}
-            )
-    if set(catalog) != set(counts.get("sources", {})):
+    if catalog != normalized_disposition_counts:
         errors.append({"code": "source_catalog_coverage_mismatch"})
+    orphan_lineage = conn.execute(
+        "SELECT COUNT(*) FROM import_lineage l WHERE NOT EXISTS ("
+        "SELECT 1 FROM source_row_disposition d "
+        "WHERE d.source_sheet=l.source_sheet AND d.source_row=l.source_row "
+        "AND d.disposition='emitted')"
+    ).fetchone()[0]
+    emitted_without_lineage = conn.execute(
+        "SELECT COUNT(*) FROM source_row_disposition d "
+        "WHERE d.disposition='emitted' AND NOT EXISTS ("
+        "SELECT 1 FROM import_lineage l WHERE l.source_sheet=d.source_sheet "
+        "AND l.source_row=d.source_row)"
+    ).fetchone()[0]
+    invalid_dispositions = conn.execute(
+        "SELECT COUNT(*) FROM source_row_disposition "
+        "WHERE disposition='' OR reason='' OR disposition='emission_required' "
+        "OR disposition IN ('decision_required', 'contract_mismatch') "
+        "OR evidence_json='{}' OR (disposition='emitted' "
+        "AND destinations_json='[]')"
+    ).fetchone()[0]
+    if orphan_lineage or emitted_without_lineage or invalid_dispositions:
+        errors.append(
+            {
+                "code": "source_row_disposition_invalid",
+                "orphan_lineage": orphan_lineage,
+                "emitted_without_lineage": emitted_without_lineage,
+                "invalid_dispositions": invalid_dispositions,
+            }
+        )
     return errors
 
 
@@ -475,6 +627,61 @@ def validate_mapping_coverage(conn: sqlite3.Connection) -> list[dict]:
     }
     if actual_mapping_tables != counts.get("mapping_tables", {}):
         errors.append({"code": "schema_mapping_coverage_mismatch"})
+    mapping_rows = tuple(
+        conn.execute(
+            "SELECT source_sheet, source_column, model_key, sql_table, "
+            "sql_column FROM schema_mapping"
+        )
+    )
+    semantic_keys = [
+        (
+            row["source_sheet"],
+            row["source_column"],
+            row["model_key"],
+            row["sql_table"],
+            row["sql_column"],
+        )
+        for row in mapping_rows
+    ]
+    if len(semantic_keys) != len(set(semantic_keys)):
+        errors.append({"code": "schema_mapping_semantic_duplicate"})
+    sentinel = "__27vette_global_schema_mapping__"
+    if sentinel in LIVE_MODELS or any(
+        row["model_key"] == sentinel for row in mapping_rows
+    ):
+        errors.append({"code": "schema_mapping_global_sentinel_collision"})
+    actual_columns = {
+        (row["sql_table"], row["sql_column"]) for row in mapping_rows
+    }
+    required_columns = {
+        (table, column)
+        for table, columns in counts.get(
+            "required_destination_columns", {}
+        ).items()
+        for column in columns
+    }
+    if not required_columns <= actual_columns:
+        errors.append(
+            {
+                "code": "schema_mapping_destination_coverage_missing",
+                "missing": sorted(required_columns - actual_columns),
+            }
+        )
+    tables = _table_names(conn)
+    missing_destination_columns = []
+    for table, column in actual_columns:
+        if table not in tables or column not in {
+            row["name"]
+            for row in conn.execute(f"PRAGMA table_info({_quote(table)})")
+        }:
+            missing_destination_columns.append((table, column))
+    if missing_destination_columns:
+        errors.append(
+            {
+                "code": "schema_mapping_destination_column_missing",
+                "missing": sorted(missing_destination_columns),
+            }
+        )
     expected_physical = {
         physical_table(model, role)
         for model in LIVE_MODELS
@@ -525,7 +732,34 @@ def _fsync_directory(path: Path) -> None:
         os.close(descriptor)
 
 
-def _backup_destination(destination: Path) -> Path:
+def _same_destination(
+    destination: Path, expected: DestinationSnapshot
+) -> DestinationSnapshot:
+    actual = capture_destination_snapshot(destination)
+    if actual != expected:
+        raise DestinationChanged(
+            "destination_changed_during_import: destination snapshot drifted"
+        )
+    return actual
+
+
+def _verify_backup(backup: Path, source: DestinationSnapshot) -> None:
+    conn = db.connect_readonly(backup)
+    try:
+        errors = _integrity_errors(conn)
+        logical = _logical_fingerprint(conn)
+        user_version = conn.execute("PRAGMA user_version").fetchone()[0]
+    finally:
+        conn.close()
+    if errors or logical != source.logical_fingerprint or user_version != source.user_version:
+        raise BackupVerificationError(
+            "backup_verification_failed: integrity or logical fingerprint mismatch"
+        )
+
+
+def _backup_destination(
+    destination: Path, snapshot: DestinationSnapshot
+) -> Path:
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
     backup = destination.with_name(f"{destination.name}.backup-{timestamp}")
     source = db.connect_readonly(destination)
@@ -533,41 +767,93 @@ def _backup_destination(destination: Path) -> Path:
     try:
         source.backup(target)
         target.commit()
-    finally:
         target.close()
         source.close()
-    _fsync_file(backup)
-    _fsync_directory(destination.parent)
-    return backup
+        _verify_backup(backup, snapshot)
+        _same_destination(destination, snapshot)
+        _fsync_file(backup)
+        _fsync_directory(destination.parent)
+        return backup
+    except BaseException:
+        try:
+            target.close()
+        except sqlite3.Error:
+            pass
+        try:
+            source.close()
+        except sqlite3.Error:
+            pass
+        try:
+            backup.unlink()
+        except OSError:
+            pass
+        raise
 
 
-def promote_candidate(candidate: Path, destination: Path) -> Path:
-    """Checkpoint, sync, back up, and atomically promote a verified candidate."""
-    candidate_path = Path(candidate)
-    destination_path = Path(destination)
-    conn = db.connect(candidate_path)
+def _checkpoint_and_verify_candidate(candidate: Path) -> None:
+    conn = db.connect(candidate)
     try:
-        errors = candidate_integrity_errors(conn)
+        errors = _integrity_errors(conn)
+        errors.extend(candidate_integrity_errors(conn))
         if errors:
             raise ValueError(f"candidate integrity failed: {errors!r}")
-        conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        try:
+            checkpoint = tuple(
+                conn.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone()
+            )
+        except sqlite3.DatabaseError as error:
+            raise CandidateCheckpointError(
+                f"candidate_checkpoint_failed: {error}"
+            ) from error
+        if len(checkpoint) != 3 or checkpoint[0] != 0 or checkpoint[1] != checkpoint[2]:
+            raise CandidateCheckpointError(
+                f"candidate_checkpoint_incomplete: {checkpoint!r}"
+            )
     finally:
         conn.close()
     for suffix in ("-wal", "-shm"):
-        artifact = Path(str(candidate_path) + suffix)
+        artifact = Path(str(candidate) + suffix)
         if artifact.exists():
             artifact.unlink()
-    _fsync_file(candidate_path)
-    _fsync_directory(candidate_path.parent)
+    _fsync_file(candidate)
+    _fsync_directory(candidate.parent)
+    readonly = db.connect_readonly(candidate)
+    try:
+        errors = _integrity_errors(readonly)
+        errors.extend(
+            [dict(row) for row in readonly.execute("PRAGMA foreign_key_check")]
+        )
+        errors.extend(reconcile_source_counts(readonly))
+        errors.extend(validate_mapping_coverage(readonly))
+        if errors:
+            raise ValueError(
+                f"candidate read-only verification failed: {errors!r}"
+            )
+    finally:
+        readonly.close()
+
+
+def promote_candidate(
+    candidate: Path,
+    destination: Path,
+    snapshot: DestinationSnapshot,
+) -> Path:
+    """Checkpoint, sync, back up, and atomically promote a verified candidate."""
+    candidate_path = Path(candidate)
+    destination_path = Path(destination)
+    _checkpoint_and_verify_candidate(candidate_path)
+    _same_destination(destination_path, snapshot)
     rollback: Path | None = None
     try:
         if destination_path.exists():
-            _backup_destination(destination_path)
+            _backup_destination(destination_path, snapshot)
+            _same_destination(destination_path, snapshot)
             rollback = destination_path.with_name(
                 f".{destination_path.name}.rollback-{uuid.uuid4().hex}"
             )
             os.link(destination_path, rollback)
             _fsync_directory(destination_path.parent)
+        _same_destination(destination_path, snapshot)
         os.replace(candidate_path, destination_path)
         _fsync_directory(destination_path.parent)
     except BaseException:
@@ -591,9 +877,16 @@ def promote_candidate(candidate: Path, destination: Path) -> Path:
     return destination_path
 
 
-def remove_candidate_artifacts(candidate: Path) -> None:
-    for path in (Path(candidate), Path(str(candidate) + "-wal"), Path(str(candidate) + "-shm")):
+def remove_candidate_artifacts(
+    candidate: Path, *, preserve_sidecars: bool = False
+) -> None:
+    paths = [Path(candidate)]
+    if not preserve_sidecars:
+        paths.extend(
+            [Path(str(candidate) + "-wal"), Path(str(candidate) + "-shm")]
+        )
+    for path in paths:
         try:
             path.unlink()
-        except FileNotFoundError:
+        except OSError:
             pass

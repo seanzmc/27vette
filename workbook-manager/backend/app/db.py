@@ -23,7 +23,7 @@ def connect(db_path: Path) -> sqlite3.Connection:
 
 def connect_readonly(db_path: Path) -> sqlite3.Connection:
     """Open an existing database without creating files or changing journal state."""
-    uri = f"{Path(db_path).resolve().as_uri()}?mode=ro"
+    uri = f"{Path(db_path).resolve().as_uri()}?mode=ro&immutable=1"
     conn = sqlite3.connect(uri, uri=True)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA query_only=ON")
@@ -273,6 +273,17 @@ CANONICAL_SUPPORT_DDL = (
       source_row_hash TEXT NOT NULL,
       lineage_role TEXT NOT NULL,
       transform_status TEXT NOT NULL
+    )""",
+    """CREATE TABLE source_row_disposition (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      import_run_id INTEGER NOT NULL REFERENCES import_runs(id),
+      source_sheet TEXT NOT NULL REFERENCES source_table_catalog(source_sheet),
+      source_row INTEGER NOT NULL,
+      disposition TEXT NOT NULL,
+      destinations_json TEXT NOT NULL DEFAULT '[]',
+      reason TEXT NOT NULL,
+      evidence_json TEXT NOT NULL DEFAULT '{}',
+      UNIQUE(import_run_id, source_sheet, source_row)
     )""",
     """CREATE TABLE import_issues (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -597,6 +608,16 @@ def create_canonical_schema(conn: sqlite3.Connection) -> None:
             "ON import_lineage(source_sheet, source_row)"
         )
         conn.execute(
+            "CREATE UNIQUE INDEX schema_mapping_null_safe_unique ON "
+            "schema_mapping(source_sheet, source_column, "
+            "COALESCE(model_key, '__27vette_global_schema_mapping__'), "
+            "sql_table, sql_column)"
+        )
+        conn.execute(
+            "CREATE INDEX idx_source_row_disposition_source ON "
+            "source_row_disposition(source_sheet, source_row)"
+        )
+        conn.execute(
             "CREATE INDEX idx_import_issues_run ON import_issues(run_id)"
         )
         conn.execute(
@@ -710,14 +731,6 @@ def init_schema(conn: sqlite3.Connection) -> None:
     conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_issues_run ON import_issues(run_id)"
     )
-    conn.commit()
-
-
-def clear_imported_data(conn: sqlite3.Connection) -> None:
-    """Remove imported rows (not staged changes / history) before re-import."""
-    for spec in TABLE_SPECS:
-        conn.execute(f"DELETE FROM {spec.table}")
-    conn.execute("DELETE FROM raw_sheet_rows")
     conn.commit()
 
 
