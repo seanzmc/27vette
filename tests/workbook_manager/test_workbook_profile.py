@@ -1,5 +1,6 @@
 import shutil
 
+import pytest
 from openpyxl import load_workbook
 
 from app.catalog import LIVE_MODELS
@@ -13,6 +14,36 @@ def _copy_with_extra_sheet(real_workbook, tmp_path, sheet_name):
     sheet = workbook.create_sheet(sheet_name)
     sheet.append(("Exact Header", "Another Header"))
     sheet.append(("value", 1))
+    workbook.save(copied)
+    workbook.close()
+    return copied
+
+
+def _copy_with_source_binding(
+    real_workbook,
+    tmp_path,
+    *,
+    model_key,
+    existing_role,
+    source_role,
+    sheet_name,
+):
+    copied = tmp_path / f"{model_key}-{source_role}.xlsx"
+    shutil.copyfile(real_workbook, copied)
+    workbook = load_workbook(copied)
+    sources = workbook["model_workbook_sources"]
+    headers = {cell.value: cell.column for cell in sources[1]}
+    for row_number in range(2, sources.max_row + 1):
+        if (
+            sources.cell(row_number, headers["model_key"]).value == model_key
+            and sources.cell(row_number, headers["source_role"]).value
+            == existing_role
+        ):
+            sources.cell(row_number, headers["source_role"]).value = source_role
+            sources.cell(row_number, headers["sheet_name"]).value = sheet_name
+            break
+    else:
+        raise AssertionError((model_key, existing_role))
     workbook.save(copied)
     workbook.close()
     return copied
@@ -111,6 +142,78 @@ def test_unknown_inactive_source_role_requires_a_decision(real_workbook, tmp_pat
         finding.status == "decision_required"
         and finding.code == "source_role_unclassified"
         and finding.value == "unapproved_future_role"
+        for finding in profile.findings
+    )
+
+
+@pytest.mark.parametrize(
+    "control_sheet",
+    ("model_master", "model_registry_promotion", "model_workbook_sources"),
+)
+def test_duplicate_control_header_is_rejected(
+    real_workbook,
+    tmp_path,
+    control_sheet,
+):
+    copied = tmp_path / f"duplicate-{control_sheet}.xlsx"
+    shutil.copyfile(real_workbook, copied)
+    workbook = load_workbook(copied)
+    sheet = workbook[control_sheet]
+    sheet.cell(1, sheet.max_column + 1).value = "active"
+    workbook.save(copied)
+    workbook.close()
+
+    with pytest.raises(
+        ValueError,
+        match=rf"Sheet {control_sheet!r} has duplicate header 'active'",
+    ):
+        profile_workbook(copied)
+
+
+def test_known_registry_role_cannot_claim_a_central_sheet(real_workbook, tmp_path):
+    copied = _copy_with_source_binding(
+        real_workbook,
+        tmp_path,
+        model_key="stingray",
+        existing_role="source_option_sheet",
+        source_role="source_option_sheet",
+        sheet_name="model_master",
+    )
+
+    profile = profile_workbook(copied)
+    sheet = next(s for s in profile.sheets if s.source_sheet == "model_master")
+
+    assert sheet.disposition == "decision_required"
+    assert sheet.destination_tables == ()
+    assert any(
+        finding.code == "source_ownership_conflict"
+        and finding.source_sheet == "model_master"
+        and finding.model_key == "stingray"
+        and finding.value["source_role"] == "source_option_sheet"
+        for finding in profile.findings
+    )
+
+
+def test_unknown_registry_role_cannot_claim_a_central_sheet(real_workbook, tmp_path):
+    copied = _copy_with_source_binding(
+        real_workbook,
+        tmp_path,
+        model_key="zr1",
+        existing_role="source_option_sheet",
+        source_role="unapproved_future_role",
+        sheet_name="model_master",
+    )
+
+    profile = profile_workbook(copied)
+    sheet = next(s for s in profile.sheets if s.source_sheet == "model_master")
+
+    assert sheet.disposition == "decision_required"
+    assert sheet.destination_tables == ()
+    assert any(
+        finding.code == "source_ownership_conflict"
+        and finding.source_sheet == "model_master"
+        and finding.model_key == "zr1"
+        and finding.value["source_role"] == "unapproved_future_role"
         for finding in profile.findings
     )
 

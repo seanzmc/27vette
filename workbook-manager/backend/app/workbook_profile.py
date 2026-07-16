@@ -94,6 +94,18 @@ def _sha256(path: Path) -> str:
 def _rows(sheet) -> tuple[tuple[str, ...], list[tuple[int, dict[str, object]]]]:
     iterator = sheet.iter_rows(values_only=True)
     raw_headers = next(iterator, ())
+    seen_headers: set[str] = set()
+    duplicate_headers: list[str] = []
+    for header in raw_headers:
+        if not isinstance(header, str) or not header:
+            continue
+        if header in seen_headers and header not in duplicate_headers:
+            duplicate_headers.append(header)
+        seen_headers.add(header)
+    if duplicate_headers:
+        duplicates = ", ".join(repr(header) for header in duplicate_headers)
+        noun = "header" if len(duplicate_headers) == 1 else "headers"
+        raise ValueError(f"Sheet {sheet.title!r} has duplicate {noun} {duplicates}")
     if not raw_headers or any(not isinstance(header, str) or not header for header in raw_headers):
         raise ValueError(f"Sheet {sheet.title!r} has missing or non-text headers")
     headers = tuple(raw_headers)
@@ -222,9 +234,31 @@ def profile_workbook(path: Path) -> WorkbookProfile:
 
         destinations_by_source: dict[str, set[str]] = defaultdict(set)
         unclassified_registered: set[str] = set()
+        ownership_conflicts: set[str] = set()
         for source_row, row in source_rows:
             source_role = str(row.get("source_role") or "")
             sheet_name = str(row.get("sheet_name") or "")
+            if sheet_name in _CENTRAL_DESTINATIONS:
+                ownership_conflicts.add(sheet_name)
+                findings.append(
+                    Finding(
+                        severity="error",
+                        status="decision_required",
+                        code="source_ownership_conflict",
+                        message=(
+                            "Workbook source binding conflicts with explicit central "
+                            "sheet ownership; correct the registry binding before import."
+                        ),
+                        source_sheet=sheet_name,
+                        source_row=source_row,
+                        source_column="sheet_name",
+                        model_key=str(row.get("model_key") or ""),
+                        value={
+                            "source_role": source_role,
+                            "central_destinations": _CENTRAL_DESTINATIONS[sheet_name],
+                        },
+                    )
+                )
             if sheet_name and source_role not in _SOURCE_ROLE_TO_TABLE_ROLE:
                 unclassified_registered.add(sheet_name)
                 findings.append(
@@ -296,6 +330,10 @@ def profile_workbook(path: Path) -> WorkbookProfile:
                         source_sheet=sheet_name,
                     )
                 )
+            elif sheet_name in ownership_conflicts:
+                disposition = "decision_required"
+                destination_tables = ()
+                reason = "Central and registry source ownership conflict."
             elif sheet_name in _CENTRAL_DESTINATIONS:
                 destination_tables = _CENTRAL_DESTINATIONS[sheet_name]
                 disposition = (
