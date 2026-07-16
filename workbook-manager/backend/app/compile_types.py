@@ -49,6 +49,7 @@ class CompiledTable:
     rows: tuple[CompiledRow, ...]
     model_key: str = ""
     role: str = ""
+    schema_mappings: tuple["SchemaMapping", ...] = ()
 
 
 @dataclass(frozen=True)
