@@ -491,6 +491,16 @@ user-approved derived domain resolves the current Z06
 visible runtime step and must not be interpreted as option active/selectable
 state.
 
+Fail closed on every active `model_variants` row whose normalized `model_key`
+is not live, and require each live model's distinct active membership count to
+equal `model_master.expected_variant_count`. The step-summary mapping identity
+is `(model_key, step_key)`: one route has exactly one summary destination, with
+`section_key` retained as a required summary-section foreign key.
+
+Normalization evidence records exact pre-trim, pre-lowercase workbook text.
+Derived route rows merge source mapping parameters and retain reversible
+evidence for both the model and route key.
+
 Compile blank `PriceRef.Trim` as `None`. The SQL table uses an internal
 `price_ref_id INTEGER PRIMARY KEY AUTOINCREMENT` plus a NULL-safe unique
 expression index on

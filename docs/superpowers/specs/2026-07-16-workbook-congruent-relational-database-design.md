@@ -261,12 +261,16 @@ Relationships include:
 
 - `model_variants.model_key -> models.model_key`
 - `model_variants.variant_id -> variants.variant_id`
+- each live model's active `model_variants` count equals its
+  `models.expected_variant_count`; unknown active model ownership stops import
 - `variants.body_style -> body_styles.body_style`
 - `variants.trim_level -> trim_levels.trim_level`
 - model-owned option/override/interior `section_id -> sections.section_id`
 - `section_presentation` references both model and section
 - `runtime_steps`, runtime context sections, and runtime step-summary mappings
   reference `(model_key, route_key)` in `runtime_route_keys`
+- each `(model_key, step_key)` has exactly one runtime summary destination;
+  `section_key` is a required foreign-key value, not part of that identity
 - runtime tables reference their model and use model-scoped unique keys
 - model-owned scope fields reference body style, trim, or variant when they are
   restricted
@@ -281,6 +285,11 @@ The route-key domain was approved on 2026-07-16 after the current workbook and
 runtime contract proved that `step_order_summary_map` row 41 intentionally maps
 Z06 `standard_equipment` to `required_charges` while the visible runtime step
 list intentionally excludes `standard_equipment`.
+
+Normalization lineage preserves the exact raw workbook text before trimming
+or case normalization. Derived route rows merge their source row's mapping
+parameters and retain reversible evidence for both `model_key` and
+`route_key`.
 
 ## 7. Relationship Hardening
 

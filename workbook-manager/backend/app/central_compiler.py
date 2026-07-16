@@ -179,7 +179,7 @@ _TABLE_PRIMARY_KEYS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("runtime_summary_sections", ("model_key", "section_key")),
     (
         "runtime_step_summary_map",
-        ("model_key", "step_key", "section_key"),
+        ("model_key", "step_key"),
     ),
     ("model_assets", ("model_key",)),
     ("price_ref", ("option_type", "trim_level", "code")),
@@ -237,11 +237,26 @@ def _required_text(
 def _lower(
     value: object, *, sheet: str, row: int, column: str
 ) -> tuple[str, dict[str, object]]:
-    original = _required_text(value, sheet=sheet, row=row, column=column)
-    normalized = original.lower()
+    original = "" if value is None else str(value)
+    trimmed = original.strip()
+    if not trimmed:
+        raise _decision(
+            "central_required_value_missing",
+            "A required central value is blank.",
+            sheet=sheet,
+            row=row,
+            column=column,
+            value=value,
+        )
+    normalized = trimmed.lower()
+    transforms: list[str] = []
+    if trimmed != original:
+        transforms.append("trim")
+    if normalized != trimmed:
+        transforms.append("lowercase")
     parameters = (
-        {"original": original, "transform": "lowercase"}
-        if normalized != original
+        {"original": original, "transform": "_then_".join(transforms)}
+        if transforms
         else {}
     )
     return normalized, parameters
@@ -500,6 +515,7 @@ def compile_central_tables(
 
         model_rows: list[CompiledRow] = []
         registry_by_model: dict[str, str] = {}
+        expected_variants_by_model: dict[str, int] = {}
         for row_number, row in _active_rows(source["model_master"], "model_master"):
             model_key, model_parameter = _lower(
                 row.get("model_key"),
@@ -516,6 +532,14 @@ def compile_central_tables(
                 column="registry_key",
             )
             registry_by_model[model_key] = registry_key
+            expected_variant_count = _integer(
+                row.get("expected_variant_count"),
+                sheet="model_master",
+                row=row_number,
+                column="expected_variant_count",
+            )
+            assert expected_variant_count is not None
+            expected_variants_by_model[model_key] = expected_variant_count
             parameters = {"model_key": model_parameter} if model_parameter else {}
             model_rows.append(
                 _compiled_row(
@@ -536,12 +560,7 @@ def compile_central_tables(
                         ),
                         "dataset_name": _text(row.get("dataset_name")),
                         "export_slug": _text(row.get("export_slug")),
-                        "expected_variant_count": _integer(
-                            row.get("expected_variant_count"),
-                            sheet="model_master",
-                            row=row_number,
-                            column="expected_variant_count",
-                        ),
+                        "expected_variant_count": expected_variant_count,
                         "default_model": _boolean(
                             row.get("default_model"),
                             sheet="model_master",
@@ -759,7 +778,14 @@ def compile_central_tables(
                 column="model_key",
             )
             if model_key not in model_keys:
-                continue
+                raise _decision(
+                    "model_variant_model_reference_missing",
+                    "An active model_variants row references no live model.",
+                    sheet="model_variants",
+                    row=row_number,
+                    column="model_key",
+                    value=model_key,
+                )
             variant_id, variant_parameter = _lower(
                 row.get("variant_id"),
                 sheet="model_variants",
@@ -803,12 +829,20 @@ def compile_central_tables(
                 )
             )
             variants_by_model[model_key].add(variant_id)
-        if set(variants_by_model) != model_keys:
-            raise _decision(
-                "live_model_variants_missing",
-                "Every live model must have active model_variants rows.",
-                sheet="model_variants",
-            )
+        for model_key in sorted(model_keys):
+            actual = len(variants_by_model.get(model_key, set()))
+            expected = expected_variants_by_model[model_key]
+            if actual != expected:
+                raise _decision(
+                    "model_variant_count_mismatch",
+                    "Active model variant membership does not match the model contract.",
+                    sheet="model_variants",
+                    value={
+                        "model_key": model_key,
+                        "expected": expected,
+                        "actual": actual,
+                    },
+                )
 
         variant_by_id = {row.values["variant_id"]: row.values for row in variant_rows}
         model_body_styles = {
@@ -985,8 +1019,17 @@ def compile_central_tables(
                 column="section_id",
             )
             section = sections_by_id[section_id]
-            raw_step = _text(row.get("step_key"))
-            step_key = raw_step.lower() if raw_step else str(section["step_key"])
+            raw_step = "" if row.get("step_key") is None else str(row["step_key"])
+            if raw_step.strip():
+                step_key, step_parameter = _lower(
+                    row.get("step_key"),
+                    sheet="section_presentation",
+                    row=row_number,
+                    column="step_key",
+                )
+            else:
+                step_key = str(section["step_key"])
+                step_parameter = {}
             parameters: dict[str, object] = {
                 key: value
                 for key, value in {
@@ -1002,16 +1045,13 @@ def compile_central_tables(
                     "original": row.get("display_label"),
                     "transform": "fallback_from_sections.section_name",
                 }
-            if not raw_step:
+            if not raw_step.strip():
                 parameters["step_key"] = {
                     "original": row.get("step_key"),
                     "transform": "fallback_from_sections.step_key",
                 }
-            elif step_key != raw_step:
-                parameters["step_key"] = {
-                    "original": raw_step,
-                    "transform": "lowercase",
-                }
+            elif step_parameter:
+                parameters["step_key"] = step_parameter
             display_order = _integer(
                 row.get("section_display_order"),
                 sheet="section_presentation",
@@ -1169,12 +1209,16 @@ def compile_central_tables(
         for row_number, row in _active_rows(
             source["context_choice_copy"], "context_choice_copy"
         ):
-            raw_model = _required_text(
-                row.get("model_key"),
-                sheet="context_choice_copy",
-                row=row_number,
-                column="model_key",
-            )
+            raw_model = "" if row.get("model_key") is None else str(row["model_key"])
+            if not raw_model.strip():
+                raise _decision(
+                    "central_required_value_missing",
+                    "A required central value is blank.",
+                    sheet="context_choice_copy",
+                    row=row_number,
+                    column="model_key",
+                    value=row.get("model_key"),
+                )
             context_type, context_parameter = _lower(
                 row.get("context_type"),
                 sheet="context_choice_copy",
@@ -1187,11 +1231,19 @@ def compile_central_tables(
                 row=row_number,
                 column="value",
             )
-            raw_body_style = _text(row.get("body_style"))
+            raw_body_style = (
+                "" if row.get("body_style") is None else str(row["body_style"])
+            )
+            trimmed_body_style = raw_body_style.strip()
             body_style = None
             body_parameter: dict[str, object] = {}
-            if raw_body_style and raw_body_style != "*":
-                body_style = raw_body_style.lower()
+            if trimmed_body_style and trimmed_body_style != "*":
+                body_style, body_parameter = _lower(
+                    row.get("body_style"),
+                    sheet="context_choice_copy",
+                    row=row_number,
+                    column="body_style",
+                )
                 _ensure_reference(
                     body_style,
                     body_styles,
@@ -1200,21 +1252,22 @@ def compile_central_tables(
                     row=row_number,
                     column="body_style",
                 )
-                if body_style != raw_body_style:
-                    body_parameter = {
-                        "original": raw_body_style,
-                        "transform": "lowercase",
-                    }
             else:
                 body_parameter = {
                     "original": row.get("body_style"),
                     "transform": "unrestricted_to_null",
                 }
-            if raw_model == "*":
+            if raw_model.strip() == "*":
                 candidate_models = profile.active_models
                 lineage_role = "shared_source_split"
+                model_parameter: dict[str, object] = {}
             else:
-                model_key = raw_model.lower()
+                model_key, model_parameter = _lower(
+                    row.get("model_key"),
+                    sheet="context_choice_copy",
+                    row=row_number,
+                    column="model_key",
+                )
                 _ensure_reference(
                     model_key,
                     model_keys,
@@ -1224,7 +1277,7 @@ def compile_central_tables(
                     column="model_key",
                 )
                 candidate_models = (model_key,)
-                lineage_role = "normalized" if model_key != raw_model else "direct"
+                lineage_role = "normalized" if model_parameter else "direct"
             accepted_models: list[str] = []
             for model_key in candidate_models:
                 if (model_key, context_type) not in context_keys:
@@ -1244,9 +1297,9 @@ def compile_central_tables(
                         row=row_number,
                         column="context_type",
                         value=context_type,
-                    )
+                )
                 if value not in domain:
-                    if raw_model == "*":
+                    if raw_model.strip() == "*":
                         continue
                     raise _decision(
                         "context_choice_value_reference_missing",
@@ -1274,12 +1327,13 @@ def compile_central_tables(
                         "context_type": context_parameter,
                         "value": value_parameter,
                         "body_style": body_parameter,
+                        "model_key": model_parameter,
                     }.items()
                     if item
                 }
-                if raw_model == "*":
+                if raw_model.strip() == "*":
                     parameters["model_key"] = {
-                        "original": "*",
+                        "original": raw_model,
                         "transform": "expand_to_active_model_domain",
                     }
                 context_choice_rows.append(
@@ -1356,6 +1410,7 @@ def compile_central_tables(
             summary_keys.add((model_key, section_key))
 
         step_summary_rows: list[CompiledRow] = []
+        step_summary_keys: set[tuple[str, str]] = set()
         for row_number, row in _active_rows(
             source["step_order_summary_map"], "step_order_summary_map"
         ):
@@ -1387,6 +1442,17 @@ def compile_central_tables(
                 row=row_number,
                 column="section_key",
             )
+            route_identity = (model_key, step_key)
+            if route_identity in step_summary_keys:
+                raise _decision(
+                    "step_summary_route_duplicate",
+                    "A model route maps to more than one active summary destination.",
+                    sheet="step_order_summary_map",
+                    row=row_number,
+                    column="step_key",
+                    value=route_identity,
+                )
+            step_summary_keys.add(route_identity)
             parameters = {
                 key: value
                 for key, value in {
@@ -1479,19 +1545,22 @@ def compile_central_tables(
                 row=row_number,
                 column="OptionType",
             )
-            raw_trim = _text(row.get("Trim"))
-            trim_level: str | None = raw_trim.lower() if raw_trim else None
+            raw_trim = "" if row.get("Trim") is None else str(row["Trim"])
+            trim_level: str | None
             trim_parameter: dict[str, object] = {}
-            if trim_level is None:
+            if not raw_trim.strip():
+                trim_level = None
                 trim_parameter = {
                     "original": row.get("Trim"),
                     "transform": "unrestricted_to_null",
                 }
-            elif trim_level != raw_trim:
-                trim_parameter = {
-                    "original": raw_trim,
-                    "transform": "lowercase",
-                }
+            else:
+                trim_level, trim_parameter = _lower(
+                    row.get("Trim"),
+                    sheet="PriceRef",
+                    row=row_number,
+                    column="Trim",
+                )
             parameters = {
                 key: item
                 for key, item in {
@@ -1567,6 +1636,21 @@ def compile_central_tables(
         for runtime_step in runtime_step_rows:
             model_key = str(runtime_step.values["model_key"])
             step_key = str(runtime_step.values["step_key"])
+            route_parameters = dict(runtime_step.mapping_parameters)
+            route_parameters.update(
+                {
+                    "model_key": _derived_mapping_parameter(
+                        runtime_step,
+                        "model_key",
+                        "derived_from_runtime_steps.model_key",
+                    ),
+                    "route_key": _derived_mapping_parameter(
+                        runtime_step,
+                        "step_key",
+                        "derived_from_runtime_steps.step_key",
+                    ),
+                }
+            )
             route_rows_by_key[(model_key, step_key)] = _compiled_row(
                 {
                     "model_key": model_key,
@@ -1576,17 +1660,26 @@ def compile_central_tables(
                 runtime_step.source_sheet,
                 runtime_step.source_row,
                 lineage_role=runtime_step.lineage_role,
-                mapping_parameters={
-                    "route_key": _derived_mapping_parameter(
-                        runtime_step,
-                        "step_key",
-                        "derived_from_runtime_steps.step_key",
-                    )
-                },
+                mapping_parameters=route_parameters,
             )
         for summary_map in step_summary_rows:
             model_key = str(summary_map.values["model_key"])
             step_key = str(summary_map.values["step_key"])
+            route_parameters = dict(summary_map.mapping_parameters)
+            route_parameters.update(
+                {
+                    "model_key": _derived_mapping_parameter(
+                        summary_map,
+                        "model_key",
+                        "derived_from_step_order_summary_map.model_key",
+                    ),
+                    "route_key": _derived_mapping_parameter(
+                        summary_map,
+                        "step_key",
+                        "derived_from_step_order_summary_map.step_key",
+                    ),
+                }
+            )
             route_rows_by_key.setdefault(
                 (model_key, step_key),
                 _compiled_row(
@@ -1598,13 +1691,7 @@ def compile_central_tables(
                     summary_map.source_sheet,
                     summary_map.source_row,
                     lineage_role=summary_map.lineage_role,
-                    mapping_parameters={
-                        "route_key": _derived_mapping_parameter(
-                            summary_map,
-                            "step_key",
-                            "derived_from_step_order_summary_map.step_key",
-                        )
-                    },
+                    mapping_parameters=route_parameters,
                 ),
             )
         route_rows = [

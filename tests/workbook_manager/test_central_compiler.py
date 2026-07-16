@@ -61,7 +61,7 @@ def test_compiles_every_central_table_with_declared_primary_keys(compiled_centra
         ("runtime_summary_sections", ("model_key", "section_key")),
         (
             "runtime_step_summary_map",
-            ("model_key", "step_key", "section_key"),
+            ("model_key", "step_key"),
         ),
         ("model_assets", ("model_key",)),
         ("price_ref", ("option_type", "trim_level", "code")),
@@ -282,4 +282,115 @@ def test_derived_route_lineage_preserves_pre_normalized_source_value(
     assert route.mapping_parameters["route_key"] == {
         "original": "BODY_STYLE",
         "transform": "lowercase_then_derived_from_runtime_steps.step_key",
+    }
+
+
+def test_active_model_variant_with_unknown_model_fails_closed(
+    tmp_path, real_workbook
+):
+    path = tmp_path / "unknown-model-variant.xlsx"
+    workbook = load_workbook(real_workbook)
+    workbook["model_variants"].cell(row=2, column=1, value="stingraye")
+    workbook.save(path)
+    workbook.close()
+
+    with pytest.raises(DecisionRequired) as error:
+        compile_central_tables(profile_workbook(path), path)
+    assert error.value.code == "model_variant_model_reference_missing"
+    assert error.value.source_sheet == "model_variants"
+    assert error.value.source_row == 2
+    assert error.value.source_column == "model_key"
+    assert error.value.value == "stingraye"
+
+
+def test_live_model_variant_count_must_match_model_contract(
+    tmp_path, real_workbook
+):
+    path = tmp_path / "missing-model-variant.xlsx"
+    workbook = load_workbook(real_workbook)
+    workbook["model_variants"].cell(row=2, column=4, value=False)
+    workbook.save(path)
+    workbook.close()
+
+    with pytest.raises(DecisionRequired) as error:
+        compile_central_tables(profile_workbook(path), path)
+    assert error.value.code == "model_variant_count_mismatch"
+    assert error.value.source_sheet == "model_variants"
+    assert error.value.value == {
+        "model_key": "stingray",
+        "expected": 6,
+        "actual": 5,
+    }
+
+
+def test_step_summary_route_has_exactly_one_destination(
+    tmp_path, real_workbook
+):
+    path = tmp_path / "duplicate-step-summary-route.xlsx"
+    workbook = load_workbook(real_workbook)
+    workbook["step_order_summary_map"].append(
+        (
+            "stingray",
+            "body_style",
+            "pricing_summary",
+            True,
+            "Test-only conflicting destination.",
+        )
+    )
+    duplicate_row = workbook["step_order_summary_map"].max_row
+    workbook.save(path)
+    workbook.close()
+
+    with pytest.raises(DecisionRequired) as error:
+        compile_central_tables(profile_workbook(path), path)
+    assert error.value.code == "step_summary_route_duplicate"
+    assert error.value.source_sheet == "step_order_summary_map"
+    assert error.value.source_row == duplicate_row
+    assert error.value.value == ("stingray", "body_style")
+
+
+def test_route_lineage_preserves_exact_raw_case_and_whitespace(
+    tmp_path, real_workbook
+):
+    path = tmp_path / "raw-route-lineage.xlsx"
+    workbook = load_workbook(real_workbook)
+    sheet = workbook["runtime_steps"]
+    headers = {cell.value: cell.column for cell in sheet[1]}
+    for row_number in range(2, sheet.max_row + 1):
+        if (
+            sheet.cell(row_number, headers["model_key"]).value == "stingray"
+            and sheet.cell(row_number, headers["step_key"]).value
+            == "body_style"
+        ):
+            sheet.cell(row_number, headers["model_key"]).value = "STINGRAY"
+            sheet.cell(row_number, headers["step_key"]).value = " BODY_STYLE "
+            break
+    else:
+        raise AssertionError("missing stingray body_style runtime step")
+    workbook.save(path)
+    workbook.close()
+
+    tables = {
+        table.name: table
+        for table in compile_central_tables(profile_workbook(path), path)
+    }
+    route = next(
+        row
+        for row in tables["runtime_route_keys"].rows
+        if row.values["model_key"] == "stingray"
+        and row.values["route_key"] == "body_style"
+    )
+    assert route.mapping_parameters["model_key"] == {
+        "original": "STINGRAY",
+        "transform": "lowercase_then_derived_from_runtime_steps.model_key",
+    }
+    assert route.mapping_parameters["route_key"] == {
+        "original": " BODY_STYLE ",
+        "transform": (
+            "trim_then_lowercase_then_derived_from_runtime_steps.step_key"
+        ),
+    }
+    assert route.mapping_parameters["step_key"] == {
+        "original": " BODY_STYLE ",
+        "transform": "trim_then_lowercase",
     }

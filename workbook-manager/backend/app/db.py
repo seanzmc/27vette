@@ -165,7 +165,7 @@ CENTRAL_DDL = (
       section_key TEXT NOT NULL,
       active INTEGER NOT NULL CHECK(active IN (0, 1)),
       notes TEXT NOT NULL DEFAULT '',
-      PRIMARY KEY(model_key, step_key, section_key),
+      PRIMARY KEY(model_key, step_key),
       FOREIGN KEY(model_key, step_key)
         REFERENCES runtime_route_keys(model_key, route_key),
       FOREIGN KEY(model_key, section_key)

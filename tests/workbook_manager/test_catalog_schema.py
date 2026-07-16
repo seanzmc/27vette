@@ -278,6 +278,38 @@ def test_runtime_summary_map_rejects_unknown_model_route(connection):
         )
 
 
+def test_runtime_summary_map_allows_only_one_destination_per_route(connection):
+    db.create_canonical_schema(connection)
+    connection.execute(
+        "INSERT INTO models(model_key, registry_key, model_label, active) "
+        "VALUES('z06', 'z06', 'Z06', 1)"
+    )
+    connection.execute(
+        "INSERT INTO runtime_route_keys(model_key, route_key, route_kind) "
+        "VALUES('z06', 'standard_equipment', 'hidden_summary_bucket')"
+    )
+    connection.executemany(
+        "INSERT INTO runtime_summary_sections("
+        "model_key, section_key, section_label, display_order, active"
+        ") VALUES('z06', ?, ?, ?, 1)",
+        (
+            ("required_charges", "Required Charges", 1),
+            ("pricing_summary", "Pricing Summary", 2),
+        ),
+    )
+    connection.execute(
+        "INSERT INTO runtime_step_summary_map("
+        "model_key, step_key, section_key, active"
+        ") VALUES('z06', 'standard_equipment', 'required_charges', 1)"
+    )
+    with pytest.raises(sqlite3.IntegrityError, match="UNIQUE constraint failed"):
+        connection.execute(
+            "INSERT INTO runtime_step_summary_map("
+            "model_key, step_key, section_key, active"
+            ") VALUES('z06', 'standard_equipment', 'pricing_summary', 1)"
+        )
+
+
 def test_price_ref_null_scope_has_null_safe_identity(connection):
     db.create_canonical_schema(connection)
     connection.execute(
