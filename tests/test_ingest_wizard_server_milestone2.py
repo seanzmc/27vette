@@ -113,6 +113,8 @@ class WizardServerMilestone2Test(unittest.TestCase):
         )
         self.assertEqual(status, 200)
         subject = queue["items"][0]["subject"]
+        self.assertIn("presentation", queue["items"][0])
+        self.assertNotIn("presentation", subject)
 
         status, resolved = self.request(
             "POST",
@@ -139,6 +141,35 @@ class WizardServerMilestone2Test(unittest.TestCase):
         )
         self.assertEqual(status, 200)
         self.assertEqual(reopened["subject"]["state"], "open")
+
+    def test_resolution_endpoint_rejects_read_only_presentation_payload(self) -> None:
+        run_id = self.start_models_run()
+        self.assertEqual(
+            self.request("POST", f"/api/wizard/sessions/{run_id}/compile", {})[0],
+            200,
+        )
+        query = urllib.parse.urlencode(
+            {"reason": "missing_section", "state": "open", "actionable": "yes", "limit": 1}
+        )
+        item = self.request(
+            "GET", f"/api/wizard/sessions/{run_id}/exceptions?{query}"
+        )[1]["items"][0]
+
+        status, response = self.request(
+            "POST",
+            f"/api/wizard/sessions/{run_id}/exceptions/resolve",
+            {
+                "subjectId": item["subject"]["subjectId"],
+                "subjectVersion": item["subject"]["subjectVersion"],
+                "action": "choose_section",
+                "payload": {"sectionId": "sec_whee_001"},
+                "reviewer": "sean",
+                "presentation": item["presentation"],
+            },
+        )
+
+        self.assertEqual(status, 400)
+        self.assertIn("unknown fields", response["error"])
 
     def test_exception_preview_endpoint_is_strict_and_side_effect_free(self) -> None:
         run_id = self.start_models_run()

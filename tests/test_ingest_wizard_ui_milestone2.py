@@ -60,7 +60,7 @@ def test_exception_cards_use_typed_controls_evidence_and_lifecycle_api() -> None
     assert "Existing workbook rows" in js
     assert "Already-derived rows" in js
     assert "Shared context — not written by this decision" in js
-    assert "Exact decision effect" in js
+    assert "Exact workbook rows" in js
     assert "Comparator context" in js
     assert "Proposal to evaluate — not workbook rows" in js
     assert "Target workbook state" not in js
@@ -81,8 +81,8 @@ def test_exception_cards_use_typed_controls_evidence_and_lifecycle_api() -> None
     assert 'id="exception-review-state"' in html
     assert 'q: $("#exception-q").value.trim()' in js
     assert "/exceptions/preview`" in js
-    assert "Preview exact workbook effect" in js
-    assert "Confirm and save this exact effect" in js
+    assert "Preview effect" in js
+    assert "Save exact effect" in js
     assert "Reject entire proposal — write no rows" in js
     assert 'name="rejectWholeProposal" required' in js
     assert "Why this target fact is not applicable" not in js
@@ -90,7 +90,7 @@ def test_exception_cards_use_typed_controls_evidence_and_lifecycle_api() -> None
     assert "choices.priceScopes" in js
     assert "variantScope: scope.variantScope" in js
     assert "result.variantScope = selectedScope.variantScope" in js
-    assert ".exception-card .card-head > div" in css
+    assert ".exception-summary-toggle" in css
     assert "overflow-wrap: anywhere" in css
     assert 'name="bodyStyleScope"' not in js
     assert 'name="trimLevelScope"' not in js
@@ -111,6 +111,42 @@ def test_exception_layout_has_mobile_single_column_fallback() -> None:
     mobile = css[css.index("@media (max-width: 720px)") :]
     assert ".evidence-grid" in mobile
     assert "grid-template-columns: 1fr" in mobile
+    assert "#stage-exceptions .decision-outcome input[type=\"radio\"]" in mobile
+    assert "width: 18px" in mobile
+
+
+def test_exception_review_is_one_expandable_decision_and_one_form() -> None:
+    js = WIZARD_JS.read_text(encoding="utf-8")
+
+    assert "expandedSubjectId: null" in js
+    assert "function renderExceptionSummary(item)" in js
+    assert "function renderExpandedException(item)" in js
+    assert "function renderDecisionOutcomes(item)" in js
+    assert "function toggleExpandedException(" in js
+    assert 'aria-expanded="${expanded ? "true" : "false"}"' in js
+    action_form = js[js.index("function exceptionActionForm(item)") : js.index("function renderDecisionOutcomes(item)")]
+    assert "actions.map" not in action_form
+    assert action_form.count('<form class="exception-resolution-form"') == 1
+    assert action_form.count('class="decision-preview"') == 1
+    assert "renderDecisionOutcomes(item)" in action_form
+    assert 'class="decision-outcomes"' in js
+    assert 'next ? next.subject.subjectId : "__first__"' in js
+    assert 'focusId === "__first__"' in js
+
+
+def test_exception_primary_surface_omits_empty_evidence_and_internal_gate_copy() -> None:
+    js = WIZARD_JS.read_text(encoding="utf-8")
+
+    assert 'if (!entries.length) return "";' in js
+    assert "Blocks ${escapeHtml(subject.model)} compilation" in js
+    assert "compileReady blocked" not in js
+    assert "function conflictComparisonView(item)" in js
+    assert "Existing" in js
+    assert "Proposed" in js
+    assert "Exact workbook rows" in js
+    assert '["add", "added"].includes(entry.effect)' in js
+    assert '["update", "changed"].includes(entry.effect)' in js
+    assert '["remove", "removed"].includes(entry.effect)' in js
 
 
 def test_visible_resume_routes_current_and_historical_states() -> None:

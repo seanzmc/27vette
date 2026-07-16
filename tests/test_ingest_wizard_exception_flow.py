@@ -149,6 +149,168 @@ class ExceptionFlowTest(unittest.TestCase):
         self.assertTrue(all(section["sectionName"] for section in sections))
         self.assertEqual(item["choices"]["relationshipRuleTypes"], [])
 
+    def test_exception_view_adds_decision_first_display_projection(self) -> None:
+        section = self.store.exception_queue_view(
+            self.run_id,
+            reason="missing_section",
+            state="open",
+            actionable="yes",
+            limit=1,
+        )["items"][0]
+        exclusive = self.store.exception_queue_view(
+            self.run_id,
+            reason="comparator_only_exclusive_group_proposal",
+            limit=1,
+        )["items"][0]
+
+        for item in (section, exclusive):
+            presentation = item["presentation"]
+            self.assertTrue(presentation["title"])
+            self.assertTrue(presentation["summary"])
+            self.assertTrue(presentation["whyAsked"])
+            self.assertIsInstance(presentation["options"], list)
+            self.assertNotIn("presentation", item["subject"])
+
+        self.assertIn("Place", section["presentation"]["summary"])
+        self.assertIn("Roof panel, transparent", section["presentation"]["summary"])
+        self.assertIn("Choose at most one", exclusive["presentation"]["summary"])
+        presented = {
+            option["rpo"]: option for option in exclusive["presentation"]["options"]
+        }
+        self.assertEqual(presented["BV4"]["label"], "Personalized Plaque")
+        self.assertEqual(presented["PDB"]["label"], "Description unavailable")
+        specific = self.store._presentation_option(
+            "NGA",
+            [
+                {
+                    "optionId": "opt_nga_001",
+                    "rpo": "NGA",
+                    "name": "Exhaust tips",
+                    "description": "Exhaust tips, Black",
+                }
+            ],
+            [],
+        )
+        self.assertEqual(specific["label"], "Exhaust tips, Black")
+
+    def test_presentation_copy_is_isolated_from_authority_preview_and_artifacts(self) -> None:
+        original = self.store.exception_queue_view(
+            self.run_id,
+            reason="missing_section",
+            state="open",
+            actionable="yes",
+            limit=1,
+        )
+        subject = original["items"][0]["subject"]
+        run_dir = self.store.run_dir(self.run_id)
+        before_files = {
+            path.name: path.read_bytes() for path in run_dir.iterdir() if path.is_file()
+        }
+        before_preview = self.store.preview_exception(
+            self.run_id,
+            subject_id=subject["subjectId"],
+            subject_version=subject["subjectVersion"],
+            action="choose_section",
+            payload={"sectionId": "sec_whee_001"},
+        )
+
+        with mock.patch.object(
+            self.store,
+            "_exception_presentation",
+            return_value={
+                "title": "Display copy changed",
+                "summary": "Display copy changed",
+                "whyAsked": "Display copy changed",
+                "options": [],
+                "comparison": None,
+            },
+        ):
+            changed = self.store.exception_queue_view(
+                self.run_id,
+                reason="missing_section",
+                state="open",
+                actionable="yes",
+                limit=1,
+            )
+            after_preview = self.store.preview_exception(
+                self.run_id,
+                subject_id=subject["subjectId"],
+                subject_version=subject["subjectVersion"],
+                action="choose_section",
+                payload={"sectionId": "sec_whee_001"},
+            )
+
+        self.assertEqual(
+            changed["queueSubjectFingerprint"], original["queueSubjectFingerprint"]
+        )
+        self.assertEqual(
+            changed["items"][0]["subject"]["subjectVersion"], subject["subjectVersion"]
+        )
+        self.assertEqual(after_preview, before_preview)
+        self.assertEqual(
+            {path.name: path.read_bytes() for path in run_dir.iterdir() if path.is_file()},
+            before_files,
+        )
+
+    def test_group_and_conflict_presentation_never_leads_with_compiler_json(self) -> None:
+        base = {
+            "subject": {
+                "model": "zr1",
+                "question": "Review proposal.",
+                "proposedRows": [
+                    {
+                        "sourceRpo": "PDB",
+                        "memberRpos": ["BV4", "CC3"],
+                        "groupType": "requires_any",
+                    }
+                ],
+                "semanticConflict": {},
+            },
+            "decisionType": "rule_group",
+            "reviewState": "needs_decision",
+            "evidence": {
+                "sourceEvidence": [],
+                "existingWorkbookRows": [],
+                "alreadyDerivedRows": [],
+                "comparator": [{}],
+                "workbookReferences": [],
+            },
+        }
+        options = [
+            {"optionId": "opt_pdb", "rpo": "PDB", "name": "Carbon Wheel Package"},
+            {"optionId": "opt_bv4", "rpo": "BV4", "name": "Personalized Plaque"},
+            {"optionId": "opt_cc3", "rpo": "CC3", "name": "Transparent roof panel"},
+        ]
+
+        group = self.store._exception_presentation(base, options)
+        self.assertIn("requires at least one of", group["summary"])
+        self.assertNotIn("requires_any", group["summary"])
+
+        conflict_item = json.loads(json.dumps(base))
+        conflict_item["reviewState"] = "semantic_conflict"
+        conflict_item["subject"]["semanticConflict"] = {
+            "overlapKind": "member_set_mismatch",
+            "existingMemberRpos": ["BV4"],
+            "proposedMemberRpos": ["BV4", "CC3"],
+        }
+        conflict_item["evidence"]["existingWorkbookRows"] = [
+            {
+                "values": {
+                    "source_id": "opt_pdb",
+                    "group_type": "requires_all",
+                }
+            }
+        ]
+
+        conflict = self.store._exception_presentation(conflict_item, options)
+        comparison = conflict["comparison"]
+        self.assertEqual(comparison["difference"], "different member set")
+        self.assertIn("PDB — Carbon Wheel Package", comparison["existing"])
+        self.assertIn("BV4 — Personalized Plaque", comparison["existing"])
+        self.assertIn("requires all of", comparison["existing"])
+        self.assertIn("requires at least one of", comparison["proposed"])
+        self.assertNotIn("{", comparison["existing"] + comparison["proposed"])
+
     def test_exception_view_separates_source_existing_derived_and_shared_context(self) -> None:
         payload = self.store.exception_queue_view(
             self.run_id,

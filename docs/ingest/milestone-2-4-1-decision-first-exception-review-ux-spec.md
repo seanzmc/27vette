@@ -1,6 +1,6 @@
 # Milestone 2.4.1 — Decision-First Exception Review UX Correction
 
-Status: DRAFT — SPEC ONLY, NOT APPROVED FOR IMPLEMENTATION. Exception mutation remains paused. Milestone 3 remains blocked and unapproved.
+Status: APPROVED AND IMPLEMENTED 2026-07-16 — local implementation and verification complete; independent closure review pending. Exception mutation remains paused outside disposable proof. Milestone 3 remains blocked and unapproved.
 
 Recommended reasoning level: high.
 
@@ -290,4 +290,25 @@ Revert only the display projection, browser renderer/styles, scoped tests, and d
 
 ## Approval gate
 
-Writing this spec does not approve implementation. Approval must explicitly authorize Milestone 2.4.1's presentation/session changes and its disposable proof only. It does not authorize Milestone 3, `pass-c-3`, live workbook writes, generation, publication, promotion, deployment, or dealer changes.
+Sean approved this spec on 2026-07-15 and explicitly authorized execution on 2026-07-16. That approval covers only Milestone 2.4.1's presentation/session changes and disposable proof. It does not authorize Milestone 3, `pass-c-3`, live workbook writes, generation, publication, promotion, deployment, or dealer changes.
+
+## Implementation checkpoint — 2026-07-16
+
+Implemented surfaces:
+
+- `session.py` now adds a display-only `presentation` projection built from structured target/comparator/session data. Tests prove presentation copy cannot change subject versions, queue authority, preview effects, artifacts, or accepted mutation payloads.
+- `wizard.js` now renders compact summary rows, at most one expanded decision, one mutually exclusive outcome fieldset, one conditional form, one preview/save path, concise effect copy, collapsed exact rows, and read-only plain-language conflict comparisons.
+- `wizard.css` now enforces the desktop/mobile compact-row budgets, visible focus, 44 px outcome targets, progressive disclosure, and zero-overflow mobile radio behavior.
+- Scoped session, server, and UI tests cover the presentation contract, mutation-field isolation, plain group/conflict copy, one-card/one-form structure, preview vocabulary, focus advancement, and mobile radio regression.
+
+Verification completed:
+
+- scoped gate: 37 passed;
+- full ingest gate: 360 passed, 18 subtests passed;
+- workbook package and schema validation: valid, zero issues;
+- Python compile, JavaScript syntax, and `git diff --check`: passed;
+- browser proof at 1,200 × 720 and 390 × 844: compact/one-expanded-card behavior, conditional outcomes, exact preview, invalidation, save, reopen, keyboard expansion/focus, no horizontal overflow, and zero console warnings/errors;
+- retained run `20260715-225924-b198b4`: GET-only browser observation; forensic run `20260715-150312-eb8d08`: untouched;
+- `stingray_master.xlsx`, the raw export, `form-app/data.js`, and runtime contracts: byte-identical to `HEAD`.
+
+Independent closure review has not run. Per this spec, Milestones 2.4/2.4.1 do not close and normal exception mutation does not resume until an independent verifier passes the comprehension and safety gates without edits. No Fable receipt or `STATE.md` update is created before that gate.

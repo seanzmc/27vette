@@ -1,6 +1,6 @@
 # Milestone 2.4 — Exception Review Safety and Semantic Conflict Closure
 
-Status: DRAFT — SPEC ONLY, NOT APPROVED FOR IMPLEMENTATION. Exception review is paused. Milestone 3 remains blocked and unapproved.
+Status: IMPLEMENTED 2026-07-15 and corrected by approved Milestone 2.4.1 on 2026-07-16. Joint independent closure review remains pending; exception review is paused outside disposable proof. Milestone 3 remains blocked and unapproved.
 
 Recommended reasoning level: high.
 
@@ -310,4 +310,4 @@ Revert only the scoped code/test/docs changes. Remove only the new disposable pr
 
 ## Approval gate
 
-Implementation is not approved by this draft. Approval must explicitly authorize Milestone 2.4 only. It does not authorize Milestone 3, `pass-c-3`, workbook writes, generation, publication, promotion, deployment, or dealer changes.
+Milestone 2.4's semantic-conflict and exact-preview machinery was implemented in commit `302136b`; Sean approved the Milestone 2.4.1 decision-first correction on 2026-07-15 and authorized execution on 2026-07-16. The combined work still requires one independent closure review. It does not authorize Milestone 3, `pass-c-3`, workbook writes, generation, publication, promotion, deployment, or dealer changes.

@@ -700,6 +700,8 @@ const exceptionState = {
   payload: null,
   offset: 0,
   limit: 20,
+  expandedSubjectId: null,
+  pendingFocusSubjectId: null,
 };
 
 function optionSelect(name, options, placeholder) {
@@ -803,15 +805,19 @@ function exceptionActionForm(item) {
       : prerequisites.message || "No complete workbook-writable answer is available from the current source and compiler.";
     return `<div class="source-blocker"><b>Blocked — no decision control is available.</b> ${escapeHtml(detail)}</div>`;
   }
-  return `<div class="exception-actions">${actions
-    .map(
-      (action) => `<form class="exception-resolution-form" data-action="${escapeHtml(action)}" data-subject-id="${escapeHtml(item.subject.subjectId)}" data-subject-version="${escapeHtml(item.subject.subjectVersion)}" data-reason-code="${escapeHtml(item.subject.reasonCode)}">
-        ${exceptionActionFields(item, action)}
-        <section class="decision-preview" aria-live="polite"><h3>Exact decision effect</h3><div class="empty-note">Complete the fields, then preview every physical workbook row before saving.</div></section>
-        <button class="primary" type="submit">Preview exact workbook effect</button>
-      </form>`
-    )
-    .join("")}</div>`;
+  return `<form class="exception-resolution-form" data-action="" data-subject-id="${escapeHtml(item.subject.subjectId)}" data-subject-version="${escapeHtml(item.subject.subjectVersion)}" data-reason-code="${escapeHtml(item.subject.reasonCode)}">
+    ${renderDecisionOutcomes(item)}
+    <div class="conditional-action-fields"></div>
+    <section class="decision-preview" aria-live="polite" hidden></section>
+    <button class="primary decision-primary" type="submit" disabled>Preview effect</button>
+  </form>`;
+}
+
+function renderDecisionOutcomes(item) {
+  const actions = item.availableActions || [];
+  return `<fieldset class="decision-outcomes"><legend>Choose one outcome</legend>
+    ${actions.map((action) => `<label class="decision-outcome"><input type="radio" name="decisionAction" value="${escapeHtml(action)}"> <span>${escapeHtml(actionLabel(action, item.subject.reasonCode))}</span></label>`).join("")}
+  </fieldset>`;
 }
 
 function sourceEvidenceView(candidate) {
@@ -860,7 +866,8 @@ function comparatorEvidenceView(fact) {
 }
 
 function evidenceColumn(title, entries, formatter) {
-  return `<section class="evidence-column"><h3>${escapeHtml(title)}</h3>${entries.length ? entries.map(formatter).join("") : '<div class="empty-note">No directly joined evidence for this subject.</div>'}</section>`;
+  if (!entries.length) return "";
+  return `<details class="evidence-column"><summary>${escapeHtml(title)} (${entries.length})</summary>${entries.map(formatter).join("")}</details>`;
 }
 
 function decisionEffectView(preview) {
@@ -872,14 +879,50 @@ function decisionEffectView(preview) {
   const cleared = effect.removedBlockerSubjectIds || [];
   const added = effect.addedBlockerSubjectIds || [];
   const suppressed = effect.suppressedProposalRows || [];
+  let summary;
+  if (!preview.projectable) {
+    summary = "Cannot be saved because the decision does not produce a complete workbook-safe effect.";
+  } else if (suppressed.length) {
+    summary = "Writes no rows and suppresses the entire proposal.";
+  } else if (!effect.writesRows || !rows.length) {
+    summary = "Writes no workbook rows.";
+  } else {
+    const additions = rows.filter((entry) => ["add", "added"].includes(entry.effect)).length;
+    const updates = rows.filter((entry) => ["update", "changed"].includes(entry.effect)).length;
+    const removals = rows.filter((entry) => ["remove", "removed"].includes(entry.effect)).length;
+    const changes = [];
+    if (additions) changes.push(`adds ${additions}`);
+    if (updates) changes.push(`updates ${updates}`);
+    if (removals) changes.push(`removes ${removals}`);
+    summary = `${changes.join(", ") || "Changes"} workbook row${rows.length === 1 ? "" : "s"} (${rows.length} total).`;
+  }
   const suppressedHtml = suppressed.length
-    ? `<div class="source-blocker"><b>Rows written: 0.</b> The complete proposal below will be suppressed, not partially edited.${suppressed.map(canonicalRowView).join("")}</div>`
+    ? `<div class="source-blocker"><b>Entire proposal suppressed.</b>${suppressed.map(canonicalRowView).join("")}</div>`
     : "";
-  return `<h3 tabindex="-1">Exact decision effect</h3>${rowHtml}${suppressedHtml}
-    <div class="cell-sub">Rows written: ${escapeHtml(effect.writesRows ? rows.length : 0)}. Clears ${escapeHtml(cleared.length)} blocker${cleared.length === 1 ? "" : "s"}; adds ${escapeHtml(added.length)} blocker${added.length === 1 ? "" : "s"}. Live workbook write: no.</div>`;
+  return `<h3 tabindex="-1">Preview</h3>
+    <p class="preview-summary">${escapeHtml(summary)} <b>The live workbook is not being written.</b></p>
+    <div class="cell-sub">Clears ${escapeHtml(cleared.length)} blocker${cleared.length === 1 ? "" : "s"}; adds ${escapeHtml(added.length)} blocker${added.length === 1 ? "" : "s"}.</div>
+    <details class="exact-effects"><summary>Exact workbook rows (${rows.length})</summary>${rowHtml}${suppressedHtml}</details>`;
 }
 
-function renderExceptionCard(item) {
+function sourceSnippetView(item) {
+  const source = (item.evidence.sourceEvidence || [])[0];
+  if (!source) return "";
+  const rpo = source.rpo || source.refOnlyRpo || "Target source";
+  return `<div class="source-snippet"><span>Target source</span><b>${escapeHtml(rpo)}</b> — ${escapeHtml(source.description || "Description unavailable")}</div>`;
+}
+
+function conflictComparisonView(item) {
+  const comparison = (item.presentation || {}).comparison;
+  if (!comparison) return "";
+  return `<section class="conflict-comparison" aria-label="Existing and proposed behavior">
+    <div><span>Existing</span><p>${escapeHtml(comparison.existing)}</p></div>
+    <div><span>Proposed</span><p>${escapeHtml(comparison.proposed)}</p></div>
+    <p class="conflict-difference"><b>Difference:</b> ${escapeHtml(comparison.difference)}</p>
+  </section>`;
+}
+
+function supportingEvidenceView(item) {
   const subject = item.subject;
   const raw = item.evidence.sourceEvidence || [];
   const existingRows = item.evidence.existingWorkbookRows || [];
@@ -887,27 +930,68 @@ function renderExceptionCard(item) {
   const sharedContext = item.evidence.sharedContext || [];
   const comparator = item.evidence.comparator || [];
   const proposed = subject.proposedRows || [];
-  const stale = (item.history.stale || []).length;
-  return `<article class="exception-card ${item.state === "resolved" ? "exception-resolved" : ""}">
-    <div class="card-head">
-      <div><span class="card-title">${escapeHtml(subject.model)} · ${escapeHtml(item.decisionType || subject.family)}</span>
-        <div class="cell-sub">Affects ${(item.affectedSheets || []).map(escapeHtml).join(", ") || "no writable sheet yet"}</div></div>
-      <span class="type-badge ${subject.severity === "blocker" ? "type-unsupported" : ""}">${escapeHtml(subject.severity)} · ${escapeHtml(item.state)}</span>
-    </div>
-    <p class="exception-question">${escapeHtml(subject.question)}</p>
-    <details class="debug-detail"><summary>Compiler details</summary><code>${escapeHtml(subject.reasonCode)} · ${escapeHtml(subject.subjectId)}</code></details>
-    ${stale ? `<div class="status-note">${stale} prior answer${stale === 1 ? "" : "s"} became stale when evidence changed.</div>` : ""}
-    <div class="evidence-grid">
+  const columns = `
       ${evidenceColumn("Raw source evidence", raw, sourceEvidenceView)}
       ${evidenceColumn("Existing workbook rows", existingRows, canonicalRowView)}
       ${evidenceColumn("Already-derived rows", derivedRows, canonicalRowView)}
       ${evidenceColumn("Comparator context", comparator, comparatorEvidenceView)}
       ${evidenceColumn("Proposal to evaluate — not workbook rows", proposed, canonicalRowView)}
+    `;
+  return `<details class="supporting-details"><summary>Supporting details</summary>
+    <div class="evidence-grid">${columns}</div>
+    ${sharedContext.length ? `<details class="shared-context"><summary>Shared context — not written by this decision (${sharedContext.length})</summary>${sharedContext.map(canonicalRowView).join("")}</details>` : ""}
+    <details class="debug-detail"><summary>Technical details</summary>
+      <div class="gate-impact"><b>Gate impact:</b> Blocks ${escapeHtml(subject.model)} compilation.</div>
+      <code>${escapeHtml(subject.reasonCode)} · ${escapeHtml(subject.subjectId)}</code>
+      <div class="cell-sub">Affected sheets: ${(item.affectedSheets || []).map(escapeHtml).join(", ") || "not yet projectable"}</div>
+    </details>
+  </details>`;
+}
+
+function renderExpandedException(item) {
+  const subject = item.subject;
+  const presentation = item.presentation || {};
+  const stale = (item.history.stale || []).length;
+  return `<section class="exception-card ${item.state === "resolved" ? "exception-resolved" : ""}" id="exception-detail-${escapeHtml(subject.subjectId)}">
+    <div class="decision-heading">
+      <div><span class="decision-kicker">Decision</span><h2 tabindex="-1">${escapeHtml(presentation.title || `${subject.model} decision`)}</h2></div>
+      <span class="type-badge ${subject.severity === "blocking" ? "type-unsupported" : ""}">${escapeHtml(item.reviewState.replaceAll("_", " "))}</span>
     </div>
-    <details class="shared-context"><summary>Shared context — not written by this decision (${sharedContext.length})</summary>${sharedContext.length ? sharedContext.map(canonicalRowView).join("") : '<div class="empty-note">No shared context.</div>'}</details>
-    <div class="gate-impact"><b>Gate impact:</b> ${escapeHtml(subject.severity)} — unresolved keeps ${escapeHtml(subject.model)} compileReady blocked.</div>
+    <p class="decision-sentence">${escapeHtml(presentation.summary || subject.question)}</p>
+    <p class="why-asked"><b>Why this needs a decision:</b> ${escapeHtml(presentation.whyAsked || subject.question)}</p>
+    ${sourceSnippetView(item)}
+    ${conflictComparisonView(item)}
+    ${stale ? `<div class="status-note">${stale} prior answer${stale === 1 ? "" : "s"} became stale when evidence changed.</div>` : ""}
+    <div class="compilation-impact">Blocks ${escapeHtml(subject.model)} compilation</div>
     ${exceptionActionForm(item)}
+    ${supportingEvidenceView(item)}
+  </section>`;
+}
+
+function renderExceptionSummary(item) {
+  const subject = item.subject;
+  const presentation = item.presentation || {};
+  const expanded = exceptionState.expandedSubjectId === subject.subjectId;
+  const rpos = (presentation.options || []).map((option) => option.rpo).filter(Boolean).join(" · ");
+  return `<article class="exception-summary ${expanded ? "is-expanded" : ""} ${item.state === "resolved" ? "exception-resolved" : ""}">
+    <button type="button" class="exception-summary-toggle" data-subject-id="${escapeHtml(subject.subjectId)}" aria-expanded="${expanded ? "true" : "false"}" aria-controls="exception-detail-${escapeHtml(subject.subjectId)}">
+      <span class="summary-model">${escapeHtml(subject.model)}</span>
+      <span class="summary-type">${escapeHtml(item.decisionType.replaceAll("_", " "))}</span>
+      <span class="summary-rpos">${escapeHtml(rpos || "Source decision")}</span>
+      <span class="summary-behavior">${escapeHtml(presentation.summary || subject.question)}</span>
+      <span class="summary-state">${escapeHtml(item.reviewState.replaceAll("_", " "))}</span>
+    </button>
+    ${expanded ? renderExpandedException(item) : ""}
   </article>`;
+}
+
+function renderExceptionCard(item) {
+  return renderExceptionSummary(item);
+}
+
+function toggleExpandedException(subjectId) {
+  exceptionState.expandedSubjectId = exceptionState.expandedSubjectId === subjectId ? null : subjectId;
+  if (exceptionState.payload) renderExceptionPage(exceptionState.payload);
 }
 
 function fillExceptionFilter(id, values, allLabel) {
@@ -926,6 +1010,12 @@ function renderExceptionReadiness(summary) {
 function renderExceptionPage(payload) {
   exceptionState.payload = payload;
   exceptionState.offset = payload.offset;
+  if (
+    exceptionState.expandedSubjectId &&
+    !payload.items.some((item) => item.subject.subjectId === exceptionState.expandedSubjectId)
+  ) {
+    exceptionState.expandedSubjectId = null;
+  }
   fillExceptionFilter("#exception-model", payload.filters.models, "All models");
   fillExceptionFilter("#exception-decision", payload.filters.decisionTypes, "All decision types");
   fillExceptionFilter("#exception-sheet", payload.filters.affectedSheets, "All affected sheets");
@@ -940,6 +1030,21 @@ function renderExceptionPage(payload) {
     <button id="exceptions-next" class="ghost" ${last >= payload.total ? "disabled" : ""}>Next</button>`;
   $("#exceptions-prev").addEventListener("click", () => loadExceptions(Math.max(0, payload.offset - payload.limit)));
   $("#exceptions-next").addEventListener("click", () => loadExceptions(payload.offset + payload.limit));
+  if (exceptionState.pendingFocusSubjectId) {
+    const focusId = exceptionState.pendingFocusSubjectId;
+    exceptionState.pendingFocusSubjectId = null;
+    requestAnimationFrame(() => {
+      const buttons = [...document.querySelectorAll(".exception-summary-toggle")];
+      const firstDecisionId = payload.items
+        .find((item) => item.reviewState === "needs_decision")?.subject.subjectId;
+      const target = buttons.find(
+        (button) => button.dataset.subjectId === (
+          focusId === "__first__" ? firstDecisionId : focusId
+        )
+      ) || buttons.find((button) => button.dataset.subjectId === firstDecisionId);
+      if (target) target.focus();
+    });
+  }
 }
 
 async function loadExceptions(offset = 0) {
@@ -1007,11 +1112,36 @@ function resolutionPayload(form, action, reasonCode) {
   }
 }
 
+function invalidateDecisionPreview(form) {
+  form.dataset.previewToken = "";
+  const preview = form.querySelector(".decision-preview");
+  preview.hidden = true;
+  preview.innerHTML = "";
+  form.querySelector('button[type="submit"]').textContent = "Preview effect";
+}
+
+$("#exception-queue").addEventListener("change", (event) => {
+  const outcome = event.target.closest('input[name="decisionAction"]');
+  if (!outcome) return;
+  const form = outcome.closest(".exception-resolution-form");
+  form.dataset.action = outcome.value;
+  form.querySelector(".conditional-action-fields").innerHTML = exceptionActionFields(
+    exceptionState.payload.items.find((item) => item.subject.subjectId === form.dataset.subjectId),
+    outcome.value
+  );
+  form.querySelector('button[type="submit"]').disabled = false;
+  invalidateDecisionPreview(form);
+});
+
 $("#exception-queue").addEventListener("submit", async (event) => {
   const form = event.target.closest(".exception-resolution-form");
   if (!form) return;
   event.preventDefault();
   clearError();
+  if (!form.dataset.action) {
+    showError("Choose one outcome before previewing its effect.");
+    return;
+  }
   const button = form.querySelector('button[type="submit"]');
   button.disabled = true;
   try {
@@ -1030,10 +1160,11 @@ $("#exception-queue").addEventListener("submit", async (event) => {
         payload,
       });
       form.dataset.previewToken = previewToken;
+      form.querySelector(".decision-preview").hidden = false;
       form.querySelector(".decision-preview").innerHTML = decisionEffectView(preview);
       form.querySelector(".decision-preview h3").focus();
-      button.textContent = "Confirm and save this exact effect";
-      $("#exception-status").textContent = "Preview complete. Review every row, then confirm to save.";
+      button.textContent = "Save exact effect";
+      $("#exception-status").textContent = "Preview complete. Review the summary and exact rows, then save.";
       return;
     }
     const reviewer = $("#exception-reviewer").value.trim();
@@ -1053,6 +1184,13 @@ $("#exception-queue").addEventListener("submit", async (event) => {
     state.session = result.summary.session;
     renderExceptionReadiness(result.summary);
     $("#exception-status").textContent = "Resolution saved and compiler rerun completed.";
+    const currentIndex = (exceptionState.payload.items || [])
+      .findIndex((item) => item.subject.subjectId === form.dataset.subjectId);
+    const next = (exceptionState.payload.items || [])
+      .slice(currentIndex + 1)
+      .find((item) => item.reviewState === "needs_decision");
+    exceptionState.expandedSubjectId = null;
+    exceptionState.pendingFocusSubjectId = next ? next.subject.subjectId : "__first__";
     await loadExceptions(exceptionState.offset);
   } catch (error) {
     showError(error.message);
@@ -1064,12 +1202,21 @@ $("#exception-queue").addEventListener("submit", async (event) => {
 $("#exception-queue").addEventListener("input", (event) => {
   const form = event.target.closest(".exception-resolution-form");
   if (!form || !form.dataset.previewToken) return;
-  form.dataset.previewToken = "";
-  form.querySelector(".decision-preview").innerHTML = '<h3>Exact decision effect</h3><div class="empty-note">Inputs changed. Preview the exact rows again before saving.</div>';
-  form.querySelector('button[type="submit"]').textContent = "Preview exact workbook effect";
+  invalidateDecisionPreview(form);
+  $("#exception-status").textContent = "Inputs changed. Preview the effect again before saving.";
 });
 
 $("#exception-queue").addEventListener("click", async (event) => {
+  const toggle = event.target.closest(".exception-summary-toggle");
+  if (toggle) {
+    toggleExpandedException(toggle.dataset.subjectId);
+    if (exceptionState.expandedSubjectId === toggle.dataset.subjectId) {
+      requestAnimationFrame(() => {
+        document.getElementById(`exception-detail-${toggle.dataset.subjectId}`)?.querySelector("h2")?.focus();
+      });
+    }
+    return;
+  }
   const button = event.target.closest(".exception-reopen");
   if (!button) return;
   clearError();

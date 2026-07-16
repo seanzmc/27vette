@@ -1263,6 +1263,278 @@ class WizardSessionStore:
         )
         return {rpo for rpo, count in counts.items() if count == 1}
 
+    @staticmethod
+    def _presentation_option(
+        rpo: str,
+        model_options: list[dict[str, Any]],
+        source_rows: list[dict[str, Any]],
+    ) -> dict[str, str]:
+        """Return non-authoritative display copy for one structured option reference."""
+
+        normalized = str(rpo or "").strip().upper()
+        matches = [
+            option
+            for option in model_options
+            if str(option.get("rpo") or "").strip().upper() == normalized
+        ]
+        source_match = next(
+            (
+                row
+                for row in source_rows
+                if str(row.get("rpo") or row.get("refOnlyRpo") or "").strip().upper()
+                == normalized
+                and str(row.get("description") or "").strip()
+            ),
+            None,
+        )
+        label = str(
+            (matches[0].get("description") if matches else "")
+            or ((source_match or {}).get("description") or "")
+            or (matches[0].get("name") if matches else "")
+            or "Description unavailable"
+        ).strip()
+        return {
+            "optionId": str(matches[0].get("optionId") or "") if len(matches) == 1 else "",
+            "rpo": normalized,
+            "label": label,
+        }
+
+    @staticmethod
+    def _presentation_option_text(option: dict[str, str]) -> str:
+        rpo = str(option.get("rpo") or "").strip()
+        label = str(option.get("label") or "Description unavailable").strip()
+        return f"{rpo} — {label}" if rpo else label
+
+    def _exception_presentation(
+        self,
+        item: dict[str, Any],
+        model_options: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        """Project one conservative, display-only decision description."""
+
+        subject = item["subject"]
+        evidence = item.get("evidence") or {}
+        source_rows = list(evidence.get("sourceEvidence") or [])
+        proposed_rows = list(subject.get("proposedRows") or [])
+        proposed = proposed_rows[0] if proposed_rows else {}
+        decision_type = str(item.get("decisionType") or "source_or_tooling")
+        model = str(subject.get("model") or "target").replace("_", " ").upper()
+
+        rpos: list[str] = []
+        for row in proposed_rows:
+            for value in (
+                row.get("sourceRpo"),
+                row.get("targetRpo"),
+                row.get("conditionRpo"),
+                *(row.get("memberRpos") or []),
+            ):
+                normalized = str(value or "").strip().upper()
+                if normalized and normalized not in rpos:
+                    rpos.append(normalized)
+        if not rpos:
+            for row in source_rows:
+                normalized = str(row.get("rpo") or row.get("refOnlyRpo") or "").strip().upper()
+                if normalized and normalized not in rpos:
+                    rpos.append(normalized)
+
+        options = [
+            self._presentation_option(rpo, model_options, source_rows) for rpo in rpos
+        ]
+        by_rpo = {option["rpo"]: option for option in options}
+
+        def option_text(rpo: Any) -> str:
+            normalized = str(rpo or "").strip().upper()
+            option = by_rpo.get(normalized)
+            if option is None:
+                option = self._presentation_option(normalized, model_options, source_rows)
+            return self._presentation_option_text(option)
+
+        def value(record: dict[str, Any], camel: str, snake: str) -> Any:
+            return record.get(camel) if record.get(camel) not in (None, "") else record.get(snake)
+
+        def group_phrase(group_type: Any) -> str:
+            return {
+                "requires_any": "requires at least one of",
+                "requires_all": "requires all of",
+                "includes_all": "includes",
+                "includes_any": "includes one of",
+                "excludes_all": "makes unavailable",
+                "excludes_any": "makes any of these unavailable",
+            }.get(str(group_type or ""), "applies this rule to")
+
+        def fact_summary(row: dict[str, Any]) -> str:
+            values = row.get("values") or row.get("signature") or row
+            source_rpo = value(values, "sourceRpo", "source_rpo")
+            target_rpo = value(values, "targetRpo", "target_rpo")
+            condition_rpo = value(values, "conditionRpo", "condition_rpo")
+            members = value(values, "memberRpos", "member_rpos") or []
+            group_type = value(values, "groupType", "group_type")
+            selection_mode = value(values, "selectionMode", "selection_mode")
+            rule_type = value(values, "ruleType", "rule_type")
+            if source_rpo and members:
+                member_text = ", ".join(option_text(rpo) for rpo in members)
+                return f"Selecting {option_text(source_rpo)} {group_phrase(group_type)}: {member_text}."
+            if members:
+                member_text = ", ".join(option_text(rpo) for rpo in members)
+                exact = str(selection_mode or "").startswith("required")
+                return f"Choose {'exactly' if exact else 'at most'} one of: {member_text}."
+            if source_rpo and target_rpo:
+                behavior = {
+                    "requires": "requires",
+                    "includes": "includes",
+                    "excludes": "makes unavailable",
+                    "replaces": "replaces",
+                }.get(str(rule_type or ""), "has a relationship with")
+                return f"Selecting {option_text(source_rpo)} {behavior} {option_text(target_rpo)}."
+            if target_rpo or condition_rpo:
+                target_text = option_text(target_rpo or condition_rpo)
+                return f"Applies a target rule to {target_text}."
+            return "The target workbook contains a rule with a different structured effect."
+
+        decision_names = {
+            "section": "section placement",
+            "identity": "option identity",
+            "relationship": "option relationship",
+            "rule_group": "group rule",
+            "exclusive_group": "exclusive choices",
+            "default": "default selection",
+            "price": "price rule",
+            "source_or_tooling": "source requirement",
+        }
+        title = f"{model} {decision_names.get(decision_type, 'decision')}"
+        comparison = None
+
+        if item.get("reviewState") == "semantic_conflict":
+            conflict = subject.get("semanticConflict") or {}
+            overlap_kind = str(conflict.get("overlapKind") or "different_behavior")
+            overlap = {
+                "member_set_mismatch": "different member set",
+                "subset": "proposed members are a subset",
+                "superset": "proposed members are a superset",
+                "partial_overlap": "partial overlap",
+                "different_relationship": "different relationship",
+                "reverse_relationship": "reverse relationship",
+            }.get(overlap_kind, overlap_kind.replace("_", " "))
+            summary = "The proposal and target workbook describe incompatible behavior."
+            existing = list(evidence.get("existingWorkbookRows") or [])
+            derived = list(evidence.get("alreadyDerivedRows") or [])
+            existing_members = list(conflict.get("existingMemberRpos") or [])
+            proposed_members = list(conflict.get("proposedMemberRpos") or [])
+            if existing_members or proposed_members:
+                group_row = next(
+                    (
+                        row.get("values") or {}
+                        for row in existing
+                        if (row.get("values") or {}).get("group_type")
+                    ),
+                    {},
+                )
+                source_id = str(group_row.get("source_id") or "")
+                source_rpo = next(
+                    (
+                        str(option.get("rpo") or "")
+                        for option in model_options
+                        if str(option.get("optionId") or "") == source_id
+                    ),
+                    str(proposed.get("sourceRpo") or ""),
+                )
+                existing_fact = {
+                    "sourceRpo": source_rpo,
+                    "memberRpos": existing_members,
+                    "groupType": group_row.get("group_type") or proposed.get("groupType"),
+                }
+                proposed_fact = {
+                    **proposed,
+                    "memberRpos": proposed_members or proposed.get("memberRpos") or [],
+                }
+                existing_text = fact_summary(existing_fact)
+                proposed_text = fact_summary(proposed_fact)
+            else:
+                existing_text = " ".join(fact_summary(row) for row in (existing or derived)) if (existing or derived) else "No exact target row is available."
+                proposed_text = " ".join(fact_summary(row) for row in proposed_rows) if proposed_rows else "No exact proposal row is available."
+            comparison = {
+                "existing": existing_text,
+                "proposed": proposed_text,
+                "difference": overlap,
+            }
+        elif decision_type == "section":
+            subject_option = options[0] if options else self._presentation_option("", [], source_rows)
+            if not options and source_rows:
+                subject_option = {
+                    "optionId": "",
+                    "rpo": "",
+                    "label": str(source_rows[0].get("description") or "Description unavailable"),
+                }
+            summary = f"Place {self._presentation_option_text(subject_option)} in one target section."
+        elif decision_type == "identity":
+            summary = f"Match {option_text(rpos[0] if rpos else '')} to one existing target option."
+        elif decision_type == "relationship":
+            behavior = {
+                "requires": "requires",
+                "includes": "includes",
+                "excludes": "makes unavailable",
+                "replaces": "replaces",
+            }.get(str(proposed.get("ruleType") or ""), "has a relationship with")
+            summary = (
+                f"When {option_text(proposed.get('sourceRpo'))} is selected, "
+                f"it {behavior} {option_text(proposed.get('targetRpo'))}."
+            )
+        elif decision_type == "rule_group":
+            members = ", ".join(option_text(rpo) for rpo in proposed.get("memberRpos") or [])
+            summary = (
+                f"Selecting {option_text(proposed.get('sourceRpo'))} "
+                f"{group_phrase(proposed.get('groupType'))}: {members or 'Description unavailable'}."
+            )
+        elif decision_type == "exclusive_group":
+            members = ", ".join(option_text(rpo) for rpo in proposed.get("memberRpos") or [])
+            exact = str(proposed.get("selectionMode") or "").startswith("required")
+            summary = f"Choose {'exactly' if exact else 'at most'} one of: {members or 'Description unavailable'}."
+        elif decision_type == "default":
+            summary = f"{option_text(proposed.get('targetRpo') or proposed.get('rpo'))} is selected by default."
+        elif decision_type == "price":
+            target = proposed.get("targetRpo") or (rpos[0] if rpos else "")
+            condition = proposed.get("conditionRpo")
+            comparator = list(evidence.get("comparator") or [])
+            price = proposed.get("priceValue")
+            if price in (None, "") and comparator:
+                price = (comparator[0].get("context") or {}).get("priceValue")
+            price_text = f"${price}" if price not in (None, "") else "the reviewed whole-dollar price"
+            condition_text = f"When {option_text(condition)} applies, " if condition else ""
+            summary = f"{condition_text}{option_text(target)} costs {price_text} for the selected target scope."
+        else:
+            summary = str(subject.get("question") or "Provide the missing target evidence before this can compile.")
+
+        source_label = next(
+            (
+                self._presentation_option_text(
+                    self._presentation_option(
+                        str(row.get("rpo") or row.get("refOnlyRpo") or ""),
+                        model_options,
+                        source_rows,
+                    )
+                )
+                for row in source_rows
+                if str(row.get("rpo") or row.get("refOnlyRpo") or row.get("description") or "")
+            ),
+            "",
+        )
+        if source_label:
+            why_asked = f"The target source identifies {source_label}."
+        elif evidence.get("workbookReferences"):
+            why_asked = "The target workbook contains evidence that still needs an exact decision."
+        else:
+            why_asked = "The current target evidence does not produce one complete workbook-safe answer."
+        if evidence.get("comparator"):
+            why_asked += " Comparator suggestion is supporting evidence only."
+
+        return {
+            "title": title,
+            "summary": summary,
+            "whyAsked": why_asked,
+            "options": options,
+            "comparison": comparison,
+        }
+
     def _compiler_freshness(self, run_id: str, report: dict[str, Any]) -> dict[str, Any]:
         """Compare current compiler inputs to the authority bound into the report."""
 
@@ -1463,6 +1735,13 @@ class WizardSessionStore:
                             row.get("name")
                             or row.get("option_name")
                             or row.get("description")
+                            or ""
+                        ),
+                        "description": str(
+                            row.get("description")
+                            or row.get("detail_raw")
+                            or row.get("name")
+                            or row.get("option_name")
                             or ""
                         ),
                         "sectionId": str(row.get("section_id") or ""),
@@ -1729,6 +2008,7 @@ class WizardSessionStore:
                 item["reviewState"] = "source_or_tooling_blocked"
             else:
                 item["reviewState"] = "needs_decision"
+            item["presentation"] = self._exception_presentation(item, model_options)
             decision_type_catalog.add(item["decisionType"])
             affected_sheet_catalog.update(item["affectedSheets"])
             review_state_catalog.add(item["reviewState"])
