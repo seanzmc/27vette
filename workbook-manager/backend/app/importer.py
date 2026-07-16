@@ -406,7 +406,6 @@ def _canonical_import_workbook(
     candidate = destination_path.with_name(
         f".{destination_path.name}.candidate-{uuid.uuid4().hex}.sqlite3"
     )
-    preserve_candidate_sidecars = False
     try:
         migration.load_candidate(
             compiled,
@@ -432,7 +431,12 @@ def _canonical_import_workbook(
                 for error in errors
             )
             return _report(findings, candidate_path=candidate)
-        promoted = promote_candidate(candidate, destination_path, snapshot)
+        promoted = migration._promote_candidate_for_task6_tests(
+            candidate,
+            destination_path,
+            snapshot,
+            _capability=_TASK6_TEST_CAPABILITY,
+        )
         return _report(
             compiled.findings,
             candidate_path=candidate,
@@ -451,7 +455,6 @@ def _canonical_import_workbook(
             candidate_path=candidate,
         )
     except migration.CandidateCheckpointError as error:
-        preserve_candidate_sidecars = True
         return _report(
             (
                 Finding(
@@ -488,9 +491,7 @@ def _canonical_import_workbook(
             candidate_path=candidate,
         )
     finally:
-        migration.remove_candidate_artifacts(
-            candidate, preserve_sidecars=preserve_candidate_sidecars
-        )
+        migration.remove_candidate_artifacts(candidate)
 
 
 def import_workbook(
@@ -515,7 +516,7 @@ def import_workbook(
     )
 
 
-_TASK6_TEST_CAPABILITY = object()
+_TASK6_TEST_CAPABILITY = migration._TASK6_TEST_CAPABILITY
 
 
 def _import_workbook_for_task6_tests(

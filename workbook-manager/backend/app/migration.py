@@ -50,6 +50,9 @@ class BackupVerificationError(RuntimeError):
     pass
 
 
+_TASK6_TEST_CAPABILITY = object()
+
+
 _MODEL_LOAD_ORDER = (
     "options",
     "interiors",
@@ -838,7 +841,22 @@ def promote_candidate(
     destination: Path,
     snapshot: DestinationSnapshot,
 ) -> Path:
+    """Fail closed until Task 7 supplies the mandatory contract auditor."""
+    raise PermissionError(
+        "contract_audit_required: Task 7 must authorize candidate promotion"
+    )
+
+
+def _promote_candidate_for_task6_tests(
+    candidate: Path,
+    destination: Path,
+    snapshot: DestinationSnapshot,
+    *,
+    _capability: object,
+) -> Path:
     """Checkpoint, sync, back up, and atomically promote a verified candidate."""
+    if _capability is not _TASK6_TEST_CAPABILITY:
+        raise PermissionError("Task 6 structural promotion capability required")
     candidate_path = Path(candidate)
     destination_path = Path(destination)
     _checkpoint_and_verify_candidate(candidate_path)
@@ -877,14 +895,12 @@ def promote_candidate(
     return destination_path
 
 
-def remove_candidate_artifacts(
-    candidate: Path, *, preserve_sidecars: bool = False
-) -> None:
-    paths = [Path(candidate)]
-    if not preserve_sidecars:
-        paths.extend(
-            [Path(str(candidate) + "-wal"), Path(str(candidate) + "-shm")]
-        )
+def remove_candidate_artifacts(candidate: Path) -> None:
+    paths = [
+        Path(candidate),
+        Path(str(candidate) + "-wal"),
+        Path(str(candidate) + "-shm"),
+    ]
     for path in paths:
         try:
             path.unlink()

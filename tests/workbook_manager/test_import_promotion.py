@@ -47,6 +47,38 @@ def test_public_import_is_path_only_and_fails_closed_until_task_7(
         importer._import_workbook_for_task6_tests(
             destination, real_workbook, _capability=object()
         )
+    with pytest.raises(PermissionError):
+        migration._promote_candidate_for_task6_tests(
+            tmp_path / "candidate.sqlite3",
+            destination,
+            migration.capture_destination_snapshot(destination),
+            _capability=object(),
+        )
+
+
+@pytest.mark.parametrize(
+    "public_promote",
+    (migration.promote_candidate, importer.promote_candidate),
+)
+def test_public_low_level_promotion_fails_closed_until_task_7(
+    tmp_path, real_workbook, public_promote
+):
+    candidate = tmp_path / f"{public_promote.__module__}.candidate.sqlite3"
+    destination = tmp_path / f"{public_promote.__module__}.destination.sqlite3"
+    importer.load_candidate(importer.compile_workbook(real_workbook), candidate)
+    conn = db.connect(destination)
+    db.create_canonical_schema(conn)
+    db.set_meta(conn, "destination_marker", "must-survive")
+    conn.commit()
+    conn.close()
+    snapshot = migration.capture_destination_snapshot(destination)
+    before = _digest(destination)
+
+    with pytest.raises(PermissionError, match="contract_audit_required"):
+        public_promote(candidate, destination, snapshot)
+
+    assert _digest(destination) == before
+    assert candidate.exists()
 
 
 def test_api_import_uses_fail_closed_path_without_opening_live_connection(
@@ -462,46 +494,39 @@ def test_failed_backup_verification_removes_backup_and_preserves_destination(
     assert not list(tmp_path.glob("*.backup-*"))
 
 
-def test_busy_candidate_checkpoint_preserves_wal_and_shm(
+def test_busy_candidate_checkpoint_removes_disposable_candidate_set(
     tmp_path, real_workbook, monkeypatch
 ):
-    candidate = tmp_path / "candidate.sqlite3"
-    importer.load_candidate(importer.compile_workbook(real_workbook), candidate)
-    snapshot = migration.capture_destination_snapshot(tmp_path / "absent.sqlite3")
-    real_connect = migration.db.connect
+    destination = tmp_path / "destination.sqlite3"
+    conn = db.connect(destination)
+    db.create_canonical_schema(conn)
+    db.set_meta(conn, "destination_marker", "must-survive")
+    conn.commit()
+    conn.close()
+    before = _digest(destination)
+    candidates = []
 
-    class BusyConnection:
-        def __init__(self, connection):
-            self.connection = connection
-
-        def execute(self, sql, *args):
-            if sql == "PRAGMA wal_checkpoint(TRUNCATE)":
-                Path(str(candidate) + "-wal").write_bytes(b"busy-wal")
-                Path(str(candidate) + "-shm").write_bytes(b"busy-shm")
-
-                class Result:
-                    @staticmethod
-                    def fetchone():
-                        return (1, 3, 2)
-
-                return Result()
-            return self.connection.execute(sql, *args)
-
-        def close(self):
-            pass
+    def reject_busy_checkpoint(candidate):
+        candidates.append(Path(candidate))
+        Path(str(candidate) + "-wal").write_bytes(b"busy-wal")
+        Path(str(candidate) + "-shm").write_bytes(b"busy-shm")
+        raise migration.CandidateCheckpointError(
+            "candidate_checkpoint_incomplete: (1, 3, 2)"
+        )
 
     monkeypatch.setattr(
-        migration.db,
-        "connect",
-        lambda path: BusyConnection(real_connect(path)),
+        migration, "_checkpoint_and_verify_candidate", reject_busy_checkpoint
     )
 
-    with pytest.raises(migration.CandidateCheckpointError):
-        migration.promote_candidate(
-            candidate, tmp_path / "absent.sqlite3", snapshot
-        )
-    assert Path(str(candidate) + "-wal").read_bytes() == b"busy-wal"
-    assert Path(str(candidate) + "-shm").read_bytes() == b"busy-shm"
+    report = _task6_import(destination, real_workbook)
+
+    assert report.finding_codes == ("candidate_checkpoint_incomplete",)
+    assert _digest(destination) == before
+    assert len(candidates) == 1
+    candidate = candidates[0]
+    assert not candidate.exists()
+    assert not Path(str(candidate) + "-wal").exists()
+    assert not Path(str(candidate) + "-shm").exists()
 
 
 def test_corrupt_destination_audit_is_structured(tmp_path, real_workbook):
