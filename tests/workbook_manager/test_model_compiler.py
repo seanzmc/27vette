@@ -70,8 +70,39 @@ def test_direct_rows_preserve_registered_source_and_workbook_row(compiled_models
     assert first.lineage_role == "normalized"
     assert first.mapping_parameters["price"] == {
         "original": None,
+        "canonical": 0,
         "transform": "blank_to_zero",
-        "reverse_transform": "zero_to_blank",
+        "reverse_transform": "restore_original_number_from_lineage",
+    }
+
+
+def test_live_trimmed_text_preserves_exact_raw_lineage(compiled_models):
+    table = next(table for table in compiled_models if table.name == "stingray_options")
+    trailing = next(row for row in table.rows if row.source_row == 19)
+    leading = next(row for row in table.rows if row.source_row == 135)
+
+    assert trailing.values["description"] == (
+        "Illuminate the engine bay. Included with Engine Appearance package "
+        "and accessory engine covers."
+    )
+    assert trailing.mapping_parameters["description"] == {
+        "original": (
+            "Illuminate the engine bay. Included with Engine Appearance package "
+            "and accessory engine covers. "
+        ),
+        "canonical": trailing.values["description"],
+        "transform": "trim_text",
+        "reverse_transform": "restore_original_text_from_lineage",
+    }
+    assert leading.values["detail_raw"].startswith("includes (B4Z)")
+    assert leading.mapping_parameters["detail_raw"] == {
+        "original": (
+            " includes (B4Z) Performance Traction Management 1. Requires "
+            "(Z51) Z51 Performance Package."
+        ),
+        "canonical": leading.values["detail_raw"],
+        "transform": "trim_text",
+        "reverse_transform": "restore_original_text_from_lineage",
     }
 
 
@@ -101,13 +132,17 @@ def test_aliases_and_scope_normalization_retain_reversible_evidence(compiled_mod
     )
     assert rule.mapping_parameters["source_interior_id"] == {
         "source_column": "source_id",
+        "original": rule.values["source_interior_id"],
+        "canonical": rule.values["source_interior_id"],
         "transform": "typed_entity_reference",
         "reverse_transform": "coalesce_typed_entity_reference",
     }
     assert rule.mapping_parameters["target_option_id"] == {
         "source_column": "target_id",
+        "original": rule.values["target_option_id"],
+        "canonical": rule.values["target_option_id"],
         "transform": "option_reference",
-        "reverse_transform": "identity",
+        "reverse_transform": "restore_original_text_from_lineage",
     }
 
     unrestricted = next(
@@ -118,8 +153,9 @@ def test_aliases_and_scope_normalization_retain_reversible_evidence(compiled_mod
     assert unrestricted.values["body_style_scope"] is None
     assert unrestricted.mapping_parameters["body_style_scope"] == {
         "original": "*",
-        "transform": "unrestricted_to_null",
-        "reverse_transform": "null_to_wildcard",
+        "canonical": None,
+        "transform": "asterisk_to_null",
+        "reverse_transform": "restore_original_scope_from_lineage",
     }
     restricted = next(
         row
@@ -128,9 +164,58 @@ def test_aliases_and_scope_normalization_retain_reversible_evidence(compiled_mod
     )
     assert restricted.mapping_parameters["trim_level_scope"] == {
         "original": "1LZ",
+        "canonical": "1lz",
         "transform": "lowercase",
-        "reverse_transform": "uppercase",
+        "reverse_transform": "restore_original_scope_from_lineage",
     }
+
+
+def test_schema_mappings_state_actual_column_contracts(compiled_models):
+    mappings = {
+        (table.role, mapping.source_column, mapping.destination_column): (
+            mapping.transform,
+            mapping.reverse_transform,
+        )
+        for table in compiled_models
+        if table.model_key == "stingray"
+        for mapping in table.schema_mappings
+    }
+    assert mappings[("options", "description", "description")] == (
+        "blank_to_empty_else_trim_text",
+        "restore_original_text_from_lineage",
+    )
+    assert mappings[("options", "price", "price")] == (
+        "blank_to_zero_else_normalize_integer",
+        "restore_original_number_from_lineage",
+    )
+    assert mappings[("options", "selectable", "selectable")] == (
+        "normalize_workbook_boolean",
+        "restore_original_boolean_from_lineage",
+    )
+    assert mappings[("price_rules", "body_style_scope", "body_style_scope")] == (
+        "blank_or_asterisk_to_null_else_trim_and_lowercase",
+        "restore_original_scope_from_lineage",
+    )
+    assert mappings[("rule_mapping", "source_id", "source_option_id")] == (
+        "require_nonblank_trim_text_then_typed_entity_reference",
+        "coalesce_typed_entity_reference_then_restore_original_text_from_lineage",
+    )
+    assert mappings[("rule_group_members", "target_id", "target_option_id")] == (
+        "require_nonblank_trim_text_then_option_reference",
+        "restore_original_text_from_lineage",
+    )
+
+
+def test_mapping_evidence_is_deeply_immutable(compiled_models):
+    row = next(
+        row
+        for table in compiled_models
+        if table.name == "grand_sport_options"
+        for row in table.rows
+        if "price" in row.mapping_parameters
+    )
+    with pytest.raises(TypeError):
+        row.mapping_parameters["price"]["transform"] = "mutated"
 
 
 def _copy_with_changed_cell(

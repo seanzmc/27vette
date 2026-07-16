@@ -12,6 +12,27 @@ def _empty_mapping() -> Mapping[str, object]:
     return MappingProxyType({})
 
 
+def freeze_value(value: object) -> object:
+    """Recursively freeze compiler evidence into immutable containers."""
+    if isinstance(value, Mapping):
+        return MappingProxyType(
+            {key: freeze_value(item) for key, item in value.items()}
+        )
+    if isinstance(value, tuple):
+        return tuple(freeze_value(item) for item in value)
+    if isinstance(value, list):
+        return tuple(freeze_value(item) for item in value)
+    if isinstance(value, set):
+        return frozenset(freeze_value(item) for item in value)
+    return value
+
+
+def freeze_mapping(value: Mapping[str, object]) -> Mapping[str, object]:
+    frozen = freeze_value(value)
+    assert isinstance(frozen, Mapping)
+    return frozen
+
+
 class DecisionRequired(ValueError):
     """Hard stop for workbook evidence that cannot be compiled safely."""
 

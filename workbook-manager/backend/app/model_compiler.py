@@ -16,6 +16,7 @@ from .compile_types import (
     DecisionRequired,
     SchemaMapping,
     WorkbookProfile,
+    freeze_mapping,
 )
 
 
@@ -145,6 +146,94 @@ _COLUMN_DESTINATIONS: Mapping[str, Mapping[str, tuple[str, ...]]] = MappingProxy
     }
 )
 
+_BOOLEAN_COLUMNS = frozenset(
+    {
+        ("options", "selectable"),
+        ("options", "active"),
+        ("rule_groups", "active"),
+        ("rule_group_members", "active"),
+        ("exclusive_groups", "active"),
+        ("exclusive_group_members", "active"),
+        ("variant_overrides", "selectable"),
+        ("variant_overrides", "active"),
+    }
+)
+
+_SCOPE_COLUMNS = frozenset(
+    {
+        ("rule_mapping", "body_style_scope"),
+        ("price_rules", "body_style_scope"),
+        ("price_rules", "trim_level_scope"),
+        ("rule_groups", "body_style_scope"),
+        ("rule_groups", "trim_level_scope"),
+        ("rule_groups", "variant_scope"),
+    }
+)
+
+_BLANK_TO_ZERO_INTEGER_COLUMNS = frozenset(
+    {
+        ("options", "price"),
+        ("rule_group_members", "display_order"),
+    }
+)
+
+_REQUIRED_INTEGER_COLUMNS = frozenset(
+    {
+        ("options", "display_order"),
+        ("price_rules", "price_value"),
+        ("exclusive_group_members", "display_order"),
+    }
+)
+
+_BLANK_TO_NULL_TEXT_COLUMNS = frozenset(
+    {
+        ("options", "display_behavior"),
+        ("rule_mapping", "runtime_action"),
+        ("variant_overrides", "display_behavior"),
+        ("variant_overrides", "section_id"),
+    }
+)
+
+_BLANK_TO_EMPTY_TEXT_COLUMNS = frozenset(
+    {
+        ("options", "rpo"),
+        ("options", "description"),
+        ("options", "detail_raw"),
+        ("rule_mapping", "original_detail_raw"),
+        ("rule_mapping", "disabled_reason"),
+        ("price_rules", "notes"),
+        ("rule_groups", "disabled_reason"),
+        ("rule_groups", "notes"),
+        ("exclusive_groups", "notes"),
+        ("variant_overrides", "note"),
+    }
+)
+
+_REQUIRED_TEXT_COLUMNS = frozenset(
+    {
+        ("options", "option_id"),
+        ("options", "option_name"),
+        ("options", "section_id"),
+        ("option_availability", "option_id"),
+        ("option_availability", "variant_id"),
+        ("option_availability", "status"),
+        ("rule_mapping", "rule_id"),
+        ("rule_mapping", "rule_type"),
+        ("price_rules", "price_rule_id"),
+        ("price_rules", "price_rule_type"),
+        ("price_rules", "target_option_id"),
+        ("rule_groups", "group_id"),
+        ("rule_groups", "group_type"),
+        ("rule_group_members", "group_id"),
+        ("exclusive_groups", "group_id"),
+        ("exclusive_groups", "selection_mode"),
+        ("exclusive_group_members", "group_id"),
+        ("exclusive_group_members", "option_id"),
+        ("variant_overrides", "option_id"),
+        ("variant_overrides", "variant_id"),
+    }
+)
+
 
 def _decision(
     code: str,
@@ -257,12 +346,20 @@ def _boolean(
     if isinstance(value, bool):
         return value, {}
     if value in (0, 1):
-        return bool(value), {"original": value, "transform": "integer_to_boolean"}
-    if isinstance(value, str) and value.strip().lower() in {"true", "false"}:
-        return value.strip().lower() == "true", {
+        canonical = bool(value)
+        return canonical, {
             "original": value,
+            "canonical": canonical,
+            "transform": "integer_to_boolean",
+            "reverse_transform": "restore_original_boolean_from_lineage",
+        }
+    if isinstance(value, str) and value.strip().lower() in {"true", "false"}:
+        canonical = value.strip().lower() == "true"
+        return canonical, {
+            "original": value,
+            "canonical": canonical,
             "transform": "text_to_boolean",
-            "reverse_transform": "boolean_to_titlecase_text",
+            "reverse_transform": "restore_original_boolean_from_lineage",
         }
     raise _decision(
         "boolean_value_invalid",
@@ -363,11 +460,16 @@ def _scope(
     trimmed = original.strip()
     if not trimmed or trimmed == "*":
         parameters = {}
-        if original:
+        if value is not None:
+            transforms: list[str] = []
+            if trimmed != original:
+                transforms.append("trim")
+            transforms.append("asterisk_to_null" if trimmed == "*" else "blank_to_null")
             parameters = {
                 "original": original,
-                "transform": "unrestricted_to_null",
-                "reverse_transform": "null_to_wildcard",
+                "canonical": None,
+                "transform": "_then_".join(transforms),
+                "reverse_transform": "restore_original_scope_from_lineage",
             }
         return None, parameters
     normalized = trimmed.lower()
@@ -386,11 +488,11 @@ def _scope(
         transforms.append("lowercase")
     if not transforms:
         return normalized, {}
-    reverse = "uppercase" if normalized.upper() == trimmed else "identity"
     return normalized, {
         "original": original,
+        "canonical": normalized,
         "transform": "_then_".join(transforms),
-        "reverse_transform": reverse,
+        "reverse_transform": "restore_original_scope_from_lineage",
     }
 
 
@@ -422,8 +524,55 @@ def _compiled_row(
     sheet: str,
     row: int,
     parameters: Mapping[str, object] | None = None,
+    *,
+    source_values: Mapping[str, object] | None = None,
+    role: str = "",
 ) -> CompiledRow:
     mapping_parameters = dict(parameters or {})
+    if source_values is not None:
+        destinations = _COLUMN_DESTINATIONS.get(role, {})
+        for source_column in _HEADERS[role]:
+            raw = source_values.get(source_column)
+            destination_columns = destinations.get(source_column, (source_column,))
+            is_alias = (
+                len(destination_columns) > 1
+                or destination_columns != (source_column,)
+            )
+            for destination in destination_columns:
+                evidence = dict(mapping_parameters.get(destination, {}))
+                if "original" in evidence:
+                    continue
+                canonical = values.get(destination)
+                if not is_alias and raw == canonical:
+                    continue
+                transform, reverse_transform = _schema_contract(
+                    role, source_column, destination
+                )
+                if (
+                    not is_alias
+                    and isinstance(raw, str)
+                    and isinstance(canonical, str)
+                    and raw != canonical
+                    and raw.strip() == canonical
+                ):
+                    transform = "trim_text"
+                evidence.update(
+                    {
+                        "original": raw,
+                        "canonical": canonical,
+                        "transform": str(evidence.get("transform") or transform),
+                        "reverse_transform": str(
+                            evidence.get("reverse_transform") or reverse_transform
+                        ),
+                    }
+                )
+                mapping_parameters[destination] = evidence
+    for destination, evidence_value in tuple(mapping_parameters.items()):
+        if not isinstance(evidence_value, Mapping):
+            continue
+        evidence = dict(evidence_value)
+        evidence.setdefault("canonical", values.get(destination))
+        mapping_parameters[destination] = evidence
     return CompiledRow(
         values=MappingProxyType(dict(values)),
         source_sheet=sheet,
@@ -432,8 +581,61 @@ def _compiled_row(
             isinstance(value, Mapping) and "original" in value
             for value in mapping_parameters.values()
         ) else "direct",
-        mapping_parameters=MappingProxyType(mapping_parameters),
+        mapping_parameters=freeze_mapping(mapping_parameters),
     )
+
+
+def _schema_contract(
+    role: str, source_column: str, destination_column: str
+) -> tuple[str, str]:
+    destinations = _COLUMN_DESTINATIONS.get(role, {}).get(source_column, ())
+    if len(destinations) == 2:
+        return (
+            "require_nonblank_trim_text_then_typed_entity_reference",
+            "coalesce_typed_entity_reference_then_restore_original_text_from_lineage",
+        )
+    if source_column != destination_column:
+        return (
+            "require_nonblank_trim_text_then_option_reference",
+            "restore_original_text_from_lineage",
+        )
+    identity = (role, source_column)
+    if identity in _BOOLEAN_COLUMNS:
+        return (
+            "normalize_workbook_boolean",
+            "restore_original_boolean_from_lineage",
+        )
+    if identity in _SCOPE_COLUMNS:
+        return (
+            "blank_or_asterisk_to_null_else_trim_and_lowercase",
+            "restore_original_scope_from_lineage",
+        )
+    if identity in _BLANK_TO_ZERO_INTEGER_COLUMNS:
+        return (
+            "blank_to_zero_else_normalize_integer",
+            "restore_original_number_from_lineage",
+        )
+    if identity in _REQUIRED_INTEGER_COLUMNS:
+        return (
+            "normalize_required_integer",
+            "restore_original_number_from_lineage",
+        )
+    if identity in _BLANK_TO_NULL_TEXT_COLUMNS:
+        return (
+            "blank_to_null_else_trim_text",
+            "restore_original_text_from_lineage",
+        )
+    if identity in _BLANK_TO_EMPTY_TEXT_COLUMNS:
+        return (
+            "blank_to_empty_else_trim_text",
+            "restore_original_text_from_lineage",
+        )
+    if identity in _REQUIRED_TEXT_COLUMNS:
+        return (
+            "require_nonblank_trim_text",
+            "restore_original_text_from_lineage",
+        )
+    raise RuntimeError(f"missing direct schema mapping contract: {identity!r}")
 
 
 def _schema_mappings(
@@ -444,16 +646,9 @@ def _schema_mappings(
     mappings: list[SchemaMapping] = []
     for source_column in _HEADERS[role]:
         for destination_column in destinations.get(source_column, (source_column,)):
-            renamed = source_column != destination_column
-            transform = "identity"
-            reverse = "identity"
-            if source_column in {"source_id", "condition_option_id"} and len(
-                destinations.get(source_column, ())
-            ) == 2:
-                transform = "typed_entity_reference"
-                reverse = "coalesce_typed_entity_reference"
-            elif renamed:
-                transform = "option_reference"
+            transform, reverse = _schema_contract(
+                role, source_column, destination_column
+            )
             mappings.append(
                 SchemaMapping(
                     source_sheet=source_sheet,
@@ -483,7 +678,7 @@ def _alias_parameters(role: str) -> dict[str, object]:
                 "reverse_transform": (
                     "coalesce_typed_entity_reference"
                     if len(destinations) == 2
-                    else "identity"
+                    else "restore_original_text_from_lineage"
                 ),
             }
     return parameters
@@ -760,8 +955,9 @@ def compile_direct_model_tables(
                     price = 0
                     parameters["price"] = {
                         "original": raw_price,
+                        "canonical": 0,
                         "transform": "blank_to_zero",
-                        "reverse_transform": "zero_to_blank",
+                        "reverse_transform": "restore_original_number_from_lineage",
                     }
                 else:
                     price = _integer(
@@ -799,6 +995,8 @@ def compile_direct_model_tables(
                         options_sheet,
                         row_number,
                         parameters,
+                        source_values=row,
+                        role="options",
                     )
                 )
             tables.append(
@@ -851,6 +1049,8 @@ def compile_direct_model_tables(
                         },
                         ovs_sheet,
                         row_number,
+                        source_values=row,
+                        role="option_availability",
                     )
                 )
             tables.append(
@@ -929,6 +1129,8 @@ def compile_direct_model_tables(
                         rule_sheet,
                         row_number,
                         parameters,
+                        source_values=row,
+                        role="rule_mapping",
                     )
                 )
             tables.append(
@@ -1018,6 +1220,8 @@ def compile_direct_model_tables(
                         price_sheet,
                         row_number,
                         parameters,
+                        source_values=row,
+                        role="price_rules",
                     )
                 )
             tables.append(
@@ -1111,6 +1315,8 @@ def compile_direct_model_tables(
                         group_sheet,
                         row_number,
                         parameters,
+                        source_values=row,
+                        role="rule_groups",
                     )
                 )
             tables.append(
@@ -1162,8 +1368,9 @@ def compile_direct_model_tables(
                     display_order = 0
                     parameters["display_order"] = {
                         "original": raw_display_order,
+                        "canonical": 0,
                         "transform": "blank_to_zero",
-                        "reverse_transform": "zero_to_blank",
+                        "reverse_transform": "restore_original_number_from_lineage",
                     }
                 else:
                     display_order = _integer(
@@ -1184,6 +1391,8 @@ def compile_direct_model_tables(
                         member_sheet,
                         row_number,
                         parameters,
+                        source_values=row,
+                        role="rule_group_members",
                     )
                 )
             tables.append(
@@ -1226,6 +1435,8 @@ def compile_direct_model_tables(
                         exclusive_sheet,
                         row_number,
                         {"active": active_parameter} if active_parameter else {},
+                        source_values=row,
+                        role="exclusive_groups",
                     )
                 )
             tables.append(
@@ -1288,6 +1499,8 @@ def compile_direct_model_tables(
                         exclusive_member_sheet,
                         row_number,
                         {"active": active_parameter} if active_parameter else {},
+                        source_values=row,
+                        role="exclusive_group_members",
                     )
                 )
             tables.append(
@@ -1376,6 +1589,8 @@ def compile_direct_model_tables(
                         override_sheet,
                         row_number,
                         parameters,
+                        source_values=row,
+                        role="variant_overrides",
                     )
                 )
             tables.append(
