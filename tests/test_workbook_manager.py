@@ -443,8 +443,15 @@ class TestApi(unittest.TestCase):
         cls.tmpdir = Path(tempfile.mkdtemp(prefix="wbm-api-"))
         os.environ["WBM_DB"] = str(cls.tmpdir / "api.sqlite3")
         os.environ["WBM_VAR_DIR"] = str(cls.tmpdir / "var")
+        # Force a FULL re-import of the app package so config re-reads the
+        # env vars above. The bare "app" entry must be deleted too: leaving
+        # the package object in sys.modules makes `from . import staging`
+        # resolve to the stale module via the package attribute while
+        # `from .staging import StagingError` re-imports a fresh copy —
+        # two StagingError classes, and main.py's `except StagingError`
+        # misses the raise (500 instead of 422).
         for mod in list(sys.modules):
-            if mod.startswith("app."):
+            if mod == "app" or mod.startswith("app."):
                 del sys.modules[mod]
         from fastapi.testclient import TestClient
         from app.main import app as fastapi_app

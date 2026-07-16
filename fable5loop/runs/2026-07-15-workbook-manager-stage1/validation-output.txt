@@ -23,3 +23,7 @@ Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude se
 ?? fable5loop/runs/2026-07-15-workbook-manager-stage1/
 ?? tests/test_workbook_manager.py
 ?? workbook-manager/
+
+== 2026-07-16 follow-up: host pytest run (Sean) found TestApi::test_stage_endpoint_validation_error_shape failing (500 instead of 422).
+Root cause: test-harness module reset deleted app.* from sys.modules but not the bare "app" package; the re-imported main.py then bound the STALE staging module (via package attribute in `from . import staging`) while `from .staging import StagingError` re-imported a fresh class — two StagingError classes, so the endpoint's except missed the raise. Mechanism reproduced deterministically in sandbox (stale=True, same-class=False; consistent after full reset). Production import path is single-pass and unaffected.
+Fix: tests/test_workbook_manager.py TestApi.setUpClass now deletes "app" plus "app.*". Sandbox suite re-run: 30 tests OK (7 environment skips). Host re-run pending: WBM_SLOW_GATE=1 .venv/bin/python -m pytest tests/test_workbook_manager.py -q
