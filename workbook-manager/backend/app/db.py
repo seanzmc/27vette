@@ -301,13 +301,21 @@ def _model_key_column(model_key: str) -> str:
     )
 
 
+def _quote_identifier(identifier: str) -> str:
+    return '"' + identifier.replace('"', '""') + '"'
+
+
+def _quoted_physical_table(model_key: str, role: str) -> str:
+    return _quote_identifier(physical_table(model_key, role))
+
+
 def _model_table_ddl(model_key: str, role: str) -> str:
-    table = physical_table(model_key, role)
+    table = _quoted_physical_table(model_key, role)
     model_column = _model_key_column(model_key)
-    options = physical_table(model_key, "options")
-    interiors = physical_table(model_key, "interiors")
-    groups = physical_table(model_key, "rule_groups")
-    exclusive_groups = physical_table(model_key, "exclusive_groups")
+    options = _quoted_physical_table(model_key, "options")
+    interiors = _quoted_physical_table(model_key, "interiors")
+    groups = _quoted_physical_table(model_key, "rule_groups")
+    exclusive_groups = _quoted_physical_table(model_key, "exclusive_groups")
 
     bodies = {
         "options": f"""{model_column},
@@ -324,9 +332,11 @@ def _model_table_ddl(model_key: str, role: str) -> str:
           display_behavior TEXT""",
         "option_availability": f"""{model_column},
           option_id TEXT NOT NULL REFERENCES {options}(option_id),
-          variant_id TEXT NOT NULL REFERENCES variants(variant_id),
+          variant_id TEXT NOT NULL,
           status TEXT NOT NULL,
-          PRIMARY KEY(option_id, variant_id)""",
+          PRIMARY KEY(option_id, variant_id),
+          FOREIGN KEY(model_key, variant_id)
+            REFERENCES model_variants(model_key, variant_id)""",
         "rule_mapping": f"""{model_column},
           rule_id TEXT PRIMARY KEY,
           source_option_id TEXT REFERENCES {options}(option_id),
@@ -336,10 +346,12 @@ def _model_table_ddl(model_key: str, role: str) -> str:
           original_detail_raw TEXT NOT NULL DEFAULT '',
           body_style_scope TEXT REFERENCES body_styles(body_style),
           trim_level_scope TEXT REFERENCES trim_levels(trim_level),
-          variant_scope TEXT REFERENCES variants(variant_id),
+          variant_scope TEXT,
           runtime_action TEXT,
           disabled_reason TEXT NOT NULL DEFAULT '',
-          CHECK((source_option_id IS NOT NULL) != (source_interior_id IS NOT NULL))""",
+          CHECK((source_option_id IS NOT NULL) != (source_interior_id IS NOT NULL)),
+          FOREIGN KEY(model_key, variant_scope)
+            REFERENCES model_variants(model_key, variant_id)""",
         "price_rules": f"""{model_column},
           price_rule_id TEXT PRIMARY KEY,
           condition_option_id TEXT REFERENCES {options}(option_id),
@@ -349,19 +361,23 @@ def _model_table_ddl(model_key: str, role: str) -> str:
           price_value INTEGER NOT NULL,
           body_style_scope TEXT REFERENCES body_styles(body_style),
           trim_level_scope TEXT REFERENCES trim_levels(trim_level),
-          variant_scope TEXT REFERENCES variants(variant_id),
+          variant_scope TEXT,
           notes TEXT NOT NULL DEFAULT '',
-          CHECK((condition_option_id IS NOT NULL) != (condition_interior_id IS NOT NULL))""",
+          CHECK((condition_option_id IS NOT NULL) != (condition_interior_id IS NOT NULL)),
+          FOREIGN KEY(model_key, variant_scope)
+            REFERENCES model_variants(model_key, variant_id)""",
         "rule_groups": f"""{model_column},
           group_id TEXT PRIMARY KEY,
           group_type TEXT NOT NULL,
           source_option_id TEXT NOT NULL REFERENCES {options}(option_id),
           body_style_scope TEXT REFERENCES body_styles(body_style),
           trim_level_scope TEXT REFERENCES trim_levels(trim_level),
-          variant_scope TEXT REFERENCES variants(variant_id),
+          variant_scope TEXT,
           disabled_reason TEXT NOT NULL DEFAULT '',
           active INTEGER NOT NULL CHECK(active IN (0, 1)),
-          notes TEXT NOT NULL DEFAULT ''""",
+          notes TEXT NOT NULL DEFAULT '',
+          FOREIGN KEY(model_key, variant_scope)
+            REFERENCES model_variants(model_key, variant_id)""",
         "rule_group_members": f"""{model_column},
           group_id TEXT NOT NULL REFERENCES {groups}(group_id),
           target_option_id TEXT NOT NULL REFERENCES {options}(option_id),
@@ -381,13 +397,15 @@ def _model_table_ddl(model_key: str, role: str) -> str:
           PRIMARY KEY(group_id, option_id)""",
         "variant_overrides": f"""{model_column},
           option_id TEXT NOT NULL REFERENCES {options}(option_id),
-          variant_id TEXT NOT NULL REFERENCES variants(variant_id),
+          variant_id TEXT NOT NULL,
           selectable INTEGER CHECK(selectable IN (0, 1)),
           display_behavior TEXT,
           section_id TEXT REFERENCES sections(section_id),
           active INTEGER NOT NULL CHECK(active IN (0, 1)),
           note TEXT NOT NULL DEFAULT '',
-          PRIMARY KEY(option_id, variant_id)""",
+          PRIMARY KEY(option_id, variant_id),
+          FOREIGN KEY(model_key, variant_id)
+            REFERENCES model_variants(model_key, variant_id)""",
         "interiors": f"""{model_column},
           interior_id TEXT PRIMARY KEY,
           interior_name TEXT NOT NULL,
@@ -409,7 +427,7 @@ def _model_table_ddl(model_key: str, role: str) -> str:
           interior_id TEXT NOT NULL REFERENCES {interiors}(interior_id),
           trim_level TEXT REFERENCES trim_levels(trim_level),
           body_style TEXT REFERENCES body_styles(body_style),
-          variant_id TEXT REFERENCES variants(variant_id),
+          variant_id TEXT,
           active INTEGER NOT NULL CHECK(active IN (0, 1)),
           requires_option_id TEXT REFERENCES {options}(option_id),
           notes TEXT NOT NULL DEFAULT '',
@@ -425,7 +443,8 @@ def _model_table_ddl(model_key: str, role: str) -> str:
           interior_leaf_label TEXT NOT NULL DEFAULT '',
           interior_reference_order INTEGER,
           grouping_source TEXT NOT NULL DEFAULT '',
-          UNIQUE(interior_id, trim_level, body_style, variant_id)""",
+          FOREIGN KEY(model_key, variant_id)
+            REFERENCES model_variants(model_key, variant_id)""",
         "interior_components": f"""{model_column},
           interior_id TEXT NOT NULL REFERENCES {interiors}(interior_id),
           rpo TEXT NOT NULL,
@@ -477,11 +496,13 @@ def _model_table_ddl(model_key: str, role: str) -> str:
           condition_id TEXT,
           body_style_scope TEXT REFERENCES body_styles(body_style),
           trim_level_scope TEXT REFERENCES trim_levels(trim_level),
-          variant_scope TEXT REFERENCES variants(variant_id),
+          variant_scope TEXT,
           priority INTEGER NOT NULL,
           active INTEGER NOT NULL CHECK(active IN (0, 1)),
           notes TEXT NOT NULL DEFAULT '',
-          display_behavior TEXT""",
+          display_behavior TEXT,
+          FOREIGN KEY(model_key, variant_scope)
+            REFERENCES model_variants(model_key, variant_id)""",
         "runtime_rule_exceptions": f"""{model_column},
           exception_id TEXT PRIMARY KEY,
           source_option_id TEXT NOT NULL REFERENCES {options}(option_id),
@@ -489,10 +510,12 @@ def _model_table_ddl(model_key: str, role: str) -> str:
           exception_type TEXT NOT NULL,
           body_style_scope TEXT REFERENCES body_styles(body_style),
           trim_level_scope TEXT REFERENCES trim_levels(trim_level),
-          variant_scope TEXT REFERENCES variants(variant_id),
+          variant_scope TEXT,
           disabled_reason TEXT NOT NULL DEFAULT '',
           active INTEGER NOT NULL CHECK(active IN (0, 1)),
-          notes TEXT NOT NULL DEFAULT ''""",
+          notes TEXT NOT NULL DEFAULT '',
+          FOREIGN KEY(model_key, variant_scope)
+            REFERENCES model_variants(model_key, variant_id)""",
     }
     return f"CREATE TABLE {table} (\n  {bodies[role]}\n)"
 
@@ -513,6 +536,17 @@ def create_canonical_schema(conn: sqlite3.Connection) -> None:
             )
             for role in ordered_roles:
                 conn.execute(_model_table_ddl(model_key, role))
+            scope_table_name = physical_table(model_key, "interior_scope")
+            scope_table = _quote_identifier(scope_table_name)
+            scope_index = _quote_identifier(
+                f"{scope_table_name}_null_safe_scope_unique"
+            )
+            conn.execute(
+                f"CREATE UNIQUE INDEX {scope_index} ON {scope_table} ("
+                "interior_id, COALESCE(trim_level, ''), "
+                "COALESCE(body_style, ''), COALESCE(variant_id, '')"
+                ")"
+            )
         for ddl in CANONICAL_SUPPORT_DDL:
             conn.execute(ddl)
         conn.execute(
