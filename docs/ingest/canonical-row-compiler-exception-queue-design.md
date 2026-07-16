@@ -916,7 +916,11 @@ Milestone 2.3 is implemented and independently verified under `milestone-2-3-tar
 
 ### Milestone 2.4 — exception review safety and semantic conflict closure
 
-Drafted under `milestone-2-4-exception-review-safety-semantic-conflict-plan.md` after live review of run `20260715-150312-eb8d08`. The current browser broadly joins shared evidence as `Target workbook state`, does not expand proposal signatures into exact physical-row effects, and makes whole-subject rejection look like an ambiguous rationale field. Exact physical-key guards also do not reject subset/superset exclusive groups or incompatible relationship types for the same endpoints. The forensic run contains two run-only GSX exclusive-group confirmations that demonstrate overlapping subgroup effects; no workbook write occurred. Do not mutate that run or continue exception review until this milestone is approved, implemented, and independently verified.
+Drafted under `milestone-2-4-exception-review-safety-semantic-conflict-plan.md` after live review of run `20260715-150312-eb8d08`. Commit `302136b` implemented semantic-overlap blocking, separated evidence surfaces, exact side-effect-free preview, and explicit whole-proposal rejection, but the milestone has not been closed or independently verified. The forensic run remains immutable and no workbook write occurred.
+
+### Milestone 2.4.1 — decision-first exception review UX correction
+
+Drafted under `milestone-2-4-1-decision-first-exception-review-ux-spec.md` after live browser review of run `20260715-225924-b198b4` proved that Milestone 2.4's safer evidence contract was rendered as a much larger evidence-first form. The correction preserves every semantic, preview, authority, and fail-closed gate while making the primary surface one plain-English product decision, one conditional action form, one preview summary, and collapsed technical evidence. Run `20260715-225924-b198b4` is GET-only observation evidence. Exception mutation and Milestone 3 remain paused until Milestones 2.4 and 2.4.1 pass one independent closure review.
 
 ### Milestone 3 — mechanical plan and deployment proof
 
