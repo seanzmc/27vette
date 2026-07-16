@@ -250,6 +250,16 @@ workbook/runtime distinction for Z06 `standard_equipment`: it is a hidden
 summary bucket and is not fabricated as a visible runtime step. This table is
 not an options active/selectable dictionary and does not own option behavior.
 
+`runtime_context_choices` is the current generator's complete choice inventory,
+not a projection of `context_choice_copy`. Active model variants derive the two
+body-style plus six trim/variant choices for each live model (24 rows total),
+using the exact `body_style__{body_style}` and
+`trim_level__{body_style}__{trim_level.lower()}` IDs. Its identity is
+`(model_key, context_choice_id)`; rows retain their model route, context section,
+body, optional trim and variant, price, display order, and lineage.
+`context_choice_copy` only overlays tooltip text through the current
+wildcard/exact precedence.
+
 `price_ref` uses an internal `price_ref_id` surrogate because its workbook
 natural identity includes nullable unrestricted trim scope. A NULL-safe unique
 index over `(option_type, COALESCE(trim_level, '<unrestricted>'), code)`
@@ -331,7 +341,8 @@ The adapter maps workbook `adds_rpo` to canonical `added_option_id` and back.
 `asset_map` is split by target type:
 
 - option targets -> `<model>_option_assets`
-- context choice targets -> `<model>_context_choice_assets`
+- context choice targets -> `<model>_context_choice_assets`, with
+  `asset_map.target_id` mapped directly to `context_choice_id`
 - model-card targets remain centralized and reference `models`
 
 Wildcard option assets are expanded into applicable models first. Exact-model
@@ -361,8 +372,8 @@ Shared workbook sheets are split only through proven generator behavior:
   behavior.
 - `default_selection_rules` and runtime exceptions -> model tables by exact
   model ownership.
-- shared context copy -> explicit model runtime rows using the current
-  wildcard/exact matching contract.
+- shared context copy -> tooltip overlays on variant-derived runtime choices
+  using the current wildcard/exact matching contract.
 
 No row is assigned to a model merely because its identifier happens to exist
 there. Ownership must be proved by model scope, registered source, and current

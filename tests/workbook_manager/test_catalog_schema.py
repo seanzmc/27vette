@@ -278,6 +278,72 @@ def test_runtime_summary_map_rejects_unknown_model_route(connection):
         )
 
 
+def test_runtime_context_choice_schema_enforces_full_relational_ownership(connection):
+    db.create_canonical_schema(connection)
+    connection.executemany(
+        "INSERT INTO models(model_key, registry_key, model_label, active) "
+        "VALUES(?, ?, ?, 1)",
+        (("stingray", "stingray", "Stingray"), ("z06", "z06", "Z06")),
+    )
+    connection.execute("INSERT INTO body_styles VALUES('coupe')")
+    connection.execute("INSERT INTO trim_levels VALUES('1lt')")
+    connection.execute(
+        "INSERT INTO variants(variant_id, model_year, trim_level, body_style, "
+        "display_name, base_price, display_order, active) "
+        "VALUES('1lt_c07', 2027, '1lt', 'coupe', 'Stingray Coupe 1LT', 73495, 1, 1)"
+    )
+    connection.execute(
+        "INSERT INTO model_variants(model_key, variant_id, display_order, active) "
+        "VALUES('stingray', '1lt_c07', 1, 1)"
+    )
+    connection.execute(
+        "INSERT INTO runtime_route_keys(model_key, route_key, route_kind) "
+        "VALUES('stingray', 'trim_level', 'visible_step')"
+    )
+    connection.execute(
+        "INSERT INTO runtime_context_sections(model_key, context_type, section_id, "
+        "section_name, selection_mode, choice_mode, is_required, standard_behavior, "
+        "section_display_order, step_key, step_label, active) "
+        "VALUES('stingray', 'trim_level', 'sec_context_trim_level', 'Trim Level', "
+        "'single_select_req', 'single', 1, 'user_selected', 2, 'trim_level', "
+        "'Trim Level', 1)"
+    )
+    connection.execute(
+        "INSERT INTO runtime_context_choices(model_key, context_choice_id, "
+        "context_type, value, label, description, section_id, step_key, body_style, "
+        "trim_level, variant_id, base_price, display_order, active) "
+        "VALUES('stingray', 'trim_level__coupe__1lt', 'trim_level', '1LT', '1LT', "
+        "'Stingray Coupe 1LT', 'sec_context_trim_level', 'trim_level', 'coupe', "
+        "'1lt', '1lt_c07', 73495, 1, 1)"
+    )
+    with pytest.raises(sqlite3.IntegrityError, match="FOREIGN KEY constraint failed"):
+        connection.execute(
+            "INSERT INTO runtime_context_choices(model_key, context_choice_id, "
+            "context_type, value, label, description, section_id, step_key, body_style, "
+            "trim_level, variant_id, base_price, display_order, active) "
+            "VALUES('z06', 'trim_level__coupe__1lt', 'trim_level', '1LT', '1LT', "
+            "'Wrong owner', 'sec_context_trim_level', 'trim_level', 'coupe', "
+            "'1lt', '1lt_c07', 73495, 1, 1)"
+        )
+
+
+def test_context_choice_asset_uses_context_choice_id_fk(connection):
+    db.create_canonical_schema(connection)
+    connection.execute(
+        "INSERT INTO models(model_key, registry_key, model_label, active) "
+        "VALUES('stingray', 'stingray', 'Stingray', 1)"
+    )
+    info = connection.execute(
+        "PRAGMA table_info(stingray_context_choice_assets)"
+    ).fetchall()
+    assert [row["name"] for row in info if row["pk"]] == ["context_choice_id"]
+    with pytest.raises(sqlite3.IntegrityError, match="FOREIGN KEY constraint failed"):
+        connection.execute(
+            "INSERT INTO stingray_context_choice_assets(model_key, context_choice_id, "
+            "image_url, active) VALUES('stingray', 'body_style__coupe', 'coupe.png', 1)"
+        )
+
+
 def test_runtime_summary_map_allows_only_one_destination_per_route(connection):
     db.create_canonical_schema(connection)
     connection.execute(

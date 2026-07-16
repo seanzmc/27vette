@@ -175,7 +175,7 @@ _TABLE_PRIMARY_KEYS: tuple[tuple[str, tuple[str, ...]], ...] = (
         "runtime_context_sections",
         ("model_key", "context_type", "section_id"),
     ),
-    ("runtime_context_choices", ("model_key", "context_type", "value")),
+    ("runtime_context_choices", ("model_key", "context_choice_id")),
     ("runtime_summary_sections", ("model_key", "section_key")),
     (
         "runtime_step_summary_map",
@@ -1205,69 +1205,16 @@ def compile_central_tables(
             )
             context_keys.add((model_key, context_type))
 
-        context_choice_rows: list[CompiledRow] = []
+        # Context choices are derived from active model variants, matching
+        # contract.build_model_context_choices.  context_choice_copy supplies
+        # wildcard/exact tooltip overlays; it is not the choice inventory.
+        normalized_copy_rows: list[dict[str, object]] = []
         for row_number, row in _active_rows(
             source["context_choice_copy"], "context_choice_copy"
         ):
-            raw_model = "" if row.get("model_key") is None else str(row["model_key"])
-            if not raw_model.strip():
-                raise _decision(
-                    "central_required_value_missing",
-                    "A required central value is blank.",
-                    sheet="context_choice_copy",
-                    row=row_number,
-                    column="model_key",
-                    value=row.get("model_key"),
-                )
-            context_type, context_parameter = _lower(
-                row.get("context_type"),
-                sheet="context_choice_copy",
-                row=row_number,
-                column="context_type",
-            )
-            value, value_parameter = _lower(
-                row.get("value"),
-                sheet="context_choice_copy",
-                row=row_number,
-                column="value",
-            )
-            raw_body_style = (
-                "" if row.get("body_style") is None else str(row["body_style"])
-            )
-            trimmed_body_style = raw_body_style.strip()
-            body_style = None
-            body_parameter: dict[str, object] = {}
-            if trimmed_body_style and trimmed_body_style != "*":
-                body_style, body_parameter = _lower(
-                    row.get("body_style"),
-                    sheet="context_choice_copy",
-                    row=row_number,
-                    column="body_style",
-                )
-                _ensure_reference(
-                    body_style,
-                    body_styles,
-                    code="context_choice_body_style_reference_missing",
-                    sheet="context_choice_copy",
-                    row=row_number,
-                    column="body_style",
-                )
-            else:
-                body_parameter = {
-                    "original": row.get("body_style"),
-                    "transform": "unrestricted_to_null",
-                }
-            if raw_model.strip() == "*":
-                candidate_models = profile.active_models
-                lineage_role = "shared_source_split"
-                model_parameter: dict[str, object] = {}
-            else:
-                model_key, model_parameter = _lower(
-                    row.get("model_key"),
-                    sheet="context_choice_copy",
-                    row=row_number,
-                    column="model_key",
-                )
+            raw_model = _text(row.get("model_key")) or "*"
+            model_key = raw_model.lower()
+            if model_key != "*":
                 _ensure_reference(
                     model_key,
                     model_keys,
@@ -1276,80 +1223,304 @@ def compile_central_tables(
                     row=row_number,
                     column="model_key",
                 )
-                candidate_models = (model_key,)
-                lineage_role = "normalized" if model_parameter else "direct"
-            accepted_models: list[str] = []
-            for model_key in candidate_models:
-                if (model_key, context_type) not in context_keys:
-                    continue
-                domain = (
-                    model_trim_levels[model_key]
+            context_type, _ = _lower(
+                row.get("context_type"),
+                sheet="context_choice_copy",
+                row=row_number,
+                column="context_type",
+            )
+            if context_type not in {"body_style", "trim_level"}:
+                raise _decision(
+                    "context_choice_type_unresolved",
+                    "A context choice copy type has no approved relational domain.",
+                    sheet="context_choice_copy",
+                    row=row_number,
+                    column="context_type",
+                    value=context_type,
+                )
+            value, _ = _lower(
+                row.get("value"),
+                sheet="context_choice_copy",
+                row=row_number,
+                column="value",
+            )
+            raw_body_style = _text(row.get("body_style")) or "*"
+            body_style = raw_body_style.lower()
+            if body_style != "*":
+                _ensure_reference(
+                    body_style,
+                    body_styles,
+                    code="context_choice_body_style_reference_missing",
+                    sheet="context_choice_copy",
+                    row=row_number,
+                    column="body_style",
+                )
+            candidate_models = profile.active_models if model_key == "*" else (model_key,)
+            accepted_models = [
+                candidate
+                for candidate in candidate_models
+                if (candidate, context_type) in context_keys
+                and value
+                in (
+                    model_trim_levels[candidate]
                     if context_type == "trim_level"
-                    else model_body_styles[model_key]
-                    if context_type == "body_style"
-                    else None
+                    else model_body_styles[candidate]
                 )
-                if domain is None:
-                    raise _decision(
-                        "context_choice_type_unresolved",
-                        "A context choice type has no approved relational domain.",
-                        sheet="context_choice_copy",
-                        row=row_number,
-                        column="context_type",
-                        value=context_type,
+                and (
+                    body_style == "*"
+                    or body_style in model_body_styles[candidate]
                 )
-                if value not in domain:
-                    if raw_model.strip() == "*":
-                        continue
-                    raise _decision(
-                        "context_choice_value_reference_missing",
-                        "A model-specific context choice has no active model variant.",
-                        sheet="context_choice_copy",
-                        row=row_number,
-                        column="value",
-                        value=value,
-                    )
-                if body_style is not None and body_style not in model_body_styles[model_key]:
-                    continue
-                accepted_models.append(model_key)
+            ]
             if not accepted_models:
                 raise _decision(
                     "context_choice_owner_unresolved",
-                    "A context choice row applies to no active model domain.",
+                    "A context choice copy row applies to no active model choice.",
                     sheet="context_choice_copy",
                     row=row_number,
                     value={"context_type": context_type, "value": value},
                 )
-            for model_key in accepted_models:
-                parameters = {
-                    key: item
-                    for key, item in {
-                        "context_type": context_parameter,
-                        "value": value_parameter,
-                        "body_style": body_parameter,
-                        "model_key": model_parameter,
-                    }.items()
-                    if item
+            normalized_copy_rows.append(
+                {
+                    "source_row": row_number,
+                    "model_key": model_key,
+                    "context_type": context_type,
+                    "value": value,
+                    "body_style": body_style,
+                    "info_tooltip": _text(row.get("info_tooltip")),
+                    "notes": _text(row.get("notes")),
                 }
-                if raw_model.strip() == "*":
-                    parameters["model_key"] = {
-                        "original": raw_model,
-                        "transform": "expand_to_active_model_domain",
+            )
+
+        def _copy_for(
+            model_key: str,
+            context_type: str,
+            value: str,
+            body_style: str,
+        ) -> dict[str, object] | None:
+            best_score = -1
+            best: dict[str, object] | None = None
+            for copy_row in normalized_copy_rows:
+                if copy_row["context_type"] != context_type:
+                    continue
+                if copy_row["value"] != value.lower():
+                    continue
+                if copy_row["model_key"] not in {"*", model_key}:
+                    continue
+                if copy_row["body_style"] not in {"*", body_style}:
+                    continue
+                score = (
+                    2 if copy_row["model_key"] == model_key else 0
+                ) + (1 if copy_row["body_style"] == body_style else 0)
+                if copy_row["info_tooltip"] and score > best_score:
+                    best_score = score
+                    best = copy_row
+            return best
+
+        context_section_by_key = {
+            (row.values["model_key"], row.values["context_type"]): row
+            for row in context_section_rows
+        }
+        variant_row_by_id = {
+            row.values["variant_id"]: row for row in variant_rows
+        }
+        memberships_by_model = {
+            model_key: [
+                row
+                for row in model_variant_rows
+                if row.values["model_key"] == model_key
+            ]
+            for model_key in LIVE_MODELS
+        }
+        context_choice_rows: list[CompiledRow] = []
+        for model_key in LIVE_MODELS:
+            memberships = memberships_by_model[model_key]
+            ordered_body_styles: list[str] = []
+            for membership in memberships:
+                body_style = variant_row_by_id[
+                    membership.values["variant_id"]
+                ].values["body_style"]
+                if body_style not in ordered_body_styles:
+                    ordered_body_styles.append(body_style)
+            body_section = context_section_by_key[(model_key, "body_style")]
+            for display_order, body_style in enumerate(
+                ordered_body_styles, start=1
+            ):
+                body_memberships = [
+                    membership
+                    for membership in memberships
+                    if variant_row_by_id[
+                        membership.values["variant_id"]
+                    ].values["body_style"]
+                    == body_style
+                ]
+                source_membership = body_memberships[0]
+                copy_row = _copy_for(
+                    model_key, "body_style", body_style, body_style
+                )
+                context_choice_id = f"body_style__{body_style}"
+                parameters: dict[str, object] = {
+                    "context_choice_id": {
+                        "original": tuple(
+                            row.values["variant_id"] for row in body_memberships
+                        ),
+                        "canonical": context_choice_id,
+                        "transform": "derive_body_context_choice_id",
+                    },
+                    "description": {
+                        "original": len(body_memberships),
+                        "canonical": f"{len(body_memberships)} trims available",
+                        "transform": "describe_body_variant_count",
+                    },
+                    "section_id": {
+                        "source_sheet": body_section.source_sheet,
+                        "source_row": body_section.source_row,
+                        "original": body_section.values["section_id"],
+                        "canonical": body_section.values["section_id"],
+                        "transform": "join_context_section",
+                    },
+                    "step_key": {
+                        "source_sheet": body_section.source_sheet,
+                        "source_row": body_section.source_row,
+                        "original": body_section.values["step_key"],
+                        "canonical": body_section.values["step_key"],
+                        "transform": "join_context_route",
+                    },
+                }
+                if copy_row is not None:
+                    parameters["info_tooltip"] = {
+                        "source_sheet": "context_choice_copy",
+                        "source_row": copy_row["source_row"],
+                        "original": copy_row["info_tooltip"],
+                        "canonical": copy_row["info_tooltip"],
+                        "transform": "apply_wildcard_exact_tooltip_precedence",
                     }
                 context_choice_rows.append(
                     _compiled_row(
                         {
                             "model_key": model_key,
-                            "context_type": context_type,
-                            "value": value,
+                            "context_choice_id": context_choice_id,
+                            "context_type": "body_style",
+                            "value": body_style,
+                            "label": body_style.title(),
+                            "description": f"{len(body_memberships)} trims available",
+                            "info_tooltip": (
+                                str(copy_row["info_tooltip"])
+                                if copy_row is not None
+                                else ""
+                            ),
+                            "section_id": body_section.values["section_id"],
+                            "step_key": body_section.values["step_key"],
                             "body_style": body_style,
-                            "info_tooltip": _text(row.get("info_tooltip")),
+                            "trim_level": None,
+                            "variant_id": None,
+                            "base_price": None,
+                            "display_order": display_order,
                             "active": True,
-                            "notes": _text(row.get("notes")),
+                            "notes": (
+                                str(copy_row["notes"])
+                                if copy_row is not None
+                                else ""
+                            ),
                         },
-                        "context_choice_copy",
-                        row_number,
-                        lineage_role=lineage_role if parameters else "direct",
+                        source_membership.source_sheet,
+                        source_membership.source_row,
+                        lineage_role="normalized",
+                        mapping_parameters=parameters,
+                    )
+                )
+
+            trim_section = context_section_by_key[(model_key, "trim_level")]
+            for membership in memberships:
+                variant = variant_row_by_id[membership.values["variant_id"]]
+                body_style = str(variant.values["body_style"])
+                trim_level = str(variant.values["trim_level"])
+                display_value = trim_level.upper()
+                context_choice_id = (
+                    f"trim_level__{body_style}__{trim_level.lower()}"
+                )
+                copy_row = _copy_for(
+                    model_key,
+                    "trim_level",
+                    display_value,
+                    body_style,
+                )
+                parameters = {
+                    "context_choice_id": {
+                        "original": variant.values["variant_id"],
+                        "canonical": context_choice_id,
+                        "transform": "derive_trim_context_choice_id",
+                    },
+                    "value": {
+                        "original": trim_level,
+                        "canonical": display_value,
+                        "transform": "uppercase_runtime_trim_label",
+                    },
+                    "label": {
+                        "original": trim_level,
+                        "canonical": display_value,
+                        "transform": "uppercase_runtime_trim_label",
+                    },
+                    "variant_id": {
+                        "source_sheet": variant.source_sheet,
+                        "source_row": variant.source_row,
+                        "original": variant.values["variant_id"],
+                        "canonical": variant.values["variant_id"],
+                        "transform": "join_model_variant",
+                    },
+                    "section_id": {
+                        "source_sheet": trim_section.source_sheet,
+                        "source_row": trim_section.source_row,
+                        "original": trim_section.values["section_id"],
+                        "canonical": trim_section.values["section_id"],
+                        "transform": "join_context_section",
+                    },
+                    "step_key": {
+                        "source_sheet": trim_section.source_sheet,
+                        "source_row": trim_section.source_row,
+                        "original": trim_section.values["step_key"],
+                        "canonical": trim_section.values["step_key"],
+                        "transform": "join_context_route",
+                    },
+                }
+                if copy_row is not None:
+                    parameters["info_tooltip"] = {
+                        "source_sheet": "context_choice_copy",
+                        "source_row": copy_row["source_row"],
+                        "original": copy_row["info_tooltip"],
+                        "canonical": copy_row["info_tooltip"],
+                        "transform": "apply_wildcard_exact_tooltip_precedence",
+                    }
+                context_choice_rows.append(
+                    _compiled_row(
+                        {
+                            "model_key": model_key,
+                            "context_choice_id": context_choice_id,
+                            "context_type": "trim_level",
+                            "value": display_value,
+                            "label": display_value,
+                            "description": variant.values["display_name"],
+                            "info_tooltip": (
+                                str(copy_row["info_tooltip"])
+                                if copy_row is not None
+                                else ""
+                            ),
+                            "section_id": trim_section.values["section_id"],
+                            "step_key": trim_section.values["step_key"],
+                            "body_style": body_style,
+                            "trim_level": trim_level,
+                            "variant_id": variant.values["variant_id"],
+                            "base_price": variant.values["base_price"],
+                            "display_order": variant.values["display_order"],
+                            "active": True,
+                            "notes": (
+                                str(copy_row["notes"])
+                                if copy_row is not None
+                                else ""
+                            ),
+                        },
+                        membership.source_sheet,
+                        membership.source_row,
+                        lineage_role="normalized",
                         mapping_parameters=parameters,
                     )
                 )

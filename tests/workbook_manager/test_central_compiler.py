@@ -57,7 +57,7 @@ def test_compiles_every_central_table_with_declared_primary_keys(compiled_centra
             "runtime_context_sections",
             ("model_key", "context_type", "section_id"),
         ),
-        ("runtime_context_choices", ("model_key", "context_type", "value")),
+        ("runtime_context_choices", ("model_key", "context_choice_id")),
         ("runtime_summary_sections", ("model_key", "section_key")),
         (
             "runtime_step_summary_map",
@@ -97,26 +97,119 @@ def test_runtime_route_keys_distinguish_visible_and_hidden_routes(
     }
 
 
+def test_context_choices_compile_complete_generator_inventory_with_lineage(
+    compiled_central,
+):
+    tables = {table.name: table for table in compiled_central}
+    choices = tables["runtime_context_choices"].rows
+    assert len(choices) == 24
+    assert {
+        model: sum(row.values["model_key"] == model for row in choices)
+        for model in ("stingray", "grand_sport", "z06")
+    } == {"stingray": 8, "grand_sport": 8, "z06": 8}
+
+    body = next(
+        row
+        for row in choices
+        if row.values["model_key"] == "stingray"
+        and row.values["context_choice_id"] == "body_style__coupe"
+    )
+    assert dict(body.values) == {
+        "model_key": "stingray",
+        "context_choice_id": "body_style__coupe",
+        "context_type": "body_style",
+        "value": "coupe",
+        "label": "Coupe",
+        "description": "3 trims available",
+        "info_tooltip": "",
+        "section_id": "sec_context_body_style",
+        "step_key": "body_style",
+        "body_style": "coupe",
+        "trim_level": None,
+        "variant_id": None,
+        "base_price": None,
+        "display_order": 1,
+        "active": True,
+        "notes": "",
+    }
+    assert body.source_sheet == "model_variants"
+    assert body.lineage_role == "normalized"
+    assert body.mapping_parameters["context_choice_id"]["transform"] == (
+        "derive_body_context_choice_id"
+    )
+
+    trim = next(
+        row
+        for row in choices
+        if row.values["model_key"] == "grand_sport"
+        and row.values["context_choice_id"] == "trim_level__convertible__1lt"
+    )
+    assert trim.values["value"] == "1LT"
+    assert trim.values["label"] == "1LT"
+    assert trim.values["trim_level"] == "1lt"
+    assert trim.values["variant_id"] == "1lt_e67"
+    assert trim.values["base_price"] == 95495
+    assert trim.values["display_order"] == 10
+    assert trim.values["section_id"] == "sec_context_trim_level"
+    assert trim.values["step_key"] == "trim_level"
+    assert trim.source_sheet == "model_variants"
+    assert trim.mapping_parameters["info_tooltip"]["source_sheet"] == (
+        "context_choice_copy"
+    )
+    assert trim.mapping_parameters["info_tooltip"]["source_row"] == 2
+
+    assert {
+        row.values["context_choice_id"]
+        for row in choices
+        if row.values["model_key"] == "z06"
+    } == {
+        "body_style__coupe",
+        "body_style__convertible",
+        "trim_level__coupe__1lz",
+        "trim_level__coupe__2lz",
+        "trim_level__coupe__3lz",
+        "trim_level__convertible__1lz",
+        "trim_level__convertible__2lz",
+        "trim_level__convertible__3lz",
+    }
+
+
+def test_context_choices_reference_model_body_trim_variant_section_and_route(
+    compiled_central,
+):
+    tables = {table.name: table for table in compiled_central}
+    bodies = {row.values["body_style"] for row in tables["body_styles"].rows}
+    trims = {row.values["trim_level"] for row in tables["trim_levels"].rows}
+    variants = {
+        (row.values["model_key"], row.values["variant_id"])
+        for row in tables["model_variants"].rows
+    }
+    sections = {
+        (row.values["model_key"], row.values["context_type"], row.values["section_id"])
+        for row in tables["runtime_context_sections"].rows
+    }
+    routes = {
+        (row.values["model_key"], row.values["route_key"])
+        for row in tables["runtime_route_keys"].rows
+    }
+    for row in tables["runtime_context_choices"].rows:
+        assert row.values["body_style"] in bodies
+        assert row.values["trim_level"] is None or row.values["trim_level"] in trims
+        assert row.values["variant_id"] is None or (
+            row.values["model_key"], row.values["variant_id"]
+        ) in variants
+        assert (
+            row.values["model_key"],
+            row.values["context_type"],
+            row.values["section_id"],
+        ) in sections
+        assert (row.values["model_key"], row.values["step_key"]) in routes
+
+
 def test_normalization_preserves_original_values_in_lineage_evidence(
     compiled_central,
 ):
     tables = {table.name: table for table in compiled_central}
-    choice = next(
-        row
-        for row in tables["runtime_context_choices"].rows
-        if row.values["model_key"] == "stingray" and row.values["value"] == "1lt"
-    )
-    assert choice.source_sheet == "context_choice_copy"
-    assert choice.source_row == 2
-    assert choice.lineage_role == "shared_source_split"
-    assert choice.mapping_parameters["value"] == {
-        "original": "1LT",
-        "transform": "lowercase",
-    }
-    assert choice.mapping_parameters["body_style"] == {
-        "original": "*",
-        "transform": "unrestricted_to_null",
-    }
 
     unrestricted_price = next(
         row

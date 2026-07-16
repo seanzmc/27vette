@@ -481,6 +481,14 @@ original value in lineage mapping parameters, and use `None` for unrestricted
 scope only. Context sections remain distinct from option sections but must
 reference the same model/route keys.
 
+Compile the complete runtime context-choice inventory from active model
+variants, matching `contract.py::build_model_context_choices`: two body-style
+choices plus six body/trim/variant choices per live model (24 total), keyed by
+`(model_key, context_choice_id)`. `context_choice_copy` supplies tooltip copy
+through the current wildcard/exact precedence; it does not create inventory.
+Retain the choice's model route, context section, body, optional trim and
+variant, price, display order, and derived/source lineage.
+
 Populate `runtime_route_keys` from the union of active
 `runtime_steps.step_key` and active `step_order_summary_map.step_key` values per
 live model. Runtime-step keys are `visible_step`; summary-only keys are
@@ -706,6 +714,10 @@ option, and added option all resolve for that model. Split assets by target type
 apply wildcard option rows first, and let exact-model rows replace the same
 target. Expand wildcard context copy only where current runtime metadata accepts
 it. Never assign a shared row based solely on an ID collision.
+
+Context-choice assets map `asset_map.target_id` directly to the canonical
+`context_choice_id` and reference `(model_key, context_choice_id)`; wildcard
+context-choice assets remain unsupported.
 
 - [ ] **Step 4: Run shared compiler plus existing workbook schema tests**
 

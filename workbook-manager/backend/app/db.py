@@ -142,13 +142,28 @@ CENTRAL_DDL = (
     )""",
     """CREATE TABLE runtime_context_choices (
       model_key TEXT NOT NULL REFERENCES models(model_key),
+      context_choice_id TEXT NOT NULL,
       context_type TEXT NOT NULL,
       value TEXT NOT NULL,
-      body_style TEXT REFERENCES body_styles(body_style),
+      label TEXT NOT NULL,
+      description TEXT NOT NULL DEFAULT '',
       info_tooltip TEXT NOT NULL DEFAULT '',
+      section_id TEXT NOT NULL,
+      step_key TEXT NOT NULL,
+      body_style TEXT NOT NULL REFERENCES body_styles(body_style),
+      trim_level TEXT REFERENCES trim_levels(trim_level),
+      variant_id TEXT,
+      base_price INTEGER,
+      display_order INTEGER NOT NULL,
       active INTEGER NOT NULL CHECK(active IN (0, 1)),
       notes TEXT NOT NULL DEFAULT '',
-      PRIMARY KEY(model_key, context_type, value)
+      PRIMARY KEY(model_key, context_choice_id),
+      FOREIGN KEY(model_key, context_type, section_id)
+        REFERENCES runtime_context_sections(model_key, context_type, section_id),
+      FOREIGN KEY(model_key, step_key)
+        REFERENCES runtime_route_keys(model_key, route_key),
+      FOREIGN KEY(model_key, variant_id)
+        REFERENCES model_variants(model_key, variant_id)
     )""",
     """CREATE TABLE runtime_summary_sections (
       model_key TEXT NOT NULL REFERENCES models(model_key),
@@ -490,8 +505,7 @@ def _model_table_ddl(model_key: str, role: str) -> str:
           active INTEGER NOT NULL CHECK(active IN (0, 1)),
           notes TEXT NOT NULL DEFAULT ''""",
         "context_choice_assets": f"""{model_column},
-          context_type TEXT NOT NULL,
-          choice_value TEXT NOT NULL,
+          context_choice_id TEXT PRIMARY KEY,
           image_url TEXT NOT NULL,
           image_alt TEXT NOT NULL DEFAULT '',
           image_fit TEXT NOT NULL DEFAULT '',
@@ -501,9 +515,8 @@ def _model_table_ddl(model_key: str, role: str) -> str:
           hover_image_position TEXT NOT NULL DEFAULT '',
           active INTEGER NOT NULL CHECK(active IN (0, 1)),
           notes TEXT NOT NULL DEFAULT '',
-          PRIMARY KEY(context_type, choice_value),
-          FOREIGN KEY(model_key, context_type, choice_value)
-            REFERENCES runtime_context_choices(model_key, context_type, value)""",
+          FOREIGN KEY(model_key, context_choice_id)
+            REFERENCES runtime_context_choices(model_key, context_choice_id)""",
         "default_selection_rules": f"""{model_column},
           rule_id TEXT PRIMARY KEY,
           target_option_id TEXT NOT NULL REFERENCES {options}(option_id),
