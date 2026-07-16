@@ -1,0 +1,6 @@
+# Backend-only dependencies for workbook-manager (install into the repo venv):
+#   .venv/bin/python -m pip install -r workbook-manager/backend/requirements.txt
+# Core repo tooling stays on requirements.txt (openpyxl only).
+fastapi>=0.111,<1
+uvicorn>=0.30,<1
+httpx>=0.27,<1   # test client for the pytest suite

@@ -33,6 +33,8 @@ scripts/
   apply_workbook_ops.py       gated workbook writes from exported ops batches
   workbook_editor_server.py   localhost workbook review/edit UI
   ingest_wizard_server.py     localhost ingest wizard UI (raw order-guide intake)
+workbook-manager/             React + FastAPI + SQLite workbook editor
+                              (staged edits, SQL audit, gated sync; see its README)
   compare-generated-contracts.mjs  contract diff ignoring timestamps
   corvette_form_generator/    shared lib: config, workbook I/O, rules, pricing,
                               interiors, contract, registry, schema validation
@@ -119,6 +121,18 @@ Review-then-apply via CLI (default is validate + dry-run):
 ```
 
 An Apply is only the workbook-write step — afterwards regenerate affected model artifacts, run the relevant gates below, and review diffs.
+
+## Workbook Manager Workflow
+
+`workbook-manager/` is a React (Vite) + FastAPI + SQLite editor for
+`stingray_master.xlsx`: import into a normalized database with full
+duplicate/unresolved-reference reporting, staged form-based edits with
+batch validation and an append-only SQL audit trail, and workbook
+synchronization exclusively through the existing
+`editor_ops.apply_batch` → `save_workbook_safely()` gate (dry-run first,
+explicit confirmation, automatic backup). Setup, run, and test commands:
+`workbook-manager/README.md`. Tests: `tests/test_workbook_manager.py`
+(add `WBM_SLOW_GATE=1` for the full dry-run/live-write gate tests).
 
 ## Workbook And Generator Workflows
 
