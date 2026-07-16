@@ -81,6 +81,34 @@ def test_public_low_level_promotion_fails_closed_until_task_7(
     assert candidate.exists()
 
 
+def test_canonical_orchestrator_requires_capability_before_work(
+    tmp_path, real_workbook, monkeypatch
+):
+    destination = tmp_path / "canonical-boundary.sqlite3"
+    conn = db.connect(destination)
+    db.create_canonical_schema(conn)
+    db.set_meta(conn, "destination_marker", "must-survive")
+    conn.commit()
+    conn.close()
+    before = _digest(destination)
+
+    def forbidden(*_args, **_kwargs):
+        raise AssertionError("unauthorized canonical import performed work")
+
+    monkeypatch.setattr(importer, "compile_workbook", forbidden)
+    monkeypatch.setattr(migration, "load_candidate", forbidden)
+
+    with pytest.raises(TypeError):
+        importer._canonical_import_workbook(destination, real_workbook)
+    with pytest.raises(PermissionError):
+        importer._canonical_import_workbook(
+            destination, real_workbook, _capability=object()
+        )
+
+    assert _digest(destination) == before
+    assert not list(tmp_path.glob(".*.candidate-*.sqlite3*"))
+
+
 def test_api_import_uses_fail_closed_path_without_opening_live_connection(
     tmp_path, real_workbook, monkeypatch
 ):

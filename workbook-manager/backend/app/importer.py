@@ -337,7 +337,11 @@ def _file_sha256(path: Path) -> str:
 def _canonical_import_workbook(
     destination: Path,
     workbook_path: Path,
+    *,
+    _capability: object,
 ) -> ImportReport:
+    if _capability is not _TASK6_TEST_CAPABILITY:
+        raise PermissionError("Task 6 canonical import capability required")
     destination_path = Path(destination)
     workbook = Path(workbook_path)
 
@@ -528,7 +532,11 @@ def _import_workbook_for_task6_tests(
     """Private structural entry removed when Task 7 wires the real auditor."""
     if _capability is not _TASK6_TEST_CAPABILITY:
         raise PermissionError("Task 6 structural import capability required")
-    return _canonical_import_workbook(Path(db_path), Path(workbook_path))
+    return _canonical_import_workbook(
+        Path(db_path),
+        Path(workbook_path),
+        _capability=_TASK6_TEST_CAPABILITY,
+    )
 
 
 def latest_report(conn: sqlite3.Connection) -> dict | None:
