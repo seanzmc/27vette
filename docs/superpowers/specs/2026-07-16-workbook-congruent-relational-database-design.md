@@ -227,6 +227,7 @@ Shared form structure remains centralized:
 - `model_variants`
 - `sections`
 - `section_presentation`
+- `runtime_route_keys`
 - `runtime_steps`
 - `runtime_context_sections`
 - `runtime_context_choices`
@@ -240,6 +241,22 @@ Shared form structure remains centralized:
 workbook has no master sheets for them. Their values come only from active
 `variant_master` and are not independent product-authoring sources.
 
+`runtime_route_keys` is a narrow model-scoped derived relationship domain. It
+is the union of active `runtime_steps.step_key` values and active
+`step_order_summary_map.step_key` values for each live model. Keys present in
+`runtime_steps` have `route_kind=visible_step`; keys present only in the
+summary map have `route_kind=hidden_summary_bucket`. This preserves the
+workbook/runtime distinction for Z06 `standard_equipment`: it is a hidden
+summary bucket and is not fabricated as a visible runtime step. This table is
+not an options active/selectable dictionary and does not own option behavior.
+
+`price_ref` uses an internal `price_ref_id` surrogate because its workbook
+natural identity includes nullable unrestricted trim scope. A NULL-safe unique
+index over `(option_type, COALESCE(trim_level, '<unrestricted>'), code)`
+preserves that natural identity. Blank workbook trim scope compiles only to
+SQL `NULL`; empty strings and the reserved sentinel are not valid domain
+values.
+
 Relationships include:
 
 - `model_variants.model_key -> models.model_key`
@@ -248,6 +265,8 @@ Relationships include:
 - `variants.trim_level -> trim_levels.trim_level`
 - model-owned option/override/interior `section_id -> sections.section_id`
 - `section_presentation` references both model and section
+- `runtime_steps`, runtime context sections, and runtime step-summary mappings
+  reference `(model_key, route_key)` in `runtime_route_keys`
 - runtime tables reference their model and use model-scoped unique keys
 - model-owned scope fields reference body style, trim, or variant when they are
   restricted
@@ -257,6 +276,11 @@ generator treats them separately from option sections. They still connect to
 the same model and runtime-step structure. The database must not pretend that a
 context section is a `section_master` row when the workbook contract says it is
 not.
+
+The route-key domain was approved on 2026-07-16 after the current workbook and
+runtime contract proved that `step_order_summary_map` row 41 intentionally maps
+Z06 `standard_equipment` to `required_charges` while the visible runtime step
+list intentionally excludes `standard_equipment`.
 
 ## 7. Relationship Hardening
 

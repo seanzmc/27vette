@@ -103,6 +103,13 @@ CENTRAL_DDL = (
       notes TEXT NOT NULL DEFAULT '',
       PRIMARY KEY(model_key, section_id)
     )""",
+    """CREATE TABLE runtime_route_keys (
+      model_key TEXT NOT NULL REFERENCES models(model_key),
+      route_key TEXT NOT NULL,
+      route_kind TEXT NOT NULL
+        CHECK(route_kind IN ('visible_step', 'hidden_summary_bucket')),
+      PRIMARY KEY(model_key, route_key)
+    )""",
     """CREATE TABLE runtime_steps (
       model_key TEXT NOT NULL REFERENCES models(model_key),
       step_key TEXT NOT NULL,
@@ -111,7 +118,9 @@ CENTRAL_DDL = (
       source TEXT NOT NULL,
       active INTEGER NOT NULL CHECK(active IN (0, 1)),
       notes TEXT NOT NULL DEFAULT '',
-      PRIMARY KEY(model_key, step_key)
+      PRIMARY KEY(model_key, step_key),
+      FOREIGN KEY(model_key, step_key)
+        REFERENCES runtime_route_keys(model_key, route_key)
     )""",
     """CREATE TABLE runtime_context_sections (
       model_key TEXT NOT NULL REFERENCES models(model_key),
@@ -128,7 +137,8 @@ CENTRAL_DDL = (
       active INTEGER NOT NULL CHECK(active IN (0, 1)),
       notes TEXT NOT NULL DEFAULT '',
       PRIMARY KEY(model_key, context_type, section_id),
-      FOREIGN KEY(model_key, step_key) REFERENCES runtime_steps(model_key, step_key)
+      FOREIGN KEY(model_key, step_key)
+        REFERENCES runtime_route_keys(model_key, route_key)
     )""",
     """CREATE TABLE runtime_context_choices (
       model_key TEXT NOT NULL REFERENCES models(model_key),
@@ -156,7 +166,8 @@ CENTRAL_DDL = (
       active INTEGER NOT NULL CHECK(active IN (0, 1)),
       notes TEXT NOT NULL DEFAULT '',
       PRIMARY KEY(model_key, step_key, section_key),
-      FOREIGN KEY(model_key, step_key) REFERENCES runtime_steps(model_key, step_key),
+      FOREIGN KEY(model_key, step_key)
+        REFERENCES runtime_route_keys(model_key, route_key),
       FOREIGN KEY(model_key, section_key)
         REFERENCES runtime_summary_sections(model_key, section_key)
     )""",
@@ -173,11 +184,15 @@ CENTRAL_DDL = (
       notes TEXT NOT NULL DEFAULT ''
     )""",
     """CREATE TABLE price_ref (
-      option_type TEXT NOT NULL,
-      trim_level TEXT NOT NULL,
-      code TEXT NOT NULL,
-      price INTEGER NOT NULL,
-      PRIMARY KEY(option_type, trim_level, code)
+      price_ref_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      option_type TEXT NOT NULL
+        CHECK(option_type <> '' AND option_type <> '<unrestricted>'),
+      trim_level TEXT
+        CHECK(trim_level IS NULL OR (
+          trim_level <> '' AND trim_level <> '<unrestricted>'
+        )),
+      code TEXT NOT NULL CHECK(code <> '' AND code <> '<unrestricted>'),
+      price INTEGER NOT NULL
     )""",
     """CREATE TABLE rule_phrase_map (
       phrase TEXT PRIMARY KEY,
@@ -527,6 +542,12 @@ def create_canonical_schema(conn: sqlite3.Connection) -> None:
     with conn:
         for ddl in CENTRAL_DDL:
             conn.execute(ddl)
+        conn.execute(
+            "CREATE UNIQUE INDEX price_ref_null_safe_identity_unique "
+            "ON price_ref("
+            "option_type, COALESCE(trim_level, '<unrestricted>'), code"
+            ")"
+        )
         for model_key in LIVE_MODELS:
             # Interiors must exist before rules with typed interior references.
             ordered_roles = ("options", "interiors") + tuple(

@@ -31,10 +31,13 @@ _CENTRAL_DESTINATIONS: dict[str, tuple[str, ...]] = {
     "section_master": ("sections",),
     "context_section_master": ("runtime_context_sections",),
     "section_presentation": ("section_presentation",),
-    "runtime_steps": ("runtime_steps",),
+    "runtime_steps": ("runtime_route_keys", "runtime_steps"),
     "context_choice_copy": ("runtime_context_choices",),
     "order_summary_sections": ("runtime_summary_sections",),
-    "step_order_summary_map": ("runtime_step_summary_map",),
+    "step_order_summary_map": (
+        "runtime_route_keys",
+        "runtime_step_summary_map",
+    ),
     "default_selection_rules": tuple(
         physical_table(model, "default_selection_rules") for model in LIVE_MODELS
     ),

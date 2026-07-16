@@ -231,3 +231,89 @@ def test_allowlisted_physical_identifiers_are_quoted_in_ddl(connection):
         assert sql.startswith(f'CREATE TABLE "{table}"')
         for referenced in physical_tables:
             assert f"REFERENCES {referenced}" not in sql
+
+
+def _composite_foreign_keys(connection, table):
+    grouped = {}
+    for row in connection.execute(f"PRAGMA foreign_key_list({table})"):
+        grouped.setdefault(row["id"], []).append(row)
+    return [
+        (
+            {row["table"] for row in rows},
+            {(row["from"], row["to"]) for row in rows},
+        )
+        for rows in grouped.values()
+    ]
+
+
+def test_runtime_route_consumers_share_model_scoped_foreign_key(connection):
+    db.create_canonical_schema(connection)
+    for table, route_column in (
+        ("runtime_steps", "step_key"),
+        ("runtime_context_sections", "step_key"),
+        ("runtime_step_summary_map", "step_key"),
+    ):
+        assert (
+            {"runtime_route_keys"},
+            {("model_key", "model_key"), (route_column, "route_key")},
+        ) in _composite_foreign_keys(connection, table)
+
+
+def test_runtime_summary_map_rejects_unknown_model_route(connection):
+    db.create_canonical_schema(connection)
+    connection.execute(
+        "INSERT INTO models(model_key, registry_key, model_label, active) "
+        "VALUES('z06', 'z06', 'Z06', 1)"
+    )
+    connection.execute(
+        "INSERT INTO runtime_summary_sections("
+        "model_key, section_key, section_label, display_order, active"
+        ") VALUES('z06', 'required_charges', 'Required Charges', 1, 1)"
+    )
+    with pytest.raises(sqlite3.IntegrityError, match="FOREIGN KEY constraint failed"):
+        connection.execute(
+            "INSERT INTO runtime_step_summary_map("
+            "model_key, step_key, section_key, active"
+            ") VALUES('z06', 'unknown_route', 'required_charges', 1)"
+        )
+
+
+def test_price_ref_null_scope_has_null_safe_identity(connection):
+    db.create_canonical_schema(connection)
+    connection.execute(
+        "INSERT INTO price_ref(option_type, trim_level, code, price) "
+        "VALUES('stitching', NULL, '36S', 495)"
+    )
+    with pytest.raises(sqlite3.IntegrityError, match="UNIQUE constraint failed"):
+        connection.execute(
+            "INSERT INTO price_ref(option_type, trim_level, code, price) "
+            "VALUES('stitching', NULL, '36S', 595)"
+        )
+    connection.execute(
+        "INSERT INTO price_ref(option_type, trim_level, code, price) "
+        "VALUES('stitching', '1lt', '36S', 595)"
+    )
+    assert connection.execute("SELECT COUNT(*) FROM price_ref").fetchone()[0] == 2
+    info = connection.execute("PRAGMA table_info(price_ref)").fetchall()
+    assert [row["name"] for row in info if row["pk"]] == ["price_ref_id"]
+
+
+@pytest.mark.parametrize(
+    "option_type, trim_level, code",
+    (
+        ("", None, "36S"),
+        ("stitching", "", "36S"),
+        ("stitching", "<unrestricted>", "36S"),
+        ("stitching", None, ""),
+    ),
+)
+def test_price_ref_rejects_empty_or_sentinel_identity_parts(
+    connection, option_type, trim_level, code
+):
+    db.create_canonical_schema(connection)
+    with pytest.raises(sqlite3.IntegrityError, match="CHECK constraint failed"):
+        connection.execute(
+            "INSERT INTO price_ref(option_type, trim_level, code, price) "
+            "VALUES(?, ?, ?, 495)",
+            (option_type, trim_level, code),
+        )

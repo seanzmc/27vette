@@ -2,9 +2,53 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
+from types import MappingProxyType
 from typing import Literal, Mapping
+
+
+def _empty_mapping() -> Mapping[str, object]:
+    return MappingProxyType({})
+
+
+class DecisionRequired(ValueError):
+    """Hard stop for workbook evidence that cannot be compiled safely."""
+
+    def __init__(
+        self,
+        code: str,
+        message: str,
+        *,
+        source_sheet: str = "",
+        source_row: int | None = None,
+        source_column: str = "",
+        value: object = None,
+    ) -> None:
+        super().__init__(f"decision_required:{code}: {message}")
+        self.code = code
+        self.source_sheet = source_sheet
+        self.source_row = source_row
+        self.source_column = source_column
+        self.value = value
+
+
+@dataclass(frozen=True)
+class CompiledRow:
+    values: Mapping[str, object]
+    source_sheet: str
+    source_row: int
+    lineage_role: str = "direct"
+    mapping_parameters: Mapping[str, object] = field(default_factory=_empty_mapping)
+
+
+@dataclass(frozen=True)
+class CompiledTable:
+    name: str
+    primary_key: tuple[str, ...]
+    rows: tuple[CompiledRow, ...]
+    model_key: str = ""
+    role: str = ""
 
 
 @dataclass(frozen=True)

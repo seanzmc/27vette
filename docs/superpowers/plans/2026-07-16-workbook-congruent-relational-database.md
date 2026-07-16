@@ -18,6 +18,11 @@
 - Each model options table must declare `option_id TEXT PRIMARY KEY`; no surrogate option ID and no shared conceptual `options` table may remain.
 - Every model-owned table must carry a `model_key` foreign key plus a constant-model check constraint.
 - Enable `PRAGMA foreign_keys=ON`; do not emulate relational integrity solely in Python.
+- Use the approved model-scoped `runtime_route_keys` derived domain for visible
+  runtime steps and hidden summary buckets; it is not an option activation or
+  selectability dictionary.
+- Represent unrestricted `price_ref.trim_level` only as `NULL`, with the
+  approved NULL-safe natural-identity index and internal surrogate row key.
 - Stop on unknown or ambiguous ownership, missing required source roles, contract drift, or any finding requiring a product/business decision.
 - Only blank/`*` scope normalization, identifier normalization, proven shared-row splitting, and semantic field aliases may proceed without a business decision.
 - Existing guarded workbook writes remain `editor_ops.apply_batch()` -> `save_workbook_safely()`.
@@ -381,7 +386,13 @@ git commit -m "feat: profile workbook source coverage"
 
 **Files:**
 - Create: `workbook-manager/backend/app/central_compiler.py`
+- Modify: `workbook-manager/backend/app/compile_types.py`
+- Modify: `workbook-manager/backend/app/workbook_profile.py`
+- Modify: `workbook-manager/backend/app/db.py`
 - Create: `tests/workbook_manager/test_central_compiler.py`
+- Modify: `tests/workbook_manager/test_catalog_schema.py`
+- Modify: `docs/superpowers/specs/2026-07-16-workbook-congruent-relational-database-design.md`
+- Modify: `docs/superpowers/plans/2026-07-16-workbook-congruent-relational-database.md`
 
 **Interfaces:**
 - Produces: `CompiledRow`, `CompiledTable`, `compile_central_tables(profile, workbook_path) -> tuple[CompiledTable, ...]`.
@@ -420,6 +431,19 @@ def test_runtime_structure_has_one_model_aware_route(compiled_central):
     assert ("stingray", "body_style") in step_keys
     assert ("grand_sport", "body_style") in step_keys
     assert ("z06", "body_style") in step_keys
+
+
+def test_runtime_route_keys_keep_hidden_summary_buckets_distinct(compiled_central):
+    tables = {table.name: table for table in compiled_central}
+    routes = {
+        (row.values["model_key"], row.values["route_key"]): row.values["route_kind"]
+        for row in tables["runtime_route_keys"].rows
+    }
+    assert routes[("z06", "standard_equipment")] == "hidden_summary_bucket"
+    assert ("z06", "standard_equipment") not in {
+        (row.values["model_key"], row.values["step_key"])
+        for row in tables["runtime_steps"].rows
+    }
 ```
 
 - [ ] **Step 2: Verify tests fail because the compiler is absent**
@@ -448,14 +472,30 @@ class CompiledTable:
 
 Compile `models`, `model_registry_promotion`, `body_styles`, `trim_levels`,
 `variants`, `model_variants`, `sections`, `section_presentation`,
-`runtime_steps`, `runtime_context_sections`, `runtime_context_choices`,
+`runtime_route_keys`, `runtime_steps`, `runtime_context_sections`, `runtime_context_choices`,
 `runtime_summary_sections`, `runtime_step_summary_map`, `model_assets`,
 `price_ref`, and `rule_phrase_map`.
 
 Normalize case consistently (`1LT` -> `1lt`, body styles lowercase), retain the
 original value in lineage mapping parameters, and use `None` for unrestricted
 scope only. Context sections remain distinct from option sections but must
-reference the same model/runtime-step keys.
+reference the same model/route keys.
+
+Populate `runtime_route_keys` from the union of active
+`runtime_steps.step_key` and active `step_order_summary_map.step_key` values per
+live model. Runtime-step keys are `visible_step`; summary-only keys are
+`hidden_summary_bucket`. All runtime step, context-section, and step-summary
+route references use the composite model/route foreign key. This
+user-approved derived domain resolves the current Z06
+`standard_equipment -> required_charges` summary route without adding a fake
+visible runtime step and must not be interpreted as option active/selectable
+state.
+
+Compile blank `PriceRef.Trim` as `None`. The SQL table uses an internal
+`price_ref_id INTEGER PRIMARY KEY AUTOINCREMENT` plus a NULL-safe unique
+expression index on
+`(option_type, COALESCE(trim_level, '<unrestricted>'), code)`. Reject empty
+identity values and the reserved sentinel.
 
 - [ ] **Step 4: Run central compiler and catalog tests**
 
@@ -464,7 +504,7 @@ Expected: all Task 1-3 tests pass.
 - [ ] **Step 5: Commit Task 3**
 
 ```bash
-git add workbook-manager/backend/app/central_compiler.py workbook-manager/backend/app/compile_types.py tests/workbook_manager/test_central_compiler.py
+git add workbook-manager/backend/app/central_compiler.py workbook-manager/backend/app/compile_types.py workbook-manager/backend/app/workbook_profile.py workbook-manager/backend/app/db.py tests/workbook_manager/test_central_compiler.py tests/workbook_manager/test_catalog_schema.py docs/superpowers/specs/2026-07-16-workbook-congruent-relational-database-design.md docs/superpowers/plans/2026-07-16-workbook-congruent-relational-database.md
 git commit -m "feat: compile central form relationships"
 ```
 
