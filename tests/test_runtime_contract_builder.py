@@ -78,7 +78,7 @@ class RuntimeContractBuilderTests(unittest.TestCase):
         self.assertIn("from corvette_form_generator.runtime_contract import build_model_runtime_contract", production_source)
         self.assertIn("from corvette_form_generator.runtime_contract import build_model_runtime_contract", inspection_source)
         self.assertIn("from corvette_form_generator.runtime_contract import build_model_runtime_contract", assembly_source)
-        self.assertIn("build_model_runtime_contract(MODEL_CONFIG, source_data)", production_source)
+        self.assertIn("build_model_runtime_contract(effective_config, source_data)", production_source)
         self.assertIn("build_model_runtime_contract(config, draft)", inspection_source)
         self.assertIn("build_model_runtime_contract(config, source_data)", assembly_source)
         self.assertIn("build_model_runtime_contract(config, draft)", assembly_source)

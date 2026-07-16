@@ -471,9 +471,12 @@ wb.save(workbook_path)
 
 sys.path.insert(0, "scripts")
 from corvette_form_generator import production
+from corvette_form_generator.model_configs import discover_generation_model_configs
 
-production.WORKBOOK_PATH = workbook_path
-data = production.build_production_source_data()
+config = discover_generation_model_configs(workbook_path)["stingray"].with_overrides(
+    workbook_path=workbook_path
+)
+data = production.build_production_source_data(config)
 choice = next(row for row in data["choices"] if row["choice_id"] == "2lt_c07__opt_uqt_002")
 standard = next((row for row in data["standardEquipment"] if row["equipment_id"] == "std_2lt_c07__opt_uqt_002"), None)
 print(json.dumps({
@@ -632,7 +635,8 @@ test("Stingray Phase 5 interior components are workbook-owned", () => {
     }
   }
 
-  assert.match(generatorSource, /build_model_interiors\(MODEL_CONFIG\)/);
+  assert.match(generatorSource, /build_model_interiors\(effective_config\)/);
+  assert.doesNotMatch(generatorSource, /build_model_interiors\(MODEL_CONFIG\)/);
   assert.doesNotMatch(generatorSource, /workbook_interior_component_metadata/);
   assert.doesNotMatch(generatorSource, /missing_workbook_components_/);
 });

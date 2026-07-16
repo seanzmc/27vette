@@ -51,6 +51,10 @@ class BackupVerificationError(RuntimeError):
     pass
 
 
+class CandidateChangedAfterAudit(RuntimeError):
+    pass
+
+
 _MODEL_LOAD_ORDER = (
     "options",
     "interiors",
@@ -834,6 +838,12 @@ def _checkpoint_and_verify_candidate(candidate: Path) -> None:
         readonly.close()
 
 
+def finalize_candidate_for_audit(candidate: Path) -> None:
+    """Checkpoint and freeze the exact sidecar-free candidate to be audited."""
+
+    _checkpoint_and_verify_candidate(Path(candidate))
+
+
 def promote_candidate(
     candidate: Path,
     destination: Path,
@@ -853,16 +863,19 @@ def _promote_audited_candidate(
     audit: ContractAudit,
 ) -> Path:
     """Promote only after the importer completed an empty contract audit."""
-    from .contract_audit import ContractAudit, consume_audit_authorization
+    from .contract_audit import ContractAudit, verify_audit_authorization
 
-    if (
-        not isinstance(audit, ContractAudit)
-        or not consume_audit_authorization(audit, candidate)
-    ):
+    if not isinstance(audit, ContractAudit):
         raise PermissionError("Completed audit for this exact candidate required")
     candidate_path = Path(candidate)
     destination_path = Path(destination)
-    _checkpoint_and_verify_candidate(candidate_path)
+    authorization = verify_audit_authorization(audit, candidate_path)
+    if authorization == "missing":
+        raise PermissionError("Completed audit for this exact candidate required")
+    if authorization != "valid":
+        raise CandidateChangedAfterAudit(
+            "Candidate logical state or sidecars changed after contract audit"
+        )
     _same_destination(destination_path, snapshot)
     rollback: Path | None = None
     try:
@@ -875,6 +888,13 @@ def _promote_audited_candidate(
             os.link(destination_path, rollback)
             _fsync_directory(destination_path.parent)
         _same_destination(destination_path, snapshot)
+        authorization = verify_audit_authorization(
+            audit, candidate_path, consume=True
+        )
+        if authorization != "valid":
+            raise CandidateChangedAfterAudit(
+                "Candidate logical state or sidecars changed before replacement"
+            )
         os.replace(candidate_path, destination_path)
         _fsync_directory(destination_path.parent)
     except BaseException:

@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
 import sqlite3
+from collections import Counter
 from pathlib import Path
 from typing import Mapping
 
@@ -17,6 +19,146 @@ class ReverseMappingError(ValueError):
 
 def _quote(identifier: str) -> str:
     return '"' + identifier.replace('"', '""') + '"'
+
+
+def _jsonable(value: object) -> object:
+    if isinstance(value, Mapping):
+        return {str(key): _jsonable(item) for key, item in value.items()}
+    if isinstance(value, (tuple, list, set, frozenset)):
+        return [_jsonable(item) for item in value]
+    return value
+
+
+def _json(value: object) -> str:
+    return json.dumps(
+        _jsonable(value), sort_keys=True, separators=(",", ":"), default=str
+    )
+
+
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _compiled_lineage_hashes(compiled) -> dict[tuple[str, str], str]:
+    hashes = {}
+    for table in compiled.tables:
+        for row in table.rows:
+            key = {column: row.values[column] for column in table.primary_key}
+            evidence = {
+                "values": row.values,
+                "source_sheet": row.source_sheet,
+                "source_row": row.source_row,
+                "lineage_role": row.lineage_role,
+                "mapping_parameters": row.mapping_parameters,
+            }
+            hashes[(table.name, _json(key))] = hashlib.sha256(
+                _json(evidence).encode("utf-8")
+            ).hexdigest()
+    return hashes
+
+
+def _validated_import_run(
+    conn: sqlite3.Connection,
+    source_path: Path,
+) -> int:
+    run_id_row = conn.execute(
+        "SELECT value FROM meta WHERE key='last_import_run_id'"
+    ).fetchone()
+    if run_id_row is None:
+        raise ReverseMappingError("Persisted lineage has no import run identity")
+    run_id = int(run_id_row[0])
+    run = conn.execute(
+        "SELECT workbook_sha256 FROM import_runs WHERE id=?", (run_id,)
+    ).fetchone()
+    if run is None:
+        raise ReverseMappingError("Persisted lineage import run is missing")
+    source_sha256 = _file_sha256(source_path)
+    if str(run["workbook_sha256"]) != source_sha256:
+        raise ReverseMappingError(
+            "Source workbook SHA does not match the persisted import run"
+        )
+    return run_id
+
+
+def _validate_persisted_lineage(
+    conn: sqlite3.Connection,
+    compiled,
+    run_id: int,
+) -> None:
+    hashes = _compiled_lineage_hashes(compiled)
+    expected = Counter(
+        (
+            entry.destination_table,
+            _json(dict(entry.destination_key)),
+            entry.source_sheet,
+            entry.source_row,
+            hashes[(entry.destination_table, _json(entry.destination_key))],
+            entry.mapping_role,
+            "mapped",
+        )
+        for entry in compiled.lineage
+    )
+    persisted_rows = tuple(
+        conn.execute(
+            "SELECT sql_table, primary_key_json, source_sheet, source_row, "
+            "source_row_hash, lineage_role, transform_status "
+            "FROM import_lineage WHERE import_run_id=?",
+            (run_id,),
+        )
+    )
+    persisted = Counter(
+        (
+            row["sql_table"],
+            _json(json.loads(row["primary_key_json"])),
+            row["source_sheet"],
+            row["source_row"],
+            row["source_row_hash"],
+            row["lineage_role"],
+            row["transform_status"],
+        )
+        for row in persisted_rows
+    )
+    if persisted != expected:
+        raise ReverseMappingError(
+            "Persisted import_lineage does not exactly match recompiled lineage"
+        )
+
+    lineage_destinations: dict[tuple[str, int], set[tuple[str, str]]] = {}
+    for row in persisted_rows:
+        lineage_destinations.setdefault(
+            (row["source_sheet"], row["source_row"]), set()
+        ).add(
+            (
+                row["sql_table"],
+                _json(json.loads(row["primary_key_json"])),
+            )
+        )
+    disposition_destinations = {}
+    for row in conn.execute(
+        "SELECT source_sheet, source_row, destinations_json "
+        "FROM source_row_disposition WHERE import_run_id=? "
+        "AND disposition='emitted'",
+        (run_id,),
+    ):
+        destination_set = {
+            (
+                destination["destination_table"],
+                _json(destination["destination_key"]),
+            )
+            for destination in json.loads(row["destinations_json"])
+        }
+        disposition_destinations[(row["source_sheet"], row["source_row"])] = (
+            destination_set
+        )
+    if disposition_destinations != lineage_destinations:
+        raise ReverseMappingError(
+            "Emitted source-row disposition destinations do not exactly match "
+            "persisted import_lineage"
+        )
 
 
 def _truthy(value: object) -> int:
@@ -275,8 +417,6 @@ def export_comparison_workbook(
 
     source_path = Path(source)
     destination_path = Path(destination)
-    destination_path.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(source_path, destination_path)
 
     # Recompile the immutable source to obtain the exact canonical baseline.
     # This avoids guessing how a derived destination field related to an
@@ -284,7 +424,11 @@ def export_comparison_workbook(
     # are reverse-applied.
     from .importer import compile_workbook
 
+    run_id = _validated_import_run(conn, source_path)
     compiled = compile_workbook(source_path)
+    _validate_persisted_lineage(conn, compiled, run_id)
+    destination_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source_path, destination_path)
     expected_rows: dict[tuple[str, str], Mapping[str, object]] = {}
     for table in compiled.tables:
         for row in table.rows:
@@ -306,8 +450,10 @@ def export_comparison_workbook(
     try:
         dispositions = conn.execute(
             "SELECT source_sheet, source_row, destinations_json, evidence_json "
-            "FROM source_row_disposition WHERE disposition='emitted' "
-            "ORDER BY source_sheet, source_row"
+            "FROM source_row_disposition WHERE import_run_id=? "
+            "AND disposition='emitted' "
+            "ORDER BY source_sheet, source_row",
+            (run_id,),
         )
         for disposition in dispositions:
             sheet_name = str(disposition["source_sheet"])

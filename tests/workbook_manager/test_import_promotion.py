@@ -99,6 +99,94 @@ def test_constructed_empty_audit_cannot_replace_destination(
     assert candidate.exists()
 
 
+def test_post_audit_wal_mutation_cannot_replace_destination(
+    tmp_path, real_workbook, monkeypatch
+):
+    destination = tmp_path / "wal-audit-destination.sqlite3"
+    conn = db.connect(destination)
+    db.create_canonical_schema(conn)
+    db.set_meta(conn, "destination_marker", "must-survive")
+    conn.commit()
+    conn.close()
+    before = _digest(destination)
+    writers = []
+    real_audit = importer.contract_audit.audit_runtime_contracts
+
+    def audit_then_write_wal(conn, source_workbook, temp_dir):
+        audit = real_audit(conn, source_workbook, temp_dir)
+        candidate = Path(
+            next(
+                row[2]
+                for row in conn.execute("PRAGMA database_list")
+                if row[1] == "main"
+            )
+        )
+        writer = sqlite3.connect(candidate)
+        writer.execute("PRAGMA journal_mode=WAL")
+        writer.execute(
+            "UPDATE stingray_options SET option_name=? WHERE option_id=?",
+            ("unaudited WAL mutation", "opt_gba_001"),
+        )
+        writer.commit()
+        writers.append(writer)
+        assert Path(str(candidate) + "-wal").exists()
+        return audit
+
+    monkeypatch.setattr(
+        importer.contract_audit, "audit_runtime_contracts", audit_then_write_wal
+    )
+    try:
+        report = importer.import_workbook(destination, real_workbook)
+    finally:
+        for writer in writers:
+            writer.close()
+
+    assert report.status == "contract_mismatch"
+    assert report.finding_codes == ("candidate_changed_after_contract_audit",)
+    assert _digest(destination) == before
+    assert not list(tmp_path.glob(".*.candidate-*.sqlite3*"))
+    assert not list(tmp_path.glob("*.backup-*"))
+
+
+def test_candidate_wal_after_backup_is_rechecked_before_replace(
+    tmp_path, real_workbook, monkeypatch
+):
+    destination = tmp_path / "post-backup-candidate.sqlite3"
+    conn = db.connect(destination)
+    db.create_canonical_schema(conn)
+    db.set_meta(conn, "destination_marker", "must-survive")
+    conn.commit()
+    conn.close()
+    before = _digest(destination)
+    writers = []
+    real_backup = migration._backup_destination
+
+    def backup_then_mutate_candidate(path, snapshot):
+        backup = real_backup(path, snapshot)
+        candidate = next(tmp_path.glob(".*.candidate-*.sqlite3"))
+        writer = sqlite3.connect(candidate)
+        writer.execute("PRAGMA journal_mode=WAL")
+        writer.execute(
+            "UPDATE stingray_options SET option_name=? WHERE option_id=?",
+            ("changed after backup", "opt_gba_001"),
+        )
+        writer.commit()
+        writers.append(writer)
+        return backup
+
+    monkeypatch.setattr(migration, "_backup_destination", backup_then_mutate_candidate)
+    try:
+        report = importer.import_workbook(destination, real_workbook)
+    finally:
+        for writer in writers:
+            writer.close()
+
+    assert report.status == "contract_mismatch"
+    assert report.finding_codes == ("candidate_changed_after_contract_audit",)
+    assert _digest(destination) == before
+    assert not list(tmp_path.glob(".*.candidate-*.sqlite3*"))
+
+
 def test_api_import_uses_path_only_audited_import_without_opening_live_connection(
     tmp_path, real_workbook, monkeypatch
 ):

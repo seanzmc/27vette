@@ -33,7 +33,7 @@ MISSING = _Missing()
 TIMESTAMP_KEYS = frozenset({"generated_at", "sourceGeneratedAt", "generatedAt"})
 _AUTHORIZATION_LOCK = threading.Lock()
 _AUDIT_AUTHORIZATIONS: dict[
-    int, tuple[weakref.ReferenceType["ContractAudit"], Path, str]
+    int, tuple[weakref.ReferenceType["ContractAudit"], "CandidateAuditState"]
 ] = {}
 
 
@@ -52,12 +52,75 @@ class ContractAudit:
     generated_paths: Mapping[str, Path]
 
 
+@dataclass(frozen=True)
+class CandidateAuditState:
+    path: Path
+    stat_signature: tuple[int, int, int, int]
+    main_sha256: str
+    logical_fingerprint: str
+
+
 def _file_sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as source:
         for chunk in iter(lambda: source.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def _candidate_sidecars(candidate: Path) -> tuple[Path, ...]:
+    return tuple(
+        artifact
+        for artifact in (
+            Path(str(candidate) + "-wal"),
+            Path(str(candidate) + "-shm"),
+        )
+        if artifact.exists()
+    )
+
+
+def _capture_candidate_state(
+    candidate: Path,
+    conn: sqlite3.Connection | None = None,
+) -> CandidateAuditState:
+    from . import db as dbmod
+    from .migration import _logical_fingerprint
+
+    candidate_path = Path(candidate).resolve()
+    if _candidate_sidecars(candidate_path):
+        raise ValueError("Audited candidate has SQLite sidecars")
+    before = candidate_path.stat()
+    close_conn = conn is None
+    readonly = conn or dbmod.connect_readonly(candidate_path)
+    try:
+        logical_fingerprint = _logical_fingerprint(readonly)
+    finally:
+        if close_conn:
+            readonly.close()
+    main_sha256 = _file_sha256(candidate_path)
+    after = candidate_path.stat()
+    if _candidate_sidecars(candidate_path):
+        raise ValueError("Audited candidate gained SQLite sidecars")
+    before_signature = (
+        before.st_dev,
+        before.st_ino,
+        before.st_size,
+        before.st_mtime_ns,
+    )
+    after_signature = (
+        after.st_dev,
+        after.st_ino,
+        after.st_size,
+        after.st_mtime_ns,
+    )
+    if after_signature != before_signature:
+        raise ValueError("Audited candidate changed while fingerprinting")
+    return CandidateAuditState(
+        path=candidate_path,
+        stat_signature=after_signature,
+        main_sha256=main_sha256,
+        logical_fingerprint=logical_fingerprint,
+    )
 
 
 def _record_audit_authorization(
@@ -69,6 +132,16 @@ def _record_audit_authorization(
     candidate = Path(str(database_row[2])).resolve()
     if not candidate.is_file():
         raise ValueError("Contract audit requires a file-backed candidate database")
+    try:
+        state = _capture_candidate_state(candidate, conn)
+    except ValueError:
+        # Standalone comparison audits may intentionally inspect a mutable
+        # test/staging connection. They return differences but never mint a
+        # promotion receipt. The production importer supplies query-only,
+        # pre-finalized candidates and must remain strictly sidecar-free.
+        if conn.execute("PRAGMA query_only").fetchone()[0]:
+            raise
+        return
     identity = id(audit)
 
     def discard(_reference) -> None:
@@ -79,29 +152,35 @@ def _record_audit_authorization(
     with _AUTHORIZATION_LOCK:
         _AUDIT_AUTHORIZATIONS[identity] = (
             reference,
-            candidate,
-            _file_sha256(candidate),
+            state,
         )
 
 
-def consume_audit_authorization(
-    audit: ContractAudit, candidate: Path
-) -> bool:
-    """Consume the one-time receipt minted by this exact audit invocation."""
-
+def verify_audit_authorization(
+    audit: ContractAudit, candidate: Path, *, consume: bool = False
+) -> str:
+    """Verify the exact finalized logical state audited by this invocation."""
     with _AUTHORIZATION_LOCK:
-        receipt = _AUDIT_AUTHORIZATIONS.pop(id(audit), None)
+        receipt = _AUDIT_AUTHORIZATIONS.get(id(audit))
     if receipt is None:
-        return False
-    reference, audited_path, audited_sha256 = receipt
-    candidate_path = Path(candidate).resolve()
-    return (
-        reference() is audit
-        and audit.models == LIVE_MODELS
-        and audit.differences == ()
-        and audited_path == candidate_path
-        and _file_sha256(candidate_path) == audited_sha256
-    )
+        return "missing"
+    reference, audited_state = receipt
+    if (
+        reference() is not audit
+        or audit.models != LIVE_MODELS
+        or audit.differences != ()
+    ):
+        return "missing"
+    try:
+        current_state = _capture_candidate_state(candidate)
+    except (OSError, sqlite3.DatabaseError, ValueError):
+        return "changed"
+    if current_state != audited_state:
+        return "changed"
+    if consume:
+        with _AUTHORIZATION_LOCK:
+            _AUDIT_AUTHORIZATIONS.pop(id(audit), None)
+    return "valid"
 
 
 def discard_audit_authorization(audit: ContractAudit) -> None:

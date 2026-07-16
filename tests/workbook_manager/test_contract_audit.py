@@ -1,6 +1,8 @@
 import hashlib
 import json
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from threading import Barrier, local
 
 import pytest
 from openpyxl import load_workbook
@@ -130,6 +132,40 @@ def test_unreconstructable_sql_field_fails_closed(
         )
 
 
+@pytest.mark.parametrize("tamper", ("lineage", "disposition"))
+def test_persisted_lineage_tampering_fails_closed(
+    imported_db, real_workbook, tmp_path, tamper
+):
+    if tamper == "lineage":
+        imported_db.execute(
+            "DELETE FROM import_lineage WHERE id=(SELECT MIN(id) FROM import_lineage)"
+        )
+    else:
+        imported_db.execute(
+            "UPDATE source_row_disposition SET destinations_json='[]' "
+            "WHERE id=(SELECT MIN(id) FROM source_row_disposition "
+            "WHERE disposition='emitted')"
+        )
+    imported_db.commit()
+
+    with pytest.raises(export_adapter.ReverseMappingError, match="lineage"):
+        export_adapter.export_comparison_workbook(
+            imported_db, real_workbook, tmp_path / f"tampered-{tamper}.xlsx"
+        )
+
+
+def test_source_hash_must_match_persisted_import_run(
+    imported_db, real_workbook, tmp_path
+):
+    changed = tmp_path / real_workbook.name
+    changed.write_bytes(real_workbook.read_bytes() + b"source drift")
+
+    with pytest.raises(export_adapter.ReverseMappingError, match="SHA"):
+        export_adapter.export_comparison_workbook(
+            imported_db, changed, tmp_path / "hash-mismatch.xlsx"
+        )
+
+
 def test_stingray_generation_honors_comparison_config_paths(
     tmp_path, real_workbook, monkeypatch
 ):
@@ -167,6 +203,66 @@ def test_stingray_generation_honors_comparison_config_paths(
 
     assert compatibility_path.is_relative_to(config.output_dir)
     assert any(choice.get("label") == changed_label for choice in payload["choices"])
+
+
+def test_concurrent_stingray_generations_keep_labels_and_paths_isolated(
+    tmp_path, real_workbook, monkeypatch
+):
+    configs = []
+    expected_labels = []
+    for name in ("first", "second"):
+        comparison = tmp_path / f"{name}.xlsx"
+        comparison.write_bytes(real_workbook.read_bytes())
+        workbook = load_workbook(comparison)
+        options = workbook["stingray_options"]
+        headers = {cell.value: cell.column for cell in options[1]}
+        changed_label = f"Task 7 concurrent {name} label"
+        for row in range(2, options.max_row + 1):
+            if options.cell(row, headers["option_id"]).value == "opt_gba_001":
+                options.cell(row, headers["option_name"], changed_label)
+                break
+        else:
+            raise AssertionError("fixture option opt_gba_001 not found")
+        workbook.save(comparison)
+        workbook.close()
+
+        config_root = tmp_path / f"{name}-root"
+        config = discover_generation_model_configs(comparison)["stingray"].with_overrides(
+            root=config_root,
+            workbook_path=comparison,
+            output_dir=config_root / "output",
+            app_dir=config_root / "app",
+        )
+        configs.append(config)
+        expected_labels.append(changed_label)
+
+    original_rows_from_sheet = production.rows_from_sheet
+    first_read_gate = Barrier(2)
+    thread_state = local()
+
+    def synchronized_first_read(workbook, sheet_name):
+        if not getattr(thread_state, "first_read_complete", False):
+            thread_state.first_read_complete = True
+            first_read_gate.wait(timeout=10)
+        return original_rows_from_sheet(workbook, sheet_name)
+
+    monkeypatch.setattr(production, "rows_from_sheet", synchronized_first_read)
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = tuple(executor.map(production.generate_production_artifacts, configs))
+
+    for config, expected_label, result in zip(configs, expected_labels, results):
+        runtime_path = Path(result["runtime_contract_json"])
+        compatibility_path = Path(result["json"])
+        payload = json.loads(runtime_path.read_text(encoding="utf-8"))
+
+        assert runtime_path.is_relative_to(config.root)
+        assert compatibility_path.is_relative_to(config.output_dir)
+        assert any(choice.get("label") == expected_label for choice in payload["choices"])
+        assert all(
+            choice.get("label") not in set(expected_labels) - {expected_label}
+            for choice in payload["choices"]
+        )
 
 
 def test_failed_contract_audit_does_not_promote_or_write_repo_artifacts(

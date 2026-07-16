@@ -66,18 +66,11 @@ from corvette_form_generator.validation import validation_error_count
 from corvette_form_generator.workbook import clean, intish, money, rows_from_sheet
 
 
-MODEL_CONFIG = base_model_config("stingray")
-ROOT = MODEL_CONFIG.root
-WORKBOOK_PATH = MODEL_CONFIG.workbook_path
-OUTPUT_DIR = MODEL_CONFIG.output_dir
-APP_DIR = MODEL_CONFIG.app_dir
-STEP_ORDER = list(MODEL_CONFIG.step_order)
-STEP_LABELS = dict(MODEL_CONFIG.step_labels)
-CONTEXT_SECTIONS = [dict(section) for section in MODEL_CONFIG.context_sections]
-SECTION_STEP_OVERRIDES = dict(MODEL_CONFIG.section_step_overrides)
-BODY_STYLE_DISPLAY_ORDER = dict(MODEL_CONFIG.body_style_display_order)
-SELECTION_MODE_LABELS = dict(MODEL_CONFIG.selection_mode_labels)
-STANDARD_SECTIONS = set(MODEL_CONFIG.standard_sections)
+DEFAULT_MODEL_CONFIG = base_model_config("stingray")
+ROOT = DEFAULT_MODEL_CONFIG.root
+WORKBOOK_PATH = DEFAULT_MODEL_CONFIG.workbook_path
+OUTPUT_DIR = DEFAULT_MODEL_CONFIG.output_dir
+APP_DIR = DEFAULT_MODEL_CONFIG.app_dir
 
 
 def step_for_section(
@@ -85,19 +78,30 @@ def step_for_section(
     section_name: str,
     section_step_key: str = "",
     *,
+    config: ModelConfig | None = None,
     standard_sections: set[str] | frozenset[str] | None = None,
 ) -> str:
+    effective_config = config or DEFAULT_MODEL_CONFIG
     return shared_step_for_section(
         section_id,
         section_name,
         section_step_key=section_step_key,
-        standard_sections=standard_sections or STANDARD_SECTIONS,
-        section_step_overrides=SECTION_STEP_OVERRIDES,
+        standard_sections=(
+            effective_config.standard_sections
+            if standard_sections is None
+            else standard_sections
+        ),
+        section_step_overrides=effective_config.section_step_overrides,
     )
 
 
-def selection_mode_label(selection_mode: str) -> str:
-    return shared_selection_mode_label(selection_mode, SELECTION_MODE_LABELS)
+def selection_mode_label(
+    selection_mode: str, config: ModelConfig | None = None
+) -> str:
+    effective_config = config or DEFAULT_MODEL_CONFIG
+    return shared_selection_mode_label(
+        selection_mode, effective_config.selection_mode_labels
+    )
 
 
 def workbook_bool(row: dict[str, str], field: str, fallback: bool) -> bool:
@@ -160,52 +164,68 @@ def build_standard_equipment(choices: list[dict[str, Any]]) -> list[dict[str, An
     return [standard_equipment_row(selected[key][1]) for key in key_order]
 
 
-def build_production_source_data(config: ModelConfig | None = None) -> dict[str, Any]:
-    """Assemble the current-generation Stingray source payload without writing artifacts."""
-
-    global MODEL_CONFIG
+def _build_production_source_data(
+    config: ModelConfig | None = None,
+) -> tuple[dict[str, Any], ModelConfig]:
+    """Assemble Stingray source data and return its workbook-effective config."""
 
     requested_config = config or base_model_config("stingray")
     wb = load_workbook(requested_config.workbook_path)
-    MODEL_CONFIG = load_model_config_overrides(wb, requested_config)
-    if MODEL_CONFIG.model_key != "stingray":
+    effective_config = load_model_config_overrides(wb, requested_config)
+    if effective_config.model_key != "stingray":
         raise ValueError("current-generation compatibility source assembly supports only Stingray")
 
     variants_raw = rows_from_sheet(wb, "variant_master")
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
-    options_raw = rows_from_sheet(wb, MODEL_CONFIG.source_option_sheet)
-    statuses_raw = rows_from_sheet(wb, MODEL_CONFIG.status_sheet)
-    context_copy_rows = context_choice_copy_rows(wb, MODEL_CONFIG.model_key)
-    rules_raw = rows_from_sheet(wb, MODEL_CONFIG.rule_mapping_sheet)
-    price_rules_raw = rows_from_sheet(wb, MODEL_CONFIG.price_rules_sheet)
-    color_overrides_raw = rows_from_sheet(wb, MODEL_CONFIG.color_overrides_sheet)
-    rule_groups = load_rule_groups(wb, MODEL_CONFIG)
-    exclusive_groups = load_exclusive_groups(wb, MODEL_CONFIG)
-    default_selection_rules = load_default_selection_rules(wb, MODEL_CONFIG.model_key)
-    default_selection_display_rules = load_default_selection_display_rules(wb, MODEL_CONFIG.model_key)
-    runtime_rule_exceptions = load_runtime_rule_exceptions(wb, MODEL_CONFIG.model_key)
-    order_summary_metadata = load_order_summary_metadata(wb, MODEL_CONFIG.model_key)
-    runtime_steps = load_runtime_steps(wb, MODEL_CONFIG.model_key, MODEL_CONFIG.step_order, MODEL_CONFIG.step_labels)
+    options_raw = rows_from_sheet(wb, effective_config.source_option_sheet)
+    statuses_raw = rows_from_sheet(wb, effective_config.status_sheet)
+    context_copy_rows = context_choice_copy_rows(wb, effective_config.model_key)
+    rules_raw = rows_from_sheet(wb, effective_config.rule_mapping_sheet)
+    price_rules_raw = rows_from_sheet(wb, effective_config.price_rules_sheet)
+    color_overrides_raw = rows_from_sheet(wb, effective_config.color_overrides_sheet)
+    rule_groups = load_rule_groups(wb, effective_config)
+    exclusive_groups = load_exclusive_groups(wb, effective_config)
+    default_selection_rules = load_default_selection_rules(wb, effective_config.model_key)
+    default_selection_display_rules = load_default_selection_display_rules(wb, effective_config.model_key)
+    runtime_rule_exceptions = load_runtime_rule_exceptions(wb, effective_config.model_key)
+    order_summary_metadata = load_order_summary_metadata(wb, effective_config.model_key)
+    runtime_steps = load_runtime_steps(
+        wb,
+        effective_config.model_key,
+        effective_config.step_order,
+        effective_config.step_labels,
+    )
     context_sections = [
-        {**row, "selection_mode_label": selection_mode_label(row.get("selection_mode", ""))}
-        for row in load_context_sections(wb, MODEL_CONFIG.model_key, MODEL_CONFIG.context_sections)
+        {
+            **row,
+            "selection_mode_label": selection_mode_label(
+                row.get("selection_mode", ""), effective_config
+            ),
+        }
+        for row in load_context_sections(
+            wb, effective_config.model_key, effective_config.context_sections
+        )
     ]
-    section_presentation_rows = load_section_presentation(wb, MODEL_CONFIG.model_key)
+    section_presentation_rows = load_section_presentation(
+        wb, effective_config.model_key
+    )
     section_presentation = {row["section_id"]: row for row in section_presentation_rows}
     standard_section_ids = {
         section_id
         for section_id, presentation in section_presentation.items()
         if presentation_bool(presentation, "standard_equipment_bucket", default=False)
-    } or set(STANDARD_SECTIONS)
+    } or set(effective_config.standard_sections)
     variant_option_override_rows = load_variant_option_overrides(
-        wb, MODEL_CONFIG.model_key, MODEL_CONFIG.variant_option_overrides_sheet
+        wb,
+        effective_config.model_key,
+        effective_config.variant_option_overrides_sheet,
     )
     variant_option_overrides = {
         (row["option_id"], row["variant_id"]): row
         for row in variant_option_override_rows
     }
-    option_assets = option_asset_map(wb, MODEL_CONFIG.model_key)
-    bodystyle_assets = bodystyle_asset_map(wb, MODEL_CONFIG.model_key)
+    option_assets = option_asset_map(wb, effective_config.model_key)
+    bodystyle_assets = bodystyle_asset_map(wb, effective_config.model_key)
     grouped_requires = grouped_requirement_pairs(rule_groups)
     grouped_excludes = grouped_exclusion_pairs(rule_groups) | exclusive_group_pairs(exclusive_groups)
 
@@ -241,7 +261,8 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
             "display_order": intish(row.get("display_order")),
         }
         for row in variants_raw
-        if row.get("active") == "True" and row.get("variant_id", "") in MODEL_CONFIG.variant_ids
+        if row.get("active") == "True"
+        and row.get("variant_id", "") in effective_config.variant_ids
     ]
 
     section_rows: list[dict[str, Any]] = [dict(row) for row in context_sections]
@@ -253,6 +274,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
             section_id,
             section_name,
             presentation_step_key or section.get("step_key", ""),
+            config=effective_config,
             standard_sections=standard_section_ids,
         )
         selection_mode = section.get("selection_mode", "")
@@ -266,13 +288,17 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
                 "section_id": section_id,
                 "section_name": section_name,
                 "selection_mode": selection_mode,
-                "selection_mode_label": selection_mode_label(selection_mode),
+                "selection_mode_label": selection_mode_label(
+                    selection_mode, effective_config
+                ),
                 "choice_mode": normalize_mode(selection_mode),
                 "is_required": section.get("is_required", ""),
                 "standard_behavior": section.get("standard_behavior", ""),
                 "section_display_order": section_display_order,
                 "step_key": step_key,
-                "step_label": STEP_LABELS.get(step_key, step_key.replace("_", " ").title()),
+                "step_label": effective_config.step_labels.get(
+                    step_key, step_key.replace("_", " ").title()
+                ),
             }
         )
 
@@ -284,7 +310,11 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
         row["section_ids"] = "|".join(sorted(section_ids_by_step.get(row["step_key"], [])))
 
     context_choices = build_model_context_choices(
-        active_variants, context_copy_rows, MODEL_CONFIG.model_key, BODY_STYLE_DISPLAY_ORDER, bodystyle_assets
+        active_variants,
+        context_copy_rows,
+        effective_config.model_key,
+        effective_config.body_style_display_order,
+        bodystyle_assets,
     )
 
     def choice_section_metadata(section_id: str) -> dict[str, Any]:
@@ -296,6 +326,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
             section_id,
             section_name,
             presentation_step_key or section.get("step_key", ""),
+            config=effective_config,
             standard_sections=standard_section_ids,
         )
         mode = section.get("selection_mode", "")
@@ -305,7 +336,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
             "auto_added_summary_required": presentation_bool(presentation, "auto_added_bucket", default=False),
             "step_key": step_key,
             "selection_mode": mode,
-            "selection_mode_label": selection_mode_label(mode),
+            "selection_mode_label": selection_mode_label(mode, effective_config),
             "choice_mode": normalize_mode(mode),
         }
 
@@ -388,7 +419,10 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
                 "source_detail_raw": option["source_detail_raw"],
             }
             if not display_behavior and derived_default_selected_display_behavior(
-                choice, MODEL_CONFIG.model_key, default_selection_display_rules, exclusive_groups
+                choice,
+                effective_config.model_key,
+                default_selection_display_rules,
+                exclusive_groups,
             ):
                 display_behavior = "default_selected"
             if display_behavior:
@@ -398,7 +432,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
 
     validation_rows: list[dict[str, Any]] = []
     source_interior_ids: set[str] = set()
-    for row in rows_from_sheet(wb, MODEL_CONFIG.interior_source_sheet):
+    for row in rows_from_sheet(wb, effective_config.interior_source_sheet):
         interior_id = row.get("interior_id", "")
         if interior_id:
             source_interior_ids.add(interior_id)
@@ -416,7 +450,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
                 }
             )
 
-    interiors = build_model_interiors(MODEL_CONFIG)
+    interiors = build_model_interiors(effective_config)
     for row in interiors:
         # Keep the existing Stingray runtime contract byte-for-byte compatible
         # while sharing the workbook-owned interior builder with draft models.
@@ -496,7 +530,9 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
             }
         )
 
-    extend_with_derived_swap_rules(MODEL_CONFIG, raw_rules, options_by_id, interiors_by_id, sections)
+    extend_with_derived_swap_rules(
+        effective_config, raw_rules, options_by_id, interiors_by_id, sections
+    )
 
     price_rules = [
         {
@@ -539,26 +575,31 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
         option["section_id"] for option in options_by_id.values() if option["active"] == "True" and option["section_id"]
     }
     for section_id in sorted(sections_with_choices):
-        if section_step_resolution_source(section_id, sections, MODEL_CONFIG, section_presentation) == "heuristic":
+        if (
+            section_step_resolution_source(
+                section_id, sections, effective_config, section_presentation
+            )
+            == "heuristic"
+        ):
             validation_rows.append(
                 {
                     "check_id": f"heuristic_section_step_key_{section_id}",
                     "severity": "error",
                     "entity_type": "section",
                     "entity_id": section_id,
-                    "message": f"Active {MODEL_CONFIG.model_label} choices fell back to heuristic step placement instead of workbook-owned placement.",
+                    "message": f"Active {effective_config.model_label} choices fell back to heuristic step placement instead of workbook-owned placement.",
                 }
             )
 
     # Validation floor
-    if len(active_variants) != MODEL_CONFIG.expected_variant_count:
+    if len(active_variants) != effective_config.expected_variant_count:
         validation_rows.append(
             {
                 "check_id": "active_variant_count",
                 "severity": "error",
                 "entity_type": "variant",
                 "entity_id": "",
-                "message": f"Expected {MODEL_CONFIG.expected_variant_count} active {MODEL_CONFIG.model_label} variants; found {len(active_variants)}.",
+                "message": f"Expected {effective_config.expected_variant_count} active {effective_config.model_label} variants; found {len(active_variants)}.",
             }
         )
     expected_status_rows = len(active_variants) * len(options_by_id)
@@ -570,7 +611,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
                 "severity": "error",
                 "entity_type": "availability",
                 "entity_id": "",
-                "message": f"Expected {expected_status_rows} canonical {MODEL_CONFIG.status_sheet} rows; found {canonical_status_rows}.",
+                "message": f"Expected {expected_status_rows} canonical {effective_config.status_sheet} rows; found {canonical_status_rows}.",
             }
         )
     valid_ids = set(options_by_id) | set(interiors_by_id)
@@ -608,7 +649,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
                 "severity": "pass",
                 "entity_type": "variant",
                 "entity_id": "",
-                "message": f"{len(active_variants)} active {MODEL_CONFIG.model_label} variants exported.",
+                "message": f"{len(active_variants)} active {effective_config.model_label} variants exported.",
             },
             {
                 "check_id": "availability_rows",
@@ -630,8 +671,8 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
     generated_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
     data = {
         "dataset": {
-            "name": MODEL_CONFIG.dataset_name,
-            "source_workbook": MODEL_CONFIG.workbook_path.name,
+            "name": effective_config.dataset_name,
+            "source_workbook": effective_config.workbook_path.name,
             "generated_at": generated_at,
         },
         "variants": active_variants,
@@ -652,7 +693,16 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
         "validation": validation_rows,
     }
     wb.close()
-    return data
+    return data, effective_config
+
+
+def build_production_source_data(
+    config: ModelConfig | None = None,
+) -> dict[str, Any]:
+    """Assemble the current-generation Stingray source payload without writing artifacts."""
+
+    source_data, _ = _build_production_source_data(config)
+    return source_data
 
 
 def write_stingray_compatibility_artifacts(
@@ -698,8 +748,7 @@ def write_stingray_compatibility_artifacts(
 
 
 def generate_production_artifacts(config: ModelConfig | None = None) -> dict[str, Any]:
-    source_data = build_production_source_data(config)
-    effective_config = MODEL_CONFIG
+    source_data, effective_config = _build_production_source_data(config)
     runtime_data = build_model_runtime_contract(effective_config, source_data)
     runtime_json_path = runtime_contract_artifact_path(
         effective_config.root, effective_config.model_key

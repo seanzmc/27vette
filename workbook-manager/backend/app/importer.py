@@ -467,6 +467,7 @@ def _canonical_import_workbook(
                 for error in errors
             )
             return _report(findings, candidate_path=candidate)
+        migration.finalize_candidate_for_audit(candidate)
         audit_root = Path(tempfile.mkdtemp(prefix="workbook-contract-audit-"))
         post_audit_drift: Finding | None = None
         try:
@@ -543,6 +544,18 @@ def _canonical_import_workbook(
                     severity="error",
                     status="contract_mismatch",
                     code="candidate_checkpoint_incomplete",
+                    message=str(error),
+                ),
+            ),
+            candidate_path=candidate,
+        )
+    except migration.CandidateChangedAfterAudit as error:
+        return _report(
+            (
+                Finding(
+                    severity="error",
+                    status="contract_mismatch",
+                    code="candidate_changed_after_contract_audit",
                     message=str(error),
                 ),
             ),
