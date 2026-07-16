@@ -11,13 +11,31 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import sqlite3
+import uuid
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Literal, Mapping
 
 from openpyxl import load_workbook
 
 from . import db as dbmod
+from . import migration
+from .catalog import LIVE_MODELS
+from .central_compiler import compile_central_tables
+from .compile_types import (
+    CompiledTable,
+    DecisionRequired,
+    Finding,
+    LineageEntry,
+    SchemaMapping,
+    SourceSheet,
+    freeze_mapping,
+)
+from .model_compiler import compile_direct_model_tables
+from .shared_compiler import compile_shared_model_tables
 from .specs import (
     RAW_PRESERVED_SHEETS,
     SPEC_BY_TABLE,
@@ -25,6 +43,31 @@ from .specs import (
     TableSpec,
 )
 from .validation import check_references
+from .workbook_profile import profile_workbook
+
+
+@dataclass(frozen=True)
+class CompiledWorkbook:
+    tables: tuple[CompiledTable, ...]
+    source_catalog: tuple[SourceSheet, ...]
+    schema_mappings: tuple[SchemaMapping, ...]
+    lineage: tuple[LineageEntry, ...]
+    findings: tuple[Finding, ...]
+
+
+@dataclass(frozen=True)
+class ImportReport:
+    status: Literal["validated", "decision_required", "contract_mismatch"]
+    live_models: tuple[str, ...]
+    findings: tuple[Finding, ...]
+    decision_required: tuple[Finding, ...]
+    contract_differences: tuple[Finding, ...]
+    candidate_path: Path | None
+    promoted_path: Path | None
+
+    @property
+    def finding_codes(self) -> tuple[str, ...]:
+        return tuple(finding.code for finding in self.findings)
 
 
 def _now() -> str:
@@ -266,8 +309,331 @@ class Importer:
         return count
 
 
-def import_workbook(conn: sqlite3.Connection, workbook_path: Path) -> dict:
-    return Importer(conn, workbook_path).run()
+def _central_schema_mappings(
+    tables: tuple[CompiledTable, ...],
+) -> tuple[SchemaMapping, ...]:
+    """Materialize central column ownership from immutable row evidence."""
+    contracts: dict[
+        tuple[str, str, str, str], tuple[set[str], set[str]]
+    ] = {}
+    for table in tables:
+        for row in table.rows:
+            for destination_column in row.values:
+                parameter = row.mapping_parameters.get(destination_column, {})
+                if not isinstance(parameter, Mapping):
+                    parameter = {}
+                source_column = str(
+                    parameter.get("source_column") or destination_column
+                )
+                key = (
+                    row.source_sheet,
+                    source_column,
+                    table.name,
+                    destination_column,
+                )
+                transforms, reverse_transforms = contracts.setdefault(
+                    key, (set(), set())
+                )
+                transforms.add(str(parameter.get("transform") or "identity"))
+                reverse_transforms.add(
+                    str(parameter.get("reverse_transform") or "identity")
+                )
+    return tuple(
+        SchemaMapping(
+            source_sheet=source_sheet,
+            source_column=source_column,
+            destination_table=destination_table,
+            destination_column=destination_column,
+            transform="|".join(sorted(transforms)),
+            reverse_transform="|".join(sorted(reverse_transforms)),
+        )
+        for (
+            source_sheet,
+            source_column,
+            destination_table,
+            destination_column,
+        ), (transforms, reverse_transforms) in sorted(contracts.items())
+    )
+
+
+def _lineage(tables: tuple[CompiledTable, ...]) -> tuple[LineageEntry, ...]:
+    entries: list[LineageEntry] = []
+    for table in tables:
+        for row in table.rows:
+            entries.append(
+                LineageEntry(
+                    destination_table=table.name,
+                    destination_key=freeze_mapping(
+                        {
+                            column: row.values[column]
+                            for column in table.primary_key
+                        }
+                    ),
+                    source_sheet=row.source_sheet,
+                    source_row=row.source_row,
+                    mapping_role=row.lineage_role,
+                )
+            )
+    return tuple(entries)
+
+
+def compile_workbook(path: Path) -> CompiledWorkbook:
+    """Run the complete read-only workbook compiler sequence."""
+    workbook_path = Path(path)
+    profile = profile_workbook(workbook_path)
+    central = compile_central_tables(profile, workbook_path)
+    direct = compile_direct_model_tables(profile, workbook_path, central)
+    shared = compile_shared_model_tables(
+        profile, workbook_path, central, direct
+    )
+    tables = tuple(central) + tuple(shared.tables)
+    mappings = _central_schema_mappings(tuple(central)) + tuple(
+        mapping
+        for table in shared.tables
+        for mapping in table.schema_mappings
+    )
+    return CompiledWorkbook(
+        tables=tables,
+        source_catalog=profile.sheets,
+        schema_mappings=mappings,
+        lineage=_lineage(tables),
+        findings=shared.findings,
+    )
+
+
+def load_candidate(compiled: CompiledWorkbook, path: Path) -> Path:
+    return migration.load_candidate(compiled, path)
+
+
+def promote_candidate(candidate: Path, destination: Path) -> Path:
+    return migration.promote_candidate(candidate, destination)
+
+
+def _report(
+    findings: tuple[Finding, ...],
+    *,
+    candidate_path: Path | None = None,
+    promoted_path: Path | None = None,
+) -> ImportReport:
+    decisions = tuple(
+        finding for finding in findings if finding.status == "decision_required"
+    )
+    contracts = tuple(
+        finding for finding in findings if finding.status == "contract_mismatch"
+    )
+    if decisions:
+        status: Literal[
+            "validated", "decision_required", "contract_mismatch"
+        ] = "decision_required"
+    elif contracts:
+        status = "contract_mismatch"
+    else:
+        status = "validated"
+    return ImportReport(
+        status=status,
+        live_models=LIVE_MODELS,
+        findings=findings,
+        decision_required=decisions,
+        contract_differences=contracts,
+        candidate_path=candidate_path,
+        promoted_path=promoted_path,
+    )
+
+
+def _decision_finding(error: DecisionRequired) -> Finding:
+    return Finding(
+        severity="error",
+        status="decision_required",
+        code=error.code,
+        message=str(error),
+        source_sheet=error.source_sheet,
+        source_row=error.source_row,
+        source_column=error.source_column,
+        value=error.value,
+    )
+
+
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _canonical_import_workbook(
+    destination: Path,
+    workbook_path: Path,
+    *,
+    audit_contracts: bool,
+) -> ImportReport:
+    destination_path = Path(destination)
+    workbook = Path(workbook_path)
+
+    legacy_findings = migration.audit_legacy_destination(destination_path)
+    if legacy_findings:
+        return _report(legacy_findings)
+
+    if not audit_contracts:
+        # TASK 6 ONLY: Task 7 deletes this branch and makes the contract
+        # auditor mandatory.  Keeping the bypass behind pytest's per-test
+        # marker prevents API and normal runtime callers from selecting it.
+        if "PYTEST_CURRENT_TEST" not in os.environ:
+            return _report(
+                (
+                    Finding(
+                        severity="error",
+                        status="contract_mismatch",
+                        code="contract_audit_test_bypass_rejected",
+                        message=(
+                            "audit_contracts=False is restricted to Task 6 "
+                            "tests until the Task 7 auditor exists."
+                        ),
+                    ),
+                )
+            )
+    else:
+        return _report(
+            (
+                Finding(
+                    severity="error",
+                    status="contract_mismatch",
+                    code="contract_auditor_unavailable",
+                    message=(
+                        "Task 7 must provide the mandatory contract auditor "
+                        "before production promotion is enabled."
+                    ),
+                ),
+            )
+        )
+
+    try:
+        initial_mtime_ns = str(workbook.stat().st_mtime_ns)
+        initial_sha256 = _file_sha256(workbook)
+    except OSError as error:
+        return _report(
+            (
+                Finding(
+                    severity="error",
+                    status="decision_required",
+                    code="workbook_unavailable",
+                    message=str(error),
+                    value=str(workbook),
+                ),
+            )
+        )
+    try:
+        compiled = compile_workbook(workbook)
+    except DecisionRequired as error:
+        return _report((_decision_finding(error),))
+    except (KeyError, ValueError) as error:
+        return _report(
+            (
+                Finding(
+                    severity="error",
+                    status="contract_mismatch",
+                    code="workbook_compile_contract_mismatch",
+                    message=str(error),
+                ),
+            )
+        )
+    if (
+        str(workbook.stat().st_mtime_ns) != initial_mtime_ns
+        or _file_sha256(workbook) != initial_sha256
+    ):
+        return _report(
+            (
+                Finding(
+                    severity="error",
+                    status="decision_required",
+                    code="workbook_changed_during_compile",
+                    message=(
+                        "The workbook changed during read-only compilation; "
+                        "retry from a stable source file."
+                    ),
+                ),
+            )
+        )
+
+    blocking = tuple(
+        finding
+        for finding in compiled.findings
+        if finding.status in {"decision_required", "contract_mismatch"}
+        or finding.severity == "error"
+    )
+    if blocking:
+        return _report(blocking)
+
+    destination_path.parent.mkdir(parents=True, exist_ok=True)
+    candidate = destination_path.with_name(
+        f".{destination_path.name}.candidate-{uuid.uuid4().hex}.sqlite3"
+    )
+    try:
+        migration.load_candidate(
+            compiled,
+            candidate,
+            workbook_path=workbook,
+            workbook_mtime_ns=initial_mtime_ns,
+            workbook_sha256=initial_sha256,
+        )
+        conn = dbmod.connect(candidate)
+        try:
+            errors = migration.candidate_integrity_errors(conn)
+        finally:
+            conn.close()
+        if errors:
+            findings = tuple(
+                Finding(
+                    severity="error",
+                    status="contract_mismatch",
+                    code=str(error.get("code") or "candidate_integrity_error"),
+                    message=json.dumps(error, sort_keys=True, default=str),
+                    value=error,
+                )
+                for error in errors
+            )
+            return _report(findings, candidate_path=candidate)
+        promoted = promote_candidate(candidate, destination_path)
+        return _report(
+            compiled.findings,
+            candidate_path=candidate,
+            promoted_path=promoted,
+        )
+    except (OSError, sqlite3.DatabaseError, ValueError) as error:
+        return _report(
+            (
+                Finding(
+                    severity="error",
+                    status="contract_mismatch",
+                    code="candidate_build_or_promotion_failed",
+                    message=str(error),
+                ),
+            ),
+            candidate_path=candidate,
+        )
+    finally:
+        migration.remove_candidate_artifacts(candidate)
+
+
+def import_workbook(
+    db_path: Path | sqlite3.Connection,
+    workbook_path: Path,
+    *,
+    audit_contracts: bool = True,
+) -> ImportReport | dict:
+    """Import through the canonical path, or the reserved Stage 1 adapter.
+
+    The connection form is temporary compatibility for the reserved legacy
+    ``tests/test_workbook_manager.py`` suite only and is not used by the
+    canonical candidate path.  Task 8 removes it with the legacy schema.
+    """
+    if isinstance(db_path, sqlite3.Connection):
+        if audit_contracts is not True:
+            raise TypeError("legacy connection import has no audit bypass")
+        return Importer(db_path, workbook_path).run()
+    return _canonical_import_workbook(
+        Path(db_path), Path(workbook_path), audit_contracts=audit_contracts
+    )
 
 
 def latest_report(conn: sqlite3.Connection) -> dict | None:

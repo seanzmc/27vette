@@ -1,4 +1,5 @@
 from pathlib import Path
+import sqlite3
 import shutil
 import sys
 
@@ -22,6 +23,55 @@ def repo_root() -> Path:
 @pytest.fixture
 def real_workbook(repo_root: Path) -> Path:
     return repo_root / "stingray_master.xlsx"
+
+
+@pytest.fixture
+def broken_fk_workbook(tmp_path, real_workbook) -> Path:
+    destination = tmp_path / "broken-fk.xlsx"
+    shutil.copyfile(real_workbook, destination)
+    workbook = load_workbook(destination)
+    options = workbook["stingray_options"]
+    ovs = workbook["stingray_ovs"]
+    option_headers = {cell.value: cell.column for cell in options[1]}
+    ovs_headers = {cell.value: cell.column for cell in ovs[1]}
+    referenced = {
+        ovs.cell(row, ovs_headers["option_id"]).value
+        for row in range(2, ovs.max_row + 1)
+    }
+    for row in range(2, options.max_row + 1):
+        if options.cell(row, option_headers["option_id"]).value in referenced:
+            options.delete_rows(row)
+            break
+    else:
+        raise AssertionError("no referenced Stingray option row found")
+    workbook.save(destination)
+    workbook.close()
+    return destination
+
+
+@pytest.fixture
+def legacy_db_path(tmp_path) -> Path:
+    path = tmp_path / "legacy.sqlite3"
+    conn = sqlite3.connect(path)
+    conn.execute(
+        "CREATE TABLE pending_changes ("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        "ts TEXT NOT NULL,"
+        "session_id TEXT NOT NULL DEFAULT '',"
+        "table_name TEXT NOT NULL,"
+        "model_id TEXT NOT NULL DEFAULT '',"
+        "entity_key_json TEXT NOT NULL,"
+        "op TEXT NOT NULL,"
+        "old_json TEXT,"
+        "new_json TEXT,"
+        "status TEXT NOT NULL DEFAULT 'staged',"
+        "validation_json TEXT NOT NULL DEFAULT '{}',"
+        "confirmed_dependencies INTEGER NOT NULL DEFAULT 0"
+        ")"
+    )
+    conn.commit()
+    conn.close()
+    return path
 
 
 @pytest.fixture
