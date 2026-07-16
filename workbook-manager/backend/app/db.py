@@ -6,7 +6,6 @@ import sqlite3
 from pathlib import Path
 
 from .catalog import LIVE_MODELS, MODEL_TABLE_ROLES, physical_table
-from .specs import TABLE_SPECS, TableSpec
 
 
 def connect(db_path: Path) -> sqlite3.Connection:
@@ -309,8 +308,9 @@ CANONICAL_SUPPORT_DDL = (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       ts TEXT NOT NULL,
       session_id TEXT NOT NULL DEFAULT '',
-      table_name TEXT NOT NULL,
-      model_id TEXT NOT NULL DEFAULT '',
+      model_key TEXT NOT NULL REFERENCES models(model_key),
+      table_role TEXT NOT NULL,
+      sql_table TEXT NOT NULL,
       entity_key_json TEXT NOT NULL,
       op TEXT NOT NULL,
       old_json TEXT,
@@ -323,9 +323,10 @@ CANONICAL_SUPPORT_DDL = (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       ts TEXT NOT NULL,
       actor TEXT NOT NULL DEFAULT '',
-      entity_type TEXT NOT NULL,
+      model_key TEXT NOT NULL REFERENCES models(model_key),
+      table_role TEXT NOT NULL,
+      sql_table TEXT NOT NULL,
       entity_id TEXT NOT NULL,
-      model_id TEXT NOT NULL DEFAULT '',
       op TEXT NOT NULL,
       old_json TEXT,
       new_json TEXT,
@@ -335,7 +336,8 @@ CANONICAL_SUPPORT_DDL = (
       status TEXT NOT NULL,
       sync_status TEXT NOT NULL DEFAULT 'pending',
       sync_detail TEXT NOT NULL DEFAULT '',
-      pending_change_id INTEGER REFERENCES pending_changes(id)
+      pending_change_id INTEGER REFERENCES pending_changes(id),
+      related_history_id INTEGER REFERENCES change_history(id)
     )""",
     """CREATE TABLE meta (
       key TEXT PRIMARY KEY,
@@ -622,116 +624,18 @@ def create_canonical_schema(conn: sqlite3.Connection) -> None:
         )
         conn.execute(
             "CREATE INDEX idx_history_entity "
-            "ON change_history(entity_type, entity_id)"
+            "ON change_history(sql_table, entity_id)"
         )
-
-
-def _table_ddl(spec: TableSpec) -> str:
-    cols = ["id INTEGER PRIMARY KEY AUTOINCREMENT"]
-    if spec.model_scoped:
-        cols.append("model_id TEXT NOT NULL")
-    for c in spec.columns:
-        cols.append(f'"{c.sql_name()}" TEXT NOT NULL DEFAULT \'\'')
-    cols.append("src_sheet TEXT NOT NULL DEFAULT ''")
-    cols.append("src_row INTEGER")
-    key_cols = list(spec.key)
-    if spec.model_scoped:
-        key_cols = ["model_id", *key_cols]
-    quoted = ", ".join(f'"{k}"' for k in key_cols)
-    cols.append(f"UNIQUE({quoted})")
-    for ref in spec.refs:
-        if ref.scope == "global":
-            cols.append(
-                f'FOREIGN KEY("{ref.column}") REFERENCES '
-                f'{ref.target_table}("{ref.target_column}")'
-            )
-    body = ",\n  ".join(cols)
-    return f"CREATE TABLE IF NOT EXISTS {spec.table} (\n  {body}\n)"
-
-
-SUPPORT_DDL = [
-    """CREATE TABLE IF NOT EXISTS raw_sheet_rows (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      sheet TEXT NOT NULL,
-      src_row INTEGER NOT NULL,
-      data_json TEXT NOT NULL,
-      UNIQUE(sheet, src_row)
-    )""",
-    """CREATE TABLE IF NOT EXISTS import_runs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      ts TEXT NOT NULL,
-      workbook_path TEXT NOT NULL,
-      workbook_mtime_ns TEXT NOT NULL,
-      workbook_sha256 TEXT NOT NULL,
-      status TEXT NOT NULL,
-      row_counts_json TEXT NOT NULL DEFAULT '{}',
-      issue_counts_json TEXT NOT NULL DEFAULT '{}'
-    )""",
-    """CREATE TABLE IF NOT EXISTS import_issues (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      run_id INTEGER NOT NULL REFERENCES import_runs(id),
-      severity TEXT NOT NULL,          -- error | warning
-      category TEXT NOT NULL,          -- duplicate_id | unresolved_ref | ...
-      sheet TEXT NOT NULL DEFAULT '',
-      src_row INTEGER,
-      table_name TEXT NOT NULL DEFAULT '',
-      model_id TEXT NOT NULL DEFAULT '',
-      entity_key TEXT NOT NULL DEFAULT '',
-      field TEXT NOT NULL DEFAULT '',
-      message TEXT NOT NULL
-    )""",
-    """CREATE TABLE IF NOT EXISTS pending_changes (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      ts TEXT NOT NULL,
-      session_id TEXT NOT NULL DEFAULT '',
-      table_name TEXT NOT NULL,
-      model_id TEXT NOT NULL DEFAULT '',
-      entity_key_json TEXT NOT NULL,
-      op TEXT NOT NULL,                -- add | update | delete
-      old_json TEXT,
-      new_json TEXT,
-      status TEXT NOT NULL DEFAULT 'staged',  -- staged | committed | discarded
-      validation_json TEXT NOT NULL DEFAULT '{}',
-      confirmed_dependencies INTEGER NOT NULL DEFAULT 0
-    )""",
-    """CREATE TABLE IF NOT EXISTS change_history (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      ts TEXT NOT NULL,
-      actor TEXT NOT NULL DEFAULT '',
-      entity_type TEXT NOT NULL,
-      entity_id TEXT NOT NULL,
-      model_id TEXT NOT NULL DEFAULT '',
-      op TEXT NOT NULL,
-      old_json TEXT,
-      new_json TEXT,
-      src_sheet TEXT NOT NULL DEFAULT '',
-      src_row INTEGER,
-      validation_result TEXT NOT NULL DEFAULT '',
-      status TEXT NOT NULL,            -- committed | rolled_back
-      sync_status TEXT NOT NULL DEFAULT 'pending',  -- pending | synced | sync_failed | n/a
-      sync_detail TEXT NOT NULL DEFAULT '',
-      pending_change_id INTEGER
-    )""",
-    """CREATE TABLE IF NOT EXISTS meta (
-      key TEXT PRIMARY KEY,
-      value TEXT NOT NULL
-    )""",
-]
-
-
-def init_schema(conn: sqlite3.Connection) -> None:
-    for spec in TABLE_SPECS:
-        conn.execute(_table_ddl(spec))
-    for ddl in SUPPORT_DDL:
-        conn.execute(ddl)
-    conn.execute(
-        "CREATE INDEX IF NOT EXISTS idx_history_entity "
-        "ON change_history(entity_type, entity_id)"
-    )
-    conn.execute(
-        "CREATE INDEX IF NOT EXISTS idx_issues_run ON import_issues(run_id)"
-    )
-    conn.commit()
+        conn.execute(
+            "CREATE TRIGGER change_history_append_only_update "
+            "BEFORE UPDATE ON change_history BEGIN "
+            "SELECT RAISE(ABORT, 'change_history is append-only'); END"
+        )
+        conn.execute(
+            "CREATE TRIGGER change_history_append_only_delete "
+            "BEFORE DELETE ON change_history BEGIN "
+            "SELECT RAISE(ABORT, 'change_history is append-only'); END"
+        )
 
 
 def get_meta(conn: sqlite3.Connection, key: str, default: str = "") -> str:

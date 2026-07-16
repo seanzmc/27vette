@@ -8,8 +8,9 @@ from pydantic import BaseModel, Field
 
 
 class ValidationIssue(BaseModel):
-    table: str = ""
-    model_id: str = ""
+    model_key: str = ""
+    table_role: str = ""
+    sql_table: str = ""
     field: str = ""
     entity_key: str = ""
     message: str
@@ -17,8 +18,8 @@ class ValidationIssue(BaseModel):
 
 
 class StageChangeRequest(BaseModel):
-    table: str
-    model_id: str = ""
+    model_key: str
+    table_role: str
     op: str = Field(pattern="^(add|update|delete)$")
     key: dict[str, str] = Field(default_factory=dict)
     record: Optional[dict[str, Any]] = None
@@ -30,8 +31,9 @@ class ChangeOut(BaseModel):
     id: int
     ts: str
     session_id: str
-    table_name: str
-    model_id: str
+    model_key: str
+    table_role: str
+    sql_table: str
     op: str
     status: str
     entity_key: Optional[dict] = None

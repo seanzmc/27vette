@@ -1,240 +1,239 @@
-"""Relational validation over the normalized tables.
-
-Two consumers:
-- the importer calls :func:`check_references` for a full unresolved-relationship
-  sweep after ingest;
-- the staging layer calls :func:`validate_record` / :func:`find_dependents`
-  for per-change validation and delete protection.
-
-All messages carry exact entity ids, field names, and sheet references.
-"""
+"""Registry-driven validation for canonical physical model tables."""
 
 from __future__ import annotations
 
+import json
 import sqlite3
+from typing import Mapping
 
-from .specs import SPEC_BY_TABLE, TABLE_SPECS, RefSpec, TableSpec
-
-
-def _interior_models(conn: sqlite3.Connection) -> dict[str, set[str]]:
-    """model -> interior ids visible to it (via its interior_source_sheet)."""
-    out: dict[str, set[str]] = {}
-    rows = conn.execute(
-        "SELECT model_key AS m, sheet_name FROM sheet_registry "
-        "WHERE source_role='interior_source_sheet'"
-    ).fetchall()
-    for r in rows:
-        ids = {x["interior_id"] for x in conn.execute(
-            "SELECT interior_id FROM interiors WHERE src_sheet=?",
-            (r["sheet_name"],))}
-        out[r["m"]] = ids
-    return out
+from .catalog import (
+    MODEL_TABLE_ROLES,
+    ROLE_EXCLUSIVE_COLUMN_PAIRS,
+    RoleEditSpec,
+    edit_spec,
+)
 
 
-def _ref_exists(conn, ref: RefSpec, value: str, model_id: str,
-                interior_scope: dict[str, set[str]] | None = None) -> bool:
-    if ref.scope == "global":
-        row = conn.execute(
-            f'SELECT 1 FROM {ref.target_table} WHERE "{ref.target_column}"=? '
-            "LIMIT 1", (value,)).fetchone()
-        return row is not None
-    if ref.scope == "model":
-        target_spec = SPEC_BY_TABLE[ref.target_table]
-        if target_spec.model_scoped:
-            row = conn.execute(
-                f'SELECT 1 FROM {ref.target_table} WHERE model_id=? AND '
-                f'"{ref.target_column}"=? LIMIT 1', (model_id, value)).fetchone()
-        else:
-            # model-scoped ref into a model_key-column table
-            row = conn.execute(
-                f'SELECT 1 FROM {ref.target_table} WHERE model_key=? AND '
-                f'"{ref.target_column}"=? LIMIT 1', (model_id, value)).fetchone()
-        return row is not None
-    if ref.scope == "model_union":
-        for table in ref.union_tables:
-            tspec = SPEC_BY_TABLE[table]
-            if tspec.model_scoped:
-                row = conn.execute(
-                    f'SELECT 1 FROM {table} WHERE model_id=? AND '
-                    f'"{tspec.key[0]}"=? LIMIT 1', (model_id, value)).fetchone()
-                if row:
-                    return True
-            elif table == "interiors":
-                scope = (interior_scope or {}).get(model_id)
-                if scope is not None and value in scope:
-                    return True
-                if scope is None:
-                    row = conn.execute(
-                        "SELECT 1 FROM interiors WHERE interior_id=? LIMIT 1",
-                        (value,)).fetchone()
-                    if row:
-                        return True
-            else:
-                row = conn.execute(
-                    f'SELECT 1 FROM {table} WHERE "{tspec.key[0]}"=? LIMIT 1',
-                    (value,)).fetchone()
-                if row:
-                    return True
-        return False
-    return True
+def _quote(identifier: str) -> str:
+    return '"' + identifier.replace('"', '""') + '"'
 
 
-def check_references(conn: sqlite3.Connection) -> list[dict]:
-    """Full sweep: report every unresolved reference in every table."""
-    issues: list[dict] = []
-    interior_scope = _interior_models(conn)
-    for spec in TABLE_SPECS:
-        if not spec.refs:
-            continue
-        rows = conn.execute(f"SELECT * FROM {spec.table}").fetchall()
-        for row in rows:
-            model_id = row["model_id"] if spec.model_scoped else (
-                row["model_key"] if spec.has_model_key_column else "")
-            key_label = "/".join(str(row[k]) for k in spec.key)
-            for ref in spec.refs:
-                value = str(row[ref.column] or "")
-                if value == "":
-                    if not ref.optional:
-                        issues.append(_issue(spec, row, ref, key_label,
-                                             model_id,
-                                             f"required reference "
-                                             f"{ref.column} is blank"))
-                    continue
-                if not _ref_exists(conn, ref, value, model_id, interior_scope):
-                    issues.append(_issue(
-                        spec, row, ref, key_label, model_id,
-                        f"{spec.table}.{ref.column}={value!r} does not match "
-                        f"any {ref.target_table}.{ref.target_column}"
-                        + (f" for model {model_id!r}" if ref.scope != "global"
-                           else "")))
-    return issues
+def _blank(value: object) -> bool:
+    return value is None or (isinstance(value, str) and value.strip() == "")
 
 
-def _issue(spec, row, ref, key_label, model_id, message) -> dict:
+def _where_key(spec: RoleEditSpec, key: Mapping[str, object]):
+    clauses = []
+    values = []
+    for column in spec.key:
+        clauses.append(f"{_quote(column)} IS ?")
+        values.append(key.get(column))
+    return " AND ".join(clauses), values
+
+
+def _error(spec: RoleEditSpec, field: str, message: str, record=None) -> dict:
+    record = record or {}
     return {
-        "severity": "error", "category": "unresolved_ref",
-        "sheet": row["src_sheet"], "src_row": row["src_row"],
-        "table_name": spec.table, "model_id": model_id or "",
-        "entity_key": key_label, "field": ref.column, "message": message,
+        "model_key": spec.model_key,
+        "table_role": spec.table_role,
+        "sql_table": spec.sql_table,
+        "field": field,
+        "entity_key": "/".join(str(record.get(k, "")) for k in spec.key),
+        "message": message,
     }
 
 
-# ── per-record validation (staging) ───────────────────────────────────
-
-def validate_record(conn: sqlite3.Connection, spec: TableSpec, model_id: str,
-                    record: dict, *, op: str, original_key: dict | None = None
-                    ) -> list[dict]:
+def validate_record(
+    conn: sqlite3.Connection,
+    model_key: str,
+    role: str,
+    record: Mapping[str, object],
+    *,
+    op: str,
+    original_key: Mapping[str, object] | None = None,
+) -> list[dict]:
+    """Validate one canonical row without accepting a caller SQL identifier."""
+    spec = edit_spec(conn, model_key, role)
     errors: list[dict] = []
+    supplied_model = record.get("model_key")
+    if supplied_model is not None and supplied_model != model_key:
+        errors.append(_error(
+            spec, "model_key",
+            f"record model_key {supplied_model!r} does not match route "
+            f"model_key {model_key!r}", record,
+        ))
 
-    def err(field, message):
-        errors.append({
-            "table": spec.table, "model_id": model_id or "",
-            "field": field, "message": message,
-            "entity_key": "/".join(str(record.get(k, "")) for k in spec.key),
-        })
+    unknown = set(record) - set(spec.columns)
+    for column in sorted(unknown):
+        errors.append(_error(spec, column, "unknown canonical column", record))
 
-    # key completeness
-    for k in spec.key:
-        if str(record.get(k, "")).strip() == "":
-            err(k, f"key field {k!r} is required")
-    if errors:
-        return errors
+    for column in spec.key:
+        if column not in spec.nullable and _blank(record.get(column)):
+            errors.append(_error(
+                spec, column, f"key field {column!r} is required", record
+            ))
+    if op == "add":
+        for column in sorted(spec.required):
+            if _blank(record.get(column)):
+                errors.append(_error(
+                    spec, column, f"required field {column!r} is missing", record
+                ))
+    for left, right in ROLE_EXCLUSIVE_COLUMN_PAIRS.get(role, ()):
+        populated = int(not _blank(record.get(left))) + int(
+            not _blank(record.get(right))
+        )
+        if populated != 1:
+            errors.append(_error(
+                spec,
+                f"{left},{right}",
+                f"exactly one of {left!r} and {right!r} is required",
+                record,
+            ))
+    if op == "update" and original_key is not None:
+        for column in spec.key:
+            if record.get(column) != original_key.get(column):
+                errors.append(_error(
+                    spec,
+                    column,
+                    f"key field {column!r} cannot change on update "
+                    f"({original_key.get(column)!r} -> {record.get(column)!r}); "
+                    "stage a delete plus an add instead",
+                    record,
+                ))
 
-    # types + enums
-    for col in spec.columns:
-        name = col.sql_name()
-        value = str(record.get(name, "") or "")
-        if value == "":
+    for column, value in record.items():
+        if column == "model_key" or column not in spec.types or _blank(value):
             continue
-        if col.ctype == "int":
+        if spec.types[column] == "integer":
             try:
                 int(str(value).replace(",", ""))
-            except ValueError:
-                err(name, f"{name} must be an integer, got {value!r}")
-        elif col.ctype == "bool":
-            if value not in ("True", "False"):
-                err(name, f"{name} must be True or False, got {value!r}")
-        if col.enum and value not in col.enum:
-            err(name, f"{name} must be one of {list(col.enum)}, got {value!r}")
+            except (TypeError, ValueError):
+                errors.append(_error(
+                    spec, column,
+                    f"{column} must be an integer, got {value!r}", record,
+                ))
+        if column in spec.booleans and value not in (
+            0, 1, False, True, "0", "1", "False", "True"
+        ):
+            errors.append(_error(
+                spec, column, f"{column} must be boolean, got {value!r}", record
+            ))
+        allowed = spec.enums.get(column)
+        canonical = None if value == "" and None in (allowed or ()) else value
+        if allowed and canonical not in allowed:
+            errors.append(_error(
+                spec, column,
+                f"{column} must be one of {list(allowed)!r}, got {value!r}",
+                record,
+            ))
 
-    # keys are immutable on update (the workbook write path cannot rename
-    # keys either — editor_ops treats them as immutable; renames must be
-    # modeled as delete + add so dependents are inspected)
-    if op == "update" and original_key:
-        changed = [k for k in spec.key
-                   if str(record.get(k)) != str(original_key.get(k))]
-        if changed:
-            for k in changed:
-                err(k, f"key field {k!r} cannot change on update "
-                       f"({original_key.get(k)!r} → {record.get(k)!r}); "
-                       "stage a delete plus an add instead")
-            return errors
+    if op == "add" and not errors:
+        where, values = _where_key(spec, record)
+        if conn.execute(
+            f"SELECT 1 FROM {_quote(spec.sql_table)} WHERE {where} LIMIT 1",
+            values,
+        ).fetchone():
+            errors.append(_error(
+                spec, ",".join(spec.key),
+                "a record with this key already exists in model scope", record,
+            ))
 
-    # uniqueness within scope
-    if op == "add":
-        where = " AND ".join(f'"{k}"=?' for k in spec.key)
-        params = [str(record.get(k, "")) for k in spec.key]
-        if spec.model_scoped:
-            where = "model_id=? AND " + where
-            params = [model_id, *params]
-        row = conn.execute(
-            f"SELECT 1 FROM {spec.table} WHERE {where} LIMIT 1", params
-        ).fetchone()
-        if row:
-            err(",".join(spec.key),
-                "a record with this key already exists in scope "
-                + (f"(model {model_id})" if spec.model_scoped else "(global)"))
-
-    # references
-    interior_scope = _interior_models(conn)
-    for ref in spec.refs:
-        value = str(record.get(ref.column, "") or "")
-        if value == "":
-            if not ref.optional:
-                err(ref.column, f"required reference {ref.column} is blank")
+    candidate = dict(record)
+    candidate["model_key"] = model_key
+    for foreign_key in spec.foreign_keys:
+        values = [candidate.get(column) for column in foreign_key.columns]
+        if any(_blank(value) for value in values):
             continue
-        if not _ref_exists(conn, ref, value, model_id, interior_scope):
-            err(ref.column,
-                f"{ref.column}={value!r} does not resolve to "
-                f"{ref.target_table}.{ref.target_column}"
-                + (f" for model {model_id!r}" if ref.scope != "global" else ""))
+        where = " AND ".join(
+            f"{_quote(column)}=?" for column in foreign_key.target_columns
+        )
+        if conn.execute(
+            f"SELECT 1 FROM {_quote(foreign_key.target_table)} "
+            f"WHERE {where} LIMIT 1",
+            values,
+        ).fetchone() is None:
+            for column in foreign_key.columns:
+                if column != "model_key":
+                    errors.append(_error(
+                        spec,
+                        column,
+                        f"reference does not resolve to "
+                        f"{foreign_key.target_table}",
+                        record,
+                    ))
     return errors
 
 
-# ── dependency inspection (delete protection) ────────────────────────
+def _source_evidence(
+    conn: sqlite3.Connection, table: str, key: Mapping[str, object]
+) -> tuple[str, int | None]:
+    key_json = json.dumps(dict(key), sort_keys=True, separators=(",", ":"))
+    row = conn.execute(
+        "SELECT source_sheet, source_row FROM import_lineage "
+        "WHERE sql_table=? AND primary_key_json=? "
+        "ORDER BY id LIMIT 1",
+        (table, key_json),
+    ).fetchone()
+    return (str(row["source_sheet"]), int(row["source_row"])) if row else ("", None)
 
-def find_dependents(conn: sqlite3.Connection, spec: TableSpec,
-                    model_id: str, key: dict) -> list[dict]:
-    """Records in other tables that reference the given record."""
+
+def find_dependents(
+    conn: sqlite3.Connection,
+    model_key: str,
+    role: str,
+    key: Mapping[str, object],
+) -> list[dict]:
+    """Inspect every canonical model role for inbound SQLite foreign keys."""
+    target = edit_spec(conn, model_key, role)
+    target_values = dict(key)
+    target_values["model_key"] = model_key
     dependents: list[dict] = []
-    # A record is referenced through its first key column value (canonical id)
-    # by RefSpecs in other tables that target this table.
-    target_col = spec.key[0]
-    target_value = str(key.get(target_col, ""))
-    if not target_value:
-        return dependents
-    for other in TABLE_SPECS:
-        for ref in other.refs:
-            targets = (ref.target_table,) if ref.scope != "model_union" \
-                else ref.union_tables
-            if spec.table not in targets:
+    for other_role in MODEL_TABLE_ROLES:
+        other = edit_spec(conn, model_key, other_role)
+        for foreign_key in other.foreign_keys:
+            if foreign_key.target_table != target.sql_table:
                 continue
-            where = f'"{ref.column}"=?'
-            params: list = [target_value]
-            if other.model_scoped and spec.model_scoped:
-                where += " AND model_id=?"
-                params.append(model_id)
+            try:
+                values = [
+                    target_values[column]
+                    for column in foreign_key.target_columns
+                ]
+            except KeyError:
+                continue
+            where = " AND ".join(
+                f"{_quote(column)} IS ?" for column in foreign_key.columns
+            )
             rows = conn.execute(
-                f"SELECT * FROM {other.table} WHERE {where}", params
+                f"SELECT * FROM {_quote(other.sql_table)} WHERE {where}", values
             ).fetchall()
             for row in rows:
+                row_key = {column: row[column] for column in other.key}
+                source_sheet, source_row = _source_evidence(
+                    conn, other.sql_table, row_key
+                )
                 dependents.append({
-                    "table": other.table,
-                    "model_id": row["model_id"] if other.model_scoped else (
-                        row["model_key"] if other.has_model_key_column else ""),
-                    "field": ref.column,
-                    "entity_key": "/".join(str(row[k]) for k in other.key),
-                    "src_sheet": row["src_sheet"],
-                    "src_row": row["src_row"],
+                    "model_key": model_key,
+                    "table_role": other_role,
+                    "sql_table": other.sql_table,
+                    "field": ",".join(foreign_key.columns),
+                    "entity_key": "/".join(str(row[column]) for column in other.key),
+                    "source_sheet": source_sheet,
+                    "source_row": source_row,
                 })
     return dependents
+
+
+def check_references(conn: sqlite3.Connection) -> list[dict]:
+    """Return SQLite's canonical unresolved relationship report."""
+    return [
+        {
+            "severity": "error",
+            "category": "unresolved_ref",
+            "sql_table": row[0],
+            "rowid": row[1],
+            "target_table": row[2],
+            "foreign_key_id": row[3],
+            "message": "canonical foreign key violation",
+        }
+        for row in conn.execute("PRAGMA foreign_key_check")
+    ]

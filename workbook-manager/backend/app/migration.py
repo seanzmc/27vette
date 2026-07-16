@@ -208,14 +208,25 @@ def capture_destination_snapshot(destination: Path) -> DestinationSnapshot:
                 staged = conn.execute(
                     "SELECT COUNT(*) FROM pending_changes WHERE status='staged'"
                 ).fetchone()[0]
-            if "change_history" in tables and "sync_status" in {
+            history_columns = {
                 row["name"]
                 for row in conn.execute("PRAGMA table_info(change_history)")
-            }:
-                unsynced = conn.execute(
-                    "SELECT COUNT(*) FROM change_history "
-                    "WHERE sync_status NOT IN ('synced', 'n/a')"
-                ).fetchone()[0]
+            } if "change_history" in tables else set()
+            if "sync_status" in history_columns:
+                if "related_history_id" in history_columns:
+                    unsynced = conn.execute(
+                        "SELECT COUNT(*) FROM change_history h "
+                        "WHERE h.status='committed' "
+                        "AND h.sync_status='pending' "
+                        "AND NOT EXISTS (SELECT 1 FROM change_history event "
+                        "WHERE event.related_history_id=h.id "
+                        "AND event.status='sync_succeeded')"
+                    ).fetchone()[0]
+                else:
+                    unsynced = conn.execute(
+                        "SELECT COUNT(*) FROM change_history "
+                        "WHERE sync_status NOT IN ('synced', 'n/a')"
+                    ).fetchone()[0]
             user_version = conn.execute("PRAGMA user_version").fetchone()[0]
             logical = _logical_fingerprint(conn)
         finally:

@@ -3,7 +3,7 @@
 Canonical identifiers are never altered; every function here derives a
 display value from a canonical one. Prefix stripping is deterministic and
 reversible: a prefix is removed only when it is explicitly declared for the
-table in the specs (``id_prefixes``); nothing is stripped merely because it
+table in canonical catalog metadata; nothing is stripped merely because it
 looks repetitive, so ``canonical == confirmed_prefix + stripped_remainder``
 always holds.
 """

@@ -16,21 +16,28 @@ from app import db  # noqa: E402
 from app import importer  # noqa: E402
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def repo_root() -> Path:
     return REPO_ROOT
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def real_workbook(repo_root: Path) -> Path:
     return repo_root / "stingray_master.xlsx"
 
 
-@pytest.fixture
-def imported_db_path(tmp_path, real_workbook):
-    database_path = tmp_path / "imported.sqlite3"
+@pytest.fixture(scope="session")
+def canonical_db_template(tmp_path_factory, real_workbook):
+    database_path = tmp_path_factory.mktemp("canonical-db") / "template.sqlite3"
     report = importer.import_workbook(database_path, real_workbook)
     assert report.status == "validated"
+    return database_path
+
+
+@pytest.fixture
+def imported_db_path(tmp_path, canonical_db_template):
+    database_path = tmp_path / "imported.sqlite3"
+    shutil.copyfile(canonical_db_template, database_path)
     return database_path
 
 

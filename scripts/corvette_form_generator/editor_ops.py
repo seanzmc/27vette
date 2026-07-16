@@ -242,6 +242,15 @@ EDITOR_SHEET_META: dict[str, dict] = {
         "enums": {},
         "refs": {"interior_id": "interiors"},
     },
+    "runtime_rule_exceptions": {
+        "key": ("model_key", "exception_id"),
+        "types": {"active": "bool"},
+        "enums": {},
+        "refs": {
+            "source_option_id": "options",
+            "target_option_id": "options",
+        },
+    },
     "runtime_steps_meta": {
         "key": ("model_key", "step_key"),
         "types": {"runtime_order": "int", "active": "bool"},
@@ -286,6 +295,7 @@ GLOBAL_SHEET_FAMILIES: dict[str, str] = {
     "default_selection_rules": "default_selection_rules",
     "asset_map": "asset_map",
     "interior_components": "interior_components",
+    "runtime_rule_exceptions": "runtime_rule_exceptions",
     "runtime_steps": "runtime_steps_meta",
     "section_presentation": "section_presentation_meta",
     "context_section_master": "context_section_master_meta",
