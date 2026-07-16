@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 import sqlite3
+import tempfile
 import uuid
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Literal, Mapping
 
+from . import contract_audit
 from . import db as dbmod
 from . import migration
 from .catalog import LIVE_MODELS
@@ -334,14 +337,43 @@ def _file_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _workbook_audit_drift(
+    workbook: Path,
+    initial_mtime_ns: str,
+    initial_sha256: str,
+) -> Finding | None:
+    try:
+        changed = (
+            str(workbook.stat().st_mtime_ns) != initial_mtime_ns
+            or _file_sha256(workbook) != initial_sha256
+        )
+    except OSError as error:
+        return Finding(
+            severity="error",
+            status="decision_required",
+            code="workbook_changed_during_contract_audit",
+            message=str(error),
+            value=str(workbook),
+        )
+    if not changed:
+        return None
+    return Finding(
+        severity="error",
+        status="decision_required",
+        code="workbook_changed_during_contract_audit",
+        message=(
+            "The workbook changed during runtime-contract audit; retry from "
+            "a stable source file."
+        ),
+        value=str(workbook),
+    )
+
+
 def _canonical_import_workbook(
     destination: Path,
     workbook_path: Path,
-    *,
-    _capability: object,
 ) -> ImportReport:
-    if _capability is not _TASK6_TEST_CAPABILITY:
-        raise PermissionError("Task 6 canonical import capability required")
+    """Compile, audit all promoted contracts, and atomically promote."""
     destination_path = Path(destination)
     workbook = Path(workbook_path)
 
@@ -435,11 +467,57 @@ def _canonical_import_workbook(
                 for error in errors
             )
             return _report(findings, candidate_path=candidate)
-        promoted = migration._promote_candidate_for_task6_tests(
+        audit_root = Path(tempfile.mkdtemp(prefix="workbook-contract-audit-"))
+        post_audit_drift: Finding | None = None
+        try:
+            audit_conn = dbmod.connect_readonly(candidate)
+            try:
+                audit = contract_audit.audit_runtime_contracts(
+                    audit_conn, workbook, audit_root
+                )
+                post_audit_drift = _workbook_audit_drift(
+                    workbook, initial_mtime_ns, initial_sha256
+                )
+            finally:
+                audit_conn.close()
+        finally:
+            shutil.rmtree(audit_root, ignore_errors=True)
+        if post_audit_drift is not None:
+            contract_audit.discard_audit_authorization(audit)
+            return _report((post_audit_drift,), candidate_path=candidate)
+        if audit.differences:
+            contract_audit.discard_audit_authorization(audit)
+            findings = tuple(
+                Finding(
+                    severity="error",
+                    status="contract_mismatch",
+                    code="runtime_contract_difference",
+                    message=(
+                        f"{difference.model_key} {difference.json_path}: "
+                        f"{difference.baseline_value!r} != "
+                        f"{difference.candidate_value!r}"
+                    ),
+                    value={
+                        "model_key": difference.model_key,
+                        "json_path": difference.json_path,
+                        "baseline_value": repr(difference.baseline_value),
+                        "candidate_value": repr(difference.candidate_value),
+                    },
+                )
+                for difference in audit.differences
+            )
+            return _report(findings, candidate_path=candidate)
+        final_drift = _workbook_audit_drift(
+            workbook, initial_mtime_ns, initial_sha256
+        )
+        if final_drift is not None:
+            contract_audit.discard_audit_authorization(audit)
+            return _report((final_drift,), candidate_path=candidate)
+        promoted = migration._promote_audited_candidate(
             candidate,
             destination_path,
             snapshot,
-            _capability=_TASK6_TEST_CAPABILITY,
+            audit=audit,
         )
         return _report(
             compiled.findings,
@@ -502,40 +580,12 @@ def import_workbook(
     db_path: Path,
     workbook_path: Path,
 ) -> ImportReport:
-    """Fail closed until Task 7 supplies the mandatory contract auditor."""
+    """Build and promote only after mandatory runtime-contract parity."""
     if not isinstance(db_path, (str, Path)):
         raise TypeError("db_path must be a filesystem destination path")
-    return _report(
-        (
-            Finding(
-                severity="error",
-                status="decision_required",
-                code="contract_audit_required",
-                message=(
-                    "Task 7 contract audit is required before canonical "
-                    "candidate promotion can run."
-                ),
-            ),
-        )
-    )
-
-
-_TASK6_TEST_CAPABILITY = migration._TASK6_TEST_CAPABILITY
-
-
-def _import_workbook_for_task6_tests(
-    db_path: Path,
-    workbook_path: Path,
-    *,
-    _capability: object,
-) -> ImportReport:
-    """Private structural entry removed when Task 7 wires the real auditor."""
-    if _capability is not _TASK6_TEST_CAPABILITY:
-        raise PermissionError("Task 6 structural import capability required")
     return _canonical_import_workbook(
         Path(db_path),
         Path(workbook_path),
-        _capability=_TASK6_TEST_CAPABILITY,
     )
 
 

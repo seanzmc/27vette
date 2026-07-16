@@ -22,6 +22,7 @@ from .catalog import LIVE_MODELS, MODEL_TABLE_ROLES, physical_table
 from .compile_types import Finding
 
 if TYPE_CHECKING:
+    from .contract_audit import ContractAudit
     from .importer import CompiledWorkbook
 
 
@@ -48,9 +49,6 @@ class CandidateCheckpointError(RuntimeError):
 
 class BackupVerificationError(RuntimeError):
     pass
-
-
-_TASK6_TEST_CAPABILITY = object()
 
 
 _MODEL_LOAD_ORDER = (
@@ -841,22 +839,27 @@ def promote_candidate(
     destination: Path,
     snapshot: DestinationSnapshot,
 ) -> Path:
-    """Fail closed until Task 7 supplies the mandatory contract auditor."""
+    """Reject direct promotion; the audited importer owns this boundary."""
     raise PermissionError(
-        "contract_audit_required: Task 7 must authorize candidate promotion"
+        "contract_audit_required: use import_workbook for audited promotion"
     )
 
 
-def _promote_candidate_for_task6_tests(
+def _promote_audited_candidate(
     candidate: Path,
     destination: Path,
     snapshot: DestinationSnapshot,
     *,
-    _capability: object,
+    audit: ContractAudit,
 ) -> Path:
-    """Checkpoint, sync, back up, and atomically promote a verified candidate."""
-    if _capability is not _TASK6_TEST_CAPABILITY:
-        raise PermissionError("Task 6 structural promotion capability required")
+    """Promote only after the importer completed an empty contract audit."""
+    from .contract_audit import ContractAudit, consume_audit_authorization
+
+    if (
+        not isinstance(audit, ContractAudit)
+        or not consume_audit_authorization(audit, candidate)
+    ):
+        raise PermissionError("Completed audit for this exact candidate required")
     candidate_path = Path(candidate)
     destination_path = Path(destination)
     _checkpoint_and_verify_candidate(candidate_path)

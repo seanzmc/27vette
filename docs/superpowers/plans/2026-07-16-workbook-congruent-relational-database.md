@@ -908,7 +908,7 @@ git commit -m "feat: promote validated workbook database atomically"
 - Produces: `export_comparison_workbook(conn, source, destination)`, `audit_runtime_contracts(conn, source_workbook, temp_dir) -> ContractAudit`.
 - Consumes: schema mapping/lineage, current generators, `discover_generation_model_configs`, and `generate_model_artifacts`.
 
-- [ ] **Step 1: Write failing reversible mapping and contract tests**
+- [x] **Step 1: Write failing reversible mapping and contract tests**
 
 Declare these shared imported-database fixtures in `conftest.py`; they are
 expected to fail until the real contract auditor is implemented in Step 3:
@@ -965,9 +965,9 @@ def test_all_promoted_contracts_match_except_timestamps(imported_db, real_workbo
     assert audit.differences == ()
 ```
 
-- [ ] **Step 2: Run the focused tests and confirm missing adapter failures**
+- [x] **Step 2: Run the focused tests and confirm missing adapter failures**
 
-- [ ] **Step 3: Implement reversible export and isolated generation**
+- [x] **Step 3: Implement reversible export and isolated generation**
 
 Copy the workbook to a temporary path, rewrite canonical source sheets through
 `schema_mapping`, reconstruct original aliases (`added_option_id` ->
@@ -1015,7 +1015,7 @@ Finish Task 7 by removing the Task 6 `audit_contracts` argument entirely.
 `audit_runtime_contracts` and may call `promote_candidate` only when
 `differences == ()`.
 
-- [ ] **Step 4: Run contract audit and existing model contract tests**
+- [x] **Step 4: Run contract audit and existing model contract tests**
 
 ```bash
 .venv/bin/python -m pytest tests/workbook_manager/test_contract_audit.py -q
@@ -1026,7 +1026,7 @@ node --test tests/z06-form-data-draft.test.mjs
 
 Expected: SQL round trip matches all three contracts; no repo artifact changes.
 
-- [ ] **Step 5: Commit Task 7**
+- [x] **Step 5: Commit Task 7**
 
 ```bash
 git add workbook-manager/backend/app/export_adapter.py workbook-manager/backend/app/contract_audit.py tests/workbook_manager/conftest.py tests/workbook_manager/test_contract_audit.py

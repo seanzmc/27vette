@@ -1,15 +1,18 @@
 import hashlib
 import inspect
 import os
+import shutil
 import sqlite3
 from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from openpyxl import load_workbook
 
 from app import db, importer, migration
 from app.catalog import LIVE_MODELS, MODEL_TABLE_ROLES
 from app.compile_types import freeze_mapping
+from app.contract_audit import ContractAudit
 
 
 def _digest(path):
@@ -17,25 +20,18 @@ def _digest(path):
 
 
 def _task6_import(destination, workbook):
-    return importer._import_workbook_for_task6_tests(
-        destination,
-        workbook,
-        _capability=importer._TASK6_TEST_CAPABILITY,
-    )
+    return importer.import_workbook(destination, workbook)
 
 
-def test_public_import_is_path_only_and_fails_closed_until_task_7(
+def test_public_import_is_path_only_and_has_no_audit_bypass(
     tmp_path, real_workbook
 ):
     signature = inspect.signature(importer.import_workbook)
     assert "audit_contracts" not in signature.parameters
     destination = tmp_path / "public.sqlite3"
 
-    report = importer.import_workbook(destination, real_workbook)
-
-    assert report.status == "decision_required"
-    assert report.finding_codes == ("contract_audit_required",)
-    assert not destination.exists()
+    assert not hasattr(importer, "_import_workbook_for_task6_tests")
+    assert not hasattr(importer, "_TASK6_TEST_CAPABILITY")
     conn = sqlite3.connect(":memory:")
     try:
         with pytest.raises(TypeError):
@@ -44,15 +40,11 @@ def test_public_import_is_path_only_and_fails_closed_until_task_7(
         conn.close()
     assert not hasattr(importer, "Importer")
     with pytest.raises(PermissionError):
-        importer._import_workbook_for_task6_tests(
-            destination, real_workbook, _capability=object()
-        )
-    with pytest.raises(PermissionError):
-        migration._promote_candidate_for_task6_tests(
+        migration._promote_audited_candidate(
             tmp_path / "candidate.sqlite3",
             destination,
             migration.capture_destination_snapshot(destination),
-            _capability=object(),
+            audit=object(),
         )
 
 
@@ -60,7 +52,7 @@ def test_public_import_is_path_only_and_fails_closed_until_task_7(
     "public_promote",
     (migration.promote_candidate, importer.promote_candidate),
 )
-def test_public_low_level_promotion_fails_closed_until_task_7(
+def test_public_low_level_promotion_requires_audited_importer(
     tmp_path, real_workbook, public_promote
 ):
     candidate = tmp_path / f"{public_promote.__module__}.candidate.sqlite3"
@@ -81,35 +73,33 @@ def test_public_low_level_promotion_fails_closed_until_task_7(
     assert candidate.exists()
 
 
-def test_canonical_orchestrator_requires_capability_before_work(
-    tmp_path, real_workbook, monkeypatch
+def test_constructed_empty_audit_cannot_replace_destination(
+    tmp_path, real_workbook
 ):
-    destination = tmp_path / "canonical-boundary.sqlite3"
+    candidate = tmp_path / "fake-audit-candidate.sqlite3"
+    destination = tmp_path / "fake-audit-destination.sqlite3"
+    importer.load_candidate(importer.compile_workbook(real_workbook), candidate)
     conn = db.connect(destination)
     db.create_canonical_schema(conn)
     db.set_meta(conn, "destination_marker", "must-survive")
     conn.commit()
     conn.close()
     before = _digest(destination)
+    snapshot = migration.capture_destination_snapshot(destination)
+    fake = ContractAudit(
+        models=LIVE_MODELS, differences=(), generated_paths={}
+    )
 
-    def forbidden(*_args, **_kwargs):
-        raise AssertionError("unauthorized canonical import performed work")
-
-    monkeypatch.setattr(importer, "compile_workbook", forbidden)
-    monkeypatch.setattr(migration, "load_candidate", forbidden)
-
-    with pytest.raises(TypeError):
-        importer._canonical_import_workbook(destination, real_workbook)
-    with pytest.raises(PermissionError):
-        importer._canonical_import_workbook(
-            destination, real_workbook, _capability=object()
+    with pytest.raises(PermissionError, match="[Cc]ompleted audit"):
+        migration._promote_audited_candidate(
+            candidate, destination, snapshot, audit=fake
         )
 
     assert _digest(destination) == before
-    assert not list(tmp_path.glob(".*.candidate-*.sqlite3*"))
+    assert candidate.exists()
 
 
-def test_api_import_uses_fail_closed_path_without_opening_live_connection(
+def test_api_import_uses_path_only_audited_import_without_opening_live_connection(
     tmp_path, real_workbook, monkeypatch
 ):
     from app import main
@@ -123,10 +113,83 @@ def test_api_import_uses_fail_closed_path_without_opening_live_connection(
         lambda: (_ for _ in ()).throw(AssertionError("must stay unopened")),
     )
 
-    report = main.run_import()
+    monkeypatch.setattr(
+        importer,
+        "import_workbook",
+        lambda db_path, workbook_path: (db_path, workbook_path),
+    )
+
+    assert main.run_import() == (destination, real_workbook)
+
+
+def test_canonical_orchestrator_cannot_skip_contract_audit(
+    tmp_path, real_workbook, monkeypatch
+):
+    destination = tmp_path / "canonical-audit-boundary.sqlite3"
+
+    def reject_contracts(*_args, **_kwargs):
+        from app.contract_audit import ContractAudit, ContractDifference
+
+        return ContractAudit(
+            models=("stingray", "grand_sport", "z06"),
+            differences=(
+                ContractDifference(
+                    "stingray", "$.choices[0].label", "old", "new"
+                ),
+            ),
+            generated_paths={},
+        )
+
+    monkeypatch.setattr(
+        importer.contract_audit, "audit_runtime_contracts", reject_contracts
+    )
+    monkeypatch.setattr(
+        migration,
+        "_promote_audited_candidate",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+            AssertionError("contract mismatch must not promote")
+        ),
+    )
+
+    report = importer._canonical_import_workbook(destination, real_workbook)
+
+    assert report.status == "contract_mismatch"
+    assert report.finding_codes == ("runtime_contract_difference",)
+    assert report.promoted_path is None
+    assert not destination.exists()
+
+
+def test_workbook_change_during_contract_audit_blocks_promotion(
+    tmp_path, real_workbook, monkeypatch
+):
+    workbook_path = tmp_path / "drifting-source" / real_workbook.name
+    workbook_path.parent.mkdir()
+    workbook_path.write_bytes(real_workbook.read_bytes())
+    shutil.copytree(
+        real_workbook.parent / "form-output" / "runtime",
+        workbook_path.parent / "form-output" / "runtime",
+    )
+    destination = tmp_path / "must-not-promote-drift.sqlite3"
+    real_audit = importer.contract_audit.audit_runtime_contracts
+
+    def audit_then_change(conn, source_workbook, temp_dir):
+        audit = real_audit(conn, source_workbook, temp_dir)
+        workbook = load_workbook(workbook_path)
+        sheet = workbook["zr1_options"]
+        sheet.cell(2, sheet.max_column, "changed during contract audit")
+        workbook.save(workbook_path)
+        workbook.close()
+        return audit
+
+    monkeypatch.setattr(
+        importer.contract_audit, "audit_runtime_contracts", audit_then_change
+    )
+
+    report = importer.import_workbook(destination, workbook_path)
 
     assert report.status == "decision_required"
-    assert report.finding_codes == ("contract_audit_required",)
+    assert report.finding_codes == ("workbook_changed_during_contract_audit",)
+    assert report.promoted_path is None
     assert not destination.exists()
 
 

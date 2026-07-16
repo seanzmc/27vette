@@ -13,6 +13,7 @@ if str(BACKEND_ROOT) not in sys.path:
     sys.path.insert(0, str(BACKEND_ROOT))
 
 from app import db  # noqa: E402
+from app import importer  # noqa: E402
 
 
 @pytest.fixture
@@ -23,6 +24,23 @@ def repo_root() -> Path:
 @pytest.fixture
 def real_workbook(repo_root: Path) -> Path:
     return repo_root / "stingray_master.xlsx"
+
+
+@pytest.fixture
+def imported_db_path(tmp_path, real_workbook):
+    database_path = tmp_path / "imported.sqlite3"
+    report = importer.import_workbook(database_path, real_workbook)
+    assert report.status == "validated"
+    return database_path
+
+
+@pytest.fixture
+def imported_db(imported_db_path):
+    conn = db.connect(imported_db_path)
+    try:
+        yield conn
+    finally:
+        conn.close()
 
 
 @pytest.fixture
