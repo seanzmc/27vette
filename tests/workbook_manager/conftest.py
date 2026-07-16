@@ -222,6 +222,19 @@ def duplicate_exact_asset_workbook(tmp_path, real_workbook) -> Path:
 
 
 @pytest.fixture
+def unknown_shared_model_workbook(tmp_path, real_workbook) -> Path:
+    destination = tmp_path / "unknown-shared-model.xlsx"
+    shutil.copyfile(real_workbook, destination)
+    workbook = load_workbook(destination)
+    sheet = workbook["model_interior_scope"]
+    headers = {cell.value: cell.column for cell in sheet[1]}
+    sheet.cell(2, headers["model_key"]).value = "unknown_future"
+    workbook.save(destination)
+    workbook.close()
+    return destination
+
+
+@pytest.fixture
 def connection(tmp_path):
     conn = db.connect(tmp_path / "test.sqlite3")
     try:

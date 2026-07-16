@@ -106,6 +106,35 @@ def test_shared_result_reports_all_inactive_future_exclusions(shared):
     ]
 
 
+def test_unknown_shared_model_finding_survives_the_public_compile_sequence(
+    unknown_shared_model_workbook,
+):
+    profile = profile_workbook(unknown_shared_model_workbook)
+    central = compile_central_tables(profile, unknown_shared_model_workbook)
+    direct = compile_direct_model_tables(
+        profile, unknown_shared_model_workbook, central
+    )
+    result = compile_shared_model_tables(
+        profile, unknown_shared_model_workbook, central, direct
+    )
+
+    assert result.findings[: len(profile.findings)] == profile.findings
+    findings = [
+        finding
+        for finding in result.findings
+        if finding.code == "unknown_model_row_requires_decision"
+    ]
+    assert len(findings) == 1
+    finding = findings[0]
+    assert finding.severity == "error"
+    assert finding.status == "decision_required"
+    assert finding.source_sheet == "model_interior_scope"
+    assert finding.source_row == 2
+    assert finding.source_column == "model_key"
+    assert finding.model_key == "unknown_future"
+    assert finding.value == "unknown_future"
+
+
 def test_color_override_added_option_is_a_foreign_key(shared):
     table = shared.table("grand_sport_color_overrides")
     row = table.rows[0]

@@ -9,13 +9,14 @@ from typing import Iterable, Mapping
 
 from openpyxl import load_workbook
 
-from .catalog import LIVE_MODELS, physical_table
+from .catalog import LIVE_MODELS, MODEL_TABLE_ROLES, physical_table
 from .compile_types import (
     CompiledRow,
     CompiledTable,
     DecisionRequired,
     SchemaMapping,
     WorkbookProfile,
+    finding_blocks_destinations,
     freeze_mapping,
 )
 
@@ -820,11 +821,15 @@ def compile_direct_model_tables(
             "The workbook path or content no longer matches its profile.",
             value=str(path),
         )
+    direct_destinations = {
+        physical_table(model, role)
+        for model in LIVE_MODELS
+        for role in MODEL_TABLE_ROLES[:9]
+    }
     blocking = [
         finding
         for finding in profile.findings
-        if finding.severity == "error"
-        or finding.status in {"decision_required", "contract_mismatch"}
+        if finding_blocks_destinations(finding, profile, direct_destinations)
     ]
     if blocking:
         finding = blocking[0]

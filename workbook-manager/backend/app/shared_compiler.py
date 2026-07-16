@@ -1718,11 +1718,7 @@ def compile_shared_model_tables(
             value=domains["models"],
         )
     direct_tables, direct_by_key, options, option_rpos = _direct_domains(direct)
-    findings: list[Finding] = [
-        finding
-        for finding in profile.findings
-        if finding.code == "inactive_future_row_excluded"
-    ]
+    findings: list[Finding] = list(profile.findings)
 
     workbook = load_workbook(path, read_only=True, data_only=True)
     try:

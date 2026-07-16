@@ -16,6 +16,7 @@ from .compile_types import (
     CompiledTable,
     DecisionRequired,
     WorkbookProfile,
+    finding_blocks_destinations,
 )
 
 
@@ -466,11 +467,15 @@ def compile_central_tables(
             "The workbook path or content no longer matches its read-only profile.",
             value=str(path),
         )
+    expected_destinations = {
+        table_name for table_name, _ in _TABLE_PRIMARY_KEYS
+    }
     blocking_findings = [
         finding
         for finding in profile.findings
-        if finding.severity == "error"
-        or finding.status in {"decision_required", "contract_mismatch"}
+        if finding_blocks_destinations(
+            finding, profile, expected_destinations
+        )
     ]
     if blocking_findings:
         finding = blocking_findings[0]
@@ -489,9 +494,6 @@ def compile_central_tables(
             value={"expected": LIVE_MODELS, "actual": profile.active_models},
         )
 
-    expected_destinations = {
-        table_name for table_name, _ in _TABLE_PRIMARY_KEYS
-    }
     profiled_destinations = {
         destination
         for sheet in profile.sheets

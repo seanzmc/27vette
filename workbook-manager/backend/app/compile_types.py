@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 from types import MappingProxyType
-from typing import Literal, Mapping
+from typing import Collection, Literal, Mapping
 
 
 def _empty_mapping() -> Mapping[str, object]:
@@ -126,3 +126,33 @@ class WorkbookProfile:
     inactive_models: tuple[str, ...]
     active_sources: Mapping[str, Mapping[str, str]]
     findings: tuple[Finding, ...]
+
+
+def finding_blocks_destinations(
+    finding: Finding,
+    profile: WorkbookProfile,
+    destination_tables: Collection[str],
+) -> bool:
+    """Return whether a profile finding must stop a destination-owned stage."""
+    blocking = (
+        finding.severity == "error"
+        or finding.status in {"decision_required", "contract_mismatch"}
+    )
+    if not blocking:
+        return False
+    if finding.code != "unknown_model_row_requires_decision":
+        return True
+    source = next(
+        (
+            sheet
+            for sheet in profile.sheets
+            if sheet.source_sheet == finding.source_sheet
+        ),
+        None,
+    )
+    if source is None or source.disposition not in {
+        "canonical_direct",
+        "canonical_split",
+    }:
+        return True
+    return bool(set(source.destination_tables) & set(destination_tables))
