@@ -1095,26 +1095,64 @@ def _compile_color_overrides(
             interior_id = _text(raw.get("interior_id"))
             option_id = _text(raw.get("option_id"))
             added_option_id = _text(raw.get("adds_rpo"))
-            owners = [
+            eligible_models = tuple(
                 model
                 for model in LIVE_MODELS
                 if profile.active_sources[model]["color_overrides_sheet"] == sheet
-                and interior_id in scope_by_model[model]
-                and option_id in options[model]
-                and added_option_id in options[model]
+            )
+            reference_models = {
+                "interior_id": tuple(
+                    model
+                    for model in eligible_models
+                    if interior_id in scope_by_model[model]
+                ),
+                "option_id": tuple(
+                    model for model in eligible_models if option_id in options[model]
+                ),
+                "adds_rpo": tuple(
+                    model
+                    for model in eligible_models
+                    if added_option_id in options[model]
+                ),
+            }
+            reference_values = {
+                "interior_id": interior_id,
+                "option_id": option_id,
+                "adds_rpo": added_option_id,
+            }
+            unresolved = [
+                column for column, models in reference_models.items() if not models
             ]
+            for column in unresolved:
+                findings.append(
+                    _finding(
+                        "shared_color_reference_missing",
+                        "A color override reference resolves in no eligible live model.",
+                        sheet=sheet,
+                        row=row_number,
+                        column=column,
+                        value=reference_values[column],
+                    )
+                )
+            if unresolved:
+                continue
+            owner_set = set(eligible_models)
+            for models in reference_models.values():
+                owner_set.intersection_update(models)
+            owners = tuple(model for model in LIVE_MODELS if model in owner_set)
             if not owners:
                 findings.append(
                     _finding(
-                        "shared_row_owner_unresolved",
-                        "A color override does not resolve through an owned interior and both model options.",
+                        "shared_color_owner_conflict",
+                        "Color override references resolve separately but share no model owner.",
                         sheet=sheet,
                         row=row_number,
-                        column="interior_id",
                         value={
-                            "interior_id": interior_id,
-                            "option_id": option_id,
-                            "adds_rpo": added_option_id,
+                            column: {
+                                "value": reference_values[column],
+                                "models": models,
+                            }
+                            for column, models in reference_models.items()
                         },
                     )
                 )
@@ -1187,7 +1225,7 @@ def _asset_mappings(model: str, role: str):
 def _compile_assets(
     workbook,
     options: Mapping[str, set[str]],
-    context_choices: set[tuple[str, str, str]],
+    context_choices: set[tuple[str, str]],
     findings: list[Finding],
 ):
     rows = _read_rows(workbook, "asset_map", _SHEET_HEADERS["asset_map"])
@@ -1227,6 +1265,7 @@ def _compile_assets(
         else:
             exact_rows.append((row_number, raw))
 
+    first_by_precedence: dict[tuple[str, str, str], int] = {}
     for row_number, raw in (*wildcard_rows, *exact_rows):
         row_model = _text(raw.get("model_key")).lower()
         target_type = _text(raw.get("target_type")).lower()
@@ -1247,6 +1286,26 @@ def _compile_assets(
         if target_type == "model":
             # Central compilation owns model-card assets.
             continue
+        precedence_key = (row_model, target_type, target_id)
+        if precedence_key in first_by_precedence:
+            findings.append(
+                _finding(
+                    "duplicate_asset_precedence_key",
+                    "Multiple active asset rows occupy the same precedence key.",
+                    sheet="asset_map",
+                    row=row_number,
+                    column="target_id",
+                    model_key=row_model,
+                    value={
+                        "model_key": row_model,
+                        "target_type": target_type,
+                        "target_id": target_id,
+                        "first_source_row": first_by_precedence[precedence_key],
+                    },
+                )
+            )
+            continue
+        first_by_precedence[precedence_key] = row_number
         if row_model != "*" and row_model not in LIVE_MODELS:
             continue
         if not target_id or not image_url:
@@ -1659,7 +1718,11 @@ def compile_shared_model_tables(
             value=domains["models"],
         )
     direct_tables, direct_by_key, options, option_rpos = _direct_domains(direct)
-    findings: list[Finding] = []
+    findings: list[Finding] = [
+        finding
+        for finding in profile.findings
+        if finding.code == "inactive_future_row_excluded"
+    ]
 
     workbook = load_workbook(path, read_only=True, data_only=True)
     try:

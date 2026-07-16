@@ -62,6 +62,24 @@ _CENTRAL_DESTINATIONS: dict[str, tuple[str, ...]] = {
     "rule_phrase_map": ("rule_phrase_map",),
 }
 
+# Model-scoped central/shared inputs may contain staged future-model rows.  An
+# exact model_key on an active row must be classified from model_master rather
+# than disappearing merely because the model is not in the live catalog.
+_MODEL_SCOPED_CANONICAL_SHEETS = (
+    "model_variants",
+    "section_presentation",
+    "context_section_master",
+    "runtime_steps",
+    "context_choice_copy",
+    "order_summary_sections",
+    "step_order_summary_map",
+    "default_selection_rules",
+    "runtime_rule_exceptions",
+    "asset_map",
+    "model_interior_scope",
+    "interior_components",
+)
+
 _SOURCE_ROLE_TO_TABLE_ROLE = {
     "source_option_sheet": "options",
     "status_sheet": "option_availability",
@@ -152,6 +170,16 @@ def _discover_active_models(model_rows, promotion_rows) -> tuple[str, ...]:
     )
 
 
+def _discover_known_models(model_rows) -> tuple[str, ...]:
+    return tuple(
+        dict.fromkeys(
+            str(row["model_key"])
+            for _, row in model_rows
+            if row.get("model_key")
+        )
+    )
+
+
 def _active_source_registry(
     source_rows,
     active_models: tuple[str, ...],
@@ -203,7 +231,11 @@ def profile_workbook(path: Path) -> WorkbookProfile:
             {"model_key", "source_role", "sheet_name", "active"},
         )
 
+        known_models = _discover_known_models(model_rows)
         active_models = _discover_active_models(model_rows, promotion_rows)
+        inactive_models = tuple(
+            model for model in known_models if model not in active_models
+        )
         if active_models != LIVE_MODELS:
             findings.append(
                 Finding(
@@ -234,6 +266,60 @@ def profile_workbook(path: Path) -> WorkbookProfile:
                         },
                     )
                 )
+
+        known_model_set = frozenset(known_models)
+        inactive_model_set = frozenset(inactive_models)
+        for sheet_name in _MODEL_SCOPED_CANONICAL_SHEETS:
+            if sheet_name not in sheet_data:
+                continue
+            headers, rows = sheet_data[sheet_name]
+            if "model_key" not in headers or "active" not in headers:
+                continue
+            for row_number, row in rows:
+                if not _truthy(row.get("active")):
+                    continue
+                model_key = str(row.get("model_key") or "").strip().lower()
+                if not model_key or model_key == "*":
+                    continue
+                if model_key in inactive_model_set:
+                    findings.append(
+                        Finding(
+                            severity="info",
+                            status="mapped",
+                            code="inactive_future_row_excluded",
+                            message=(
+                                "An active row belongs to a known inactive future "
+                                "model and is excluded from live canonical tables."
+                            ),
+                            source_sheet=sheet_name,
+                            source_row=row_number,
+                            source_column="model_key",
+                            model_key=model_key,
+                            value=model_key,
+                        )
+                    )
+                elif model_key not in known_model_set:
+                    code = (
+                        "model_variant_model_reference_missing"
+                        if sheet_name == "model_variants"
+                        else "unknown_model_row_requires_decision"
+                    )
+                    findings.append(
+                        Finding(
+                            severity="error",
+                            status="decision_required",
+                            code=code,
+                            message=(
+                                "An active model-scoped row names a model absent "
+                                "from model_master."
+                            ),
+                            source_sheet=sheet_name,
+                            source_row=row_number,
+                            source_column="model_key",
+                            model_key=model_key,
+                            value=model_key,
+                        )
+                    )
 
         destinations_by_source: dict[str, set[str]] = defaultdict(set)
         unclassified_registered: set[str] = set()
@@ -395,7 +481,9 @@ def profile_workbook(path: Path) -> WorkbookProfile:
             workbook_path=workbook_path,
             workbook_sha256=workbook_hash,
             sheets=tuple(profiled_sheets),
+            known_models=known_models,
             active_models=active_models,
+            inactive_models=inactive_models,
             active_sources=frozen_sources,
             findings=tuple(findings),
         )

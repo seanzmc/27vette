@@ -105,6 +105,122 @@ def unsupported_wildcard_context_asset_workbook(tmp_path, real_workbook) -> Path
     return destination
 
 
+def _copy_with_color_override_value(
+    tmp_path, real_workbook, *, name: str, column: str, value: str
+) -> Path:
+    destination = tmp_path / f"{name}.xlsx"
+    shutil.copyfile(real_workbook, destination)
+    workbook = load_workbook(destination)
+    sheet = workbook["color_overrides"]
+    headers = {cell.value: cell.column for cell in sheet[1]}
+    sheet.cell(2, headers[column]).value = value
+    workbook.save(destination)
+    workbook.close()
+    return destination
+
+
+@pytest.fixture
+def invalid_color_added_option_workbook(tmp_path, real_workbook) -> Path:
+    return _copy_with_color_override_value(
+        tmp_path,
+        real_workbook,
+        name="invalid-color-added-option",
+        column="adds_rpo",
+        value="opt_missing_added",
+    )
+
+
+@pytest.fixture
+def invalid_color_interior_workbook(tmp_path, real_workbook) -> Path:
+    return _copy_with_color_override_value(
+        tmp_path,
+        real_workbook,
+        name="invalid-color-interior",
+        column="interior_id",
+        value="int_missing_color",
+    )
+
+
+@pytest.fixture
+def invalid_color_option_workbook(tmp_path, real_workbook) -> Path:
+    return _copy_with_color_override_value(
+        tmp_path,
+        real_workbook,
+        name="invalid-color-option",
+        column="option_id",
+        value="opt_missing_color",
+    )
+
+
+@pytest.fixture
+def conflicting_color_owners_workbook(tmp_path, real_workbook) -> Path:
+    destination = tmp_path / "conflicting-color-owners.xlsx"
+    shutil.copyfile(real_workbook, destination)
+    workbook = load_workbook(destination)
+    sheet = workbook["color_overrides"]
+    headers = {cell.value: cell.column for cell in sheet[1]}
+    sheet.cell(2, headers["interior_id"]).value = "3LT_AE4_EL9"
+    sheet.cell(2, headers["option_id"]).value = "opt_085"
+    workbook.save(destination)
+    workbook.close()
+    return destination
+
+
+def _append_asset_rows(destination: Path, real_workbook: Path, rows) -> Path:
+    shutil.copyfile(real_workbook, destination)
+    workbook = load_workbook(destination)
+    sheet = workbook["asset_map"]
+    headers = [cell.value for cell in sheet[1]]
+    for values in rows:
+        row = {header: None for header in headers}
+        row.update(values)
+        sheet.append(tuple(row[header] for header in headers))
+    workbook.save(destination)
+    workbook.close()
+    return destination
+
+
+@pytest.fixture
+def duplicate_wildcard_asset_workbook(tmp_path, real_workbook) -> Path:
+    return _append_asset_rows(
+        tmp_path / "duplicate-wildcard-asset.xlsx",
+        real_workbook,
+        (
+            {
+                "model_key": "*",
+                "target_type": "option",
+                "target_id": "opt_gba_001",
+                "image_url": "https://example.test/duplicate-wildcard.png",
+                "active": True,
+            },
+        ),
+    )
+
+
+@pytest.fixture
+def duplicate_exact_asset_workbook(tmp_path, real_workbook) -> Path:
+    return _append_asset_rows(
+        tmp_path / "duplicate-exact-asset.xlsx",
+        real_workbook,
+        (
+            {
+                "model_key": "stingray",
+                "target_type": "option",
+                "target_id": "opt_gba_001",
+                "image_url": "https://example.test/first-exact.png",
+                "active": True,
+            },
+            {
+                "model_key": "stingray",
+                "target_type": "option",
+                "target_id": "opt_gba_001",
+                "image_url": "https://example.test/duplicate-exact.png",
+                "active": True,
+            },
+        ),
+    )
+
+
 @pytest.fixture
 def connection(tmp_path):
     conn = db.connect(tmp_path / "test.sqlite3")

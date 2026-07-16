@@ -87,6 +87,25 @@ def test_scope_and_components_split_only_by_exact_model_key(shared):
             assert all(row.values["model_key"] == model for row in table.rows)
 
 
+def test_shared_result_reports_all_inactive_future_exclusions(shared):
+    exclusions = [
+        finding
+        for finding in shared.findings
+        if finding.code == "inactive_future_row_excluded"
+    ]
+    assert Counter(finding.source_sheet for finding in exclusions) == {
+        "model_interior_scope": 180,
+        "interior_components": 254,
+        "default_selection_rules": 10,
+    }
+    assert not [
+        finding
+        for finding in shared.findings
+        if finding.severity == "error"
+        or finding.status in {"decision_required", "contract_mismatch"}
+    ]
+
+
 def test_color_override_added_option_is_a_foreign_key(shared):
     table = shared.table("grand_sport_color_overrides")
     row = table.rows[0]
@@ -107,6 +126,51 @@ def test_color_override_added_option_is_a_foreign_key(shared):
         }
         for row in table.rows
     )
+
+
+@pytest.mark.parametrize(
+    ("fixture_name", "column", "value"),
+    (
+        ("invalid_color_interior_workbook", "interior_id", "int_missing_color"),
+        ("invalid_color_added_option_workbook", "adds_rpo", "opt_missing_added"),
+        ("invalid_color_option_workbook", "option_id", "opt_missing_color"),
+    ),
+)
+def test_color_override_reports_the_exact_unresolved_reference(
+    request, fixture_name, column, value
+):
+    result = _compile(request.getfixturevalue(fixture_name))
+    finding = next(
+        finding
+        for finding in result.findings
+        if finding.code == "shared_color_reference_missing"
+        and finding.source_row == 2
+    )
+    assert finding.source_sheet == "color_overrides"
+    assert finding.source_column == column
+    assert finding.value == value
+
+
+def test_color_override_reports_nonintersecting_owner_sets(
+    conflicting_color_owners_workbook,
+):
+    result = _compile(conflicting_color_owners_workbook)
+    finding = next(
+        finding
+        for finding in result.findings
+        if finding.code == "shared_color_owner_conflict"
+        and finding.source_row == 2
+    )
+    assert finding.source_sheet == "color_overrides"
+    assert finding.source_column == ""
+    assert finding.value == {
+        "interior_id": {"value": "3LT_AE4_EL9", "models": ("grand_sport",)},
+        "option_id": {"value": "opt_085", "models": ("z06",)},
+        "adds_rpo": {
+            "value": "opt_d30_001",
+            "models": ("stingray", "grand_sport", "z06"),
+        },
+    }
 
 
 def test_wildcard_option_assets_expand_to_matching_models(shared):
@@ -141,6 +205,55 @@ def test_exact_model_option_asset_overlays_matching_wildcard(
     assert stingray.lineage_role == "direct"
     assert grand_sport.values["image_url"].endswith("imgi_10_gba.png")
     assert grand_sport.lineage_role == "shared_source_split"
+
+
+def test_duplicate_wildcard_asset_is_blocking_and_first_row_wins(
+    duplicate_wildcard_asset_workbook,
+):
+    result = _compile(duplicate_wildcard_asset_workbook)
+    finding = next(
+        finding
+        for finding in result.findings
+        if finding.code == "duplicate_asset_precedence_key"
+    )
+    assert finding.source_sheet == "asset_map"
+    assert finding.source_column == "target_id"
+    assert finding.model_key == "*"
+    assert finding.value == {
+        "model_key": "*",
+        "target_type": "option",
+        "target_id": "opt_gba_001",
+        "first_source_row": 127,
+    }
+    grand_sport = next(
+        row
+        for row in result.table("grand_sport_option_assets").rows
+        if row.values["option_id"] == "opt_gba_001"
+    )
+    assert grand_sport.values["image_url"].endswith("imgi_10_gba.png")
+
+
+def test_duplicate_exact_asset_is_blocking_and_first_exact_row_wins(
+    duplicate_exact_asset_workbook,
+):
+    result = _compile(duplicate_exact_asset_workbook)
+    finding = next(
+        finding
+        for finding in result.findings
+        if finding.code == "duplicate_asset_precedence_key"
+    )
+    assert finding.source_sheet == "asset_map"
+    assert finding.source_column == "target_id"
+    assert finding.model_key == "stingray"
+    assert finding.value["model_key"] == "stingray"
+    assert finding.value["target_type"] == "option"
+    assert finding.value["target_id"] == "opt_gba_001"
+    stingray = next(
+        row
+        for row in result.table("stingray_option_assets").rows
+        if row.values["option_id"] == "opt_gba_001"
+    )
+    assert stingray.values["image_url"] == "https://example.test/first-exact.png"
 
 
 def test_context_choice_assets_are_exact_model_rows_and_model_cards_stay_central(

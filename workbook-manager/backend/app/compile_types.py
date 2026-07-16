@@ -121,6 +121,8 @@ class WorkbookProfile:
     workbook_path: Path
     workbook_sha256: str
     sheets: tuple[SourceSheet, ...]
+    known_models: tuple[str, ...]
     active_models: tuple[str, ...]
+    inactive_models: tuple[str, ...]
     active_sources: Mapping[str, Mapping[str, str]]
     findings: tuple[Finding, ...]

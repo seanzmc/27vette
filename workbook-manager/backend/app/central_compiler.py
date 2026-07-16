@@ -844,16 +844,6 @@ def compile_central_tables(
                     },
                 )
 
-        variant_by_id = {row.values["variant_id"]: row.values for row in variant_rows}
-        model_body_styles = {
-            model: {variant_by_id[variant]["body_style"] for variant in variants}
-            for model, variants in variants_by_model.items()
-        }
-        model_trim_levels = {
-            model: {variant_by_id[variant]["trim_level"] for variant in variants}
-            for model, variants in variants_by_model.items()
-        }
-
         section_rows: list[CompiledRow] = []
         sections_by_id: dict[str, Mapping[str, object]] = {}
         for row_number, row in source["section_master"]:
@@ -1208,12 +1198,37 @@ def compile_central_tables(
         # Context choices are derived from active model variants, matching
         # contract.build_model_context_choices.  context_choice_copy supplies
         # wildcard/exact tooltip overlays; it is not the choice inventory.
+        variant_row_by_id = {
+            row.values["variant_id"]: row for row in variant_rows
+        }
+        memberships_by_model = {
+            model_key: [
+                row
+                for row in model_variant_rows
+                if row.values["model_key"] == model_key
+            ]
+            for model_key in LIVE_MODELS
+        }
+        actual_choice_identities: set[tuple[str, str, str, str]] = set()
+        for candidate_model, memberships in memberships_by_model.items():
+            for membership in memberships:
+                variant = variant_row_by_id[membership.values["variant_id"]]
+                body_style = str(variant.values["body_style"])
+                trim_level = str(variant.values["trim_level"])
+                actual_choice_identities.add(
+                    (candidate_model, "body_style", body_style, body_style)
+                )
+                actual_choice_identities.add(
+                    (candidate_model, "trim_level", trim_level, body_style)
+                )
         normalized_copy_rows: list[dict[str, object]] = []
         for row_number, row in _active_rows(
             source["context_choice_copy"], "context_choice_copy"
         ):
             raw_model = _text(row.get("model_key")) or "*"
             model_key = raw_model.lower()
+            if model_key in profile.inactive_models:
+                continue
             if model_key != "*":
                 _ensure_reference(
                     model_key,
@@ -1260,15 +1275,17 @@ def compile_central_tables(
                 candidate
                 for candidate in candidate_models
                 if (candidate, context_type) in context_keys
-                and value
-                in (
-                    model_trim_levels[candidate]
-                    if context_type == "trim_level"
-                    else model_body_styles[candidate]
-                )
-                and (
-                    body_style == "*"
-                    or body_style in model_body_styles[candidate]
+                and any(
+                    choice_model == candidate
+                    and choice_type == context_type
+                    and choice_value == value
+                    and (body_style == "*" or choice_body == body_style)
+                    for (
+                        choice_model,
+                        choice_type,
+                        choice_value,
+                        choice_body,
+                    ) in actual_choice_identities
                 )
             ]
             if not accepted_models:
@@ -1277,7 +1294,11 @@ def compile_central_tables(
                     "A context choice copy row applies to no active model choice.",
                     sheet="context_choice_copy",
                     row=row_number,
-                    value={"context_type": context_type, "value": value},
+                    value={
+                        "context_type": context_type,
+                        "value": value,
+                        "body_style": body_style,
+                    },
                 )
             normalized_copy_rows.append(
                 {
@@ -1319,17 +1340,6 @@ def compile_central_tables(
         context_section_by_key = {
             (row.values["model_key"], row.values["context_type"]): row
             for row in context_section_rows
-        }
-        variant_row_by_id = {
-            row.values["variant_id"]: row for row in variant_rows
-        }
-        memberships_by_model = {
-            model_key: [
-                row
-                for row in model_variant_rows
-                if row.values["model_key"] == model_key
-            ]
-            for model_key in LIVE_MODELS
         }
         context_choice_rows: list[CompiledRow] = []
         for model_key in LIVE_MODELS:

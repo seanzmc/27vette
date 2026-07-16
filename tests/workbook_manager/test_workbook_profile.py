@@ -1,4 +1,6 @@
 import shutil
+from collections import Counter
+from dataclasses import FrozenInstanceError
 
 import pytest
 from openpyxl import load_workbook
@@ -72,6 +74,61 @@ def test_live_model_sources_have_identical_roles(real_workbook):
         for sources in profile.active_sources.values()
         for source_sheet in sources.values()
     )
+
+
+def test_profile_distinguishes_known_inactive_models_immutably(real_workbook):
+    profile = profile_workbook(real_workbook)
+
+    assert profile.known_models == (*LIVE_MODELS, "zr1", "zr1x")
+    assert profile.inactive_models == ("zr1", "zr1x")
+    with pytest.raises(FrozenInstanceError):
+        profile.inactive_models += ("future",)
+
+
+def test_profile_reconciles_every_active_inactive_model_split_row(real_workbook):
+    profile = profile_workbook(real_workbook)
+    exclusions = [
+        finding
+        for finding in profile.findings
+        if finding.code == "inactive_future_row_excluded"
+    ]
+
+    assert Counter(finding.source_sheet for finding in exclusions) == {
+        "model_interior_scope": 180,
+        "interior_components": 254,
+        "default_selection_rules": 10,
+    }
+    assert len(exclusions) == 444
+    assert all(finding.severity == "info" for finding in exclusions)
+    assert all(finding.status == "mapped" for finding in exclusions)
+    assert all(finding.source_row is not None for finding in exclusions)
+    assert all(finding.source_column == "model_key" for finding in exclusions)
+    assert all(finding.model_key in {"zr1", "zr1x"} for finding in exclusions)
+    assert all(finding.value == finding.model_key for finding in exclusions)
+
+
+def test_unknown_active_model_split_row_requires_a_decision(real_workbook, tmp_path):
+    copied = tmp_path / "unknown-model-split-row.xlsx"
+    shutil.copyfile(real_workbook, copied)
+    workbook = load_workbook(copied)
+    sheet = workbook["model_interior_scope"]
+    headers = {cell.value: cell.column for cell in sheet[1]}
+    sheet.cell(2, headers["model_key"]).value = "unknown_future"
+    workbook.save(copied)
+    workbook.close()
+
+    profile = profile_workbook(copied)
+    finding = next(
+        finding
+        for finding in profile.findings
+        if finding.code == "unknown_model_row_requires_decision"
+    )
+    assert finding.status == "decision_required"
+    assert finding.source_sheet == "model_interior_scope"
+    assert finding.source_row == 2
+    assert finding.source_column == "model_key"
+    assert finding.model_key == "unknown_future"
+    assert finding.value == "unknown_future"
 
 
 def test_current_workbook_has_no_retired_generated_sources(real_workbook):

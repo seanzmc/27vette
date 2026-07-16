@@ -206,6 +206,58 @@ def test_context_choices_reference_model_body_trim_variant_section_and_route(
         assert (row.values["model_key"], row.values["step_key"]) in routes
 
 
+def test_context_copy_rejects_nonexistent_body_trim_combination(
+    tmp_path, real_workbook
+):
+    path = tmp_path / "non-cartesian-context-copy.xlsx"
+    workbook = load_workbook(real_workbook)
+    memberships = workbook["model_variants"]
+    membership_headers = {cell.value: cell.column for cell in memberships[1]}
+    for row_number in range(2, memberships.max_row + 1):
+        if (
+            memberships.cell(row_number, membership_headers["model_key"]).value
+            == "stingray"
+            and memberships.cell(
+                row_number, membership_headers["variant_id"]
+            ).value
+            == "3lt_c67"
+        ):
+            memberships.cell(
+                row_number, membership_headers["variant_id"]
+            ).value = "1lz_h67"
+            break
+    else:
+        raise AssertionError("missing Stingray 3LT convertible membership")
+
+    copy_sheet = workbook["context_choice_copy"]
+    copy_headers = [cell.value for cell in copy_sheet[1]]
+    copy_row = {header: None for header in copy_headers}
+    copy_row.update(
+        {
+            "model_key": "stingray",
+            "context_type": "trim_level",
+            "value": "3LT",
+            "body_style": "convertible",
+            "info_tooltip": "Must not attach to a nonexistent choice.",
+            "active": True,
+        }
+    )
+    copy_sheet.append(tuple(copy_row[header] for header in copy_headers))
+    workbook.save(path)
+    workbook.close()
+
+    with pytest.raises(DecisionRequired) as error:
+        compile_central_tables(profile_workbook(path), path)
+    assert error.value.code == "context_choice_owner_unresolved"
+    assert error.value.source_sheet == "context_choice_copy"
+    assert error.value.source_row == copy_sheet.max_row
+    assert error.value.value == {
+        "context_type": "trim_level",
+        "value": "3lt",
+        "body_style": "convertible",
+    }
+
+
 def test_normalization_preserves_original_values_in_lineage_evidence(
     compiled_central,
 ):
