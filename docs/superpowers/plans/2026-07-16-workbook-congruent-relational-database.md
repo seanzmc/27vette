@@ -278,9 +278,18 @@ def test_live_model_sources_have_identical_roles(repo_root):
 def test_generated_and_future_sources_are_explicit(repo_root):
     profile = profile_workbook(repo_root / "stingray_master.xlsx")
     by_name = {sheet.source_sheet: sheet for sheet in profile.sheets}
-    assert by_name["form_choices"].disposition == "generated_artifact_validation"
+    assert not [name for name in by_name if name.startswith("form_")]
+    assert not [
+        sheet for sheet in profile.sheets
+        if sheet.disposition == "generated_artifact_validation"
+    ]
     assert by_name["zr1_options"].disposition == "inactive_future_source"
 ```
+
+The current workbook contract contains zero retired generated `form_*` sheets.
+Profile copied or legacy inputs with a `form_*` sheet as
+`generated_artifact_validation` and emit the `retired_generated_sheet_present`
+contract mismatch; never import those sheets as source data.
 
 - [ ] **Step 2: Run tests and verify failure**
 

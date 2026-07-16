@@ -121,11 +121,12 @@ Every one of the 65 workbook sheets receives exactly one disposition:
 - `decision_required`: not imported until its ownership or contract is decided.
 
 The catalog records the source sheet, disposition, destination tables,
-source-of-truth class, row count, and reason. Current `form_*` sheets are
-`generated_artifact_validation`: they are checked against regenerated output
-rather than duplicated as editable canonical data. ZR1/ZR1X sheets are
-`inactive_future_source` unless separately promoted. No workbook sheet is
-silently ignored.
+source-of-truth class, row count, and reason. The current workbook contract has
+zero retired generated `form_*` sheets. If a legacy or copied input contains
+one, it is `generated_artifact_validation`, checked against regenerated output,
+and reported as a contract mismatch rather than duplicated as editable
+canonical data. ZR1/ZR1X sheets are `inactive_future_source` unless separately
+promoted. No workbook sheet is silently ignored.
 
 ### `schema_mapping`
 
