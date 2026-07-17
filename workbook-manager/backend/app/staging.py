@@ -7,7 +7,12 @@ import sqlite3
 from datetime import datetime, timezone
 from typing import Mapping
 
-from .catalog import RoleEditSpec, edit_spec
+from .catalog import (
+    RoleEditSpec,
+    canonical_record,
+    canonical_value,
+    edit_spec,
+)
 from .validation import find_dependents, validate_record
 
 
@@ -28,7 +33,9 @@ class StagingError(Exception):
 def _issue(spec: RoleEditSpec, field: str, message: str, **extra) -> dict:
     return {
         "model_key": spec.model_key,
+        "model_id": spec.model_key,
         "table_role": spec.table_role,
+        "table": spec.table_role,
         "sql_table": spec.sql_table,
         "field": field,
         "entity_key": "",
@@ -61,6 +68,91 @@ def _source_lineage(conn, spec: RoleEditSpec, key: Mapping[str, object]):
     ).fetchone()
 
 
+def _canonical_json_record(
+    spec: RoleEditSpec, raw: str | None
+) -> dict | None:
+    value = json.loads(raw) if raw is not None else None
+    if value is None:
+        return None
+    if not isinstance(value, dict) or set(value) - set(spec.columns):
+        raise ValueError("persisted edit row is not a canonical record")
+    return canonical_record(spec, value)
+
+
+def _committed_unsynced_add_target(
+    conn: sqlite3.Connection,
+    spec: RoleEditSpec,
+    key: Mapping[str, object],
+    current_row,
+) -> str | None:
+    """Prove a lineage-free row is an exact, still-unsynced committed add."""
+    matching = []
+    for row in conn.execute(
+        "SELECT * FROM pending_changes WHERE model_key=? AND table_role=? "
+        "AND sql_table=? AND status='committed' ORDER BY id",
+        (spec.model_key, spec.table_role, spec.sql_table),
+    ):
+        try:
+            entity_key = canonical_record(
+                spec, json.loads(row["entity_key_json"])
+            )
+        except (json.JSONDecodeError, TypeError, ValueError):
+            return None
+        if entity_key == canonical_record(spec, key):
+            matching.append(dict(row))
+    if not matching:
+        return None
+    state = None
+    for index, change in enumerate(matching):
+        histories = conn.execute(
+            "SELECT h.* FROM change_history h "
+            "WHERE h.pending_change_id=? AND h.status='committed'",
+            (change["id"],),
+        ).fetchall()
+        if len(histories) != 1 or conn.execute(
+            "SELECT 1 FROM change_history WHERE related_history_id=? "
+            "AND status='sync_succeeded' LIMIT 1",
+            (histories[0]["id"] if histories else -1,),
+        ).fetchone():
+            return None
+        history = histories[0]
+        try:
+            old = _canonical_json_record(spec, change["old_json"])
+            new = _canonical_json_record(spec, change["new_json"])
+            history_old = _canonical_json_record(spec, history["old_json"])
+            history_new = _canonical_json_record(spec, history["new_json"])
+        except (json.JSONDecodeError, TypeError, ValueError):
+            return None
+        if (
+            history["model_key"] != spec.model_key
+            or history["table_role"] != spec.table_role
+            or history["sql_table"] != spec.sql_table
+            or history["op"] != change["op"]
+            or history_old != old
+            or history_new != new
+        ):
+            return None
+        if index == 0:
+            if change["op"] != "add" or old is not None or not isinstance(new, dict):
+                return None
+        elif change["op"] == "update":
+            if old != state or not isinstance(new, dict):
+                return None
+        elif change["op"] == "delete":
+            if old != state or new is not None:
+                return None
+        else:
+            return None
+        state = new
+    try:
+        current = canonical_record(spec, dict(current_row))
+    except ValueError:
+        return None
+    if state is None or state != current:
+        return None
+    return target_sheet_for(conn, spec.model_key, spec.table_role)
+
+
 def _shared_source_guard(
     conn: sqlite3.Connection, spec: RoleEditSpec, op: str,
     key: Mapping[str, object],
@@ -77,6 +169,11 @@ def _shared_source_guard(
         return []
     lineage = _source_lineage(conn, spec, key)
     if lineage is None:
+        current_row = _fetch_row(conn, spec, key)
+        if current_row is not None and _committed_unsynced_add_target(
+            conn, spec, key, current_row
+        ):
+            return []
         return [_issue(
             spec, "", "existing row has no exact import lineage; edit blocked"
         )]
@@ -87,6 +184,20 @@ def _shared_source_guard(
         (lineage["source_sheet"], lineage["source_row"]),
     ).fetchone()
     destinations = json.loads(disposition["destinations_json"]) if disposition else []
+    if spec.table_role == "runtime_steps" and destinations:
+        destination_tables = {
+            item.get("destination_table") for item in destinations
+        }
+        step_destinations = [
+            item for item in destinations
+            if item.get("destination_table") == "runtime_steps"
+        ]
+        if (
+            destination_tables <= {"runtime_steps", "runtime_route_keys"}
+            and len(step_destinations) == 1
+            and step_destinations[0].get("destination_key") == dict(key)
+        ):
+            return []
     if len(destinations) > 1:
         return [_issue(
             spec,
@@ -124,6 +235,17 @@ def _derived_guard(
     return errors
 
 
+def _value_changed(
+    spec: RoleEditSpec, column: str, before: object, after: object
+) -> bool:
+    try:
+        return canonical_value(spec, column, before) != canonical_value(
+            spec, column, after
+        )
+    except (TypeError, ValueError):
+        return True
+
+
 def stage_change(
     conn: sqlite3.Connection,
     *,
@@ -148,18 +270,46 @@ def stage_change(
         }]) from None
     if op not in {"add", "update", "delete"}:
         raise StagingError([_issue(spec, "op", f"unsupported operation {op!r}")])
+    try:
+        key = canonical_record(spec, key)
+    except ValueError as error:
+        raise StagingError([_issue(spec, ",".join(spec.key), str(error))]) from None
     old_row = _fetch_row(conn, spec, key) if op != "add" else None
     if op in {"update", "delete"} and old_row is None:
         raise StagingError([_issue(spec, ",".join(spec.key), "record not found")])
 
+    old = canonical_record(spec, dict(old_row)) if old_row is not None else None
+    candidate = dict(record or {}) if record is not None else None
+    if op == "update":
+        candidate = dict(old or {})
+        candidate.update(record or {})
+    elif candidate is not None:
+        candidate.setdefault("model_key", model_key)
+
     errors = _shared_source_guard(conn, spec, op, key)
-    errors += _derived_guard(spec, old_row, record, op)
     dependents: list[dict] = []
     if op in {"add", "update"}:
-        errors += validate_record(
-            conn, model_key, table_role, record or {}, op=op,
+        candidate_errors = validate_record(
+            conn, model_key, table_role, candidate or {}, op=op,
             original_key=key if op == "update" else None,
         )
+        errors += candidate_errors
+        if not candidate_errors:
+            candidate = canonical_record(spec, candidate or {})
+            errors += _derived_guard(spec, old, candidate, op)
+            if op == "update":
+                changed = [
+                    column for column in spec.columns
+                    if column not in {"model_key", *spec.key}
+                    and _value_changed(
+                        spec, column, (old or {}).get(column),
+                        candidate.get(column),
+                    )
+                ]
+                if not changed:
+                    errors.append(_issue(
+                        spec, "", "update has no changed non-key fields"
+                    ))
     else:
         dependents = find_dependents(conn, model_key, table_role, key)
         if dependents and not confirm_dependencies:
@@ -172,10 +322,7 @@ def stage_change(
     if errors:
         raise StagingError(errors)
 
-    old = dict(old_row) if old_row is not None else None
-    new = dict(record) if record is not None else None
-    if new is not None:
-        new["model_key"] = model_key
+    new = candidate
     cursor = conn.execute(
         "INSERT INTO pending_changes("
         "ts, session_id, model_key, table_role, sql_table, entity_key_json, "
@@ -199,6 +346,14 @@ def _change_dict(row) -> dict:
     for field in ("entity_key_json", "old_json", "new_json", "validation_json"):
         raw = result.pop(field, None)
         result[field.removesuffix("_json")] = json.loads(raw) if raw else None
+    result["model_id"] = result["model_key"]
+    legacy_table = (
+        "form_steps"
+        if result["table_role"] == "runtime_steps"
+        else result["table_role"]
+    )
+    result["table"] = legacy_table
+    result["table_name"] = legacy_table
     return result
 
 
@@ -240,8 +395,50 @@ def discard_change(conn, change_id: int) -> dict:
     return get_change(conn, change_id)
 
 
+def _dependent_is_resolved_by_staged_change(
+    conn: sqlite3.Connection,
+    parent_spec: RoleEditSpec,
+    parent_key: Mapping[str, object],
+    dependent: dict,
+    staged_by_identity: Mapping[tuple[str, str, str], dict],
+) -> bool:
+    identity = (
+        dependent["model_key"], dependent["table_role"],
+        json.dumps(dependent["key"], sort_keys=True),
+    )
+    resolution = staged_by_identity.get(identity)
+    if resolution is None:
+        return False
+    if resolution["op"] == "delete":
+        return True
+    if resolution["op"] != "update":
+        return False
+    child_spec = edit_spec(
+        conn, dependent["model_key"], dependent["table_role"]
+    )
+    parent_values = {"model_key": parent_spec.model_key, **dict(parent_key)}
+    candidate = resolution["new"] or {}
+    for foreign_key in child_spec.foreign_keys:
+        if foreign_key.target_table != parent_spec.sql_table:
+            continue
+        if all(
+            candidate.get(child_column) == parent_values.get(parent_column)
+            for child_column, parent_column in zip(
+                foreign_key.columns, foreign_key.target_columns, strict=True
+            )
+        ):
+            return False
+    return True
+
+
 def revalidate_staged(conn) -> dict:
     changes = list_changes(conn, "staged")
+    staged_by_identity = {
+        (
+            change["model_key"], change["table_role"],
+            json.dumps(change["entity_key"], sort_keys=True),
+        ): change for change in changes
+    }
     results = []
     seen = {}
     ok = True
@@ -261,6 +458,16 @@ def revalidate_staged(conn) -> dict:
             })
         seen[identity] = change["id"]
         spec = edit_spec(conn, change["model_key"], change["table_role"])
+        try:
+            change["entity_key"] = canonical_record(
+                spec, change["entity_key"] or {}
+            )
+            if change["old"] is not None:
+                change["old"] = canonical_record(spec, change["old"])
+            if change["new"] is not None:
+                change["new"] = canonical_record(spec, change["new"])
+        except ValueError as error:
+            errors.append(_issue(spec, "", str(error)))
         current = _fetch_row(conn, spec, change["entity_key"])
         if change["op"] == "add":
             errors += validate_record(
@@ -280,31 +487,46 @@ def revalidate_staged(conn) -> dict:
                 conn, change["model_key"], change["table_role"],
                 change["entity_key"],
             )
+            missing = [
+                dependent for dependent in dependents
+                if not _dependent_is_resolved_by_staged_change(
+                    conn, spec, change["entity_key"], dependent,
+                    staged_by_identity,
+                )
+            ]
             if dependents and not change["confirmed_dependencies"]:
                 errors.append(_issue(
                     spec, "", f"{len(dependents)} dependent record(s) still exist"
                 ))
-        conn.execute(
-            "UPDATE pending_changes SET validation_json=? WHERE id=?",
-            (json.dumps({"errors": errors}), change["id"]),
-        )
+            elif missing:
+                errors.append(_issue(
+                    spec, "",
+                    f"delete batch is incomplete: {len(missing)} dependent "
+                    "record(s) are not staged for deletion",
+                    dependents=missing,
+                ))
+        if errors:
+            conn.execute(
+                "UPDATE pending_changes SET validation_json=? WHERE id=?",
+                (json.dumps({"errors": errors}), change["id"]),
+            )
+        else:
+            conn.execute(
+                "UPDATE pending_changes SET entity_key_json=?, old_json=?, "
+                "new_json=?, validation_json=? WHERE id=?",
+                (
+                    json.dumps(change["entity_key"], sort_keys=True),
+                    json.dumps(change["old"])
+                    if change["old"] is not None else None,
+                    json.dumps(change["new"])
+                    if change["new"] is not None else None,
+                    json.dumps({"errors": []}), change["id"],
+                ),
+            )
         ok = ok and not errors
         results.append({"change_id": change["id"], "errors": errors})
     conn.commit()
     return {"ok": ok, "results": results}
-
-
-def _coerce(spec: RoleEditSpec, column: str, value: object):
-    if value == "" and column in spec.nullable:
-        return None
-    if column in spec.booleans:
-        if value in (True, 1, "1", "True"):
-            return 1
-        if value in (False, 0, "0", "False"):
-            return 0
-    if value is not None and spec.types.get(column) == "integer":
-        return int(str(value).replace(",", ""))
-    return value
 
 
 def _apply_change(conn, spec: RoleEditSpec, change: dict) -> None:
@@ -315,7 +537,8 @@ def _apply_change(conn, spec: RoleEditSpec, change: dict) -> None:
             if column != "model_key" and column in record
         ]
         values = [spec.model_key] + [
-            _coerce(spec, column, record[column]) for column in columns[1:]
+            canonical_value(spec, column, record[column])
+            for column in columns[1:]
         ]
         conn.execute(
             f"INSERT INTO {_quote(spec.sql_table)} "
@@ -328,12 +551,14 @@ def _apply_change(conn, spec: RoleEditSpec, change: dict) -> None:
             column for column in spec.columns
             if column not in {"model_key", *spec.key} and column in record
         ]
+        if not columns:
+            raise sqlite3.OperationalError("update has no writable columns")
         where, key_values = _where_key(spec, change["entity_key"])
         conn.execute(
             f"UPDATE {_quote(spec.sql_table)} SET "
             + ",".join(f"{_quote(column)}=?" for column in columns)
             + f" WHERE {where}",
-            [_coerce(spec, column, record[column]) for column in columns]
+            [canonical_value(spec, column, record[column]) for column in columns]
             + key_values,
         )
     else:
@@ -365,6 +590,87 @@ def _append_history(conn, spec: RoleEditSpec, change: dict, actor: str) -> None:
     )
 
 
+def _ordered_changes(conn, changes: list[dict]) -> list[dict]:
+    """Return a stable FK-safe batch order or raise for an unresolved cycle."""
+    by_id = {change["id"]: change for change in changes}
+    edges = {change["id"]: set() for change in changes}
+    indegree = {change["id"]: 0 for change in changes}
+
+    table_changes = {}
+    for change in changes:
+        spec = edit_spec(conn, change["model_key"], change["table_role"])
+        table_changes.setdefault(spec.sql_table, []).append(change)
+
+    def add_edge(before: int, after: int) -> None:
+        if before == after or after in edges[before]:
+            return
+        edges[before].add(after)
+        indegree[after] += 1
+
+    for child in changes:
+        child_spec = edit_spec(
+            conn, child["model_key"], child["table_role"]
+        )
+        values = child["old"] if child["op"] == "delete" else child["new"]
+        values = values or {}
+        for foreign_key in child_spec.foreign_keys:
+            referenced_values = tuple(
+                values.get(column) for column in foreign_key.columns
+            )
+            parent = None
+            for candidate in table_changes.get(foreign_key.target_table, ()):
+                candidate_values = (
+                    candidate["old"] if candidate["op"] == "delete"
+                    else candidate["new"]
+                ) or {}
+                if tuple(
+                    candidate_values.get(column)
+                    for column in foreign_key.target_columns
+                ) == referenced_values:
+                    parent = candidate
+                    break
+            if child["op"] == "update":
+                old_values = child["old"] or {}
+                old_reference = tuple(
+                    old_values.get(column) for column in foreign_key.columns
+                )
+                for old_parent in table_changes.get(
+                    foreign_key.target_table, ()
+                ):
+                    if old_parent["op"] != "delete":
+                        continue
+                    parent_values = old_parent["old"] or {}
+                    if tuple(
+                        parent_values.get(column)
+                        for column in foreign_key.target_columns
+                    ) == old_reference:
+                        add_edge(child["id"], old_parent["id"])
+            if parent is None:
+                continue
+            if child["op"] == "delete" and parent["op"] == "delete":
+                add_edge(child["id"], parent["id"])
+            elif child["op"] != "delete" and parent["op"] == "add":
+                add_edge(parent["id"], child["id"])
+            elif parent["op"] == "delete":
+                raise sqlite3.IntegrityError(
+                    "batch leaves a child referencing a deleted parent"
+                )
+
+    ready = sorted(change_id for change_id, degree in indegree.items() if degree == 0)
+    ordered = []
+    while ready:
+        change_id = ready.pop(0)
+        ordered.append(by_id[change_id])
+        for after in sorted(edges[change_id]):
+            indegree[after] -= 1
+            if indegree[after] == 0:
+                ready.append(after)
+                ready.sort()
+    if len(ordered) != len(changes):
+        raise sqlite3.IntegrityError("dependency cycle in staged batch")
+    return ordered
+
+
 def commit_staged(conn, actor: str = "") -> dict:
     validation = revalidate_staged(conn)
     if not validation["ok"]:
@@ -375,7 +681,8 @@ def commit_staged(conn, actor: str = "") -> dict:
         return {"ok": False, "status": "empty", "committed": 0,
                 "validation": validation}
     try:
-        conn.execute("BEGIN")
+        changes = _ordered_changes(conn, changes)
+        conn.execute("BEGIN IMMEDIATE")
         for change in changes:
             spec = edit_spec(conn, change["model_key"], change["table_role"])
             _apply_change(conn, spec, change)
@@ -384,8 +691,13 @@ def commit_staged(conn, actor: str = "") -> dict:
                 "UPDATE pending_changes SET status='committed' WHERE id=?",
                 (change["id"],),
             )
+        violations = conn.execute("PRAGMA foreign_key_check").fetchall()
+        if violations:
+            raise sqlite3.IntegrityError(
+                f"batch leaves {len(violations)} foreign-key violation(s)"
+            )
         conn.commit()
-    except sqlite3.IntegrityError as error:
+    except sqlite3.Error as error:
         conn.rollback()
         return {
             "ok": False, "status": "constraint_failed", "committed": 0,
@@ -402,7 +714,8 @@ def target_sheet_for(
     spec = edit_spec(conn, model_key, table_role)
     rows = conn.execute(
         "SELECT DISTINCT source_sheet FROM schema_mapping "
-        "WHERE model_key=? AND sql_table=? AND substr(source_column,1,2)<>'__' "
+        "WHERE (model_key=? OR model_key IS NULL) AND sql_table=? "
+        "AND substr(source_column,1,2)<>'__' "
         "ORDER BY source_sheet",
         (model_key, spec.sql_table),
     ).fetchall()

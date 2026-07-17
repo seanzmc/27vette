@@ -29,6 +29,15 @@ MODEL_TABLE_ROLES = (
     "runtime_rule_exceptions",
 )
 
+# Canonical workbook-owned tables that are shared physically but keyed by
+# model.  They are intentionally separate from MODEL_TABLE_ROLES: compilers
+# use that tuple to create one physical table per model, while these names
+# already identify their one canonical SQL table.
+CENTRAL_EDIT_ROLES = (
+    "runtime_steps",
+    "section_presentation",
+)
+
 
 ROLE_KEYS: Mapping[str, tuple[str, ...]] = MappingProxyType({
     "options": ("option_id",),
@@ -48,6 +57,8 @@ ROLE_KEYS: Mapping[str, tuple[str, ...]] = MappingProxyType({
     "context_choice_assets": ("context_choice_id",),
     "default_selection_rules": ("rule_id",),
     "runtime_rule_exceptions": ("exception_id",),
+    "runtime_steps": ("model_key", "step_key"),
+    "section_presentation": ("model_key", "section_id"),
 })
 
 ROLE_BOOLEAN_COLUMNS: Mapping[str, frozenset[str]] = MappingProxyType({
@@ -64,6 +75,8 @@ ROLE_BOOLEAN_COLUMNS: Mapping[str, frozenset[str]] = MappingProxyType({
     "context_choice_assets": frozenset({"active"}),
     "default_selection_rules": frozenset({"active"}),
     "runtime_rule_exceptions": frozenset({"active"}),
+    "runtime_steps": frozenset({"active"}),
+    "section_presentation": frozenset({"active"}),
 })
 
 ROLE_ENUMS: Mapping[str, Mapping[str, tuple[object, ...]]] = MappingProxyType({
@@ -123,6 +136,8 @@ ROLE_EDITOR_FAMILY: Mapping[str, str] = MappingProxyType({
     "context_choice_assets": "asset_map",
     "default_selection_rules": "default_selection_rules",
     "runtime_rule_exceptions": "runtime_rule_exceptions",
+    "runtime_steps": "runtime_steps_meta",
+    "section_presentation": "section_presentation_meta",
 })
 
 ROLE_EXCLUSIVE_COLUMN_PAIRS: Mapping[str, tuple[tuple[str, str], ...]] = (
@@ -155,6 +170,44 @@ class RoleEditSpec:
     foreign_keys: tuple[ForeignKeySpec, ...]
 
 
+def canonical_value(
+    spec: RoleEditSpec, column: str, value: object
+) -> object:
+    """Return the one SQLite/history representation for a typed edit value."""
+    if (
+        column in spec.nullable
+        and isinstance(value, str)
+        and not value.strip()
+    ):
+        return None
+    if value is None or column not in spec.types:
+        return value
+    if column in spec.booleans:
+        if value in (True, 1, "1", "True"):
+            return 1
+        if value in (False, 0, "0", "False"):
+            return 0
+        raise ValueError(f"{column} must be boolean, got {value!r}")
+    if spec.types[column] == "integer":
+        try:
+            return int(str(value).replace(",", ""))
+        except (TypeError, ValueError) as error:
+            raise ValueError(
+                f"{column} must be an integer, got {value!r}"
+            ) from error
+    return value
+
+
+def canonical_record(
+    spec: RoleEditSpec, record: Mapping[str, object]
+) -> dict[str, object]:
+    """Canonicalize known columns while retaining unknowns for validation."""
+    return {
+        column: canonical_value(spec, column, value)
+        for column, value in record.items()
+    }
+
+
 def physical_table(model_key: str, role: str) -> str:
     """Return a canonical physical table name for validated catalog values."""
     if model_key not in LIVE_MODELS or role not in MODEL_TABLE_ROLES:
@@ -184,7 +237,14 @@ def edit_spec(
     conn: sqlite3.Connection, model_key: str, role: str
 ) -> RoleEditSpec:
     """Return immutable edit metadata for one allowlisted physical table."""
-    table = resolve_model_table(conn, model_key, role)
+    if role in CENTRAL_EDIT_ROLES:
+        if model_key not in LIVE_MODELS or conn.execute(
+            "SELECT 1 FROM models WHERE model_key=?", (model_key,)
+        ).fetchone() is None:
+            raise KeyError((model_key, role))
+        table = role
+    else:
+        table = resolve_model_table(conn, model_key, role)
     info = conn.execute(
         f"PRAGMA table_info({_quote_identifier(table)})"
     ).fetchall()

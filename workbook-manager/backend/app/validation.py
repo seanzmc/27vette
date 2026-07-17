@@ -7,9 +7,11 @@ import sqlite3
 from typing import Mapping
 
 from .catalog import (
+    CENTRAL_EDIT_ROLES,
     MODEL_TABLE_ROLES,
     ROLE_EXCLUSIVE_COLUMN_PAIRS,
     RoleEditSpec,
+    canonical_value,
     edit_spec,
 )
 
@@ -35,7 +37,9 @@ def _error(spec: RoleEditSpec, field: str, message: str, record=None) -> dict:
     record = record or {}
     return {
         "model_key": spec.model_key,
+        "model_id": spec.model_key,
         "table_role": spec.table_role,
+        "table": spec.table_role,
         "sql_table": spec.sql_table,
         "field": field,
         "entity_key": "/".join(str(record.get(k, "")) for k in spec.key),
@@ -55,6 +59,14 @@ def validate_record(
     """Validate one canonical row without accepting a caller SQL identifier."""
     spec = edit_spec(conn, model_key, role)
     errors: list[dict] = []
+    canonical: dict[str, object] = {}
+    for column, value in record.items():
+        try:
+            canonical[column] = canonical_value(spec, column, value)
+        except ValueError as error:
+            canonical[column] = value
+            errors.append(_error(spec, column, str(error), record))
+    record = canonical
     supplied_model = record.get("model_key")
     if supplied_model is not None and supplied_model != model_key:
         errors.append(_error(
@@ -72,7 +84,7 @@ def validate_record(
             errors.append(_error(
                 spec, column, f"key field {column!r} is required", record
             ))
-    if op == "add":
+    if op in {"add", "update"}:
         for column in sorted(spec.required):
             if _blank(record.get(column)):
                 errors.append(_error(
@@ -104,23 +116,8 @@ def validate_record(
     for column, value in record.items():
         if column == "model_key" or column not in spec.types or _blank(value):
             continue
-        if spec.types[column] == "integer":
-            try:
-                int(str(value).replace(",", ""))
-            except (TypeError, ValueError):
-                errors.append(_error(
-                    spec, column,
-                    f"{column} must be an integer, got {value!r}", record,
-                ))
-        if column in spec.booleans and value not in (
-            0, 1, False, True, "0", "1", "False", "True"
-        ):
-            errors.append(_error(
-                spec, column, f"{column} must be boolean, got {value!r}", record
-            ))
         allowed = spec.enums.get(column)
-        canonical = None if value == "" and None in (allowed or ()) else value
-        if allowed and canonical not in allowed:
+        if allowed and value not in allowed:
             errors.append(_error(
                 spec, column,
                 f"{column} must be one of {list(allowed)!r}, got {value!r}",
@@ -152,6 +149,23 @@ def validate_record(
             f"WHERE {where} LIMIT 1",
             values,
         ).fetchone() is None:
+            staged_parent = False
+            for pending in conn.execute(
+                "SELECT new_json FROM pending_changes "
+                "WHERE sql_table=? AND status='staged' AND op='add'",
+                (foreign_key.target_table,),
+            ):
+                staged = json.loads(pending["new_json"] or "{}")
+                if all(
+                    staged.get(target_column) == value
+                    for target_column, value in zip(
+                        foreign_key.target_columns, values, strict=True
+                    )
+                ):
+                    staged_parent = True
+                    break
+            if staged_parent:
+                continue
             for column in foreign_key.columns:
                 if column != "model_key":
                     errors.append(_error(
@@ -188,7 +202,7 @@ def find_dependents(
     target_values = dict(key)
     target_values["model_key"] = model_key
     dependents: list[dict] = []
-    for other_role in MODEL_TABLE_ROLES:
+    for other_role in (*MODEL_TABLE_ROLES, *CENTRAL_EDIT_ROLES):
         other = edit_spec(conn, model_key, other_role)
         for foreign_key in other.foreign_keys:
             if foreign_key.target_table != target.sql_table:
@@ -213,12 +227,17 @@ def find_dependents(
                 )
                 dependents.append({
                     "model_key": model_key,
+                    "model_id": model_key,
                     "table_role": other_role,
+                    "table": other_role,
                     "sql_table": other.sql_table,
                     "field": ",".join(foreign_key.columns),
                     "entity_key": "/".join(str(row[column]) for column in other.key),
+                    "key": row_key,
                     "source_sheet": source_sheet,
                     "source_row": source_row,
+                    "src_sheet": source_sheet,
+                    "src_row": source_row,
                 })
     return dependents
 

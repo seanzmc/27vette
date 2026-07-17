@@ -18,8 +18,10 @@ class ValidationIssue(BaseModel):
 
 
 class StageChangeRequest(BaseModel):
-    model_key: str
-    table_role: str
+    model_key: str = ""
+    table_role: str = ""
+    model_id: str = ""
+    table: str = ""
     op: str = Field(pattern="^(add|update|delete)$")
     key: dict[str, str] = Field(default_factory=dict)
     record: Optional[dict[str, Any]] = None
@@ -33,6 +35,9 @@ class ChangeOut(BaseModel):
     session_id: str
     model_key: str
     table_role: str
+    model_id: str = ""
+    table: str = ""
+    table_name: str = ""
     sql_table: str
     op: str
     status: str

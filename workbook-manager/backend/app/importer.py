@@ -467,6 +467,9 @@ def _canonical_import_workbook(
                 for error in errors
             )
             return _report(findings, candidate_path=candidate)
+        migration.carry_forward_canonical_edit_state(
+            destination_path, candidate, snapshot
+        )
         migration.finalize_candidate_for_audit(candidate)
         audit_root = Path(tempfile.mkdtemp(prefix="workbook-contract-audit-"))
         post_audit_drift: Finding | None = None
@@ -568,6 +571,18 @@ def _canonical_import_workbook(
                     severity="error",
                     status="contract_mismatch",
                     code="backup_verification_failed",
+                    message=str(error),
+                ),
+            ),
+            candidate_path=candidate,
+        )
+    except migration.EditStateCarryForwardError as error:
+        return _report(
+            (
+                Finding(
+                    severity="error",
+                    status="decision_required",
+                    code="canonical_edit_state_incompatible",
                     message=str(error),
                 ),
             ),

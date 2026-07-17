@@ -8,8 +8,10 @@ import shutil
 import sqlite3
 import sys
 import tempfile
+import types
 import unittest
 from pathlib import Path
+from unittest import mock
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BACKEND = REPO_ROOT / "workbook-manager" / "backend"
@@ -317,20 +319,209 @@ class TestApi(unittest.TestCase):
     def test_status_and_models(self):
         status = self.client.get("/api/status").json()
         self.assertEqual(status["tables"]["stingray_options"], 242)
-        keys = {m["model_key"] for m in self.client.get(
-            "/api/models").json()["models"]}
+        models = self.client.get("/api/models").json()["models"]
+        keys = {m["model_key"] for m in models}
         self.assertLessEqual({"stingray", "grand_sport", "z06"}, keys)
+        stingray = next(m for m in models if m["model_key"] == "stingray")
+        self.assertEqual(stingray["label"], stingray["model_label"])
+        self.assertIn(stingray["active"], {"True", "False"})
+        self.assertIn(stingray["default_model"], {"True", "False"})
+        self.assertIn(stingray["promoted_to_runtime"], {"True", "False"})
+        self.assertIsInstance(stingray["scaffold"], bool)
 
     def test_structure_and_collections(self):
-        self.assertTrue(self.client.get(
-            "/api/structure/stingray").json()["steps"])
+        structure = self.client.get("/api/structure/stingray").json()
+        self.assertTrue(structure["steps"])
+        step = structure["steps"][0]
+        self.assertTrue(step["display_name"])
+        self.assertIn(step["active"], {"True", "False"})
+        self.assertIsInstance(step["sections"], list)
+        self.assertTrue(structure["section_presentation"])
+        presentation = structure["section_presentation"][0]
+        self.assertTrue(presentation["display_name"])
+        self.assertIn(presentation["active"], {"True", "False"})
+        self.assertIn(structure["variants"][0]["active"], {"True", "False"})
         collections = self.client.get(
             "/api/models/stingray/collections").json()["collections"]
         self.assertIn("options", {row["table_role"] for row in collections})
+        self.assertIn("options", {row["table"] for row in collections})
+
+    def test_transitional_record_routes_delegate_to_physical_tables(self):
+        schema = self.client.get(
+            "/api/records/options/schema?model=stingray"
+        )
+        self.assertEqual(schema.status_code, 200, schema.text)
+        body = schema.json()
+        self.assertEqual(body["table"], "options")
+        self.assertTrue(body["model_scoped"])
+        self.assertEqual(body["table_role"], "options")
+        records = self.client.get(
+            "/api/records/options?model=stingray&limit=2"
+        )
+        self.assertEqual(records.status_code, 200, records.text)
+        self.assertEqual(records.json()["table"], "options")
+        self.assertEqual(len(records.json()["records"]), 2)
+        row_ids = [row["id"] for row in records.json()["records"]]
+        self.assertEqual(len(set(row_ids)), 2)
+        repeated = self.client.get(
+            "/api/records/options?model=stingray&limit=2"
+        ).json()["records"]
+        self.assertEqual(row_ids, [row["id"] for row in repeated])
+
+    def test_legacy_structure_tables_use_canonical_central_services(self):
+        schema = self.client.get(
+            "/api/records/form_steps/schema?model=stingray"
+        )
+        self.assertEqual(schema.status_code, 200, schema.text)
+        self.assertEqual(schema.json()["table"], "form_steps")
+        self.assertEqual(schema.json()["table_role"], "runtime_steps")
+        self.assertEqual(schema.json()["sql_table"], "runtime_steps")
+        self.assertEqual(schema.json()["key"], ["model_key", "step_key"])
+
+        records = self.client.get(
+            "/api/records/form_steps?model=stingray&limit=1"
+        )
+        self.assertEqual(records.status_code, 200, records.text)
+        row = records.json()["records"][0]
+        self.assertEqual(row["model_key"], "stingray")
+        self.assertTrue(row["id"])
+
+        response = self.client.post("/api/changes", json={
+            "model_id": "",
+            "table": "form_steps",
+            "op": "update",
+            "key": {
+                "id": row["id"],
+                "model_key": row["model_key"],
+                "step_key": row["step_key"],
+            },
+            "record": {
+                **row,
+                "display_name": "derived UI label must be stripped",
+                "sections": [],
+                "notes": f"{row['notes']} compatibility".strip(),
+            },
+        })
+        self.assertEqual(response.status_code, 200, response.text)
+        body = response.json()
+        self.assertEqual(body["model_key"], "stingray")
+        self.assertEqual(body["table_role"], "runtime_steps")
+        self.assertEqual(body["table"], "form_steps")
+        self.assertNotIn("id", body["new"])
+        self.assertNotIn("display_name", body["new"])
+        self.assertNotIn("sections", body["new"])
+        validation = self.client.post("/api/changes/validate")
+        self.assertEqual(validation.status_code, 200, validation.text)
+        self.assertTrue(validation.json()["ok"], validation.text)
+        self.client.delete(f"/api/changes/{body['id']}")
+
+    def test_legacy_section_presentation_uses_canonical_central_service(self):
+        section_schema = self.client.get(
+            "/api/records/section_presentation/schema?model=stingray"
+        )
+        self.assertEqual(section_schema.status_code, 200, section_schema.text)
+        self.assertEqual(
+            section_schema.json()["table_role"], "section_presentation"
+        )
+        section_row = self.client.get(
+            "/api/records/section_presentation?model=stingray&limit=1"
+        ).json()["records"][0]
+        section_change = self.client.post("/api/changes", json={
+            "table": "section_presentation",
+            "model_id": "",
+            "op": "update",
+            "key": {
+                "id": section_row["id"],
+                "model_key": section_row["model_key"],
+                "section_id": section_row["section_id"],
+            },
+            "record": {
+                **section_row,
+                "display_name": "derived label",
+                "notes": f"{section_row['notes']} compatibility".strip(),
+            },
+        })
+        self.assertEqual(section_change.status_code, 200, section_change.text)
+        section_body = section_change.json()
+        self.assertEqual(section_body["table_role"], "section_presentation")
+        self.assertEqual(section_body["table"], "section_presentation")
+        self.assertNotIn("id", section_body["new"])
+        self.assertNotIn("display_name", section_body["new"])
+        validation = self.client.post("/api/changes/validate")
+        self.assertEqual(validation.status_code, 200, validation.text)
+        self.assertTrue(validation.json()["ok"], validation.text)
+        self.client.delete(f"/api/changes/{section_body['id']}")
+
+    def test_import_response_retains_canonical_fields_and_legacy_aliases(self):
+        finding = types.SimpleNamespace(
+            severity="warning", status="mapped", code="mapped_test",
+            message="mapped", source_sheet="runtime_steps", source_row=2,
+            source_column="step_key", model_key="stingray", value=None,
+        )
+        report = types.SimpleNamespace(
+            status="validated", live_models=("stingray",),
+            findings=(finding,), decision_required=(),
+            contract_differences=(), candidate_path=None,
+            promoted_path=None,
+        )
+        main_module = sys.modules["app.main"]
+        with mock.patch.object(
+            main_module.importer, "import_workbook", return_value=report
+        ):
+            response = self.client.post("/api/import")
+        self.assertEqual(response.status_code, 200, response.text)
+        body = response.json()
+        self.assertEqual(body["status"], "validated")
+        self.assertEqual(body["live_models"], ["stingray"])
+        self.assertEqual(body["findings"][0]["code"], "mapped_test")
+        self.assertEqual(body["run"]["status"], "imported")
+        self.assertEqual(body["issues"][0]["category"], "mapped_test")
+
+    def test_transitional_dependency_and_stage_payload_aliases(self):
+        row = self.client.get(
+            "/api/records/options?model=stingray&search=Z51&limit=1"
+        ).json()["records"][0]
+        dependencies = self.client.post(
+            "/api/records/options/dependencies",
+            json={"model_id": "stingray", "key": {"option_id": row["option_id"]}},
+        )
+        self.assertEqual(dependencies.status_code, 200, dependencies.text)
+        if dependencies.json()["dependents"]:
+            dependent = dependencies.json()["dependents"][0]
+            self.assertIn("table", dependent)
+            self.assertIn("src_sheet", dependent)
+            self.assertIn("src_row", dependent)
+        resp = self.client.post("/api/changes", json={
+            "model_id": "stingray", "table": "options", "op": "update",
+            "key": {"option_id": row["option_id"]},
+            "record": {"price": row["price"] + 1},
+        })
+        self.assertEqual(resp.status_code, 200, resp.text)
+        self.assertEqual(resp.json()["model_id"], "stingray")
+        self.assertEqual(resp.json()["table"], "options")
+        self.assertEqual(resp.json()["table_name"], "options")
+
+    def test_react_string_values_stage_as_canonical_types(self):
+        row = self.client.get(
+            "/api/records/options?model=stingray&search=Z51&limit=1"
+        ).json()["records"][0]
+        response = self.client.post("/api/changes", json={
+            "model_id": "stingray", "table": "options", "op": "update",
+            "key": {"option_id": row["option_id"]},
+            "record": {
+                "price": f"{row['price'] + 1:,}",
+                "active": "False" if row["active"] else "True",
+            },
+        })
+        self.assertEqual(response.status_code, 200, response.text)
+        change = response.json()
+        self.assertIsInstance(change["new"]["price"], int)
+        self.assertIn(change["new"]["active"], (0, 1))
+        self.client.delete(f"/api/changes/{change['id']}")
 
     def test_stage_endpoint_validation_error_shape(self):
         resp = self.client.post("/api/changes", json={
-            "model_key": "stingray", "table_role": "options", "op": "add",
+            "model_id": "stingray", "table": "options", "op": "add",
             "key": {"option_id": "opt_x"},
             "record": {"option_id": "opt_x", "price": "not-a-number"},
         })

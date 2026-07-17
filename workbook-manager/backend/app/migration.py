@@ -55,6 +55,25 @@ class CandidateChangedAfterAudit(RuntimeError):
     pass
 
 
+class EditStateCarryForwardError(RuntimeError):
+    pass
+
+
+_EDIT_STATE_COLUMNS = {
+    "pending_changes": (
+        "id", "ts", "session_id", "model_key", "table_role", "sql_table",
+        "entity_key_json", "op", "old_json", "new_json", "status",
+        "validation_json", "confirmed_dependencies",
+    ),
+    "change_history": (
+        "id", "ts", "actor", "model_key", "table_role", "sql_table",
+        "entity_id", "op", "old_json", "new_json", "src_sheet", "src_row",
+        "validation_result", "status", "sync_status", "sync_detail",
+        "pending_change_id", "related_history_id",
+    ),
+}
+
+
 _MODEL_LOAD_ORDER = (
     "options",
     "interiors",
@@ -276,6 +295,298 @@ def capture_destination_snapshot(destination: Path) -> DestinationSnapshot:
 def audit_legacy_destination(destination: Path) -> tuple[Finding, ...]:
     """Read legacy edit state without creating or mutating destination files."""
     return capture_destination_snapshot(destination).findings
+
+
+def _edit_state_rows(
+    conn: sqlite3.Connection,
+) -> dict[str, tuple[tuple[object, ...], ...]]:
+    tables = _table_names(conn)
+    present = set(_EDIT_STATE_COLUMNS) & tables
+    if not present:
+        return {table: () for table in _EDIT_STATE_COLUMNS}
+    counts = {
+        table: conn.execute(
+            f"SELECT COUNT(*) FROM {_quote(table)}"
+        ).fetchone()[0]
+        for table in present
+    }
+    if not any(counts.values()):
+        return {table: () for table in _EDIT_STATE_COLUMNS}
+    if present != set(_EDIT_STATE_COLUMNS):
+        raise EditStateCarryForwardError(
+            "canonical_edit_state_incompatible: one edit-state table is missing"
+        )
+    for table, expected in _EDIT_STATE_COLUMNS.items():
+        actual = tuple(
+            row["name"] for row in conn.execute(
+                f"PRAGMA table_info({_quote(table)})"
+            )
+        )
+        if actual != expected:
+            raise EditStateCarryForwardError(
+                f"canonical_edit_state_incompatible: {table} columns differ"
+            )
+    if "model_table_registry" not in tables:
+        raise EditStateCarryForwardError(
+            "canonical_edit_state_incompatible: model table registry is missing"
+        )
+    for table in _EDIT_STATE_COLUMNS:
+        unresolved = conn.execute(
+            f"SELECT COUNT(*) FROM {_quote(table)} state "
+            "WHERE NOT EXISTS (SELECT 1 FROM model_table_registry registry "
+            "WHERE registry.model_key=state.model_key "
+            "AND registry.table_role=state.table_role "
+            "AND registry.sql_table=state.sql_table AND registry.active=1)"
+        ).fetchone()[0]
+        if unresolved:
+            raise EditStateCarryForwardError(
+                f"canonical_edit_state_incompatible: {table} has {unresolved} "
+                "row(s) without an exact active model-table route"
+            )
+    _validate_edit_state_semantics(conn)
+    return {
+        table: tuple(
+            tuple(row) for row in conn.execute(
+                f"SELECT * FROM {_quote(table)} ORDER BY id"
+            )
+        )
+        for table in _EDIT_STATE_COLUMNS
+    }
+
+
+def _validate_edit_state_semantics(conn: sqlite3.Connection) -> None:
+    pending = {
+        int(row["id"]): dict(row)
+        for row in conn.execute("SELECT * FROM pending_changes ORDER BY id")
+    }
+    history = {
+        int(row["id"]): dict(row)
+        for row in conn.execute("SELECT * FROM change_history ORDER BY id")
+    }
+
+    def json_object(raw, *, nullable: bool = False, empty: bool = False):
+        if raw is None and nullable:
+            return None
+        if raw == "" and empty:
+            return {}
+        try:
+            value = json.loads(raw)
+        except (TypeError, json.JSONDecodeError) as error:
+            raise EditStateCarryForwardError(
+                "canonical_edit_state_incompatible: malformed JSON payload"
+            ) from error
+        if not isinstance(value, dict):
+            raise EditStateCarryForwardError(
+                "canonical_edit_state_incompatible: edit-state JSON payload "
+                "must be an object"
+            )
+        return value
+
+    def validate_payload(row, *, pending_row: bool) -> None:
+        if row["op"] not in {"add", "update", "delete"}:
+            raise EditStateCarryForwardError(
+                "canonical_edit_state_incompatible: unknown edit operation"
+            )
+        old = json_object(row["old_json"], nullable=True)
+        new = json_object(row["new_json"], nullable=True)
+        expected = {
+            "add": (None, dict),
+            "update": (dict, dict),
+            "delete": (dict, None),
+        }[row["op"]]
+        if (
+            (expected[0] is None and old is not None)
+            or (expected[0] is dict and not isinstance(old, dict))
+            or (expected[1] is None and new is not None)
+            or (expected[1] is dict and not isinstance(new, dict))
+        ):
+            raise EditStateCarryForwardError(
+                "canonical_edit_state_incompatible: operation payload shape differs"
+            )
+        if pending_row:
+            key = json_object(row["entity_key_json"])
+            json_object(row["validation_json"], empty=True)
+            if not key or row["confirmed_dependencies"] not in (0, 1):
+                raise EditStateCarryForwardError(
+                    "canonical_edit_state_incompatible: invalid key or confirmation"
+                )
+        else:
+            json_object(row["sync_detail"], empty=True)
+
+    for change in pending.values():
+        validate_payload(change, pending_row=True)
+        if change["status"] not in {"committed", "discarded"}:
+            raise EditStateCarryForwardError(
+                "canonical_edit_state_incompatible: pending change status is "
+                "not fully resolved"
+            )
+        if change["status"] == "committed":
+            commits = [
+                row for row in history.values()
+                if row["status"] == "committed"
+                and row["pending_change_id"] == change["id"]
+            ]
+            if len(commits) != 1:
+                raise EditStateCarryForwardError(
+                    "canonical_edit_state_incompatible: committed pending "
+                    "change lacks one exact history row"
+                )
+            commit = commits[0]
+            if any(
+                commit[field] != change[field]
+                for field in (
+                    "model_key", "table_role", "sql_table", "op",
+                    "old_json", "new_json",
+                )
+            ):
+                raise EditStateCarryForwardError(
+                    "canonical_edit_state_incompatible: pending/history route "
+                    "or operation differs"
+                )
+    for event in history.values():
+        validate_payload(event, pending_row=False)
+        if event["status"] == "committed":
+            if (
+                event["sync_status"] != "pending"
+                or event["related_history_id"] is not None
+                or event["pending_change_id"] not in pending
+                or pending[event["pending_change_id"]]["status"] != "committed"
+            ):
+                raise EditStateCarryForwardError(
+                    "canonical_edit_state_incompatible: malformed committed "
+                    "history state"
+                )
+            if not any(
+                candidate["status"] == "sync_succeeded"
+                and candidate["related_history_id"] == event["id"]
+                for candidate in history.values()
+            ):
+                raise EditStateCarryForwardError(
+                    "canonical_edit_state_incompatible: committed history "
+                    "lacks a successful sync event"
+                )
+            continue
+        expected_sync = {
+            "sync_succeeded": "synced",
+            "sync_failed": "sync_failed",
+        }.get(event["status"])
+        parent = history.get(event["related_history_id"])
+        if (
+            expected_sync is None
+            or event["sync_status"] != expected_sync
+            or event["pending_change_id"] is not None
+            or parent is None
+            or parent["status"] != "committed"
+            or any(
+                event[field] != parent[field]
+                for field in (
+                    "model_key", "table_role", "sql_table", "entity_id", "op",
+                    "old_json", "new_json", "src_sheet", "src_row",
+                )
+            )
+        ):
+            raise EditStateCarryForwardError(
+                "canonical_edit_state_incompatible: malformed sync history event"
+            )
+
+
+def _edit_state_digest(
+    rows: Mapping[str, tuple[tuple[object, ...], ...]],
+    sequences: tuple[tuple[str, int], ...] = (),
+) -> str:
+    digest = hashlib.sha256()
+    for table in _EDIT_STATE_COLUMNS:
+        digest.update(table.encode("utf-8"))
+        digest.update(repr(rows[table]).encode("utf-8"))
+    digest.update(repr(sequences).encode("utf-8"))
+    return digest.hexdigest()
+
+
+def _edit_state_sequences(
+    conn: sqlite3.Connection,
+) -> tuple[tuple[str, int], ...]:
+    if "sqlite_sequence" not in _table_names(conn):
+        return ()
+    return tuple(
+        (str(row["name"]), int(row["seq"]))
+        for row in conn.execute(
+            "SELECT name, seq FROM sqlite_sequence "
+            "WHERE name IN ('pending_changes','change_history') ORDER BY name"
+        )
+    )
+
+
+def carry_forward_canonical_edit_state(
+    destination: Path,
+    candidate: Path,
+    snapshot: DestinationSnapshot,
+) -> None:
+    """Copy only exact canonical, fully synchronized edit audit state.
+
+    The source is checked against the caller's immutable destination snapshot
+    immediately before and after the copy.  Ambiguous legacy shapes are never
+    translated into the canonical model-role history contract.
+    """
+    if not snapshot.exists:
+        return
+    destination_path = Path(destination)
+    candidate_path = Path(candidate)
+    _same_destination(destination_path, snapshot)
+    source = db.connect_readonly(destination_path)
+    try:
+        source.execute("BEGIN")
+        source_rows = _edit_state_rows(source)
+        source_sequences = _edit_state_sequences(source)
+        source_digest = _edit_state_digest(source_rows, source_sequences)
+    finally:
+        source.close()
+    if not any(source_rows.values()) and not source_sequences:
+        _same_destination(destination_path, snapshot)
+        return
+
+    target = db.connect(candidate_path)
+    try:
+        with target:
+            if any(
+                target.execute(
+                    f"SELECT COUNT(*) FROM {_quote(table)}"
+                ).fetchone()[0]
+                for table in _EDIT_STATE_COLUMNS
+            ):
+                raise EditStateCarryForwardError(
+                    "candidate edit-state tables were not empty"
+                )
+            target.execute("PRAGMA defer_foreign_keys=ON")
+            for table, columns in _EDIT_STATE_COLUMNS.items():
+                placeholders = ",".join("?" for _ in columns)
+                target.executemany(
+                    f"INSERT INTO {_quote(table)} "
+                    f"({','.join(_quote(column) for column in columns)}) "
+                    f"VALUES({placeholders})",
+                    source_rows[table],
+                )
+            target.execute(
+                "DELETE FROM sqlite_sequence "
+                "WHERE name IN ('pending_changes','change_history')"
+            )
+            target.executemany(
+                "INSERT INTO sqlite_sequence(name, seq) VALUES(?,?)",
+                source_sequences,
+            )
+            violations = tuple(target.execute("PRAGMA foreign_key_check"))
+            if violations:
+                raise EditStateCarryForwardError(
+                    "carried canonical edit state violates candidate foreign keys"
+                )
+        target_rows = _edit_state_rows(target)
+        target_sequences = _edit_state_sequences(target)
+        if _edit_state_digest(target_rows, target_sequences) != source_digest:
+            raise EditStateCarryForwardError(
+                "carried canonical edit state does not match its audited source"
+            )
+    finally:
+        target.close()
+    _same_destination(destination_path, snapshot)
 
 
 def _ordered_tables(compiled: "CompiledWorkbook"):
@@ -528,6 +839,8 @@ def load_candidate(
             )
             db.set_meta(conn, "last_import_run_id", str(run_id))
             db.set_meta(conn, "compiled_row_count", str(len(compiled.lineage)))
+            if workbook_sha256:
+                db.set_meta(conn, "trusted_workbook_sha256", workbook_sha256)
         return candidate
     finally:
         conn.close()

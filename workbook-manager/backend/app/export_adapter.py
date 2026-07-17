@@ -77,9 +77,15 @@ def _validated_import_run(
     if run is None:
         raise ReverseMappingError("Persisted lineage import run is missing")
     source_sha256 = _file_sha256(source_path)
-    if str(run["workbook_sha256"]) != source_sha256:
+    trusted_row = conn.execute(
+        "SELECT value FROM meta WHERE key='trusted_workbook_sha256'"
+    ).fetchone()
+    trusted_sha256 = str(trusted_row[0]) if trusted_row else str(
+        run["workbook_sha256"]
+    )
+    if trusted_sha256 != source_sha256:
         raise ReverseMappingError(
-            "Source workbook SHA does not match the persisted import run"
+            "Source workbook SHA does not match the trusted synchronization base"
         )
     return run_id
 

@@ -1,5 +1,6 @@
 import hashlib
 import inspect
+import json
 import os
 import shutil
 import sqlite3
@@ -201,13 +202,22 @@ def test_api_import_uses_path_only_audited_import_without_opening_live_connectio
         lambda: (_ for _ in ()).throw(AssertionError("must stay unopened")),
     )
 
-    monkeypatch.setattr(
-        importer,
-        "import_workbook",
-        lambda db_path, workbook_path: (db_path, workbook_path),
-    )
+    calls = []
 
-    assert main.run_import() == (destination, real_workbook)
+    def audited_import(db_path, workbook_path):
+        calls.append((db_path, workbook_path))
+        return importer.ImportReport(
+            status="validated", live_models=("stingray",), findings=(),
+            decision_required=(), contract_differences=(),
+            candidate_path=None, promoted_path=db_path,
+        )
+
+    monkeypatch.setattr(importer, "import_workbook", audited_import)
+
+    response = main.run_import()
+    assert calls == [(destination, real_workbook)]
+    assert response["status"] == "validated"
+    assert response["run"]["status"] == "imported"
 
 
 def test_canonical_orchestrator_cannot_skip_contract_audit(
@@ -323,6 +333,9 @@ def test_successful_candidate_has_complete_lineage(tmp_path, real_workbook):
         assert run["workbook_sha256"] == _digest(real_workbook)
         assert run["status"] == "validated"
         assert conn.execute(
+            "SELECT value FROM meta WHERE key='trusted_workbook_sha256'"
+        ).fetchone()[0] == _digest(real_workbook)
+        assert conn.execute(
             "SELECT COUNT(*) FROM source_row_disposition"
         ).fetchone()[0] == 11180
         assert conn.execute(
@@ -420,6 +433,174 @@ def test_legacy_unsynced_history_blocks_replacement(tmp_path, real_workbook):
     assert report.status == "decision_required"
     assert report.finding_codes == ("legacy_unsynced_change_history",)
     assert _digest(destination) == before
+
+
+def test_reimport_preserves_unambiguous_canonical_edit_history(
+    imported_db_path, real_workbook
+):
+    conn = db.connect(imported_db_path)
+    try:
+        option = dict(conn.execute(
+            "SELECT * FROM stingray_options ORDER BY option_id LIMIT 1"
+        ).fetchone())
+        option_json = json.dumps(option, sort_keys=True)
+        pending_id = conn.execute(
+            "INSERT INTO pending_changes("
+            "ts, session_id, model_key, table_role, sql_table, "
+            "entity_key_json, op, old_json, new_json, status, "
+            "validation_json, confirmed_dependencies) "
+            "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+            (
+                "2026-07-16T12:00:00+00:00", "preserve-test", "stingray",
+                "options", "stingray_options",
+                json.dumps({"option_id": option["option_id"]}, sort_keys=True),
+                "update", option_json, option_json, "committed", "{}", 0,
+            ),
+        ).lastrowid
+        conn.execute(
+            "INSERT INTO pending_changes("
+            "ts, session_id, model_key, table_role, sql_table, "
+            "entity_key_json, op, old_json, new_json, status, "
+            "validation_json, confirmed_dependencies) "
+            "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+            (
+                "2026-07-16T12:00:01+00:00", "preserve-test", "stingray",
+                "options", "stingray_options", '{"option_id":"discarded"}',
+                "add", None,
+                json.dumps(
+                    {**option, "option_id": "discarded"}, sort_keys=True
+                ),
+                "discarded", "{}", 0,
+            ),
+        )
+        committed_id = conn.execute(
+            "INSERT INTO change_history("
+            "ts, actor, model_key, table_role, sql_table, entity_id, op, "
+            "old_json, new_json, src_sheet, src_row, validation_result, "
+            "status, sync_status, pending_change_id) "
+            "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (
+                "2026-07-16T12:00:02+00:00", "preserve-test", "stingray",
+                "options", "stingray_options", option["option_id"], "update",
+                option_json, option_json, "stingray_options", 2, "passed",
+                "committed", "pending", pending_id,
+            ),
+        ).lastrowid
+        conn.execute(
+            "INSERT INTO change_history("
+            "ts, actor, model_key, table_role, sql_table, entity_id, op, "
+            "old_json, new_json, src_sheet, src_row, validation_result, "
+            "status, sync_status, sync_detail, related_history_id) "
+            "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (
+                "2026-07-16T12:00:03+00:00", "workbook-sync", "stingray",
+                "options", "stingray_options", option["option_id"], "update",
+                option_json, option_json, "stingray_options", 2, "passed",
+                "sync_succeeded", "synced", '{"status":"applied"}',
+                committed_id,
+            ),
+        )
+        conn.execute(
+            "UPDATE sqlite_sequence SET seq=seq+7 "
+            "WHERE name IN ('pending_changes','change_history')"
+        )
+        conn.commit()
+        expected_pending = tuple(
+            tuple(row) for row in conn.execute(
+                "SELECT * FROM pending_changes ORDER BY id"
+            )
+        )
+        expected_history = tuple(
+            tuple(row) for row in conn.execute(
+                "SELECT * FROM change_history ORDER BY id"
+            )
+        )
+        expected_sequences = tuple(
+            tuple(row) for row in conn.execute(
+                "SELECT name, seq FROM sqlite_sequence "
+                "WHERE name IN ('pending_changes','change_history') ORDER BY name"
+            )
+        )
+    finally:
+        conn.close()
+
+    report = importer.import_workbook(imported_db_path, real_workbook)
+
+    assert report.status == "validated"
+    conn = db.connect(imported_db_path)
+    try:
+        assert tuple(
+            tuple(row) for row in conn.execute(
+                "SELECT * FROM pending_changes ORDER BY id"
+            )
+        ) == expected_pending
+        assert tuple(
+            tuple(row) for row in conn.execute(
+                "SELECT * FROM change_history ORDER BY id"
+            )
+        ) == expected_history
+        assert tuple(
+            tuple(row) for row in conn.execute(
+                "SELECT name, seq FROM sqlite_sequence "
+                "WHERE name IN ('pending_changes','change_history') ORDER BY name"
+            )
+        ) == expected_sequences
+        with pytest.raises(sqlite3.IntegrityError, match="append-only"):
+            conn.execute("UPDATE change_history SET actor='tampered'")
+    finally:
+        conn.close()
+
+
+def test_reimport_rejects_malformed_synced_history(
+    imported_db_path, real_workbook
+):
+    conn = db.connect(imported_db_path)
+    try:
+        conn.execute(
+            "INSERT INTO change_history("
+            "ts, actor, model_key, table_role, sql_table, entity_id, op, "
+            "validation_result, status, sync_status) "
+            "VALUES(?,?,?,?,?,?,?,?,?,?)",
+            (
+                "2026-07-16T12:00:00+00:00", "legacy", "stingray",
+                "options", "stingray_options", "opt_malformed", "update",
+                "passed", "committed", "synced",
+            ),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+    before = _digest(imported_db_path)
+
+    report = importer.import_workbook(imported_db_path, real_workbook)
+
+    assert report.status == "decision_required"
+    assert report.finding_codes == ("canonical_edit_state_incompatible",)
+    assert _digest(imported_db_path) == before
+
+
+def test_carry_forward_rejects_invalid_edit_state_domains(imported_db):
+    cases = (
+        ("teleport", "{}", 0),
+        ("add", "{malformed", 0),
+        ("add", "{}", 2),
+    )
+    for op, new_json, confirmed in cases:
+        imported_db.execute(
+            "INSERT INTO pending_changes("
+            "ts, model_key, table_role, sql_table, entity_key_json, op, "
+            "new_json, status, validation_json, confirmed_dependencies) "
+            "VALUES(?,?,?,?,?,?,?,?,?,?)",
+            (
+                "2026-07-16T12:00:00+00:00", "stingray", "options",
+                "stingray_options", '{"option_id":"invalid"}', op,
+                new_json, "discarded", "{}", confirmed,
+            ),
+        )
+        with pytest.raises(migration.EditStateCarryForwardError):
+            migration._edit_state_rows(imported_db)
+        imported_db.execute("DELETE FROM pending_changes")
+        imported_db.commit()
 
 
 def test_compiler_returns_complete_canonical_contract(real_workbook):
