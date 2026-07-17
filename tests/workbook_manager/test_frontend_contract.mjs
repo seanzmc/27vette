@@ -10,6 +10,10 @@ import {
   tableViewModel,
 } from "../../workbook-manager/frontend/src/tableRegistry.js";
 import { api } from "../../workbook-manager/frontend/src/api.js";
+import {
+  isCurrentGeneration,
+  isCurrentSelection,
+} from "../../workbook-manager/frontend/src/requestGuards.js";
 
 test("uses server supplied canonical and source names", () => {
   const table = tableViewModel({
@@ -242,4 +246,91 @@ test("blocked imports publish their evidence for the Findings tab", async () => 
   assert.equal(events.length, 1);
   assert.equal(events[0].type, "wbm:import-findings");
   assert.equal(events[0].detail.findings[0].code, "business_rule_required");
+});
+
+test("old-role debounced search cannot issue or win after selection changes", () => {
+  const oldSearch = {
+    generation: 4,
+    modelKey: "stingray",
+    tableRole: "options",
+  };
+  const selectedRole = {
+    generation: 5,
+    modelKey: "stingray",
+    tableRole: "prices",
+  };
+  let issued = 0;
+  let view = { schema: "prices", rows: ["current-price-row"] };
+
+  if (isCurrentSelection(oldSearch, selectedRole)) issued += 1;
+  if (isCurrentSelection(oldSearch, selectedRole)) {
+    view = { schema: "options", rows: ["stale-option-row"] };
+  }
+
+  assert.equal(issued, 0);
+  assert.deepEqual(view, {
+    schema: "prices",
+    rows: ["current-price-row"],
+  });
+  assert.equal(isCurrentSelection(selectedRole, selectedRole), true);
+
+  const operations = readFileSync(
+    new URL(
+      "../../workbook-manager/frontend/src/components/ModelOperations.jsx",
+      import.meta.url
+    ),
+    "utf8"
+  );
+  assert.match(operations, /selectionGenerationRef/);
+  assert.match(operations, /isCurrentSelection/);
+  assert.match(operations, /searchTimer\.current = null/);
+});
+
+test("older findings refresh success or failure cannot replace the newest run", () => {
+  let currentGeneration = 1;
+  const oldGeneration = currentGeneration;
+  const newGeneration = ++currentGeneration;
+  let findingsState = { status: "loading", items: [], error: "" };
+  const settle = (generation, state) => {
+    if (isCurrentGeneration(generation, currentGeneration)) {
+      findingsState = state;
+    }
+  };
+
+  settle(newGeneration, {
+    status: "ready",
+    items: [{ code: "new-run" }],
+    error: "",
+  });
+  settle(oldGeneration, {
+    status: "error",
+    items: [{ code: "old-run" }],
+    error: "old request failed",
+  });
+  assert.deepEqual(findingsState, {
+    status: "ready",
+    items: [{ code: "new-run" }],
+    error: "",
+  });
+
+  const app = readFileSync(
+    new URL("../../workbook-manager/frontend/src/App.jsx", import.meta.url),
+    "utf8"
+  );
+  assert.match(app, /statusGenerationRef/);
+  assert.match(app, /isCurrentGeneration/);
+  assert.match(app, /refreshStatus\(report\)/);
+
+  const changes = readFileSync(
+    new URL(
+      "../../workbook-manager/frontend/src/components/ChangesSync.jsx",
+      import.meta.url
+    ),
+    "utf8"
+  );
+  assert.ok(
+    changes.indexOf("onImportComplete(completedImport)")
+      < changes.indexOf('api.changes("staged")'),
+    "a completed import must invalidate older status work before another await",
+  );
 });

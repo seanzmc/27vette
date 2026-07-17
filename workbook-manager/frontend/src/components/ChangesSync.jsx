@@ -6,7 +6,7 @@ import {
 import { api } from "../api.js";
 import { importReportViewModel } from "../tableRegistry.js";
 
-export default function ChangesSync({ status, onChanged }) {
+export default function ChangesSync({ status, onChanged, onImportComplete }) {
   const [staged, setStaged] = useState([]);
   const [validation, setValidation] = useState(null);
   const [commitResult, setCommitResult] = useState(null);
@@ -17,10 +17,17 @@ export default function ChangesSync({ status, onChanged }) {
   const [notice, setNotice] = useState(null);
   const [busy, setBusy] = useState("");
 
-  const refresh = async () => {
+  const refresh = async (completedImport = null) => {
+    const statusRefresh = completedImport && onImportComplete
+      ? onImportComplete(completedImport)
+      : null;
     const c = await api.changes("staged");
     setStaged(c.changes);
-    onChanged();
+    if (statusRefresh) {
+      await statusRefresh;
+    } else {
+      await onChanged();
+    }
   };
 
   useEffect(() => { refresh(); }, []); // eslint-disable-line
@@ -234,7 +241,7 @@ export default function ChangesSync({ status, onChanged }) {
             onClick={() => run("import", async () => {
               const r = await api.runImport();
               setImportReport(r);
-              await refresh();
+              await refresh(r);
             })}
           >
             <FileUp size={15} /> Re-Import Workbook

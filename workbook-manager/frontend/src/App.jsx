@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Database, History, ListOrdered, Settings2, GitBranch, ShieldAlert,
 } from "lucide-react";
 import { api } from "./api.js";
+import { isCurrentGeneration } from "./requestGuards.js";
 import { blockingFindings } from "./tableRegistry.js";
 import FormStructure from "./components/FormStructure.jsx";
 import ModelOperations from "./components/ModelOperations.jsx";
@@ -22,33 +23,61 @@ export default function App() {
   });
   const [importRunId, setImportRunId] = useState(null);
   const [fatal, setFatal] = useState("");
+  const statusGenerationRef = useRef(0);
 
-  const refreshStatus = useCallback(async () => {
+  const refreshStatus = useCallback(async (completedImport = null) => {
+    const requestGeneration = ++statusGenerationRef.current;
+    const isCurrent = () => isCurrentGeneration(
+      requestGeneration,
+      statusGenerationRef.current,
+    );
+    const importReport = Array.isArray(completedImport?.findings)
+      ? completedImport
+      : null;
+    setFindingState((current) => importReport
+      ? {
+        status: "ready",
+        items: importReport.findings,
+        error: "",
+      }
+      : {
+        status: "loading",
+        items: current.items,
+        error: "",
+      });
+    if (importReport) setImportRunId(null);
     try {
       let currentStatus = await api.status();
+      if (!isCurrent()) return;
       setStatus(currentStatus);
       let importBlocked = false;
       if (!currentStatus.last_import) {
-        const report = await api.runImport().catch((e) => {
+        let report = null;
+        try {
+          report = await api.runImport();
+        } catch (e) {
+          if (!isCurrent()) return;
           const blocked = e.detail?.findings || [];
           setFindingState({ status: "ready", items: blocked, error: "" });
           setImportRunId(null);
           setFatal(`Initial import blocked: ${e.message}`);
           importBlocked = true;
-          return null;
-        });
+        }
         if (report) {
+          if (!isCurrent()) return;
           setFindingState({
             status: "ready",
             items: report.findings || [],
             error: "",
           });
           currentStatus = await api.status();
+          if (!isCurrent()) return;
           setStatus(currentStatus);
         }
       }
       const latestRunId = currentStatus.last_import?.id;
       if (latestRunId != null) {
+        if (!isCurrent()) return;
         setFindingState((current) => ({
           status: "loading",
           items: current.items,
@@ -56,6 +85,7 @@ export default function App() {
         }));
         try {
           const report = await api.findings(latestRunId);
+          if (!isCurrent()) return;
           setFindingState({
             status: "ready",
             items: report.findings,
@@ -63,6 +93,7 @@ export default function App() {
           });
           setImportRunId(latestRunId);
         } catch (error) {
+          if (!isCurrent()) return;
           setFindingState((current) => ({
             status: "error",
             items: current.items,
@@ -70,6 +101,7 @@ export default function App() {
           }));
         }
       } else if (!importBlocked) {
+        if (!isCurrent()) return;
         setFindingState((current) => ({
           status: "ready",
           items: current.items,
@@ -77,12 +109,14 @@ export default function App() {
         }));
       }
       const m = await api.models();
+      if (!isCurrent()) return;
       setModels(m.models);
       if (m.models.length && !m.models.some((x) => x.model_key === modelKey)) {
         setModelKey(m.models[0].model_key);
       }
       if (!importBlocked) setFatal("");
     } catch (e) {
+      if (!isCurrent()) return;
       setFindingState((current) => ({
         status: "error",
         items: current.items,
@@ -92,10 +126,14 @@ export default function App() {
     }
   }, [modelKey]);
 
-  useEffect(() => { refreshStatus(); }, []); // eslint-disable-line
+  useEffect(() => {
+    refreshStatus();
+    return () => { ++statusGenerationRef.current; };
+  }, []); // eslint-disable-line
 
   useEffect(() => {
     const showBlockedImport = (event) => {
+      ++statusGenerationRef.current;
       setFindingState({
         status: "ready",
         items: event.detail?.findings || [],
@@ -191,11 +229,15 @@ export default function App() {
             importRunId={importRunId}
             status={findingState.status}
             error={findingState.error}
-            onRetry={refreshStatus}
+            onRetry={() => refreshStatus()}
           />
         )}
         {tab === "changes" && (
-          <ChangesSync status={status} onChanged={refreshStatus} />
+          <ChangesSync
+            status={status}
+            onChanged={() => refreshStatus()}
+            onImportComplete={(report) => refreshStatus(report)}
+          />
         )}
         {tab === "history" && <HistoryView models={models} />}
       </main>

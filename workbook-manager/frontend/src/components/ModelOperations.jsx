@@ -3,6 +3,7 @@ import {
   Columns2, PlusCircle, Pencil, Search, Table2, Trash2, TriangleAlert,
 } from "lucide-react";
 import { api } from "../api.js";
+import { isCurrentSelection } from "../requestGuards.js";
 import { tableViewModel } from "../tableRegistry.js";
 import RecordForm from "./RecordForm.jsx";
 
@@ -23,7 +24,19 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
   const searchTimer = useRef(null);
   const tableRequestRef = useRef(0);
   const recordRequestRef = useRef(0);
+  const selectionGenerationRef = useRef(0);
+  const modelKeyRef = useRef(modelKey);
+  const roleRef = useRef(role);
   const LIMIT = 100;
+
+  modelKeyRef.current = modelKey;
+  roleRef.current = role;
+
+  const currentSelection = () => ({
+    generation: selectionGenerationRef.current,
+    modelKey: modelKeyRef.current,
+    tableRole: roleRef.current,
+  });
 
   const activeTable = tables.find((table) => table.key === role);
 
@@ -59,28 +72,51 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
     loadTables(modelKey);
     return () => {
       clearTimeout(searchTimer.current);
+      searchTimer.current = null;
       ++tableRequestRef.current;
+      ++selectionGenerationRef.current;
       ++recordRequestRef.current;
     };
   }, [modelKey]); // eslint-disable-line
 
-  const loadRows = async (tableRole = role, s = search, o = offset) => {
+  const loadRows = async (
+    tableRole = role,
+    s = search,
+    o = offset,
+    selectedModel = modelKey,
+    selectionGeneration = selectionGenerationRef.current,
+  ) => {
+    const selection = {
+      generation: selectionGeneration,
+      modelKey: selectedModel,
+      tableRole,
+    };
+    if (!isCurrentSelection(selection, currentSelection())) return;
     if (!tableRole) return;
     const requestId = ++recordRequestRef.current;
     setRecordState({ status: "loading", error: "" });
     try {
-      const spec = await api.schema(tableRole, modelKey);
-      if (requestId !== recordRequestRef.current) return;
+      const spec = await api.schema(tableRole, selectedModel);
+      if (
+        requestId !== recordRequestRef.current
+        || !isCurrentSelection(selection, currentSelection())
+      ) return;
       const resp = await api.records(tableRole, {
-        model: modelKey, search: s, limit: LIMIT, offset: o,
+        model: selectedModel, search: s, limit: LIMIT, offset: o,
       });
-      if (requestId !== recordRequestRef.current) return;
+      if (
+        requestId !== recordRequestRef.current
+        || !isCurrentSelection(selection, currentSelection())
+      ) return;
       setSchema(spec);
       setRows(resp.records);
       setTotal(resp.total);
       setRecordState({ status: "ready", error: "" });
     } catch (error) {
-      if (requestId !== recordRequestRef.current) return;
+      if (
+        requestId !== recordRequestRef.current
+        || !isCurrentSelection(selection, currentSelection())
+      ) return;
       setSchema(null);
       setRows([]);
       setTotal(0);
@@ -89,22 +125,40 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
   };
 
   useEffect(() => {
+    clearTimeout(searchTimer.current);
+    searchTimer.current = null;
+    const selectionGeneration = ++selectionGenerationRef.current;
+    ++recordRequestRef.current;
     setOffset(0);
     setCompare([]);
     setEditing(null);
     setDeps(null);
     if (tableState.status === "ready" && role) {
-      loadRows(role, search, 0);
+      loadRows(role, search, 0, modelKey, selectionGeneration);
     }
-    return () => { ++recordRequestRef.current; };
+    return () => {
+      clearTimeout(searchTimer.current);
+      searchTimer.current = null;
+      ++selectionGenerationRef.current;
+      ++recordRequestRef.current;
+    };
   }, [role, modelKey, tableState.status]); // eslint-disable-line
 
   const onSearch = (value) => {
     setSearch(value);
     clearTimeout(searchTimer.current);
+    const selection = currentSelection();
     searchTimer.current = setTimeout(() => {
+      searchTimer.current = null;
+      if (!isCurrentSelection(selection, currentSelection())) return;
       setOffset(0);
-      loadRows(role, value, 0);
+      loadRows(
+        selection.tableRole,
+        value,
+        0,
+        selection.modelKey,
+        selection.generation,
+      );
     }, 250);
   };
 
