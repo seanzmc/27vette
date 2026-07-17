@@ -1,6 +1,6 @@
 # Workbook-Congruent Relational Database Design
 
-Status: completed and verified on 2026-07-16.
+Status: completed and verified on 2026-07-17.
 
 ## 1. Objective
 
@@ -585,7 +585,7 @@ objective.
 
 ## 18. Completion Record
 
-Completed on 2026-07-16. The implementation replaced the workbook manager's
+Completed on 2026-07-17. The implementation replaced the workbook manager's
 conceptual shared-table database with central relational domains and identical
 17-role physical collections for Stingray, Grand Sport, and Z06. The completed
 surfaces are the compiler/profile/mapping pipeline, candidate audit and atomic
@@ -615,7 +615,7 @@ documentation.
 
 ### Validation
 
-- `pytest tests/workbook_manager`: 176 passed, 1 skipped, with the existing
+- `pytest tests/workbook_manager`: 177 passed, 1 skipped, with the existing
   FastAPI/Starlette TestClient deprecation warning.
 - `pytest tests/test_workbook_manager.py`: 27 passed, 1 skipped, with the same
   existing warning.
