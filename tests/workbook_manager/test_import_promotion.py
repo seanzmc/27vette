@@ -4,6 +4,7 @@ import json
 import os
 import shutil
 import sqlite3
+import zipfile
 from dataclasses import replace
 from pathlib import Path
 
@@ -801,6 +802,26 @@ def test_workbook_read_oserror_is_typed_and_destination_stable(
     assert report.status == "contract_mismatch"
     assert report.finding_codes == ("workbook_source_read_failed",)
     assert report.findings[0].value == str(real_workbook)
+    assert _digest(imported_db_path) == before
+
+
+@pytest.mark.parametrize(
+    "fixture_name",
+    ("corrupt_content_types_workbook", "corrupt_workbook_xml_workbook"),
+)
+def test_valid_zip_with_corrupt_xml_is_a_typed_source_failure(
+    imported_db_path, request, fixture_name
+):
+    workbook = request.getfixturevalue(fixture_name)
+    assert zipfile.is_zipfile(workbook)
+    before = _digest(imported_db_path)
+
+    report = importer.import_workbook(imported_db_path, workbook)
+
+    assert report.status == "contract_mismatch"
+    assert report.finding_codes == ("workbook_source_invalid",)
+    assert report.findings[0].value == str(workbook)
+    assert str(workbook) in report.findings[0].message
     assert _digest(imported_db_path) == before
 
 

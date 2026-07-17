@@ -611,6 +611,12 @@ documentation.
   Malformed workbook packages, unsupported workbook formats, and workbook read
   failures likewise return typed blocking findings while preserving the
   destination database byte-for-byte.
+- Valid ZIP workbooks with corrupt OOXML manifests or workbook XML also return
+  typed `workbook_source_invalid` findings. A prior canonical database whose
+  mapping schema/status vocabulary predates this contract exposes an actionable
+  `database_reimport_required` status and gates canonical routes with HTTP `409`;
+  only a successful validated atomic re-import clears the gate, while a failed
+  import preserves the prior database and blocker.
 - A guarded scratch proof completed a validated import, dry sync, and live sync
   through `editor_ops`; advanced the trusted workbook hash; retained all three
   empty `runtime_rule_exceptions` source routes; and returned zero foreign-key
@@ -629,14 +635,12 @@ documentation.
 
 ### Validation
 
-- `pytest tests/workbook_manager`: 188 passed, 1 skipped, with the existing
-  FastAPI/Starlette TestClient deprecation warning.
-- `pytest tests/test_workbook_manager.py`: 27 passed, 1 skipped, with the same
-  existing warning.
+- Combined workbook-manager Python gate: 223 passed, 2 skipped, with the
+  existing FastAPI/Starlette TestClient deprecation warning.
 - Workbook package validation: valid, 0 issues.
 - Workbook schema/live-contract validation: valid, 0 issues, 0 errors, and 0
   warnings.
-- Frontend contract Node gate: 13 passed.
+- Frontend contract Node gate: 14 passed.
 - Stingray regression Node gate: 89 passed.
 - Grand Sport draft Node gate: 19 passed.
 - Z06 draft Node gate: 24 passed.

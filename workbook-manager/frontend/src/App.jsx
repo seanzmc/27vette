@@ -108,6 +108,7 @@ export default function App() {
           error: "",
         }));
       }
+      if (importBlocked) return;
       const m = await api.models();
       if (!isCurrent()) return;
       setModels(m.models);

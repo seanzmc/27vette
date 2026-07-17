@@ -38,8 +38,14 @@ imports contain neither and do not flatten mappings into a generic status.
   and apply. A stale row rejects the whole batch with HTTP `409`; it is never
   silently overwritten.
 - SQL history is append-only and tracks workbook sync state.
-- Malformed or unreadable workbook sources return typed blocking import
-  findings and leave the currently promoted database unchanged.
+- Malformed or unreadable workbook sources—including valid ZIP containers with
+  corrupt OOXML manifests or workbook XML—return typed blocking import findings
+  and leave the currently promoted database unchanged.
+- A database whose mapping table predates the current constrained contract is
+  not relabeled or migrated in place. `GET /api/status` reports the actionable
+  `database_reimport_required` blocker, `POST /api/imports` remains available,
+  and other canonical routes return typed HTTP `409` until a validated atomic
+  re-import replaces the database.
 - Workbook writes are never direct. A live sync requires explicit confirmation
   and still uses `editor_ops.apply_batch()` -> `save_workbook_safely()` with
   lock, mtime, dry-run, package/schema, backup, and atomic-replace gates.

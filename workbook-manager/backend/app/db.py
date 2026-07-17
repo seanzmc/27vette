@@ -6,6 +6,80 @@ import sqlite3
 from pathlib import Path
 
 from .catalog import LIVE_MODELS, MODEL_TABLE_ROLES, physical_table
+from .compile_types import CONTRACT_STATUSES
+
+
+SCHEMA_MAPPING_COLUMNS = (
+    "id",
+    "source_sheet",
+    "source_column",
+    "model_key",
+    "source_role",
+    "sql_table",
+    "sql_column",
+    "transform_type",
+    "transform_parameters_json",
+    "contract_status",
+    "notes",
+)
+
+
+def database_compatibility_issue(
+    conn: sqlite3.Connection,
+) -> dict[str, object] | None:
+    """Return a read-only re-import blocker for an obsolete canonical DB."""
+    reasons: list[str] = []
+    try:
+        table = conn.execute(
+            "SELECT sql FROM sqlite_master "
+            "WHERE type='table' AND name='schema_mapping'"
+        ).fetchone()
+        if table is None:
+            reasons.append("schema_mapping table is missing")
+        else:
+            columns = tuple(
+                row["name"]
+                for row in conn.execute("PRAGMA table_info(schema_mapping)")
+            )
+            if columns != SCHEMA_MAPPING_COLUMNS:
+                reasons.append(
+                    "schema_mapping columns do not match the current contract"
+                )
+            ddl = str(table["sql"] or "").lower()
+            compact_ddl = "".join(ddl.split())
+            if "check(contract_statusin(" not in compact_ddl or any(
+                f"'{status}'" not in ddl for status in CONTRACT_STATUSES
+            ):
+                reasons.append(
+                    "schema_mapping contract_status constraint is obsolete"
+                )
+            statuses = {
+                row["contract_status"]
+                for row in conn.execute(
+                    "SELECT DISTINCT contract_status FROM schema_mapping"
+                )
+            }
+            unsupported = sorted(statuses.difference(CONTRACT_STATUSES))
+            if unsupported:
+                reasons.append(
+                    "schema_mapping contains unsupported contract statuses: "
+                    + ", ".join(unsupported)
+                )
+    except sqlite3.DatabaseError as error:
+        reasons.append(f"canonical schema audit failed: {error}")
+    if not reasons:
+        return None
+    return {
+        "compatible": False,
+        "code": "database_reimport_required",
+        "message": (
+            "This database predates the current canonical contract. Run a "
+            "validated re-import with POST /api/imports; no in-place migration "
+            "was attempted."
+        ),
+        "action": "POST /api/imports",
+        "reasons": reasons,
+    }
 
 
 def connect(db_path: Path) -> sqlite3.Connection:

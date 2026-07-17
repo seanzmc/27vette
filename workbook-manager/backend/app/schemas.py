@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field, JsonValue
+from pydantic import BaseModel, Field, JsonValue, RootModel
 
 
 class DependencyOut(BaseModel):
@@ -63,6 +63,18 @@ class ValidationErrorResponse(BaseModel):
 
 class MessageErrorResponse(BaseModel):
     detail: str
+
+
+class DatabaseCompatibilityDetail(BaseModel):
+    compatible: Literal[False]
+    code: Literal["database_reimport_required"]
+    message: str
+    action: Literal["POST /api/imports"]
+    reasons: list[str] = Field(default_factory=list)
+
+
+class DatabaseCompatibilityErrorResponse(BaseModel):
+    detail: DatabaseCompatibilityDetail
 
 
 class StageChangeRequest(BaseModel):
@@ -539,3 +551,13 @@ class ExportOut(BaseModel):
 class BackupOut(BaseModel):
     ok: Literal[True]
     path: str
+
+
+class DatabaseCompatibilityResponse(
+    RootModel[
+        DatabaseCompatibilityErrorResponse
+        | CommitConflictResponse
+        | SyncConflictResponse
+    ]
+):
+    """Document compatibility gates without hiding route-specific conflicts."""

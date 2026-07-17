@@ -2,6 +2,7 @@ from pathlib import Path
 import sqlite3
 import shutil
 import sys
+import zipfile
 
 import pytest
 from openpyxl import load_workbook
@@ -14,6 +15,20 @@ if str(BACKEND_ROOT) not in sys.path:
 
 from app import db  # noqa: E402
 from app import importer  # noqa: E402
+
+
+def _corrupt_ooxml_member(
+    source: Path, destination: Path, member: str
+) -> Path:
+    with zipfile.ZipFile(source, "r") as original, zipfile.ZipFile(
+        destination, "w"
+    ) as corrupted:
+        for info in original.infolist():
+            payload = original.read(info.filename)
+            if info.filename == member:
+                payload = b"<malformed>"
+            corrupted.writestr(info, payload)
+    return destination
 
 
 @pytest.fixture(scope="session")
@@ -48,6 +63,24 @@ def imported_db(imported_db_path):
         yield conn
     finally:
         conn.close()
+
+
+@pytest.fixture
+def corrupt_content_types_workbook(tmp_path, real_workbook) -> Path:
+    return _corrupt_ooxml_member(
+        real_workbook,
+        tmp_path / "corrupt-content-types.xlsx",
+        "[Content_Types].xml",
+    )
+
+
+@pytest.fixture
+def corrupt_workbook_xml_workbook(tmp_path, real_workbook) -> Path:
+    return _corrupt_ooxml_member(
+        real_workbook,
+        tmp_path / "corrupt-workbook-xml.xlsx",
+        "xl/workbook.xml",
+    )
 
 
 @pytest.fixture

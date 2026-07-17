@@ -1470,11 +1470,10 @@ authorizes including them.
   initial linked-worktree invocation exposed only missing local environment
   setup (`.venv`/`PYTHONPATH`), not an objective defect. No artificial failure
   or production change was introduced.
-- Full Python gates: 188 passed, 1 skipped in `tests/workbook_manager`; 27
-  passed, 1 skipped in `tests/test_workbook_manager.py`. Both emitted only the
+- Final combined Python gate: 223 passed, 2 skipped. It emitted only the
   existing FastAPI/Starlette TestClient deprecation warning.
 - Package/schema validators were valid with zero issues, errors, or warnings.
-  Node gates passed 13, 89, 19, and 24 tests; the Vite build transformed 1,521
+  Node gates passed 14, 89, 19, and 24 tests; the Vite build transformed 1,521
   modules; `git diff --check` passed.
 - The Grand Sport and Z06 Node generator gates refreshed only tracked
   `generated_at` timestamps. Those exact two files were restored from `HEAD`;
@@ -1491,6 +1490,11 @@ authorizes including them.
   legacy structure route, and typed the dependencies endpoint. A guarded
   scratch import/dry-sync/live-sync proof passed without touching the canonical
   workbook or generated/dealer surfaces.
+- Final compatibility review additionally typed corrupt OOXML XML parsing,
+  fail-closed prior canonical databases with an actionable re-import gate, and
+  verified successful versus failed atomic re-import behavior. The focused API
+  and import regressions passed, the frontend contract gate increased to 14,
+  and the production build still transformed 1,521 modules.
 - The design spec and workbook-manager README are closed with exact commands,
   results, preserved boundaries, residual fail-closed limitation, and no stale
   approval prompt. Follow-up: none implied.

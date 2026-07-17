@@ -26,9 +26,9 @@ from .schemas import (
     BackupOut,
     ChangeListOut,
     ChangeOut,
-    CommitConflictResponse,
     CommitOut,
     CommitRequest,
+    DatabaseCompatibilityResponse,
     DependenciesOut,
     DependenciesRequest,
     ExportOut,
@@ -46,7 +46,6 @@ from .schemas import (
     MessageErrorResponse,
     SchemaMappingsOut,
     StageChangeRequest,
-    SyncConflictResponse,
     SyncOut,
     SyncRequest,
     TableSchemaOut,
@@ -61,6 +60,9 @@ router = APIRouter()
 
 NOT_FOUND_RESPONSE = {404: {"model": MessageErrorResponse}}
 VALIDATION_RESPONSE = {422: {"model": ValidationErrorResponse}}
+DATABASE_COMPATIBILITY_RESPONSE = {
+    409: {"model": DatabaseCompatibilityResponse}
+}
 
 
 def _require_model(model_key: str) -> None:
@@ -710,6 +712,22 @@ def _history(
 
 @router.get("/api/status")
 def status(conn: sqlite3.Connection = Depends(get_conn)):
+    compatibility_issue = dbmod.database_compatibility_issue(conn)
+    workbook_path = config.DEFAULT_WORKBOOK
+    excel_lock = workbook_path.with_name(f"~${workbook_path.name}")
+    if compatibility_issue is not None:
+        return {
+            "tables": {},
+            "staged_changes": 0,
+            "unsynced_committed_changes": 0,
+            "last_import": None,
+            "database": compatibility_issue,
+            "workbook": {
+                "workbook_path": str(workbook_path),
+                "exists": workbook_path.is_file(),
+                "excel_lock": excel_lock.exists(),
+            },
+        }
     counts = {}
     for model_key in LIVE_MODELS:
         for role in MODEL_TABLE_ROLES:
@@ -727,13 +745,12 @@ def status(conn: sqlite3.Connection = Depends(get_conn)):
     run = conn.execute(
         "SELECT * FROM import_runs ORDER BY id DESC LIMIT 1"
     ).fetchone()
-    workbook_path = config.DEFAULT_WORKBOOK
-    excel_lock = workbook_path.with_name(f"~${workbook_path.name}")
     return {
         "tables": counts,
         "staged_changes": staged,
         "unsynced_committed_changes": unsynced,
         "last_import": dict(run) if run else None,
+        "database": {"compatible": True},
         "workbook": {
             "workbook_path": str(workbook_path),
             "exists": workbook_path.is_file(),
@@ -754,7 +771,7 @@ def run_import():
     return _run_import_to(config.DEFAULT_DB, config.DEFAULT_WORKBOOK)
 
 
-@router.get("/api/import/latest")
+@router.get("/api/import/latest", responses=DATABASE_COMPATIBILITY_RESPONSE)
 def latest_import(conn: sqlite3.Connection = Depends(get_conn)):
     report = importer.latest_report(conn)
     if report is None:
@@ -800,7 +817,7 @@ def create_import(payload: ImportRequest, request: Request):
 @router.get(
     "/api/imports/{import_run_id}",
     response_model=ImportRunOut,
-    responses=NOT_FOUND_RESPONSE,
+    responses={**NOT_FOUND_RESPONSE, **DATABASE_COMPATIBILITY_RESPONSE},
 )
 def import_run(
     import_run_id: int, conn: sqlite3.Connection = Depends(get_conn)
@@ -814,7 +831,7 @@ def import_run(
 @router.get(
     "/api/imports/{import_run_id}/findings",
     response_model=FindingsOut,
-    responses=NOT_FOUND_RESPONSE,
+    responses={**NOT_FOUND_RESPONSE, **DATABASE_COMPATIBILITY_RESPONSE},
 )
 def import_findings(
     import_run_id: int, conn: sqlite3.Connection = Depends(get_conn)
@@ -825,12 +842,20 @@ def import_findings(
         raise HTTPException(404, "unknown import run") from None
 
 
-@router.get("/api/schema/mappings", response_model=SchemaMappingsOut)
+@router.get(
+    "/api/schema/mappings",
+    response_model=SchemaMappingsOut,
+    responses=DATABASE_COMPATIBILITY_RESPONSE,
+)
 def schema_mappings(conn: sqlite3.Connection = Depends(get_conn)):
     return _schema_mappings(conn)
 
 
-@router.get("/api/models", response_model=ModelsOut)
+@router.get(
+    "/api/models",
+    response_model=ModelsOut,
+    responses=DATABASE_COMPATIBILITY_RESPONSE,
+)
 def models(conn: sqlite3.Connection = Depends(get_conn)):
     return _models(conn)
 
@@ -838,7 +863,7 @@ def models(conn: sqlite3.Connection = Depends(get_conn)):
 @router.get(
     "/api/models/{model_key}/tables",
     response_model=ModelTablesOut,
-    responses=NOT_FOUND_RESPONSE,
+    responses={**NOT_FOUND_RESPONSE, **DATABASE_COMPATIBILITY_RESPONSE},
 )
 def model_tables(
     model_key: str, conn: sqlite3.Connection = Depends(get_conn)
@@ -852,7 +877,7 @@ def model_tables(
 @router.get(
     "/api/models/{model_key}/variants",
     response_model=ModelVariantsOut,
-    responses=NOT_FOUND_RESPONSE,
+    responses={**NOT_FOUND_RESPONSE, **DATABASE_COMPATIBILITY_RESPONSE},
 )
 def model_variants(
     model_key: str, conn: sqlite3.Connection = Depends(get_conn)
@@ -866,7 +891,7 @@ def model_variants(
 @router.get(
     "/api/models/{model_key}/runtime",
     response_model=ModelRuntimeOut,
-    responses=NOT_FOUND_RESPONSE,
+    responses={**NOT_FOUND_RESPONSE, **DATABASE_COMPATIBILITY_RESPONSE},
 )
 def model_runtime(
     model_key: str, conn: sqlite3.Connection = Depends(get_conn)
@@ -880,7 +905,7 @@ def model_runtime(
 @router.get(
     "/api/models/{model_key}/tables/{table_role}/schema",
     response_model=TableSchemaOut,
-    responses=NOT_FOUND_RESPONSE,
+    responses={**NOT_FOUND_RESPONSE, **DATABASE_COMPATIBILITY_RESPONSE},
 )
 def record_schema(
     model_key: str,
@@ -896,7 +921,11 @@ def record_schema(
 @router.get(
     "/api/models/{model_key}/tables/{table_role}",
     response_model=ModelTableRecordsOut,
-    responses={**NOT_FOUND_RESPONSE, **VALIDATION_RESPONSE},
+    responses={
+        **NOT_FOUND_RESPONSE,
+        **VALIDATION_RESPONSE,
+        **DATABASE_COMPATIBILITY_RESPONSE,
+    },
 )
 def records(
     model_key: str,
@@ -915,7 +944,7 @@ def records(
 @router.post(
     "/api/models/{model_key}/tables/{table_role}/dependencies",
     response_model=DependenciesOut,
-    responses=NOT_FOUND_RESPONSE,
+    responses={**NOT_FOUND_RESPONSE, **DATABASE_COMPATIBILITY_RESPONSE},
 )
 def dependencies_post(
     model_key: str,
@@ -932,7 +961,11 @@ def dependencies_post(
 @router.post(
     "/api/changes",
     response_model=ChangeOut,
-    responses={**NOT_FOUND_RESPONSE, **VALIDATION_RESPONSE},
+    responses={
+        **NOT_FOUND_RESPONSE,
+        **VALIDATION_RESPONSE,
+        **DATABASE_COMPATIBILITY_RESPONSE,
+    },
 )
 def stage(
     payload: StageChangeRequest,
@@ -941,7 +974,11 @@ def stage(
     return _stage_change(conn, payload)
 
 
-@router.get("/api/changes", response_model=ChangeListOut)
+@router.get(
+    "/api/changes",
+    response_model=ChangeListOut,
+    responses=DATABASE_COMPATIBILITY_RESPONSE,
+)
 def changes(
     status: str = "staged", conn: sqlite3.Connection = Depends(get_conn)
 ):
@@ -956,7 +993,11 @@ def changes(
 @router.delete(
     "/api/changes/{change_id}",
     response_model=ChangeOut,
-    responses={**NOT_FOUND_RESPONSE, **VALIDATION_RESPONSE},
+    responses={
+        **NOT_FOUND_RESPONSE,
+        **VALIDATION_RESPONSE,
+        **DATABASE_COMPATIBILITY_RESPONSE,
+    },
 )
 def discard(change_id: int, conn: sqlite3.Connection = Depends(get_conn)):
     try:
@@ -978,7 +1019,11 @@ def discard(change_id: int, conn: sqlite3.Connection = Depends(get_conn)):
         raise HTTPException(422, detail={"errors": enriched}) from exc
 
 
-@router.post("/api/changes/validate", response_model=ValidationOut)
+@router.post(
+    "/api/changes/validate",
+    response_model=ValidationOut,
+    responses=DATABASE_COMPATIBILITY_RESPONSE,
+)
 def validate_changes(conn: sqlite3.Connection = Depends(get_conn)):
     return _validation_with_lineage(conn, staging.revalidate_staged(conn))
 
@@ -988,7 +1033,7 @@ def validate_changes(conn: sqlite3.Connection = Depends(get_conn)):
     response_model=CommitOut,
     responses={
         **VALIDATION_RESPONSE,
-        409: {"model": CommitConflictResponse},
+        **DATABASE_COMPATIBILITY_RESPONSE,
     },
 )
 def commit(
@@ -1013,7 +1058,11 @@ def commit(
 @router.get(
     "/api/history",
     response_model=HistoryOut,
-    responses={**NOT_FOUND_RESPONSE, **VALIDATION_RESPONSE},
+    responses={
+        **NOT_FOUND_RESPONSE,
+        **VALIDATION_RESPONSE,
+        **DATABASE_COMPATIBILITY_RESPONSE,
+    },
 )
 def history(
     model_key: str = "",
@@ -1052,7 +1101,7 @@ def history(
     response_model=SyncOut,
     responses={
         **VALIDATION_RESPONSE,
-        409: {"model": SyncConflictResponse},
+        **DATABASE_COMPATIBILITY_RESPONSE,
     },
 )
 def sync_endpoint(
@@ -1075,12 +1124,20 @@ def sync_endpoint(
     return result
 
 
-@router.post("/api/export", response_model=ExportOut)
+@router.post(
+    "/api/export",
+    response_model=ExportOut,
+    responses=DATABASE_COMPATIBILITY_RESPONSE,
+)
 def export(conn: sqlite3.Connection = Depends(get_conn)):
     return syncmod.export_comparison_workbook(conn, config.DEFAULT_WORKBOOK)
 
 
-@router.post("/api/backup", response_model=BackupOut)
+@router.post(
+    "/api/backup",
+    response_model=BackupOut,
+    responses=DATABASE_COMPATIBILITY_RESPONSE,
+)
 def backup(request: Request, conn: sqlite3.Connection = Depends(get_conn)):
     return syncmod.backup_database(conn, Path(request.app.state.db_path))
 
@@ -1099,6 +1156,23 @@ def create_app(db_path: Path | None = None) -> FastAPI:
     api.state.db_path = Path(db_path) if db_path is not None else config.DEFAULT_DB
     api.state.uses_default_path = db_path is None
     api.state.connection = None
+
+    @api.middleware("http")
+    async def require_compatible_database(request: Request, call_next):
+        path = request.url.path
+        gate_exempt = (
+            request.method == "GET" and path == "/api/status"
+        ) or (
+            request.method == "POST" and path == "/api/imports"
+        )
+        if path.startswith("/api/") and not gate_exempt:
+            issue = dbmod.database_compatibility_issue(get_conn(request))
+            if issue is not None:
+                return JSONResponse(
+                    status_code=409,
+                    content={"detail": issue},
+                )
+        return await call_next(request)
 
     @api.exception_handler(RequestValidationError)
     async def request_validation_error(_request: Request, exc: RequestValidationError):

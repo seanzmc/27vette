@@ -10,6 +10,60 @@ from fastapi.testclient import TestClient
 from app import main
 
 
+def _rewrite_as_prior_canonical_database(database_path: Path) -> None:
+    conn = sqlite3.connect(database_path)
+    try:
+        conn.execute("DROP INDEX schema_mapping_null_safe_unique")
+        conn.execute("ALTER TABLE schema_mapping RENAME TO old_schema_mapping")
+        conn.execute(
+            "CREATE TABLE schema_mapping ("
+            "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+            "source_sheet TEXT NOT NULL,"
+            "source_column TEXT NOT NULL,"
+            "model_key TEXT REFERENCES models(model_key),"
+            "source_role TEXT NOT NULL DEFAULT '',"
+            "sql_table TEXT NOT NULL,"
+            "sql_column TEXT NOT NULL,"
+            "transform_type TEXT NOT NULL,"
+            "transform_parameters_json TEXT NOT NULL DEFAULT '{}',"
+            "contract_status TEXT NOT NULL,"
+            "notes TEXT NOT NULL DEFAULT '',"
+            "UNIQUE(source_sheet, source_column, model_key, sql_table, sql_column)"
+            ")"
+        )
+        conn.execute(
+            "INSERT INTO schema_mapping("
+            "id, source_sheet, source_column, model_key, source_role, sql_table, "
+            "sql_column, transform_type, transform_parameters_json, "
+            "contract_status, notes) "
+            "SELECT id, source_sheet, source_column, model_key, '', sql_table, "
+            "sql_column, transform_type, transform_parameters_json, 'mapped', '' "
+            "FROM old_schema_mapping"
+        )
+        conn.execute("DROP TABLE old_schema_mapping")
+        conn.execute(
+            "CREATE UNIQUE INDEX schema_mapping_null_safe_unique ON "
+            "schema_mapping(source_sheet, source_column, "
+            "COALESCE(model_key, '__27vette_global_schema_mapping__'), "
+            "sql_table, sql_column)"
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+@pytest.fixture
+def prior_canonical_db_path(imported_db_path: Path) -> Path:
+    _rewrite_as_prior_canonical_database(imported_db_path)
+    return imported_db_path
+
+
+@pytest.fixture
+def prior_client(prior_canonical_db_path: Path):
+    with TestClient(main.create_app(prior_canonical_db_path)) as test_client:
+        yield test_client
+
+
 def test_create_app_supports_an_isolated_database(imported_db_path: Path):
     create_app = getattr(main, "create_app", None)
     assert callable(create_app)
@@ -340,6 +394,149 @@ def test_malformed_workbook_import_is_typed_409_and_reopens_database(
     assert finding["value"] == str(malformed)
     assert imported_db_path.read_bytes() == before
     assert client.get("/api/models").status_code == 200
+
+
+@pytest.mark.parametrize(
+    "fixture_name",
+    ("corrupt_content_types_workbook", "corrupt_workbook_xml_workbook"),
+)
+def test_corrupt_xml_workbook_import_is_typed_409_and_reopens_database(
+    client: TestClient, imported_db_path: Path, request, fixture_name
+):
+    workbook = request.getfixturevalue(fixture_name)
+    before = imported_db_path.read_bytes()
+
+    response = client.post(
+        "/api/imports", json={"workbook_path": str(workbook)}
+    )
+
+    assert response.status_code == 409
+    finding = response.json()["detail"]["findings"][0]
+    assert finding["code"] == "workbook_source_invalid"
+    assert finding["value"] == str(workbook)
+    assert imported_db_path.read_bytes() == before
+    assert client.get("/api/models").status_code == 200
+
+
+def _assert_reimport_required(response):
+    assert response.status_code == 409
+    detail = response.json()["detail"]
+    assert detail["code"] == "database_reimport_required"
+    assert detail["compatible"] is False
+    assert detail["action"] == "POST /api/imports"
+    assert "validated re-import" in detail["message"]
+
+
+def test_prior_canonical_database_exposes_status_but_gates_canonical_routes(
+    prior_client: TestClient,
+    prior_canonical_db_path: Path,
+):
+    status = prior_client.get("/api/status")
+    assert status.status_code == 200
+    body = status.json()
+    assert body["database"]["compatible"] is False
+    assert body["database"]["code"] == "database_reimport_required"
+    assert body["database"]["action"] == "POST /api/imports"
+    assert body["last_import"] is None
+    raw = sqlite3.connect(prior_canonical_db_path)
+    try:
+        statuses = {
+            row[0]
+            for row in raw.execute(
+                "SELECT DISTINCT contract_status FROM schema_mapping"
+            )
+        }
+        ddl = raw.execute(
+            "SELECT sql FROM sqlite_master "
+            "WHERE type='table' AND name='schema_mapping'"
+        ).fetchone()[0]
+    finally:
+        raw.close()
+    assert statuses == {"mapped"}
+    assert "CHECK" not in ddl.upper()
+
+    requests = (
+        ("get", "/api/schema/mappings", None),
+        ("get", "/api/models", None),
+        ("get", "/api/models/stingray/tables", None),
+        ("get", "/api/models/stingray/runtime", None),
+        ("get", "/api/changes", None),
+        ("get", "/api/history", None),
+        ("post", "/api/changes/validate", {}),
+        ("post", "/api/sync", {}),
+        ("post", "/api/export", {}),
+        ("post", "/api/backup", {}),
+    )
+    for method, path, payload in requests:
+        kwargs = {"json": payload} if payload is not None else {}
+        response = getattr(prior_client, method)(path, **kwargs)
+        _assert_reimport_required(response)
+
+
+def test_prior_database_import_replaces_gate_and_reconnects(
+    prior_client: TestClient,
+    real_workbook: Path,
+):
+    blocked = prior_client.get("/api/schema/mappings")
+    _assert_reimport_required(blocked)
+
+    imported = prior_client.post(
+        "/api/imports", json={"workbook_path": str(real_workbook)}
+    )
+
+    assert imported.status_code == 200
+    assert imported.json()["status"] == "validated"
+    mappings = prior_client.get("/api/schema/mappings")
+    assert mappings.status_code == 200
+    statuses = {
+        mapping["contract_status"]
+        for mapping in mappings.json()["mappings"]
+    }
+    assert "mapped" not in statuses
+    assert "exact" in statuses
+    assert prior_client.get("/api/models").status_code == 200
+
+
+def test_failed_prior_database_import_preserves_bytes_and_gate(
+    prior_client: TestClient,
+    prior_canonical_db_path: Path,
+    corrupt_workbook_xml_workbook: Path,
+):
+    assert prior_client.get("/api/status").json()["database"][
+        "compatible"
+    ] is False
+    before = prior_canonical_db_path.read_bytes()
+
+    failed = prior_client.post(
+        "/api/imports",
+        json={"workbook_path": str(corrupt_workbook_xml_workbook)},
+    )
+
+    assert failed.status_code == 409
+    assert failed.json()["detail"]["findings"][0]["code"] == (
+        "workbook_source_invalid"
+    )
+    assert prior_canonical_db_path.read_bytes() == before
+    _assert_reimport_required(prior_client.get("/api/models"))
+
+
+def test_reimport_gate_is_documented_for_canonical_endpoints(
+    prior_client: TestClient,
+):
+    schema = prior_client.get("/openapi.json").json()
+    for path, operations in schema["paths"].items():
+        if not path.startswith("/api/"):
+            continue
+        for method, operation in operations.items():
+            if (method, path) in {
+                ("get", "/api/status"),
+                ("post", "/api/imports"),
+            }:
+                continue
+            response = operation["responses"]["409"]
+            assert response["content"]["application/json"]["schema"][
+                "$ref"
+            ].endswith("/DatabaseCompatibilityResponse")
 
 
 def test_openapi_contracts_are_exact_and_document_domain_errors(

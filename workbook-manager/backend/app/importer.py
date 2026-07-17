@@ -9,6 +9,7 @@ import shutil
 import sqlite3
 import tempfile
 import uuid
+from xml.etree.ElementTree import ParseError
 from zipfile import BadZipFile
 from dataclasses import dataclass, replace
 from pathlib import Path
@@ -471,7 +472,7 @@ def _canonical_import_workbook(
         compiled = compile_workbook(workbook)
     except DecisionRequired as error:
         return _report((_decision_finding(error),))
-    except (BadZipFile, InvalidFileException) as error:
+    except (BadZipFile, InvalidFileException, ParseError) as error:
         return _report(
             (
                 Finding(

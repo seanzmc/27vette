@@ -334,3 +334,15 @@ test("older findings refresh success or failure cannot replace the newest run", 
     "a completed import must invalidate older status work before another await",
   );
 });
+
+test("a blocked initial re-import does not call gated canonical routes", () => {
+  const app = readFileSync(
+    new URL("../../workbook-manager/frontend/src/App.jsx", import.meta.url),
+    "utf8"
+  );
+  assert.match(app, /if \(importBlocked\) return;/);
+  assert.ok(
+    app.indexOf("if (importBlocked) return;") < app.indexOf("await api.models()"),
+    "the actionable import error must remain visible instead of being overwritten",
+  );
+});
