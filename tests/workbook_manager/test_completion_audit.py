@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from app import db, importer
@@ -107,3 +109,29 @@ def test_objective_completion(audited_database):
         )
         assert primary_key(conn, f"{model}_options") == ("option_id",)
     assert not table_exists(conn, "options")
+
+    mapping_statuses = {
+        row["contract_status"]
+        for row in conn.execute("SELECT contract_status FROM schema_mapping")
+    }
+    assert mapping_statuses == {
+        "exact",
+        "identifier_normalized",
+        "shared_source_split",
+        "semantic_alias",
+        "derived_from_contract",
+    }
+    assert {
+        row["source_role"]
+        for row in conn.execute(
+            "SELECT source_role FROM schema_mapping "
+            "WHERE source_sheet='grandSport_options'"
+        )
+    } == {"source_option_sheet"}
+    assert all(
+        json.loads(row["source_sheets_json"]) == ["runtime_rule_exceptions"]
+        for row in conn.execute(
+            "SELECT source_sheets_json FROM model_table_registry "
+            "WHERE table_role='runtime_rule_exceptions'"
+        )
+    )

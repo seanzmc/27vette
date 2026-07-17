@@ -628,9 +628,14 @@ def _registry_rows(compiled: "CompiledWorkbook"):
     for model in LIVE_MODELS:
         for role in MODEL_TABLE_ROLES:
             table = by_key[(model, role)]
-            source_sheets = tuple(
-                sorted({row.source_sheet for row in table.rows})
-            )
+            source_sheets = tuple(sorted(
+                {row.source_sheet for row in table.rows if row.source_sheet}
+                or {
+                    mapping.source_sheet
+                    for mapping in table.schema_mappings
+                    if mapping.source_sheet
+                }
+            ))
             split = any(
                 row.lineage_role == "shared_source_split" for row in table.rows
             )
@@ -742,13 +747,13 @@ def load_candidate(
                         mapping.source_sheet,
                         mapping.source_column,
                         mapping.model_key or None,
-                        "",
+                        mapping.source_role,
                         mapping.destination_table,
                         mapping.destination_column,
                         mapping.transform,
-                        _json({"reverse_transform": mapping.reverse_transform}),
-                        "mapped",
-                        "",
+                        _json(dict(mapping.transform_parameters)),
+                        mapping.contract_status,
+                        mapping.notes,
                     )
                     for mapping in compiled.schema_mappings
                 ),

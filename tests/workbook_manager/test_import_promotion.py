@@ -664,6 +664,146 @@ def test_mapping_coverage_is_independent_of_mapping_row_count(
     assert "schema_mapping_destination_coverage_missing" in codes
 
 
+def test_schema_mapping_persists_proven_roles_parameters_and_statuses(imported_db):
+    allowed = {
+        "exact",
+        "identifier_normalized",
+        "shared_source_split",
+        "semantic_alias",
+        "derived_from_contract",
+        "contract_mismatch",
+        "decision_required",
+    }
+    rows = [dict(row) for row in imported_db.execute(
+        "SELECT * FROM schema_mapping ORDER BY id"
+    )]
+    assert rows
+    assert {row["contract_status"] for row in rows} <= allowed
+    assert {
+        "exact",
+        "identifier_normalized",
+        "shared_source_split",
+        "semantic_alias",
+        "derived_from_contract",
+    } <= {row["contract_status"] for row in rows}
+    assert not {
+        "contract_mismatch", "decision_required"
+    } & {row["contract_status"] for row in rows}
+    with pytest.raises(sqlite3.IntegrityError):
+        imported_db.execute(
+            "UPDATE schema_mapping SET contract_status='mapped' WHERE id=?",
+            (rows[0]["id"],),
+        )
+    imported_db.rollback()
+    assert {
+        row["source_role"]
+        for row in rows
+        if row["source_sheet"] == "grandSport_options"
+    } == {"source_option_sheet"}
+
+    exact = next(
+        row for row in rows
+        if row["contract_status"] == "exact"
+    )
+    assert exact["source_column"] == exact["sql_column"]
+    assert exact["transform_type"] == "identity"
+    assert json.loads(exact["transform_parameters_json"])[
+        "reverse_transform"
+    ] == "identity"
+
+    normalized = next(
+        row for row in rows
+        if row["source_sheet"] == "lt_interiors"
+        and row["source_column"] == "Interior Name"
+        and row["sql_column"] == "interior_name"
+    )
+    assert normalized["contract_status"] == "identifier_normalized"
+    assert json.loads(normalized["transform_parameters_json"])[
+        "source_identifier"
+    ] == "Interior Name"
+
+    alias = next(
+        row for row in rows
+        if row["source_sheet"] == "color_overrides"
+        and row["source_column"] == "adds_rpo"
+        and row["sql_column"] == "added_option_id"
+    )
+    assert alias["contract_status"] == "semantic_alias"
+    assert json.loads(alias["transform_parameters_json"])[
+        "reverse_transform"
+    ] == "restore_original_text_from_lineage"
+
+    shared = next(
+        row for row in rows
+        if row["source_sheet"] == "model_interior_scope"
+        and row["model_key"] == "grand_sport"
+        and row["sql_column"] == "interior_id"
+    )
+    assert shared["contract_status"] == "shared_source_split"
+    assert json.loads(shared["transform_parameters_json"])[
+        "model_key"
+    ] == "grand_sport"
+
+    derived = next(
+        row for row in rows
+        if row["source_column"] == "__model_table_ownership__"
+    )
+    assert derived["contract_status"] == "derived_from_contract"
+    assert "compiler contract" in derived["notes"]
+
+
+def test_empty_runtime_exception_roles_retain_real_source_sheet(imported_db):
+    rows = imported_db.execute(
+        "SELECT model_key, source_sheets_json FROM model_table_registry "
+        "WHERE table_role='runtime_rule_exceptions' ORDER BY model_key"
+    ).fetchall()
+    assert len(rows) == 3
+    assert all(
+        json.loads(row["source_sheets_json"]) == ["runtime_rule_exceptions"]
+        for row in rows
+    )
+
+
+@pytest.mark.parametrize(
+    ("name", "payload", "expected_code"),
+    (
+        ("text.xlsx", b"not an xlsx zip", "workbook_source_invalid"),
+        ("wrong-extension.xls", b"not an excel file", "workbook_source_invalid"),
+    ),
+)
+def test_malformed_workbook_fails_closed_without_destination_change(
+    imported_db_path, tmp_path, name, payload, expected_code
+):
+    malformed = tmp_path / name
+    malformed.write_bytes(payload)
+    before = _digest(imported_db_path)
+
+    report = importer.import_workbook(imported_db_path, malformed)
+
+    assert report.status == "contract_mismatch"
+    assert report.finding_codes == (expected_code,)
+    assert report.findings[0].value == str(malformed)
+    assert str(malformed) in report.findings[0].message
+    assert _digest(imported_db_path) == before
+
+
+def test_workbook_read_oserror_is_typed_and_destination_stable(
+    imported_db_path, real_workbook, monkeypatch
+):
+    before = _digest(imported_db_path)
+
+    def fail_read(_path):
+        raise OSError("permission denied while reading workbook")
+
+    monkeypatch.setattr(importer, "profile_workbook", fail_read)
+    report = importer.import_workbook(imported_db_path, real_workbook)
+
+    assert report.status == "contract_mismatch"
+    assert report.finding_codes == ("workbook_source_read_failed",)
+    assert report.findings[0].value == str(real_workbook)
+    assert _digest(imported_db_path) == before
+
+
 def test_structurally_failed_candidate_is_removed_and_destination_is_stable(
     tmp_path, real_workbook, monkeypatch
 ):

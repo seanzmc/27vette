@@ -207,6 +207,135 @@ def test_key_only_update_is_rejected_and_sqlite_error_rolls_back(
     ).fetchone() is None
 
 
+def test_stale_update_conflict_preserves_external_value_and_batch_atomicity(
+    imported_db, imported_db_path
+):
+    row = imported_db.execute(
+        "SELECT option_id, price FROM stingray_options WHERE rpo='Z51'"
+    ).fetchone()
+    original_price = row["price"]
+    staging.stage_change(
+        imported_db,
+        model_key="stingray",
+        table_role="options",
+        op="update",
+        key={"option_id": row["option_id"]},
+        record={"price": row["price"] + 1},
+    )
+    add_record = valid_option_record(imported_db)
+    staging.stage_change(
+        imported_db,
+        model_key="stingray",
+        table_role="options",
+        op="add",
+        key={"option_id": add_record["option_id"]},
+        record=add_record,
+    )
+
+    external = sqlite3.connect(imported_db_path)
+    external.execute(
+        "UPDATE stingray_options SET price=? WHERE option_id=?",
+        (99, row["option_id"]),
+    )
+    external.commit()
+    external.close()
+    history_before = imported_db.execute(
+        "SELECT COUNT(*) FROM change_history"
+    ).fetchone()[0]
+
+    result = staging.commit_staged(imported_db, actor="race-test")
+
+    assert result["status"] == "stale_conflict"
+    assert result["committed"] == 0
+    assert any(row["option_id"] in error for error in result["errors"])
+    assert imported_db.execute(
+        "SELECT price FROM stingray_options WHERE option_id=?",
+        (row["option_id"],),
+    ).fetchone()[0] == 99
+    assert original_price != 99
+    assert imported_db.execute(
+        "SELECT 1 FROM stingray_options WHERE option_id='opt_test_901'"
+    ).fetchone() is None
+    assert imported_db.execute(
+        "SELECT COUNT(*) FROM change_history"
+    ).fetchone()[0] == history_before
+    assert imported_db.execute(
+        "SELECT COUNT(*) FROM pending_changes WHERE status='staged'"
+    ).fetchone()[0] == 2
+    assert not imported_db.in_transaction
+
+
+def test_stale_delete_conflict_preserves_changed_row_and_history(
+    imported_db, imported_db_path
+):
+    commit_added_option_change(imported_db)
+    staging.stage_change(
+        imported_db,
+        model_key="stingray",
+        table_role="options",
+        op="delete",
+        key={"option_id": "opt_test_901"},
+        record=None,
+    )
+    history_before = imported_db.execute(
+        "SELECT COUNT(*) FROM change_history"
+    ).fetchone()[0]
+    external = sqlite3.connect(imported_db_path)
+    external.execute(
+        "UPDATE stingray_options SET price=99 WHERE option_id='opt_test_901'"
+    )
+    external.commit()
+    external.close()
+
+    result = staging.commit_staged(imported_db, actor="delete-race-test")
+
+    assert result["status"] == "stale_conflict"
+    assert result["committed"] == 0
+    assert imported_db.execute(
+        "SELECT price FROM stingray_options WHERE option_id='opt_test_901'"
+    ).fetchone()[0] == 99
+    assert imported_db.execute(
+        "SELECT COUNT(*) FROM change_history"
+    ).fetchone()[0] == history_before
+    assert not imported_db.in_transaction
+
+
+def test_equivalent_sqlite_and_json_types_do_not_create_false_stale_conflict(
+    imported_db
+):
+    row = dict(imported_db.execute(
+        "SELECT * FROM stingray_options WHERE rpo='Z51'"
+    ).fetchone())
+    change = staging.stage_change(
+        imported_db,
+        model_key="stingray",
+        table_role="options",
+        op="update",
+        key={"option_id": row["option_id"]},
+        record={"price": row["price"] + 1},
+    )
+    old = dict(change["old"])
+    old["price"] = f"{old['price']:,}"
+    old["selectable"] = "True" if old["selectable"] else "False"
+    old["active"] = "True" if old["active"] else "False"
+    if old["display_behavior"] is None:
+        old["display_behavior"] = ""
+    imported_db.execute(
+        "UPDATE pending_changes SET old_json=? WHERE id=?",
+        (json.dumps(old), change["id"]),
+    )
+    imported_db.commit()
+
+    result = staging.commit_staged(imported_db, actor="normalization-test")
+
+    assert result["status"] == "committed", result
+    assert imported_db.execute(
+        "SELECT price FROM stingray_options WHERE option_id=?",
+        (row["option_id"],),
+    ).fetchone()[0] == row["price"] + 1
+    assert not imported_db.in_transaction
+
+
 def test_delete_finds_all_option_dependents(imported_db):
     prefix = physical_table("stingray", "options").removesuffix("_options")
     row = imported_db.execute(

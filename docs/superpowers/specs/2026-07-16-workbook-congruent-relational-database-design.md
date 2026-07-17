@@ -601,6 +601,20 @@ documentation.
   every live model has the same 17 active table roles, the conceptual shared
   `options` table does not exist, and `PRAGMA foreign_key_check` returned no
   rows.
+- The persisted 646-row schema map now retains source roles, reversible
+  transform parameters, notes, and the approved constrained status vocabulary:
+  79 exact, 209 identifier-normalized, 277 shared-source-split, 36 semantic
+  aliases, and 45 contract-derived mappings. No current mapping is flattened
+  to a generic status, and no mismatch/decision row is invented.
+- Transaction-time optimistic checks reject stale staged updates or deletes as
+  typed HTTP `409` conflicts before any row or history entry is committed.
+  Malformed workbook packages, unsupported workbook formats, and workbook read
+  failures likewise return typed blocking findings while preserving the
+  destination database byte-for-byte.
+- A guarded scratch proof completed a validated import, dry sync, and live sync
+  through `editor_ops`; advanced the trusted workbook hash; retained all three
+  empty `runtime_rule_exceptions` source routes; and returned zero foreign-key
+  violations. The canonical workbook was not written.
 - Read-only FastAPI verification against temporary `WBM_DB` and `WBM_VAR_DIR`
   paths proved all three models, identical registries, SQL/workbook names,
   exact `option_id` search, variants with body/trim relationships, runtime
@@ -615,7 +629,7 @@ documentation.
 
 ### Validation
 
-- `pytest tests/workbook_manager`: 177 passed, 1 skipped, with the existing
+- `pytest tests/workbook_manager`: 188 passed, 1 skipped, with the existing
   FastAPI/Starlette TestClient deprecation warning.
 - `pytest tests/test_workbook_manager.py`: 27 passed, 1 skipped, with the same
   existing warning.
@@ -649,6 +663,8 @@ submission file change.
 Ambiguous shared-source fan-out edits and shared-source adds remain explicitly
 fail-closed. They require separate business/schema authority only if a future
 request needs those operations; the completed migration does not guess their
-meaning. The existing TestClient deprecation warning is outside this task's
-approved dependency scope. No unresolved current-generation contract mismatch
-or business decision remains. Follow-up: none implied.
+meaning. Stale staged rows and malformed workbook sources also fail closed with
+typed evidence and require a fresh stage or corrected source, not an overwrite
+escape path. The existing TestClient deprecation warning is outside this
+task's approved dependency scope. No unresolved current-generation contract
+mismatch or business decision remains. Follow-up: none implied.

@@ -1470,7 +1470,7 @@ authorizes including them.
   initial linked-worktree invocation exposed only missing local environment
   setup (`.venv`/`PYTHONPATH`), not an objective defect. No artificial failure
   or production change was introduced.
-- Full Python gates: 177 passed, 1 skipped in `tests/workbook_manager`; 27
+- Full Python gates: 188 passed, 1 skipped in `tests/workbook_manager`; 27
   passed, 1 skipped in `tests/test_workbook_manager.py`. Both emitted only the
   existing FastAPI/Starlette TestClient deprecation warning.
 - Package/schema validators were valid with zero issues, errors, or warnings.
@@ -1484,6 +1484,13 @@ authorizes including them.
   verification passed. No UI import, edit, commit, sync, export, backup, live
   workbook write, or dealer submission was triggered. Screenshots remain only
   under `/private/tmp`.
+- Final integrated review hardening added transaction-time optimistic
+  concurrency for staged update/delete batches, persisted the approved
+  schema-mapping status/source-role/transform evidence, typed malformed-source
+  import failures, retained lineage for empty model roles, removed the final
+  legacy structure route, and typed the dependencies endpoint. A guarded
+  scratch import/dry-sync/live-sync proof passed without touching the canonical
+  workbook or generated/dealer surfaces.
 - The design spec and workbook-manager README are closed with exact commands,
   results, preserved boundaries, residual fail-closed limitation, and no stale
   approval prompt. Follow-up: none implied.

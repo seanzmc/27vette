@@ -29,6 +29,8 @@ from .schemas import (
     CommitConflictResponse,
     CommitOut,
     CommitRequest,
+    DependenciesOut,
+    DependenciesRequest,
     ExportOut,
     FindingsOut,
     HistoryOut,
@@ -833,14 +835,6 @@ def models(conn: sqlite3.Connection = Depends(get_conn)):
     return _models(conn)
 
 
-@router.get("/api/structure/{model_key}")
-def structure(model_key: str, conn: sqlite3.Connection = Depends(get_conn)):
-    try:
-        return _runtime(conn, model_key)
-    except KeyError:
-        raise HTTPException(404, f"unknown model {model_key!r}") from None
-
-
 @router.get(
     "/api/models/{model_key}/tables",
     response_model=ModelTablesOut,
@@ -918,15 +912,19 @@ def records(
         raise HTTPException(404, "unknown model/table role") from None
 
 
-@router.post("/api/models/{model_key}/tables/{table_role}/dependencies")
+@router.post(
+    "/api/models/{model_key}/tables/{table_role}/dependencies",
+    response_model=DependenciesOut,
+    responses=NOT_FOUND_RESPONSE,
+)
 def dependencies_post(
     model_key: str,
     table_role: str,
-    body: dict,
+    body: DependenciesRequest,
     conn: sqlite3.Connection = Depends(get_conn),
 ):
     try:
-        return _dependencies(conn, model_key, table_role, body.get("key", {}))
+        return _dependencies(conn, model_key, table_role, body.key)
     except KeyError:
         raise HTTPException(404, "unknown model/table role") from None
 

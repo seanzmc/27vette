@@ -22,6 +22,15 @@ class DependencyOut(BaseModel):
     src_row: Optional[int] = None
 
 
+class DependenciesRequest(BaseModel):
+    key: dict[str, JsonValue] = Field(default_factory=dict)
+
+
+class DependenciesOut(BaseModel):
+    dependents: list[DependencyOut] = Field(default_factory=list)
+    count: int
+
+
 class DestinationEvidenceOut(BaseModel):
     destination_table: str
     destination_key: dict[str, JsonValue]
@@ -195,7 +204,15 @@ class SchemaMappingOut(BaseModel):
     sql_column: str
     transform_type: str
     transform_parameters: dict[str, JsonValue] = Field(default_factory=dict)
-    contract_status: str
+    contract_status: Literal[
+        "exact",
+        "identifier_normalized",
+        "shared_source_split",
+        "semantic_alias",
+        "derived_from_contract",
+        "contract_mismatch",
+        "decision_required",
+    ]
     notes: str = ""
 
 

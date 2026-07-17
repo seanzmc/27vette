@@ -330,17 +330,19 @@ class TestApi(unittest.TestCase):
         self.assertIsInstance(stingray["scaffold"], bool)
 
     def test_structure_and_canonical_tables(self):
-        structure = self.client.get("/api/structure/stingray").json()
+        structure = self.client.get("/api/models/stingray/runtime").json()
         self.assertTrue(structure["steps"])
         step = structure["steps"][0]
-        self.assertTrue(step["display_name"])
-        self.assertIn(step["active"], {"True", "False"})
-        self.assertIsInstance(step["sections"], list)
+        self.assertTrue(step["step_label"])
+        self.assertIn(step["active"], {0, 1})
         self.assertTrue(structure["section_presentation"])
         presentation = structure["section_presentation"][0]
-        self.assertTrue(presentation["display_name"])
-        self.assertIn(presentation["active"], {"True", "False"})
-        self.assertIn(structure["variants"][0]["active"], {"True", "False"})
+        self.assertTrue(presentation["display_label"])
+        self.assertIn(presentation["active"], {0, 1})
+        variants = self.client.get(
+            "/api/models/stingray/variants"
+        ).json()["variants"]
+        self.assertIn(variants[0]["active"], {0, 1})
         tables = self.client.get(
             "/api/models/stingray/tables").json()["tables"]
         options = next(row for row in tables if row["role"] == "options")

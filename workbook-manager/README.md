@@ -20,13 +20,26 @@ uses `option_id` as its SQLite primary key. `source_table_catalog`,
 provenance; the API resolves logical model/table roles through
 `model_table_registry` rather than accepting SQL identifiers.
 
+Each mapping records its workbook source role, reversible transform parameters,
+and one approved contract status: `exact`, `identifier_normalized`,
+`shared_source_split`, `semantic_alias`, `derived_from_contract`,
+`contract_mismatch`, or `decision_required`. The latter two are reserved for
+real blocking findings and are never invented; successful current-generation
+imports contain neither and do not flatten mappings into a generic status.
+
 ## Safety boundary
 
 - Import builds and audits a candidate database before atomic promotion.
 - Unknown ownership, missing source roles, contract differences, and required
   business decisions fail closed with source evidence.
 - Adds, updates, and deletes are staged and batch-validated before commit.
+- Update and delete commits compare their staged old snapshot to the current
+  canonical row inside the same immediate transaction used for revalidation
+  and apply. A stale row rejects the whole batch with HTTP `409`; it is never
+  silently overwritten.
 - SQL history is append-only and tracks workbook sync state.
+- Malformed or unreadable workbook sources return typed blocking import
+  findings and leave the currently promoted database unchanged.
 - Workbook writes are never direct. A live sync requires explicit confirmation
   and still uses `editor_ops.apply_batch()` -> `save_workbook_safely()` with
   lock, mtime, dry-run, package/schema, backup, and atomic-replace gates.

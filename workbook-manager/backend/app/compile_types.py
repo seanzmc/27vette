@@ -8,6 +8,17 @@ from types import MappingProxyType
 from typing import Collection, Literal, Mapping
 
 
+CONTRACT_STATUSES = (
+    "exact",
+    "identifier_normalized",
+    "shared_source_split",
+    "semantic_alias",
+    "derived_from_contract",
+    "contract_mismatch",
+    "decision_required",
+)
+
+
 def _empty_mapping() -> Mapping[str, object]:
     return MappingProxyType({})
 
@@ -93,8 +104,25 @@ class SchemaMapping:
     destination_table: str
     destination_column: str
     model_key: str = ""
+    source_role: str = ""
     transform: str = "identity"
     reverse_transform: str = "identity"
+    transform_parameters: Mapping[str, object] = field(
+        default_factory=_empty_mapping
+    )
+    contract_status: str = "exact"
+    notes: str = ""
+
+    def __post_init__(self) -> None:
+        if self.contract_status not in CONTRACT_STATUSES:
+            raise ValueError(
+                f"unsupported schema mapping status {self.contract_status!r}"
+            )
+        object.__setattr__(
+            self,
+            "transform_parameters",
+            freeze_mapping(self.transform_parameters),
+        )
 
 
 @dataclass(frozen=True)

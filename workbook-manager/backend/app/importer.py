@@ -4,13 +4,17 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import shutil
 import sqlite3
 import tempfile
 import uuid
+from zipfile import BadZipFile
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Literal, Mapping
+
+from openpyxl.utils.exceptions import InvalidFileException
 
 from . import contract_audit
 from . import db as dbmod
@@ -99,6 +103,72 @@ def _central_schema_mappings(
             destination_table,
             destination_column,
         ), (transforms, reverse_transforms) in sorted(contracts.items())
+    )
+
+
+def _identifier(value: str) -> str:
+    """Normalize a workbook header for evidence-only contract comparison."""
+    words = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", value.strip())
+    return re.sub(r"[^a-zA-Z0-9]+", "_", words).strip("_").lower()
+
+
+def _source_role(profile, mapping: SchemaMapping) -> str:
+    candidates = {
+        role
+        for model_key, roles in profile.active_sources.items()
+        if not mapping.model_key or model_key == mapping.model_key
+        for role, source_sheet in roles.items()
+        if source_sheet == mapping.source_sheet
+    }
+    return next(iter(candidates)) if len(candidates) == 1 else ""
+
+
+def _mapping_contract(
+    profile, mapping: SchemaMapping
+) -> SchemaMapping:
+    """Attach only contract classifications proven by profile/compiler evidence."""
+    source_by_name = {source.source_sheet: source for source in profile.sheets}
+    source = source_by_name.get(mapping.source_sheet)
+    source_role = _source_role(profile, mapping)
+    derived = mapping.source_column.startswith("__")
+    normalized_identifier = _identifier(mapping.source_column)
+    if derived:
+        status = "derived_from_contract"
+        notes = "Source-absent field derived from the approved compiler contract."
+    elif (
+        mapping.source_column != mapping.destination_column
+        and normalized_identifier == mapping.destination_column
+    ):
+        status = "identifier_normalized"
+        notes = "Workbook identifier is reversibly normalized to SQL snake_case."
+    elif mapping.source_column != mapping.destination_column:
+        status = "semantic_alias"
+        notes = "Workbook field uses a proven reversible semantic SQL alias."
+    elif source is not None and source.disposition == "canonical_split":
+        status = "shared_source_split"
+        notes = "Workbook source is split by proven model ownership."
+    elif mapping.transform == "identity":
+        status = "exact"
+        notes = "Workbook header and SQL column are identical identity fields."
+    else:
+        status = "identifier_normalized"
+        notes = "Workbook value is reversibly normalized by the compiler contract."
+    parameters = {
+        **dict(mapping.transform_parameters),
+        "reverse_transform": mapping.reverse_transform,
+        "source_identifier": mapping.source_column,
+        "destination_identifier": mapping.destination_column,
+    }
+    if mapping.model_key:
+        parameters["model_key"] = mapping.model_key
+    if source_role:
+        parameters["source_role"] = source_role
+    return replace(
+        mapping,
+        source_role=source_role,
+        transform_parameters=parameters,
+        contract_status=status,
+        notes=notes,
     )
 
 
@@ -260,6 +330,7 @@ def compile_workbook(path: Path) -> CompiledWorkbook:
                 )
             )
     mappings += tuple(derived_mappings)
+    mappings = tuple(_mapping_contract(profile, mapping) for mapping in mappings)
     lineage = _lineage(tables)
     source_catalog, findings = _classify_source_rows(
         profile.sheets, lineage, shared.findings
@@ -400,6 +471,30 @@ def _canonical_import_workbook(
         compiled = compile_workbook(workbook)
     except DecisionRequired as error:
         return _report((_decision_finding(error),))
+    except (BadZipFile, InvalidFileException) as error:
+        return _report(
+            (
+                Finding(
+                    severity="error",
+                    status="contract_mismatch",
+                    code="workbook_source_invalid",
+                    message=f"Invalid workbook source {workbook}: {error}",
+                    value=str(workbook),
+                ),
+            )
+        )
+    except OSError as error:
+        return _report(
+            (
+                Finding(
+                    severity="error",
+                    status="contract_mismatch",
+                    code="workbook_source_read_failed",
+                    message=f"Could not read workbook source {workbook}: {error}",
+                    value=str(workbook),
+                ),
+            )
+        )
     except (KeyError, ValueError) as error:
         return _report(
             (
@@ -411,10 +506,24 @@ def _canonical_import_workbook(
                 ),
             )
         )
-    if (
-        str(workbook.stat().st_mtime_ns) != initial_mtime_ns
-        or _file_sha256(workbook) != initial_sha256
-    ):
+    try:
+        changed_during_compile = (
+            str(workbook.stat().st_mtime_ns) != initial_mtime_ns
+            or _file_sha256(workbook) != initial_sha256
+        )
+    except OSError as error:
+        return _report(
+            (
+                Finding(
+                    severity="error",
+                    status="contract_mismatch",
+                    code="workbook_source_read_failed",
+                    message=f"Could not re-read workbook source {workbook}: {error}",
+                    value=str(workbook),
+                ),
+            )
+        )
+    if changed_during_compile:
         return _report(
             (
                 Finding(

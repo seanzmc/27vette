@@ -431,7 +431,7 @@ def _dependent_is_resolved_by_staged_change(
     return True
 
 
-def revalidate_staged(conn) -> dict:
+def revalidate_staged(conn, *, commit: bool = True) -> dict:
     changes = list_changes(conn, "staged")
     staged_by_identity = {
         (
@@ -525,8 +525,45 @@ def revalidate_staged(conn) -> dict:
             )
         ok = ok and not errors
         results.append({"change_id": change["id"], "errors": errors})
-    conn.commit()
+    if commit:
+        conn.commit()
     return {"ok": ok, "results": results}
+
+
+def _stale_conflicts(conn, changes: list[dict]) -> list[str]:
+    """Compare staged old snapshots to canonical rows under the write lock."""
+    conflicts = []
+    for change in changes:
+        if change["op"] not in {"update", "delete"}:
+            continue
+        spec = edit_spec(conn, change["model_key"], change["table_role"])
+        current = _fetch_row(conn, spec, change["entity_key"])
+        if current is None:
+            conflicts.append(
+                f"{spec.sql_table} {change['entity_key']} no longer exists"
+            )
+            continue
+        current_record = canonical_record(
+            spec, {column: current[column] for column in spec.columns}
+        )
+        expected = change.get("old")
+        if expected is None:
+            conflicts.append(
+                f"{spec.sql_table} {change['entity_key']} has no staged old snapshot"
+            )
+            continue
+        expected_record = canonical_record(
+            spec, {column: expected.get(column) for column in spec.columns}
+        )
+        if current_record != expected_record:
+            identity = "/".join(
+                str(change["entity_key"].get(column, ""))
+                for column in spec.key
+            )
+            conflicts.append(
+                f"{spec.sql_table} {identity} changed after it was staged"
+            )
+    return conflicts
 
 
 def _apply_change(conn, spec: RoleEditSpec, change: dict) -> None:
@@ -672,17 +709,27 @@ def _ordered_changes(conn, changes: list[dict]) -> list[dict]:
 
 
 def commit_staged(conn, actor: str = "") -> dict:
-    validation = revalidate_staged(conn)
-    if not validation["ok"]:
-        return {"ok": False, "status": "invalid", "committed": 0,
-                "validation": validation}
     changes = list_changes(conn, "staged")
+    validation = {"ok": True, "results": []}
     if not changes:
         return {"ok": False, "status": "empty", "committed": 0,
                 "validation": validation}
     try:
-        changes = _ordered_changes(conn, changes)
         conn.execute("BEGIN IMMEDIATE")
+        validation = revalidate_staged(conn, commit=False)
+        if not validation["ok"]:
+            conn.commit()
+            return {"ok": False, "status": "invalid", "committed": 0,
+                    "validation": validation}
+        changes = list_changes(conn, "staged")
+        conflicts = _stale_conflicts(conn, changes)
+        if conflicts:
+            conn.rollback()
+            return {
+                "ok": False, "status": "stale_conflict", "committed": 0,
+                "validation": validation, "errors": conflicts,
+            }
+        changes = _ordered_changes(conn, changes)
         for change in changes:
             spec = edit_spec(conn, change["model_key"], change["table_role"])
             _apply_change(conn, spec, change)

@@ -248,7 +248,11 @@ CANONICAL_SUPPORT_DDL = (
       sql_column TEXT NOT NULL,
       transform_type TEXT NOT NULL,
       transform_parameters_json TEXT NOT NULL DEFAULT '{}',
-      contract_status TEXT NOT NULL,
+      contract_status TEXT NOT NULL CHECK(contract_status IN (
+        'exact', 'identifier_normalized', 'shared_source_split',
+        'semantic_alias', 'derived_from_contract', 'contract_mismatch',
+        'decision_required'
+      )),
       notes TEXT NOT NULL DEFAULT '',
       UNIQUE(source_sheet, source_column, model_key, sql_table, sql_column)
     )""",

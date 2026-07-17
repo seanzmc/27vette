@@ -251,9 +251,11 @@ def test_removed_transitional_routes_are_absent_and_return_404(
     assert "/api/records/{table_role}" not in paths
     assert "/api/records/{table_role}/schema" not in paths
     assert "/api/records/{table_role}/dependencies" not in paths
+    assert "/api/structure/{model_key}" not in paths
 
     assert client.post("/api/import").status_code == 404
     assert client.get("/api/models/stingray/collections").status_code == 404
+    assert client.get("/api/structure/stingray").status_code == 404
     assert client.get("/api/records/options?model=stingray").status_code == 404
     assert (
         client.get("/api/records/options/schema?model=stingray").status_code
@@ -273,6 +275,71 @@ def test_removed_transitional_routes_are_absent_and_return_404(
     assert "/api/import" not in registered_paths
     assert "/api/models/{model_key}/collections" not in registered_paths
     assert not any(path.startswith("/api/records/") for path in registered_paths)
+    assert "/api/structure/{model_key}" not in registered_paths
+
+
+def test_dependencies_route_has_explicit_request_and_response_contracts(
+    client: TestClient,
+):
+    operation = client.get("/openapi.json").json()["paths"][
+        "/api/models/{model_key}/tables/{table_role}/dependencies"
+    ]["post"]
+    request_schema = operation["requestBody"]["content"][
+        "application/json"
+    ]["schema"]
+    response_schema = operation["responses"]["200"]["content"][
+        "application/json"
+    ]["schema"]
+    assert request_schema["$ref"].endswith("/DependenciesRequest")
+    assert response_schema["$ref"].endswith("/DependenciesOut")
+
+
+def test_stale_commit_is_typed_http_409(
+    client: TestClient, imported_db_path: Path
+):
+    row = client.get(
+        "/api/models/stingray/tables/options?search=Z51&limit=1"
+    ).json()["records"][0]
+    staged = client.post("/api/changes", json={
+        "model_key": "stingray",
+        "table_role": "options",
+        "op": "update",
+        "key": {"option_id": row["option_id"]},
+        "record": {"price": row["price"] + 1},
+    })
+    assert staged.status_code == 200
+    external = sqlite3.connect(imported_db_path)
+    external.execute(
+        "UPDATE stingray_options SET price=99 WHERE option_id=?",
+        (row["option_id"],),
+    )
+    external.commit()
+    external.close()
+
+    response = client.post("/api/changes/commit", json={"actor": "race-api"})
+
+    assert response.status_code == 409
+    assert response.json()["detail"]["status"] == "stale_conflict"
+    assert response.json()["detail"]["committed"] == 0
+
+
+def test_malformed_workbook_import_is_typed_409_and_reopens_database(
+    client: TestClient, imported_db_path: Path, tmp_path
+):
+    malformed = tmp_path / "malformed-api.xlsx"
+    malformed.write_text("not a workbook", encoding="utf-8")
+    before = imported_db_path.read_bytes()
+
+    response = client.post(
+        "/api/imports", json={"workbook_path": str(malformed)}
+    )
+
+    assert response.status_code == 409
+    finding = response.json()["detail"]["findings"][0]
+    assert finding["code"] == "workbook_source_invalid"
+    assert finding["value"] == str(malformed)
+    assert imported_db_path.read_bytes() == before
+    assert client.get("/api/models").status_code == 200
 
 
 def test_openapi_contracts_are_exact_and_document_domain_errors(

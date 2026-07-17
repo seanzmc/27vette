@@ -378,9 +378,14 @@ def _assert_recompiled_matches_sql(
     for model_key in LIVE_MODELS:
         for role in MODEL_TABLE_ROLES:
             table = by_role[(model_key, role)]
-            source_sheets = tuple(
-                sorted({row.source_sheet for row in table.rows})
-            )
+            source_sheets = tuple(sorted(
+                {row.source_sheet for row in table.rows if row.source_sheet}
+                or {
+                    mapping.source_sheet
+                    for mapping in table.schema_mappings
+                    if mapping.source_sheet
+                }
+            ))
             split = any(
                 row.lineage_role == "shared_source_split" for row in table.rows
             )
