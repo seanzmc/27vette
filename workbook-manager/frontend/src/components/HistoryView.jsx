@@ -5,17 +5,21 @@ import { api } from "../api.js";
 export default function HistoryView({ models }) {
   const [rows, setRows] = useState([]);
   const [total, setTotal] = useState(0);
-  const [model, setModel] = useState("");
+  const [modelKey, setModelKey] = useState("");
   const [syncStatus, setSyncStatus] = useState("");
   const [expanded, setExpanded] = useState(null);
 
-  const load = async (m = model, s = syncStatus) => {
-    const r = await api.history({ model: m, sync_status: s, limit: 200 });
+  const load = async (selectedModel = modelKey, s = syncStatus) => {
+    const r = await api.history({
+      model_key: selectedModel,
+      sync_status: s,
+      limit: 200,
+    });
     setRows(r.history);
     setTotal(r.total);
   };
 
-  useEffect(() => { load(); }, [model, syncStatus]); // eslint-disable-line
+  useEffect(() => { load(); }, [modelKey, syncStatus]); // eslint-disable-line
 
   return (
     <div>
@@ -23,8 +27,8 @@ export default function HistoryView({ models }) {
       <div className="panel">
         <div className="panel-head">
           <div className="toolbar">
-            <select className="select" style={{ width: 180 }} value={model}
-              onChange={(e) => setModel(e.target.value)}>
+            <select className="select" style={{ width: 180 }} value={modelKey}
+              onChange={(e) => setModelKey(e.target.value)}>
               <option value="">All models</option>
               {models.map((m) => (
                 <option key={m.model_key} value={m.model_key}>{m.label}</option>
@@ -52,9 +56,10 @@ export default function HistoryView({ models }) {
                 onClick={() => setExpanded(expanded === h.id ? null : h.id)}
               >
                 <span className={`op-tag ${h.op}`}>{h.op.toUpperCase()}</span>
-                <span className="mono">{h.entity_type}</span>
+                <span className="mono">{h.table_role}</span>
+                <span className="chip mono">SQL · {h.sql_table}</span>
                 <span className="mono faint">{h.entity_id}</span>
-                {h.model_id && <span className="chip blue">{h.model_id}</span>}
+                {h.model_key && <span className="chip blue">{h.model_key}</span>}
                 <span className={`chip ${h.sync_status === "synced" ? "on" : h.sync_status === "pending" ? "warn" : h.sync_status === "sync_failed" ? "err" : ""}`}>
                   {h.sync_status}
                 </span>
@@ -77,7 +82,9 @@ export default function HistoryView({ models }) {
                         ...Object.keys(h.new || {}),
                       ])
                     )
-                      .filter((k) => !["id", "src_sheet", "src_row", "model_id"].includes(k))
+                      .filter((k) => ![
+                        "id", "src_sheet", "src_row", "model_key",
+                      ].includes(k))
                       .map((k) => {
                         const a = String(h.old?.[k] ?? "");
                         const b = String(h.new?.[k] ?? "");

@@ -39,3 +39,22 @@ export function findingViewModel(finding) {
     sourceLabel: parts.join(" · ") || "No source location recorded",
   };
 }
+
+export function importReportViewModel(report) {
+  const findings = Array.isArray(report.findings) ? report.findings : [];
+  return {
+    status: report.status,
+    findings,
+    findingCount: findings.length,
+    blockingCount: blockingFindings(findings).length,
+  };
+}
+
+export function fieldInputValue(column, value) {
+  if (column.ctype === "bool" && value !== "" && value != null) {
+    return value === true || value === 1 || value === "1" || value === "True"
+      ? "True"
+      : "False";
+  }
+  return value ?? "";
+}

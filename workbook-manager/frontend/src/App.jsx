@@ -15,7 +15,11 @@ export default function App() {
   const [status, setStatus] = useState(null);
   const [models, setModels] = useState([]);
   const [modelKey, setModelKey] = useState("stingray");
-  const [findings, setFindings] = useState([]);
+  const [findingState, setFindingState] = useState({
+    status: "loading",
+    items: [],
+    error: "",
+  });
   const [importRunId, setImportRunId] = useState(null);
   const [fatal, setFatal] = useState("");
 
@@ -27,23 +31,50 @@ export default function App() {
       if (!currentStatus.last_import) {
         const report = await api.runImport().catch((e) => {
           const blocked = e.detail?.findings || [];
-          setFindings(blocked);
+          setFindingState({ status: "ready", items: blocked, error: "" });
           setImportRunId(null);
           setFatal(`Initial import blocked: ${e.message}`);
           importBlocked = true;
           return null;
         });
         if (report) {
-          setFindings(report.findings || []);
+          setFindingState({
+            status: "ready",
+            items: report.findings || [],
+            error: "",
+          });
           currentStatus = await api.status();
           setStatus(currentStatus);
         }
       }
       const latestRunId = currentStatus.last_import?.id;
       if (latestRunId != null) {
-        const report = await api.findings(latestRunId);
-        setFindings(report.findings);
-        setImportRunId(latestRunId);
+        setFindingState((current) => ({
+          status: "loading",
+          items: current.items,
+          error: "",
+        }));
+        try {
+          const report = await api.findings(latestRunId);
+          setFindingState({
+            status: "ready",
+            items: report.findings,
+            error: "",
+          });
+          setImportRunId(latestRunId);
+        } catch (error) {
+          setFindingState((current) => ({
+            status: "error",
+            items: current.items,
+            error: error.message,
+          }));
+        }
+      } else if (!importBlocked) {
+        setFindingState((current) => ({
+          status: "ready",
+          items: current.items,
+          error: "",
+        }));
       }
       const m = await api.models();
       setModels(m.models);
@@ -52,6 +83,11 @@ export default function App() {
       }
       if (!importBlocked) setFatal("");
     } catch (e) {
+      setFindingState((current) => ({
+        status: "error",
+        items: current.items,
+        error: e.message,
+      }));
       setFatal(`Backend unreachable: ${e.message}`);
     }
   }, [modelKey]);
@@ -60,7 +96,11 @@ export default function App() {
 
   useEffect(() => {
     const showBlockedImport = (event) => {
-      setFindings(event.detail?.findings || []);
+      setFindingState({
+        status: "ready",
+        items: event.detail?.findings || [],
+        error: "",
+      });
       setImportRunId(null);
       setTab("findings");
     };
@@ -72,7 +112,7 @@ export default function App() {
 
   const staged = status?.staged_changes ?? 0;
   const unsynced = status?.unsynced_committed_changes ?? 0;
-  const blockingCount = blockingFindings(findings).length;
+  const blockingCount = blockingFindings(findingState.items).length;
 
   const tabs = [
     { id: "structure", label: "Form Structure", icon: ListOrdered },
@@ -146,7 +186,13 @@ export default function App() {
           />
         )}
         {tab === "findings" && (
-          <ImportFindings findings={findings} importRunId={importRunId} />
+          <ImportFindings
+            findings={findingState.items}
+            importRunId={importRunId}
+            status={findingState.status}
+            error={findingState.error}
+            onRetry={refreshStatus}
+          />
         )}
         {tab === "changes" && (
           <ChangesSync status={status} onChanged={refreshStatus} />

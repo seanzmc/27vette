@@ -18,30 +18,74 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
   const [compare, setCompare] = useState([]); // selected row ids for diff
   const [deps, setDeps] = useState(null);     // dependency dialog state
   const [notice, setNotice] = useState(null);
+  const [tableState, setTableState] = useState({ status: "loading", error: "" });
+  const [recordState, setRecordState] = useState({ status: "idle", error: "" });
   const searchTimer = useRef(null);
+  const tableRequestRef = useRef(0);
+  const recordRequestRef = useRef(0);
   const LIMIT = 100;
 
   const activeTable = tables.find((table) => table.key === role);
 
-  useEffect(() => {
-    (async () => {
-      const response = await api.tables(modelKey);
+  const loadTables = async (selectedModel = modelKey) => {
+    const requestId = ++tableRequestRef.current;
+    ++recordRequestRef.current;
+    setTableState({ status: "loading", error: "" });
+    setRecordState({ status: "idle", error: "" });
+    setTables([]);
+    setSchema(null);
+    setRows([]);
+    setTotal(0);
+    try {
+      const response = await api.tables(selectedModel);
+      if (requestId !== tableRequestRef.current) return;
       const registryTables = response.tables.map(tableViewModel);
       setTables(registryTables);
       if (!registryTables.some((table) => table.key === role)) {
-        setRole(registryTables[0]?.key || "options");
+        setRole(registryTables[0]?.key || "");
       }
-    })();
+      setTableState({ status: "ready", error: "" });
+    } catch (error) {
+      if (requestId !== tableRequestRef.current) return;
+      setTables([]);
+      setSchema(null);
+      setRows([]);
+      setTotal(0);
+      setTableState({ status: "error", error: error.message });
+    }
+  };
+
+  useEffect(() => {
+    loadTables(modelKey);
+    return () => {
+      clearTimeout(searchTimer.current);
+      ++tableRequestRef.current;
+      ++recordRequestRef.current;
+    };
   }, [modelKey]); // eslint-disable-line
 
   const loadRows = async (tableRole = role, s = search, o = offset) => {
-    const spec = await api.schema(tableRole, modelKey);
-    setSchema(spec);
-    const resp = await api.records(tableRole, {
-      model: modelKey, search: s, limit: LIMIT, offset: o,
-    });
-    setRows(resp.records);
-    setTotal(resp.total);
+    if (!tableRole) return;
+    const requestId = ++recordRequestRef.current;
+    setRecordState({ status: "loading", error: "" });
+    try {
+      const spec = await api.schema(tableRole, modelKey);
+      if (requestId !== recordRequestRef.current) return;
+      const resp = await api.records(tableRole, {
+        model: modelKey, search: s, limit: LIMIT, offset: o,
+      });
+      if (requestId !== recordRequestRef.current) return;
+      setSchema(spec);
+      setRows(resp.records);
+      setTotal(resp.total);
+      setRecordState({ status: "ready", error: "" });
+    } catch (error) {
+      if (requestId !== recordRequestRef.current) return;
+      setSchema(null);
+      setRows([]);
+      setTotal(0);
+      setRecordState({ status: "error", error: error.message });
+    }
   };
 
   useEffect(() => {
@@ -49,8 +93,11 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
     setCompare([]);
     setEditing(null);
     setDeps(null);
-    loadRows(role, search, 0);
-  }, [role, modelKey]); // eslint-disable-line
+    if (tableState.status === "ready" && role) {
+      loadRows(role, search, 0);
+    }
+    return () => { ++recordRequestRef.current; };
+  }, [role, modelKey, tableState.status]); // eslint-disable-line
 
   const onSearch = (value) => {
     setSearch(value);
@@ -118,7 +165,20 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
         ))}
       </div>
       <div className="pill-row">
-        {tables.map((table) => (
+        {tableState.status === "loading" && (
+          <span className="muted" role="status">Loading canonical tables…</span>
+        )}
+        {tableState.status === "error" && (
+          <div className="notice err" role="alert">
+            <strong>Unable to load canonical tables.</strong>{" "}
+            {tableState.error}
+            <button className="btn small" style={{ marginLeft: 10 }} onClick={() => loadTables(modelKey)}>Retry</button>
+          </div>
+        )}
+        {tableState.status === "ready" && tables.length === 0 && (
+          <span className="muted">No canonical tables are registered for this model.</span>
+        )}
+        {tableState.status === "ready" && tables.map((table) => (
           <button
             key={table.key}
             className={`pill ${table.key === role ? "active" : ""}`}
@@ -162,11 +222,12 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
                 placeholder="Search all fields…"
                 value={search}
                 onChange={(e) => onSearch(e.target.value)}
+                disabled={!activeTable || recordState.status === "loading"}
               />
             </div>
             <button
               className="btn green small"
-              disabled={!activeTable?.editable}
+              disabled={!activeTable?.editable || recordState.status === "loading"}
               onClick={() => setEditing({ mode: "add", initial: null })}
             >
               <PlusCircle size={14} /> Add
@@ -184,14 +245,39 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
               </tr>
             </thead>
             <tbody>
-              {rows.length === 0 && (
+              {recordState.status === "loading" && (
+                <tr>
+                  <td colSpan={previewCols.length + 2} className="empty" role="status">
+                    Loading records…
+                  </td>
+                </tr>
+              )}
+              {recordState.status === "error" && (
+                <tr>
+                  <td colSpan={previewCols.length + 2}>
+                    <div className="notice err" role="alert">
+                      <strong>Unable to load records.</strong>{" "}
+                      {recordState.error}
+                      <button className="btn small" style={{ marginLeft: 10 }} onClick={() => loadRows(role, search, offset)}>Retry</button>
+                    </div>
+                  </td>
+                </tr>
+              )}
+              {recordState.status === "idle" && (
+                <tr>
+                  <td colSpan={previewCols.length + 2} className="empty">
+                    Choose a canonical table to inspect its records.
+                  </td>
+                </tr>
+              )}
+              {recordState.status === "ready" && rows.length === 0 && (
                 <tr>
                   <td colSpan={previewCols.length + 2} className="empty">
                     No records{search ? " match the search" : ""}.
                   </td>
                 </tr>
               )}
-              {rows.map((r) => (
+              {recordState.status === "ready" && rows.map((r) => (
                 <tr key={r.id} className={compare.some((x) => x.id === r.id) ? "selected" : ""}>
                   <td>
                     <input
@@ -320,10 +406,12 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
               <tbody>
                 {deps.dependents.map((d, i) => (
                   <tr key={i}>
-                    <td>{d.table}</td>
+                    <td>{d.table_role}</td>
                     <td className="mono">{d.entity_key}</td>
                     <td className="mono faint">{d.field}</td>
-                    <td className="mono faint">{d.src_sheet} · {d.src_row}</td>
+                    <td className="mono faint">
+                      {d.source_sheet} · {d.source_row}
+                    </td>
                   </tr>
                 ))}
               </tbody>

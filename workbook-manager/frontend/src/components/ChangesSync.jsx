@@ -4,6 +4,7 @@ import {
   RefreshCcw, ShieldCheck, Undo2,
 } from "lucide-react";
 import { api } from "../api.js";
+import { importReportViewModel } from "../tableRegistry.js";
 
 export default function ChangesSync({ status, onChanged }) {
   const [staged, setStaged] = useState([]);
@@ -38,6 +39,9 @@ export default function ChangesSync({ status, onChanged }) {
   };
 
   const unsynced = status?.unsynced_committed_changes ?? 0;
+  const importView = importReport
+    ? importReportViewModel(importReport)
+    : null;
 
   return (
     <div>
@@ -78,8 +82,9 @@ export default function ChangesSync({ status, onChanged }) {
             return (
               <div className="change-row" key={c.id}>
                 <span className={`op-tag ${c.op}`}>{c.op.toUpperCase()}</span>
-                <span className="mono">{c.table_name}</span>
-                {c.model_id && <span className="chip blue">{c.model_id}</span>}
+                <span className="mono">{c.table_role}</span>
+                <span className="chip mono">SQL · {c.sql_table}</span>
+                {c.model_key && <span className="chip blue">{c.model_key}</span>}
                 <span className="mono faint">
                   {Object.entries(c.entity_key || {}).map(([k, v]) => `${k}=${v}`).join(", ")}
                 </span>
@@ -108,7 +113,9 @@ export default function ChangesSync({ status, onChanged }) {
               {validation.results.flatMap((r) =>
                 r.errors.map((e, i) => (
                   <li key={`${r.change_id}-${i}`}>
-                    #{r.change_id} · {e.table}{e.model_id ? ` (${e.model_id})` : ""}
+                    #{r.change_id} · {e.table_role}
+                    {e.model_key ? ` (${e.model_key})` : ""}
+                    {e.sql_table ? ` · ${e.sql_table}` : ""}
                     {e.field ? ` · ${e.field}` : ""} — {e.message}
                   </li>
                 ))
@@ -257,23 +264,27 @@ export default function ChangesSync({ status, onChanged }) {
           </button>
         </div>
         {notice && <div className="panel-body"><div className={`notice ${notice.kind}`}>{notice.text}</div></div>}
-        {importReport && (
+        {importView && (
           <div className="panel-body">
-            <div className={`notice ${importReport.run.status === "imported" ? "ok" : "warn"}`}>
-              Import {importReport.run.status} · {importReport.issues.length} issue(s)
+            <div className={`notice ${importView.status === "validated" ? "ok" : "warn"}`}>
+              Import {importView.status} · {importView.findingCount} finding(s)
             </div>
-            {importReport.issues.length > 0 && (
+            {importView.findings.length > 0 && (
               <ul className="error-list">
-                {importReport.issues.slice(0, 50).map((i) => (
+                {importView.findings.slice(0, 50).map((finding, index) => (
                   <li
-                    key={i.id}
-                    style={i.severity === "warning"
+                    key={`${finding.code}-${finding.source_sheet}-${finding.source_row}-${index}`}
+                    style={finding.severity === "warning"
                       ? { color: "var(--accent)", borderColor: "rgba(245,185,66,.4)", background: "rgba(245,185,66,.07)" }
                       : undefined}
                   >
-                    [{i.severity}] {i.category} · {i.sheet}
-                    {i.src_row ? `:${i.src_row}` : ""}
-                    {i.entity_key ? ` · ${i.entity_key}` : ""} — {i.message}
+                    [{finding.severity}] {finding.code} · {finding.source_sheet}
+                    {finding.source_row != null ? `:${finding.source_row}` : ""}
+                    {finding.source_column ? ` · ${finding.source_column}` : ""}
+                    {finding.model_key ? ` · ${finding.model_key}` : ""}
+                    {finding.entity_key ? ` · ${finding.entity_key}` : ""}
+                    {finding.sql_table ? ` · ${finding.sql_table}` : ""}
+                    {" — "}{finding.message}
                   </li>
                 ))}
               </ul>

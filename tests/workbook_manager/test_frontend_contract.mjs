@@ -1,9 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import {
   blockingFindings,
+  fieldInputValue,
   findingViewModel,
+  importReportViewModel,
   tableViewModel,
 } from "../../workbook-manager/frontend/src/tableRegistry.js";
 import { api } from "../../workbook-manager/frontend/src/api.js";
@@ -85,8 +88,8 @@ test("import and staging use typed v2 payloads", async () => {
   try {
     await api.runImport("/tmp/source workbook.xlsx");
     await api.stage({
-      table: "options",
-      model_id: "stingray",
+      table_role: "options",
+      model_key: "stingray",
       op: "update",
       key: { option_id: "Z51" },
       record: { price: 1 },
@@ -107,6 +110,74 @@ test("import and staging use typed v2 payloads", async () => {
     key: { option_id: "Z51" },
     record: { price: 1 },
   });
+});
+
+test("successful import reports use exact v2 fields", () => {
+  const report = importReportViewModel({
+    status: "validated",
+    findings: [{ status: "mapped", code: "mapped_source" }],
+    decision_required: [],
+    contract_differences: [],
+  });
+  assert.equal(report.status, "validated");
+  assert.equal(report.findingCount, 1);
+  assert.equal(report.blockingCount, 0);
+});
+
+test("canonical integer booleans remain editable in schema forms", () => {
+  assert.equal(fieldInputValue({ ctype: "bool" }, 1), "True");
+  assert.equal(fieldInputValue({ ctype: "bool" }, 0), "False");
+  assert.equal(fieldInputValue({ ctype: "text" }, null), "");
+});
+
+test("checked-in React callers contain no frontend compatibility data path", () => {
+  const root = new URL("../../workbook-manager/frontend/src/", import.meta.url);
+  const source = (path) => readFileSync(new URL(path, root), "utf8");
+  const apiSource = source("api.js");
+  const recordForm = source("components/RecordForm.jsx");
+  const formStructure = source("components/FormStructure.jsx");
+  const changesSync = source("components/ChangesSync.jsx");
+  const history = source("components/HistoryView.jsx");
+
+  for (const legacy of ["payload.table", "model_id", "form_steps"]) {
+    assert.equal(apiSource.includes(legacy), false, legacy);
+  }
+  assert.equal(apiSource.includes("normalized.model"), false);
+  assert.match(recordForm, /model_key:\s*modelKey/);
+  assert.match(recordForm, /table_role:\s*schema\.table_role/);
+  assert.equal(recordForm.includes("model_id"), false);
+  assert.equal(formStructure.includes("form_steps"), false);
+  assert.equal(formStructure.includes("model_id"), false);
+  assert.equal(changesSync.includes("importReport.run"), false);
+  assert.equal(changesSync.includes("importReport.issues"), false);
+  for (const field of ["model_key", "table_role", "sql_table", "entity_key"]) {
+    assert.equal(changesSync.includes(field), true, field);
+  }
+  assert.equal(history.includes("entity_type"), false);
+  assert.equal(history.includes("model_id"), false);
+  assert.equal(history.includes("table_role"), true);
+  assert.equal(history.includes("model_key"), true);
+  assert.equal(history.includes("sql_table"), true);
+  assert.equal(history.includes("entity_id"), true);
+});
+
+test("findings and model operations expose loading error and retry states", () => {
+  const root = new URL("../../workbook-manager/frontend/src/", import.meta.url);
+  const source = (path) => readFileSync(new URL(path, root), "utf8");
+  const app = source("App.jsx");
+  const findings = source("components/ImportFindings.jsx");
+  const operations = source("components/ModelOperations.jsx");
+
+  assert.match(app, /status:\s*"loading"/);
+  assert.match(findings, /Loading import findings/);
+  assert.match(findings, /Unable to load import findings/);
+  assert.match(findings, />Retry</);
+  assert.match(operations, /Loading canonical tables/);
+  assert.match(operations, /Unable to load canonical tables/);
+  assert.match(operations, /Loading records/);
+  assert.match(operations, /Unable to load records/);
+  assert.match(operations, /tableRequestRef/);
+  assert.match(operations, /recordRequestRef/);
 });
 
 test("default import resolves the backend-owned workbook path", async () => {

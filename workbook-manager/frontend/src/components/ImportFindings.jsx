@@ -6,7 +6,9 @@ import {
   findingViewModel,
 } from "../tableRegistry.js";
 
-export default function ImportFindings({ findings = [], importRunId = null }) {
+export default function ImportFindings({
+  findings = [], importRunId = null, status = "ready", error = "", onRetry,
+}) {
   const rows = useMemo(
     () => findings.map(findingViewModel),
     [findings]
@@ -19,7 +21,23 @@ export default function ImportFindings({ findings = [], importRunId = null }) {
         <ShieldAlert size={14} /> Import &amp; Contract Findings
       </div>
 
-      {blockers.length > 0 && (
+      {status === "loading" && (
+        <div className="panel">
+          <div className="empty" role="status">Loading import findings…</div>
+        </div>
+      )}
+
+      {status === "error" && (
+        <div className="notice err" role="alert">
+          <strong>Unable to load import findings.</strong>{" "}
+          {error || "The findings request failed."}
+          {onRetry && (
+            <button className="btn small" style={{ marginLeft: 10 }} onClick={onRetry}>Retry</button>
+          )}
+        </div>
+      )}
+
+      {status === "ready" && blockers.length > 0 && (
         <div className="notice err" role="alert">
           <strong>{blockers.length} blocking finding(s).</strong>{" "}
           Resolve contract mismatches before promotion. A business decision is
@@ -28,6 +46,7 @@ export default function ImportFindings({ findings = [], importRunId = null }) {
         </div>
       )}
 
+      {status === "ready" && (
       <div className="panel" style={{ marginTop: 10 }}>
         <div className="panel-head">
           <span className="muted">
@@ -108,6 +127,7 @@ export default function ImportFindings({ findings = [], importRunId = null }) {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }

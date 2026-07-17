@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Check, X } from "lucide-react";
 import { humanize } from "../naming.js";
+import { fieldInputValue } from "../tableRegistry.js";
 
 /** Schema-driven add/edit form. Stages the change through the API and
  * surfaces field-level validation errors returned by the backend. */
@@ -9,7 +10,9 @@ export default function RecordForm({
 }) {
   const [draft, setDraft] = useState(() => {
     const base = {};
-    for (const col of schema.columns) base[col.name] = initial?.[col.name] ?? "";
+    for (const col of schema.columns) {
+      base[col.name] = fieldInputValue(col, initial?.[col.name]);
+    }
     return base;
   });
   const [errors, setErrors] = useState([]);
@@ -26,8 +29,8 @@ export default function RecordForm({
         key[k] = mode === "edit" ? String(initial?.[k] ?? "") : String(draft[k] ?? "");
       }
       await stageFn({
-        table: schema.table,
-        model_id: schema.model_scoped ? modelKey : "",
+        model_key: modelKey,
+        table_role: schema.table_role,
         op: mode === "edit" ? "update" : "add",
         key,
         record: draft,

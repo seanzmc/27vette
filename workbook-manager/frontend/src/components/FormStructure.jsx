@@ -5,13 +5,19 @@ import { humanize } from "../naming.js";
 import RecordForm from "./RecordForm.jsx";
 
 export default function FormStructure({ models, modelKey, setModelKey, onChanged }) {
-  const [structure, setStructure] = useState(null);
-  const [editing, setEditing] = useState(null); // {table, mode, initial, schema}
+  const [runtime, setRuntime] = useState(null);
+  const [variants, setVariants] = useState([]);
+  const [editing, setEditing] = useState(null); // {role, mode, initial, schema}
   const [error, setError] = useState("");
 
   const load = async (key) => {
     try {
-      setStructure(await api.structure(key));
+      const [runtimeResponse, variantResponse] = await Promise.all([
+        api.runtime(key),
+        api.variants(key),
+      ]);
+      setRuntime(runtimeResponse);
+      setVariants(variantResponse.variants);
       setError("");
     } catch (e) {
       setError(e.message);
@@ -20,9 +26,9 @@ export default function FormStructure({ models, modelKey, setModelKey, onChanged
 
   useEffect(() => { if (modelKey) load(modelKey); }, [modelKey]);
 
-  const startEdit = async (table, initial) => {
-    const schema = await api.schema(table, modelKey);
-    setEditing({ table, mode: initial ? "edit" : "add", initial, schema });
+  const startEdit = async (role, initial) => {
+    const schema = await api.schema(role, modelKey);
+    setEditing({ role, mode: initial ? "edit" : "add", initial, schema });
   };
 
   const staged = async () => {
@@ -58,43 +64,47 @@ export default function FormStructure({ models, modelKey, setModelKey, onChanged
 
       {error && <div className="notice err">{error}</div>}
 
-      {structure && (
+      {runtime && (
         <>
           <div className="section-heading">
             <ChevronRight size={14} /> Runtime Steps &amp; Interface Sections — {humanize(modelKey)}
           </div>
           <div className="panel">
-            {structure.steps.length === 0 && (
+            {runtime.steps.length === 0 && (
               <div className="empty">
                 No workbook-owned runtime steps for this model (unpromoted
                 scaffolds have empty presentation sheets).
               </div>
             )}
-            {structure.steps.map((s, i) => (
+            {runtime.steps.map((s, i) => {
+              const sections = runtime.section_presentation.filter(
+                (section) => section.step_key === s.step_key
+              );
+              return (
               <div className="step-row" key={s.step_key}>
                 <span className="step-num">{s.runtime_order || i + 1}</span>
                 <div className="step-main">
                   <div className="label">
-                    {s.display_name}
-                    {s.active !== "True" && (
+                    {s.step_label}
+                    {!s.active && (
                       <span className="chip off" style={{ marginLeft: 6 }}>inactive</span>
                     )}
                   </div>
                   <div className="key">{s.step_key}</div>
                 </div>
                 <div className="step-sections">
-                  {s.sections.length === 0 ? (
+                  {sections.length === 0 ? (
                     <span className="faint" style={{ fontSize: 12 }}>
                       no sections mapped
                     </span>
                   ) : (
-                    s.sections.map((sec) => (
+                    sections.map((sec) => (
                       <span
                         key={sec.section_id}
-                        className={`chip ${sec.active === "True" ? "" : "off"}`}
+                        className={`chip ${sec.active ? "" : "off"}`}
                         title={`${sec.section_id} · order ${sec.section_display_order}`}
                       >
-                        {sec.display_name}
+                        {sec.display_label}
                       </span>
                     ))
                   )}
@@ -102,12 +112,13 @@ export default function FormStructure({ models, modelKey, setModelKey, onChanged
                 <button
                   className="icon-btn"
                   title="Edit step"
-                  onClick={() => startEdit("form_steps", s)}
+                  onClick={() => startEdit("runtime_steps", s)}
                 >
                   <Pencil size={14} />
                 </button>
               </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="section-heading">Section Presentation Order</div>
@@ -129,16 +140,16 @@ export default function FormStructure({ models, modelKey, setModelKey, onChanged
                 </tr>
               </thead>
               <tbody>
-                {structure.section_presentation.map((p) => (
+                {runtime.section_presentation.map((p) => (
                   <tr key={p.section_id}>
                     <td>{p.section_display_order}</td>
-                    <td>{p.display_name}</td>
+                    <td>{p.display_label}</td>
                     <td className="mono faint">{p.section_id}</td>
                     <td className="mono faint">{p.step_key}</td>
                     <td>{p.display_behavior || <span className="faint">—</span>}</td>
                     <td>
-                      <span className={`chip ${p.active === "True" ? "on" : "off"}`}>
-                        {p.active}
+                      <span className={`chip ${p.active ? "on" : "off"}`}>
+                        {p.active ? "Active" : "Inactive"}
                       </span>
                     </td>
                     <td>
@@ -164,7 +175,7 @@ export default function FormStructure({ models, modelKey, setModelKey, onChanged
                 </tr>
               </thead>
               <tbody>
-                {structure.variants.map((v) => (
+                {variants.map((v) => (
                   <tr key={v.variant_id}>
                     <td className="mono">{v.variant_id}</td>
                     <td>{v.trim_level}</td>
@@ -173,8 +184,8 @@ export default function FormStructure({ models, modelKey, setModelKey, onChanged
                     <td>{v.base_price}</td>
                     <td>{v.display_order}</td>
                     <td>
-                      <span className={`chip ${v.active === "True" ? "on" : "off"}`}>
-                        {v.active}
+                      <span className={`chip ${v.active ? "on" : "off"}`}>
+                        {v.active ? "Active" : "Inactive"}
                       </span>
                     </td>
                   </tr>
@@ -188,12 +199,12 @@ export default function FormStructure({ models, modelKey, setModelKey, onChanged
       {editing && (
         <div style={{ marginTop: 14 }}>
           <RecordForm
-            key={`${editing.table}-${editing.mode}-${editing.initial?.id ?? "new"}`}
+            key={`${editing.role}-${editing.mode}-${editing.initial?.id ?? "new"}`}
             schema={editing.schema}
             mode={editing.mode}
             initial={editing.initial}
             modelKey={modelKey}
-            stageFn={(p) => api.stage({ ...p, model_id: "" })}
+            stageFn={api.stage}
             onStaged={staged}
             onCancel={() => setEditing(null)}
           />

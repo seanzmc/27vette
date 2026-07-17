@@ -448,5 +448,7 @@ def test_commit_and_history_use_exact_typed_payloads(client: TestClient):
     assert item["actor"] == "typed-api-test"
     assert item["model_key"] == "stingray"
     assert item["table_role"] == "options"
+    assert item["sql_table"] == "stingray_options"
+    assert item["entity_id"] == row["option_id"]
     assert item["old"]["option_id"] == row["option_id"]
     assert item["new"]["price"] == row["price"] + 1
