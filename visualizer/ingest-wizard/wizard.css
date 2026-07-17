@@ -241,15 +241,13 @@ tr.evidence-row td { background: var(--panel-2); }
 .decision-kicker { color: var(--accent); font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 .decision-sentence {
   max-width: 860px; font-size: 18px; line-height: 1.4; margin: 12px 0 6px;
-  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden;
 }
 .why-asked {
   max-width: 860px; color: var(--muted); margin: 0 0 10px;
-  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
 }
 .source-snippet {
   max-width: 860px; border-left: 2px solid var(--blue); padding: 7px 10px; margin: 8px 0;
-  color: var(--muted); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden;
+  color: var(--muted);
 }
 .source-snippet span { color: var(--blue); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; margin-right: 8px; }
 .compilation-impact { display: inline-block; margin: 4px 0 10px; color: var(--red); font-size: 12px; font-weight: 700; }

@@ -1504,20 +1504,18 @@ class WizardSessionStore:
         else:
             summary = str(subject.get("question") or "Provide the missing target evidence before this can compile.")
 
-        source_label = next(
-            (
-                self._presentation_option_text(
-                    self._presentation_option(
-                        str(row.get("rpo") or row.get("refOnlyRpo") or ""),
-                        model_options,
-                        source_rows,
-                    )
+        source_label = ""
+        for row in source_rows:
+            source_rpo = str(row.get("rpo") or row.get("refOnlyRpo") or "").strip()
+            source_description = str(row.get("description") or "").strip()
+            if source_rpo:
+                source_label = self._presentation_option_text(
+                    self._presentation_option(source_rpo, model_options, source_rows)
                 )
-                for row in source_rows
-                if str(row.get("rpo") or row.get("refOnlyRpo") or row.get("description") or "")
-            ),
-            "",
-        )
+            elif source_description:
+                source_label = source_description
+            if source_label:
+                break
         if source_label:
             why_asked = f"The target source identifies {source_label}."
         elif evidence.get("workbookReferences"):
@@ -2456,17 +2454,30 @@ class WizardSessionStore:
         try:
             replace_json_artifact_set(run_dir, {"exception-resolutions.json": current})
             self.compile_canonical_rows(run_id)
-            refreshed = self.exception_queue_view(run_id, query=str(subject_id), limit=100)
-            subject_view = next(
+            refreshed_detail = self.compiler_detail(run_id)
+            accepted_resolution = next(
                 (
-                    item
-                    for item in refreshed["items"]
-                    if item["subject"].get("subjectId") == subject_id
+                    entry
+                    for entry in refreshed_detail["resolutions"].get("validEntries") or []
+                    if entry.get("subjectId") == subject_id
+                    and entry.get("subjectVersion") == subject_version
                 ),
                 None,
             )
-            if subject_view is None:
-                raise WizardError("Resolved subject disappeared from the current queue.", status=409)
+            if accepted_resolution is None:
+                raise WizardError("Compiler did not accept the saved exception resolution.", status=409)
+            blocker_subjects = {
+                str(blocker.get("subjectId") or "")
+                for model_entry in (refreshed_detail["compileReport"].get("models") or {}).values()
+                for blocker in model_entry.get("blockers") or []
+            }
+            pending_projection = subject_id in blocker_subjects
+            subject_view = {
+                **subject_view,
+                "state": "resolved_pending_projection" if pending_projection else "resolved",
+                "reviewState": "pending_projection" if pending_projection else "resolved",
+                "resolution": dict(accepted_resolution),
+            }
             result = {"summary": self.compiler_summary(run_id), "subject": subject_view}
         except Exception:
             self._restore_run_files(run_dir, snapshot)

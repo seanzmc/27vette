@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 
@@ -132,6 +133,17 @@ def test_exception_review_is_one_expandable_decision_and_one_form() -> None:
     assert 'class="decision-outcomes"' in js
     assert 'next ? next.subject.subjectId : "__first__"' in js
     assert 'focusId === "__first__"' in js
+
+
+def test_expanded_exception_copy_is_not_line_clamped() -> None:
+    css = WIZARD_CSS.read_text(encoding="utf-8")
+
+    for selector in ("decision-sentence", "why-asked", "source-snippet"):
+        match = re.search(rf"\.{selector}\s*\{{([^}}]*)\}}", css)
+        assert match is not None
+        declarations = match.group(1)
+        assert "line-clamp" not in declarations
+        assert "overflow: hidden" not in declarations
 
 
 def test_exception_primary_surface_omits_empty_evidence_and_internal_gate_copy() -> None:

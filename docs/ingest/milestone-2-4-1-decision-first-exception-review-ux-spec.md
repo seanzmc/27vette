@@ -86,7 +86,7 @@ The default expanded card contains, in this order:
 
 1. **Decision heading** — target model plus a human decision name.
 2. **Proposed behavior** — one plain-English sentence describing direction, members, selection behavior, condition, price, or section placement.
-3. **Why the wizard is asking** — at most two lines from the owning target evidence and, when applicable, a clear `Comparator suggestion` label.
+3. **Why the wizard is asking** — the full owning target evidence and, when applicable, a clear `Comparator suggestion` label. Expanded decision copy must never require DevTools to read.
 4. **One decision fieldset** — all available answers to this subject as mutually exclusive choices.
 5. **One preview region and one primary button** — never one per action.
 6. **Collapsed supporting details** — evidence, existing/derived rows, exact effects, shared context, workbook sheets/keys, and compiler identifiers.
@@ -138,7 +138,7 @@ Exact `(sheet, key, action, values)` effects remain under an initially collapsed
 
 ### 6. Supporting evidence
 
-- Show one owning source snippet at the top level, line-clamped to three lines.
+- Show one owning source snippet in full at the expanded-card top level. The collapsed queue summary may remain compact.
 - Put raw sheet names, cell coordinates, full raw copy, comparator payloads, existing workbook rows, already-derived rows, shared context, and stable IDs under labeled disclosures.
 - For group decisions, render the proposed and existing member sets as labeled RPO/description lists, not JSON arrays.
 - For relationship decisions, render direction as `source → behavior → target`.
@@ -310,5 +310,11 @@ Verification completed:
 - browser proof at 1,200 × 720 and 390 × 844: compact/one-expanded-card behavior, conditional outcomes, exact preview, invalidation, save, reopen, keyboard expansion/focus, no horizontal overflow, and zero console warnings/errors;
 - retained run `20260715-225924-b198b4`: GET-only browser observation; forensic run `20260715-150312-eb8d08`: untouched;
 - `stingray_master.xlsx`, the raw export, `form-app/data.js`, and runtime contracts: byte-identical to `HEAD`.
+
+Corrective checkpoint — 2026-07-17:
+
+- expanded proposed behavior, why-asked copy, and owning source snippets now render in full while collapsed queue summaries remain compact;
+- blank-RPO section decisions now use their exact owning source description instead of borrowing another blank-RPO option's display copy;
+- successful resolution responses validate the accepted compiler resolution directly and no longer fail because of a secondary queue-visibility lookup.
 
 Independent closure review has not run. Per this spec, Milestones 2.4/2.4.1 do not close and normal exception mutation does not resume until an independent verifier passes the comprehension and safety gates without edits. No Fable receipt or `STATE.md` update is created before that gate.

@@ -193,6 +193,49 @@ class ExceptionFlowTest(unittest.TestCase):
         )
         self.assertEqual(specific["label"], "Exhaust tips, Black")
 
+    def test_section_presentation_why_uses_owning_blank_rpo_source_copy(self) -> None:
+        source_copy = "Custom Leather Wrapped Interior Package with target-only detail"
+        item = {
+            "subject": {
+                "model": "grand_sport_x",
+                "question": "Choose one canonical target section.",
+                "proposedRows": [],
+                "semanticConflict": {},
+            },
+            "decisionType": "section",
+            "reviewState": "needs_decision",
+            "evidence": {
+                "sourceEvidence": [
+                    {
+                        "candidateId": "Interior 3:85",
+                        "rpo": "",
+                        "refOnlyRpo": "",
+                        "description": source_copy,
+                    }
+                ],
+                "existingWorkbookRows": [],
+                "alreadyDerivedRows": [],
+                "comparator": [],
+                "workbookReferences": [],
+            },
+        }
+
+        presentation = self.store._exception_presentation(
+            item,
+            [
+                {
+                    "optionId": "opt_unrelated_001",
+                    "rpo": "",
+                    "description": "Unrelated first target option",
+                }
+            ],
+        )
+
+        self.assertEqual(
+            presentation["whyAsked"],
+            f"The target source identifies {source_copy}.",
+        )
+
     def test_presentation_copy_is_isolated_from_authority_preview_and_artifacts(self) -> None:
         original = self.store.exception_queue_view(
             self.run_id,
@@ -400,6 +443,38 @@ class ExceptionFlowTest(unittest.TestCase):
         self.assertIn("resolvedAt", resolution)
         self.assertEqual(result["summary"]["session"]["runId"], self.run_id)
         self.assertFalse((self.store.run_dir(self.run_id) / "apply-plan.json").exists())
+
+    def test_resolution_success_does_not_depend_on_post_compile_queue_lookup(self) -> None:
+        item = self.store.exception_queue_view(
+            self.run_id,
+            reason="missing_section",
+            state="open",
+            actionable="yes",
+            limit=1,
+        )["items"][0]
+        subject = item["subject"]
+
+        with mock.patch.object(
+            self.store,
+            "exception_queue_view",
+            return_value={"items": []},
+        ):
+            result = self.store.resolve_exception(
+                self.run_id,
+                subject_id=subject["subjectId"],
+                subject_version=subject["subjectVersion"],
+                action="choose_section",
+                payload={"sectionId": "sec_whee_001"},
+                reviewer="sean",
+            )
+
+        self.assertEqual(result["subject"]["state"], "resolved")
+        self.assertEqual(
+            result["subject"]["resolution"]["subjectId"],
+            subject["subjectId"],
+        )
+        valid = self.store.compiler_detail(self.run_id)["resolutions"]["validEntries"]
+        self.assertIn(subject["subjectId"], {entry["subjectId"] for entry in valid})
 
     def test_exception_preview_is_side_effect_free_and_returns_exact_physical_effects(self) -> None:
         item = self.store.exception_queue_view(
