@@ -725,11 +725,18 @@ def status(conn: sqlite3.Connection = Depends(get_conn)):
     run = conn.execute(
         "SELECT * FROM import_runs ORDER BY id DESC LIMIT 1"
     ).fetchone()
+    workbook_path = config.DEFAULT_WORKBOOK
+    excel_lock = workbook_path.with_name(f"~${workbook_path.name}")
     return {
         "tables": counts,
         "staged_changes": staged,
         "unsynced_committed_changes": unsynced,
         "last_import": dict(run) if run else None,
+        "workbook": {
+            "workbook_path": str(workbook_path),
+            "exists": workbook_path.is_file(),
+            "excel_lock": excel_lock.exists(),
+        },
     }
 
 
@@ -743,16 +750,6 @@ def run_import():
     if not config.DEFAULT_WORKBOOK.exists():
         raise HTTPException(404, f"workbook not found: {config.DEFAULT_WORKBOOK}")
     return _run_import_to(config.DEFAULT_DB, config.DEFAULT_WORKBOOK)
-
-
-@router.post("/api/import")
-def run_import_endpoint(request: Request):
-    if not config.DEFAULT_WORKBOOK.exists():
-        raise HTTPException(404, f"workbook not found: {config.DEFAULT_WORKBOOK}")
-    _close_connection(request.app)
-    return _run_import_to(
-        Path(request.app.state.db_path), config.DEFAULT_WORKBOOK
-    )
 
 
 @router.get("/api/import/latest")
@@ -844,16 +841,6 @@ def structure(model_key: str, conn: sqlite3.Connection = Depends(get_conn)):
         raise HTTPException(404, f"unknown model {model_key!r}") from None
 
 
-@router.get("/api/models/{model_key}/collections")
-def collections(
-    model_key: str, conn: sqlite3.Connection = Depends(get_conn)
-):
-    try:
-        return _collections(conn, model_key)
-    except KeyError:
-        raise HTTPException(404, f"unknown model {model_key!r}") from None
-
-
 @router.get(
     "/api/models/{model_key}/tables",
     response_model=ModelTablesOut,
@@ -940,63 +927,6 @@ def dependencies_post(
 ):
     try:
         return _dependencies(conn, model_key, table_role, body.get("key", {}))
-    except KeyError:
-        raise HTTPException(404, "unknown model/table role") from None
-
-
-@router.get("/api/records/{table_role}/schema")
-def record_schema_compat(
-    table_role: str,
-    model: str = "",
-    conn: sqlite3.Connection = Depends(get_conn),
-):
-    canonical_role = _LEGACY_TABLE_ROLES.get(table_role, table_role)
-    try:
-        result = _schema_dict(conn, model, canonical_role)
-    except KeyError:
-        raise HTTPException(404, "unknown model/table role") from None
-    result["table"] = table_role
-    if canonical_role in CENTRAL_EDIT_ROLES:
-        result["model_scoped"] = False
-    return result
-
-
-@router.get("/api/records/{table_role}")
-def records_compat(
-    table_role: str,
-    model: str = "",
-    search: str = "",
-    limit: int = Query(200, le=2000),
-    offset: int = 0,
-    conn: sqlite3.Connection = Depends(get_conn),
-):
-    canonical_role = _LEGACY_TABLE_ROLES.get(table_role, table_role)
-    try:
-        result = _records(conn, model, canonical_role, search, limit, offset)
-    except KeyError:
-        raise HTTPException(404, "unknown model/table role") from None
-    result["model_id"] = model
-    result["table"] = table_role
-    return result
-
-
-@router.post("/api/records/{table_role}/dependencies")
-def dependencies_compat(
-    table_role: str,
-    body: dict,
-    conn: sqlite3.Connection = Depends(get_conn),
-):
-    canonical_role = _LEGACY_TABLE_ROLES.get(table_role, table_role)
-    model_key = (
-        body.get("model_id")
-        or body.get("model_key")
-        or (body.get("key") or {}).get("model_key")
-    )
-    key = dict(body.get("key") or {})
-    key.pop("id", None)
-    key.pop("_display_id", None)
-    try:
-        return _dependencies(conn, model_key, canonical_role, key)
     except KeyError:
         raise HTTPException(404, "unknown model/table role") from None
 

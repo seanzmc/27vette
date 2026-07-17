@@ -23,6 +23,13 @@ def test_create_app_supports_an_isolated_database(imported_db_path: Path):
     }
 
 
+def test_status_exposes_the_backend_owned_workbook_path(client: TestClient):
+    response = client.get("/api/status")
+    assert response.status_code == 200
+    workbook = response.json()["workbook"]
+    assert Path(workbook["workbook_path"]).name == "stingray_master.xlsx"
+
+
 @pytest.fixture
 def client(imported_db_path: Path):
     with TestClient(main.create_app(imported_db_path)) as test_client:
@@ -232,6 +239,40 @@ def test_primary_routes_publish_named_response_contracts(client: TestClient):
         "/api/backup",
     ):
         assert path in schema["paths"]
+
+
+def test_removed_transitional_routes_are_absent_and_return_404(
+    client: TestClient,
+):
+    schema = client.get("/openapi.json").json()
+    paths = schema["paths"]
+    assert "/api/import" not in paths
+    assert "/api/models/{model_key}/collections" not in paths
+    assert "/api/records/{table_role}" not in paths
+    assert "/api/records/{table_role}/schema" not in paths
+    assert "/api/records/{table_role}/dependencies" not in paths
+
+    assert client.post("/api/import").status_code == 404
+    assert client.get("/api/models/stingray/collections").status_code == 404
+    assert client.get("/api/records/options?model=stingray").status_code == 404
+    assert (
+        client.get("/api/records/options/schema?model=stingray").status_code
+        == 404
+    )
+    assert (
+        client.post(
+            "/api/records/options/dependencies",
+            json={"model_id": "stingray", "key": {"option_id": "Z51"}},
+        ).status_code
+        == 404
+    )
+
+    registered_paths = {
+        route.path for route in client.app.routes if hasattr(route, "path")
+    }
+    assert "/api/import" not in registered_paths
+    assert "/api/models/{model_key}/collections" not in registered_paths
+    assert not any(path.startswith("/api/records/") for path in registered_paths)
 
 
 def test_openapi_contracts_are_exact_and_document_domain_errors(

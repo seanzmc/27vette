@@ -3,12 +3,12 @@ import {
   Columns2, PlusCircle, Pencil, Search, Table2, Trash2, TriangleAlert,
 } from "lucide-react";
 import { api } from "../api.js";
-import { displayId } from "../naming.js";
+import { tableViewModel } from "../tableRegistry.js";
 import RecordForm from "./RecordForm.jsx";
 
 export default function ModelOperations({ models, modelKey, setModelKey, onChanged }) {
-  const [collections, setCollections] = useState([]);
-  const [table, setTable] = useState("options");
+  const [tables, setTables] = useState([]);
+  const [role, setRole] = useState("options");
   const [schema, setSchema] = useState(null);
   const [rows, setRows] = useState([]);
   const [total, setTotal] = useState(0);
@@ -21,22 +21,23 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
   const searchTimer = useRef(null);
   const LIMIT = 100;
 
-  const activeCollection = collections.find((c) => c.table === table);
+  const activeTable = tables.find((table) => table.key === role);
 
   useEffect(() => {
     (async () => {
-      const c = await api.collections(modelKey);
-      setCollections(c.collections);
-      if (!c.collections.some((x) => x.table === table)) {
-        setTable(c.collections[0]?.table || "options");
+      const response = await api.tables(modelKey);
+      const registryTables = response.tables.map(tableViewModel);
+      setTables(registryTables);
+      if (!registryTables.some((table) => table.key === role)) {
+        setRole(registryTables[0]?.key || "options");
       }
     })();
   }, [modelKey]); // eslint-disable-line
 
-  const loadRows = async (t = table, s = search, o = offset) => {
-    const spec = await api.schema(t, modelKey);
+  const loadRows = async (tableRole = role, s = search, o = offset) => {
+    const spec = await api.schema(tableRole, modelKey);
     setSchema(spec);
-    const resp = await api.records(t, {
+    const resp = await api.records(tableRole, {
       model: modelKey, search: s, limit: LIMIT, offset: o,
     });
     setRows(resp.records);
@@ -48,15 +49,15 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
     setCompare([]);
     setEditing(null);
     setDeps(null);
-    loadRows(table, search, 0);
-  }, [table, modelKey]); // eslint-disable-line
+    loadRows(role, search, 0);
+  }, [role, modelKey]); // eslint-disable-line
 
   const onSearch = (value) => {
     setSearch(value);
     clearTimeout(searchTimer.current);
     searchTimer.current = setTimeout(() => {
       setOffset(0);
-      loadRows(table, value, 0);
+      loadRows(role, value, 0);
     }, 250);
   };
 
@@ -70,8 +71,8 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
   const stageDelete = async (row, confirm = false) => {
     try {
       await api.stage({
-        table,
-        model_id: schema.model_scoped ? modelKey : "",
+        table_role: role,
+        model_key: modelKey,
         op: "delete",
         key: Object.fromEntries(schema.key.map((k) => [k, String(row[k] ?? "")])),
         confirm_dependencies: confirm,
@@ -117,17 +118,16 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
         ))}
       </div>
       <div className="pill-row">
-        {collections.map((c) => (
+        {tables.map((table) => (
           <button
-            key={c.table}
-            className={`pill ${c.table === table ? "active" : ""}`}
-            title={c.sheet ? `sheet: ${c.sheet}` : "shared reference data"}
-            onClick={() => setTable(c.table)}
+            key={table.key}
+            className={`pill ${table.key === role ? "active" : ""}`}
+            title={`source: ${table.sourceLabel}`}
+            onClick={() => setRole(table.key)}
           >
-            {c.label}
-            <span className="count">{c.count}</span>
-            {c.shared ? " ·shared" : ""}
-            {!c.editable ? " ·read-only" : ""}
+            {table.label}
+            <span className="count">{table.count}</span>
+            {!table.editable ? " ·read-only" : ""}
           </button>
         ))}
       </div>
@@ -136,14 +136,17 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
         <div className="panel-head">
           <div className="toolbar">
             <Table2 size={15} color="var(--blue)" />
-            <strong>{activeCollection?.label || table}</strong>
-            {activeCollection?.sheet && (
-              <span className="mono faint">({activeCollection.sheet})</span>
+            <strong>{activeTable?.label || role}</strong>
+            {activeTable && (
+              <>
+                <span className="chip blue mono">SQL · {activeTable.sqlTable}</span>
+                <span className="chip mono">Source · {activeTable.sourceLabel}</span>
+              </>
             )}
             {schema && (
               <span className="chip">key: {schema.key.join(" + ")}</span>
             )}
-            {activeCollection && !activeCollection.editable && (
+            {activeTable && !activeTable.editable && (
               <span className="chip warn">read-only</span>
             )}
           </div>
@@ -163,7 +166,7 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
             </div>
             <button
               className="btn green small"
-              disabled={!activeCollection?.editable}
+              disabled={!activeTable?.editable}
               onClick={() => setEditing({ mode: "add", initial: null })}
             >
               <PlusCircle size={14} /> Add
@@ -211,7 +214,7 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
                       <button
                         className="icon-btn"
                         title="Edit"
-                        disabled={!activeCollection?.editable}
+                        disabled={!activeTable?.editable}
                         onClick={() => setEditing({ mode: "edit", initial: r })}
                       >
                         <Pencil size={14} />
@@ -219,7 +222,7 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
                       <button
                         className="icon-btn danger"
                         title="Stage delete"
-                        disabled={!activeCollection?.editable}
+                        disabled={!activeTable?.editable}
                         onClick={() => stageDelete(r)}
                       >
                         <Trash2 size={14} />
@@ -242,14 +245,14 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
               <button
                 className="btn small"
                 disabled={offset === 0}
-                onClick={() => { const o = Math.max(0, offset - LIMIT); setOffset(o); loadRows(table, search, o); }}
+                onClick={() => { const o = Math.max(0, offset - LIMIT); setOffset(o); loadRows(role, search, o); }}
               >
                 ‹ Prev
               </button>
               <button
                 className="btn small"
                 disabled={offset + LIMIT >= total}
-                onClick={() => { const o = offset + LIMIT; setOffset(o); loadRows(table, search, o); }}
+                onClick={() => { const o = offset + LIMIT; setOffset(o); loadRows(role, search, o); }}
               >
                 Next ›
               </button>
@@ -289,7 +292,7 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
       {editing && schema && (
         <div style={{ marginTop: 14 }}>
           <RecordForm
-            key={`${table}-${editing.mode}-${editing.initial?.id ?? "new"}`}
+            key={`${role}-${editing.mode}-${editing.initial?.id ?? "new"}`}
             schema={schema}
             mode={editing.mode}
             initial={editing.initial}

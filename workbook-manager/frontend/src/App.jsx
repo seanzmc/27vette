@@ -1,37 +1,56 @@
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  Database, History, ListOrdered, Settings2, GitBranch,
+  Database, History, ListOrdered, Settings2, GitBranch, ShieldAlert,
 } from "lucide-react";
 import { api } from "./api.js";
+import { blockingFindings } from "./tableRegistry.js";
 import FormStructure from "./components/FormStructure.jsx";
 import ModelOperations from "./components/ModelOperations.jsx";
 import ChangesSync from "./components/ChangesSync.jsx";
 import HistoryView from "./components/HistoryView.jsx";
+import ImportFindings from "./components/ImportFindings.jsx";
 
 export default function App() {
   const [tab, setTab] = useState("structure");
   const [status, setStatus] = useState(null);
   const [models, setModels] = useState([]);
   const [modelKey, setModelKey] = useState("stingray");
+  const [findings, setFindings] = useState([]);
+  const [importRunId, setImportRunId] = useState(null);
   const [fatal, setFatal] = useState("");
 
   const refreshStatus = useCallback(async () => {
     try {
-      const s = await api.status();
-      setStatus(s);
-      if (!s.last_import) {
+      let currentStatus = await api.status();
+      setStatus(currentStatus);
+      let importBlocked = false;
+      if (!currentStatus.last_import) {
         const report = await api.runImport().catch((e) => {
-          setFatal(`Initial import failed: ${e.message}`);
+          const blocked = e.detail?.findings || [];
+          setFindings(blocked);
+          setImportRunId(null);
+          setFatal(`Initial import blocked: ${e.message}`);
+          importBlocked = true;
           return null;
         });
-        if (report) setStatus(await api.status());
+        if (report) {
+          setFindings(report.findings || []);
+          currentStatus = await api.status();
+          setStatus(currentStatus);
+        }
+      }
+      const latestRunId = currentStatus.last_import?.id;
+      if (latestRunId != null) {
+        const report = await api.findings(latestRunId);
+        setFindings(report.findings);
+        setImportRunId(latestRunId);
       }
       const m = await api.models();
       setModels(m.models);
       if (m.models.length && !m.models.some((x) => x.model_key === modelKey)) {
         setModelKey(m.models[0].model_key);
       }
-      setFatal("");
+      if (!importBlocked) setFatal("");
     } catch (e) {
       setFatal(`Backend unreachable: ${e.message}`);
     }
@@ -39,12 +58,31 @@ export default function App() {
 
   useEffect(() => { refreshStatus(); }, []); // eslint-disable-line
 
+  useEffect(() => {
+    const showBlockedImport = (event) => {
+      setFindings(event.detail?.findings || []);
+      setImportRunId(null);
+      setTab("findings");
+    };
+    window.addEventListener("wbm:import-findings", showBlockedImport);
+    return () => window.removeEventListener(
+      "wbm:import-findings", showBlockedImport
+    );
+  }, []);
+
   const staged = status?.staged_changes ?? 0;
   const unsynced = status?.unsynced_committed_changes ?? 0;
+  const blockingCount = blockingFindings(findings).length;
 
   const tabs = [
     { id: "structure", label: "Form Structure", icon: ListOrdered },
     { id: "operations", label: "Model Operations", icon: Settings2 },
+    {
+      id: "findings",
+      label: "Findings",
+      icon: ShieldAlert,
+      badge: blockingCount || null,
+    },
     {
       id: "changes",
       label: "Changes & Sync",
@@ -106,6 +144,9 @@ export default function App() {
             setModelKey={setModelKey}
             onChanged={refreshStatus}
           />
+        )}
+        {tab === "findings" && (
+          <ImportFindings findings={findings} importRunId={importRunId} />
         )}
         {tab === "changes" && (
           <ChangesSync status={status} onChanged={refreshStatus} />
