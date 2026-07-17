@@ -1,6 +1,6 @@
 # Workbook-Congruent Relational Database Design
 
-Status: approved in conversation on 2026-07-16; written-spec review pending.
+Status: completed and verified on 2026-07-16.
 
 ## 1. Objective
 
@@ -582,3 +582,73 @@ Completion requires all of the following current-state evidence:
 
 Only this evidence—not implementation intent or a narrow test—can close the
 objective.
+
+## 18. Completion Record
+
+Completed on 2026-07-16. The implementation replaced the workbook manager's
+conceptual shared-table database with central relational domains and identical
+17-role physical collections for Stingray, Grand Sport, and Z06. The completed
+surfaces are the compiler/profile/mapping pipeline, candidate audit and atomic
+promotion, registry-driven validation/staging/history/sync, typed FastAPI API,
+React model-table and findings views, completion audit, and owning
+documentation.
+
+### Objective evidence
+
+- A fresh import returned `validated` for `stingray`, `grand_sport`, and `z06`,
+  with zero `decision_required` findings and zero runtime-contract differences.
+- SQLite introspection proved `option_id` is each model options primary key,
+  every live model has the same 17 active table roles, the conceptual shared
+  `options` table does not exist, and `PRAGMA foreign_key_check` returned no
+  rows.
+- Read-only FastAPI verification against temporary `WBM_DB` and `WBM_VAR_DIR`
+  paths proved all three models, identical registries, SQL/workbook names,
+  exact `option_id` search, variants with body/trim relationships, runtime
+  steps/sections, and 444 source-traced import findings. Only GET requests were
+  issued after the temporary database was built; staged and unsynced counts
+  remained zero and no sync was triggered.
+- Playwright verification succeeded at desktop and 390 x 844 mobile widths.
+  It showed all three live models, 17 role buttons, model-specific SQL and
+  workbook source names, `option_id` search, variants/runtime structure, and
+  the Findings source-trace columns. Screenshots were saved under
+  `/private/tmp` and were not added to the repository.
+
+### Validation
+
+- `pytest tests/workbook_manager`: 176 passed, 1 skipped, with the existing
+  FastAPI/Starlette TestClient deprecation warning.
+- `pytest tests/test_workbook_manager.py`: 27 passed, 1 skipped, with the same
+  existing warning.
+- Workbook package validation: valid, 0 issues.
+- Workbook schema/live-contract validation: valid, 0 issues, 0 errors, and 0
+  warnings.
+- Frontend contract Node gate: 13 passed.
+- Stingray regression Node gate: 89 passed.
+- Grand Sport draft Node gate: 19 passed.
+- Z06 draft Node gate: 24 passed.
+- Vite production build: passed, 1,521 modules transformed.
+- `git diff --check`: passed.
+
+The Grand Sport and Z06 Node gates invoked their generators and refreshed only
+the `generated_at` value in their tracked runtime contracts. Those two
+test-side-effect files were restored exactly from `HEAD` before completion.
+The final preserved hashes are:
+
+```text
+stingray_master.xlsx  03e8c9671185f238dde7f4bc8e7003da0f74d842d9cc2f76126f938cbb7b54d6
+form-app/data.js       dd60534734c1330085ea74602515e1ab75aa964d3134c230abe0f26217b79e78
+form-output aggregate 0a21250e7ea4fb5d93912c200671796eb92c3779aa8a8a77ac862b7dda9d6b03
+```
+
+Git comparison to the pre-implementation baseline shows no workbook,
+generated runtime artifact, `form-app` runtime/dealer surface, or other dealer
+submission file change.
+
+### Residual risk and follow-up
+
+Ambiguous shared-source fan-out edits and shared-source adds remain explicitly
+fail-closed. They require separate business/schema authority only if a future
+request needs those operations; the completed migration does not guess their
+meaning. The existing TestClient deprecation warning is outside this task's
+approved dependency scope. No unresolved current-generation contract mismatch
+or business decision remains. Follow-up: none implied.

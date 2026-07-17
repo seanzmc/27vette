@@ -1,103 +1,182 @@
 # Workbook Manager (React + FastAPI + SQLite)
 
-Interactive editor for `stingray_master.xlsx`: investigate, add, edit,
-validate, and remove workbook records through a form-based UI instead of
-direct spreadsheet manipulation.
+Workbook-traceable editor and audit console for `stingray_master.xlsx`.
+The workbook remains canonical in this stage; SQLite is the relational query,
+validation, staging, and audit surface.
 
 ```text
-React interface (frontend/, Vite build served by FastAPI)
-    ↓
-FastAPI API + validation layer (backend/app/)
-    ↓
-SQLite database (var/workbook_manager.sqlite3 — normalized, auditable)
-    ↕
-openpyxl import/export adapter (backend/app/importer.py, sync.py)
-    ↓
-stingray_master.xlsx (canonical in Stage 1)
+stingray_master.xlsx
+    -> profiled and compiled into a temporary canonical SQLite candidate
+    -> relational, lineage, reconciliation, and runtime-contract gates
+    -> atomic promotion to workbook_manager.sqlite3
+    -> FastAPI typed API
+    -> React registry, findings, edit, history, and sync views
 ```
 
-## Stage 1 status (current)
+The database has central relationship tables plus identical physical 17-role
+collections for `stingray`, `grand_sport`, and `z06`. Each model options table
+uses `option_id` as its SQLite primary key. `source_table_catalog`,
+`schema_mapping`, and `import_lineage` retain exact workbook names and row
+provenance; the API resolves logical model/table roles through
+`model_table_registry` rather than accepting SQL identifiers.
 
-The workbook remains canonical. Import populates SQLite; edits are staged,
-validated, and committed to SQLite with an append-only audit trail; approved
-changes synchronize back to the workbook **only** through the repo's existing
-gated pipeline (`editor_ops.apply_batch` → `save_workbook_safely()`), which
-enforces Excel-lock refusal, staleness checks, batch validation, temp-copy
-dry-run, package + schema validation, automatic backup, and atomic replace.
-Stage 2 (SQLite canonical, Excel becomes import/export format) requires no
-API or React changes — only the sync direction flips.
+## Safety boundary
+
+- Import builds and audits a candidate database before atomic promotion.
+- Unknown ownership, missing source roles, contract differences, and required
+  business decisions fail closed with source evidence.
+- Adds, updates, and deletes are staged and batch-validated before commit.
+- SQL history is append-only and tracks workbook sync state.
+- Workbook writes are never direct. A live sync requires explicit confirmation
+  and still uses `editor_ops.apply_batch()` -> `save_workbook_safely()` with
+  lock, mtime, dry-run, package/schema, backup, and atomic-replace gates.
+- This migration does not change generated runtime contracts or dealer
+  submission behavior.
+
+Ambiguous shared-source edits remain intentionally unavailable: a one-model
+edit that would fan out through a shared workbook row, or an add whose shared
+ownership cannot be represented unambiguously, is rejected rather than guessed.
 
 ## Setup
 
+Run from the repository root:
+
 ```sh
-# backend deps (repo venv)
+python3 -m venv .venv
+.venv/bin/python -m pip install --upgrade pip
+.venv/bin/python -m pip install -r requirements.txt
 .venv/bin/python -m pip install -r workbook-manager/backend/requirements.txt
 
-# frontend build (one-time per change; FastAPI serves dist/)
-cd workbook-manager/frontend && npm install && npm run build
+cd workbook-manager/frontend
+npm ci
+npm run build
+cd ../..
+```
+
+The backend test modules also import the shared generator package directly:
+
+```sh
+export PYTHONPATH="$PWD/scripts"
 ```
 
 ## Run
 
 ```sh
-./workbook-manager/run.sh            # serves API + built UI on :8050
-# dev mode with hot reload (optional):
-cd workbook-manager/frontend && npm run dev   # :5183, proxies /api → :8050
+./workbook-manager/run.sh
 ```
 
-Environment overrides: `WBM_WORKBOOK`, `WBM_DB`, `WBM_VAR_DIR`, `WBM_PORT`.
-
-## Workflow
-
-1. **Import** — `POST /api/import` (the UI triggers this on first load).
-   Every duplicate identifier, missing sheet/column, and unresolved
-   relationship is reported with sheet/row/entity detail; nothing is
-   silently dropped (rows with issues still import; first occurrence wins
-   on duplicates).
-2. **Edit** — Form Structure workspace (models, runtime steps, section
-   presentation/order, context sections, variants) and Model Operations
-   workspace (options, OVS, exclusive groups + members, rule mapping, rule
-   groups + members, pricing, variant overrides, assets, interior scope,
-   components; shared interiors/color overrides). Collections come from the
-   workbook's own `model_workbook_sources` registry, not a hardcoded list.
-3. **Stage** — every add/update/delete is validated (keys, types, enums,
-   scoped uniqueness, references) and queued in `pending_changes`. Undo
-   discards a staged change without touching data or audit history.
-   Deletes are blocked while dependents exist unless explicitly confirmed.
-4. **Commit** — batch revalidation, then one SQLite transaction; every
-   change lands in the append-only `change_history` table (timestamp,
-   actor, entity, model, op, old/new values, source sheet/row, validation
-   result, sync status).
-5. **Sync** — dry-run first (full gate, no write), then an explicit
-   confirmation writes the workbook with an automatic timestamped backup
-   (`backups/`) and an entry in `form-output/workbook-edit-log.jsonl`.
-   After a live write, regenerate artifacts per the repo README gates.
-6. **Export** — `POST /api/export` regenerates a comparison workbook under
-   `var/exports/` from the database (unmanaged sheets preserved verbatim)
-   for diffing against the live workbook.
-
-## Identity and normalization rules
-
-- `option_id` is **model-scoped** (verified: 144–186 ids overlap across
-  models) — SQLite enforces `UNIQUE(model_id, option_id)`; rule/group/price
-  ids are stored model-scoped as well; `interior_id` is global.
-- Canonical IDs are never rewritten. Display names/ids (`Title Case`,
-  confirmed-prefix stripping like `opt_z51_001 → Z51 001`) are derived at
-  display time only (`naming.py` / `naming.js`) and are reversible.
-- Workbook coordinates are traceability metadata (`src_sheet`, `src_row`),
-  never record identity.
-- `section_master` and the raw-preserved sheets (`PriceRef`,
-  `context_choice_copy`, `rule_phrase_map`, `runtime_rule_exceptions`) are
-  read-only in phase 1 because no gated write family exists for them;
-  ZR1/ZR1X scaffolds are visible but locked while their
-  `model_workbook_sources` rows are inactive.
-
-## Tests
+Open `http://127.0.0.1:8050/`. Environment overrides are `WBM_WORKBOOK`,
+`WBM_DB`, `WBM_VAR_DIR`, and `WBM_PORT`. To keep a verification run isolated:
 
 ```sh
-.venv/bin/python -m pytest tests/test_workbook_manager.py -q
-# full editor_ops dry-run + scratch-copy live-write gates (slower):
-WBM_SLOW_GATE=1 .venv/bin/python -m pytest tests/test_workbook_manager.py -q
+tmp_dir="$(mktemp -d /private/tmp/wbm-audit.XXXXXX)"
+WBM_DB="$tmp_dir/audited.sqlite3" \
+WBM_VAR_DIR="$tmp_dir/var" \
+WBM_WORKBOOK="$PWD/stingray_master.xlsx" \
+WBM_PORT=18050 \
+./workbook-manager/run.sh
 ```
 
-API tests skip automatically until the backend requirements are installed.
+## Import
+
+With the server running, import the canonical workbook through the typed API:
+
+```sh
+curl --fail-with-body \
+  --header 'Content-Type: application/json' \
+  --data "{\"workbook_path\":\"$PWD/stingray_master.xlsx\"}" \
+  http://127.0.0.1:8050/api/imports
+```
+
+A successful response has `status: "validated"`, the three live models, zero
+decision-required findings, and zero contract differences. HTTP `409` means
+promotion stopped; review the returned source sheet, row, column, code, and
+message rather than editing around it.
+
+Primary read surfaces:
+
+```text
+GET /api/status
+GET /api/imports/{import_run_id}
+GET /api/imports/{import_run_id}/findings
+GET /api/schema/mappings
+GET /api/models
+GET /api/models/{model_key}/tables
+GET /api/models/{model_key}/tables/{table_role}
+GET /api/models/{model_key}/variants
+GET /api/models/{model_key}/runtime
+GET /api/changes
+GET /api/history
+```
+
+Write-capable routes (`/api/imports`, `/api/changes`, `/api/sync`, `/api/export`,
+and `/api/backup`) must not be used for read-only browser verification. The
+React client calls the same typed API and never constructs physical SQL names.
+
+## Full completion audit
+
+Run from the repository root with `PYTHONPATH` exported as shown above:
+
+```sh
+.venv/bin/python -m pytest tests/workbook_manager -q
+.venv/bin/python -m pytest tests/test_workbook_manager.py -q
+.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+node --test tests/workbook_manager/test_frontend_contract.mjs
+node --test tests/stingray-form-regression.test.mjs
+node --test tests/grand-sport-draft-data.test.mjs
+node --test tests/z06-form-data-draft.test.mjs
+(cd workbook-manager/frontend && npm run build)
+git diff --check
+```
+
+The Grand Sport and Z06 Node generator tests refresh the generated timestamp in
+their tracked runtime-contract files. Treat that as validation output, inspect
+the diff, and do not stage a timestamp-only refresh when no generated artifact
+change was requested.
+
+Verify preserved source/runtime hashes:
+
+```sh
+shasum -a 256 stingray_master.xlsx form-app/data.js
+python3 - <<'PY'
+import hashlib
+import subprocess
+from pathlib import Path
+
+files = subprocess.check_output(["git", "ls-files", "form-output"]).decode().splitlines()
+digest = hashlib.sha256()
+for name in files:
+    file_hash = hashlib.sha256(Path(name).read_bytes()).hexdigest()
+    digest.update(f"{file_hash}  {name}\n".encode())
+print(digest.hexdigest(), "tracked form-output aggregate")
+PY
+```
+
+Expected values for the completed migration:
+
+```text
+stingray_master.xlsx  03e8c9671185f238dde7f4bc8e7003da0f74d842d9cc2f76126f938cbb7b54d6
+form-app/data.js       dd60534734c1330085ea74602515e1ab75aa964d3134c230abe0f26217b79e78
+form-output aggregate 0a21250e7ea4fb5d93912c200671796eb92c3779aa8a8a77ac862b7dda9d6b03
+```
+
+`tests/workbook_manager/test_completion_audit.py` performs the final fresh
+database schema audit: three live models, identical 17-role registries,
+`option_id` primary keys, zero foreign-key violations, zero unresolved
+decisions/contract differences, and no conceptual shared `options` table.
+
+## Editing and sync workflow
+
+1. Import a validated candidate database.
+2. Select a model and canonical table role in Model Operations. The UI displays
+   both the physical SQL table and workbook source sheet.
+3. Stage a change. Validation reports canonical keys and workbook lineage.
+4. Review dependencies and validate the complete staged batch.
+5. Commit once; the transaction appends corresponding history rows.
+6. Run a sync dry-run. A live sync additionally requires `confirm: "SYNC"` and
+   the reviewed workbook mtime, then executes the existing guarded write path.
+7. After any authorized live workbook write, regenerate and validate affected
+   artifacts using the repository-level commands in the root `README.md`.
+
+No live workbook write or dealer submission is part of the completion audit.

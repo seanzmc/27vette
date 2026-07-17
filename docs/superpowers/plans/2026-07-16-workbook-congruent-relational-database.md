@@ -1,12 +1,14 @@
 # Workbook-Congruent Relational Database Implementation Plan
 
+Status: completed and verified on 2026-07-16.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Replace the workbook manager's conceptual shared-table SQLite schema with a workbook-traceable, hardened relational schema whose identical Stingray, Grand Sport, and Z06 table collections use `option_id` primary keys and reproduce all three current runtime contracts.
 
 **Architecture:** Compile `stingray_master.xlsx` into typed central tables plus identical physical per-model table families, recording every source mapping and row lineage. Build and validate a candidate SQLite file atomically, serve it through registry-driven FastAPI routes, and keep workbook export/sync behind the existing guarded write path.
 
-**Tech Stack:** Python 3.14, stdlib `sqlite3`, FastAPI/Pydantic, `openpyxl`, pytest/unittest, React 19 + Vite, Node's built-in test runner, existing Corvette generators and contract comparator.
+**Tech Stack:** Python 3.14, stdlib `sqlite3`, FastAPI/Pydantic, `openpyxl`, pytest/unittest, React 18.3 + Vite, Node's built-in test runner, existing Corvette generators and contract comparator.
 
 ## Global Constraints
 
@@ -27,7 +29,10 @@
 - Only blank/`*` scope normalization, identifier normalization, proven shared-row splitting, and semantic field aliases may proceed without a business decision.
 - Existing guarded workbook writes remain `editor_ops.apply_batch()` -> `save_workbook_safely()`.
 - Use test-driven development: write and observe each failing test before production code.
-- Preserve the user's unstaged changes in `tests/test_workbook_manager.py` and `fable5loop/runs/2026-07-15-workbook-manager-stage1/validation-output.txt`. Never stage the Fable receipt. The legacy test file requires the explicit Task 8 approval gate below before it may be migrated or staged.
+- The user explicitly approved the Task 8 migration and commit of the existing
+  `tests/test_workbook_manager.py` module-reset fix. The unrelated
+  `fable5loop/runs/2026-07-15-workbook-manager-stage1/validation-output.txt`
+  receipt remains preserved and was never staged.
 - Reference design: `docs/superpowers/specs/2026-07-16-workbook-congruent-relational-database-design.md`.
 
 ---
@@ -92,7 +97,7 @@
 - Produces: `LIVE_MODELS`, `MODEL_TABLE_ROLES`, `physical_table(model_key, role)`, `resolve_model_table(conn, model_key, role)`, `create_canonical_schema(conn)`.
 - Consumes: no new task interfaces; uses only stdlib `sqlite3`.
 
-- [ ] **Step 1: Write failing schema tests**
+- [x] **Step 1: Write failing schema tests**
 
 Create these base fixtures in `conftest.py`, then add the schema tests:
 
@@ -164,7 +169,7 @@ def test_model_owned_table_rejects_wrong_model(connection):
         )
 ```
 
-- [ ] **Step 2: Run tests and observe the expected failure**
+- [x] **Step 2: Run tests and observe the expected failure**
 
 Run:
 
@@ -174,7 +179,7 @@ Run:
 
 Expected: collection failure because `app.catalog` and `create_canonical_schema` do not exist.
 
-- [ ] **Step 3: Implement the catalog and DDL**
+- [x] **Step 3: Implement the catalog and DDL**
 
 Define the exact role tuple and safe resolver:
 
@@ -233,12 +238,12 @@ Generate equivalent DDL for the other two models and all 17 roles. Use quoted
 identifier interpolation only with values returned by `physical_table`; never
 interpolate request data.
 
-- [ ] **Step 4: Run schema tests**
+- [x] **Step 4: Run schema tests**
 
 Run the Task 1 test file. Expected: all tests pass and `PRAGMA foreign_keys`
 returns `1`.
 
-- [ ] **Step 5: Commit Task 1**
+- [x] **Step 5: Commit Task 1**
 
 ```bash
 git add workbook-manager/backend/app/catalog.py workbook-manager/backend/app/db.py tests/workbook_manager/conftest.py tests/workbook_manager/test_catalog_schema.py
@@ -258,7 +263,7 @@ git commit -m "feat: define canonical model database schema"
 - Produces: `Finding`, `SourceSheet`, `WorkbookProfile`, `profile_workbook(path) -> WorkbookProfile`.
 - Consumes: `LIVE_MODELS` and canonical roles from Task 1.
 
-- [ ] **Step 1: Write failing profile tests against the real workbook**
+- [x] **Step 1: Write failing profile tests against the real workbook**
 
 ```python
 from app.workbook_profile import profile_workbook
@@ -296,11 +301,11 @@ Profile copied or legacy inputs with a `form_*` sheet as
 `generated_artifact_validation` and emit the `retired_generated_sheet_present`
 contract mismatch; never import those sheets as source data.
 
-- [ ] **Step 2: Run tests and verify failure**
+- [x] **Step 2: Run tests and verify failure**
 
 Expected: import error for the missing profile module.
 
-- [ ] **Step 3: Implement immutable compiler types and read-only profiling**
+- [x] **Step 3: Implement immutable compiler types and read-only profiling**
 
 Use these public dataclasses:
 
@@ -364,7 +369,7 @@ classify every sheet. Do not hardcode live source sheet names; derive them from
 `model_workbook_sources` and use a finite disposition policy for generated,
 inactive future, shared, and direct sources.
 
-- [ ] **Step 4: Run profile tests and workbook schema validator**
+- [x] **Step 4: Run profile tests and workbook schema validator**
 
 ```bash
 .venv/bin/python -m pytest tests/workbook_manager/test_workbook_profile.py -q
@@ -373,7 +378,7 @@ inactive future, shared, and direct sources.
 
 Expected: tests pass; the workbook validator exits successfully.
 
-- [ ] **Step 5: Commit Task 2**
+- [x] **Step 5: Commit Task 2**
 
 ```bash
 git add workbook-manager/backend/app/compile_types.py workbook-manager/backend/app/workbook_profile.py tests/workbook_manager/test_workbook_profile.py
@@ -398,7 +403,7 @@ git commit -m "feat: profile workbook source coverage"
 - Produces: `CompiledRow`, `CompiledTable`, `compile_central_tables(profile, workbook_path) -> tuple[CompiledTable, ...]`.
 - Consumes: profile/types from Task 2 and central table names from Task 1.
 
-- [ ] **Step 1: Write failing central relationship tests**
+- [x] **Step 1: Write failing central relationship tests**
 
 Assert these concrete behaviors:
 
@@ -446,9 +451,9 @@ def test_runtime_route_keys_keep_hidden_summary_buckets_distinct(compiled_centra
     }
 ```
 
-- [ ] **Step 2: Verify tests fail because the compiler is absent**
+- [x] **Step 2: Verify tests fail because the compiler is absent**
 
-- [ ] **Step 3: Implement central compilation and exact lineage**
+- [x] **Step 3: Implement central compilation and exact lineage**
 
 Define:
 
@@ -515,11 +520,11 @@ expression index on
 `(option_type, COALESCE(trim_level, '<unrestricted>'), code)`. Reject empty
 identity values and the reserved sentinel.
 
-- [ ] **Step 4: Run central compiler and catalog tests**
+- [x] **Step 4: Run central compiler and catalog tests**
 
 Expected: all Task 1-3 tests pass.
 
-- [ ] **Step 5: Commit Task 3**
+- [x] **Step 5: Commit Task 3**
 
 ```bash
 git add workbook-manager/backend/app/central_compiler.py workbook-manager/backend/app/compile_types.py workbook-manager/backend/app/workbook_profile.py workbook-manager/backend/app/db.py tests/workbook_manager/test_central_compiler.py tests/workbook_manager/test_catalog_schema.py docs/superpowers/specs/2026-07-16-workbook-congruent-relational-database-design.md docs/superpowers/plans/2026-07-16-workbook-congruent-relational-database.md
@@ -538,7 +543,7 @@ git commit -m "feat: compile central form relationships"
 - Produces: `compile_direct_model_tables(profile, workbook_path, central) -> tuple[CompiledTable, ...]`.
 - Consumes: Tasks 1-3 compiler types, source registry, and central domains.
 
-- [ ] **Step 1: Write failing tests for all direct model roles**
+- [x] **Step 1: Write failing tests for all direct model roles**
 
 ```python
 @pytest.fixture
@@ -572,12 +577,12 @@ def test_polymorphic_sources_are_typed_without_prefix_guessing(compiled_models):
         assert bool(values.get("source_option_id")) ^ bool(values.get("source_interior_id"))
 ```
 
-- [ ] **Step 2: Verify red failures**
+- [x] **Step 2: Verify red failures**
 
 Expected: missing `model_compiler` or missing `role`/`model_key` fields on
 `CompiledTable`.
 
-- [ ] **Step 3: Implement direct role compilation**
+- [x] **Step 3: Implement direct role compilation**
 
 Use the `CompiledTable.model_key` and `CompiledTable.role` fields defined in
 Task 3. Resolve exact workbook sources only through `profile.active_sources`.
@@ -604,11 +609,11 @@ Targets must resolve to the model options set. Normalize body/trim/variant
 unrestricted scopes to `None`; preserve restricted values through central
 domain keys. Emit a `schema_mapping` entry for every renamed column.
 
-- [ ] **Step 4: Run Tasks 1-4 tests**
+- [x] **Step 4: Run Tasks 1-4 tests**
 
 Expected: exact current row counts and no unresolved live option/OVS reference.
 
-- [ ] **Step 5: Commit Task 4**
+- [x] **Step 5: Commit Task 4**
 
 ```bash
 git add workbook-manager/backend/app/model_compiler.py workbook-manager/backend/app/compile_types.py tests/workbook_manager/test_model_compiler.py
@@ -628,7 +633,7 @@ git commit -m "feat: compile identical live model table families"
 - Produces: `compile_shared_model_tables(profile, workbook_path, central, direct) -> SharedCompilation`.
 - Consumes: registered interior sources, compiled model options, runtime wildcard behavior, and compiler types.
 
-- [ ] **Step 1: Write failing split and dead-end tests**
+- [x] **Step 1: Write failing split and dead-end tests**
 
 Cover real-workbook model interiors, wildcard asset overlay, `adds_rpo` aliasing,
 and ambiguous IDs:
@@ -688,9 +693,9 @@ that interior and two real Stingray option IDs, and intentionally add no
 `model_interior_scope` row. The compiler must report the row; it must not guess
 Stingray ownership from the option IDs.
 
-- [ ] **Step 2: Run and observe expected failures**
+- [x] **Step 2: Run and observe expected failures**
 
-- [ ] **Step 3: Implement shared splitters with current contract semantics**
+- [x] **Step 3: Implement shared splitters with current contract semantics**
 
 Implement:
 
@@ -719,7 +724,7 @@ Context-choice assets map `asset_map.target_id` directly to the canonical
 `context_choice_id` and reference `(model_key, context_choice_id)`; wildcard
 context-choice assets remain unsupported.
 
-- [ ] **Step 4: Run shared compiler plus existing workbook schema tests**
+- [x] **Step 4: Run shared compiler plus existing workbook schema tests**
 
 ```bash
 .venv/bin/python -m pytest tests/workbook_manager/test_shared_compiler.py tests/test_schema_validation_metadata.py -q
@@ -727,7 +732,7 @@ context-choice assets remain unsupported.
 
 Expected: pass; shared rows have complete one-to-many lineage.
 
-- [ ] **Step 5: Commit Task 5**
+- [x] **Step 5: Commit Task 5**
 
 ```bash
 git add workbook-manager/backend/app/shared_compiler.py tests/workbook_manager/conftest.py tests/workbook_manager/test_shared_compiler.py
@@ -749,7 +754,7 @@ git commit -m "feat: split shared workbook sources by model"
 - Produces: `compile_workbook(path) -> CompiledWorkbook`, `load_candidate(compiled, path)`, `promote_candidate(candidate, destination)`, `import_workbook(db_path, workbook_path) -> ImportReport`.
 - Consumes: all compiler output from Tasks 2-5 and DDL from Task 1.
 
-- [ ] **Step 1: Write failing candidate/promotion tests**
+- [x] **Step 1: Write failing candidate/promotion tests**
 
 Create `broken_fk_workbook` by copying the real workbook, deleting the first
 `stingray_options` row whose `option_id` is referenced by `stingray_ovs`, and
@@ -826,12 +831,12 @@ The fixture DDL must reproduce all current `pending_changes` columns from
 `workbook-manager/backend/app/db.py`; it must not import the new schema helper
 to manufacture a false non-legacy database.
 
-- [ ] **Step 2: Verify failures against the current destructive clear/import path**
+- [x] **Step 2: Verify failures against the current destructive clear/import path**
 
 Expected: tests fail because current importer accepts a connection, clears live
 tables, and lacks candidate promotion.
 
-- [ ] **Step 3: Implement compile/load/audit/promotion orchestration**
+- [x] **Step 3: Implement compile/load/audit/promotion orchestration**
 
 Define the orchestration result types exactly:
 
@@ -882,12 +887,12 @@ legacy history.
 before Task 7 exists. Task 7 must delete that bypass and make the real contract
 auditor mandatory before any production candidate can be promoted.
 
-- [ ] **Step 4: Run import tests against a temporary destination**
+- [x] **Step 4: Run import tests against a temporary destination**
 
 Expected: real workbook imports without touching the repo database or workbook;
 failure cases leave sentinel destination bytes unchanged.
 
-- [ ] **Step 5: Commit Task 6**
+- [x] **Step 5: Commit Task 6**
 
 ```bash
 git add workbook-manager/backend/app/importer.py workbook-manager/backend/app/migration.py workbook-manager/backend/app/db.py tests/workbook_manager/conftest.py tests/workbook_manager/test_import_promotion.py
@@ -1050,7 +1055,7 @@ git commit -m "feat: audit SQL data against runtime contracts"
 - Produces: `validate_record(conn, model_key, role, record, op, original_key)`, `find_dependents(conn, model_key, role, key)`, unchanged staged-change verbs using `table_role` rather than conceptual table names.
 - Consumes: safe physical-table resolution, schema mappings, and export adapter.
 
-- [ ] **Step 0: Resolve the dirty legacy-test gate before editing**
+- [x] **Step 0: Resolve the dirty legacy-test gate before editing**
 
 `tests/test_workbook_manager.py` has a user-owned unstaged module-reset fix, but
 the rest of that file asserts the Stage 1 shared `options` table and legacy
@@ -1060,7 +1065,7 @@ the file while preserving and including the module-reset fix. Do not create
 shared conceptual SQL views or a second compatibility data path to avoid this
 gate.
 
-- [ ] **Step 1: Write failing staging/dependency/sync tests**
+- [x] **Step 1: Write failing staging/dependency/sync tests**
 
 Cover add/update/delete per physical model table, cross-model rejection,
 dependent-delete blocking across all model relations, append-only history, and
@@ -1132,9 +1137,9 @@ def test_sync_batch_restores_workbook_field_names(imported_db, real_workbook):
     assert "option_id" in batch["items"][0]["row"]
 ```
 
-- [ ] **Step 2: Run tests and observe conceptual-spec failures**
+- [x] **Step 2: Run tests and observe conceptual-spec failures**
 
-- [ ] **Step 3: Replace `TableSpec` lookups with catalog/registry metadata**
+- [x] **Step 3: Replace `TableSpec` lookups with catalog/registry metadata**
 
 All public staging payloads use `model_key` and `table_role`; `sql_table` is
 resolved internally. Validate types, enums, FKs, immutable keys, and dependency
@@ -1156,7 +1161,7 @@ Delete `specs.py` only after
 returns no callers. Do not replace it with compatibility views or duplicate
 catalog definitions.
 
-- [ ] **Step 4: Run staging/sync tests and a scratch-copy slow gate**
+- [x] **Step 4: Run staging/sync tests and a scratch-copy slow gate**
 
 ```bash
 .venv/bin/python -m pytest tests/workbook_manager/test_staging_sync.py -q
@@ -1165,7 +1170,7 @@ WBM_SLOW_GATE=1 .venv/bin/python -m pytest tests/workbook_manager/test_staging_s
 
 Expected: both pass; scratch copy gets a backup, real workbook hash is unchanged.
 
-- [ ] **Step 5: Commit Task 8**
+- [x] **Step 5: Commit Task 8**
 
 ```bash
 git add workbook-manager/backend/app/catalog.py workbook-manager/backend/app/validation.py workbook-manager/backend/app/staging.py workbook-manager/backend/app/sync.py workbook-manager/backend/app/specs.py tests/workbook_manager/test_staging_sync.py tests/test_workbook_manager.py
@@ -1190,7 +1195,7 @@ Fable validation receipt remains unstaged.
   `create_app(db_path: Path | None = None) -> FastAPI` for isolated tests.
 - Consumes: Tasks 1-8 backend services; route functions contain no compiler SQL.
 
-- [ ] **Step 1: Write failing API tests**
+- [x] **Step 1: Write failing API tests**
 
 ```python
 @pytest.fixture
@@ -1223,9 +1228,9 @@ def test_decision_finding_has_actionable_source_detail(
     assert {"source_sheet", "source_row", "source_column", "code"} <= finding
 ```
 
-- [ ] **Step 2: Verify red 404/route failures**
+- [x] **Step 2: Verify red 404/route failures**
 
-- [ ] **Step 3: Implement typed request/response models and routes**
+- [x] **Step 3: Implement typed request/response models and routes**
 
 Add `ImportReportOut`, `FindingOut`, `SchemaMappingOut`, `ModelTableOut`,
 `ModelRuntimeOut`, and revise `StageChangeRequest` to accept `model_key` and
@@ -1238,7 +1243,7 @@ frontend switches in Task 10. They must not retain conceptual-table SQL. Task
 10 removes these transitional aliases after the React callers use v2, leaving
 one supported API route per operation.
 
-- [ ] **Step 4: Run API and existing workbook-manager tests**
+- [x] **Step 4: Run API and existing workbook-manager tests**
 
 ```bash
 .venv/bin/python -m pytest tests/workbook_manager/test_api_v2.py -q
@@ -1248,7 +1253,7 @@ one supported API route per operation.
 Expected: v2 tests pass; the user's module-reset fix keeps the legacy API
 validation test at 422 rather than 500.
 
-- [ ] **Step 5: Commit Task 9 without staging the user-owned legacy test change**
+- [x] **Step 5: Commit Task 9 without staging the user-owned legacy test change**
 
 ```bash
 git add workbook-manager/backend/app/main.py workbook-manager/backend/app/schemas.py tests/workbook_manager/test_api_v2.py
@@ -1273,7 +1278,7 @@ git commit -m "feat: expose canonical workbook database API"
 - Produces: frontend calls to v2 model/table roles and visible import/contract findings.
 - Consumes: typed Task 9 response shapes; no SQL table-name construction in React.
 
-- [ ] **Step 1: Write failing pure frontend contract tests**
+- [x] **Step 1: Write failing pure frontend contract tests**
 
 ```javascript
 import test from "node:test";
@@ -1302,13 +1307,13 @@ test("decision and contract findings are blocking", () => {
 });
 ```
 
-- [ ] **Step 2: Run Node test and verify module-not-found failure**
+- [x] **Step 2: Run Node test and verify module-not-found failure**
 
 ```bash
 node --test tests/workbook_manager/test_frontend_contract.mjs
 ```
 
-- [ ] **Step 3: Implement v2 API calls and UI components**
+- [x] **Step 3: Implement v2 API calls and UI components**
 
 `tableRegistry.js` must remain pure. `api.js` calls server routes with encoded
 model/role values. `ModelOperations` stores the role as selection state and uses
@@ -1321,7 +1326,7 @@ After all React calls use v2, remove `/api/import`,
 that those three legacy surfaces return 404 and that their handlers no longer
 appear in the FastAPI route registry.
 
-- [ ] **Step 4: Run Node test and Vite build**
+- [x] **Step 4: Run Node test and Vite build**
 
 ```bash
 node --test tests/workbook_manager/test_frontend_contract.mjs
@@ -1330,7 +1335,7 @@ cd workbook-manager/frontend && npm run build
 
 Expected: tests and build pass without adding dependencies.
 
-- [ ] **Step 5: Commit Task 10**
+- [x] **Step 5: Commit Task 10**
 
 ```bash
 git add workbook-manager/backend/app/main.py workbook-manager/frontend/src/api.js workbook-manager/frontend/src/tableRegistry.js workbook-manager/frontend/src/App.jsx workbook-manager/frontend/src/components/ModelOperations.jsx workbook-manager/frontend/src/components/ImportFindings.jsx tests/workbook_manager/test_api_v2.py tests/workbook_manager/test_frontend_contract.mjs
@@ -1352,7 +1357,7 @@ git commit -m "feat: show canonical tables and import findings"
 - Produces: final requirement-by-requirement evidence and closed owning spec.
 - Consumes: the complete system from Tasks 1-10.
 
-- [ ] **Step 1: Add a failing completion-audit test before docs**
+- [x] **Step 1: Add a failing completion-audit test before docs**
 
 Create `tests/workbook_manager/test_completion_audit.py` that builds a temporary
 database from the real workbook and asserts:
@@ -1408,7 +1413,7 @@ def test_objective_completion(audited_database):
     assert not table_exists(conn, "options")
 ```
 
-- [ ] **Step 2: Run the complete automated gate set**
+- [x] **Step 2: Run the complete automated gate set**
 
 ```bash
 .venv/bin/python -m pytest tests/workbook_manager -q
@@ -1425,7 +1430,7 @@ git diff --check
 
 Expected: all commands pass. Record exact counts and any environment skips.
 
-- [ ] **Step 3: Run manual FastAPI and browser verification**
+- [x] **Step 3: Run manual FastAPI and browser verification**
 
 Start `./workbook-manager/run.sh` with `WBM_DB` and `WBM_VAR_DIR` pointing to a
 temporary directory. Verify at desktop and mobile widths:
@@ -1440,7 +1445,7 @@ temporary directory. Verify at desktop and mobile widths:
 
 Save screenshots under `/private/tmp`; do not add them to the repository.
 
-- [ ] **Step 4: Audit preserved boundaries and update owning docs**
+- [x] **Step 4: Audit preserved boundaries and update owning docs**
 
 Compare hashes for `stingray_master.xlsx`, `form-app/data.js`, and promoted
 runtime contracts against pre-implementation values. Confirm no dealer files
@@ -1448,7 +1453,7 @@ changed. Update the workbook-manager README with exact setup/run/import/audit
 commands and close the design spec with completion date, changed surfaces,
 validation results, residual risks, and `none implied` follow-up when true.
 
-- [ ] **Step 5: Commit documentation and completion audit**
+- [x] **Step 5: Commit documentation and completion audit**
 
 ```bash
 git add tests/workbook_manager/test_completion_audit.py workbook-manager/README.md README.md docs/superpowers/specs/2026-07-16-workbook-congruent-relational-database-design.md docs/superpowers/plans/2026-07-16-workbook-congruent-relational-database.md
@@ -1457,6 +1462,31 @@ git commit -m "docs: verify relational workbook database migration"
 
 Do not stage the user's pre-existing modified files unless the user separately
 authorizes including them.
+
+### Task 11 execution result
+
+- The completion-audit test was added before documentation. Its first valid
+  behavior run passed because it audits the already-completed Tasks 1-10; the
+  initial linked-worktree invocation exposed only missing local environment
+  setup (`.venv`/`PYTHONPATH`), not an objective defect. No artificial failure
+  or production change was introduced.
+- Full Python gates: 176 passed, 1 skipped in `tests/workbook_manager`; 27
+  passed, 1 skipped in `tests/test_workbook_manager.py`. Both emitted only the
+  existing FastAPI/Starlette TestClient deprecation warning.
+- Package/schema validators were valid with zero issues, errors, or warnings.
+  Node gates passed 13, 89, 19, and 24 tests; the Vite build transformed 1,521
+  modules; `git diff --check` passed.
+- The Grand Sport and Z06 Node generator gates refreshed only tracked
+  `generated_at` timestamps. Those exact two files were restored from `HEAD`;
+  workbook, registry, and tracked `form-output` hashes then matched their
+  pre-implementation values.
+- Read-only temporary FastAPI verification and Playwright desktop/mobile
+  verification passed. No UI import, edit, commit, sync, export, backup, live
+  workbook write, or dealer submission was triggered. Screenshots remain only
+  under `/private/tmp`.
+- The design spec and workbook-manager README are closed with exact commands,
+  results, preserved boundaries, residual fail-closed limitation, and no stale
+  approval prompt. Follow-up: none implied.
 
 ---
 
