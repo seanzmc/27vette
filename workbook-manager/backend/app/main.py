@@ -9,7 +9,8 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Request
-from fastapi.responses import FileResponse
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import config, db as dbmod, importer, staging, sync as syncmod
@@ -22,12 +23,16 @@ from .catalog import (
 )
 from .naming import display_id, humanize
 from .schemas import (
+    BackupOut,
     ChangeListOut,
     ChangeOut,
+    CommitConflictResponse,
     CommitOut,
     CommitRequest,
+    ExportOut,
     FindingsOut,
     HistoryOut,
+    ImportConflictResponse,
     ImportReportOut,
     ImportRequest,
     ImportRunOut,
@@ -35,10 +40,15 @@ from .schemas import (
     ModelTableRecordsOut,
     ModelTablesOut,
     ModelVariantsOut,
-    OperationOut,
+    ModelsOut,
+    MessageErrorResponse,
     SchemaMappingsOut,
     StageChangeRequest,
+    SyncConflictResponse,
+    SyncOut,
     SyncRequest,
+    TableSchemaOut,
+    ValidationErrorResponse,
     ValidationOut,
 )
 from .staging import StagingError
@@ -46,6 +56,24 @@ from .validation import find_dependents
 
 
 router = APIRouter()
+
+NOT_FOUND_RESPONSE = {404: {"model": MessageErrorResponse}}
+VALIDATION_RESPONSE = {422: {"model": ValidationErrorResponse}}
+
+
+def _require_model(model_key: str) -> None:
+    if model_key not in LIVE_MODELS:
+        raise HTTPException(404, "unknown model")
+
+
+def _require_model_role(
+    conn: sqlite3.Connection, model_key: str, table_role: str
+) -> None:
+    _require_model(model_key)
+    try:
+        edit_spec(conn, model_key, table_role)
+    except KeyError:
+        raise HTTPException(404, "unknown model/table role") from None
 
 
 def get_conn(request: Request) -> sqlite3.Connection:
@@ -69,10 +97,6 @@ def _close_connection(api: FastAPI) -> None:
     if conn is not None:
         conn.close()
         api.state.connection = None
-
-
-def _staging_error(exc: StagingError) -> HTTPException:
-    return HTTPException(status_code=422, detail={"errors": exc.errors})
 
 
 _LEGACY_TABLE_ROLES = {
@@ -512,6 +536,13 @@ def _staging_errors_with_lineage(
             "ORDER BY CASE WHEN model_key=? THEN 0 ELSE 1 END, id LIMIT 1",
             (spec.sql_table, field, model_key, model_key),
         ).fetchone()
+        error.setdefault("model_key", model_key)
+        error.setdefault("table_role", table_role)
+        error.setdefault("sql_table", spec.sql_table)
+        error.setdefault("field", field)
+        error.setdefault("entity_key", "/".join(
+            str(canonical_key.get(column) or "") for column in spec.key
+        ))
         error.setdefault(
             "source_sheet",
             str(lineage["source_sheet"] if lineage else (
@@ -526,6 +557,39 @@ def _staging_errors_with_lineage(
             "source_column", str(mapping["source_column"] if mapping else field)
         )
         output.append(error)
+    return output
+
+
+def _validation_with_lineage(
+    conn: sqlite3.Connection, validation: dict
+) -> dict:
+    output = {"ok": bool(validation.get("ok")), "results": []}
+    for raw_result in validation.get("results", []):
+        result = dict(raw_result)
+        change = staging.get_change(conn, int(result["change_id"]))
+        result["errors"] = _staging_errors_with_lineage(
+            conn,
+            change["model_key"],
+            change["table_role"],
+            change["entity_key"] or {},
+            list(result.get("errors") or []),
+        )
+        output["results"].append(result)
+    return output
+
+
+def _change_with_lineage(conn: sqlite3.Connection, change: dict) -> dict:
+    output = dict(change)
+    validation = dict(output.get("validation") or {})
+    validation["errors"] = _staging_errors_with_lineage(
+        conn,
+        output["model_key"],
+        output["table_role"],
+        output.get("entity_key") or {},
+        list(validation.get("errors") or []),
+    )
+    validation.setdefault("dependents", [])
+    output["validation"] = validation
     return output
 
 
@@ -566,12 +630,23 @@ def _stage_change(conn: sqlite3.Connection, payload: StageChangeRequest) -> dict
         raise HTTPException(
             status_code=422,
             detail={"errors": [{
+                "model_key": model_key,
+                "table_role": table_role,
+                "sql_table": "",
                 "field": "model_id/table",
+                "entity_key": "",
                 "message": "one consistent model and table role are required",
+                "source_sheet": "",
+                "source_row": None,
+                "source_column": "model_id/table",
+                "code": "inconsistent_resource_identity",
+                "severity": "error",
+                "status": "invalid",
             }]},
         )
+    _require_model_role(conn, model_key, table_role)
     try:
-        return staging.stage_change(
+        change = staging.stage_change(
             conn,
             model_key=model_key,
             table_role=table_role,
@@ -581,6 +656,7 @@ def _stage_change(conn: sqlite3.Connection, payload: StageChangeRequest) -> dict
             session_id=payload.session_id,
             confirm_dependencies=payload.confirm_dependencies,
         )
+        return _change_with_lineage(conn, change)
     except StagingError as exc:
         enriched = _staging_errors_with_lineage(
             conn, model_key, table_role, key, exc.errors
@@ -687,7 +763,15 @@ def latest_import(conn: sqlite3.Connection = Depends(get_conn)):
     return report
 
 
-@router.post("/api/imports", response_model=ImportReportOut)
+@router.post(
+    "/api/imports",
+    response_model=ImportReportOut,
+    responses={
+        **NOT_FOUND_RESPONSE,
+        **VALIDATION_RESPONSE,
+        409: {"model": ImportConflictResponse},
+    },
+)
 def create_import(payload: ImportRequest, request: Request):
     workbook_path = Path(payload.workbook_path)
     if not workbook_path.is_file():
@@ -714,7 +798,11 @@ def create_import(payload: ImportRequest, request: Request):
     return canonical
 
 
-@router.get("/api/imports/{import_run_id}", response_model=ImportRunOut)
+@router.get(
+    "/api/imports/{import_run_id}",
+    response_model=ImportRunOut,
+    responses=NOT_FOUND_RESPONSE,
+)
 def import_run(
     import_run_id: int, conn: sqlite3.Connection = Depends(get_conn)
 ):
@@ -725,7 +813,9 @@ def import_run(
 
 
 @router.get(
-    "/api/imports/{import_run_id}/findings", response_model=FindingsOut
+    "/api/imports/{import_run_id}/findings",
+    response_model=FindingsOut,
+    responses=NOT_FOUND_RESPONSE,
 )
 def import_findings(
     import_run_id: int, conn: sqlite3.Connection = Depends(get_conn)
@@ -741,7 +831,7 @@ def schema_mappings(conn: sqlite3.Connection = Depends(get_conn)):
     return _schema_mappings(conn)
 
 
-@router.get("/api/models")
+@router.get("/api/models", response_model=ModelsOut)
 def models(conn: sqlite3.Connection = Depends(get_conn)):
     return _models(conn)
 
@@ -764,7 +854,11 @@ def collections(
         raise HTTPException(404, f"unknown model {model_key!r}") from None
 
 
-@router.get("/api/models/{model_key}/tables", response_model=ModelTablesOut)
+@router.get(
+    "/api/models/{model_key}/tables",
+    response_model=ModelTablesOut,
+    responses=NOT_FOUND_RESPONSE,
+)
 def model_tables(
     model_key: str, conn: sqlite3.Connection = Depends(get_conn)
 ):
@@ -775,7 +869,9 @@ def model_tables(
 
 
 @router.get(
-    "/api/models/{model_key}/variants", response_model=ModelVariantsOut
+    "/api/models/{model_key}/variants",
+    response_model=ModelVariantsOut,
+    responses=NOT_FOUND_RESPONSE,
 )
 def model_variants(
     model_key: str, conn: sqlite3.Connection = Depends(get_conn)
@@ -786,7 +882,11 @@ def model_variants(
         raise HTTPException(404, "unknown model") from None
 
 
-@router.get("/api/models/{model_key}/runtime", response_model=ModelRuntimeOut)
+@router.get(
+    "/api/models/{model_key}/runtime",
+    response_model=ModelRuntimeOut,
+    responses=NOT_FOUND_RESPONSE,
+)
 def model_runtime(
     model_key: str, conn: sqlite3.Connection = Depends(get_conn)
 ):
@@ -796,7 +896,11 @@ def model_runtime(
         raise HTTPException(404, "unknown model") from None
 
 
-@router.get("/api/models/{model_key}/tables/{table_role}/schema")
+@router.get(
+    "/api/models/{model_key}/tables/{table_role}/schema",
+    response_model=TableSchemaOut,
+    responses=NOT_FOUND_RESPONSE,
+)
 def record_schema(
     model_key: str,
     table_role: str,
@@ -811,6 +915,7 @@ def record_schema(
 @router.get(
     "/api/models/{model_key}/tables/{table_role}",
     response_model=ModelTableRecordsOut,
+    responses={**NOT_FOUND_RESPONSE, **VALIDATION_RESPONSE},
 )
 def records(
     model_key: str,
@@ -896,7 +1001,11 @@ def dependencies_compat(
         raise HTTPException(404, "unknown model/table role") from None
 
 
-@router.post("/api/changes", response_model=ChangeOut)
+@router.post(
+    "/api/changes",
+    response_model=ChangeOut,
+    responses={**NOT_FOUND_RESPONSE, **VALIDATION_RESPONSE},
+)
 def stage(
     payload: StageChangeRequest,
     conn: sqlite3.Connection = Depends(get_conn),
@@ -908,30 +1017,76 @@ def stage(
 def changes(
     status: str = "staged", conn: sqlite3.Connection = Depends(get_conn)
 ):
-    return {"changes": staging.list_changes(conn, status)}
+    return {
+        "changes": [
+            _change_with_lineage(conn, change)
+            for change in staging.list_changes(conn, status)
+        ]
+    }
 
 
-@router.delete("/api/changes/{change_id}", response_model=ChangeOut)
+@router.delete(
+    "/api/changes/{change_id}",
+    response_model=ChangeOut,
+    responses={**NOT_FOUND_RESPONSE, **VALIDATION_RESPONSE},
+)
 def discard(change_id: int, conn: sqlite3.Connection = Depends(get_conn)):
     try:
-        return staging.discard_change(conn, change_id)
+        change = staging.get_change(conn, change_id)
+    except StagingError:
+        raise HTTPException(404, f"change {change_id} not found") from None
+    try:
+        return _change_with_lineage(
+            conn, staging.discard_change(conn, change_id)
+        )
     except StagingError as exc:
-        raise _staging_error(exc) from exc
+        enriched = _staging_errors_with_lineage(
+            conn,
+            change["model_key"],
+            change["table_role"],
+            change["entity_key"] or {},
+            exc.errors,
+        )
+        raise HTTPException(422, detail={"errors": enriched}) from exc
 
 
 @router.post("/api/changes/validate", response_model=ValidationOut)
 def validate_changes(conn: sqlite3.Connection = Depends(get_conn)):
-    return staging.revalidate_staged(conn)
+    return _validation_with_lineage(conn, staging.revalidate_staged(conn))
 
 
-@router.post("/api/changes/commit", response_model=CommitOut)
+@router.post(
+    "/api/changes/commit",
+    response_model=CommitOut,
+    responses={
+        **VALIDATION_RESPONSE,
+        409: {"model": CommitConflictResponse},
+    },
+)
 def commit(
     payload: CommitRequest, conn: sqlite3.Connection = Depends(get_conn)
 ):
-    return staging.commit_staged(conn, actor=payload.actor)
+    result = dict(staging.commit_staged(conn, actor=payload.actor))
+    result["validation"] = _validation_with_lineage(
+        conn, result.get("validation") or {"ok": True, "results": []}
+    )
+    if result.get("status") == "invalid":
+        errors = [
+            error
+            for item in result["validation"]["results"]
+            for error in item["errors"]
+        ]
+        raise HTTPException(422, detail={"errors": errors})
+    if not result.get("ok"):
+        raise HTTPException(409, detail=result)
+    return result
 
 
-@router.get("/api/history", response_model=HistoryOut)
+@router.get(
+    "/api/history",
+    response_model=HistoryOut,
+    responses={**NOT_FOUND_RESPONSE, **VALIDATION_RESPONSE},
+)
 def history(
     model_key: str = "",
     table_role: str = "",
@@ -942,17 +1097,36 @@ def history(
     offset: int = 0,
     conn: sqlite3.Connection = Depends(get_conn),
 ):
+    model_key = model_key or model
+    table_role = _LEGACY_TABLE_ROLES.get(
+        table_role or entity_type, table_role or entity_type
+    )
+    if model_key:
+        _require_model(model_key)
+    if table_role and table_role not in {
+        *MODEL_TABLE_ROLES, *CENTRAL_EDIT_ROLES
+    }:
+        raise HTTPException(404, "unknown table role")
+    if model_key and table_role:
+        _require_model_role(conn, model_key, table_role)
     return _history(
         conn,
-        model_key or model,
-        table_role or entity_type,
+        model_key,
+        table_role,
         sync_status,
         limit,
         offset,
     )
 
 
-@router.post("/api/sync", response_model=OperationOut)
+@router.post(
+    "/api/sync",
+    response_model=SyncOut,
+    responses={
+        **VALIDATION_RESPONSE,
+        409: {"model": SyncConflictResponse},
+    },
+)
 def sync_endpoint(
     payload: SyncRequest,
     conn: sqlite3.Connection = Depends(get_conn),
@@ -973,12 +1147,12 @@ def sync_endpoint(
     return result
 
 
-@router.post("/api/export", response_model=OperationOut)
+@router.post("/api/export", response_model=ExportOut)
 def export(conn: sqlite3.Connection = Depends(get_conn)):
     return syncmod.export_comparison_workbook(conn, config.DEFAULT_WORKBOOK)
 
 
-@router.post("/api/backup", response_model=OperationOut)
+@router.post("/api/backup", response_model=BackupOut)
 def backup(request: Request, conn: sqlite3.Connection = Depends(get_conn)):
     return syncmod.backup_database(conn, Path(request.app.state.db_path))
 
@@ -997,6 +1171,30 @@ def create_app(db_path: Path | None = None) -> FastAPI:
     api.state.db_path = Path(db_path) if db_path is not None else config.DEFAULT_DB
     api.state.uses_default_path = db_path is None
     api.state.connection = None
+
+    @api.exception_handler(RequestValidationError)
+    async def request_validation_error(_request: Request, exc: RequestValidationError):
+        errors = []
+        for item in exc.errors():
+            field = ".".join(str(part) for part in item.get("loc", ()))
+            errors.append({
+                "model_key": "",
+                "table_role": "",
+                "sql_table": "",
+                "field": field,
+                "entity_key": "",
+                "message": str(item.get("msg") or "invalid request"),
+                "source_sheet": "",
+                "source_row": None,
+                "source_column": field,
+                "code": str(item.get("type") or "request_validation"),
+                "severity": "error",
+                "status": "invalid",
+            })
+        return JSONResponse(
+            status_code=422, content={"detail": {"errors": errors}}
+        )
+
     api.include_router(router)
     if config.FRONTEND_DIST.exists():
         api.mount(
