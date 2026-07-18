@@ -725,6 +725,11 @@ function exceptionActionFields(item, action) {
         <select name="sectionId" required><option value="">Choose one workbook section</option>
           ${(choices.sections || []).map((section) => `<option value="${escapeHtml(section.sectionId)}">${escapeHtml(section.sectionName)} · ${escapeHtml(section.sectionId)}</option>`).join("")}
         </select></label>`;
+    case "keep_inactive_option":
+      return `<label>Canonical section
+        <select name="sectionId" required><option value="">Choose one workbook section</option>
+          ${(choices.sections || []).map((section) => `<option value="${escapeHtml(section.sectionId)}">${escapeHtml(section.sectionName)} · ${escapeHtml(section.sectionId)}</option>`).join("")}
+        </select></label><div class="status-note">Keep this option as inactive, nonselectable, and unpriced.</div>`;
     case "choose_relationship":
       return `<div class="typed-grid">
         <label>Source option ${optionSelect("sourceOptionId", choices.targetOptions, "Choose exact source option")}</label>
@@ -763,6 +768,9 @@ function exceptionActionFields(item, action) {
     case "approve_removal":
       return '<label>Why reference impact is cleared <input name="reason" required></label>';
     case "mark_not_applicable":
+      if (subject.reasonCode === "missing_section") {
+        return '<fieldset class="proposal-rejection"><legend>Omit this source option</legend><label><input type="checkbox" name="rejectWholeProposal" required> I understand this option and its generated rows will be omitted from the target.</label><label>Audit reason <input name="reason" required></label></fieldset>';
+      }
       return '<fieldset class="proposal-rejection"><legend>Reject entire proposal — write no rows</legend><div class="source-blocker">Do not use rejection for a partial disagreement. If one member, direction, scope, or field is wrong, leave this subject blocked.</div><label><input type="checkbox" name="rejectWholeProposal" required> I understand this rejects the complete proposal, not one member, direction, scope, or field.</label><label>Optional audit note <input name="reason" placeholder="Target evidence that rejects the complete proposal"></label></fieldset>';
     case "record_allowed_deferral":
       return `<div class="typed-grid"><label>Allowed deferral kind
@@ -779,6 +787,7 @@ function actionLabel(action, reasonCode) {
   }
   return {
     choose_section: "Use this section",
+    keep_inactive_option: "Keep inactive and unpriced",
     choose_relationship: "Save exact relationship",
     retain_existing: "Keep selected existing row",
     provide_typed_value: "Save typed value",
@@ -1075,6 +1084,8 @@ function resolutionPayload(form, action, reasonCode) {
   const data = new FormData(form);
   switch (action) {
     case "choose_section":
+      return { sectionId: data.get("sectionId") };
+    case "keep_inactive_option":
       return { sectionId: data.get("sectionId") };
     case "choose_relationship":
       return { sourceOptionId: data.get("sourceOptionId"), ruleType: data.get("ruleType"), targetOptionId: data.get("targetOptionId") };

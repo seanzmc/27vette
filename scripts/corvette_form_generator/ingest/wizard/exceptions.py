@@ -29,6 +29,7 @@ ALLOWED_ACTIONS = frozenset(
         "record_allowed_deferral",
         "choose_section",
         "choose_relationship",
+        "keep_inactive_option",
     }
 )
 ALLOWED_DISPOSITIONS = frozenset({"resolved", "resolved_not_applicable", "retained_existing", "allowed_deferral"})
@@ -37,6 +38,7 @@ ACTION_DISPOSITIONS = {
     "approve_removal": "resolved",
     "choose_section": "resolved",
     "choose_relationship": "resolved",
+    "keep_inactive_option": "resolved",
     "retain_existing": "retained_existing",
     "mark_not_applicable": "resolved_not_applicable",
     "record_allowed_deferral": "allowed_deferral",
@@ -45,7 +47,7 @@ ACTION_DISPOSITIONS = {
 REASON_ACTIONS = {
     "missing_price_scope": {"provide_typed_value"},
     "unresolved_price_scope": {"provide_typed_value"},
-    "missing_section": {"choose_section"},
+    "missing_section": {"choose_section", "keep_inactive_option", "mark_not_applicable"},
     "unresolved_relationship_endpoint": {"choose_relationship", "mark_not_applicable"},
     "unresolved_relationship_identity": {"choose_relationship", "mark_not_applicable"},
     "unsupported_relationship_type": {"choose_relationship", "mark_not_applicable"},
@@ -55,6 +57,8 @@ REASON_ACTIONS = {
     "comparator_only_exclusive_group_proposal": {"provide_typed_value", "mark_not_applicable"},
     "comparator_only_price_rule_proposal": {"provide_typed_value", "mark_not_applicable"},
     "comparator_only_default_selection_proposal": {"provide_typed_value", "mark_not_applicable"},
+    "semantic_group_overlap": {"mark_not_applicable"},
+    "semantic_relationship_conflict": {"mark_not_applicable"},
     "ambiguous_existing_identity": {"retain_existing"},
     "deletion_reference_impact": {"approve_removal", "retain_existing"},
     "asset_map_media_missing": {"record_allowed_deferral"},
@@ -137,6 +141,11 @@ def validate_resolution(resolution: Mapping[str, Any], subject: Mapping[str, Any
     if action == "choose_section":
         if set(payload) != {"sectionId"} or not isinstance(payload.get("sectionId"), str) or not payload["sectionId"].strip():
             raise ValueError("choose_section requires exactly one non-empty string sectionId.")
+    elif action == "keep_inactive_option":
+        if set(payload) != {"sectionId"} or not isinstance(payload.get("sectionId"), str) or not payload["sectionId"].strip():
+            raise ValueError(
+                "keep_inactive_option requires exactly one non-empty string sectionId."
+            )
     elif action == "choose_relationship":
         required = {"sourceOptionId", "ruleType", "targetOptionId"}
         if set(payload) != required or not all(isinstance(payload.get(key), str) and payload[key].strip() for key in required):

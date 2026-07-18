@@ -377,7 +377,7 @@ class CanonicalCompilerTest(unittest.TestCase):
         self.assertEqual(conflict["reasonCode"], "semantic_group_overlap")
         self.assertEqual(conflict["semanticConflict"]["overlapKind"], "proposed_subset")
         self.assertEqual(conflict["semanticConflict"]["affectedSheets"], ["zr1_exclusive_groups", "zr1_exclusive_members"])
-        self.assertEqual(conflict["allowedActions"], [])
+        self.assertEqual(conflict["allowedActions"], ["mark_not_applicable"])
         self.assertIn(subject["subjectId"], conflict_subject_ids)
         self.assertFalse(
             any(
@@ -427,7 +427,7 @@ class CanonicalCompilerTest(unittest.TestCase):
         )
         self.assertEqual(conflict["reasonCode"], "semantic_relationship_conflict")
         self.assertEqual(conflict["semanticConflict"]["overlapKind"], "same_direction_different_type")
-        self.assertEqual(conflict["allowedActions"], [])
+        self.assertEqual(conflict["allowedActions"], ["mark_not_applicable"])
         self.assertIn(subject["subjectId"], conflict_subject_ids)
 
     def test_semantic_gate_blocks_rule_group_member_mismatch(self) -> None:
@@ -486,7 +486,7 @@ class CanonicalCompilerTest(unittest.TestCase):
         )
         self.assertEqual(conflict["reasonCode"], "semantic_group_overlap")
         self.assertEqual(conflict["semanticConflict"]["overlapKind"], "member_set_mismatch")
-        self.assertEqual(conflict["allowedActions"], [])
+        self.assertEqual(conflict["allowedActions"], ["mark_not_applicable"])
         self.assertIn(subject["subjectId"], conflict_subject_ids)
 
     def test_requirement_for_target_standard_on_every_variant_is_not_a_rule_question(self) -> None:
@@ -1889,6 +1889,21 @@ class CanonicalCompilerTest(unittest.TestCase):
                 "",
             ]
         )
+        workbook["zr1_options"].append(
+            [
+                "opt_std_other",
+                "",
+                0,
+                "Unrelated no-RPO standard equipment",
+                "",
+                "Unrelated no-RPO standard equipment",
+                "sec_stan_001",
+                False,
+                41,
+                False,
+                "",
+            ]
+        )
         workbook.save(self.master)
         workbook.close()
         option_payload = copy.deepcopy(self.option_payload)
@@ -1899,7 +1914,7 @@ class CanonicalCompilerTest(unittest.TestCase):
                 "rowIndex": 4,
                 "modelFamily": "ZR1",
                 "modelFamilies": ["ZR1"],
-                "sectionLabel": "Wheels",
+                "sectionLabel": "",
                 "rowKind": "standard_no_rpo",
                 "rpo": "",
                 "refOnlyRpo": "",
@@ -1938,6 +1953,7 @@ class CanonicalCompilerTest(unittest.TestCase):
         )
 
         self.assertEqual(option["values"]["option_id"], "opt_std_existing")
+        self.assertEqual(option["values"]["section_id"], "sec_whee_001")
         self.assertIs(option["values"]["active"], True)
         self.assertIs(option["values"]["selectable"], False)
         ovs = next(
@@ -1954,6 +1970,132 @@ class CanonicalCompilerTest(unittest.TestCase):
                 for subject in result["exception-queue.json"]["subjects"]
             )
         )
+
+    def test_all_unavailable_duplicate_rpo_does_not_compete_for_target_identity(self) -> None:
+        option_payload = copy.deepcopy(self.option_payload)
+        target_candidate = next(
+            candidate
+            for candidate in option_payload["candidates"]
+            if candidate.get("rpo") == "BV4"
+        )
+        sibling = copy.deepcopy(target_candidate)
+        sibling["candidateId"] = "Mechanical 4:999"
+        sibling["description"] = "ZR1X Personalized Plaque"
+        sibling["sourceEvidence"] = {
+            **sibling["sourceEvidence"],
+            "rowIndex": 999,
+        }
+        sibling["statuses"] = [
+            {
+                **status,
+                "raw": "--",
+                "status": "unavailable",
+                "disclosureMarker": "",
+                "flags": [],
+            }
+            for status in sibling["statuses"]
+        ]
+        option_payload["candidates"].append(sibling)
+        join_report = join_prices(
+            option_payload["candidates"],
+            self.price_payload["priceRows"],
+        )
+
+        result = self.compile(
+            option_payload=option_payload,
+            join_report=join_report,
+        )
+
+        self.assertFalse(
+            any(
+                subject["reasonCode"] == "ambiguous_existing_identity"
+                and any(row.get("rpo") == "BV4" for row in subject["proposedRows"])
+                for subject in result["exception-queue.json"]["subjects"]
+            )
+        )
+        options = [
+            row
+            for row in result["canonical-row-manifest.json"]["rows"]
+            if row["model"] == "zr1"
+            and row["family"] == "options"
+            and row["values"].get("rpo") == "BV4"
+        ]
+        self.assertEqual(len(options), 1)
+        self.assertEqual(options[0]["values"]["option_id"], "opt_bv4_001")
+
+    def test_all_unavailable_target_occurrence_is_not_an_exception(self) -> None:
+        option_payload = copy.deepcopy(self.option_payload)
+        unavailable = copy.deepcopy(
+            next(
+                candidate
+                for candidate in option_payload["candidates"]
+                if candidate.get("rpo") == "BV4"
+            )
+        )
+        unavailable.update(
+            {
+                "candidateId": "Mechanical 4:998",
+                "rpo": "ZZZ",
+                "refOnlyRpo": "",
+                "description": "Unavailable target-only option",
+                "priceMatch": None,
+                "listPrice": None,
+                "priceRows": [],
+            }
+        )
+        unavailable["sourceEvidence"] = {
+            **unavailable["sourceEvidence"],
+            "rowIndex": 998,
+        }
+        unavailable["statuses"] = [
+            {
+                **status,
+                "raw": "--",
+                "status": "unavailable",
+                "disclosureMarker": "",
+                "flags": [],
+            }
+            for status in unavailable["statuses"]
+        ]
+        option_payload["candidates"].append(unavailable)
+        join_report = join_prices(
+            option_payload["candidates"],
+            self.price_payload["priceRows"],
+        )
+        scoped_signature = option_occurrence_signature(
+            {
+                **unavailable,
+                "statuses": model_scoped_statuses(unavailable, "zr1"),
+            }
+        )
+
+        result = self.compile(
+            option_payload=option_payload,
+            join_report=join_report,
+        )
+
+        self.assertFalse(
+            any(
+                scoped_signature in subject.get("evidenceReferences", [])
+                for subject in result["exception-queue.json"]["subjects"]
+            )
+        )
+        self.assertFalse(
+            any(
+                row["model"] == "zr1"
+                and row["family"] == "options"
+                and row["values"].get("rpo") == "ZZZ"
+                for row in result["canonical-row-manifest.json"]["rows"]
+            )
+        )
+        source_feature = next(
+            item
+            for item in result["compile-report.json"]["sourceFeatureCoverage"]
+            if item["family"] == "options"
+            and item["featureId"]
+            == f"candidate:zr1:{_candidate_feature_index(option_payload['candidates'])[unavailable['candidateId']]}"
+        )
+        self.assertEqual(source_feature["disposition"], "resolved_not_applicable")
 
     def test_retain_existing_resolution_consumes_one_ambiguous_option_identity(self) -> None:
         from openpyxl import load_workbook
@@ -2294,6 +2436,27 @@ class CanonicalCompilerTest(unittest.TestCase):
             price_payload=price_payload,
             join_report=join_report,
             resolution_entries=resolutions,
+        )
+        resolved_subject_ids = {subject["subjectId"] for subject in subjects.values()}
+        self.assertTrue(
+            resolved_subject_ids
+            <= {
+                subject["subjectId"]
+                for subject in second["exception-queue.json"]["subjects"]
+            }
+        )
+        self.assertTrue(
+            resolved_subject_ids
+            <= {
+                entry["subjectId"]
+                for entry in second["exception-resolutions.json"]["validEntries"]
+            }
+        )
+        self.assertTrue(
+            resolved_subject_ids.isdisjoint(
+                entry["subjectId"]
+                for entry in second["exception-resolutions.json"]["supersededEntries"]
+            )
         )
         rows = second["canonical-row-manifest.json"]["rows"]
         for family in (
@@ -2773,6 +2936,140 @@ class CanonicalCompilerTest(unittest.TestCase):
             for item in second["compile-report.json"]["models"]["zr1"]["blockers"]
         }
         self.assertNotIn(subject["subjectId"], blocker_ids)
+
+    def test_missing_section_can_be_resolved_by_omitting_the_source_option(self) -> None:
+        option_payload = copy.deepcopy(self.option_payload)
+        omitted_candidate = next(
+            item for item in option_payload["candidates"] if item.get("rpo") == "CC3"
+        )
+        omitted_candidate["description"] = (
+            "Roof panel, transparent\n1. Requires (CC2) painted roof panel."
+        )
+        join_report = join_prices(
+            option_payload["candidates"], self.price_payload["priceRows"]
+        )
+        first = self.compile(
+            option_payload=option_payload,
+            join_report=join_report,
+        )
+        candidate_id = option_occurrence_signature(
+            {
+                **omitted_candidate,
+                "statuses": model_scoped_statuses(omitted_candidate, "zr1"),
+            }
+        )
+        subject = next(
+            item
+            for item in first["exception-queue.json"]["subjects"]
+            if item["reasonCode"] == "missing_section"
+            and item["evidenceReferences"] == [candidate_id]
+        )
+        candidate = omitted_candidate
+        resolution = {
+            "subjectId": subject["subjectId"],
+            "subjectVersion": subject["subjectVersion"],
+            "action": "mark_not_applicable",
+            "payload": {"reason": "Reviewer omitted this target option."},
+            "disposition": "resolved_not_applicable",
+        }
+
+        second = self.compile(
+            option_payload=option_payload,
+            join_report=join_report,
+            resolution_entries=[resolution],
+        )
+
+        self.assertFalse(
+            any(
+                row["family"] == "options"
+                and row["values"].get("rpo") == candidate.get("rpo")
+                for row in second["canonical-row-manifest.json"]["rows"]
+            )
+        )
+        self.assertNotIn(
+            subject["subjectId"],
+            {
+                blocker["subjectId"]
+                for blocker in second["compile-report.json"]["models"]["zr1"]["blockers"]
+            },
+        )
+        self.assertIn(
+            subject["subjectId"],
+            {
+                entry["subjectId"]
+                for entry in second["exception-resolutions.json"]["validEntries"]
+            },
+        )
+        omitted_status_coverage = [
+            item
+            for item in second["compile-report.json"]["sourceFeatureCoverage"]
+            if item["family"] == "ovs"
+            and str(item["featureId"]).startswith(
+                f"status:{option_occurrence_signature(candidate)}:"
+            )
+        ]
+        self.assertTrue(omitted_status_coverage)
+        self.assertEqual(
+            {item["disposition"] for item in omitted_status_coverage},
+            {"resolved_not_applicable"},
+        )
+        omitted_relationship_coverage = [
+            item
+            for item in second["compile-report.json"]["sourceFeatureCoverage"]
+            if item["family"] == "rule_mapping"
+            and f"candidate:{option_occurrence_signature(candidate)}"
+            in item["evidenceIds"]
+        ]
+        self.assertTrue(omitted_relationship_coverage)
+        self.assertEqual(
+            {item["disposition"] for item in omitted_relationship_coverage},
+            {"resolved_not_applicable"},
+        )
+
+    def test_missing_section_can_keep_an_inactive_nonselectable_unpriced_option(self) -> None:
+        first = self.compile()
+        subject = next(
+            item
+            for item in first["exception-queue.json"]["subjects"]
+            if item["reasonCode"] == "missing_section"
+        )
+        candidate_id = subject["evidenceReferences"][0]
+        candidate = next(
+            item
+            for item in self.option_payload["candidates"]
+            if option_occurrence_signature(
+                {**item, "statuses": model_scoped_statuses(item, "zr1")}
+            )
+            == candidate_id
+        )
+        resolution = {
+            "subjectId": subject["subjectId"],
+            "subjectVersion": subject["subjectVersion"],
+            "action": "keep_inactive_option",
+            "payload": {"sectionId": "sec_whee_001"},
+            "disposition": "resolved",
+        }
+
+        second = self.compile(resolution_entries=[resolution])
+
+        option = next(
+            row
+            for row in second["canonical-row-manifest.json"]["rows"]
+            if row["family"] == "options"
+            and row["values"].get("rpo") == candidate.get("rpo")
+        )
+        self.assertEqual(option["status"], "ready")
+        self.assertEqual(option["values"]["section_id"], "sec_whee_001")
+        self.assertEqual(option["values"]["price"], "")
+        self.assertFalse(option["values"]["active"])
+        self.assertFalse(option["values"]["selectable"])
+        self.assertNotIn(
+            subject["subjectId"],
+            {
+                blocker["subjectId"]
+                for blocker in second["compile-report.json"]["models"]["zr1"]["blockers"]
+            },
+        )
 
     def test_typed_price_scope_resolution_is_consumed_into_price_rule(self) -> None:
         first = self.compile()

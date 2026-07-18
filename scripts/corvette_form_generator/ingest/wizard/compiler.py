@@ -952,9 +952,23 @@ def _compile_target_options(
 ]:
     entry = registry["source_option_sheet"]
     existing_options = _rows(extract, entry["sheetName"])
-    scoped_source = [
+    target_scoped_source = [
         {**candidate, "statuses": model_scoped_statuses(candidate, target)}
         for candidate in scope_candidates(candidates, target)
+    ]
+    omitted_candidate_ids = {
+        str(candidate.get("candidateId") or "")
+        for candidate in target_scoped_source
+        if candidate.get("statuses")
+        and all(
+            status.get("status") == "unavailable"
+            for status in candidate.get("statuses") or []
+        )
+    }
+    scoped_source = [
+        candidate
+        for candidate in target_scoped_source
+        if str(candidate.get("candidateId") or "") not in omitted_candidate_ids
     ]
     grouped_candidates: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for candidate in scoped_source:
@@ -1000,7 +1014,10 @@ def _compile_target_options(
     resolution_entries_by_subject: dict[str, list[Mapping[str, Any]]] = defaultdict(list)
     for resolution in resolution_entries:
         resolution_entries_by_subject[str(resolution.get("subjectId") or "")].append(resolution)
-    candidate_disposition: dict[str, str] = {}
+    candidate_disposition: dict[str, str] = {
+        candidate_id: "resolved_not_applicable"
+        for candidate_id in omitted_candidate_ids
+    }
     rpo_ids: dict[str, str] = {}
     ovs_entry = registry["status_sheet"]
     ovs_rows: list[dict[str, Any]] = []
@@ -1115,7 +1132,9 @@ def _compile_target_options(
             source = profile_requirement.get("source") or {}
             if evidence_id and source:
                 dependencies.append(_dependency(evidence_id, source))
-        section_id = _existing_section(existing_options, rpo)
+        section_id = str(existing.get("section_id") or "") if existing else ""
+        if not section_id:
+            section_id = _existing_section(existing_options, rpo)
         if not section_id:
             section_id = _section_by_source_label(extract, str(candidate.get("sectionLabel") or ""))
         if not section_id and profile_precedent:
@@ -1136,7 +1155,11 @@ def _compile_target_options(
                 [stable_candidate_id, rpo],
                 dependencies,
                 evidence_references=[stable_candidate_id],
-                allowed_actions=["choose_section"],
+                allowed_actions=[
+                    "choose_section",
+                    "keep_inactive_option",
+                    "mark_not_applicable",
+                ],
                 question="Choose one canonical target section.",
             )
             exceptions.append(subject)
@@ -1147,13 +1170,27 @@ def _compile_target_options(
                     checked = validate_resolution(matching_resolutions[0], subject)
                 except ValueError:
                     checked = None
-                if checked and checked.get("action") == "choose_section" and checked.get("disposition") == "resolved":
+                if checked and checked.get("action") in {
+                    "choose_section",
+                    "keep_inactive_option",
+                    "mark_not_applicable",
+                }:
                     consumed_resolution = checked
             if consumed_resolution is None:
                 candidate_disposition[candidate_id] = "blocked_exception"
                 continue
+            if consumed_resolution["action"] == "mark_not_applicable":
+                candidate_disposition[candidate_id] = "resolved_not_applicable"
+                consumed_resolution_subjects.add(subject["subjectId"])
+                continue
             section_id = str(consumed_resolution["payload"]["sectionId"])
+            keep_inactive = consumed_resolution["action"] == "keep_inactive_option"
+            dependencies.append(
+                _dependency(f"resolution:{subject['subjectId']}", consumed_resolution)
+            )
             consumed_resolution_subjects.add(subject["subjectId"])
+        else:
+            keep_inactive = False
         section_row = next(
             (
                 row
@@ -1165,7 +1202,7 @@ def _compile_target_options(
         if section_row is None:
             raise ValueError(f"Resolved section_id is absent from section_master: {section_id}")
         dependencies.append(_dependency(f"workbook:section_master:{section_id}", section_row))
-        price_match = candidate.get("priceMatch")
+        price_match = None if keep_inactive else candidate.get("priceMatch")
         applicable_price_rows = _target_scoped_price_rows(candidate, target, variants)
         if price_match == "exact" and len(applicable_price_rows) != 1:
             price_match = "ambiguous"
@@ -1421,7 +1458,7 @@ def _compile_target_options(
             candidate_disposition[candidate_id] = "compiled_ready"
         price_allocation = (
             dict(profile_requirement.get("priceAllocation") or {})
-            if profile_requirement
+            if profile_requirement and not keep_inactive
             else {}
         )
         if price_allocation:
@@ -1448,6 +1485,8 @@ def _compile_target_options(
             )
         statuses = model_scoped_statuses(candidate, target)
         if (
+            not keep_inactive
+            and
             price is None
             and statuses
             and {str(status.get("status") or "") for status in statuses} == {"standard"}
@@ -1464,7 +1503,7 @@ def _compile_target_options(
             and workbook_truthy(section_contract.get("is_required"))
             and canonical_selectable
         )
-        selectable = (
+        selectable = False if keep_inactive else (
             candidate.get("rowKind") == "orderable"
             and any(status.get("status") == "available" for status in statuses)
             and (canonical_selectable if profile_owns_selectability else True)
@@ -1472,13 +1511,15 @@ def _compile_target_options(
         source_active = any(
             status.get("status") in {"available", "standard"} for status in statuses
         )
-        active = (
+        active = False if keep_inactive else (
             True
             if source_active
             else bool(workbook_truthy(existing.get("active")))
             if existing
             else bool(candidate.get("rowKind") == "orderable" and statuses)
         )
+        if keep_inactive:
+            price = None
         display_order = existing.get("display_order") if existing else ""
         known = {
             "option_id": option_id,
@@ -2376,6 +2417,24 @@ def _source_feature_ledger(
             )
         ledger.append({"featureId": f"source-sheet:{sheet_name}", "model": "*", "family": "source_sheet", "disposition": disposition, "evidenceIds": evidence_ids})
     candidates = option_payload.get("candidates") or []
+    omitted_candidate_evidence = {
+        (target, f"candidate:{signature}")
+        for target in targets
+        for candidate in scope_candidates(candidates, target)
+        for signature in {
+            option_occurrence_signature(candidate),
+            option_occurrence_signature(
+                {
+                    **candidate,
+                    "statuses": model_scoped_statuses(candidate, target),
+                }
+            ),
+        }
+        if candidate_dispositions.get(
+            (target, str(candidate.get("candidateId") or ""))
+        )
+        == "resolved_not_applicable"
+    }
     for candidate in candidates:
         candidate_id = str(candidate.get("candidateId") or "")
         candidate_feature_id = candidate_feature_index[candidate_id]
@@ -2402,9 +2461,16 @@ def _source_feature_ledger(
                 )
             ]
             model = selected_models[0] if len(selected_models) == 1 else "*"
+            omitted_for_selected_models = bool(selected_models) and all(
+                candidate_dispositions.get((target, candidate_id))
+                == "resolved_not_applicable"
+                for target in selected_models
+            )
             for feature_id in status_feature_index.get(candidate_id, {}).get(status_signature, []):
                 disposition = (
-                    "resolved_not_a_workbook_fact"
+                    "resolved_not_applicable"
+                    if omitted_for_selected_models
+                    else "resolved_not_a_workbook_fact"
                     if feature_id in profile_consumed_status_features
                     else "compiled"
                     if feature_id in compiled_status_features
@@ -2478,7 +2544,16 @@ def _source_feature_ledger(
                 comparator_effects[str(evidence_id)] = str(disposition.get("disposition") or "")
             continue
         model = str(disposition.get("model") or "*")
-        ledger.append({"featureId": f"relationship:{model}:{disposition.get('featureId')}", "model": model, "family": "rule_mapping", "disposition": _source_disposition(disposition.get("disposition")), "evidenceIds": list(disposition.get("evidenceIds") or [])})
+        evidence_ids = list(disposition.get("evidenceIds") or [])
+        relationship_disposition = (
+            "resolved_not_applicable"
+            if any(
+                (model, str(evidence_id)) in omitted_candidate_evidence
+                for evidence_id in evidence_ids
+            )
+            else disposition.get("disposition")
+        )
+        ledger.append({"featureId": f"relationship:{model}:{disposition.get('featureId')}", "model": model, "family": "rule_mapping", "disposition": _source_disposition(relationship_disposition), "evidenceIds": evidence_ids})
     comparator_exception_ids = {
         evidence_id
         for disposition in relationship_dispositions
@@ -2794,7 +2869,7 @@ def _apply_comparator_semantic_gate(
                 dependencies,
                 evidence_references=subject.get("evidenceReferences") or [],
                 proposed_rows=proposed_rows,
-                allowed_actions=[],
+                allowed_actions=["mark_not_applicable"],
                 question=(
                     "The proposed exclusive group overlaps an existing target-owned group. "
                     "Target evidence must resolve the complete member set and selection mode."
@@ -2916,7 +2991,7 @@ def _apply_comparator_semantic_gate(
             [*(subject.get("evidenceDependencies") or []), *conflict_dependencies],
             evidence_references=subject.get("evidenceReferences") or [],
             proposed_rows=proposed_rows,
-            allowed_actions=[],
+            allowed_actions=["mark_not_applicable"],
             question=(
                 "The proposed relationship conflicts with target-owned relationship semantics. "
                 "Target evidence must establish the correct direction and relationship type."
@@ -3050,7 +3125,7 @@ def _apply_comparator_semantic_gate(
                 dependencies,
                 evidence_references=subject.get("evidenceReferences") or [],
                 proposed_rows=proposed_rows,
-                allowed_actions=[],
+                allowed_actions=["mark_not_applicable"],
                 question=(
                     "The proposed rule group overlaps a target-owned group with a different member set. "
                     "Target evidence must establish the complete group."
@@ -3336,17 +3411,28 @@ def _reconcile_represented_comparator_facts(
             continue
         by_id = {
             dependency["evidenceId"]: dependency
-            for dependency in [*(row.get("evidenceDependencies") or []), *additions]
+            for dependency in row.get("evidenceDependencies") or []
         }
+        for dependency in additions:
+            by_id.setdefault(dependency["evidenceId"], dependency)
         dependencies = [by_id[key] for key in sorted(by_id)]
         row["evidenceDependencies"] = dependencies
         row["derivationVersion"] = derivation_version(
             row.get("semanticSignature") or {}, dependencies
         )
 
+    resolution_derived_subject_ids = {
+        str(dependency.get("evidenceId") or "").removeprefix("resolution:")
+        for row in manifest_rows
+        for dependency in row.get("evidenceDependencies") or []
+        if str(dependency.get("evidenceId") or "").startswith("resolution:")
+    }
     filtered = []
     for subject in exceptions:
         if not str(subject.get("reasonCode") or "").startswith("comparator_only_"):
+            filtered.append(subject)
+            continue
+        if str(subject.get("subjectId") or "") in resolution_derived_subject_ids:
             filtered.append(subject)
             continue
         references = {
@@ -3521,6 +3607,7 @@ def compile_canonical_rows(
     consumed_resolution_subjects: set[str] = set()
     semantic_conflict_subject_ids: set[str] = set()
     semantic_conflict_evidence: set[tuple[str, str]] = set()
+    resolved_semantic_conflict_evidence: set[tuple[str, str]] = set()
     compiled_base_price_rows: set[str] = set()
     compiled_status_features: set[str] = set()
     profile_consumed_status_features: set[str] = set()
@@ -3868,7 +3955,32 @@ def compile_canonical_rows(
             )
         )
         semantic_conflict_subject_ids.update(conflict_ids)
-        semantic_conflict_evidence.update(conflict_evidence)
+        resolved_conflict_evidence: set[tuple[str, str]] = set()
+        for conflict_subject in guarded_subjects:
+            if not str(conflict_subject.get("reasonCode") or "").startswith("semantic_"):
+                continue
+            matching_resolutions = [
+                entry
+                for entry in resolution_entries
+                if str(entry.get("subjectId") or "")
+                == str(conflict_subject.get("subjectId") or "")
+            ]
+            if len(matching_resolutions) != 1:
+                continue
+            try:
+                checked = validate_resolution(matching_resolutions[0], conflict_subject)
+            except ValueError:
+                continue
+            if checked.get("action") != "mark_not_applicable":
+                continue
+            consumed_resolution_subjects.add(str(conflict_subject["subjectId"]))
+            resolved_conflict_evidence.update(
+                (target, str(reference))
+                for reference in conflict_subject.get("evidenceReferences") or []
+                if str(reference).startswith("comparator:")
+            )
+        semantic_conflict_evidence.update(conflict_evidence - resolved_conflict_evidence)
+        resolved_semantic_conflict_evidence.update(resolved_conflict_evidence)
         projectable_subject_ids = {
             str(subject.get("subjectId") or "")
             for subject in guarded_subjects
@@ -3994,6 +4106,8 @@ def compile_canonical_rows(
     consumed_resolution_subjects.difference_update(semantic_conflict_subject_ids)
     for key in semantic_conflict_evidence:
         comparator_effect_dispositions[key] = "semantic_conflict_blocker"
+    for key in resolved_semantic_conflict_evidence:
+        comparator_effect_dispositions[key] = "resolved_not_applicable"
     relationship_dispositions = [
         {
             **item,
@@ -4004,6 +4118,12 @@ def compile_canonical_rows(
                     str(item.get("featureId") or ""),
                 )
                 in semantic_conflict_evidence
+                else "resolved_not_applicable"
+                if (
+                    str(item.get("model") or ""),
+                    str(item.get("featureId") or ""),
+                )
+                in resolved_semantic_conflict_evidence
                 else item.get("disposition")
             ),
         }
@@ -4018,7 +4138,7 @@ def compile_canonical_rows(
         exceptions,
         comparator_artifact,
         targets,
-        semantic_conflict_evidence,
+        semantic_conflict_evidence | resolved_semantic_conflict_evidence,
     )
     for target, evidence_id in represented_comparator_evidence:
         comparator_effect_dispositions[(target, evidence_id)] = "compiled_ready"

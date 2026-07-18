@@ -18,7 +18,12 @@ def _clean_text(value: Any) -> str:
 
 
 def _copy_identity(row: Mapping[str, Any]) -> str:
-    return _clean_text(row.get("description") or row.get("option_name"))
+    copy = str(row.get("description") or row.get("option_name") or "").splitlines()[0]
+    return re.sub(
+        r"[^a-z0-9]+",
+        " ",
+        _clean_text(copy),
+    ).strip()
 
 
 def _status_vector(row: Mapping[str, Any]) -> list[dict[str, str]]:
@@ -92,11 +97,17 @@ def match_option_occurrences(candidates: Sequence[Mapping[str, Any]], existing_r
         ),
         (
             "rpo_section_status_price",
-            lambda candidate, row: _stage_two_signature(row) == _stage_two_signature(candidate),
+            lambda candidate, row: bool(
+                str(candidate.get("rpo") or candidate.get("refOnlyRpo") or "").strip()
+            )
+            and _stage_two_signature(row) == _stage_two_signature(candidate),
         ),
         (
             "unique_remaining_occurrence",
-            lambda candidate, row: str(row.get("rpo") or "").upper()
+            lambda candidate, row: bool(
+                str(candidate.get("rpo") or candidate.get("refOnlyRpo") or "").strip()
+            )
+            and str(row.get("rpo") or "").upper()
             == str(candidate.get("rpo") or candidate.get("refOnlyRpo") or "").upper(),
         ),
     )

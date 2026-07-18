@@ -139,7 +139,10 @@ class ExceptionFlowTest(unittest.TestCase):
 
         self.assertGreater(payload["total"], 0)
         item = payload["items"][0]
-        self.assertEqual(item["subject"]["allowedActions"], ["choose_section"])
+        self.assertEqual(
+            item["subject"]["allowedActions"],
+            ["choose_section", "keep_inactive_option", "mark_not_applicable"],
+        )
         self.assertTrue(item["evidence"]["sourceEvidence"])
         raw = item["evidence"]["sourceEvidence"][0]
         self.assertTrue(raw["sourceEvidence"]["cells"])
@@ -749,6 +752,15 @@ class ExceptionFlowTest(unittest.TestCase):
             ),
             ["retain_existing"],
         )
+        self.assertEqual(
+            self.store._projectable_exception_actions(
+                {
+                    "reasonCode": "semantic_group_overlap",
+                    "allowedActions": ["mark_not_applicable"],
+                }
+            ),
+            ["mark_not_applicable"],
+        )
         for reason in (
             "unresolved_relationship_endpoint",
             "unresolved_relationship_identity",
@@ -860,6 +872,41 @@ class ExceptionFlowTest(unittest.TestCase):
                 },
                 reviewer="sean",
             )
+
+    def test_price_resolution_accepts_canonical_scope_case(self) -> None:
+        payload = self.store.exception_queue_view(
+            self.run_id,
+            reason="unresolved_price_scope",
+            state="open",
+            actionable="yes",
+        )
+        item = payload["items"][0]
+        subject = item["subject"]
+        scope = next(
+            choice
+            for choice in item["choices"]["priceScopes"]
+            if choice["trimLevelScope"] not in {"*", choice["trimLevelScope"].lower()}
+            and choice["variantScope"] == "*"
+        )
+
+        result = self.store.resolve_exception(
+            self.run_id,
+            subject_id=subject["subjectId"],
+            subject_version=subject["subjectVersion"],
+            action="provide_typed_value",
+            payload={
+                "bodyStyleScope": scope["bodyStyleScope"].lower(),
+                "trimLevelScope": scope["trimLevelScope"].lower(),
+                "variantScope": scope["variantScope"].lower(),
+                "priceValue": 1234,
+            },
+            reviewer="sean",
+        )
+
+        self.assertEqual(
+            result["subject"]["resolution"]["payload"]["trimLevelScope"],
+            scope["trimLevelScope"].lower(),
+        )
 
     def test_concurrent_resolutions_merge_without_lost_update(self) -> None:
         subjects = [

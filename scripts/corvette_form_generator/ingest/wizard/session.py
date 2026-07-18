@@ -1220,6 +1220,8 @@ class WizardSessionStore:
             action = str(raw_action)
             if action == "choose_section":
                 projectable.append(action)
+            elif action == "keep_inactive_option" and reason == "missing_section":
+                projectable.append(action)
             elif action == "choose_relationship" and reason in {
                 "unsupported_relationship_type",
                 "unsupported_relationship_direction",
@@ -1237,6 +1239,7 @@ class WizardSessionStore:
             } and proposal_catalog_complete:
                 projectable.append(action)
             elif action == "mark_not_applicable" and reason in {
+                "missing_section",
                 "unsupported_relationship_type",
                 "unsupported_relationship_direction",
                 "comparator_only_relationship_proposal",
@@ -1245,6 +1248,11 @@ class WizardSessionStore:
                 "comparator_only_price_rule_proposal",
                 "comparator_only_default_selection_proposal",
             } and proposal_catalog_complete:
+                projectable.append(action)
+            elif action == "mark_not_applicable" and reason in {
+                "semantic_group_overlap",
+                "semantic_relationship_conflict",
+            }:
                 projectable.append(action)
             else:
                 unsupported_row_actions.append(action)
@@ -2138,7 +2146,7 @@ class WizardSessionStore:
             resolution = validate_resolution(resolution, subject)
         except ValueError as exc:
             raise WizardError(f"Invalid exception resolution: {exc}") from exc
-        if action == "choose_section":
+        if action in {"choose_section", "keep_inactive_option"}:
             allowed_sections = {
                 str(section.get("sectionId") or "")
                 for section in workbook_sections(self._require_workbook())
@@ -2152,16 +2160,16 @@ class WizardSessionStore:
         }:
             allowed_scopes = {
                 (
-                    str(scope.get("bodyStyleScope") or ""),
-                    str(scope.get("trimLevelScope") or ""),
-                    str(scope.get("variantScope") or ""),
+                    str(scope.get("bodyStyleScope") or "").casefold(),
+                    str(scope.get("trimLevelScope") or "").casefold(),
+                    str(scope.get("variantScope") or "").casefold(),
                 )
                 for scope in subject_view["choices"].get("priceScopes") or []
             }
             requested_scope = (
-                str(resolution["payload"].get("bodyStyleScope") or ""),
-                str(resolution["payload"].get("trimLevelScope") or ""),
-                str(resolution["payload"].get("variantScope") or ""),
+                str(resolution["payload"].get("bodyStyleScope") or "").casefold(),
+                str(resolution["payload"].get("trimLevelScope") or "").casefold(),
+                str(resolution["payload"].get("variantScope") or "").casefold(),
             )
             if requested_scope not in allowed_scopes:
                 raise WizardError("Price scope is not a current target variant or canonical wildcard choice.")
@@ -2394,7 +2402,7 @@ class WizardSessionStore:
             resolution = validate_resolution(resolution, subject)
         except ValueError as exc:
             raise WizardError(f"Invalid exception resolution: {exc}") from exc
-        if action == "choose_section":
+        if action in {"choose_section", "keep_inactive_option"}:
             allowed_sections = {
                 str(section.get("sectionId") or "")
                 for section in workbook_sections(self._require_workbook())
@@ -2408,16 +2416,16 @@ class WizardSessionStore:
         }:
             allowed_scopes = {
                 (
-                    str(scope.get("bodyStyleScope") or ""),
-                    str(scope.get("trimLevelScope") or ""),
-                    str(scope.get("variantScope") or ""),
+                    str(scope.get("bodyStyleScope") or "").casefold(),
+                    str(scope.get("trimLevelScope") or "").casefold(),
+                    str(scope.get("variantScope") or "").casefold(),
                 )
                 for scope in subject_view["choices"].get("priceScopes") or []
             }
             requested_scope = (
-                str(resolution["payload"].get("bodyStyleScope") or ""),
-                str(resolution["payload"].get("trimLevelScope") or ""),
-                str(resolution["payload"].get("variantScope") or ""),
+                str(resolution["payload"].get("bodyStyleScope") or "").casefold(),
+                str(resolution["payload"].get("trimLevelScope") or "").casefold(),
+                str(resolution["payload"].get("variantScope") or "").casefold(),
             )
             if requested_scope not in allowed_scopes:
                 raise WizardError("Price scope is not a current target variant or canonical wildcard choice.")

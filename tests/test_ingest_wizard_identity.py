@@ -74,6 +74,52 @@ class IdentityContractTest(unittest.TestCase):
         self.assertEqual(result[0]["optionId"], "opt_509")
         self.assertEqual(result[0]["matchStage"], "no_rpo_copy_identity")
 
+    def test_new_no_rpo_standard_row_does_not_match_unrelated_blank_rpo_rows(self) -> None:
+        candidate = self.candidate("", "OnStar Basics")
+        candidate["rowKind"] = "standard_no_rpo"
+        existing = [
+            self.existing("opt_673", "", "Custom Leather Wrapped Interior Package"),
+            self.existing("opt_863", "", "Intersection Automatic Emergency Braking"),
+        ]
+
+        result = match_option_occurrences([candidate], existing)
+
+        self.assertEqual(result[0]["status"], "new")
+        self.assertEqual(result[0]["matchStage"], "none")
+
+    def test_no_rpo_copy_identity_ignores_punctuation_spacing(self) -> None:
+        candidate = self.candidate("", "NEW!  Intersection Automatic Emergency Braking")
+        candidate["rowKind"] = "standard_no_rpo"
+        existing = self.existing(
+            "opt_863",
+            "",
+            "NEW!Intersection Automatic Emergency Braking",
+        )
+
+        result = match_option_occurrences([candidate], [existing])
+
+        self.assertEqual(result[0]["status"], "matched")
+        self.assertEqual(result[0]["optionId"], "opt_863")
+        self.assertEqual(result[0]["matchStage"], "no_rpo_copy_identity")
+
+    def test_no_rpo_copy_identity_uses_primary_copy_before_disclosure(self) -> None:
+        candidate = self.candidate(
+            "",
+            "Custom Leather Wrapped Interior Package\n1. Available on 3LZ only.",
+        )
+        candidate["rowKind"] = "standard_no_rpo"
+        existing = self.existing(
+            "opt_673",
+            "",
+            "Custom Leather Wrapped Interior Package",
+        )
+
+        result = match_option_occurrences([candidate], [existing])
+
+        self.assertEqual(result[0]["status"], "matched")
+        self.assertEqual(result[0]["optionId"], "opt_673")
+        self.assertEqual(result[0]["matchStage"], "no_rpo_copy_identity")
+
     def test_matching_stages_apply_globally_before_weaker_candidates(self) -> None:
         exact = self.candidate("PDB", "Carbon wheel package", price=16000)
         weaker = self.candidate("PDB", "Different copy", price=16000)
