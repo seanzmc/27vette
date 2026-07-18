@@ -545,15 +545,15 @@ git commit -m "fix: unify guarded workbook changeset writes"
 
 **Files:**
 - Create: `scripts/corvette_form_generator/ingest/wizard/changeset_emitter.py`
-- Modify: `scripts/corvette_form_generator/ingest/wizard/plan_builder.py`
 - Modify: `scripts/corvette_form_generator/ingest/wizard/session.py:3055-3244`
+- Inspect only: `scripts/corvette_form_generator/ingest/wizard/plan_builder.py` — equivalence-test import; left untouched here so Task 6 deletes the legacy projection in the only production touch
 - Create: `tests/test_ingest_wizard_changeset.py`
 - Modify: `tests/test_ingest_wizard_plan.py:683-1165`
 - Modify: `tests/test_ingest_wizard_compiler_session.py`
 
 **Interfaces:**
 - Consumes: exact-current canonical manifest, compile report, selection, compiler bindings, exception queue/resolutions, comparator evidence, workbook path, and shared registry.
-- Produces: `emit_manifest_changeset(...) -> dict` and `WizardSessionStore.emit_changeset(run_id) -> dict`.
+- Produces: `emit_manifest_changeset(...) -> dict`, `WizardSessionStore.emit_changeset(run_id) -> dict`, and a new `changeset_emitted` session state stored in `session.json` and surfaced through `list_sessions()`.
 
 - [ ] **Step 1: Write failing exact projection and coverage tests**
 
@@ -587,9 +587,9 @@ PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_ingest_wizard_changeset
 
 Expected: FAIL importing `changeset_emitter`.
 
-- [ ] **Step 3: Move mechanical projection out of `plan_builder.py`**
+- [ ] **Step 3: Port the mechanical projection into the emitter**
 
-Move the currently verified `build_manifest_plan()` validation/projection logic into `emit_manifest_changeset()`. Replace only its output assembly:
+Port the currently verified `build_manifest_plan()` validation/projection logic into `emit_manifest_changeset()`. The legacy function itself stays in `plan_builder.py` for the Step 5 test-local equivalence comparison and is deleted in Task 6. Replace only the output assembly:
 
 - `create_sheet` becomes `sheetCreates`;
 - add/update/delete operations become field-level `rowChanges` with exact before/after values;
@@ -603,9 +603,11 @@ The function may perform mechanical sheet/header resolution and the already-veri
 
 `WizardSessionStore.emit_changeset(run_id)` requires `compiled_ready`, exact current inputs, no downstream mutation, and writes `workbook-change-set.json` atomically in the run directory. Re-emission from identical inputs must be byte-identical. A changed input invalidates the artifact and requires recompile.
 
-- [ ] **Step 5: Keep one temporary compatibility assertion, not a second production path**
+Successful emission transitions the session to `changeset_emitted` (a new state constant declared next to `STATE_COMPILED_READY`). `list_sessions()` must then return the run with `runId` and `state: "changeset_emitted"` — the exact payload shape the Tasks 8/9 session lookups filter on.
 
-During this task only, retain `build_manifest_plan()` as a test-only wrapper that compares legacy projection semantics to the new ChangeSet. Mark it private and remove its current-session call in Task 6. The wrapper must never create approval/write authority.
+- [ ] **Step 5: Keep the legacy-equivalence comparison test-local**
+
+Leave `plan_builder.py` untouched in this task. The equivalence harness lives only in the test file: `tests/test_ingest_wizard_plan.py` imports the still-present `build_manifest_plan()` and compares legacy projection semantics (sheet creates, field-level before/after rows, no-op coverage) against the new ChangeSet over the frozen snapshot. Add no production wrapper, and give the comparison no approval/write authority. Task 6 deletes `build_manifest_plan()` together with the plan stage and removes this comparison test in the same commit, so `plan_builder.py` is touched once.
 
 - [ ] **Step 6: Run exact-current and focused compiler gates**
 
@@ -624,7 +626,6 @@ Expected: PASS with frozen semantic coverage and protected hashes unchanged.
 ```sh
 git diff --check
 git add scripts/corvette_form_generator/ingest/wizard/changeset_emitter.py \
-  scripts/corvette_form_generator/ingest/wizard/plan_builder.py \
   scripts/corvette_form_generator/ingest/wizard/session.py \
   tests/test_ingest_wizard_changeset.py \
   tests/test_ingest_wizard_plan.py \
@@ -637,7 +638,9 @@ git commit -m "feat: emit shared changesets from ingest"
 **Files:**
 - Create: `scripts/corvette_form_generator/ingest/wizard/legacy_reader.py`
 - Modify: `scripts/corvette_form_generator/ingest/wizard/session.py`
+- Modify: `scripts/corvette_form_generator/ingest/wizard/plan_builder.py` — delete `build_manifest_plan()` with the plan stage
 - Modify: `scripts/ingest_wizard_server.py:108-343`
+- Delete: `scripts/ingest_wizard_apply.py` — calls the retired `apply_approved_plan()` write surface
 - Modify: `visualizer/ingest-wizard/index.html`
 - Modify: `visualizer/ingest-wizard/wizard.js`
 - Modify: `visualizer/ingest-wizard/wizard.css`
@@ -645,10 +648,12 @@ git commit -m "feat: emit shared changesets from ingest"
 - Modify: `tests/test_ingest_wizard_server_pass_b.py`
 - Modify: `tests/test_ingest_wizard_ui_milestone2.py`
 - Modify: `tests/test_ingest_wizard_ui_blockers.py`
+- Modify: `tests/test_ingest_wizard_plan.py` — drop the Task 5 legacy-equivalence comparison
+- Delete: `tests/test_ingest_wizard_apply.py` — suite for the retired apply CLI
 
 **Interfaces:**
 - Consumes: `WizardSessionStore` intake/profile/select/compile/exception/emit methods and `LegacyRunReader` GET methods.
-- Produces: `POST /changeset`, `GET /changeset`, five-function browser flow, and HTTP `410` for retired mutation routes.
+- Produces: `POST /changeset`, `GET /changeset`, the `changeset_emitted` state in `GET /api/wizard/sessions` payloads, five-function browser flow, and HTTP `410` for retired mutation routes.
 
 - [ ] **Step 1: Write failing server boundary tests**
 
@@ -659,6 +664,18 @@ def test_current_compiled_ready_session_emits_changeset(self):
     )
     self.assertEqual(status, 200)
     self.assertEqual(payload["changeSet"]["schemaVersion"], "workbook-changeset-1")
+    self.assertEqual(payload["session"]["state"], "changeset_emitted")
+
+
+def test_sessions_list_exposes_changeset_emitted_state(self):
+    status, payload = self.get_json("/api/wizard/sessions")
+    self.assertEqual(status, 200)
+    emitted = {
+        session["runId"]
+        for session in payload["sessions"]
+        if session.get("state") == "changeset_emitted"
+    }
+    self.assertIn(self.run_id, emitted)
 
 
 def test_retired_mutation_routes_are_gone(self):
@@ -689,11 +706,13 @@ Expected: FAIL on the new boundary assertions.
 
 - [ ] **Step 3: Replace the current plan stage with ChangeSet completion**
 
-The compiler summary shows one action, `Create ChangeSet`, only for `compiled_ready`. Its result screen shows targets, sheet creations, row-change counts, no-op coverage, workbook fingerprint, and download. It contains no approval or apply control and no route back into historical review.
+The compiler summary shows one action, `Create ChangeSet`, only for `compiled_ready`. Its result screen shows targets, sheet creations, row-change counts, no-op coverage, workbook fingerprint, and download. It contains no approval or apply control and no route back into historical review. Delete the now-unreachable `build_manifest_plan()` from `plan_builder.py` and the Task 5 legacy-equivalence comparison from `tests/test_ingest_wizard_plan.py` in the same commit.
 
 - [ ] **Step 4: Retire mutation routes explicitly**
 
 POST requests to the seven historical endpoints return HTTP `410` and the exact error above. GET historical plan/evidence display may call `LegacyRunReader`, which reads JSON only and exposes no write methods. Remove `approve_write()` and `apply_approved_plan()` from the server-reachable store surface.
+
+Retire `scripts/ingest_wizard_apply.py` and `tests/test_ingest_wizard_apply.py` in this commit: the script calls the removed `apply_approved_plan()` surface, and `scripts/apply_workbook_changeset.py` is the only operator preview/approval/write CLI. Do not convert it to a wrapper — the pass-c-3 write contract it enforces is retired, not relocated.
 
 - [ ] **Step 5: Remove current-session imports of write/deployment orchestration**
 
@@ -724,11 +743,14 @@ git diff --check
 git add scripts/corvette_form_generator/ingest/wizard \
   scripts/corvette_form_generator/workbook_domain/deployment_proof.py \
   scripts/ingest_wizard_server.py \
+  scripts/ingest_wizard_apply.py \
   visualizer/ingest-wizard \
   tests/test_ingest_wizard_server.py \
   tests/test_ingest_wizard_server_pass_b.py \
   tests/test_ingest_wizard_ui_milestone2.py \
-  tests/test_ingest_wizard_ui_blockers.py
+  tests/test_ingest_wizard_ui_blockers.py \
+  tests/test_ingest_wizard_plan.py \
+  tests/test_ingest_wizard_apply.py
 git commit -m "refactor: narrow ingest to changeset emission"
 ```
 
@@ -740,9 +762,11 @@ git commit -m "refactor: narrow ingest to changeset emission"
 - Modify: `scripts/workbook_editor_server.py`
 - Delete: `visualizer/workbook-editor/workbook-editor.js`
 - Modify: `tests/test_editor_ops_meta.py`
+- Delete: `tests/test_editor_server_ingest_review.py` — suite for the removed `/api/ingest/*` handlers
 - Modify: `docs/ingest/ingest-separation-model-integration-editor-consolidation-spec.md`
 - Modify: `docs/ingest/README.md`
 - Modify: `README.md`
+- Modify: `AGENTS.md` — §8 ingest write-path description
 
 **Interfaces:**
 - Consumes: shared ChangeSet service and existing editor operations.
@@ -771,9 +795,11 @@ Expected: FAIL on both new assertions.
 
 - [ ] **Step 3: Remove only the obsolete ingest surface and dead file**
 
-Delete `IngestReviewTab`, its helpers/state/styles, its navigation button/render branch, and unreferenced server `/api/ingest/*` handlers. Delete the unreferenced React prototype. Preserve Form Structure, Sheet Browser, Review, Pending Changes, operation payloads, and Apply behavior.
+Delete `IngestReviewTab`, its helpers/state/styles, its navigation button/render branch, and unreferenced server `/api/ingest/*` handlers. Delete the unreferenced React prototype. Delete `tests/test_editor_server_ingest_review.py` with the handlers it covers; the Pass 2 payload library (`ingest/review_payload.py`) and `tests/test_ingest_review_payload.py` stay as legacy library surface. Preserve Form Structure, Sheet Browser, Review, Pending Changes, operation payloads, and Apply behavior.
 
 - [ ] **Step 4: Run the complete Phase 1 gate**
+
+Run the full live ingest/editor/domain suite surface, not only the files Tasks 1–6 happened to touch:
 
 ```sh
 PYTHONPATH=scripts .venv/bin/python -m pytest \
@@ -781,14 +807,38 @@ PYTHONPATH=scripts .venv/bin/python -m pytest \
   tests/test_workbook_changeset.py \
   tests/test_workbook_changeset_service.py \
   tests/test_editor_ops_apply.py \
+  tests/test_editor_ops_global_families.py \
   tests/test_editor_ops_meta.py \
-  tests/test_ingest_wizard_changeset.py \
+  tests/test_editor_server_payload.py \
+  tests/test_editor_server_write_api.py \
+  tests/test_ingest_review_payload.py \
   tests/test_ingest_wizard_canonical_compiler.py \
+  tests/test_ingest_wizard_canonical_rows.py \
+  tests/test_ingest_wizard_changeset.py \
+  tests/test_ingest_wizard_comparator_evidence.py \
   tests/test_ingest_wizard_compiler_session.py \
+  tests/test_ingest_wizard_copy_split.py \
+  tests/test_ingest_wizard_decisions.py \
   tests/test_ingest_wizard_exception_flow.py \
+  tests/test_ingest_wizard_exceptions.py \
+  tests/test_ingest_wizard_hints.py \
+  tests/test_ingest_wizard_identity.py \
+  tests/test_ingest_wizard_joiner.py \
+  tests/test_ingest_wizard_parser.py \
+  tests/test_ingest_wizard_plan.py \
+  tests/test_ingest_wizard_profile_compiler.py \
+  tests/test_ingest_wizard_profiler.py \
+  tests/test_ingest_wizard_relationship_compiler.py \
   tests/test_ingest_wizard_server.py \
   tests/test_ingest_wizard_server_milestone2.py \
-  tests/test_ingest_wizard_ui_milestone2.py -q
+  tests/test_ingest_wizard_server_pass_b.py \
+  tests/test_ingest_wizard_session.py \
+  tests/test_ingest_wizard_ui_blockers.py \
+  tests/test_ingest_wizard_ui_milestone2.py \
+  tests/test_ingest_wizard_ui_reference.py \
+  tests/test_ingest_wizard_ui_relationships.py \
+  tests/test_order_guide_ingest_interpreter.py \
+  tests/test_order_guide_ingest_profiler.py -q
 node --check visualizer/ingest-wizard/wizard.js
 node --check visualizer/workbook-editor/editor.js
 .venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
@@ -796,11 +846,11 @@ node --check visualizer/workbook-editor/editor.js
 git diff --check
 ```
 
-Expected: all tests PASS; workbook validators clean; no protected product file changed.
+Expected: all tests PASS; workbook validators clean; no protected product file changed. Two suites are absent by design: `tests/test_ingest_wizard_apply.py` (retired in Task 6) and `tests/test_editor_server_ingest_review.py` (retired in Step 3 with the `/api/ingest/*` handlers). `tests/test_editor_lints.py` is excluded from this gate: its `RealWorkbookCompareTest` reds are pre-existing workbook-data findings tracked outside this program — run it separately and confirm only the same named failures, no new ones.
 
 - [ ] **Step 5: Update owner docs with exact Phase 1 evidence**
 
-Mark Phase 1 complete in the approved spec, name commits/files/tests, state that no workbook write occurred, and replace README descriptions of the ingest/editor surfaces with the five-function/shared-service path. Do not duplicate the full spec in README.
+Mark Phase 1 complete in the approved spec, name commits/files/tests, state that no workbook write occurred, and replace README descriptions of the ingest/editor surfaces with the five-function/shared-service path. Update AGENTS.md §8 so the raw-ingest write-path description names `workbook-changeset-1` emission plus the shared service and `scripts/apply_workbook_changeset.py` in place of the retired `pass-c-3`/`ingest_wizard_apply.py` contract. Do not duplicate the full spec in README or AGENTS.md.
 
 - [ ] **Step 6: Commit Phase 1 closure**
 
@@ -808,8 +858,9 @@ Mark Phase 1 complete in the approved spec, name commits/files/tests, state that
 git add visualizer/workbook-editor \
   scripts/workbook_editor_server.py \
   tests/test_editor_ops_meta.py \
+  tests/test_editor_server_ingest_review.py \
   docs/ingest/ingest-separation-model-integration-editor-consolidation-spec.md \
-  docs/ingest/README.md README.md
+  docs/ingest/README.md README.md AGENTS.md
 git commit -m "refactor: remove duplicate ingest editor workflow"
 ```
 
@@ -832,25 +883,50 @@ git commit -m "refactor: remove duplicate ingest editor workflow"
 
 Before any merge/rebase operation, inspect `git status`, branch divergence, workbook hash, `form-app/data.js`, tracked `form-output`, and `form-output/workbook-edit-log.jsonl`. Preserve `main`'s canonical workbook and real audit entry. Do not reuse any old approval after reconciliation.
 
-- [ ] **Step 2: Re-run the five-function ingest path against exact-current inputs**
+- [ ] **Step 2: Start the ingest server and re-run the five-function path through compile**
 
-Use the browser or service API to select the raw source, confirm roles, select `grand_sport_x`, `zr1`, and `zr1x`, compile, resolve only newly emitted typed exceptions, and emit one ChangeSet. Record the new run ID and hashes in the owner spec.
+Start the ingest server if it is not already running; the browser flow and every session lookup below require it:
 
-Resolve the emitted run and stable proof paths from the server after emission:
+```sh
+.venv/bin/python scripts/ingest_wizard_server.py --port 8040
+```
+
+Use the browser or service API to select the raw source, confirm roles, select `grand_sport_x`, `zr1`, and `zr1x`, and compile. Record the new run ID and compile/queue hashes in the owner spec at compile time, and set `ingest_run_id` to the new run's ID — the seed step and all later steps consume it.
+
+- [ ] **Step 3: Seed the frozen exception resolutions behind a fingerprint gate**
+
+The frozen run carries 158 typed exception resolutions, stored strictly per-run, and resolutions shape the manifest the ChangeSet projects. A fresh compile re-emits the same queue with zero seeding; re-answering it by hand would silently invalidate the exact-equivalence argument this phase rests on. Copy the frozen resolutions into the new run only when the queue fingerprint matches exactly, and refuse otherwise:
+
+```sh
+frozen_resolutions="form-output/ingest-wizard/20260717-091317-470292/exception-resolutions.json"
+run_dir="form-output/ingest-wizard/$ingest_run_id"
+test "$(jq -r '.queueSubjectFingerprint' "$frozen_resolutions")" = \
+  "$(jq -r '.queueSubjectFingerprint' "$run_dir/exception-queue.json")"
+cp "$frozen_resolutions" "$run_dir/exception-resolutions.json"
+```
+
+Re-run projection so the manifest and compile report bind the replayed `resolutionSemanticSha`, then confirm every replayed resolution reads back valid against the current queue. Resolve by hand only genuinely newly emitted typed exceptions — the expected count is zero. A fingerprint mismatch or an invalidated replayed resolution stops the task: reconcile against the frozen snapshot instead of re-answering the queue.
+
+- [ ] **Step 4: Emit the ChangeSet and resolve the run/proof paths from the server**
+
+Emit one ChangeSet from the seeded session, then resolve the emitted run and stable proof paths. The server lookup must return the same run ID recorded in Step 2:
 
 ```sh
 curl --fail --silent http://127.0.0.1:8040/api/wizard/sessions \
   > /private/tmp/27vette-ingest-sessions.json
-ingest_run_id="$(jq -r '.sessions | map(select(.state == "changeset_emitted")) | sort_by(.runId) | last | .runId' \
+ingest_run_id_lookup="$(jq -r '.sessions | map(select(.state == "changeset_emitted")) | sort_by(.runId) | last | .runId' \
   /private/tmp/27vette-ingest-sessions.json)"
-test -n "$ingest_run_id" && test "$ingest_run_id" != "null"
+test -n "$ingest_run_id_lookup" && test "$ingest_run_id_lookup" != "null"
+test "$ingest_run_id_lookup" = "$ingest_run_id"
 changeset_path="form-output/ingest-wizard/$ingest_run_id/workbook-change-set.json"
 proof_dir="/private/tmp/27vette-changeset-proof-$ingest_run_id"
 test -f "$changeset_path"
 mkdir -p "$proof_dir"
 ```
 
-- [ ] **Step 3: Preview through the shared CLI into an isolated directory**
+Record the emission hashes in the owner spec.
+
+- [ ] **Step 5: Preview through the shared CLI into an isolated directory**
 
 ```sh
 .venv/bin/python scripts/apply_workbook_changeset.py \
@@ -861,11 +937,11 @@ mkdir -p "$proof_dir"
 
 Expected: preview `ok=true`, exact coverage, no unresolved blockers, and no canonical workbook mutation.
 
-- [ ] **Step 4: Run relocated deployment proof on temporary workbooks**
+- [ ] **Step 6: Run relocated deployment proof on temporary workbooks**
 
 Call `workbook_domain.deployment_proof` for GSX+ZR1, ZR1X repeatability, and the all-target atomic ChangeSet. Require package/schema/Boolean/final-state/readback, generator contracts, registry loading, zero semantic signature mismatches, zero deployment blockers, and zero deferrals.
 
-- [ ] **Step 5: Present the approval packet and stop**
+- [ ] **Step 7: Present the approval packet and stop**
 
 Present targets, workbook SHA/mtime, sheet creations, row changes by sheet/action, no-op coverage, warning IDs, backup/rollback behavior, preview hash, deployment-proof hash, protected-surface hashes, and the three ratified interpretation statements. Do not create `ChangeApproval` or run `--write` until Sean explicitly approves this exact packet.
 
@@ -885,7 +961,7 @@ Present targets, workbook SHA/mtime, sheet creations, row changes by sheet/actio
 
 - [ ] **Step 1: Create the bound approval without writing**
 
-Recover the exact approved paths and refuse if its preview packet is absent:
+The ingest server from Task 8 must still be running — restart it with `.venv/bin/python scripts/ingest_wizard_server.py --port 8040` if it is not. Recover the exact approved paths and refuse if its preview packet is absent:
 
 ```sh
 curl --fail --silent http://127.0.0.1:8040/api/wizard/sessions \
@@ -1226,7 +1302,7 @@ git commit -m "feat: make manager the shared changeset editor"
 - Modify: `AGENTS.md` only if its durable editor boundary is no longer accurate
 - Modify: `docs/ingest/README.md`
 - Modify: `docs/ingest/ingest-separation-model-integration-editor-consolidation-spec.md`
-- Retire only after parity: `scripts/workbook_editor_server.py`, `visualizer/workbook-editor/`
+- Retire only after parity: `scripts/workbook_editor_server.py`, `visualizer/workbook-editor/`, `scripts/apply_workbook_ops.py`
 
 **Interfaces:**
 - Consumes: shared registry/service, Manager backend/UI, saved canonical workbook, and existing editor parity fixtures.
@@ -1265,7 +1341,7 @@ Then manually verify the full editor workflow at desktop and mobile widths again
 
 - [ ] **Step 3: Retire the fallback only after every parity row passes**
 
-Remove the old editor server/UI and its now-obsolete tests/README commands. Preserve shared `editor_ops` compatibility only if another active non-editor caller still needs it; otherwise reduce it to a compatibility import layer over `workbook_domain`.
+Remove the old editor server/UI and its now-obsolete tests/README commands. Retire `scripts/apply_workbook_ops.py` in the same pass: `scripts/apply_workbook_changeset.py` is the single operator preview/approval/write CLI, and keeping the old ops-batch CLI would leave a second operator write path over the `editor_ops` compatibility layer. Preserve shared `editor_ops` compatibility only if another active non-editor caller still needs it; otherwise reduce it to a compatibility import layer over `workbook_domain`.
 
 - [ ] **Step 4: Run full affected-path validation**
 
@@ -1296,7 +1372,7 @@ git add -- README.md workbook-manager/README.md \
   docs/ingest/README.md \
   docs/ingest/ingest-separation-model-integration-editor-consolidation-spec.md \
   tests/test_workbook_manager.py tests/test_workbook_manager_frontend.mjs
-git add -u -- scripts/workbook_editor_server.py visualizer/workbook-editor
+git add -u -- scripts/workbook_editor_server.py visualizer/workbook-editor scripts/apply_workbook_ops.py
 if ! git diff --quiet -- AGENTS.md; then git add -- AGENTS.md; fi
 git commit -m "refactor: consolidate workbook editing on shared changesets"
 ```
