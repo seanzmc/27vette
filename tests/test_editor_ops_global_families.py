@@ -437,6 +437,47 @@ class GlobalFamilyOpsTest(unittest.TestCase):
         self.assertEqual(added[7], "False")
         self.assertEqual(added[9], "True")
 
+    def test_pending_inactive_source_registration_validates_same_batch_references(self) -> None:
+        items = [
+            {
+                "action": "update",
+                "sheet": "model_workbook_sources",
+                "key": {"model_key": "zr1", "source_role": "source_option_sheet"},
+                "row": {"sheet_name": "zr1_options", "active": False},
+            },
+            {
+                "action": "add",
+                "sheet": "zr1_options",
+                "key": {"option_id": "opt_pending_001"},
+                "row": {
+                    "option_id": "opt_pending_001",
+                    "rpo": "PND",
+                    "option_name": "Pending inactive source option",
+                    "section_id": "sec_whee_001",
+                    "selectable": True,
+                    "active": False,
+                },
+            },
+            {
+                "action": "add",
+                "sheet": "default_selection_rules",
+                "key": {"model_key": "zr1", "rule_id": "zr1_pending_default"},
+                "row": {
+                    "model_key": "zr1",
+                    "rule_id": "zr1_pending_default",
+                    "target_option_id": "opt_pending_001",
+                    "condition_type": "always",
+                    "condition_id": "",
+                    "priority": 1,
+                    "active": False,
+                },
+            },
+        ]
+
+        result = self.run_batch(items)
+
+        self.assertTrue(result["ok"], result)
+
     def test_create_sheet_failures(self) -> None:
         result = self.run_batch(
             [{"action": "create_sheet", "sheet": "z06_options", "family": "options", "headersFrom": "z06_options"}]

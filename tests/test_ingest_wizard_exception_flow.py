@@ -252,13 +252,17 @@ class ExceptionFlowTest(unittest.TestCase):
         before_files = {
             path.name: path.read_bytes() for path in run_dir.iterdir() if path.is_file()
         }
-        before_preview = self.store.preview_exception(
-            self.run_id,
-            subject_id=subject["subjectId"],
-            subject_version=subject["subjectVersion"],
-            action="choose_section",
-            payload={"sectionId": "sec_whee_001"},
-        )
+        with mock.patch(
+            "corvette_form_generator.ingest.wizard.session.time.strftime",
+            return_value="2026-07-17T00:00:00Z",
+        ):
+            before_preview = self.store.preview_exception(
+                self.run_id,
+                subject_id=subject["subjectId"],
+                subject_version=subject["subjectVersion"],
+                action="choose_section",
+                payload={"sectionId": "sec_whee_001"},
+            )
 
         with mock.patch.object(
             self.store,
@@ -278,13 +282,17 @@ class ExceptionFlowTest(unittest.TestCase):
                 actionable="yes",
                 limit=1,
             )
-            after_preview = self.store.preview_exception(
-                self.run_id,
-                subject_id=subject["subjectId"],
-                subject_version=subject["subjectVersion"],
-                action="choose_section",
-                payload={"sectionId": "sec_whee_001"},
-            )
+            with mock.patch(
+                "corvette_form_generator.ingest.wizard.session.time.strftime",
+                return_value="2026-07-17T00:00:01Z",
+            ):
+                after_preview = self.store.preview_exception(
+                    self.run_id,
+                    subject_id=subject["subjectId"],
+                    subject_version=subject["subjectVersion"],
+                    action="choose_section",
+                    payload={"sectionId": "sec_whee_001"},
+                )
 
         self.assertEqual(
             changed["queueSubjectFingerprint"], original["queueSubjectFingerprint"]

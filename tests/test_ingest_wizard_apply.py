@@ -25,6 +25,7 @@ for entry in (ROOT / "scripts", ROOT / "tests"):
 from corvette_form_generator.ingest.wizard.session import (  # noqa: E402
     WizardError,
     WizardSessionStore,
+    file_fingerprint,
     read_json,
     write_json,
 )
@@ -159,12 +160,40 @@ class ApplyFlowTest(unittest.TestCase):
                 if item.get("action") in {"add", "update"} and str(item.get("sheet") or "").endswith("options"):
                     item.setdefault("row", {})["selectable"] = True
                     item["row"]["active"] = True
+        session = read_json(run_dir / "session.json")
+        authority = {
+            "fingerprint": "fixture-run-authority",
+            "bindings": {
+                "files": {
+                    label: file_fingerprint(path)
+                    for label, path in {
+                        "source": Path(session["sourcePath"]),
+                        "workbook": self.master,
+                        "sheetRoles": run_dir / "sheet-roles.json",
+                        "optionCandidates": run_dir / "option-candidates.json",
+                        "priceRows": run_dir / "price-rows.json",
+                        "joinReport": run_dir / "join-report.json",
+                        "modelSelection": run_dir / "model-selection.json",
+                    }.items()
+                }
+            },
+        }
         for filename, payload, field in (
-            ("canonical-row-manifest.json", {"schemaVersion": "canonical-rows-1"}, "canonicalManifestSha"),
+            (
+                "canonical-row-manifest.json",
+                {
+                    "schemaVersion": "canonical-rows-1",
+                    "manifestSemanticSha": "fixture-manifest-semantic",
+                    "runAuthorityFingerprint": authority,
+                },
+                "canonicalManifestSha",
+            ),
             (
                 "compile-report.json",
                 {
                     "schemaVersion": compile_schema_version,
+                    "manifestSemanticSha": "fixture-manifest-semantic",
+                    "runAuthorityFingerprint": authority,
                     "deferrals": compile_deferrals,
                     "sourceFeatureCoverage": source_feature_coverage,
                     "models": compile_models,
@@ -172,12 +201,29 @@ class ApplyFlowTest(unittest.TestCase):
                 "compileReportSha",
             ),
             ("exception-resolutions.json", {"schemaVersion": "exception-resolutions-1"}, "exceptionResolutionsSha"),
+            ("exception-queue.json", {"schemaVersion": "exception-queue-1"}, "exceptionQueueSha"),
+            ("comparator-evidence.json", {"schemaVersion": "comparator-evidence-1"}, "comparatorEvidenceSha"),
         ):
             write_json(run_dir / filename, payload)
             plan[field] = hashlib.sha256((run_dir / filename).read_bytes()).hexdigest()
         plan["schemaVersion"] = "pass-c-3"
+        selection = read_json(run_dir / "model-selection.json")
+        plan["sourceFingerprint"] = selection["sourceFingerprint"]
+        plan["candidatesFingerprint"] = selection["candidatesFingerprint"]
+        plan["canonicalManifestSemanticSha"] = "fixture-manifest-semantic"
+        plan["runAuthorityFingerprint"] = authority
+        plan["planReadiness"] = {"planReady": True}
+        plan["compilerBindings"] = {
+            field: plan[field]
+            for field in (
+                "canonicalManifestSha",
+                "compileReportSha",
+                "exceptionResolutionsSha",
+                "exceptionQueueSha",
+                "comparatorEvidenceSha",
+            )
+        }
         write_json(run_dir / "apply-plan.json", plan)
-        session = read_json(run_dir / "session.json")
         session["state"] = "plan_built"
         write_json(run_dir / "session.json", session)
         scoped = self.store.approve_plan(self.run_id, "sean")["approval"]
@@ -234,6 +280,46 @@ class ApplyFlowTest(unittest.TestCase):
                     }
                     for model in targets
                 },
+                "deploymentProofPhases": [
+                    {
+                        "phaseId": phase_id,
+                        "models": phase_models,
+                        "passed": True,
+                        "continuity": {
+                            model: {
+                                "status": "deployment_probe_passed",
+                                "deploymentBlockers": [],
+                                "deploymentDeferrals": [],
+                            }
+                            for model in phase_models
+                        },
+                    }
+                    for phase_id, phase_models in [
+                        *(
+                            [
+                                (
+                                    "grand_sport_x_plus_zr1",
+                                    [
+                                        model
+                                        for model in ("grand_sport_x", "zr1")
+                                        if model in targets
+                                    ],
+                                )
+                            ]
+                            if any(
+                                model in targets
+                                for model in ("grand_sport_x", "zr1")
+                            )
+                            else []
+                        ),
+                        *(
+                            [("zr1x_repeatability", ["zr1x"])]
+                            if "zr1x" in targets
+                            else []
+                        ),
+                        ("all_targets_atomic", targets),
+                    ]
+                ],
             }
         )
         report["applyResult"] = {
@@ -450,6 +536,11 @@ class ApplyFlowTest(unittest.TestCase):
                 ],
             ),
             patch.object(self.store, "_activate_probe_models"),
+            patch.object(
+                self.store,
+                "_validate_probe_activation",
+                return_value={"ok": True, "errors": []},
+            ),
             patch(
                 "corvette_form_generator.model_configs.discover_generation_model_configs",
                 return_value={"stingray": config},
@@ -467,12 +558,396 @@ class ApplyFlowTest(unittest.TestCase):
             )
 
         entry = continuity["stingray"]
+        overrides = config.with_overrides.call_args.kwargs
+        self.assertEqual(overrides["root"], overrides["output_dir"].parent)
+        self.assertEqual(overrides["app_dir"].parent, overrides["root"])
+        self.assertEqual(overrides["workbook_path"].parent, overrides["root"])
+        self.assertTrue(entry["probePaths"]["allTemporary"])
         self.assertEqual(entry["counts"]["validationErrors"], 1)
         self.assertEqual(entry["status"], "not_deployment_ready")
         self.assertIn(
             "generated_validation_errors",
             {item["kind"] for item in entry["deploymentBlockers"]},
         )
+
+    def test_manifest_runtime_signature_parity_uses_generated_rpos_and_variants(self) -> None:
+        plan = {
+            "coverage": {
+                "manifestRows": [
+                    {
+                        "model": "zr1",
+                        "family": "rule_mapping",
+                        "action": "add",
+                        "key": {"rule_id": "rule_fixture"},
+                        "semanticSignature": {
+                            "bodyStyleScope": "*",
+                            "ruleType": "requires",
+                            "sourceRpo": "AAA",
+                            "targetRpo": "BBB",
+                            "trimLevelScope": "*",
+                            "variantScope": "*",
+                        },
+                    },
+                    {
+                        "model": "zr1",
+                        "family": "model_variants",
+                        "action": "add",
+                        "key": {"model_key": "zr1", "variant_id": "3lz_h07"},
+                        "semanticSignature": {"variantId": "3lz_h07"},
+                    },
+                    {
+                        "model": "*",
+                        "family": "rule_mapping",
+                        "action": "noop",
+                        "key": {"rule_id": "shared_rule_fixture"},
+                        "semanticSignature": {
+                            "bodyStyleScope": "*",
+                            "ruleType": "requires",
+                            "sourceRpo": "AAA",
+                            "targetRpo": "BBB",
+                            "trimLevelScope": "*",
+                            "variantScope": "*",
+                        },
+                    },
+                    {
+                        "model": "zr1",
+                        "family": "rule_mapping",
+                        "action": "delete",
+                        "key": {"rule_id": "deleted_rule_fixture"},
+                        "semanticSignature": {"ruleType": "requires"},
+                    },
+                    {
+                        "model": "zr1",
+                        "family": "rule_mapping",
+                        "action": "add",
+                        "key": {"rule_id": "rule_interior_fixture"},
+                        "semanticSignature": {
+                            "bodyStyleScope": "*",
+                            "ruleType": "excludes",
+                            "sourceRpo": "AAA",
+                            "targetRpo": "3LZ_AE4_HAG",
+                            "trimLevelScope": "*",
+                            "variantScope": "*",
+                        },
+                    },
+                    {
+                        "model": "zr1",
+                        "family": "price_rules",
+                        "action": "add",
+                        "key": {"price_rule_id": "price_fixture"},
+                        "semanticSignature": {
+                            "bodyStyleScope": "*",
+                            "conditionOptionId": "opt_aaa",
+                            "priceValue": 695,
+                            "targetOptionId": "opt_aaa",
+                            "trimLevelScope": "3LZ",
+                            "variantScope": "*",
+                        },
+                    },
+                    {
+                        "model": "zr1",
+                        "family": "default_selection_rules",
+                        "action": "noop",
+                        "key": {"model_key": "zr1", "rule_id": "default_fixture"},
+                        "canonicalValues": {
+                            "model_key": "zr1",
+                            "rule_id": "default_fixture",
+                            "condition_type": "trim",
+                            "condition_id": "3LZ",
+                            "target_option_id": "opt_bbb",
+                            "body_style_scope": "*",
+                            "trim_level_scope": "3LZ",
+                            "variant_scope": "*",
+                        },
+                        "semanticSignature": {
+                            "family": "default_selection_rules",
+                            "retainedKey": {
+                                "model_key": "zr1",
+                                "rule_id": "default_fixture",
+                            },
+                            "sheet": "default_selection_rules",
+                        },
+                    },
+                    {
+                        "model": "zr1",
+                        "family": "price_rules",
+                        "action": "noop",
+                        "key": {"price_rule_id": "foreign_price_fixture"},
+                        "semanticSignature": {"priceValue": 100},
+                        "projectionScopeDisposition": (
+                            "retained_existing_noop_outside_target_domain"
+                        ),
+                    },
+                ]
+            }
+        }
+        contract = {
+            "choices": [
+                {"option_id": "opt_aaa", "rpo": "AAA"},
+                {"option_id": "opt_bbb", "rpo": "BBB"},
+            ],
+            "rules": [
+                {
+                    "rule_id": "rule_fixture",
+                    "rule_type": "requires",
+                    "source_id": "opt_aaa",
+                    "target_id": "opt_bbb",
+                },
+                {
+                    "rule_id": "rule_interior_fixture",
+                    "rule_type": "excludes",
+                    "source_id": "opt_aaa",
+                    "target_id": "3LZ_AE4_HAG",
+                },
+                {
+                    "rule_id": "shared_rule_fixture",
+                    "rule_type": "requires",
+                    "source_id": "opt_aaa",
+                    "target_id": "opt_bbb",
+                },
+            ],
+            "interiors": [{"interior_id": "3LZ_AE4_HAG"}],
+            "priceRules": [
+                {
+                    "price_rule_id": "price_fixture",
+                    "condition_option_id": "opt_aaa",
+                    "price_rule_type": "override",
+                    "price_value": 695,
+                    "target_option_id": "opt_aaa",
+                    "trim_level_scope": "3LZ",
+                }
+            ],
+            "defaultSelectionRules": [
+                {
+                    "rule_id": "default_fixture",
+                    "condition_type": "trim",
+                    "condition_id": "3LZ",
+                    "target_option_id": "opt_bbb",
+                    "trim_level_scope": "3LZ",
+                }
+            ],
+            "variants": [{"variant_id": "3lz_h07"}],
+        }
+
+        self.assertEqual(
+            self.store._manifest_runtime_signature_mismatches(plan, "zr1", contract),
+            [],
+        )
+        contract["rules"][0]["target_id"] = "opt_aaa"
+        mismatches = self.store._manifest_runtime_signature_mismatches(
+            plan, "zr1", contract
+        )
+        self.assertEqual(mismatches[0]["kind"], "semantic_signature_mismatch")
+
+        contract["rules"][0]["target_id"] = "opt_bbb"
+        contract["rules"].append(
+            {
+                "rule_id": "unexpected_rule",
+                "rule_type": "requires",
+                "source_id": "opt_aaa",
+                "target_id": "opt_bbb",
+            }
+        )
+        mismatches = self.store._manifest_runtime_signature_mismatches(
+            plan, "zr1", contract
+        )
+        self.assertIn("generated_row_unexpected", {item["kind"] for item in mismatches})
+
+        contract["rules"].pop()
+        contract["defaultSelectionRules"][0]["target_option_id"] = "opt_aaa"
+        mismatches = self.store._manifest_runtime_signature_mismatches(
+            plan, "zr1", contract
+        )
+        self.assertIn("semantic_signature_mismatch", {item["kind"] for item in mismatches})
+
+        contract["defaultSelectionRules"][0]["target_option_id"] = "opt_bbb"
+        contract["rules"].append(
+            {
+                "rule_id": "deleted_rule_fixture",
+                "rule_type": "requires",
+                "source_id": "opt_aaa",
+                "target_id": "opt_bbb",
+            }
+        )
+        mismatches = self.store._manifest_runtime_signature_mismatches(
+            plan, "zr1", contract
+        )
+        self.assertIn("deleted_row_still_generated", {item["kind"] for item in mismatches})
+
+    def test_source_feature_coverage_agreement_requires_bound_clean_coverage_and_parity(
+        self,
+    ) -> None:
+        plan = {
+            "sourceFeatureCoverage": {
+                "semanticSha": "coverage-sha",
+                "byModel": {
+                    "zr1": {
+                        "featureCount": 3,
+                        "dispositionCounts": {
+                            "compiled": 2,
+                            "resolved_not_applicable": 1,
+                        },
+                        "blockingFeatures": [],
+                    }
+                },
+            }
+        }
+
+        clean = self.store._source_feature_coverage_agreement(plan, "zr1", [])
+        self.assertTrue(clean["ok"])
+        blocked = self.store._source_feature_coverage_agreement(
+            plan,
+            "zr1",
+            [{"kind": "generated_row_unexpected"}],
+        )
+        self.assertFalse(blocked["ok"])
+
+    def test_probe_activation_is_target_only(self) -> None:
+        from openpyxl import load_workbook
+        import shutil
+
+        before_activation = self.root / "before-activation.xlsx"
+        shutil.copy2(self.master, before_activation)
+        self.store._activate_probe_models(self.master, ["zr1"])
+
+        with patch(
+            "corvette_form_generator.schema_validation.validate_workbook_schema",
+            return_value=[],
+        ):
+            validation = self.store._validate_probe_activation(
+                before_activation,
+                self.master,
+                ["zr1"],
+            )
+        self.assertTrue(validation["ok"], validation)
+        self.assertEqual(validation["package"]["status"], "valid")
+        self.assertEqual(validation["schema"]["error_count"], 0)
+        self.assertEqual(validation["boolHygiene"]["error_count"], 0)
+        self.assertEqual(validation["exactReadback"]["errors"], [])
+
+        wb = load_workbook(self.master, read_only=True, data_only=True)
+        try:
+            for sheet_name in (
+                "model_master",
+                "model_variants",
+                "model_workbook_sources",
+                "model_registry_promotion",
+            ):
+                ws = wb[sheet_name]
+                headers = {
+                    str(cell.value): index
+                    for index, cell in enumerate(ws[1])
+                    if cell.value is not None
+                }
+                rows = [
+                    tuple(cell.value for cell in row)
+                    for row in ws.iter_rows(min_row=2)
+                ]
+                for row in rows:
+                    model_key = str(row[headers["model_key"]] or "")
+                    if not model_key:
+                        continue
+                    self.assertEqual(
+                        str(row[headers["active"]]).lower() in {"true", "1"},
+                        model_key == "zr1",
+                        (sheet_name, model_key),
+                    )
+                    if sheet_name == "model_registry_promotion":
+                        self.assertEqual(
+                            str(row[headers["promoted_to_runtime"]]).lower()
+                            in {"true", "1"},
+                            model_key == "zr1",
+                            (sheet_name, model_key),
+                        )
+                        self.assertEqual(
+                            str(row[headers["default_model"]]).lower()
+                            in {"true", "1"},
+                            model_key == "zr1",
+                            (sheet_name, model_key),
+                        )
+        finally:
+            wb.close()
+
+    def test_pass_c3_deployment_proof_runs_required_target_phases(self) -> None:
+        rows = [
+            {
+                "manifestRef": f"manifest-{index}",
+                "model": model,
+                "family": "options",
+                "action": "add",
+                "key": {"option_id": f"opt_{index}"},
+            }
+            for index, model in enumerate(("grand_sport_x", "zr1", "zr1x", "*"))
+        ]
+        plan = {
+            "schemaVersion": "pass-c-3",
+            "targets": ["grand_sport_x", "zr1", "zr1x"],
+            "targetModes": {
+                "grand_sport_x": "greenfield",
+                "zr1": "reprocess",
+                "zr1x": "reprocess",
+            },
+            "coverage": {"manifestRows": rows, "noops": []},
+            "stage1": {
+                "items": [
+                    {
+                        "action": "add",
+                        "sheet": "model_registry_promotion",
+                        "key": {"model_key": "grand_sport_x"},
+                        "row": {"model_key": "grand_sport_x"},
+                        "_manifestRefs": [],
+                        "_scaffoldRule": "pass_c3_greenfield_registry_promotion",
+                    }
+                ]
+            },
+            "stage2": {
+                "items": [
+                    {
+                        "action": "add",
+                        "sheet": "fixture",
+                        "key": row["key"],
+                        "row": row["key"],
+                        "_manifestRef": row["manifestRef"],
+                    }
+                    for row in rows
+                ]
+            },
+        }
+        seen: list[list[str]] = []
+
+        def probe(_workbook, _batch, phase_plan, *, schema_validation):
+            self.assertTrue(schema_validation)
+            models = list(phase_plan["targets"])
+            seen.append(models)
+            promotion_models = {
+                item.get("key", {}).get("model_key")
+                for item in phase_plan["stage1"]["items"]
+                if item.get("_scaffoldRule")
+                == "pass_c3_greenfield_registry_promotion"
+            }
+            self.assertEqual(
+                promotion_models,
+                {"grand_sport_x"} if "grand_sport_x" in models else set(),
+            )
+            return {
+                model: {"status": "deployment_probe_passed"} for model in models
+            }
+
+        with patch.object(self.store, "_deployment_continuity_probe", side_effect=probe):
+            phases, final = self.store._deployment_proof_phases(
+                self.master, plan, schema_validation=True
+            )
+
+        self.assertEqual(
+            seen,
+            [
+                ["grand_sport_x", "zr1"],
+                ["zr1x"],
+                ["grand_sport_x", "zr1", "zr1x"],
+            ],
+        )
+        self.assertTrue(all(phase["passed"] for phase in phases))
+        self.assertEqual(set(final), {"grand_sport_x", "zr1", "zr1x"})
 
     def test_option_semantic_blockers_read_add_and_update_rows(self) -> None:
         def blockers(action: str, row: dict) -> list[dict]:
@@ -671,6 +1146,17 @@ class ApplyFlowTest(unittest.TestCase):
 
         self.assert_refusal_preserves_evidence(run_dir, refuse)
 
+    def test_write_approval_refuses_missing_required_deployment_phases(self) -> None:
+        run_dir, _ = self.future_write_authority(approve=False)
+        report = read_json(run_dir / "apply-dry-run-report.json")
+        report["deploymentProofPhases"] = []
+        write_json(run_dir / "apply-dry-run-report.json", report)
+
+        with self.assertRaisesRegex(WizardError, "deployment proof phases"):
+            self.store.approve_write(self.run_id, "sean")
+
+        self.assertFalse((run_dir / "write-approval.json").exists())
+
     def test_asset_map_deferred_is_forbidden(self) -> None:
         self.assert_forbidden_deferral_refuses("asset_map_deferred")
 
@@ -681,13 +1167,13 @@ class ApplyFlowTest(unittest.TestCase):
                 explicit_option_semantics=False,
             )
 
-    def test_compile_report_requires_all_readiness_flags(self) -> None:
+    def test_compile_report_requires_compile_ready_not_downstream_stage_flags(self) -> None:
         models = {
             model: {
-                "compileReady": True,
-                "planReady": True,
-                "writeReady": model != "zr1",
-                "deploymentReady": True,
+                "compileReady": model != "zr1",
+                "planReady": False,
+                "writeReady": False,
+                "deploymentReady": False,
                 "blockers": [],
             }
             for model in ("zr1", "zr1x")
@@ -698,6 +1184,22 @@ class ApplyFlowTest(unittest.TestCase):
             self.store.approve_write(self.run_id, "sean")
 
         self.assertFalse((run_dir / "write-approval.json").exists())
+
+    def test_downstream_readiness_comes_from_plan_and_deployment_proof(self) -> None:
+        models = {
+            model: {
+                "compileReady": True,
+                "planReady": False,
+                "writeReady": False,
+                "deploymentReady": False,
+                "blockers": [],
+            }
+            for model in ("zr1", "zr1x")
+        }
+
+        run_dir, _ = self.future_write_authority(compile_models=models)
+
+        self.assertTrue((run_dir / "write-approval.json").is_file())
 
     def test_compile_report_requires_exact_schema(self) -> None:
         run_dir, _ = self.future_write_authority(
@@ -856,6 +1358,7 @@ class ApplyFlowTest(unittest.TestCase):
             schema_validation=True,
             result=result,
             deployment=deployment,
+            deployment_phases=report["deploymentProofPhases"],
         )
 
         self.assertEqual(eligibility["deferrals"], [])
@@ -904,6 +1407,7 @@ class ApplyFlowTest(unittest.TestCase):
             schema_validation=True,
             result=report["applyResult"],
             deployment=deployment,
+            deployment_phases=report["deploymentProofPhases"],
         )
 
         blocker_kinds = {
@@ -933,6 +1437,33 @@ class ApplyFlowTest(unittest.TestCase):
             self.store.approve_write(self.run_id, "sean")
 
         self.assertFalse((run_dir / "write-approval.json").exists())
+
+    def test_unrelated_not_applicable_coverage_is_not_deployment_proof(self) -> None:
+        coverage = [
+            {
+                "model": "*",
+                "family": "ovs",
+                "disposition": "resolved_not_applicable",
+                "evidenceIds": ["status:fixture"],
+            },
+            {
+                "model": "grand_sport",
+                "family": "price_rules",
+                "disposition": "resolved_not_applicable",
+                "evidenceIds": ["price:fixture"],
+            },
+        ]
+        run_dir, _ = self.future_write_authority(
+            approve=False,
+            source_feature_coverage=coverage,
+        )
+
+        self.assertEqual(
+            self.store._compile_report_not_applicable_families(
+                run_dir, ["grand_sport_x", "zr1", "zr1x"]
+            ),
+            set(),
+        )
 
     def test_live_apply_reuses_approved_probe_without_post_mutation_reapply(self) -> None:
         run_dir, eligible_report = self.future_write_authority()
@@ -980,6 +1511,12 @@ class ApplyFlowTest(unittest.TestCase):
 
     def test_deleted_exception_resolutions_refuses_before_writer(self) -> None:
         self.assert_deleted_compiler_artifact_refuses("exception-resolutions.json")
+
+    def test_deleted_exception_queue_refuses_before_writer(self) -> None:
+        self.assert_deleted_compiler_artifact_refuses("exception-queue.json")
+
+    def test_deleted_comparator_evidence_refuses_before_writer(self) -> None:
+        self.assert_deleted_compiler_artifact_refuses("comparator-evidence.json")
 
     def assert_wrong_write_approval_refuses(self, field: str, value: str, message: str) -> None:
         run_dir, _ = self.future_write_authority()

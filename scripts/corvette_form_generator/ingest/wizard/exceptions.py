@@ -258,7 +258,13 @@ def classify_resolutions(entries: Iterable[Mapping[str, Any]], subjects: Iterabl
     return {"valid": sorted(valid, key=sort_key), "stale": sorted(stale, key=sort_key), "superseded": sorted(superseded, key=sort_key)}
 
 
-def _resolution_semantic_entry(entry: Mapping[str, Any]) -> dict[str, Any]:
+def resolution_semantic_entry(entry: Mapping[str, Any]) -> dict[str, Any]:
+    """Return only resolution fields that can change canonical behavior.
+
+    Reviewer identity and timestamps are audit metadata. They must not change
+    manifest dependencies, preview effects, or compiler semantic hashes.
+    """
+
     return {
         "subjectId": entry.get("subjectId"),
         "subjectVersion": entry.get("subjectVersion"),
@@ -283,7 +289,7 @@ def build_resolution_artifact(
             raise ValueError(f"Deferral kind {item.get('kind')!r} is not allowlisted.")
         checked_deferrals.append(item)
     valid = sorted((dict(entry) for entry in valid_entries), key=lambda item: str(item.get("subjectId") or ""))
-    semantic_entries = [_resolution_semantic_entry(entry) for entry in valid]
+    semantic_entries = [resolution_semantic_entry(entry) for entry in valid]
     return {
         "schemaVersion": EXCEPTION_RESOLUTIONS_SCHEMA,
         "queueSubjectFingerprint": str(queue_subject_fingerprint),

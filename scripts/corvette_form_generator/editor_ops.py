@@ -878,9 +878,10 @@ def _prepare_batch(extract, batch):
             }
         )
 
-    # A scaffold plan can activate/register model_workbook_sources and then
-    # write to those sheets in the same combined batch. Reflect those pending
-    # source rows in the registry maps before validating subsequent ops.
+    # A scaffold plan can register model_workbook_sources and write to those
+    # sheets in the same combined batch. Reflect every pending registration in
+    # the edit-time maps even when it remains inactive for runtime discovery;
+    # the source-row operation itself is the explicit batch authority.
     source_keycols = EDITOR_SHEET_META["model_workbook_sources"]["key"]
     source_index = _sheet_key_index(extract, "model_workbook_sources", source_keycols)
     for o in ops:
@@ -890,8 +891,6 @@ def _prepare_batch(extract, batch):
         row = dict(source_index.get(_key_tuple(key, source_keycols), {}))
         row.update(key)
         row.update(o.get("row") or {})
-        if not workbook_truthy(row.get("active")):
-            continue
         model_key = str(row.get("model_key") or "").strip()
         source_role = str(row.get("source_role") or "").strip()
         sheet_name = str(row.get("sheet_name") or "").strip()
@@ -901,7 +900,11 @@ def _prepare_batch(extract, batch):
         sheet_family.setdefault(sheet_name, family)
         models_by_sheet.setdefault(sheet_name, set()).add(model_key)
         by_model_family[(model_key, family)] = sheet_name
-    bool_storage = _bool_storage_conventions(extract, sheet_family, created_templates)
+    bool_storage = (
+        {}
+        if batch.get("forceTypedBools") is True
+        else _bool_storage_conventions(extract, sheet_family, created_templates)
+    )
     promoted = {r.get("model_key"): workbook_truthy(r.get("promoted_to_runtime"))
                 for r in rows_of(extract, "model_registry_promotion")}
 
@@ -1342,6 +1345,45 @@ def verify_prepared_workbook(path: Path, prepared: list[dict]) -> dict:
     prepared_checked = 0
     workbook = load_workbook(path, read_only=True, data_only=False)
     try:
+        grouped: dict[tuple[str, str], list[dict]] = {}
+        for operation in prepared:
+            if operation.get("action") == "create_sheet":
+                continue
+            grouped.setdefault(
+                (str(operation.get("sheet") or ""), str(operation.get("_family") or "")),
+                [],
+            ).append(operation)
+
+        readback: dict[tuple[str, str], dict] = {}
+        for (sheet, family), operations in grouped.items():
+            if sheet not in workbook.sheetnames:
+                readback[(sheet, family)] = {"error": "target sheet is absent"}
+                continue
+            worksheet = workbook[sheet]
+            headers = [cell.value for cell in worksheet[1]]
+            columns = {
+                str(header): column_index
+                for column_index, header in enumerate(headers)
+                if header is not None
+            }
+            key_columns = tuple(EDITOR_SHEET_META.get(family, {}).get("key") or ())
+            missing_key_columns = [column for column in key_columns if column not in columns]
+            if missing_key_columns:
+                readback[(sheet, family)] = {
+                    "error": f"key columns are absent: {missing_key_columns}"
+                }
+                continue
+            requested_keys = {operation.get("_kt") for operation in operations}
+            matches_by_key = {key: [] for key in requested_keys}
+            for values in worksheet.iter_rows(min_row=2, values_only=True):
+                row_key = _canonical_readback_key(values, columns, key_columns)
+                if row_key in matches_by_key:
+                    matches_by_key[row_key].append(values)
+            readback[(sheet, family)] = {
+                "columns": columns,
+                "matches": matches_by_key,
+            }
+
         for index, operation in enumerate(prepared):
             action = operation.get("action")
             sheet = str(operation.get("sheet") or "")
@@ -1360,27 +1402,13 @@ def verify_prepared_workbook(path: Path, prepared: list[dict]) -> dict:
                     continue
                 prepared_checked += 1
                 continue
-
-            if sheet not in workbook.sheetnames:
-                errors.append(f"{context}: target sheet is absent")
-                continue
-            worksheet = workbook[sheet]
-            headers = [cell.value for cell in worksheet[1]]
-            columns = {
-                str(header): column_index
-                for column_index, header in enumerate(headers)
-                if header is not None
-            }
             family = operation.get("_family")
-            key_columns = tuple(EDITOR_SHEET_META.get(family, {}).get("key") or ())
-            missing_key_columns = [column for column in key_columns if column not in columns]
-            if missing_key_columns:
-                errors.append(f"{context}: key columns are absent: {missing_key_columns}")
+            cached = readback[(sheet, str(family or ""))]
+            if cached.get("error"):
+                errors.append(f"{context}: {cached['error']}")
                 continue
-            matches = []
-            for values in worksheet.iter_rows(min_row=2, values_only=True):
-                if _canonical_readback_key(values, columns, key_columns) == operation.get("_kt"):
-                    matches.append(values)
+            columns = cached["columns"]
+            matches = cached["matches"].get(operation.get("_kt"), [])
             if action == "delete":
                 if matches:
                     errors.append(
@@ -1528,7 +1556,27 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
                 "verification": verification,
             }
         assert_valid_workbook_package(tmp)
-        bool_issues = compare_bool_like_workbooks(path, tmp)
+        approved_bool_type_migrations = None
+        if batch.get("forceTypedBools") is True:
+            typed_sheet_family = dict(sheet_family)
+            for operation in prepared:
+                operation_sheet = str(operation.get("sheet") or "")
+                operation_family = str(operation.get("_family") or "")
+                if operation_sheet and operation_family:
+                    typed_sheet_family[operation_sheet] = operation_family
+            approved_bool_type_migrations = [
+                (sheet, column)
+                for sheet, family in typed_sheet_family.items()
+                for column, kind in EDITOR_SHEET_META.get(family, {}).get(
+                    "types", {}
+                ).items()
+                if kind == "bool"
+            ]
+        bool_issues = compare_bool_like_workbooks(
+            path,
+            tmp,
+            approved_bool_type_migrations=approved_bool_type_migrations,
+        )
         bool_hygiene_result = bool_hygiene_result_payload(path, tmp, bool_issues)
         bool_hygiene_result["issues"] = bool_hygiene_result["issues"][:20]
         if bool_hygiene_result["error_count"]:
@@ -1561,7 +1609,12 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
     touched = apply_ops_to_workbook(wb, prepared, sheet_family)
     for name in touched:
         resize_sheet_tables(wb[name])
-    backup_path = save_workbook_safely(wb, path, loaded_mtime_ns=loaded_mtime)
+    backup_path = save_workbook_safely(
+        wb,
+        path,
+        loaded_mtime_ns=loaded_mtime,
+        approved_bool_type_migrations=approved_bool_type_migrations,
+    )
     live_verification = verify_prepared_workbook(path, prepared)
     if not live_verification["ok"]:
         return {

@@ -18,6 +18,13 @@ from typing import Any
 
 from openpyxl import load_workbook
 
+from corvette_form_generator.editor_ops import (
+    EDITOR_SHEET_META,
+    GLOBAL_SHEET_FAMILIES,
+    SOURCE_ROLE_FAMILIES,
+    extract_workbook,
+    model_sheet_registry,
+)
 from corvette_form_generator.ingest.wizard.copy_split import propose_copy_split
 from corvette_form_generator.ingest.wizard.decisions import (
     MODEL_LABELS,
@@ -26,6 +33,7 @@ from corvette_form_generator.ingest.wizard.decisions import (
     candidate_needs_section_decision,
     scope_candidates,
 )
+from corvette_form_generator.model_configs import base_model_config
 from corvette_form_generator.workbook import rows_from_sheet, workbook_truthy
 
 SCHEMA_VERSION_C = "pass-c-2"
@@ -250,7 +258,7 @@ def _planned_relationship_rpos(records: dict[str, dict[str, Any]]) -> set[str]:
 def plan_summary(plan: dict[str, Any]) -> dict[str, Any]:
     """UI-facing summary: everything except the raw op lists."""
 
-    return {
+    summary = {
         "schemaVersion": plan["schemaVersion"],
         "targets": plan["targets"],
         "valid": plan["valid"],
@@ -261,6 +269,12 @@ def plan_summary(plan: dict[str, Any]) -> dict[str, Any]:
         "workbookFingerprint": plan["workbookFingerprint"],
         "decisionsFingerprint": plan["decisionsFingerprint"],
     }
+    if plan.get("schemaVersion") == "pass-c-3":
+        summary["planReadiness"] = plan.get("planReadiness")
+        summary["canonicalManifestSemanticSha"] = plan.get(
+            "canonicalManifestSemanticSha"
+        )
+    return summary
 
 
 def plan_markdown(plan: dict[str, Any], dry_run: dict[str, Any]) -> str:
@@ -297,6 +311,894 @@ def plan_markdown(plan: dict[str, Any], dry_run: dict[str, Any]) -> str:
         lines += ["", "## Gaps"]
         lines += [f"- [{g['kind']}] {g['model']}: {g['detail']}" for g in report["gaps"]]
     return "\n".join(lines) + "\n"
+
+
+MANIFEST_STAGE1_FAMILIES = frozenset(
+    {
+        "model_master",
+        "model_variants",
+        "variant_master",
+        "model_workbook_sources",
+        "model_registry_promotion",
+    }
+)
+MANIFEST_ACTION_ORDER = {"add": 0, "update": 1, "delete": 2, "noop": 3}
+
+
+def _manifest_key_text(key: dict[str, Any]) -> str:
+    return canonical_json({str(column): key[column] for column in sorted(key)})
+
+
+def _manifest_normalized_row(family: str, row: dict[str, Any]) -> dict[str, Any]:
+    types = EDITOR_SHEET_META[family].get("types") or {}
+    normalized: dict[str, Any] = {}
+    for column, raw_value in row.items():
+        value = None if raw_value == "" else raw_value
+        if value is not None and types.get(column) == "int":
+            text = str(value).strip()
+            value = int(text) if text.lstrip("-").isdigit() else value
+        elif value is not None and types.get(column) == "bool":
+            value = workbook_truthy(value)
+        normalized[column] = value
+    return normalized
+
+
+def build_manifest_plan(
+    *,
+    workbook_path: Path,
+    manifest: dict[str, Any],
+    compile_report: dict[str, Any],
+    selection: dict[str, Any],
+    compiler_bindings: dict[str, str],
+    authority_artifacts: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    """Project an exact-current canonical manifest into a pass-c-3 plan.
+
+    This function validates and translates. It does not rematch identity,
+    derive business behavior, or clean target sheets beyond manifest actions.
+    """
+
+    workbook_path = Path(workbook_path)
+    targets = [str(target) for target in selection.get("targets") or []]
+    if not targets or len(targets) != len(set(targets)):
+        raise ValueError("Canonical plan needs a nonempty unique target selection.")
+    modes = {str(key): str(value) for key, value in (manifest.get("modelModes") or {}).items()}
+    report_models = {
+        str(key): dict(value or {})
+        for key, value in (compile_report.get("models") or {}).items()
+    }
+    if set(targets) != set(modes) or set(targets) != set(report_models):
+        raise ValueError("Canonical plan target set does not match compiler artifacts.")
+    required_authority_artifacts = {
+        "exceptionQueue",
+        "resolutions",
+        "comparatorEvidence",
+    }
+    if set(authority_artifacts) != required_authority_artifacts:
+        raise ValueError(
+            "Canonical plan requires the complete exception queue, resolutions, "
+            "and comparator evidence artifact set."
+        )
+    queue = authority_artifacts["exceptionQueue"]
+    resolutions = authority_artifacts["resolutions"]
+    comparator_evidence = authority_artifacts["comparatorEvidence"]
+    if set(comparator_evidence.get("targets") or {}) != set(targets):
+        raise ValueError(
+            "Canonical plan comparator evidence target set does not match selection."
+        )
+    authority = manifest.get("runAuthorityFingerprint")
+    if not authority or any(
+        artifact.get("runAuthorityFingerprint") != authority
+        for artifact in (compile_report, queue, comparator_evidence)
+    ):
+        raise ValueError("Canonical plan authority fingerprints do not agree.")
+    queue_fingerprint = str(queue.get("queueSubjectFingerprint") or "")
+    if not queue_fingerprint or any(
+        str(value or "") != queue_fingerprint
+        for value in (
+            compile_report.get("queueSubjectFingerprint"),
+            resolutions.get("queueSubjectFingerprint"),
+        )
+    ):
+        raise ValueError("Canonical plan queue and resolution fingerprints do not agree.")
+    comparator_semantic_sha = str(
+        comparator_evidence.get("comparatorEvidenceSemanticSha") or ""
+    )
+    if not comparator_semantic_sha or any(
+        str(value or "") != comparator_semantic_sha
+        for value in (
+            compile_report.get("comparatorEvidenceSemanticSha"),
+            queue.get("comparatorEvidenceSemanticSha"),
+        )
+    ):
+        raise ValueError("Canonical plan comparator evidence bindings do not agree.")
+    unknown_subject_models = {
+        str(subject.get("model") or "")
+        for subject in queue.get("subjects") or []
+        if str(subject.get("model") or "") not in set(targets)
+    }
+    if unknown_subject_models:
+        raise ValueError(
+            "Canonical plan exception queue contains subjects outside the selected "
+            f"targets: {sorted(unknown_subject_models)}"
+        )
+    current_subjects = {
+        (str(subject.get("subjectId") or ""), str(subject.get("subjectVersion") or ""))
+        for subject in queue.get("subjects") or []
+    }
+    orphan_resolutions = [
+        entry
+        for entry in resolutions.get("validEntries") or []
+        if (
+            str(entry.get("subjectId") or ""),
+            str(entry.get("subjectVersion") or ""),
+        )
+        not in current_subjects
+    ]
+    if orphan_resolutions:
+        raise ValueError(
+            "Canonical plan resolutions do not map to the exact current exception queue."
+        )
+    for target in targets:
+        model_report = report_models[target]
+        if not model_report.get("compileReady") or model_report.get("blockers"):
+            raise ValueError(f"Canonical target {target} is not compile-ready.")
+        if str(model_report.get("mode") or "") != modes[target]:
+            raise ValueError(f"Canonical target {target} mode does not match the manifest.")
+    if compile_report.get("deferrals"):
+        raise ValueError("Canonical plan cannot project unresolved compiler deferrals.")
+
+    extract = extract_workbook(workbook_path)
+    sheets = extract.get("sheets") or {}
+    registry, registered_family = model_sheet_registry(extract)
+    registered_family = {**GLOBAL_SHEET_FAMILIES, **registered_family}
+    comparators = {
+        str(key): str(value)
+        for key, value in (selection.get("comparators") or {}).items()
+    }
+    if set(comparators) != set(targets):
+        raise ValueError("Canonical plan comparator targets do not match the selection.")
+
+    rows = [dict(row) for row in manifest.get("rows") or []]
+    if not rows:
+        raise ValueError("Canonical manifest has no rows to project.")
+    greenfield_targets = {
+        model for model, mode in modes.items() if mode == "greenfield"
+    }
+    isolated_role_by_family = {
+        family: role for role, family in MODEL_SHEET_ROLES
+    }
+    greenfield_sheets = {
+        (model, family): str(getattr(base_model_config(model), role))
+        for model in greenfield_targets
+        for family, role in isolated_role_by_family.items()
+    }
+    target_option_ids = {
+        model: {
+            str(row.get("key", {}).get("option_id") or "")
+            for row in rows
+            if row.get("model") == model and row.get("family") == "options"
+        }
+        for model in greenfield_targets
+    }
+    target_interior_ids = {
+        model: {
+            str(row.get("key", {}).get("interior_id") or "")
+            for row in rows
+            if row.get("model") == model
+            and row.get("family") == "model_interior_scope"
+        }
+        for model in greenfield_targets
+    }
+    rule_group_ids_with_applicable_members = {
+        model: {
+            str(row.get("values", {}).get("group_id") or "")
+            for row in rows
+            if row.get("model") == model
+            and row.get("family") == "rule_group_members"
+            and str(row.get("values", {}).get("target_id") or "")
+            in target_option_ids[model] | target_interior_ids[model]
+        }
+        for model in greenfield_targets
+    }
+    applicable_rule_group_ids = {
+        model: {
+            str(row.get("values", {}).get("group_id") or "")
+            for row in rows
+            if row.get("model") == model
+            and row.get("family") == "rule_groups"
+            and str(row.get("values", {}).get("group_id") or "")
+            in rule_group_ids_with_applicable_members[model]
+            and str(row.get("values", {}).get("source_id") or "")
+            in target_option_ids[model] | target_interior_ids[model]
+        }
+        for model in greenfield_targets
+    }
+    applicable_exclusive_member_counts = {
+        model: {
+            group_id: sum(
+                1
+                for row in rows
+                if row.get("model") == model
+                and row.get("family") == "exclusive_members"
+                and str(row.get("values", {}).get("group_id") or "") == group_id
+                and str(row.get("values", {}).get("option_id") or "")
+                in target_option_ids[model]
+            )
+            for group_id in {
+                str(row.get("values", {}).get("group_id") or "")
+                for row in rows
+                if row.get("model") == model
+                and row.get("family") == "exclusive_members"
+            }
+        }
+        for model in greenfield_targets
+    }
+    applicable_exclusive_group_ids = {
+        model: {
+            group_id
+            for group_id, count in applicable_exclusive_member_counts[model].items()
+            if count >= 2
+        }
+        for model in greenfield_targets
+    }
+
+    def greenfield_row_is_applicable(row: dict[str, Any]) -> bool:
+        model = str(row.get("model") or "")
+        family = str(row.get("family") or "")
+        values = row.get("values") or {}
+        option_ids = target_option_ids.get(model, set())
+        reference_ids = option_ids | target_interior_ids.get(model, set())
+        if family == "price_rules":
+            return {
+                str(values.get("condition_option_id") or ""),
+                str(values.get("target_option_id") or ""),
+            } <= reference_ids
+        if family == "rule_mapping":
+            return {
+                str(values.get("source_id") or ""),
+                str(values.get("target_id") or ""),
+            } <= reference_ids
+        if family == "rule_group_members":
+            return (
+                str(values.get("target_id") or "") in reference_ids
+                and str(values.get("group_id") or "")
+                in applicable_rule_group_ids.get(model, set())
+            )
+        if family == "exclusive_members":
+            return (
+                str(values.get("option_id") or "") in option_ids
+                and str(values.get("group_id") or "")
+                in applicable_exclusive_group_ids.get(model, set())
+            )
+        if family == "rule_groups":
+            return str(values.get("group_id") or "") in applicable_rule_group_ids.get(
+                model, set()
+            )
+        if family == "exclusive_groups":
+            return str(values.get("group_id") or "") in applicable_exclusive_group_ids.get(
+                model, set()
+            )
+        return True
+
+    projection_migrations: list[dict[str, Any]] = []
+    projection_scope_exclusions: list[dict[str, Any]] = []
+    migrated_rows: list[dict[str, Any]] = []
+    for index, original in enumerate(rows):
+        row = dict(original)
+        model = str(row.get("model") or "")
+        family = str(row.get("family") or "")
+        if model in greenfield_targets and family == "model_workbook_sources":
+            values = dict(row.get("values") or {})
+            role = str(values.get("source_role") or "")
+            source_family = SOURCE_ROLE_FAMILIES.get(role)
+            target_sheet = greenfield_sheets.get((model, source_family or ""))
+            if target_sheet and str(values.get("sheet_name") or "") != target_sheet:
+                previous_sheet = str(values.get("sheet_name") or "")
+                values["sheet_name"] = target_sheet
+                row["values"] = values
+                projection_migrations.append(
+                    {
+                        "manifestIndex": index,
+                        "model": model,
+                        "family": family,
+                        "sourceRole": role,
+                        "fromSheet": previous_sheet,
+                        "toSheet": target_sheet,
+                        "fromAction": str(row.get("action") or ""),
+                        "toAction": str(row.get("action") or ""),
+                        "reason": "greenfield_target_sheet_isolation",
+                    }
+                )
+        elif model in greenfield_targets and family in isolated_role_by_family:
+            target_sheet = greenfield_sheets[(model, family)]
+            previous_sheet = str(row.get("sheet") or "")
+            previous_action = str(row.get("action") or "")
+            if previous_sheet != target_sheet:
+                if not greenfield_row_is_applicable(row):
+                    if previous_action != "noop":
+                        raise ValueError(
+                            "Greenfield target-sheet isolation cannot discard a non-noop "
+                            f"{model}/{family} row outside the target reference domain."
+                        )
+                    row["projectionScopeDisposition"] = (
+                        "retained_existing_noop_outside_target_domain"
+                    )
+                    projection_scope_exclusions.append(
+                        {
+                            "manifestIndex": index,
+                            "model": model,
+                            "family": family,
+                            "sheet": previous_sheet,
+                            "action": previous_action,
+                            "key": dict(row.get("key") or {}),
+                            "reason": "outside_greenfield_target_reference_domain",
+                        }
+                    )
+                    migrated_rows.append(row)
+                    continue
+                row["sheet"] = target_sheet
+                if target_sheet not in sheets and previous_action in {
+                    "noop",
+                    "update",
+                }:
+                    row["action"] = "add"
+                projection_migrations.append(
+                    {
+                        "manifestIndex": index,
+                        "model": model,
+                        "family": family,
+                        "fromSheet": previous_sheet,
+                        "toSheet": target_sheet,
+                        "fromAction": previous_action,
+                        "toAction": str(row.get("action") or ""),
+                        "reason": "greenfield_target_sheet_isolation",
+                    }
+                )
+        migrated_rows.append(row)
+    rows = migrated_rows
+    source_sheet_by_model_family: dict[tuple[str, str], str] = {}
+    source_sheet = sheets.get("model_workbook_sources") or {}
+    for source_row in source_sheet.get("rows") or []:
+        source_family = SOURCE_ROLE_FAMILIES.get(
+            str(source_row.get("source_role") or "")
+        )
+        source_model = str(source_row.get("model_key") or "")
+        source_name = str(source_row.get("sheet_name") or "")
+        if source_model and source_family and source_name:
+            source_sheet_by_model_family[(source_model, source_family)] = source_name
+    for manifest_row in rows:
+        if manifest_row.get("family") != "model_workbook_sources":
+            continue
+        source_values = manifest_row.get("values") or {}
+        source_model = str(source_values.get("model_key") or "")
+        source_family = SOURCE_ROLE_FAMILIES.get(
+            str(source_values.get("source_role") or "")
+        )
+        source_name = str(source_values.get("sheet_name") or "")
+        if not (source_model and source_family):
+            continue
+        if manifest_row.get("action") == "delete":
+            source_sheet_by_model_family.pop((source_model, source_family), None)
+        elif source_name:
+            source_sheet_by_model_family[(source_model, source_family)] = source_name
+    seen_keys: set[tuple[str, str]] = set()
+    sheet_families: dict[str, str] = {}
+    checked_rows: list[dict[str, Any]] = []
+
+    for index, row in enumerate(rows):
+        model = str(row.get("model") or "")
+        family = str(row.get("family") or "")
+        sheet = str(row.get("sheet") or "")
+        action = str(row.get("action") or "")
+        status = str(row.get("status") or "")
+        key = dict(row.get("key") or {})
+        values = dict(row.get("values") or {})
+        if model not in targets and model != "*":
+            raise ValueError(f"Manifest row {index} has unselected model {model!r}.")
+        if status != "ready":
+            raise ValueError(f"Manifest row {index} is not ready.")
+        if family not in EDITOR_SHEET_META:
+            raise ValueError(f"Manifest row {index} has unknown family {family!r}.")
+        if action not in MANIFEST_ACTION_ORDER:
+            raise ValueError(f"Manifest row {index} has unsupported action {action!r}.")
+        if not sheet:
+            raise ValueError(f"Manifest row {index} has no physical sheet.")
+        prior_family = sheet_families.setdefault(sheet, family)
+        if prior_family != family:
+            raise ValueError(f"Manifest sheet {sheet} maps to multiple families.")
+        expected_source_sheet = source_sheet_by_model_family.get((model, family))
+        if (
+            expected_source_sheet
+            and sheet != expected_source_sheet
+            and row.get("projectionScopeDisposition")
+            != "retained_existing_noop_outside_target_domain"
+        ):
+            raise ValueError(
+                f"Manifest row {index} routes {model!r}/{family!r} to {sheet!r}; "
+                f"model_workbook_sources requires {expected_source_sheet!r}."
+            )
+        key_columns = list(EDITOR_SHEET_META[family]["key"])
+        if sorted(key) != sorted(key_columns) or any(
+            not str(value or "").strip() for value in key.values()
+        ):
+            raise ValueError(
+                f"Manifest row {index} key must be exactly nonblank {key_columns}."
+            )
+        physical_key = (sheet, _manifest_key_text(key))
+        if physical_key in seen_keys:
+            raise ValueError(f"Manifest maps physical key more than once: {physical_key!r}.")
+        seen_keys.add(physical_key)
+        for column in key_columns:
+            if values.get(column) != key[column]:
+                raise ValueError(
+                    f"Manifest row {index} values do not preserve key column {column}."
+                )
+
+        sheet_data = sheets.get(sheet)
+        if sheet_data is None:
+            if action != "add":
+                raise ValueError(
+                    f"Manifest row {index} cannot {action} absent sheet {sheet}."
+                )
+            headers = list(values)
+        else:
+            headers = list(sheet_data.get("headers") or [])
+            if registered_family.get(sheet) not in {None, family}:
+                raise ValueError(f"Manifest family disagrees with workbook registry for {sheet}.")
+        if set(values) != set(headers):
+            raise ValueError(
+                f"Manifest row {index} values do not match the exact {sheet} header vector."
+            )
+
+        existing = None
+        if sheet_data is not None:
+            matching = [
+                candidate
+                for candidate in sheet_data.get("rows") or []
+                if all(
+                    str(candidate.get(column) or "").strip()
+                    == str(key[column] or "").strip()
+                    for column in key_columns
+                )
+            ]
+            if len(matching) > 1:
+                raise ValueError(f"Workbook key is ambiguous before projection: {physical_key!r}.")
+            existing = matching[0] if matching else None
+        if action == "add" and existing is not None:
+            raise ValueError(f"Manifest add already exists in workbook: {physical_key!r}.")
+        if action in {"update", "delete", "noop"} and existing is None:
+            raise ValueError(f"Manifest {action} is missing in workbook: {physical_key!r}.")
+        if action == "noop" and _manifest_normalized_row(
+            family, existing or {}
+        ) != _manifest_normalized_row(family, values):
+            raise ValueError(f"Manifest noop does not equal workbook state: {physical_key!r}.")
+        typed_normalization_columns = [
+            column
+            for column, kind in EDITOR_SHEET_META[family].get("types", {}).items()
+            if existing is not None
+            and (
+                (
+                    kind == "bool"
+                    and isinstance(values.get(column), bool)
+                    and not isinstance(existing.get(column), bool)
+                )
+                or (
+                    kind == "int"
+                    and isinstance(values.get(column), int)
+                    and not isinstance(values.get(column), bool)
+                    and (
+                        not isinstance(existing.get(column), int)
+                        or isinstance(existing.get(column), bool)
+                    )
+                )
+            )
+        ]
+        checked_rows.append(
+            {
+                **row,
+                "model": model,
+                "family": family,
+                "sheet": sheet,
+                "action": action,
+                "key": key,
+                "values": values,
+                "projectionPhysicalAction": (
+                    "update"
+                    if action == "noop" and typed_normalization_columns
+                    else action
+                ),
+                "typedNormalizationColumns": typed_normalization_columns,
+            }
+        )
+
+    missing_sheets = sorted(sheet for sheet in sheet_families if sheet not in sheets)
+    creates: list[dict[str, Any]] = []
+    for sheet in missing_sheets:
+        family = sheet_families[sheet]
+        sheet_rows = [row for row in checked_rows if row["sheet"] == sheet]
+        expected_headers = set(sheet_rows[0]["values"])
+        target = str(sheet_rows[0]["model"])
+        comparator = comparators[target]
+        candidates = sorted(
+            entry["sheet"]
+            for entry in registry.get(comparator, [])
+            if entry.get("family") == family
+            and set((sheets.get(entry["sheet"]) or {}).get("headers") or [])
+            == expected_headers
+        )
+        if len(candidates) != 1:
+            raise ValueError(
+                f"Missing sheet {sheet} needs one exact comparator header template; found {candidates}."
+            )
+        creates.append(
+            {
+                "action": "create_sheet",
+                "sheet": sheet,
+                "family": family,
+                "headersFrom": candidates[0],
+                "_manifestRefs": [],
+                "_scaffoldRule": "canonical_manifest_missing_sheet",
+            }
+        )
+
+    planned_sheets = set(sheets) | {item["sheet"] for item in creates}
+    for migration in projection_migrations:
+        if migration.get("family") != "model_workbook_sources":
+            continue
+        target_sheet = str(migration.get("toSheet") or "")
+        if not target_sheet or target_sheet in planned_sheets:
+            continue
+        source_sheet_name = str(migration.get("fromSheet") or "")
+        source_role = str(migration.get("sourceRole") or "")
+        source_family = SOURCE_ROLE_FAMILIES.get(source_role)
+        model = str(migration.get("model") or "")
+        key_columns = list(EDITOR_SHEET_META.get(source_family or "", {}).get("key") or [])
+        if source_sheet_name not in sheets and source_family:
+            comparator = comparators.get(model, "")
+            candidates = sorted(
+                entry["sheet"]
+                for entry in registry.get(comparator, [])
+                if entry.get("family") == source_family
+                and set(key_columns).issubset(
+                    set((sheets.get(entry["sheet"]) or {}).get("headers") or [])
+                )
+            )
+            if len(candidates) == 1:
+                source_sheet_name = candidates[0]
+        template = sheets.get(source_sheet_name) or {}
+        if not source_family or not template.get("headers"):
+            raise ValueError(
+                f"Greenfield source registration {source_role!r} cannot create "
+                f"{target_sheet!r} from {source_sheet_name!r}."
+            )
+        missing_keys = [
+            key
+            for key in EDITOR_SHEET_META[source_family]["key"]
+            if key not in template["headers"]
+        ]
+        if missing_keys:
+            raise ValueError(
+                f"Greenfield source template {source_sheet_name!r} lacks key "
+                f"column(s) {missing_keys}."
+            )
+        creates.append(
+            {
+                "action": "create_sheet",
+                "sheet": target_sheet,
+                "family": source_family,
+                "headersFrom": source_sheet_name,
+                "_manifestRefs": [
+                    f"manifest-{int(migration['manifestIndex']):05d}"
+                ],
+                "_scaffoldRule": "canonical_manifest_source_sheet",
+            }
+        )
+        planned_sheets.add(target_sheet)
+
+    for manifest_index, row in enumerate(checked_rows):
+        if (
+            row.get("family") != "model_workbook_sources"
+            or row.get("action") == "delete"
+        ):
+            continue
+        values = row.get("values") or {}
+        target_sheet = str(values.get("sheet_name") or "")
+        source_role = str(values.get("source_role") or "")
+        source_family = SOURCE_ROLE_FAMILIES.get(source_role)
+        model = str(values.get("model_key") or row.get("model") or "")
+        if (
+            not target_sheet
+            or not source_family
+            or target_sheet in planned_sheets
+        ):
+            continue
+        comparator = comparators.get(model, "")
+        key_columns = set(EDITOR_SHEET_META[source_family].get("key") or [])
+        candidates = sorted(
+            entry["sheet"]
+            for entry in registry.get(comparator, [])
+            if entry.get("role") == source_role
+            and entry.get("family") == source_family
+            and key_columns.issubset(
+                set((sheets.get(entry["sheet"]) or {}).get("headers") or [])
+            )
+        )
+        if len(candidates) != 1:
+            raise ValueError(
+                f"Canonical source registration {source_role!r} cannot create "
+                f"{target_sheet!r}; expected one exact comparator template, "
+                f"found {candidates}."
+            )
+        creates.append(
+            {
+                "action": "create_sheet",
+                "sheet": target_sheet,
+                "family": source_family,
+                "headersFrom": candidates[0],
+                "_manifestRefs": [f"manifest-{manifest_index:05d}"],
+                "_scaffoldRule": "canonical_manifest_registered_source_sheet",
+            }
+        )
+        planned_sheets.add(target_sheet)
+
+    promotion_sheet = sheets.get("model_registry_promotion") or {}
+    promotion_headers = list(promotion_sheet.get("headers") or [])
+    existing_promotions = {
+        str(row.get("model_key") or "")
+        for row in promotion_sheet.get("rows") or []
+    }
+    next_promotion_order = 1 + max(
+        [
+            int(row.get("display_order") or 0)
+            for row in promotion_sheet.get("rows") or []
+        ]
+        or [0]
+    )
+    for model in sorted(greenfield_targets):
+        if model in existing_promotions:
+            continue
+        config = MODEL_PLAN_CONFIG[model]
+        promotion_values: dict[str, Any] = {
+            header: None for header in promotion_headers
+        }
+        promotion_values.update(
+            {
+                "model_key": model,
+                "registry_key": config["registryKey"],
+                "promoted_to_runtime": False,
+                "default_model": False,
+                "artifact_path": (
+                    f"form-output/runtime/{config['exportSlug']}-runtime-contract.json"
+                ),
+                "artifact_type": "runtime_contract",
+                "active": False,
+                "display_order": next_promotion_order,
+                "notes": "Inactive greenfield deployment-proof scaffold.",
+            }
+        )
+        creates.append(
+            {
+                "action": "add",
+                "sheet": "model_registry_promotion",
+                "family": "model_registry_promotion",
+                "key": {"model_key": model},
+                "row": promotion_values,
+                "_manifestRefs": [],
+                "_scaffoldRule": "pass_c3_greenfield_registry_promotion",
+            }
+        )
+        next_promotion_order += 1
+
+    ordered_rows = sorted(
+        enumerate(checked_rows),
+        key=lambda pair: (
+            0 if pair[1]["family"] in MANIFEST_STAGE1_FAMILIES else 1,
+            pair[1]["sheet"],
+            MANIFEST_ACTION_ORDER[pair[1]["action"]],
+            _manifest_key_text(pair[1]["key"]),
+            pair[0],
+        ),
+    )
+    stage1 = sorted(creates, key=lambda item: item["sheet"])
+    stage2: list[dict[str, Any]] = []
+    coverage_rows: list[dict[str, Any]] = []
+    noop_receipts: list[dict[str, Any]] = []
+    plan_ref = 0
+    for original_index, row in ordered_rows:
+        manifest_ref = f"manifest-{original_index:05d}"
+        receipt = {
+            "manifestRef": manifest_ref,
+            "model": row["model"],
+            "family": row["family"],
+            "sheet": row["sheet"],
+            "action": row["action"],
+            "key": row["key"],
+            "semanticSignature": row.get("semanticSignature"),
+            "derivationVersion": row.get("derivationVersion"),
+            "projectionScopeDisposition": row.get("projectionScopeDisposition"),
+            "projectionPhysicalAction": row.get("projectionPhysicalAction"),
+            # Preserve the compiler-authored row verbatim for bidirectional
+            # temporary-runtime parity. This is evidence only; operations remain
+            # the sole workbook mutation surface.
+            "canonicalValues": dict(row.get("values") or {}),
+            "evidenceDependencies": list(row.get("evidenceDependencies") or []),
+        }
+        physical_action = str(row.get("projectionPhysicalAction") or row["action"])
+        if row["action"] == "noop" and physical_action == "noop":
+            noop_ref = f"noop-{len(noop_receipts):05d}"
+            noop_receipts.append({**receipt, "noopRef": noop_ref})
+            coverage_rows.append({**receipt, "noopRef": noop_ref})
+            continue
+        operation: dict[str, Any] = {
+            "action": physical_action,
+            "sheet": row["sheet"],
+            "key": row["key"],
+            "_manifestRef": manifest_ref,
+            "_planRef": f"op-{plan_ref:05d}",
+        }
+        if physical_action == "add":
+            operation["row"] = row["values"]
+        elif physical_action == "update":
+            key_columns = set(EDITOR_SHEET_META[row["family"]]["key"])
+            typed_normalization_columns = set(
+                row.get("typedNormalizationColumns") or []
+            )
+            operation["row"] = {
+                column: value
+                for column, value in row["values"].items()
+                if column not in key_columns
+                and (
+                    not typed_normalization_columns
+                    or column in typed_normalization_columns
+                )
+            }
+        destination = (
+            stage1 if row["family"] in MANIFEST_STAGE1_FAMILIES else stage2
+        )
+        destination.append(operation)
+        coverage_rows.append({**receipt, "planRef": operation["_planRef"]})
+        plan_ref += 1
+
+    for scaffold in stage1:
+        if scaffold.get("action") == "create_sheet":
+            derived_refs = [
+                entry["manifestRef"]
+                for entry in coverage_rows
+                if entry["sheet"] == scaffold["sheet"]
+            ]
+            scaffold["_manifestRefs"] = sorted(
+                set(scaffold.get("_manifestRefs") or []) | set(derived_refs)
+            )
+        if not scaffold.get("_planRef"):
+            scaffold["_planRef"] = f"op-{plan_ref:05d}"
+            plan_ref += 1
+
+    per_sheet: dict[str, dict[str, int]] = {}
+    for item in [*stage1, *stage2]:
+        counts = per_sheet.setdefault(item["sheet"], {})
+        counts[item["action"]] = counts.get(item["action"], 0) + 1
+    for receipt in noop_receipts:
+        counts = per_sheet.setdefault(receipt["sheet"], {})
+        counts["noop"] = counts.get("noop", 0) + 1
+
+    continuity_names = {
+        "price_rules": "priceRules",
+        "rule_groups": "ruleGroups",
+        "color_overrides": "colorOverrides",
+        "interior_components": "interiorComponents",
+        "asset_map": "assetMap",
+    }
+    runtime_continuity: dict[str, dict[str, Any]] = {}
+    for model in targets:
+        source_ops: dict[str, dict[str, int]] = {}
+        for row in checked_rows:
+            if row["model"] != model or row["action"] not in {
+                "add",
+                "update",
+                "noop",
+            }:
+                continue
+            label = continuity_names.get(row["family"])
+            if not label:
+                continue
+            actions = source_ops.setdefault(label, {})
+            actions[row["action"]] = actions.get(row["action"], 0) + 1
+        runtime_continuity[model] = {"sourceOps": source_ops}
+
+    workbook_fingerprint = {
+        "sha256": hashlib.sha256(workbook_path.read_bytes()).hexdigest(),
+        "mtimeNs": str(workbook_path.stat().st_mtime_ns),
+    }
+    bound_hashes = dict(sorted(compiler_bindings.items()))
+    source_feature_rows = list(compile_report.get("sourceFeatureCoverage") or [])
+    source_feature_summary: dict[str, Any] = {
+        "semanticSha": hashlib.sha256(
+            json.dumps(
+                source_feature_rows,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+        ).hexdigest(),
+        "byModel": {},
+    }
+    allowed_source_dispositions = {
+        "compiled",
+        "resolved_not_applicable",
+        "resolved_not_a_workbook_fact",
+    }
+    for model in targets:
+        scoped_rows = [
+            row
+            for row in source_feature_rows
+            if str(row.get("model") or "") in {model, "*"}
+        ]
+        disposition_counts: dict[str, int] = {}
+        for row in scoped_rows:
+            disposition = str(row.get("disposition") or "")
+            disposition_counts[disposition] = disposition_counts.get(disposition, 0) + 1
+        source_feature_summary["byModel"][model] = {
+            "featureCount": len(scoped_rows),
+            "dispositionCounts": dict(sorted(disposition_counts.items())),
+            "blockingFeatures": [
+                {
+                    "featureId": str(row.get("featureId") or ""),
+                    "family": str(row.get("family") or ""),
+                    "disposition": str(row.get("disposition") or ""),
+                }
+                for row in scoped_rows
+                if str(row.get("disposition") or "")
+                not in allowed_source_dispositions
+            ][:50],
+        }
+    return {
+        "schemaVersion": "pass-c-3",
+        "targets": targets,
+        "targetModes": modes,
+        "sourceFingerprint": selection.get("sourceFingerprint"),
+        "candidatesFingerprint": selection.get("candidatesFingerprint"),
+        "decisionsFingerprint": compiler_bindings.get("exceptionResolutionsSha"),
+        "canonicalManifestSemanticSha": manifest.get("manifestSemanticSha"),
+        "runAuthorityFingerprint": manifest.get("runAuthorityFingerprint"),
+        "compilerBindings": bound_hashes,
+        "sourceFeatureCoverage": source_feature_summary,
+        **bound_hashes,
+        "workbookFingerprint": workbook_fingerprint,
+        "projectionMigrations": {
+            "policy": "greenfield_target_sheet_isolation",
+            "rowCount": len(projection_migrations),
+            "rows": projection_migrations,
+            "scopeExclusionCount": len(projection_scope_exclusions),
+            "scopeExclusions": projection_scope_exclusions,
+        },
+        "stage1": {"items": stage1},
+        "stage2": {"items": stage2},
+        "coverage": {
+            "manifestRows": coverage_rows,
+            "noops": noop_receipts,
+            "uncoveredManifestRows": [],
+            "uncoveredApprovedDecisions": [],
+        },
+        "planReadiness": {
+            "planReady": True,
+            "manifestRowCount": len(coverage_rows),
+            "mutationCount": len(stage1) + len(stage2),
+            "noopCount": len(noop_receipts),
+            "uncoveredCount": 0,
+        },
+        "report": {
+            "perSheetCounts": per_sheet,
+            "perSheetActionCounts": per_sheet,
+            "runtimeContinuity": runtime_continuity,
+            "clearedRows": {},
+            "holds": [],
+            "deferrals": [],
+            "unreviewedSplits": {},
+            "gaps": [],
+            "blockingGaps": [],
+        },
+        "valid": True,
+    }
 
 
 def build_plan(

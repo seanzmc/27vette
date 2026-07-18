@@ -651,6 +651,11 @@ function renderCompilerSummary(summary) {
     </div>
     <div class="cards">${modelCards}</div>`;
   $("#compile-btn").textContent = "Recompile canonical rows";
+  const canonicalPlanReady =
+    summary.session.state === "compiled_ready" &&
+    !summary.freshness.stale &&
+    Object.values(summary.models || {}).every((entry) => entry.compileReady && !entry.blockerCount);
+  $("#compile-build-plan-btn").classList.toggle("hidden", !canonicalPlanReady);
   $("#review-exceptions-btn").classList.toggle("hidden", !exceptions.total);
   $("#compile-status").textContent = summary.freshness.stale
     ? `Inputs changed after compile: ${summary.freshness.reasons.join("; ")}. Recompile required.`
@@ -666,6 +671,7 @@ async function enterCompile() {
     compilerState.summary = null;
     $("#compile-summary").innerHTML = '<div class="empty-note">Model selection is saved. Compile to derive canonical rows and the exact exception queue.</div>';
     $("#compile-btn").textContent = "Compile canonical rows";
+    $("#compile-build-plan-btn").classList.add("hidden");
     $("#review-exceptions-btn").classList.add("hidden");
     $("#compile-status").textContent = "Inputs stay read-only.";
   }
@@ -2862,9 +2868,9 @@ function renderPlan(detail) {
   $("#plan-status").textContent = planApprovalStatus(state.session.state);
 }
 
-async function buildPlan() {
+async function buildPlan(event) {
   clearError();
-  const button = $("#to-plan-btn");
+  const button = event?.currentTarget || $("#to-plan-btn");
   button.disabled = true;
   button.textContent = "Building plan…";
   try {
@@ -2876,11 +2882,12 @@ async function buildPlan() {
     showError(error.message);
   } finally {
     button.disabled = false;
-    button.textContent = "Build apply plan";
+    button.textContent = button.id === "compile-build-plan-btn" ? "Build canonical apply plan" : "Build apply plan";
   }
 }
 
 $("#to-plan-btn").addEventListener("click", buildPlan);
+$("#compile-build-plan-btn").addEventListener("click", buildPlan);
 $("#rebuild-plan-btn").addEventListener("click", buildPlan);
 $("#back-to-review").addEventListener("click", () => setStage("review"));
 $("#approve-plan-btn").addEventListener("click", async () => {

@@ -138,6 +138,33 @@ class CanonicalCompilerTest(unittest.TestCase):
         self.assertEqual(registry["zr1"]["source_option_sheet"]["headers"][0], "option_id")
         self.assertIn("rule_group_members_sheet", registry["zr1"])
 
+    def test_family_registry_isolates_greenfield_model_rule_sheets(self) -> None:
+        registry = build_family_registry(self.master, ["future_x"])["future_x"]
+
+        self.assertEqual(registry["price_rules_sheet"]["sheetName"], "future_x_price_rules")
+        self.assertEqual(registry["rule_mapping_sheet"]["sheetName"], "future_x_rule_mapping")
+        self.assertEqual(registry["rule_groups_sheet"]["sheetName"], "future_x_rule_groups")
+        self.assertEqual(
+            registry["rule_group_members_sheet"]["sheetName"],
+            "future_x_rule_members",
+        )
+        self.assertEqual(
+            registry["exclusive_groups_sheet"]["sheetName"],
+            "future_x_exclusive_groups",
+        )
+        self.assertEqual(
+            registry["exclusive_group_members_sheet"]["sheetName"],
+            "future_x_exclusive_members",
+        )
+        self.assertEqual(
+            registry["color_overrides_sheet"]["sheetName"],
+            "future_x_color_overrides",
+        )
+        self.assertEqual(registry["interior_source_sheet"]["sheetName"], "lt_interiors")
+        self.assertTrue(
+            all(len(entry["sheetName"]) <= 31 for entry in registry.values())
+        )
+
     def test_interior_profile_metadata_does_not_replace_target_option_evidence(self) -> None:
         option_payload = copy.deepcopy(self.option_payload)
         component = copy.deepcopy(
@@ -2576,11 +2603,15 @@ class CanonicalCompilerTest(unittest.TestCase):
             )
         )
         rows = second["canonical-row-manifest.json"]["rows"]
+        self.assertTrue(
+            all(row["family"] in EDITOR_SHEET_META for row in rows),
+            sorted({row["family"] for row in rows} - set(EDITOR_SHEET_META)),
+        )
         for family in (
             "rule_groups",
             "rule_group_members",
             "exclusive_groups",
-            "exclusive_group_members",
+            "exclusive_members",
             "price_rules",
         ):
             with self.subTest(family=family):
@@ -3220,6 +3251,53 @@ class CanonicalCompilerTest(unittest.TestCase):
             for item in second["compile-report.json"]["models"]["zr1"]["blockers"]
         }
         self.assertNotIn(subject["subjectId"], blocker_ids)
+
+    def test_current_resolution_projects_when_stale_history_has_same_subject_id(self) -> None:
+        first = self.compile()
+        subject = next(
+            item
+            for item in first["exception-queue.json"]["subjects"]
+            if item["reasonCode"] == "unresolved_price_scope"
+        )
+        stale = {
+            "subjectId": subject["subjectId"],
+            "subjectVersion": "superseded-subject-version",
+            "action": "provide_typed_value",
+            "payload": {"priceValue": 695},
+            "disposition": "resolved",
+        }
+        current = {
+            "subjectId": subject["subjectId"],
+            "subjectVersion": subject["subjectVersion"],
+            "action": "provide_typed_value",
+            "payload": {
+                "bodyStyleScope": "*",
+                "trimLevelScope": "*",
+                "variantScope": "*",
+                "priceValue": 695,
+            },
+            "disposition": "resolved",
+        }
+
+        second = self.compile(resolution_entries=[stale, current])
+
+        price_rule = next(
+            row
+            for row in second["canonical-row-manifest.json"]["rows"]
+            if row["family"] == "price_rules"
+            and row["values"].get("body_style_scope") == "*"
+            and row["values"].get("trim_level_scope") == "*"
+            and row["values"].get("variant_scope") == "*"
+            and row["values"].get("price_value") == 695
+        )
+        self.assertEqual(price_rule["status"], "ready")
+        self.assertNotIn(
+            subject["subjectId"],
+            {
+                item["subjectId"]
+                for item in second["compile-report.json"]["models"]["zr1"]["blockers"]
+            },
+        )
 
     def test_artifacts_are_deterministic_and_resolution_independent_queue(self) -> None:
         first = self.compile()

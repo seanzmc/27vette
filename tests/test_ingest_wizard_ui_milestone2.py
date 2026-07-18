@@ -36,6 +36,14 @@ def test_compile_summary_uses_compact_api_and_separate_readiness_gates() -> None
     assert '$("#review-exceptions-btn").addEventListener("click", enterExceptions);' in js
 
 
+def test_compiled_ready_can_continue_to_canonical_plan() -> None:
+    html = WIZARD_HTML.read_text(encoding="utf-8")
+    js = WIZARD_JS.read_text(encoding="utf-8")
+    assert 'id="compile-build-plan-btn"' in html
+    assert 'summary.session.state === "compiled_ready"' in js
+    assert '$("#compile-build-plan-btn").addEventListener("click", buildPlan);' in js
+
+
 def test_exception_cards_use_typed_controls_evidence_and_lifecycle_api() -> None:
     html = WIZARD_HTML.read_text(encoding="utf-8")
     js = WIZARD_JS.read_text(encoding="utf-8")

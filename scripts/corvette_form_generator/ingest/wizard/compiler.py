@@ -38,6 +38,7 @@ from corvette_form_generator.ingest.wizard.exceptions import (
     build_resolution_artifact,
     classify_resolutions,
     exception_subject,
+    resolution_semantic_entry,
     validate_resolution,
 )
 from corvette_form_generator.ingest.wizard.identity import (
@@ -200,7 +201,36 @@ def _dependency(evidence_id: str, value: Any) -> dict[str, str]:
     normalized_id = str(evidence_id).strip()
     if not normalized_id:
         raise ValueError("Evidence dependencies require a non-empty evidenceId.")
-    return {"evidenceId": normalized_id, "semanticFingerprint": semantic_hash(value)}
+    semantic_value = (
+        resolution_semantic_entry(value)
+        if normalized_id.startswith("resolution:") and isinstance(value, Mapping)
+        else value
+    )
+    return {"evidenceId": normalized_id, "semanticFingerprint": semantic_hash(semantic_value)}
+
+
+def _validated_current_resolution(
+    entries: Iterable[Mapping[str, Any]],
+    subject: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    """Return the one resolution for this exact subject generation.
+
+    Stale and superseded entries are audit history, not competing choices.
+    """
+
+    matches = [
+        entry
+        for entry in entries
+        if str(entry.get("subjectId") or "") == str(subject.get("subjectId") or "")
+        and str(entry.get("subjectVersion") or "")
+        == str(subject.get("subjectVersion") or "")
+    ]
+    if len(matches) != 1:
+        return None
+    try:
+        return validate_resolution(matches[0], subject)
+    except ValueError:
+        return None
 
 
 def _complete_values(headers: Iterable[str], known: Mapping[str, Any]) -> dict[str, Any]:
@@ -1084,15 +1114,12 @@ def _compile_target_options(
                 question="Choose the unique established target occurrence.",
             )
             exceptions.append(subject)
-            matching_resolutions = resolution_entries_by_subject.get(subject["subjectId"], [])
-            retained_resolution = None
-            if len(matching_resolutions) == 1:
-                try:
-                    checked = validate_resolution(matching_resolutions[0], subject)
-                except ValueError:
-                    checked = None
-                if checked and checked.get("action") == "retain_existing":
-                    retained_resolution = checked
+            retained_resolution = _validated_current_resolution(
+                resolution_entries_by_subject.get(subject["subjectId"], []),
+                subject,
+            )
+            if retained_resolution and retained_resolution.get("action") != "retain_existing":
+                retained_resolution = None
             if retained_resolution is None:
                 candidate_disposition[candidate_id] = "blocked_exception"
                 continue
@@ -1163,19 +1190,16 @@ def _compile_target_options(
                 question="Choose one canonical target section.",
             )
             exceptions.append(subject)
-            matching_resolutions = resolution_entries_by_subject.get(subject["subjectId"], [])
-            consumed_resolution = None
-            if len(matching_resolutions) == 1:
-                try:
-                    checked = validate_resolution(matching_resolutions[0], subject)
-                except ValueError:
-                    checked = None
-                if checked and checked.get("action") in {
-                    "choose_section",
-                    "keep_inactive_option",
-                    "mark_not_applicable",
-                }:
-                    consumed_resolution = checked
+            consumed_resolution = _validated_current_resolution(
+                resolution_entries_by_subject.get(subject["subjectId"], []),
+                subject,
+            )
+            if consumed_resolution and consumed_resolution.get("action") not in {
+                "choose_section",
+                "keep_inactive_option",
+                "mark_not_applicable",
+            }:
+                consumed_resolution = None
             if consumed_resolution is None:
                 candidate_disposition[candidate_id] = "blocked_exception"
                 continue
@@ -1325,15 +1349,15 @@ def _compile_target_options(
                 question="Resolve the target-specific conditional price and scope.",
             )
             exceptions.append(price_subject)
-            matching_resolutions = resolution_entries_by_subject.get(price_subject["subjectId"], [])
-            typed_resolution = None
-            if len(matching_resolutions) == 1:
-                try:
-                    checked = validate_resolution(matching_resolutions[0], price_subject)
-                except ValueError:
-                    checked = None
-                if checked and checked.get("action") == "provide_typed_value" and checked.get("disposition") == "resolved":
-                    typed_resolution = checked
+            typed_resolution = _validated_current_resolution(
+                resolution_entries_by_subject.get(price_subject["subjectId"], []),
+                price_subject,
+            )
+            if typed_resolution and not (
+                typed_resolution.get("action") == "provide_typed_value"
+                and typed_resolution.get("disposition") == "resolved"
+            ):
+                typed_resolution = None
             if typed_resolution is None:
                 price = _int_price(existing.get("price"))
                 row_status = "blocked"
@@ -1746,13 +1770,10 @@ def _relationship_rows(
                 feature_ids_by_evidence[str(evidence_id)].add(feature_id)
 
     def current_resolution(subject: Mapping[str, Any]) -> dict[str, Any] | None:
-        matches = resolutions_by_subject.get(str(subject.get("subjectId") or ""), [])
-        if len(matches) != 1:
-            return None
-        try:
-            return validate_resolution(matches[0], subject)
-        except ValueError:
-            return None
+        return _validated_current_resolution(
+            resolutions_by_subject.get(str(subject.get("subjectId") or ""), []),
+            subject,
+        )
 
     def update_disposition(subject: Mapping[str, Any], disposition: str) -> None:
         for reference in subject.get("evidenceReferences") or []:
@@ -1999,12 +2020,11 @@ def _comparator_proposal_rows(
         fact_type = reason_fact_type.get(reason)
         if fact_type is None:
             continue
-        matches = resolutions_by_subject.get(str(subject.get("subjectId") or ""), [])
-        if len(matches) != 1:
-            continue
-        try:
-            resolution = validate_resolution(matches[0], subject)
-        except ValueError:
+        resolution = _validated_current_resolution(
+            resolutions_by_subject.get(str(subject.get("subjectId") or ""), []),
+            subject,
+        )
+        if resolution is None:
             continue
         if resolution.get("action") != "provide_typed_value":
             continue
@@ -2173,7 +2193,7 @@ def _comparator_proposal_rows(
                     },
                 )
                 add_row(
-                    family="exclusive_group_members",
+                    family="exclusive_members",
                     entry=member_entry,
                     existing=existing_member,
                     key={"group_id": group_id, "option_id": member_id},
@@ -3977,17 +3997,8 @@ def compile_canonical_rows(
         for conflict_subject in guarded_subjects:
             if not str(conflict_subject.get("reasonCode") or "").startswith("semantic_"):
                 continue
-            matching_resolutions = [
-                entry
-                for entry in resolution_entries
-                if str(entry.get("subjectId") or "")
-                == str(conflict_subject.get("subjectId") or "")
-            ]
-            if len(matching_resolutions) != 1:
-                continue
-            try:
-                checked = validate_resolution(matching_resolutions[0], conflict_subject)
-            except ValueError:
+            checked = _validated_current_resolution(resolution_entries, conflict_subject)
+            if checked is None:
                 continue
             if checked.get("action") != "mark_not_applicable":
                 continue

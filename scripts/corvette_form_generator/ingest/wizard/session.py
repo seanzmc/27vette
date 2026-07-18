@@ -117,9 +117,6 @@ WRITABLE_PLAN_SCHEMA = "pass-c-3"
 ALLOWED_WRITE_DEFERRAL_KINDS = {"asset_map_media_missing"}
 COMPILE_READINESS_FIELDS = (
     "compileReady",
-    "planReady",
-    "writeReady",
-    "deploymentReady",
 )
 NOT_APPLICABLE_DEPLOYMENT_FAMILIES = {
     "asset_map",
@@ -131,6 +128,8 @@ COMPILER_ARTIFACT_BINDINGS = (
     ("canonical-row-manifest.json", "canonicalManifestSha"),
     ("compile-report.json", "compileReportSha"),
     ("exception-resolutions.json", "exceptionResolutionsSha"),
+    ("exception-queue.json", "exceptionQueueSha"),
+    ("comparator-evidence.json", "comparatorEvidenceSha"),
 )
 DECISION_STATES = (
     STATE_MODELS_SELECTED,
@@ -160,6 +159,14 @@ COMPILER_CACHE_ARTIFACTS = tuple(
 )
 COMPILER_MUTATION_FILES = (*COMPILER_ARTIFACTS, "exception-log.jsonl", "session.json")
 COMPILER_STATES = (STATE_COMPILED, STATE_COMPILED_WITH_EXCEPTIONS)
+COMPILER_EVIDENCE_STATES = COMPILER_STATES + (
+    STATE_PLAN_BUILT,
+    STATE_PLAN_APPROVED,
+    STATE_DRY_RUN_APPROVED,
+    STATE_DRY_RUN_VALIDATED_WRITE_BLOCKED,
+    STATE_DRY_RUN_VALIDATED_WRITE_ELIGIBLE,
+    STATE_WRITE_APPROVED,
+)
 COMPILER_DOWNSTREAM_ARTIFACTS = (
     "apply-plan.json",
     "apply-plan-dryrun.json",
@@ -506,6 +513,8 @@ class WizardSessionStore:
                 continue
             model = str(item.get("model") or "")
             family = str(item.get("family") or "")
+            if family not in NOT_APPLICABLE_DEPLOYMENT_FAMILIES:
+                continue
             evidence_ids = item.get("evidenceIds") or []
             valid_evidence = (
                 isinstance(evidence_ids, list)
@@ -513,10 +522,10 @@ class WizardSessionStore:
                 and all(isinstance(value, str) and value.strip() for value in evidence_ids)
                 and len(set(evidence_ids)) == len(evidence_ids)
             )
-            if model not in target_set or family not in NOT_APPLICABLE_DEPLOYMENT_FAMILIES:
+            if model not in target_set:
                 raise WizardError(
                     "Compile report resolved_not_applicable coverage must bind a selected target "
-                    "and known deployment family.",
+                    "for a known deployment family.",
                     status=409,
                 )
             if not valid_evidence:
@@ -1025,7 +1034,7 @@ class WizardSessionStore:
         """Load and cross-validate one coherent compiled artifact set."""
 
         session = self.load_session(run_id, verify_source=False)
-        if session.get("state") not in COMPILER_STATES:
+        if session.get("state") not in COMPILER_EVIDENCE_STATES:
             raise WizardError("Compile canonical rows first.", status=404)
         run_dir = self.run_dir(run_id)
         missing = [name for name in COMPILER_ARTIFACTS if not (run_dir / name).is_file()]
@@ -3055,11 +3064,15 @@ class WizardSessionStore:
         import tempfile
 
         from corvette_form_generator.editor_ops import apply_batch
-        from corvette_form_generator.ingest.wizard.plan_builder import build_plan
+        from corvette_form_generator.ingest.wizard.plan_builder import (
+            build_manifest_plan,
+            build_plan,
+        )
 
         session = self.load_session(run_id, verify_source=False)
         self._refuse_if_applied(session)
         if session["state"] not in (
+            STATE_COMPILED_READY,
             STATE_DECISIONS_COMPLETE,
             STATE_PLAN_BUILT,
             STATE_PLAN_APPROVED,
@@ -3067,12 +3080,108 @@ class WizardSessionStore:
             STATE_DRY_RUN_VALIDATED_WRITE_BLOCKED,
             STATE_DRY_RUN_VALIDATED_WRITE_ELIGIBLE,
         ):
-            raise WizardError("Mark decisions complete before building the apply plan.", status=409)
+            raise WizardError(
+                "Resolve compiler blockers or mark legacy decisions complete before building the apply plan.",
+                status=409,
+            )
         run_dir = self.run_dir(run_id)
-        _, candidates_file, candidates = self._parsed_candidates(run_id)
+        prior_plan_file = run_dir / "apply-plan.json"
+        canonical_mode = session["state"] == STATE_COMPILED_READY
+        if prior_plan_file.is_file():
+            canonical_mode = canonical_mode or (
+                read_json(prior_plan_file).get("schemaVersion") == WRITABLE_PLAN_SCHEMA
+            )
+        if canonical_mode and session["state"] not in (
+            STATE_COMPILED_READY,
+            STATE_PLAN_BUILT,
+        ):
+            raise WizardError(
+                "An approved canonical plan cannot be rebuilt in place; start a fresh compile run.",
+                status=409,
+            )
+        _, candidates_file, candidates = self._parsed_candidates(
+            run_id,
+            allow_compiled=session["state"] in COMPILER_STATES,
+        )
         selection = self._load_selection(run_id, candidates_file)
         state = self._decision_state(run_id, candidates, selection)
         workbook = self._require_workbook()
+        if canonical_mode:
+            detail = self.compiler_detail(run_id)
+            freshness = self._compiler_freshness(run_id, detail["compileReport"])
+            if freshness["stale"]:
+                raise WizardError(
+                    "Compiler inputs changed; recompile before building the canonical plan: "
+                    + ", ".join(freshness["reasons"]),
+                    status=409,
+                )
+            bindings = self._compiler_artifact_bindings(run_dir)
+            plan = build_manifest_plan(
+                workbook_path=workbook,
+                manifest=detail["manifest"],
+                compile_report=detail["compileReport"],
+                selection=selection,
+                compiler_bindings=bindings,
+                authority_artifacts={
+                    "exceptionQueue": detail["exceptionQueue"],
+                    "resolutions": detail["resolutions"],
+                    "comparatorEvidence": read_json(
+                        run_dir / "comparator-evidence.json"
+                    ),
+                },
+            )
+            combined = apply_batch(
+                workbook,
+                self._combined_plan_batch(plan, workbook),
+                write=False,
+                run_schema_validation=schema_validation,
+            )
+
+            def canonical_summary(result: dict[str, Any]) -> dict[str, Any]:
+                return {
+                    "ok": result.get("ok", False),
+                    "status": result.get("status", ""),
+                    "errors": result.get("errors", []),
+                    "warnings": result.get("warnings", []),
+                    "opCount": (result.get("operationCoverage") or {}).get("preparedCount"),
+                    "schemaErrors": (result.get("schemaResult") or {}).get("error_count"),
+                    "operationCoverage": result.get("operationCoverage"),
+                }
+
+            combined_summary = canonical_summary(combined)
+            dry_run = {
+                "mode": "atomic_manifest_projection",
+                "stage1": {
+                    "ok": combined_summary["ok"],
+                    "status": "covered_by_atomic_combined_validation",
+                    "errors": combined_summary["errors"],
+                    "warnings": [],
+                    "opCount": len(plan["stage1"]["items"]),
+                },
+                "stage1Scratch": {
+                    "ok": combined_summary["ok"],
+                    "status": "not_separately_written_atomic_plan",
+                    "errors": combined_summary["errors"],
+                    "warnings": [],
+                },
+                "stage2": combined_summary,
+                "combined": combined_summary,
+                "ok": bool(plan["valid"] and combined_summary["ok"]),
+            }
+            write_json(run_dir / "apply-plan.json", plan)
+            write_json(run_dir / "apply-plan-dryrun.json", dry_run)
+            (run_dir / "apply-plan.md").write_text(
+                plan_markdown(plan, dry_run), encoding="utf-8"
+            )
+            session["state"] = (
+                STATE_PLAN_BUILT if dry_run["ok"] else STATE_COMPILED_READY
+            )
+            write_json(run_dir / "session.json", session)
+            return {
+                "session": session,
+                "plan": plan_summary(plan),
+                "dryRun": dry_run,
+            }
         plan = build_plan(
             workbook_path=workbook,
             selection=selection,
@@ -3165,9 +3274,34 @@ class WizardSessionStore:
         # Fail closed if anything shifted since the plan was built.
         _, candidates_file, candidates = self._parsed_candidates(run_id)
         selection = self._load_selection(run_id, candidates_file)
-        state = self._decision_state(run_id, candidates, selection)
-        if plan["decisionsFingerprint"] != artifact_sha(state["decisions"]):
-            raise WizardError("Decisions changed after the plan was built; rebuild the plan.", status=409)
+        if plan.get("schemaVersion") == WRITABLE_PLAN_SCHEMA:
+            self._require_compiler_bindings(run_dir, plan)
+            manifest = read_json(run_dir / "canonical-row-manifest.json")
+            report = read_json(run_dir / "compile-report.json")
+            freshness = self._compiler_freshness(run_id, report)
+            if freshness["stale"]:
+                raise WizardError(
+                    "Compiler inputs changed after the plan was built; recompile in a fresh run.",
+                    status=409,
+                )
+            if plan.get("targets") != selection.get("targets"):
+                raise WizardError("Selected targets changed after the canonical plan was built.", status=409)
+            if plan.get("sourceFingerprint") != selection.get("sourceFingerprint"):
+                raise WizardError("Source binding changed after the canonical plan was built.", status=409)
+            if plan.get("candidatesFingerprint") != selection.get("candidatesFingerprint"):
+                raise WizardError("Candidate binding changed after the canonical plan was built.", status=409)
+            if plan.get("canonicalManifestSemanticSha") != manifest.get("manifestSemanticSha"):
+                raise WizardError("Canonical manifest changed after the plan was built.", status=409)
+            if not plan.get("valid") or not (plan.get("planReadiness") or {}).get(
+                "planReady"
+            ):
+                raise WizardError("Canonical plan is not plan-ready.", status=409)
+        else:
+            state = self._decision_state(run_id, candidates, selection)
+            if plan["decisionsFingerprint"] != artifact_sha(state["decisions"]):
+                raise WizardError(
+                    "Decisions changed after the plan was built; rebuild the plan.", status=409
+                )
         workbook = self._require_workbook()
         if plan["workbookFingerprint"]["mtimeNs"] != str(workbook.stat().st_mtime_ns) or plan[
             "workbookFingerprint"
@@ -3200,6 +3334,7 @@ class WizardSessionStore:
     def _combined_plan_batch(self, plan: dict[str, Any], workbook: Path) -> dict[str, Any]:
         return {
             "workbookMtimeNs": str(workbook.stat().st_mtime_ns),
+            "forceTypedBools": plan.get("schemaVersion") == WRITABLE_PLAN_SCHEMA,
             "items": [*plan["stage1"]["items"], *plan["stage2"]["items"]],
         }
 
@@ -3227,11 +3362,12 @@ class WizardSessionStore:
         output: dict[str, Any] = {}
         for model in plan.get("targets") or []:
             source_ops = (plan_continuity.get(model) or {}).get("sourceOps") or {}
-            price_adds = sum((source_ops.get("priceRules") or {}).get(action, 0) for action in ("add", "update"))
-            rule_group_adds = sum((source_ops.get("ruleGroups") or {}).get(action, 0) for action in ("add", "update"))
-            color_adds = sum((source_ops.get("colorOverrides") or {}).get(action, 0) for action in ("add", "update"))
-            component_adds = sum((source_ops.get("interiorComponents") or {}).get(action, 0) for action in ("add", "update"))
-            asset_adds = sum((source_ops.get("assetMap") or {}).get(action, 0) for action in ("add", "update"))
+            source_actions = ("add", "update", "noop")
+            price_adds = sum((source_ops.get("priceRules") or {}).get(action, 0) for action in source_actions)
+            rule_group_adds = sum((source_ops.get("ruleGroups") or {}).get(action, 0) for action in source_actions)
+            color_adds = sum((source_ops.get("colorOverrides") or {}).get(action, 0) for action in source_actions)
+            component_adds = sum((source_ops.get("interiorComponents") or {}).get(action, 0) for action in source_actions)
+            asset_adds = sum((source_ops.get("assetMap") or {}).get(action, 0) for action in source_actions)
             blockers: list[dict[str, str]] = []
             deferrals: list[dict[str, str]] = []
             if model in {"zr1", "zr1x"} and price_adds == 0:
@@ -3290,13 +3426,31 @@ class WizardSessionStore:
                 for row in range(2, ws.max_row + 1):
                     model_key = str(ws.cell(row=row, column=model_col).value or "").strip().lower()
                     if model_key not in targets:
-                        if sheet_name == "model_master" and "active" in headers:
+                        if "active" in headers:
                             ws.cell(row=row, column=headers["active"], value=False)
+                        if sheet_name == "model_registry_promotion" and "promoted_to_runtime" in headers:
+                            ws.cell(
+                                row=row,
+                                column=headers["promoted_to_runtime"],
+                                value=False,
+                            )
+                        if sheet_name == "model_registry_promotion" and "default_model" in headers:
+                            ws.cell(
+                                row=row,
+                                column=headers["default_model"],
+                                value=False,
+                            )
                         continue
                     for column, value in fields.items():
                         if column in headers:
                             ws.cell(row=row, column=headers[column], value=value)
                     if sheet_name == "model_registry_promotion":
+                        if "default_model" in headers:
+                            ws.cell(
+                                row=row,
+                                column=headers["default_model"],
+                                value=model_key == models[0],
+                            )
                         if "artifact_type" in headers:
                             ws.cell(row=row, column=headers["artifact_type"], value="runtime_contract")
                         if "artifact_path" in headers:
@@ -3319,9 +3473,688 @@ class WizardSessionStore:
         finally:
             wb.close()
 
+    def _validate_probe_activation(
+        self,
+        before_workbook: Path,
+        activated_workbook: Path,
+        models: list[str],
+    ) -> dict[str, Any]:
+        """Revalidate and exactly read back a temp-only activation save."""
+
+        from openpyxl import load_workbook
+
+        from corvette_form_generator.schema_validation import (
+            result_payload as schema_result_payload,
+            validate_workbook_schema,
+        )
+        from corvette_form_generator.workbook_bool_hygiene import (
+            compare_bool_like_workbooks,
+            result_payload as bool_hygiene_result_payload,
+        )
+        from corvette_form_generator.workbook_package import (
+            assert_valid_workbook_package,
+        )
+
+        errors: list[str] = []
+        try:
+            assert_valid_workbook_package(activated_workbook)
+        except Exception as exc:
+            errors.append(str(exc))
+            package_result = {"status": "invalid", "error": str(exc)}
+        else:
+            package_result = {"status": "valid", "issues": []}
+
+        schema_issues = validate_workbook_schema(
+            activated_workbook,
+            check_live_contract=False,
+        )
+        schema_result = schema_result_payload(str(activated_workbook), schema_issues)
+        if schema_result.get("error_count"):
+            errors.append(
+                f"post-activation schema validation returned "
+                f"{schema_result['error_count']} error(s)"
+            )
+
+        bool_issues = compare_bool_like_workbooks(
+            before_workbook,
+            activated_workbook,
+        )
+        bool_result = bool_hygiene_result_payload(
+            before_workbook,
+            activated_workbook,
+            bool_issues,
+        )
+        bool_result["issues"] = bool_result.get("issues", [])[:20]
+        if bool_result.get("error_count"):
+            errors.append(
+                f"post-activation Boolean hygiene returned "
+                f"{bool_result['error_count']} error(s)"
+            )
+
+        targets = set(models)
+        checked = 0
+
+        def is_true(value: Any) -> bool:
+            return value is True or str(value or "").strip().lower() in {
+                "1",
+                "true",
+                "yes",
+            }
+
+        wb = load_workbook(activated_workbook, read_only=True, data_only=True)
+        try:
+            target_variants: set[str] = set()
+            for sheet_name in (
+                "model_master",
+                "model_variants",
+                "model_workbook_sources",
+                "model_registry_promotion",
+            ):
+                if sheet_name not in wb.sheetnames:
+                    errors.append(f"post-activation readback missing sheet {sheet_name!r}")
+                    continue
+                ws = wb[sheet_name]
+                headers = {
+                    str(cell.value): index
+                    for index, cell in enumerate(ws[1])
+                    if cell.value is not None
+                }
+                if "model_key" not in headers or "active" not in headers:
+                    errors.append(
+                        f"post-activation readback missing model_key/active in {sheet_name!r}"
+                    )
+                    continue
+                seen_targets: set[str] = set()
+                for row in ws.iter_rows(min_row=2, values_only=True):
+                    model_key = str(row[headers["model_key"]] or "").strip().lower()
+                    if not model_key:
+                        continue
+                    expected_active = model_key in targets
+                    if is_true(row[headers["active"]]) != expected_active:
+                        errors.append(
+                            f"post-activation readback {sheet_name}:{model_key} active mismatch"
+                        )
+                    if expected_active:
+                        seen_targets.add(model_key)
+                    if sheet_name == "model_variants" and expected_active:
+                        variant_id = str(row[headers.get("variant_id", -1)] or "").strip()
+                        if variant_id:
+                            target_variants.add(variant_id)
+                    if sheet_name == "model_registry_promotion":
+                        if is_true(row[headers.get("promoted_to_runtime", -1)]) != expected_active:
+                            errors.append(
+                                f"post-activation readback {model_key} promotion mismatch"
+                            )
+                        expected_default = expected_active and model_key == models[0]
+                        if is_true(row[headers.get("default_model", -1)]) != expected_default:
+                            errors.append(
+                                f"post-activation readback {model_key} default mismatch"
+                            )
+                    checked += 1
+                missing_targets = targets - seen_targets
+                if missing_targets:
+                    errors.append(
+                        f"post-activation readback {sheet_name} missing targets "
+                        f"{sorted(missing_targets)}"
+                    )
+
+            if "variant_master" not in wb.sheetnames:
+                errors.append("post-activation readback missing sheet 'variant_master'")
+            else:
+                ws = wb["variant_master"]
+                headers = {
+                    str(cell.value): index
+                    for index, cell in enumerate(ws[1])
+                    if cell.value is not None
+                }
+                active_variants = {
+                    str(row[headers["variant_id"]] or "").strip()
+                    for row in ws.iter_rows(min_row=2, values_only=True)
+                    if row[headers.get("variant_id", -1)]
+                    and is_true(row[headers.get("active", -1)])
+                }
+                inactive_targets = target_variants - active_variants
+                if inactive_targets:
+                    errors.append(
+                        f"post-activation readback has inactive target variants "
+                        f"{sorted(inactive_targets)}"
+                    )
+                checked += len(target_variants)
+        finally:
+            wb.close()
+
+        return {
+            "ok": not errors,
+            "errors": errors,
+            "package": package_result,
+            "schema": schema_result,
+            "boolHygiene": bool_result,
+            "exactReadback": {"checked": checked, "errors": list(errors)},
+        }
+
     def _source_count(self, payload: dict[str, Any], key: str) -> int:
         value = payload.get(key)
         return len(value) if isinstance(value, list) else 0
+
+    def _source_feature_coverage_agreement(
+        self,
+        plan: dict[str, Any],
+        model: str,
+        signature_mismatches: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        coverage = plan.get("sourceFeatureCoverage") or {}
+        model_coverage = (coverage.get("byModel") or {}).get(model) or {}
+        blocking_features = list(model_coverage.get("blockingFeatures") or [])
+        feature_count = model_coverage.get("featureCount")
+        errors: list[str] = []
+        if (
+            not coverage.get("semanticSha")
+            or not isinstance(feature_count, int)
+            or feature_count <= 0
+        ):
+            errors.append("bound compiler source-feature coverage is absent or empty")
+        if blocking_features:
+            errors.append(
+                f"compiler source-feature coverage contains {len(blocking_features)} blocking feature(s)"
+            )
+        if signature_mismatches:
+            errors.append(
+                f"runtime parity contains {len(signature_mismatches)} semantic mismatch(es)"
+            )
+        return {
+            "ok": not errors,
+            "semanticSha": coverage.get("semanticSha"),
+            "featureCount": feature_count,
+            "dispositionCounts": dict(model_coverage.get("dispositionCounts") or {}),
+            "blockingFeatures": blocking_features,
+            "runtimeMismatchCount": len(signature_mismatches),
+            "errors": errors,
+        }
+
+    def _manifest_runtime_signature_mismatches(
+        self,
+        plan: dict[str, Any],
+        model: str,
+        contract: dict[str, Any],
+    ) -> list[dict[str, Any]]:
+        """Compare target-authored manifest semantics to generated runtime rows."""
+
+        def scope(value: Any) -> str:
+            return str(value or "*").strip().lower() or "*"
+
+        choices = {
+            str(row.get("id") or row.get("option_id") or ""): str(row.get("rpo") or "").upper()
+            for row in contract.get("choices") or []
+            if isinstance(row, dict)
+        }
+        interior_ids = {
+            str(row.get("interior_id") or "")
+            for row in contract.get("interiors") or []
+            if isinstance(row, dict) and row.get("interior_id")
+        }
+
+        def rpo(option_id: Any) -> str:
+            endpoint_id = str(option_id or "")
+            if endpoint_id in choices:
+                return choices[endpoint_id]
+            if endpoint_id in interior_ids:
+                return endpoint_id.upper()
+            return ""
+
+        runtime_rows = {
+            "rule_mapping": {
+                str(row.get("rule_id") or ""): row for row in contract.get("rules") or []
+            },
+            "rule_groups": {
+                str(row.get("group_id") or ""): row for row in contract.get("ruleGroups") or []
+            },
+            "exclusive_groups": {
+                str(row.get("group_id") or ""): row
+                for row in contract.get("exclusiveGroups") or []
+            },
+            "default_selection_rules": {
+                str(row.get("rule_id") or ""): row
+                for row in contract.get("defaultSelectionRules") or []
+            },
+            "price_rules": {
+                str(row.get("price_rule_id") or ""): row
+                for row in contract.get("priceRules") or []
+            },
+        }
+        mismatches: list[dict[str, Any]] = []
+        material = [
+            row
+            for row in (plan.get("coverage") or {}).get("manifestRows") or []
+            if row.get("model") in {model, "*"}
+            and row.get("action") in {"add", "update", "noop"}
+            and row.get("projectionScopeDisposition")
+            != "retained_existing_noop_outside_target_domain"
+        ]
+        expected_runtime_ids: dict[str, set[str]] = {
+            family: set() for family in runtime_rows
+        }
+        for row in material:
+            family = str(row.get("family") or "")
+            if family not in {
+                "rule_mapping",
+                "rule_groups",
+                "rule_group_members",
+                "exclusive_groups",
+                "exclusive_members",
+                "default_selection_rules",
+                "price_rules",
+            }:
+                continue
+            key = row.get("key") or {}
+            values = row.get("canonicalValues") or {}
+            if row.get("model") == "*" and family == "rule_mapping" and values:
+                if not rpo(values.get("source_id")) or not rpo(values.get("target_id")):
+                    continue
+            expected = row.get("semanticSignature")
+            if values:
+                if family == "rule_mapping":
+                    expected = {
+                        "bodyStyleScope": scope(values.get("body_style_scope")),
+                        "ruleType": str(values.get("rule_type") or ""),
+                        "sourceRpo": rpo(values.get("source_id")),
+                        "targetRpo": rpo(values.get("target_id")),
+                        "trimLevelScope": scope(values.get("trim_level_scope")),
+                        "variantScope": scope(values.get("variant_scope")),
+                    }
+                elif family == "rule_groups":
+                    group_id = str(key.get("group_id") or values.get("group_id") or "")
+                    expected = {
+                        "bodyStyleScope": scope(values.get("body_style_scope")),
+                        "groupType": str(values.get("group_type") or ""),
+                        "memberRpos": sorted(
+                            rpo((member.get("canonicalValues") or {}).get("target_id"))
+                            for member in material
+                            if member.get("family") == "rule_group_members"
+                            and str((member.get("key") or {}).get("group_id") or "")
+                            == group_id
+                        ),
+                        "sourceRpo": rpo(values.get("source_id")),
+                        "trimLevelScope": scope(values.get("trim_level_scope")),
+                        "variantScope": scope(values.get("variant_scope")),
+                    }
+                elif family == "exclusive_groups":
+                    group_id = str(key.get("group_id") or values.get("group_id") or "")
+                    expected = {
+                        "memberRpos": sorted(
+                            rpo((member.get("canonicalValues") or {}).get("option_id"))
+                            for member in material
+                            if member.get("family") == "exclusive_members"
+                            and str((member.get("key") or {}).get("group_id") or "")
+                            == group_id
+                        ),
+                        "selectionMode": str(values.get("selection_mode") or ""),
+                    }
+                elif family == "default_selection_rules":
+                    expected = {
+                        "bodyStyleScope": scope(values.get("body_style_scope")),
+                        "conditionId": str(values.get("condition_id") or ""),
+                        "conditionType": str(values.get("condition_type") or ""),
+                        "modelKey": str(values.get("model_key") or model),
+                        "targetOptionId": str(values.get("target_option_id") or ""),
+                        "trimLevelScope": scope(values.get("trim_level_scope")),
+                        "variantScope": scope(values.get("variant_scope")),
+                    }
+                elif family == "price_rules":
+                    expected = {
+                        "bodyStyleScope": scope(values.get("body_style_scope")),
+                        "conditionOptionId": str(values.get("condition_option_id") or ""),
+                        "priceRuleType": str(values.get("price_rule_type") or ""),
+                        "priceValue": values.get("price_value"),
+                        "targetOptionId": str(values.get("target_option_id") or ""),
+                        "trimLevelScope": scope(values.get("trim_level_scope")),
+                        "variantScope": scope(values.get("variant_scope")),
+                    }
+            if not isinstance(expected, dict):
+                mismatches.append(
+                    {"family": family, "key": key, "kind": "missing_manifest_semantic_signature"}
+                )
+                continue
+            if family in {"rule_group_members", "exclusive_members"}:
+                group_family = "rule_groups" if family == "rule_group_members" else "exclusive_groups"
+                group_id = str(key.get("group_id") or "")
+                generated = runtime_rows[group_family].get(group_id)
+                target_field = "target_ids" if family == "rule_group_members" else "option_ids"
+                option_field = "target_id" if family == "rule_group_members" else "option_id"
+                generated_rpos = sorted(
+                    rpo(value) for value in ((generated or {}).get(target_field) or [])
+                )
+                expected_rpo = str(
+                    expected.get("memberRpo") or rpo(key.get(option_field))
+                ).upper()
+                if generated is None or expected_rpo not in generated_rpos:
+                    mismatches.append(
+                        {
+                            "family": family,
+                            "key": key,
+                            "kind": "generated_member_missing",
+                            "expectedRpo": expected_rpo,
+                            "generatedRpos": generated_rpos,
+                            "optionId": key.get(option_field),
+                        }
+                    )
+                continue
+            key_field = {
+                "rule_mapping": "rule_id",
+                "rule_groups": "group_id",
+                "exclusive_groups": "group_id",
+                "default_selection_rules": "rule_id",
+                "price_rules": "price_rule_id",
+            }[family]
+            runtime_id = str(key.get(key_field) or "")
+            expected_runtime_ids[family].add(runtime_id)
+            generated = runtime_rows.get(family, {}).get(runtime_id)
+            if generated is None:
+                mismatches.append(
+                    {"family": family, "key": key, "kind": "generated_row_missing"}
+                )
+                continue
+            if expected.get("retainedKey") and not values:
+                continue
+            if family == "rule_mapping":
+                actual = {
+                    "bodyStyleScope": scope(generated.get("body_style_scope")),
+                    "ruleType": str(generated.get("rule_type") or ""),
+                    "sourceRpo": rpo(generated.get("source_id")),
+                    "targetRpo": rpo(generated.get("target_id")),
+                    "trimLevelScope": scope(generated.get("trim_level_scope")),
+                    "variantScope": scope(generated.get("variant_scope")),
+                }
+            elif family == "rule_groups":
+                actual = {
+                    "bodyStyleScope": scope(generated.get("body_style_scope")),
+                    "groupType": str(generated.get("group_type") or ""),
+                    "memberRpos": sorted(rpo(value) for value in generated.get("target_ids") or []),
+                    "sourceRpo": rpo(generated.get("source_id")),
+                    "trimLevelScope": scope(generated.get("trim_level_scope")),
+                    "variantScope": scope(generated.get("variant_scope")),
+                }
+            elif family == "exclusive_groups":
+                actual = {
+                    "memberRpos": sorted(rpo(value) for value in generated.get("option_ids") or []),
+                    "selectionMode": str(generated.get("selection_mode") or ""),
+                }
+            elif family == "default_selection_rules":
+                actual = {
+                    "bodyStyleScope": scope(generated.get("body_style_scope")),
+                    "conditionId": str(generated.get("condition_id") or ""),
+                    "conditionType": str(generated.get("condition_type") or ""),
+                    "modelKey": model,
+                    "targetOptionId": str(generated.get("target_option_id") or ""),
+                    "trimLevelScope": scope(generated.get("trim_level_scope")),
+                    "variantScope": scope(generated.get("variant_scope")),
+                }
+            elif family == "price_rules":
+                actual = {
+                    "bodyStyleScope": scope(generated.get("body_style_scope")),
+                    "priceRuleType": str(generated.get("price_rule_type") or ""),
+                    "priceValue": generated.get("price_value"),
+                    "trimLevelScope": scope(generated.get("trim_level_scope")),
+                    "variantScope": scope(generated.get("variant_scope")),
+                }
+                if "conditionOptionId" in expected or "targetOptionId" in expected:
+                    actual.update(
+                        {
+                            "conditionOptionId": str(
+                                generated.get("condition_option_id") or ""
+                            ),
+                            "targetOptionId": str(
+                                generated.get("target_option_id") or ""
+                            ),
+                        }
+                    )
+                else:
+                    actual.update(
+                        {
+                            "conditionRpo": rpo(generated.get("condition_option_id")),
+                            "targetRpo": rpo(generated.get("target_option_id")),
+                        }
+                    )
+            else:
+                continue
+            comparable_expected = dict(expected)
+            for scope_field in (
+                "bodyStyleScope",
+                "trimLevelScope",
+                "variantScope",
+            ):
+                if scope_field in comparable_expected:
+                    comparable_expected[scope_field] = scope(
+                        comparable_expected[scope_field]
+                    )
+            comparable_actual = {
+                key: actual.get(key) for key in comparable_expected
+            }
+            if semantic_hash(comparable_actual) != semantic_hash(comparable_expected):
+                mismatches.append(
+                    {
+                        "family": family,
+                        "key": key,
+                        "kind": "semantic_signature_mismatch",
+                        "expected": expected,
+                        "generated": actual,
+                    }
+                )
+
+        for row in (plan.get("coverage") or {}).get("manifestRows") or []:
+            if row.get("model") not in {model, "*"} or row.get("action") != "delete":
+                continue
+            family = str(row.get("family") or "")
+            key_field = {
+                "rule_mapping": "rule_id",
+                "rule_groups": "group_id",
+                "exclusive_groups": "group_id",
+                "default_selection_rules": "rule_id",
+                "price_rules": "price_rule_id",
+            }.get(family)
+            if key_field is None:
+                continue
+            runtime_id = str((row.get("key") or {}).get(key_field) or "")
+            if runtime_id in runtime_rows[family]:
+                mismatches.append(
+                    {
+                        "family": family,
+                        "key": row.get("key") or {},
+                        "kind": "deleted_row_still_generated",
+                    }
+                )
+
+        for family, rows_by_id in runtime_rows.items():
+            for runtime_id in sorted(set(rows_by_id) - expected_runtime_ids[family]):
+                mismatches.append(
+                    {
+                        "family": family,
+                        "key": {"runtimeId": runtime_id},
+                        "kind": "generated_row_unexpected",
+                    }
+                )
+
+        expected_variants = {
+            str((row.get("key") or {}).get("variant_id") or "")
+            for row in (plan.get("coverage") or {}).get("manifestRows") or []
+            if row.get("model") == model
+            and row.get("family") == "model_variants"
+            and row.get("action") in {"add", "update", "noop"}
+        }
+        generated_variants = {
+            str(row.get("variant_id") or "")
+            for row in contract.get("variants") or []
+            if isinstance(row, dict)
+        }
+        if expected_variants != generated_variants:
+            mismatches.append(
+                {
+                    "family": "model_variants",
+                    "kind": "variant_set_mismatch",
+                    "missing": sorted(expected_variants - generated_variants),
+                    "unexpected": sorted(generated_variants - expected_variants),
+                }
+            )
+        return mismatches
+
+    def _deployment_phase_plan(
+        self,
+        plan: dict[str, Any],
+        models: list[str],
+    ) -> dict[str, Any]:
+        """Return a mechanical target subset for temp-only phased proof."""
+
+        selected = set(models)
+        coverage = plan.get("coverage") or {}
+        manifest_rows = [
+            dict(row)
+            for row in coverage.get("manifestRows") or []
+            if row.get("model") == "*" or row.get("model") in selected
+        ]
+        manifest_refs = {str(row.get("manifestRef") or "") for row in manifest_rows}
+
+        def include(item: dict[str, Any]) -> bool:
+            if (
+                item.get("_scaffoldRule")
+                == "pass_c3_greenfield_registry_promotion"
+            ):
+                return str((item.get("key") or {}).get("model_key") or "") in selected
+            if item.get("action") == "create_sheet":
+                return bool(manifest_refs & set(item.get("_manifestRefs") or []))
+            return str(item.get("_manifestRef") or "") in manifest_refs
+
+        stage1 = [dict(item) for item in plan.get("stage1", {}).get("items") or [] if include(item)]
+        stage2 = [dict(item) for item in plan.get("stage2", {}).get("items") or [] if include(item)]
+        noops = [
+            dict(row)
+            for row in coverage.get("noops") or []
+            if row.get("model") == "*" or row.get("model") in selected
+        ]
+        return {
+            **plan,
+            "targets": list(models),
+            "targetModes": {
+                model: (plan.get("targetModes") or {}).get(model) for model in models
+            },
+            "stage1": {"items": stage1},
+            "stage2": {"items": stage2},
+            "coverage": {
+                **coverage,
+                "manifestRows": manifest_rows,
+                "noops": noops,
+            },
+            "planReadiness": {
+                "planReady": True,
+                "manifestRowCount": len(manifest_rows),
+                "mutationCount": len(stage1) + len(stage2),
+                "noopCount": len(noops),
+                "uncoveredCount": 0,
+            },
+        }
+
+    def _deployment_proof_phases(
+        self,
+        workbook: Path,
+        plan: dict[str, Any],
+        *,
+        schema_validation: bool,
+    ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        """Run the required GSX/ZR1, ZR1X, then all-target temp proofs."""
+
+        targets = [str(model) for model in plan.get("targets") or []]
+        phase_models: list[tuple[str, list[str]]] = []
+        first = [model for model in ("grand_sport_x", "zr1") if model in targets]
+        if first:
+            phase_models.append(("grand_sport_x_plus_zr1", first))
+        if "zr1x" in targets:
+            phase_models.append(("zr1x_repeatability", ["zr1x"]))
+        phase_models.append(("all_targets_atomic", targets))
+
+        phases: list[dict[str, Any]] = []
+        final: dict[str, Any] = {}
+        for phase_id, models in phase_models:
+            phase_plan = (
+                plan if models == targets else self._deployment_phase_plan(plan, models)
+            )
+            continuity = self._deployment_continuity_probe(
+                workbook,
+                self._combined_plan_batch(phase_plan, workbook),
+                phase_plan,
+                schema_validation=schema_validation,
+            )
+            passed = bool(models) and all(
+                (continuity.get(model) or {}).get("status") == "deployment_probe_passed"
+                for model in models
+            )
+            phases.append(
+                {
+                    "phaseId": phase_id,
+                    "models": models,
+                    "passed": passed,
+                    "continuity": continuity,
+                }
+            )
+            if phase_id == "all_targets_atomic":
+                final = continuity
+        return phases, final
+
+    def _expected_deployment_phase_specs(
+        self,
+        plan: dict[str, Any],
+    ) -> list[tuple[str, list[str]]]:
+        targets = [str(model) for model in plan.get("targets") or []]
+        specs: list[tuple[str, list[str]]] = []
+        first = [model for model in ("grand_sport_x", "zr1") if model in targets]
+        if first:
+            specs.append(("grand_sport_x_plus_zr1", first))
+        if "zr1x" in targets:
+            specs.append(("zr1x_repeatability", ["zr1x"]))
+        specs.append(("all_targets_atomic", targets))
+        return specs
+
+    def _deployment_phase_blockers(
+        self,
+        plan: dict[str, Any],
+        phases: list[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        expected = self._expected_deployment_phase_specs(plan)
+        actual = [
+            (
+                str(phase.get("phaseId") or ""),
+                [str(model) for model in phase.get("models") or []],
+            )
+            for phase in phases
+        ]
+        blockers: list[dict[str, Any]] = []
+        if actual != expected:
+            blockers.append(
+                {
+                    "kind": "deployment_proof_phases_invalid",
+                    "detail": (
+                        "required deployment proof phases are absent, reordered, or scoped "
+                        f"incorrectly; expected {expected}, got {actual}"
+                    ),
+                }
+            )
+            return blockers
+        for phase, (phase_id, models) in zip(phases, expected, strict=True):
+            continuity = phase.get("continuity") or {}
+            failed_models = [
+                model
+                for model in models
+                if (continuity.get(model) or {}).get("status")
+                != "deployment_probe_passed"
+            ]
+            if phase.get("passed") is not True or failed_models:
+                blockers.append(
+                    {
+                        "kind": "deployment_proof_phase_failed",
+                        "detail": (
+                            f"deployment proof phase {phase_id!r} did not pass for "
+                            f"{failed_models or models}"
+                        ),
+                    }
+                )
+        return blockers
 
     def _deployment_continuity_probe(
         self,
@@ -3336,9 +4169,17 @@ class WizardSessionStore:
         import shutil
         import tempfile
 
-        from corvette_form_generator.contract import ASSET_IMAGE_FIELDS
+        from openpyxl import load_workbook
+
+        from corvette_form_generator.contract import ASSET_IMAGE_FIELDS, load_model_asset_map
         from corvette_form_generator.editor_ops import apply_batch
         from corvette_form_generator.model_configs import discover_generation_model_configs
+        from corvette_form_generator.registry_promotion import (
+            assert_runtime_contract,
+            build_registry_from_artifacts,
+            registry_model_key,
+            runtime_contract_artifact_path,
+        )
         from corvette_form_generator.source_assembly import assemble_model_source
 
         targets = [str(model) for model in plan.get("targets") or []]
@@ -3380,7 +4221,38 @@ class WizardSessionStore:
                     )
                 return continuity
 
+            pre_activation_workbook = tmp_root / "pre-activation.xlsx"
+            shutil.copy2(tmp_workbook, pre_activation_workbook)
             self._activate_probe_models(tmp_workbook, targets)
+            activation_validation = self._validate_probe_activation(
+                pre_activation_workbook,
+                tmp_workbook,
+                targets,
+            )
+            for model in targets:
+                continuity.setdefault(model, {})["postActivationValidation"] = (
+                    activation_validation
+                )
+            if not activation_validation.get("ok"):
+                detail = "; ".join(activation_validation.get("errors") or [])
+                for model in targets:
+                    entry = continuity.setdefault(model, {})
+                    blockers = list(entry.get("deploymentBlockers") or [])
+                    blockers.append(
+                        {
+                            "kind": "post_activation_validation_failed",
+                            "detail": detail or "temporary activation validation failed",
+                        }
+                    )
+                    entry.update(
+                        {
+                            "status": "not_deployment_ready",
+                            "registryLoadable": False,
+                            "registryError": detail,
+                            "deploymentBlockers": blockers,
+                        }
+                    )
+                return continuity
             try:
                 configs = discover_generation_model_configs(tmp_workbook)
             except Exception as exc:
@@ -3409,10 +4281,25 @@ class WizardSessionStore:
                     continue
 
                 config = config.with_overrides(
+                    root=tmp_root,
                     workbook_path=tmp_workbook,
                     output_dir=tmp_root / "form-output",
                     app_dir=tmp_root / "form-app",
                 )
+                entry["probePaths"] = {
+                    "root": str(tmp_root),
+                    "workbook": str(tmp_workbook),
+                    "outputDir": str(tmp_root / "form-output"),
+                    "appDir": str(tmp_root / "form-app"),
+                    "allTemporary": all(
+                        path.is_relative_to(tmp_root)
+                        for path in (
+                            tmp_workbook,
+                            tmp_root / "form-output",
+                            tmp_root / "form-app",
+                        )
+                    ),
+                }
                 try:
                     assembly = assemble_model_source(config)
                 except Exception as exc:
@@ -3429,12 +4316,28 @@ class WizardSessionStore:
                     continue
 
                 source = assembly.source_data
+                contract = getattr(assembly, "runtime_contract", source)
+                try:
+                    assert_runtime_contract(
+                        contract, source=f"temporary deployment proof:{model}"
+                    )
+                    runtime_path = runtime_contract_artifact_path(tmp_root, model)
+                    runtime_path.parent.mkdir(parents=True, exist_ok=True)
+                    runtime_path.write_text(
+                        json.dumps(contract, indent=2, ensure_ascii=False) + "\n",
+                        encoding="utf-8",
+                    )
+
+                except Exception as exc:
+                    blockers.append(
+                        {"kind": "runtime_contract_invalid", "detail": str(exc)}
+                    )
                 raw_validation = source.get("validation")
                 validation: list[dict[str, Any]] = raw_validation if isinstance(raw_validation, list) else []
                 pricing_deferred = any(row.get("check_id") == "pricing_deferred" for row in validation if isinstance(row, dict))
-                raw_choices = source.get("choices")
+                raw_choices = contract.get("choices")
                 choices: list[dict[str, Any]] = raw_choices if isinstance(raw_choices, list) else []
-                raw_interiors = source.get("interiors")
+                raw_interiors = contract.get("interiors")
                 interiors: list[dict[str, Any]] = raw_interiors if isinstance(raw_interiors, list) else []
                 media_count = sum(
                     1
@@ -3448,12 +4351,21 @@ class WizardSessionStore:
                 )
                 counts = {
                     "choices": len(choices),
-                    "directRules": self._source_count(source, "rules"),
-                    "ruleGroups": self._source_count(source, "ruleGroups"),
-                    "exclusiveGroups": self._source_count(source, "exclusiveGroups"),
-                    "priceRules": self._source_count(source, "priceRules"),
+                    "customerSelectableChoices": sum(
+                        1
+                        for choice in choices
+                        if isinstance(choice, dict)
+                        and str(choice.get("selectable") or "").strip().lower()
+                        in {"true", "1", "yes"}
+                        and str(choice.get("active") or "true").strip().lower()
+                        not in {"false", "0", "no"}
+                    ),
+                    "directRules": self._source_count(contract, "rules"),
+                    "ruleGroups": self._source_count(contract, "ruleGroups"),
+                    "exclusiveGroups": self._source_count(contract, "exclusiveGroups"),
+                    "priceRules": self._source_count(contract, "priceRules"),
                     "pricingDeferred": pricing_deferred,
-                    "colorOverrides": self._source_count(source, "colorOverrides"),
+                    "colorOverrides": self._source_count(contract, "colorOverrides"),
                     "interiors": len(interiors),
                     "interiorComponentLineItems": component_count,
                     "optionMediaCoveredChoices": media_count,
@@ -3468,6 +4380,38 @@ class WizardSessionStore:
                             "detail": (
                                 f"generated contract has {counts['validationErrors']} validation error(s)"
                             ),
+                        }
+                    )
+                if counts["customerSelectableChoices"] == 0:
+                    blockers.append(
+                        {
+                            "kind": "customer_selectable_choices_missing",
+                            "detail": "generated contract has zero active customer-selectable choices",
+                        }
+                    )
+                signature_mismatches = self._manifest_runtime_signature_mismatches(
+                    plan, model, contract
+                )
+                source_feature_agreement = self._source_feature_coverage_agreement(
+                    plan,
+                    model,
+                    signature_mismatches,
+                )
+                if signature_mismatches:
+                    blockers.append(
+                        {
+                            "kind": "manifest_runtime_signature_mismatch",
+                            "detail": (
+                                f"{len(signature_mismatches)} manifest/runtime semantic "
+                                "mismatch(es)"
+                            ),
+                        }
+                    )
+                if not source_feature_agreement["ok"]:
+                    blockers.append(
+                        {
+                            "kind": "source_feature_coverage_disagreement",
+                            "detail": "; ".join(source_feature_agreement["errors"]),
                         }
                     )
                 if model in {"zr1", "zr1x"} and counts["priceRules"] == 0 and pricing_deferred:
@@ -3508,12 +4452,76 @@ class WizardSessionStore:
                 entry.update(
                     {
                         "status": "not_deployment_ready" if blockers else "deployment_probe_passed",
-                        "registryLoadable": True,
-                        "registryError": "",
+                        "registryLoadable": None,
+                        "registryError": "registry proof pending",
                         "counts": counts,
+                        "signatureMismatches": signature_mismatches,
+                        "sourceFeatureCoverageAgreement": source_feature_agreement,
+                        "validationErrors": [
+                            row
+                            for row in validation
+                            if isinstance(row, dict) and row.get("severity") == "error"
+                        ][:50],
+                        "validationWarnings": [
+                            row
+                            for row in validation
+                            if isinstance(row, dict) and row.get("severity") == "warning"
+                        ][:50],
                         "deploymentBlockers": blockers,
                         "deploymentDeferrals": deferrals,
                     }
+                )
+            registry_error = ""
+            registry_models: set[str] = set()
+            registry_promotion_rows: list[dict[str, Any]] = []
+            try:
+                wb = load_workbook(tmp_workbook, read_only=True, data_only=True)
+                try:
+                    promotion_sheet = wb["model_registry_promotion"]
+                    promotion_headers = [cell.value for cell in promotion_sheet[1]]
+                    registry_promotion_rows = [
+                        {
+                            str(header): value
+                            for header, value in zip(promotion_headers, values)
+                            if header is not None
+                        }
+                        for values in promotion_sheet.iter_rows(
+                            min_row=2, values_only=True
+                        )
+                        if str(values[0] or "") in targets
+                    ]
+                    registry = build_registry_from_artifacts(
+                        wb,
+                        model_assets=load_model_asset_map(wb, registry_model_key),
+                        root=tmp_root,
+                    )
+                finally:
+                    wb.close()
+                registry_models = set((registry.get("models") or {}).keys())
+            except Exception as exc:
+                registry_error = str(exc)
+            expected_registry_models = {registry_model_key(model) for model in targets}
+            unexpected_registry_models = registry_models - expected_registry_models
+            for model in targets:
+                entry = continuity.setdefault(model, {})
+                blockers = list(entry.get("deploymentBlockers") or [])
+                registry_key = registry_model_key(model)
+                if registry_error or registry_key not in registry_models or unexpected_registry_models:
+                    detail = registry_error or (
+                        f"registry models were {sorted(registry_models)}, expected exactly "
+                        f"{sorted(expected_registry_models)}"
+                    )
+                    blockers.append({"kind": "registry_load_failed", "detail": detail})
+                    entry["registryLoadable"] = False
+                    entry["registryError"] = detail
+                else:
+                    entry["registryLoadable"] = True
+                    entry["registryError"] = ""
+                entry["registryModels"] = sorted(registry_models)
+                entry["registryPromotionRows"] = registry_promotion_rows
+                entry["deploymentBlockers"] = blockers
+                entry["status"] = (
+                    "not_deployment_ready" if blockers else "deployment_probe_passed"
                 )
             return continuity
 
@@ -3561,9 +4569,32 @@ class WizardSessionStore:
     ) -> tuple[Path, dict[str, Any]]:
         _, candidates_file, candidates = self._parsed_candidates(run_id)
         selection = self._load_selection(run_id, candidates_file)
-        state = self._decision_state(run_id, candidates, selection)
-        if plan.get("decisionsFingerprint") != artifact_sha(state["decisions"]):
-            raise WizardError("Decisions changed after the plan was approved; rebuild the plan.", status=409)
+        if plan.get("schemaVersion") == WRITABLE_PLAN_SCHEMA:
+            run_dir = self.run_dir(run_id)
+            self._require_compiler_bindings(run_dir, plan)
+            manifest = read_json(run_dir / "canonical-row-manifest.json")
+            report = read_json(run_dir / "compile-report.json")
+            freshness = self._compiler_freshness(run_id, report)
+            if freshness["stale"]:
+                raise WizardError(
+                    "Compiler inputs changed after plan approval; start a fresh compile run.",
+                    status=409,
+                )
+            if plan.get("targets") != selection.get("targets"):
+                raise WizardError("Selected targets changed after plan approval.", status=409)
+            if plan.get("candidatesFingerprint") != selection.get("candidatesFingerprint"):
+                raise WizardError("Candidate binding changed after plan approval.", status=409)
+            if plan.get("canonicalManifestSemanticSha") != manifest.get(
+                "manifestSemanticSha"
+            ):
+                raise WizardError("Canonical manifest changed after plan approval.", status=409)
+        else:
+            state = self._decision_state(run_id, candidates, selection)
+            if plan.get("decisionsFingerprint") != artifact_sha(state["decisions"]):
+                raise WizardError(
+                    "Decisions changed after the plan was approved; rebuild the plan.",
+                    status=409,
+                )
         source_fingerprint = plan.get("sourceFingerprint") or selection.get("sourceFingerprint") or {}
         if source_fingerprint.get("sha256") != session.get("fingerprint", {}).get("sha256"):
             raise WizardError("Source fingerprint changed after the plan was approved; start a new run.", status=409)
@@ -3675,10 +4706,14 @@ class WizardSessionStore:
         schema_validation: bool,
         result: dict[str, Any],
         deployment: dict[str, Any],
+        deployment_phases: list[dict[str, Any]],
     ) -> dict[str, Any]:
         from corvette_form_generator.editor_ops import classify_warnings
 
         global_blockers: list[dict[str, Any]] = []
+        global_blockers.extend(
+            self._deployment_phase_blockers(plan, deployment_phases)
+        )
         target_blockers: dict[str, list[dict[str, Any]]] = {
             str(model): [] for model in plan.get("targets") or []
         }
@@ -3717,7 +4752,7 @@ class WizardSessionStore:
             else {}
         )
         if plan.get("schemaVersion") == WRITABLE_PLAN_SCHEMA:
-            for field in ("canonicalManifestSha", "compileReportSha", "exceptionResolutionsSha"):
+            for _filename, field in COMPILER_ARTIFACT_BINDINGS:
                 if not compiler_bindings.get(field) or plan.get(field) != compiler_bindings.get(field):
                     global_blockers.append(
                         {"kind": "compiler_binding_missing", "detail": f"{field} is absent or stale"}
@@ -3816,13 +4851,23 @@ class WizardSessionStore:
             target_blockers[model].extend(effective_deployment_blockers[model])
 
         accepted_warning_ids: list[str] = []
+        warning_sheet_models: dict[str, set[str]] = defaultdict(set)
+        for receipt in (plan.get("coverage") or {}).get("manifestRows") or []:
+            receipt_model = str(receipt.get("model") or "")
+            receipt_sheet = str(receipt.get("sheet") or "")
+            if receipt_model in target_blockers and receipt_sheet:
+                warning_sheet_models[receipt_sheet].add(receipt_model)
         for warning_id in warning_policy.get("confirmableIds") or []:
+            warning_sheet = str(warning_id).partition(":")[2]
+            authored_models = warning_sheet_models.get(warning_sheet, set())
             matched_model = next(
                 (
                     model
                     for model in target_blockers
-                    if str(warning_id).partition(":")[2].startswith(
-                        {"grand_sport_x": "grandSportX_"}.get(model, f"{model}_")
+                    if authored_models == {model}
+                    or (
+                        not authored_models
+                        and warning_sheet.startswith(f"{model}_")
                     )
                 ),
                 "",
@@ -3883,6 +4928,16 @@ class WizardSessionStore:
         eligibility = report.get("writeEligibility") or {}
         if not eligibility.get("eligible"):
             raise WizardError("Dry-run report is not write eligible.", status=409)
+        phase_blockers = self._deployment_phase_blockers(
+            plan,
+            list(report.get("deploymentProofPhases") or []),
+        )
+        if phase_blockers:
+            raise WizardError(
+                "Write approval requires the exact ordered deployment proof phases: "
+                + "; ".join(str(item.get("detail") or "") for item in phase_blockers),
+                status=409,
+            )
         if eligibility.get("blockers"):
             raise WizardError("Write-eligible report still contains blockers.", status=409)
         targets = list(plan.get("targets") or [])
@@ -4213,15 +5268,28 @@ class WizardSessionStore:
             "preparedCount": 0,
             "errors": ["editor result did not include prepared readback"],
         }
+        deployment_proof_phases: list[dict[str, Any]] = []
         if result.get("ok") and write:
             deployment_continuity = dict((approved_report or {}).get("deploymentContinuity") or {})
-        elif result.get("ok"):
-            deployment_continuity = self._deployment_continuity_probe(
-                workbook,
-                batch,
-                plan,
-                schema_validation=schema_validation,
+            deployment_proof_phases = list(
+                (approved_report or {}).get("deploymentProofPhases") or []
             )
+        elif result.get("ok"):
+            if plan.get("schemaVersion") == WRITABLE_PLAN_SCHEMA:
+                deployment_proof_phases, deployment_continuity = (
+                    self._deployment_proof_phases(
+                        workbook,
+                        plan,
+                        schema_validation=schema_validation,
+                    )
+                )
+            else:
+                deployment_continuity = self._deployment_continuity_probe(
+                    workbook,
+                    batch,
+                    plan,
+                    schema_validation=schema_validation,
+                )
         else:
             deployment_continuity = {}
         if result.get("ok"):
@@ -4236,6 +5304,7 @@ class WizardSessionStore:
                     schema_validation=schema_validation,
                     result=result,
                     deployment=deployment_continuity,
+                    deployment_phases=deployment_proof_phases,
                 )
         else:
             execution_blocker = {
@@ -4291,6 +5360,7 @@ class WizardSessionStore:
             "perSheetActionCounts": per_sheet_action_counts,
             "runtimeContinuity": (plan.get("report") or {}).get("runtimeContinuity", {}),
             "deploymentContinuity": deployment_continuity,
+            "deploymentProofPhases": deployment_proof_phases,
             "workbookBefore": before,
             "workbookAfter": after,
             "warnings": result.get("warnings", []),

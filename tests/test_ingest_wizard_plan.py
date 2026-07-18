@@ -20,7 +20,11 @@ for entry in (ROOT / "scripts", ROOT / "tests"):
     if str(entry) not in sys.path:
         sys.path.insert(0, str(entry))
 
-from corvette_form_generator.ingest.wizard.plan_builder import build_plan  # noqa: E402
+from corvette_form_generator.editor_ops import extract_workbook  # noqa: E402
+from corvette_form_generator.ingest.wizard.plan_builder import (  # noqa: E402
+    build_manifest_plan,
+    build_plan,
+)
 from corvette_form_generator.ingest.wizard.session import (  # noqa: E402
     WizardError,
     WizardSessionStore,
@@ -559,6 +563,109 @@ class PlanFlowTest(unittest.TestCase):
         with self.assertRaises(WizardError):
             self.store.approve_plan(self.run_id, "")
 
+    def test_compiled_ready_builds_atomic_pass_c3_plan_without_legacy_decisions(self) -> None:
+        run_dir = self.store.run_dir(self.run_id)
+        session = read_json(run_dir / "session.json")
+        session["state"] = "compiled_ready"
+        write_json(run_dir / "session.json", session)
+        extract = extract_workbook(self.master)
+        zr1 = next(
+            row
+            for row in extract["sheets"]["model_master"]["rows"]
+            if row["model_key"] == "zr1"
+        )
+        zr1x = {**zr1, "model_key": "zr1x", "registry_key": "zr1x", "model_label": "ZR1X"}
+        rows = [
+            CanonicalPlanProjectionTest._manifest_row(
+                model="zr1",
+                family="model_master",
+                sheet="model_master",
+                action="noop",
+                key={"model_key": "zr1"},
+                values=zr1,
+            ),
+            CanonicalPlanProjectionTest._manifest_row(
+                model="zr1x",
+                family="model_master",
+                sheet="model_master",
+                action="add",
+                key={"model_key": "zr1x"},
+                values=zr1x,
+            ),
+        ]
+        authority = {
+            "fingerprint": "fixture-authority",
+            "bindings": {"compilerPolicyVersion": "fixture"},
+        }
+        manifest = {
+            "schemaVersion": "canonical-row-manifest-v1",
+            "manifestSemanticSha": "fixture-manifest-semantic",
+            "runAuthorityFingerprint": authority,
+            "modelModes": {"zr1": "reprocess", "zr1x": "reprocess"},
+            "rows": rows,
+        }
+        report = {
+            "runAuthorityFingerprint": authority,
+            "queueSubjectFingerprint": "fixture-queue",
+            "comparatorEvidenceSemanticSha": "fixture-comparator",
+            "models": {
+                model: {"mode": "reprocess", "compileReady": True, "blockers": []}
+                for model in ("zr1", "zr1x")
+            },
+            "deferrals": [],
+            "sourceFeatureCoverage": [],
+        }
+        queue = {
+            "queueSubjectFingerprint": "fixture-queue",
+            "comparatorEvidenceSemanticSha": "fixture-comparator",
+            "runAuthorityFingerprint": authority,
+            "subjects": [],
+        }
+        resolutions = {
+            "queueSubjectFingerprint": "fixture-queue",
+            "validEntries": [],
+        }
+        comparator = {
+            "comparatorEvidenceSemanticSha": "fixture-comparator",
+            "runAuthorityFingerprint": authority,
+            "targets": {"zr1": {}, "zr1x": {}},
+        }
+        detail = {
+            "manifest": manifest,
+            "compileReport": report,
+            "exceptionQueue": queue,
+            "resolutions": resolutions,
+        }
+        for name, payload in {
+            "canonical-row-manifest.json": manifest,
+            "compile-report.json": report,
+            "exception-resolutions.json": resolutions,
+            "exception-queue.json": queue,
+            "comparator-evidence.json": comparator,
+        }.items():
+            write_json(run_dir / name, payload)
+        before = self.master.read_bytes()
+
+        with patch.object(self.store, "compiler_detail", return_value=detail), patch.object(
+            self.store,
+            "_compiler_freshness",
+            return_value={"stale": False, "reasons": []},
+        ):
+            result = self.store.build_apply_plan(self.run_id, schema_validation=False)
+            rebuilt = self.store.build_apply_plan(self.run_id, schema_validation=False)
+
+        self.assertEqual(result["session"]["state"], "plan_built")
+        self.assertEqual(result["plan"]["schemaVersion"], "pass-c-3")
+        self.assertEqual(rebuilt["plan"]["schemaVersion"], "pass-c-3")
+        self.assertTrue(result["plan"]["planReadiness"]["planReady"])
+        self.assertEqual(result["dryRun"]["mode"], "atomic_manifest_projection")
+        self.assertTrue(result["dryRun"]["combined"]["ok"], result["dryRun"])
+        self.assertEqual(self.master.read_bytes(), before)
+        plan = read_json(run_dir / "apply-plan.json")
+        self.assertEqual(len(plan["coverage"]["manifestRows"]), 2)
+        self.assertEqual(len(plan["coverage"]["noops"]), 1)
+        self.assertNotEqual(plan["decisionsFingerprint"], read_json(run_dir / "decisions.json"))
+
     def test_pass_c3_plan_approval_requires_all_compiler_artifacts(self) -> None:
         self.complete_all()
         self.store.build_apply_plan(self.run_id, schema_validation=False)
@@ -571,6 +678,504 @@ class PlanFlowTest(unittest.TestCase):
             self.store.approve_plan(self.run_id, "sean")
 
         self.assertFalse((run_dir / "plan-approval.json").exists())
+
+
+class CanonicalPlanProjectionTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+        self.master = build_master_workbook(self.root / "master.xlsx")
+        self.extract = extract_workbook(self.master)
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    def _build(
+        self,
+        *,
+        rows: list[dict],
+        targets: list[str],
+        modes: dict[str, str],
+        comparator_targets: list[str] | None = None,
+    ) -> dict:
+        authority = {
+            "fingerprint": "authority-sha",
+            "bindings": {"compilerPolicyVersion": "fixture"},
+        }
+        return build_manifest_plan(
+            workbook_path=self.master,
+            manifest={
+                "schemaVersion": "canonical-row-manifest-v1",
+                "manifestSemanticSha": "manifest-semantic-sha",
+                "runAuthorityFingerprint": authority,
+                "modelModes": modes,
+                "rows": rows,
+            },
+            compile_report={
+                "models": {
+                    target: {
+                        "mode": modes[target],
+                        "compileReady": True,
+                        "blockers": [],
+                    }
+                    for target in targets
+                },
+                "deferrals": [],
+                "runAuthorityFingerprint": authority,
+                "queueSubjectFingerprint": "queue-sha",
+                "comparatorEvidenceSemanticSha": "comparator-semantic-sha",
+            },
+            selection={
+                "targets": targets,
+                "comparators": {target: "z06" for target in targets},
+                "sourceFingerprint": "source-sha",
+                "candidatesFingerprint": "candidate-sha",
+            },
+            compiler_bindings={
+                "canonicalManifestSha": "manifest-file-sha",
+                "compileReportSha": "report-file-sha",
+                "exceptionResolutionsSha": "resolution-file-sha",
+                "exceptionQueueSha": "queue-file-sha",
+                "comparatorEvidenceSha": "comparator-file-sha",
+            },
+            authority_artifacts={
+                "exceptionQueue": {
+                    "queueSubjectFingerprint": "queue-sha",
+                    "comparatorEvidenceSemanticSha": "comparator-semantic-sha",
+                    "runAuthorityFingerprint": authority,
+                    "subjects": [],
+                },
+                "resolutions": {
+                    "queueSubjectFingerprint": "queue-sha",
+                    "validEntries": [],
+                },
+                "comparatorEvidence": {
+                    "comparatorEvidenceSemanticSha": "comparator-semantic-sha",
+                    "runAuthorityFingerprint": authority,
+                    "targets": {
+                        target: {} for target in (comparator_targets or targets)
+                    },
+                },
+            },
+        )
+
+    @staticmethod
+    def _manifest_row(
+        *,
+        model: str,
+        family: str,
+        sheet: str,
+        action: str,
+        key: dict,
+        values: dict,
+        status: str = "ready",
+    ) -> dict:
+        return {
+            "model": model,
+            "family": family,
+            "sheet": sheet,
+            "action": action,
+            "key": key,
+            "values": values,
+            "status": status,
+            "semanticSignature": {"fixture": [sheet, key]},
+            "derivationVersion": "fixture",
+        }
+
+    def test_manifest_plan_projects_exact_mutations_and_explicit_noop_coverage(self) -> None:
+        model_row = next(
+            row
+            for row in self.extract["sheets"]["model_master"]["rows"]
+            if row["model_key"] == "zr1"
+        )
+        existing = self.extract["sheets"]["zr1_options"]["rows"][0]
+        updated = {**existing, "description": "Canonical updated description"}
+        headers = self.extract["sheets"]["zr1_options"]["headers"]
+        added = {header: None for header in headers}
+        added.update(
+            {
+                "option_id": "opt_fixture_new_001",
+                "rpo": "NEW",
+                "price": 100,
+                "option_name": "Fixture option",
+                "description": "Fixture option",
+                "section_id": "sec_whee_001",
+                "selectable": True,
+                "active": True,
+            }
+        )
+        rows = [
+            self._manifest_row(
+                model="zr1",
+                family="model_master",
+                sheet="model_master",
+                action="noop",
+                key={"model_key": "zr1"},
+                values=model_row,
+            ),
+            self._manifest_row(
+                model="zr1",
+                family="options",
+                sheet="zr1_options",
+                action="update",
+                key={"option_id": existing["option_id"]},
+                values=updated,
+            ),
+            self._manifest_row(
+                model="zr1",
+                family="options",
+                sheet="zr1_options",
+                action="add",
+                key={"option_id": added["option_id"]},
+                values=added,
+            ),
+        ]
+
+        first = self._build(rows=rows, targets=["zr1"], modes={"zr1": "reprocess"})
+        second = self._build(rows=rows, targets=["zr1"], modes={"zr1": "reprocess"})
+
+        self.assertEqual(first, second)
+        self.assertTrue(first["valid"])
+        self.assertTrue(first["planReadiness"]["planReady"])
+        self.assertEqual(len(first["coverage"]["manifestRows"]), 3)
+        self.assertEqual(len(first["coverage"]["noops"]), 1)
+        self.assertEqual(len(first["stage2"]["items"]), 2)
+        update = next(item for item in first["stage2"]["items"] if item["action"] == "update")
+        self.assertNotIn("option_id", update["row"])
+        self.assertEqual(update["row"]["description"], "Canonical updated description")
+
+    def test_manifest_plan_refuses_comparator_evidence_target_drift(self) -> None:
+        with self.assertRaisesRegex(ValueError, "comparator evidence target"):
+            self._build(
+                rows=[
+                    self._manifest_row(
+                        model="zr1",
+                        family="model_master",
+                        sheet="model_master",
+                        action="noop",
+                        key={"model_key": "zr1"},
+                        values={"model_key": "zr1", "active": False},
+                    )
+                ],
+                targets=["zr1"],
+                modes={"zr1": "reprocess"},
+                comparator_targets=["zr1x"],
+            )
+
+    def test_manifest_noop_with_text_booleans_projects_typed_normalization(self) -> None:
+        from openpyxl import load_workbook
+
+        wb = load_workbook(self.master)
+        ws = wb["zr1_options"]
+        headers = {
+            str(cell.value): index + 1
+            for index, cell in enumerate(ws[1])
+            if cell.value is not None
+        }
+        ws.cell(row=2, column=headers["selectable"], value="False")
+        ws.cell(row=2, column=headers["active"], value="True")
+        ws.cell(row=2, column=headers["price"], value="0")
+        wb.save(self.master)
+        wb.close()
+
+        row = extract_workbook(self.master)["sheets"]["zr1_options"]["rows"][0]
+        values = {**row, "selectable": False, "active": True, "price": 0}
+        plan = self._build(
+            rows=[
+                self._manifest_row(
+                    model="zr1",
+                    family="options",
+                    sheet="zr1_options",
+                    action="noop",
+                    key={"option_id": row["option_id"]},
+                    values=values,
+                )
+            ],
+            targets=["zr1"],
+            modes={"zr1": "reprocess"},
+        )
+
+        operation = plan["stage2"]["items"][0]
+        self.assertEqual(operation["action"], "update")
+        self.assertEqual(
+            operation["row"],
+            {"price": 0, "selectable": False, "active": True},
+        )
+        receipt = plan["coverage"]["manifestRows"][0]
+        self.assertEqual(receipt["action"], "noop")
+        self.assertEqual(receipt["projectionPhysicalAction"], "update")
+        self.assertEqual(plan["coverage"]["noops"], [])
+
+    def test_manifest_plan_creates_missing_target_sheet_from_comparator_headers(self) -> None:
+        source_headers = self.extract["sheets"]["model_workbook_sources"]["headers"]
+        source_values = {header: None for header in source_headers}
+        source_values.update(
+            {
+                "model_key": "grand_sport_x",
+                "source_role": "source_option_sheet",
+                "sheet_name": "grand_sport_x_options",
+                "active": True,
+            }
+        )
+        option_headers = self.extract["sheets"]["z06_options"]["headers"]
+        option_values = {header: None for header in option_headers}
+        option_values.update(
+            {
+                "option_id": "opt_fixture_001",
+                "rpo": "FIX",
+                "price": 0,
+                "option_name": "Fixture",
+                "description": "Fixture",
+                "section_id": "sec_whee_001",
+                "selectable": True,
+                "active": True,
+            }
+        )
+        rows = [
+            self._manifest_row(
+                model="grand_sport_x",
+                family="model_workbook_sources",
+                sheet="model_workbook_sources",
+                action="add",
+                key={
+                    "model_key": "grand_sport_x",
+                    "source_role": "source_option_sheet",
+                },
+                values=source_values,
+            ),
+            self._manifest_row(
+                model="grand_sport_x",
+                family="options",
+                sheet="grand_sport_x_options",
+                action="add",
+                key={"option_id": "opt_fixture_001"},
+                values=option_values,
+            ),
+        ]
+
+        plan = self._build(
+            rows=rows,
+            targets=["grand_sport_x"],
+            modes={"grand_sport_x": "greenfield"},
+        )
+
+        create = next(item for item in plan["stage1"]["items"] if item["action"] == "create_sheet")
+        self.assertEqual(create["sheet"], "grand_sport_x_options")
+        self.assertEqual(create["family"], "options")
+        self.assertEqual(create["headersFrom"], "z06_options")
+
+    def test_canonical_source_registration_creates_zero_row_target_sheet(self) -> None:
+        source_headers = self.extract["sheets"]["model_workbook_sources"]["headers"]
+        source_values: dict = {header: None for header in source_headers}
+        source_values.update(
+            {
+                "model_key": "grand_sport_x",
+                "source_role": "variant_option_overrides_sheet",
+                "sheet_name": "grand_sport_x_variant_overrides",
+                "active": False,
+            }
+        )
+
+        plan = self._build(
+            rows=[
+                self._manifest_row(
+                    model="grand_sport_x",
+                    family="model_workbook_sources",
+                    sheet="model_workbook_sources",
+                    action="add",
+                    key={
+                        "model_key": "grand_sport_x",
+                        "source_role": "variant_option_overrides_sheet",
+                    },
+                    values=source_values,
+                )
+            ],
+            targets=["grand_sport_x"],
+            modes={"grand_sport_x": "greenfield"},
+        )
+
+        create = next(
+            item
+            for item in plan["stage1"]["items"]
+            if item.get("action") == "create_sheet"
+            and item.get("sheet") == "grand_sport_x_variant_overrides"
+        )
+        self.assertEqual(create["family"], "variant_overrides")
+        self.assertEqual(create["headersFrom"], "z06_variant_overrides")
+        self.assertEqual(
+            create["_manifestRefs"],
+            [plan["coverage"]["manifestRows"][0]["manifestRef"]],
+        )
+
+    def test_greenfield_projection_migrates_reviewed_global_rules_to_isolated_sheet(self) -> None:
+        source_headers = self.extract["sheets"]["model_workbook_sources"]["headers"]
+        source_values = {header: None for header in source_headers}
+        source_values.update(
+            {
+                "model_key": "grand_sport_x",
+                "source_role": "price_rules_sheet",
+                "sheet_name": "z06_price_rules",
+                "active": False,
+            }
+        )
+        price_row = self.extract["sheets"]["z06_price_rules"]["rows"][0]
+        option_headers = self.extract["sheets"]["z06_options"]["headers"]
+        option_template = self.extract["sheets"]["z06_options"]["rows"][0]
+        option_rows = []
+        for option_id in (
+            price_row["condition_option_id"],
+            price_row["target_option_id"],
+        ):
+            existing_option = next(
+                (
+                    row
+                    for row in self.extract["sheets"]["z06_options"]["rows"]
+                    if row["option_id"] == option_id
+                ),
+                None,
+            )
+            option_values = (
+                dict(existing_option)
+                if existing_option
+                else {header: option_template.get(header) for header in option_headers}
+            )
+            option_values.update(
+                {
+                    "option_id": option_id,
+                    "rpo": option_id.removeprefix("opt_").removesuffix("_001").upper(),
+                }
+            )
+            option_rows.append(
+                self._manifest_row(
+                    model="grand_sport_x",
+                    family="options",
+                    sheet="z06_options",
+                    action=(
+                        "noop"
+                        if existing_option
+                        else "add"
+                    ),
+                    key={"option_id": option_id},
+                    values=option_values,
+                )
+            )
+        rows = [
+            self._manifest_row(
+                model="grand_sport_x",
+                family="model_workbook_sources",
+                sheet="model_workbook_sources",
+                action="add",
+                key={
+                    "model_key": "grand_sport_x",
+                    "source_role": "price_rules_sheet",
+                },
+                values=source_values,
+            ),
+            self._manifest_row(
+                model="grand_sport_x",
+                family="model_workbook_sources",
+                sheet="model_workbook_sources",
+                action="add",
+                key={
+                    "model_key": "grand_sport_x",
+                    "source_role": "variant_option_overrides_sheet",
+                },
+                values={
+                    **source_values,
+                    "source_role": "variant_option_overrides_sheet",
+                    "sheet_name": "z06_variant_overrides",
+                },
+            ),
+            self._manifest_row(
+                model="grand_sport_x",
+                family="price_rules",
+                sheet="z06_price_rules",
+                action="noop",
+                key={"price_rule_id": price_row["price_rule_id"]},
+                values=price_row,
+            ),
+            *option_rows,
+        ]
+
+        plan = self._build(
+            rows=rows,
+            targets=["grand_sport_x"],
+            modes={"grand_sport_x": "greenfield"},
+        )
+
+        create = next(
+            item
+            for item in plan["stage1"]["items"]
+            if item.get("sheet") == "grand_sport_x_price_rules"
+        )
+        self.assertEqual(create["sheet"], "grand_sport_x_price_rules")
+        migrated = next(
+            item
+            for item in plan["stage2"]["items"]
+            if item.get("sheet") == "grand_sport_x_price_rules"
+        )
+        self.assertEqual(migrated["action"], "add")
+        self.assertEqual(migrated["sheet"], "grand_sport_x_price_rules")
+        source = next(
+            item
+            for item in plan["stage1"]["items"]
+            if item.get("sheet") == "model_workbook_sources"
+        )
+        self.assertEqual(source["row"]["sheet_name"], "grand_sport_x_price_rules")
+        self.assertEqual(plan["projectionMigrations"]["rowCount"], 5)
+        variant_create = next(
+            item
+            for item in plan["stage1"]["items"]
+            if item.get("action") == "create_sheet"
+            and item.get("sheet") == "grand_sport_x_variant_overrides"
+        )
+        self.assertEqual(variant_create["headersFrom"], "z06_variant_overrides")
+        promotion = next(
+            item
+            for item in plan["stage1"]["items"]
+            if item.get("sheet") == "model_registry_promotion"
+            and item.get("key", {}).get("model_key") == "grand_sport_x"
+        )
+        self.assertEqual(promotion["action"], "add")
+        self.assertFalse(promotion["row"]["active"])
+        self.assertFalse(promotion["row"]["promoted_to_runtime"])
+        self.assertEqual(
+            promotion["_scaffoldRule"],
+            "pass_c3_greenfield_registry_promotion",
+        )
+
+    def test_manifest_plan_refuses_target_rows_routed_to_comparator_sheet(self) -> None:
+        option = self.extract["sheets"]["z06_options"]["rows"][0]
+        row = self._manifest_row(
+            model="zr1",
+            family="options",
+            sheet="z06_options",
+            action="noop",
+            key={"option_id": option["option_id"]},
+            values=option,
+        )
+
+        with self.assertRaisesRegex(ValueError, "model_workbook_sources requires"):
+            self._build(rows=[row], targets=["zr1"], modes={"zr1": "reprocess"})
+
+    def test_manifest_plan_refuses_non_ready_or_unknown_columns(self) -> None:
+        existing = self.extract["sheets"]["zr1_options"]["rows"][0]
+        row = self._manifest_row(
+            model="zr1",
+            family="options",
+            sheet="zr1_options",
+            action="noop",
+            key={"option_id": existing["option_id"]},
+            values=existing,
+            status="blocked",
+        )
+        with self.assertRaisesRegex(ValueError, "not ready"):
+            self._build(rows=[row], targets=["zr1"], modes={"zr1": "reprocess"})
+
+        row["status"] = "ready"
+        row["values"] = {**existing, "invented_column": "not canonical"}
+        with self.assertRaisesRegex(ValueError, "header"):
+            self._build(rows=[row], targets=["zr1"], modes={"zr1": "reprocess"})
 
 
 if __name__ == "__main__":

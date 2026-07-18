@@ -679,6 +679,61 @@ class ApplyBatchTest(unittest.TestCase):
         backups = Path(self._dir.name) / "backups"
         self.assertTrue(any(backups.iterdir()))
 
+    def test_pass_c3_batch_forces_real_excel_booleans_over_text_convention(self):
+        wb = load_workbook(self.path)
+        ws = wb["stingray_options"]
+        headers = {
+            str(cell.value): index + 1
+            for index, cell in enumerate(ws[1])
+            if cell.value is not None
+        }
+        for row in range(2, ws.max_row + 1):
+            ws.cell(row=row, column=headers["selectable"], value="True")
+            ws.cell(row=row, column=headers["active"], value="True")
+        wb.save(self.path)
+        wb.close()
+
+        payload = batch(
+            {
+                "action": "update",
+                "sheet": "stingray_options",
+                "key": {"option_id": "opt_one_001"},
+                "row": {"selectable": False, "active": True},
+            },
+            mtime=self.path.stat().st_mtime_ns,
+        )
+        payload["forceTypedBools"] = True
+        with patch(
+            "corvette_form_generator.editor_ops.validate_workbook_schema",
+            return_value=[],
+        ):
+            result = apply_batch(
+                self.path,
+                payload,
+                write=True,
+                log_path=self.log,
+                run_schema_validation=True,
+            )
+
+        self.assertTrue(result["ok"], result)
+        wb = load_workbook(self.path, read_only=True, data_only=True)
+        try:
+            ws = wb["stingray_options"]
+            headers = {
+                str(cell.value): index
+                for index, cell in enumerate(ws[1])
+                if cell.value is not None
+            }
+            row = next(
+                values
+                for values in ws.iter_rows(min_row=2, values_only=True)
+                if values[headers["option_id"]] == "opt_one_001"
+            )
+            self.assertIs(row[headers["selectable"]], False)
+            self.assertIs(row[headers["active"]], True)
+        finally:
+            wb.close()
+
     def test_update_and_delete(self):
         # mtime passed as a string, as the browser must send it (JS precision)
         result = self.run_batch(
@@ -729,6 +784,37 @@ class ApplyBatchTest(unittest.TestCase):
         self.assertEqual(result["verification"]["preparedChecked"], 1)
         self.assertEqual(result["verification"]["preparedCount"], 1)
         self.assertEqual(self.path.read_bytes(), before)
+
+    def test_exact_readback_indexes_each_sheet_once_for_multiple_operations(self):
+        wb = load_workbook(self.path, read_only=True)
+        try:
+            data_rows = wb["stingray_options"].max_row - 1
+        finally:
+            wb.close()
+        original = editor_ops._canonical_readback_key
+        with patch.object(
+            editor_ops,
+            "_canonical_readback_key",
+            wraps=original,
+        ) as readback_key:
+            result = self.run_batch(
+                op(
+                    "update",
+                    "stingray_options",
+                    {"option_id": "opt_one_001"},
+                    {"price": 11},
+                ),
+                op(
+                    "update",
+                    "stingray_options",
+                    {"option_id": "opt_thr_001"},
+                    {"price": 12},
+                ),
+                write=False,
+            )
+
+        self.assertTrue(result["ok"], result)
+        self.assertEqual(readback_key.call_count, data_rows)
 
     def test_composite_members_each_count_as_raw_operations(self):
         composite = add_option_composite()
@@ -830,11 +916,18 @@ class ApplyBatchTest(unittest.TestCase):
     def test_tampered_live_save_exposes_apply_verification_failed(self):
         real_safe_save = editor_ops.save_workbook_safely
 
-        def save_and_tamper_live(workbook, workbook_path, *, loaded_mtime_ns):
+        def save_and_tamper_live(
+            workbook,
+            workbook_path,
+            *,
+            loaded_mtime_ns,
+            approved_bool_type_migrations=None,
+        ):
             backup_path = real_safe_save(
                 workbook,
                 workbook_path,
                 loaded_mtime_ns=loaded_mtime_ns,
+                approved_bool_type_migrations=approved_bool_type_migrations,
             )
             tampered = load_workbook(workbook_path)
             ws = tampered["stingray_options"]
