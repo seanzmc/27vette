@@ -81,6 +81,8 @@ Every closeout must record a skill-update decision in the run receipt `run.json`
 
 - **Surface-string dedup keys:** Duplicate/collision detection must key on the domain's identity, not on rendered strings — flagging duplicate proposed option names by candidate count marked 298/298 rows because GM legitimately lists every RPO on both a category sheet and "Additional Options"; keying on distinct RPOs per name gave the true 13 collisions. Before shipping any duplicate flag, ask what the domain treats as the same thing and count that; also compute the flag over the full scope, not the currently filtered view.
 
+- **Automation-pane scroll events:** In the in-app Browser pane, programmatic scrolling (`window.scrollBy`, `scrollIntoView`) changes `scrollY` without dispatching any `scroll` event — a scroll listener under test appears dead while working fine for real users, and a hasty "fix" would chase a nonexistent bug. Verify scroll-driven behavior with real input (the computer tool's scroll action) or by dispatching a synthetic `scroll` event on `document`, and treat "scrollY moved but no listener fired" as an automation artifact until a dispatched event also fails.
+
 - **Adverb rubrics:** A criterion like "flagged exceptions drop materially" is ungradable — the verifier had to invent the metric post-hoc (flag composition, marker-match rate) and the headline count moved 5% while the actual goal hit 100%. Write criteria as named measurable metrics ("zero unmatched-footnote flags on the real export"), and have verifiers reproduce before/after numbers by reconstructing the prior code via `git show HEAD:<path>` into a scratchpad module instead of trusting recorded values.
 
 ## Anti-patterns

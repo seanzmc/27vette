@@ -567,6 +567,12 @@ textarea {
   justify-content: flex-start;
 }
 
+/* Vehicle Setup's sticky Next footer is a mobile-only affordance; desktop
+   keeps the in-panel "Continue to …" action */
+.setup-step-footer {
+  display: none;
+}
+
 .section-title {
   display: flex;
   align-items: center;
@@ -1545,6 +1551,12 @@ textarea {
   color: var(--ok);
 }
 
+/* summary-drawer action copies (Reset / Download / Submit) are a mobile-only
+   surface; wider viewports keep the topbar toolbar */
+.summary-actions {
+  display: none;
+}
+
 .summary-panel {
   display: flex;
   flex-direction: column;
@@ -2370,14 +2382,20 @@ body:has(.app-shell[data-mobile-drawer]) {
     grid-template-columns: 1fr;
   }
 
+  /* single in-flow header grid: row 1 = steps hamburger + build-summary
+     control, row 2 = brand block. No absolute positioning, no reserved
+     padding band. */
   .topbar {
-    position: relative;
-    gap: 14px;
-    padding: 52px 16px 16px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px 14px;
   }
 
   .brand-block {
     display: grid;
+    grid-column: 1 / -1;
+    grid-row: 2;
     gap: 10px;
     justify-items: start;
   }
@@ -2403,20 +2421,25 @@ body:has(.app-shell[data-mobile-drawer]) {
     max-width: calc(100vw - 28px);
   }
 
+  /* compact header pill: mirrors the hamburger's weight on the left —
+     left control opens steps, right control opens the build summary. The
+     running total stays visible at all times. */
   .mobile-summary-bar {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    display: inline-flex;
+    grid-column: 3;
+    grid-row: 1;
     align-items: center;
-    gap: 12px;
-    width: calc(100% - 24px);
-    min-height: 0;
-    margin: 12px auto 0;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 14px 16px;
-    background: var(--panel-strong);
+    justify-self: end;
+    gap: 8px;
+    min-width: 0;
+    min-height: 44px;
+    margin: 0;
+    border: 1px solid var(--control-border);
+    border-radius: 999px;
+    padding: 4px 14px;
+    background: var(--control-bg);
     color: var(--ink);
-    text-align: left;
+    text-align: right;
     letter-spacing: 0;
     text-transform: none;
     box-shadow: none;
@@ -2426,15 +2449,16 @@ body:has(.app-shell[data-mobile-drawer]) {
   .mobile-summary-bar:focus-visible,
   .mobile-summary-bar[aria-expanded="true"] {
     border-color: var(--choice-hover-border);
-    background: var(--choice-hover);
+    background: var(--control-hover);
     color: var(--ink);
     filter: none;
   }
 
   .mobile-summary-total-block {
     display: grid;
-    gap: 2px;
+    gap: 0;
     min-width: 0;
+    justify-items: end;
   }
 
   .mobile-summary-bar strong,
@@ -2445,8 +2469,8 @@ body:has(.app-shell[data-mobile-drawer]) {
   .mobile-summary-bar strong {
     overflow: hidden;
     color: var(--accent);
-    font-size: 20px;
-    line-height: 1.05;
+    font-size: 16px;
+    line-height: 1.1;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -2458,39 +2482,39 @@ body:has(.app-shell[data-mobile-drawer]) {
     font-weight: 800;
   }
 
+  #mobileSummarySelected {
+    display: none;
+  }
+
   .mobile-summary-bar > span:last-child {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    min-width: 36px;
-    min-height: 36px;
-    border: 1px solid var(--control-border);
-    border-radius: 999px;
     padding: 0;
-    background: var(--control-bg);
     color: var(--accent);
     text-align: center;
-    font-size: 20px;
+    font-size: 18px;
     line-height: 1;
     white-space: nowrap;
   }
 
-  .mobile-summary-label {
-    color: var(--accent);
+  .mobile-summary-bar .mobile-summary-label {
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
+    white-space: nowrap;
   }
 
   .mobile-drawer-button {
-    position: absolute;
-    top: 14px;
-    z-index: 1;
+    position: static;
     display: inline-grid;
     place-items: center;
-    width: 36px;
-    min-height: 36px;
+    width: 44px;
+    min-height: 44px;
     padding: 0;
     border: 1px solid var(--control-border);
+    border-radius: 999px;
     background: var(--control-bg);
     color: #cfd3d6;
     font-size: 18px;
@@ -2517,12 +2541,12 @@ body:has(.app-shell[data-mobile-drawer]) {
   }
 
   .mobile-drawer-button-left {
-    left: 16px;
+    grid-column: 1;
+    grid-row: 1;
   }
 
   .mobile-drawer-button-right {
     display: none;
-    right: 16px;
   }
 
   h1 {
@@ -2530,84 +2554,49 @@ body:has(.app-shell[data-mobile-drawer]) {
     line-height: 1.15;
   }
 
+  /* Reset / Download / Submit live in the summary drawer and on the final
+     step at this width — the header keeps only the two drawer controls */
   .toolbar {
-    display: grid;
-    grid-template-columns: 44px 44px minmax(0, 1fr);
-    gap: 8px;
-    justify-content: stretch;
-  }
-
-  .toolbar-action-group {
-    display: contents;
-  }
-
-  .toolbar-build-group {
-    padding-left: 0;
-    border-left: 0;
-  }
-
-  .model-picker {
-    grid-column: 1 / -1;
-  }
-
-  .toolbar button {
-    width: 100%;
-    padding: 0 8px;
-    font-size: 12px;
-    white-space: normal;
-  }
-
-  .toolbar #downloadBuildButton {
-    grid-column: 2;
-  }
-
-  .toolbar #submitDealerButton {
-    grid-column: 3;
-  }
-
-  .toolbar .mobile-drawer-button-right {
     display: none;
   }
 
-  .toolbar #resetButton,
-  .download-icon-button {
-    display: inline-grid;
-    place-items: center;
-    width: 44px;
-    min-width: 44px;
-    padding: 0;
+  .summary-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
   }
 
+  .summary-actions #summarySubmitButton {
+    grid-column: 1 / -1;
+  }
+
+  /* progress row = step counter + Back only; the single forward affordance
+     is the sticky Next footer at the bottom of every step */
   .mobile-progress {
     display: grid;
-    grid-template-columns: minmax(74px, 0.8fr) minmax(0, 1.4fr) minmax(74px, 0.8fr);
+    grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
     gap: 10px;
     order: 1;
     border-bottom: 1px solid var(--hairline);
-    padding: 14px 16px;
+    padding: 12px 16px;
     background: var(--panel);
   }
 
   .mobile-progress[data-has-previous="false"] {
-    grid-template-columns: minmax(0, 1fr) minmax(74px, 0.35fr);
-  }
-
-  .mobile-progress[data-has-next="false"] {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .mobile-progress[data-has-previous="false"] div {
-    grid-column: 1;
-  }
-
-  .mobile-progress[data-has-previous="false"] #mobileNextStep {
-    grid-column: 2;
+  #mobileNextStep {
+    display: none;
   }
 
   .mobile-progress div {
     display: grid;
     gap: 3px;
+    justify-items: end;
+    text-align: right;
   }
 
   .mobile-progress span {
@@ -2622,7 +2611,8 @@ body:has(.app-shell[data-mobile-drawer]) {
   }
 
   .mobile-progress button {
-    width: 100%;
+    width: auto;
+    padding: 0 16px;
   }
 
   .choice-panel {
@@ -2849,6 +2839,14 @@ body:has(.app-shell[data-mobile-drawer]) {
     padding: 12px 16px;
     border-top: 1px solid var(--hairline);
     background: var(--panel);
+  }
+
+  .setup-step-footer {
+    display: flex;
+  }
+
+  .vehicle-setup-next-action {
+    display: none;
   }
 
   .step-footer button {

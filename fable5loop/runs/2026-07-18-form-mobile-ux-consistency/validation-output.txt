@@ -1,0 +1,18 @@
+== node --test tests/stingray-form-regression.test.mjs ==
+ℹ tests 89
+ℹ pass 89
+ℹ fail 0
+== node --test tests/multi-model-runtime-switching.test.mjs ==
+ℹ tests 47
+ℹ pass 47
+ℹ fail 0
+== git status -- form-output form-app (generated churn check) ==
+ M form-app/app.js
+ M form-app/index.html
+ M form-app/styles.css
+== git diff --stat ==
+ form-app/app.js                         |  53 +++++++++-
+ form-app/index.html                     |  22 ++--
+ form-app/styles.css                     | 172 ++++++++++++++++----------------
+ tests/stingray-form-regression.test.mjs |  33 ++++--
+ 4 files changed, 172 insertions(+), 108 deletions(-)
