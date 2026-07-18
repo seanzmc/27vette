@@ -362,7 +362,8 @@ All tests must isolate temporary workbooks, databases, receipts, and edit logs. 
 
 This section is updated in place as work completes. It is not a prompt to create another closure document.
 
-- Phase 1 — pending implementation authorization.
+- Phase 1 — Task 1 snapshot reconciliation completed and independently verified
+  on 2026-07-18 (`121 tests and 4 subtests passed`); Tasks 2-7 remain pending.
 - Phase 2 — blocked by Phase 1, independent Milestone 3 verification, current-input rebuild, explicit interpretation ratification, and live-write approval.
 - Phase 3 — blocked by successful three-model workbook integration and shared-service stability.
 - Runtime publication/promotion — separate approval after Phase 2.

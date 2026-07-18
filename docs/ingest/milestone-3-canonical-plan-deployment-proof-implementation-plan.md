@@ -266,4 +266,6 @@ Final temporary-workbook report SHA-256 `eaf105124604487767f31574739f7b5cd0c5cc1
 
 Parent gates: 254 focused tests plus 18 subtests passed; Node passed 275/275; workbook package/schema validators passed with zero issues; the full Python suite passed 706 tests plus 25 subtests with two skips and the four separately owned failures already recorded in `fable5loop/STATE.md`. Protected workbook, raw source, publication bundle, and live runtime-contract hashes remained unchanged after generated timestamp churn was restored. No `write-approval.json`, live workbook write, runtime publication, model promotion, deployment, or dealer change occurred.
 
-Independent final verification remains the only open acceptance item.
+Task 1 snapshot reconciliation was independently verified on 2026-07-18 with
+`121 tests and 4 subtests passed`. Full Milestone 3 independent final acceptance
+remains open; this Task 1 verification does not authorize or begin Task 2.

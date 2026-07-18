@@ -80,7 +80,7 @@ Tests:
 - Consumes: current manifest, plan, dry-run, compile report, exception resolutions, and protected-surface hashes.
 - Produces: one documented set of authoritative hashes/counts used by Task 5's equivalence test.
 
-- [ ] **Step 1: Capture exact-current artifact hashes and counts without writing files**
+- [x] **Step 1: Capture exact-current artifact hashes and counts without writing files**
 
 ```sh
 shasum -a 256 \
@@ -97,7 +97,7 @@ jq '.coverage | {manifestRows:(.manifestRows|length), noops:(.noops|length), unc
 
 Expected current characterization before independent reconciliation: manifest SHA `b3e32dea5afeaf10eb6296d82283ff844403a80da1f3659b6ad20d5d0409926f`; 3,719 plan operations, including nine sheet creations; 6,408 covered manifest rows; 2,699 no-op receipts; zero uncovered rows.
 
-- [ ] **Step 2: Run the exact-current independent verification lane**
+- [x] **Step 2: Run the exact-current independent verification lane**
 
 ```sh
 PYTHONPATH=scripts .venv/bin/python -m pytest \
@@ -109,15 +109,15 @@ PYTHONPATH=scripts .venv/bin/python -m pytest \
 
 Expected: PASS. If the verifier reproduces different artifacts or any protected hash changes, stop under the approved spec instead of updating documentation.
 
-- [ ] **Step 3: Reconcile the closeout text to the verified snapshot**
+- [x] **Step 3: Reconcile the closeout text to the verified snapshot**
 
 Update the Milestone 3 completion record with the verified file hashes, operation counts, no-op counts, named nine sheet creations, and separately identified inactive Grand Sport X promotion scaffold. Remove the superseded 3,692/3,643/2,725 claims rather than keeping both snapshots.
 
-- [ ] **Step 4: Record the frozen snapshot binding in the owner spec**
+- [x] **Step 4: Record the frozen snapshot binding in the owner spec**
 
 Replace the characterization paragraph with the exact verified hashes/counts and state that Task 5 must reproduce the same semantic projection from the manifest.
 
-- [ ] **Step 5: Validate and commit the reconciliation**
+- [x] **Step 5: Validate and commit the reconciliation**
 
 ```sh
 git diff --check
@@ -129,6 +129,14 @@ git commit -m "docs: freeze authoritative ingest projection evidence"
 ```
 
 Expected: one docs-only commit; no run artifact or product file staged.
+
+**Task 1 verification receipt (2026-07-18):** Completed in commit `ecd4381`
+and independently reverified against the committed artifact set. The focused
+lane passed `121 tests and 4 subtests`; all five protected artifact hashes,
+projection counts, nine GSX sheet creations, inactive `grand_sport_x`
+promotion scaffold, and readback proof matched the frozen documentation. The
+verification left the worktree clean and did not modify product files or ingest
+run artifacts.
 
 ### Task 2: Extract the shared workbook registry without semantic changes
 
