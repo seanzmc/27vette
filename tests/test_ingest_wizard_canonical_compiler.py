@@ -2290,6 +2290,123 @@ class CanonicalCompilerTest(unittest.TestCase):
             self.assertEqual(len(ledger_entries), 1)
             self.assertEqual(ledger_entries[0]["disposition"], "resolved_not_applicable")
 
+    def test_mark_not_applicable_updates_comparator_evidence_disposition(self) -> None:
+        evidence_id = "comparator:direct_rule:variant-scoped"
+        subject = compiler_module._typed_exception(
+            "zr1",
+            "rule_mapping",
+            "comparator_only_relationship_proposal",
+            ["PBC", "requires", "ZZ3"],
+            [],
+            evidence_references=[evidence_id],
+            proposed_rows=[
+                {
+                    "sourceRpo": "PBC",
+                    "ruleType": "requires",
+                    "targetRpo": "ZZ3",
+                    "bodyStyleScope": "*",
+                    "trimLevelScope": "*",
+                    "variantScope": "*",
+                }
+            ],
+            allowed_actions=["choose_relationship", "mark_not_applicable"],
+            question="Confirm or reject this comparator relationship.",
+        )
+        resolution = {
+            "subjectId": subject["subjectId"],
+            "subjectVersion": subject["subjectVersion"],
+            "action": "mark_not_applicable",
+            "payload": {"reason": "The target status matrix makes the rule unnecessary."},
+            "disposition": "resolved_not_applicable",
+        }
+        relationship_result = {
+            "rows": [],
+            "exceptions": [subject],
+            "dispositions": [
+                {
+                    "featureId": "derived:relationship:proposal",
+                    "evidenceIds": [evidence_id],
+                    "disposition": "proposed_exception",
+                }
+            ],
+        }
+
+        _, _, consumed, overrides = compiler_module._relationship_rows(
+            {"sheets": {"zr1_rule_mapping": {"headers": [], "rows": []}}},
+            "zr1",
+            {"rule_mapping_sheet": {"sheetName": "zr1_rule_mapping", "headers": []}},
+            {},
+            set(),
+            set(),
+            relationship_result,
+            [resolution],
+        )
+
+        self.assertIn(subject["subjectId"], consumed)
+        self.assertEqual(overrides[evidence_id], "resolved_not_applicable")
+        self.assertEqual(
+            overrides["derived:relationship:proposal"],
+            "resolved_not_applicable",
+        )
+
+    def test_comparator_coverage_disposition_is_scoped_by_target(self) -> None:
+        evidence_id = "comparator:direct_rule:shared"
+        relationship_dispositions = [
+            {
+                "featureId": evidence_id,
+                "model": "zr1",
+                "evidenceIds": [evidence_id],
+                "disposition": "resolved_not_applicable",
+            },
+            {
+                "featureId": evidence_id,
+                "model": "zr1x",
+                "evidenceIds": [evidence_id],
+                "disposition": "proposed_exception",
+            },
+        ]
+        comparator_artifact = {
+            "targets": {
+                model: {
+                    "facts": [
+                        {
+                            "evidenceId": evidence_id,
+                            "factType": "direct_rule",
+                        }
+                    ]
+                }
+                for model in ("zr1", "zr1x")
+            }
+        }
+
+        ledger = compiler_module._source_feature_ledger(
+            ["zr1", "zr1x"],
+            {"candidates": [], "skippedRows": []},
+            {"priceRows": [], "baseModelPriceRows": [], "skippedPriceRows": []},
+            {"roles": {}},
+            {"sheets": []},
+            {},
+            relationship_dispositions,
+            comparator_artifact,
+            set(),
+            set(),
+            set(),
+            set(),
+            set(),
+            set(),
+            {},
+            {},
+        )
+        dispositions = {
+            item["model"]: item["disposition"]
+            for item in ledger
+            if evidence_id in item["evidenceIds"]
+            and item["featureId"].startswith("comparator:")
+        }
+
+        self.assertEqual(dispositions["zr1"], "resolved_not_applicable")
+        self.assertEqual(dispositions["zr1x"], "exception_open")
+
     def test_choose_relationship_replaces_uses_canonical_excludes_runtime_action(self) -> None:
         option_payload, price_payload, join_report, first, subject = (
             self.compile_with_ready_comparator_relationship()

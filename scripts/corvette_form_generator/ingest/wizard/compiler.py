@@ -1728,10 +1728,22 @@ def _relationship_rows(
         if option_id
     }
     known_feature_ids = {
-        str(item.get("featureId") or "")
+        str(feature_id)
         for item in relationship_result.get("dispositions") or []
-        if str(item.get("featureId") or "")
+        for feature_id in [
+            item.get("featureId"),
+            *(item.get("evidenceIds") or []),
+        ]
+        if str(feature_id or "")
     }
+    feature_ids_by_evidence: dict[str, set[str]] = defaultdict(set)
+    for item in relationship_result.get("dispositions") or []:
+        feature_id = str(item.get("featureId") or "")
+        if not feature_id:
+            continue
+        for evidence_id in item.get("evidenceIds") or []:
+            if str(evidence_id or ""):
+                feature_ids_by_evidence[str(evidence_id)].add(feature_id)
 
     def current_resolution(subject: Mapping[str, Any]) -> dict[str, Any] | None:
         matches = resolutions_by_subject.get(str(subject.get("subjectId") or ""), [])
@@ -1747,6 +1759,8 @@ def _relationship_rows(
             reference = str(reference)
             if reference in known_feature_ids:
                 disposition_overrides[reference] = disposition
+            for feature_id in feature_ids_by_evidence.get(reference, set()):
+                disposition_overrides[feature_id] = disposition
 
     def emit_rule(
         *,
@@ -2536,12 +2550,15 @@ def _source_feature_ledger(
     for row in sorted(price_payload.get("skippedPriceRows") or [], key=semantic_hash):
         ledger.append({"featureId": f"skipped-price:{semantic_hash(row)}", "model": "*", "family": "price_rules", "disposition": "unsupported_blocker", "evidenceIds": [f"{row.get('sheetName')}:{row.get('rowIndex')}"]})
     relationship_dispositions = list(relationship_dispositions)
-    comparator_effects: dict[str, str] = {}
+    comparator_effects: dict[tuple[str, str], str] = {}
     for disposition in relationship_dispositions:
         feature_id = str(disposition.get("featureId") or "")
         if feature_id.startswith("comparator:"):
+            model = str(disposition.get("model") or "*")
             for evidence_id in disposition.get("evidenceIds") or []:
-                comparator_effects[str(evidence_id)] = str(disposition.get("disposition") or "")
+                comparator_effects[(model, str(evidence_id))] = str(
+                    disposition.get("disposition") or ""
+                )
             continue
         model = str(disposition.get("model") or "*")
         evidence_ids = list(disposition.get("evidenceIds") or [])
@@ -2555,7 +2572,7 @@ def _source_feature_ledger(
         )
         ledger.append({"featureId": f"relationship:{model}:{disposition.get('featureId')}", "model": model, "family": "rule_mapping", "disposition": _source_disposition(relationship_disposition), "evidenceIds": evidence_ids})
     comparator_exception_ids = {
-        evidence_id
+        (str(disposition.get("model") or "*"), evidence_id)
         for disposition in relationship_dispositions
         if disposition.get("disposition") == "proposed_exception"
         for evidence_id in disposition.get("evidenceIds") or []
@@ -2564,11 +2581,12 @@ def _source_feature_ledger(
     for target, entry in sorted((comparator_artifact.get("targets") or {}).items()):
         for fact in entry.get("facts") or []:
             evidence_id = str(fact.get("evidenceId") or "")
+            effect_key = (target, evidence_id)
             disposition = (
-                _source_disposition(comparator_effects[evidence_id])
-                if evidence_id in comparator_effects
+                _source_disposition(comparator_effects[effect_key])
+                if effect_key in comparator_effects
                 else "exception_open"
-                if evidence_id in comparator_exception_ids
+                if effect_key in comparator_exception_ids
                 else "resolved_not_applicable"
             )
             ledger.append({"featureId": f"comparator:{target}:{evidence_id}", "model": target, "family": fact.get("factType"), "disposition": disposition, "evidenceIds": [evidence_id]})
