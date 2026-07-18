@@ -1,0 +1,1310 @@
+# Ingest Separation, Three-Model Integration, and Editor Consolidation Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Replace the overlapping ingest/editor write paths with one five-function ingest module, one shared `workbook-changeset-1` service, a verified Grand Sport X/ZR1/ZR1X workbook integration, and one final editor UI.
+
+**Architecture:** Ingest ends after emitting an immutable ChangeSet. A shared workbook-domain package owns registry metadata, strict ChangeSet parsing, preview, approval, guarded apply, rollback, and receipts. The existing editor and then the Workbook Manager consume that service; SQLite remains a disposable projection and journal, never canonical product data.
+
+**Tech Stack:** Python 3, `openpyxl`, standard-library JSON/hash/dataclasses/SQLite/HTTP, existing Preact workbook editor, existing React/Vite Workbook Manager, pytest/unittest, Node test runner. Add no dependencies.
+
+## Global Constraints
+
+- `stingray_master.xlsx` remains the canonical product/business source.
+- Ingest owns only raw intake, profiling/target selection, canonical compilation, typed exception resolution, and ChangeSet emission.
+- Ingest may not approve or perform workbook writes, generation, publication, promotion, deployment, or dealer submission.
+- Use one schema named `workbook-changeset-1`; do not retain `pass-c-3` as a parallel production write contract.
+- Preserve compiler keys, values, actions, stable IDs, evidence bindings, and semantic signatures.
+- Add no dependency, workbook schema, generated contract, dealer change, or deployment-path change without separate approval.
+- Keep historical Pass B/C/D.2 artifacts GET-only; current sessions may not enter or mutate their states.
+- Keep the existing editor available until the Manager passes complete writable-surface parity.
+- Every temporary workbook, database, receipt, and audit log must be isolated from tracked product/audit files.
+- Phase 1 performs no live canonical-workbook write.
+- Phase 2 stops for explicit approval before the one live workbook write.
+- Runtime publication/promotion remains separate from workbook integration.
+- Update the approved owner spec in place; do not create per-task milestone/spec documents.
+
+## Planned File Ownership
+
+New shared package:
+
+- `scripts/corvette_form_generator/workbook_domain/registry.py` — sole declarative workbook family/key/type/enum/reference registry.
+- `scripts/corvette_form_generator/workbook_domain/changeset.py` — `workbook-changeset-1` normalization, parsing, fingerprints, and editor-batch conversion.
+- `scripts/corvette_form_generator/workbook_domain/service.py` — preview, approval, guarded apply, rollback, and receipt creation.
+- `scripts/corvette_form_generator/workbook_domain/deployment_proof.py` — temporary generation/registry/runtime-contract proof relocated out of ingest.
+- `scripts/corvette_form_generator/workbook_domain/__init__.py` — narrow public exports only.
+- `scripts/apply_workbook_changeset.py` — shared operator CLI; preview by default, explicit approval artifact, explicit `--write` consumption.
+
+Ingest:
+
+- `scripts/corvette_form_generator/ingest/wizard/changeset_emitter.py` — pure canonical-manifest-to-ChangeSet projection.
+- `scripts/corvette_form_generator/ingest/wizard/session.py` — current intake/profile/compile/exception/emit orchestration only after extraction.
+- `scripts/corvette_form_generator/ingest/wizard/legacy_reader.py` — GET-only historical artifact reader.
+- `scripts/ingest_wizard_server.py` and `visualizer/ingest-wizard/` — only the five current functions plus read-only historical display.
+
+Editor transition:
+
+- `scripts/corvette_form_generator/editor_ops.py` — compatibility adapter over shared registry plus the existing operation engine until all consumers move.
+- `scripts/workbook_editor_server.py` and `visualizer/workbook-editor/editor.js` — existing fallback editor; remove normal Ingest Review navigation.
+- `workbook-manager/backend/app/` — disposable projection, ChangeSet journal, and shared-service API adapters.
+- `workbook-manager/frontend/src/` — final editor UI over the shared API.
+
+Tests:
+
+- `tests/test_workbook_domain_registry.py`
+- `tests/test_workbook_changeset.py`
+- `tests/test_workbook_changeset_service.py`
+- `tests/test_ingest_wizard_changeset.py`
+- Existing ingest/editor/Manager tests named in each task.
+
+## Operator Summary
+
+- Tasks 1–7 establish the shared contract and separate ingest. They never write the canonical workbook.
+- Task 8 rebuilds and proves one exact-current three-model ChangeSet, then stops for Sean's approval.
+- Task 9 is the single approved workbook integration and regeneration task.
+- Tasks 10–13 convert the Manager into the one editor and retire the fallback only after parity.
+- No task publishes or promotes the three models publicly; that remains a separate decision after workbook integration.
+
+---
+
+## Phase 1 — Separate ingest and establish the shared path
+
+### Task 1: Freeze one authoritative Milestone 3 snapshot
+
+**Files:**
+- Modify: `docs/ingest/milestone-3-canonical-plan-deployment-proof-implementation-plan.md`
+- Modify: `docs/ingest/ingest-separation-model-integration-editor-consolidation-spec.md`
+- Inspect only: `form-output/ingest-wizard/20260717-091317-470292/`
+
+**Interfaces:**
+- Consumes: current manifest, plan, dry-run, compile report, exception resolutions, and protected-surface hashes.
+- Produces: one documented set of authoritative hashes/counts used by Task 5's equivalence test.
+
+- [ ] **Step 1: Capture exact-current artifact hashes and counts without writing files**
+
+```sh
+shasum -a 256 \
+  form-output/ingest-wizard/20260717-091317-470292/canonical-row-manifest.json \
+  form-output/ingest-wizard/20260717-091317-470292/apply-plan.json \
+  form-output/ingest-wizard/20260717-091317-470292/apply-plan-dryrun.json \
+  form-output/ingest-wizard/20260717-091317-470292/compile-report.json \
+  form-output/ingest-wizard/20260717-091317-470292/exception-resolutions.json
+jq '[.stage1.items[],.stage2.items[]] | {total:length, creates:(map(select(.action=="create_sheet"))|length), rows:(map(select(.action!="create_sheet"))|length)}' \
+  form-output/ingest-wizard/20260717-091317-470292/apply-plan.json
+jq '.coverage | {manifestRows:(.manifestRows|length), noops:(.noops|length), uncovered:(.uncoveredManifestRows|length)}' \
+  form-output/ingest-wizard/20260717-091317-470292/apply-plan.json
+```
+
+Expected current characterization before independent reconciliation: manifest SHA `b3e32dea5afeaf10eb6296d82283ff844403a80da1f3659b6ad20d5d0409926f`; 3,719 plan operations, including nine sheet creations; 6,408 covered manifest rows; 2,699 no-op receipts; zero uncovered rows.
+
+- [ ] **Step 2: Run the exact-current independent verification lane**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest \
+  tests/test_ingest_wizard_plan.py \
+  tests/test_ingest_wizard_apply.py \
+  tests/test_ingest_wizard_compiler_session.py \
+  tests/test_ingest_wizard_exception_flow.py -q
+```
+
+Expected: PASS. If the verifier reproduces different artifacts or any protected hash changes, stop under the approved spec instead of updating documentation.
+
+- [ ] **Step 3: Reconcile the closeout text to the verified snapshot**
+
+Update the Milestone 3 completion record with the verified file hashes, operation counts, no-op counts, named nine sheet creations, and separately identified inactive Grand Sport X promotion scaffold. Remove the superseded 3,692/3,643/2,725 claims rather than keeping both snapshots.
+
+- [ ] **Step 4: Record the frozen snapshot binding in the owner spec**
+
+Replace the characterization paragraph with the exact verified hashes/counts and state that Task 5 must reproduce the same semantic projection from the manifest.
+
+- [ ] **Step 5: Validate and commit the reconciliation**
+
+```sh
+git diff --check
+git diff -- docs/ingest/milestone-3-canonical-plan-deployment-proof-implementation-plan.md \
+  docs/ingest/ingest-separation-model-integration-editor-consolidation-spec.md
+git add docs/ingest/milestone-3-canonical-plan-deployment-proof-implementation-plan.md \
+  docs/ingest/ingest-separation-model-integration-editor-consolidation-spec.md
+git commit -m "docs: freeze authoritative ingest projection evidence"
+```
+
+Expected: one docs-only commit; no run artifact or product file staged.
+
+### Task 2: Extract the shared workbook registry without semantic changes
+
+**Files:**
+- Create: `scripts/corvette_form_generator/workbook_domain/__init__.py`
+- Create: `scripts/corvette_form_generator/workbook_domain/registry.py`
+- Modify: `scripts/corvette_form_generator/editor_ops.py:41-299`
+- Create: `tests/test_workbook_domain_registry.py`
+- Modify: `tests/test_editor_ops_meta.py`
+- Modify: `tests/test_editor_ops_global_families.py`
+
+**Interfaces:**
+- Consumes: current `SOURCE_ROLE_FAMILIES`, `EDITOR_SHEET_META`, `GLOBAL_SHEET_FAMILIES`, and live `model_workbook_sources` rows.
+- Produces: `family_spec(name)`, `registered_sheet_families(extract)`, and compatibility aliases imported by `editor_ops`.
+
+- [ ] **Step 1: Write failing registry identity and resolution tests**
+
+```python
+from corvette_form_generator import editor_ops
+from corvette_form_generator.workbook_domain.registry import (
+    EDITOR_SHEET_META,
+    GLOBAL_SHEET_FAMILIES,
+    SOURCE_ROLE_FAMILIES,
+    family_spec,
+    registered_sheet_families,
+)
+
+
+def test_editor_ops_uses_shared_registry_objects():
+    assert editor_ops.EDITOR_SHEET_META is EDITOR_SHEET_META
+    assert editor_ops.GLOBAL_SHEET_FAMILIES is GLOBAL_SHEET_FAMILIES
+    assert editor_ops.SOURCE_ROLE_FAMILIES is SOURCE_ROLE_FAMILIES
+
+
+def test_registered_sheet_families_uses_live_workbook_rows():
+    extract = {
+        "sheets": {
+            "model_workbook_sources": {
+                "rows": [{
+                    "model_key": "demo",
+                    "source_role": "source_option_sheet",
+                    "sheet_name": "demo_options",
+                    "active": True,
+                }]
+            }
+        }
+    }
+    assert registered_sheet_families(extract)["demo_options"] == "options"
+    assert family_spec("options")["key"] == ("option_id",)
+```
+
+- [ ] **Step 2: Run the tests and verify the module is absent**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_workbook_domain_registry.py -q
+```
+
+Expected: FAIL with `ModuleNotFoundError: corvette_form_generator.workbook_domain`.
+
+- [ ] **Step 3: Move the exact registry literals and add narrow accessors**
+
+`registry.py` must contain the current literal definitions unchanged plus:
+
+```python
+def family_spec(name: str) -> dict:
+    try:
+        return EDITOR_SHEET_META[name]
+    except KeyError as exc:
+        raise KeyError(f"Unknown workbook family: {name}") from exc
+
+
+def registered_sheet_families(extract: dict) -> dict[str, str]:
+    result = dict(GLOBAL_SHEET_FAMILIES)
+    rows = extract.get("sheets", {}).get("model_workbook_sources", {}).get("rows", [])
+    for row in rows:
+        if not workbook_truthy(row.get("active")):
+            continue
+        family = SOURCE_ROLE_FAMILIES.get(str(row.get("source_role") or ""))
+        sheet = str(row.get("sheet_name") or "")
+        if family and sheet:
+            result[sheet] = family
+    return result
+```
+
+Import `workbook_truthy` from `corvette_form_generator.workbook`. In `editor_ops.py`, delete the three literal blocks and import/re-export the exact objects from `workbook_domain.registry`.
+
+- [ ] **Step 4: Run registry and existing editor metadata tests**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest \
+  tests/test_workbook_domain_registry.py \
+  tests/test_editor_ops_meta.py \
+  tests/test_editor_ops_global_families.py \
+  tests/test_editor_ops_apply.py -q
+```
+
+Expected: PASS with no changed validation behavior.
+
+- [ ] **Step 5: Commit the semantic-preserving extraction**
+
+```sh
+git diff --check
+git add scripts/corvette_form_generator/workbook_domain \
+  scripts/corvette_form_generator/editor_ops.py \
+  tests/test_workbook_domain_registry.py \
+  tests/test_editor_ops_meta.py \
+  tests/test_editor_ops_global_families.py
+git commit -m "refactor: centralize workbook domain registry"
+```
+
+### Task 3: Implement the immutable `workbook-changeset-1` contract
+
+**Files:**
+- Create: `scripts/corvette_form_generator/workbook_domain/changeset.py`
+- Modify: `scripts/corvette_form_generator/workbook_domain/__init__.py`
+- Create: `tests/test_workbook_changeset.py`
+
+**Interfaces:**
+- Consumes: workbook registry and extracted workbook rows.
+- Produces: `ChangeSetError`, `canonical_json(value)`, `changeset_fingerprint(payload)`, `parse_changeset(payload)`, and `changeset_to_editor_batch(changeset, extract)`.
+
+- [ ] **Step 1: Write failing fingerprint, parsing, delta, and stale-before tests**
+
+```python
+import copy
+import pytest
+
+from corvette_form_generator.workbook_domain.changeset import (
+    ChangeSetError,
+    changeset_fingerprint,
+    changeset_to_editor_batch,
+    parse_changeset,
+)
+
+
+def sample_changeset():
+    payload = {
+        "schemaVersion": "workbook-changeset-1",
+        "source": {"kind": "editor", "runId": "test-run"},
+        "targets": ["stingray"],
+        "workbook": {"sha256": "a" * 64, "mtimeNs": "123"},
+        "sheetCreates": [],
+        "rowChanges": [{
+            "action": "update",
+            "sheet": "stingray_options",
+            "family": "options",
+            "key": {"option_id": "opt_1"},
+            "fields": {"price": {"before": 100, "after": 200}},
+            "provenance": [{"kind": "editor", "id": "field:price"}],
+        }],
+        "noops": [],
+        "warningAcknowledgementsRequested": [],
+        "bindings": {},
+    }
+    payload["semanticFingerprint"] = changeset_fingerprint(payload)
+    payload["changeSetId"] = payload["semanticFingerprint"][:24]
+    return payload
+
+
+def test_fingerprint_ignores_mapping_order_but_not_semantics():
+    payload = sample_changeset()
+    reordered = copy.deepcopy(payload)
+    reordered["source"] = {"runId": "test-run", "kind": "editor"}
+    assert changeset_fingerprint(reordered) == payload["semanticFingerprint"]
+    reordered["rowChanges"][0]["fields"]["price"]["after"] = 201
+    assert changeset_fingerprint(reordered) != payload["semanticFingerprint"]
+
+
+def test_update_emits_only_changed_fields_and_checks_before_value():
+    parsed = parse_changeset(sample_changeset())
+    extract = {"sheets": {"stingray_options": {
+        "headers": ["option_id", "price"],
+        "rows": [{"option_id": "opt_1", "price": 100}],
+    }}}
+    batch = changeset_to_editor_batch(parsed, extract)
+    assert batch["items"] == [{
+        "action": "update",
+        "sheet": "stingray_options",
+        "key": {"option_id": "opt_1"},
+        "row": {"price": 200},
+    }]
+    extract["sheets"]["stingray_options"]["rows"][0]["price"] = 150
+    with pytest.raises(ChangeSetError, match="before value"):
+        changeset_to_editor_batch(parsed, extract)
+```
+
+- [ ] **Step 2: Run the new tests and verify the contract is absent**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_workbook_changeset.py -q
+```
+
+Expected: FAIL importing `workbook_domain.changeset`.
+
+- [ ] **Step 3: Implement strict normalization and parsing**
+
+Use canonical JSON `json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)` and SHA-256. Exclude only `changeSetId` and `semanticFingerprint` from the fingerprint input. Reject unknown top-level and row-change fields, duplicate row keys, unchanged field pairs, missing provenance, invalid actions, family/key disagreement, non-64-character workbook SHA, non-string mtime, unsorted/duplicate targets, and a stored fingerprint/ID mismatch.
+
+The public return of `parse_changeset()` is a deep-copied normalized dict; it never mutates caller data.
+
+- [ ] **Step 4: Implement field-delta conversion**
+
+`changeset_to_editor_batch()` must:
+
+- convert each `sheetCreates` entry to `create_sheet`;
+- require updates/deletes to match exact current before values;
+- require adds to be absent by canonical key;
+- emit update `row` values only for changed fields;
+- emit full after values for adds and no `row` for deletes;
+- set `workbookMtimeNs` from the immutable ChangeSet; and
+- set `workbookSha256` from the immutable ChangeSet; and
+- exclude no-op receipts from mutations.
+
+- [ ] **Step 5: Run contract and editor validation tests**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest \
+  tests/test_workbook_changeset.py \
+  tests/test_editor_ops_apply.py -q
+```
+
+Expected: PASS.
+
+- [ ] **Step 6: Commit the contract**
+
+```sh
+git diff --check
+git add scripts/corvette_form_generator/workbook_domain/changeset.py \
+  scripts/corvette_form_generator/workbook_domain/__init__.py \
+  tests/test_workbook_changeset.py
+git commit -m "feat: add shared workbook changeset contract"
+```
+
+### Task 4: Add the shared service and close writer race/rollback failures
+
+**Files:**
+- Create: `scripts/corvette_form_generator/workbook_domain/service.py`
+- Modify: `scripts/corvette_form_generator/workbook_domain/__init__.py`
+- Modify: `scripts/corvette_form_generator/editor_ops.py:1460-1640`
+- Modify: `scripts/corvette_form_generator/workbook.py:98-148`
+- Create: `scripts/apply_workbook_changeset.py`
+- Create: `tests/test_workbook_changeset_service.py`
+- Modify: `tests/test_editor_ops_apply.py:916-1055`
+
+**Interfaces:**
+- Consumes: parsed ChangeSet and current workbook path.
+- Produces: `preview_changeset()`, `approve_changeset()`, `apply_changeset()`, `restore_workbook_backup()`, and CLI preview/approval/write receipts.
+
+- [ ] **Step 1: Write failing drift and rollback fault-injection tests**
+
+```python
+def test_live_apply_rechecks_original_reviewed_fingerprint(tmp_path, monkeypatch):
+    workbook = make_workbook(tmp_path)
+    changeset = make_valid_changeset(workbook)
+    preview = preview_changeset(workbook, changeset)
+    approval = approve_changeset(changeset, preview, actor="Sean", warning_ids=[])
+
+    original_prepare = editor_ops._prepare_batch
+    def mutate_after_prepare(extract, batch):
+        result = original_prepare(extract, batch)
+        workbook.touch()
+        return result
+    monkeypatch.setattr(editor_ops, "_prepare_batch", mutate_after_prepare)
+
+    receipt = apply_changeset(workbook, changeset, preview, approval)
+    assert receipt["status"] == "stale_before_save"
+    assert receipt["workbookState"] == "untouched"
+
+
+def test_failed_live_readback_restores_and_verifies_backup(tmp_path, monkeypatch):
+    workbook = make_workbook(tmp_path)
+    before = workbook.read_bytes()
+    changeset = make_valid_changeset(workbook)
+    preview = preview_changeset(workbook, changeset)
+    approval = approve_changeset(changeset, preview, actor="Sean", warning_ids=[])
+    monkeypatch.setattr(editor_ops, "verify_prepared_workbook", lambda *_: {
+        "ok": False, "preparedChecked": 0, "preparedCount": 1, "errors": ["forced"],
+    })
+
+    receipt = apply_changeset(workbook, changeset, preview, approval)
+    assert receipt["status"] == "apply_verification_failed_rolled_back"
+    assert receipt["workbookState"] == "restored"
+    assert workbook.read_bytes() == before
+```
+
+Use existing workbook fixture helpers from `tests/test_editor_ops_apply.py`; do not introduce a new workbook generator dependency.
+
+Define the helpers in `tests/test_workbook_changeset_service.py`:
+
+```python
+import hashlib
+from test_editor_ops_apply import build_ops_fixture
+from corvette_form_generator.workbook_domain.changeset import changeset_fingerprint
+
+
+def make_workbook(tmp_path):
+    path = tmp_path / "fixture.xlsx"
+    build_ops_fixture().save(path)
+    return path
+
+
+def make_valid_changeset(path):
+    payload = {
+        "schemaVersion": "workbook-changeset-1",
+        "source": {"kind": "editor", "runId": "service-test"},
+        "targets": ["stingray"],
+        "workbook": {
+            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+            "mtimeNs": str(path.stat().st_mtime_ns),
+        },
+        "sheetCreates": [],
+        "rowChanges": [{
+            "action": "update",
+            "sheet": "stingray_options",
+            "family": "options",
+            "key": {"option_id": "opt_one_001"},
+            "fields": {"price": {"before": 100, "after": 101}},
+            "provenance": [{"kind": "editor", "id": "service-test:price"}],
+        }],
+        "noops": [],
+        "warningAcknowledgementsRequested": [],
+        "bindings": {},
+    }
+    payload["semanticFingerprint"] = changeset_fingerprint(payload)
+    payload["changeSetId"] = payload["semanticFingerprint"][:24]
+    return payload
+```
+
+- [ ] **Step 2: Run the fault tests and verify they fail against current behavior**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest \
+  tests/test_workbook_changeset_service.py \
+  tests/test_editor_ops_apply.py::ApplyBatchTest::test_tampered_live_save_exposes_apply_verification_failed -q
+```
+
+Expected: FAIL because the service is absent and the current writer does not restore.
+
+- [ ] **Step 3: Preserve the reviewed workbook identity through save**
+
+At `apply_batch()` entry, capture both expected mtime and SHA-256 from the batch/ChangeSet. Immediately before loading for live mutation and again immediately before `save_workbook_safely()`, require the same mtime and SHA. Pass the original reviewed mtime—not a newly accepted mtime—to the safe saver.
+
+Return `stale_before_save` with `workbookState: "untouched"` when either comparison differs.
+
+- [ ] **Step 4: Add verified restoration**
+
+Implement in `workbook.py`:
+
+```python
+def restore_workbook_backup(path: Path, backup_path: Path) -> None:
+    path = Path(path)
+    backup_path = Path(backup_path)
+    assert_valid_workbook_package(backup_path)
+    with tempfile.NamedTemporaryFile(
+        prefix=f"{path.stem}-restore-", suffix=path.suffix,
+        delete=False, dir=path.parent,
+    ) as handle:
+        restore_tmp = Path(handle.name)
+    try:
+        shutil.copy2(backup_path, restore_tmp)
+        assert_valid_workbook_package(restore_tmp)
+        check = load_workbook(restore_tmp, read_only=True, data_only=True)
+        check.close()
+        restore_tmp.replace(path)
+    finally:
+        restore_tmp.unlink(missing_ok=True)
+```
+
+On failed live readback, call this helper, reopen/rehash the restored workbook, and return `apply_verification_failed_rolled_back` only after restoration matches the backup. If restoration cannot be verified, raise a hard `workbook_restore_failed` result containing both paths and do not claim the workbook is safe.
+
+- [ ] **Step 5: Implement immutable preview, approval, and receipt binding**
+
+`preview_changeset()` calls `parse_changeset()`, verifies workbook SHA/mtime, converts to an editor batch, and calls `apply_batch(write=False)`. `approve_changeset()` requires a passing preview and returns `workbook-change-approval-1`. `apply_changeset()` requires exact ChangeSet/preview/approval/workbook fingerprints and calls `apply_batch(write=True)` once. All three return JSON-serializable dicts.
+
+- [ ] **Step 6: Add the shared CLI**
+
+The CLI contract is:
+
+```sh
+.venv/bin/python scripts/apply_workbook_changeset.py change-set.json --workbook stingray_master.xlsx --preview-out preview.json
+.venv/bin/python scripts/apply_workbook_changeset.py change-set.json --workbook stingray_master.xlsx --approve Sean --preview preview.json --approval-out approval.json
+.venv/bin/python scripts/apply_workbook_changeset.py change-set.json --workbook stingray_master.xlsx --write --preview preview.json --approval approval.json --receipt-out receipt.json
+```
+
+Preview is the default. `--approve` never writes. `--write` refuses without both exact bound files. Output paths are explicit; tests use temporary directories and never the tracked edit log.
+
+- [ ] **Step 7: Run the service, editor, package, and schema gates**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest \
+  tests/test_workbook_changeset.py \
+  tests/test_workbook_changeset_service.py \
+  tests/test_editor_ops_apply.py -q
+.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+```
+
+Expected: tests PASS; workbook validators report zero issues/errors/warnings.
+
+- [ ] **Step 8: Commit the shared service and writer repair**
+
+```sh
+git diff --check
+git add scripts/corvette_form_generator/workbook_domain \
+  scripts/corvette_form_generator/editor_ops.py \
+  scripts/corvette_form_generator/workbook.py \
+  scripts/apply_workbook_changeset.py \
+  tests/test_workbook_changeset_service.py \
+  tests/test_editor_ops_apply.py
+git commit -m "fix: unify guarded workbook changeset writes"
+```
+
+### Task 5: Emit an equivalent ChangeSet from the canonical compiler
+
+**Files:**
+- Create: `scripts/corvette_form_generator/ingest/wizard/changeset_emitter.py`
+- Modify: `scripts/corvette_form_generator/ingest/wizard/plan_builder.py`
+- Modify: `scripts/corvette_form_generator/ingest/wizard/session.py:3055-3244`
+- Create: `tests/test_ingest_wizard_changeset.py`
+- Modify: `tests/test_ingest_wizard_plan.py:683-1165`
+- Modify: `tests/test_ingest_wizard_compiler_session.py`
+
+**Interfaces:**
+- Consumes: exact-current canonical manifest, compile report, selection, compiler bindings, exception queue/resolutions, comparator evidence, workbook path, and shared registry.
+- Produces: `emit_manifest_changeset(...) -> dict` and `WizardSessionStore.emit_changeset(run_id) -> dict`.
+
+- [ ] **Step 1: Write failing exact projection and coverage tests**
+
+```python
+def test_manifest_emitter_covers_every_row_without_changing_semantics(current_run):
+    changeset = emit_manifest_changeset(**current_run.inputs)
+    covered = {
+        item["provenance"][0]["manifestRef"]
+        for item in changeset["rowChanges"] + changeset["noops"]
+    }
+    expected = {row["manifestRef"] for row in current_run.manifest["rows"]}
+    assert covered == expected
+    assert len(covered) == len(current_run.manifest["rows"])
+    assert changeset["bindings"]["canonicalManifestSha"] == current_run.manifest_sha
+
+
+def test_emitter_is_byte_deterministic_and_does_not_read_legacy_decisions(current_run):
+    first = emit_manifest_changeset(**current_run.inputs)
+    current_run.decisions_file.write_text('{"decisions":[{"id":"legacy"}]}')
+    second = emit_manifest_changeset(**current_run.inputs)
+    assert canonical_json(first) == canonical_json(second)
+```
+
+Add negative tests for target drift, stale bindings, unknown family/header, non-ready row, duplicate manifest reference, unbound projection migration, and any unsupported non-manifest mutation.
+
+- [ ] **Step 2: Run the new test and verify the emitter is absent**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_ingest_wizard_changeset.py -q
+```
+
+Expected: FAIL importing `changeset_emitter`.
+
+- [ ] **Step 3: Move mechanical projection out of `plan_builder.py`**
+
+Move the currently verified `build_manifest_plan()` validation/projection logic into `emit_manifest_changeset()`. Replace only its output assembly:
+
+- `create_sheet` becomes `sheetCreates`;
+- add/update/delete operations become field-level `rowChanges` with exact before/after values;
+- manifest no-ops become `noops`;
+- compiler/authority fingerprints become `bindings`; and
+- the inactive Grand Sport X promotion scaffold remains one explicitly named non-manifest row change bound to the frozen projection receipt.
+
+The function may perform mechanical sheet/header resolution and the already-verified greenfield isolation migration. It may not infer new product meaning or read `decisions.json`.
+
+- [ ] **Step 4: Add session emission and immutable artifact output**
+
+`WizardSessionStore.emit_changeset(run_id)` requires `compiled_ready`, exact current inputs, no downstream mutation, and writes `workbook-change-set.json` atomically in the run directory. Re-emission from identical inputs must be byte-identical. A changed input invalidates the artifact and requires recompile.
+
+- [ ] **Step 5: Keep one temporary compatibility assertion, not a second production path**
+
+During this task only, retain `build_manifest_plan()` as a test-only wrapper that compares legacy projection semantics to the new ChangeSet. Mark it private and remove its current-session call in Task 6. The wrapper must never create approval/write authority.
+
+- [ ] **Step 6: Run exact-current and focused compiler gates**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest \
+  tests/test_ingest_wizard_changeset.py \
+  tests/test_ingest_wizard_plan.py \
+  tests/test_ingest_wizard_compiler_session.py \
+  tests/test_ingest_wizard_exception_flow.py -q
+```
+
+Expected: PASS with frozen semantic coverage and protected hashes unchanged.
+
+- [ ] **Step 7: Commit the emitter**
+
+```sh
+git diff --check
+git add scripts/corvette_form_generator/ingest/wizard/changeset_emitter.py \
+  scripts/corvette_form_generator/ingest/wizard/plan_builder.py \
+  scripts/corvette_form_generator/ingest/wizard/session.py \
+  tests/test_ingest_wizard_changeset.py \
+  tests/test_ingest_wizard_plan.py \
+  tests/test_ingest_wizard_compiler_session.py
+git commit -m "feat: emit shared changesets from ingest"
+```
+
+### Task 6: Make the browser/API expose only the five-function current path
+
+**Files:**
+- Create: `scripts/corvette_form_generator/ingest/wizard/legacy_reader.py`
+- Modify: `scripts/corvette_form_generator/ingest/wizard/session.py`
+- Modify: `scripts/ingest_wizard_server.py:108-343`
+- Modify: `visualizer/ingest-wizard/index.html`
+- Modify: `visualizer/ingest-wizard/wizard.js`
+- Modify: `visualizer/ingest-wizard/wizard.css`
+- Modify: `tests/test_ingest_wizard_server.py`
+- Modify: `tests/test_ingest_wizard_server_pass_b.py`
+- Modify: `tests/test_ingest_wizard_ui_milestone2.py`
+- Modify: `tests/test_ingest_wizard_ui_blockers.py`
+
+**Interfaces:**
+- Consumes: `WizardSessionStore` intake/profile/select/compile/exception/emit methods and `LegacyRunReader` GET methods.
+- Produces: `POST /changeset`, `GET /changeset`, five-function browser flow, and HTTP `410` for retired mutation routes.
+
+- [ ] **Step 1: Write failing server boundary tests**
+
+```python
+def test_current_compiled_ready_session_emits_changeset(self):
+    status, payload = self.post_json(
+        f"/api/wizard/sessions/{self.run_id}/changeset", {}
+    )
+    self.assertEqual(status, 200)
+    self.assertEqual(payload["changeSet"]["schemaVersion"], "workbook-changeset-1")
+
+
+def test_retired_mutation_routes_are_gone(self):
+    for suffix in (
+        "/decisions", "/decisions/delete", "/copy-decisions", "/complete",
+        "/plan", "/plan/approve", "/write/approve",
+    ):
+        status, payload = self.post_json(
+            f"/api/wizard/sessions/{self.run_id}{suffix}", {}
+        )
+        self.assertEqual(status, 410)
+        self.assertEqual(payload["error"], "Historical ingest mutation is retired.")
+```
+
+Add a source assertion that `wizard.js` contains no `back-to-review`, `copy-decisions`, `mark-complete`, plan approval, or write approval binding.
+
+- [ ] **Step 2: Run server/UI tests and verify current routes remain writable**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest \
+  tests/test_ingest_wizard_server.py \
+  tests/test_ingest_wizard_server_pass_b.py \
+  tests/test_ingest_wizard_ui_milestone2.py \
+  tests/test_ingest_wizard_ui_blockers.py -q
+```
+
+Expected: FAIL on the new boundary assertions.
+
+- [ ] **Step 3: Replace the current plan stage with ChangeSet completion**
+
+The compiler summary shows one action, `Create ChangeSet`, only for `compiled_ready`. Its result screen shows targets, sheet creations, row-change counts, no-op coverage, workbook fingerprint, and download. It contains no approval or apply control and no route back into historical review.
+
+- [ ] **Step 4: Retire mutation routes explicitly**
+
+POST requests to the seven historical endpoints return HTTP `410` and the exact error above. GET historical plan/evidence display may call `LegacyRunReader`, which reads JSON only and exposes no write methods. Remove `approve_write()` and `apply_approved_plan()` from the server-reachable store surface.
+
+- [ ] **Step 5: Remove current-session imports of write/deployment orchestration**
+
+Move temporary deployment-proof helpers from `session.py` to `workbook_domain/deployment_proof.py`. The ingest session may import the ChangeSet emitter but may not import `apply_batch`, `save_workbook_safely`, generators, registry publication, promotion, or the shared service's apply function.
+
+- [ ] **Step 6: Run focused tests and static authority checks**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest \
+  tests/test_ingest_wizard_server.py \
+  tests/test_ingest_wizard_server_milestone2.py \
+  tests/test_ingest_wizard_server_pass_b.py \
+  tests/test_ingest_wizard_ui_milestone2.py \
+  tests/test_ingest_wizard_ui_blockers.py -q
+node --check visualizer/ingest-wizard/wizard.js
+! rg -n "apply_batch|save_workbook_safely|approve_write|apply_approved_plan|generate_registry|promote_model" \
+  scripts/corvette_form_generator/ingest/wizard/session.py \
+  scripts/ingest_wizard_server.py \
+  visualizer/ingest-wizard/wizard.js
+```
+
+Expected: all tests and static checks PASS.
+
+- [ ] **Step 7: Commit the narrow current UI/API**
+
+```sh
+git diff --check
+git add scripts/corvette_form_generator/ingest/wizard \
+  scripts/corvette_form_generator/workbook_domain/deployment_proof.py \
+  scripts/ingest_wizard_server.py \
+  visualizer/ingest-wizard \
+  tests/test_ingest_wizard_server.py \
+  tests/test_ingest_wizard_server_pass_b.py \
+  tests/test_ingest_wizard_ui_milestone2.py \
+  tests/test_ingest_wizard_ui_blockers.py
+git commit -m "refactor: narrow ingest to changeset emission"
+```
+
+### Task 7: Remove the embedded editor ingest workflow and close Phase 1
+
+**Files:**
+- Modify: `visualizer/workbook-editor/editor.js:946-1321,1454-1512`
+- Modify: `visualizer/workbook-editor/editor.css`
+- Modify: `scripts/workbook_editor_server.py`
+- Delete: `visualizer/workbook-editor/workbook-editor.js`
+- Modify: `tests/test_editor_ops_meta.py`
+- Modify: `docs/ingest/ingest-separation-model-integration-editor-consolidation-spec.md`
+- Modify: `docs/ingest/README.md`
+- Modify: `README.md`
+
+**Interfaces:**
+- Consumes: shared ChangeSet service and existing editor operations.
+- Produces: fallback editor without Ingest Review; Phase 1 completion evidence.
+
+- [ ] **Step 1: Add failing source/UI assertions**
+
+```python
+def test_workbook_editor_has_no_ingest_review_navigation():
+    source = Path("visualizer/workbook-editor/editor.js").read_text()
+    assert ">Ingest Review<" not in source
+    assert "/api/ingest/" not in source
+
+
+def test_dead_react_prototype_is_absent():
+    assert not Path("visualizer/workbook-editor/workbook-editor.js").exists()
+```
+
+- [ ] **Step 2: Run the assertions and verify the old tab/prototype exist**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_editor_ops_meta.py -q
+```
+
+Expected: FAIL on both new assertions.
+
+- [ ] **Step 3: Remove only the obsolete ingest surface and dead file**
+
+Delete `IngestReviewTab`, its helpers/state/styles, its navigation button/render branch, and unreferenced server `/api/ingest/*` handlers. Delete the unreferenced React prototype. Preserve Form Structure, Sheet Browser, Review, Pending Changes, operation payloads, and Apply behavior.
+
+- [ ] **Step 4: Run the complete Phase 1 gate**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest \
+  tests/test_workbook_domain_registry.py \
+  tests/test_workbook_changeset.py \
+  tests/test_workbook_changeset_service.py \
+  tests/test_editor_ops_apply.py \
+  tests/test_editor_ops_meta.py \
+  tests/test_ingest_wizard_changeset.py \
+  tests/test_ingest_wizard_canonical_compiler.py \
+  tests/test_ingest_wizard_compiler_session.py \
+  tests/test_ingest_wizard_exception_flow.py \
+  tests/test_ingest_wizard_server.py \
+  tests/test_ingest_wizard_server_milestone2.py \
+  tests/test_ingest_wizard_ui_milestone2.py -q
+node --check visualizer/ingest-wizard/wizard.js
+node --check visualizer/workbook-editor/editor.js
+.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+git diff --check
+```
+
+Expected: all tests PASS; workbook validators clean; no protected product file changed.
+
+- [ ] **Step 5: Update owner docs with exact Phase 1 evidence**
+
+Mark Phase 1 complete in the approved spec, name commits/files/tests, state that no workbook write occurred, and replace README descriptions of the ingest/editor surfaces with the five-function/shared-service path. Do not duplicate the full spec in README.
+
+- [ ] **Step 6: Commit Phase 1 closure**
+
+```sh
+git add visualizer/workbook-editor \
+  scripts/workbook_editor_server.py \
+  tests/test_editor_ops_meta.py \
+  docs/ingest/ingest-separation-model-integration-editor-consolidation-spec.md \
+  docs/ingest/README.md README.md
+git commit -m "refactor: remove duplicate ingest editor workflow"
+```
+
+---
+
+## Phase 2 — Integrate Grand Sport X, ZR1, and ZR1X
+
+### Task 8: Rebuild and prove the all-target ChangeSet, then stop for approval
+
+**Files:**
+- Generated run artifact: `form-output/ingest-wizard/$ingest_run_id/workbook-change-set.json`
+- Generated receipts in an explicit temporary directory outside tracked product paths.
+- Modify after proof: `docs/ingest/ingest-separation-model-integration-editor-consolidation-spec.md`
+
+**Interfaces:**
+- Consumes: current `main` workbook/source fingerprints, five-function ingest module, shared service, and ratified GSX/N26/inactive-promotion interpretation.
+- Produces: one exact-current atomic ChangeSet and passing preview/deployment proof; no canonical write.
+
+- [ ] **Step 1: Reconcile the feature branch with `main` without accepting generated/audit drift**
+
+Before any merge/rebase operation, inspect `git status`, branch divergence, workbook hash, `form-app/data.js`, tracked `form-output`, and `form-output/workbook-edit-log.jsonl`. Preserve `main`'s canonical workbook and real audit entry. Do not reuse any old approval after reconciliation.
+
+- [ ] **Step 2: Re-run the five-function ingest path against exact-current inputs**
+
+Use the browser or service API to select the raw source, confirm roles, select `grand_sport_x`, `zr1`, and `zr1x`, compile, resolve only newly emitted typed exceptions, and emit one ChangeSet. Record the new run ID and hashes in the owner spec.
+
+Resolve the emitted run and stable proof paths from the server after emission:
+
+```sh
+curl --fail --silent http://127.0.0.1:8040/api/wizard/sessions \
+  > /private/tmp/27vette-ingest-sessions.json
+ingest_run_id="$(jq -r '.sessions | map(select(.state == "changeset_emitted")) | sort_by(.runId) | last | .runId' \
+  /private/tmp/27vette-ingest-sessions.json)"
+test -n "$ingest_run_id" && test "$ingest_run_id" != "null"
+changeset_path="form-output/ingest-wizard/$ingest_run_id/workbook-change-set.json"
+proof_dir="/private/tmp/27vette-changeset-proof-$ingest_run_id"
+test -f "$changeset_path"
+mkdir -p "$proof_dir"
+```
+
+- [ ] **Step 3: Preview through the shared CLI into an isolated directory**
+
+```sh
+.venv/bin/python scripts/apply_workbook_changeset.py \
+  "$changeset_path" \
+  --workbook stingray_master.xlsx \
+  --preview-out "$proof_dir/change-preview.json"
+```
+
+Expected: preview `ok=true`, exact coverage, no unresolved blockers, and no canonical workbook mutation.
+
+- [ ] **Step 4: Run relocated deployment proof on temporary workbooks**
+
+Call `workbook_domain.deployment_proof` for GSX+ZR1, ZR1X repeatability, and the all-target atomic ChangeSet. Require package/schema/Boolean/final-state/readback, generator contracts, registry loading, zero semantic signature mismatches, zero deployment blockers, and zero deferrals.
+
+- [ ] **Step 5: Present the approval packet and stop**
+
+Present targets, workbook SHA/mtime, sheet creations, row changes by sheet/action, no-op coverage, warning IDs, backup/rollback behavior, preview hash, deployment-proof hash, protected-surface hashes, and the three ratified interpretation statements. Do not create `ChangeApproval` or run `--write` until Sean explicitly approves this exact packet.
+
+### Task 9: Apply the approved ChangeSet once and regenerate affected artifacts
+
+**Files:**
+- Modify: `stingray_master.xlsx`
+- Create: recoverable workbook backup under `backups/`
+- Modify: affected `form-output/` generated artifacts through generators only
+- Modify: `form-app/data.js` only if separately authorized publication occurs; workbook integration alone must not modify it
+- Modify: `docs/ingest/ingest-separation-model-integration-editor-consolidation-spec.md`
+- Modify: `docs/ingest/milestone-3-canonical-plan-deployment-proof-implementation-plan.md`
+
+**Interfaces:**
+- Consumes: exact approved ChangeSet, preview, warning IDs, workbook fingerprint, and approval actor.
+- Produces: one successful ChangeReceipt, verified workbook backup/readback, and regenerated three-model contracts.
+
+- [ ] **Step 1: Create the bound approval without writing**
+
+Recover the exact approved paths and refuse if its preview packet is absent:
+
+```sh
+curl --fail --silent http://127.0.0.1:8040/api/wizard/sessions \
+  > /private/tmp/27vette-ingest-sessions.json
+ingest_run_id="$(jq -r '.sessions | map(select(.state == "changeset_emitted")) | sort_by(.runId) | last | .runId' \
+  /private/tmp/27vette-ingest-sessions.json)"
+changeset_path="form-output/ingest-wizard/$ingest_run_id/workbook-change-set.json"
+proof_dir="/private/tmp/27vette-changeset-proof-$ingest_run_id"
+test -f "$changeset_path" && test -f "$proof_dir/change-preview.json"
+```
+
+```sh
+.venv/bin/python scripts/apply_workbook_changeset.py \
+  "$changeset_path" \
+  --workbook stingray_master.xlsx \
+  --approve Sean \
+  --preview "$proof_dir/change-preview.json" \
+  --approval-out "$proof_dir/change-approval.json"
+```
+
+Expected: approval created; workbook hash unchanged.
+
+- [ ] **Step 2: Confirm Excel is closed and the exact workbook fingerprint still matches**
+
+```sh
+test ! -e './~$stingray_master.xlsx'
+shasum -a 256 stingray_master.xlsx
+```
+
+Expected: no lock and the exact approved SHA.
+
+- [ ] **Step 3: Perform the one authorized live write**
+
+```sh
+.venv/bin/python scripts/apply_workbook_changeset.py \
+  "$changeset_path" \
+  --workbook stingray_master.xlsx \
+  --write \
+  --preview "$proof_dir/change-preview.json" \
+  --approval "$proof_dir/change-approval.json" \
+  --receipt-out "$proof_dir/change-receipt.json"
+```
+
+Expected: `status=applied`, verified backup path, exact prepared/readback counts, zero validation errors, and a changed canonical workbook SHA.
+
+- [ ] **Step 4: Verify the saved workbook and backup independently**
+
+```sh
+.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+test -f "$(jq -r '.backupPath' "$proof_dir/change-receipt.json")"
+```
+
+Expected: package valid, schema zero errors/warnings, backup exists.
+
+- [ ] **Step 5: Regenerate the three targets without public promotion**
+
+Run the exact model-generation configuration discovered from the saved workbook for `grand_sport_x`, `zr1`, and `zr1x`. Do not call `promote_model.py --write` and do not publish `form-app/data.js` unless separately approved.
+
+- [ ] **Step 6: Run affected and existing-model gates**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest \
+  tests/test_model_config_metadata.py \
+  tests/test_registry_promotion_metadata.py \
+  tests/test_schema_validation_metadata.py \
+  tests/test_rule_derivation.py -q
+node --test tests/stingray-form-regression.test.mjs
+node --test tests/grand-sport-draft-data.test.mjs
+node --test tests/z06-form-data-draft.test.mjs
+node --test tests/multi-model-runtime-switching.test.mjs
+git diff --check
+```
+
+Expected: all relevant gates PASS. Review all workbook/generated diffs and restore only proven timestamp churn.
+
+- [ ] **Step 7: Close Phase 2 and commit only verified source/generated changes**
+
+Record exact workbook backup/hash, ChangeSet/preview/approval/receipt hashes, sheets/counts, generator/test results, preserved runtime/dealer boundaries, and residual risk in the two owner docs. Never stage the temporary proof directory or backup.
+
+```sh
+git diff --check
+git add -- stingray_master.xlsx \
+  form-output/runtime/grand-sport-x-runtime-contract.json \
+  form-output/runtime/zr1-runtime-contract.json \
+  form-output/runtime/zr1x-runtime-contract.json \
+  docs/ingest/ingest-separation-model-integration-editor-consolidation-spec.md \
+  docs/ingest/milestone-3-canonical-plan-deployment-proof-implementation-plan.md
+git diff --cached --check
+git commit -m "feat: integrate grand sport x zr1 and zr1x workbook data"
+```
+
+Expected: the backup and `/private/tmp` receipts remain unstaged; `form-app/data.js` remains unchanged.
+
+---
+
+## Phase 3 — Consolidate to one workbook editor
+
+### Task 10: Make Manager metadata a shared-registry adapter
+
+**Files:**
+- Modify: `workbook-manager/backend/app/specs.py`
+- Modify: `workbook-manager/backend/app/validation.py`
+- Modify: `workbook-manager/backend/app/importer.py`
+- Modify: `tests/test_workbook_manager.py`
+
+**Interfaces:**
+- Consumes: `workbook_domain.registry` and disposable imported workbook rows.
+- Produces: SQL projection metadata with no duplicate keys/types/enums/references and transactional re-import.
+
+- [ ] **Step 1: Add failing registry parity and transactional import tests**
+
+```python
+def test_every_editable_manager_table_uses_shared_family_contract(self):
+    for spec in TABLE_SPECS:
+        if not spec.editable:
+            continue
+        shared = family_spec(spec.editor_family)
+        self.assertEqual(spec.key, shared["key"])
+        self.assertEqual(spec.types(), shared.get("types", {}))
+        self.assertEqual(spec.enums(), shared.get("enums", {}))
+
+
+def test_failed_reimport_preserves_promoted_projection(self):
+    before = snapshot_imported_counts(self.conn)
+    with self.assertRaises(KeyError):
+        importer.run(self.conn, self.missing_required_sheet_workbook)
+    self.assertEqual(snapshot_imported_counts(self.conn), before)
+```
+
+- [ ] **Step 2: Run focused Manager tests and verify the duplicated contract/failure**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_workbook_manager.py -q
+```
+
+Expected: new parity or transactional test FAILS before implementation.
+
+- [ ] **Step 3: Reduce `specs.py` to SQL/projection-only metadata**
+
+Keep physical table/column naming and reversible import mapping. Resolve workbook key/type/enum/ref/model-scoping behavior from `family_spec(spec.editor_family)`. Delete duplicated workbook-domain literals.
+
+- [ ] **Step 4: Make import build a replacement database transactionally**
+
+Build/import/validate in a temporary database or one uncommitted transaction. Promote only after all required sheets, mappings, foreign keys, lineage, and contract gates pass. On failure, leave the active database bytes and imported counts unchanged.
+
+- [ ] **Step 5: Run Manager and workbook gates**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_workbook_manager.py -q
+.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+```
+
+Expected: PASS; canonical workbook unchanged.
+
+- [ ] **Step 6: Commit the disposable-projection conversion**
+
+```sh
+git diff --check
+git add workbook-manager/backend/app/specs.py \
+  workbook-manager/backend/app/validation.py \
+  workbook-manager/backend/app/importer.py \
+  tests/test_workbook_manager.py
+git commit -m "refactor: derive manager contracts from shared registry"
+```
+
+### Task 11: Replace Manager full-row sync with ChangeSet journal semantics
+
+**Files:**
+- Modify: `workbook-manager/backend/app/db.py`
+- Modify: `workbook-manager/backend/app/staging.py`
+- Modify: `workbook-manager/backend/app/sync.py`
+- Modify: `workbook-manager/backend/app/main.py`
+- Modify: `workbook-manager/backend/app/schemas.py`
+- Modify: `tests/test_workbook_manager.py`
+
+**Interfaces:**
+- Consumes: shared ChangeSet parser/service and disposable projection rows.
+- Produces: draft/approved/applied/failed/cancelled ChangeSet journal with retry, cancel, and rebase.
+
+- [ ] **Step 1: Add failing conflict, atomic batch, and recovery tests**
+
+```python
+def test_two_edits_to_one_row_coalesce_to_field_deltas(self):
+    stage_price(self.conn, "opt_1", 100, 200)
+    stage_description(self.conn, "opt_1", "Old", "New")
+    changeset = staging.build_changeset(self.conn, actor="Sean")
+    row = changeset["rowChanges"][0]
+    self.assertEqual(set(row["fields"]), {"price", "description"})
+
+
+def test_parent_and_member_validate_atomically(self):
+    stage_exclusive_group(self.conn, "grp_new")
+    stage_exclusive_member(self.conn, "grp_new", "opt_1")
+    preview = staging.preview_draft(self.conn, actor="Sean")
+    self.assertTrue(preview["ok"])
+
+
+def test_failed_sync_can_retry_cancel_or_rebase(self):
+    failed_id = create_failed_changeset(self.conn)
+    self.assertEqual(syncmod.retry(self.conn, failed_id)["status"], "draft")
+    self.assertEqual(syncmod.cancel(self.conn, failed_id)["status"], "cancelled")
+```
+
+- [ ] **Step 2: Run the tests and verify current full-row/pending-only behavior fails**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_workbook_manager.py -q
+```
+
+Expected: new tests FAIL.
+
+- [ ] **Step 3: Add journal tables without making SQLite canonical**
+
+Add `changesets` with immutable proposal JSON/fingerprint/workbook fingerprint/status and `changeset_events` with append-only actor/action/detail/timestamp. Allowed statuses are `draft`, `approved`, `applied`, `failed`, and `cancelled`. Imported row tables remain rebuildable projections.
+
+- [ ] **Step 4: Build field-delta ChangeSets from staged edits**
+
+Coalesce changes by `(sheet, family, canonical key)`, retain the earliest before value and latest after value per field, drop net-zero fields, validate the proposed final batch through `preview_changeset()`, and commit one ChangeSet journal record rather than full-row `change_history` snapshots as write authority.
+
+- [ ] **Step 5: Replace sync translation with the shared service**
+
+`sync.py` loads the immutable ChangeSet and bound preview/approval, calls `apply_changeset()`, and records the returned ChangeReceipt event. Failed status remains recoverable. Re-import is blocked while an approved or failed-unsynchronized ChangeSet exists. Rebase refreshes before values only after field-level conflict checks and emits a new fingerprint/preview; it never edits the approved proposal in place.
+
+- [ ] **Step 6: Run all Manager backend and shared-service tests**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest \
+  tests/test_workbook_manager.py \
+  tests/test_workbook_changeset.py \
+  tests/test_workbook_changeset_service.py -q
+```
+
+Expected: PASS.
+
+- [ ] **Step 7: Commit Manager ChangeSet semantics**
+
+```sh
+git diff --check
+git add workbook-manager/backend/app/db.py \
+  workbook-manager/backend/app/staging.py \
+  workbook-manager/backend/app/sync.py \
+  workbook-manager/backend/app/main.py \
+  workbook-manager/backend/app/schemas.py \
+  tests/test_workbook_manager.py
+git commit -m "refactor: journal manager edits as shared changesets"
+```
+
+### Task 12: Make the React Manager the shared-service editor UI
+
+**Files:**
+- Modify: `workbook-manager/frontend/src/api.js`
+- Modify: `workbook-manager/frontend/src/App.jsx`
+- Modify: `workbook-manager/frontend/src/components/ChangesSync.jsx`
+- Modify: `workbook-manager/frontend/src/components/FormStructure.jsx`
+- Modify: `workbook-manager/frontend/src/components/ModelOperations.jsx`
+- Modify: `workbook-manager/frontend/src/components/RecordForm.jsx`
+- Modify: `workbook-manager/frontend/src/components/HistoryView.jsx`
+- Modify: `workbook-manager/frontend/src/styles.css`
+- Create: `tests/test_workbook_manager_frontend.mjs`
+
+**Interfaces:**
+- Consumes: Manager endpoints for registry-derived schemas, ChangeSet draft/preview/approval/apply/retry/cancel/rebase, and receipts.
+- Produces: one clear editor workflow with explicit workbook/generated/publication state.
+
+- [ ] **Step 1: Add failing frontend contract tests**
+
+```javascript
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import test from "node:test";
+
+const api = fs.readFileSync("workbook-manager/frontend/src/api.js", "utf8");
+const sync = fs.readFileSync(
+  "workbook-manager/frontend/src/components/ChangesSync.jsx", "utf8"
+);
+
+test("manager uses changeset lifecycle endpoints", () => {
+  for (const route of ["/api/changesets/preview", "/approve", "/apply", "/retry", "/cancel", "/rebase"]) {
+    assert.match(api, new RegExp(route.replaceAll("/", "\\/")));
+  }
+  assert.doesNotMatch(api, /\/api\/sync/);
+});
+
+test("post-write state distinguishes workbook and publication", () => {
+  assert.match(sync, /Workbook synchronized/);
+  assert.match(sync, /Generated artifacts/);
+  assert.match(sync, /Registry publication/);
+});
+```
+
+- [ ] **Step 2: Run the Node test and verify old sync UI fails**
+
+```sh
+node --test tests/test_workbook_manager_frontend.mjs
+```
+
+Expected: FAIL.
+
+- [ ] **Step 3: Replace staging/sync language with the ChangeSet lifecycle**
+
+The primary flow is Edit fields → Review ChangeSet → Preview → Approve → Apply. Display exact affected rows/fields, warnings, workbook fingerprint, backup/rollback guarantee, and receipt state. Failed items expose Retry, Cancel, and Rebase. Do not expose database commit as successful workbook work.
+
+- [ ] **Step 4: Correct Form Structure through shared registry data**
+
+Render step/section mapping from the backend's registry-derived final structure, including the `section_master.step_key` fallback when `section_presentation.step_key` is blank. Add a backend fixture assertion in `tests/test_workbook_manager.py` and a frontend text/state assertion here.
+
+- [ ] **Step 5: Add compact responsive behavior**
+
+At mobile widths, show one edit/review panel, collapse evidence, and keep the action/status summary visible. Do not add a larger multi-form review surface.
+
+- [ ] **Step 6: Run frontend contracts and build**
+
+```sh
+node --test tests/test_workbook_manager_frontend.mjs
+(cd workbook-manager/frontend && npm run build)
+```
+
+Expected: Node tests PASS and Vite production build succeeds.
+
+- [ ] **Step 7: Commit the final UI path**
+
+```sh
+git diff --check
+git add workbook-manager/frontend/src tests/test_workbook_manager_frontend.mjs
+git commit -m "feat: make manager the shared changeset editor"
+```
+
+### Task 13: Prove parity, retire the old editor, and close the program
+
+**Files:**
+- Modify: `tests/test_workbook_manager.py`
+- Modify: `tests/test_workbook_manager_frontend.mjs`
+- Modify: relevant existing editor comparison tests
+- Modify: `README.md`
+- Modify: `workbook-manager/README.md`
+- Modify: `AGENTS.md` only if its durable editor boundary is no longer accurate
+- Modify: `docs/ingest/README.md`
+- Modify: `docs/ingest/ingest-separation-model-integration-editor-consolidation-spec.md`
+- Retire only after parity: `scripts/workbook_editor_server.py`, `visualizer/workbook-editor/`
+
+**Interfaces:**
+- Consumes: shared registry/service, Manager backend/UI, saved canonical workbook, and existing editor parity fixtures.
+- Produces: one supported editor, closed owner spec, and no stale route/document claims.
+
+- [ ] **Step 1: Add a table-driven parity test covering every writable family**
+
+```python
+def test_manager_matches_shared_service_for_every_writable_family(self):
+    for family, fixture in writable_family_fixtures().items():
+        with self.subTest(family=family):
+            changeset = manager_changeset_for_fixture(fixture)
+            manager_preview = manager_preview_changeset(changeset)
+            shared_preview = preview_changeset(fixture.workbook, changeset)
+            self.assertEqual(manager_preview["status"], shared_preview["status"])
+            self.assertEqual(manager_preview["operationCoverage"], shared_preview["operationCoverage"])
+            self.assertEqual(manager_preview["warnings"], shared_preview["warnings"])
+```
+
+Fixtures must cover add/update/delete, parent/member atomic edits, direct/union/conditional references, model/shared sheets, warning confirmation, stale refusal, rollback, failed-sync recovery, and exact readback.
+
+- [ ] **Step 2: Run backend/frontend/browser parity before deleting fallback files**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest \
+  tests/test_workbook_manager.py \
+  tests/test_workbook_domain_registry.py \
+  tests/test_workbook_changeset.py \
+  tests/test_workbook_changeset_service.py \
+  tests/test_editor_ops_apply.py -q
+node --test tests/test_workbook_manager_frontend.mjs
+(cd workbook-manager/frontend && npm run build)
+```
+
+Then manually verify the full editor workflow at desktop and mobile widths against a disposable workbook/database. No live canonical write is part of parity testing.
+
+- [ ] **Step 3: Retire the fallback only after every parity row passes**
+
+Remove the old editor server/UI and its now-obsolete tests/README commands. Preserve shared `editor_ops` compatibility only if another active non-editor caller still needs it; otherwise reduce it to a compatibility import layer over `workbook_domain`.
+
+- [ ] **Step 4: Run full affected-path validation**
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m pytest -q
+node --test tests/stingray-form-regression.test.mjs
+node --test tests/grand-sport-draft-data.test.mjs
+node --test tests/z06-form-data-draft.test.mjs
+node --test tests/multi-model-runtime-switching.test.mjs
+node --test tests/test_workbook_manager_frontend.mjs
+(cd workbook-manager/frontend && npm run build)
+.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+git diff --check
+```
+
+Expected: affected tests PASS; any pre-existing unrelated failures are named with unchanged evidence; workbook/package/schema/runtime/dealer boundaries remain valid.
+
+- [ ] **Step 5: Close documentation in place**
+
+Mark all three phases complete in the approved spec with dates, commits, files, workbook/model integration evidence, editor parity results, preserved boundaries, and residual risk. Update README and Manager README to one editor command and one ChangeSet path. Remove stale claims that the old editor or ingest plan/apply routes are supported. Do not create another closure spec.
+
+- [ ] **Step 6: Commit the consolidation closeout**
+
+```sh
+git diff --check
+git add -- README.md workbook-manager/README.md \
+  docs/ingest/README.md \
+  docs/ingest/ingest-separation-model-integration-editor-consolidation-spec.md \
+  tests/test_workbook_manager.py tests/test_workbook_manager_frontend.mjs
+git add -u -- scripts/workbook_editor_server.py visualizer/workbook-editor
+if ! git diff --quiet -- AGENTS.md; then git add -- AGENTS.md; fi
+git commit -m "refactor: consolidate workbook editing on shared changesets"
+```
+
+Expected: one final scoped commit after review confirms no unrelated files or temporary artifacts are staged.
+
+## Final program stop conditions
+
+Stop and request Sean's decision if any task requires new product behavior, changes a reviewed compiler semantic, cannot represent an existing safe editor operation in `workbook-changeset-1`, disagrees with a current generator/runtime contract, cannot prove rollback, needs a new dependency/schema/public/deployment/security boundary, or would retire the fallback before parity.
+
+Do not stop merely because a file is large, tests take time, or implementation needs several commits. Do not solve difficulty by adding another plan, state machine, database authority, or compatibility write path.

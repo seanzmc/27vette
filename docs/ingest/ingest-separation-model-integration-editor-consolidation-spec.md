@@ -1,6 +1,6 @@
 # Ingest Separation, Three-Model Integration, and Editor Consolidation Spec
 
-Status: DRAFT FOR REVIEW 2026-07-18. Sean approved the boundaries and recommended pathway on 2026-07-18. This document authorizes specification only. It does not authorize implementation, a live workbook write, generation, publication, promotion, deployment, or dealer changes.
+Status: APPROVED 2026-07-18. Sean approved the boundaries, pathway, and written spec. Implementation remains gated by the implementation plan and its phase-specific approvals. This approval does not itself authorize a live workbook write, publication, promotion, deployment, or dealer changes.
 
 Document ownership: `canonical-row-compiler-exception-queue-design.md` continues to own compiler semantics and the currently implemented safety contract. This spec owns the approved separation, shared ChangeSet migration, three-model workbook integration sequence, and editor consolidation destination. When implementation completes, update the existing owner documents in place; do not add another competing workflow guide.
 
