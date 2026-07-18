@@ -1,0 +1,369 @@
+# Ingest Separation, Three-Model Integration, and Editor Consolidation Spec
+
+Status: DRAFT FOR REVIEW 2026-07-18. Sean approved the boundaries and recommended pathway on 2026-07-18. This document authorizes specification only. It does not authorize implementation, a live workbook write, generation, publication, promotion, deployment, or dealer changes.
+
+Document ownership: `canonical-row-compiler-exception-queue-design.md` continues to own compiler semantics and the currently implemented safety contract. This spec owns the approved separation, shared ChangeSet migration, three-model workbook integration sequence, and editor consolidation destination. When implementation completes, update the existing owner documents in place; do not add another competing workflow guide.
+
+## 1. Plain-English outcome
+
+Finish the current work without building another overlapping system.
+
+The completed system has:
+
+1. One small ingest module that accepts a raw order guide, derives everything it can, asks only necessary questions, and emits a shared ChangeSet.
+2. One shared workbook service that validates, previews, approves, writes, rolls back, and records every ChangeSet.
+3. One workbook editor UI that uses that same service.
+
+Grand Sport X, ZR1, and ZR1X are integrated into `stingray_master.xlsx` through that shared path before the two editor UIs are consolidated.
+
+## 2. Current diagnosis
+
+The canonical compiler is not the primary failure. Run `20260717-091317-470292` already compiled Grand Sport X, ZR1, and ZR1X with zero blockers and proved the proposed result against temporary workbooks.
+
+The failure is ownership:
+
+- The ingest wizard contains the current compiler/typed-exception path and the historical broad-decision path.
+- It also owns plan building, plan approval, write approval, temporary deployment proof, and live-write continuation.
+- The workbook editor exposes a separate historical Ingest Review workflow.
+- The Workbook Manager introduces another schema, validation, staging, and synchronization authority.
+- All three eventually depend on `editor_ops`, but they do not share one final ChangeSet contract or one declarative workbook registry.
+
+This produces broken navigation, hidden operations, duplicated validation, and uncertainty about which system is authoritative.
+
+## 3. Fixed boundaries
+
+These boundaries are approved and are not implementation choices.
+
+### 3.1 Ingest owns only five functions
+
+The standalone ingest module owns:
+
+1. Raw source intake.
+2. Profiling and target selection.
+3. Canonical compilation.
+4. Typed exception resolution.
+5. Emission of a shared ChangeSet.
+
+Ingest does not own:
+
+- workbook-write approval;
+- workbook mutation;
+- backup or rollback;
+- generated-artifact refresh;
+- registry publication;
+- runtime promotion;
+- deployment; or
+- dealer submission.
+
+### 3.2 The workbook remains canonical
+
+`stingray_master.xlsx` remains the product/business source of truth. SQLite, browser state, ingest artifacts, and ChangeSets are projections, proposals, journals, or evidence. None may become a second workbook authority.
+
+### 3.3 Historical ingest is read-only
+
+Historical Pass B/C/D.2 decisions and plans remain available only as evidence. A current compiler session may not navigate into, copy from, complete, approve, or mutate a historical workflow state.
+
+### 3.4 One editor survives
+
+The existing workbook editor remains the fallback writer until replacement parity is proven. The Workbook Manager React UI is the likely final UI, but it may not retain an independent schema, validator, writer, or canonical row store.
+
+### 3.5 Protected behavior stays unchanged
+
+This work does not change product rules, prices, availability, generated runtime contracts, the dealer endpoint, dealer payloads, Turnstile behavior, submission UX, dependencies, or deployment paths unless a separate approved decision explicitly requires it.
+
+## 4. Simple target architecture
+
+```text
+Raw order guide
+    -> ingest: intake
+    -> ingest: profile and select targets
+    -> ingest: compile canonical rows
+    -> ingest: resolve typed exceptions
+    -> ingest: emit ChangeSet
+
+ChangeSet
+    -> shared workbook service: preview and final-state validation
+    -> explicit approval
+    -> guarded workbook write, rollback, and readback
+    -> ChangeReceipt
+
+Canonical workbook
+    -> existing generators and validators
+    -> explicit registry publication/promotion when separately approved
+```
+
+There is no direct ingest-to-workbook write path and no editor-specific writer.
+
+## 5. Shared workbook contract
+
+### 5.1 One declarative workbook registry
+
+Create one registry, derived from the current `editor_ops` metadata and live workbook registration tables, that owns:
+
+- sheet-family and model-sheet resolution;
+- headers, keys, types, nullability, and enums;
+- model scope;
+- direct, union, and conditional references;
+- parent/child and delete dependencies;
+- writable versus read-only surfaces; and
+- final-state validation order.
+
+The ingest ChangeSet emitter, shared workbook service, both editor UIs during transition, import/projection code, and tests consume this registry. Workbook Manager metadata may be migrated into it only when it adds a proven contract missing from the current registry. It may not remain a parallel authority.
+
+### 5.2 ChangeSet proposal
+
+The immutable proposal uses schema `workbook-changeset-1` and contains:
+
+- ChangeSet ID and deterministic semantic fingerprint;
+- source kind and source/run identifiers;
+- selected target models;
+- canonical workbook SHA-256 and mtime preconditions;
+- required sheet creations, including family and exact header template;
+- row changes identified by sheet, family, and canonical key;
+- field-level changes rather than unrelated full-row replacement;
+- exact before and after values;
+- add/delete values represented as empty-before/full-after or full-before/empty-after;
+- row-level provenance and evidence identifiers;
+- compiler manifest and resolution fingerprints when the source is ingest;
+- explicit no-op coverage receipts when the source compiler accounts for unchanged rows; and
+- requested warning acknowledgements, without granting write authority.
+
+The ChangeSet does not contain an editable copy of workbook rows and cannot approve itself.
+
+### 5.3 Preview and execution receipts
+
+Mutable lifecycle state does not rewrite the ChangeSet. The shared service emits receipts bound to its semantic fingerprint:
+
+- `ChangePreview`: final-state validation, warnings, operation coverage, and temporary readback.
+- `ChangeApproval`: operator, scope, accepted warning IDs, ChangeSet fingerprint, workbook fingerprint, and preview fingerprint.
+- `ChangeReceipt`: applied/failed/rolled-back status, backup path, exact readback, validation results, timestamps, and post-write gate reminders.
+
+An editor or ingest UI may display these receipts, but only the shared workbook service creates them.
+
+## 6. Three implementation phases
+
+This is one completion program with three phases. Do not create a new design or milestone document for each slice. Record phase status and evidence in this file.
+
+### Phase 1 — Separate ingest and establish the shared path
+
+#### Goal
+
+Make the five-function ingest module real without changing the proven compiler result.
+
+#### Work
+
+1. Extract the shared workbook registry from the current active metadata path.
+2. Implement `workbook-changeset-1`, its deterministic fingerprint, and strict parsing.
+3. Add a ChangeSet adapter to `editor_ops` so the shared final-state validator remains the one validation/write engine.
+4. Fix the existing writer before any live use:
+   - preserve and recheck the originally reviewed workbook SHA/mtime immediately before save;
+   - refuse any drift during validation;
+   - restore the backup automatically if post-write readback fails; and
+   - report whether a failed write was untouched or rolled back.
+5. Add a pure ingest emitter that translates an exact-current ready canonical manifest into a ChangeSet without choosing IDs, values, sheets, actions, or business meaning.
+6. Replace the current compiler-path “Build canonical apply plan” continuation with “Create ChangeSet.”
+7. Remove write approval and apply continuation from the ingest UI/API.
+8. Make historical decision, copy, complete, plan, and approval routes read-only or unavailable to current sessions.
+9. Remove the existing workbook editor's normal-navigation Ingest Review tab. Historical evidence may remain available through an explicitly labeled read-only archive surface.
+
+#### Required equivalence proof
+
+Before implementation begins, independent verification must freeze one authoritative snapshot of run `20260717-091317-470292`. The current on-disk `apply-plan.json` was written after the Milestone 3 closeout text and its projection counts differ from that text. Do not silently choose either version or carry both forward. Reconcile the difference, update the owning Milestone 3 closeout with the verified snapshot, and bind the emitter proof to that snapshot.
+
+The canonical manifest currently contains 6,408 rows: 2,581 `add`, 941 `update`, and 2,886 `noop`. The later on-disk plan currently maps those rows to 3,709 manifest-backed operations and 2,699 no-op receipts, plus nine sheet-creation operations and one separately identified inactive Grand Sport X promotion scaffold. These are characterization facts, not permanent contract constants.
+
+For the frozen authoritative snapshot, the new emitter must preserve the already-reviewed result:
+
+- every manifest row covered exactly once by a row change or no-op receipt;
+- every non-manifest sheet creation or inactive scaffold separately named and justified;
+- zero uncovered rows;
+- zero changed keys, values, stable IDs, actions, or semantic signatures; and
+- byte-identical protected workbook, raw source, generated artifacts, and runtime publication files.
+
+The existing `pass-c-3` plan remains immutable evidence. It is not relabeled as a ChangeSet and is not production write authority after this phase.
+
+#### Phase 1 completion gate
+
+Phase 1 is complete only when:
+
+- the current ingest path exposes exactly the five owned functions;
+- ingest code cannot call `apply_batch()`, `save_workbook_safely()`, generation, publication, or promotion;
+- a current session cannot enter or mutate legacy workflow state;
+- the shared service rejects stale, malformed, partial, or off-target ChangeSets;
+- injected writer drift is refused before save;
+- injected post-write verification failure restores the backup and verifies restoration; and
+- the Milestone 3 closeout and frozen run artifacts describe the same authoritative snapshot; and
+- the frozen-run equivalence proof passes.
+
+No live canonical-workbook write occurs in Phase 1.
+
+### Phase 2 — Integrate Grand Sport X, ZR1, and ZR1X
+
+#### Goal
+
+Use the shared ChangeSet path to write the three proven models into the canonical workbook safely.
+
+#### Preconditions
+
+- Independent final verification of Milestone 3 passes.
+- Phase 1 is complete.
+- The current branch is reconciled with `main` while preserving `main`'s canonical workbook, generated artifacts, and real edit-log history.
+- The compiler run and ChangeSet are rebuilt against the exact current workbook fingerprint. Old plans and approvals remain stale by design.
+- Sean explicitly ratifies the live-write interpretation already used in temporary proof:
+  - Grand Sport X uses isolated target sheets for the 369 migrated rows;
+  - N26's `$695` price uses wildcard scope because the source gives no narrower qualifier; and
+  - the Grand Sport X promotion record remains inactive until a separate publication step.
+
+#### Work
+
+1. Recompile the three targets from current source/workbook inputs.
+2. Resolve only newly produced typed exceptions; do not revive superseded broad review.
+3. Emit one atomic all-target ChangeSet.
+4. Preview it through the shared service on a temporary workbook.
+5. Require exact row-operation coverage, package/schema validation, Boolean hygiene, final-state relationship validation, and readback.
+6. Run the existing Grand Sport X + ZR1, ZR1X repeatability, and all-target generation/registry/runtime-contract proofs against temporary copies.
+7. Present the exact ChangeSet summary, warnings, backup/rollback behavior, and affected sheets for explicit live-write approval.
+8. Apply once to `stingray_master.xlsx` through the shared service.
+9. Reopen the saved workbook, verify exact readback, package/schema integrity, and the backup on disk.
+10. Regenerate all affected artifacts through the normal workbook-to-generator path and review every workbook/generated diff.
+
+#### Workbook integration definition
+
+The three models are integrated when their approved canonical rows and registrations exist in `stingray_master.xlsx`, the workbook and generated contracts pass, and no unintended source/runtime changes exist.
+
+Workbook integration does not itself activate the models publicly. Registry publication and runtime promotion remain a separate explicit approval and validation step.
+
+#### Phase 2 completion gate
+
+- One approved ChangeSet and one successful ChangeReceipt cover the full write.
+- Backup, disk reopen, exact readback, package/schema, Boolean, and relationship gates pass.
+- Grand Sport X, ZR1, and ZR1X generation and registry-load proofs pass from the saved workbook.
+- Generated diffs match the approved ChangeSet's intended model scope.
+- Existing Stingray, Grand Sport, Z06, and dealer behavior remain unchanged.
+- The owning Milestone 3 and this spec record exact completion evidence and residual risk.
+
+### Phase 3 — Consolidate to one workbook editor
+
+#### Goal
+
+Replace two competing editors with one UI over the shared registry and ChangeSet service.
+
+#### Work
+
+1. Keep the existing editor available as the fallback while parity is built.
+2. Retain the Workbook Manager React UI as the likely destination.
+3. Remove or bypass its independent schema, validation, full-row sync translation, and direct canonical-row authority.
+4. Make every edit produce `workbook-changeset-1` field deltas against an exact workbook fingerprint.
+5. Use SQLite only for:
+   - a disposable read projection;
+   - ChangeSet drafts;
+   - append-only approvals and receipts; and
+   - query/history views.
+6. Block re-import while any approved ChangeSet is unsynchronized.
+7. Provide retry, cancel, and rebase for failed or stale ChangeSets.
+8. Validate parent/child changes against the proposed final batch state.
+9. Show post-write state explicitly: workbook synchronized, generated artifacts stale/current, registry publication pending/current, and exact next gates.
+10. Remove dead duplicate editor code and correct stale editor tests/copy only when the shared replacement path covers them.
+
+Do not merge either Workbook Manager implementation wholesale. Reuse proven UI, database, lineage, audit, and contract-test work selectively after it is made subordinate to the shared registry and ChangeSet service.
+
+#### Parity gate
+
+The final editor must prove every writable collection and relationship supported by the existing editor, including:
+
+- add/update/delete and field-level conflict detection;
+- atomic parent/member changes;
+- direct, union, and conditional references;
+- stale workbook refusal;
+- warning confirmation;
+- failed-write rollback;
+- failed-sync retry/cancel/rebase;
+- exact preview/readback;
+- model and shared-sheet scoping; and
+- browser behavior at desktop and mobile widths.
+
+Only after parity passes may the existing editor be retired and the Manager UI become the sole supported editor.
+
+## 7. Scope controls that keep this simple
+
+The implementation must not:
+
+- redesign the compiler or repeat already resolved model review;
+- invent a new workbook schema or business-rule taxonomy;
+- create a second ChangeSet format;
+- keep `pass-c-3` as a permanent parallel write contract;
+- add a dependency without separate approval;
+- combine workbook integration with public runtime promotion;
+- rewrite the React UI before the shared service contract exists;
+- rewrite the existing editor before replacement parity exists;
+- retain writable legacy ingest routes for convenience;
+- create additional pass/spec documents unless a genuinely new user decision blocks this owner spec; or
+- merge unrelated branch cleanup, generated drift, workbook changes, or dealer work.
+
+If code cannot fit these boundaries, stop and report the exact contradiction rather than adding another compatibility layer.
+
+## 8. Stop conditions requiring Sean's decision
+
+Stop before continuing if:
+
+- source evidence requires a new price, availability, default, relationship, or other product decision;
+- the new ChangeSet cannot represent an existing safe editor operation without changing workbook behavior;
+- the frozen manifest-to-ChangeSet equivalence proof changes a reviewed key, value, action, or semantic signature;
+- current `main` workbook changes create a real three-model reconciliation conflict;
+- final-state validation disagrees with a current generator/runtime contract;
+- a new dependency, workbook schema, generated contract, public interface, deployment path, or security boundary is required;
+- rollback cannot prove the workbook was restored after an injected failure; or
+- editor consolidation would remove a supported editing capability before parity exists.
+
+Ordinary implementation difficulty, file size, or test count is not a reason to widen scope or create another workflow.
+
+## 9. Validation ownership
+
+Each phase runs only the gates relevant to its changed surface, followed by the full affected-path gate at phase close.
+
+### Phase 1
+
+- ChangeSet schema, fingerprint, malformed-input, stale-input, coverage, and equivalence tests.
+- Shared registry contract tests against every active workbook family.
+- Final-state relationship tests, including atomic parent/member changes.
+- Writer race and rollback fault-injection tests.
+- Current ingest compiler/session/API/UI tests.
+- Static assertions that the current ingest path exposes no write/apply/promotion authority.
+- Workbook package/schema validators and protected-surface hashes.
+
+### Phase 2
+
+- Fresh exact-current compiler and ChangeSet proof.
+- Temporary apply/readback and all three deployment-proof phases.
+- Approved live-write backup, reopen, package/schema, Boolean, final-state, and exact readback gates.
+- Affected generator, registry, and runtime-contract tests.
+- Existing-model regression gates.
+- Generated diff and clean-tree/idempotency review.
+- No live dealer submission.
+
+### Phase 3
+
+- Shared service and editor API contract tests.
+- Frontend behavior tests for every writable family.
+- Concurrency, re-import, stale edit, failed sync, retry/cancel/rebase, and rollback tests.
+- Desktop/mobile browser parity.
+- Existing editor comparison until retirement.
+- Workbook package/schema and affected runtime regression gates.
+
+All tests must isolate temporary workbooks, databases, receipts, and edit logs. Validation may not contaminate tracked audit history or generated artifacts.
+
+## 10. Rollback
+
+- Phase 1 changes no canonical product data. Roll back code/docs and retain the frozen compiler evidence.
+- Phase 2 creates a verified backup before the single live write. Any failed post-write gate restores that backup automatically and proves the restored workbook fingerprint before returning failure.
+- Phase 3 retains the existing editor until replacement parity passes. The Manager UI is not advertised as the supported writer before that gate.
+
+## 11. Completion record
+
+This section is updated in place as work completes. It is not a prompt to create another closure document.
+
+- Phase 1 — pending implementation authorization.
+- Phase 2 — blocked by Phase 1, independent Milestone 3 verification, current-input rebuild, explicit interpretation ratification, and live-write approval.
+- Phase 3 — blocked by successful three-model workbook integration and shared-service stability.
+- Runtime publication/promotion — separate approval after Phase 2.
+- Dealer submission changes — not authorized and not implied.
