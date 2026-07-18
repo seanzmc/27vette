@@ -247,14 +247,20 @@ The original reviewed manifest encoded Grand Sport X rule families against compa
 - rule groups require a valid target source and member; exclusive groups require at least two valid target members;
 - one inactive, unpromoted Grand Sport X `model_registry_promotion` scaffold was added so temporary phased registry proof can exercise the same registry loader without authorizing promotion.
 
-Final plan evidence for run `20260717-091317-470292`:
+Final plan evidence for run `20260717-091317-470292`, re-verified against the on-disk artifacts and frozen as the one authoritative snapshot (the earlier characterization recorded here predates the final on-disk plan and is superseded):
 
-- plan SHA-256 `2c5fa763bc388bdb8a0307fbc639c5ec34f7146ceccce8439c2845176ddf5a19`;
-- 6,408/6,408 manifest rows covered;
-- 3,692 mutations: 49 stage-1 and 3,643 stage-2 operations;
-- 2,725 explicit no-op receipts and zero uncovered rows;
+- canonical-row-manifest.json SHA-256 `b3e32dea5afeaf10eb6296d82283ff844403a80da1f3659b6ad20d5d0409926f`;
+- apply-plan.json SHA-256 `0b91bffdfc8643bdbfc31ffcb40695601d6d721ae122652ba95598cad30dd5fe`;
+- apply-plan-dryrun.json SHA-256 `097579feaa83ff515fd9edeb132c1aeb4d19440d22ed45a4c30cf0846f3b0a00`;
+- compile-report.json SHA-256 `ffa8215adab91d903bed70999b2f3951d291d1946784935714e622cdcf9d4e4d`;
+- exception-resolutions.json SHA-256 `c47335d13fccddf0248bb777eba8cb684888f32921daa95c591d3e37e8a09c65`, carrying 158 entries and envelope `queueSubjectFingerprint` `0634e4e0ba2b628e02b88d6325e2ea2aa3d5cfa5eb32aba7e4a69b05f647cf79`;
+- 6,408/6,408 manifest rows covered and zero uncovered rows;
+- 3,719 plan operations (50 stage-1 and 3,669 stage-2): 2,765 `add`, 945 `update`, and nine `create_sheet`;
+- 2,699 explicit no-op receipts;
+- nine sheet creations, all Grand Sport X isolated target sheets: `grand_sport_x_exclusive_groups`, `grand_sport_x_exclusive_members`, `grand_sport_x_options`, `grand_sport_x_ovs`, `grand_sport_x_price_rules`, `grand_sport_x_rule_groups`, `grand_sport_x_rule_mapping`, `grand_sport_x_rule_members`, and `grand_sport_x_variant_overrides` (the first eight with scaffold rule `canonical_manifest_missing_sheet`; `grand_sport_x_variant_overrides` with `canonical_manifest_source_sheet`);
+- one separately identified non-manifest scaffold, operation `op-03718`: an `add` to sheet `model_registry_promotion` (family `model_registry_promotion`, key `model_key=grand_sport_x`, scaffold rule `pass_c3_greenfield_registry_promotion`, zero manifest refs) whose row carries `promoted_to_runtime=false`, `default_model=false`, `active=false`, `display_order=6`, `artifact_path=form-output/runtime/grand-sport-x-runtime-contract.json`, `artifact_type=runtime_contract`, and notes "Inactive greenfield deployment-proof scaffold.";
 - deterministic reprojection is object-identical;
-- 3,692/3,692 operations prepared and read back exactly.
+- 3,719/3,719 operations prepared and read back exactly (dry-run `operationCoverage`: raw 3,719, covered 3,719, prepared 3,719).
 
 Final temporary-workbook report SHA-256 `eaf105124604487767f31574739f7b5cd0c5cc18996b8992bec942a1e13685ad` has `write=false`, `status=validated_write_eligible`, and `writeEligibility.eligible=true`. Grand Sport X + ZR1, ZR1X repeatability, and all-target atomic phases all passed with registry loading, zero generated validation errors, zero semantic-signature mismatches, zero deployment blockers, and zero deferrals. The 18 accepted warnings are only the expected inactive target-sheet scaffold warnings.
 
