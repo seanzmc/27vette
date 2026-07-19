@@ -642,7 +642,7 @@ generated artifacts, or ingest run artifacts modified.
 - Consumes: exact-current canonical manifest, compile report, selection, compiler bindings, exception queue/resolutions, comparator evidence, workbook path, and shared registry.
 - Produces: `emit_manifest_changeset(...) -> dict`, `WizardSessionStore.emit_changeset(run_id) -> dict`, and a new `changeset_emitted` session state stored in `session.json` and surfaced through `list_sessions()`.
 
-- [ ] **Step 1: Write failing exact projection and coverage tests**
+- [x] **Step 1: Write failing exact projection and coverage tests**
 
 ```python
 def test_manifest_emitter_covers_every_row_without_changing_semantics(current_run):
@@ -666,7 +666,7 @@ def test_emitter_is_byte_deterministic_and_does_not_read_legacy_decisions(curren
 
 Add negative tests for target drift, stale bindings, unknown family/header, non-ready row, duplicate manifest reference, unbound projection migration, and any unsupported non-manifest mutation.
 
-- [ ] **Step 2: Run the new test and verify the emitter is absent**
+- [x] **Step 2: Run the new test and verify the emitter is absent**
 
 ```sh
 PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_ingest_wizard_changeset.py -q
@@ -674,7 +674,7 @@ PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_ingest_wizard_changeset
 
 Expected: FAIL importing `changeset_emitter`.
 
-- [ ] **Step 3: Port the mechanical projection into the emitter**
+- [x] **Step 3: Port the mechanical projection into the emitter**
 
 Port the currently verified `build_manifest_plan()` validation/projection logic into `emit_manifest_changeset()`. The legacy function itself stays in `plan_builder.py` for the Step 5 test-local equivalence comparison and is deleted in Task 6. Replace only the output assembly:
 
@@ -686,17 +686,17 @@ Port the currently verified `build_manifest_plan()` validation/projection logic 
 
 The function may perform mechanical sheet/header resolution and the already-verified greenfield isolation migration. It may not infer new product meaning or read `decisions.json`.
 
-- [ ] **Step 4: Add session emission and immutable artifact output**
+- [x] **Step 4: Add session emission and immutable artifact output**
 
 `WizardSessionStore.emit_changeset(run_id)` requires `compiled_ready`, exact current inputs, no downstream mutation, and writes `workbook-change-set.json` atomically in the run directory. Re-emission from identical inputs must be byte-identical. A changed input invalidates the artifact and requires recompile.
 
 Successful emission transitions the session to `changeset_emitted` (a new state constant declared next to `STATE_COMPILED_READY`). `list_sessions()` must then return the run with `runId` and `state: "changeset_emitted"` — the exact payload shape the Tasks 8/9 session lookups filter on.
 
-- [ ] **Step 5: Keep the legacy-equivalence comparison test-local**
+- [x] **Step 5: Keep the legacy-equivalence comparison test-local**
 
 Leave `plan_builder.py` untouched in this task. The equivalence harness lives only in the test file: `tests/test_ingest_wizard_plan.py` imports the still-present `build_manifest_plan()` and compares legacy projection semantics (sheet creates, field-level before/after rows, no-op coverage) against the new ChangeSet over the frozen snapshot. Add no production wrapper, and give the comparison no approval/write authority. Task 6 deletes `build_manifest_plan()` together with the plan stage and removes this comparison test in the same commit, so `plan_builder.py` is touched once.
 
-- [ ] **Step 6: Run exact-current and focused compiler gates**
+- [x] **Step 6: Run exact-current and focused compiler gates**
 
 ```sh
 PYTHONPATH=scripts .venv/bin/python -m pytest \
@@ -708,7 +708,7 @@ PYTHONPATH=scripts .venv/bin/python -m pytest \
 
 Expected: PASS with frozen semantic coverage and protected hashes unchanged.
 
-- [ ] **Step 7: Commit the emitter**
+- [x] **Step 7: Commit the emitter**
 
 ```sh
 git diff --check
@@ -719,6 +719,50 @@ git add scripts/corvette_form_generator/ingest/wizard/changeset_emitter.py \
   tests/test_ingest_wizard_compiler_session.py
 git commit -m "feat: emit shared changesets from ingest"
 ```
+
+**Task 5 verification receipt (2026-07-19):** Completed in commit
+`1607b67`, independently reverified. Both delegated implementer subagents
+timed out at the delegation cap: the session subagent had already landed
+its exact-design `session.py` diff (including the two evidence-state
+extensions later validated on review); the test subagent produced
+nothing. The orchestrator ported the emitter and wrote all tests
+directly. Before any test existed, a throwaway probe ran both projections
+over the frozen run and live workbook: 9 identical sheetCreates, 3,710
+rowChanges with identical op identities and zero after-value mismatches,
+2,699 noops, 6,408/6,408 coverage, one named scaffold — the same result
+the committed `LegacyEquivalenceTest` now proves (3 fixture scenarios +
+the frozen snapshot, which ran rather than skipped). Plan-text
+adaptations, all validated by the spec-compliance review, which also
+verified the validation half of the port line-for-line identical to
+`build_manifest_plan`: `run_id` is a required emitter input (source
+identity is signed); add/delete rowChanges omit None-after/None-before
+columns (the Task 3 contract rejects None→None unchanged pairs; final
+workbook state identical); update rowChanges emit only true field deltas
+(legacy update ops carry all non-key columns); scaffold provenance is
+kind `scaffold` with no manifestRef; targets sorted per contract;
+`warningAcknowledgementsRequested` emitted empty (the service derives
+accepted warnings from the live preview); the session gained
+`STATE_CHANGESET_EMITTED` in `COMPILER_EVIDENCE_STATES` and the
+`_parsed_candidates` allow-list (required for idempotent re-emission).
+Gates passed: the Task 5 lane (`test_ingest_wizard_changeset.py`,
+`test_ingest_wizard_plan.py`, `test_ingest_wizard_compiler_session.py`,
+`test_ingest_wizard_exception_flow.py`) at 90 tests and 4 subtests; the
+full ingest wizard lane at 183; all five Task 1 protected hashes
+re-verified unchanged (manifest `b3e32dea`, apply-plan `0b91bffd`,
+compile-report `ffa8215a`, resolutions `c47335d1`, workbook `03e8c967`).
+Spec-compliance review passed. The code-quality reviewer timed out at the
+delegation cap, so the orchestrator performed the quality pass directly:
+determinism (sorted creates, explicit sortKey ordering, sorted bindings,
+no timestamps — plus two passing byte-identical re-emission tests that
+re-emit rather than re-read), input purity (copies throughout, only the
+workbook file is read), `_existing` never serialized (explicit
+construction at every output site), ValueError parity with
+`build_manifest_plan` and no partial-artifact path (emission completes
+before the atomic two-file replace). Deferred minors: intentional
+`_manifest_key_text`/helper duplication until Task 6 deletes the legacy
+projection; emitter self-parse adds ~1-2s on a 6,408-row changeset.
+Worktree clean; no product files, generated artifacts, or ingest run
+artifacts modified.
 
 ### Task 6: Make the browser/API expose only the five-function current path
 
