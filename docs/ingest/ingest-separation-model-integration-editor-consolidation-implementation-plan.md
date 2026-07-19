@@ -928,7 +928,7 @@ promotion, deployment, or dealer surface changed.
 - Consumes: shared ChangeSet service and existing editor operations.
 - Produces: fallback editor without Ingest Review; Phase 1 completion evidence.
 
-- [ ] **Step 1: Add failing source/UI assertions**
+- [x] **Step 1: Add failing source/UI assertions**
 
 ```python
 def test_workbook_editor_has_no_ingest_review_navigation():
@@ -941,7 +941,7 @@ def test_dead_react_prototype_is_absent():
     assert not Path("visualizer/workbook-editor/workbook-editor.js").exists()
 ```
 
-- [ ] **Step 2: Run the assertions and verify the old tab/prototype exist**
+- [x] **Step 2: Run the assertions and verify the old tab/prototype exist**
 
 ```sh
 PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_editor_ops_meta.py -q
@@ -949,11 +949,11 @@ PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_editor_ops_meta.py -q
 
 Expected: FAIL on both new assertions.
 
-- [ ] **Step 3: Remove only the obsolete ingest surface and dead file**
+- [x] **Step 3: Remove only the obsolete ingest surface and dead file**
 
 Delete `IngestReviewTab`, its helpers/state/styles, its navigation button/render branch, and unreferenced server `/api/ingest/*` handlers. Delete the unreferenced React prototype. Delete `tests/test_editor_server_ingest_review.py` with the handlers it covers; the Pass 2 payload library (`ingest/review_payload.py`) and `tests/test_ingest_review_payload.py` stay as legacy library surface. Preserve Form Structure, Sheet Browser, Review, Pending Changes, operation payloads, and Apply behavior.
 
-- [ ] **Step 4: Run the complete Phase 1 gate**
+- [x] **Step 4: Run the complete Phase 1 gate**
 
 Run the full live ingest/editor/domain suite surface, not only the files Tasks 1–6 happened to touch:
 
@@ -1004,11 +1004,11 @@ git diff --check
 
 Expected: all tests PASS; workbook validators clean; no protected product file changed. Two suites are absent by design: `tests/test_ingest_wizard_apply.py` (retired in Task 6) and `tests/test_editor_server_ingest_review.py` (retired in Step 3 with the `/api/ingest/*` handlers). `tests/test_editor_lints.py` is excluded from this gate: its `RealWorkbookCompareTest` reds are pre-existing workbook-data findings tracked outside this program — run it separately and confirm only the same named failures, no new ones.
 
-- [ ] **Step 5: Update owner docs with exact Phase 1 evidence**
+- [x] **Step 5: Update owner docs with exact Phase 1 evidence**
 
 Mark Phase 1 complete in the approved spec, name commits/files/tests, state that no workbook write occurred, and replace README descriptions of the ingest/editor surfaces with the five-function/shared-service path. Update AGENTS.md §8 so the raw-ingest write-path description names `workbook-changeset-1` emission plus the shared service and `scripts/apply_workbook_changeset.py` in place of the retired `pass-c-3`/`ingest_wizard_apply.py` contract. Do not duplicate the full spec in README or AGENTS.md.
 
-- [ ] **Step 6: Commit Phase 1 closure**
+- [x] **Step 6: Commit Phase 1 closure**
 
 ```sh
 git add visualizer/workbook-editor \
@@ -1019,6 +1019,25 @@ git add visualizer/workbook-editor \
   docs/ingest/README.md README.md AGENTS.md
 git commit -m "refactor: remove duplicate ingest editor workflow"
 ```
+
+**Task 7 / Phase 1 verification receipt (2026-07-19):** Completed in commit
+`9da2757`. The source/UI assertions failed first on the existing Ingest Review
+tab and dead React prototype, then passed after the obsolete UI block/styles,
+server `/api/ingest/*` handlers/options, prototype, and handler test suite were
+removed. Form Structure, Sheet Browser, Review, Pending Changes, typed
+operation payloads, and fallback Apply behavior were preserved. The first full
+gate exposed eleven stale assertions for Task 6-retired `mark_complete` and
+broad-review reference/relationship browser controls; those historical tests
+were retired or rebound to the five-function/typed-exception path rather than
+restoring unreachable mutation UI. The rerun passed `486 tests and 36
+subtests` in 180.53 seconds. `node --check` passed for both wizard/editor
+scripts; workbook package and schema validation were valid with zero issues,
+errors, or warnings; and `git diff --check` passed after removing one trailing
+CSS blank line. The separate editor-lint lane retained only the three known
+real-workbook failures (`d1_rwj_wks_collision`,
+`c2_cj2_stingray_name_deviator`, `r3_drz_pending_review`) with 23 tests
+passing. No canonical workbook, generated artifact, registry, runtime,
+promotion, deployment, or dealer surface changed. Phase 2 was not started.
 
 ---
 

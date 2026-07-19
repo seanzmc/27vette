@@ -368,7 +368,7 @@ This section is updated in place as work completes. It is not a prompt to create
   Task 6 commits `c0c92fd` and `59f5e7a` narrowed the current browser/API to
   the five owned functions, retired the ingest apply CLI and historical
   mutation routes, and moved temporary deployment proof out of ingest. Task 7
-  removed the fallback editor's embedded Ingest Review UI/API and dead React
+  commit `9da2757` removed the fallback editor's embedded Ingest Review UI/API and dead React
   prototype while preserving Form Structure, Sheet Browser, Review, Pending
   Changes, typed operation payloads, and Apply behavior. The complete Phase 1
   gate passed `486 tests and 36 subtests`; both JavaScript syntax checks,
