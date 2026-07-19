@@ -152,7 +152,7 @@ run artifacts.
 - Consumes: current `SOURCE_ROLE_FAMILIES`, `EDITOR_SHEET_META`, `GLOBAL_SHEET_FAMILIES`, and live `model_workbook_sources` rows.
 - Produces: `family_spec(name)`, `registered_sheet_families(extract)`, and compatibility aliases imported by `editor_ops`.
 
-- [ ] **Step 1: Write failing registry identity and resolution tests**
+- [x] **Step 1: Write failing registry identity and resolution tests**
 
 ```python
 from corvette_form_generator import editor_ops
@@ -188,7 +188,7 @@ def test_registered_sheet_families_uses_live_workbook_rows():
     assert family_spec("options")["key"] == ("option_id",)
 ```
 
-- [ ] **Step 2: Run the tests and verify the module is absent**
+- [x] **Step 2: Run the tests and verify the module is absent**
 
 ```sh
 PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_workbook_domain_registry.py -q
@@ -196,7 +196,7 @@ PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_workbook_domain_registr
 
 Expected: FAIL with `ModuleNotFoundError: corvette_form_generator.workbook_domain`.
 
-- [ ] **Step 3: Move the exact registry literals and add narrow accessors**
+- [x] **Step 3: Move the exact registry literals and add narrow accessors**
 
 `registry.py` must contain the current literal definitions unchanged plus:
 
@@ -223,7 +223,7 @@ def registered_sheet_families(extract: dict) -> dict[str, str]:
 
 Import `workbook_truthy` from `corvette_form_generator.workbook`. In `editor_ops.py`, delete the three literal blocks and import/re-export the exact objects from `workbook_domain.registry`.
 
-- [ ] **Step 4: Run registry and existing editor metadata tests**
+- [x] **Step 4: Run registry and existing editor metadata tests**
 
 ```sh
 PYTHONPATH=scripts .venv/bin/python -m pytest \
@@ -235,7 +235,7 @@ PYTHONPATH=scripts .venv/bin/python -m pytest \
 
 Expected: PASS with no changed validation behavior.
 
-- [ ] **Step 5: Commit the semantic-preserving extraction**
+- [x] **Step 5: Commit the semantic-preserving extraction**
 
 ```sh
 git diff --check
@@ -246,6 +246,27 @@ git add scripts/corvette_form_generator/workbook_domain \
   tests/test_editor_ops_global_families.py
 git commit -m "refactor: centralize workbook domain registry"
 ```
+
+**Task 2 verification receipt (2026-07-18):** Completed in commit
+`1400b08` and independently reverified. The three registry literals moved
+byte-identical from `editor_ops.py:40-294` to
+`workbook_domain/registry.py:14-268` (diff-verified, comments and
+`tuple(SOURCE_ROLE_FAMILIES)` self-reference preserved); `editor_ops`
+compatibility aliases are object-identical to the shared registry objects.
+Gates passed: the Task 2 lane (`test_workbook_domain_registry.py`,
+`test_editor_ops_meta.py`, `test_editor_ops_global_families.py`,
+`test_editor_ops_apply.py`) at 82 tests and 7 subtests, plus the consumer
+lane (`test_ingest_wizard_plan.py`, `test_ingest_wizard_compiler_session.py`)
+at 39 tests and 4 subtests; `py_compile` clean on the two new modules,
+`editor_ops.py`, and all five alias consumers. Spec-compliance review
+passed and code-quality review returned APPROVED with four deferred minor
+notes (explicit-`None` extract intermediates, `model_sheet_registry`
+merge-semantics alignment for the future adapter consumer, staged-API
+skip-path coverage, and `family_spec` returning the live meta dict
+consistent with existing `editor_ops` usage). The three
+`test_editor_lints.py` `RealWorkbook*` failures were proven pre-existing at
+parent `66f9d43` and are unrelated to this extraction. Worktree clean; no
+product files, generated artifacts, or ingest run artifacts modified.
 
 ### Task 3: Implement the immutable `workbook-changeset-1` contract
 
