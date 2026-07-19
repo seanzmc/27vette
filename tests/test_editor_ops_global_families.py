@@ -65,6 +65,11 @@ class GlobalFamilyOpsTest(unittest.TestCase):
                 log_path=Path(self._tmp.name) / "edit-log.jsonl",
             )
 
+    def test_editor_ops_aliases_shared_registry(self) -> None:
+        from corvette_form_generator.workbook_domain import registry as shared_registry
+        self.assertIs(editor_ops.GLOBAL_SHEET_FAMILIES, shared_registry.GLOBAL_SHEET_FAMILIES)
+        self.assertIs(editor_ops.SOURCE_ROLE_FAMILIES, shared_registry.SOURCE_ROLE_FAMILIES)
+
     def test_asset_map_and_interior_components_accept_canonical_operations(self) -> None:
         result = self.run_batch(
             [

@@ -12,7 +12,7 @@ SCRIPTS_DIR = ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from corvette_form_generator.editor_ops import (  # noqa: E402
+from corvette_form_generator.workbook_domain.registry import (  # noqa: E402
     EDITOR_SHEET_META,
     GLOBAL_SHEET_FAMILIES,
     SOURCE_ROLE_FAMILIES,
