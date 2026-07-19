@@ -103,7 +103,6 @@ button.ghost { background: transparent; }
 #stage-candidates .filters .ghost { margin-left: auto; }
 /* Review actions sit below summary + filters, behind one separator line. */
 .actions-bar { border-top: 1px solid var(--line); padding-top: 12px; }
-.actions-bar #mark-complete-btn { margin-left: auto; }
 
 table.cand { width: 100%; border-collapse: collapse; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
 table.cand th, table.cand td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
@@ -141,69 +140,6 @@ tr.evidence-row td { background: var(--panel-2); }
 .cmp-label { display: block; margin-top: 8px; font-size: 12px; color: var(--muted); }
 .cmp-select { margin-left: 6px; }
 .sub-h { font-size: 15px; margin: 18px 0 6px; }
-.dec-cell { min-width: 340px; }
-.dec-cell select, .dec-cell input { margin: 2px 4px 2px 0; max-width: 170px; font-size: 12px; }
-.dec-cell .dec-note { max-width: 120px; }
-.dec-save { padding: 3px 10px; font-size: 12px; }
-.group-form { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0; }
-.group-form input, .group-form select { font-size: 12px; padding: 4px 6px; }
-.group-form .rel-help { flex-basis: 100%; margin: 0 0 2px; }
-.rel-kind-options { display: flex; flex-wrap: wrap; gap: 6px; flex-basis: 100%; }
-.rel-kind-choice {
-  display: flex; align-items: flex-start; gap: 6px; max-width: 260px;
-  border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px;
-  background: var(--panel-2); font-size: 12px;
-}
-.rel-kind-choice input { margin-top: 2px; }
-.rel-kind-choice small { display: block; color: var(--muted); line-height: 1.3; }
-#group-payload { min-width: 320px; }
-.hints { margin-top: 4px; }
-.hints .sum-chip { font-size: 11px; }
-.pres-sheet { margin-bottom: 18px; }
-.pres-sheet .desc { font-size: 12px; word-break: break-all; }
-#review-blockers .empty-note { margin: 8px 0; }
-.blocker-panel {
-  border: 1px solid var(--line); border-left: 3px solid var(--red);
-  border-radius: 8px; background: var(--panel); padding: 10px 14px;
-  margin: 8px 0 14px;
-}
-.blocker-panel-ok { border-left-color: var(--green); }
-.blocker-summary { cursor: pointer; display: flex; justify-content: space-between; gap: 12px; align-items: center; }
-.blocker-summary::marker { color: var(--muted); }
-.blocker-toggle-hint { color: var(--muted); font-size: 12px; white-space: nowrap; }
-.blocker-body { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
-.blocker-head { font-size: 13px; }
-.blocker-group { font-size: 13px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-.blocker-chips { display: flex; flex-wrap: wrap; gap: 4px; width: 100%; }
-.blocker-row, .blocker-switch-model {
-  font-size: 11px; padding: 2px 8px; max-width: min(100%, 680px);
-  white-space: normal; overflow-wrap: anywhere; text-align: left;
-}
-.blocker-more { width: 100%; }
-.blocker-more summary { cursor: pointer; font-size: 12px; color: var(--muted); }
-.blocker-more[open] { display: flex; flex-wrap: wrap; gap: 4px; }
-.blocker-more[open] summary { width: 100%; }
-@media (max-width: 900px) {
-  .dec-cell select, .dec-cell input { max-width: 100%; }
-  .group-form { flex-direction: column; align-items: stretch; }
-}
-.pres-edit { width: 100%; font-size: 12px; font-family: monospace; padding: 3px 6px; box-sizing: border-box; }
-.dec-inline { font-size: 12px; white-space: nowrap; margin-right: 6px; }
-.pres-table th { font-size: 11px; text-transform: none; }
-.pres-table .pres-cell { width: 100%; min-width: 70px; font-size: 12px; padding: 2px 4px; box-sizing: border-box; }
-.hint-accept { cursor: pointer; border: 1px dashed currentColor; }
-#bulk-bar:empty { display: none; }
-.lane-help { display: flex; gap: 14px; align-items: baseline; font-size: 13px; color: var(--muted); margin: 6px 0; }
-.lane-help .glossary summary { cursor: pointer; font-size: 12px; }
-.lane-help .glossary ul { font-size: 12px; margin: 4px 0 0 16px; }
-.ref-line { color: #3d7a5d; }
-.ref-line.ref-new { color: #9a7b2f; }
-.ref-use-section { font-size: 11px; padding: 2px 8px; }
-.dec-clear { font-size: 11px; padding: 2px 8px; }
-.row-check { transform: scale(1.15); }
-.plan-list { font-size: 13px; margin: 4px 0 12px 18px; }
-#plan-approver { font-size: 13px; padding: 5px 8px; }
-
 /* Milestone 2 compiler and typed exception flow */
 .gate-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 8px 0; }
 .gate-chip { border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; font-size: 12px; }

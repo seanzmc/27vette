@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
-"""Local dev server for the interactive ingest wizard (Passes A through C).
+"""Local server for the five-function current ingest path.
 
-Read-only toward the canonical workbook and raw exports; writes only
-run-scoped JSON under form-output/ingest-wizard/. Pass A: profile, roles,
-parse, candidates. Pass B: model selection, decision lanes, completeness.
-Pass C: dry-run apply plan and reviewer approval gate.
-See docs/ingest/pass-a/interactive-ingest-wizard-pass-a-spec.md and
-docs/ingest/ingest-wizard-end-to-end-completion-spec.md (Passes B-F).
+The server writes only run-scoped intake, profile, compile, typed-exception,
+and immutable ChangeSet artifacts. Historical decision/plan evidence is GET
+only; workbook approval and application belong to the shared workbook service.
 """
 
 from __future__ import annotations
@@ -23,6 +20,7 @@ SCRIPTS_DIR = ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
+from corvette_form_generator.ingest.wizard.legacy_reader import LegacyRunReader  # noqa: E402
 from corvette_form_generator.ingest.wizard.session import (  # noqa: E402
     WizardError,
     WizardSessionStore,
@@ -104,6 +102,17 @@ class WizardHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _legacy_detail(self, run_id: str, artifact: str) -> dict:
+        reader = LegacyRunReader(self.store.base)
+        try:
+            if artifact == "changeset":
+                return reader.changeset_detail(run_id)
+            return reader.plan_detail(run_id)
+        except FileNotFoundError as exc:
+            raise WizardError(str(exc), status=404) from exc
+        except ValueError as exc:
+            raise WizardError(str(exc)) from exc
+
     # ------------------------------------------------------------- routes
     def do_GET(self) -> None:  # noqa: N802 - stdlib naming
         split = urlsplit(self.path)
@@ -181,9 +190,13 @@ class WizardHandler(BaseHTTPRequestHandler):
                         limit=(query.get("limit") or [50])[0],
                     )
                 )
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/changeset"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/changeset")]
+                self._require_query_fields(query, set(), "ChangeSet")
+                self._send_json(self._legacy_detail(run_id, "changeset"))
             elif path.startswith("/api/wizard/sessions/") and path.endswith("/plan"):
                 run_id = path[len("/api/wizard/sessions/"):-len("/plan")]
-                self._send_json(self.store.plan_detail(run_id))
+                self._send_json(self._legacy_detail(run_id, "plan"))
             elif path.startswith("/api/wizard/sessions/"):
                 run_id = path[len("/api/wizard/sessions/"):]
                 self._send_json(self.store.session_detail(run_id))
@@ -197,7 +210,18 @@ class WizardHandler(BaseHTTPRequestHandler):
         path = unquote(split.path)
         query = parse_qs(split.query)
         try:
-            if path == "/api/wizard/upload":
+            retired_suffixes = (
+                "/decisions",
+                "/decisions/delete",
+                "/copy-decisions",
+                "/complete",
+                "/plan",
+                "/plan/approve",
+                "/write/approve",
+            )
+            if path.startswith("/api/wizard/sessions/") and path.endswith(retired_suffixes):
+                self._send_error_json("Historical ingest mutation is retired.", 410)
+            elif path == "/api/wizard/upload":
                 filename = (query.get("filename") or [""])[0]
                 saved = self.store.save_upload(filename, self._read_body())
                 self._send_json({"file": saved})
@@ -233,6 +257,11 @@ class WizardHandler(BaseHTTPRequestHandler):
                 self._require_exact_fields(payload, set(), "Compile request")
                 self.store.compile_canonical_rows(run_id)
                 self._send_json(self.store.compiler_summary(run_id))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/changeset"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/changeset")]
+                payload = self._json_body()
+                self._require_exact_fields(payload, set(), "ChangeSet request")
+                self._send_json(self.store.emit_changeset(run_id))
             elif path.startswith("/api/wizard/sessions/") and path.endswith("/exceptions/preview"):
                 run_id = path[len("/api/wizard/sessions/"):-len("/exceptions/preview")]
                 payload = self._json_body()
@@ -290,55 +319,6 @@ class WizardHandler(BaseHTTPRequestHandler):
                         reviewer=str(payload.get("reviewer") or ""),
                     )
                 )
-            elif path.startswith("/api/wizard/sessions/") and path.endswith("/decisions/delete"):
-                run_id = path[len("/api/wizard/sessions/"):-len("/decisions/delete")]
-                payload = self._json_body()
-                decision_ids = payload.get("decisionIds")
-                batch_id = str(payload.get("batchId") or "")
-                if decision_ids is not None and not isinstance(decision_ids, list):
-                    raise WizardError("decisionIds must be a list when present.")
-                self._send_json(
-                    self.store.delete_decisions(
-                        run_id,
-                        decision_ids=[str(d) for d in decision_ids] if decision_ids else None,
-                        batch_id=batch_id,
-                    )
-                )
-            elif path.startswith("/api/wizard/sessions/") and path.endswith("/decisions"):
-                run_id = path[len("/api/wizard/sessions/"):-len("/decisions")]
-                payload = self._json_body()
-                decisions = payload.get("decisions")
-                if not isinstance(decisions, list):
-                    raise WizardError("Request body must carry a decisions list.")
-                self._send_json(self.store.save_decisions(run_id, decisions))
-            elif path.startswith("/api/wizard/sessions/") and path.endswith("/copy-decisions"):
-                run_id = path[len("/api/wizard/sessions/"):-len("/copy-decisions")]
-                payload = self._json_body()
-                from_model = str(payload.get("fromModel") or "")
-                to_model = str(payload.get("toModel") or "")
-                if not from_model or not to_model:
-                    raise WizardError("Request body must carry fromModel and toModel.")
-                self._send_json(
-                    self.store.copy_model_decisions(
-                        run_id, from_model, to_model, overwrite=bool(payload.get("overwrite"))
-                    )
-                )
-            elif path.startswith("/api/wizard/sessions/") and path.endswith("/complete"):
-                run_id = path[len("/api/wizard/sessions/"):-len("/complete")]
-                self._json_body()  # accept and ignore an empty JSON body
-                self._send_json(self.store.mark_complete(run_id))
-            elif path.startswith("/api/wizard/sessions/") and path.endswith("/plan"):
-                run_id = path[len("/api/wizard/sessions/"):-len("/plan")]
-                self._json_body()  # accept and ignore an empty JSON body
-                self._send_json(self.store.build_apply_plan(run_id))
-            elif path.startswith("/api/wizard/sessions/") and path.endswith("/plan/approve"):
-                run_id = path[len("/api/wizard/sessions/"):-len("/plan/approve")]
-                payload = self._json_body()
-                self._send_json(self.store.approve_plan(run_id, str(payload.get("approver") or "")))
-            elif path.startswith("/api/wizard/sessions/") and path.endswith("/write/approve"):
-                run_id = path[len("/api/wizard/sessions/"):-len("/write/approve")]
-                payload = self._json_body()
-                self._send_json(self.store.approve_write(run_id, str(payload.get("approver") or "")))
             else:
                 self._send_error_json("Not found.", 404)
         except WizardError as exc:
