@@ -8,6 +8,7 @@ live workbook is never touched.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 import tempfile
@@ -21,6 +22,9 @@ for entry in (ROOT / "scripts", ROOT / "tests"):
         sys.path.insert(0, str(entry))
 
 from corvette_form_generator.editor_ops import extract_workbook  # noqa: E402
+from corvette_form_generator.ingest.wizard.changeset_emitter import (  # noqa: E402
+    emit_manifest_changeset,
+)
 from corvette_form_generator.ingest.wizard.plan_builder import (  # noqa: E402
     build_manifest_plan,
     build_plan,
@@ -1176,6 +1180,358 @@ class CanonicalPlanProjectionTest(unittest.TestCase):
         row["values"] = {**existing, "invented_column": "not canonical"}
         with self.assertRaisesRegex(ValueError, "header"):
             self._build(rows=[row], targets=["zr1"], modes={"zr1": "reprocess"})
+
+
+class LegacyEquivalenceTest(unittest.TestCase):
+    """Test-local equivalence: legacy pass-c-3 projection vs workbook-changeset-1.
+
+    build_manifest_plan remains the production legacy surface until Task 6
+    deletes it; this comparison carries no approval/write authority."""
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self._tmp.name)
+        self.master = build_master_workbook(self.root / "master.xlsx")
+        self.extract = extract_workbook(self.master)
+
+    def tearDown(self) -> None:
+        self._tmp.cleanup()
+
+    def _inputs(self, *, rows: list[dict], targets: list[str], modes: dict[str, str]) -> dict:
+        authority = {
+            "fingerprint": "authority-sha",
+            "bindings": {"compilerPolicyVersion": "fixture"},
+        }
+        return {
+            "workbook_path": self.master,
+            "manifest": {
+                "schemaVersion": "canonical-row-manifest-v1",
+                "manifestSemanticSha": "manifest-semantic-sha",
+                "runAuthorityFingerprint": authority,
+                "modelModes": modes,
+                "rows": rows,
+            },
+            "compile_report": {
+                "models": {
+                    target: {"mode": modes[target], "compileReady": True, "blockers": []}
+                    for target in targets
+                },
+                "deferrals": [],
+                "runAuthorityFingerprint": authority,
+                "queueSubjectFingerprint": "queue-sha",
+                "comparatorEvidenceSemanticSha": "comparator-semantic-sha",
+            },
+            "selection": {
+                "targets": targets,
+                "comparators": {target: "z06" for target in targets},
+                "sourceFingerprint": "source-sha",
+                "candidatesFingerprint": "candidate-sha",
+            },
+            "compiler_bindings": {
+                "canonicalManifestSha": "manifest-file-sha",
+                "compileReportSha": "report-file-sha",
+                "exceptionResolutionsSha": "resolution-file-sha",
+                "exceptionQueueSha": "queue-file-sha",
+                "comparatorEvidenceSha": "comparator-file-sha",
+            },
+            "authority_artifacts": {
+                "exceptionQueue": {
+                    "queueSubjectFingerprint": "queue-sha",
+                    "comparatorEvidenceSemanticSha": "comparator-semantic-sha",
+                    "runAuthorityFingerprint": authority,
+                    "subjects": [],
+                },
+                "resolutions": {
+                    "queueSubjectFingerprint": "queue-sha",
+                    "validEntries": [],
+                },
+                "comparatorEvidence": {
+                    "comparatorEvidenceSemanticSha": "comparator-semantic-sha",
+                    "runAuthorityFingerprint": authority,
+                    "targets": {target: {} for target in targets},
+                },
+            },
+        }
+
+    def _projections(self, *, rows: list[dict], targets: list[str], modes: dict[str, str]):
+        inputs = self._inputs(rows=rows, targets=targets, modes=modes)
+        plan = build_manifest_plan(**inputs)
+        changeset = emit_manifest_changeset(run_id="equivalence-fixture", **inputs)
+        return plan, changeset
+
+    def _existing_row(self, sheet: str, key: dict):
+        for row in self.extract["sheets"].get(sheet, {}).get("rows", []):
+            if all(row.get(column) == value for column, value in key.items()):
+                return row
+        return None
+
+    def _assert_equivalent(self, plan: dict, changeset: dict, manifest_rows: list[dict]) -> None:
+        plan_creates = {
+            (item["sheet"], item["family"], item["headersFrom"])
+            for item in plan["stage1"]["items"]
+            if item["action"] == "create_sheet"
+        }
+        cs_creates = {
+            (item["sheet"], item["family"], item["headersFrom"])
+            for item in changeset["sheetCreates"]
+        }
+        self.assertEqual(plan_creates, cs_creates)
+
+        plan_ops = [
+            item
+            for item in [*plan["stage1"]["items"], *plan["stage2"]["items"]]
+            if item["action"] != "create_sheet"
+        ]
+        plan_by_id = {}
+        for op in plan_ops:
+            ident = (op["action"], op["sheet"], json.dumps(op["key"], sort_keys=True))
+            plan_by_id.setdefault(ident, []).append(op)
+        cs_by_id = {}
+        for change in changeset["rowChanges"]:
+            ident = (change["action"], change["sheet"], json.dumps(change["key"], sort_keys=True))
+            cs_by_id.setdefault(ident, []).append(change)
+        self.assertEqual(set(plan_by_id), set(cs_by_id))
+
+        for ident, changes in cs_by_id.items():
+            change = changes[0]
+            op = plan_by_id[ident][0]
+            after = {column: pair["after"] for column, pair in change["fields"].items()}
+            if change["action"] == "add":
+                self.assertEqual(
+                    after,
+                    {column: value for column, value in op["row"].items() if value is not None},
+                    ident,
+                )
+            elif change["action"] == "update":
+                for column, value in after.items():
+                    self.assertEqual(op["row"].get(column), value, f"{ident} column {column}")
+                current = self._existing_row(change["sheet"], change["key"]) or {}
+                for column, value in op["row"].items():
+                    if column not in after:
+                        self.assertEqual(
+                            current.get(column),
+                            value,
+                            f"{ident} op-only column {column} is not a no-op",
+                        )
+
+        plan_noop_refs = {receipt["manifestRef"] for receipt in plan["coverage"]["noops"]}
+        cs_noop_refs = {
+            entry["provenance"][0]["manifestRef"] for entry in changeset["noops"]
+        }
+        self.assertEqual(plan_noop_refs, cs_noop_refs)
+
+        covered = {
+            entry["provenance"][0]["manifestRef"]
+            for entry in [*changeset["rowChanges"], *changeset["noops"]]
+            if "manifestRef" in entry["provenance"][0]
+        }
+        self.assertEqual(len(covered), len(manifest_rows))
+        self.assertEqual(covered, {f"manifest-{index:05d}" for index in range(len(manifest_rows))})
+
+    def test_reprocess_projection_equivalent(self) -> None:
+        model_row = next(
+            row
+            for row in self.extract["sheets"]["model_master"]["rows"]
+            if row["model_key"] == "zr1"
+        )
+        existing = self.extract["sheets"]["zr1_options"]["rows"][0]
+        updated = {**existing, "description": "Equivalence updated description"}
+        headers = self.extract["sheets"]["zr1_options"]["headers"]
+        added = {header: None for header in headers}
+        added.update(
+            {
+                "option_id": "opt_fixture_new_001",
+                "rpo": "NEW",
+                "price": 100,
+                "option_name": "Fixture option",
+                "description": "Fixture option",
+                "section_id": "sec_whee_001",
+                "selectable": True,
+                "active": True,
+            }
+        )
+        rows = [
+            CanonicalPlanProjectionTest._manifest_row(
+                model="zr1",
+                family="model_master",
+                sheet="model_master",
+                action="noop",
+                key={"model_key": "zr1"},
+                values=model_row,
+            ),
+            CanonicalPlanProjectionTest._manifest_row(
+                model="zr1",
+                family="options",
+                sheet="zr1_options",
+                action="update",
+                key={"option_id": existing["option_id"]},
+                values=updated,
+            ),
+            CanonicalPlanProjectionTest._manifest_row(
+                model="zr1",
+                family="options",
+                sheet="zr1_options",
+                action="add",
+                key={"option_id": added["option_id"]},
+                values=added,
+            ),
+        ]
+        plan, changeset = self._projections(rows=rows, targets=["zr1"], modes={"zr1": "reprocess"})
+        self._assert_equivalent(plan, changeset, rows)
+
+    def test_typed_normalization_equivalent(self) -> None:
+        from openpyxl import load_workbook
+
+        wb = load_workbook(self.master)
+        ws = wb["zr1_options"]
+        headers = {
+            str(cell.value): index + 1
+            for index, cell in enumerate(ws[1])
+            if cell.value is not None
+        }
+        ws.cell(row=2, column=headers["selectable"], value="False")
+        ws.cell(row=2, column=headers["active"], value="True")
+        ws.cell(row=2, column=headers["price"], value="0")
+        wb.save(self.master)
+        wb.close()
+        self.extract = extract_workbook(self.master)
+
+        row = self.extract["sheets"]["zr1_options"]["rows"][0]
+        values = {**row, "selectable": False, "active": True, "price": 0}
+        rows = [
+            CanonicalPlanProjectionTest._manifest_row(
+                model="zr1",
+                family="options",
+                sheet="zr1_options",
+                action="noop",
+                key={"option_id": row["option_id"]},
+                values=values,
+            )
+        ]
+        plan, changeset = self._projections(rows=rows, targets=["zr1"], modes={"zr1": "reprocess"})
+        self._assert_equivalent(plan, changeset, rows)
+
+    def test_greenfield_projection_equivalent(self) -> None:
+        source_headers = self.extract["sheets"]["model_workbook_sources"]["headers"]
+        source_values = {header: None for header in source_headers}
+        source_values.update(
+            {
+                "model_key": "grand_sport_x",
+                "source_role": "source_option_sheet",
+                "sheet_name": "grand_sport_x_options",
+                "active": True,
+            }
+        )
+        option_headers = self.extract["sheets"]["z06_options"]["headers"]
+        option_values = {header: None for header in option_headers}
+        option_values.update(
+            {
+                "option_id": "opt_fixture_001",
+                "rpo": "FIX",
+                "price": 0,
+                "option_name": "Fixture",
+                "description": "Fixture",
+                "section_id": "sec_whee_001",
+                "selectable": True,
+                "active": True,
+            }
+        )
+        rows = [
+            CanonicalPlanProjectionTest._manifest_row(
+                model="grand_sport_x",
+                family="model_workbook_sources",
+                sheet="model_workbook_sources",
+                action="add",
+                key={"model_key": "grand_sport_x", "source_role": "source_option_sheet"},
+                values=source_values,
+            ),
+            CanonicalPlanProjectionTest._manifest_row(
+                model="grand_sport_x",
+                family="options",
+                sheet="grand_sport_x_options",
+                action="add",
+                key={"option_id": "opt_fixture_001"},
+                values=option_values,
+            ),
+        ]
+        plan, changeset = self._projections(
+            rows=rows, targets=["grand_sport_x"], modes={"grand_sport_x": "greenfield"}
+        )
+        self._assert_equivalent(plan, changeset, rows)
+        scaffolds = [
+            change
+            for change in changeset["rowChanges"]
+            if change["provenance"][0].get("kind") == "scaffold"
+        ]
+        self.assertEqual(len(scaffolds), 1)
+        self.assertEqual(scaffolds[0]["key"], {"model_key": "grand_sport_x"})
+
+    @unittest.skipUnless(
+        (Path(__file__).resolve().parents[1]
+         / "form-output/ingest-wizard/20260717-091317-470292/canonical-row-manifest.json").is_file(),
+        "frozen run evidence not present",
+    )
+    def test_frozen_snapshot_projection_equivalent(self) -> None:
+        run_dir = (
+            Path(__file__).resolve().parents[1]
+            / "form-output/ingest-wizard/20260717-091317-470292"
+        )
+        workbook = Path(__file__).resolve().parents[1] / "stingray_master.xlsx"
+        bindings = {}
+        for filename, field in (
+            ("canonical-row-manifest.json", "canonicalManifestSha"),
+            ("compile-report.json", "compileReportSha"),
+            ("exception-resolutions.json", "exceptionResolutionsSha"),
+            ("exception-queue.json", "exceptionQueueSha"),
+            ("comparator-evidence.json", "comparatorEvidenceSha"),
+        ):
+            bindings[field] = hashlib.sha256((run_dir / filename).read_bytes()).hexdigest()
+        inputs = {
+            "workbook_path": workbook,
+            "manifest": read_json(run_dir / "canonical-row-manifest.json"),
+            "compile_report": read_json(run_dir / "compile-report.json"),
+            "selection": read_json(run_dir / "model-selection.json"),
+            "compiler_bindings": bindings,
+            "authority_artifacts": {
+                "exceptionQueue": read_json(run_dir / "exception-queue.json"),
+                "resolutions": read_json(run_dir / "exception-resolutions.json"),
+                "comparatorEvidence": read_json(run_dir / "comparator-evidence.json"),
+            },
+        }
+        plan = build_manifest_plan(**inputs)
+        changeset = emit_manifest_changeset(
+            run_id="20260717-091317-470292", **inputs
+        )
+
+        self.extract = extract_workbook(workbook)
+        self._assert_equivalent(plan, changeset, inputs["manifest"]["rows"])
+
+        self.assertEqual(len(changeset["sheetCreates"]), 9)
+        self.assertEqual(
+            {item["sheet"] for item in changeset["sheetCreates"]},
+            {
+                "grand_sport_x_exclusive_groups",
+                "grand_sport_x_exclusive_members",
+                "grand_sport_x_options",
+                "grand_sport_x_ovs",
+                "grand_sport_x_price_rules",
+                "grand_sport_x_rule_groups",
+                "grand_sport_x_rule_mapping",
+                "grand_sport_x_rule_members",
+                "grand_sport_x_variant_overrides",
+            },
+        )
+        self.assertEqual(len(changeset["rowChanges"]), 3710)
+        self.assertEqual(len(changeset["noops"]), 2699)
+        scaffolds = [
+            change
+            for change in changeset["rowChanges"]
+            if change["provenance"][0].get("kind") == "scaffold"
+        ]
+        self.assertEqual(len(scaffolds), 1)
+        self.assertEqual(scaffolds[0]["key"], {"model_key": "grand_sport_x"})
+        self.assertEqual(scaffolds[0]["fields"]["promoted_to_runtime"]["after"], False)
+        self.assertEqual(scaffolds[0]["fields"]["active"]["after"], False)
 
 
 if __name__ == "__main__":

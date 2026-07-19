@@ -95,6 +95,8 @@ STATE_PARSED = "parsed"
 STATE_MODELS_SELECTED = "models_selected"
 STATE_COMPILED_READY = "compiled_ready"
 STATE_COMPILED = STATE_COMPILED_READY
+# Marks successful ChangeSet emission (workbook-change-set.json written).
+STATE_CHANGESET_EMITTED = "changeset_emitted"
 STATE_COMPILED_WITH_EXCEPTIONS = "compiled_with_exceptions"
 STATE_DECISIONS_IN_PROGRESS = "decisions_in_progress"
 STATE_DECISIONS_COMPLETE = "decisions_complete"
@@ -160,6 +162,7 @@ COMPILER_CACHE_ARTIFACTS = tuple(
 COMPILER_MUTATION_FILES = (*COMPILER_ARTIFACTS, "exception-log.jsonl", "session.json")
 COMPILER_STATES = (STATE_COMPILED, STATE_COMPILED_WITH_EXCEPTIONS)
 COMPILER_EVIDENCE_STATES = COMPILER_STATES + (
+    STATE_CHANGESET_EMITTED,
     STATE_PLAN_BUILT,
     STATE_PLAN_APPROVED,
     STATE_DRY_RUN_APPROVED,
@@ -769,7 +772,9 @@ class WizardSessionStore:
         self, run_id: str, *, allow_compiled: bool = False
     ) -> tuple[dict[str, Any], Path, list[dict[str, Any]]]:
         session = self.load_session(run_id, verify_source=False)
-        allowed = (STATE_PARSED,) + DECISION_STATES + (COMPILER_STATES if allow_compiled else ())
+        allowed = (STATE_PARSED,) + DECISION_STATES + (
+            COMPILER_STATES + (STATE_CHANGESET_EMITTED,) if allow_compiled else ()
+        )
         if session["state"] not in allowed:
             raise WizardError("Run the parse before Pass B model selection.")
         candidates_file = self.run_dir(run_id) / "option-candidates.json"
@@ -3241,6 +3246,61 @@ class WizardSessionStore:
         session["state"] = STATE_PLAN_BUILT if dry_run["ok"] else STATE_DECISIONS_COMPLETE
         write_json(run_dir / "session.json", session)
         return {"session": session, "plan": plan_summary(plan), "dryRun": dry_run}
+
+    def emit_changeset(self, run_id: str) -> dict[str, Any]:
+        """Emit the signed ``workbook-changeset-1`` artifact for a compiled run.
+
+        Projects the exact-current canonical manifest through the decision-free
+        changeset emitter and atomically replaces workbook-change-set.json plus
+        session.json. Re-emission from identical inputs is a byte-identical
+        no-op; the run must be recompiled first when compiler inputs went
+        stale."""
+
+        from corvette_form_generator.ingest.wizard.changeset_emitter import (
+            emit_manifest_changeset,
+        )
+
+        session = self.load_session(run_id, verify_source=False)
+        self._refuse_if_applied(session)
+        if session["state"] not in (STATE_COMPILED_READY, STATE_CHANGESET_EMITTED):
+            raise WizardError(
+                "Resolve compiler blockers before emitting the ChangeSet.",
+                status=409,
+            )
+        run_dir = self.run_dir(run_id)
+        _, candidates_file, _candidates = self._parsed_candidates(
+            run_id, allow_compiled=True
+        )
+        selection = self._load_selection(run_id, candidates_file)
+        workbook = self._require_workbook()
+        detail = self.compiler_detail(run_id)
+        freshness = self._compiler_freshness(run_id, detail["compileReport"])
+        if freshness["stale"]:
+            raise WizardError(
+                "Compiler inputs changed; recompile before emitting the ChangeSet: "
+                + ", ".join(freshness["reasons"]),
+                status=409,
+            )
+        bindings = self._compiler_artifact_bindings(run_dir)
+        changeset = emit_manifest_changeset(
+            workbook_path=workbook,
+            run_id=run_id,
+            manifest=detail["manifest"],
+            compile_report=detail["compileReport"],
+            selection=selection,
+            compiler_bindings=bindings,
+            authority_artifacts={
+                "exceptionQueue": detail["exceptionQueue"],
+                "resolutions": detail["resolutions"],
+                "comparatorEvidence": read_json(run_dir / "comparator-evidence.json"),
+            },
+        )
+        session["state"] = STATE_CHANGESET_EMITTED
+        replace_json_artifact_set(
+            run_dir,
+            {"workbook-change-set.json": changeset, "session.json": session},
+        )
+        return {"session": session, "changeSet": changeset}
 
     def plan_detail(self, run_id: str) -> dict[str, Any]:
         run_dir = self.run_dir(run_id)
