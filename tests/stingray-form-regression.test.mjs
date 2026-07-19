@@ -751,6 +751,10 @@ test("mobile shell exposes compact progress and summary targets", () => {
   assert.doesNotMatch(htmlSource, /Current Build/);
   assert.match(htmlSource, /<small class="mobile-summary-label">Build Summary<\/small>/);
   assert.match(htmlSource, /id="mobileSummaryButton"/);
+  // the mobile summary pill lives inside the topbar next to the hamburger
+  assert.match(htmlSource, /id="openStepDrawerButton"[\s\S]*id="mobileSummaryButton"[\s\S]*class="brand-block"/);
+  // summary drawer hosts mobile copies of Reset / Download / Submit
+  assert.match(htmlSource, /id="summaryActionsCard"[\s\S]*id="summaryResetButton"[\s\S]*id="summaryDownloadButton"[\s\S]*id="summarySubmitButton"/);
   assert.match(htmlSource, /id="openSummaryDrawerButton"/);
   assert.match(htmlSource, /id="downloadBuildButton"[\s\S]*aria-label="Download Build"[\s\S]*<svg class="download-icon"[\s\S]*<path d="M12 3v11/);
   assert.match(htmlSource, /class="toolbar-action-group toolbar-build-group"[\s\S]*id="openSummaryDrawerButton"[\s\S]*id="submitDealerButton"/);
@@ -830,16 +834,25 @@ test("summary drawer is callable from desktop and condensed at smaller breakpoin
   assert.match(narrowDesktopBreakpoint, /\.toolbar \.mobile-drawer-button-right\s*\{[\s\S]*width:\s*100%/);
   assert.match(middleBreakpoint, /\.mobile-summary-bar\s*\{[\s\S]*display:\s*none/);
   assert.doesNotMatch(middleBreakpoint, /\.step-rail\s*\{[\s\S]*position:\s*fixed/);
-  assert.match(mobileBreakpoint, /\.mobile-summary-bar\s*\{[\s\S]*display:\s*grid/);
-  assert.match(mobileBreakpoint, /\.toolbar \.mobile-drawer-button-right\s*\{[\s\S]*display:\s*none/);
-  assert.match(mobileBreakpoint, /\.mobile-summary-bar\s*\{[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\) auto/);
+  // mobile header: compact summary pill + hamburger share row 1 of an
+  // in-flow topbar grid; the toolbar (Reset/Download/Submit) is hidden and
+  // its actions live in the summary drawer + final step instead
+  assert.match(mobileBreakpoint, /\.mobile-summary-bar\s*\{[\s\S]*display:\s*inline-flex/);
+  assert.match(mobileBreakpoint, /\.mobile-summary-bar\s*\{[\s\S]*grid-column:\s*3;[\s\S]*grid-row:\s*1/);
   assert.match(mobileBreakpoint, /\.mobile-summary-bar > span:last-child\s*\{[\s\S]*white-space:\s*nowrap/);
-  assert.match(mobileBreakpoint, /\.mobile-summary-bar > span:last-child\s*\{[\s\S]*width:\s*36px/);
   assert.doesNotMatch(mobileBreakpoint, /\.mobile-summary-bar > span:last-child::after/);
-  assert.match(mobileBreakpoint, /\.mobile-progress\[data-has-next="false"\]\s*\{[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\)/);
-  assert.match(mobileBreakpoint, /\.toolbar\s*\{[\s\S]*grid-template-columns:\s*44px 44px minmax\(0, 1fr\)/);
-  assert.match(mobileBreakpoint, /\.toolbar #downloadBuildButton\s*\{[\s\S]*grid-column:\s*2/);
-  assert.match(mobileBreakpoint, /\.toolbar #submitDealerButton\s*\{[\s\S]*grid-column:\s*3/);
+  assert.match(mobileBreakpoint, /\.mobile-drawer-button\s*\{[\s\S]*position:\s*static/);
+  assert.doesNotMatch(mobileBreakpoint, /\.mobile-drawer-button\s*\{[\s\S]*position:\s*absolute/);
+  assert.doesNotMatch(mobileBreakpoint, /\.topbar\s*\{[\s\S]*padding:\s*52px/);
+  assert.match(mobileBreakpoint, /\.topbar\s*\{[\s\S]*grid-template-columns:\s*auto minmax\(0, 1fr\) auto/);
+  assert.match(mobileBreakpoint, /\.brand-block\s*\{[\s\S]*grid-column:\s*1 \/ -1;[\s\S]*grid-row:\s*2/);
+  assert.match(mobileBreakpoint, /\.mobile-progress\[data-has-previous="false"\]\s*\{[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\)/);
+  assert.match(mobileBreakpoint, /#mobileNextStep\s*\{[\s\S]*display:\s*none/);
+  assert.match(mobileBreakpoint, /\.toolbar\s*\{[\s\S]*display:\s*none/);
+  assert.match(mobileBreakpoint, /\.summary-actions\s*\{[\s\S]*display:\s*grid;[\s\S]*grid-template-columns:\s*1fr 1fr/);
+  assert.match(mobileBreakpoint, /\.summary-actions #summarySubmitButton\s*\{[\s\S]*grid-column:\s*1 \/ -1/);
+  assert.match(mobileBreakpoint, /\.setup-step-footer\s*\{[\s\S]*display:\s*flex/);
+  assert.match(mobileBreakpoint, /\.vehicle-setup-next-action\s*\{[\s\S]*display:\s*none/);
   assert.match(mobileBreakpoint, /\.setup-choice-grid,\n\s*\.trim-setup-group \.setup-choice-grid\s*\{[\s\S]*grid-template-columns:\s*1fr/);
   assert.match(mobileBreakpoint, /\.setup-choice-card,\n\s*\.model-choice-card\s*\{[\s\S]*min-width:\s*0/);
   assert.match(mobileBreakpoint, /\.vehicle-setup-stepper\s*\{[\s\S]*display:\s*grid;[\s\S]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/);
@@ -858,6 +871,10 @@ test("summary drawer redirects page wheel scrolling and lets standard equipment 
   assert.match(appSource, /function tooltipShouldFloat/);
   assert.match(appSource, /tooltipShouldFloat\(trigger\)/);
   assert.match(appSource, /dataset\.floating = "viewport"/);
+  // fixed-position floating panels must close on scroll/resize or they
+  // detach from their trigger card
+  assert.match(appSource, /document\.addEventListener\(\s*"scroll",[\s\S]*closeTooltips\(\);[\s\S]*\{ capture: true, passive: true \}/);
+  assert.match(appSource, /window\.addEventListener\?\.\("resize", \(\) => closeTooltips\(\)\)/);
   assert.match(stylesSource, /\.tooltip-panel\[data-floating="viewport"\]\s*\{[\s\S]*position:\s*fixed;[\s\S]*z-index:\s*120/);
   assert.match(stylesSource, /\.app-shell\[data-mobile-drawer="summary"\] \.summary-panel\s*\{[\s\S]*transform:\s*none/);
   assert.match(appSource, /standard-equipment-summary/);

@@ -1,0 +1,22 @@
+== gates: node grand-sport + switching: 72/72 pass (see below reproduction)
+== pytest metadata gates: 75 passed
+== schema gate: valid, 0 errors
+
+-- apply_workbook_ops dry-run: ok/validated, 128 ops, schema valid
+-- apply_workbook_ops --write: ok/applied, 128 ops, backup backups/stingray_master-20260711-121000.xlsx
+
+ℹ tests 72
+ℹ suites 0
+ℹ pass 72
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2645.167416
+...                                                                      [100%]
+75 passed in 1.02s
+  "issue_count": 0,
+  "error_count": 0,
+  "warning_count": 0,
+  "issues": []
+}

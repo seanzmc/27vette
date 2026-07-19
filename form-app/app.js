@@ -78,6 +78,9 @@ const els = {
   resetButton: document.querySelector("#resetButton"),
   downloadBuildButton: document.querySelector("#downloadBuildButton"),
   submitDealerButton: document.querySelector("#submitDealerButton"),
+  summaryResetButton: document.querySelector("#summaryResetButton"),
+  summaryDownloadButton: document.querySelector("#summaryDownloadButton"),
+  summarySubmitButton: document.querySelector("#summarySubmitButton"),
   dealerSubmitModal: document.querySelector("#dealerSubmitModal"),
   dealerSubmitForm: document.querySelector("#dealerSubmitForm"),
   dealerSubmitName: document.querySelector("#dealerSubmitName"),
@@ -559,6 +562,18 @@ if (document?.addEventListener) {
     if (stopEventAfterTooltipTouch(event)) return;
     if (!event.target?.closest?.(".info-tooltip")) closeTooltips();
   });
+  // floating tooltip panels are position: fixed with coordinates computed at
+  // open time, so any scroll or resize detaches them from their trigger —
+  // close instead of chasing the trigger
+  document.addEventListener(
+    "scroll",
+    (event) => {
+      if (event.target?.nodeType === 1 && event.target.closest?.(".tooltip-panel")) return;
+      closeTooltips();
+    },
+    { capture: true, passive: true }
+  );
+  if (typeof window !== "undefined") window.addEventListener?.("resize", () => closeTooltips());
 }
 
 function currentVariant() {
@@ -2527,6 +2542,7 @@ function renderFinalStepActions() {
   const disabled = missing.length ? "disabled" : "";
   return `
     <footer class="step-footer final-step-actions" aria-label="Build actions">
+      <button type="button" class="ghost-button" data-final-reset>Reset Build</button>
       <button type="button" data-final-download ${disabled} title="${downloadTitle}">Download Build</button>
       <button type="button" data-final-submit ${disabled} title="${submitTitle}">Submit to Dealer</button>
     </footer>
@@ -2654,7 +2670,16 @@ function renderStepContent({ resetScroll = false } = {}) {
 
   const next = nextStep();
   const isVehicleSetupStep = isModelStep;
+  const setupStage = isModelStep ? normalizeVehicleSetupStage(state.vehicleSetupStage) : "";
+  const setupNextLabel = setupStage === "model" ? "Body Style" : setupStage === "body_style" ? "Trim Level" : "";
   const nextButtonLabel = next ? `Next: ${next.step_label}` : "";
+  // mobile-only sticky footer for the Vehicle Setup stages; desktop keeps the
+  // in-panel "Continue to …" action (footer hidden by CSS above 760px)
+  const setupFooterLabel = setupNextLabel ? `Next: ${setupNextLabel}` : nextButtonLabel;
+  const setupFooter =
+    isVehicleSetupStep && setupFooterLabel
+      ? `<footer class="step-footer setup-step-footer"><button type="button" data-next-step="${next?.step_key || "model"}">${setupFooterLabel}</button></footer>`
+      : "";
   els.stepContent.dataset.activeStep = state.activeStep;
   els.stepContent.dataset.stepKind = isModelStep ? "model" : isContextStep ? "context" : "option";
   els.stepContent.innerHTML = `
@@ -2669,9 +2694,9 @@ function renderStepContent({ resetScroll = false } = {}) {
     ${
       next && !isVehicleSetupStep
         ? `<footer class="step-footer"><button type="button" data-next-step="${next.step_key}">${nextButtonLabel}</button></footer>`
-        : !next
-          ? renderFinalStepActions()
-          : ""
+        : isVehicleSetupStep
+          ? setupFooter
+          : renderFinalStepActions()
     }
   `;
   if (resetScroll) resetStepScroll();
@@ -2708,7 +2733,8 @@ function renderStepContent({ resetScroll = false } = {}) {
       setVehicleSetupStage(button.dataset.setupStage);
     });
   });
-  els.stepContent.querySelector("[data-next-step]")?.addEventListener("click", goToNextStep);
+  els.stepContent.querySelectorAll("[data-next-step]").forEach((button) => button.addEventListener("click", goToNextStep));
+  els.stepContent.querySelector("[data-final-reset]")?.addEventListener("click", requestResetBuild);
   els.stepContent.querySelector("[data-final-download]")?.addEventListener("click", downloadBuild);
   els.stepContent.querySelector("[data-final-submit]")?.addEventListener("click", openDealerSubmitModal);
   bindTooltips(els.stepContent);
@@ -2785,6 +2811,14 @@ function renderSummary() {
   if (els.submitDealerButton) {
     els.submitDealerButton.disabled = missing.length > 0;
     els.submitDealerButton.title = missing.length ? "Complete required selections before submitting your build." : "";
+  }
+  if (els.summaryDownloadButton) {
+    els.summaryDownloadButton.disabled = missing.length > 0;
+    els.summaryDownloadButton.title = missing.length ? "Complete required selections before downloading your build." : "";
+  }
+  if (els.summarySubmitButton) {
+    els.summarySubmitButton.disabled = missing.length > 0;
+    els.summarySubmitButton.title = missing.length ? "Complete required selections before submitting your build." : "";
   }
   if (els.mobileSummaryTotal) els.mobileSummaryTotal.textContent = formatMoney(total);
   if (els.mobileSummarySelected) {
@@ -3364,6 +3398,17 @@ function init() {
   els.resetButton.addEventListener("click", requestResetBuild);
   els.downloadBuildButton.addEventListener("click", downloadBuild);
   els.submitDealerButton?.addEventListener("click", openDealerSubmitModal);
+  // summary-drawer copies: close the drawer first so the confirm/submit modals
+  // (z-index 20) are not covered by the drawer (z-index 30)
+  els.summaryResetButton?.addEventListener("click", () => {
+    closeMobileDrawers();
+    requestResetBuild();
+  });
+  els.summaryDownloadButton?.addEventListener("click", downloadBuild);
+  els.summarySubmitButton?.addEventListener("click", () => {
+    closeMobileDrawers();
+    openDealerSubmitModal();
+  });
   els.mobilePrevStep?.addEventListener("click", goToPreviousStep);
   els.mobileNextStep?.addEventListener("click", goToNextStep);
   els.openStepDrawerButton?.addEventListener("click", () => setMobileDrawer("steps"));

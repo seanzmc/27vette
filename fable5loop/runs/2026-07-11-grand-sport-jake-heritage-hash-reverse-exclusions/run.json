@@ -1,0 +1,61 @@
+{
+ "run": "2026-07-11-grand-sport-jake-heritage-hash-reverse-exclusions",
+ "changed_surfaces": [
+  "workbook",
+  "generated_artifacts",
+  "registry"
+ ],
+ "spec": ".hermes/plans/grand-sport-jake-heritage-hash-reverse-exclusions-spec.md",
+ "workbook_write": {
+  "tool": "scripts/apply_workbook_ops.py",
+  "ops": 40,
+  "backup": "backups/stingray_master-20260711-124953.xlsx"
+ },
+ "verifier": {
+  "required": true,
+  "independent_context": true,
+  "verdict": "pass",
+  "accepted_by_human": false,
+  "cycles": 1,
+  "pattern": "adversarial-verification",
+  "cycle1": "pass - independent subagent re-derived all rubric items from scratch: 5 groups x 7 targets on disk, gates 25/25 + 47/47 node + 73/73 pytest + schema valid, browser DOM/aria proof for SNE and VPW, scope limited to expected artifacts"
+ },
+ "gates": {
+  "node_grand_sport": "25/25",
+  "node_multi_model_runtime_switching": "47/47",
+  "pytest_metadata": "73/73",
+  "workbook_schema": "valid_0_errors"
+ },
+ "browser_proof": "SNE and VPW selections independently DOM/aria-verified to disable all 6 hash marks + Z15 with correct reason text; deselect re-enables both; screenshots rendered blank this session so DOM/aria-disabled state was used as the verification signal",
+ "followups": [
+  "PDA/VPW not disabled when Z15 or a hash mark is selected first (Z15's own reverse group doesn't target them) - pre-existing, out of scope for this pass"
+ ],
+ "id": "2026-07-11-grand-sport-jake-heritage-hash-reverse-exclusions",
+ "started_at": "2026-07-11T12:45:00",
+ "completed_at": "2026-07-11T13:20:00",
+ "objective": "Grand Sport: SHT/PDA/SNE/VPO/VPW must deactivate Heritage Hash Marks + Z15 (Jake-graphics analog of the closed stripe/heritage reverse-exclusion gap)",
+ "changed_surface": "workbook + regenerated grand-sport artifacts + registry",
+ "outcome_rubric": "fable5loop/runs/2026-07-11-grand-sport-jake-heritage-hash-reverse-exclusions/outcome.md",
+ "verifier_report": "fable5loop/runs/2026-07-11-grand-sport-jake-heritage-hash-reverse-exclusions/verifier-report.md",
+ "validation_output": "fable5loop/runs/2026-07-11-grand-sport-jake-heritage-hash-reverse-exclusions/validation-output.txt",
+ "state_updates": [
+  {
+   "section": "Verified facts",
+   "evidence": "fable5loop/runs/2026-07-11-grand-sport-jake-heritage-hash-reverse-exclusions/verifier-report.md"
+  },
+  {
+   "section": "Open failures",
+   "evidence": "fable5loop/runs/2026-07-11-grand-sport-jake-heritage-hash-reverse-exclusions/outcome.md"
+  },
+  {
+   "section": "Last session",
+   "evidence": "fable5loop/runs/2026-07-11-grand-sport-jake-heritage-hash-reverse-exclusions/validation-output.txt"
+  }
+ ],
+ "skill_update": {
+  "decision": "not_applicable",
+  "evidence": "fable5loop/runs/2026-07-11-grand-sport-jake-heritage-hash-reverse-exclusions/verifier-report.md",
+  "detail": "Fix reused the established explicit-reverse-group workbook convention and existing apply_workbook_ops/regenerate/gate pipeline; single-cycle independent verifier pass produced no new durable procedural lesson. Screenshot-render flakiness in this session was worked around with DOM/aria inspection, which is situational tooling behavior, not a repo-durable lesson."
+ },
+ "boundaries_preserved": "dealer submission untouched; generated artifacts regenerated (never hand-edited); workbook written via apply_workbook_ops.py with backup"
+}

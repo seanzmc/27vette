@@ -224,7 +224,7 @@ const expectedGrandSportExclusiveGroups = [
   },
   {
     groupId: "gs_excl_performance_aero",
-    optionIds: ["opt_t0e_001", "opt_t0f_001"],
+    optionIds: ["opt_t0e_001", "opt_t0f_001", "opt_5zv_001"],
     selectionMode: "required_single_within_group",
   },
   {
@@ -953,6 +953,31 @@ test("Grand Sport Z52 packages keep direct replacement peers unavailable", () =>
   assert.equal(runtime.state.selected.has("opt_t0e_001"), true, "T0E should restore when no aero peer remains");
   assert.equal(runtime.state.selected.has("opt_jx6_001"), true, "JX6 should restore when no brake peer remains");
   assert.equal(autoAddedRpos().some((rpo) => ["J56", "J57", "T0F"].includes(rpo)), false);
+});
+
+test("Grand Sport 5ZV high wing satisfies the required aero choice", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grandSport");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const choice = (optionId) => runtime.activeChoiceRows().find((candidate) => candidate.option_id === optionId);
+  const fiveZv = choice("opt_5zv_001");
+  assert.ok(fiveZv, "5ZV should be active for Grand Sport");
+  assert.equal(runtime.state.selected.has("opt_t0e_001"), true, "T0E should start as the Grand Sport default aero choice");
+
+  runtime.handleChoice(fiveZv);
+  runtime.reconcileSelections();
+
+  assert.equal(runtime.state.selected.has("opt_5zv_001"), true, "5ZV should remain selected");
+  assert.equal(runtime.state.selected.has("opt_t0e_001"), false, "5ZV should replace the T0E aero default");
+  assert.equal(
+    runtime.missingRequirementDetails().some((item) => item.label === "Aero Packages"),
+    false,
+    "5ZV should satisfy the required Grand Sport aero group"
+  );
 });
 
 test("GBA paint blocks EDU but not CFL across active models", () => {

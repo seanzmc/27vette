@@ -1,0 +1,56 @@
+{
+ "run": "2026-07-11-grand-sport-stripe-hash-reverse-exclusions",
+ "changed_surfaces": [
+  "workbook",
+  "generated_artifacts",
+  "registry"
+ ],
+ "spec": ".hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md",
+ "workbook_write": {
+  "tool": "scripts/apply_workbook_ops.py",
+  "ops": 128,
+  "backup": "backups/stingray_master-20260711-121000.xlsx"
+ },
+ "verifier": {
+  "required": true,
+  "independent_context": true,
+  "verdict": "pass",
+  "accepted_by_human": false,
+  "cycles": 1,
+  "pattern": "adversarial-verification",
+  "cycle1": "pass - all 5 rubric criteria (workbook truth 16x7, generated-diff purity, runtime semantics static read, gates 72/72 + 75/75, schema valid); non-blocking note: include workbook-edit-log line in commit"
+ },
+ "gates": {
+  "node_grand_sport_and_switching": "72/72",
+  "pytest_metadata": "75/75",
+  "workbook_schema": "valid_0_errors"
+ },
+ "browser_proof": "DPB->hash disabled with reason; deselect->re-enabled; 17A->stripes disabled",
+ "followups": [
+  "Jake graphics (SHT/PDA/SNE/VPO) exclude Z15 but not hash marks - same invalid-state path; spawned as task chip"
+ ],
+ "id": "2026-07-11-grand-sport-stripe-hash-reverse-exclusions",
+ "started_at": "2026-07-11T12:00:00",
+ "completed_at": "2026-07-11T12:45:00",
+ "objective": "Grand Sport: full-length stripes must deactivate Heritage Hash Marks (reverse exclusion gap)",
+ "changed_surface": "workbook + regenerated grand-sport artifacts + registry",
+ "outcome_rubric": "fable5loop/runs/2026-07-11-grand-sport-stripe-hash-reverse-exclusions/outcome.md",
+ "verifier_report": "fable5loop/runs/2026-07-11-grand-sport-stripe-hash-reverse-exclusions/verifier-report.md",
+ "validation_output": "fable5loop/runs/2026-07-11-grand-sport-stripe-hash-reverse-exclusions/validation-output.txt",
+ "state_updates": [
+  {
+   "section": "Verified facts",
+   "evidence": "fable5loop/runs/2026-07-11-grand-sport-stripe-hash-reverse-exclusions/verifier-report.md"
+  },
+  {
+   "section": "Last session",
+   "evidence": "fable5loop/runs/2026-07-11-grand-sport-stripe-hash-reverse-exclusions/validation-output.txt"
+  }
+ ],
+ "skill_update": {
+  "decision": "not_applicable",
+  "evidence": "fable5loop/runs/2026-07-11-grand-sport-stripe-hash-reverse-exclusions/verifier-report.md",
+  "detail": "Fix reused the established explicit-reverse-group workbook convention and the existing apply_workbook_ops/regenerate/gate pipeline; single-cycle verifier pass produced no new durable procedural lesson."
+ },
+ "boundaries_preserved": "dealer submission untouched; generated artifacts regenerated (never hand-edited); workbook written via apply_workbook_ops.py with backup"
+}
