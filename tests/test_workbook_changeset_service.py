@@ -236,6 +236,58 @@ def test_apply_refuses_mismatched_preview_binding(tmp_path):
     assert workbook.read_bytes() == before
 
 
+def test_approve_refuses_preview_changed_after_fingerprinting(tmp_path):
+    workbook = make_workbook(tmp_path)
+    changeset = make_valid_changeset(workbook)
+    preview = preview_changeset(workbook, changeset)
+    preview["createdAt"] = "tampered-after-preview"
+
+    approval = approve_changeset(
+        changeset, preview, actor="Sean", warning_ids=[],
+    )
+
+    assert approval["ok"] is False
+    assert approval["status"] == "binding_mismatch"
+
+
+def test_apply_refuses_preview_changed_after_approval(tmp_path):
+    workbook = make_workbook(tmp_path)
+    before = workbook.read_bytes()
+    changeset = make_valid_changeset(workbook)
+    preview = preview_changeset(workbook, changeset)
+    approval = approve_changeset(changeset, preview, actor="Sean", warning_ids=[])
+    preview["createdAt"] = "tampered-after-approval"
+
+    receipt = apply_changeset(
+        workbook, changeset, preview, approval,
+        log_path=tmp_path / "edit-log.jsonl",
+    )
+
+    assert receipt["ok"] is False
+    assert receipt["status"] == "binding_mismatch"
+    assert receipt["workbookState"] == "untouched"
+    assert workbook.read_bytes() == before
+
+
+def test_apply_refuses_approval_changed_after_fingerprinting(tmp_path):
+    workbook = make_workbook(tmp_path)
+    before = workbook.read_bytes()
+    changeset = make_valid_changeset(workbook)
+    preview = preview_changeset(workbook, changeset)
+    approval = approve_changeset(changeset, preview, actor="Sean", warning_ids=[])
+    approval["actor"] = "tampered-after-approval"
+
+    receipt = apply_changeset(
+        workbook, changeset, preview, approval,
+        log_path=tmp_path / "edit-log.jsonl",
+    )
+
+    assert receipt["ok"] is False
+    assert receipt["status"] == "approval_invalid"
+    assert receipt["workbookState"] == "untouched"
+    assert workbook.read_bytes() == before
+
+
 def test_approve_requires_exact_warning_acceptance(tmp_path):
     workbook = make_workbook(tmp_path)
     changeset = _zr1_scaffold_changeset(workbook)

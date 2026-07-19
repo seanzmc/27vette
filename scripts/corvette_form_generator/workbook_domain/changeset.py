@@ -226,10 +226,14 @@ def _find_row(rows, key_columns, key):
 def _check_before_values(change, current, ctx):
     for column, pair in change["fields"].items():
         actual = current.get(column)
-        if actual != pair["before"]:
+        expected = pair["before"]
+        bool_type_mismatch = (
+            isinstance(actual, bool) or isinstance(expected, bool)
+        ) and type(actual) is not type(expected)
+        if bool_type_mismatch or actual != expected:
             raise ChangeSetError(
                 f"{ctx} stale before value for field {column!r}: "
-                f"changeset expects {pair['before']!r}, "
+                f"changeset expects {expected!r}, "
                 f"workbook has {actual!r}")
 
 

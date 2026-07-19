@@ -491,3 +491,17 @@ def test_before_value_comparison_tolerates_float_int_equivalence():
     extract["sheets"]["stingray_options"]["rows"][0]["price"] = 100.0
     batch = changeset_to_editor_batch(parsed, extract)
     assert batch["items"][0]["row"] == {"price": 200}
+
+
+def test_before_value_comparison_rejects_bool_int_equivalence():
+    payload = sample_changeset()
+    payload["rowChanges"][0]["fields"] = {
+        "selectable": {"before": True, "after": False},
+    }
+    parsed = parse_changeset(_resign(payload))
+    extract = {"sheets": {"stingray_options": {
+        "headers": ["option_id", "selectable"],
+        "rows": [{"option_id": "opt_1", "selectable": 1}],
+    }}}
+    with pytest.raises(ChangeSetError, match="before value"):
+        changeset_to_editor_batch(parsed, extract)

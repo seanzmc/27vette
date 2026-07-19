@@ -38,6 +38,11 @@ def _fingerprint(payload: dict, exclude: str) -> str:
     return hashlib.sha256(canonical_json(body).encode("utf-8")).hexdigest()
 
 
+def _fingerprint_matches(payload: dict, field: str) -> bool:
+    stored = payload.get(field)
+    return isinstance(stored, str) and stored == _fingerprint(payload, field)
+
+
 def _live_workbook_fingerprint(path: Path) -> dict:
     path = Path(path)
     return {
@@ -108,6 +113,9 @@ def approve_changeset(changeset: dict, preview: dict, *, actor: str,
     if preview.get("status") != "validated":
         return {"ok": False, "status": "preview_not_validated",
                 "errors": [f"preview status is {preview.get('status')!r}, not 'validated'"]}
+    if not _fingerprint_matches(preview, "previewFingerprint"):
+        return {"ok": False, "status": "binding_mismatch",
+                "errors": ["preview contents do not match previewFingerprint"]}
     if (preview.get("semanticFingerprint") != changeset.get("semanticFingerprint")
             or preview.get("changeSetId") != changeset.get("changeSetId")
             or preview.get("workbook") != changeset.get("workbook")):
@@ -156,6 +164,14 @@ def apply_changeset(workbook_path, changeset: dict, preview: dict,
         return {"ok": False, "status": "approval_invalid",
                 "workbookState": "untouched",
                 "errors": ["apply requires a passing workbook-change-approval-1"]}
+    if not _fingerprint_matches(preview, "previewFingerprint"):
+        return {"ok": False, "status": "binding_mismatch",
+                "workbookState": "untouched",
+                "errors": ["preview contents do not match previewFingerprint"]}
+    if not _fingerprint_matches(approval, "approvalFingerprint"):
+        return {"ok": False, "status": "approval_invalid",
+                "workbookState": "untouched",
+                "errors": ["approval contents do not match approvalFingerprint"]}
     if (approval.get("semanticFingerprint") != changeset.get("semanticFingerprint")
             or approval.get("semanticFingerprint") != preview.get("semanticFingerprint")
             or approval.get("previewFingerprint") != preview.get("previewFingerprint")
