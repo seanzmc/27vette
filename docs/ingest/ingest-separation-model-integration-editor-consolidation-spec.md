@@ -227,6 +227,40 @@ Use the shared ChangeSet path to write the three proven models into the canonica
 9. Reopen the saved workbook, verify exact readback, package/schema integrity, and the backup on disk.
 10. Regenerate all affected artifacts through the normal workbook-to-generator path and review every workbook/generated diff.
 
+#### Task 8 checkpoint status (2026-07-19)
+
+Task 8 stopped at its mandatory frozen-resolution fingerprint gate. Branch
+reconciliation commit `39736fb` preserves `origin/main`'s canonical workbook
+(SHA-256 `646f58e7c951963a43045b6cb5d351d7ff8e1b2460299bdf9b8cfa7d741b8379`),
+`form-app/data.js` (SHA-256
+`565d22859292b3f514dfc177a7392402afc897c3e080be945b4d068995093230`),
+and workbook edit log (SHA-256
+`477eb20af3e6e13751d8f3e3286dab01b74d3b240b120f78e0cb43bdb0c42269`).
+Exact-current run `20260719-174505-0085ca` used raw-source SHA-256
+`6ac9538d5bb8a823ade9afea70b2654057b793e1cf27c081c088545aa3add8a1`
+and run-authority fingerprint
+`9636f4851744878d0b69c1acb2cf633b03f2dcd1c90a75bc2e30f80ba207f56f`.
+Its compile report SHA-256 is
+`6c481ac9260978dcf85db6b24ff9b2cad7b92e9e8b0c2b03c689d98e6bcbfc0e`;
+its 6,021-row preliminary manifest is 2,616 add, 891 update, and 2,514
+noop rows, with semantic SHA
+`e4fcb2ac79c38ce3414890d6d06402e7e73eaac2cabe56da4a4ad92cceb9873a`.
+
+The new queue has 206 subjects and fingerprint
+`54da41d8085511092bb21e0de056b823b8c523f5952c030cf441a8b803b37937`;
+the frozen 158-resolution packet requires fingerprint
+`0634e4e0ba2b628e02b88d6325e2ea2aa3d5cfa5eb32aba7e4a69b05f647cf79`.
+The subject sets have 139 IDs in common, 67 new IDs, 19 removed IDs, and
+eight changed versions among the common IDs. Current `main` also changes the
+Grand Sport comparator authority relative to the frozen workbook: one
+exclusive-member addition, 21 rule-group additions, 147 rule-group-member
+additions, and one exclusive-group note update. Because the fingerprints do
+not match, no frozen resolution was copied, no ChangeSet was emitted, no
+preview or deployment proof was run, and no approval or workbook write was
+created. Phase 2 remains blocked pending an approved reconciliation of the
+changed typed-exception set; re-answering or partially replaying the packet is
+not authorized by the current plan.
+
 #### Workbook integration definition
 
 The three models are integrated when their approved canonical rows and registrations exist in `stingray_master.xlsx`, the workbook and generated contracts pass, and no unintended source/runtime changes exist.
