@@ -402,7 +402,7 @@ and the immutable fingerprint binds rowChanges order, so the test was
 corrected to assert order preservation — a correction independently
 validated by the spec-compliance review. Gates passed:
 `test_workbook_changeset.py` + `test_editor_ops_apply.py` +
-`test_workbook_domain_registry.py` at 92 tests and 7 subtests (32 contract
+`test_workbook_domain_registry.py` at 93 tests and 7 subtests (33 contract
 tests covering every Step 3 rejection rule and Step 4 conversion rule);
 `py_compile` clean on both package modules. Spec-compliance review passed;
 code-quality review returned APPROVED with two Important issues
@@ -410,9 +410,12 @@ code-quality review returned APPROVED with two Important issues
 before-value storage-typing contract), both fixed in `920cac4` with
 regression tests and confirmed APPROVED on focused re-review. Deferred
 minor notes: provenance-entry index in one error message, loose `match=`
-regexes, O(n) row lookup acceptable for the one-off apply pass, and the
-`True == 1` comparison edge. Worktree clean; no product files, generated
-artifacts, or ingest run artifacts modified.
+regexes, and O(n) row lookup acceptable for the one-off apply pass. A later
+independent review proved the `True == 1` edge violated the exact-before
+contract; commit `7995a90` now rejects Boolean/integer type mismatches while
+preserving the existing integer/float numeric equivalence, with a regression
+test. Worktree clean; no product files, generated artifacts, or ingest run
+artifacts modified.
 
 ### Task 4: Add the shared service and close writer race/rollback failures
 
@@ -610,7 +613,7 @@ named `workbook-change-preview-1` / `workbook-change-approval-1` /
 `workbook-change-receipt-1` (spec §5.3); the tamper test kept its
 plan-referenced name while asserting the rolled-back contract. Gates
 passed: the Task 4 lane (`test_workbook_changeset.py`,
-`test_workbook_changeset_service.py`, `test_editor_ops_apply.py`) at 104
+`test_workbook_changeset_service.py`, `test_editor_ops_apply.py`) at 108
 tests and 7 subtests; the registry/meta/global-families lane at 24; the
 ingest consumer lane at 39 tests and 4 subtests; `py_compile` clean on all
 touched modules; `validate_workbook_package.py` and
@@ -623,10 +626,13 @@ rollback claims `restored` only after SHA-256 equality with the backup;
 fault tests verified isolated from neighboring guards; service return
 paths JSON-serializable; CLI refusal and exit-code paths verified in
 code) and converted the two targeted coverage gaps into the `befa0af`
-tests (`workbook_restore_failed` branch; post-approval drift refusal).
-Deferred minor: CLI JSON parse errors surface as tracebacks rather than
-clean operator errors. No live workbook write occurred; no product files,
-generated artifacts, or ingest run artifacts modified.
+tests (`workbook_restore_failed` branch; post-approval drift refusal). A later
+independent review proved preview and approval fingerprint fields were compared
+but not recomputed from artifact contents; commit `7995a90` now verifies both
+fingerprints at approval/write boundaries and adds three tamper regressions.
+Deferred minor: CLI JSON parse errors surface as tracebacks rather than clean
+operator errors. No live workbook write occurred; no product files, generated
+artifacts, or ingest run artifacts modified.
 
 ### Task 5: Emit an equivalent ChangeSet from the canonical compiler
 
