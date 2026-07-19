@@ -98,7 +98,9 @@ def parse_changeset(payload):
     fingerprint = changeset_fingerprint(payload)
     if payload["semanticFingerprint"] != fingerprint:
         raise ChangeSetError(
-            "semanticFingerprint does not match payload contents")
+            "semanticFingerprint does not match payload contents: "
+            f"computed {fingerprint}, "
+            f"stored {payload['semanticFingerprint']}")
     if payload["changeSetId"] != payload["semanticFingerprint"][:24]:
         raise ChangeSetError("changeSetId must equal semanticFingerprint[:24]")
     return copy.deepcopy(payload)
@@ -234,9 +236,23 @@ def _check_before_values(change, current, ctx):
 def changeset_to_editor_batch(changeset, extract):
     """Convert a parsed changeset into an ``editor_ops.apply_batch`` batch.
 
+    Precondition: ``changeset`` must already have passed
+    ``parse_changeset()``; this function does not re-validate the contract
+    and raises raw ``KeyError`` for structurally impossible input.
+
     ``extract`` is the extracted workbook rows mapping
     (``{"sheets": {sheet: {"headers": [...], "rows": [...]}}}``) used to
-    resolve current rows and verify stale-before freshness.
+    resolve current rows and verify stale-before freshness. Before values
+    compare with Python ``!=`` against extracted cell values, so producers
+    must emit before values matching workbook storage conventions (some
+    sheets store Boolean columns as the text ``"True"``/``"False"``;
+    ``"True" != True`` would fail closed with a stale-before error).
+
+    ``source``, ``noops``, ``warningAcknowledgementsRequested``, and
+    ``bindings`` are carried by the contract but not interpreted here.
+
+    Emitted items are deep-copied from the changeset: mutating the returned
+    batch never alters the parsed changeset it was derived from.
     """
     items = []
     for create in changeset.get("sheetCreates", []):
@@ -263,9 +279,9 @@ def changeset_to_editor_batch(changeset, extract):
             items.append({
                 "action": "add",
                 "sheet": sheet,
-                "key": key,
-                "row": {column: pair["after"]
-                        for column, pair in change["fields"].items()},
+                "key": copy.deepcopy(key),
+                "row": copy.deepcopy({column: pair["after"]
+                                      for column, pair in change["fields"].items()}),
             })
             continue
         if sheet_data is None:
@@ -279,12 +295,16 @@ def changeset_to_editor_batch(changeset, extract):
             items.append({
                 "action": "update",
                 "sheet": sheet,
-                "key": key,
-                "row": {column: pair["after"]
-                        for column, pair in change["fields"].items()},
+                "key": copy.deepcopy(key),
+                "row": copy.deepcopy({column: pair["after"]
+                                      for column, pair in change["fields"].items()}),
             })
         else:  # delete
-            items.append({"action": "delete", "sheet": sheet, "key": key})
+            items.append({
+                "action": "delete",
+                "sheet": sheet,
+                "key": copy.deepcopy(key),
+            })
     return {
         "workbookMtimeNs": changeset["workbook"]["mtimeNs"],
         "workbookSha256": changeset["workbook"]["sha256"],

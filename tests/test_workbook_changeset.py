@@ -474,3 +474,20 @@ def test_batch_carries_workbook_freshness_fields():
     batch = changeset_to_editor_batch(parsed, _extract())
     assert batch["workbookMtimeNs"] == "123"
     assert batch["workbookSha256"] == "a" * 64
+
+
+def test_conversion_does_not_alias_parsed_changeset():
+    parsed = parse_changeset(sample_changeset())
+    batch = changeset_to_editor_batch(parsed, _extract())
+    batch["items"][0]["key"]["option_id"] = "mutated"
+    batch["items"][0]["row"]["price"] = -1
+    assert parsed["rowChanges"][0]["key"] == {"option_id": "opt_1"}
+    assert parsed["rowChanges"][0]["fields"]["price"]["after"] == 200
+
+
+def test_before_value_comparison_tolerates_float_int_equivalence():
+    parsed = parse_changeset(sample_changeset())
+    extract = _extract()
+    extract["sheets"]["stingray_options"]["rows"][0]["price"] = 100.0
+    batch = changeset_to_editor_batch(parsed, extract)
+    assert batch["items"][0]["row"] == {"price": 200}
