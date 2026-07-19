@@ -279,7 +279,7 @@ product files, generated artifacts, or ingest run artifacts modified.
 - Consumes: workbook registry and extracted workbook rows.
 - Produces: `ChangeSetError`, `canonical_json(value)`, `changeset_fingerprint(payload)`, `parse_changeset(payload)`, and `changeset_to_editor_batch(changeset, extract)`.
 
-- [ ] **Step 1: Write failing fingerprint, parsing, delta, and stale-before tests**
+- [x] **Step 1: Write failing fingerprint, parsing, delta, and stale-before tests**
 
 ```python
 import copy
@@ -344,7 +344,7 @@ def test_update_emits_only_changed_fields_and_checks_before_value():
         changeset_to_editor_batch(parsed, extract)
 ```
 
-- [ ] **Step 2: Run the new tests and verify the contract is absent**
+- [x] **Step 2: Run the new tests and verify the contract is absent**
 
 ```sh
 PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_workbook_changeset.py -q
@@ -352,13 +352,13 @@ PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_workbook_changeset.py -
 
 Expected: FAIL importing `workbook_domain.changeset`.
 
-- [ ] **Step 3: Implement strict normalization and parsing**
+- [x] **Step 3: Implement strict normalization and parsing**
 
 Use canonical JSON `json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)` and SHA-256. Exclude only `changeSetId` and `semanticFingerprint` from the fingerprint input. Reject unknown top-level and row-change fields, duplicate row keys, unchanged field pairs, missing provenance, invalid actions, family/key disagreement, non-64-character workbook SHA, non-string mtime, unsorted/duplicate targets, and a stored fingerprint/ID mismatch.
 
 The public return of `parse_changeset()` is a deep-copied normalized dict; it never mutates caller data.
 
-- [ ] **Step 4: Implement field-delta conversion**
+- [x] **Step 4: Implement field-delta conversion**
 
 `changeset_to_editor_batch()` must:
 
@@ -371,7 +371,7 @@ The public return of `parse_changeset()` is a deep-copied normalized dict; it ne
 - set `workbookSha256` from the immutable ChangeSet; and
 - exclude no-op receipts from mutations.
 
-- [ ] **Step 5: Run contract and editor validation tests**
+- [x] **Step 5: Run contract and editor validation tests**
 
 ```sh
 PYTHONPATH=scripts .venv/bin/python -m pytest \
@@ -381,7 +381,7 @@ PYTHONPATH=scripts .venv/bin/python -m pytest \
 
 Expected: PASS.
 
-- [ ] **Step 6: Commit the contract**
+- [x] **Step 6: Commit the contract**
 
 ```sh
 git diff --check
@@ -390,6 +390,29 @@ git add scripts/corvette_form_generator/workbook_domain/changeset.py \
   tests/test_workbook_changeset.py
 git commit -m "feat: add shared workbook changeset contract"
 ```
+
+**Task 3 verification receipt (2026-07-18):** Completed in commits
+`d55430a` (contract) and `920cac4` (review hardening), independently
+reverified. The implementer subagent timed out after authoring the test
+file first (TDD order preserved per file timestamps); the Step 2 red-run
+output was not preserved, but the module was verifiably absent when the
+tests were written. One implementer-authored test asserted conversion
+reorders adds before updates; the plan mandates only sheetCreates-first
+and the immutable fingerprint binds rowChanges order, so the test was
+corrected to assert order preservation — a correction independently
+validated by the spec-compliance review. Gates passed:
+`test_workbook_changeset.py` + `test_editor_ops_apply.py` +
+`test_workbook_domain_registry.py` at 92 tests and 7 subtests (32 contract
+tests covering every Step 3 rejection rule and Step 4 conversion rule);
+`py_compile` clean on both package modules. Spec-compliance review passed;
+code-quality review returned APPROVED with two Important issues
+(conversion output aliasing the parsed changeset; undocumented
+before-value storage-typing contract), both fixed in `920cac4` with
+regression tests and confirmed APPROVED on focused re-review. Deferred
+minor notes: provenance-entry index in one error message, loose `match=`
+regexes, O(n) row lookup acceptable for the one-off apply pass, and the
+`True == 1` comparison edge. Worktree clean; no product files, generated
+artifacts, or ingest run artifacts modified.
 
 ### Task 4: Add the shared service and close writer race/rollback failures
 
