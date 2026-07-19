@@ -429,7 +429,7 @@ artifacts, or ingest run artifacts modified.
 - Consumes: parsed ChangeSet and current workbook path.
 - Produces: `preview_changeset()`, `approve_changeset()`, `apply_changeset()`, `restore_workbook_backup()`, and CLI preview/approval/write receipts.
 
-- [ ] **Step 1: Write failing drift and rollback fault-injection tests**
+- [x] **Step 1: Write failing drift and rollback fault-injection tests**
 
 ```python
 def test_live_apply_rechecks_original_reviewed_fingerprint(tmp_path, monkeypatch):
@@ -509,7 +509,7 @@ def make_valid_changeset(path):
     return payload
 ```
 
-- [ ] **Step 2: Run the fault tests and verify they fail against current behavior**
+- [x] **Step 2: Run the fault tests and verify they fail against current behavior**
 
 ```sh
 PYTHONPATH=scripts .venv/bin/python -m pytest \
@@ -519,13 +519,13 @@ PYTHONPATH=scripts .venv/bin/python -m pytest \
 
 Expected: FAIL because the service is absent and the current writer does not restore.
 
-- [ ] **Step 3: Preserve the reviewed workbook identity through save**
+- [x] **Step 3: Preserve the reviewed workbook identity through save**
 
 At `apply_batch()` entry, capture both expected mtime and SHA-256 from the batch/ChangeSet. Immediately before loading for live mutation and again immediately before `save_workbook_safely()`, require the same mtime and SHA. Pass the original reviewed mtime—not a newly accepted mtime—to the safe saver.
 
 Return `stale_before_save` with `workbookState: "untouched"` when either comparison differs.
 
-- [ ] **Step 4: Add verified restoration**
+- [x] **Step 4: Add verified restoration**
 
 Implement in `workbook.py`:
 
@@ -551,11 +551,11 @@ def restore_workbook_backup(path: Path, backup_path: Path) -> None:
 
 On failed live readback, call this helper, reopen/rehash the restored workbook, and return `apply_verification_failed_rolled_back` only after restoration matches the backup. If restoration cannot be verified, raise a hard `workbook_restore_failed` result containing both paths and do not claim the workbook is safe.
 
-- [ ] **Step 5: Implement immutable preview, approval, and receipt binding**
+- [x] **Step 5: Implement immutable preview, approval, and receipt binding**
 
 `preview_changeset()` calls `parse_changeset()`, verifies workbook SHA/mtime, converts to an editor batch, and calls `apply_batch(write=False)`. `approve_changeset()` requires a passing preview and returns `workbook-change-approval-1`. `apply_changeset()` requires exact ChangeSet/preview/approval/workbook fingerprints and calls `apply_batch(write=True)` once. All three return JSON-serializable dicts.
 
-- [ ] **Step 6: Add the shared CLI**
+- [x] **Step 6: Add the shared CLI**
 
 The CLI contract is:
 
@@ -567,7 +567,7 @@ The CLI contract is:
 
 Preview is the default. `--approve` never writes. `--write` refuses without both exact bound files. Output paths are explicit; tests use temporary directories and never the tracked edit log.
 
-- [ ] **Step 7: Run the service, editor, package, and schema gates**
+- [x] **Step 7: Run the service, editor, package, and schema gates**
 
 ```sh
 PYTHONPATH=scripts .venv/bin/python -m pytest \
@@ -580,7 +580,7 @@ PYTHONPATH=scripts .venv/bin/python -m pytest \
 
 Expected: tests PASS; workbook validators report zero issues/errors/warnings.
 
-- [ ] **Step 8: Commit the shared service and writer repair**
+- [x] **Step 8: Commit the shared service and writer repair**
 
 ```sh
 git diff --check
@@ -592,6 +592,41 @@ git add scripts/corvette_form_generator/workbook_domain \
   tests/test_editor_ops_apply.py
 git commit -m "fix: unify guarded workbook changeset writes"
 ```
+
+**Task 4 verification receipt (2026-07-18):** Completed in commits
+`3c9eaf8` (service, writer repair, rollback, CLI, tests) and `befa0af`
+(restore-failure and post-approval drift coverage), independently
+reverified. Two implementer subagents timed out at the delegation cap:
+the Part A subagent wrote nothing, so Part A (writer identity rechecks,
+verified rollback, service, fault/service tests) was implemented directly
+by the orchestrator; the Part B subagent landed the CLI, its tests, and
+the plan commit before timing out at its report step. Plan-text
+adaptations, all validated by the spec-compliance review:
+`make_valid_changeset` uses fixture price `0` (the plan's `100` predates
+the fixture); the plan's unconditional verify mock was made stateful (pass
+scratch, fail live) because an unconditional mock fails the scratch
+readback first and never reaches the live-rollback path; receipt schemas
+named `workbook-change-preview-1` / `workbook-change-approval-1` /
+`workbook-change-receipt-1` (spec §5.3); the tamper test kept its
+plan-referenced name while asserting the rolled-back contract. Gates
+passed: the Task 4 lane (`test_workbook_changeset.py`,
+`test_workbook_changeset_service.py`, `test_editor_ops_apply.py`) at 104
+tests and 7 subtests; the registry/meta/global-families lane at 24; the
+ingest consumer lane at 39 tests and 4 subtests; `py_compile` clean on all
+touched modules; `validate_workbook_package.py` and
+`validate_workbook_schema.py` on `stingray_master.xlsx` both valid with
+zero issues/errors/warnings. Spec-compliance review passed; two
+code-quality review subagents timed out at the delegation cap, so the
+orchestrator performed the quality pass directly (TOCTOU: the pre-save
+recheck plus the saver's own mtime guard close the load→save window;
+rollback claims `restored` only after SHA-256 equality with the backup;
+fault tests verified isolated from neighboring guards; service return
+paths JSON-serializable; CLI refusal and exit-code paths verified in
+code) and converted the two targeted coverage gaps into the `befa0af`
+tests (`workbook_restore_failed` branch; post-approval drift refusal).
+Deferred minor: CLI JSON parse errors surface as tracebacks rather than
+clean operator errors. No live workbook write occurred; no product files,
+generated artifacts, or ingest run artifacts modified.
 
 ### Task 5: Emit an equivalent ChangeSet from the canonical compiler
 
