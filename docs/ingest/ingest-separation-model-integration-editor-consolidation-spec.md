@@ -261,6 +261,19 @@ created. Phase 2 remains blocked pending an approved reconciliation of the
 changed typed-exception set; re-answering or partially replaying the packet is
 not authorized by the current plan.
 
+An independent post-stop interface audit found a second Task 8 plan blocker
+that must be resolved before resuming beyond preview. The relocated
+`workbook_domain.deployment_proof` module exposes only the private, explicitly
+retired `TemporaryDeploymentProofMixin`; its batch builder consumes legacy
+`pass-c-3` `stage1`/`stage2` plans. It is not exported by
+`workbook_domain.__init__`, has no CLI or production caller, and cannot prove a
+fresh `workbook-changeset-1` artifact through the shared service. The shared
+`apply_workbook_changeset.py` CLI currently supports preview, approval, and
+write only. Task 8 Step 6 therefore also requires an explicitly approved
+ChangeSet-aware deployment-proof adapter/CLI or an approved plan correction;
+running the retired helper against the frozen `apply-plan.json` would not
+satisfy the exact-current ChangeSet proof.
+
 #### Workbook integration definition
 
 The three models are integrated when their approved canonical rows and registrations exist in `stingray_master.xlsx`, the workbook and generated contracts pass, and no unintended source/runtime changes exist.
