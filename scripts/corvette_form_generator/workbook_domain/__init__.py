@@ -17,16 +17,24 @@ from corvette_form_generator.workbook_domain.registry import (
     family_spec,
     registered_sheet_families,
 )
+from corvette_form_generator.workbook_domain.service import (
+    apply_changeset,
+    approve_changeset,
+    preview_changeset,
+)
 
 __all__ = [
     "ChangeSetError",
     "EDITOR_SHEET_META",
     "GLOBAL_SHEET_FAMILIES",
     "SOURCE_ROLE_FAMILIES",
+    "apply_changeset",
+    "approve_changeset",
     "canonical_json",
     "changeset_fingerprint",
     "changeset_to_editor_batch",
     "family_spec",
     "parse_changeset",
+    "preview_changeset",
     "registered_sheet_families",
 ]

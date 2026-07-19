@@ -948,6 +948,7 @@ class ApplyBatchTest(unittest.TestCase):
             {"option_id": "opt_thr_001"},
             {"price": 777},
         )
+        before = self.path.read_bytes()
         with patch(
             "corvette_form_generator.editor_ops.save_workbook_safely",
             side_effect=save_and_tamper_live,
@@ -955,10 +956,12 @@ class ApplyBatchTest(unittest.TestCase):
             result = self.run_batch(item, write=True)
 
         self.assertFalse(result["ok"], result)
-        self.assertEqual(result["status"], "apply_verification_failed")
+        self.assertEqual(result["status"], "apply_verification_failed_rolled_back")
+        self.assertEqual(result["workbookState"], "restored")
         self.assertTrue(Path(result["backupPath"]).exists())
         self.assertTrue(any("price" in error for error in result["errors"]), result)
         self.assertFalse(self.log.exists())
+        self.assertEqual(self.path.read_bytes(), before)
 
     def test_warning_requires_confirmation(self):
         item = op("update", "zr1_options", {"option_id": "opt_zzz_001"}, {"price": 1})

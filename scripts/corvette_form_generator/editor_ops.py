@@ -24,6 +24,7 @@ from corvette_form_generator.schema_validation import result_payload, validate_w
 from corvette_form_generator.workbook import (
     excel_lock_path,
     remove_table_sheet_auto_filters,
+    restore_workbook_backup,
     save_workbook_safely,
     workbook_truthy,
 )
@@ -1208,6 +1209,17 @@ def verify_prepared_workbook(path: Path, prepared: list[dict]) -> dict:
     }
 
 
+def _workbook_identity_matches(path: Path, expected_mtime_ns, expected_sha256) -> bool:
+    """True when the live file still matches the reviewed mtime/SHA identity."""
+    if str(path.stat().st_mtime_ns) != str(expected_mtime_ns):
+        return False
+    if expected_sha256 is not None:
+        actual = hashlib.sha256(path.read_bytes()).hexdigest()
+        if actual != expected_sha256:
+            return False
+    return True
+
+
 def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli",
                 log_path=None, allow_stale=False, run_schema_validation=True) -> dict:
     path = Path(path)
@@ -1228,6 +1240,11 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
         return {"ok": False, "status": "stale",
                 "errors": ["workbook changed since this batch was prepared; reload and re-verify"],
                 "warnings": []}
+    # Reviewed workbook identity: mtime always, SHA-256 when the batch carries
+    # one (ChangeSet-derived batches). Rechecked before live mutation and
+    # again before the safe save so mid-flight drift fails closed.
+    expected_mtime = batch.get("workbookMtimeNs")
+    expected_sha = batch.get("workbookSha256")
     extract = extract_workbook(path)
     errors, warnings, prepared = _prepare_batch(extract, batch)
     operation_coverage, coverage_errors = _operation_coverage(batch, prepared)
@@ -1355,22 +1372,72 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
     if not write:
         return {"ok": True, "status": "validated", "errors": [], **base}
 
+    if not allow_stale and not _workbook_identity_matches(path, expected_mtime, expected_sha):
+        return {
+            "ok": False,
+            "status": "stale_before_save",
+            "workbookState": "untouched",
+            "errors": ["workbook changed after review but before live mutation; "
+                       "re-preview and re-approve"],
+            "warnings": warnings,
+            "warningPolicy": warning_policy,
+            "operationCoverage": operation_coverage,
+            "verification": verification,
+        }
     wb = load_workbook(path)
     loaded_mtime = path.stat().st_mtime_ns
     touched = apply_ops_to_workbook(wb, prepared, sheet_family)
     for name in touched:
         resize_sheet_tables(wb[name])
+    if not allow_stale and not _workbook_identity_matches(path, expected_mtime, expected_sha):
+        return {
+            "ok": False,
+            "status": "stale_before_save",
+            "workbookState": "untouched",
+            "errors": ["workbook changed after live mutation but before save; "
+                       "re-preview and re-approve"],
+            "warnings": warnings,
+            "warningPolicy": warning_policy,
+            "operationCoverage": operation_coverage,
+            "verification": verification,
+        }
     backup_path = save_workbook_safely(
         wb,
         path,
-        loaded_mtime_ns=loaded_mtime,
+        loaded_mtime_ns=int(expected_mtime) if not allow_stale else loaded_mtime,
         approved_bool_type_migrations=approved_bool_type_migrations,
     )
     live_verification = verify_prepared_workbook(path, prepared)
     if not live_verification["ok"]:
+        restore_error = None
+        try:
+            restore_workbook_backup(path, backup_path)
+            restored_ok = (
+                hashlib.sha256(path.read_bytes()).hexdigest()
+                == hashlib.sha256(backup_path.read_bytes()).hexdigest()
+            )
+        except Exception as exc:  # never claim the workbook is safe
+            restored_ok = False
+            restore_error = str(exc)
+        if not restored_ok:
+            return {
+                "ok": False,
+                "status": "workbook_restore_failed",
+                "workbookState": "unknown",
+                "errors": [
+                    "live readback failed and backup restoration could not be "
+                    f"verified; workbook path: {path}; backup path: {backup_path}"
+                    + (f"; restore error: {restore_error}" if restore_error else ""),
+                ],
+                "backupPath": str(backup_path),
+                "workbookPath": str(path),
+                **base,
+                "verification": live_verification,
+            }
         return {
             "ok": False,
-            "status": "apply_verification_failed",
+            "status": "apply_verification_failed_rolled_back",
+            "workbookState": "restored",
             "errors": live_verification["errors"],
             "backupPath": str(backup_path),
             **base,
