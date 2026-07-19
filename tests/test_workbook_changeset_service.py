@@ -293,6 +293,76 @@ def test_preview_refuses_invalid_changeset(tmp_path):
     assert preview["status"] == "invalid_changeset"
 
 
+def test_failed_restore_reports_workbook_restore_failed(tmp_path, monkeypatch):
+    workbook = make_workbook(tmp_path)
+    changeset = make_valid_changeset(workbook)
+    preview = preview_changeset(workbook, changeset)
+    approval = approve_changeset(changeset, preview, actor="Sean", warning_ids=[])
+
+    real_verify = editor_ops.verify_prepared_workbook
+    calls = {"count": 0}
+
+    def fail_live_verify(path, prepared):
+        calls["count"] += 1
+        if calls["count"] == 1:
+            return real_verify(path, prepared)
+        return {
+            "ok": False,
+            "preparedChecked": 0,
+            "preparedCount": 1,
+            "errors": ["forced"],
+        }
+
+    monkeypatch.setattr(editor_ops, "verify_prepared_workbook", fail_live_verify)
+
+    def broken_restore(path, backup_path):
+        raise RuntimeError("backup unreadable")
+
+    monkeypatch.setattr(editor_ops, "restore_workbook_backup", broken_restore)
+
+    receipt = apply_changeset(
+        workbook, changeset, preview, approval,
+        log_path=tmp_path / "edit-log.jsonl",
+    )
+    assert receipt["ok"] is False
+    assert receipt["status"] == "workbook_restore_failed"
+    assert receipt["workbookState"] == "unknown"
+    assert str(workbook) in receipt["errors"][0]
+    assert receipt["backupPath"] in receipt["errors"][0]
+
+    # No restore occurred: the live save remains applied (price 101).
+    wb = load_workbook(workbook, read_only=True, data_only=True)
+    ws = wb["stingray_options"]
+    headers = {cell.value: index + 1 for index, cell in enumerate(ws[1])}
+    price = next(
+        ws.cell(row=row, column=headers["price"]).value
+        for row in range(2, ws.max_row + 1)
+        if ws.cell(row=row, column=headers["option_id"]).value == "opt_one_001"
+    )
+    wb.close()
+    assert price == 101
+
+
+def test_apply_refuses_workbook_drifted_after_approval(tmp_path):
+    workbook = make_workbook(tmp_path)
+    changeset = make_valid_changeset(workbook)
+    preview = preview_changeset(workbook, changeset)
+    approval = approve_changeset(changeset, preview, actor="Sean", warning_ids=[])
+
+    # Workbook drifts between approval and apply.
+    build_ops_fixture().save(workbook)
+    drifted = workbook.read_bytes()
+
+    receipt = apply_changeset(
+        workbook, changeset, preview, approval,
+        log_path=tmp_path / "edit-log.jsonl",
+    )
+    assert receipt["ok"] is False
+    assert receipt["status"] == "stale"
+    assert receipt["workbookState"] == "untouched"
+    assert workbook.read_bytes() == drifted
+
+
 # ── Plan Step 6 operator CLI tests ────────────────────────────────────
 
 
