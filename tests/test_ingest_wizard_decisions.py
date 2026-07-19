@@ -18,7 +18,6 @@ for entry in (ROOT / "scripts", ROOT / "tests"):
         sys.path.insert(0, str(entry))
 
 from corvette_form_generator.ingest.wizard.session import (  # noqa: E402
-    STATE_DECISIONS_COMPLETE,
     STATE_DECISIONS_IN_PROGRESS,
     STATE_MODELS_SELECTED,
     WizardError,
@@ -370,104 +369,6 @@ class PassBStoreTest(unittest.TestCase):
             )
         self.store.save_decisions(self.run_id, decisions)
 
-    def test_variant_reconciliation_disagreement_blocks_completion(self) -> None:
-        self.select_defaults()
-        # Fixture zr1 reconciliation disagrees (workbook-only 3lz_r67).
-        # Complete every lane but skip the reconciliation decision.
-        self.complete_model("zr1", resolve_reconciliation=False)
-        self.complete_model("zr1x")
-        progress = self.store.progress(self.run_id)
-        blockers = progress["models"]["zr1"]["blockers"]
-        self.assertEqual(
-            [b["reason"] for b in blockers], ["variant_reconciliation_disagreement_undecided"]
-        )
-        with self.assertRaises(WizardError):
-            self.store.mark_complete(self.run_id)
-        self.store.save_decisions(self.run_id, [self.reconciliation_decision("zr1")])
-        report = self.store.mark_complete(self.run_id)
-        self.assertTrue(report["allComplete"])
-
-    def test_completeness_gate_and_holds(self) -> None:
-        self.select_defaults()
-        with self.assertRaises(WizardError):
-            self.store.mark_complete(self.run_id)
-        self.complete_model("zr1")
-        progress = self.store.progress(self.run_id)
-        self.assertTrue(progress["models"]["zr1"]["complete"])
-        self.assertFalse(progress["models"]["zr1x"]["complete"])
-        self.assertFalse(progress["allComplete"])
-        self.complete_model("zr1x")
-        report = self.store.mark_complete(self.run_id)
-        self.assertTrue(report["allComplete"])
-        self.assertEqual(report["session"]["state"], STATE_DECISIONS_COMPLETE)
-
-    def test_hold_satisfies_candidate_requirement_but_is_enumerated(self) -> None:
-        self.select_defaults()
-        self.complete_model("zr1")
-        self.complete_model("zr1x")
-        candidate_id = self.zr1_candidate_ids()[0]
-        self.store.save_decisions(
-            self.run_id,
-            [
-                {
-                    "model": "zr1",
-                    "lane": "price",
-                    "candidateId": candidate_id,
-                    "action": "defer_price_extractor",
-                    "payload": {},
-                    "resolution": "hold_for_question",
-                    "reviewerNote": "ask GM rep",
-                }
-            ],
-        )
-        report = self.store.mark_complete(self.run_id)
-        self.assertTrue(report["allComplete"])
-        holds = report["models"]["zr1"]["holds"]
-        self.assertEqual(len(holds), 1)
-        self.assertEqual(holds[0]["note"], "ask GM rep")
-
-    def test_presentation_hold_blocks_completion(self) -> None:
-        self.select_defaults()
-        self.complete_model("zr1")
-        self.complete_model("zr1x")
-        self.store.save_decisions(
-            self.run_id,
-            [
-                {
-                    "model": "zr1",
-                    "lane": "presentation",
-                    "groupKey": "runtime_steps",
-                    "action": "approve_presentation_rows",
-                    "payload": {},
-                    "resolution": "hold_for_question",
-                }
-            ],
-        )
-        with self.assertRaises(WizardError):
-            self.store.mark_complete(self.run_id)
-
-    def test_new_decision_after_complete_reopens(self) -> None:
-        self.select_defaults()
-        self.complete_model("zr1")
-        self.complete_model("zr1x")
-        self.store.mark_complete(self.run_id)
-        candidate_id = self.zr1_candidate_ids()[0]
-        result = self.store.save_decisions(
-            self.run_id,
-            [
-                {
-                    "model": "zr1",
-                    "lane": "copy_split",
-                    "candidateId": candidate_id,
-                    "action": "split_copy",
-                    "payload": {"name": "Carbon Wheel Package"},
-                    "resolution": "approved_for_plan",
-                }
-            ],
-        )
-        self.assertEqual(result["session"]["state"], STATE_DECISIONS_IN_PROGRESS)
-
-    # ------------------------------------------------- b.2: delete / batch
     def test_batch_stamping_and_delete_by_batch(self) -> None:
         self.select_defaults()
         ids = self.zr1_candidate_ids()[:3]
@@ -520,17 +421,6 @@ class PassBStoreTest(unittest.TestCase):
         )
         self.assertEqual(deleted["deleted"], [f"zr1:price:{candidate_id}"])
 
-    def test_delete_drops_completed_state(self) -> None:
-        self.select_defaults()
-        self.complete_model("zr1")
-        self.complete_model("zr1x")
-        self.store.mark_complete(self.run_id)
-        candidate_id = self.zr1_candidate_ids()[0]
-        result = self.store.delete_decisions(self.run_id, decision_ids=[f"zr1:section:{candidate_id}"])
-        self.assertEqual(result["session"]["state"], STATE_DECISIONS_IN_PROGRESS)
-        self.assertFalse(self.store.progress(self.run_id)["models"]["zr1"]["complete"])
-
-    # ---------------------------------------------- b.2: reference / split
     def test_review_queue_carries_workbook_reference_and_split(self) -> None:
         self.select_defaults()
         queue = self.store.review_queue(self.run_id, "zr1", "section")

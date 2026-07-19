@@ -122,7 +122,7 @@ Current ingest direction is browser-first for source intake, then compiler/excep
 
 The shared ChangeSet/workbook-service direction does not itself authorize live workbook writes, generated-artifact refresh, registry publication, runtime promotion, deployment, or dealer changes. Those remain separate approved steps with §5 workbook safety and normal regeneration/validation gates. During transition, do not let ingest, the workbook editor, or Workbook Manager keep parallel schemas, validators, writer authority, or canonical row stores when the shared workbook registry/service should own the contract.
 
-`scripts/ingest_wizard_apply.py` is diagnostic dry-run/report-only by default and never promotes runtime artifacts. A live workbook write requires the current compiler/readiness contract: a `pass-c-3` plan, scoped dry-run approval, eligible temporary-workbook proof, separate deployment-ready write approval, current hashes/fingerprints, schema validation enabled, no Excel lock/mtime drift, exact readback, and no deployment blockers. Older `pass-c-1`/`pass-c-2` plans or historical approvals are permanently non-writable even if a label sounds approved.
+Current ingest stops after immutable `workbook-changeset-1` emission. Historical `pass-c-*` plans and approvals are GET-only evidence and never production write authority; `scripts/ingest_wizard_apply.py` is retired. Preview, approval, and any separately authorized workbook write use the shared service through `scripts/apply_workbook_changeset.py`, with exact ChangeSet/preview/approval/workbook binding, §5 workbook safety, and verified rollback. This path does not authorize generation, publication, promotion, deployment, or dealer changes.
 
 ## 9. Fable 5 Loop Workflows
 

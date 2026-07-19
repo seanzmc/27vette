@@ -87,5 +87,15 @@ class EditorSheetMetaTest(unittest.TestCase):
         )
 
 
+class WorkbookEditorSurfaceTest(unittest.TestCase):
+    def test_workbook_editor_has_no_ingest_review_navigation(self):
+        source = Path("visualizer/workbook-editor/editor.js").read_text()
+        self.assertNotIn(">Ingest Review<", source)
+        self.assertNotIn("/api/ingest/", source)
+
+    def test_dead_react_prototype_is_absent(self):
+        self.assertFalse(Path("visualizer/workbook-editor/workbook-editor.js").exists())
+
+
 if __name__ == "__main__":
     unittest.main()

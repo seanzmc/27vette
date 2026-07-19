@@ -362,9 +362,25 @@ All tests must isolate temporary workbooks, databases, receipts, and edit logs. 
 
 This section is updated in place as work completes. It is not a prompt to create another closure document.
 
-- Phase 1 — Task 1 snapshot reconciliation completed and independently verified
-  on 2026-07-18 (`121 tests and 4 subtests passed`); Tasks 2-7 remain pending.
-- Phase 2 — blocked by Phase 1, independent Milestone 3 verification, current-input rebuild, explicit interpretation ratification, and live-write approval.
+- Phase 1 — complete on 2026-07-19. Tasks 1–5 established the frozen
+  projection evidence, shared registry, strict `workbook-changeset-1`
+  contract, guarded service/rollback path, and equivalent compiler emitter.
+  Task 6 commits `c0c92fd` and `59f5e7a` narrowed the current browser/API to
+  the five owned functions, retired the ingest apply CLI and historical
+  mutation routes, and moved temporary deployment proof out of ingest. Task 7
+  removed the fallback editor's embedded Ingest Review UI/API and dead React
+  prototype while preserving Form Structure, Sheet Browser, Review, Pending
+  Changes, typed operation payloads, and Apply behavior. The complete Phase 1
+  gate passed `486 tests and 36 subtests`; both JavaScript syntax checks,
+  workbook package validation, workbook schema validation, and `git diff
+  --check` passed. The package/schema validators reported zero issues, errors,
+  or warnings. The separately run `tests/test_editor_lints.py` produced only
+  the three previously documented real-workbook reds (`d1_rwj_wks_collision`,
+  `c2_cj2_stingray_name_deviator`, and `r3_drz_pending_review`), with 23 other
+  tests passing. No canonical workbook, generated artifact, registry,
+  promotion, deployment, runtime, or dealer surface changed.
+- Phase 2 — not begun. Its Task 8 exact-current rebuild/proof and explicit
+  approval stop remain required before any approval artifact or live write.
 - Phase 3 — blocked by successful three-model workbook integration and shared-service stability.
 - Runtime publication/promotion — separate approval after Phase 2.
 - Dealer submission changes — not authorized and not implied.
