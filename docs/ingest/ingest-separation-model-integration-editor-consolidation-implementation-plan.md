@@ -792,7 +792,7 @@ artifacts modified.
 - Consumes: `WizardSessionStore` intake/profile/select/compile/exception/emit methods and `LegacyRunReader` GET methods.
 - Produces: `POST /changeset`, `GET /changeset`, the `changeset_emitted` state in `GET /api/wizard/sessions` payloads, five-function browser flow, and HTTP `410` for retired mutation routes.
 
-- [ ] **Step 1: Write failing server boundary tests**
+- [x] **Step 1: Write failing server boundary tests**
 
 ```python
 def test_current_compiled_ready_session_emits_changeset(self):
@@ -829,7 +829,7 @@ def test_retired_mutation_routes_are_gone(self):
 
 Add a source assertion that `wizard.js` contains no `back-to-review`, `copy-decisions`, `mark-complete`, plan approval, or write approval binding.
 
-- [ ] **Step 2: Run server/UI tests and verify current routes remain writable**
+- [x] **Step 2: Run server/UI tests and verify current routes remain writable**
 
 ```sh
 PYTHONPATH=scripts .venv/bin/python -m pytest \
@@ -841,21 +841,21 @@ PYTHONPATH=scripts .venv/bin/python -m pytest \
 
 Expected: FAIL on the new boundary assertions.
 
-- [ ] **Step 3: Replace the current plan stage with ChangeSet completion**
+- [x] **Step 3: Replace the current plan stage with ChangeSet completion**
 
 The compiler summary shows one action, `Create ChangeSet`, only for `compiled_ready`. Its result screen shows targets, sheet creations, row-change counts, no-op coverage, workbook fingerprint, and download. It contains no approval or apply control and no route back into historical review. Delete the now-unreachable `build_manifest_plan()` from `plan_builder.py` and the Task 5 legacy-equivalence comparison from `tests/test_ingest_wizard_plan.py` in the same commit.
 
-- [ ] **Step 4: Retire mutation routes explicitly**
+- [x] **Step 4: Retire mutation routes explicitly**
 
 POST requests to the seven historical endpoints return HTTP `410` and the exact error above. GET historical plan/evidence display may call `LegacyRunReader`, which reads JSON only and exposes no write methods. Remove `approve_write()` and `apply_approved_plan()` from the server-reachable store surface.
 
 Retire `scripts/ingest_wizard_apply.py` and `tests/test_ingest_wizard_apply.py` in this commit: the script calls the removed `apply_approved_plan()` surface, and `scripts/apply_workbook_changeset.py` is the only operator preview/approval/write CLI. Do not convert it to a wrapper — the pass-c-3 write contract it enforces is retired, not relocated.
 
-- [ ] **Step 5: Remove current-session imports of write/deployment orchestration**
+- [x] **Step 5: Remove current-session imports of write/deployment orchestration**
 
 Move temporary deployment-proof helpers from `session.py` to `workbook_domain/deployment_proof.py`. The ingest session may import the ChangeSet emitter but may not import `apply_batch`, `save_workbook_safely`, generators, registry publication, promotion, or the shared service's apply function.
 
-- [ ] **Step 6: Run focused tests and static authority checks**
+- [x] **Step 6: Run focused tests and static authority checks**
 
 ```sh
 PYTHONPATH=scripts .venv/bin/python -m pytest \
@@ -873,7 +873,7 @@ node --check visualizer/ingest-wizard/wizard.js
 
 Expected: all tests and static checks PASS.
 
-- [ ] **Step 7: Commit the narrow current UI/API**
+- [x] **Step 7: Commit the narrow current UI/API**
 
 ```sh
 git diff --check
@@ -890,6 +890,25 @@ git add scripts/corvette_form_generator/ingest/wizard \
   tests/test_ingest_wizard_apply.py
 git commit -m "refactor: narrow ingest to changeset emission"
 ```
+
+**Task 6 verification receipt (2026-07-19):** Completed with the current
+browser/API narrowed to intake/profile, target selection, compile/typed
+exceptions, and immutable ChangeSet emission. The boundary RED run failed on
+the new ChangeSet, exact-410, and retired-binding assertions before the
+implementation. `LegacyRunReader` now provides JSON-only historical plan and
+ChangeSet display; all seven retired POST routes return the exact HTTP 410
+contract; `scripts/ingest_wizard_apply.py` and its test suite are retired; the
+legacy manifest projection/equivalence surface is removed; and temporary
+deployment proof is isolated in `workbook_domain/deployment_proof.py`. Gates
+passed: the exact Step 6 lane at `31 tests and 11 subtests`, the retained
+historical projection-library lane at 13 tests, and the current
+ChangeSet/compiler/exception/session lane at `68 tests and 4 subtests`;
+`node --check`, Python compilation of all moved/touched entrypoints, and the
+static no-write-authority search also passed. The implementer subagent reached
+its iteration cap after producing the coherent implementation and RED/GREEN
+evidence; the orchestrator retired the remaining store-plan tests and reran all
+named gates. No canonical workbook, generated runtime artifact, publication,
+promotion, deployment, or dealer surface changed.
 
 ### Task 7: Remove the embedded editor ingest workflow and close Phase 1
 
