@@ -227,52 +227,73 @@ Use the shared ChangeSet path to write the three proven models into the canonica
 9. Reopen the saved workbook, verify exact readback, package/schema integrity, and the backup on disk.
 10. Regenerate all affected artifacts through the normal workbook-to-generator path and review every workbook/generated diff.
 
-#### Task 8 checkpoint status (2026-07-19)
+#### Task 8 approval checkpoint (2026-07-19)
 
-Task 8 stopped at its mandatory frozen-resolution fingerprint gate. Branch
-reconciliation commit `39736fb` preserves `origin/main`'s canonical workbook
-(SHA-256 `646f58e7c951963a43045b6cb5d351d7ff8e1b2460299bdf9b8cfa7d741b8379`),
-`form-app/data.js` (SHA-256
-`565d22859292b3f514dfc177a7392402afc897c3e080be945b4d068995093230`),
-and workbook edit log (SHA-256
-`477eb20af3e6e13751d8f3e3286dab01b74d3b240b120f78e0cb43bdb0c42269`).
-Exact-current run `20260719-174505-0085ca` used raw-source SHA-256
+The approved bounded recovery resolved both prior Task 8 blockers and stopped
+at the required approval boundary. Exact-current run
+`20260719-174505-0085ca` used raw-source SHA-256
 `6ac9538d5bb8a823ade9afea70b2654057b793e1cf27c081c088545aa3add8a1`
-and run-authority fingerprint
-`9636f4851744878d0b69c1acb2cf633b03f2dcd1c90a75bc2e30f80ba207f56f`.
-Its compile report SHA-256 is
-`6c481ac9260978dcf85db6b24ff9b2cad7b92e9e8b0c2b03c689d98e6bcbfc0e`;
-its 6,021-row preliminary manifest is 2,616 add, 891 update, and 2,514
-noop rows, with semantic SHA
-`e4fcb2ac79c38ce3414890d6d06402e7e73eaac2cabe56da4a4ad92cceb9873a`.
+against canonical-workbook SHA-256
+`646f58e7c951963a43045b6cb5d351d7ff8e1b2460299bdf9b8cfa7d741b8379`.
+Its final run-authority fingerprint is
+`34c9356abf4dba0e8509378d3a42ae8823fe1124c93e3544eb3991811b372826`.
 
-The new queue has 206 subjects and fingerprint
-`54da41d8085511092bb21e0de056b823b8c523f5952c030cf441a8b803b37937`;
-the frozen 158-resolution packet requires fingerprint
-`0634e4e0ba2b628e02b88d6325e2ea2aa3d5cfa5eb32aba7e4a69b05f647cf79`.
-The subject sets have 139 IDs in common, 67 new IDs, 19 removed IDs, and
-eight changed versions among the common IDs. Current `main` also changes the
-Grand Sport comparator authority relative to the frozen workbook: one
-exclusive-member addition, 21 rule-group additions, 147 rule-group-member
-additions, and one exclusive-group note update. Because the fingerprints do
-not match, no frozen resolution was copied, no ChangeSet was emitted, no
-preview or deployment proof was run, and no approval or workbook write was
-created. Phase 2 remains blocked pending an approved reconciliation of the
-changed typed-exception set; re-answering or partially replaying the packet is
-not authorized by the current plan.
+The changed queue was reconciled without bypassing its fingerprint or subject
+version protections. Of the initial 206 subjects, 131 frozen valid resolutions
+were reused only on exact `(subjectId, subjectVersion)` matches, eight
+changed-version entries and 19 removed subjects were omitted, and all 75 new or
+changed-version subjects were reviewed against current source/workbook and
+approved comparator authority. One later derived price-scope subject reused an
+exact frozen valid resolution only after reprojection emitted the same subject
+and version. The final queue contains 203 resolved subjects, zero stale or
+superseded entries, and zero deferrals. Its fingerprint is
+`ce9ec6060b14be9fa0aac53b6d7d34c45fb920cbafc90bd000bab835c9564e56`;
+the resolution semantic SHA is
+`6ee7c1215bd476866b75f813ad68f2327df5c6303676899e22df7455793a137b`.
+Current review confirmed eight exclusive-group, 17 price-rule, three
+relationship, and 35 rule-group proposals, while retaining the eight
+target-authoritative semantic-conflict rejections.
 
-An independent post-stop interface audit found a second Task 8 plan blocker
-that must be resolved before resuming beyond preview. The relocated
-`workbook_domain.deployment_proof` module exposes only the private, explicitly
-retired `TemporaryDeploymentProofMixin`; its batch builder consumes legacy
-`pass-c-3` `stage1`/`stage2` plans. It is not exported by
-`workbook_domain.__init__`, has no CLI or production caller, and cannot prove a
-fresh `workbook-changeset-1` artifact through the shared service. The shared
-`apply_workbook_changeset.py` CLI currently supports preview, approval, and
-write only. Task 8 Step 6 therefore also requires an explicitly approved
-ChangeSet-aware deployment-proof adapter/CLI or an approved plan correction;
-running the retired helper against the frozen `apply-plan.json` would not
-satisfy the exact-current ChangeSet proof.
+The final 6,691-row manifest contains 3,286 add, 891 update, and 2,514 noop
+rows and has semantic SHA
+`f9b3b2ddb0d9c08b0da56cdf6664722ee0f9e1d87f18fb17c6ef0edd8b77342a`.
+The emitted `workbook-changeset-1` is
+`5f108f09bb09d4dddafa18a6` with semantic fingerprint
+`5f108f09bb09d4dddafa18a6a8eef97c6d3712d491701ca9d029d415e9421746`;
+it creates 12 sheets, carries 4,204 row changes, and accounts for 2,488
+noops. Shared preview passed with fingerprint
+`03ecd79f2fbad407e41ec289868625ab7620a0000dc3ea0873e718069d51e8de`,
+zero blocking or unknown warnings, and 21 confirmable greenfield scaffold
+warnings.
+
+`workbook_domain.deployment_proof.prove_changeset_deployment()` and
+`scripts/prove_workbook_changeset.py` now provide the missing ChangeSet-aware
+temporary proof path without restoring retired `pass-c-3` authority. The
+GSX+ZR1, ZR1X repeatability, and all-target atomic phases all passed package,
+schema, Boolean hygiene, exact readback, generation, runtime-contract,
+registry-load, and semantic-signature checks. Proof fingerprint
+`0e2a72e256668d3be13628cba613341e9ddf85722efe6ad53ddc2f91c6bc7a32`
+has zero blockers and zero deferrals. An independent second temporary apply
+covered all 4,216 prepared operations, checked 21,063 field pairs, preserved
+all formulas across 65 existing sheets, and reproduced zero runtime semantic
+mismatches for all targets.
+
+The exact approval packet is
+`/private/tmp/27vette-changeset-proof-20260719-174505-0085ca/task8-approval-packet.json`
+(SHA-256
+`8b1574dd5622643d7820bff35fe7813792d4fec147980a9cc04f33355f10827a`).
+Independent workbook inspection also records that the generic `create_sheet`
+writer copies exact headers but not template header font/style; 10 of the 12
+new sheets therefore differ from their named header templates on that
+workbook-authoring presentation detail. This does not affect package/schema,
+runtime, registry, or dealer behavior, but remains visible for explicit Task 9
+approval review.
+
+The protected workbook, `form-app/data.js`, and real edit log remain
+byte-identical to their recorded hashes. No `ChangeApproval`, canonical write,
+publication, promotion, deployment, or dealer change was created. Task 8 is
+complete; Task 9 remains blocked on Sean's explicit approval of this exact
+packet.
 
 #### Workbook integration definition
 

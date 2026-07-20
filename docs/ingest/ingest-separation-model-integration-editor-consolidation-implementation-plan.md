@@ -1054,11 +1054,11 @@ promotion, deployment, or dealer surface changed. Phase 2 was not started.
 - Consumes: current `main` workbook/source fingerprints, five-function ingest module, shared service, and ratified GSX/N26/inactive-promotion interpretation.
 - Produces: one exact-current atomic ChangeSet and passing preview/deployment proof; no canonical write.
 
-- [ ] **Step 1: Reconcile the feature branch with `main` without accepting generated/audit drift**
+- [x] **Step 1: Reconcile the feature branch with `main` without accepting generated/audit drift**
 
 Before any merge/rebase operation, inspect `git status`, branch divergence, workbook hash, `form-app/data.js`, tracked `form-output`, and `form-output/workbook-edit-log.jsonl`. Preserve `main`'s canonical workbook and real audit entry. Do not reuse any old approval after reconciliation.
 
-- [ ] **Step 2: Start the ingest server and re-run the five-function path through compile**
+- [x] **Step 2: Start the ingest server and re-run the five-function path through compile**
 
 Start the ingest server if it is not already running; the browser flow and every session lookup below require it:
 
@@ -1068,7 +1068,7 @@ Start the ingest server if it is not already running; the browser flow and every
 
 Use the browser or service API to select the raw source, confirm roles, select `grand_sport_x`, `zr1`, and `zr1x`, and compile. Record the new run ID and compile/queue hashes in the owner spec at compile time, and set `ingest_run_id` to the new run's ID — the seed step and all later steps consume it.
 
-- [ ] **Step 3: Seed the frozen exception resolutions behind a fingerprint gate**
+- [x] **Step 3: Seed the frozen exception resolutions behind a fingerprint gate**
 
 The frozen run carries 158 typed exception resolutions, stored strictly per-run, and resolutions shape the manifest the ChangeSet projects. A fresh compile re-emits the same queue with zero seeding; re-answering it by hand would silently invalidate the exact-equivalence argument this phase rests on. Copy the frozen resolutions into the new run only when the queue fingerprint matches exactly, and refuse otherwise:
 
@@ -1082,7 +1082,7 @@ cp "$frozen_resolutions" "$run_dir/exception-resolutions.json"
 
 Re-run projection so the manifest and compile report bind the replayed `resolutionSemanticSha`, then confirm every replayed resolution reads back valid against the current queue. Resolve by hand only genuinely newly emitted typed exceptions — the expected count is zero. A fingerprint mismatch or an invalidated replayed resolution stops the task: reconcile against the frozen snapshot instead of re-answering the queue.
 
-- [ ] **Step 4: Emit the ChangeSet and resolve the run/proof paths from the server**
+- [x] **Step 4: Emit the ChangeSet and resolve the run/proof paths from the server**
 
 Emit one ChangeSet from the seeded session, then resolve the emitted run and stable proof paths. The server lookup must return the same run ID recorded in Step 2:
 
@@ -1101,7 +1101,7 @@ mkdir -p "$proof_dir"
 
 Record the emission hashes in the owner spec.
 
-- [ ] **Step 5: Preview through the shared CLI into an isolated directory**
+- [x] **Step 5: Preview through the shared CLI into an isolated directory**
 
 ```sh
 .venv/bin/python scripts/apply_workbook_changeset.py \
@@ -1112,13 +1112,39 @@ Record the emission hashes in the owner spec.
 
 Expected: preview `ok=true`, exact coverage, no unresolved blockers, and no canonical workbook mutation.
 
-- [ ] **Step 6: Run relocated deployment proof on temporary workbooks**
+- [x] **Step 6: Run relocated deployment proof on temporary workbooks**
 
 Call `workbook_domain.deployment_proof` for GSX+ZR1, ZR1X repeatability, and the all-target atomic ChangeSet. Require package/schema/Boolean/final-state/readback, generator contracts, registry loading, zero semantic signature mismatches, zero deployment blockers, and zero deferrals.
 
-- [ ] **Step 7: Present the approval packet and stop**
+- [x] **Step 7: Present the approval packet and stop**
 
 Present targets, workbook SHA/mtime, sheet creations, row changes by sheet/action, no-op coverage, warning IDs, backup/rollback behavior, preview hash, deployment-proof hash, protected-surface hashes, and the three ratified interpretation statements. Do not create `ChangeApproval` or run `--write` until Sean explicitly approves this exact packet.
+
+**Task 8 receipt — 2026-07-19:** Completed under Sean's bounded recovery
+authorization. The stale frozen packet was not copied or force-rebound. The
+recovery reused 131 exact frozen `(subjectId, subjectVersion)` resolutions,
+omitted eight changed-version and 19 removed subjects, reviewed all 75 current
+new/changed subjects, and recompiled to 203 resolved subjects with no stale,
+superseded, or deferred entries. Exact-current ChangeSet
+`5f108f09bb09d4dddafa18a6` creates 12 sheets, carries 4,204 row changes, and
+accounts for 2,488 noops. Shared preview fingerprint
+`03ecd79f2fbad407e41ec289868625ab7620a0000dc3ea0873e718069d51e8de`
+has zero blocking/unknown warnings. ChangeSet-aware temporary deployment proof
+fingerprint
+`0e2a72e256668d3be13628cba613341e9ddf85722efe6ad53ddc2f91c6bc7a32`
+passed all three required phases with zero blockers, deferrals, or runtime
+semantic mismatches. Independent temporary application covered all 4,216
+prepared operations and 21,063 changed field pairs; package, schema, Boolean,
+readback, formulas, generation, and registry checks passed. The exact packet is
+`/private/tmp/27vette-changeset-proof-20260719-174505-0085ca/task8-approval-packet.json`
+(SHA-256
+`8b1574dd5622643d7820bff35fe7813792d4fec147980a9cc04f33355f10827a`).
+Protected product surfaces remained byte-identical. No approval, canonical
+write, publication, promotion, deployment, or dealer change occurred. Manual
+approval review must include the packet's explicit note that 10 of 12
+batch-created sheets preserve exact headers but not the named template's header
+font/style under the existing generic writer. Task 9 remains unstarted and
+requires explicit approval of this exact packet.
 
 ### Task 9: Apply the approved ChangeSet once and regenerate affected artifacts
 
