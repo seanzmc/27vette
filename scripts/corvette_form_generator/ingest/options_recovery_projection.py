@@ -22,7 +22,11 @@ from typing import Any, Iterable, Mapping
 from openpyxl import load_workbook
 
 from corvette_form_generator.ingest.wizard.copy_split import propose_copy_split
-from corvette_form_generator.ingest.wizard.decisions import candidate_fingerprint
+from corvette_form_generator.ingest.wizard.decisions import (
+    candidate_fingerprint,
+    model_scoped_statuses,
+    scope_candidates,
+)
 from corvette_form_generator.runtime_metadata import truthy
 from corvette_form_generator.workbook import clean, intish
 
@@ -30,6 +34,8 @@ from corvette_form_generator.workbook import clean, intish
 SCHEMA_VERSION = "options-recovery-projection-1"
 CHECKPOINT_1_APPROVAL_SCHEMA_VERSION = "options-recovery-checkpoint-1-approval-1"
 CHECKPOINT_1_EXCEPTION_SCHEMA_VERSION = "options-recovery-checkpoint-1-exceptions-1"
+CHECKPOINT_1_DECISIONS_SCHEMA_VERSION = "options-recovery-checkpoint-1-decisions-1"
+CHECKPOINT_1_PENDING_SCHEMA_VERSION = "options-recovery-checkpoint-1-pending-1"
 TARGET_MODELS = ("grand_sport_x", "zr1", "zr1x")
 FRESH_GSX_RPOS = frozenset({"N26", "PRB", "R6P", "R9L", "R9V", "R9W", "R9Y", "TU7"})
 MANDATORY_CHARGE_RPOS = frozenset({"R8E"})
@@ -59,6 +65,7 @@ class ProjectionInputs:
     pre_integration_workbook_path: Path
     reviewed_plan_path: Path
     reviewed_candidates_path: Path
+    reconciliation_candidates_path: Path
     reviewed_decisions_path: Path
     exception_queue_path: Path
     exception_resolutions_path: Path
@@ -163,6 +170,37 @@ def _index_options(rows: Iterable[dict[str, Any]]) -> tuple[dict[str, dict[str, 
     return by_id, by_rpo
 
 
+def _target_all_unavailable_by_rpo(
+    candidates: Mapping[str, Any],
+    model: str,
+) -> dict[str, dict[str, Any]]:
+    unavailable: dict[str, list[dict[str, Any]]] = {}
+    applicable_rpos: set[str] = set()
+    for candidate in scope_candidates(list(candidates.get("candidates") or []), model):
+        statuses = model_scoped_statuses(candidate, model)
+        if not statuses:
+            continue
+        rpo = clean(candidate.get("rpo") or candidate.get("refOnlyRpo")).upper()
+        if not rpo:
+            continue
+        if all(status.get("status") == "unavailable" for status in statuses):
+            unavailable.setdefault(rpo, []).append({**candidate, "statuses": statuses})
+        else:
+            applicable_rpos.add(rpo)
+    return {
+        rpo: {
+            "sourceCandidateIds": sorted(clean(candidate.get("candidateId")) for candidate in rows),
+            "targetStatuses": [
+                clean(status.get("raw"))
+                for candidate in rows
+                for status in candidate.get("statuses") or []
+            ],
+        }
+        for rpo, rows in sorted(unavailable.items())
+        if rpo not in applicable_rpos
+    }
+
+
 def _tokens(value: str) -> set[str]:
     return set(TOKEN_RE.findall(value.lower().replace("new!", " ")))
 
@@ -205,6 +243,217 @@ def _comparator_copy_comparison(target: Mapping[str, Any], comparator: Mapping[s
         "comparatorNameTokens": sorted(comparator_name_tokens),
         "matchedNameTokens": sorted(matched),
         "targetRawText": target_text,
+    }
+
+
+def _copy_title(value: str) -> str:
+    """Title-case customer copy while preserving known product abbreviations."""
+
+    titled = value.title()
+    for old, new in (
+        ("Zr1", "ZR1"),
+        ("Ztk", "ZTK"),
+        ("Lpo", "LPO"),
+    ):
+        titled = titled.replace(old, new)
+    return titled
+
+
+def _identifying_copy_proposal(
+    current: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Propose concise identifying copy without reducing equipment to a generic noun."""
+
+    raw = next(
+        (
+            clean(current.get(field))
+            for field in ("option_name", "description", "detail_raw")
+            if clean(current.get(field))
+        ),
+        "",
+    )
+    wheels = re.match(r'^Wheels,\s*(?P<size>.+?\brear)\s+(?P<design>\d+-spoke,\s*.+)$', raw, re.IGNORECASE)
+    if wheels:
+        design = _copy_title(wheels.group("design").replace(",", "").strip())
+        return {
+            "option_name": f"{design} Wheels",
+            "description": wheels.group("size").strip(),
+            "sourceType": "identifying_copy_derivation",
+            "flags": [],
+        }
+
+    calipers = re.match(r"^Calipers,\s*(?P<finish>.+)$", raw, re.IGNORECASE)
+    if calipers:
+        return {
+            "option_name": f"{_copy_title(calipers.group('finish').strip())} Calipers",
+            "description": "",
+            "sourceType": "identifying_copy_derivation",
+            "flags": [],
+        }
+
+    lower = raw.lower()
+    transmission = re.match(
+        r"^Transmission,\s*(?P<speeds>\d+)-speed dual clutch,\s*includes manual and auto modes$",
+        raw,
+        re.IGNORECASE,
+    )
+    if transmission:
+        return {
+            "option_name": f"{transmission.group('speeds')}-Speed Dual-Clutch Transmission",
+            "description": "Includes manual and automatic modes",
+            "sourceType": "identifying_copy_derivation",
+            "flags": [],
+        }
+
+    stitching = re.match(
+        r"^(?P<color>.+?) custom leather stitch,\s*includes seats, instrument panel, doors and console$",
+        raw,
+        re.IGNORECASE,
+    )
+    if stitching:
+        return {
+            "option_name": f"{_copy_title(stitching.group('color'))} Custom Leather Stitching",
+            "description": "Includes seats, instrument panel, doors, and console",
+            "sourceType": "identifying_copy_derivation",
+            "flags": [],
+        }
+
+    stripes = re.match(
+        r"^(?:NEW!\s*)?(?P<color>.+?) Full Length Dual Racing Stripes(?:\n1\.\s*(?P<restriction>.+))?$",
+        raw,
+        re.IGNORECASE,
+    )
+    if stripes:
+        return {
+            "option_name": f"{_copy_title(stripes.group('color'))} Full-Length Dual Racing Stripes",
+            "description": clean(stripes.group("restriction")),
+            "sourceType": "identifying_copy_derivation",
+            "flags": [],
+        }
+
+    if lower.startswith("exterior trim, carbon fiber split window trim, painted body-color"):
+        return {
+            "option_name": "Body-Color Carbon Fiber Split-Window Trim",
+            "description": "",
+            "sourceType": "identifying_copy_derivation",
+            "flags": [],
+        }
+
+    if lower.startswith("steering wheel, carbon fiber and sueded microfiber-wrapped"):
+        return {
+            "option_name": "Carbon Fiber and Sueded Microfiber Steering Wheel",
+            "description": "",
+            "sourceType": "identifying_copy_derivation",
+            "flags": [],
+        }
+
+    if "carbon fiber aero package" in lower and "includes" in lower:
+        _, ancillary = raw.split(", includes", 1)
+        return {
+            "option_name": "Visible Carbon Fiber Aero Package",
+            "description": f"Includes{ancillary}",
+            "sourceType": "identifying_copy_derivation",
+            "flags": [],
+        }
+
+    if lower.startswith("ztk track performance package, includes"):
+        _, ancillary = raw.split(", includes", 1)
+        return {
+            "option_name": "ZTK Track Performance Package",
+            "description": f"Includes{ancillary}",
+            "sourceType": "identifying_copy_derivation",
+            "flags": [],
+        }
+
+    if lower.startswith("convertible top,") and "visible carbon fiber" in lower:
+        return {
+            "option_name": "Visible Carbon Fiber Retractable Hardtop",
+            "description": (
+                "Power-folding with remote control (down only) and power glass rear window with integral "
+                "defogger; nacelles, A-pillars, and header are Carbon Flash-painted (body-color with GBA "
+                "Black exterior)"
+            ),
+            "sourceType": "identifying_copy_derivation",
+            "flags": [],
+        }
+
+    if lower.startswith("front axle, electrified propulsion"):
+        axle = re.match(
+            r"^Front axle, electrified propulsion \((?P<axle>.+)\)\.\s*"
+            r"(?P<hp>\d+) \((?P<kw>[^)]+)\) total combined hp with LT7 engine$",
+            raw,
+            re.IGNORECASE,
+        )
+        return {
+            "option_name": "Electrified Front Axle",
+            "description": (
+                f"{axle.group('axle')}; {axle.group('hp')} hp [{axle.group('kw')}] total combined with LT7 engine"
+                if axle
+                else re.sub(r"^Front axle, electrified propulsion\s*", "", raw, flags=re.IGNORECASE)
+            ),
+            "sourceType": "identifying_copy_derivation",
+            "flags": [],
+        }
+
+    if "hood and roof decal package" in lower and "genuine corvette accessory" in lower:
+        return {
+            "option_name": "Hood and Roof Decal Package",
+            "description": "LPO. Genuine Corvette Accessory",
+            "sourceType": "identifying_copy_derivation",
+            "flags": [],
+        }
+
+    if lower.startswith("brakes,"):
+        if "zr1-specific" in lower:
+            name = "ZR1-Specific Carbon Ceramic Brakes"
+        else:
+            piston = re.search(
+                r"(?P<front>\d+)-piston front(?: and|,)\s*(?P<rear>\d+)-piston rear",
+                raw,
+                re.IGNORECASE,
+            )
+            name = (
+                f"{piston.group('front')}-Piston Front / {piston.group('rear')}-Piston Rear "
+                "Carbon Ceramic Brakes"
+                if piston
+                else "Carbon Ceramic Brakes"
+            )
+        return {
+            "option_name": name,
+            "description": (
+                "4-wheel antilock disc"
+                if "4-wheel antilock disc" in lower
+                or ("4-wheel antilock" in lower and "4-wheel disc" in lower)
+                else ""
+            ),
+            "sourceType": "identifying_copy_derivation",
+            "flags": [],
+        }
+
+    if lower.startswith("engine,") or ("5.5l" in lower and "v8" in lower):
+        description = re.sub(r"^Engine,\s*", "", raw, flags=re.IGNORECASE)
+        description = re.sub(r"^5\.5L V8 Twin Turbo,?\s*", "", description, flags=re.IGNORECASE)
+        return {
+            "option_name": "5.5L Twin-Turbo V8 Engine",
+            "description": description.strip(" ,"),
+            "sourceType": "identifying_copy_derivation",
+            "flags": [],
+        }
+
+    if lower.startswith("suspension,"):
+        is_ztk = "ztk" in lower
+        return {
+            "option_name": "ZTK Performance Suspension" if is_ztk else "Performance Suspension with Magnetic Ride Control",
+            "description": "Magnetic Selective Ride Control" if is_ztk else "",
+            "sourceType": "identifying_copy_derivation",
+            "flags": [],
+        }
+
+    return {
+        "option_name": clean(current.get("option_name")),
+        "description": clean(current.get("description")),
+        "sourceType": "identifying_copy_derivation",
+        "flags": ["needs_curated_copy"],
     }
 
 
@@ -334,6 +583,37 @@ def _cascade_references(wb: Any, old_option_id: str, target_sheet: str) -> list[
                     }
                 )
     return sorted(refs, key=lambda ref: (ref["sheet"], ref["rowNumber"], ref["column"]))
+
+
+def _deletion_projection(
+    wb: Any,
+    model: str,
+    target_sheet: str,
+    current: Mapping[str, Any],
+    reason: str,
+    **evidence: Any,
+) -> dict[str, Any]:
+    references = _cascade_references(wb, clean(current.get("option_id")), target_sheet)
+    owned_references = [
+        reference
+        for reference in references
+        if reference["sheet"].startswith(f"{model}_")
+    ]
+    return {
+        "model": model,
+        "targetSheet": target_sheet,
+        "rowNumber": current["row_number"],
+        "optionId": current["option_id"],
+        "rpo": current["rpo"],
+        "reason": reason,
+        **evidence,
+        "ownedReferenceRows": owned_references,
+        "externalSameIdReferencesPreserved": [
+            reference
+            for reference in references
+            if reference not in owned_references
+        ],
+    }
 
 
 def _manifest_identity_by_evidence(manifest: Mapping[str, Any]) -> dict[str, dict[str, str]]:
@@ -559,6 +839,38 @@ def _markdown(report: Mapping[str, Any]) -> str:
     else:
         lines.append("None.")
 
+    lines.extend(["", "## Target-applicability deletions", ""])
+    if report["targetApplicabilityDeletions"]:
+        lines.extend(
+            [
+                "| RPO | Option ID | Target raw statuses | Owned reference rows |",
+                "|---|---|---|---:|",
+            ]
+        )
+        for item in report["targetApplicabilityDeletions"]:
+            lines.append(
+                f"| {cell(item['rpo'])} | `{cell(item['optionId'])}` | "
+                f"{cell(', '.join(item['targetStatuses']))} | {len(item['ownedReferenceRows'])} |"
+            )
+    else:
+        lines.append("None.")
+
+    lines.extend(["", "## Recorded cross-target deletions", ""])
+    if report["recordedInstructionDeletions"]:
+        lines.extend(
+            [
+                "| RPO | Option ID | Reason | Owned reference rows |",
+                "|---|---|---|---:|",
+            ]
+        )
+        for item in report["recordedInstructionDeletions"]:
+            lines.append(
+                f"| {cell(item['rpo'])} | `{cell(item['optionId'])}` | "
+                f"{cell(item['reason'])} | {len(item['ownedReferenceRows'])} |"
+            )
+    else:
+        lines.append("None.")
+
     lines.extend(["", "## Pending Checkpoint 1 decisions", ""])
     lines.extend(["| Review ID | Lane | RPO / option | Proposed | Provenance |", "|---|---|---|---|---|"])
     for row in report["residualRows"]:
@@ -644,7 +956,7 @@ def _exception_group_signature(record: Mapping[str, Any]) -> dict[str, Any]:
         "proposed": record["proposed"],
         "flags": sorted(record["provenance"].get("flags") or []),
     }
-    if lane in {"copy_split", "comparator_copy_material_disagreement"}:
+    if lane in {"copy_split", "identifying_copy_review", "comparator_copy_material_disagreement"}:
         signature["currentCopy"] = {
             field: before.get(field) for field in ("option_name", "description", "detail_raw")
         }
@@ -659,6 +971,7 @@ def _exception_group_signature(record: Mapping[str, Any]) -> dict[str, Any]:
 def _required_decision(lane: str) -> str:
     return {
         "copy_split": "Accept or override option_name and description.",
+        "identifying_copy_review": "Accept or override the identifying option_name and non-repeating description.",
         "comparator_copy_material_disagreement": "Review target text; accept or override comparator copy.",
         "no_rpo_mapping": "Accept or override the comparator mapping, copy, and sequential ID.",
         "full_review": "Confirm copy, section, active, selectable, and order; override any field that differs.",
@@ -762,6 +1075,7 @@ def _checkpoint_markdown(approval: Mapping[str, Any], packet: Mapping[str, Any])
 
     lane_titles = {
         "copy_split": "Flagged copy-split choices",
+        "identifying_copy_review": "Identifying copy choices",
         "comparator_copy_material_disagreement": "Comparator-copy disagreements",
         "full_review": "Fresh GSX full review",
         "no_rpo_mapping": "GSX no-RPO mappings",
@@ -784,7 +1098,7 @@ def _checkpoint_markdown(approval: Mapping[str, Any], packet: Mapping[str, Any])
                 continue
             member = group["members"][0]
             identity = member["identity"].get("rpo") or member["identity"].get("optionId")
-            if lane in {"copy_split", "comparator_copy_material_disagreement", "no_rpo_mapping", "full_review"}:
+            if lane in {"copy_split", "identifying_copy_review", "comparator_copy_material_disagreement", "no_rpo_mapping", "full_review"}:
                 current = {
                     field: member["before"].get(field)
                     for field in ("option_name", "description", "section_id", "active", "selectable")
@@ -938,12 +1252,421 @@ def generate_checkpoint_1_packet(
     return approval, packet
 
 
+def _validate_fingerprinted_artifact(
+    payload: Mapping[str, Any],
+    fingerprint_field: str,
+    label: str,
+) -> str:
+    stored = clean(payload.get(fingerprint_field))
+    unsigned = {key: value for key, value in payload.items() if key != fingerprint_field}
+    if not stored or _canonical_sha(unsigned) != stored:
+        raise ValueError(f"{label} fingerprint mismatch")
+    return stored
+
+
+def _delete_scope(
+    workbook: Any,
+    source_sheets: Mapping[str, str],
+    group: Mapping[str, Any],
+) -> dict[str, Any]:
+    if group["lane"] not in {"full_review", "identifying_copy_review"}:
+        raise ValueError("Delete decisions require an option-row review group")
+
+    option_rows: list[dict[str, Any]] = []
+    owned_by_row: dict[tuple[str, int], dict[str, Any]] = {}
+    member_targets: list[tuple[str, str, str, int]] = []
+    for member in group["members"]:
+        model = member["model"]
+        identity = member["identity"]
+        option_id = clean(identity.get("optionId"))
+        target_sheet = source_sheets[model]
+        row_number = int(identity.get("rowNumber"))
+        member_targets.append((model, target_sheet, option_id, row_number))
+        option_rows.append(
+            {
+                "sheet": target_sheet,
+                "rowNumber": row_number,
+                "optionId": option_id,
+                "rpo": identity.get("rpo"),
+            }
+        )
+
+    owned_prefixes = tuple(f"{model}_" for model, _, _, _ in member_targets)
+    option_cells = {
+        (sheet, row_number, "option_id")
+        for _, sheet, _, row_number in member_targets
+    }
+    seen_refs: set[tuple[str, int, str, str, str]] = set()
+    external_refs: list[dict[str, Any]] = []
+    for _, target_sheet, option_id, _ in member_targets:
+        for ref in _cascade_references(workbook, option_id, target_sheet):
+            ref_key = (
+                ref["sheet"],
+                ref["rowNumber"],
+                ref["column"],
+                ref["value"],
+                ref["matchType"],
+            )
+            if ref_key in seen_refs or (ref["sheet"], ref["rowNumber"], ref["column"]) in option_cells:
+                continue
+            seen_refs.add(ref_key)
+            if ref["sheet"].startswith(owned_prefixes):
+                key = (ref["sheet"], ref["rowNumber"])
+                row = owned_by_row.setdefault(
+                    key,
+                    {
+                        "sheet": ref["sheet"],
+                        "rowNumber": ref["rowNumber"],
+                        "matches": [],
+                    },
+                )
+                row["matches"].append(
+                    {
+                        "column": ref["column"],
+                        "value": ref["value"],
+                        "matchType": ref["matchType"],
+                    }
+                )
+            else:
+                external_refs.append(ref)
+    owned_rows = sorted(owned_by_row.values(), key=lambda row: (row["sheet"], row["rowNumber"]))
+    for row in owned_rows:
+        row["matches"].sort(key=lambda match: (match["column"], match["value"]))
+    return {
+        "optionRows": sorted(option_rows, key=lambda row: (row["sheet"], row["rowNumber"])),
+        "ownedReferenceRows": owned_rows,
+        "ovsRowCount": sum(1 for row in owned_rows if row["sheet"] == "grand_sport_x_ovs"),
+        "additionalOwnedReferenceRowCount": sum(
+            1 for row in owned_rows if row["sheet"] != "grand_sport_x_ovs"
+        ),
+        "externalSameIdReferencesPreserved": sorted(
+            external_refs,
+            key=lambda ref: (ref["sheet"], ref["rowNumber"], ref["column"]),
+        ),
+    }
+
+
+def _full_pending_markdown(
+    decision_artifact: Mapping[str, Any],
+    pending: Mapping[str, Any],
+) -> str:
+    lane_titles = {
+        "copy_split": "Flagged copy choices",
+        "identifying_copy_review": "Identifying copy choices",
+        "comparator_copy_material_disagreement": "Comparator-copy disagreements",
+        "full_review": "Fresh GSX full review",
+        "no_rpo_mapping": "GSX no-RPO mappings",
+        "display_order": "Deterministic display order",
+        "active": "Active-status proposals",
+    }
+    lines = [
+        "# Checkpoint 1 Pending Exception Review",
+        "",
+        "> Complete, unabridged current and proposed values. This remains read-only and does not authorize a workbook write.",
+        "",
+        "## Decision status",
+        "",
+        f"- Recorded decision groups: **{decision_artifact['resolvedGroupCount']}**",
+        f"- Recorded review records: **{decision_artifact['resolvedReviewCount']}**",
+        f"- Recorded bulk-approval overrides: **{decision_artifact.get('bulkApprovalOverrideCount', 0)}**",
+        f"- Pending decision groups: **{pending['pendingGroupCount']}**",
+        f"- Pending review records: **{pending['pendingReviewCount']}**",
+        f"- Decision artifact fingerprint: `{decision_artifact['decisionArtifactFingerprint']}`",
+    ]
+    for lane in sorted({group["lane"] for group in pending["exceptionGroups"]}):
+        lines.extend(["", f"## {lane_titles.get(lane, lane)}", ""])
+        for group in pending["exceptionGroups"]:
+            if group["lane"] != lane:
+                continue
+            lines.extend(
+                [
+                    f"### `{group['decisionGroupId']}` — {', '.join(group['models'])} — {group['identityKey']}",
+                    "",
+                    group["requiredDecision"],
+                    "",
+                    f"Flags: `{', '.join(group['flags']) or 'none'}`",
+                    "",
+                ]
+            )
+            for member in group["members"]:
+                identity = member["identity"]
+                lines.extend(
+                    [
+                        f"#### {member['model']} — RPO `{identity.get('rpo') or 'none'}` — option `{identity.get('optionId')}`",
+                        "",
+                        "Current state:",
+                        "",
+                        "```json",
+                        json.dumps(member["before"], indent=2, sort_keys=True, ensure_ascii=False),
+                        "```",
+                        "",
+                        "Proposed state:",
+                        "",
+                        "```json",
+                        json.dumps(group["proposedState"], indent=2, sort_keys=True, ensure_ascii=False),
+                        "```",
+                        "",
+                        "Provenance:",
+                        "",
+                        "```json",
+                        json.dumps(member["provenance"], indent=2, sort_keys=True, ensure_ascii=False),
+                        "```",
+                        "",
+                    ]
+                )
+    lines.extend(
+        [
+            "Reply with a decision-group ID and `accept`, or provide the exact field override. Shared ZR groups apply to all listed models unless explicitly split.",
+            "",
+        ]
+    )
+    return "\n".join(lines)
+
+
+def record_checkpoint_1_decisions(
+    report_dir: Path,
+    current_workbook_path: Path,
+    *,
+    decisions: Iterable[Mapping[str, Any]],
+    bulk_overrides: Iterable[Mapping[str, Any]] = (),
+    reviewer: str,
+    reviewed_at: str,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Record typed exception decisions without mutating their source packet."""
+
+    report_dir = Path(report_dir)
+    current_workbook_path = Path(current_workbook_path)
+    reviewer = clean(reviewer)
+    reviewed_at = clean(reviewed_at)
+    if not reviewer or not reviewed_at:
+        raise ValueError("Checkpoint 1 decisions require reviewer and reviewed_at")
+
+    approval = _json(report_dir / "checkpoint-1-bulk-approval.json")
+    packet = _json(report_dir / "checkpoint-1-exception-review.json")
+    approval_fingerprint = _validate_fingerprinted_artifact(
+        approval,
+        "approvalFingerprint",
+        "Checkpoint 1 bulk approval",
+    )
+    packet_fingerprint = _validate_fingerprinted_artifact(
+        packet,
+        "packetFingerprint",
+        "Checkpoint 1 exception packet",
+    )
+    if packet.get("bulkApprovalFingerprint") != approval_fingerprint:
+        raise ValueError("Checkpoint 1 exception packet is not bound to the bulk approval")
+    workbook_sha = _sha256(current_workbook_path)
+    if packet.get("workbookSha256") != workbook_sha or approval.get("workbookSha256") != workbook_sha:
+        raise ValueError("Current workbook SHA does not match Checkpoint 1 artifacts")
+
+    groups_by_id = {group["decisionGroupId"]: group for group in packet["exceptionGroups"]}
+    raw_decisions = [dict(decision) for decision in decisions]
+    raw_bulk_overrides = [dict(override) for override in bulk_overrides]
+    supplied_ids = [clean(decision.get("decisionGroupId")) for decision in raw_decisions]
+    if len(set(supplied_ids)) != len(supplied_ids) or any(not value for value in supplied_ids):
+        raise ValueError("Checkpoint 1 decision-group IDs must be nonblank and unique")
+    missing = sorted(set(supplied_ids) - set(groups_by_id))
+    if missing:
+        raise ValueError(f"Unknown Checkpoint 1 decision groups: {', '.join(missing)}")
+
+    approved_ids = set(approval.get("approvedReviewIds") or [])
+    approved_records: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
+    for model, binding in (approval.get("sourceReports") or {}).items():
+        report_path = Path(binding["path"])
+        report = _json(report_path)
+        _validate_checkpoint_report(report, model, report_path)
+        if report["reportFingerprint"] != binding.get("reportFingerprint"):
+            raise ValueError(f"Checkpoint 1 source report binding mismatch for {model}")
+        for row in report["residualRows"]:
+            for item in row["reviewItems"]:
+                if item["reviewId"] not in approved_ids:
+                    continue
+                record = _checkpoint_record(model, row, item)
+                key = (model, clean(row["identity"].get("rpo")).upper(), item["lane"])
+                approved_records.setdefault(key, []).append(record)
+
+    recorded_bulk_overrides: list[dict[str, Any]] = []
+    seen_bulk_keys: set[tuple[str, str, str]] = set()
+    for instruction in raw_bulk_overrides:
+        key = (
+            clean(instruction.get("model")).lower(),
+            clean(instruction.get("rpo")).upper(),
+            clean(instruction.get("lane")),
+        )
+        if key in seen_bulk_keys:
+            raise ValueError(f"Duplicate Checkpoint 1 bulk override: {'/'.join(key)}")
+        seen_bulk_keys.add(key)
+        matches = approved_records.get(key) or []
+        if len(matches) != 1:
+            raise ValueError(
+                f"Checkpoint 1 bulk override must match exactly one approved review: {'/'.join(key)}"
+            )
+        override = instruction.get("override")
+        if not isinstance(override, Mapping) or not override:
+            raise ValueError(f"Checkpoint 1 bulk override is empty: {'/'.join(key)}")
+        unknown_fields = set(override) - set(OPTION_VIEW_FIELDS)
+        if unknown_fields:
+            raise ValueError(
+                f"Unsupported Checkpoint 1 bulk override fields: {', '.join(sorted(unknown_fields))}"
+            )
+        record = matches[0]
+        typed_override = {
+            "reviewId": record["reviewId"],
+            "model": record["model"],
+            "identity": deepcopy(record["identity"]),
+            "lane": record["lane"],
+            "action": "override_bulk_approval",
+            "override": deepcopy(dict(override)),
+            "reviewer": reviewer,
+            "reviewedAt": reviewed_at,
+            "sourceApprovalFingerprint": approval_fingerprint,
+        }
+        typed_override["decisionFingerprint"] = _canonical_sha(typed_override)
+        recorded_bulk_overrides.append(typed_override)
+    recorded_bulk_overrides.sort(key=lambda item: (item["model"], item["identity"]["rpo"], item["reviewId"]))
+
+    allowed_actions = {
+        "accept",
+        "override",
+        "override_by_model",
+        "delete_option_and_owned_references",
+        "not_applicable_due_to_delete",
+    }
+    delete_identity_keys = {
+        groups_by_id[decision["decisionGroupId"]]["identityKey"]
+        for decision in raw_decisions
+        if decision.get("action") == "delete_option_and_owned_references"
+    }
+    workbook = load_workbook(current_workbook_path, read_only=True, data_only=True)
+    try:
+        source_sheets = _source_option_sheets(workbook)
+        recorded: list[dict[str, Any]] = []
+        for instruction in raw_decisions:
+            group_id = instruction["decisionGroupId"]
+            group = groups_by_id[group_id]
+            action = clean(instruction.get("action"))
+            if action not in allowed_actions:
+                raise ValueError(f"Unsupported Checkpoint 1 decision action: {action}")
+            if action == "override" and "override" not in instruction:
+                raise ValueError(f"Override decision is missing its value: {group_id}")
+            if action == "override_by_model":
+                overrides = instruction.get("overrideByModel")
+                expected_models = set(group["models"])
+                if not isinstance(overrides, Mapping) or set(overrides) != expected_models:
+                    raise ValueError(
+                        f"Model-scoped override must cover exactly {', '.join(sorted(expected_models))}: {group_id}"
+                    )
+                for model, override in overrides.items():
+                    if not isinstance(override, Mapping) or not override:
+                        raise ValueError(f"Model-scoped override is empty for {model}: {group_id}")
+                    unknown_fields = set(override) - set(OPTION_VIEW_FIELDS)
+                    if unknown_fields:
+                        raise ValueError(
+                            f"Unsupported model-scoped override fields for {model}: {', '.join(sorted(unknown_fields))}"
+                        )
+            if action == "not_applicable_due_to_delete" and group["identityKey"] not in delete_identity_keys:
+                raise ValueError(f"Not-applicable decision has no matching delete: {group_id}")
+
+            decision: dict[str, Any] = {
+                "decisionGroupId": group_id,
+                "reviewIds": list(group["reviewIds"]),
+                "models": list(group["models"]),
+                "identityKey": group["identityKey"],
+                "lane": group["lane"],
+                "action": action,
+                "reviewer": reviewer,
+                "reviewedAt": reviewed_at,
+            }
+            if action == "accept":
+                decision["acceptedState"] = deepcopy(group["proposedState"])
+            elif action == "override":
+                decision["override"] = deepcopy(instruction["override"])
+            elif action == "override_by_model":
+                decision["overrideByModel"] = deepcopy(instruction["overrideByModel"])
+            elif action == "delete_option_and_owned_references":
+                decision["deleteScope"] = _delete_scope(workbook, source_sheets, group)
+            else:
+                decision["reason"] = "option_deleted_by_checkpoint_1_decision"
+            decision["decisionFingerprint"] = _canonical_sha(decision)
+            recorded.append(decision)
+    finally:
+        workbook.close()
+
+    recorded.sort(key=lambda decision: decision["decisionGroupId"])
+    resolved_ids = set(supplied_ids)
+    pending_groups = [
+        deepcopy(group)
+        for group in packet["exceptionGroups"]
+        if group["decisionGroupId"] not in resolved_ids
+    ]
+    resolved_review_ids = sorted(
+        review_id for decision in recorded for review_id in decision["reviewIds"]
+    )
+    pending_review_ids = sorted(
+        review_id for group in pending_groups for review_id in group["reviewIds"]
+    )
+    if set(resolved_review_ids) & set(pending_review_ids):
+        raise ValueError("Resolved and pending Checkpoint 1 review IDs overlap")
+
+    decision_artifact: dict[str, Any] = {
+        "schemaVersion": CHECKPOINT_1_DECISIONS_SCHEMA_VERSION,
+        "status": "exceptions_pending" if pending_groups else "complete",
+        "reviewer": reviewer,
+        "reviewedAt": reviewed_at,
+        "workbookPath": str(current_workbook_path),
+        "workbookSha256": workbook_sha,
+        "bulkApprovalFingerprint": approval_fingerprint,
+        "sourcePacketFingerprint": packet_fingerprint,
+        "resolvedGroupCount": len(recorded),
+        "resolvedReviewCount": len(resolved_review_ids),
+        "resolvedReviewIds": resolved_review_ids,
+        "pendingGroupCount": len(pending_groups),
+        "pendingReviewCount": len(pending_review_ids),
+        "decisions": recorded,
+        "bulkApprovalOverrideCount": len(recorded_bulk_overrides),
+        "bulkApprovalOverrides": recorded_bulk_overrides,
+    }
+    decision_artifact["decisionArtifactFingerprint"] = _canonical_sha(decision_artifact)
+
+    pending: dict[str, Any] = {
+        "schemaVersion": CHECKPOINT_1_PENDING_SCHEMA_VERSION,
+        "status": "pending_exception_review" if pending_groups else "complete",
+        "bulkApprovalFingerprint": approval_fingerprint,
+        "sourcePacketFingerprint": packet_fingerprint,
+        "decisionArtifactFingerprint": decision_artifact["decisionArtifactFingerprint"],
+        "workbookPath": str(current_workbook_path),
+        "workbookSha256": workbook_sha,
+        "resolvedGroupCount": len(recorded),
+        "resolvedReviewCount": len(resolved_review_ids),
+        "pendingGroupCount": len(pending_groups),
+        "pendingReviewCount": len(pending_review_ids),
+        "bulkApprovalOverrideCount": len(recorded_bulk_overrides),
+        "exceptionGroups": pending_groups,
+    }
+    pending["pendingPacketFingerprint"] = _canonical_sha(pending)
+
+    (report_dir / "checkpoint-1-exception-decisions.json").write_text(
+        json.dumps(decision_artifact, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    (report_dir / "checkpoint-1-pending-review.json").write_text(
+        json.dumps(pending, indent=2, sort_keys=True, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    (report_dir / "checkpoint-1-pending-review.md").write_text(
+        _full_pending_markdown(decision_artifact, pending),
+        encoding="utf-8",
+    )
+    return decision_artifact, pending
+
+
 def generate_recovery_reports(inputs: ProjectionInputs, output_dir: Path) -> dict[str, dict[str, Any]]:
     """Generate one Markdown/JSON residual report per target model."""
 
     inputs = ProjectionInputs(**{field: Path(getattr(inputs, field)) for field in inputs.__dataclass_fields__})
     reviewed_plan = _json(inputs.reviewed_plan_path)
     reviewed_candidates = _json(inputs.reviewed_candidates_path)
+    reconciliation_candidates = _json(inputs.reconciliation_candidates_path)
     reviewed_decisions = _json(inputs.reviewed_decisions_path)
     exception_queue = _json(inputs.exception_queue_path)
     exception_resolutions = _json(inputs.exception_resolutions_path)
@@ -993,6 +1716,10 @@ def generate_recovery_reports(inputs: ProjectionInputs, output_dir: Path) -> dic
             }
             for model, items in reconciliation.items()
         }
+        target_all_unavailable = {
+            model: _target_all_unavailable_by_rpo(reconciliation_candidates, model)
+            for model in ("zr1", "zr1x")
+        }
 
         gsx_by_id, gsx_by_rpo = options_index["grand_sport_x"]
         valid_plan, invalid_plan = _plan_rows(
@@ -1027,7 +1754,13 @@ def generate_recovery_reports(inputs: ProjectionInputs, output_dir: Path) -> dic
             hex_rows = [row for row in current_rows if HASH_OPTION_ID_RE.match(row["option_id"])]
             proposed_ids = _next_option_ids(current_rows, len(hex_rows))
             id_by_old = {row["option_id"]: proposed for row, proposed in zip(hex_rows, proposed_ids)}
+            z06_no_rpo_set = [("z06", source_sheets["z06"], options["z06"])]
             no_rpo_matches: dict[str, tuple[str, str, dict[str, Any], float] | None] = {
+                row["option_id"]: _best_no_rpo_comparator(row, z06_no_rpo_set)
+                for row in current_rows
+                if not row["rpo"]
+            }
+            no_rpo_order_matches: dict[str, tuple[str, str, dict[str, Any], float] | None] = {
                 row["option_id"]: _best_no_rpo_comparator(row, fallback_sets)
                 for row in current_rows
                 if not row["rpo"]
@@ -1040,7 +1773,33 @@ def generate_recovery_reports(inputs: ProjectionInputs, output_dir: Path) -> dic
 
             row_states: list[dict[str, Any]] = []
             rows_needing_order: list[tuple[dict[str, Any], dict[str, Any] | None, Mapping[str, Any]]] = []
+            target_applicability_deletions: list[dict[str, Any]] = []
+            recorded_instruction_deletions: list[dict[str, Any]] = []
             for current in current_rows:
+                if model in {"zr1", "zr1x"} and current["rpo"] in FRESH_GSX_RPOS:
+                    recorded_instruction_deletions.append(
+                        _deletion_projection(
+                            workbook,
+                            model,
+                            sheet,
+                            current,
+                            "checkpoint_1_delete_rpo_across_targets",
+                        )
+                    )
+                    continue
+                unavailable_evidence = target_all_unavailable.get(model, {}).get(current["rpo"])
+                if unavailable_evidence is not None:
+                    target_applicability_deletions.append(
+                        _deletion_projection(
+                            workbook,
+                            model,
+                            sheet,
+                            current,
+                            "all_target_variant_statuses_unavailable",
+                            **unavailable_evidence,
+                        )
+                    )
+                    continue
                 before = _option_view(current)
                 after = deepcopy(before)
                 provenance: dict[str, Any] = {}
@@ -1050,29 +1809,38 @@ def generate_recovery_reports(inputs: ProjectionInputs, output_dir: Path) -> dic
 
                 if model == "grand_sport_x":
                     if not current["rpo"]:
-                        partition = "no_rpo_standard_mapping"
+                        partition = "z06_no_rpo_copy_recovery"
                         match = no_rpo_matches.get(current["option_id"])
+                        if match is None:
+                            raise ValueError(
+                                f"No Z06 no-RPO copy match for {model} {current['option_id']}"
+                            )
                         source = {
-                            "sourceType": "promoted_model_equivalent",
-                            "reference": _comparator_ref(match[0], match[1], match[2], match[3]) if match else None,
+                            "sourceType": "exact_z06_no_rpo_copy",
+                            "reference": _comparator_ref(match[0], match[1], match[2], match[3]),
+                            "bulkEligible": True,
                         }
                         _field_change(after, provenance, "option_id", id_by_old[current["option_id"]], source)
-                        if match:
-                            _field_change(after, provenance, "option_name", match[2]["option_name"], source)
-                            _field_change(after, provenance, "description", match[2]["description"], source)
-                            rows_needing_order.append((after, match[2], source))
-                        else:
-                            split = propose_copy_split({"description": current["detail_raw"], "statuses": []})
-                            _field_change(after, provenance, "option_name", split["name"], {"sourceType": "copy_split"})
-                            _field_change(after, provenance, "description", split["description"], {"sourceType": "copy_split"})
-                            rows_needing_order.append((after, None, {"sourceType": "deterministic_section_local"}))
-                        review_items.append(
-                            _review_item(
-                                model,
-                                current,
-                                "no_rpo_mapping",
-                                {field: after[field] for field in ("option_id", "option_name", "description")},
-                                source,
+                        _field_change(after, provenance, "option_name", match[2]["option_name"], source)
+                        _field_change(after, provenance, "description", match[2]["description"], source)
+                        order_match = no_rpo_order_matches.get(current["option_id"])
+                        rows_needing_order.append(
+                            (
+                                after,
+                                order_match[2] if order_match else None,
+                                {
+                                    "sourceType": "deterministic_section_local",
+                                    "reference": (
+                                        _comparator_ref(
+                                            order_match[0],
+                                            order_match[1],
+                                            order_match[2],
+                                            order_match[3],
+                                        )
+                                        if order_match
+                                        else None
+                                    ),
+                                },
                             )
                         )
                     elif current["rpo"] in FRESH_GSX_RPOS:
@@ -1136,7 +1904,21 @@ def generate_recovery_reports(inputs: ProjectionInputs, output_dir: Path) -> dic
                 else:
                     prior = pre_by_id.get(current["option_id"]) or (pre_by_rpo.get(current["rpo"]) if current["rpo"] else None)
                     partition = "forward_copy_repair" if prior else "new_option_review"
-                    if comparator:
+                    if not current["rpo"]:
+                        match = no_rpo_matches.get(current["option_id"])
+                        if match is None:
+                            raise ValueError(
+                                f"No Z06 no-RPO copy match for {model} {current['option_id']}"
+                            )
+                        partition = "z06_no_rpo_copy_recovery"
+                        source = {
+                            "sourceType": "exact_z06_no_rpo_copy",
+                            "reference": _comparator_ref(match[0], match[1], match[2], match[3]),
+                            "bulkEligible": True,
+                        }
+                        _field_change(after, provenance, "option_name", match[2]["option_name"], source)
+                        _field_change(after, provenance, "description", match[2]["description"], source)
+                    elif comparator:
                         comparison = _comparator_copy_comparison(current, comparator)
                         bulk_eligible = not comparison["materialDisagreement"]
                         source = {
@@ -1157,25 +1939,20 @@ def generate_recovery_reports(inputs: ProjectionInputs, output_dir: Path) -> dic
                             )
                         )
                     else:
-                        input_field = next(
-                            (field for field in ("option_name", "description", "detail_raw") if current[field]),
-                            "option_name",
-                        )
-                        raw = current[input_field]
-                        split = propose_copy_split({"description": raw, "statuses": []})
+                        proposal = _identifying_copy_proposal(current)
                         source = {
-                            "sourceType": "copy_split",
-                            "inputField": input_field,
-                            "flags": split["flags"],
-                            "bulkEligible": True,
+                            "sourceType": proposal["sourceType"],
+                            "flags": proposal["flags"],
+                            "reference": proposal.get("reference"),
+                            "bulkEligible": False,
                         }
-                        _field_change(after, provenance, "option_name", split["name"], source)
-                        _field_change(after, provenance, "description", split["description"], source)
+                        _field_change(after, provenance, "option_name", proposal["option_name"], source)
+                        _field_change(after, provenance, "description", proposal["description"], source)
                         review_items.append(
                             _review_item(
                                 model,
                                 current,
-                                "copy_split",
+                                "identifying_copy_review",
                                 {"option_name": after["option_name"], "description": after["description"]},
                                 source,
                             )
@@ -1313,6 +2090,8 @@ def generate_recovery_reports(inputs: ProjectionInputs, output_dir: Path) -> dic
                 "workbookPath": str(inputs.workbook_path),
                 "workbookSha256": workbook_sha,
                 "reviewedPlanPath": str(inputs.reviewed_plan_path),
+                "targetApplicabilityCandidatesPath": str(inputs.reconciliation_candidates_path),
+                "targetApplicabilityCandidatesSha256": _sha256(inputs.reconciliation_candidates_path),
                 "sectionResolutionPath": str(inputs.exception_resolutions_path),
                 "targetSheet": sheet,
                 "comparatorModel": comparator_model,
@@ -1333,6 +2112,8 @@ def generate_recovery_reports(inputs: ProjectionInputs, output_dir: Path) -> dic
                 "sources": sources,
                 "summary": {
                     "sourceRowCount": len(current_rows),
+                    "targetApplicabilityDeletionCount": len(target_applicability_deletions),
+                    "recordedInstructionDeletionCount": len(recorded_instruction_deletions),
                     "residualRowCount": len(residual_rows),
                     "pendingReviewCount": pending_count,
                     "sectionMismatchCount": len(reconciliation[model]),
@@ -1342,6 +2123,8 @@ def generate_recovery_reports(inputs: ProjectionInputs, output_dir: Path) -> dic
                 "sectionReconciliation": reconciliation[model],
                 "sectionReconciliationCheck": reconciliation_checks[model],
                 "idRepairs": id_repairs,
+                "targetApplicabilityDeletions": target_applicability_deletions,
+                "recordedInstructionDeletions": recorded_instruction_deletions,
                 "residualRows": residual_rows,
                 "bulkDecisions": {
                     "comparatorDisplayOrder": {
@@ -1406,6 +2189,7 @@ def _default_inputs(root: Path, pre_integration_workbook_path: Path) -> Projecti
         pre_integration_workbook_path=pre_integration_workbook_path,
         reviewed_plan_path=reviewed_run / "apply-plan.json",
         reviewed_candidates_path=reviewed_run / "option-candidates.json",
+        reconciliation_candidates_path=reconciliation_run / "option-candidates.json",
         reviewed_decisions_path=reviewed_run / "decisions.json",
         exception_queue_path=reconciliation_run / "exception-queue.json",
         exception_resolutions_path=reconciliation_run / "exception-resolutions.json",

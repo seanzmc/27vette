@@ -2124,6 +2124,133 @@ class CanonicalCompilerTest(unittest.TestCase):
         )
         self.assertEqual(source_feature["disposition"], "resolved_not_applicable")
 
+    def test_all_unavailable_target_occurrence_deletes_existing_option_and_ovs(self) -> None:
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(self.master)
+        workbook["zr1_options"].append(
+            [
+                "opt_zzz_001",
+                "ZZZ",
+                0,
+                "Unavailable target-only option",
+                "",
+                "",
+                "sec_whee_001",
+                False,
+                30,
+                True,
+                "",
+            ]
+        )
+        ovs = workbook.create_sheet("zr1_ovs")
+        ovs.append(["option_id", "variant_id", "status"])
+        ovs.append(["opt_zzz_001", "1lz_r07", "unavailable"])
+        ovs.append(["opt_zzz_001", "3lz_r67", "unavailable"])
+        rules = workbook.create_sheet("zr1_rule_mapping")
+        rules.append(
+            [
+                "rule_id",
+                "source_id",
+                "rule_type",
+                "target_id",
+                "original_detail_raw",
+                "body_style_scope",
+                "runtime_action",
+                "disabled_reason",
+            ]
+        )
+        rules.append(
+            [
+                "zr1_rule_existing_requires_zzz",
+                "opt_bv4_001",
+                "requires",
+                "opt_zzz_001",
+                "",
+                "",
+                "",
+                "",
+            ]
+        )
+        workbook.save(self.master)
+        workbook.close()
+
+        option_payload = copy.deepcopy(self.option_payload)
+        unavailable = copy.deepcopy(
+            next(
+                candidate
+                for candidate in option_payload["candidates"]
+                if candidate.get("rpo") == "BV4"
+            )
+        )
+        unavailable.update(
+            {
+                "candidateId": "Mechanical 4:998",
+                "rpo": "ZZZ",
+                "refOnlyRpo": "",
+                "description": "Unavailable target-only option",
+                "priceMatch": None,
+                "listPrice": None,
+                "priceRows": [],
+            }
+        )
+        unavailable["sourceEvidence"] = {
+            **unavailable["sourceEvidence"],
+            "rowIndex": 998,
+        }
+        unavailable["statuses"] = [
+            {
+                **status,
+                "raw": "--",
+                "status": "unavailable",
+                "disclosureMarker": "",
+                "flags": [],
+            }
+            for status in unavailable["statuses"]
+        ]
+        option_payload["candidates"].append(unavailable)
+
+        result = self.compile(
+            option_payload=option_payload,
+            join_report=join_prices(
+                option_payload["candidates"],
+                self.price_payload["priceRows"],
+            ),
+        )
+        rows = result["canonical-row-manifest.json"]["rows"]
+
+        option = next(
+            row
+            for row in rows
+            if row["model"] == "zr1"
+            and row["family"] == "options"
+            and row["values"].get("option_id") == "opt_zzz_001"
+        )
+        self.assertEqual(option["action"], "delete")
+        self.assertEqual(option["disposition"], "resolved_not_applicable")
+        target_ovs = [
+            row
+            for row in rows
+            if row["model"] == "zr1"
+            and row["family"] == "ovs"
+            and row["values"].get("option_id") == "opt_zzz_001"
+        ]
+        self.assertEqual(len(target_ovs), 2)
+        self.assertEqual({row["action"] for row in target_ovs}, {"delete"})
+        self.assertEqual(
+            {row["disposition"] for row in target_ovs},
+            {"resolved_not_applicable"},
+        )
+        relationship = next(
+            row
+            for row in rows
+            if row["model"] == "zr1"
+            and row["family"] == "rule_mapping"
+            and row["values"].get("rule_id") == "zr1_rule_existing_requires_zzz"
+        )
+        self.assertEqual(relationship["action"], "delete")
+        self.assertEqual(relationship["disposition"], "resolved_not_applicable")
+
     def test_retain_existing_resolution_consumes_one_ambiguous_option_identity(self) -> None:
         from openpyxl import load_workbook
 

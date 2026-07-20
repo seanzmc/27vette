@@ -986,14 +986,18 @@ def _compile_target_options(
         {**candidate, "statuses": model_scoped_statuses(candidate, target)}
         for candidate in scope_candidates(candidates, target)
     ]
-    omitted_candidate_ids = {
-        str(candidate.get("candidateId") or "")
+    omitted_candidates = [
+        candidate
         for candidate in target_scoped_source
         if candidate.get("statuses")
         and all(
             status.get("status") == "unavailable"
             for status in candidate.get("statuses") or []
         )
+    ]
+    omitted_candidate_ids = {
+        str(candidate.get("candidateId") or "")
+        for candidate in omitted_candidates
     }
     scoped_source = [
         candidate
@@ -1053,6 +1057,23 @@ def _compile_target_options(
     ovs_rows: list[dict[str, Any]] = []
     price_rule_rows: list[dict[str, Any]] = []
     existing_by_id = {str(row.get("option_id") or ""): row for row in existing_options}
+    applicable_rpos = {
+        str(candidate.get("rpo") or candidate.get("refOnlyRpo") or "").upper()
+        for candidate in scoped_source
+        if str(candidate.get("rpo") or candidate.get("refOnlyRpo") or "").strip()
+    }
+    existing_ids_by_rpo: dict[str, list[str]] = defaultdict(list)
+    for option_id, existing in existing_by_id.items():
+        rpo = str(existing.get("rpo") or "").upper()
+        if rpo:
+            existing_ids_by_rpo[rpo].append(option_id)
+    omitted_candidate_by_option_id: dict[str, dict[str, Any]] = {}
+    for candidate in omitted_candidates:
+        rpo = str(candidate.get("rpo") or candidate.get("refOnlyRpo") or "").upper()
+        matching_existing_ids = existing_ids_by_rpo.get(rpo, [])
+        if rpo and rpo not in applicable_rpos and len(matching_existing_ids) == 1:
+            omitted_candidate_by_option_id[matching_existing_ids[0]] = candidate
+    removable_option_ids = set(omitted_candidate_by_option_id)
     used_existing: set[str] = set()
     required_by_rpo = {
         str(rpo).upper(): dict(requirement)
@@ -1641,18 +1662,27 @@ def _compile_target_options(
         )
     ovs_rows = list(ovs_by_key.values())
     existing_ovs = _rows(extract, ovs_entry["sheetName"])
-    reconciled_ovs = reconcile_rows("ovs", [row["values"] for row in ovs_rows], existing_ovs, key_columns=EDITOR_SHEET_META["ovs"]["key"])
+    reconciled_ovs = reconcile_rows(
+        "ovs",
+        [row["values"] for row in ovs_rows],
+        existing_ovs,
+        key_columns=EDITOR_SHEET_META["ovs"]["key"],
+        removals=removable_option_ids,
+    )
     action_by_key = {tuple(item["key"].values()): item["action"] for item in reconciled_ovs}
     for row in ovs_rows:
         row["action"] = action_by_key.get(tuple(row["key"].values()), row["action"])
     for item in reconciled_ovs:
-        if item["action"] != "retained_existing":
+        if item["action"] not in {"delete", "retained_existing"}:
             continue
         values = _complete_values(ovs_entry["headers"], item["values"])
+        option_id = str(item["key"].get("option_id") or "")
+        omitted_candidate = omitted_candidate_by_option_id.get(option_id)
         signature = {
             "family": "ovs",
             "model": target,
-            "retainedKey": item["key"],
+            "existingKey": item["key"],
+            "action": item["action"],
         }
         dependencies = [
             _dependency(
@@ -1660,18 +1690,29 @@ def _compile_target_options(
                 item["values"],
             )
         ]
+        if omitted_candidate is not None:
+            dependencies.append(
+                _dependency(
+                    f"target:{target}:candidate:{option_occurrence_signature(omitted_candidate)}",
+                    omitted_candidate,
+                )
+            )
         ovs_rows.append(
             _manifest_row(
                 model=target,
                 family="ovs",
                 sheet=ovs_entry["sheetName"],
-                action="noop",
+                action="delete" if item["action"] == "delete" else "noop",
                 key=item["key"],
                 values=values,
                 signature=signature,
                 dependencies=dependencies,
                 status="ready",
-                disposition="retained_existing",
+                disposition=(
+                    "resolved_not_applicable"
+                    if item["action"] == "delete"
+                    else "retained_existing"
+                ),
             )
         )
     rows.extend(ovs_rows)
@@ -1679,7 +1720,26 @@ def _compile_target_options(
         if option_id in used_existing:
             continue
         dependencies = [_dependency(f"workbook:{entry['sheetName']}:{option_id}", existing)]
-        signature = {"family": "options", "model": target, "retainedId": option_id}
+        omitted_candidate = omitted_candidate_by_option_id.get(option_id)
+        if omitted_candidate is not None:
+            dependencies.append(
+                _dependency(
+                    f"target:{target}:candidate:{option_occurrence_signature(omitted_candidate)}",
+                    omitted_candidate,
+                )
+            )
+        action = "delete" if omitted_candidate is not None else "noop"
+        disposition = (
+            "resolved_not_applicable"
+            if omitted_candidate is not None
+            else "retained_existing"
+        )
+        signature = {
+            "family": "options",
+            "model": target,
+            "existingId": option_id,
+            "action": action,
+        }
         retained_values = _complete_values(
             entry["headers"],
             {
@@ -1693,20 +1753,21 @@ def _compile_target_options(
                 model=target,
                 family="options",
                 sheet=entry["sheetName"],
-                action="noop",
+                action=action,
                 key={"option_id": option_id},
                 values=retained_values,
                 signature=signature,
                 dependencies=dependencies,
                 status="ready",
-                disposition="retained_existing",
+                disposition=disposition,
             )
         )
-        rpo = str(existing.get("rpo") or "").upper()
-        if rpo and rpo not in rpo_ids:
-            rpo_ids[rpo] = option_id
-        elif rpo and rpo_ids[rpo] != option_id:
-            rpo_ids[rpo] = ""
+        if action != "delete":
+            rpo = str(existing.get("rpo") or "").upper()
+            if rpo and rpo not in rpo_ids:
+                rpo_ids[rpo] = option_id
+            elif rpo and rpo_ids[rpo] != option_id:
+                rpo_ids[rpo] = ""
     for representative_id, aliases in candidate_aliases.items():
         disposition = candidate_disposition.get(representative_id)
         if disposition:
@@ -1917,7 +1978,12 @@ def _relationship_rows(
         source_id = str(payload["sourceOptionId"])
         target_id = str(payload["targetOptionId"])
         if source_id not in option_ids or target_id not in option_ids:
-            raise ValueError("Resolved relationship endpoints are not current emitted target options.")
+            raise ValueError(
+                "Resolved relationship endpoints are not current emitted target options: "
+                f"model={target} subject={subject.get('subjectId')} source={source_id} "
+                f"target={target_id} sourceReady={source_id in option_ids} "
+                f"targetReady={target_id in option_ids}."
+            )
         dependencies = [
             *(subject.get("evidenceDependencies") or []),
             _dependency(f"resolution:{subject['subjectId']}", resolution),
@@ -2751,6 +2817,59 @@ def _retained_existing_rows(
                     [row],
                 )
     return retained
+
+
+def _cascade_target_option_deletions(
+    rows: Iterable[Mapping[str, Any]],
+) -> list[dict[str, Any]]:
+    materialized = [dict(row) for row in rows]
+    deleted_by_model: dict[str, dict[str, dict[str, Any]]] = defaultdict(dict)
+    for row in materialized:
+        if row.get("family") != "options" or row.get("action") != "delete":
+            continue
+        model = str(row.get("model") or "")
+        option_id = str((row.get("values") or {}).get("option_id") or "")
+        if model and option_id:
+            deleted_by_model[model][option_id] = row
+    for row in materialized:
+        model = str(row.get("model") or "")
+        if row.get("family") == "options" or model not in deleted_by_model:
+            continue
+        referenced = sorted(
+            option_id
+            for option_id in deleted_by_model[model]
+            if option_id in {
+                str(value)
+                for value in (row.get("values") or {}).values()
+            }
+        )
+        if not referenced:
+            continue
+        if row.get("action") == "add":
+            raise ValueError(
+                f"Canonical row adds a reference to target-inapplicable options: {referenced}"
+            )
+        dependencies_by_id = {
+            str(dependency["evidenceId"]): dict(dependency)
+            for dependency in row.get("evidenceDependencies") or []
+        }
+        for option_id in referenced:
+            for dependency in deleted_by_model[model][option_id].get("evidenceDependencies") or []:
+                dependencies_by_id[str(dependency["evidenceId"])] = dict(dependency)
+        row["action"] = "delete"
+        row["disposition"] = "resolved_not_applicable"
+        row["semanticSignature"] = {
+            **dict(row.get("semanticSignature") or {}),
+            "targetApplicabilityDeleteOptionIds": referenced,
+        }
+        row["evidenceDependencies"] = [
+            dependencies_by_id[evidence_id]
+            for evidence_id in sorted(dependencies_by_id)
+        ]
+        row["derivationVersion"] = derivation_version(
+            row["semanticSignature"], row["evidenceDependencies"]
+        )
+    return materialized
 
 
 def _scope_value(value: Any) -> str:
@@ -4089,6 +4208,7 @@ def compile_canonical_rows(
             for item in relationship_result["dispositions"]
         )
     manifest_rows.extend(_retained_existing_rows(extract, targets, registry, manifest_rows))
+    manifest_rows = _cascade_target_option_deletions(manifest_rows)
     for effect in pending_profile_effects:
         target = str(effect["target"])
         effect_family = str(effect["family"])

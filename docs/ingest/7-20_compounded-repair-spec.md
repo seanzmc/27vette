@@ -1,6 +1,6 @@
 # 7-20 Compounded Repair Spec — GSX / ZR1 / ZR1X Options Sheets
 
-Status: IN PROGRESS — Deliverable 4.1 safe bulk set approved 2026-07-20; condensed Checkpoint 1 exception review remains pending. No workbook writes are authorized until the applicable checkpoints are approved.
+Status: IN PROGRESS — Deliverable 4.1 and Checkpoint 1 are complete as of 2026-07-20. No workbook write has occurred; the next write gate remains the dry-run/temp-workbook proof and Checkpoint 2.
 Supersedes-for-execution: `docs/ingest/options-sheet-quality-remediation-spec.md` (Fable draft) and the recovery plan in `docs/ingest/gpt-auditFindings_7-20.md` (Codex audit). This spec merges the strongest parts of both; the two source docs remain evidence.
 Scope: `grand_sport_x_options`, `zr1_options`, `zr1x_options` plus only the referential cascade forced by option-id changes. Promotion, registry, runtime, `form-app`, and dealer surfaces are out of scope.
 
@@ -8,15 +8,15 @@ Scope: `grand_sport_x_options`, `zr1_options`, `zr1x_options` plus only the refe
 
 Taken from the Codex audit (`gpt-auditFindings_7-20.md`):
 
-- **Recovery-by-reuse, not re-review.** GSX shared rows recover from the already-reviewed July 9 plan. Sean reviews only the residual diff, never hundreds of already-reviewed rows. (The original ZR1/ZR1X restore-from-pre-integration idea was invalidated on 2026-07-20 — see §1 correction; ZR1/ZR1X repair forward via §3/§4.1 comparator + `copy_split` proposals.)
+- **Recovery-by-reuse, not re-review.** GSX shared rows recover from the already-reviewed July 9 plan. Sean reviews only the residual diff, never hundreds of already-reviewed rows. (The original ZR1/ZR1X restore-from-pre-integration idea was invalidated on 2026-07-20 — see §1 correction; ZR1/ZR1X repair forward via §3/§4.1 comparator reuse plus identifying-copy derivation.)
 - **Sequencing.** Getting the workbook reviewable comes first; the permanent lint project and compiler hardening must not delay it.
-- **Explicit GSX partitions**: 203 reviewed shared RPO rows, 10 substantially-correct paint rows, 26 no-RPO standard rows mapped to promoted-model equivalents, 8 fresh RPOs needing real review (N26, PRB, R6P, R9L, R9V, R9W, R9Y, TU7).
+- **Explicit GSX partitions**: 203 reviewed shared RPO rows, 10 substantially-correct paint rows, 26 no-RPO standard rows mapped to z06 equivalents, and 8 fresh RPOs now covered by Sean's cross-target delete decision (N26, PRB, R6P, R9L, R9V, R9W, R9Y, TU7).
 - **Temp-workbook apply before any live write.**
 - **Rejection of comparator display-order copying** (canonical design says comparator order is not copied) and of stylistic copy rules the reference sheets don't actually prove.
 
 Taken from the Fable draft (`options-sheet-quality-remediation-spec.md` + `Fable-AuditFindings_7-20.md`):
 
-- **Verifier-confirmed root causes with exact locations** (§2 below) — especially the `copy_split` bypass and the fact that the fix routes through existing tested code rather than inventing new copy rules.
+- **Verifier-confirmed root causes with exact locations** (§2 below) — especially the compiler's bypass of the existing split path. Deliverable 4.1 separately uses reference-proven identifying-copy derivation because the generic split path is not sufficient for customer-facing names.
 - **The id-rename referential cascade** into `*_ovs`, `*_price_rules`, `*_rule_*`, `*_exclusive_*`, `default_selection_rules` — renaming hex ids without this breaks every reference.
 - **Executable lint predicates and the permanent gate**, including coverage for unpromoted sheets (the regression escaped because `tests/workbook-visual-copy-standardization.test.mjs` only checks promoted models).
 - **Preservation of Sean's in-progress manual edits as reviewer decisions** (5 GSX price fills: AQ9/CF7/CM9/R9W → 0, DTC → 1295) and the GSX row reordering.
@@ -66,7 +66,7 @@ Audit substrate: the **working-copy** `stingray_master.xlsx` (Sean mid-edit; his
 - Recovery sources, in priority order (amended 2026-07-20 — the original ZR1/ZR1X restore-from-`281eb14^` source is invalid; see §1 correction):
   1. Already-reviewed decisions: July 9 plan `form-output/ingest-wizard/20260709-184223-960eb1/apply-plan.json` for GSX shared rows — reused **only where candidate fingerprints still match**; mismatches drop to the review lane.
   2. Exact-RPO promoted-comparator copy proposals (z06 per the approved ZR1/ZR1X comparator mapping; grandSport/z06 for GSX where applicable): curated `option_name`/`description` proposed from the comparator row with the same RPO — presented for Checkpoint 1 bulk accept/override, recorded as typed decisions, never silently applied. `detail_raw` always stays target raw text.
-  3. Deterministic derivation (`copy_split`, section-local display-order allocation) where no comparator match exists.
+  3. Deterministic identifying-copy derivation and section-local display-order allocation where no comparator match exists. Copy derivation must keep the distinguishing finish/color/design/specification in `option_name`, move only ancillary information to `description`, avoid repetition, and fail closed to a curated-copy review rather than emitting a generic one-word name.
   4. Sean review, only for the residue.
 - Probe hygiene: all workbook reads use openpyxl `read_only=True, data_only=True` and exclude rows where every cell is None (stale-dimension phantom rows).
 
@@ -77,16 +77,19 @@ Audit substrate: the **working-copy** `stingray_master.xlsx` (Sean mid-edit; his
 One script emitting one Markdown/JSON report per model. **Not another ingest run.** Content:
 
 **ZR1 / ZR1X** — amended 2026-07-20: no restore baseline exists (§1 correction — sheets were never curated). Repair forward:
-- Copy proposals per row: exact-RPO match against the promoted z06 comparator → propose z06's curated `option_name`/`description`; no match → `copy_split`-derived proposal. Both shown side-by-side with current text at Checkpoint 1 for bulk accept/override; acceptance recorded as typed decisions. `detail_raw` keeps target raw text verbatim.
-- Existing rows keep their current (pre-existing, real) `display_order`; the 3 new rows per sheet get section-local allocation or comparator proposal.
+- Target applicability is evaluated before copy review: when every status cell for the target model's four variants is `--`, that target option row and its target-owned references are deletion work, not copy/placement review. The sibling model is evaluated independently from its own four columns even though the raw sheet is shared; no duplicated raw rows are required.
+- Copy proposals per row: exact-RPO match against the promoted z06 comparator → propose z06's curated `option_name`/`description`; no match → identifying-copy proposal that retains the unique equipment identifier in the name and ancillary non-repeating information in the description. The latter remains in Checkpoint 1 for accept/override and is never bulk-approved merely because a split was mechanically possible. `detail_raw` keeps target raw text verbatim.
+- Blank-RPO rows use a one-to-one semantic match against **z06 only** and copy z06's exact curated `option_name`/`description`, even though target option IDs differ. These deterministic mappings are not review questions; unmatched or colliding mappings fail closed.
+- Sean's recorded deletion of N26, PRB, R6P, R9L, R9V, R9W, R9Y, and TU7 applies across all three target models. ZR1/ZR1X therefore also delete N26, R6P, and TU7 (the only members of that set present there), plus their model-owned references; absent members require no synthetic row or review.
+- Existing rows keep their current (pre-existing, real) `display_order`; surviving new rows get section-local allocation or comparator proposal, while deleted rows receive no order.
 - The 1 hex no-RPO id per sheet mapped to a sequential id (cascade per §4.3).
 - Priced-standard rows (11–12 each) listed in the §4.1 price lane under Sean's standard-price rule (R8E-class mandatory charges called out as legitimate allowlist candidates).
 
 **GSX** — partitioned:
 - 203 shared RPO rows: recover copy/section/order from the July 9 reviewed plan where fingerprints match; retain current `detail_raw` evidence and Sean's price edits.
 - 10 paint rows: keep as-is (substantially correct).
-- 26 no-RPO standard rows: map to corresponding promoted-model rows; propose short sequential ids and curated copy from the promoted equivalents.
-- 8 RPOs absent from the reviewed plan (N26, PRB, R6P, R9L, R9V, R9W, R9Y, TU7): full review lane — several are currently selectable inside the standard-equipment section, so placement/status needs explicit confirmation.
+- 26 no-RPO standard rows: one-to-one map to z06 blank-RPO rows; copy exact z06 names/descriptions and propose short sequential ids without a copy-review lane.
+- 8 RPOs absent from the reviewed plan (N26, PRB, R6P, R9L, R9V, R9W, R9Y, TU7): Sean's recorded decision is deletion from GSX and from either ZR target wherever present, including model-owned references.
 
 **All three models:**
 - Decided-vs-landed section reconciliation: the 45 `choose_section` resolutions from run `20260717-091317-470292` joined to landed `section_id`; every mismatch listed by RPO. (4.1 finding, 2026-07-20: all 45 currently match the landed workbook — the lane stays in the report as a confirmation check, and Sean's remaining placement complaints get captured as new decisions at Checkpoint 1 rather than treated as landing drift.)
@@ -98,9 +101,11 @@ One script emitting one Markdown/JSON report per model. **Not another ingest run
 
 **Checkpoint 1: Sean reviews the report and marks accepts/overrides.** His placement/active/price instructions get recorded once, durably, as decisions.
 
-**Deliverable 4.1 result (2026-07-20):** the read-only reports are in `form-output/ingest-wizard/20260720-options-recovery-projection/`, bound to workbook SHA-256 `4b051a08c53142878039a21103993a4b166bc27b2b5ec5a6e033a52640885578`. All 45 historical section decisions match landed rows (41 GSX, 2 ZR1, 2 ZR1X). Each ZR sheet has 163 exact-Z06 copy proposals eligible for bulk review and zero material-disagreement exclusions; unmatched rows produce 53 ZR1 / 54 ZR1X `copy_split` proposals. Existing ZR display order and all target `detail_raw` values remain unchanged; only DTC, R6P, and the new no-RPO row per sheet receive order proposals. Workbook write authority remains stopped at Checkpoint 1.
+**Deliverable 4.1 result (2026-07-20):** the read-only reports are in `form-output/ingest-wizard/20260720-options-recovery-projection/`, bound to workbook SHA-256 `4b051a08c53142878039a21103993a4b166bc27b2b5ec5a6e033a52640885578`. All 45 historical section decisions match landed rows (41 GSX, 2 ZR1, 2 ZR1X). Target-scoped raw evidence removes five false review rows before copy repair: FEH/FEZ from ZR1 and FE8/FEJ/SIG from ZR1X, including 20 OVS rows and three target-owned rule mappings; the applicable sibling-model rows and same-id references outside the target are preserved. The recorded cross-target delete set additionally removes N26, R6P, and TU7 from both ZR sheets and projects their model-owned reference cascades. All 26 blank-RPO rows in each target model copy exact z06 names/descriptions with zero no-RPO review questions. Existing ZR display order and every surviving target `detail_raw` value remain unchanged. Workbook write authority remains stopped at Checkpoint 1.
 
-**Checkpoint 1 bulk approval (2026-07-20T14:54:02-04:00):** Sean approved the fingerprint-bound safe set: 808 review records covering the 203 reviewed-plan recoveries, 326 exact-RPO comparator-copy proposals, 58 unflagged `copy_split` proposals, 197 authoritative price-rule decisions, 22 comparator-order proposals, and 2 ZR sequential-id repairs. Approval fingerprint: `cf4a92c9c1fef9e4e351879d0f2a5354c3c60c16dca91615ea45c3306cea2ab2`. The remaining 106 review records are condensed into 79 typed decision groups in `checkpoint-1-exception-review.md/.json`; flagged copy splits are excluded from bulk approval. Checkpoint 1 and all workbook-write authority remain open pending those exception decisions.
+**Checkpoint 1 bulk approval (rebound 2026-07-20T17:36:46-04:00 after copy/deletion correction):** Sean's approved safe set binds 742 review records: 203 reviewed-plan recoveries, 325 exact-RPO comparator-copy proposals, 190 authoritative price-rule decisions, 22 comparator-order proposals, and 2 ZR sequential-id repairs. No derived identifying-copy proposal is bulk-approved. Approval fingerprint: `ae94629935489b680848662b3514e908ddedc9424cb23761f9daf18abfe6da1a`.
+
+**Checkpoint 1 complete (amended 2026-07-20T18:04:26-04:00):** all 54 exception groups / 74 exception review records now carry typed decisions; pending groups and reviews are both zero. Sean deleted 36S, 37S, 38S, and N2Z from both ZR option sheets with their 32 owned OVS rows; approved CFC, DTB, ETV, FE8 through MLP, SB9, SOF through SU1, and both TOM proposals; and approved DTC copy with price 1295 in both models. ZTK carries model-scoped copy: ZR1 references FEJ plus the J59 10-piston-front/6-piston-rear carbon-ceramic brakes, while ZR1X references FEZ and omits FEJ. Eighteen explicit overrides blank the standard-equipment prices for UQT, CFV, DY0, WUB, C2Z, B6P, ZZ3, D3V, and SL9 in both ZR sheets; promoted-model selectable-option prices remain untouched. Decision fingerprint: `a70775137337e33bcdb4e57abff076aa8635ade75420d77422bcf22d830fd668`. No workbook mutation has occurred.
 
 ### 4.2 Lint gate (read-only, permanent) — parallel with 4.1, required before live write
 
@@ -139,7 +144,7 @@ Commit `281eb14` wrote `stingray_master.xlsx` with no run receipt, against Miles
 ## 7. Done means
 
 - Lint gate green on gsx/zr1/zr1x with an allowlist Sean has seen: zero name==description, zero description==detail duplication outside allowlist, zero multi-line/oversized names outside allowlist, zero bare-`LPO` names, zero hash-derived option ids, zero null `display_order` on active rows; stub-name count (≤12 chars) at or below the reference-model band (≤6 per sheet, allowlisted).
-- ZR1/ZR1X names repaired via Checkpoint-1-approved comparator/`copy_split` proposals; GSX shared rows match the July 9 reviewed decisions or carry recorded overrides; the 8 fresh GSX RPOs and 26 no-RPO mappings carry explicit Sean decisions.
+- ZR1/ZR1X names repaired via Checkpoint-1-approved comparator/identifying-copy proposals; GSX shared rows match the July 9 reviewed decisions or carry recorded overrides; the 8 fresh GSX RPOs are deleted across targets and the 26 no-RPO mappings reuse exact z06 copy deterministically.
 - Sean's manual edits (price fills, reordering) intact in the final workbook.
 - Every `choose_section` decision reconciled: matches the workbook or has a recorded override.
 - Compiler regression tests prove the §1 numbers cannot recur.
