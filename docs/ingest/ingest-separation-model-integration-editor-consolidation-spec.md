@@ -295,6 +295,48 @@ publication, promotion, deployment, or dealer change was created. Task 8 is
 complete; Task 9 remains blocked on Sean's explicit approval of this exact
 packet.
 
+#### Task 9 completion record (2026-07-19)
+
+Sean approved the exact Task 8 packet and then separately approved the narrow
+scratch-activation generation path required by the intentionally inactive
+target metadata. ChangeSet `5f108f09bb09d4dddafa18a6` was applied once through
+the shared service. ChangeReceipt SHA-256
+`75095a18e240789ca06c9b333fafa1482328ebd444e270138dd39cdb4663141d`
+records `status=applied`, 4,216/4,216 prepared operations read back exactly,
+zero schema/Boolean errors, and backup
+`backups/stingray_master-20260719-224756.xlsx`. The backup retains the approved
+pre-write SHA-256 `646f58e7c951963a43045b6cb5d351d7ff8e1b2460299bdf9b8cfa7d741b8379`;
+the integrated workbook SHA-256 is
+`1c9bb513b147f6b3c5d91625719b04d6f297ddfd98d75072e8f8b3771a0a3219`.
+Package and schema validation passed with zero issues, errors, or warnings.
+
+The ordinary production CLI correctly continued to reject inactive models.
+For pre-promotion artifact generation only, the existing deployment-proof
+activator copied the saved workbook to `/private/tmp`, activated only
+`grand_sport_x`, `zr1`, and `zr1x` in that scratch copy, passed package/schema,
+Boolean hygiene, and 124-field exact activation readback, then supplied the
+scratch-discovered configs to the normal generator. The canonical workbook was
+byte-identical before/after that generation step. The resulting unpromoted
+runtime contracts have SHA-256 values
+`86c29263a73756404c26178f483a26448d870d6e592af7f89d7620732f0b3470`
+(Grand Sport X),
+`17fb57e18b59d472f6c3785887fef2e277209fdeb5b96483621a457551df24a5`
+(ZR1), and
+`12bf977278cb7b939ae098e415a1a1f8664149d83dd7fa0adf80bb0baca6667f`
+(ZR1X), each with zero generated validation errors.
+
+Affected gates passed: 75 Python tests; Stingray 89/89; Grand Sport 19/19;
+Z06 24/24; multi-model runtime switching 47/47; workbook package/schema
+validation; and `git diff --check`. Existing-model timestamp-only generator
+churn and optional scratch inspection manifests were removed. `form-app/data.js`
+remained at SHA-256
+`565d22859292b3f514dfc177a7392402afc897c3e080be945b4d068995093230`.
+The three targets remain inactive and unpromoted; no public registry,
+deployment, runtime application code, or dealer-submission behavior changed.
+Residual risk is the already-approved header font/style difference on 10 of 12
+new sheets; no additional follow-up is implied before the separately approved
+promotion phase.
+
 #### Workbook integration definition
 
 The three models are integrated when their approved canonical rows and registrations exist in `stingray_master.xlsx`, the workbook and generated contracts pass, and no unintended source/runtime changes exist.
@@ -447,8 +489,10 @@ This section is updated in place as work completes. It is not a prompt to create
   `c2_cj2_stingray_name_deviator`, and `r3_drz_pending_review`), with 23 other
   tests passing. No canonical workbook, generated artifact, registry,
   promotion, deployment, runtime, or dealer surface changed.
-- Phase 2 — not begun. Its Task 8 exact-current rebuild/proof and explicit
-  approval stop remain required before any approval artifact or live write.
+- Phase 2 — complete on 2026-07-19. Task 8 rebuilt and proved the exact-current
+  all-target ChangeSet; Task 9 applied it once, verified the backup and saved
+  workbook, and generated the three inactive target contracts through the
+  approved scratch-activation path. Publication and promotion remain separate.
 - Phase 3 — blocked by successful three-model workbook integration and shared-service stability.
 - Runtime publication/promotion — separate approval after Phase 2.
 - Dealer submission changes — not authorized and not implied.

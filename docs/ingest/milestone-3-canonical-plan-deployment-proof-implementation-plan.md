@@ -266,6 +266,24 @@ Final temporary-workbook report SHA-256 `eaf105124604487767f31574739f7b5cd0c5cc1
 
 Parent gates: 254 focused tests plus 18 subtests passed; Node passed 275/275; workbook package/schema validators passed with zero issues; the full Python suite passed 706 tests plus 25 subtests with two skips and the four separately owned failures already recorded in `fable5loop/STATE.md`. Protected workbook, raw source, publication bundle, and live runtime-contract hashes remained unchanged after generated timestamp churn was restored. No `write-approval.json`, live workbook write, runtime publication, model promotion, deployment, or dealer change occurred.
 
+Task 9 completed on 2026-07-19 against the exact-current replacement packet
+recorded in the consolidation spec. The shared service applied ChangeSet
+`5f108f09bb09d4dddafa18a6` once, verified all 4,216 prepared operations, saved
+backup `backups/stingray_master-20260719-224756.xlsx`, and changed the canonical
+workbook SHA from
+`646f58e7c951963a43045b6cb5d351d7ff8e1b2460299bdf9b8cfa7d741b8379`
+to `1c9bb513b147f6b3c5d91625719b04d6f297ddfd98d75072e8f8b3771a0a3219`.
+Package/schema validation returned zero issues, errors, or warnings. Because the
+approved workbook rows intentionally remain inactive, Sean separately approved
+the existing temporary-activation proof mechanism for pre-promotion generation:
+only a scratch copy was activated, while the normal generator wrote the three
+target runtime contracts. All three had zero validation errors and reproduced
+the Task 8 proof counts: Grand Sport X 1,476 choices / 222 direct rules / 37 rule
+groups / 9 exclusive groups / 26 price rules; ZR1 852 / 114 / 2 / 7 / 12; and
+ZR1X 852 / 113 / 2 / 7 / 12. The 75-test Python gate and Node gates 89/89,
+19/19, 24/24, and 47/47 passed. `form-app/data.js` remained byte-identical; no
+promotion, publication, deployment, runtime-code, or dealer change occurred.
+
 Task 1 snapshot reconciliation was independently verified on 2026-07-18 with
 `121 tests and 4 subtests passed`. Full Milestone 3 independent final acceptance
 remains open; this Task 1 verification does not authorize or begin Task 2.

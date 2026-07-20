@@ -1160,7 +1160,7 @@ requires explicit approval of this exact packet.
 - Consumes: exact approved ChangeSet, preview, warning IDs, workbook fingerprint, and approval actor.
 - Produces: one successful ChangeReceipt, verified workbook backup/readback, and regenerated three-model contracts.
 
-- [ ] **Step 1: Create the bound approval without writing**
+- [x] **Step 1: Create the bound approval without writing**
 
 The ingest server from Task 8 must still be running — restart it with `.venv/bin/python scripts/ingest_wizard_server.py --port 8040` if it is not. Recover the exact approved paths and refuse if its preview packet is absent:
 
@@ -1185,7 +1185,13 @@ test -f "$changeset_path" && test -f "$proof_dir/change-preview.json"
 
 Expected: approval created; workbook hash unchanged.
 
-- [ ] **Step 2: Confirm Excel is closed and the exact workbook fingerprint still matches**
+The approval invocation must also pass every exact
+`warningPolicy.confirmableIds[]` value from the bound preview as a repeated
+`--accept-warning` argument. The initial sample omitted those arguments and
+failed closed with `warning_confirmation_mismatch`; the corrected invocation
+accepted exactly the 21 packet-bound scaffold warnings and no others.
+
+- [x] **Step 2: Confirm Excel is closed and the exact workbook fingerprint still matches**
 
 ```sh
 test ! -e './~$stingray_master.xlsx'
@@ -1194,7 +1200,7 @@ shasum -a 256 stingray_master.xlsx
 
 Expected: no lock and the exact approved SHA.
 
-- [ ] **Step 3: Perform the one authorized live write**
+- [x] **Step 3: Perform the one authorized live write**
 
 ```sh
 .venv/bin/python scripts/apply_workbook_changeset.py \
@@ -1208,7 +1214,7 @@ Expected: no lock and the exact approved SHA.
 
 Expected: `status=applied`, verified backup path, exact prepared/readback counts, zero validation errors, and a changed canonical workbook SHA.
 
-- [ ] **Step 4: Verify the saved workbook and backup independently**
+- [x] **Step 4: Verify the saved workbook and backup independently**
 
 ```sh
 .venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
@@ -1218,11 +1224,19 @@ test -f "$(jq -r '.backupPath' "$proof_dir/change-receipt.json")"
 
 Expected: package valid, schema zero errors/warnings, backup exists.
 
-- [ ] **Step 5: Regenerate the three targets without public promotion**
+- [x] **Step 5: Regenerate the three targets without public promotion**
 
 Run the exact model-generation configuration discovered from the saved workbook for `grand_sport_x`, `zr1`, and `zr1x`. Do not call `promote_model.py --write` and do not publish `form-app/data.js` unless separately approved.
 
-- [ ] **Step 6: Run affected and existing-model gates**
+The applied rows intentionally remain inactive, so the production CLI correctly
+does not discover them. Sean separately approved the existing deployment-proof
+scratch activator for this step: activate only the three targets in a temporary
+copy, validate that copy, discover configs there, then supply those configs to
+the normal generator with only the three tracked runtime-contract paths rooted
+in the repository. The canonical workbook and `form-app/data.js` must remain
+byte-identical across this generation step.
+
+- [x] **Step 6: Run affected and existing-model gates**
 
 ```sh
 PYTHONPATH=scripts .venv/bin/python -m pytest \
@@ -1239,7 +1253,7 @@ git diff --check
 
 Expected: all relevant gates PASS. Review all workbook/generated diffs and restore only proven timestamp churn.
 
-- [ ] **Step 7: Close Phase 2 and commit only verified source/generated changes**
+- [x] **Step 7: Close Phase 2 and commit only verified source/generated changes**
 
 Record exact workbook backup/hash, ChangeSet/preview/approval/receipt hashes, sheets/counts, generator/test results, preserved runtime/dealer boundaries, and residual risk in the two owner docs. Never stage the temporary proof directory or backup.
 
@@ -1256,6 +1270,21 @@ git commit -m "feat: integrate grand sport x zr1 and zr1x workbook data"
 ```
 
 Expected: the backup and `/private/tmp` receipts remain unstaged; `form-app/data.js` remains unchanged.
+
+**Task 9 receipt — 2026-07-19:** ChangeSet
+`5f108f09bb09d4dddafa18a6` was approved by Sean and applied once. Receipt
+SHA-256 `75095a18e240789ca06c9b333fafa1482328ebd444e270138dd39cdb4663141d`
+verified all 4,216 operations and backup
+`backups/stingray_master-20260719-224756.xlsx`. The integrated workbook SHA-256
+is `1c9bb513b147f6b3c5d91625719b04d6f297ddfd98d75072e8f8b3771a0a3219`;
+package/schema validation returned zero issues, errors, or warnings. The
+separately approved scratch-activation generation produced Grand Sport X, ZR1,
+and ZR1X runtime contracts with zero validation errors while leaving the
+canonical workbook and `form-app/data.js` unchanged. Python passed 75 tests;
+Node passed 89/89, 19/19, 24/24, and 47/47. The targets remain inactive and
+unpromoted. No registry publication, deployment, runtime-code, or dealer change
+occurred. Residual risk is limited to the approved header font/style difference
+on 10 of 12 new sheets.
 
 ---
 
