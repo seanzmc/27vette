@@ -51003,7 +51003,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-07-11T16:50:06+00:00",
+          "generated_at": "2026-07-20T08:02:54+00:00",
           "status": "runtime_active"
         },
         "variants": [
