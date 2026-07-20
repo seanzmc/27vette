@@ -134,6 +134,44 @@ def _compile_report() -> dict:
     }
 
 
+def _append_gsx_promotion_scaffold(changeset: dict) -> dict:
+    changeset["rowChanges"].append(
+        {
+            "action": "add",
+            "sheet": "model_registry_promotion",
+            "family": "model_registry_promotion",
+            "key": {"model_key": "grand_sport_x"},
+            "fields": {
+                "active": {"before": None, "after": False},
+                "artifact_path": {
+                    "before": None,
+                    "after": "form-output/runtime/grand-sport-x-runtime-contract.json",
+                },
+                "artifact_type": {"before": None, "after": "runtime_contract"},
+                "default_model": {"before": None, "after": False},
+                "display_order": {"before": None, "after": 6},
+                "model_key": {"before": None, "after": "grand_sport_x"},
+                "notes": {
+                    "before": None,
+                    "after": "Inactive greenfield deployment-proof scaffold.",
+                },
+                "promoted_to_runtime": {"before": None, "after": False},
+                "registry_key": {"before": None, "after": "grand_sport_x"},
+            },
+            "provenance": [
+                {
+                    "kind": "scaffold",
+                    "id": "pass_c3_greenfield_registry_promotion",
+                    "scaffoldRule": "pass_c3_greenfield_registry_promotion",
+                }
+            ],
+        }
+    )
+    changeset["semanticFingerprint"] = changeset_fingerprint(changeset)
+    changeset["changeSetId"] = changeset["semanticFingerprint"][:24]
+    return changeset
+
+
 def _prove(
     tmp_path: Path,
     workbook: Path,
@@ -319,6 +357,160 @@ def test_changeset_proof_refuses_mixed_or_unrecognized_provenance(tmp_path):
 
     assert result["ok"] is False
     assert result["status"] == "phase_projection_invalid"
+
+
+@pytest.mark.parametrize("field", ["active", "promoted_to_runtime"])
+def test_changeset_proof_refuses_active_gsx_promotion_scaffold(
+    tmp_path,
+    monkeypatch,
+    field,
+):
+    workbook = tmp_path / "master.xlsx"
+    workbook.write_bytes(b"fixture workbook bytes")
+    changeset = _append_gsx_promotion_scaffold(_changeset(workbook))
+    changeset["rowChanges"][-1]["fields"][field]["after"] = True
+    changeset["semanticFingerprint"] = changeset_fingerprint(changeset)
+    changeset["changeSetId"] = changeset["semanticFingerprint"][:24]
+    monkeypatch.setattr(proof_module.editor_ops, "extract_workbook", lambda _path: {})
+    monkeypatch.setattr(
+        proof_module,
+        "changeset_to_editor_batch",
+        lambda _changeset, _extract: {"items": []},
+    )
+    monkeypatch.setattr(
+        proof_module.TemporaryDeploymentProofMixin,
+        "_deployment_continuity_probe",
+        lambda _self, _workbook, _batch, context, *, schema_validation: {
+            model: {
+                "status": "deployment_probe_passed",
+                "deploymentBlockers": [],
+                "deploymentDeferrals": [],
+            }
+            for model in context["targets"]
+        },
+    )
+
+    result = _prove(tmp_path, workbook, changeset=changeset)
+
+    assert result["ok"] is False
+    assert result["status"] == "phase_projection_invalid"
+    assert "inactive grand sport x promotion scaffold" in result["errors"][0].lower()
+
+
+def test_changeset_proof_refuses_promotion_scaffold_for_other_model(
+    tmp_path,
+    monkeypatch,
+):
+    workbook = tmp_path / "master.xlsx"
+    workbook.write_bytes(b"fixture workbook bytes")
+    changeset = _append_gsx_promotion_scaffold(_changeset(workbook))
+    scaffold = changeset["rowChanges"][-1]
+    scaffold["key"]["model_key"] = "zr1"
+    scaffold["fields"]["model_key"]["after"] = "zr1"
+    scaffold["fields"]["registry_key"]["after"] = "zr1"
+    changeset["semanticFingerprint"] = changeset_fingerprint(changeset)
+    changeset["changeSetId"] = changeset["semanticFingerprint"][:24]
+    monkeypatch.setattr(proof_module.editor_ops, "extract_workbook", lambda _path: {})
+    monkeypatch.setattr(
+        proof_module,
+        "changeset_to_editor_batch",
+        lambda _changeset, _extract: {"items": []},
+    )
+    monkeypatch.setattr(
+        proof_module.TemporaryDeploymentProofMixin,
+        "_deployment_continuity_probe",
+        lambda _self, _workbook, _batch, context, *, schema_validation: {
+            model: {
+                "status": "deployment_probe_passed",
+                "deploymentBlockers": [],
+                "deploymentDeferrals": [],
+            }
+            for model in context["targets"]
+        },
+    )
+
+    result = _prove(tmp_path, workbook, changeset=changeset)
+
+    assert result["ok"] is False
+    assert result["status"] == "phase_projection_invalid"
+    assert "inactive grand sport x promotion scaffold" in result["errors"][0].lower()
+
+
+def test_changeset_proof_refuses_manifest_row_outside_exact_targets(
+    tmp_path,
+    monkeypatch,
+):
+    workbook = tmp_path / "master.xlsx"
+    workbook.write_bytes(b"fixture workbook bytes")
+    manifest = _manifest()
+    manifest["rows"][0]["model"] = "off_target_model"
+    monkeypatch.setattr(proof_module.editor_ops, "extract_workbook", lambda _path: {})
+    monkeypatch.setattr(
+        proof_module,
+        "changeset_to_editor_batch",
+        lambda _changeset, _extract: {"items": []},
+    )
+    monkeypatch.setattr(
+        proof_module.TemporaryDeploymentProofMixin,
+        "_deployment_continuity_probe",
+        lambda _self, _workbook, _batch, context, *, schema_validation: {
+            model: {
+                "status": "deployment_probe_passed",
+                "deploymentBlockers": [],
+                "deploymentDeferrals": [],
+            }
+            for model in context["targets"]
+        },
+    )
+
+    result = _prove(tmp_path, workbook, manifest=manifest)
+
+    assert result["ok"] is False
+    assert result["status"] == "phase_projection_invalid"
+    assert "outside exact task 8 targets" in result["errors"][0].lower()
+
+
+def test_changeset_proof_requires_complete_all_target_phase_coverage(
+    tmp_path,
+    monkeypatch,
+):
+    workbook = tmp_path / "master.xlsx"
+    workbook.write_bytes(b"fixture workbook bytes")
+    original_phase_changeset = proof_module._phase_changeset
+
+    def incomplete_all_target_phase(changeset, manifest_rows, targets):
+        phase = original_phase_changeset(changeset, manifest_rows, targets)
+        if targets == ["grand_sport_x", "zr1", "zr1x"]:
+            phase["rowChanges"].pop()
+            phase["semanticFingerprint"] = changeset_fingerprint(phase)
+            phase["changeSetId"] = phase["semanticFingerprint"][:24]
+        return phase
+
+    monkeypatch.setattr(proof_module, "_phase_changeset", incomplete_all_target_phase)
+    monkeypatch.setattr(proof_module.editor_ops, "extract_workbook", lambda _path: {})
+    monkeypatch.setattr(
+        proof_module,
+        "changeset_to_editor_batch",
+        lambda _changeset, _extract: {"items": []},
+    )
+    monkeypatch.setattr(
+        proof_module.TemporaryDeploymentProofMixin,
+        "_deployment_continuity_probe",
+        lambda _self, _workbook, _batch, context, *, schema_validation: {
+            model: {
+                "status": "deployment_probe_passed",
+                "deploymentBlockers": [],
+                "deploymentDeferrals": [],
+            }
+            for model in context["targets"]
+        },
+    )
+
+    result = _prove(tmp_path, workbook)
+
+    assert result["ok"] is False
+    assert result["status"] == "phase_projection_invalid"
+    assert "all-target phase does not cover the complete changeset" in result["errors"][0].lower()
 
 
 def test_changeset_proof_refuses_incomplete_manifest_coverage(tmp_path):

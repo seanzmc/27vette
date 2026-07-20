@@ -1300,6 +1300,40 @@ class TemporaryDeploymentProofMixin:
 
 DEPLOYMENT_PROOF_SCHEMA = "workbook-changeset-deployment-proof-1"
 _TEMP_PATH_RE = re.compile(r"/[^\s]*/ingest-d1-deployment-[^/\s]+")
+_TASK8_TARGETS = ("grand_sport_x", "zr1", "zr1x")
+
+
+def _is_exact_gsx_promotion_scaffold(change: dict[str, Any]) -> bool:
+    return change == {
+        "action": "add",
+        "sheet": "model_registry_promotion",
+        "family": "model_registry_promotion",
+        "key": {"model_key": "grand_sport_x"},
+        "fields": {
+            "active": {"before": None, "after": False},
+            "artifact_path": {
+                "before": None,
+                "after": "form-output/runtime/grand-sport-x-runtime-contract.json",
+            },
+            "artifact_type": {"before": None, "after": "runtime_contract"},
+            "default_model": {"before": None, "after": False},
+            "display_order": {"before": None, "after": 6},
+            "model_key": {"before": None, "after": "grand_sport_x"},
+            "notes": {
+                "before": None,
+                "after": "Inactive greenfield deployment-proof scaffold.",
+            },
+            "promoted_to_runtime": {"before": None, "after": False},
+            "registry_key": {"before": None, "after": "grand_sport_x"},
+        },
+        "provenance": [
+            {
+                "kind": "scaffold",
+                "id": "pass_c3_greenfield_registry_promotion",
+                "scaffoldRule": "pass_c3_greenfield_registry_promotion",
+            }
+        ],
+    }
 
 
 class _ChangeSetDeploymentProofEngine(TemporaryDeploymentProofMixin):
@@ -1358,21 +1392,8 @@ def _change_models(
         if manifest_ref not in manifest_models:
             return set()
         return {manifest_models[manifest_ref]}
-    if (
-        kind == "scaffold"
-        and str(entry.get("id") or "") == "pass_c3_greenfield_registry_promotion"
-        and str(change.get("family") or "") == "model_registry_promotion"
-    ):
-        models: set[str] = set()
-        key_model = str((change.get("key") or {}).get("model_key") or "")
-        if key_model:
-            models.add(key_model)
-        field_model = str(
-            ((change.get("fields") or {}).get("model_key") or {}).get("after") or ""
-        )
-        if field_model:
-            models.add(field_model)
-        return models if len(models) == 1 else set()
+    if kind == "scaffold" and _is_exact_gsx_promotion_scaffold(change):
+        return {"grand_sport_x"}
     return set()
 
 
@@ -1547,7 +1568,7 @@ def prove_changeset_deployment(
             "manifest or compile-report file SHA does not match the ChangeSet binding",
         )
     targets = [str(target) for target in parsed["targets"]]
-    if targets != ["grand_sport_x", "zr1", "zr1x"]:
+    if targets != list(_TASK8_TARGETS):
         return _proof_error(
             "binding_mismatch",
             "deployment proof requires exact Task 8 targets: grand_sport_x, zr1, zr1x",
@@ -1584,6 +1605,15 @@ def prove_changeset_deployment(
         str(row["manifestRef"]): str(row.get("model") or "")
         for row in manifest_rows
     }
+    unexpected_manifest_models = sorted(
+        set(manifest_models.values()) - (set(_TASK8_TARGETS) | {"*"})
+    )
+    if unexpected_manifest_models:
+        return _proof_error(
+            "phase_projection_invalid",
+            "canonical manifest contains model authority outside exact Task 8 "
+            f"targets: {unexpected_manifest_models}",
+        )
     manifest_by_ref = {
         str(row["manifestRef"]): row
         for row in manifest_rows
@@ -1596,7 +1626,8 @@ def prove_changeset_deployment(
     if unbound_changes:
         return _proof_error(
             "phase_projection_invalid",
-            "ChangeSet row lacks exact manifest or scaffold model authority",
+            "ChangeSet row lacks exact manifest model authority or the exact inactive "
+            "Grand Sport X promotion scaffold",
         )
     projection_mismatches = []
     for change in [*parsed["rowChanges"], *parsed["noops"]]:
@@ -1666,6 +1697,14 @@ def prove_changeset_deployment(
         if not phase_targets:
             continue
         phase_changeset = _phase_changeset(parsed, manifest_rows, phase_targets)
+        if phase_id == "all_targets_atomic" and any(
+            phase_changeset[field] != parsed[field]
+            for field in ("sheetCreates", "rowChanges", "noops")
+        ):
+            return _proof_error(
+                "phase_projection_invalid",
+                "all-target phase does not cover the complete ChangeSet",
+            )
         batch = changeset_to_editor_batch(phase_changeset, extract)
         context = _proof_context(
             manifest,
