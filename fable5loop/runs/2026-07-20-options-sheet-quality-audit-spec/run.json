@@ -1,0 +1,32 @@
+{
+  "id": "2026-07-20-options-sheet-quality-audit-spec",
+  "started_at": "2026-07-20T10:30:00-04:00",
+  "completed_at": "2026-07-20T11:15:00-04:00",
+  "objective": "Read-only audit of grand_sport_x/zr1/zr1x *_options quality drift and a remediation spec that stops the drift permanently.",
+  "changed_surface": "docs/tooling",
+  "outcome_rubric": "fable5loop/runs/2026-07-20-options-sheet-quality-audit-spec/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-20-options-sheet-quality-audit-spec/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-20-options-sheet-quality-audit-spec/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-20-options-sheet-quality-audit-spec/audit-metrics.md"
+    }
+  ],
+  "skill_update": {
+    "decision": "deferred",
+    "evidence": "fable5loop/runs/2026-07-20-options-sheet-quality-audit-spec/verifier-report.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false
+  },
+  "boundaries_preserved": [
+    "workbook",
+    "generated artifacts",
+    "runtime app",
+    "dealer submission"
+  ]
+}

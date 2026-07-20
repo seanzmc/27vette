@@ -103,6 +103,18 @@ Do not commit `.venv/`. Always run Python tooling with `.venv/bin/python` or the
 .venv/bin/python scripts/ingest_wizard_server.py [--port 8040]
 ```
 
+The approved 2026-07-20 compounded-repair Deliverable 4.1 projection is a separate read-only report command; its scope and Checkpoint 1 stop are owned by `docs/ingest/7-20_compounded-repair-spec.md`:
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m corvette_form_generator.ingest.options_recovery_projection
+```
+
+After explicit Checkpoint 1 bulk approval, bind the approval to the existing reports and current workbook without regenerating either:
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m corvette_form_generator.ingest.options_recovery_projection --approve-checkpoint-1 --reviewer <name> --reviewed-at <ISO-8601>
+```
+
 ## Workbook Editor Workflow
 
 `scripts/workbook_editor_server.py` serves the fallback localhost-only UI for routine review/editing of `stingray_master.xlsx`; it derives models, sheet registries, schemas, and reference domains from the live workbook. Its obsolete embedded Ingest Review workflow is retired; raw ingest uses the separate wizard above.
