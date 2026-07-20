@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
-"""Retired temporary deployment-proof helpers, separated from ingest sessions.
+"""Temporary deployment-proof helpers, separated from ingest sessions.
 
-The shared workbook service owns application authority. This mixin preserves the
-temporary-workbook proof machinery for historical diagnostics without making it
-reachable from ``WizardSessionStore`` or the ingest server.
+The shared workbook service owns application authority. The legacy mixin remains
+available only for historical diagnostics; :func:`prove_changeset_deployment`
+is the public ``workbook-changeset-1`` proof entry point and never writes the
+canonical workbook.
 """
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -17,6 +20,19 @@ import tempfile
 from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
+
+from corvette_form_generator import editor_ops
+from corvette_form_generator.ingest.wizard.canonical_rows import (
+    semantic_hash,
+    validate_artifact_graph,
+)
+from corvette_form_generator.workbook_domain.changeset import (
+    ChangeSetError,
+    canonical_json,
+    changeset_fingerprint,
+    changeset_to_editor_batch,
+    parse_changeset,
+)
 
 ROOT = Path(__file__).resolve().parents[3]
 WRITABLE_PLAN_SCHEMA = "pass-c-3"
@@ -427,6 +443,51 @@ class TemporaryDeploymentProofMixin:
         expected_runtime_ids: dict[str, set[str]] = {
             family: set() for family in runtime_rows
         }
+        endpoint_runtime_visibility: dict[str, bool | None] = {}
+        for endpoint_row in material:
+            endpoint_family = str(endpoint_row.get("family") or "")
+            endpoint_values = endpoint_row.get("canonicalValues") or {}
+            endpoint_key = endpoint_row.get("key") or {}
+            if endpoint_family == "options":
+                endpoint_id = str(
+                    endpoint_values.get("option_id")
+                    or endpoint_key.get("option_id")
+                    or ""
+                )
+                if (
+                    endpoint_values.get("active") is False
+                    or endpoint_values.get("selectable") is False
+                ):
+                    visible: bool | None = False
+                elif (
+                    endpoint_values.get("active") is True
+                    and endpoint_values.get("selectable") is True
+                ):
+                    visible = True
+                else:
+                    visible = None
+            elif endpoint_family == "interiors":
+                endpoint_id = str(
+                    endpoint_values.get("interior_id")
+                    or endpoint_key.get("interior_id")
+                    or ""
+                )
+                if endpoint_values.get("active") is True:
+                    visible = True
+                elif endpoint_values.get("active") is False:
+                    visible = False
+                else:
+                    visible = None
+            else:
+                continue
+            if endpoint_id:
+                previous = endpoint_runtime_visibility.get(endpoint_id, False)
+                if previous is True or visible is True:
+                    endpoint_runtime_visibility[endpoint_id] = True
+                elif previous is None or visible is None:
+                    endpoint_runtime_visibility[endpoint_id] = None
+                else:
+                    endpoint_runtime_visibility[endpoint_id] = False
         for row in material:
             family = str(row.get("family") or "")
             if family not in {
@@ -441,8 +502,25 @@ class TemporaryDeploymentProofMixin:
                 continue
             key = row.get("key") or {}
             values = row.get("canonicalValues") or {}
-            if row.get("model") == "*" and family == "rule_mapping" and values:
-                if not rpo(values.get("source_id")) or not rpo(values.get("target_id")):
+            if family == "rule_mapping" and values:
+                missing_endpoints = [
+                    str(endpoint_id or "")
+                    for endpoint_id in (
+                        values.get("source_id"),
+                        values.get("target_id"),
+                    )
+                    if not rpo(endpoint_id)
+                ]
+                if missing_endpoints and all(
+                    endpoint_id in endpoint_runtime_visibility
+                    and endpoint_runtime_visibility[endpoint_id] is False
+                    for endpoint_id in missing_endpoints
+                ):
+                    # The runtime generator intentionally omits relationships
+                    # whose missing endpoints are explicitly non-runtime in
+                    # the canonical manifest. Endpoint absence by itself is
+                    # not authority because it can also indicate generator
+                    # regression.
                     continue
             expected = row.get("semanticSignature")
             if values:
@@ -1218,3 +1296,440 @@ class TemporaryDeploymentProofMixin:
                     "not_deployment_ready" if blockers else "deployment_probe_passed"
                 )
             return continuity
+
+
+DEPLOYMENT_PROOF_SCHEMA = "workbook-changeset-deployment-proof-1"
+_TEMP_PATH_RE = re.compile(r"/[^\s]*/ingest-d1-deployment-[^/\s]+")
+
+
+class _ChangeSetDeploymentProofEngine(TemporaryDeploymentProofMixin):
+    """Run temp generator/registry checks without legacy plan policy."""
+
+    def _deployment_continuity_from_plan(self, plan: dict[str, Any]) -> dict[str, Any]:
+        return {
+            str(model): {
+                "status": "deployment_probe_pending",
+                "registryLoadable": None,
+                "deploymentBlockers": [],
+                "deploymentDeferrals": [],
+            }
+            for model in plan.get("targets") or []
+        }
+
+
+def _proof_fingerprint(payload: dict[str, Any]) -> str:
+    body = {key: value for key, value in payload.items() if key != "proofFingerprint"}
+    return hashlib.sha256(canonical_json(body).encode("utf-8")).hexdigest()
+
+
+def _normalize_temporary_paths(value: Any) -> Any:
+    """Remove random temp-root names from the durable proof receipt."""
+
+    if isinstance(value, dict):
+        return {
+            str(key): _normalize_temporary_paths(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, list):
+        return [_normalize_temporary_paths(item) for item in value]
+    if isinstance(value, str):
+        return _TEMP_PATH_RE.sub("<temporary-root>", value)
+    return value
+
+
+def _manifest_rows_with_refs(manifest: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        {**dict(row), "manifestRef": f"manifest-{index:05d}"}
+        for index, row in enumerate(manifest.get("rows") or [])
+    ]
+
+
+def _change_models(
+    change: dict[str, Any],
+    manifest_models: dict[str, str],
+) -> set[str]:
+    provenance = list(change.get("provenance") or [])
+    if len(provenance) != 1:
+        return set()
+    entry = provenance[0]
+    kind = str(entry.get("kind") or "")
+    if kind == "manifest":
+        manifest_ref = str(entry.get("manifestRef") or entry.get("id") or "")
+        if manifest_ref not in manifest_models:
+            return set()
+        return {manifest_models[manifest_ref]}
+    if (
+        kind == "scaffold"
+        and str(entry.get("id") or "") == "pass_c3_greenfield_registry_promotion"
+        and str(change.get("family") or "") == "model_registry_promotion"
+    ):
+        models: set[str] = set()
+        key_model = str((change.get("key") or {}).get("model_key") or "")
+        if key_model:
+            models.add(key_model)
+        field_model = str(
+            ((change.get("fields") or {}).get("model_key") or {}).get("after") or ""
+        )
+        if field_model:
+            models.add(field_model)
+        return models if len(models) == 1 else set()
+    return set()
+
+
+def _phase_changeset(
+    changeset: dict[str, Any],
+    manifest_rows: list[dict[str, Any]],
+    targets: list[str],
+) -> dict[str, Any]:
+    """Build a mechanically filtered, valid ChangeSet for one proof phase."""
+
+    selected = set(targets)
+    manifest_models = {
+        str(row["manifestRef"]): str(row.get("model") or "")
+        for row in manifest_rows
+    }
+
+    def include(change: dict[str, Any]) -> bool:
+        models = _change_models(change, manifest_models)
+        return "*" in models or bool(models & selected)
+
+    row_changes = [dict(change) for change in changeset["rowChanges"] if include(change)]
+    noops = [dict(change) for change in changeset["noops"] if include(change)]
+    referenced_sheets = {
+        str(change.get("sheet") or "") for change in [*row_changes, *noops]
+    }
+    referenced_sheets.update(
+        str(row.get("sheet") or "")
+        for row in manifest_rows
+        if str(row.get("model") or "") in selected | {"*"}
+    )
+    for change in row_changes:
+        for pair in (change.get("fields") or {}).values():
+            after = pair.get("after") if isinstance(pair, dict) else None
+            if isinstance(after, str):
+                referenced_sheets.add(after)
+    sheet_creates = [
+        dict(create)
+        for create in changeset["sheetCreates"]
+        if str(create.get("sheet") or "") in referenced_sheets
+    ]
+    phase = {
+        **changeset,
+        "targets": sorted(targets),
+        "sheetCreates": sheet_creates,
+        "rowChanges": row_changes,
+        "noops": noops,
+    }
+    phase["semanticFingerprint"] = changeset_fingerprint(phase)
+    phase["changeSetId"] = phase["semanticFingerprint"][:24]
+    return parse_changeset(phase)
+
+
+def _proof_context(
+    manifest: dict[str, Any],
+    compile_report: dict[str, Any],
+    manifest_rows: list[dict[str, Any]],
+    targets: list[str],
+) -> dict[str, Any]:
+    selected = set(targets)
+    selected_rows = []
+    for row in manifest_rows:
+        if str(row.get("model") or "") not in selected | {"*"}:
+            continue
+        item = copy.deepcopy(row)
+        item["canonicalValues"] = copy.deepcopy(item.get("values") or {})
+        selected_rows.append(item)
+    raw_feature_coverage = compile_report.get("sourceFeatureCoverage") or []
+    if isinstance(raw_feature_coverage, list):
+        by_model: dict[str, dict[str, Any]] = {}
+        for model in targets:
+            features = [
+                copy.deepcopy(feature)
+                for feature in raw_feature_coverage
+                if str(feature.get("model") or "") in {model, "*"}
+            ]
+            dispositions = Counter(
+                str(feature.get("disposition") or "") for feature in features
+            )
+            by_model[model] = {
+                "featureCount": len(features),
+                "dispositionCounts": dict(sorted(dispositions.items())),
+                "blockingFeatures": [
+                    feature
+                    for feature in features
+                    if str(feature.get("disposition") or "")
+                    in {"exception_open", "unsupported_blocker"}
+                ],
+            }
+        source_feature_coverage = {
+            "semanticSha": semantic_hash(raw_feature_coverage),
+            "byModel": by_model,
+        }
+    else:
+        source_feature_coverage = copy.deepcopy(raw_feature_coverage)
+    return {
+        "targets": list(targets),
+        "targetModes": {
+            model: (manifest.get("modelModes") or {}).get(model)
+            for model in targets
+        },
+        "coverage": {
+            "manifestRows": selected_rows,
+        },
+        "sourceFeatureCoverage": source_feature_coverage,
+    }
+
+
+def _proof_error(status: str, message: str) -> dict[str, Any]:
+    return {"ok": False, "status": status, "errors": [message]}
+
+
+def prove_changeset_deployment(
+    workbook_path: Path | str,
+    changeset: dict[str, Any],
+    *,
+    canonical_manifest_path: Path | str,
+    compile_report_path: Path | str,
+) -> dict[str, Any]:
+    """Prove an exact ChangeSet through ordered, isolated temp-workbook phases."""
+
+    workbook = Path(workbook_path)
+    try:
+        parsed = parse_changeset(changeset)
+    except ChangeSetError as exc:
+        return _proof_error("invalid_changeset", str(exc))
+    manifest_path = Path(canonical_manifest_path)
+    report_path = Path(compile_report_path)
+    try:
+        manifest_bytes = manifest_path.read_bytes()
+        report_bytes = report_path.read_bytes()
+        manifest = json.loads(manifest_bytes)
+        compile_report = json.loads(report_bytes)
+    except (OSError, json.JSONDecodeError) as exc:
+        return _proof_error("invalid_proof_input", str(exc))
+    if not isinstance(manifest, dict) or not isinstance(compile_report, dict):
+        return _proof_error(
+            "invalid_proof_input",
+            "canonical manifest and compile report must be JSON objects",
+        )
+    manifest_sha256 = hashlib.sha256(manifest_bytes).hexdigest()
+    compile_report_sha256 = hashlib.sha256(report_bytes).hexdigest()
+    try:
+        validate_artifact_graph(manifest, compile_report)
+    except ValueError as exc:
+        return _proof_error("binding_mismatch", str(exc))
+    live_workbook = {
+        "sha256": hashlib.sha256(workbook.read_bytes()).hexdigest(),
+        "mtimeNs": str(workbook.stat().st_mtime_ns),
+    }
+    if live_workbook != parsed["workbook"]:
+        return _proof_error(
+            "stale",
+            "live workbook no longer matches the ChangeSet workbook binding",
+        )
+    manifest_semantic = str(manifest.get("manifestSemanticSha") or "")
+    if manifest_semantic != str(
+        (parsed.get("bindings") or {}).get("canonicalManifestSemanticSha") or ""
+    ):
+        return _proof_error(
+            "binding_mismatch",
+            "canonical manifest semantic SHA does not match the ChangeSet binding",
+        )
+    bindings = parsed.get("bindings") or {}
+    compiler_bindings = bindings.get("compilerBindings") or {}
+    if (
+        manifest_sha256 != str(bindings.get("canonicalManifestSha") or "")
+        or compile_report_sha256
+        != str(compiler_bindings.get("compileReportSha") or "")
+    ):
+        return _proof_error(
+            "binding_mismatch",
+            "manifest or compile-report file SHA does not match the ChangeSet binding",
+        )
+    targets = [str(target) for target in parsed["targets"]]
+    if targets != ["grand_sport_x", "zr1", "zr1x"]:
+        return _proof_error(
+            "binding_mismatch",
+            "deployment proof requires exact Task 8 targets: grand_sport_x, zr1, zr1x",
+        )
+    manifest_modes = {
+        str(model): str(mode)
+        for model, mode in (manifest.get("modelModes") or {}).items()
+    }
+    report_models = {
+        str(model): dict(result or {})
+        for model, result in (compile_report.get("models") or {}).items()
+    }
+    if set(targets) != set(manifest_modes) or set(targets) != set(report_models):
+        return _proof_error(
+            "binding_mismatch",
+            "ChangeSet, manifest, and compile report target sets do not match",
+        )
+    not_ready = [
+        model
+        for model in targets
+        if report_models[model].get("compileReady") is not True
+        or report_models[model].get("blockers")
+        or str(report_models[model].get("mode") or "") != manifest_modes[model]
+    ]
+    if not_ready or compile_report.get("deferrals"):
+        detail = not_ready or ["compile report contains deferrals"]
+        return _proof_error(
+            "compiler_not_ready",
+            f"compiler is not ready for exact targets: {detail}",
+        )
+
+    manifest_rows = _manifest_rows_with_refs(manifest)
+    manifest_models = {
+        str(row["manifestRef"]): str(row.get("model") or "")
+        for row in manifest_rows
+    }
+    manifest_by_ref = {
+        str(row["manifestRef"]): row
+        for row in manifest_rows
+    }
+    unbound_changes = [
+        change
+        for change in [*parsed["rowChanges"], *parsed["noops"]]
+        if not _change_models(change, manifest_models)
+    ]
+    if unbound_changes:
+        return _proof_error(
+            "phase_projection_invalid",
+            "ChangeSet row lacks exact manifest or scaffold model authority",
+        )
+    projection_mismatches = []
+    for change in [*parsed["rowChanges"], *parsed["noops"]]:
+        provenance = list(change.get("provenance") or [])
+        if str((provenance[0] if provenance else {}).get("kind") or "") != "manifest":
+            continue
+        manifest_ref = str(
+            provenance[0].get("manifestRef") or provenance[0].get("id") or ""
+        )
+        row = manifest_by_ref[manifest_ref]
+        structural_match = all(
+            change.get(field) == row.get(field)
+            for field in ("family", "sheet", "key")
+        )
+        if change.get("action") == "noop":
+            value_match = change.get("canonicalValues") == row.get("values")
+        else:
+            fields = change.get("fields") or {}
+            value_match = all(
+                isinstance(pair, dict)
+                and pair.get("after") == (row.get("values") or {}).get(column)
+                for column, pair in fields.items()
+            )
+            if change.get("action") == "add":
+                missing_fields = set(row.get("values") or {}) - set(fields)
+                value_match = value_match and all(
+                    (row.get("values") or {}).get(column) in (None, "")
+                    for column in missing_fields
+                )
+        if not structural_match or not value_match:
+            projection_mismatches.append(manifest_ref)
+    if projection_mismatches:
+        return _proof_error(
+            "phase_projection_invalid",
+            "ChangeSet row does not match its manifest row: "
+            + ", ".join(projection_mismatches[:5]),
+        )
+    manifest_ref_counts = Counter(
+        str(entry.get("manifestRef") or entry.get("id") or "")
+        for change in [*parsed["rowChanges"], *parsed["noops"]]
+        for entry in change.get("provenance") or []
+        if str(entry.get("kind") or "") == "manifest"
+    )
+    expected_manifest_refs = set(manifest_models)
+    if (
+        set(manifest_ref_counts) != expected_manifest_refs
+        or any(count != 1 for count in manifest_ref_counts.values())
+    ):
+        return _proof_error(
+            "phase_projection_invalid",
+            "ChangeSet manifest coverage is incomplete or duplicated",
+        )
+    phase_specs = [
+        (
+            "grand_sport_x_plus_zr1",
+            [model for model in ("grand_sport_x", "zr1") if model in targets],
+        ),
+        ("zr1x_repeatability", ["zr1x"] if "zr1x" in targets else []),
+        ("all_targets_atomic", targets),
+    ]
+    engine = _ChangeSetDeploymentProofEngine()
+    extract = editor_ops.extract_workbook(workbook)
+    phases: list[dict[str, Any]] = []
+    all_blockers: list[dict[str, Any]] = []
+    all_deferrals: list[dict[str, Any]] = []
+    for phase_id, phase_targets in phase_specs:
+        if not phase_targets:
+            continue
+        phase_changeset = _phase_changeset(parsed, manifest_rows, phase_targets)
+        batch = changeset_to_editor_batch(phase_changeset, extract)
+        context = _proof_context(
+            manifest,
+            compile_report,
+            manifest_rows,
+            phase_targets,
+        )
+        continuity = engine._deployment_continuity_probe(
+            workbook,
+            batch,
+            context,
+            schema_validation=True,
+        )
+        blockers = [
+            {"phaseId": phase_id, "model": model, **dict(blocker)}
+            for model in phase_targets
+            for blocker in (continuity.get(model) or {}).get("deploymentBlockers") or []
+        ]
+        deferrals = [
+            {"phaseId": phase_id, "model": model, **dict(deferral)}
+            for model in phase_targets
+            for deferral in (continuity.get(model) or {}).get("deploymentDeferrals") or []
+        ]
+        passed = not blockers and not deferrals and all(
+            (continuity.get(model) or {}).get("status") == "deployment_probe_passed"
+            for model in phase_targets
+        )
+        phases.append(
+            {
+                "phaseId": phase_id,
+                "targets": phase_targets,
+                "passed": passed,
+                "changeSetId": phase_changeset["changeSetId"],
+                "operationCounts": {
+                    "sheetCreates": len(phase_changeset["sheetCreates"]),
+                    "rowChanges": len(phase_changeset["rowChanges"]),
+                    "noops": len(phase_changeset["noops"]),
+                },
+                "continuity": continuity,
+            }
+        )
+        all_blockers.extend(blockers)
+        all_deferrals.extend(deferrals)
+
+    passed = bool(phases) and not all_blockers and not all_deferrals and all(
+        phase["passed"] for phase in phases
+    )
+    receipt = _normalize_temporary_paths(
+        {
+            "ok": passed,
+            "schemaVersion": DEPLOYMENT_PROOF_SCHEMA,
+            "status": (
+                "deployment_proof_passed" if passed else "deployment_proof_blocked"
+            ),
+            "changeSetId": parsed["changeSetId"],
+            "semanticFingerprint": parsed["semanticFingerprint"],
+            "workbook": dict(parsed["workbook"]),
+            "bindings": dict(parsed.get("bindings") or {}),
+            "targets": targets,
+            "phases": phases,
+            "blockers": all_blockers,
+            "deferrals": all_deferrals,
+            "errors": [],
+        }
+    )
+    receipt["proofFingerprint"] = _proof_fingerprint(receipt)
+    return receipt

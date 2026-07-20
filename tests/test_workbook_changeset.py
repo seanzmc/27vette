@@ -114,6 +114,7 @@ def test_update_emits_only_changed_fields_and_checks_before_value():
         "rows": [{"option_id": "opt_1", "price": 100}],
     }}}
     batch = changeset_to_editor_batch(parsed, extract)
+    assert batch["forceTypedBools"] is True
     assert batch["items"] == [{
         "action": "update",
         "sheet": "stingray_options",

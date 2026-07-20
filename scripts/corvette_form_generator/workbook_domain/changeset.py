@@ -253,7 +253,10 @@ def changeset_to_editor_batch(changeset, extract):
     ``"True" != True`` would fail closed with a stale-before error).
 
     ``source``, ``noops``, ``warningAcknowledgementsRequested``, and
-    ``bindings`` are carried by the contract but not interpreted here.
+    ``bindings`` are carried by the contract but not interpreted here. Every
+    ChangeSet batch forces real Excel booleans so activating a previously
+    inactive scaffold cannot preserve legacy text booleans into an active
+    model source sheet.
 
     Emitted items are deep-copied from the changeset: mutating the returned
     batch never alters the parsed changeset it was derived from.
@@ -312,5 +315,6 @@ def changeset_to_editor_batch(changeset, extract):
     return {
         "workbookMtimeNs": changeset["workbook"]["mtimeNs"],
         "workbookSha256": changeset["workbook"]["sha256"],
+        "forceTypedBools": True,
         "items": items,
     }

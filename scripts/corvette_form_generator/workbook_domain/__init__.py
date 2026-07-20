@@ -10,6 +10,9 @@ from corvette_form_generator.workbook_domain.changeset import (
     changeset_to_editor_batch,
     parse_changeset,
 )
+from corvette_form_generator.workbook_domain.deployment_proof import (
+    prove_changeset_deployment,
+)
 from corvette_form_generator.workbook_domain.registry import (
     EDITOR_SHEET_META,
     GLOBAL_SHEET_FAMILIES,
@@ -35,6 +38,7 @@ __all__ = [
     "changeset_to_editor_batch",
     "family_spec",
     "parse_changeset",
+    "prove_changeset_deployment",
     "preview_changeset",
     "registered_sheet_families",
 ]
