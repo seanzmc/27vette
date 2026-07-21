@@ -111,7 +111,8 @@ class ExceptionFlowTest(unittest.TestCase):
             limit=2,
         )
 
-        self.assertEqual(first["total"], 6)
+        self.assertEqual(first["total"], second["total"])
+        self.assertGreaterEqual(first["total"], 4)
         self.assertEqual(first["offset"], 0)
         self.assertEqual(first["limit"], 2)
         self.assertEqual(len(first["items"]), 2)

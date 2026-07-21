@@ -733,6 +733,22 @@ function exceptionActionFields(item, action) {
       </div>`;
     case "retain_existing":
       return `<label>Established target occurrence ${optionSelect("existingId", choices.existingOptions, "Choose existing target ID")}</label>`;
+    case "provide_option_copy": {
+      const proposal = (subject.proposedRows || [])[0] || {};
+      return `<div class="typed-grid copy-evidence-field">
+        <label>Customer option name <textarea name="optionName" required>${escapeHtml(proposal.proposedOptionName || "")}</textarea></label>
+        <label>Customer description <textarea name="description">${escapeHtml(proposal.proposedDescription || "")}</textarea></label>
+      </div>`;
+    }
+    case "provide_option_behavior":
+      return `<div class="typed-grid">
+        <label>Active <select name="active" required><option value="true">Active</option><option value="false">Inactive</option></select></label>
+        <label>Selectable <select name="selectable" required><option value="true">Selectable</option><option value="false">Not selectable</option></select></label>
+      </div>`;
+    case "confirm_mandatory_charge": {
+      const proposal = (subject.proposedRows || [])[0] || {};
+      return `<label>Confirmed whole-dollar mandatory charge <input name="priceValue" type="number" min="1" step="1" value="${escapeHtml(proposal.sourcePrice || "")}" required></label>`;
+    }
     case "provide_typed_value":
       if (subject.reasonCode === "comparator_only_rule_group_proposal") {
         return '<input type="hidden" name="decision" value="confirm_proposal"><div class="status-note">Confirm the exact comparator-backed proposal shown above for this target.</div>';
@@ -785,6 +801,9 @@ function actionLabel(action, reasonCode) {
     keep_inactive_option: "Keep inactive and unpriced",
     choose_relationship: "Save exact relationship",
     retain_existing: "Keep selected existing row",
+    provide_option_copy: "Save reviewed copy",
+    provide_option_behavior: "Save reviewed behavior",
+    confirm_mandatory_charge: "Confirm mandatory charge",
     provide_typed_value: "Save typed value",
     approve_removal: "Approve exact removal",
     mark_not_applicable: "Reject entire proposal — write no rows",
@@ -839,6 +858,7 @@ function sourceEvidenceView(candidate) {
 }
 
 function displayEvidenceValue(value) {
+  if (value === "" || value === null || value === undefined) return "blank";
   return value && typeof value === "object" ? JSON.stringify(value) : value;
 }
 
@@ -853,8 +873,20 @@ function evidenceValues(record, preferredKeys = []) {
 }
 
 function canonicalRowView(row) {
+  const requiredConflictFields = new Set([
+    "currentOptionName",
+    "currentDescription",
+    "proposedOptionName",
+    "proposedDescription",
+    "detailRaw",
+    "comparator",
+    "comparison",
+    "behaviorEvidence",
+    "placementEvidence",
+    "priceEvidence",
+  ]);
   const values = Object.entries(evidenceValues(row, ["values", "signature"]))
-    .filter(([, value]) => value !== "" && value !== null && value !== undefined)
+    .filter(([key, value]) => requiredConflictFields.has(key) || (value !== "" && value !== null && value !== undefined))
     .map(([key, value]) => `<span><b>${escapeHtml(key)}</b>: ${escapeHtml(displayEvidenceValue(value))}</span>`)
     .join("");
   const key = row.key && typeof row.key === "object" ? JSON.stringify(row.key) : "";
@@ -866,7 +898,7 @@ function canonicalRowView(row) {
 function comparatorEvidenceView(fact) {
   const values = evidenceValues(fact, ["values", "payload", "signature"]);
   return `<div class="evidence-entry"><b>${escapeHtml(fact.comparator || fact.model || "comparator")}</b> · ${escapeHtml(fact.kind || fact.family || "fact")}
-    <div class="row-values">${Object.entries(values).slice(0, 10).map(([key, value]) => `<span><b>${escapeHtml(key)}</b>: ${escapeHtml(displayEvidenceValue(value))}</span>`).join("") || escapeHtml(fact.evidenceId || "")}</div></div>`;
+    <div class="row-values">${Object.entries(values).map(([key, value]) => `<span><b>${escapeHtml(key)}</b>: ${escapeHtml(displayEvidenceValue(value))}</span>`).join("") || escapeHtml(fact.evidenceId || "")}</div></div>`;
 }
 
 function evidenceColumn(title, entries, formatter) {
@@ -1086,6 +1118,12 @@ function resolutionPayload(form, action, reasonCode) {
       return { sourceOptionId: data.get("sourceOptionId"), ruleType: data.get("ruleType"), targetOptionId: data.get("targetOptionId") };
     case "retain_existing":
       return { existingId: data.get("existingId") };
+    case "provide_option_copy":
+      return { optionName: data.get("optionName"), description: data.get("description") || "" };
+    case "provide_option_behavior":
+      return { active: data.get("active") === "true", selectable: data.get("selectable") === "true" };
+    case "confirm_mandatory_charge":
+      return { priceValue: Number(data.get("priceValue")) };
     case "provide_typed_value": {
       if (reasonCode === "comparator_only_rule_group_proposal") return { decision: "confirm_proposal" };
       if (reasonCode === "comparator_only_exclusive_group_proposal") {

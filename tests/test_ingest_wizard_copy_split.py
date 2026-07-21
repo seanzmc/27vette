@@ -17,6 +17,8 @@ from corvette_form_generator.ingest.wizard.copy_split import (  # noqa: E402
     FLAG_NO_SENTENCE_BREAK,
     FLAG_ONE_WORD_NAME,
     FLAG_UNMATCHED_FOOTNOTE,
+    comparator_copy_comparison,
+    is_blocking_copy_proposal,
     propose_copy_split,
 )
 
@@ -27,6 +29,41 @@ def split(text: str, markers: list[str] | None = None) -> dict:
 
 
 class CopySplitTest(unittest.TestCase):
+    def test_comparator_material_coverage_boundary_is_inclusive(self) -> None:
+        comparator = {"option_name": "Visible Carbon Fiber Wheel Package"}
+        at_boundary = comparator_copy_comparison(
+            {"detail_raw": "Visible carbon wheel"}, comparator
+        )
+        below_boundary = comparator_copy_comparison(
+            {"detail_raw": "Visible carbon"}, comparator
+        )
+
+        self.assertEqual(at_boundary["comparatorNameTokenCoverage"], 0.6)
+        self.assertFalse(at_boundary["materialDisagreement"])
+        self.assertLess(below_boundary["comparatorNameTokenCoverage"], 0.6)
+        self.assertTrue(below_boundary["materialDisagreement"])
+
+    def test_generic_one_word_proposal_blocks_even_without_helper_flag(self) -> None:
+        self.assertTrue(is_blocking_copy_proposal({"name": "Wheels", "flags": []}))
+
+    def test_every_current_and_unknown_split_flag_blocks_individually(self) -> None:
+        for flag in (
+            FLAG_ONE_WORD_NAME,
+            FLAG_NO_SENTENCE_BREAK,
+            FLAG_NAME_OVER_60,
+            FLAG_UNMATCHED_FOOTNOTE,
+            FLAG_ALL_DISCLOSURE,
+            "future_unknown_split_flag",
+        ):
+            with self.subTest(flag=flag):
+                self.assertTrue(
+                    is_blocking_copy_proposal({"name": "Valid package name", "flags": [flag]})
+                )
+
+    def test_detail_raw_preserves_exact_source_whitespace(self) -> None:
+        raw = "  Ground effects, extended splitter\n"
+        result = propose_copy_split({"description": "cleaned", "detailRaw": raw, "statuses": []})
+        self.assertEqual(result["detailRaw"], raw)
     def test_clean_split_name_description_disclosure(self) -> None:
         result = split(
             "Front Lift Adjustable Height with Memory. Scans and remembers locations. "

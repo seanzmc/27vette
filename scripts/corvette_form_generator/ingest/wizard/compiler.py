@@ -6,6 +6,7 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping
 from pathlib import Path
+import hashlib
 import re
 from typing import Any
 
@@ -34,6 +35,12 @@ from corvette_form_generator.ingest.wizard.decisions import (
     model_scoped_statuses,
     scope_candidates,
 )
+from corvette_form_generator.ingest.wizard.copy_split import (
+    FLAG_DUPLICATE_NAME,
+    comparator_copy_comparison,
+    is_blocking_copy_proposal,
+    propose_copy_split,
+)
 from corvette_form_generator.ingest.wizard.exceptions import (
     build_resolution_artifact,
     classify_resolutions,
@@ -58,6 +65,12 @@ from corvette_form_generator.model_configs import (
 from corvette_form_generator.runtime_metadata import load_rule_phrase_map
 from corvette_form_generator.schema_validation import ROLE_BOOLEAN_COLUMNS
 from corvette_form_generator.workbook import workbook_truthy
+from corvette_form_generator.options_sheet_quality import (
+    DEFAULT_ALLOWLIST_PATH,
+    DEFAULT_ALLOWLIST_RELATIVE_PATH,
+    evaluate_options_sheet_quality,
+    load_options_sheet_quality_allowlist,
+)
 
 
 ROLE_ORDER = REQUIRED_GENERATION_SOURCE_ROLES + OPTIONAL_GENERATION_SOURCE_ROLES
@@ -958,6 +971,96 @@ def _compile_target_variants(
     return rows, exceptions, desired_variants, compiled_price_rows
 
 
+def _comparator_option_rows(
+    extract: Mapping[str, Any], comparator_model: str, rpo: str
+) -> list[dict[str, Any]]:
+    source_rows = [
+        row
+        for row in _model_source_rows(extract, comparator_model)
+        if str(row.get("source_role") or "") == "source_option_sheet"
+        and workbook_truthy(row.get("active"))
+    ]
+    if len(source_rows) != 1:
+        return []
+    sheet_name = str(source_rows[0].get("sheet_name") or "")
+    return [
+        row
+        for row in _rows(extract, sheet_name)
+        if str(row.get("rpo") or "").strip().upper() == rpo
+    ]
+
+
+def _positive_int(value: Any) -> int | None:
+    if value in (None, "") or isinstance(value, bool):
+        return None
+    try:
+        number = int(value)
+    except (TypeError, ValueError):
+        return None
+    return number if number > 0 else None
+
+
+def _exact_target_default_rows(
+    extract: Mapping[str, Any], target: str, option_id: str, variants: Iterable[Mapping[str, Any]]
+) -> list[dict[str, Any]]:
+    variant_rows = list(variants)
+    allowed_scopes = {
+        "body_style_scope": {str(row.get("body_style") or "").lower() for row in variant_rows},
+        "trim_level_scope": {str(row.get("trim_level") or "").lower() for row in variant_rows},
+        "variant_scope": {str(row.get("variant_id") or "").lower() for row in variant_rows},
+    }
+    result = []
+    for row in _rows(extract, "default_selection_rules"):
+        if str(row.get("model_key") or "").strip().lower() != target:
+            continue
+        if not workbook_truthy(row.get("active")):
+            continue
+        if str(row.get("target_option_id") or "") != option_id:
+            continue
+        if str(row.get("display_behavior") or "") != "default_selected":
+            continue
+        if str(row.get("condition_type") or "") not in {"always", "unless_selected_rpo"}:
+            continue
+        valid = True
+        for field, allowed in allowed_scopes.items():
+            values = {value.strip().lower() for value in str(row.get(field) or "").split("|") if value.strip()}
+            if values and "*" not in values and not values.intersection(allowed):
+                valid = False
+                break
+        if valid:
+            result.append(row)
+    return result
+
+
+def _copy_proposal(
+    extract: Mapping[str, Any], comparator_model: str, candidate: Mapping[str, Any]
+) -> dict[str, Any]:
+    rpo = str(candidate.get("rpo") or candidate.get("refOnlyRpo") or "").strip().upper()
+    comparator_rows = _comparator_option_rows(extract, comparator_model, rpo) if rpo else []
+    if len(comparator_rows) == 1:
+        comparator = comparator_rows[0]
+        comparison = comparator_copy_comparison(
+            {"detail_raw": candidate.get("detailRaw") or candidate.get("description") or ""},
+            comparator,
+        )
+        return {
+            "name": str(comparator.get("option_name") or ""),
+            "description": str(comparator.get("description") or ""),
+            "detailRaw": str(candidate.get("detailRaw") if "detailRaw" in candidate else candidate.get("description") or ""),
+            "flags": [],
+            "source": "exact_comparator",
+            "comparator": dict(comparator),
+            "comparison": comparison,
+        }
+    split = propose_copy_split(dict(candidate))
+    return {
+        **split,
+        "source": "copy_split",
+        "comparator": None,
+        "comparison": {"availability": "not_available"},
+    }
+
+
 def _compile_target_options(
     extract: Mapping[str, Any],
     registry: Mapping[str, Mapping[str, Any]],
@@ -966,6 +1069,7 @@ def _compile_target_options(
     variants: list[dict[str, Any]],
     resolution_entries: Iterable[Mapping[str, Any]],
     status_feature_index: Mapping[str, Mapping[str, list[str]]],
+    comparator_model: str,
     profile_required_options: Mapping[str, Mapping[str, Any]] | None = None,
     profile_option_precedents: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> tuple[
@@ -1031,7 +1135,7 @@ def _compile_target_options(
         candidate_aliases[str(representative.get("candidateId") or "")] = evidence_candidate_ids
         scoped.append(representative)
     matches = match_option_occurrences(scoped, existing_options)
-    reserved = {str(row.get("option_id") or "") for row in existing_options if row.get("option_id")}
+    reserved = [str(row.get("option_id") or "") for row in existing_options if row.get("option_id")]
     new_candidates = [item["candidate"] for item in matches if item["status"] == "new"]
     allocated = allocate_ids("options", target, new_candidates, reserved_ids=reserved)
     new_ids: dict[str, list[str]] = defaultdict(list)
@@ -1074,6 +1178,39 @@ def _compile_target_options(
         if rpo and rpo not in applicable_rpos and len(matching_existing_ids) == 1:
             omitted_candidate_by_option_id[matching_existing_ids[0]] = candidate
     removable_option_ids = set(omitted_candidate_by_option_id)
+    for candidate in omitted_candidates:
+        rpo = str(candidate.get("rpo") or candidate.get("refOnlyRpo") or "").upper()
+        matching_existing_ids = existing_ids_by_rpo.get(rpo, [])
+        if not rpo or rpo in applicable_rpos or len(matching_existing_ids) <= 1:
+            continue
+        stable_candidate_id = option_occurrence_signature(candidate)
+        dependencies = [
+            _dependency(f"target:{target}:candidate:{stable_candidate_id}", candidate),
+            *(
+                _dependency(f"workbook:{entry['sheetName']}:{option_id}", existing_by_id[option_id])
+                for option_id in matching_existing_ids
+            ),
+        ]
+        exceptions.append(
+            _typed_exception(
+                target,
+                "options",
+                "ambiguous_deletion_identity",
+                [stable_candidate_id, rpo, sorted(matching_existing_ids)],
+                dependencies,
+                evidence_references=[stable_candidate_id],
+                proposed_rows=[
+                    {
+                        "existingId": option_id,
+                        "rpo": rpo,
+                        "values": existing_by_id[option_id],
+                    }
+                    for option_id in sorted(matching_existing_ids)
+                ],
+                question="Establish one exact target-owned option occurrence before deleting this all-unavailable source row.",
+            )
+        )
+        candidate_disposition[str(candidate.get("candidateId") or "")] = "blocked_exception"
     used_existing: set[str] = set()
     required_by_rpo = {
         str(rpo).upper(): dict(requirement)
@@ -1088,6 +1225,37 @@ def _compile_target_options(
         for row in _rows(extract, "section_master")
         if str(row.get("section_id") or "")
     }
+    copy_proposals = {
+        option_occurrence_signature(candidate): _copy_proposal(extract, comparator_model, candidate)
+        for candidate in scoped
+    }
+    proposed_name_counts = Counter(
+        " ".join(str(proposal.get("name") or "").lower().split())
+        for proposal in copy_proposals.values()
+        if str(proposal.get("name") or "").strip()
+    )
+    order_owners: dict[tuple[str, int], list[str]] = defaultdict(list)
+    next_order_by_section: dict[str, int] = defaultdict(int)
+    for existing_option in existing_options:
+        existing_section = str(existing_option.get("section_id") or "")
+        existing_order = _positive_int(existing_option.get("display_order"))
+        if not existing_section or existing_order is None:
+            continue
+        order_owners[(existing_section, existing_order)].append(
+            str(existing_option.get("option_id") or "")
+        )
+        next_order_by_section[existing_section] = max(
+            next_order_by_section[existing_section], existing_order
+        )
+
+    def allocate_display_order(section_id: str) -> int:
+        order = ((next_order_by_section[section_id] // 10) + 1) * 10
+        while (section_id, order) in order_owners:
+            order += 10
+        next_order_by_section[section_id] = order
+        order_owners[(section_id, order)].append("compile-local")
+        return order
+
     for match in matches:
         candidate = dict(match["candidate"])
         candidate_id = str(candidate.get("candidateId") or "")
@@ -1529,50 +1697,258 @@ def _compile_target_options(
                 )
             )
         statuses = model_scoped_statuses(candidate, target)
-        if (
-            not keep_inactive
-            and
-            price is None
-            and statuses
-            and {str(status.get("status") or "") for status in statuses} == {"standard"}
-        ):
-            price = 0
+        resolved_statuses = bool(statuses) and all(
+            status.get("status") in {"available", "standard", "unavailable"}
+            for status in statuses
+        )
+        any_available = any(status.get("status") == "available" for status in statuses)
+        all_standard = bool(statuses) and {str(status.get("status") or "") for status in statuses} == {"standard"}
         section_contract = section_contracts.get(section_id, {})
+        section_mode = str(section_contract.get("selection_mode") or "").strip().lower()
+        required_single = section_mode == "single_select_req"
+        default_rows = _exact_target_default_rows(extract, target, option_id, variants)
+        exact_default = len(default_rows) == 1
+        dependencies.extend(
+            _dependency(f"workbook:default_selection_rules:{row.get('rule_id')}", row)
+            for row in default_rows
+        )
+
         canonical_source = existing or ((profile_precedent or {}).get("source") or {})
-        canonical_selectable = workbook_truthy(canonical_source.get("selectable"))
-        profile_owns_selectability = bool(profile_requirement and profile_precedent)
-        standard_in_required_single = (
-            any(status.get("status") == "standard" for status in statuses)
-            and str(section_contract.get("selection_mode") or "").strip().lower()
-            in {"single", "single_select", "single-select", "single_select_req"}
-            and workbook_truthy(section_contract.get("is_required"))
-            and canonical_selectable
-        )
-        selectable = False if keep_inactive else (
-            candidate.get("rowKind") == "orderable"
-            and any(status.get("status") == "available" for status in statuses)
-            and (canonical_selectable if profile_owns_selectability else True)
-        ) or standard_in_required_single
-        source_active = any(
-            status.get("status") in {"available", "standard"} for status in statuses
-        )
-        active = False if keep_inactive else (
-            True
-            if source_active
-            else bool(workbook_truthy(existing.get("active")))
-            if existing
-            else bool(candidate.get("rowKind") == "orderable" and statuses)
-        )
         if keep_inactive:
-            price = None
-        display_order = existing.get("display_order") if existing else ""
+            active, selectable, price = False, False, None
+        elif existing:
+            active = bool(workbook_truthy(existing.get("active")))
+            selectable = bool(workbook_truthy(existing.get("selectable")))
+        else:
+            active = bool(resolved_statuses and (any_available or all_standard))
+            if section_mode == "display_only":
+                selectable = False
+            elif any_available and section_mode in {"single_select_req", "single_select_opt", "multi_select_opt"}:
+                selectable = True
+            elif all_standard and required_single and exact_default:
+                selectable = True
+            else:
+                selectable = False
+
+        behavior_compatible = resolved_statuses and (
+            (not active and not selectable and not (required_single and exact_default))
+            or (active and not selectable)
+            or (
+                active
+                and selectable
+                and section_mode != "display_only"
+                and (any_available or (all_standard and required_single and exact_default))
+            )
+        )
+        if len(default_rows) > 1 or not behavior_compatible:
+            behavior_subject = _typed_exception(
+                target,
+                "options",
+                "option_behavior_conflict",
+                [stable_candidate_id, option_id, active, selectable, len(default_rows)],
+                dependencies,
+                evidence_references=[stable_candidate_id],
+                proposed_rows=[
+                    {
+                        "optionId": option_id,
+                        "current": {
+                            "active": existing.get("active") if existing else None,
+                            "selectable": existing.get("selectable") if existing else None,
+                        },
+                        "proposed": {"active": active, "selectable": selectable},
+                        "statuses": statuses,
+                        "sectionId": section_id,
+                        "sectionMode": section_mode,
+                        "exactTargetDefaultEvidence": default_rows,
+                    }
+                ],
+                allowed_actions=(
+                    ["provide_option_behavior"]
+                    if not (all_standard and required_single and not exact_default) and len(default_rows) <= 1
+                    else []
+                ),
+                question="Resolve the incompatible target option behavior from workbook-owned evidence.",
+            )
+            exceptions.append(behavior_subject)
+            behavior_resolution = _validated_current_resolution(
+                resolution_entries_by_subject.get(behavior_subject["subjectId"], []),
+                behavior_subject,
+            )
+            if behavior_resolution and behavior_resolution.get("action") == "provide_option_behavior":
+                active = bool(behavior_resolution["payload"]["active"])
+                selectable = bool(behavior_resolution["payload"]["selectable"])
+                dependencies.append(_dependency(f"resolution:{behavior_subject['subjectId']}", behavior_resolution))
+                consumed_resolution_subjects.add(behavior_subject["subjectId"])
+            else:
+                row_status = "blocked"
+                candidate_disposition[candidate_id] = "blocked_exception"
+
+        if all_standard and not keep_inactive:
+            standard_price = None if section_mode == "display_only" else 0
+            if price not in (None, 0):
+                mandatory_subject = _typed_exception(
+                    target,
+                    "options",
+                    "mandatory_charge_candidate",
+                    [stable_candidate_id, option_id, price],
+                    dependencies,
+                    evidence_references=[stable_candidate_id],
+                    proposed_rows=[
+                        {
+                            "optionId": option_id,
+                            "currentPrice": existing.get("price") if existing else None,
+                            "sourcePrice": price,
+                            "ordinaryStandardPrice": standard_price,
+                            "sectionId": section_id,
+                            "sectionMode": section_mode,
+                        }
+                    ],
+                    allowed_actions=["confirm_mandatory_charge"],
+                    question="Confirm this target mandatory charge; the exact row must also remain allowlisted.",
+                )
+                exceptions.append(mandatory_subject)
+                mandatory_resolution = _validated_current_resolution(
+                    resolution_entries_by_subject.get(mandatory_subject["subjectId"], []),
+                    mandatory_subject,
+                )
+                if mandatory_resolution and mandatory_resolution.get("action") == "confirm_mandatory_charge":
+                    price = _int_price(mandatory_resolution["payload"]["priceValue"])
+                    dependencies.append(_dependency(f"resolution:{mandatory_subject['subjectId']}", mandatory_resolution))
+                    consumed_resolution_subjects.add(mandatory_subject["subjectId"])
+                else:
+                    row_status = "blocked"
+                    candidate_disposition[candidate_id] = "blocked_exception"
+            else:
+                price = standard_price
+
+        source_detail_raw = str(
+            candidate.get("detailRaw") if "detailRaw" in candidate else candidate.get("description") or ""
+        )
+        preserve_curated_copy = bool(
+            existing
+            and str(existing.get("detail_raw") or "") == source_detail_raw
+            and str(existing.get("option_name") or "").strip()
+        )
+        copy_subject: dict[str, Any] | None = None
+        if preserve_curated_copy:
+            option_name = str(existing.get("option_name") or "")
+            option_description = str(existing.get("description") or "")
+        else:
+            proposal = dict(copy_proposals[stable_candidate_id])
+            proposal_name = " ".join(str(proposal.get("name") or "").lower().split())
+            proposal_flags = list(proposal.get("flags") or [])
+            if proposal_name and proposed_name_counts[proposal_name] > 1:
+                proposal_flags.append(FLAG_DUPLICATE_NAME)
+            provisional_copy = {
+                "option_id": option_id,
+                "rpo": rpo,
+                "price": "",
+                "option_name": proposal.get("name") or "",
+                "description": proposal.get("description") or "",
+                "detail_raw": source_detail_raw,
+                "section_id": section_id,
+                "selectable": False,
+                "display_order": 1,
+                "active": False,
+            }
+            copy_quality = [
+                issue
+                for issue in evaluate_options_sheet_quality(
+                    target,
+                    entry["sheetName"],
+                    [provisional_copy],
+                    {section_id: section_mode},
+                )
+                if issue.check_id
+                in {
+                    "option_name_equals_description",
+                    "description_equals_detail_raw",
+                    "option_name_multiline",
+                    "option_name_too_long",
+                    "bare_lpo_option_name",
+                }
+            ]
+            material_conflict = bool((proposal.get("comparison") or {}).get("materialDisagreement"))
+            copy_blocked = (
+                material_conflict
+                or is_blocking_copy_proposal({**proposal, "flags": proposal_flags})
+                or bool(copy_quality)
+            )
+            option_name = str(proposal.get("name") or "")
+            option_description = str(proposal.get("description") or "")
+            if copy_blocked:
+                reason = "comparator_copy_conflict" if material_conflict else "copy_review_required"
+                copy_subject = _typed_exception(
+                    target,
+                    "options",
+                    reason,
+                    [stable_candidate_id, option_id, proposal_flags, [issue.check_id for issue in copy_quality]],
+                    [
+                        *dependencies,
+                        _dependency(f"target:{target}:copy:{stable_candidate_id}", candidate),
+                    ],
+                    evidence_references=[stable_candidate_id],
+                    proposed_rows=[
+                        {
+                            "optionId": option_id,
+                            "currentOptionName": existing.get("option_name") if existing else "",
+                            "currentDescription": existing.get("description") if existing else "",
+                            "proposedOptionName": option_name,
+                            "proposedDescription": option_description,
+                            "detailRaw": source_detail_raw,
+                            "comparator": proposal.get("comparator") or {"availability": "not_available"},
+                            "comparison": proposal.get("comparison") or {"availability": "not_available"},
+                            "reviewFlags": sorted(set(proposal_flags)),
+                            "qualityFlags": [issue.check_id for issue in copy_quality],
+                        }
+                    ],
+                    allowed_actions=["provide_option_copy"],
+                    question="Review the complete current, proposed, source, and comparator copy evidence.",
+                )
+                exceptions.append(copy_subject)
+                copy_resolution = _validated_current_resolution(
+                    resolution_entries_by_subject.get(copy_subject["subjectId"], []),
+                    copy_subject,
+                )
+                if copy_resolution and copy_resolution.get("action") == "provide_option_copy":
+                    option_name = str(copy_resolution["payload"]["optionName"])
+                    option_description = str(copy_resolution["payload"]["description"])
+                    dependencies.append(_dependency(f"resolution:{copy_subject['subjectId']}", copy_resolution))
+                    consumed_resolution_subjects.add(copy_subject["subjectId"])
+                else:
+                    row_status = "blocked"
+                    candidate_disposition[candidate_id] = "blocked_exception"
+
+        existing_order = _positive_int(existing.get("display_order")) if existing else None
+        existing_section = str(existing.get("section_id") or "") if existing else ""
+        if existing_order is not None and existing_section == section_id:
+            if len(order_owners[(section_id, existing_order)]) == 1:
+                display_order = existing_order
+            else:
+                display_order = existing_order
+                placement_subject = _typed_exception(
+                    target,
+                    "options",
+                    "option_placement_conflict",
+                    [section_id, existing_order, sorted(order_owners[(section_id, existing_order)])],
+                    dependencies,
+                    evidence_references=[stable_candidate_id],
+                    proposed_rows=[{"sectionId": section_id, "displayOrder": existing_order}],
+                    question="Resolve the retained curated display-order collision without renumbering other rows.",
+                )
+                exceptions.append(placement_subject)
+                row_status = "blocked"
+                candidate_disposition[candidate_id] = "blocked_exception"
+        else:
+            display_order = allocate_display_order(section_id)
+
         known = {
             "option_id": option_id,
             "rpo": rpo,
             "price": price if price is not None else "",
-            "option_name": str(candidate.get("description") or "").split(",", 1)[0].strip(),
-            "description": str(candidate.get("description") or ""),
-            "detail_raw": str(candidate.get("description") or ""),
+            "option_name": option_name,
+            "description": option_description,
+            "detail_raw": source_detail_raw,
             "section_id": section_id,
             "selectable": bool(selectable),
             "display_order": display_order,
@@ -1580,6 +1956,34 @@ def _compile_target_options(
             "display_behavior": canonical_source.get("display_behavior", ""),
         }
         values = _complete_values(entry["headers"], known)
+        if copy_subject is not None:
+            copy_evidence = copy_subject["proposedRows"][0]
+            copy_evidence.update(
+                {
+                    "targetStatuses": statuses,
+                    "behaviorEvidence": {
+                        "current": {
+                            "active": existing.get("active") if existing else None,
+                            "selectable": existing.get("selectable") if existing else None,
+                        },
+                        "proposed": {"active": bool(active), "selectable": bool(selectable)},
+                        "sectionMode": section_mode,
+                        "exactTargetDefaultEvidence": default_rows,
+                    },
+                    "placementEvidence": {
+                        "currentSectionId": existing_section,
+                        "currentDisplayOrder": existing_order,
+                        "proposedSectionId": section_id,
+                        "proposedDisplayOrder": display_order,
+                    },
+                    "priceEvidence": {
+                        "currentPrice": existing.get("price") if existing else None,
+                        "sourcePrice": candidate.get("listPrice"),
+                        "proposedPrice": known["price"],
+                        "priceMatch": price_match,
+                    },
+                }
+            )
         signature_payload = {"family": "options", "model": target, "occurrence": option_occurrence_signature({**candidate, "section_id": section_id})}
         action = "add" if not existing else "noop" if all(existing.get(key, "") == value for key, value in values.items()) else "update"
         rows.append(
@@ -3742,6 +4146,14 @@ def compile_canonical_rows(
     resolution_entries: Iterable[Mapping[str, Any]] = (),
 ) -> dict[str, Any]:
     resolution_entries = list(resolution_entries)
+    authority_bindings = dict(run_authority_fingerprint.get("bindings") or {})
+    allowlist_binding = authority_bindings.get("optionsSheetQualityAllowlist") or {}
+    expected_allowlist_sha = hashlib.sha256(DEFAULT_ALLOWLIST_PATH.read_bytes()).hexdigest()
+    if (
+        allowlist_binding.get("path") != DEFAULT_ALLOWLIST_RELATIVE_PATH.as_posix()
+        or allowlist_binding.get("sha256") != expected_allowlist_sha
+    ):
+        raise ValueError("Compiler authority does not bind the exact options-sheet quality allowlist path and bytes.")
     targets = [str(value) for value in selection.get("targets") or []]
     if not targets:
         raise ValueError("Compiler requires selected target models.")
@@ -3860,6 +4272,7 @@ def compile_canonical_rows(
             variants,
             resolution_entries,
             status_feature_index,
+            comparator_model=comparators[target],
             profile_required_options=profile["requiredOptions"],
             profile_option_precedents=profile["optionPrecedents"],
         )
@@ -4308,6 +4721,64 @@ def compile_canonical_rows(
         }
         for item in relationship_dispositions
     ]
+    quality_allowlist = load_options_sheet_quality_allowlist(DEFAULT_ALLOWLIST_PATH)
+    section_modes = {
+        str(row.get("section_id") or ""): str(row.get("selection_mode") or "")
+        for row in _rows(extract, "section_master")
+        if str(row.get("section_id") or "")
+    }
+    for target in targets:
+        option_sheet = str(registry[target]["source_option_sheet"]["sheetName"])
+        projected_by_id = {
+            str((row.get("values") or {}).get("option_id") or ""): dict(row.get("values") or {})
+            for row in manifest_rows
+            if row.get("model") == target
+            and row.get("family") == "options"
+            and row.get("action") != "delete"
+        }
+        quality_issues = evaluate_options_sheet_quality(
+            target,
+            option_sheet,
+            [projected_by_id[key] for key in sorted(projected_by_id)],
+            section_modes,
+            allowlist=quality_allowlist,
+        )
+        for issue in quality_issues:
+            projected = projected_by_id.get(issue.option_id, {})
+            dependencies = [
+                _dependency(
+                    f"authority:{DEFAULT_ALLOWLIST_RELATIVE_PATH.as_posix()}",
+                    {"path": DEFAULT_ALLOWLIST_RELATIVE_PATH.as_posix(), "sha256": expected_allowlist_sha},
+                )
+            ]
+            if projected:
+                dependencies.append(
+                    _dependency(
+                        f"projected:{target}:{option_sheet}:{issue.option_id}",
+                        projected,
+                    )
+                )
+            exceptions.append(
+                _typed_exception(
+                    target,
+                    "options",
+                    "projected_options_quality",
+                    [option_sheet, issue.option_id, issue.check_id, issue.value],
+                    dependencies,
+                    evidence_references=[issue.option_id] if issue.option_id else [],
+                    proposed_rows=[
+                        {
+                            "sheet": option_sheet,
+                            "optionId": issue.option_id,
+                            "checkId": issue.check_id,
+                            "value": issue.value,
+                            "message": issue.message,
+                            "projectedValues": projected,
+                        }
+                    ],
+                    question="Correct the projected option-sheet quality issue; it cannot be accepted generically.",
+                )
+            )
     family_coverage, family_blockers = _family_coverage(extract, targets, registry, manifest_rows)
     exceptions.extend(family_blockers)
     feature_coverage = _source_feature_ledger(

@@ -127,14 +127,103 @@ Deterministic script consuming the approved report → one changeset through the
 
 ### 4.4 Compiler fixes + regression tests
 
-Must land with tests **before any future compiler run against real data**; may proceed in parallel with 4.1–4.3 but never delays them.
+**Specification status: IMPLEMENTED AND VERIFIED (2026-07-21).** This recurrence-prevention deliverable landed with focused and full ingest regression coverage before a fresh real-source compiler characterization. It changes compiler mechanics and exception handling only; it does not introduce model-specific business rules, activate a model, write the workbook, or publish runtime data.
 
-1. `compiler.py:1552` routes name/description/detail through `copy_split.propose_copy_split`; raw text lands only in `detail_raw`.
-2. `identity.py:181` allocates sequential no-RPO ids against the reserved set.
-3. `display_order`: greenfield rows get deterministic section-local allocation; comparator ordering is surfaced only as a typed reviewer-acceptable proposal (never silently copied); blank only with an explicit typed exception.
-4. `update` actions never overwrite curated `option_name`/`description` with raw-derived text when the existing value already passes the §4.2 lint.
-5. `active`/price get decision lanes instead of silent derivation (typed exceptions where the compiler cannot decide). Price derivation encodes Sean's standard-price rule: replace the current narrow all-statuses-standard zero-fill (`compiler.py:1511–1518`) with section-aware semantics — standard row in a `display_only` section → price blank; standard row in a selectable-mode section → price 0; conflicts and mandatory-charge candidates become typed exceptions, not silent carries.
-6. Forced-branch regression tests (per the loop skill's fixture-shadowed-branch failure mode): fixtures forcing the LPO branch, `NEW!` marker, multi-line disclosure name, no-RPO id allocation, and curated-name-preservation update — proving the same input can no longer emit the §1 numbers.
+#### 4.4.1 Authoritative contract
+
+The compiler is governed by five rules. They are intentionally ordered and are the complete product contract for this deliverable:
+
+1. **Delete target-specific all-`--` rows first.** Resolve applicability before identity, copy, placement, behavior, or price. If every status cell for the selected target is `--`, delete that target's unique option occurrence and exact target-owned references without creating copy or placement review. Shared source sheets do not merge model scope: ZR1 and ZR1X are evaluated independently, and sibling-model rows/references remain intact. Ambiguous identity or ownership blocks the deletion rather than broadening it.
+2. **Preserve curated copy; propose only what changed or is new.** Apply these exact rules:
+   - Keep an existing valid `option_name` and `description` when source `detail_raw` is unchanged. For new or source-changed rows, create the best deterministic proposal: exact comparator copy when there is one unambiguous match, otherwise `copy_split.propose_copy_split()`. Preserve target source text verbatim in `detail_raw`.
+   - Measure comparator agreement with the existing `_comparator_copy_comparison()` semantics in `scripts/corvette_form_generator/ingest/options_recovery_projection.py` (extracted to a shared helper if needed): tokenize the complete target raw text and comparator `option_name`, remove `COPY_COMPARISON_STOPWORDS`, and flag a material conflict when matched comparator-name-token coverage is **less than `0.60`**.
+   - Every non-empty review flag emitted by `propose_copy_split()` is individually blocking, whether or not §4.2 also detects it. The current blocking set is `one_word_name`, `no_sentence_break`, `name_over_60_chars`, `unmatched_footnote_marker`, and `all_text_matched_disclosure`; queue-level `duplicate_proposed_name` is blocking too. Future unknown split flags fail closed rather than becoming automatic. A normalized one-word generic proposal such as `Wheels`, `Calipers`, `Seats`, `Suspension`, or `Trim` is also blocking even if an older helper path failed to attach `one_word_name`.
+   - Only proposals with no ambiguity, no material comparator conflict, no split/queue review flag, and no §4.2 copy-quality flag may proceed automatically. Any named blocker requires individual copy review and is excluded from bulk acceptance.
+3. **IDs and order are mechanical.** Preserve uniquely matched existing ids and valid existing section-local order. Allocate new blank-RPO ids deterministically from the lowest unused target-local `opt_NNN`; never emit `opt_std_<hash>`. Resolve section before order. For each new row, section move, missing order, or collision, assign the next unused positive multiple of `10` strictly above that target section's current maximum; reserve it immediately in the compile-local section set before processing the next row. Sort candidates by semantic signature before allocation so source iteration order cannot change the result, and never renumber retained target rows to make room. No row-by-row id or order decision is required; review is limited to ambiguous identity, unresolved section placement, or an actual placement conflict that cannot be resolved without changing curated placement.
+4. **Behavior and price follow workbook rules.** Apply these exact rules:
+   - A row is applicable only when all target statuses are resolved and at least one is `available` or `standard`; Rule 1 has already removed the all-unavailable case. “Exact target default evidence” means one active target-owned `default_selection_rules` row whose `target_option_id` is this option, whose `display_behavior` is `default_selected`, and whose condition and scopes are valid for the selected target. Comparator-only default evidence is not authority.
+   - Preserve existing `(active=False, selectable=False)` unless exact target default evidence conflicts by requiring that option to participate in a `single_select_req` section. Preserve existing `(active=True, selectable=False)` when the row is applicable and its section is resolved. Preserve existing `(active=True, selectable=True)` only when the section mode is not `display_only` and either at least one target status is `available`, or the row is `standard` in `single_select_req` with exact target default evidence. `(active=False, selectable=True)` is never compatible. Target source status by itself never changes an existing `active=False` or `selectable=False` to `True`; an incompatible pair creates one behavior conflict and remains unchanged until resolved.
+   - For a new applicable row with a resolved section, derive `active=True`. Derive `selectable=False` in `display_only`; derive `selectable=True` when any target status is `available` in `single_select_req`, `single_select_opt`, or `multi_select_opt`; derive `selectable=False` for ordinary all-`standard` rows. An all-`standard` row in `single_select_req` becomes selectable only with exact target default evidence; missing or ambiguous required-choice evidence blocks instead of guessing.
+   - Derive standard-equipment price only after section and behavior: blank in `display_only`; `0` in selectable-mode sections, including a supported required single-select default. Ordinary available options retain the existing exact/conditional price path. No row-by-row behavior or price decision is required; review only the conflicts defined here or a mandatory-charge candidate. Never hardcode an RPO-specific exception.
+5. **The complete projected sheet must pass before emission.** Evaluate the full desired target sheet—retained rows plus projected changes—with the §4.2 quality predicates after all deterministic work and accepted resolutions. Any unallowlisted issue or unresolved blocker keeps `compileReady=false`; `changeset_emitter.py` must refuse the ChangeSet. The compiler authority dependencies must include the repo-relative allowlist path `tests/fixtures/options-sheet-quality-allowlist.json` and that file's SHA-256. Changing either the path or content makes existing compile artifacts, subjects, and resolutions stale. Allowlist entries remain exact model/sheet/option/check/value bindings and cannot be created or widened by the compiler.
+
+These rules remove the prior requirement that every new row receive separate copy, behavior, and order decisions. Review is exception-driven: deterministic, non-conflicting work is automatic; only the conflicts named above reach an individual reviewer.
+
+Every conflict that reaches review must carry and display, without truncation, the current `option_name` and `description`, proposed `option_name` and `description`, complete target `detail_raw`, comparator copy and comparison evidence (or an explicit `not_available` value when no comparator exists), plus the exact behavior/placement/price evidence relevant to that conflict. A tooltip or truncated table cell does not satisfy this contract.
+
+The compiler policy version must be bumped so prior artifacts/resolutions cannot be silently reused under this contract.
+
+#### 4.4.2 Implementation checklist (non-authoritative)
+
+This checklist preserves the useful repo-traced file and test detail without expanding the five-rule contract. Reconfirm each touch point while implementing and omit any file that does not need to change.
+
+**Compiler and quality path**
+
+- `scripts/corvette_form_generator/ingest/wizard/canonical_rows.py`: bump `COMPILER_POLICY_VERSION`.
+- `scripts/corvette_form_generator/ingest/wizard/parser.py`: retain the exact source Description text for `detail_raw` and evidence/fingerprints while preserving the cleaned working value used for matching/parsing.
+- `scripts/corvette_form_generator/ingest/wizard/copy_split.py`: reuse the full-target comparator material-comparison and split helpers; preserve existing `LPO`, `NEW!`, disclosure, and raw-detail behavior.
+- `scripts/corvette_form_generator/ingest/wizard/identity.py`: deterministic target-local `opt_NNN` reservation/allocation with explicit ambiguity, collision, and exhaustion failure.
+- `scripts/corvette_form_generator/ingest/wizard/compiler.py`: apply the five rules in order; remove the first-comma/full-raw copy assignment and pre-section all-standard zero-fill.
+- `scripts/corvette_form_generator/options_sheet_quality.py`: expose a pure full-row-set evaluator shared by workbook lint and compiler while keeping the CLI/report schema stable; pass the exact allowlist path and SHA into compiler authority dependencies.
+- `scripts/corvette_form_generator/ingest/wizard/changeset_emitter.py`: preserve the existing ready/empty-blocker fail-closed boundary.
+
+**Exception and review path**
+
+- Reuse the existing exception schema where possible. Add or adjust typed reasons in `scripts/corvette_form_generator/ingest/wizard/exceptions.py` and their consumers in `scripts/corvette_form_generator/ingest/wizard/session.py` only for actual ambiguous/conflicting copy, identity/placement, behavior/price, or quality blockers.
+- Update `visualizer/ingest-wizard/wizard.js` and `visualizer/ingest-wizard/wizard.css` to satisfy the mandatory untruncated evidence contract in §4.4.1. The browser must not create per-row review cards for deterministic ids, orders, behavior, prices, or unflagged copy proposals.
+- A stale resolution or a resolution that still fails the projected-sheet gate reopens/remains blocking; there is no generic “accept quality issue” action.
+
+**Regression proof**
+
+- Add focused coverage in `tests/test_ingest_wizard_parser.py`, `tests/test_ingest_wizard_copy_split.py`, `tests/test_ingest_wizard_identity.py`, `tests/test_ingest_wizard_exceptions.py`, `tests/test_ingest_wizard_canonical_rows.py`, `tests/test_ingest_wizard_canonical_compiler.py`, `tests/test_ingest_wizard_exception_flow.py`, `tests/test_ingest_wizard_changeset.py`, `tests/test_ingest_wizard_ui_milestone2.py`, `tests/test_ingest_wizard_server.py`, and `tests/test_options_sheet_quality.py` as each surface requires.
+- Forced branches cover: shared-sheet target-specific all-`--` deletion; curated-copy preservation; comparator coverage exactly at `0.60` and immediately below it; every current split flag (`one_word_name`, `no_sentence_break`, `name_over_60_chars`, `unmatched_footnote_marker`, `all_text_matched_disclosure`); queue-level `duplicate_proposed_name`; an unflagged generic one-word proposal from an older helper path; deterministic blank-RPO ids; multiple same-section allocations proving immediate order reservation; preserved inactive curated behavior despite available source status; each new-row behavior branch; display-only/selectable-section standard prices; mandatory-charge review; allowlist-authority staleness; and full-sheet quality refusal.
+- Assert deterministic work creates no individual review subject. Assert every split/queue flag and every generic one-word proposal creates an individual blocker and cannot enter an automatic or bulk-accept path. Assert source status never silently reactivates or makes an existing row selectable, invalid existing combinations block unchanged, and only ambiguity/material conflict/copy-review/quality flags and mandatory charges block. Changing the bound allowlist path or bytes must stale the prior artifact and resolutions. A second identical compile with unchanged authority dependencies must produce identical row values and semantic fingerprints.
+- Assert no ready row has invalid copy, `opt_std_<hash>`, blank/colliding active-row order, invalid standard price, or altered non-target ownership; exact source text remains in `detail_raw`.
+
+#### 4.4.3 Validation and stop conditions
+
+Run, in order:
+
+```sh
+PYTHONPATH=scripts:tests .venv/bin/python -m pytest \
+  tests/test_ingest_wizard_parser.py \
+  tests/test_ingest_wizard_copy_split.py \
+  tests/test_ingest_wizard_identity.py \
+  tests/test_ingest_wizard_exceptions.py \
+  tests/test_ingest_wizard_canonical_rows.py \
+  tests/test_ingest_wizard_canonical_compiler.py \
+  tests/test_ingest_wizard_exception_flow.py \
+  tests/test_ingest_wizard_changeset.py \
+  tests/test_ingest_wizard_ui_milestone2.py \
+  tests/test_ingest_wizard_server.py \
+  tests/test_options_sheet_quality.py -q
+
+PYTHONPATH=scripts:tests .venv/bin/python -m pytest tests/test_ingest_wizard*.py -q
+
+PYTHONPATH=scripts .venv/bin/python -m corvette_form_generator.options_sheet_quality \
+  --workbook stingray_master.xlsx \
+  --allowlist tests/fixtures/options-sheet-quality-allowlist.json --json
+
+git diff --check
+```
+
+Then start the documented browser-first wizard and create a **fresh** ignored run (the historical run has downstream evidence and must not be reused):
+
+```sh
+.venv/bin/python scripts/ingest_wizard_server.py --port 8040
+```
+
+Bind the characterization to source `/Users/seandm/Projects/27vette/2027 Chevrolet Car Corvette Export (4) (1).xlsx`, expected SHA-256 `6ac9538d5bb8a823ade9afea70b2654057b793e1cf27c081c088545aa3add8a1`; reuse the exact sheet roles recorded by run `20260717-091317-470292`; select targets `grand_sport_x`, `zr1`, `zr1x` with comparators `grand_sport`, `z06`, `z06`. Compile against the repaired canonical workbook read-only and record deterministic-row counts, individual-review counts by genuine conflict class, and projected full-sheet quality. Do not emit or apply a ChangeSet.
+
+The real-source reprocess passes only when curated copy is preserved, deterministic rows avoid individual review, and every residual subject is a contract-defined conflict. The disposable greenfield fixture passes only when it emits no bad ready row. Both must preserve the source binding and perform no canonical workbook write.
+
+Stop and reopen this spec rather than implementing around the problem if the compiler cannot evaluate the complete desired sheet before readiness or target-owned deletion references cannot be separated between ZR1 and ZR1X. Do not add a model-specific Python exception, weaken the quality gate, force deterministic rows through individual review, bulk-accept a material disagreement, activate a model, or write/publish runtime data to make the tests pass.
+
+**Implementation receipt (2026-07-21):** compiler policy `options-recurrence-prevention-4.4-v1` implements the five-rule contract across `canonical_rows.py`, `parser.py`, `copy_split.py`, `identity.py`, `compiler.py`, `options_sheet_quality.py`, `exceptions.py`, `session.py`, and the ingest-wizard browser. The implementation preserves exact source `detail_raw`, keeps unchanged curated copy, applies the shared `0.60` comparator materiality test, fails closed on all split/queue/quality flags, allocates deterministic target-local ids and section orders, preserves workbook-authoritative behavior, deletes uniquely owned target-specific all-unavailable rows and references, binds the exact quality allowlist path/SHA to authority, and evaluates the complete projected Options sheet before readiness. Copy review cards expose current/proposed copy, complete target raw text, explicit comparator availability/comparison, target statuses, behavior/default, placement/order, and price evidence; browser verification on ZR1 J6O confirmed blank values are explicit and the reviewed-copy fields are populated without truncation.
+
+Validation passed: the focused §4.4 command reports **200 passed, 30 subtests passed**; the final focused compiler/exception/browser rerun reports **92 passed, 7 subtests passed**; the full ingest gate reports **320 passed, 38 subtests passed**; the canonical Options-sheet quality CLI reports `passed` with zero issues; Python compilation, `node --check`, and `git diff --check` pass. Fresh ignored run `20260721-015032-c8e3df` is bound to source SHA-256 `6ac9538d5bb8a823ade9afea70b2654057b793e1cf27c081c088545aa3add8a1`, uses the recorded 20260717 roles and requested GSX/ZR1/ZR1X comparator selection, and produces identical semantic fingerprints on repeated compile. It projects 653 option rows (GSX 239, ZR1 207, ZR1X 207), with 593 ready and 60 blocked; all 278 residual subjects are named contract conflicts, including 23 individual copy reviews and 22 projected-quality blockers (`standard_option_nonzero_price` 20, aggregate stub-name band 2). No ChangeSet was emitted. Receipt: `form-output/ingest-wizard/20260721-015032-c8e3df/4.4-real-source-characterization.json`.
+
+Protected surfaces remained byte-identical through the pass: `stingray_master.xlsx` SHA-256 `31764a718a29f1705961674d97de821e1474f97a4234209fef3a4fe2bce8ece3`; `form-app/data.js` SHA-256 `2848de3842575972a1191c1030d69d16b5be3da7cbd3c10ff37ad0c088f11dd7`. No workbook write, generation, publication, promotion, deployment, or dealer-submission change occurred. Residual risk is limited to the deliberately open, individually reviewable real-source conflicts; resolving them is future review work and is not implied by this implementation pass.
 
 ## 5. Explicitly not done
 

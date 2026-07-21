@@ -154,8 +154,36 @@ class IdentityContractTest(unittest.TestCase):
         by_signature = lambda rows: {row["semanticSignature"]: row["allocatedId"] for row in rows}
 
         self.assertEqual(by_signature(first), by_signature(second))
-        self.assertTrue(all(identifier.startswith("opt_std_") for identifier in by_signature(first).values()))
-        self.assertEqual(len(set(by_signature(first).values())), 2)
+        self.assertEqual(set(by_signature(first).values()), {"opt_001", "opt_002"})
+
+    def test_new_no_rpo_ids_use_lowest_unused_target_local_number(self) -> None:
+        candidate = {**self.candidate("", "Air filtration system"), "rowKind": "standard_no_rpo"}
+
+        result = allocate_ids(
+            "options",
+            "grand_sport_x",
+            [candidate],
+            reserved_ids={"opt_001", "opt_003", "opt_abc_001"},
+        )
+
+        self.assertEqual(result[0]["allocatedId"], "opt_002")
+
+    def test_option_id_collision_and_exhaustion_fail_explicitly(self) -> None:
+        candidate = {**self.candidate("", "Air filtration system"), "rowKind": "standard_no_rpo"}
+        with self.assertRaisesRegex(ValueError, "collision"):
+            allocate_ids(
+                "options",
+                "grand_sport_x",
+                [candidate],
+                reserved_ids=["opt_001", "opt_001"],
+            )
+        with self.assertRaisesRegex(ValueError, "exhausted"):
+            allocate_ids(
+                "options",
+                "grand_sport_x",
+                [candidate],
+                reserved_ids=[f"opt_{number:03d}" for number in range(1, 1000)],
+            )
 
     def test_non_option_id_format_is_stable_and_model_local(self) -> None:
         first = deterministic_family_id("rule_mapping", "zr1", {"sourceRpo": "PDB", "ruleType": "requires", "targetRpo": "PEF"})

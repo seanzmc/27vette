@@ -14,7 +14,7 @@ import re
 from collections.abc import Iterable, Mapping
 from typing import Any
 
-COMPILER_POLICY_VERSION = "milestone-2-1-v1"
+COMPILER_POLICY_VERSION = "options-recurrence-prevention-4.4-v1"
 CANONICAL_ROWS_SCHEMA = "canonical-rows-1"
 EXCEPTION_QUEUE_SCHEMA = "exception-queue-1"
 COMPILE_REPORT_SCHEMA = "compile-report-1"

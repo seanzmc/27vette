@@ -135,6 +135,40 @@ def test_quality_lint_reports_stub_count_above_reference_band(tmp_path: Path) ->
     assert issue.row is None
 
 
+def test_pure_quality_evaluator_grades_complete_projected_rows_without_workbook_io() -> None:
+    from corvette_form_generator.options_sheet_quality import evaluate_options_sheet_quality
+
+    row = dict(zip(OPTION_HEADERS, _valid_row(option_name="LPO")))
+    issues = evaluate_options_sheet_quality(
+        "zr1",
+        "zr1_options",
+        [row],
+        {"sec_std_001": "display_only"},
+    )
+
+    assert {issue.check_id for issue in issues} == {"bare_lpo_option_name"}
+    assert issues[0].option_id == "opt_001"
+
+
+def test_pure_quality_evaluator_reports_each_active_section_order_collision() -> None:
+    from corvette_form_generator.options_sheet_quality import evaluate_options_sheet_quality
+
+    rows = [
+        dict(zip(OPTION_HEADERS, _valid_row(option_id="opt_001", option_name="First package"))),
+        dict(zip(OPTION_HEADERS, _valid_row(option_id="opt_002", option_name="Second package"))),
+    ]
+
+    issues = evaluate_options_sheet_quality(
+        "zr1",
+        "zr1_options",
+        rows,
+        {"sec_std_001": "display_only"},
+    )
+
+    collisions = [issue for issue in issues if issue.check_id == "active_display_order_collision"]
+    assert {issue.option_id for issue in collisions} == {"opt_001", "opt_002"}
+
+
 def test_quality_allowlist_requires_exact_value_and_reason(tmp_path: Path) -> None:
     from corvette_form_generator.options_sheet_quality import lint_options_sheet_quality
 

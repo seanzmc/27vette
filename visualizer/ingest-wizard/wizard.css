@@ -202,6 +202,7 @@ tr.evidence-row td { background: var(--panel-2); }
 }
 .decision-preview { border: 1px solid var(--accent); border-radius: 8px; padding: 12px; margin-top: 10px; }
 .decision-preview h3 { margin: 0 0 8px; }
+.copy-evidence-field textarea { min-height: 7rem; white-space: pre-wrap; overflow: visible; resize: vertical; }
 .preview-summary { font-size: 15px; margin: 0 0 6px; }
 .exact-effects { margin-top: 10px; }
 .effect-row { min-width: 0; border-top: 1px solid var(--line); padding-top: 8px; margin-top: 8px; }

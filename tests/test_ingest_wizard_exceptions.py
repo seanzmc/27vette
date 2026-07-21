@@ -190,6 +190,49 @@ class ExceptionContractTest(unittest.TestCase):
                     self.subject,
                 )
 
+    def test_option_copy_behavior_and_mandatory_charge_payloads_are_strict(self) -> None:
+        cases = [
+            (
+                "copy_review_required",
+                "provide_option_copy",
+                {"optionName": "Carbon Fiber Wheels", "description": "Visible weave"},
+            ),
+            (
+                "option_behavior_conflict",
+                "provide_option_behavior",
+                {"active": True, "selectable": False},
+            ),
+            (
+                "mandatory_charge_candidate",
+                "confirm_mandatory_charge",
+                {"priceValue": 995},
+            ),
+        ]
+        for reason, action, payload in cases:
+            with self.subTest(reason=reason):
+                subject = dict(self.subject, reasonCode=reason, allowedActions=[action])
+                validate_resolution(
+                    {
+                        "subjectId": subject["subjectId"],
+                        "subjectVersion": subject["subjectVersion"],
+                        "action": action,
+                        "payload": payload,
+                        "disposition": "resolved",
+                    },
+                    subject,
+                )
+                with self.assertRaises(ValueError):
+                    validate_resolution(
+                        {
+                            "subjectId": subject["subjectId"],
+                            "subjectVersion": subject["subjectVersion"],
+                            "action": action,
+                            "payload": {**payload, "unexpected": True},
+                            "disposition": "resolved",
+                        },
+                        subject,
+                    )
+
     def test_action_disposition_pairs_fail_closed(self) -> None:
         section_subject = dict(
             self.subject,

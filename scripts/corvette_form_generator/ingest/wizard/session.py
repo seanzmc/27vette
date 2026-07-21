@@ -80,6 +80,10 @@ from corvette_form_generator.ingest.wizard.profiler import (
     canonical_option_sheet_eligible,
     profile_workbook,
 )
+from corvette_form_generator.options_sheet_quality import (
+    DEFAULT_ALLOWLIST_PATH,
+    DEFAULT_ALLOWLIST_RELATIVE_PATH,
+)
 
 STATE_PROFILED = "profiled"
 STATE_ROLES_CONFIRMED = "roles_confirmed"
@@ -883,6 +887,7 @@ class WizardSessionStore:
             "priceRows": run_dir / "price-rows.json",
             "joinReport": run_dir / "join-report.json",
             "modelSelection": run_dir / "model-selection.json",
+            "optionsQualityAllowlist": DEFAULT_ALLOWLIST_PATH,
         }
         missing = [label for label, path in input_paths.items() if not path.is_file()]
         if missing:
@@ -912,6 +917,10 @@ class WizardSessionStore:
         authority_bindings = {
             "compilerPolicyVersion": COMPILER_POLICY_VERSION,
             "files": before,
+            "optionsSheetQualityAllowlist": {
+                "path": DEFAULT_ALLOWLIST_RELATIVE_PATH.as_posix(),
+                "sha256": before["optionsQualityAllowlist"]["sha256"],
+            },
             "modelWorkbookSources": source_role_rows,
             "rulePhraseMap": phrase_rows,
         }
@@ -1235,6 +1244,15 @@ class WizardSessionStore:
             } and proposal_catalog_complete:
                 projectable.append(action)
             elif action == "retain_existing" and reason == "ambiguous_existing_identity":
+                projectable.append(action)
+            elif action == "provide_option_copy" and reason in {
+                "copy_review_required",
+                "comparator_copy_conflict",
+            }:
+                projectable.append(action)
+            elif action == "provide_option_behavior" and reason == "option_behavior_conflict":
+                projectable.append(action)
+            elif action == "confirm_mandatory_charge" and reason == "mandatory_charge_candidate":
                 projectable.append(action)
             elif action == "provide_typed_value" and reason in {
                 "unresolved_price_scope",

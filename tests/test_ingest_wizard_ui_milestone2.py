@@ -71,6 +71,9 @@ def test_exception_cards_use_typed_controls_evidence_and_lifecycle_api() -> None
         "choose_section",
         "choose_relationship",
         "retain_existing",
+        "provide_option_copy",
+        "provide_option_behavior",
+        "confirm_mandatory_charge",
         "provide_typed_value",
         "approve_removal",
         "mark_not_applicable",
@@ -123,6 +126,15 @@ def test_exception_cards_use_typed_controls_evidence_and_lifecycle_api() -> None
     assert 'name="defaultDisplayBehavior"' in js
     assert 'displayBehavior: displayBehavior === "__blank__" ? "" : displayBehavior' in js
     assert 'reasonCode === "comparator_only_price_rule_proposal"' in js
+    assert 'name="optionName"' in js
+    assert 'name="description"' in js
+    assert 'name="active"' in js
+    assert 'name="selectable"' in js
+    assert ".copy-evidence-field textarea" in css
+    assert "Object.entries(values).slice" not in js
+    assert 'if (value === "" || value === null || value === undefined) return "blank";' in js
+    assert '"currentDescription"' in js
+    assert "requiredConflictFields.has(key)" in js
 
 
 def test_exception_layout_has_mobile_single_column_fallback() -> None:

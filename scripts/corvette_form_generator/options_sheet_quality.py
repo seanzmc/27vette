@@ -19,6 +19,8 @@ ALLOWLIST_SCHEMA_VERSION = "options-sheet-quality-allowlist-1"
 HASH_OPTION_ID_RE = re.compile(r"^opt_std_[0-9a-f]{16,}$")
 MAX_OPTION_NAME_LENGTH = 60
 MAX_REFERENCE_STUB_COUNT = 6
+DEFAULT_ALLOWLIST_RELATIVE_PATH = Path("tests/fixtures/options-sheet-quality-allowlist.json")
+DEFAULT_ALLOWLIST_PATH = Path(__file__).resolve().parents[2] / DEFAULT_ALLOWLIST_RELATIVE_PATH
 
 
 @dataclass(frozen=True)
@@ -76,7 +78,7 @@ def _section_modes(wb: Any) -> dict[str, str]:
     }
 
 
-def _load_allowlist(path: str | Path | None) -> list[dict[str, Any]]:
+def load_options_sheet_quality_allowlist(path: str | Path | None) -> list[dict[str, Any]]:
     if path is None:
         return []
     payload = json.loads(Path(path).read_text(encoding="utf-8"))
@@ -235,51 +237,99 @@ def _row_issues(
     return issues
 
 
+def evaluate_options_sheet_quality(
+    model: str,
+    sheet: str,
+    rows: Iterable[Mapping[str, Any] | tuple[int, Mapping[str, Any]]],
+    section_modes: Mapping[str, str],
+    *,
+    allowlist: Iterable[Mapping[str, Any]] = (),
+) -> list[QualityIssue]:
+    """Evaluate a complete desired option-sheet row set without workbook I/O."""
+
+    allowlist = list(allowlist)
+    issues: list[QualityIssue] = []
+    short_rows: list[tuple[int, Mapping[str, Any]]] = []
+    active_order_rows: dict[tuple[str, str], list[tuple[int, Mapping[str, Any]]]] = {}
+    for index, item in enumerate(rows, start=2):
+        if isinstance(item, tuple):
+            row_number, row = item
+        else:
+            row_number, row = index, item
+        issues.extend(_row_issues(model, sheet, row_number, row, section_modes))
+        section_id = clean(row.get("section_id"))
+        display_order = clean(row.get("display_order"))
+        if truthy(row.get("active")) and section_id and display_order:
+            active_order_rows.setdefault((section_id, display_order), []).append((row_number, row))
+        option_name = clean(row.get("option_name"))
+        if option_name and len(option_name) <= 12:
+            short_issue = _issue(
+                "short_option_name",
+                model,
+                sheet,
+                row_number,
+                row,
+                option_name,
+                "short option name",
+            )
+            if not _is_allowed(short_issue, allowlist):
+                short_rows.append((row_number, row))
+    if len(short_rows) > MAX_REFERENCE_STUB_COUNT:
+        issues.append(
+            QualityIssue(
+                check_id="stub_name_count_exceeds_reference_band",
+                model=model,
+                sheet=sheet,
+                row=None,
+                option_id="",
+                rpo="",
+                value=len(short_rows),
+                message=(
+                    f"{len(short_rows)} unallowlisted option names are 12 characters or shorter; "
+                    f"reference maximum is {MAX_REFERENCE_STUB_COUNT}"
+                ),
+            )
+        )
+    for (section_id, display_order), collisions in sorted(active_order_rows.items()):
+        if len(collisions) < 2:
+            continue
+        for row_number, row in collisions:
+            issues.append(
+                _issue(
+                    "active_display_order_collision",
+                    model,
+                    sheet,
+                    row_number,
+                    row,
+                    {"sectionId": section_id, "displayOrder": display_order},
+                    "active options share a section-local display_order",
+                )
+            )
+    return [issue for issue in issues if not _is_allowed(issue, allowlist)]
+
+
 def lint_options_sheet_quality(
     workbook_path: str | Path,
     *,
     allowlist_path: str | Path | None = None,
 ) -> list[QualityIssue]:
     workbook_path = Path(workbook_path)
-    allowlist = _load_allowlist(allowlist_path)
+    allowlist = load_options_sheet_quality_allowlist(allowlist_path)
     wb = load_workbook(workbook_path, read_only=True, data_only=True)
     try:
         section_modes = _section_modes(wb)
         issues: list[QualityIssue] = []
         for model, sheet in _source_option_sheets(wb):
-            short_rows: list[tuple[int, Mapping[str, Any]]] = []
-            for row_number, row in _records(wb[sheet]):
-                issues.extend(_row_issues(model, sheet, row_number, row, section_modes))
-                option_name = clean(row.get("option_name"))
-                if option_name and len(option_name) <= 12:
-                    short_issue = _issue(
-                        "short_option_name",
-                        model,
-                        sheet,
-                        row_number,
-                        row,
-                        option_name,
-                        "short option name",
-                    )
-                    if not _is_allowed(short_issue, allowlist):
-                        short_rows.append((row_number, row))
-            if len(short_rows) > MAX_REFERENCE_STUB_COUNT:
-                issues.append(
-                    QualityIssue(
-                        check_id="stub_name_count_exceeds_reference_band",
-                        model=model,
-                        sheet=sheet,
-                        row=None,
-                        option_id="",
-                        rpo="",
-                        value=len(short_rows),
-                        message=(
-                            f"{len(short_rows)} unallowlisted option names are 12 characters or shorter; "
-                            f"reference maximum is {MAX_REFERENCE_STUB_COUNT}"
-                        ),
-                    )
+            issues.extend(
+                evaluate_options_sheet_quality(
+                    model,
+                    sheet,
+                    _records(wb[sheet]),
+                    section_modes,
+                    allowlist=allowlist,
                 )
-        return [issue for issue in issues if not _is_allowed(issue, allowlist)]
+            )
+        return issues
     finally:
         wb.close()
 
