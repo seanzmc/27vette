@@ -1,8 +1,8 @@
 # 7-20 Compounded Repair Spec — GSX / ZR1 / ZR1X Options Sheets
 
-Status: IN PROGRESS — Deliverables 4.1–4.3 and Checkpoint 2 are complete as of 2026-07-20. The exact approved repair is applied and validated in the canonical workbook; §4.4 compiler prevention remains next. No activation, promotion, registry publication, runtime deployment, or dealer change has occurred.
+Status: COMPLETE — The approved repair is applied and validated in the canonical workbook, and §4.4 recurrence prevention is implemented and verified as compiler policy `options-recurrence-prevention-4.4-v2`. The accepted canonical workbook is the source for the direct promotion handoff in §8. No activation, promotion, registry publication, runtime deployment, or dealer change has occurred.
 Supersedes-for-execution: `docs/ingest/options-sheet-quality-remediation-spec.md` (Fable draft) and the recovery plan in `docs/ingest/gpt-auditFindings_7-20.md` (Codex audit). This spec merges the strongest parts of both; the two source docs remain evidence.
-Scope: `grand_sport_x_options`, `zr1_options`, `zr1x_options` plus only the referential cascade forced by option-id changes. Promotion, registry, runtime, `form-app`, and dealer surfaces are out of scope.
+Scope: `grand_sport_x_options`, `zr1_options`, `zr1x_options` plus only the referential cascade forced by option-id changes. Promotion, registry, runtime, `form-app`, and dealer surfaces were out of scope for the repair; §8 records the bounded handoff without authorizing those changes.
 
 ## 0. Synthesis rationale (what was taken from where)
 
@@ -235,9 +235,9 @@ Protected surfaces remained byte-identical through the pass: `stingray_master.xl
 - No non-options sheet content cleanup beyond the id cascade.
 - No broad copy-standards project beyond the reference-proven predicates.
 
-## 6. Open item for Sean (from both audits)
+## 6. Resolved authorization record
 
-Commit `281eb14` wrote `stingray_master.xlsx` with no run receipt, against Milestone 3's no-live-write status line. Needs Sean's confirmation on whether that write was separately authorized — independent of this repair.
+Commit `281eb14` was separately authorized through the approved Task 9 ChangeSet and scratch-generation path. The later options-recovery ChangeSet was also explicitly approved and applied with its own receipt. These completed writes are accepted history and are not reopened by compiler-policy changes or promotion qualification.
 
 ## 7. Done means
 
@@ -247,3 +247,24 @@ Commit `281eb14` wrote `stingray_master.xlsx` with no run receipt, against Miles
 - Every `choose_section` decision reconciled: matches the workbook or has a recorded override.
 - Compiler regression tests prove the §1 numbers cannot recur.
 - No promotion/registry/runtime/dealer surface changed.
+
+## 8. Direct handoff to runtime promotion
+
+The repaired canonical workbook is the accepted product-data source for Grand Sport X, ZR1, and ZR1X promotion. Promotion qualification must not rerun raw ingest, replay the prior ChangeSets, reopen compiler exception queues, or request renewed approval for unchanged workbook rows merely because compiler policy, artifact ids, subject ids, or subject versions changed. Policy v2 governs future ingest compilation and does not retroactively revoke the reviewed canonical workbook.
+
+The remaining path is one bounded sequence:
+
+1. **One scratch rebuild from the current canonical workbook.** Temporarily activate only the three targets in an isolated workbook copy, regenerate their runtime contracts, and compare them with the canonical workbook and the prior contracts. Do not modify `stingray_master.xlsx` or `form-app/data.js` during this proof.
+2. **Automated qualification.** Require package/schema/Boolean and Options-sheet quality gates, clean runtime-contract validation, exact variants, nonzero selectable choices, rule/default/group/price semantic agreement, and preserved Stingray/Grand Sport/Z06/dealer behavior. Reopen product review only for a concrete material discrepancy in the generated output; do not treat a new compiler queue as a discrepancy.
+3. **One atomic promotion proposal.** Present only the activation/publication diff: target `model_master`, `variant_master`, `model_variants`, exact `model_workbook_sources`, `model_registry_promotion`, required model-card assets, and the three regenerated runtime contracts. The promotion writer must validate before replacement or restore the backup on any post-save failure.
+4. **One explicit promotion approval, then publication.** After approval, apply the exact promotion diff through the guarded workbook-save path, regenerate the registry, review the published diff, and run model switching plus affected customer workflows. Promotion does not authorize dealer endpoint, payload, Turnstile, or submission-UX changes.
+
+Generated contracts are rebuilt once after the last canonical workbook change. Unchanged product decisions remain approved. A failed automated gate may reopen only the exact conflicting workbook/runtime fact, not the complete ingest review.
+
+**Qualification progress receipt (2026-07-21):** the first isolated rebuild exposed one concrete canonical/runtime mismatch: five already-authorized default-selectability values had not been carried into the workbook, and fourteen ZR1/ZR1X included-option price cells were blank instead of explicit zero. The exact 19-cell correction was applied through the guarded workbook writer with backup `backups/stingray_master-20260721-112859.xlsx`; exact readback, workbook package, schema, Boolean-hygiene, and Options-sheet quality checks passed with zero issues. No product decision was reopened.
+
+The required post-correction scratch rebuild then passed for all three models from canonical workbook SHA-256 `336f5b4447e553b9f021f2a8c649f4b68e7603bb14efb386f47cdb534a1aa1cd`. Grand Sport X, ZR1, and ZR1X emitted clean runtime contracts with zero validation errors and respectively 150, 103, and 103 selectable option rows. Grand Sport X defaults `BC7` and `EFR` are selectable while display-only `T0E` is fixed. ZR1 and ZR1X default `EFR` is selectable; included `B6P`, `ZZ3`, `D3V`, `SL9`, `C2Z`, `CFV`, and `DY0` rows emit `base_price: 0` in fixed/non-selectable standard state. The scratch registry contains exactly the three target models.
+
+**Asset qualification receipt (2026-07-21):** nine exact `asset_map` rows were applied through the guarded workbook writer with backup `backups/stingray_master-20260721-114927.xlsx`: the three model cards, Grand Sport body-style reuse for Grand Sport X, and the supplied ZR1/ZR1X coupe/convertible primary-plus-hover assets. Exact readback, schema, Boolean hygiene, URL availability, sheet inspection, and isolated generation passed. All three model-card URLs load through the registry asset loader; all six body-style cards appear in their generated runtime contracts; every target contract reports zero validation errors. The report-only asset sync made no workbook change; because the three models remain inactive, its current target inventory labels these pre-promotion rows `stale_target`, which is expected pre-promotion report noise rather than asset invalidity. Canonical activation, registry publication, `form-app/data.js`, deployment, and dealer behavior remain untouched. The remaining promotion proposal must prove the atomic promotion writer's pre-save validation/rollback behavior before approval.
+
+**Atomic promotion-proposal receipt (2026-07-21):** `scripts/promote_model.py` now accepts repeated `--model` flags as one batch, activates every target `model_workbook_sources` row, verifies the complete candidate on a scratch workbook before canonical replacement, and restores the validated backup if post-save verification fails. Focused regressions prove source activation, preflight no-write behavior, exact rollback, and CLI atomic routing. The real no-write proposal for Grand Sport X, ZR1, and ZR1X passes with exactly 82 cell changes across five workbook sheets: 8 `model_master`, 13 `model_registry_promotion`, 14 `model_variants`, 33 `model_workbook_sources`, and 14 `variant_master`. A disposable exact write of that proposal passed preflight, post-save verification, package/schema validation, generator discovery for all six active models, and zero-error contract generation for all three targets with their body-style assets. The canonical workbook and `form-app/data.js` were not promoted or published. This exact 82-cell activation proposal is the remaining explicit promotion-approval boundary.

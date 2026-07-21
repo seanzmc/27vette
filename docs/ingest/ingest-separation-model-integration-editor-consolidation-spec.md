@@ -352,6 +352,14 @@ Workbook integration does not itself activate the models publicly. Registry publ
 - Existing Stingray, Grand Sport, Z06, and dealer behavior remain unchanged.
 - The owning Milestone 3 and this spec record exact completion evidence and residual risk.
 
+#### Direct runtime-promotion handoff
+
+Phase 2 established the canonical workbook as the accepted source for Grand Sport X, ZR1, and ZR1X. Runtime promotion is not another ingest phase. Do not rerun raw ingest, replay an applied ChangeSet, reopen compiler exceptions, or ask for renewed approval of unchanged canonical rows solely because compiler policy or artifact identity changed.
+
+Promotion qualification consists of one scratch regeneration from the latest canonical workbook, automated workbook/runtime semantic comparison, one atomic activation/publication diff, and one explicit promotion approval. Only a concrete material mismatch from the scratch generation may reopen the exact affected product fact. The promotion diff must include every required target source registration and must be rollback-safe before any canonical write. Model-card assets are part of the customer-facing promotion packet. Existing models and dealer-submission behavior remain protected.
+
+The detailed executable handoff is owned by `docs/ingest/7-20_compounded-repair-spec.md` §8; this document does not duplicate its checklist.
+
 ### Phase 3 — Consolidate to one workbook editor
 
 #### Goal
@@ -494,5 +502,5 @@ This section is updated in place as work completes. It is not a prompt to create
   workbook, and generated the three inactive target contracts through the
   approved scratch-activation path. Publication and promotion remain separate.
 - Phase 3 — blocked by successful three-model workbook integration and shared-service stability.
-- Runtime publication/promotion — separate approval after Phase 2.
+- Runtime publication/promotion — the current-workbook scratch rebuild passed on 2026-07-21 after one exact 19-cell guarded workbook correction, and the three model cards plus six body-style asset rows are now workbook-authored and generation-proven. The rollback-safe atomic writer proof and exact 82-cell three-model no-write proposal now pass. The remaining boundary is one explicit approval of that activation proposal, followed by the write, target regeneration, registry publication, and affected runtime checks. No ingest replay.
 - Dealer submission changes — not authorized and not implied.

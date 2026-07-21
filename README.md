@@ -162,13 +162,14 @@ Model refresh (from repo root, venv python):
 
 The Stingray run also writes compatibility outputs (`form-output/stingray-form-data.json/.csv`); all models write clean runtime contracts under `form-output/runtime/`. Add `--emit-inspection --inspection-output <dir>` for optional review artifacts. Generator runs never mutate `form-app/data.js` directly; `generate_registry.py` publishes the promoted registry.
 
-Promotion verify/reapply (workbook-owned; only when promotion metadata changes):
+Promotion verify/reapply (workbook-owned; repeat `--model` to validate and write one atomic multi-model batch):
 
 ```sh
-.venv/bin/python scripts/promote_model.py --model <key> --write
+.venv/bin/python scripts/promote_model.py --model <key> [--model <key> ...]
+.venv/bin/python scripts/promote_model.py --model <key> [--model <key> ...] --write
 ```
 
-then regenerate the model + registry and run that model's tests plus `multi-model-runtime-switching`.
+The first command is the no-write preflight/proposal. Run `--write` only after the exact promotion is approved; the writer validates a scratch candidate before replacement and restores its backup if post-save verification fails. Then regenerate each promoted model + registry and run those models' tests plus `multi-model-runtime-switching`.
 
 ## Validation
 
