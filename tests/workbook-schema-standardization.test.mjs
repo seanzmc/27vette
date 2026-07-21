@@ -167,8 +167,8 @@ test("LZ_Interiors is schema-compatible but not read by Stingray generation", ()
 test("future Corvette model metadata is scaffolded against shared LZ interiors", () => {
   const expectedModels = {
     z06: { label: "Z06", registryKey: "z06", variantCount: 6, active: true },
-    zr1: { label: "ZR1", registryKey: "zr1", variantCount: 4 },
-    zr1x: { label: "ZR1X", registryKey: "zr1x", variantCount: 4 },
+    zr1: { label: "ZR1", registryKey: "zr1", variantCount: 4, active: true },
+    zr1x: { label: "ZR1X", registryKey: "zr1x", variantCount: 4, active: true },
   };
   const expectedVariants = {
     z06: ["1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67", "3lz_h67"],
@@ -192,6 +192,7 @@ test("future Corvette model metadata is scaffolded against shared LZ interiors",
     zr1: {
       source_option_sheet: "zr1_options",
       status_sheet: "zr1_ovs",
+      rule_mapping_sheet: "zr1_rule_mapping",
       price_rules_sheet: "zr1_price_rules",
       rule_groups_sheet: "zr1_rule_groups",
       rule_group_members_sheet: "zr1_rule_group_members",
@@ -204,6 +205,7 @@ test("future Corvette model metadata is scaffolded against shared LZ interiors",
     zr1x: {
       source_option_sheet: "zr1x_options",
       status_sheet: "zr1x_ovs",
+      rule_mapping_sheet: "zr1x_rule_mapping",
       price_rules_sheet: "zr1x_price_rules",
       rule_groups_sheet: "zr1x_rule_groups",
       rule_group_members_sheet: "zr1x_rule_group_members",
@@ -234,8 +236,8 @@ test("future Corvette model metadata is scaffolded against shared LZ interiors",
       variantRows.map((row) => row.display_order),
       expectedVariants[modelKey].map((_, index) => index + 1),
     );
-    // z06 is a live promoted runtime model; its model_variants and
-    // model_workbook_sources rows are active. ZR1/ZR1X remain inactive scaffolds.
+    // These are live promoted runtime models, so their model_variants and
+    // model_workbook_sources rows remain active with their shared LZ interiors.
     const expectActive = expected.active ?? false;
     assert.equal(variantRows.every((row) => row.active === expectActive), true);
     if (expectActive) {

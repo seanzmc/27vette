@@ -330,7 +330,14 @@ test("generated app data exposes a multi-model registry with Stingray compatibil
 
   assert.ok(registry, "CORVETTE_FORM_DATA registry should exist");
   assert.equal(registry.defaultModelKey, "stingray");
-  assert.deepEqual(Object.keys(registry.models).sort(), ["grandSport", "stingray", "z06"]);
+  assert.deepEqual(Object.keys(registry.models).sort(), [
+    "grandSport",
+    "grand_sport_x",
+    "stingray",
+    "z06",
+    "zr1",
+    "zr1x",
+  ]);
   assert.equal(registry.models.stingray.label, "Stingray");
   assert.equal(registry.models.stingray.modelName, "Corvette Stingray");
   assert.equal(registry.models.grandSport.label, "Grand Sport");
@@ -370,27 +377,36 @@ test("generated app data exposes a multi-model registry with Stingray compatibil
   );
 });
 
-test("active roof option relative order is consistent across promoted models", () => {
+test("active roof option order preserves the established and reviewed model contracts", () => {
   const registry = loadDataWindow().CORVETTE_FORM_DATA;
   const sharedActiveRoofOrder = ["CF7", "C2Z", "CC3", "CM9", "D84", "D86"];
   const roofOrders = Object.fromEntries(
     Object.entries(registry.models).map(([modelKey, entry]) => [modelKey, sectionRpoOrder(entry.data, "sec_roof_001")])
   );
 
-  for (const [modelKey, order] of Object.entries(roofOrders)) {
+  for (const modelKey of ["stingray", "grandSport", "z06"]) {
+    const order = roofOrders[modelKey];
     assert.deepEqual(
       relativeOrder(order, sharedActiveRoofOrder),
       sharedActiveRoofOrder,
-      `${modelKey} should preserve the active shared roof option order`
+      `${modelKey} should preserve the established active shared roof option order`
     );
   }
+
+  assert.deepEqual(
+    roofOrders.grand_sport_x,
+    ["CM9", "C2Z", "D84", "D86", "CF7", "CC3", "CF8"],
+    "Grand Sport X should preserve the reviewed workbook row order"
+  );
+  assert.deepEqual(roofOrders.zr1, ["C2Z"], "ZR1 should expose its included C2Z roof equipment");
+  assert.deepEqual(roofOrders.zr1x, ["C2Z"], "ZR1X should expose its included C2Z roof equipment");
 
   assert.deepEqual(
     Object.entries(roofOrders)
       .filter(([, order]) => order.includes("CF8"))
       .map(([modelKey]) => modelKey),
-    ["grandSport"],
-    "CF8 is currently active only in Grand Sport, so the older CF8/CM9 audit item is not active cross-model drift"
+    ["grandSport", "grand_sport_x"],
+    "CF8 should remain active only in the two Grand Sport model contracts"
   );
 });
 
@@ -402,13 +418,20 @@ test("active registry models carry generated order-summary metadata without brow
   assert.doesNotMatch(appSource, /orderSectionDefinitions\.map/);
 
   const registry = loadDataWindow().CORVETTE_FORM_DATA;
+  const requiredChargesModels = new Set(["z06", "zr1", "zr1x"]);
   for (const [modelKey, entry] of Object.entries(registry.models)) {
-    const expectedOrderSummarySections = modelKey === "z06" ? 12 : 11;
-    const expectedOrderSummaryStepMap = modelKey === "z06" ? 14 : 13;
+    const expectsRequiredCharges = requiredChargesModels.has(modelKey);
+    const expectedOrderSummarySections = expectsRequiredCharges ? 12 : 11;
+    const expectedOrderSummaryStepMap = expectsRequiredCharges ? 14 : 13;
     assert.equal(entry.data.steps.length, 14, `${modelKey} should emit generated runtime steps`);
     assert.equal(entry.data.orderSummary.sections.length, expectedOrderSummarySections, `${modelKey} should emit order-summary sections`);
     assert.equal(Object.keys(entry.data.orderSummary.stepMap).length, expectedOrderSummaryStepMap, `${modelKey} should emit order-summary step map`);
     assert.equal(entry.data.orderSummary.stepMap.base_interior, "seats_interior", `${modelKey} should map interiors from generated metadata`);
+    assert.equal(
+      Object.hasOwn(entry.data.orderSummary.stepMap, "standard_equipment"),
+      expectsRequiredCharges,
+      `${modelKey} should map standard equipment exactly when its generated summary includes required charges`
+    );
   }
 });
 
