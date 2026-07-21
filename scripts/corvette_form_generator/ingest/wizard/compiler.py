@@ -1019,7 +1019,12 @@ def _exact_target_default_rows(
             continue
         if str(row.get("display_behavior") or "") != "default_selected":
             continue
-        if str(row.get("condition_type") or "") not in {"always", "unless_selected_rpo"}:
+        if str(row.get("condition_type") or "") not in {
+            "always",
+            "unless_selected_rpo",
+            "unless_selected_section",
+            "when_selected_unless_selected_section",
+        }:
             continue
         valid = True
         for field, allowed in allowed_scopes.items():
@@ -1070,6 +1075,7 @@ def _compile_target_options(
     resolution_entries: Iterable[Mapping[str, Any]],
     status_feature_index: Mapping[str, Mapping[str, list[str]]],
     comparator_model: str,
+    expected_status_columns: Mapping[str, set[str]] | None = None,
     profile_required_options: Mapping[str, Mapping[str, Any]] | None = None,
     profile_option_precedents: Mapping[str, Mapping[str, Any]] | None = None,
 ) -> tuple[
@@ -1090,6 +1096,7 @@ def _compile_target_options(
         {**candidate, "statuses": model_scoped_statuses(candidate, target)}
         for candidate in scope_candidates(candidates, target)
     ]
+    expected_status_columns = expected_status_columns or {}
     omitted_candidates = [
         candidate
         for candidate in target_scoped_source
@@ -1098,6 +1105,13 @@ def _compile_target_options(
             status.get("status") == "unavailable"
             for status in candidate.get("statuses") or []
         )
+        and bool(expected_status_columns.get(str(candidate.get("sheetName") or "")))
+        and {
+            str(status.get("columnLetter") or "")
+            for status in candidate.get("statuses") or []
+            if str(status.get("columnLetter") or "")
+        }
+        == expected_status_columns.get(str(candidate.get("sheetName") or ""))
     ]
     omitted_candidate_ids = {
         str(candidate.get("candidateId") or "")
@@ -1702,12 +1716,14 @@ def _compile_target_options(
             for status in statuses
         )
         any_available = any(status.get("status") == "available" for status in statuses)
-        all_standard = bool(statuses) and {str(status.get("status") or "") for status in statuses} == {"standard"}
+        any_standard = any(status.get("status") == "standard" for status in statuses)
+        standard_only = resolved_statuses and any_standard and not any_available
         section_contract = section_contracts.get(section_id, {})
         section_mode = str(section_contract.get("selection_mode") or "").strip().lower()
         required_single = section_mode == "single_select_req"
         default_rows = _exact_target_default_rows(extract, target, option_id, variants)
-        exact_default = len(default_rows) == 1
+        direct_default = str((existing or {}).get("display_behavior") or "") == "default_selected"
+        exact_default = direct_default or len(default_rows) == 1
         dependencies.extend(
             _dependency(f"workbook:default_selection_rules:{row.get('rule_id')}", row)
             for row in default_rows
@@ -1719,13 +1735,26 @@ def _compile_target_options(
         elif existing:
             active = bool(workbook_truthy(existing.get("active")))
             selectable = bool(workbook_truthy(existing.get("selectable")))
+            if (
+                rpo
+                and resolved_statuses
+                and exact_default
+                and section_mode != "display_only"
+                and (any_available or any_standard)
+            ):
+                active = True
+                selectable = True
+            elif standard_only and rpo:
+                active = True
+                if section_mode == "display_only":
+                    selectable = False
         else:
-            active = bool(resolved_statuses and (any_available or all_standard))
+            active = bool(resolved_statuses and (any_available or any_standard))
             if section_mode == "display_only":
                 selectable = False
             elif any_available and section_mode in {"single_select_req", "single_select_opt", "multi_select_opt"}:
                 selectable = True
-            elif all_standard and required_single and exact_default:
+            elif standard_only and exact_default:
                 selectable = True
             else:
                 selectable = False
@@ -1737,7 +1766,7 @@ def _compile_target_options(
                 active
                 and selectable
                 and section_mode != "display_only"
-                and (any_available or (all_standard and required_single and exact_default))
+                and (any_available or (standard_only and exact_default))
             )
         )
         if len(default_rows) > 1 or not behavior_compatible:
@@ -1764,7 +1793,7 @@ def _compile_target_options(
                 ],
                 allowed_actions=(
                     ["provide_option_behavior"]
-                    if not (all_standard and required_single and not exact_default) and len(default_rows) <= 1
+                    if not (standard_only and required_single and not exact_default) and len(default_rows) <= 1
                     else []
                 ),
                 question="Resolve the incompatible target option behavior from workbook-owned evidence.",
@@ -1775,16 +1804,54 @@ def _compile_target_options(
                 behavior_subject,
             )
             if behavior_resolution and behavior_resolution.get("action") == "provide_option_behavior":
-                active = bool(behavior_resolution["payload"]["active"])
-                selectable = bool(behavior_resolution["payload"]["selectable"])
-                dependencies.append(_dependency(f"resolution:{behavior_subject['subjectId']}", behavior_resolution))
-                consumed_resolution_subjects.add(behavior_subject["subjectId"])
+                resolved_active = bool(behavior_resolution["payload"]["active"])
+                resolved_selectable = bool(behavior_resolution["payload"]["selectable"])
+                resolution_compatible = resolved_statuses and (
+                    (
+                        not resolved_active
+                        and not resolved_selectable
+                        and not (required_single and exact_default)
+                    )
+                    or (resolved_active and not resolved_selectable)
+                    or (
+                        resolved_active
+                        and resolved_selectable
+                        and section_mode != "display_only"
+                        and (any_available or (standard_only and exact_default))
+                    )
+                )
+                if resolution_compatible:
+                    active = resolved_active
+                    selectable = resolved_selectable
+                    dependencies.append(_dependency(f"resolution:{behavior_subject['subjectId']}", behavior_resolution))
+                    consumed_resolution_subjects.add(behavior_subject["subjectId"])
+                else:
+                    raise ValueError(
+                        "provide_option_behavior resolution is incompatible with "
+                        f"the target status and section contract for {option_id}."
+                    )
             else:
                 row_status = "blocked"
                 candidate_disposition[candidate_id] = "blocked_exception"
 
-        if all_standard and not keep_inactive:
-            standard_price = None if section_mode == "display_only" else 0
+        if standard_only and not keep_inactive:
+            comparator_row = (copy_proposals.get(stable_candidate_id) or {}).get("comparator") or {}
+            comparator_chargeable = bool(
+                _positive_int(comparator_row.get("price"))
+                and workbook_truthy(comparator_row.get("active"))
+                and workbook_truthy(comparator_row.get("selectable"))
+            )
+            target_included_without_charge = bool(
+                existing
+                and _int_price(existing.get("price")) in (None, 0)
+            )
+            standard_price = (
+                0
+                if section_mode != "display_only" or comparator_chargeable
+                else None
+            )
+            if comparator_chargeable and target_included_without_charge:
+                price = 0
             if price not in (None, 0):
                 mandatory_subject = _typed_exception(
                     target,
@@ -4228,6 +4295,16 @@ def compile_canonical_rows(
         candidate["priceRows"] = [dict(row) for row in matching_rows]
         candidate["priceMatch"] = "exact" if len(matching_rows) == 1 else "ambiguous"
     for target in targets:
+        target_status_columns = {
+            str(sheet.get("sheetName") or ""): {
+                str(column.get("columnLetter") or "")
+                for column in sheet.get("variantColumns") or []
+                if MODEL_CODE_PREFIXES.get(str(column.get("modelCode") or "")[:3]) == target
+                and str(column.get("columnLetter") or "")
+            }
+            for sheet in sheet_profile.get("sheets") or []
+            if str(sheet.get("sheetName") or "")
+        }
         variant_rows, variant_exceptions, variants, compiled_prices = _compile_target_variants(
             extract, target, price_payload
         )
@@ -4273,6 +4350,7 @@ def compile_canonical_rows(
             resolution_entries,
             status_feature_index,
             comparator_model=comparators[target],
+            expected_status_columns=target_status_columns,
             profile_required_options=profile["requiredOptions"],
             profile_option_precedents=profile["optionPrecedents"],
         )

@@ -1574,17 +1574,20 @@ class WizardSessionStore:
             "source": Path(session["sourcePath"]),
             "workbook": self.workbook_path,
             "sheetRoles": run_dir / "sheet-roles.json",
+            "sheetProfile": run_dir / "sheet-profile.json",
             "optionCandidates": run_dir / "option-candidates.json",
             "priceRows": run_dir / "price-rows.json",
             "joinReport": run_dir / "join-report.json",
             "modelSelection": run_dir / "model-selection.json",
+            "optionsQualityAllowlist": DEFAULT_ALLOWLIST_PATH,
         }
-        expected = (
-            report.get("runAuthorityFingerprint", {})
-            .get("bindings", {})
-            .get("files", {})
+        authority_bindings = (
+            report.get("runAuthorityFingerprint", {}).get("bindings", {})
         )
+        expected = authority_bindings.get("files", {})
         reasons = []
+        if authority_bindings.get("compilerPolicyVersion") != COMPILER_POLICY_VERSION:
+            reasons.append("compiler policy changed after compile")
         for label, path in paths.items():
             if not path.is_file():
                 reasons.append(f"{label} is missing")

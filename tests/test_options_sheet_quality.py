@@ -90,7 +90,6 @@ def _valid_row(**overrides: object) -> list[object]:
         ({"option_id": "opt_std_0123456789abcdef"}, "hash_derived_option_id"),
         ({"display_order": None}, "active_option_missing_display_order"),
         ({"price": 995}, "standard_option_nonzero_price"),
-        ({"price": 0}, "display_only_standard_has_price"),
         (
             {"section_id": "sec_opt_001", "price": None},
             "selectable_section_standard_missing_zero_price",
@@ -148,6 +147,19 @@ def test_pure_quality_evaluator_grades_complete_projected_rows_without_workbook_
 
     assert {issue.check_id for issue in issues} == {"bare_lpo_option_name"}
     assert issues[0].option_id == "opt_001"
+
+
+def test_display_only_included_row_may_use_explicit_zero_price() -> None:
+    from corvette_form_generator.options_sheet_quality import evaluate_options_sheet_quality
+
+    row = dict(zip(OPTION_HEADERS, _valid_row(price=0)))
+
+    assert evaluate_options_sheet_quality(
+        "zr1",
+        "zr1_options",
+        [row],
+        {"sec_std_001": "display_only"},
+    ) == []
 
 
 def test_pure_quality_evaluator_reports_each_active_section_order_collision() -> None:

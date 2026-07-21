@@ -14,7 +14,7 @@ for entry in (ROOT / "scripts", ROOT / "tests"):
         sys.path.insert(0, str(entry))
 
 from corvette_form_generator.editor_ops import EDITOR_SHEET_META  # noqa: E402
-from corvette_form_generator.ingest.wizard.canonical_rows import canonical_bytes, semantic_hash, validate_artifact_graph  # noqa: E402
+from corvette_form_generator.ingest.wizard.canonical_rows import COMPILER_POLICY_VERSION, canonical_bytes, semantic_hash, validate_artifact_graph  # noqa: E402
 from corvette_form_generator.ingest.wizard import compiler as compiler_module  # noqa: E402
 from corvette_form_generator.ingest.wizard.comparator_evidence import build_comparator_evidence  # noqa: E402
 from corvette_form_generator.ingest.wizard.compiler import (  # noqa: E402
@@ -76,7 +76,7 @@ class CanonicalCompilerTest(unittest.TestCase):
         authority_bindings = {
             "sourceSha256": "a" * 64,
             "workbookSha256": "b" * 64,
-            "compilerPolicyVersion": "options-recurrence-prevention-4.4-v1",
+            "compilerPolicyVersion": COMPILER_POLICY_VERSION,
             "optionsSheetQualityAllowlist": {
                 "path": DEFAULT_ALLOWLIST_RELATIVE_PATH.as_posix(),
                 "sha256": hashlib.sha256(DEFAULT_ALLOWLIST_PATH.read_bytes()).hexdigest(),
@@ -877,28 +877,18 @@ class CanonicalCompilerTest(unittest.TestCase):
             and row["family"] == "options"
             and row["values"].get("rpo") == "BV4"
         )
-        self.assertFalse(
-            bv4["values"]["active"],
-            "target source status must not silently reactivate an existing inactive option",
-        )
+        self.assertTrue(bv4["values"]["active"])
         self.assertTrue(
+            bv4["values"]["selectable"],
+            "an exact target default in a selectable section must remain user-selectable",
+        )
+        self.assertFalse(
             any(
                 subject["reasonCode"] == "option_behavior_conflict"
                 and subject["model"] == "zr1"
                 and "opt_bv4_001" in str(subject.get("proposedRows") or [])
                 for subject in subjects
-            )
-        )
-        behavior_subject = next(
-            subject
-            for subject in subjects
-            if subject["reasonCode"] == "option_behavior_conflict"
-            and subject["model"] == "zr1"
-            and "opt_bv4_001" in str(subject.get("proposedRows") or [])
-        )
-        self.assertEqual(
-            behavior_subject["proposedRows"][0]["exactTargetDefaultEvidence"][0]["model_key"],
-            "zr1",
+            ),
         )
         retained_default = next(
             row
@@ -2346,6 +2336,215 @@ class CanonicalCompilerTest(unittest.TestCase):
         )
         self.assertEqual(relationship["action"], "delete")
         self.assertEqual(relationship["disposition"], "resolved_not_applicable")
+
+    def test_all_unavailable_deletion_requires_complete_target_variant_coverage(self) -> None:
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(self.master)
+        workbook["zr1_options"].append(
+            ["opt_zzz_001", "ZZZ", 0, "Partially observed option", "", "", "sec_whee_001", False, 30, True, ""]
+        )
+        workbook.save(self.master)
+        workbook.close()
+
+        option_payload = copy.deepcopy(self.option_payload)
+        unavailable = copy.deepcopy(
+            next(candidate for candidate in option_payload["candidates"] if candidate.get("rpo") == "BV4")
+        )
+        unavailable.update(
+            {
+                "candidateId": "Mechanical 4:998",
+                "rpo": "ZZZ",
+                "description": "Partially observed option",
+                "priceMatch": None,
+                "listPrice": None,
+                "priceRows": [],
+                "statuses": [
+                    {
+                        **unavailable["statuses"][0],
+                        "raw": "--",
+                        "status": "unavailable",
+                        "disclosureMarker": "",
+                        "flags": [],
+                    }
+                ],
+            }
+        )
+        option_payload["candidates"].append(unavailable)
+        sheet_profile = copy.deepcopy(self.sheet_profile)
+        mechanical = next(
+            sheet for sheet in sheet_profile["sheets"] if sheet["sheetName"] == "Mechanical 4"
+        )
+        mechanical["variantColumns"].append(
+            {
+                "columnIndex": 6,
+                "columnLetter": "F",
+                "rawHeader": "ZR1 Convertible\n1YR67\n3LZ",
+                "label": "ZR1 Convertible",
+                "modelCode": "1YR67",
+                "trim": "3LZ",
+                "bodyStyle": "convertible",
+            }
+        )
+
+        result = self.compile(
+            option_payload=option_payload,
+            join_report=join_prices(option_payload["candidates"], self.price_payload["priceRows"]),
+            sheet_profile=sheet_profile,
+        )
+
+        option = next(
+            row
+            for row in result["canonical-row-manifest.json"]["rows"]
+            if row["family"] == "options" and row["values"].get("option_id") == "opt_zzz_001"
+        )
+        self.assertNotEqual(option["action"], "delete")
+
+    def test_mixed_standard_unavailable_default_is_selectable_and_included_at_zero(self) -> None:
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(self.master)
+        workbook["z06_options"].append(
+            ["opt_qzz_001", "QZZ", 1195, "Standard target choice", "Comparator charge", "", "sec_whee_001", True, 30, True, ""]
+        )
+        workbook["zr1_options"].append(
+            ["opt_qzz_001", "QZZ", "", "Standard target choice", "", "", "sec_whee_001", False, 30, False, "default_selected"]
+        )
+        workbook.save(self.master)
+        workbook.close()
+
+        option_payload = copy.deepcopy(self.option_payload)
+        candidate = copy.deepcopy(
+            next(item for item in option_payload["candidates"] if item.get("rpo") == "BV4")
+        )
+        candidate.update(
+            {
+                "candidateId": "Mechanical 4:998",
+                "rpo": "QZZ",
+                "description": "Standard target choice",
+                "priceMatch": None,
+                "listPrice": None,
+                "priceRows": [],
+            }
+        )
+        candidate["statuses"] = [
+            {**candidate["statuses"][0], "raw": "S", "status": "standard"},
+            {**candidate["statuses"][1], "raw": "--", "status": "unavailable"},
+        ]
+        option_payload["candidates"].append(candidate)
+        comparator = build_comparator_evidence(
+            self.master,
+            self.selection["comparators"],
+            run_authority_fingerprint=self.authority,
+        )
+
+        result = self.compile(
+            option_payload=option_payload,
+            join_report=join_prices(option_payload["candidates"], self.price_payload["priceRows"]),
+            comparator_artifact=comparator,
+        )
+        option = next(
+            row
+            for row in result["canonical-row-manifest.json"]["rows"]
+            if row["family"] == "options" and row["values"].get("option_id") == "opt_qzz_001"
+        )
+
+        self.assertTrue(option["values"]["active"])
+        self.assertTrue(option["values"]["selectable"])
+        self.assertEqual(option["values"]["price"], 0)
+
+    def test_display_only_included_comparator_charge_is_fixed_at_zero(self) -> None:
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(self.master)
+        for row in workbook["section_master"].iter_rows(min_row=2):
+            if row[0].value == "sec_std_001":
+                row[2].value = "display_only"
+        workbook["z06_options"].append(
+            ["opt_cfv_001", "CFV", 4495, "Included carbon feature", "Comparator charge", "", "sec_std_001", True, 30, True, ""]
+        )
+        workbook["zr1_options"].append(
+            ["opt_cfv_001", "CFV", "", "Included carbon feature", "", "", "sec_std_001", False, 30, True, ""]
+        )
+        workbook.save(self.master)
+        workbook.close()
+
+        option_payload = copy.deepcopy(self.option_payload)
+        candidate = copy.deepcopy(
+            next(item for item in option_payload["candidates"] if item.get("rpo") == "BV4")
+        )
+        candidate.update(
+            {
+                "candidateId": "Mechanical 4:998",
+                "rpo": "CFV",
+                "description": "Included carbon feature",
+                "sectionLabel": "Standard Equipment",
+                "priceMatch": None,
+                "listPrice": None,
+                "priceRows": [],
+                "statuses": [
+                    {**status, "raw": "S", "status": "standard"}
+                    for status in candidate["statuses"]
+                ],
+            }
+        )
+        option_payload["candidates"].append(candidate)
+        comparator = build_comparator_evidence(
+            self.master,
+            self.selection["comparators"],
+            run_authority_fingerprint=self.authority,
+        )
+
+        result = self.compile(
+            option_payload=option_payload,
+            join_report=join_prices(option_payload["candidates"], self.price_payload["priceRows"]),
+            comparator_artifact=comparator,
+        )
+        option = next(
+            row
+            for row in result["canonical-row-manifest.json"]["rows"]
+            if row["family"] == "options" and row["values"].get("option_id") == "opt_cfv_001"
+        )
+
+        self.assertTrue(option["values"]["active"])
+        self.assertFalse(option["values"]["selectable"])
+        self.assertEqual(option["values"]["price"], 0)
+
+    def test_invalid_option_behavior_resolution_remains_blocked(self) -> None:
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(self.master)
+        for row in workbook["section_master"].iter_rows(min_row=2):
+            if row[0].value == "sec_std_001":
+                row[2].value = "display_only"
+        for row in workbook["zr1_options"].iter_rows(min_row=2):
+            if row[0].value == "opt_bv4_001":
+                row[6].value = "sec_std_001"
+                row[7].value = True
+                row[9].value = True
+        workbook.save(self.master)
+        workbook.close()
+
+        first = self.compile()
+        subject = next(
+            item
+            for item in first["exception-queue.json"]["subjects"]
+            if item["reasonCode"] == "option_behavior_conflict"
+            and "opt_bv4_001" in str(item.get("proposedRows") or [])
+        )
+        resolution = {
+            "subjectId": subject["subjectId"],
+            "subjectVersion": subject["subjectVersion"],
+            "action": "provide_option_behavior",
+            "payload": {"active": True, "selectable": True},
+            "disposition": "resolved",
+        }
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "incompatible with the target status and section contract",
+        ):
+            self.compile(resolution_entries=[resolution])
 
     def test_all_unavailable_deletion_blocks_when_target_identity_is_ambiguous(self) -> None:
         from openpyxl import load_workbook

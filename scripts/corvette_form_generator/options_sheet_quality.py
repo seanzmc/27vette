@@ -210,18 +210,6 @@ def _row_issues(
                     "non-selectable standard row carries a nonzero price",
                 )
             )
-        elif section_mode == "display_only" and price is not None:
-            issues.append(
-                _issue(
-                    "display_only_standard_has_price",
-                    model,
-                    sheet,
-                    row_number,
-                    row,
-                    raw_price,
-                    "display-only standard row must have a blank price",
-                )
-            )
         elif section_mode and section_mode != "display_only" and price is None:
             issues.append(
                 _issue(

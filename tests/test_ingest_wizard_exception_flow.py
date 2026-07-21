@@ -20,6 +20,7 @@ from corvette_form_generator.ingest.wizard.session import (  # noqa: E402
     COMPILER_MUTATION_FILES,
     WizardError,
     WizardSessionStore,
+    file_fingerprint,
 )
 from ingest_wizard_fixtures import build_master_workbook, build_raw_export  # noqa: E402
 
@@ -719,6 +720,41 @@ class ExceptionFlowTest(unittest.TestCase):
                 )
         finally:
             os.utime(self.master, ns=(stat.st_atime_ns, stat.st_mtime_ns))
+
+    def test_summary_reports_sheet_profile_drift(self) -> None:
+        profile = self.store.run_dir(self.run_id) / "sheet-profile.json"
+        payload = json.loads(profile.read_text(encoding="utf-8"))
+        payload["testDrift"] = True
+        profile.write_text(json.dumps(payload), encoding="utf-8")
+
+        freshness = self.store.compiler_summary(self.run_id)["freshness"]
+
+        self.assertTrue(freshness["stale"])
+        self.assertIn("sheetProfile changed after compile", freshness["reasons"])
+
+    def test_freshness_binds_options_quality_allowlist(self) -> None:
+        from corvette_form_generator.ingest.wizard import session as session_module
+
+        report = self.store.compiler_detail(self.run_id)["compileReport"]
+        allowlist = self.root / "quality-allowlist.json"
+        allowlist.write_text('{"schemaVersion":"options-sheet-quality-allowlist-1","entries":[]}', encoding="utf-8")
+        report["runAuthorityFingerprint"]["bindings"]["files"]["optionsQualityAllowlist"] = file_fingerprint(allowlist)
+        allowlist.write_text('{"schemaVersion":"options-sheet-quality-allowlist-1","entries":[{"changed":true}]}', encoding="utf-8")
+
+        with mock.patch.object(session_module, "DEFAULT_ALLOWLIST_PATH", allowlist):
+            freshness = self.store._compiler_freshness(self.run_id, report)
+
+        self.assertTrue(freshness["stale"])
+        self.assertIn("optionsQualityAllowlist changed after compile", freshness["reasons"])
+
+    def test_freshness_rejects_prior_compiler_policy(self) -> None:
+        report = self.store.compiler_detail(self.run_id)["compileReport"]
+        report["runAuthorityFingerprint"]["bindings"]["compilerPolicyVersion"] = "prior-policy"
+
+        freshness = self.store._compiler_freshness(self.run_id, report)
+
+        self.assertTrue(freshness["stale"])
+        self.assertIn("compiler policy changed after compile", freshness["reasons"])
 
     def test_compiler_complete_row_actions_are_exposed(self) -> None:
         subject = {
