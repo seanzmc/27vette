@@ -194,7 +194,7 @@ PYTHONPATH=scripts .venv/bin/python -m corvette_form_generator.options_sheet_qua
   --allowlist tests/fixtures/options-sheet-quality-allowlist.json
 ```
 
-This gate is intentionally red on the unrepaired GSX/ZR1/ZR1X workbook. For the required pre-write proof, point the command or `OPTIONS_SHEET_QUALITY_WORKBOOK` pytest variable at the repaired temporary workbook; do not weaken the gate against the canonical source.
+The gate is required green on the canonical workbook. During a reviewed pre-write repair, point the command or `OPTIONS_SHEET_QUALITY_WORKBOOK` pytest variable at the repaired temporary workbook first; never weaken the gate to force a pass.
 
 Workbook package integrity / repair (also run if Excel reports recovery):
 
