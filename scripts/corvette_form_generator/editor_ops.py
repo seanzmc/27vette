@@ -590,6 +590,19 @@ def _prepare_batch(extract, batch):
     _registry, sheet_family, models_by_sheet, by_model_family = maps
     sheet_family = {**GLOBAL_SHEET_FAMILIES, **sheet_family}
 
+    # Editing may target an existing scaffold sheet that is deliberately
+    # inactive for runtime discovery. Keep this edit-time registration local
+    # so model_sheet_registry() remains the active-only discovery boundary.
+    for row in rows_of(extract, "model_workbook_sources"):
+        model_key = str(row.get("model_key") or "").strip()
+        sheet_name = str(row.get("sheet_name") or "").strip()
+        family = SOURCE_ROLE_FAMILIES.get(row.get("source_role"))
+        if not (model_key and sheet_name in extract["sheets"] and family):
+            continue
+        sheet_family.setdefault(sheet_name, family)
+        models_by_sheet.setdefault(sheet_name, set()).add(model_key)
+        by_model_family.setdefault((model_key, family), sheet_name)
+
     prepared_creates: list[dict] = []
     created_templates: dict[str, str] = {}
     for i, o in enumerate(creates):

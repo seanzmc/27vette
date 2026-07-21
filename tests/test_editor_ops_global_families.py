@@ -442,6 +442,46 @@ class GlobalFamilyOpsTest(unittest.TestCase):
         self.assertEqual(added[7], "False")
         self.assertEqual(added[9], "True")
 
+    def test_existing_inactive_source_sheet_is_editable_without_source_update(self) -> None:
+        extract = editor_ops.extract_workbook(self.path)
+        registry, sheet_family = editor_ops.model_sheet_registry(extract)
+        self.assertNotIn("zr1", registry)
+        self.assertNotIn("zr1_options", sheet_family)
+        source_rows_before = list(extract["sheets"]["model_workbook_sources"]["rows"])
+        items = [
+            {
+                "action": "add",
+                "sheet": "zr1_options",
+                "key": {"option_id": "opt_inactive_001"},
+                "row": {
+                    "option_id": "opt_inactive_001",
+                    "rpo": "INA",
+                    "option_name": "Inactive source option",
+                    "section_id": "sec_whee_001",
+                    "selectable": True,
+                    "active": False,
+                },
+            }
+        ]
+
+        preview = self.run_batch(items)
+        result = self.run_batch(
+            items,
+            write=True,
+            confirmed=tuple(warning["id"] for warning in preview["warnings"]),
+        )
+
+        self.assertTrue(result["ok"], result)
+        saved = editor_ops.extract_workbook(self.path)
+        self.assertEqual(
+            saved["sheets"]["model_workbook_sources"]["rows"],
+            source_rows_before,
+        )
+        self.assertIn(
+            "opt_inactive_001",
+            {row["option_id"] for row in saved["sheets"]["zr1_options"]["rows"]},
+        )
+
     def test_pending_inactive_source_registration_validates_same_batch_references(self) -> None:
         items = [
             {

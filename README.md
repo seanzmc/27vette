@@ -186,6 +186,16 @@ Workbook schema gate:
 .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
 ```
 
+Customer-facing option-sheet quality gate (all configured option sheets, including inactive scaffolds):
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m corvette_form_generator.options_sheet_quality \
+  --workbook stingray_master.xlsx \
+  --allowlist tests/fixtures/options-sheet-quality-allowlist.json
+```
+
+This gate is intentionally red on the unrepaired GSX/ZR1/ZR1X workbook. For the required pre-write proof, point the command or `OPTIONS_SHEET_QUALITY_WORKBOOK` pytest variable at the repaired temporary workbook; do not weaken the gate against the canonical source.
+
 Workbook package integrity / repair (also run if Excel reports recovery):
 
 ```sh
