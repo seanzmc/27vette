@@ -1,14 +1,17 @@
 # Workbook Manager Rebaseline Correction Pass
 
 Date: 2026-07-22
-Status: diagnosis complete; model/registry correction is ready, but final import acceptance is blocked by one workbook source decision
+Status: ready for implementation; the missing source row was recovered from canonical workbook history
 Recommended reasoning level: high
 
 ## Goal
 
 Make PR #8 accept the stabilized workbook without expanding unpublished-model rehabilitation, and remove Workbook Manager copies of workbook-domain metadata now owned by `scripts/corvette_form_generator/workbook_domain/registry.py`.
 
-This is a correction pass on `codex/workbook-relational-db`. It is not a workbook-data pass, runtime-publication pass, ingest pass, deployment pass, or dealer-submission pass.
+This is a correction pass on `codex/workbook-relational-db`. Its only workbook
+scope is restoring one historically canonical section row through the guarded
+write path. It is not a runtime-publication, ingest, deployment, or
+dealer-submission pass.
 
 ## Current diagnosis
 
@@ -30,8 +33,12 @@ exposed a second, independent source inconsistency:
   `sec_z06_pkg_001`;
 - no workbook cell outside those three references defines that section;
 - the retained published Z06 runtime contract contains a rendered definition,
-  but a generated artifact is not authority for silently authoring the missing
-  workbook row; and
+  but that generated artifact was not used as authoring authority;
+- canonical workbook history at commit `43b4ecafcda86a658641ee501ca94b307ff93339`
+  contains the exact missing `section_master` row: section name `Z06 Carbon Fiber
+  Wheel and Brake Packages`, `selection_mode=single_select_opt`,
+  `is_required=False`, `display_order=15`,
+  `standard_behavior=user_selected`, and `step_key=wheels`; and
 - the manager is correct to keep this orphan reference blocking once population
   handling reaches it.
 
@@ -172,18 +179,16 @@ Run catalog/schema and staging/sync tests.
 3. Keep the three-model completion contract, 17 physical roles per published model, foreign-key checks, lineage coverage, audit authorization, atomic promotion, rollback, and guarded sync assertions.
 4. Update owner docs to say published rather than active/live where publication is the actual boundary.
 
-### Task 5 — Resolve the source-owned Z06 section blocker
+### Task 5 — Restore the canonical Z06 section source row
 
-Do not infer a workbook row from the generated runtime contract. Before final
-import acceptance, obtain or identify an authoritative workbook-source definition
-for `sec_z06_pkg_001`, including its label, selection mode, required/default
-semantics, display order, and runtime-step placement. Apply any approved workbook
-correction only through the guarded workbook write path with the full workbook
-safety, regeneration, and review gates in `AGENTS.md` §5.
+Restore the exact historical `section_master` row for `sec_z06_pkg_001` recovered
+from canonical workbook commit `43b4ecafcda86a658641ee501ca94b307ff93339`.
+Do not infer or alter any value from the generated runtime contract. Use the
+guarded workbook write path and all backup, package/schema validation,
+regeneration, generated-diff review, and rollback requirements in `AGENTS.md` §5.
 
-If repository evidence instead proves that these option rows legally own an
-inline section definition, document that existing contract and correct the generic
-compiler. Do not add a Z06-specific exception.
+The generated Z06 runtime contract must remain semantically unchanged after
+regeneration; any additional drift stops the pass.
 
 ### Task 6 — Run the correction acceptance gate
 
@@ -210,13 +215,16 @@ Final PR acceptance additionally requires:
 
 - one successful real-workbook import;
 - exactly three published model families in the canonical database;
-- an authoritative, reviewed resolution for `sec_z06_pkg_001`;
+- the exact historical `sec_z06_pkg_001` row restored through the guarded
+  workbook path;
 - rollback and guarded writer tests green;
-- no workbook, runtime contract, registry publication, dealer, dependency, or deployment change.
+- no workbook change beyond that one restored row, no semantic runtime-contract
+  drift, and no registry-publication, dealer, dependency, or deployment change.
 
 ## Preserved boundaries
 
-- `stingray_master.xlsx` remains unchanged.
+- `stingray_master.xlsx` changes only by restoring the exact historical
+  `sec_z06_pkg_001` `section_master` row.
 - `form-output/runtime/*` and `form-app/data.js` remain unchanged.
 - Published runtime models remain Stingray, Grand Sport, and Z06.
 - Grand Sport X, ZR1, and ZR1X remain unpublished and are not rehabilitated here.
@@ -228,4 +236,7 @@ Final PR acceptance additionally requires:
 
 ## Rollback
 
-The pass is code/tests/docs only. Revert its correction commit(s) to return to the rebaselined PR snapshot. No workbook or generated artifact restoration should be necessary.
+Revert the code/docs correction commits and restore the workbook backup created by
+the guarded write if any acceptance gate fails. Generated artifacts must either
+match the reviewed regeneration or be restored with the workbook rollback; never
+leave a mixed source/artifact state.
