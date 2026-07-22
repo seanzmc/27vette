@@ -332,11 +332,8 @@ test("generated app data exposes a multi-model registry with Stingray compatibil
   assert.equal(registry.defaultModelKey, "stingray");
   assert.deepEqual(Object.keys(registry.models).sort(), [
     "grandSport",
-    "grand_sport_x",
     "stingray",
     "z06",
-    "zr1",
-    "zr1x",
   ]);
   assert.equal(registry.models.stingray.label, "Stingray");
   assert.equal(registry.models.stingray.modelName, "Corvette Stingray");
@@ -394,19 +391,11 @@ test("active roof option order preserves the established and reviewed model cont
   }
 
   assert.deepEqual(
-    roofOrders.grand_sport_x,
-    ["CM9", "C2Z", "D84", "D86", "CF7", "CC3", "CF8"],
-    "Grand Sport X should preserve the reviewed workbook row order"
-  );
-  assert.deepEqual(roofOrders.zr1, ["C2Z"], "ZR1 should expose its included C2Z roof equipment");
-  assert.deepEqual(roofOrders.zr1x, ["C2Z"], "ZR1X should expose its included C2Z roof equipment");
-
-  assert.deepEqual(
     Object.entries(roofOrders)
       .filter(([, order]) => order.includes("CF8"))
       .map(([modelKey]) => modelKey),
-    ["grandSport", "grand_sport_x"],
-    "CF8 should remain active only in the two Grand Sport model contracts"
+    ["grandSport"],
+    "CF8 should remain active in the published Grand Sport contract"
   );
 });
 
@@ -418,7 +407,7 @@ test("active registry models carry generated order-summary metadata without brow
   assert.doesNotMatch(appSource, /orderSectionDefinitions\.map/);
 
   const registry = loadDataWindow().CORVETTE_FORM_DATA;
-  const requiredChargesModels = new Set(["z06", "zr1", "zr1x"]);
+  const requiredChargesModels = new Set(["z06"]);
   for (const [modelKey, entry] of Object.entries(registry.models)) {
     const expectsRequiredCharges = requiredChargesModels.has(modelKey);
     const expectedOrderSummarySections = expectsRequiredCharges ? 12 : 11;

@@ -7,7 +7,7 @@ Developer workspace for the 2027 Corvette static order-form app. Live at `order.
 - Stingray, Grand Sport, and Z06 are live customer-facing forms; no frontend package install or build step.
 - `form-app/data.js` exposes the multi-model registry at `window.CORVETTE_FORM_DATA` (default model `stingray`; `window.STINGRAY_FORM_DATA` remains a legacy alias for the Stingray dataset). Each model entry carries generated model data plus model-card image metadata from the workbook `asset_map` sheet.
 - Runtime promotion is workbook-owned: `model_master`, `model_registry_promotion`, and `variant_master` decide which models reach the registry; `scripts/promote_model.py` applies promotion rows; registry generation embeds promoted `form-output/runtime/*-runtime-contract.json` verbatim.
-- ZR1 and ZR1X have model-scoped workbook sheets but are unpromoted future models; their rows are inactive historical scaffolds needing a focused ingest reprocess before use as source truth, and they must not be promoted as part of another model's pass.
+- Grand Sport X, ZR1, and ZR1X are unpromoted future models. Their active workbook registrations and retained runtime contracts remain available for focused rehabilitation, but they are not published in `form-app/data.js` and must not be promoted as part of another model's pass.
 - Dealer submission posts to the WordPress endpoint `https://stingraychevroletcorvette.com/wp-json/corvette-build/v1/submit` with Cloudflare Turnstile — protected boundary, see AGENTS.md §6.
 - Some Grand Sport/Z06 artifact names still carry draft/inspection wording from migration; inspect active registry data and tests before treating that wording as runtime status.
 
@@ -40,7 +40,8 @@ workbook-manager/             React + FastAPI + SQLite workbook editor
   corvette_form_generator/    shared lib: config, workbook I/O, rules, pricing,
                               interiors, contract, registry, schema validation
 form-output/                  generated artifacts (never hand-edit);
-                              runtime/ = promoted contracts; inspection/ = opt-in review
+                              runtime/ = retained contracts; registry publication is promotion-controlled;
+                              inspection/ = opt-in review
 form-app/                     index.html, styles.css, app.js + generated data.js
 tests/                        node --test *.mjs + pytest gates
 docs/, .hermes/plans/         active specs, reviews, ingest docs
@@ -103,17 +104,7 @@ Do not commit `.venv/`. Always run Python tooling with `.venv/bin/python` or the
 .venv/bin/python scripts/ingest_wizard_server.py [--port 8040]
 ```
 
-The approved 2026-07-20 compounded-repair Deliverable 4.1 projection is a separate read-only report command; its scope and Checkpoint 1 stop are owned by `docs/ingest/7-20_compounded-repair-spec.md`:
-
-```sh
-PYTHONPATH=scripts .venv/bin/python -m corvette_form_generator.ingest.options_recovery_projection
-```
-
-After explicit Checkpoint 1 bulk approval, bind the approval to the existing reports and current workbook without regenerating either:
-
-```sh
-PYTHONPATH=scripts .venv/bin/python -m corvette_form_generator.ingest.options_recovery_projection --approve-checkpoint-1 --reviewer <name> --reviewed-at <ISO-8601>
-```
+The completed 2026-07-20 compounded recovery remains documented as historical evidence in `docs/ingest/7-20_compounded-repair-spec.md`; its one-use projection and ChangeSet commands are retired.
 
 ## Workbook Editor Workflow
 

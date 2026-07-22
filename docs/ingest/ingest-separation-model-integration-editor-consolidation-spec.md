@@ -358,7 +358,7 @@ Phase 2 established the canonical workbook as the accepted source for Grand Spor
 
 Promotion qualification consists of one scratch regeneration from the latest canonical workbook, automated workbook/runtime semantic comparison, one atomic activation/publication diff, and one explicit promotion approval. Only a concrete material mismatch from the scratch generation may reopen the exact affected product fact. The promotion diff must include every required target source registration and must be rollback-safe before any canonical write. Model-card assets are part of the customer-facing promotion packet. Existing models and dealer-submission behavior remain protected.
 
-The detailed executable handoff is owned by `docs/ingest/7-20_compounded-repair-spec.md` §8; this document does not duplicate its checklist.
+The completed promotion handoff and its validation receipt are retained as historical evidence in `docs/ingest/7-20_compounded-repair-spec.md` §8. It has no remaining executable promotion step; any future publication requires a new current-workbook review and explicit approval.
 
 ### Phase 3 — Consolidate to one workbook editor
 

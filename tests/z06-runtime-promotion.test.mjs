@@ -142,11 +142,8 @@ test("generated app registry promotes Z06 without changing default model", () =>
   assert.equal(registry.defaultModelKey, "stingray");
   assert.deepEqual(Object.keys(registry.models).sort(), [
     "grandSport",
-    "grand_sport_x",
     "stingray",
     "z06",
-    "zr1",
-    "zr1x",
   ]);
   assert.equal(registry.models.z06.key, "z06");
   assert.equal(registry.models.z06.label, "Z06");
@@ -165,7 +162,7 @@ test("dedicated registry generator publishes promoted runtime artifacts", () => 
   const result = JSON.parse(output);
   assert.equal(result.status, "registry_generated");
   assert.ok(result.output.endsWith("form-app/data.js"));
-  assert.deepEqual(result.models, ["stingray", "grandSport", "z06", "zr1", "zr1x", "grand_sport_x"]);
+  assert.deepEqual(result.models, ["stingray", "grandSport", "z06"]);
 
   const registry = loadDataWindow().CORVETTE_FORM_DATA;
   assert.equal(registry.defaultModelKey, "stingray");
