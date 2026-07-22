@@ -1,7 +1,7 @@
 # Workbook Manager Rebaseline Correction Pass
 
 Date: 2026-07-22
-Status: ready for implementation; the missing source row was recovered from canonical workbook history
+Status: source blocker resolved; implementation awaits the model-materialization decision below
 Recommended reasoning level: high
 
 ## Goal
@@ -68,15 +68,35 @@ Use explicit internal meanings:
 - **Importable models**: active `model_master` rows with active source registrations. On the current workbook this is all six models.
 - **Published models**: importable models whose active `model_registry_promotion` row has `promoted_to_runtime=True`. On the current workbook this is Stingray, Grand Sport, and Z06.
 
-Workbook Manager continues to materialize, contract-audit, expose for editing, and synchronize only the **published** three-model set in this pass. It must recognize the other three as valid registered-but-unpublished workbook data and exclude them deterministically without treating them as unknown or malformed.
+The inspection proved that this distinction alone does not decide which models the
+Manager should materialize. Two internally consistent boundaries remain:
 
-Do not compile or validate Grand Sport X, ZR1, or ZR1X runtime correctness here. That is the separate rehabilitation work already deferred by `nextSteps_v2.md`.
+- **Bounded three-model PR:** profile all six, but materialize/edit/synchronize
+  only the three published models. This preserves PR #8's approved title and
+  keeps Grand Sport X/ZR1/ZR1X rehabilitation separate, but intentionally makes
+  the Manager narrower than the workbook's full active/source-registered set.
+- **Full importable-model Manager:** materialize/edit all six importable models
+  while contract-auditing only the three published models. This is the cleaner
+  long-term separation, but current editor evidence includes 129 unpublished-model
+  rule-mapping orphan references, so it pulls rehabilitation and exception-policy
+  decisions into PR #8.
+
+Recommendation: use the bounded three-model boundary for PR #8, because its
+approved scope is “three live models” and `nextSteps_v2.md` explicitly deferred
+unpublished-model rehabilitation. Do not implement either boundary until the user
+confirms this choice.
 
 ### 2. Derive model population from the workbook snapshot
 
-Remove the hardcoded `LIVE_MODELS` model-population authority from `workbook-manager/backend/app/catalog.py`.
+After the materialization decision is confirmed, remove the ambiguous
+`LIVE_MODELS` model-population authority from
+`workbook-manager/backend/app/catalog.py`.
 
-The read-only profile owns discovery for a specific workbook snapshot. Downstream schema creation, compilers, migration, audit, query allowlists, and sync validation receive the profiled published-model tuple explicitly or derive it from the promoted canonical database. No component may silently substitute a module-level three-model literal.
+The read-only profile owns discovery for a specific workbook snapshot. Downstream
+schema creation, compilers, migration, audit, query allowlists, and sync validation
+must receive explicitly named importable, materialized, and published tuples as
+their responsibilities require. No component may silently substitute one set for
+another through a module-level `LIVE_MODELS` literal.
 
 Keep the existing public `ImportReport.live_models` and API response field for compatibility; its value remains the published model tuple. Internal code and messages should use `published_models` where ambiguity matters.
 
