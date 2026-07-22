@@ -1,9 +1,11 @@
 # Ingest wizard end-to-end completion spec — Passes B–F (Grand Sport X, ZR1, ZR1X)
 
 Date: 2026-07-05
-Status: Approved 2026-07-05 (checkpoint 1, Sean). Open product decisions resolved same day — see "Open product decisions" at the end. Implementation may proceed pass by pass; checkpoints 2–5 remain live gates.
+Status: Historical approved program. Passes B–D.2 were implemented through 2026-07-09; future implementation under the broad decision-lane/clean-reprocess architecture is superseded by `canonical-row-compiler-exception-queue-design.md`. Checkpoints for any live write, regeneration, or promotion remain closed.
 Recommended reasoning level for implementation agents: high.
 Owner docs: this file (end-to-end program), `docs/ingest/README.md` (index), `Order-Guide_IngestPrompt.md` (contract summary).
+
+Post-D.2 supersession: this file records the implemented/history path and its evidence. Do not extend its ten-lane decision model, cross-model decision copying, wholesale scaffold deletion, or `pass-c-2` apply contract. The current production direction is safety closure first, then deterministic canonical-row compilation plus a typed exception queue; where this historical spec conflicts with that design, the newer design controls.
 
 ## Purpose
 
@@ -24,7 +26,7 @@ Evidence inspected: `docs/ingest/pass-a/interactive-ingest-wizard-pass-a-spec.md
 ### What exists
 
 - **Pass A (implemented 2026-07-03)** — browser wizard at `scripts/ingest_wizard_server.py` (port 8040): choose/upload file → sheet cards → role confirmation → deterministic parse → exact 1-to-1 price join → read-only candidate table. Session states `profiled → roles_confirmed → parsed`, artifacts under `form-output/ingest-wizard/<run-id>/` (`session.json`, `sheet-profile.json`, `sheet-roles.json`, `option-candidates.json`, `price-rows.json`, `join-report.json`), all `schemaVersion: "pass-a-1"`, fail-closed transitions, source-file fingerprinting.
-- **New raw export** (`2027 Chevrolet Car Corvette Export (4) (1).xlsx`, commit `dc9f442`): 28 sheets — `Equipment Groups|Interior|Exterior|Mechanical|Standard Equipment 1–5`, `Price Schedule`, `Color and Trim 1–2`. Contains Grand Sport X: `1YG07`/`1YG67` model codes in Price Schedule base-model rows and equipment-sheet variant headers, alongside `1YC` (Stingray), `1YE` (Grand Sport), `1YH` (Z06), `1YR` (ZR1), ZR1X codes. The older 23-sheet `..._RAW.xlsx` stays as reference.
+- **New raw export** (`2027 Chevrolet Car Corvette Export (4) (1).xlsx`, commit `dc9f442`): 28 sheets — `Equipment Groups|Interior|Exterior|Mechanical|Standard Equipment 1–5`, `Price Schedule`, `Color and Trim 1–2`. Contains Grand Sport X: `1YG07`/`1YG67` model codes in Price Schedule base-model rows and equipment-sheet variant headers, alongside `1YC` (Stingray), `1YE` (Grand Sport), `1YH` (Z06), `1YR` (ZR1), ZR1X codes.
 - **Workbook model metadata** (read-only probe 2026-07-05):
   - `model_master`: `stingray`, `grand_sport`, `z06` active; `zr1`, `zr1x` inactive scaffolds (`expected_variant_count` 4). **No `grand_sport_x` row.**
   - `variant_master`: 6 inactive GSX variant rows already exist (`1lt_g07`…`3lt_g67`, with prices); 4 ZR1 (`1lz_r07/3lz_r07/1lz_r67/3lz_r67`) and 4 ZR1X (`1lz_s07/3lz_s07/1lz_s67/3lz_s67`) inactive rows.
@@ -49,11 +51,11 @@ Risk level: high overall (workbook writes + registry publication + runtime chang
 
 | Model | `model_key` | `registry_key` | `export_slug` | sheet prefix | variants | interiors |
 |---|---|---|---|---|---|---|
-| Grand Sport X | `grand_sport_x` | `grandSportX` | `grand-sport-x` | `grandSportX_` | 6 (`1lt_g07`…`3lt_g67`, already in `variant_master`) | `lt_interiors` (LT trims) + `model_interior_scope` rows |
+| Grand Sport X | `grand_sport_x` | `grand_sport_x` | `grand-sport-x` | `grandSportX_` | 6 (`1lt_g07`…`3lt_g67`, already in `variant_master`) | `lt_interiors` (LT trims) + `model_interior_scope` rows |
 | ZR1 | `zr1` (existing) | `zr1` | `zr1` | `zr1_` | 4 (`1lz_r*`) — **must reconcile against export headers** | `LZ_Interiors` |
 | ZR1X | `zr1x` (existing) | `zr1x` | `zr1x` | `zr1x_` | 4 (`1lz_s*`) — **must reconcile against export headers** | `LZ_Interiors` |
 
-Naming follows the existing `grandSport_*`/`zr1_*` conventions. `expected_variant_count` must be set from reconciled export variant headers, not assumed; if the export shows a different trim/body matrix (e.g. 2LZ rows), that is a reviewer decision surfaced in Pass B, and `variant_master`/`model_variants` scaffolds are corrected in Pass D — never silently.
+Naming follows the existing `grandSport_*`/`zr1_*` sheet-prefix conventions, while Grand Sport X registry metadata follows the runtime metadata contract for new model keys: `grand_sport_x`, not a camelCase alias. `expected_variant_count` must be set from reconciled export variant headers, not assumed; if the export shows a different trim/body matrix (e.g. 2LZ rows), that is a reviewer decision surfaced in Pass B, and `variant_master`/`model_variants` scaffolds are corrected in Pass D — never silently.
 
 ## Architecture
 
@@ -138,6 +140,8 @@ Decision records: `{candidateFingerprint, lane, action (Pass 5 vocabulary, exten
 
 **C.1 canonical workbook coverage (implemented 2026-07-08, spec `docs/ingest/pass-c/pass-c1-canonical-workbook-coverage-spec.md`):** dry-run plan now exposes `default_selection_rules` through `editor_ops.py`, emits reviewed default-selection rows or blocks when required defaults are unresolved, classifies new required canonical gaps as `blockingGaps`, resolves relationship/exclusive identities against planned and retained existing target options, allocates option display order section-locally, adds keyed add/update/no-op planning for `model_interior_scope`, and keeps `color_overrides` / `interior_components` / `asset_map` deferrals visible as non-blocking open items. No workbook writes, generated artifacts, runtime promotion, or Pass D writer.
 
+**C.2 real-data dry-run closure (implemented 2026-07-08):** resolved the C.1 blocker found by Codex/Hermes review: `*_rule_mapping` plan rows now match canonical headers by omitting non-existent `active`, and `*_exclusive_groups` carries the reviewer group label in canonical `notes` instead of non-existent `group_name`. Added a live-header dry-run regression for relationship/exclusive rows. Rebuilt real run `20260707-193441-ea9e4c`: 52 stage-1 ops, 5,719 stage-2 ops, `plan.valid=true`, `blockingGaps=0`, `dryRun.ok=true`, `stage2.ok=true`, `schemaErrors=0`, session `plan_built`. Script-split carry-forward remains visible for visual checkpoint review: GSX 178, ZR1 155, ZR1X 156. No workbook writes, generated artifacts, runtime promotion, or Pass D writer.
+
 **Surface:** tooling/UI/tests/docs. Still read-only toward the workbook. Risk: medium-high (this is where decisions become concrete workbook rows; errors here become Pass D writes).
 
 ### C1 — plan builder
@@ -168,17 +172,20 @@ Deterministic translation of `decisions.json` into an ordered workbook operation
 
 ## Pass D — approved workbook apply
 
-**Surface:** workbook/data (protected — AGENTS.md §5). Risk: high. **Human approval checkpoint: explicit approval of this spec's Pass D plus the in-wizard `plan_approved` record are both required before any `--write`.**
+**Surface:** workbook/data (protected — AGENTS.md §5). Risk: high. **Human approval checkpoint: explicit approval of the child Pass D spec plus the in-wizard `plan_approved` record are both required before any `--write`; approval to implement the CLI is still separate from approval to run a live workbook write.**
 
-- Apply path: `apply_workbook_ops.py`-style invocation of `editor_ops.apply_batch(..., write=True)` wrapped by a new wizard endpoint/CLI `scripts/ingest_wizard_apply.py --run <run-id> [--write]`; dry-run by default, `--write` required, refuses unless session is `plan_approved` and the plan's workbook fingerprint (mtime_ns + sha256 captured at plan build) still matches the live file.
+Child specs: `docs/ingest/pass-d/pass-d-approved-workbook-apply-spec.md` (implemented 2026-07-08 for CLI/tests/docs and real-run dry-run evidence), `docs/ingest/pass-d/pass-d1-export-continuity-and-deployment-readiness-spec.md` (implemented 2026-07-08 blocker-closure pass), and `docs/ingest/pass-d/pass-d2-rebuilt-dry-run-evidence-spec.md` (implemented 2026-07-09 for rebuilt all-target `pass-c-2` dry-run evidence). Pass D.1 superseded the old run's live-write readiness: run `20260707-193441-ea9e4c` is diagnostic evidence only. D.2 run `20260709-003524-650cae` is immutable dry-run evidence and not approved for write.
+
+- Apply path: `apply_workbook_ops.py`-style invocation of `editor_ops.apply_batch(..., write=True)` wrapped by `scripts/ingest_wizard_apply.py --run <run-id> [--write]`; dry-run by default, `--write` required, refuses unless session is `plan_approved` and the plan's workbook fingerprint (mtime_ns + sha256 captured at plan build) still matches the live file.
+- Final live write uses a single combined batch (`stage1.items + stage2.items`) so stage-1 scaffolding and stage-2 data are saved atomically through one `save_workbook_safely()` call, rather than writing stage 1 and then risking a stage-2 failure.
 - All writes flow through `save_workbook_safely()`: Excel-lock refusal (`~$stingray_master.xlsx`), mtime-change refusal, temp-copy package validation, timestamped backup, atomic replace.
-- Post-write verification (scripted, not claimed): reload workbook read-only; assert per-sheet row counts match the plan; assert a sampled set of ops landed cell-exact; write `apply-report.json` (+ append to `form-output/workbook-edit-log.jsonl`).
+- Post-write verification (scripted, not claimed): reload workbook read-only; assert per-sheet row counts match the plan; assert planned add/update/delete/create_sheet effects landed cell-exact; write `apply-report.json` (+ append to `form-output/workbook-edit-log.jsonl`).
 - Models remain **inactive/unpromoted** after apply — `model_master.active` stays False for all three; activation is Pass F's `promote_model.py` job. This keeps generation/registry behavior unchanged until promotion is explicitly run.
 - Failure handling: any invariant failure aborts before `--write`; a failed safe-save leaves the original file untouched (temp-file protocol); the run stays in `plan_approved` for retry after cause analysis. Restoring from the timestamped backup is the rollback path and is documented in the apply report.
 
-**Exit criteria:** `applied` state with `apply-report.json` showing zero mismatches; workbook verified on disk; backup exists; no `form-output/` or `form-app/` changes yet.
+**Implementation checkpoint:** CLI/tests/docs complete and the old approved run produced a dry-run report (`write=false`, 5,771 combined ops, 41 warnings, 0 apply errors, workbook fingerprint unchanged), but Pass D.1 found that this dry-run did not mirror the real write path's bool-storage guard and that the export shape was not deployment-continuous. Pass D.1 is implemented. Pass D.2 completed 2026-07-09 with rebuilt all-target run `20260709-003524-650cae`: `pass-c-2`, dry-run validated, bool hygiene clean, workbook fingerprint unchanged, Grand Sport X registry-loadable, and ZR1/ZR1X explicitly `not_deployment_ready` because price-rule and rule-group blockers remain. **Post-D.2 decision:** Sean selected the follow-up source/tooling path on 2026-07-09. Safety closure comes first, followed by the canonical-row compiler and typed exception queue in `canonical-row-compiler-exception-queue-design.md`; no scaffold or live write is approved.
 
-**Files:** `scripts/ingest_wizard_apply.py` (new), `session.py`, server endpoint + UI stage 7 (apply is allowed to be CLI-only if the UI button adds risk — decision at implementation, both paths must enforce the same gates), `tests/test_ingest_wizard_apply.py` (fixture workbooks, never the live one); docs updates.
+**Files:** `scripts/ingest_wizard_apply.py` (new), `session.py`, `tests/test_ingest_wizard_apply.py` (fixture workbooks, never the live one); docs updates. No server endpoint or UI stage-7/apply button in this pass; the first apply path is CLI-only.
 
 **Validation:** apply tests on fixture workbooks (refusal cases: lock file, mtime drift, unapproved plan, fingerprint mismatch; success case: counts + cell samples); then the real apply, followed immediately by `pytest tests/test_editor_lints.py`-class schema/package validation and a manual diff review of the workbook (openpyxl-based sheet diff against the pre-apply backup, included in `apply-report.json`).
 
@@ -267,7 +274,7 @@ Per pass as specified above; program-level before "done": full README validation
 
 ## Open product decisions — resolved 2026-07-05 (Sean)
 
-1. GSX naming set: **confirmed** — `grand_sport_x` / `grandSportX` / `grand-sport-x` / `grandSportX_*` prefix.
+1. GSX naming set: **revised by Pass D.1** — `grand_sport_x` / `grand_sport_x` registry key / `grand-sport-x` / `grandSportX_*` sheet prefix.
 2. ZR1/ZR1X variant matrices: **confirmed 4 each** — 1LZ and 3LZ, coupe and convertible (matches existing `variant_master`/`model_variants` scaffolds). Pass B variant reconciliation still runs; any export-header disagreement still surfaces as a blocking decision rather than silently trusting either side.
 3. Comparator model: **per target** — `grand_sport` for GSX, `z06` for ZR1/ZR1X (matches lane-10 template defaults).
 4. Promotion order: **GSX first, then ZR1, then ZR1X** (staggered, per-model go/no-go at checkpoint 5 unchanged).

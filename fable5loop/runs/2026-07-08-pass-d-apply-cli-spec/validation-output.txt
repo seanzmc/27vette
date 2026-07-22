@@ -1,0 +1,123 @@
+# Validation output · 2026-07-08 Pass D approved workbook apply CLI spec
+
+## Repo state before closeout
+
+Command:
+
+```sh
+git status --short --branch
+```
+
+Observed:
+
+```text
+## ingest-wizard...origin/ingest-wizard
+ M docs/ingest/README.md
+ M docs/ingest/ingest-wizard-end-to-end-completion-spec.md
+ M fable5loop/STATE.md
+?? docs/ingest/pass-d/
+?? fable5loop/runs/2026-07-08-pass-c2-real-data-dry-run-closure/
+```
+
+## Independent verifier
+
+Delegation: `deleg_09d874bf`
+
+Result: FAIL before fix, because the child spec was correct but `docs/ingest/ingest-wizard-end-to-end-completion-spec.md` line 186 still mentioned `server endpoint + UI stage 7` and allowed CLI-only as an implementation-time decision.
+
+Verifier also reported:
+
+- child spec AGENTS.md checklist: PASS
+- approval boundary: PASS
+- source-of-truth/workbook safety/generated/dealer boundaries: PASS
+- loop validator: PASS
+- `git diff --check`: PASS
+
+## Required fix
+
+Patched the Pass D file list in `docs/ingest/ingest-wizard-end-to-end-completion-spec.md` to remove server endpoint/UI stage 7 and state the first apply path is CLI-only.
+
+## Post-fix validation
+
+Command:
+
+```sh
+date '+%Y-%m-%dT%H:%M:%S%z' && git diff --check && .venv/bin/python scripts/validate_fable5_loop.py && git status --short --branch
+```
+
+Output:
+
+```text
+2026-07-08T14:57:15-0400
+Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.
+## ingest-wizard...origin/ingest-wizard
+ M docs/ingest/README.md
+ M docs/ingest/ingest-wizard-end-to-end-completion-spec.md
+ M fable5loop/STATE.md
+?? docs/ingest/pass-d/
+?? fable5loop/runs/2026-07-08-pass-c2-real-data-dry-run-closure/
+```
+
+Exit code: 0.
+
+Command:
+
+```python
+from pathlib import Path
+root=Path('/Users/seandm/Projects/27vette')
+e2e=(root/'docs/ingest/ingest-wizard-end-to-end-completion-spec.md').read_text()
+spec=(root/'docs/ingest/pass-d/pass-d-approved-workbook-apply-spec.md').read_text()
+checks={
+ 'e2e_no_server_endpoint_ui_stage7': 'server endpoint + UI stage 7' not in e2e and 'No server endpoint or UI stage-7/apply button in this pass' in e2e,
+ 'spec_no_server_endpoint_ui_stage7': 'No server endpoint and no UI stage-7 button' in spec,
+ 'approval_boundary': 'does not authorize the live `--write`' in spec,
+ 'combined_batch': 'stage1.items + stage2.items' in spec,
+}
+for k,v in checks.items(): print(f'{k}={v}')
+if not all(checks.values()): raise SystemExit(1)
+```
+
+Output:
+
+```text
+e2e_no_server_endpoint_ui_stage7=True
+spec_no_server_endpoint_ui_stage7=True
+approval_boundary=True
+combined_batch=True
+```
+
+Exit code: 0.
+
+## Final receipt/schema validation
+
+Command:
+
+```sh
+git diff --check && .venv/bin/python scripts/validate_fable5_loop.py && git status --short --branch && git diff --stat
+```
+
+Output:
+
+```text
+Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.
+## ingest-wizard...origin/ingest-wizard
+ M docs/ingest/README.md
+ M docs/ingest/ingest-wizard-end-to-end-completion-spec.md
+ M fable5loop/STATE.md
+?? docs/ingest/pass-d/
+?? fable5loop/runs/2026-07-08-pass-c2-real-data-dry-run-closure/
+?? fable5loop/runs/2026-07-08-pass-d-apply-cli-spec/
+ docs/ingest/README.md                                   |  2 +-
+ docs/ingest/ingest-wizard-end-to-end-completion-spec.md | 11 +++++++----
+ fable5loop/STATE.md                                     |  6 +++++-
+ 3 files changed, 13 insertions(+), 6 deletions(-)
+```
+
+Exit code: 0.
+
+## Gates not run
+
+- Python/Node runtime or generator tests: not relevant to a docs-only spec pass.
+- Workbook package/schema validation: no workbook write occurred.
+- Browser/manual wizard verification: no UI/runtime change occurred.
+- Dealer validation: dealer boundary untouched.

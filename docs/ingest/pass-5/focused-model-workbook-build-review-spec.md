@@ -490,7 +490,7 @@ Real raw-export smoke, using the controlled model scope:
 ```sh
 rm -rf /tmp/27vette-pass5-evidence /tmp/27vette-pass5-candidates /tmp/27vette-pass5-interpretation
 .venv/bin/python scripts/order_guide_ingest_profiler.py \
-  --raw-export "2027 Chevrolet Car Corvette Export_RAW.xlsx" \
+  --raw-export "<raw_export>.xlsx" \
   --workbook stingray_master.xlsx \
   --run-id pass5-smoke-evidence \
   --output-dir /tmp/27vette-pass5-evidence
@@ -579,7 +579,7 @@ Docs:
 - `node --check visualizer/workbook-editor/editor.js` — clean.
 - `.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx` — 0 errors / 0 warnings.
 - `git diff --exit-code -- stingray_master.xlsx form-app/data.js` and `git diff --exit-code -- $(git ls-files form-output)` — clean; `git status --short -- form-output` — empty. No workbook, registry, or generated-runtime writes.
-- Real raw-export smoke (`2027 Chevrolet Car Corvette Export_RAW.xlsx`, `--models zr1,zr1x,z06`, `--primary-models zr1,zr1x`, `--comparator-models z06`) into `/tmp/27vette-pass5-{evidence,candidates,interpretation}`: selection persisted with zr1=20/zr1x=20/z06=30 matched variant columns; `workbook-build-summary.json` reports `focused_workbook_build`, cross-check ok, lanes option_rows=609, ovs_rows=609, relationships=221, pricing=0, duplicates_and_source_coverage=589, blocked_extractor_gaps=3; 2031 units with zero comparator/non-selected leakage; ZR1/ZR1X scaffold matches reported as `existing_inactive_scaffold` only.
+- Real raw-export smoke (prior 23-sheet source, `--models zr1,zr1x,z06`, `--primary-models zr1,zr1x`, `--comparator-models z06`) into `/tmp/27vette-pass5-{evidence,candidates,interpretation}`: selection persisted with zr1=20/zr1x=20/z06=30 matched variant columns; `workbook-build-summary.json` reports `focused_workbook_build`, cross-check ok, lanes option_rows=609, ovs_rows=609, relationships=221, pricing=0, duplicates_and_source_coverage=589, blocked_extractor_gaps=3; 2031 units with zero comparator/non-selected leakage; ZR1/ZR1X scaffold matches reported as `existing_inactive_scaffold` only.
 - Manual browser smoke against `workbook_editor_server.py --port 8127` with the /tmp artifacts: ZR1/ZR1X primary and Z06 comparator chips, focused queue default with lane `option_rows`, six lane counts, guided lane question, reviewer-resolution decision select, raw candidate drill-down intact, decision validation round-trip ok with `version: 3` / `review_mode: focused_workbook_build`.
 - Stale-direction scan (`rg` per the validation plan): remaining hits are legacy compatibility/debug code with Pass 5 notes, tests locking the legacy vocabulary for legacy families only, or historical spec notes that explicitly point to Pass 5.
 

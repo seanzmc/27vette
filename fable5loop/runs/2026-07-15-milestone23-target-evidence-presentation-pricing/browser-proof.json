@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "milestone-2-3-browser-proof-1",
+  "server": "http://127.0.0.1:8040/",
+  "compiledRunId": "20260715-035235-12e239",
+  "profileRunId": "20260715-040407-4ec62a",
+  "profileRunRetained": false,
+  "pass": true,
+  "compiledRun": {
+    "sessionState": "compiled_with_exceptions",
+    "modelBlockers": {
+      "grand_sport_x": 95,
+      "zr1": 59,
+      "zr1x": 59
+    },
+    "actionableSubjects": 203,
+    "nonActionableSubjects": 10,
+    "unresolvedRelationshipIdentitySubjects": 0,
+    "reasonOptions": [
+      "ambiguous_existing_identity",
+      "comparator_only_exclusive_group_proposal",
+      "comparator_only_price_rule_proposal",
+      "comparator_only_relationship_proposal",
+      "comparator_only_rule_group_proposal",
+      "missing_section",
+      "unresolved_price_scope"
+    ],
+    "javascriptErrors": 0,
+    "consoleMessages": 0,
+    "mutationPerformed": false
+  },
+  "profileRoleControls": {
+    "Equipment Groups 1": {
+      "Options": "disabled",
+      "Price": "disabled",
+      "Exclude": "active"
+    },
+    "Interior 1": {
+      "Options": "active",
+      "Price": "disabled",
+      "Exclude": "available"
+    },
+    "Exterior 1": {
+      "Options": "active",
+      "Price": "disabled",
+      "Exclude": "available"
+    },
+    "Mechanical 1": {
+      "Options": "active",
+      "Price": "disabled",
+      "Exclude": "available"
+    },
+    "Color and Trim 1": {
+      "Options": "disabled",
+      "Price": "disabled",
+      "Exclude": "active"
+    }
+  },
+  "notes": [
+    "The exact-current run resumed and rendered 95/59/59 subjects with no JavaScript errors.",
+    "The reason filter contained no unresolved_relationship_identity choice because the exact-current queue contains zero such subjects.",
+    "A fresh profiled session proved Equipment Groups and Color and Trim cannot receive the Options role while Interior, Exterior, and Mechanical can; the transient profile-only run was then removed.",
+    "No reviewer resolution, workbook mutation, plan projection, publication, or promotion occurred."
+  ]
+}

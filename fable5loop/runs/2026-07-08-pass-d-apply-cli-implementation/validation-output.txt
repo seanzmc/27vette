@@ -1,0 +1,184 @@
+# Validation output · 2026-07-08 Pass D apply CLI implementation
+
+## RED test proof
+
+Command:
+
+```sh
+.venv/bin/python -m pytest tests/test_ingest_wizard_apply.py -q
+```
+
+Initial result before implementation:
+
+```text
+5 failed
+AttributeError: 'WizardSessionStore' object has no attribute 'apply_approved_plan'
+can't open file '/Users/seandm/Projects/27vette/scripts/ingest_wizard_apply.py': [Errno 2] No such file or directory
+```
+
+## Focused implementation tests
+
+Command:
+
+```sh
+PYTHONPATH=scripts .venv/bin/python -m py_compile \
+  scripts/ingest_wizard_apply.py \
+  scripts/corvette_form_generator/ingest/wizard/session.py \
+  scripts/corvette_form_generator/editor_ops.py && \
+.venv/bin/python -m pytest \
+  tests/test_ingest_wizard_apply.py \
+  tests/test_ingest_wizard_plan.py \
+  tests/test_editor_ops_global_families.py \
+  tests/test_editor_ops_apply.py -q
+```
+
+Observed:
+
+```text
+................................................................         [100%]
+64 passed in 50.06s
+```
+
+Verifier-required regression proof before fix:
+
+```text
+tests/test_ingest_wizard_apply.py::ApplyFlowTest::test_confirmed_write_applies_combined_plan_reports_and_locks_run
+AssertionError: WizardError not raised
+
+tests/test_ingest_wizard_apply.py::ApplyFlowTest::test_default_dry_run_writes_report_and_leaves_workbook_unchanged
+AssertionError: 'pass-c-1' != 'pass-d-1'
+```
+
+Fix confirmation:
+
+```text
+.venv/bin/python -m pytest tests/test_ingest_wizard_apply.py -q
+.....                                                                    [100%]
+5 passed in 2.17s
+```
+
+## JS syntax and diff whitespace
+
+Command:
+
+```sh
+node --check visualizer/ingest-wizard/wizard.js && git diff --check
+```
+
+Observed: exit 0, no output.
+
+## Workbook package/schema current-state validation
+
+Command:
+
+```sh
+.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx && \
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+```
+
+Observed:
+
+```json
+{
+  "workbook": "stingray_master.xlsx",
+  "status": "valid",
+  "issue_count": 0,
+  "issues": []
+}
+{
+  "workbook": "stingray_master.xlsx",
+  "status": "valid",
+  "issue_count": 0,
+  "error_count": 0,
+  "warning_count": 0,
+  "issues": []
+}
+```
+
+## Real approved run dry-run only
+
+Command:
+
+```sh
+.venv/bin/python scripts/ingest_wizard_apply.py --run 20260707-193441-ea9e4c --workbook stingray_master.xlsx
+```
+
+Observed summary:
+
+```text
+{'ok': True, 'status': 'validated', 'opCount': 5771, 'reportPath': '/Users/seandm/Projects/27vette/form-output/ingest-wizard/20260707-193441-ea9e4c/apply-dry-run-report.json'}
+errors 0 warnings 41
+```
+
+Dry-run report probe:
+
+```json
+{
+  "path": "form-output/ingest-wizard/20260707-193441-ea9e4c/apply-dry-run-report.json",
+  "schemaVersion": "pass-d-1",
+  "write": false,
+  "ok": true,
+  "status": "validated",
+  "opCounts": {
+    "stage1": 52,
+    "stage2": 5719,
+    "combined": 5771
+  },
+  "perSheetCountKeys": 33,
+  "hasApplyResult": true,
+  "startedAt": true,
+  "completedAt": true,
+  "approvedBy": "Hermes Agent",
+  "fingerprintEqual": true,
+  "warningCount": 41,
+  "mismatches": [],
+  "backupPath": null
+}
+```
+
+## Fable receipt/state validation
+
+Command:
+
+```sh
+git diff --check && .venv/bin/python scripts/validate_fable5_loop.py && git status --short --branch
+```
+
+Observed after STATE/receipt update:
+
+```text
+Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.
+## ingest-wizard...origin/ingest-wizard
+ M docs/ingest/README.md
+ M docs/ingest/ingest-wizard-end-to-end-completion-spec.md
+ M fable5loop/STATE.md
+ M scripts/corvette_form_generator/editor_ops.py
+ M scripts/corvette_form_generator/ingest/wizard/session.py
+ M tests/test_editor_ops_global_families.py
+?? docs/ingest/pass-d/
+?? fable5loop/runs/2026-07-08-pass-c2-real-data-dry-run-closure/
+?? fable5loop/runs/2026-07-08-pass-d-apply-cli-implementation/
+?? fable5loop/runs/2026-07-08-pass-d-apply-cli-spec/
+?? scripts/ingest_wizard_apply.py
+?? tests/test_ingest_wizard_apply.py
+```
+
+## Independent re-verifier result
+
+Re-verifier `deleg_29426206` returned PASS after the required fixes.
+
+Key verifier evidence:
+
+- `select_models()` now calls `_refuse_if_applied()` before validation/mutation.
+- Other mutating paths inspected: `save_decisions`, `delete_decisions`, `copy_model_decisions`, `build_apply_plan`, `mark_complete`; `approve_plan` rejects non-plan states including `applied`.
+- Targeted pytest: `64 passed in 51.26s`.
+- `node --check visualizer/ingest-wizard/wizard.js` passed.
+- Workbook package/schema valid with 0 issues.
+- Report probe: `schemaVersion=pass-d-1`, `write=false`, `status=validated`, stage1 `52`, stage2 `5719`, combined `5771`, `perSheetCountKeys=33`, warnings `41`, `applyResult.status=validated`, `applyResult.errors=0`, `confirmedWarnings=[]`, workbook before/after equal, verification mismatches `[]`, no backup/log paths, no `apply-report.json`, session remains `plan_approved`.
+- Protected-surface check: `git diff --name-only -- stingray_master.xlsx form-app form-output runtime dealer` empty; no Excel lock file.
+
+## Gates not run
+
+- Live workbook `--write`: intentionally not run; still requires separate explicit approval.
+- Post-write package/schema/diff validation: blocked on live write approval.
+- Generation/registry/runtime/browser/dealer gates: out of Pass D implementation checkpoint; Pass E/F own those surfaces.

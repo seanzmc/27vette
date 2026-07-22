@@ -148,3 +148,29 @@ def save_workbook_safely(
     except Exception:
         tmp_path.unlink(missing_ok=True)
         raise
+
+
+def restore_workbook_backup(path: Path, backup_path: Path) -> None:
+    """Restore ``path`` from ``backup_path`` through a validated temp copy.
+
+    The backup is package-validated, copied to a temporary sibling, the copy
+    is package-validated and reopened, and only then atomically replaces the
+    live path. Callers must re-verify the restored file before claiming it
+    is safe.
+    """
+    path = Path(path)
+    backup_path = Path(backup_path)
+    assert_valid_workbook_package(backup_path)
+    with tempfile.NamedTemporaryFile(
+        prefix=f"{path.stem}-restore-", suffix=path.suffix,
+        delete=False, dir=path.parent,
+    ) as handle:
+        restore_tmp = Path(handle.name)
+    try:
+        shutil.copy2(backup_path, restore_tmp)
+        assert_valid_workbook_package(restore_tmp)
+        check = load_workbook(restore_tmp, read_only=True, data_only=True)
+        check.close()
+        restore_tmp.replace(path)
+    finally:
+        restore_tmp.unlink(missing_ok=True)

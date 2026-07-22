@@ -54,7 +54,7 @@ function clearError() {
   $("#error-banner").classList.add("hidden");
 }
 
-const STAGES = ["files", "sheets", "candidates", "models", "review", "plan"];
+const STAGES = ["files", "sheets", "candidates", "models", "compile", "exceptions", "changeset"];
 
 function setStage(stage) {
   clearError();
@@ -65,6 +65,8 @@ function setStage(stage) {
   document.querySelectorAll("#stepper .step").forEach((el, index) => {
     el.classList.toggle("active", index === reached);
     el.classList.toggle("done", index < reached);
+    if (index === reached) el.setAttribute("aria-current", "step");
+    else el.removeAttribute("aria-current");
   });
   $("#run-info").textContent = state.session
     ? `${state.session.sourceFile} · run ${state.session.runId}`
@@ -77,7 +79,92 @@ async function loadFiles() {
   const payload = await getJSON("/api/wizard/files");
   state.files = payload.files;
   renderFiles();
+  await loadSessions();
 }
+
+async function loadSessions() {
+  const payload = await getJSON("/api/wizard/sessions");
+  const sessions = payload.sessions || [];
+  $("#run-list").innerHTML = sessions.length
+    ? sessions
+        .slice(0, 12)
+        .map(
+          (session) => `<div class="file-row">
+            <div><b>${escapeHtml(session.sourceFile)}</b><div class="cell-sub">${escapeHtml(session.runId)} · ${escapeHtml(session.state)}</div></div>
+            <button class="primary resume-run" data-run-id="${escapeHtml(session.runId)}">Resume</button>
+          </div>`
+        )
+        .join("")
+    : '<div class="empty-note">No saved runs yet.</div>';
+}
+
+async function resumeSession(runId) {
+  clearError();
+  const detail = await getJSON(`/api/wizard/sessions/${runId}`);
+  state.session = detail.session;
+  state.profile = detail.profile;
+  state.roles = detail.roles || {};
+  state.joinReport = detail.joinReport;
+  state.selectedFile = detail.session.sourceFile;
+  if (!Object.keys(state.roles).length) {
+    for (const card of state.profile.sheets) state.roles[card.sheetName] = card.recommendedRole;
+  }
+  compilerState.summary = null;
+  const prepareModels = async () => {
+    await loadModels();
+    modelState.targets = new Set((detail.modelSelection || {}).targets || []);
+    modelState.comparators = { ...((detail.modelSelection || {}).comparators || {}) };
+  };
+  switch (detail.session.state) {
+    case "profiled":
+      $("#run-parse-btn").classList.add("hidden");
+      renderSheets();
+      setStage("sheets");
+      break;
+    case "roles_confirmed":
+      renderSheets();
+      $("#roles-status").textContent = "Roles confirmed — ready to parse.";
+      $("#run-parse-btn").classList.remove("hidden");
+      setStage("sheets");
+      break;
+    case "parsed":
+      populateSheetFilter();
+      await loadCandidates();
+      setStage("candidates");
+      break;
+    case "models_selected":
+      await prepareModels();
+      await enterCompile();
+      break;
+    case "compiled_ready":
+      await prepareModels();
+      await enterCompile();
+      break;
+    case "changeset_emitted": {
+      const changeset = await getJSON(`/api/wizard/sessions/${runId}/changeset`);
+      renderChangeSet(changeset);
+      setStage("changeset");
+      break;
+    }
+    case "compiled_with_exceptions":
+      await prepareModels();
+      await enterExceptions();
+      break;
+
+    default:
+      throw new Error(`Run state ${detail.session.state} has no safe browser resume route.`);
+  }
+}
+
+$("#run-list").addEventListener("click", (event) => {
+  const button = event.target.closest(".resume-run");
+  if (!button) return;
+  button.disabled = true;
+  resumeSession(button.dataset.runId).catch((error) => {
+    button.disabled = false;
+    showError(error.message);
+  });
+});
 
 function renderFiles() {
   const list = $("#file-list");
@@ -87,11 +174,11 @@ function renderFiles() {
     list.innerHTML = state.files
       .map(
         (file) => `
-        <div class="file-row ${state.selectedFile === file.name ? "selected" : ""}" data-file="${escapeHtml(file.name)}">
+        <button type="button" class="file-row file-choice ${state.selectedFile === file.name ? "selected" : ""}" data-file="${escapeHtml(file.name)}" aria-pressed="${state.selectedFile === file.name}">
           <span class="file-name">${escapeHtml(file.name)}</span>
           <span class="badge">${escapeHtml(file.origin)}</span>
           <span class="file-meta">${(file.sizeBytes / 1024).toFixed(0)} KB</span>
-        </div>`
+        </button>`
       )
       .join("");
   }
@@ -183,12 +270,14 @@ function renderSheets() {
       const roleButton = (value, label) => {
         const allowed =
           value === "exclude" ||
-          (value === "options" && card.sheetType === "options_matrix") ||
+          (value === "options" && card.sheetType === "options_matrix" && card.canonicalOptionSource === true) ||
           (value === "price" && card.sheetType === "price_sheet");
         return `<button class="role-btn ${role === value ? "active" : ""}" data-sheet="${escapeHtml(card.sheetName)}" data-role="${value}" ${allowed ? "" : "disabled"}>${label}</button>`;
       };
       const subtypeNote =
-        card.contentSubtype === "standard_equipment"
+        card.sheetType === "options_matrix" && card.canonicalOptionSource !== true
+          ? '<div class="card-note">Excluded from canonical processing — use Interior, Exterior, or Mechanical sheets</div>'
+          : card.contentSubtype === "standard_equipment"
           ? '<div class="card-note">Standard-equipment content — excluded by default</div>'
           : "";
       const reasons = card.confidenceReasons.length
@@ -432,11 +521,6 @@ async function loadModels() {
     }
   }
   renderModels();
-  if (payload.selection) {
-    // Returning to this stage after a selection: restore the reconciliation
-    // panel (and its pending mandatory decisions) instead of hiding it.
-    reloadReconciliation().catch(() => {});
-  }
 }
 
 function renderModels() {
@@ -446,7 +530,7 @@ function renderModels() {
       const isTarget = modelState.targets.has(model.modelKey);
       const comparator = modelState.comparators[model.modelKey] || "";
       const comparatorSelect = isTarget
-        ? `<label class="cmp-label">Reference model (workbook data used for prefill and comparisons)
+        ? `<label class="cmp-label">Comparator model (corroborating context only)
             <select class="cmp-select" data-model="${escapeHtml(model.modelKey)}">
               <option value="">none</option>
               ${comparatorChoices
@@ -506,1625 +590,765 @@ $("#confirm-models-btn").addEventListener("click", async () => {
     modelState.selection = payload.selection;
     modelState.reconciliation = payload.reconciliation;
     $("#models-status").textContent = "Selection saved.";
-    renderReconciliation();
+    await enterCompile();
   } catch (error) {
     showError(error.message);
   }
 });
 
-function renderReconciliation() {
-  const models = (modelState.reconciliation || {}).models || {};
-  const blocks = Object.entries(models).map(([key, entry]) => {
-    const rows = entry.exportVariants
-      .map((v) => `<span class="vchip">${escapeHtml(v.modelCode)} ${escapeHtml(v.trim)} ${escapeHtml(v.bodyStyle)}</span>`)
-      .join("");
-    let verdict;
-    if (entry.agrees) {
-      verdict = '<span class="conf conf-high">matches workbook scaffold</span>';
-    } else if (!entry.workbookHasScaffold) {
-      verdict = `<span class="conf conf-medium">new model — no workbook variants yet; confirm the export's ${entry.exportVariants.length}</span>`;
-    } else {
-      verdict = `<span class="conf conf-low">disagrees — ${entry.exportOnly.length} export-only, ${entry.workbookOnly.length} workbook-only</span>`;
-    }
-    let actions = "";
-    if (!entry.agrees) {
-      if (entry.decision) {
-        actions = `<div class="card-stats">
-          <span class="conf conf-high">decided — ${escapeHtml(labelFor(ACTION_LABELS, entry.decision.action))} (${escapeHtml(labelFor(RESOLUTION_LABELS, entry.decision.resolution))})</span>
-          <button class="ghost recon-clear" data-decision-id="${escapeHtml(entry.decision.decisionId)}">Clear</button>
-        </div>`;
-      } else {
-        const explain = entry.workbookHasScaffold
-          ? "The export and the workbook scaffold disagree. Pick one before decisions can complete:"
-          : "This model has no variant rows in the workbook yet — that's expected for a new model. Confirm the export's variants:";
-        actions = `<div class="card-stats">${escapeHtml(explain)}</div>
-          <div class="sheet-actions">
-            <button class="primary recon-accept" data-model="${escapeHtml(key)}">Accept the export's variants</button>
-            <button class="ghost recon-question" data-model="${escapeHtml(key)}">Record a business question</button>
-          </div>`;
-      }
-    }
-    return `<div class="card"><div class="card-head"><span class="card-title">${escapeHtml(key)}</span>${verdict}</div>
-      <div class="variant-chips">${rows}</div>${actions}</div>`;
-  });
-  $("#reconciliation").innerHTML = blocks.length
-    ? `<h2 class="sub-h">Variant reconciliation</h2>
-       <p class="hint">The export's variant columns vs the workbook's variant rows. A mismatch is a mandatory call — decide it here (it used to hide in the review lanes).</p>
-       <div class="cards">${blocks.join("")}</div>
-       <div class="sheet-actions"><button id="to-review-btn" class="primary">Start decision review</button></div>`
-    : "";
-  const toReview = $("#to-review-btn");
-  if (toReview) toReview.addEventListener("click", () => enterReview());
-  document.querySelectorAll(".recon-accept, .recon-question").forEach((button) =>
-    button.addEventListener("click", async () => {
-      clearError();
-      const question = button.classList.contains("recon-question");
-      try {
-        await postJSON(`/api/wizard/sessions/${state.session.runId}/decisions`, {
-          decisions: [
-            {
-              model: button.dataset.model,
-              lane: "relationship",
-              groupKey: "variant_reconciliation",
-              action: question ? "needs_product_decision" : "confirm_export_variants",
-              payload: {
-                exportVariants: (models[button.dataset.model] || {}).exportVariants || [],
-              },
-              resolution: question ? "hold_for_question" : "approved_for_plan",
-              reviewerNote: question ? "Variant lineup needs a business answer." : "",
-            },
-          ],
-        });
-        await reloadReconciliation();
-      } catch (error) {
-        showError(error.message);
-      }
-    })
-  );
-  document.querySelectorAll(".recon-clear").forEach((button) =>
-    button.addEventListener("click", async () => {
-      clearError();
-      try {
-        await postJSON(`/api/wizard/sessions/${state.session.runId}/decisions/delete`, {
-          decisionIds: [button.dataset.decisionId],
-        });
-        await reloadReconciliation();
-      } catch (error) {
-        showError(error.message);
-      }
-    })
-  );
-}
+/* -------------------------------------------------------- stage: compiler */
 
-async function reloadReconciliation() {
-  modelState.reconciliation = await getJSON(
-    `/api/wizard/sessions/${state.session.runId}/reconciliation`
-  );
-  renderReconciliation();
-}
-
-$("#to-models-btn").addEventListener("click", async () => {
-  clearError();
-  try {
-    await loadModels();
-    setStage("models");
-  } catch (error) {
-    showError(error.message);
-  }
-});
-$("#back-to-candidates").addEventListener("click", () => setStage("candidates"));
-$("#back-to-models").addEventListener("click", () => setStage("models"));
-
-/* --------------------------------------------------------- stage: review */
-
-const LANES = [
-  ["section", "Section assignment"],
-  ["price", "Price resolution"],
-  ["exclusive_group", "Exclusive groups"],
-  ["relationship", "Relationships"],
-  ["copy_split", "Copy split"],
-  ["status_nuance", "Status nuances"],
-  ["duplicate", "Duplicates"],
-  ["standard_equipment", "Standard equipment"],
-  ["interior_media_deferral", "Interiors / media deferrals"],
-  ["presentation", "Presentation metadata"],
-];
-
-/* Stored decision values never change (Pass C reads them); these maps are the
-   reviewer-facing language layer only. */
-const RESOLUTION_LABELS = {
-  approved_for_plan: ["Approve — write to workbook", "Goes into the apply plan in Pass C."],
-  hold_for_question: ["Hold — I have a question", "Counts as reviewed; listed in the holds report until resolved."],
-  not_needed: ["Skip — don't carry over", "Recorded so it never comes back as missing."],
+const compilerState = {
+  summary: null,
 };
 
-const ACTION_LABELS = {
-  assign_section: ["Put in section", "Places this option in the chosen form section."],
-  accept_exact_price: ["Use matched price", "Takes the single price-schedule match."],
-  choose_price_row: ["Pick a price row", "Choose one of several matching price rows."],
-  set_reviewed_price: ["Enter a price", "Type the reviewed dollar value."],
-  confirm_no_price: ["No price (included)", "Confirms this option carries no separate price."],
-  defer_price_extractor: ["Defer — fix price source later", "Price stays empty in the plan until decided."],
-  create_exclusive_group: ["Create pick-one group", "Members can't be ordered together."],
-  create_relationship_candidate: ["Record relationship", "Requires/includes/excludes between options."],
-  needs_product_decision: [
-    "Record business question",
-    "Saves the open question into the plan report — no rule or row is written until it's answered.",
-  ],
-  confirm_export_variants: ["Accept export variants", "The export's variant lineup is the right one for this model."],
-  split_copy: ["Set customer copy", "Name / description / fine print for the form."],
-  confirm_status: ["Confirm as parsed", "The parsed availability status is right."],
-  mark_unresolved_blocked: ["Can't resolve — block it", "Status can't be determined from the source."],
-  classify_duplicate_source: ["Classify duplicate", "Same option or different by context?"],
-  include_standard_equipment: ["Include as standard", "Shows as standard equipment for this model."],
-  exclude_row: [
-    "Leave out — don't write this row",
-    "The row is not carried into the workbook. Nothing that already exists is deleted.",
-  ],
-  defer_item: ["Defer for later", "Named item to handle in the apply pass."],
-  approve_presentation_rows: ["Approve rows", "Approves this sheet's presentation rows."],
-};
-
-const LANE_DESCRIPTIONS = {
-  section: "Pick where each option lives in the form. Sections come from the workbook's section_master sheet — the same sections live models use. Skip — don't carry over saves without a section and drops the row from the plan.",
-  price: "Settle every option's price. Filter by price state; single matches can be accepted wholesale. A typed reviewed $ overrides the discovered price. Rows you skipped in Section assignment don't need a price.",
-  exclusive_group: "Group options the customer must pick only one of. Rarely needed for options already in a pick-one section (listed below) — the section already enforces it.",
-  relationship: "Record workbook-safe option rules: Requires, Includes / auto-adds, or Not available with. Hints can prefill the form; save writes the relationship to the Pass C plan.",
-  copy_split: "Names follow your comma rule: text before the first comma (LPO rows use the part between the first and second comma); the rest is description; footnote-numbered lines are fine print. Fix only the flagged exceptions — one-word names, duplicates, unmatched footnotes.",
-  status_nuance: "Only rows with genuinely ambiguous availability symbols (□ upgradeable, standalone D dealer-install, unknown) — A/D is parsed as available automatically.",
-  duplicate: "Same RPO on more than one source sheet in this ingest file — one option or context-distinct?",
-  standard_equipment: "Rows without an orderable RPO, plus anything you assigned to a standard section. Rows that are available-to-order on this model (A statuses) or that carry any price are options, not standard equipment — both are excluded automatically.",
-  interior_media_deferral: "Record named to-dos the wizard can't parse (interiors, colors, images) so the apply plan carries them as open items.",
-  presentation: "Approve the form's skeleton for this model — steps, section display, order summary. Required before the model can go live.",
-};
-
-function labelFor(map, value) {
-  const entry = map[value];
-  return entry ? entry[0] : value.replaceAll("_", " ");
+function readinessLabel(value) {
+  return value ? "ready" : "blocked";
 }
 
-function normalizedStatusBase(raw) {
-  return String(raw || "")
-    .replace(/\d+$/, "")
-    .replace(/[—–−]/g, "-")
-    .replace(/\s+/g, "")
-    .toUpperCase();
-}
-
-function titleFor(map, value) {
-  const entry = map[value];
-  return entry ? entry[1] : "";
-}
-
-const RELATIONSHIP_KIND_CHOICES = [
-  {
-    value: "requires",
-    label: "Requires",
-    help: "Source can be selected only when the target is also selected.",
-  },
-  {
-    value: "includes",
-    label: "Includes / auto-adds",
-    help: "Selecting the source adds the target option automatically.",
-  },
-  {
-    value: "not_available_with",
-    label: "Not available with",
-    help: "Source and target cannot be selected together.",
-  },
-];
-const RELATIONSHIP_KINDS = RELATIONSHIP_KIND_CHOICES.map((choice) => choice.value);
-const RELATIONSHIP_KIND_ALIASES = {
-  only_available_with: "requires",
-  requires_additional_equipment: "requires",
-  included_with: "includes",
-};
-const RELATIONSHIP_KIND_LABELS = Object.fromEntries(RELATIONSHIP_KIND_CHOICES.map((choice) => [choice.value, choice.label]));
-
-function canonicalRelationshipKind(kind) {
-  const raw = String(kind || "").trim();
-  return RELATIONSHIP_KINDS.includes(raw) ? raw : RELATIONSHIP_KIND_ALIASES[raw] || "";
-}
-
-function relationshipKindLabel(kind) {
-  const canonical = canonicalRelationshipKind(kind);
-  if (canonical) return RELATIONSHIP_KIND_LABELS[canonical];
-  return kind ? `Needs manual handling: ${String(kind).replaceAll("_", " ")}` : "Needs manual handling";
-}
-
-function relationshipKindControl(current = "") {
-  const selected = canonicalRelationshipKind(current);
-  return `<div class="rel-kind-options" id="group-kind" role="radiogroup" aria-label="Relationship rule type">
-    ${RELATIONSHIP_KIND_CHOICES.map(
-      (choice) => `
-        <label class="rel-kind-choice">
-          <input type="radio" name="group-kind" value="${escapeHtml(choice.value)}"${choice.value === selected ? " checked" : ""}>
-          <span><b>${escapeHtml(choice.label)}</b><small>${escapeHtml(choice.help)}</small></span>
-        </label>`
-    ).join("")}
-  </div>`;
-}
-
-function selectedRelationshipKind() {
-  const selected = document.querySelector('input[name="group-kind"]:checked');
-  return selected ? selected.value : "";
-}
-
-function setRelationshipKind(kind) {
-  const canonical = canonicalRelationshipKind(kind);
-  document.querySelectorAll('input[name="group-kind"]').forEach((input) => {
-    input.checked = input.value === canonical;
-  });
-  return canonical;
-}
-
-const reviewState = {
-  payload: null,
-  progress: null,
-  checked: new Set(),
-  queueKey: "",
-  lastBatch: null, // {batchId, count, queueKey}
-  lastBulkNote: "",
-  splitShowAll: false,
-  blockerCollapsed: false,
-};
-
-/* Lanes whose queue is one row per candidate — they share the row-level
-   filters (decision state, workbook reference, section state). */
-const PER_CANDIDATE_LANES = ["section", "price", "copy_split", "status_nuance", "standard_equipment"];
-
-function currentQueueKey() {
-  return [
-    $("#review-model").value,
-    $("#review-lane").value,
-    $("#review-q").value.trim(),
-    $("#review-source-section").value,
-    $("#review-decision-state").value,
-    $("#review-price-state").value,
-    $("#review-price-presence").value,
-    $("#review-workbook-ref").value,
-    $("#review-section-state").value,
-  ].join("|");
-}
-
-async function enterReview() {
-  const modelSelect = $("#review-model");
-  modelSelect.innerHTML = [...modelState.targets]
-    .map((key) => `<option value="${escapeHtml(key)}">${escapeHtml(key)}</option>`)
+function renderCompilerSummary(summary) {
+  compilerState.summary = summary;
+  state.session = summary.session;
+  const manifest = summary.counts.manifest;
+  const exceptions = summary.counts.exceptions;
+  const actionCounts = Object.entries(manifest.byAction || {})
+    .map(([action, count]) => `<span class="sum-chip"><b>${escapeHtml(count)}</b> ${escapeHtml(action)}</span>`)
     .join("");
-  const laneSelect = $("#review-lane");
-  laneSelect.innerHTML = LANES.map(
-    ([lane, label]) => `<option value="${escapeHtml(lane)}">${escapeHtml(label)}</option>`
-  ).join("");
-  await refreshReview();
-  setStage("review");
-}
-
-async function refreshReview() {
-  const model = $("#review-model").value;
-  const lane = $("#review-lane").value;
-  const params = new URLSearchParams({ model, lane });
-  if ($("#review-q").value.trim()) params.set("q", $("#review-q").value.trim());
-  if ($("#review-source-section").value) params.set("sourceSection", $("#review-source-section").value);
-  const perCandidate = PER_CANDIDATE_LANES.includes(lane);
-  $("#review-decision-state").classList.toggle("hidden", !perCandidate);
-  if (perCandidate && $("#review-decision-state").value) {
-    params.set("decisionState", $("#review-decision-state").value);
-  }
-  $("#review-price-state").classList.toggle("hidden", lane !== "price");
-  if (lane === "price" && $("#review-price-state").value) params.set("priceMatch", $("#review-price-state").value);
-  $("#review-price-presence").classList.toggle("hidden", lane !== "standard_equipment");
-  if (lane === "standard_equipment" && $("#review-price-presence").value) {
-    params.set("pricePresence", $("#review-price-presence").value);
-  }
-  $("#review-workbook-ref").classList.toggle("hidden", !perCandidate);
-  if (perCandidate && $("#review-workbook-ref").value) {
-    params.set("workbookRef", $("#review-workbook-ref").value);
-  }
-  const hasSectionFilter = perCandidate && lane !== "section";
-  $("#review-section-state").classList.toggle("hidden", !hasSectionFilter);
-  if (hasSectionFilter && $("#review-section-state").value) {
-    params.set("sectionState", $("#review-section-state").value);
-  }
-  reviewState.payload = await getJSON(
-    `/api/wizard/sessions/${state.session.runId}/review?${params}`
-  );
-  reviewState.progress = await getJSON(`/api/wizard/sessions/${state.session.runId}/progress`);
-  const key = currentQueueKey();
-  if (key !== reviewState.queueKey) {
-    reviewState.checked = new Set();
-    reviewState.queueKey = key;
-  }
-  populateSourceSections();
-  populateCopyBar();
-  renderProgress();
-  renderLaneHeader();
-  renderBulkBar();
-  renderQueue();
-}
-
-function renderLaneHeader() {
-  const lane = $("#review-lane").value;
-  $("#lane-help").innerHTML = `
-    <span>${escapeHtml(LANE_DESCRIPTIONS[lane] || "")}</span>
-    <details class="glossary"><summary>What do these buttons mean?</summary>
-      <ul>
-        ${["approved_for_plan", "hold_for_question", "not_needed"]
-          .map((value) => `<li><b>${escapeHtml(labelFor(RESOLUTION_LABELS, value))}</b> — ${escapeHtml(titleFor(RESOLUTION_LABELS, value))}</li>`)
-          .join("")}
-        <li><b>Clear</b> — removes a saved decision (kept in the audit log).</li>
-        <li><b>Undo last bulk</b> — removes every decision from your most recent bulk action.</li>
-      </ul>
-    </details>`;
-}
-
-function populateSourceSections() {
-  const select = $("#review-source-section");
-  const current = select.value;
-  const sections = reviewState.payload.sourceSections || [];
-  select.innerHTML =
-    '<option value="">All source groups</option>' +
-    sections
-      .map((label) => `<option value="${escapeHtml(label)}" ${label === current ? "selected" : ""}>${escapeHtml(label)}</option>`)
-      .join("");
-}
-
-function populateCopyBar() {
-  const current = $("#review-model").value;
-  const others = [...modelState.targets].filter((key) => key !== current);
-  const select = $("#copy-from-model");
-  const previous = select.value;
-  select.innerHTML = others
-    .map((key) => `<option value="${escapeHtml(key)}" ${key === previous ? "selected" : ""}>${escapeHtml(key)}</option>`)
-    .join("");
-  $("#copy-from-label").textContent = select.value || others[0] || "";
-  $("#copy-to-label").textContent = current;
-}
-
-$("#copy-from-model").addEventListener("change", () => {
-  $("#copy-from-label").textContent = $("#copy-from-model").value;
-});
-
-function renderProgress() {
-  const model = $("#review-model").value;
-  const entry = reviewState.progress.models[model];
-  if (!entry) return;
-  const chips = LANES.map(([lane, label]) => {
-    const laneEntry = entry.lanes[lane] || {};
-    const missing = laneEntry.missing ?? null;
-    const cls = missing === null ? "" : missing === 0 ? "sum-exact" : "sum-warn";
-    const text =
-      missing === null
-        ? `${laneEntry.decisions} decided`
-        : `${(laneEntry.required ?? 0) - missing}/${laneEntry.required ?? 0}`;
-    return `<span class="sum-chip ${cls}" title="${escapeHtml(label)}">${escapeHtml(label)}: <b>${text}</b></span>`;
-  }).join("");
-  const stateChip = entry.complete
-    ? '<span class="sum-chip sum-exact"><b>complete</b></span>'
-    : `<span class="sum-chip sum-warn"><b>${entry.blockers.length}</b> blockers</span>`;
-  $("#progress-chips").innerHTML = stateChip + chips;
-  renderBlockerPanel();
-}
-
-/* ---------------------------------------------------------- blocker panel */
-
-const LANE_LABELS = Object.fromEntries(LANES);
-
-const BLOCKER_REASON_LABELS = {
-  no_decision: "still need a decision",
-  flagged_status_undecided: "have a flagged status that needs a call",
-  presentation_sheet_unapproved: "still need approval",
-  variant_reconciliation_disagreement_undecided: "needs a decision",
-};
-
-const BLOCKER_CHIP_LIMIT = 15;
-
-function blockerRowChip(blocker) {
-  const rpo = blocker.rpo || "";
-  const label = rpo
-    ? `${rpo}${blocker.description ? ` — ${blocker.description.slice(0, 60)}` : ""}`
-    : blocker.description || blocker.candidateId;
-  return `<button class="blocker-row ghost" data-lane="${escapeHtml(blocker.lane)}" data-rpo="${escapeHtml(rpo)}"
-    title="Open the ${escapeHtml(LANE_LABELS[blocker.lane] || blocker.lane)} lane filtered to this row">${escapeHtml(label)}</button>`;
-}
-
-function renderBlockerPanel() {
-  const container = $("#review-blockers");
-  const progress = reviewState.progress;
-  if (!progress) {
-    container.innerHTML = "";
-    return;
-  }
-  const currentModel = $("#review-model").value;
-  const otherModelButtons = Object.entries(progress.models || {})
-    .filter(([model, entry]) => model !== currentModel && (entry.blockers || []).length)
-    .map(
-      ([model, entry]) =>
-        `<button class="blocker-switch-model ghost" data-model="${escapeHtml(model)}">${escapeHtml(model)}: ${entry.blockers.length} blocker${entry.blockers.length === 1 ? "" : "s"}</button>`
-    )
-    .join(" ");
-  const entry = (progress.models || {})[currentModel];
-  const blockers = (entry || {}).blockers || [];
-  if (!blockers.length) {
-    container.innerHTML = otherModelButtons
-      ? `<div class="blocker-panel blocker-panel-ok"><span class="status-note"><b>${escapeHtml(currentModel)}</b> has no blockers — other models still do:</span> ${otherModelButtons}</div>`
-      : "";
-    return;
-  }
-  const groups = new Map();
-  for (const blocker of blockers) {
-    const key = `${blocker.lane}|${blocker.reason}`;
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(blocker);
-  }
-  const blocks = [...groups.entries()].map(([key, items]) => {
-    const [lane, reason] = key.split("|");
-    if (reason === "variant_reconciliation_disagreement_undecided") {
-      return `<div class="blocker-group">
-        <span>Variant reconciliation ${escapeHtml(BLOCKER_REASON_LABELS[reason])} — the export's variant lineup disagrees with the workbook.</span>
-        <button class="blocker-models primary">Decide on the Models step</button>
-      </div>`;
-    }
-    if (reason === "presentation_sheet_unapproved") {
-      const chips = items
-        .map((blocker) => {
-          const [friendly] = PRESENTATION_SHEET_INFO[blocker.groupKey] || [blocker.groupKey];
-          return `<button class="blocker-row ghost" data-lane="presentation" data-rpo="">${escapeHtml(friendly)}</button>`;
-        })
-        .join(" ");
-      return `<div class="blocker-group">
-        <span><b>${items.length}</b> presentation sheet${items.length === 1 ? "" : "s"} ${escapeHtml(BLOCKER_REASON_LABELS[reason])}:</span>
-        ${chips}
-      </div>`;
-    }
-    const laneLabel = LANE_LABELS[lane] || lane;
-    const reasonLabel = BLOCKER_REASON_LABELS[reason] || reason.replaceAll("_", " ");
-    const inline = items.slice(0, BLOCKER_CHIP_LIMIT).map(blockerRowChip).join(" ");
-    const rest = items.slice(BLOCKER_CHIP_LIMIT);
-    const overflow = rest.length
-      ? `<details class="blocker-more"><summary>Show ${rest.length} more</summary>${rest.map(blockerRowChip).join(" ")}</details>`
-      : "";
-    return `<div class="blocker-group">
-      <span><b>${items.length}</b> ${escapeHtml(laneLabel)} row${items.length === 1 ? "" : "s"} ${escapeHtml(reasonLabel)}.</span>
-      <button class="blocker-jump-lane ghost" data-lane="${escapeHtml(lane)}" title="Open the lane showing only rows without a decision">Review these</button>
-      <div class="blocker-chips">${inline}${overflow}</div>
-    </div>`;
-  });
-  const openAttr = reviewState.blockerCollapsed ? "" : " open";
-  container.innerHTML = `<details class="blocker-panel"${openAttr}>
-    <summary class="blocker-summary">
-      <span><b>${blockers.length}</b> item${blockers.length === 1 ? "" : "s"} block${blockers.length === 1 ? "s" : ""} completion for <b>${escapeHtml(currentModel)}</b></span>
-      <span class="blocker-toggle-hint">click to ${reviewState.blockerCollapsed ? "show" : "hide"}</span>
-    </summary>
-    <div class="blocker-body">
-      <div class="blocker-head">Click any item to jump to it. The list refreshes as you save decisions.</div>
-      ${blocks.join("")}
-      ${otherModelButtons ? `<div class="blocker-head">Other models with blockers: ${otherModelButtons}</div>` : ""}
-    </div>
-  </details>`;
-}
-
-async function jumpToLane(lane, { rpo = "" } = {}) {
-  $("#review-lane").value = lane;
-  resetReviewFilters();
-  $("#review-q").value = rpo;
-  if (!rpo && PER_CANDIDATE_LANES.includes(lane)) {
-    $("#review-decision-state").value = "undecided";
-  }
-  if (lane === "copy_split") reviewState.splitShowAll = true;
-  await refreshReview();
-}
-
-$("#review-blockers").addEventListener("click", async (event) => {
-  clearError();
-  try {
-    const summary = event.target.closest(".blocker-summary");
-    if (summary) {
-      window.setTimeout(() => {
-        const panel = summary.closest(".blocker-panel");
-        if (panel) reviewState.blockerCollapsed = !panel.open;
-      }, 0);
-      return;
-    }
-    const switchModel = event.target.closest(".blocker-switch-model");
-    if (switchModel) {
-      $("#review-model").value = switchModel.dataset.model;
-      resetReviewFilters();
-      $("#review-q").value = "";
-      await refreshReview();
-      return;
-    }
-    const models = event.target.closest(".blocker-models");
-    if (models) {
-      await loadModels();
-      setStage("models");
-      return;
-    }
-    const row = event.target.closest(".blocker-row");
-    if (row) {
-      await jumpToLane(row.dataset.lane, { rpo: row.dataset.rpo || "" });
-      return;
-    }
-    const laneJump = event.target.closest(".blocker-jump-lane");
-    if (laneJump) await jumpToLane(laneJump.dataset.lane);
-  } catch (error) {
-    showError(error.message);
-  }
-});
-
-function decisionFor(candidateId) {
-  return (reviewState.payload.decisions || []).find((d) => d.candidateId === candidateId);
-}
-
-function selectControl(cls, options, current, placeholder) {
-  return `<select class="${cls}">
-    ${placeholder ? `<option value="">${escapeHtml(placeholder)}</option>` : ""}
-    ${options
-      .map(
-        (value) =>
-          `<option value="${escapeHtml(value)}" title="${escapeHtml(titleFor(ACTION_LABELS, value))}" ${value === current ? "selected" : ""}>${escapeHtml(labelFor(ACTION_LABELS, value))}</option>`
-      )
-      .join("")}
-  </select>`;
-}
-
-function resolutionOptions(current) {
-  return ["approved_for_plan", "hold_for_question", "not_needed"]
-    .map(
-      (value) =>
-        `<option value="${value}" title="${escapeHtml(titleFor(RESOLUTION_LABELS, value))}" ${current === value ? "selected" : ""}>${escapeHtml(labelFor(RESOLUTION_LABELS, value))}</option>`
-    )
-    .join("");
-}
-
-function sectionSelect(current) {
-  return `<select class="dec-section">
-    <option value="">— section —</option>
-    ${(reviewState.payload.sections || [])
-      .map(
-        (section) =>
-          `<option value="${escapeHtml(section.sectionId)}" ${section.sectionId === current ? "selected" : ""}>${escapeHtml(section.sectionName)} (${escapeHtml(section.stepKey)})</option>`
-      )
-      .join("")}
-  </select>`;
-}
-
-function laneRowControls(lane, candidate) {
-  const decision = decisionFor(candidate.candidateId);
-  const payload = (decision && decision.payload) || {};
-  let controls = "";
-  if (lane === "section") {
-    const workbookRpo = candidate.rpo || candidate.refOnlyRpo;
-    const reference = ((reviewState.payload.workbookReference || {})[workbookRpo] || [])[0];
-    const payloadHasSelectable = Object.prototype.hasOwnProperty.call(payload, "selectable");
-    const payloadHasActive = Object.prototype.hasOwnProperty.call(payload, "active");
-    const effectiveSelectable = payloadHasSelectable ? payload.selectable : reference ? reference.selectable : undefined;
-    const effectiveActive = payloadHasActive ? payload.active : reference ? reference.active : undefined;
-    const referenceStateAttrs = reference
-      ? `${reference.selectable === undefined || reference.selectable === null ? "" : ` data-selectable="${reference.selectable ? "true" : "false"}"`}${reference.active === undefined || reference.active === null ? "" : ` data-active="${reference.active ? "true" : "false"}"`}`
-      : "";
-    const useReference =
-      reference && reference.sectionId
-        ? `<button class="ref-use-section ghost" data-section="${escapeHtml(reference.sectionId)}"${referenceStateAttrs} title="${escapeHtml(reference.sectionName || reference.sectionId)}">Use ${escapeHtml(reference.modelKey)}'s section</button>`
-        : "";
-    controls = `${sectionSelect(payload.sectionId || "")}${useReference}
-      <label class="dec-inline" title="Row is written but can't be picked — display/reference only."><input type="checkbox" class="dec-not-selectable" ${effectiveSelectable === false ? "checked" : ""}> not selectable</label>
-      <label class="dec-inline" title="Row is written with active = false — hidden from the form until turned on."><input type="checkbox" class="dec-inactive" ${effectiveActive === false ? "checked" : ""}> inactive</label>`;
-  } else if (lane === "price") {
-    const exact = candidate.priceMatch === "exact";
-    const rows = (candidate.priceRows || [])
-      .map(
-        (row, index) =>
-          `<option value="${index}" ${Number(payload.priceRowIndex) === index ? "selected" : ""}>${fmtPrice(row.listPrice)}${row.qualifier ? ` — ${escapeHtml(row.qualifier)}` : ""}</option>`
-      )
-      .join("");
-    controls = `
-      ${exact ? `<label class="dec-inline"><input type="checkbox" class="dec-price-exact" ${!decision || decision.action === "accept_exact_price" ? "checked" : ""}> accept ${fmtPrice(candidate.listPrice ?? (candidate.priceRows[0] || {}).listPrice)}</label>` : ""}
-      ${rows ? `<select class="dec-price-row"><option value="">— pick price row —</option>${rows}</select>` : ""}
-      <input class="dec-price-manual" type="number" step="0.01" placeholder="reviewed $" title="Overrides the discovered price — the plan writes this value." value="${payload.reviewedPrice ?? ""}">
-      <label class="dec-inline"><input type="checkbox" class="dec-price-none" ${decision && decision.action === "confirm_no_price" ? "checked" : ""}> no price</label>
-      <label class="dec-inline"><input type="checkbox" class="dec-price-defer" ${decision && decision.action === "defer_price_extractor" ? "checked" : ""}> defer</label>`;
-  } else if (lane === "copy_split") {
-    const proposal = candidate.proposedSplit || {};
-    controls = `
-      <input class="dec-copy-name" placeholder="customer-facing name" value="${escapeHtml(payload.name ?? proposal.name ?? "")}">
-      <input class="dec-copy-desc" placeholder="description" value="${escapeHtml(payload.description ?? proposal.description ?? "")}">
-      <input class="dec-copy-disc" placeholder="fine print / disclosure" value="${escapeHtml(payload.disclosure ?? proposal.disclosure ?? "")}">
-      ${(proposal.flags || []).map((flag) => `<span class="sum-chip sum-warn">${escapeHtml(flag.replaceAll("_", " "))}</span>`).join("")}`;
-  } else if (lane === "status_nuance") {
-    const explanations = (candidate.statuses || [])
-      .filter((status) => {
-        const flags = status.flags || [];
-        const raw = normalizedStatusBase(status.raw);
-        return (
-          flags.includes("unknown_status_symbol") ||
-          flags.includes("upgradeable_equipment_group_review") ||
-          status.status === "unresolved" ||
-          raw === "D"
-        );
-      })
-      .map((status) => {
-        const raw = normalizedStatusBase(status.raw);
-        let why = "couldn't parse this symbol — needs a call";
-        if (raw === "□") why = "□ upgradeable group — standard here, upgradeable elsewhere; confirm it reads as standard";
-        else if (raw === "D") why = "dealer-installed nuance — parsed as available; confirm";
-        return `<div class="cell-sub">“${escapeHtml(status.raw)}” on ${escapeHtml(status.modelCode)} ${escapeHtml(status.trim)} → parsed <b>${escapeHtml(status.status)}</b>; ${escapeHtml(why)}</div>`;
-      })
-      .join("");
-    controls = `${explanations}${selectControl(
-      "dec-status-action",
-      ["confirm_status", "mark_unresolved_blocked"],
-      decision ? decision.action : "confirm_status"
-    )}`;
-  } else if (lane === "standard_equipment") {
-    controls = selectControl(
-      "dec-se-action",
-      ["include_standard_equipment", "exclude_row"],
-      decision ? decision.action : "include_standard_equipment"
-    );
-  }
-  return `
-    ${controls}
-    <select class="dec-resolution">${resolutionOptions(decision ? decision.resolution : "approved_for_plan")}</select>
-    <input class="dec-note" placeholder="note" title="Saved with the decision — shows on recorded decisions, the holds report, and the plan's holds list. Never written to the workbook." value="${escapeHtml(decision ? decision.reviewerNote : "")}">
-    <button class="dec-save primary" data-id="${escapeHtml(candidate.candidateId)}">Save</button>
-    ${decision ? '<span class="conf conf-high">saved</span>' : ""}`;
-}
-
-function collectRowDecision(lane, row, candidateId) {
-  const resolution = row.querySelector(".dec-resolution").value;
-  const reviewerNote = row.querySelector(".dec-note").value;
-  let action = "";
-  let payload = {};
-  if (lane === "section") {
-    const sectionId = row.querySelector(".dec-section").value;
-    if (sectionId) {
-      action = "assign_section";
-      payload = { sectionId };
-      if (row.querySelector(".dec-not-selectable").checked) payload.selectable = false;
-      if (row.querySelector(".dec-inactive").checked) payload.active = false;
-    } else if (resolution === "not_needed") {
-      // Skip — don't carry over: valid without a section; the row stays out
-      // of the plan and owes no price decision.
-      action = "exclude_row";
-    } else {
-      throw new Error("Pick a section, or choose “Skip — don't carry over” to drop the row.");
-    }
-  } else if (lane === "price") {
-    const exact = row.querySelector(".dec-price-exact");
-    const rowSelect = row.querySelector(".dec-price-row");
-    const manual = row.querySelector(".dec-price-manual");
-    if (row.querySelector(".dec-price-defer").checked) {
-      action = "defer_price_extractor";
-    } else if (row.querySelector(".dec-price-none").checked) {
-      action = "confirm_no_price";
-    } else if (manual.value !== "") {
-      action = "set_reviewed_price";
-      payload = { reviewedPrice: Number(manual.value) };
-    } else if (rowSelect && rowSelect.value !== "") {
-      action = "choose_price_row";
-      payload = { priceRowIndex: Number(rowSelect.value) };
-    } else if (exact && exact.checked) {
-      action = "accept_exact_price";
-    } else {
-      throw new Error("Pick a price resolution (accept, price row, reviewed value, no price, or defer).");
-    }
-  } else if (lane === "copy_split") {
-    action = "split_copy";
-    payload = {
-      name: row.querySelector(".dec-copy-name").value,
-      description: row.querySelector(".dec-copy-desc").value,
-      disclosure: row.querySelector(".dec-copy-disc").value,
-    };
-    if (!payload.name) throw new Error("Customer-facing name is required.");
-  } else if (lane === "status_nuance") {
-    action = row.querySelector(".dec-status-action").value;
-  } else if (lane === "standard_equipment") {
-    action = row.querySelector(".dec-se-action").value;
-  }
-  return {
-    model: $("#review-model").value,
-    lane,
-    candidateId,
-    action,
-    payload,
-    resolution,
-    reviewerNote,
-  };
-}
-
-function hintBlock(candidate, clickable = false) {
-  const hints = (reviewState.payload.hints || {})[candidate.candidateId] || [];
-  if (!hints.length) return "";
-  const chips = hints
-    .map((hint) => {
-      const label = `${escapeHtml(relationshipKindLabel(hint.kind))}${hint.rpoTokens.length ? ` → ${escapeHtml(hint.rpoTokens.join(", "))}` : ""}`;
-      if (!clickable) return `<span class="sum-chip" title="${escapeHtml(hint.snippet)}">${label}</span>`;
-      return `<button class="sum-chip hint-accept" title="${escapeHtml(hint.snippet)}"
-        data-kind="${escapeHtml(hint.kind)}"
-        data-source="${escapeHtml(candidate.rpo || candidate.refOnlyRpo)}"
-        data-targets="${escapeHtml(hint.rpoTokens.join(","))}">${label}</button>`;
-    })
-    .join("");
-  return `<div class="hints">${chips}<div class="cell-sub">Hints are suggestions only — ${clickable ? "click one to prefill the form, then edit and save" : "record them in the Relationships lane"}.</div></div>`;
-}
-
-function referenceLine(candidate) {
-  const workbookRpo = candidate.rpo || candidate.refOnlyRpo;
-  const rows = (reviewState.payload.workbookReference || {})[workbookRpo];
-  if (!workbookRpo) return "";
-  if (!rows || !rows.length) {
-    return '<div class="cell-sub ref-line ref-new">New to workbook — no reference</div>';
-  }
-  const top = rows[0];
-  const price = top.price ? ` · ${fmtPrice(Number(top.price))}` : "";
-  const selectable = top.selectable === false ? " · not selectable" : "";
-  const active = top.active === false ? " · inactive" : "";
-  const section = top.sectionName || top.sectionId || "no section";
-  const more = rows.length > 1 ? ` (+${rows.length - 1} more)` : "";
-  return `<div class="cell-sub ref-line">In workbook: <b>${escapeHtml(top.modelKey)}</b> “${escapeHtml(top.optionName || workbookRpo)}” · ${escapeHtml(section)}${price}${selectable}${active}${more}</div>`;
-}
-
-function visibleQueueCandidates() {
-  const lane = $("#review-lane").value;
-  let rows = reviewState.payload.candidates || [];
-  if (lane === "copy_split" && !reviewState.splitShowAll) {
-    rows = rows.filter((c) => ((c.proposedSplit || {}).flags || []).length > 0);
-  }
-  return rows;
-}
-
-function renderQueue() {
-  const lane = $("#review-lane").value;
-  if (lane === "presentation") {
-    renderPresentationQueue();
-    return;
-  }
-  if (lane === "duplicate") {
-    renderDuplicateLane();
-    return;
-  }
-  if (lane === "exclusive_group" || lane === "relationship" || lane === "interior_media_deferral") {
-    renderGroupLane(lane);
-    return;
-  }
-  const candidates = visibleQueueCandidates();
-  const splitToggle =
-    lane === "copy_split"
-      ? `<div class="hint">Script proposals prefilled. Showing ${reviewState.splitShowAll ? "all rows" : "flagged rows only"} ·
-          <button id="split-toggle" class="ghost">${reviewState.splitShowAll ? "Show flagged only" : "Show all rows"}</button></div>`
-      : "";
-  const rows = candidates
-    .map((candidate) => {
-      const decision = decisionFor(candidate.candidateId);
-      const checked = reviewState.checked.has(candidate.candidateId);
-      return `
-      <tr class="cand-row">
-        <td><input type="checkbox" class="row-check" data-id="${escapeHtml(candidate.candidateId)}" ${checked ? "checked" : ""}></td>
-        <td class="rpo">${escapeHtml(candidate.rpo || candidate.refOnlyRpo)}</td>
-        <td class="desc">${escapeHtml(candidate.description)}
-          <div class="cell-sub">${escapeHtml(candidate.sheetName)} · row ${candidate.rowIndex} · ${escapeHtml(candidate.sectionLabel)}</div>
-          ${referenceLine(candidate)}
-          ${hintBlock(candidate)}</td>
-        <td><div class="stchips">${statusChips(candidate)}</div></td>
-        <td>${priceBadge(candidate)}</td>
-        <td class="dec-cell">${laneRowControls(lane, candidate)}
-          ${decision ? `<button class="dec-clear ghost" data-id="${escapeHtml(candidate.candidateId)}">Clear</button>` : ""}</td>
-      </tr>`;
-    })
-    .join("");
-  $("#review-queue").innerHTML = rows
-    ? `${splitToggle}<table class="cand"><thead><tr>
-        <th><input type="checkbox" id="check-all" title="Select all filtered rows"></th>
-        <th>RPO</th><th>Description</th><th>Statuses</th><th>Price</th><th>Decision</th>
-      </tr></thead><tbody>${rows}</tbody></table>`
-    : `${splitToggle}<div class="empty-note">No candidates in this lane for the current filters.</div>`;
-  const checkAll = document.querySelector("#check-all");
-  if (checkAll) {
-    checkAll.checked = candidates.length > 0 && candidates.every((c) => reviewState.checked.has(c.candidateId));
-  }
-  const splitButton = document.querySelector("#split-toggle");
-  if (splitButton) {
-    splitButton.addEventListener("click", () => {
-      reviewState.splitShowAll = !reviewState.splitShowAll;
-      renderBulkBar();
-      renderQueue();
-    });
-  }
-}
-
-function groupPayloadSummary(decision) {
-  const payload = decision.payload || {};
-  if (decision.lane === "relationship") {
-    if (decision.action === "needs_product_decision") {
-      return `Open question${payload.note ? `: ${payload.note}` : ""}`;
-    }
-    return `${relationshipKindLabel(payload.kind)}: ${payload.sourceRpo || ""} → ${(payload.targetRpos || []).join(", ")}${payload.note ? ` — ${payload.note}` : ""}`;
-  }
-  if (decision.lane === "exclusive_group") {
-    return `members: ${(payload.members || []).join(", ")}`;
-  }
-  if (decision.lane === "interior_media_deferral") {
-    return `${payload.kind || ""}${payload.note ? ` — ${payload.note}` : ""}`;
-  }
-  return Object.entries(payload)
-    .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(", ") : value}`)
-    .join(" · ");
-}
-
-function exclusivePoolTable() {
-  const sections = Object.fromEntries((reviewState.payload.sections || []).map((s) => [s.sectionId, s]));
-  const sectionDecisions = reviewState.payload.sectionDecisions || {};
-  const query = ($("#review-q").value || "").trim().toLowerCase();
-  const pool = (reviewState.payload.candidates || []).filter(
-    (candidate) => {
-      const rpo = candidate.rpo || candidate.refOnlyRpo;
-      return rpo && (!query || rpo.toLowerCase().includes(query) || candidate.description.toLowerCase().includes(query));
-    }
-  );
-  const rows = pool
-    .map((candidate) => {
-      const rpo = candidate.rpo || candidate.refOnlyRpo;
-      const sectionId = sectionDecisions[candidate.candidateId] || "";
-      const section = sections[sectionId];
-      const single = section && String(section.selectionMode || "").startsWith("single");
-      const sectionNote = section
-        ? `${escapeHtml(section.sectionName)}${single ? ' <span class="conf conf-high">pick-one section already</span>' : ""}`
-        : '<span class="cell-sub">no section yet</span>';
-      return `
-      <tr class="cand-row">
-        <td><input type="checkbox" class="pool-check" data-rpo="${escapeHtml(rpo)}"></td>
-        <td class="rpo">${escapeHtml(rpo)}</td>
-        <td class="desc">${escapeHtml(candidate.description.split("\n")[0])}</td>
-        <td>${sectionNote}</td>
-      </tr>`;
-    })
-    .join("");
-  return `<table class="cand"><thead><tr><th></th><th>RPO</th><th>Option</th><th>Assigned section</th></tr></thead><tbody>${rows}</tbody></table>`;
-}
-
-function groupFormFields(lane) {
-  if (lane === "exclusive_group") {
-    return `<input id="group-key" placeholder="exclusive group name (e.g. roof-panels)">`;
-  }
-  if (lane === "relationship") {
-    return `
-      <p class="hint rel-help">Choose the workbook rule this creates. If a phrase hint used a synonym, the wizard normalizes it to one of these three rule types before saving.</p>
-      <input id="group-key" placeholder="relationship name (e.g. Z51-requires-E60)">
-      ${relationshipKindControl()}
-      <input id="group-source" placeholder="source RPO">
-      <input id="group-targets" placeholder="target RPOs, comma-separated">`;
-  }
-  return `
-    <input id="group-key" placeholder="deferral name (e.g. gsx-interior-scope)">
-    ${selectControl("x", ["interior", "color", "asset", "other"], "", "— kind —").replace('class="x"', 'id="deferral-kind"')}`;
-}
-
-function renderGroupLane(lane) {
-  const decisions = reviewState.payload.decisions || [];
-  const existing = decisions
-    .map(
-      (decision) => `
-      <tr class="cand-row">
-        <td class="rpo">${escapeHtml(decision.groupKey)}</td>
-        <td class="desc">${escapeHtml(labelFor(ACTION_LABELS, decision.action))} · ${escapeHtml(groupPayloadSummary(decision))}</td>
-        <td>${escapeHtml(labelFor(RESOLUTION_LABELS, decision.resolution))}</td>
-        <td>${escapeHtml(decision.reviewerNote)}${decision.copiedFrom ? ` <span class="cell-sub">copied from ${escapeHtml(decision.copiedFrom)}</span>` : ""}</td>
-        <td><button class="group-edit ghost" data-decision-id="${escapeHtml(decision.decisionId)}">Edit</button>
-            <button class="group-clear ghost" data-decision-id="${escapeHtml(decision.decisionId)}">Clear</button></td>
-      </tr>`
-    )
-    .join("");
-  const hintRows =
-    lane === "relationship"
-      ? (reviewState.payload.candidates || [])
-          .filter((candidate) => (reviewState.payload.hints || {})[candidate.candidateId])
-          .map(
-            (candidate) => `
-            <tr class="cand-row">
-              <td class="rpo">${escapeHtml(candidate.rpo || candidate.refOnlyRpo)}</td>
-              <td class="desc">${escapeHtml(candidate.description)}${hintBlock(candidate, true)}</td>
-              <td colspan="2"></td>
-            </tr>`
-          )
-          .join("")
-      : "";
-  const pickOneSections = (reviewState.payload.sections || [])
-    .filter((section) => String(section.selectionMode || "").startsWith("single"))
-    .map((section) => section.sectionName);
-  const exclusiveExtras =
-    lane === "exclusive_group"
-      ? `<p class="hint">Check the options that belong together, name the group, save. Options already in a <b>pick-one section</b> usually don't need an exclusive group — the section enforces it. Use the search box above to narrow the pool.</p>
-         ${pickOneSections.length ? `<p class="hint">Pick-one sections in this workbook: <b>${pickOneSections.map(escapeHtml).join(", ")}</b>.</p>` : ""}
-         ${exclusivePoolTable()}`
-      : "";
-  const deferralExtras =
-    lane === "interior_media_deferral"
-      ? `<p class="hint">This lane records named to-dos the wizard can't parse (Color &amp; Trim isn't ingested). Each recorded item is carried into the Pass C plan report as an open work item instead of silently missing.</p>
-         <div class="cards">${(reviewState.payload.suggestedDeferrals || [])
-           .map(
-             (item) => `
-             <div class="card"><div class="card-head"><span class="card-title">${escapeHtml(item.label)}</span></div>
-               <div class="card-stats">${escapeHtml(item.why)}</div>
-               <button class="primary defer-suggest" data-key="${escapeHtml(item.groupKey)}" data-kind="${escapeHtml(item.kind)}" data-label="${escapeHtml(item.label)}">Record this deferral</button>
-             </div>`
-           )
-           .join("")}</div>`
-      : "";
-  const resolutionControl = lane === "relationship" ? "" : `<select id="group-resolution">${resolutionOptions("approved_for_plan")}</select>`;
-  const saveLabel = lane === "exclusive_group" ? "Create group from checked options" : lane === "relationship" ? "Save relationship" : "Save decision";
-  $("#review-queue").innerHTML = `
-    ${exclusiveExtras}
-    ${deferralExtras}
-    <div class="group-form">
-      ${groupFormFields(lane)}
-      ${resolutionControl}
-      <input id="group-note" placeholder="note">
-      <button id="group-save" class="primary">${saveLabel}</button>
-    </div>
-    ${existing ? `<h2 class="sub-h">Recorded decisions</h2><table class="cand"><tbody>${existing}</tbody></table>` : ""}
-    ${hintRows ? `<h2 class="sub-h">Candidates with relationship hints — click a hint to prefill the form</h2><table class="cand"><tbody>${hintRows}</tbody></table>` : ""}`;
-  document.querySelectorAll(".defer-suggest").forEach((button) =>
-    button.addEventListener("click", async () => {
-      clearError();
-      try {
-        await saveDecisions([
-          {
-            model: $("#review-model").value,
-            lane: "interior_media_deferral",
-            groupKey: button.dataset.key,
-            action: "defer_item",
-            payload: { kind: button.dataset.kind, note: button.dataset.label },
-            resolution: "approved_for_plan",
-            reviewerNote: "",
-          },
-        ]);
-      } catch (error) {
-        showError(error.message);
-      }
-    })
-  );
-  $("#group-save").addEventListener("click", async () => {
-    clearError();
-    try {
-      await saveDecisions([collectGroupDecision(lane)]);
-    } catch (error) {
-      showError(error.message);
-    }
-  });
-  document.querySelectorAll(".group-clear").forEach((button) =>
-    button.addEventListener("click", async () => {
-      clearError();
-      try {
-        await postJSON(`/api/wizard/sessions/${state.session.runId}/decisions/delete`, {
-          decisionIds: [button.dataset.decisionId],
-        });
-        await refreshReview();
-      } catch (error) {
-        showError(error.message);
-      }
-    })
-  );
-  document.querySelectorAll(".group-edit").forEach((button) =>
-    button.addEventListener("click", () => {
-      // Prefill the form from the recorded decision; saving under the same
-      // name replaces it (decision ids are model:lane:groupKey).
-      const decision = decisions.find((d) => d.decisionId === button.dataset.decisionId);
-      if (!decision) return;
-      const payload = decision.payload || {};
-      $("#group-key").value = decision.groupKey;
-      const resolution = $("#group-resolution");
-      if (resolution) resolution.value = decision.resolution;
-      $("#group-note").value = decision.reviewerNote || "";
-      if (lane === "relationship") {
-        setRelationshipKind(payload.kind || "");
-        $("#group-source").value = payload.sourceRpo || "";
-        $("#group-targets").value = (payload.targetRpos || []).join(", ");
-      } else if (lane === "exclusive_group") {
-        const members = new Set(payload.members || []);
-        document.querySelectorAll(".pool-check").forEach((box) => {
-          box.checked = members.has(box.dataset.rpo);
-        });
-      } else if (lane === "interior_media_deferral") {
-        $("#deferral-kind").value = payload.kind || "";
-      }
-      $("#group-key").scrollIntoView({ behavior: "smooth", block: "center" });
-    })
-  );
-}
-
-function collectGroupDecision(lane) {
-  const groupKey = $("#group-key").value.trim();
-  if (!groupKey) throw new Error("Give the decision a name.");
-  const base = {
-    model: $("#review-model").value,
-    lane,
-    groupKey,
-    resolution: lane === "relationship" ? "approved_for_plan" : $("#group-resolution").value,
-    reviewerNote: $("#group-note").value,
-  };
-  const csv = (value) =>
-    value
-      .split(",")
-      .map((token) => token.trim().toUpperCase())
-      .filter(Boolean);
-  if (lane === "exclusive_group") {
-    const members = [...document.querySelectorAll(".pool-check:checked")].map((box) => box.dataset.rpo);
-    if (members.length < 2) throw new Error("Check at least two options for the group.");
-    return { ...base, action: "create_exclusive_group", payload: { members } };
-  }
-  if (lane === "relationship") {
-    const kind = selectedRelationshipKind();
-    const sourceRpo = $("#group-source").value.trim().toUpperCase();
-    const targetRpos = csv($("#group-targets").value);
-    if (!kind || !sourceRpo || !targetRpos.length) {
-      throw new Error("Relationship needs one of the three rule types, a source RPO, and at least one target RPO.");
-    }
-    return { ...base, action: "create_relationship_candidate", payload: { kind, sourceRpo, targetRpos } };
-  }
-  const kind = $("#deferral-kind").value;
-  if (!kind) throw new Error("Pick a deferral kind.");
-  return { ...base, action: "defer_item", payload: { kind, note: $("#group-note").value } };
-}
-
-function renderDuplicateLane() {
-  const groups = reviewState.payload.duplicateGroups || [];
-  const decisions = reviewState.payload.decisions || [];
-  const decidedByRpo = Object.fromEntries(decisions.map((decision) => [decision.groupKey, decision]));
-  const byId = Object.fromEntries((reviewState.payload.candidates || []).map((c) => [c.candidateId, c]));
-  if (!groups.length) {
-    $("#review-queue").innerHTML =
-      '<div class="empty-note">No in-file RPO collisions for this model — the same RPO never appears on more than one source sheet. Nothing to do here.</div>';
-    return;
-  }
-  const blocks = groups
-    .map((group) => {
-      const decision = decidedByRpo[group.rpo];
-      const rows = group.candidateIds
-        .map((id) => byId[id])
-        .filter(Boolean)
+  const modelCards = Object.entries(summary.models || {})
+    .map(([model, entry]) => {
+      const gates = ["compileReady"]
         .map(
-          (candidate) => `
-          <tr class="cand-row">
-            <td class="rpo">${escapeHtml(candidate.rpo)}</td>
-            <td class="desc">${escapeHtml(candidate.description)}
-              <div class="cell-sub">${escapeHtml(candidate.sheetName)} · row ${candidate.rowIndex}</div></td>
-            <td><div class="stchips">${statusChips(candidate)}</div></td>
-          </tr>`
+          (gate) =>
+            `<span class="gate-chip ${entry[gate] ? "gate-ready" : "gate-blocked"}"><b>${escapeHtml(gate)}</b> ${readinessLabel(entry[gate])}</span>`
         )
         .join("");
-      return `
-      <div class="pres-sheet">
-        <h2 class="sub-h">${escapeHtml(group.rpo)} appears on ${group.sheets.length} sheets
-          ${decision ? '<span class="conf conf-high">decided</span>' : '<span class="conf conf-low">needs a call</span>'}</h2>
-        <table class="cand"><tbody>${rows}</tbody></table>
-        <div class="group-form">
-          ${selectControl("dup-class", ["same_option", "distinct_by_context"], decision ? (decision.payload || {}).classification : "", "— same option or different? —").replace('class="dup-class"', `class="dup-class" data-rpo="${escapeHtml(group.rpo)}"`)}
-          <button class="primary dup-save" data-rpo="${escapeHtml(group.rpo)}">Save</button>
-          ${decision ? `<button class="ghost dup-clear" data-decision-id="${escapeHtml(decision.decisionId)}">Clear</button>` : ""}
-        </div>
+      return `<div class="card readiness-card">
+        <div class="card-head"><span class="card-title">${escapeHtml(model)}</span><span class="type-badge">${escapeHtml(entry.mode || "target")}</span></div>
+        <div class="gate-grid">${gates}</div>
+        <div class="card-stats">${escapeHtml(entry.blockerCount)} blockers · ${escapeHtml(entry.deferralCount)} deferrals</div>
       </div>`;
     })
     .join("");
-  $("#review-queue").innerHTML = `
-    <p class="hint">Same RPO on more than one source sheet <b>in this ingest file</b>. Decide whether the rows describe one option (rows merge in the plan) or context-distinct entries. Workbook matches show in the reference lines of other lanes — that's separate.</p>
-    ${blocks}`;
-  document.querySelectorAll(".dup-clear").forEach((button) =>
-    button.addEventListener("click", async () => {
-      clearError();
-      try {
-        await postJSON(`/api/wizard/sessions/${state.session.runId}/decisions/delete`, {
-          decisionIds: [button.dataset.decisionId],
-        });
-        await refreshReview();
-      } catch (error) {
-        showError(error.message);
-      }
-    })
-  );
-  document.querySelectorAll(".dup-save").forEach((button) =>
-    button.addEventListener("click", async () => {
-      clearError();
-      try {
-        const rpo = button.dataset.rpo;
-        const select = document.querySelector(`.dup-class[data-rpo="${CSS.escape(rpo)}"]`);
-        if (!select.value) throw new Error("Pick same option or different by context first.");
-        await saveDecisions([
-          {
-            model: $("#review-model").value,
-            lane: "duplicate",
-            groupKey: rpo,
-            action: "classify_duplicate_source",
-            payload: { classification: select.value },
-            resolution: "approved_for_plan",
-            reviewerNote: "",
-          },
-        ]);
-      } catch (error) {
-        showError(error.message);
-      }
-    })
-  );
-}
-
-const PRESENTATION_SHEET_INFO = {
-  runtime_steps: ["Form steps", "The ordered steps of the build form (Paint, Wheels, …)."],
-  section_presentation: ["Section display", "How each section renders inside its step (labels, order, behavior)."],
-  context_section_master: ["Context sections", "Body-style / trim chooser sections at the top of the form."],
-  order_summary_sections: ["Order summary sections", "The buckets on the final order summary."],
-  step_order_summary_map: ["Step → summary mapping", "Which step's choices land in which summary bucket."],
-};
-
-function renderPresentationQueue() {
-  const prefill = reviewState.payload.prefill;
-  const decisions = reviewState.payload.decisions || [];
-  const decidedSheets = new Set(decisions.map((decision) => decision.groupKey));
-  const blocks = Object.entries(prefill.sheets)
-    .map(([sheet, proposals]) => {
-      const decided = decidedSheets.has(sheet);
-      const columns = [...new Set(proposals.flatMap((proposal) => Object.keys(proposal.row)))];
-      const header = `<tr><th></th>${columns.map((column) => `<th>${escapeHtml(column)}</th>`).join("")}</tr>`;
-      const rows = proposals
-        .map(
-          (proposal, index) => `
-          <tr class="cand-row">
-            <td><input type="checkbox" class="pres-row" data-sheet="${escapeHtml(sheet)}" data-index="${index}" checked></td>
-            ${columns
-              .map(
-                (column) =>
-                  `<td><input class="pres-cell" data-sheet="${escapeHtml(sheet)}" data-index="${index}" data-column="${escapeHtml(column)}" value="${escapeHtml(proposal.row[column] ?? "")}" ${column === "model_key" ? "readonly" : ""}></td>`
-              )
-              .join("")}
-          </tr>`
-        )
-        .join("");
-      const [friendly, purpose] = PRESENTATION_SHEET_INFO[sheet] || [sheet, ""];
-      return `
-      <div class="pres-sheet">
-        <h2 class="sub-h">${escapeHtml(friendly)} <span class="cell-sub">(${escapeHtml(sheet)})</span> ${decided ? '<span class="conf conf-high">approved</span>' : `<span class="conf conf-low">${proposals.length} template rows pending</span>`}</h2>
-        <div class="cell-sub">${escapeHtml(purpose)}</div>
-        <table class="cand pres-table"><thead>${header}</thead><tbody>${rows}</tbody></table>
-        <button class="primary pres-approve" data-sheet="${escapeHtml(sheet)}">Approve checked rows for ${escapeHtml(friendly)}</button>
-      </div>`;
-    })
-    .join("");
-  $("#review-queue").innerHTML = `
-    <p class="hint">This lane builds the form's skeleton for the new model — steps, section display, and the order summary. It's a hard go-live requirement: the runtime refuses a promoted model without these rows. Everything is prefilled from <b>${escapeHtml(prefill.templateModel)}</b>'s live rows — edit any cell, uncheck rows to drop, then approve each sheet.</p>
-    ${blocks}`;
-  document.querySelectorAll(".pres-approve").forEach((button) =>
-    button.addEventListener("click", async () => {
-      clearError();
-      try {
-        const sheet = button.dataset.sheet;
-        const checked = [...document.querySelectorAll(`.pres-row[data-sheet="${CSS.escape(sheet)}"]`)]
-          .filter((box) => box.checked)
-          .map((box) => {
-            const row = {};
-            document
-              .querySelectorAll(`.pres-cell[data-sheet="${CSS.escape(sheet)}"][data-index="${box.dataset.index}"]`)
-              .forEach((cell) => {
-                row[cell.dataset.column] = cell.value;
-              });
-            return row;
-          });
-        await saveDecisions([
-          {
-            model: $("#review-model").value,
-            lane: "presentation",
-            groupKey: sheet,
-            action: "approve_presentation_rows",
-            payload: { rows: checked, templateModel: prefill.templateModel },
-            resolution: "approved_for_plan",
-            reviewerNote: "",
-          },
-        ]);
-      } catch (error) {
-        showError(error.message);
-      }
-    })
-  );
-}
-
-async function saveDecisions(decisions, { isBulk = false } = {}) {
-  const payload = await postJSON(`/api/wizard/sessions/${state.session.runId}/decisions`, {
-    decisions,
-  });
-  state.session = payload.session;
-  if (!isBulk) reviewState.lastBatch = null;
-  await refreshReview();
-  return payload.batchId;
-}
-
-$("#review-queue").addEventListener("change", (event) => {
-  const box = event.target.closest(".row-check");
-  if (box) {
-    if (box.checked) reviewState.checked.add(box.dataset.id);
-    else reviewState.checked.delete(box.dataset.id);
-    renderBulkBar();
-    return;
-  }
-  const all = event.target.closest("#check-all");
-  if (all) {
-    if (all.checked) {
-      for (const candidate of visibleQueueCandidates()) reviewState.checked.add(candidate.candidateId);
-    } else {
-      reviewState.checked = new Set();
-    }
-    renderBulkBar();
-    renderQueue();
-  }
-});
-
-$("#review-queue").addEventListener("click", async (event) => {
-  const clear = event.target.closest(".dec-clear");
-  if (clear) {
-    clearError();
-    try {
-      const model = $("#review-model").value;
-      const lane = $("#review-lane").value;
-      const payload = await postJSON(`/api/wizard/sessions/${state.session.runId}/decisions/delete`, {
-        decisionIds: [`${model}:${lane}:${clear.dataset.id}`],
-      });
-      state.session = payload.session;
-      await refreshReview();
-    } catch (error) {
-      showError(error.message);
-    }
-    return;
-  }
-  const useRef = event.target.closest(".ref-use-section");
-  if (useRef) {
-    const select = useRef.closest("tr").querySelector(".dec-section");
-    if (select) select.value = useRef.dataset.section;
-    const notSelectable = useRef.closest("tr").querySelector(".dec-not-selectable");
-    if (notSelectable && useRef.dataset.selectable) notSelectable.checked = useRef.dataset.selectable === "false";
-    const inactive = useRef.closest("tr").querySelector(".dec-inactive");
-    if (inactive && useRef.dataset.active) inactive.checked = useRef.dataset.active === "false";
-    return;
-  }
-  const hint = event.target.closest(".hint-accept");
-  if (hint) {
-    // Prefill the relationship form from the hint; reviewer edits then saves.
-    const canonicalKind = setRelationshipKind(hint.dataset.kind);
-    $("#group-source").value = hint.dataset.source;
-    $("#group-targets").value = hint.dataset.targets;
-    $("#group-key").value = `${hint.dataset.source}-${canonicalKind || hint.dataset.kind}`.toLowerCase();
-    $("#group-key").scrollIntoView({ behavior: "smooth", block: "center" });
-    return;
-  }
-  const button = event.target.closest(".dec-save");
-  if (!button) return;
-  clearError();
-  try {
-    const row = button.closest("tr");
-    await saveDecisions([collectRowDecision($("#review-lane").value, row, button.dataset.id)]);
-  } catch (error) {
-    showError(error.message);
-  }
-});
-
-/* ------------------------------------------------------------ bulk actions */
-
-function checkedCandidates() {
-  return visibleQueueCandidates().filter((c) => reviewState.checked.has(c.candidateId));
-}
-
-function renderBulkBar() {
-  const lane = $("#review-lane").value;
-  const checked = checkedCandidates();
-  const n = checked.length;
-  const disabled = n === 0 ? "disabled" : "";
-  let controls = "";
-  if (lane === "section") {
-    const refModel = ((modelState.selection || {}).comparators || {})[$("#review-model").value] || "";
-    const withRef = checked.filter(
-      (c) => ((((reviewState.payload || {}).workbookReference || {})[c.rpo || c.refOnlyRpo] || [])[0] || {}).sectionId
-    ).length;
-    const refButton = refModel
-      ? `<button id="bulk-ref-section" class="ghost" ${withRef ? "" : "disabled"} title="Each checked row takes the section its RPO already has on ${escapeHtml(refModel)} in the workbook. Rows without a match are left undecided. Every row stays editable afterwards.">Use ${escapeHtml(refModel)}'s section for ${withRef} of ${n} checked</button>`
-      : "";
-    controls = `
-      ${sectionSelect("").replace('class="dec-section"', 'id="bulk-section"')}
-      <button id="bulk-assign-section" class="primary" ${disabled}>Put ${n} checked row${n === 1 ? "" : "s"} in this section</button>
-      <button id="bulk-section-skip" class="ghost" ${disabled}>Skip — don't carry over ${n} checked</button>
-      ${refButton}`;
-  } else if (lane === "price") {
-    // Single-price matches are safe to accept wholesale — no checking needed
-    // (still one batch, still undoable). Checked rows narrow it if any.
-    const pool = n ? checked : visibleQueueCandidates().filter((c) => !decisionFor(c.candidateId));
-    const exactCount = pool.filter((c) => c.priceMatch === "exact").length;
-    controls = `<button id="bulk-accept-exact" class="primary" ${exactCount ? "" : "disabled"}>Accept ${exactCount} single-price match${exactCount === 1 ? "" : "es"} ${n ? "(checked)" : "(all filtered, undecided)"}</button>`;
-  } else if (lane === "status_nuance") {
-    controls = `<button id="bulk-confirm-status" class="primary" ${disabled}>Confirm parsed status for ${n} checked</button>`;
-  } else if (lane === "standard_equipment") {
-    controls = `
-      <button id="bulk-se-include" class="primary" ${disabled}>Include ${n} checked</button>
-      <button id="bulk-se-exclude" class="ghost" ${disabled}>Leave out ${n} checked</button>`;
-  } else if (lane === "copy_split") {
-    controls = `<button id="bulk-accept-split" class="primary" ${disabled}>Accept script copy for ${n} checked</button>`;
-  }
-  if (!controls) {
-    $("#bulk-bar").innerHTML = "";
-    return;
-  }
-  const undo =
-    reviewState.lastBatch && reviewState.lastBatch.queueKey === reviewState.queueKey
-      ? `<button id="bulk-undo" class="ghost">Undo last bulk (${reviewState.lastBatch.count} row${reviewState.lastBatch.count === 1 ? "" : "s"})</button>`
-      : "";
-  const note =
-    reviewState.lastBulkNote && reviewState.lastBatch && reviewState.lastBatch.queueKey === reviewState.queueKey
-      ? `<span class="status-note">${escapeHtml(reviewState.lastBulkNote)}</span>`
-      : "";
-  $("#bulk-bar").innerHTML = `
-    <span class="status-note"><b>${n}</b> checked <span class="cell-sub">(header checkbox selects all filtered)</span></span>
-    ${controls}
-    ${undo}
-    ${note}`;
-  bindBulk(lane);
-}
-
-function bindBulk(lane) {
-  const model = $("#review-model").value;
-  const base = (candidate) => ({
-    model,
-    lane,
-    candidateId: candidate.candidateId,
-    resolution: "approved_for_plan",
-    reviewerNote: "bulk",
-  });
-  const on = (id, handler) => {
-    const el = document.querySelector(id);
-    if (el) el.addEventListener("click", handler);
-  };
-  const bulkSave = async (rows, builder, note = "") => {
-    clearError();
-    try {
-      const decisions = rows.map(builder);
-      if (!decisions.length) return;
-      const batchId = await saveDecisions(decisions, { isBulk: true });
-      reviewState.lastBatch = { batchId, count: decisions.length, queueKey: reviewState.queueKey };
-      reviewState.lastBulkNote = note;
-      renderBulkBar();
-    } catch (error) {
-      showError(error.message);
-    }
-  };
-  on("#bulk-assign-section", () => {
-    const sectionId = $("#bulk-section").value;
-    if (!sectionId) {
-      showError("Pick a section for the checked rows first.");
-      return;
-    }
-    bulkSave(checkedCandidates(), (candidate) => ({ ...base(candidate), action: "assign_section", payload: { sectionId } }));
-  });
-  on("#bulk-ref-section", () => {
-    const checked = checkedCandidates();
-    const rows = checked
-      .map((candidate) => ({
-        candidate,
-        ref: (((reviewState.payload || {}).workbookReference || {})[candidate.rpo || candidate.refOnlyRpo] || [])[0],
-      }))
-      .filter((entry) => entry.ref && entry.ref.sectionId);
-    bulkSave(
-      rows,
-      ({ candidate, ref }) => ({
-        ...base(candidate),
-        action: "assign_section",
-        payload: {
-          sectionId: ref.sectionId,
-          ...(ref.selectable === false ? { selectable: false } : {}),
-          ...(ref.active === false ? { active: false } : {}),
-        },
-      }),
-      `${rows.length} assigned from the reference model · ${checked.length - rows.length} left undecided (no workbook match)`
-    );
-  });
-  on("#bulk-section-skip", () => {
-    bulkSave(
-      checkedCandidates(),
-      (candidate) => ({
-        ...base(candidate),
-        action: "exclude_row",
-        payload: {},
-        resolution: "not_needed",
-        reviewerNote: "bulk skip",
-      }),
-      "Skipped rows stay out of the plan and do not need price decisions."
-    );
-  });
-  on("#bulk-accept-exact", () => {
-    const checked = checkedCandidates();
-    const pool = checked.length
-      ? checked
-      : visibleQueueCandidates().filter((candidate) => !decisionFor(candidate.candidateId));
-    bulkSave(
-      pool.filter((candidate) => candidate.priceMatch === "exact"),
-      (candidate) => ({ ...base(candidate), action: "accept_exact_price", payload: {} })
-    );
-  });
-  on("#bulk-confirm-status", () =>
-    bulkSave(checkedCandidates(), (candidate) => ({ ...base(candidate), action: "confirm_status", payload: {} }))
-  );
-  on("#bulk-se-include", () =>
-    bulkSave(checkedCandidates(), (candidate) => ({ ...base(candidate), action: "include_standard_equipment", payload: {} }))
-  );
-  on("#bulk-se-exclude", () =>
-    bulkSave(checkedCandidates(), (candidate) => ({ ...base(candidate), action: "exclude_row", payload: {} }))
-  );
-  on("#bulk-accept-split", () =>
-    bulkSave(checkedCandidates(), (candidate) => ({
-      ...base(candidate),
-      action: "split_copy",
-      payload: {
-        name: (candidate.proposedSplit || {}).name || "",
-        description: (candidate.proposedSplit || {}).description || "",
-        disclosure: (candidate.proposedSplit || {}).disclosure || "",
-      },
-    }))
-  );
-  on("#bulk-undo", async () => {
-    clearError();
-    try {
-      const payload = await postJSON(`/api/wizard/sessions/${state.session.runId}/decisions/delete`, {
-        batchId: reviewState.lastBatch.batchId,
-      });
-      state.session = payload.session;
-      reviewState.lastBatch = null;
-      await refreshReview();
-    } catch (error) {
-      showError(error.message);
-    }
-  });
-}
-
-/* -------------------------------------------------------------- model copy */
-
-$("#copy-decisions-btn").addEventListener("click", async () => {
-  clearError();
-  try {
-    const payload = await postJSON(`/api/wizard/sessions/${state.session.runId}/copy-decisions`, {
-      fromModel: $("#copy-from-model").value,
-      toModel: $("#review-model").value,
-      overwrite: $("#copy-overwrite").checked,
-    });
-    state.session = payload.session;
-    const lanes = Object.entries(payload.copiedByLane)
-      .map(([lane, count]) => `${lane.replaceAll("_", " ")} ${count}`)
-      .join(", ");
-    $("#copy-report").textContent = `Copied ${payload.copied}${lanes ? ` (${lanes})` : ""}; skipped ${payload.skipped.length}.`;
-    await refreshReview();
-  } catch (error) {
-    showError(error.message);
-  }
-});
-
-$("#mark-complete-btn").addEventListener("click", async () => {
-  clearError();
-  try {
-    const payload = await postJSON(`/api/wizard/sessions/${state.session.runId}/complete`, {});
-    state.session = payload.session;
-    await refreshReview();
-    // The blocker panel is empty when complete, so this note survives it.
-    $("#review-blockers").innerHTML = '<div class="status-note">Decisions complete for all selected targets — build the apply plan when ready.</div>';
-    $("#to-plan-btn").classList.remove("hidden");
-  } catch (error) {
-    // The blocker panel below carries the actionable detail; keep the banner short.
-    showError(
-      error.message.startsWith("Decisions are not complete")
-        ? "Decisions are not complete — the blocker list below links to every open item."
-        : error.message
-    );
-    await refreshReview().catch(() => {});
-  }
-});
-
-const REVIEW_FILTER_IDS = [
-  "#review-source-section",
-  "#review-decision-state",
-  "#review-price-state",
-  "#review-price-presence",
-  "#review-workbook-ref",
-  "#review-section-state",
-];
-
-function resetReviewFilters() {
-  for (const id of REVIEW_FILTER_IDS) $(id).value = "";
-}
-
-for (const id of ["#review-model", "#review-lane", ...REVIEW_FILTER_IDS]) {
-  $(id).addEventListener("change", () => {
-    if (id === "#review-model" || id === "#review-lane") resetReviewFilters();
-    refreshReview().catch((error) => showError(error.message));
-  });
-}
-let reviewTimer = null;
-$("#review-q").addEventListener("input", () => {
-  clearTimeout(reviewTimer);
-  reviewTimer = setTimeout(() => refreshReview().catch((error) => showError(error.message)), 250);
-});
-
-/* ------------------------------------------------------------- stage: plan */
-
-function planBlock(title, entries, formatter) {
-  if (!entries || !entries.length) return "";
-  return `<h2 class="sub-h">${escapeHtml(title)}</h2><ul class="plan-list">${entries.map((e) => `<li>${formatter(e)}</li>`).join("")}</ul>`;
-}
-
-function renderPlan(detail) {
-  const plan = detail.plan;
-  const dryRun = detail.dryRun || {};
-  const report = plan.report;
-  const sheets = Object.entries(report.perSheetCounts)
-    .map(
-      ([sheet, counts]) =>
-        `<tr class="cand-row"><td class="rpo">${escapeHtml(sheet)}</td><td>${escapeHtml(
-          Object.entries(counts)
-            .map(([action, count]) => `${action.replaceAll("_", " ")} ${count}`)
-            .join(" · ")
-        )}</td></tr>`
-    )
-    .join("");
-  const stageChip = (label, entry) =>
-    `<span class="sum-chip ${entry && entry.ok ? "sum-exact" : "sum-warn"}"><b>${escapeHtml(label)}</b>: ${escapeHtml((entry || {}).status || "—")}${entry && entry.errors && entry.errors.length ? ` — ${escapeHtml(entry.errors[0])}` : ""}</span>`;
-  $("#plan-summary").innerHTML = `
+  $("#compile-summary").innerHTML = `
     <div class="summary">
-      <span class="sum-chip ${plan.valid ? "sum-exact" : "sum-warn"}"><b>plan ${plan.valid ? "valid" : "has blockers"}</b></span>
-      <span class="sum-chip"><b>${plan.stage1Count}</b> scaffolding ops</span>
-      <span class="sum-chip"><b>${plan.stage2Count}</b> data ops</span>
-      ${stageChip("dry run: live check", dryRun.stage1)}
-      ${stageChip("dry run: scratch apply", dryRun.stage1Scratch)}
-      ${stageChip("dry run: data + schema", dryRun.stage2)}
-      ${detail.approval ? `<span class="sum-chip sum-exact"><b>approved by ${escapeHtml(detail.approval.approvedBy)}</b> ${escapeHtml(detail.approval.approvedAt)}</span>` : ""}
+      <span class="sum-chip"><b>${escapeHtml(manifest.total)}</b> proposed rows</span>
+      ${actionCounts}
+      <span class="sum-chip ${exceptions.byState.open ? "sum-warn" : "sum-exact"}"><b>${escapeHtml(exceptions.byState.open || 0)}</b> open exceptions</span>
+      <span class="sum-chip"><b>${escapeHtml(exceptions.byState.resolved || 0)}</b> resolved</span>
+      <span class="sum-chip ${exceptions.byState.resolved_pending_projection ? "sum-warn" : ""}"><b>${escapeHtml(exceptions.byState.resolved_pending_projection || 0)}</b> awaiting compiler projection</span>
+      <span class="sum-chip"><b>${escapeHtml(exceptions.actionable || 0)}</b> reviewer-answerable</span>
     </div>
-    <table class="cand"><thead><tr><th>Sheet</th><th>Ops</th></tr></thead><tbody>${sheets}</tbody></table>
-    ${planBlock("Scaffold rows cleared (clean reprocess)", Object.entries(report.clearedRows), ([sheet, count]) => `${escapeHtml(sheet)}: ${count} rows replaced`)}
-    ${planBlock("Script splits carried unreviewed", Object.entries(report.unreviewedSplits), ([model, rpos]) => `${escapeHtml(model)}: ${rpos.length} options (${escapeHtml(rpos.slice(0, 10).join(", "))}${rpos.length > 10 ? "…" : ""})`)}
-    ${planBlock("Holds — answers still owed", report.holds, (h) => `${escapeHtml(h.model)} · ${escapeHtml(h.decisionId)} — ${escapeHtml(h.note)}`)}
-    ${planBlock("Deferred work items", report.deferrals, (d) => `${escapeHtml(d.model)} · ${escapeHtml(d.groupKey)}`)}
-    ${planBlock("Gaps", report.gaps, (g) => `[${escapeHtml(g.kind.replaceAll("_", " "))}] ${escapeHtml(g.model)}: ${escapeHtml(g.detail)}`)}`;
-  $("#approve-plan-btn").disabled = !(state.session.state === "plan_built");
-  $("#plan-status").textContent =
-    state.session.state === "plan_approved"
-      ? "Approved — ready for the Pass D apply step."
-      : state.session.state === "plan_built"
-        ? "Dry run clean — approve to sign off for apply."
-        : "Plan has blockers or the dry run failed; fix and rebuild.";
+    <div class="cards">${modelCards}</div>`;
+  $("#compile-btn").textContent = "Recompile canonical rows";
+  const changeSetReady =
+    summary.session.state === "compiled_ready" &&
+    !summary.freshness.stale &&
+    Object.values(summary.models || {}).every((entry) => entry.compileReady && !entry.blockerCount);
+  $("#compile-changeset-btn").classList.toggle("hidden", !changeSetReady);
+  $("#review-exceptions-btn").classList.toggle("hidden", !exceptions.total);
+  $("#compile-status").textContent = summary.freshness.stale
+    ? `Inputs changed after compile: ${summary.freshness.reasons.join("; ")}. Recompile required.`
+    : `Compiler state: ${summary.session.state}. No workbook write performed.`;
 }
 
-async function buildPlan() {
+async function enterCompile() {
+  setStage("compile");
+  if (state.session && ["compiled_ready", "compiled_with_exceptions"].includes(state.session.state)) {
+    const summary = await getJSON(`/api/wizard/sessions/${state.session.runId}/compile`);
+    renderCompilerSummary(summary);
+  } else {
+    compilerState.summary = null;
+    $("#compile-summary").innerHTML = '<div class="empty-note">Model selection is saved. Compile to derive canonical rows and the exact exception queue.</div>';
+    $("#compile-btn").textContent = "Compile canonical rows";
+    $("#compile-changeset-btn").classList.add("hidden");
+    $("#review-exceptions-btn").classList.add("hidden");
+    $("#compile-status").textContent = "Inputs stay read-only.";
+  }
+}
+
+async function runCompile() {
   clearError();
-  const button = $("#to-plan-btn");
+  const button = $("#compile-btn");
   button.disabled = true;
-  button.textContent = "Building plan…";
+  button.textContent = "Compiling…";
   try {
-    const payload = await postJSON(`/api/wizard/sessions/${state.session.runId}/plan`, {});
-    state.session = payload.session;
-    renderPlan({ plan: payload.plan, dryRun: payload.dryRun, approval: null });
-    setStage("plan");
+    const summary = await postJSON(`/api/wizard/sessions/${state.session.runId}/compile`, {});
+    renderCompilerSummary(summary);
   } catch (error) {
     showError(error.message);
   } finally {
     button.disabled = false;
-    button.textContent = "Build apply plan";
+    if (!compilerState.summary) button.textContent = "Compile canonical rows";
   }
 }
 
-$("#to-plan-btn").addEventListener("click", buildPlan);
-$("#rebuild-plan-btn").addEventListener("click", buildPlan);
-$("#back-to-review").addEventListener("click", () => setStage("review"));
-$("#approve-plan-btn").addEventListener("click", async () => {
-  clearError();
-  try {
-    const payload = await postJSON(`/api/wizard/sessions/${state.session.runId}/plan/approve`, {
-      approver: $("#plan-approver").value,
+$("#compile-btn").addEventListener("click", runCompile);
+$("#review-exceptions-btn").addEventListener("click", enterExceptions);
+$("#compile-back-models").addEventListener("click", async () => {
+  await loadModels();
+  setStage("models");
+});
+
+/* ------------------------------------------------------- stage: exceptions */
+
+const exceptionState = {
+  payload: null,
+  offset: 0,
+  limit: 20,
+  expandedSubjectId: null,
+  pendingFocusSubjectId: null,
+};
+
+function optionSelect(name, options, placeholder) {
+  return `<select name="${escapeHtml(name)}" required>
+    <option value="">${escapeHtml(placeholder)}</option>
+    ${(options || [])
+      .map(
+        (option) =>
+          `<option value="${escapeHtml(option.optionId)}">${escapeHtml(option.rpo || "—")} · ${escapeHtml(option.name || option.optionId)} · ${escapeHtml(option.optionId)}</option>`
+      )
+      .join("")}
+  </select>`;
+}
+
+function exceptionActionFields(item, action) {
+  const subject = item.subject;
+  const choices = item.choices || {};
+  switch (action) {
+    case "choose_section":
+      return `<label>Canonical section
+        <select name="sectionId" required><option value="">Choose one workbook section</option>
+          ${(choices.sections || []).map((section) => `<option value="${escapeHtml(section.sectionId)}">${escapeHtml(section.sectionName)} · ${escapeHtml(section.sectionId)}</option>`).join("")}
+        </select></label>`;
+    case "keep_inactive_option":
+      return `<label>Canonical section
+        <select name="sectionId" required><option value="">Choose one workbook section</option>
+          ${(choices.sections || []).map((section) => `<option value="${escapeHtml(section.sectionId)}">${escapeHtml(section.sectionName)} · ${escapeHtml(section.sectionId)}</option>`).join("")}
+        </select></label><div class="status-note">Keep this option as inactive, nonselectable, and unpriced.</div>`;
+    case "choose_relationship":
+      return `<div class="typed-grid">
+        <label>Source option ${optionSelect("sourceOptionId", choices.targetOptions, "Choose exact source option")}</label>
+        <label>Relationship <select name="ruleType" required><option value="">Choose rule type</option>${(choices.relationshipRuleTypes || []).map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}</select></label>
+        <label>Target option ${optionSelect("targetOptionId", choices.targetOptions, "Choose exact target option")}</label>
+      </div>`;
+    case "retain_existing":
+      return `<label>Established target occurrence ${optionSelect("existingId", choices.existingOptions, "Choose existing target ID")}</label>`;
+    case "provide_option_copy": {
+      const proposal = (subject.proposedRows || [])[0] || {};
+      return `<div class="typed-grid copy-evidence-field">
+        <label>Customer option name <textarea name="optionName" required>${escapeHtml(proposal.proposedOptionName || "")}</textarea></label>
+        <label>Customer description <textarea name="description">${escapeHtml(proposal.proposedDescription || "")}</textarea></label>
+      </div>`;
+    }
+    case "provide_option_behavior":
+      return `<div class="typed-grid">
+        <label>Active <select name="active" required><option value="true">Active</option><option value="false">Inactive</option></select></label>
+        <label>Selectable <select name="selectable" required><option value="true">Selectable</option><option value="false">Not selectable</option></select></label>
+      </div>`;
+    case "confirm_mandatory_charge": {
+      const proposal = (subject.proposedRows || [])[0] || {};
+      return `<label>Confirmed whole-dollar mandatory charge <input name="priceValue" type="number" min="1" step="1" value="${escapeHtml(proposal.sourcePrice || "")}" required></label>`;
+    }
+    case "provide_typed_value":
+      if (subject.reasonCode === "comparator_only_rule_group_proposal") {
+        return '<input type="hidden" name="decision" value="confirm_proposal"><div class="status-note">Confirm the exact comparator-backed proposal shown above for this target.</div>';
+      }
+      if (subject.reasonCode === "comparator_only_exclusive_group_proposal") {
+        return `<input type="hidden" name="decision" value="confirm_proposal"><label>Target selection behavior
+          <select name="selectionMode" required><option value="">Choose target behavior</option>${(choices.exclusiveSelectionModes || []).map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value.replaceAll("_", " "))}</option>`).join("")}</select>
+        </label>`;
+      }
+      if (subject.reasonCode === "comparator_only_default_selection_proposal") {
+        return `<input type="hidden" name="decision" value="confirm_proposal"><div class="typed-grid">
+          <label>Target priority <input name="priority" type="number" min="0" step="1" required></label>
+          <label>Target display behavior <select name="defaultDisplayBehavior" required>
+            <option value="">Choose target display behavior</option>
+            <option value="default_selected">Default selected</option>
+            <option value="__blank__">Normal display</option>
+          </select></label>
+        </div>`;
+      }
+      return `<div class="typed-grid">
+        ${subject.reasonCode === "comparator_only_price_rule_proposal" ? '<input type="hidden" name="decision" value="confirm_proposal">' : ""}
+        <label>Target price scope <select name="priceScope" required>
+          <option value="">Choose one target variant scope</option>
+          ${(choices.priceScopes || []).map((scope) => `<option value="${escapeHtml(JSON.stringify({ bodyStyleScope: scope.bodyStyleScope, trimLevelScope: scope.trimLevelScope, variantScope: scope.variantScope }))}">${escapeHtml(scope.label)}</option>`).join("")}
+        </select></label>
+        <label>Whole-dollar price <input name="priceValue" type="number" step="1" ${["unresolved_price_scope", "comparator_only_price_rule_proposal"].includes(subject.reasonCode) ? "required" : ""}></label>
+      </div>`;
+    case "approve_removal":
+      return '<label>Why reference impact is cleared <input name="reason" required></label>';
+    case "mark_not_applicable":
+      if (subject.reasonCode === "missing_section") {
+        return '<fieldset class="proposal-rejection"><legend>Omit this source option</legend><label><input type="checkbox" name="rejectWholeProposal" required> I understand this option and its generated rows will be omitted from the target.</label><label>Audit reason <input name="reason" required></label></fieldset>';
+      }
+      return '<fieldset class="proposal-rejection"><legend>Reject entire proposal — write no rows</legend><div class="source-blocker">Do not use rejection for a partial disagreement. If one member, direction, scope, or field is wrong, leave this subject blocked.</div><label><input type="checkbox" name="rejectWholeProposal" required> I understand this rejects the complete proposal, not one member, direction, scope, or field.</label><label>Optional audit note <input name="reason" placeholder="Target evidence that rejects the complete proposal"></label></fieldset>';
+    case "record_allowed_deferral":
+      return `<div class="typed-grid"><label>Allowed deferral kind
+        <select name="kind" required><option value="">Choose allowlisted kind</option>${(choices.deferralKinds || []).map((kind) => `<option value="${escapeHtml(kind)}">${escapeHtml(kind)}</option>`).join("")}</select>
+        </label><label>Reason <input name="reason" required></label></div>`;
+    default:
+      return "";
+  }
+}
+
+function actionLabel(action, reasonCode) {
+  if (action === "provide_typed_value" && reasonCode.startsWith("comparator_only_")) {
+    return "Confirm exact proposal";
+  }
+  return {
+    choose_section: "Use this section",
+    keep_inactive_option: "Keep inactive and unpriced",
+    choose_relationship: "Save exact relationship",
+    retain_existing: "Keep selected existing row",
+    provide_option_copy: "Save reviewed copy",
+    provide_option_behavior: "Save reviewed behavior",
+    confirm_mandatory_charge: "Confirm mandatory charge",
+    provide_typed_value: "Save typed value",
+    approve_removal: "Approve exact removal",
+    mark_not_applicable: "Reject entire proposal — write no rows",
+    record_allowed_deferral: "Record allowed deferral",
+  }[action] || action.replaceAll("_", " ");
+}
+
+function exceptionActionForm(item) {
+  if (item.resolution) {
+    const label = item.state === "resolved_pending_projection"
+      ? "Answer saved — compiler projection still required"
+      : "Resolved";
+    return `<div class="exception-resolution"><b>${escapeHtml(label)}:</b> ${escapeHtml(item.resolution.action)} by ${escapeHtml(item.resolution.reviewer || "unknown reviewer")}
+      <button class="ghost exception-reopen" data-subject-id="${escapeHtml(item.subject.subjectId)}" data-subject-version="${escapeHtml(item.subject.subjectVersion)}">Reopen</button></div>`;
+  }
+  const actions = item.availableActions || [];
+  if (!actions.length) {
+    const conflict = item.subject.semanticConflict || {};
+    const prerequisites = item.prerequisites || {};
+    const detail = conflict.overlapKind
+      ? `Semantic conflict: ${conflict.overlapKind.replaceAll("_", " ")}. Affected sheets: ${(item.affectedSheets || []).join(", ") || "not yet projectable"}.`
+      : prerequisites.message || "No complete workbook-writable answer is available from the current source and compiler.";
+    return `<div class="source-blocker"><b>Blocked — no decision control is available.</b> ${escapeHtml(detail)}</div>`;
+  }
+  return `<form class="exception-resolution-form" data-action="" data-subject-id="${escapeHtml(item.subject.subjectId)}" data-subject-version="${escapeHtml(item.subject.subjectVersion)}" data-reason-code="${escapeHtml(item.subject.reasonCode)}">
+    ${renderDecisionOutcomes(item)}
+    <div class="conditional-action-fields"></div>
+    <section class="decision-preview" aria-live="polite" hidden></section>
+    <button class="primary decision-primary" type="submit" disabled>Preview effect</button>
+  </form>`;
+}
+
+function renderDecisionOutcomes(item) {
+  const actions = item.availableActions || [];
+  return `<fieldset class="decision-outcomes"><legend>Choose one outcome</legend>
+    ${actions.map((action) => `<label class="decision-outcome"><input type="radio" name="decisionAction" value="${escapeHtml(action)}"> <span>${escapeHtml(actionLabel(action, item.subject.reasonCode))}</span></label>`).join("")}
+  </fieldset>`;
+}
+
+function sourceEvidenceView(candidate) {
+  const evidence = candidate.sourceEvidence || {};
+  const rawCells = evidence.cells || {};
+  const normalizedCells = Array.isArray(rawCells)
+    ? rawCells
+    : Object.entries(rawCells).map(([coordinate, value]) => ({ coordinate, value }));
+  const cells = normalizedCells
+    .map((cell) => `<li><code>${escapeHtml(cell.coordinate || "cell")}</code> ${escapeHtml(cell.value)}</li>`)
+    .join("");
+  return `<div class="evidence-entry"><b>${escapeHtml(candidate.rpo || candidate.refOnlyRpo || "source row")}</b> — ${escapeHtml(candidate.description || "")}
+    <div class="cell-sub">${escapeHtml(evidence.sheetName || candidate.sheetName || "source")} · ${escapeHtml(candidate.sectionLabel || "no source section")}</div>
+    <ul class="evidence-cells">${cells}</ul></div>`;
+}
+
+function displayEvidenceValue(value) {
+  if (value === "" || value === null || value === undefined) return "blank";
+  return value && typeof value === "object" ? JSON.stringify(value) : value;
+}
+
+function evidenceValues(record, preferredKeys = []) {
+  for (const key of preferredKeys) {
+    const values = record[key];
+    if (values && typeof values === "object" && Object.keys(values).length) return values;
+  }
+  return Object.fromEntries(
+    Object.entries(record).filter(([key]) => !["evidenceId", "evidenceDependencies", "evidenceReferences", "proposedRows"].includes(key))
+  );
+}
+
+function canonicalRowView(row) {
+  const requiredConflictFields = new Set([
+    "currentOptionName",
+    "currentDescription",
+    "proposedOptionName",
+    "proposedDescription",
+    "detailRaw",
+    "comparator",
+    "comparison",
+    "behaviorEvidence",
+    "placementEvidence",
+    "priceEvidence",
+  ]);
+  const values = Object.entries(evidenceValues(row, ["values", "signature"]))
+    .filter(([key, value]) => requiredConflictFields.has(key) || (value !== "" && value !== null && value !== undefined))
+    .map(([key, value]) => `<span><b>${escapeHtml(key)}</b>: ${escapeHtml(displayEvidenceValue(value))}</span>`)
+    .join("");
+  const key = row.key && typeof row.key === "object" ? JSON.stringify(row.key) : "";
+  return `<div class="evidence-entry"><b>${escapeHtml(row.sheet || row.family || "row")}</b> · ${escapeHtml(row.action || "proposal signature")}
+    ${key ? `<div class="cell-sub">Key: ${escapeHtml(key)}</div>` : ""}
+    <div class="row-values">${values || "No populated preview fields."}</div></div>`;
+}
+
+function comparatorEvidenceView(fact) {
+  const values = evidenceValues(fact, ["values", "payload", "signature"]);
+  return `<div class="evidence-entry"><b>${escapeHtml(fact.comparator || fact.model || "comparator")}</b> · ${escapeHtml(fact.kind || fact.family || "fact")}
+    <div class="row-values">${Object.entries(values).map(([key, value]) => `<span><b>${escapeHtml(key)}</b>: ${escapeHtml(displayEvidenceValue(value))}</span>`).join("") || escapeHtml(fact.evidenceId || "")}</div></div>`;
+}
+
+function evidenceColumn(title, entries, formatter) {
+  if (!entries.length) return "";
+  return `<details class="evidence-column"><summary>${escapeHtml(title)} (${entries.length})</summary>${entries.map(formatter).join("")}</details>`;
+}
+
+function decisionEffectView(preview) {
+  const effect = preview.decisionEffect || {};
+  const rows = effect.rows || [];
+  const rowHtml = rows.length
+    ? rows.map((entry) => `<div class="effect-row"><span class="type-badge">${escapeHtml(entry.effect)}</span>${canonicalRowView(entry.after || entry.before || {})}</div>`).join("")
+    : '<div class="empty-note">This decision writes zero physical rows.</div>';
+  const cleared = effect.removedBlockerSubjectIds || [];
+  const added = effect.addedBlockerSubjectIds || [];
+  const suppressed = effect.suppressedProposalRows || [];
+  let summary;
+  if (!preview.projectable) {
+    summary = "Cannot be saved because the decision does not produce a complete workbook-safe effect.";
+  } else if (suppressed.length) {
+    summary = "Writes no rows and suppresses the entire proposal.";
+  } else if (!effect.writesRows || !rows.length) {
+    summary = "Writes no workbook rows.";
+  } else {
+    const additions = rows.filter((entry) => ["add", "added"].includes(entry.effect)).length;
+    const updates = rows.filter((entry) => ["update", "changed"].includes(entry.effect)).length;
+    const removals = rows.filter((entry) => ["remove", "removed"].includes(entry.effect)).length;
+    const changes = [];
+    if (additions) changes.push(`adds ${additions}`);
+    if (updates) changes.push(`updates ${updates}`);
+    if (removals) changes.push(`removes ${removals}`);
+    summary = `${changes.join(", ") || "Changes"} workbook row${rows.length === 1 ? "" : "s"} (${rows.length} total).`;
+  }
+  const suppressedHtml = suppressed.length
+    ? `<div class="source-blocker"><b>Entire proposal suppressed.</b>${suppressed.map(canonicalRowView).join("")}</div>`
+    : "";
+  return `<h3 tabindex="-1">Preview</h3>
+    <p class="preview-summary">${escapeHtml(summary)} <b>The live workbook is not being written.</b></p>
+    <div class="cell-sub">Clears ${escapeHtml(cleared.length)} blocker${cleared.length === 1 ? "" : "s"}; adds ${escapeHtml(added.length)} blocker${added.length === 1 ? "" : "s"}.</div>
+    <details class="exact-effects"><summary>Exact workbook rows (${rows.length})</summary>${rowHtml}${suppressedHtml}</details>`;
+}
+
+function sourceSnippetView(item) {
+  const source = (item.evidence.sourceEvidence || [])[0];
+  if (!source) return "";
+  const rpo = source.rpo || source.refOnlyRpo || "Target source";
+  return `<div class="source-snippet"><span>Target source</span><b>${escapeHtml(rpo)}</b> — ${escapeHtml(source.description || "Description unavailable")}</div>`;
+}
+
+function conflictComparisonView(item) {
+  const comparison = (item.presentation || {}).comparison;
+  if (!comparison) return "";
+  return `<section class="conflict-comparison" aria-label="Existing and proposed behavior">
+    <div><span>Existing</span><p>${escapeHtml(comparison.existing)}</p></div>
+    <div><span>Proposed</span><p>${escapeHtml(comparison.proposed)}</p></div>
+    <p class="conflict-difference"><b>Difference:</b> ${escapeHtml(comparison.difference)}</p>
+  </section>`;
+}
+
+function supportingEvidenceView(item) {
+  const subject = item.subject;
+  const raw = item.evidence.sourceEvidence || [];
+  const existingRows = item.evidence.existingWorkbookRows || [];
+  const derivedRows = item.evidence.alreadyDerivedRows || [];
+  const sharedContext = item.evidence.sharedContext || [];
+  const comparator = item.evidence.comparator || [];
+  const proposed = subject.proposedRows || [];
+  const columns = `
+      ${evidenceColumn("Raw source evidence", raw, sourceEvidenceView)}
+      ${evidenceColumn("Existing workbook rows", existingRows, canonicalRowView)}
+      ${evidenceColumn("Already-derived rows", derivedRows, canonicalRowView)}
+      ${evidenceColumn("Comparator context", comparator, comparatorEvidenceView)}
+      ${evidenceColumn("Proposal to evaluate — not workbook rows", proposed, canonicalRowView)}
+    `;
+  return `<details class="supporting-details"><summary>Supporting details</summary>
+    <div class="evidence-grid">${columns}</div>
+    ${sharedContext.length ? `<details class="shared-context"><summary>Shared context — not written by this decision (${sharedContext.length})</summary>${sharedContext.map(canonicalRowView).join("")}</details>` : ""}
+    <details class="debug-detail"><summary>Technical details</summary>
+      <div class="gate-impact"><b>Gate impact:</b> Blocks ${escapeHtml(subject.model)} compilation.</div>
+      <code>${escapeHtml(subject.reasonCode)} · ${escapeHtml(subject.subjectId)}</code>
+      <div class="cell-sub">Affected sheets: ${(item.affectedSheets || []).map(escapeHtml).join(", ") || "not yet projectable"}</div>
+    </details>
+  </details>`;
+}
+
+function renderExpandedException(item) {
+  const subject = item.subject;
+  const presentation = item.presentation || {};
+  const stale = (item.history.stale || []).length;
+  return `<section class="exception-card ${item.state === "resolved" ? "exception-resolved" : ""}" id="exception-detail-${escapeHtml(subject.subjectId)}">
+    <div class="decision-heading">
+      <div><span class="decision-kicker">Decision</span><h2 tabindex="-1">${escapeHtml(presentation.title || `${subject.model} decision`)}</h2></div>
+      <span class="type-badge ${subject.severity === "blocking" ? "type-unsupported" : ""}">${escapeHtml(item.reviewState.replaceAll("_", " "))}</span>
+    </div>
+    <p class="decision-sentence">${escapeHtml(presentation.summary || subject.question)}</p>
+    <p class="why-asked"><b>Why this needs a decision:</b> ${escapeHtml(presentation.whyAsked || subject.question)}</p>
+    ${sourceSnippetView(item)}
+    ${conflictComparisonView(item)}
+    ${stale ? `<div class="status-note">${stale} prior answer${stale === 1 ? "" : "s"} became stale when evidence changed.</div>` : ""}
+    <div class="compilation-impact">Blocks ${escapeHtml(subject.model)} compilation</div>
+    ${exceptionActionForm(item)}
+    ${supportingEvidenceView(item)}
+  </section>`;
+}
+
+function renderExceptionSummary(item) {
+  const subject = item.subject;
+  const presentation = item.presentation || {};
+  const expanded = exceptionState.expandedSubjectId === subject.subjectId;
+  const rpos = (presentation.options || []).map((option) => option.rpo).filter(Boolean).join(" · ");
+  return `<article class="exception-summary ${expanded ? "is-expanded" : ""} ${item.state === "resolved" ? "exception-resolved" : ""}">
+    <button type="button" class="exception-summary-toggle" data-subject-id="${escapeHtml(subject.subjectId)}" aria-expanded="${expanded ? "true" : "false"}" aria-controls="exception-detail-${escapeHtml(subject.subjectId)}">
+      <span class="summary-model">${escapeHtml(subject.model)}</span>
+      <span class="summary-type">${escapeHtml(item.decisionType.replaceAll("_", " "))}</span>
+      <span class="summary-rpos">${escapeHtml(rpos || "Source decision")}</span>
+      <span class="summary-behavior">${escapeHtml(presentation.summary || subject.question)}</span>
+      <span class="summary-state">${escapeHtml(item.reviewState.replaceAll("_", " "))}</span>
+    </button>
+    ${expanded ? renderExpandedException(item) : ""}
+  </article>`;
+}
+
+function renderExceptionCard(item) {
+  return renderExceptionSummary(item);
+}
+
+function toggleExpandedException(subjectId) {
+  exceptionState.expandedSubjectId = exceptionState.expandedSubjectId === subjectId ? null : subjectId;
+  if (exceptionState.payload) renderExceptionPage(exceptionState.payload);
+}
+
+function fillExceptionFilter(id, values, allLabel) {
+  const select = $(id);
+  const current = select.value;
+  select.innerHTML = `<option value="">${escapeHtml(allLabel)}</option>${(values || []).map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(value.replaceAll("_", " "))}</option>`).join("")}`;
+  if ([...select.options].some((option) => option.value === current)) select.value = current;
+}
+
+function renderExceptionReadiness(summary) {
+  $("#exception-readiness").innerHTML = Object.entries(summary.models || {})
+    .map(([model, entry]) => `<span class="sum-chip ${entry.compileReady ? "sum-exact" : "sum-warn"}"><b>${escapeHtml(model)}</b>: compile ${readinessLabel(entry.compileReady)} · ${escapeHtml(entry.blockerCount)} blockers</span>`)
+    .join("");
+}
+
+function renderExceptionPage(payload) {
+  exceptionState.payload = payload;
+  exceptionState.offset = payload.offset;
+  if (
+    exceptionState.expandedSubjectId &&
+    !payload.items.some((item) => item.subject.subjectId === exceptionState.expandedSubjectId)
+  ) {
+    exceptionState.expandedSubjectId = null;
+  }
+  fillExceptionFilter("#exception-model", payload.filters.models, "All models");
+  fillExceptionFilter("#exception-decision", payload.filters.decisionTypes, "All decision types");
+  fillExceptionFilter("#exception-sheet", payload.filters.affectedSheets, "All affected sheets");
+  $("#exception-queue").innerHTML = payload.items.length
+    ? payload.items.map(renderExceptionCard).join("")
+    : '<div class="empty-note">No exceptions match these filters.</div>';
+  const first = payload.total ? payload.offset + 1 : 0;
+  const last = Math.min(payload.total, payload.offset + payload.items.length);
+  $("#exception-pagination").innerHTML = `
+    <button id="exceptions-prev" class="ghost" ${payload.offset <= 0 ? "disabled" : ""}>Previous</button>
+    <span class="status-note">Showing ${first}–${last} of ${payload.total}</span>
+    <button id="exceptions-next" class="ghost" ${last >= payload.total ? "disabled" : ""}>Next</button>`;
+  $("#exceptions-prev").addEventListener("click", () => loadExceptions(Math.max(0, payload.offset - payload.limit)));
+  $("#exceptions-next").addEventListener("click", () => loadExceptions(payload.offset + payload.limit));
+  if (exceptionState.pendingFocusSubjectId) {
+    const focusId = exceptionState.pendingFocusSubjectId;
+    exceptionState.pendingFocusSubjectId = null;
+    requestAnimationFrame(() => {
+      const buttons = [...document.querySelectorAll(".exception-summary-toggle")];
+      const firstDecisionId = payload.items
+        .find((item) => item.reviewState === "needs_decision")?.subject.subjectId;
+      const target = buttons.find(
+        (button) => button.dataset.subjectId === (
+          focusId === "__first__" ? firstDecisionId : focusId
+        )
+      ) || buttons.find((button) => button.dataset.subjectId === firstDecisionId);
+      if (target) target.focus();
     });
-    state.session = payload.session;
-    const detail = await getJSON(`/api/wizard/sessions/${state.session.runId}/plan`);
-    renderPlan(detail);
+  }
+}
+
+async function loadExceptions(offset = 0) {
+  const params = new URLSearchParams({
+    model: $("#exception-model").value,
+    decisionType: $("#exception-decision").value,
+    sheet: $("#exception-sheet").value,
+    reviewState: $("#exception-review-state").value,
+    q: $("#exception-q").value.trim(),
+    offset: String(offset),
+    limit: String(exceptionState.limit),
+  });
+  const payload = await getJSON(`/api/wizard/sessions/${state.session.runId}/exceptions?${params}`);
+  renderExceptionPage(payload);
+}
+
+async function enterExceptions() {
+  setStage("exceptions");
+  if (!compilerState.summary) {
+    compilerState.summary = await getJSON(`/api/wizard/sessions/${state.session.runId}/compile`);
+    state.session = compilerState.summary.session;
+  }
+  renderExceptionReadiness(compilerState.summary);
+  await loadExceptions(0);
+}
+
+function resolutionPayload(form, action, reasonCode) {
+  const data = new FormData(form);
+  switch (action) {
+    case "choose_section":
+      return { sectionId: data.get("sectionId") };
+    case "keep_inactive_option":
+      return { sectionId: data.get("sectionId") };
+    case "choose_relationship":
+      return { sourceOptionId: data.get("sourceOptionId"), ruleType: data.get("ruleType"), targetOptionId: data.get("targetOptionId") };
+    case "retain_existing":
+      return { existingId: data.get("existingId") };
+    case "provide_option_copy":
+      return { optionName: data.get("optionName"), description: data.get("description") || "" };
+    case "provide_option_behavior":
+      return { active: data.get("active") === "true", selectable: data.get("selectable") === "true" };
+    case "confirm_mandatory_charge":
+      return { priceValue: Number(data.get("priceValue")) };
+    case "provide_typed_value": {
+      if (reasonCode === "comparator_only_rule_group_proposal") return { decision: "confirm_proposal" };
+      if (reasonCode === "comparator_only_exclusive_group_proposal") {
+        return { decision: "confirm_proposal", selectionMode: data.get("selectionMode") };
+      }
+      if (reasonCode === "comparator_only_default_selection_proposal") {
+        const displayBehavior = data.get("defaultDisplayBehavior");
+        return {
+          decision: "confirm_proposal",
+          priority: Number(data.get("priority")),
+          displayBehavior: displayBehavior === "__blank__" ? "" : displayBehavior,
+        };
+      }
+      const selectedScope = JSON.parse(data.get("priceScope"));
+      const result = {};
+      if (reasonCode === "comparator_only_price_rule_proposal") result.decision = "confirm_proposal";
+      if (selectedScope.bodyStyleScope) result.bodyStyleScope = selectedScope.bodyStyleScope;
+      if (selectedScope.trimLevelScope) result.trimLevelScope = selectedScope.trimLevelScope;
+      if (selectedScope.variantScope) result.variantScope = selectedScope.variantScope;
+      if (data.get("priceValue") !== "") result.priceValue = Number(data.get("priceValue"));
+      return result;
+    }
+    case "approve_removal":
+    case "mark_not_applicable":
+      return { reason: data.get("reason") || "Reviewer rejected the entire proposal; no rows should be written." };
+    case "record_allowed_deferral":
+      return { kind: data.get("kind"), reason: data.get("reason") };
+    default:
+      return {};
+  }
+}
+
+function invalidateDecisionPreview(form) {
+  form.dataset.previewToken = "";
+  const preview = form.querySelector(".decision-preview");
+  preview.hidden = true;
+  preview.innerHTML = "";
+  form.querySelector('button[type="submit"]').textContent = "Preview effect";
+}
+
+$("#exception-queue").addEventListener("change", (event) => {
+  const outcome = event.target.closest('input[name="decisionAction"]');
+  if (!outcome) return;
+  const form = outcome.closest(".exception-resolution-form");
+  form.dataset.action = outcome.value;
+  form.querySelector(".conditional-action-fields").innerHTML = exceptionActionFields(
+    exceptionState.payload.items.find((item) => item.subject.subjectId === form.dataset.subjectId),
+    outcome.value
+  );
+  form.querySelector('button[type="submit"]').disabled = false;
+  invalidateDecisionPreview(form);
+});
+
+$("#exception-queue").addEventListener("submit", async (event) => {
+  const form = event.target.closest(".exception-resolution-form");
+  if (!form) return;
+  event.preventDefault();
+  clearError();
+  if (!form.dataset.action) {
+    showError("Choose one outcome before previewing its effect.");
+    return;
+  }
+  const button = form.querySelector('button[type="submit"]');
+  button.disabled = true;
+  try {
+    const payload = resolutionPayload(form, form.dataset.action, form.dataset.reasonCode);
+    const previewToken = JSON.stringify({
+      subjectId: form.dataset.subjectId,
+      subjectVersion: form.dataset.subjectVersion,
+      action: form.dataset.action,
+      payload,
+    });
+    if (form.dataset.previewToken !== previewToken) {
+      const preview = await postJSON(`/api/wizard/sessions/${state.session.runId}/exceptions/preview`, {
+        subjectId: form.dataset.subjectId,
+        subjectVersion: form.dataset.subjectVersion,
+        action: form.dataset.action,
+        payload,
+      });
+      form.dataset.previewToken = previewToken;
+      form.querySelector(".decision-preview").hidden = false;
+      form.querySelector(".decision-preview").innerHTML = decisionEffectView(preview);
+      form.querySelector(".decision-preview h3").focus();
+      button.textContent = "Save exact effect";
+      $("#exception-status").textContent = "Preview complete. Review the summary and exact rows, then save.";
+      return;
+    }
+    const reviewer = $("#exception-reviewer").value.trim();
+    if (!reviewer) {
+      showError("Enter the reviewer name before saving an exception answer.");
+      $("#exception-reviewer").focus();
+      return;
+    }
+    const result = await postJSON(`/api/wizard/sessions/${state.session.runId}/exceptions/resolve`, {
+      subjectId: form.dataset.subjectId,
+      subjectVersion: form.dataset.subjectVersion,
+      action: form.dataset.action,
+      payload,
+      reviewer,
+    });
+    compilerState.summary = result.summary;
+    state.session = result.summary.session;
+    renderExceptionReadiness(result.summary);
+    $("#exception-status").textContent = "Resolution saved and compiler rerun completed.";
+    const currentIndex = (exceptionState.payload.items || [])
+      .findIndex((item) => item.subject.subjectId === form.dataset.subjectId);
+    const next = (exceptionState.payload.items || [])
+      .slice(currentIndex + 1)
+      .find((item) => item.reviewState === "needs_decision");
+    exceptionState.expandedSubjectId = null;
+    exceptionState.pendingFocusSubjectId = next ? next.subject.subjectId : "__first__";
+    await loadExceptions(exceptionState.offset);
   } catch (error) {
     showError(error.message);
+  } finally {
+    button.disabled = false;
   }
 });
+
+$("#exception-queue").addEventListener("input", (event) => {
+  const form = event.target.closest(".exception-resolution-form");
+  if (!form || !form.dataset.previewToken) return;
+  invalidateDecisionPreview(form);
+  $("#exception-status").textContent = "Inputs changed. Preview the effect again before saving.";
+});
+
+$("#exception-queue").addEventListener("click", async (event) => {
+  const toggle = event.target.closest(".exception-summary-toggle");
+  if (toggle) {
+    toggleExpandedException(toggle.dataset.subjectId);
+    if (exceptionState.expandedSubjectId === toggle.dataset.subjectId) {
+      requestAnimationFrame(() => {
+        document.getElementById(`exception-detail-${toggle.dataset.subjectId}`)?.querySelector("h2")?.focus();
+      });
+    }
+    return;
+  }
+  const button = event.target.closest(".exception-reopen");
+  if (!button) return;
+  clearError();
+  const reviewer = $("#exception-reviewer").value.trim();
+  if (!reviewer) {
+    showError("Enter the reviewer name before reopening an answer.");
+    return;
+  }
+  button.disabled = true;
+  try {
+    const result = await postJSON(`/api/wizard/sessions/${state.session.runId}/exceptions/reopen`, {
+      subjectId: button.dataset.subjectId,
+      subjectVersion: button.dataset.subjectVersion,
+      reviewer,
+    });
+    compilerState.summary = result.summary;
+    state.session = result.summary.session;
+    renderExceptionReadiness(result.summary);
+    $("#exception-status").textContent = "Resolution reopened and compiler rerun completed.";
+    await loadExceptions(exceptionState.offset);
+  } catch (error) {
+    showError(error.message);
+  } finally {
+    button.disabled = false;
+  }
+});
+
+for (const id of ["#exception-model", "#exception-decision", "#exception-sheet", "#exception-review-state"]) {
+  $(id).addEventListener("change", () => loadExceptions(0).catch((error) => showError(error.message)));
+}
+let exceptionSearchTimer = null;
+$("#exception-q").addEventListener("input", () => {
+  clearTimeout(exceptionSearchTimer);
+  exceptionSearchTimer = setTimeout(() => loadExceptions(0).catch((error) => showError(error.message)), 250);
+});
+$("#exceptions-recompile-btn").addEventListener("click", async () => {
+  await runCompile();
+  if (compilerState.summary) await enterExceptions();
+});
+$("#exceptions-back-compile").addEventListener("click", enterCompile);
+
+/* ------------------------------------------------------- stage: changeset */
+
+function renderChangeSet(detail) {
+  const changeSet = detail.changeSet;
+  state.session = detail.session;
+  const sheetCreates = changeSet.sheetCreates || [];
+  const rowChanges = changeSet.rowChanges || [];
+  const noops = changeSet.noops || [];
+  const targets = changeSet.targets || [];
+  const workbook = changeSet.workbookFingerprint || {};
+  $("#changeset-summary").innerHTML = `
+    <div class="summary">
+      <span class="sum-chip"><b>${escapeHtml(targets.length)}</b> targets</span>
+      <span class="sum-chip"><b>${escapeHtml(sheetCreates.length)}</b> sheet creations</span>
+      <span class="sum-chip"><b>${escapeHtml(rowChanges.length)}</b> row changes</span>
+      <span class="sum-chip"><b>${escapeHtml(noops.length)}</b> no-op receipts</span>
+    </div>
+    <p class="status-note">Targets: ${targets.map(escapeHtml).join(", ") || "none"}</p>
+    <p class="status-note">Workbook fingerprint: <code>${escapeHtml(workbook.sha256 || "unavailable")}</code></p>`;
+  const blob = new Blob([JSON.stringify(changeSet, null, 2) + "\n"], { type: "application/json" });
+  const download = $("#changeset-download");
+  if (download.dataset.objectUrl) URL.revokeObjectURL(download.dataset.objectUrl);
+  download.dataset.objectUrl = URL.createObjectURL(blob);
+  download.href = download.dataset.objectUrl;
+  $("#changeset-download").download = "workbook-change-set.json";
+  $("#changeset-status").textContent = "ChangeSet emitted. No approval or workbook apply occurred.";
+}
+
+async function createChangeSet() {
+  clearError();
+  const button = $("#compile-changeset-btn");
+  button.disabled = true;
+  button.textContent = "Creating ChangeSet…";
+  try {
+    const detail = await postJSON(`/api/wizard/sessions/${state.session.runId}/changeset`, {});
+    renderChangeSet(detail);
+    setStage("changeset");
+  } catch (error) {
+    showError(error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Create ChangeSet";
+  }
+}
+
+$("#compile-changeset-btn").addEventListener("click", createChangeSet);
+$("#back-to-candidates").addEventListener("click", () => setStage("candidates"));
 
 /* ------------------------------------------------------------------- init */
 

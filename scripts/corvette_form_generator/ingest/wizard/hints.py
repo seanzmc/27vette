@@ -11,46 +11,42 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from corvette_form_generator.ingest.source_profiler import RPO_RE
+from corvette_form_generator.ingest.wizard.relationship_compiler import advisory_phrase_rows, scan_text
 
-# Ordered so more specific phrases win the `kind` label when several overlap.
-PHRASE_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
-    ("not_available_with", re.compile(r"not\s+available\s+with", re.IGNORECASE)),
-    ("only_available_with", re.compile(r"only\s+available\s+(?:with|on)", re.IGNORECASE)),
-    ("requires_additional_equipment", re.compile(r"requires\s+additional\s+equipment", re.IGNORECASE)),
-    ("requires", re.compile(r"\brequires?\b", re.IGNORECASE)),
-    ("included_with", re.compile(r"included\s+(?:with|in|on)", re.IGNORECASE)),
-    ("includes", re.compile(r"\bincludes?\b", re.IGNORECASE)),
-    ("deletes", re.compile(r"\bdeletes?\b", re.IGNORECASE)),
-    ("replaces", re.compile(r"\breplaces?\b", re.IGNORECASE)),
-    ("upgradeable_to", re.compile(r"upgradeable\s+to", re.IGNORECASE)),
+_KIND_BY_PHRASE = {
+    "not available with": "not_available_with",
+    "only available with": "only_available_with",
+    "requires additional equipment": "requires_additional_equipment",
+    "requires": "requires",
+    "included with": "included_with",
+    "included in": "included_with",
+    "included on": "included_with",
+    "includes": "includes",
+    "deletes": "deletes",
+    "replaces": "replaces",
+    "upgradeable to": "upgradeable_to",
+}
+
+# Compatibility adapter for the legacy copy splitter. These patterns are
+# derived from the advisory vocabulary above and are not compiler authority.
+PHRASE_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = tuple(
+    (kind, re.compile(re.escape(phrase), re.IGNORECASE))
+    for phrase, kind in _KIND_BY_PHRASE.items()
 )
-
-# Parenthesized tokens are trusted at RPO length; bare tokens must mix
-# letters and digits (Z51, E60, BV4 …) — all-alpha flags ordinary uppercase
-# words, all-digit flags prices/quantities.
-RPO_TOKEN_RE = re.compile(r"\(([A-Z0-9]{2,4})\)|\b([A-Z0-9]{3,4})\b")
-SNIPPET_CHARS = 90
 
 
 def scan_candidate_text(text: str) -> list[dict[str, Any]]:
     """Return ordered relationship hints found in one candidate's text."""
 
-    hints: list[dict[str, Any]] = []
-    for kind, pattern in PHRASE_PATTERNS:
-        for match in pattern.finditer(text or ""):
-            start = max(0, match.start() - SNIPPET_CHARS // 3)
-            end = min(len(text), match.end() + SNIPPET_CHARS)
-            snippet = text[start:end].strip()
-            hints.append(
-                {
-                    "kind": kind,
-                    "matchedText": match.group(0),
-                    "snippet": snippet,
-                    "rpoTokens": _rpo_tokens(text[match.end():end]),
-                }
-            )
-    return hints
+    return [
+        {
+            "kind": _KIND_BY_PHRASE[hit["phraseKey"]],
+            "matchedText": hit["matchedText"],
+            "snippet": hit["snippet"],
+            "rpoTokens": hit["rpoTokens"],
+        }
+        for hit in scan_text(text or "", advisory_phrase_rows())
+    ]
 
 
 def scan_candidates(candidates: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
@@ -66,16 +62,3 @@ def scan_candidates(candidates: list[dict[str, Any]]) -> dict[str, list[dict[str
         if hints:
             result[candidate["candidateId"]] = hints
     return result
-
-
-def _rpo_tokens(text: str) -> list[str]:
-    tokens: list[str] = []
-    for match in RPO_TOKEN_RE.finditer(text or ""):
-        parenthesized = match.group(1)
-        token = (parenthesized or match.group(2) or "").upper()
-        if not token or not RPO_RE.fullmatch(token) or token in tokens:
-            continue
-        if not parenthesized and (token.isdigit() or token.isalpha()):
-            continue
-        tokens.append(token)
-    return tokens

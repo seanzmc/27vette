@@ -1,0 +1,29 @@
+== FINAL (post-fix) 2026-07-15 ==
+== python3 -m py_compile workbook-manager/backend/app/*.py: OK
+test_dry_run_through_editor_ops_gate (tests.test_workbook_manager.TestSyncBatch) ... skipped 'full dry-run gate is slow; set WBM_SLOW_GATE=1'
+test_live_write_on_scratch_copy_creates_backup_and_marks_synced (tests.test_workbook_manager.TestSyncBatch) ... skipped 'full live-write gate is slow; set WBM_SLOW_GATE=1'
+test_live_write_requires_matching_mtime (tests.test_workbook_manager.TestSyncBatch) ... ok
+
+----------------------------------------------------------------------
+Ran 30 tests in 5.827s
+
+OK (skipped=7)
+
+== python3 scripts/validate_fable5_loop.py
+Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.
+
+== piecewise editor_ops gate on scratch copy: prepare=[] apply ok, save ok, readback ok=True, package ok (0.4s), bool-hygiene 0 issues (3.7s); schema-validation stage exceeded sandbox 42s process cap — run WBM_SLOW_GATE=1 pytest on host
+== node --check api.js naming.js vite.config.js: OK; Vite build + FastAPI TestClient tests deferred to host (PyPI/npm blocked in sandbox)
+
+== git status --porcelain
+ M README.md
+ M fable5loop/STATE.md
+ M fable5loop/skills/27vette-fable5-compounding.md
+?? "docs/react-editor prompt.md"
+?? fable5loop/runs/2026-07-15-workbook-manager-stage1/
+?? tests/test_workbook_manager.py
+?? workbook-manager/
+
+== 2026-07-16 follow-up: host pytest run (Sean) found TestApi::test_stage_endpoint_validation_error_shape failing (500 instead of 422).
+Root cause: test-harness module reset deleted app.* from sys.modules but not the bare "app" package; the re-imported main.py then bound the STALE staging module (via package attribute in `from . import staging`) while `from .staging import StagingError` re-imported a fresh class — two StagingError classes, so the endpoint's except missed the raise. Mechanism reproduced deterministically in sandbox (stale=True, same-class=False; consistent after full reset). Production import path is single-pass and unaffected.
+Fix: tests/test_workbook_manager.py TestApi.setUpClass now deletes "app" plus "app.*". Sandbox suite re-run: 30 tests OK (7 environment skips). Host re-run pending: WBM_SLOW_GATE=1 .venv/bin/python -m pytest tests/test_workbook_manager.py -q

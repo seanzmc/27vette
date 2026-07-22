@@ -1,0 +1,77 @@
+{
+  "artifactFileShas": {
+    "canonical-row-manifest.json": "fcf262936422f5372f4ea925a7b03a300f89830896f7f277f35f850e9a2e0f18",
+    "comparator-evidence.json": "277a103d838dbec73899ad308cfd8ed5835130950c79a1abf82b68b7954613f8",
+    "compile-report.json": "93e60d28af3769ca6292fa4b2efaad7e3bc76e156d17a74a7ffc1980a4117a5b",
+    "exception-queue.json": "1adf5d0a9e4a7945cf230d8d28f4d5ad58591c70d72436aea16270f66bfc2a3a",
+    "exception-resolutions.json": "4e43ee06b02dde0d74fcd182fb7cba6aa62340a76eed4a3da6ae54d34d215882"
+  },
+  "comparatorDispositionCounts": {
+    "comparator_nonportable_context_only": 142,
+    "corroborated_target_match": 66,
+    "target_endpoint_missing_context_only": 299,
+    "target_proposal_exception": 120
+  },
+  "evidencePartitions": {
+    "distinctTargetFingerprints": 3,
+    "workbookEntries": 2405
+  },
+  "exceptionSubjects": 800,
+  "familyCoverageDispositions": {
+    "compiled": 15,
+    "retained_existing": 34,
+    "unsupported_blocker": 26
+  },
+  "manifestActions": {
+    "add": 1274,
+    "noop": 3419,
+    "update": 408
+  },
+  "manifestFamilies": {
+    "asset_map": 28,
+    "color_overrides": 382,
+    "default_selection_rules": 10,
+    "exclusive_groups": 18,
+    "exclusive_members": 56,
+    "interior_components": 254,
+    "interiors": 262,
+    "model_interior_scope": 180,
+    "model_master": 2,
+    "model_registry_promotion": 2,
+    "model_variants": 14,
+    "model_workbook_sources": 20,
+    "options": 602,
+    "ovs": 2758,
+    "price_rules": 49,
+    "rule_group_members": 213,
+    "rule_groups": 31,
+    "rule_mapping": 188,
+    "variant_master": 32
+  },
+  "manifestRows": 5101,
+  "modelModes": {
+    "grand_sport_x": "greenfield",
+    "zr1": "reprocess",
+    "zr1x": "reprocess"
+  },
+  "runId": "20260712-215133-64bfad",
+  "semanticShas": {
+    "comparator": "f5efcef832b9a2d19ca6c54b1de541b155b351a2b456aab5b7b3e24e1e3bb450",
+    "manifest": "55d4fc4e7e77634e24984117fb97b5bba2b40c5a30035b0f6f2068ff82407938",
+    "queue": "c01d2a316f5bc5661fc26238c2c016861c65a4497e1f748f9639423b96c7e796",
+    "report": "1b630ddc7b16b4b617d698bd8839562fbc35132398b82961e8242576a6f6b304"
+  },
+  "sourceFeatureDispositions": {
+    "compiled": 5647,
+    "exception_open": 1915,
+    "resolved_not_a_workbook_fact": 561,
+    "resolved_not_applicable": 8948,
+    "unsupported_blocker": 137
+  },
+  "state": "compiled_with_exceptions",
+  "statusFeatureDispositions": {
+    "compiled": 4250,
+    "exception_open": 752,
+    "resolved_not_applicable": 7152
+  }
+}

@@ -19,7 +19,7 @@ from corvette_form_generator.ingest.wizard.session import (  # noqa: E402
 )
 from ingest_wizard_fixtures import build_raw_export  # noqa: E402
 
-ROLES = {"Equipment Groups 1": "options", "Price Schedule": "price"}
+ROLES = {"Exterior 1": "options", "Price Schedule": "price"}
 
 
 class WizardSessionTest(unittest.TestCase):
@@ -58,10 +58,10 @@ class WizardSessionTest(unittest.TestCase):
     def test_roles_validation_fails_closed(self) -> None:
         run_id = self.store.create_session("raw.xlsx")["session"]["runId"]
         with self.assertRaises(WizardError):  # no price sheet
-            self.store.confirm_roles(run_id, {"Equipment Groups 1": "options"})
+            self.store.confirm_roles(run_id, {"Exterior 1": "options"})
         with self.assertRaises(WizardError):  # price role on an options matrix
             self.store.confirm_roles(
-                run_id, {"Equipment Groups 1": "price", "Price Schedule": "price"}
+                run_id, {"Exterior 1": "price", "Price Schedule": "price"}
             )
         with self.assertRaises(WizardError):  # options role on unsupported sheet
             self.store.confirm_roles(
@@ -72,12 +72,16 @@ class WizardSessionTest(unittest.TestCase):
         with self.assertRaises(WizardError):  # parse before roles
             self.store.run_parse(run_id)
 
-    def test_standard_equipment_sheet_can_be_included_by_override(self) -> None:
+    def test_non_target_option_sheets_cannot_be_included_by_override(self) -> None:
         run_id = self.store.create_session("raw.xlsx")["session"]["runId"]
-        session = self.store.confirm_roles(
-            run_id, {"Standard Equipment 1": "options", "Price Schedule": "price"}
-        )
-        self.assertEqual(session["state"], "roles_confirmed")
+        with self.assertRaisesRegex(
+            WizardError,
+            "Interior, Exterior, or Mechanical",
+        ):
+            self.store.confirm_roles(
+                run_id,
+                {"Standard Equipment 1": "options", "Price Schedule": "price"},
+            )
 
     def test_full_run_reaches_parsed_candidates(self) -> None:
         run_id = self.store.create_session("raw.xlsx")["session"]["runId"]

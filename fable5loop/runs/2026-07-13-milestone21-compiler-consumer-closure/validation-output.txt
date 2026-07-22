@@ -1,0 +1,132 @@
+Milestone 2.1 validation — 2026-07-13
+
+Status: implementation, parent gates, and independent final-delta verification complete.
+
+1. Final focused compiler/API/UI gate
+Command:
+PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_ingest_wizard_parser.py tests/test_ingest_wizard_identity.py tests/test_ingest_wizard_relationship_compiler.py tests/test_ingest_wizard_exceptions.py tests/test_ingest_wizard_canonical_compiler.py tests/test_ingest_wizard_exception_flow.py tests/test_ingest_wizard_ui_milestone2.py -q
+Result:
+84 passed, 12 subtests passed in 6.72s.
+
+2. Syntax and diff checks
+Commands:
+PYTHONPATH=scripts .venv/bin/python -m py_compile scripts/corvette_form_generator/ingest/wizard/canonical_rows.py scripts/corvette_form_generator/ingest/wizard/parser.py scripts/corvette_form_generator/ingest/wizard/identity.py scripts/corvette_form_generator/ingest/wizard/relationship_compiler.py scripts/corvette_form_generator/ingest/wizard/exceptions.py scripts/corvette_form_generator/ingest/wizard/compiler.py scripts/corvette_form_generator/ingest/wizard/session.py
+node --check visualizer/ingest-wizard/wizard.js
+git diff --check
+Result:
+Passed with no output.
+
+3. Broad affected ingest/editor gate
+Command:
+PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_order_guide_ingest_profiler.py tests/test_order_guide_candidate_normalizer.py tests/test_ingest_wizard*.py tests/test_editor_ops_global_families.py -q
+Result:
+307 passed, 16 subtests passed in 101.74s.
+
+4. Full repository suite before the final projectability repair
+Command:
+PYTHONPATH=scripts .venv/bin/python -m pytest -q
+Result:
+600 passed, 23 subtests passed, 5 failed in 281.55s.
+Failure classification:
+- tests/test_editor_lints.py::RealWorkbookLintTest::test_d1_rwj_wks_collision — documented pre-existing live-workbook expectation failure.
+- tests/test_editor_lints.py::RealWorkbookCompareTest::test_c2_cj2_stingray_name_deviator — documented pre-existing live-workbook expectation failure.
+- tests/test_editor_lints.py::RealWorkbookCompareTest::test_r3_drz_pending_review — documented pre-existing live-workbook expectation failure.
+- tests/test_source_assembly_characterization.py::test_shared_assembler_preserves_stingray_runtime_drift_surfaces — documented pre-existing display_behavior characterization failure.
+- tests/test_fable5_loop_contract.py::test_repository_fable5_loop_contract_passes — expected while this receipt/verifier/STATE closeout remains incomplete.
+No Milestone 2.1 implementation test failed. Full-suite timestamp churn in form-output/runtime/*.json and form-output/stingray-form-data.json was restored; none remains in the working diff.
+The 4m41s full suite was not repeated after the two-test session projectability repair. The exact final session/UI snapshot is covered by the 84-test focused gate and the 307-test broad affected gate above; no unrelated runtime/generator surface changed.
+
+5. Workbook read-only validation
+Commands:
+.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+Result:
+Package and schema validation passed with zero issues/errors/warnings.
+
+6. Fresh real-source compiler proof
+Artifact:
+fable5loop/runs/2026-07-13-milestone21-compiler-consumer-closure/real-source-proof.json
+Run:
+20260713-181910-7dc5bb
+Result:
+- 5,093 canonical rows: 5,076 ready and 17 blocked.
+- Zero duplicate physical keys.
+- 711 exception subjects: 257 actionable and 454 actionless.
+- Actionless: 396 typed color/interior/model endpoints, 37 incomplete comparator catalogs, 19 global/target metadata-family blockers, and 2 Color/Trim parser blockers.
+- Grand Sport X, ZR1, and ZR1X compileReady=false.
+- Same-run recompile was byte-identical across manifest, comparator evidence, queue, resolutions, and report.
+- Post-full-suite artifact hashes and protected hashes exactly matched real-source-proof.json.
+
+7. Desktop browser resolve/recompile/reopen proof
+Disposable run:
+20260713-182553-e53434
+Result:
+- comparator price form rendered finite target scope choices with bodyStyleScope, trimLevelScope, and variantScope;
+- reviewer-authored wildcard scope plus $995 resolution saved and recompiled;
+- Grand Sport X blocker count moved 399 → 398;
+- resolved card showed the target-authored price row;
+- reopen restored 398 → 399;
+- incomplete comparator group catalog rendered with zero forms;
+- browser console had zero messages/errors.
+
+8. Final mobile browser proof and overflow correction
+Disposable run:
+20260713-184453-49bcd5
+Method:
+Installed Chrome headless, temporary profile, Node built-in WebSocket/CDP, Emulation.setDeviceMetricsOverride at 390x844, top/card screenshots, and mechanical DOM measurements.
+Initial result:
+Long comparator reason/subject IDs made #exception-queue scrollWidth exceed clientWidth by 224px. This was a real mobile overflow defect.
+Correction:
+visualizer/ingest-wizard/wizard.css now constrains and wraps the exception-card header content while keeping the severity/state badge flex-stable; tests/test_ingest_wizard_ui_milestone2.py characterizes the CSS contract.
+Final result:
+- viewport 390x844; max-width 720px media query active;
+- document, stepper, exception filters, actions bar, and exception queue horizontal overflow: 0;
+- 20 rendered cards; card overflow: 0; control overflow: 0;
+- 19 finite price-scope options; empty error banner;
+- overflowing element list empty;
+- top-of-page and scrolled-card screenshots visually showed no clipping.
+- UI source suite: 6 passed.
+Temporary server and Chrome processes were stopped.
+
+9. Protected surfaces
+SHA-256 values in real-source-proof.json remain current for:
+- stingray_master.xlsx;
+- 2027 Chevrolet Car Corvette Export (4) (1).xlsx;
+- form-app/data.js;
+- form-app/app.js;
+- retained Milestone 2 manifest/comparator/queue/resolutions/report artifacts.
+No workbook, source, runtime publication, pass-c-3, promotion, deployment, or dealer mutation occurred.
+
+10. Independent verification
+- Exact compiler/API/proof verifier: deleg_db6d9493 — BLOCK. All prior compiler findings passed, but direct mutation authorized actions without the current ready/unique option catalog and duplicate ready RPO identities were collapsed to a set.
+- Parent remediation: `_projectable_exception_actions()` now fails comparator proposals closed without a complete catalog; `_unique_option_rpos()` preserves identity multiplicity; GET and mutation authorization use the same current queue view. Added RED/GREEN tests for no-catalog projection, hidden-action mutation refusal, aggregate immutability, and duplicate-RPO exclusion.
+- Temporary clone of real run `20260713-181910-7dc5bb`: incomplete comparator rule-group `availableActions=[]`; direct `mark_not_applicable` rejected with 409; all compiler mutation artifacts byte-unchanged.
+- Session projectability final-delta verifier: deleg_37da6841 — PASS. Fifteen exception-flow tests passed in 2.77s; temporary real-run clone rejected the hidden action with 409 and all seven mutation files unchanged; no verifier edits.
+- Final mobile CSS delta verifier: deleg_7a565068 — PASS. Verified scoped wrapping/shrinking/badge rules against the exact exception-card DOM; UI suite 6 passed; no verifier edits.
+Combined final verdict: PASS. Receipt/STATE and Fable validator closure are recorded below.
+
+11. Fable 5 loop contract
+Command:
+.venv/bin/python scripts/validate_fable5_loop.py
+Result:
+Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.
+
+12. Fable contract regression
+Initial command after adding the current receipt:
+PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_fable5_loop_contract.py -q
+Initial result:
+12 passed, 1 failed. `test_validator_rejects_stale_last_session_pointer` still replaced the original 2026-07-05 receipt rather than the current latest receipt, so it no longer exercised the validator's latest-run rule.
+Correction:
+The test now discovers the latest copied receipt with `run.json` and replaces that path. This is companion coverage for the current STATE/receipt closeout, not a validator behavior change.
+Final result:
+13 passed in 0.45s. Fable 5 loop validator passed again after the correction.
+
+13. Final closeout recheck
+Commands:
+.venv/bin/python scripts/validate_fable5_loop.py
+git diff --check
+PYTHONPATH=scripts .venv/bin/python -m py_compile <changed wizard Python modules>
+node --check visualizer/ingest-wizard/wizard.js
+SHA-256 comparison of fresh compiler artifacts and protected surfaces against `real-source-proof.json`
+Result:
+All commands exited 0. Fresh artifact hashes match the proof; protected workbook/source/form-app/retained-run hashes match the proof; every mapped path exists.

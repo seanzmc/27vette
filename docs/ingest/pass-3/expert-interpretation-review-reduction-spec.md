@@ -531,7 +531,7 @@ Manual smoke:
 ```sh
 rm -rf /tmp/27vette-pass3-evidence /tmp/27vette-pass3-candidates /tmp/27vette-pass3-interpretation
 .venv/bin/python scripts/order_guide_ingest_profiler.py \
-  --raw-export "2027 Chevrolet Car Corvette Export_RAW.xlsx" \
+  --raw-export "<raw_export>.xlsx" \
   --workbook stingray_master.xlsx \
   --run-id pass3-smoke-evidence \
   --output-dir /tmp/27vette-pass3-evidence

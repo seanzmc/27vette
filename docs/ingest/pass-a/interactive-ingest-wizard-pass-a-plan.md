@@ -1925,7 +1925,7 @@ Implementation notes:
 .venv/bin/python scripts/ingest_wizard_server.py --port 8040
 ```
 
-Open `http://127.0.0.1:8040/`, walk the four stages against `2027 Chevrolet Car Corvette Export_RAW.xlsx`, and check the browser console for errors. (Full proof-of-success verification is Task 7.)
+Open `http://127.0.0.1:8040/`, walk the four stages against the original Pass A raw export, and check the browser console for errors. (Full proof-of-success verification is Task 7.)
 
 - [ ] **Step 5: Commit**
 
@@ -1977,7 +1977,7 @@ Expected: all tests pass, including the pre-existing ingest/editor suites.
 
 - [ ] **Step 5: Browser proof of success** — start the server, open the browser, and verify against the real raw export:
 
-- choose `2027 Chevrolet Car Corvette Export_RAW.xlsx`;
+- choose the original Pass A raw export;
 - sheet cards: 23 sheets — 16 options matrices (4 flagged standard-equipment subtype, recommended exclude), 1 price sheet, 2 unsupported Color and Trim; `Equipment Groups 4` shows `mixed` family (ZR1 + ZR1X) with 8 variant columns;
 - confirm recommended roles, run the parse;
 - candidate table: `BV4` shows an exact price match at 395 with evidence cells; `PDB`, `PDD`, `PDF` show ambiguous matches with 3 price rows each; filters and the evidence drawer work.

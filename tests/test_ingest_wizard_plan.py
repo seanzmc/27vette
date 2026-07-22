@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Pass C tests: plan builder, scratch dry-run, approval gate.
+"""Historical Pass C projection-library characterization tests.
 
-Fixture workbooks only; schema validation is off for the dry run because the
-compact fixture is not schema-complete (op-level validation still runs). The
-live workbook is never touched.
+The current ingest API no longer exposes plan mutation or approval. These
+fixture-only tests retain coverage for the read-only ``build_plan`` library
+used to interpret historical evidence; no current session enters plan state.
 """
 
 from __future__ import annotations
@@ -13,6 +13,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 for entry in (ROOT / "scripts", ROOT / "tests"):
@@ -21,7 +22,6 @@ for entry in (ROOT / "scripts", ROOT / "tests"):
 
 from corvette_form_generator.ingest.wizard.plan_builder import build_plan  # noqa: E402
 from corvette_form_generator.ingest.wizard.session import (  # noqa: E402
-    WizardError,
     WizardSessionStore,
     read_json,
 )
@@ -31,6 +31,11 @@ from ingest_wizard_fixtures import build_master_workbook, build_raw_export  # no
 class PlanFlowTest(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.TemporaryDirectory()
+        self._schema_patch = patch(
+            "corvette_form_generator.editor_ops.validate_workbook_schema",
+            return_value=[],
+        )
+        self._schema_patch.start()
         self.root = Path(self._tmp.name)
         build_raw_export(self.root / "raw.xlsx")
         self.master = build_master_workbook(self.root / "master.xlsx")
@@ -43,6 +48,7 @@ class PlanFlowTest(unittest.TestCase):
         self.store.select_models(self.run_id, ["zr1", "zr1x"], {"zr1": "z06", "zr1x": "z06"})
 
     def tearDown(self) -> None:
+        self._schema_patch.stop()
         self._tmp.cleanup()
 
     def complete_model(
@@ -121,7 +127,6 @@ class PlanFlowTest(unittest.TestCase):
     def complete_all(self, *, zr1_extra: list[dict] | None = None) -> None:
         self.complete_model("zr1", extra=zr1_extra)
         self.complete_model("zr1x")
-        self.store.mark_complete(self.run_id)
 
     def plan_inputs(self) -> dict:
         run_dir = self.store.run_dir(self.run_id)
@@ -136,15 +141,13 @@ class PlanFlowTest(unittest.TestCase):
             "candidates_fingerprint": selection["candidatesFingerprint"],
         }
 
-    def test_plan_requires_decisions_complete(self) -> None:
-        with self.assertRaises(WizardError):
-            self.store.build_apply_plan(self.run_id, schema_validation=False)
 
     def test_plan_deterministic_and_covered(self) -> None:
         self.complete_all()
         inputs = self.plan_inputs()
         plan_a = build_plan(**inputs)
         plan_b = build_plan(**inputs)
+        self.assertEqual(plan_a["schemaVersion"], "pass-c-2")
         self.assertEqual(json.dumps(plan_a, sort_keys=True), json.dumps(plan_b, sort_keys=True))
         self.assertTrue(plan_a["valid"], plan_a["report"]["blockingGaps"])
         self.assertEqual(plan_a["coverage"]["uncoveredApprovedDecisions"], [])
@@ -153,11 +156,25 @@ class PlanFlowTest(unittest.TestCase):
         # Presentation rows land as adds on all five sheets.
         for sheet in ("runtime_steps", "section_presentation", "context_section_master", "order_summary_sections", "step_order_summary_map"):
             self.assertIn("add", plan_a["report"]["perSheetCounts"].get(sheet, {}), sheet)
+            self.assertIn("add", plan_a["report"]["perSheetActionCounts"].get(sheet, {}), sheet)
         # No timestamps anywhere in the plan payload (determinism guard).
         import re
 
         payload = json.dumps(plan_a)
         self.assertIsNone(re.search(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}", payload))
+
+    def test_grand_sport_x_registry_key_uses_runtime_metadata_key(self) -> None:
+        inputs = self.plan_inputs()
+        inputs["selection"] = {**inputs["selection"], "targets": ["grand_sport_x"]}
+        plan = build_plan(**inputs)
+        rows = [
+            item["row"]
+            for item in plan["stage1"]["items"]
+            if item.get("sheet") in {"model_master", "model_registry_promotion"}
+        ]
+
+        self.assertTrue(rows)
+        self.assertTrue(all(row["registry_key"] == "grand_sport_x" for row in rows))
 
     def test_relationship_and_exclusive_ops(self) -> None:
         extra = [
@@ -188,6 +205,47 @@ class PlanFlowTest(unittest.TestCase):
         self.assertEqual(group["row"]["group_id"], "excl_zr1wheelpack")
         members = [i for i in items if i["sheet"] == "zr1_exclusive_members" and i["action"] == "add"]
         self.assertEqual(len(members), 2)
+
+    def test_relationship_and_exclusive_ops_dry_run_against_live_like_headers(self) -> None:
+        from openpyxl import load_workbook
+
+        extra = [
+            {
+                "model": "zr1",
+                "lane": "relationship",
+                "groupKey": "pdb-excludes-c2z",
+                "action": "create_relationship_candidate",
+                "payload": {"kind": "not_available_with", "sourceRpo": "PDB", "targetRpos": ["C2Z"]},
+                "resolution": "approved_for_plan",
+            },
+            {
+                "model": "zr1",
+                "lane": "exclusive_group",
+                "groupKey": "zr1-wheel-pack",
+                "action": "create_exclusive_group",
+                "payload": {"members": ["PDB", "C2Z"]},
+                "resolution": "approved_for_plan",
+            },
+        ]
+        self.complete_all(zr1_extra=extra)
+
+        wb = load_workbook(self.master, read_only=True, data_only=True)
+        try:
+            rule_headers = [cell.value for cell in wb["z06_rule_mapping"][1]]
+            group_headers = [cell.value for cell in wb["z06_exclusive_groups"][1]]
+        finally:
+            wb.close()
+        self.assertNotIn("active", rule_headers)
+        self.assertNotIn("group_name", group_headers)
+        self.assertIn("notes", group_headers)
+
+        plan = build_plan(**self.plan_inputs())
+        self.assertTrue(plan["valid"], plan["report"]["blockingGaps"])
+        rule = next(i for i in plan["stage2"]["items"] if i["sheet"] == "zr1_rule_mapping" and i["action"] == "add")
+        group = next(i for i in plan["stage2"]["items"] if i["sheet"] == "zr1_exclusive_groups" and i["action"] == "add")
+        self.assertNotIn("active", rule["row"])
+        self.assertNotIn("group_name", group["row"])
+        self.assertEqual(group["row"]["notes"], "Review group: zr1-wheel-pack")
 
     def test_default_selection_rule_emits_from_reviewed_exclusive_payload(self) -> None:
         extra = [
@@ -415,62 +473,3 @@ class PlanFlowTest(unittest.TestCase):
         plan = build_plan(**{**self.plan_inputs(), "workbook_path": crippled})
         self.assertFalse(plan["valid"])
         self.assertIn("no_variants_mapped", {g["kind"] for g in plan["report"]["blockingGaps"]})
-
-    def test_store_flow_build_approve_and_invalidation(self) -> None:
-        self.complete_all()
-        before = self.master.read_bytes()
-        result = self.store.build_apply_plan(self.run_id, schema_validation=False)
-        self.assertTrue(result["dryRun"]["ok"], result["dryRun"])
-        self.assertEqual(result["session"]["state"], "plan_built")
-        self.assertEqual(self.master.read_bytes(), before)
-        run_dir = self.store.run_dir(self.run_id)
-        self.assertTrue((run_dir / "apply-plan.md").is_file())
-
-        approved = self.store.approve_plan(self.run_id, "sean")
-        self.assertEqual(approved["session"]["state"], "plan_approved")
-        self.assertTrue((run_dir / "plan-approval.json").is_file())
-
-        # A new decision reopens the run and invalidates the plan.
-        candidate = self.store.review_queue(self.run_id, "zr1", "section")["candidates"][0]
-        saved = self.store.save_decisions(
-            self.run_id,
-            [
-                {
-                    "model": "zr1",
-                    "lane": "section",
-                    "candidateId": candidate["candidateId"],
-                    "action": "assign_section",
-                    "payload": {"sectionId": "sec_pain_001"},
-                    "resolution": "approved_for_plan",
-                }
-            ],
-        )
-        self.assertEqual(saved["session"]["state"], "decisions_in_progress")
-        with self.assertRaises(WizardError):
-            self.store.approve_plan(self.run_id, "sean")
-
-    def test_workbook_change_blocks_approval(self) -> None:
-        self.complete_all()
-        self.store.build_apply_plan(self.run_id, schema_validation=False)
-        # Any workbook change after the build — even mtime-preserving — must
-        # fail the approval closed (sha256 compared, not just mtime).
-        import os
-
-        stat = self.master.stat()
-        data = self.master.read_bytes()
-        self.master.write_bytes(data + b"\x00")
-        os.utime(self.master, ns=(stat.st_atime_ns, stat.st_mtime_ns))
-        with self.assertRaises(WizardError):
-            self.store.approve_plan(self.run_id, "sean")
-
-    def test_approval_requires_built_plan_and_name(self) -> None:
-        self.complete_all()
-        with self.assertRaises(WizardError):
-            self.store.approve_plan(self.run_id, "sean")  # not built yet
-        self.store.build_apply_plan(self.run_id, schema_validation=False)
-        with self.assertRaises(WizardError):
-            self.store.approve_plan(self.run_id, "")
-
-
-if __name__ == "__main__":
-    unittest.main()

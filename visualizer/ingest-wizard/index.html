@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+  <meta charset="utf-8">
+  <link rel="icon" href="data:,">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ingest Wizard</title>
 <link rel="stylesheet" href="/wizard.css">
@@ -12,24 +13,30 @@
     <span class="brand-title">Ingest Wizard</span>
     <span class="brand-sub">raw order-guide intake · workbook stays read-only</span>
   </div>
-  <nav class="stepper" id="stepper">
-    <span class="step" data-stage="files">1 · Choose file</span>
-    <span class="step" data-stage="sheets">2 · Sheet roles</span>
-    <span class="step" data-stage="candidates">3 · Candidates</span>
-    <span class="step" data-stage="models">4 · Models</span>
-    <span class="step" data-stage="review">5 · Review</span>
-    <span class="step" data-stage="plan">6 · Plan</span>
+  <nav aria-label="Ingest progress">
+    <ol class="stepper" id="stepper">
+      <li class="step" data-stage="files">1 · Choose file</li>
+      <li class="step" data-stage="sheets">2 · Sheet roles</li>
+      <li class="step" data-stage="candidates">3 · Candidates</li>
+      <li class="step" data-stage="models">4 · Models</li>
+      <li class="step" data-stage="compile">5 · Compile</li>
+      <li class="step" data-stage="exceptions">6 · Exceptions</li>
+      <li class="step" data-stage="changeset">7 · ChangeSet</li>
+    </ol>
   </nav>
   <div class="runinfo" id="run-info"></div>
 </header>
 
-<div id="error-banner" class="error-banner hidden"></div>
+<div id="error-banner" class="error-banner hidden" role="alert"></div>
 
 <main>
   <section id="stage-files" class="stage">
     <h1>Choose a raw GM order-guide export</h1>
     <p class="hint">Pick a workbook to profile. The file is never modified; the canonical workbook is never a source.</p>
     <div id="file-list" class="file-list"></div>
+    <h2 class="sub-h">Resume a saved run</h2>
+    <p class="hint">Resume returns to the current compiler or exception step. Historical decision runs remain available only through their original debug screens.</p>
+    <div id="run-list" class="file-list"></div>
     <div class="file-actions">
       <label class="upload-label">
         Upload .xlsx
@@ -52,7 +59,7 @@
 
   <section id="stage-candidates" class="stage hidden">
     <h1>Option candidates</h1>
-    <p class="hint">Read-only audit step — nothing to decide here. Check that the parse looks right (counts, prices, skipped rows); if something is off, fix the sheet roles. Decisions start at step 5.</p>
+    <p class="hint">Read-only audit step — nothing to decide here. Check that the parse looks right (counts, prices, skipped rows); if something is off, fix the sheet roles. Canonical compilation starts at step 5.</p>
     <div id="summary-chips" class="summary"></div>
     <div class="filters">
       <select id="filter-sheet"><option value="">All sheets</option></select>
@@ -71,7 +78,7 @@
 
   <section id="stage-models" class="stage hidden">
     <h1>Select target models</h1>
-    <p class="hint">Targets get decision capture. Each target picks a reference model — a live model whose workbook data prefills presentation metadata and shows "In workbook" comparisons during review. Defaults follow the approved end-to-end spec.</p>
+    <p class="hint">Each target picks one live comparator model. Comparator facts are context and corroboration only; they never supply target prices, IDs, copy, sections, defaults, or availability.</p>
     <div id="model-cards" class="cards"></div>
     <div class="sheet-actions">
       <button id="confirm-models-btn" class="primary">Confirm model selection</button>
@@ -81,67 +88,57 @@
     <div id="reconciliation"></div>
   </section>
 
-  <section id="stage-review" class="stage hidden">
-    <h1>Review decisions</h1>
-    <div id="progress-chips" class="summary"></div>
-    <div class="filters">
-      <select id="review-model" title="Which target model you're reviewing"></select>
-      <select id="review-lane" title="Which kind of decision"></select>
-      <select id="review-source-section" title="Filter by where the row came from in the export"><option value="">All source groups</option></select>
-      <select id="review-decision-state" class="hidden" title="Filter by whether this lane already has a saved decision">
-        <option value="">All decision states</option>
-        <option value="undecided">Needs decision</option>
-        <option value="decided">Already decided</option>
-      </select>
-      <select id="review-price-state" class="hidden">
-        <option value="">All price states</option>
-        <option value="exact">Single price match</option>
-        <option value="ambiguous">Multiple prices</option>
-        <option value="none">No price</option>
-      </select>
-      <select id="review-price-presence" class="hidden" title="Filter by whether the export attached any price to the row">
-        <option value="">Priced or not</option>
-        <option value="unpriced">No price</option>
-        <option value="priced">Has price</option>
-      </select>
-      <select id="review-workbook-ref" class="hidden" title="Filter by whether the RPO already exists on a live workbook model">
-        <option value="">Workbook: all</option>
-        <option value="in_workbook">Already in workbook</option>
-        <option value="new">New to workbook</option>
-      </select>
-      <select id="review-section-state" class="hidden" title="Filter by whether you've already put the row in a form section">
-        <option value="">Section: all</option>
-        <option value="assigned">Section assigned</option>
-        <option value="unassigned">No section yet</option>
-      </select>
-      <input type="search" id="review-q" placeholder="Search RPO or description…">
+  <section id="stage-compile" class="stage hidden">
+    <h1>Compile canonical rows</h1>
+    <p class="hint">The compiler derives every supported workbook row and turns only unresolved product facts into typed exceptions. The workbook and raw export stay read-only.</p>
+    <div id="compile-summary"></div>
+    <div class="sheet-actions">
+      <button id="compile-btn" class="primary">Compile canonical rows</button>
+      <button id="compile-changeset-btn" class="primary hidden">Create ChangeSet</button>
+      <button id="review-exceptions-btn" class="primary hidden">Review open exceptions</button>
+      <button id="compile-back-models" class="ghost">Back to models</button>
+      <span id="compile-status" class="status-note" aria-live="polite"></span>
     </div>
-    <div class="filters actions-bar">
-      <button id="back-to-models" class="ghost">Back to models</button>
-      <span class="status-note">Reuse work between the models you're ingesting:</span>
-      <button id="copy-decisions-btn" class="ghost">Copy <span id="copy-from-label"></span>'s finished decisions to <span id="copy-to-label"></span></button>
-      <select id="copy-from-model" title="Which model's decisions to copy from"></select>
-      <label class="status-note" title="Off = rows you've already decided here are left alone."><input type="checkbox" id="copy-overwrite"> also replace decisions I've already made here</label>
-      <span id="copy-report" class="status-note"></span>
-      <button id="mark-complete-btn" class="primary">Mark decisions complete</button>
-      <button id="to-plan-btn" class="primary hidden">Build apply plan</button>
-    </div>
-    <div id="lane-help" class="lane-help"></div>
-    <div id="bulk-bar" class="filters"></div>
-    <div id="review-blockers"></div>
-    <div id="review-queue"></div>
   </section>
 
-  <section id="stage-plan" class="stage hidden">
-    <h1>Apply plan</h1>
-    <p class="hint">The plan is what Pass D will write into the workbook — nothing has been written yet. Review the numbers, the dry-run result, and the open items; approving is your sign-off for the write step.</p>
-    <div id="plan-summary"></div>
+  <section id="stage-exceptions" class="stage hidden">
+    <h1>Typed exception review</h1>
+    <p class="hint">Review one target-workbook fact at a time. Preview shows every physical row before anything is saved. Conflict and prerequisite cards remain read-only.</p>
+    <div id="exception-readiness" class="summary"></div>
+    <div class="filters exception-filters">
+      <select id="exception-model" aria-label="Filter exceptions by target model"><option value="">All models</option></select>
+      <select id="exception-decision" aria-label="Filter exceptions by decision type"><option value="">All decision types</option></select>
+      <select id="exception-sheet" aria-label="Filter exceptions by affected workbook sheet"><option value="">All affected sheets</option></select>
+      <select id="exception-review-state" aria-label="Filter exceptions by concrete review state">
+        <option value="needs_decision">Needs reviewer decision</option>
+        <option value="prerequisite_blocked">Blocked by missing or ambiguous target identity</option>
+        <option value="semantic_conflict">Blocked by semantic conflict</option>
+        <option value="source_or_tooling_blocked">Blocked by source evidence or compiler support</option>
+        <option value="resolved">Resolved</option>
+        <option value="pending_projection">Answer saved — still blocked</option>
+        <option value="stale_reopened">Reopened after evidence changed</option>
+        <option value="">All review states</option>
+      </select>
+      <input id="exception-q" type="search" placeholder="Search RPO, copy, stable ID, or workbook sheet…" aria-label="Search exceptions">
+    </div>
+    <div class="filters actions-bar">
+      <label class="status-note" for="exception-reviewer">Reviewer</label>
+      <input id="exception-reviewer" autocomplete="name" placeholder="your name">
+      <button id="exceptions-recompile-btn" class="ghost">Recompile</button>
+      <button id="exceptions-back-compile" class="ghost">Back to compile summary</button>
+      <span id="exception-status" class="status-note" aria-live="polite"></span>
+    </div>
+    <div id="exception-queue"></div>
+    <div id="exception-pagination" class="sheet-actions"></div>
+  </section>
+
+  <section id="stage-changeset" class="stage hidden">
+    <h1>ChangeSet created</h1>
+    <p class="hint">The compiler output is packaged for the shared workbook service. This browser cannot approve or apply it.</p>
+    <div id="changeset-summary"></div>
     <div class="sheet-actions">
-      <button id="rebuild-plan-btn" class="ghost">Rebuild plan</button>
-      <input id="plan-approver" placeholder="your name">
-      <button id="approve-plan-btn" class="primary">Approve plan for apply</button>
-      <button id="back-to-review" class="ghost">Back to review</button>
-      <span id="plan-status" class="status-note"></span>
+      <a id="changeset-download" class="primary" href="#">Download ChangeSet</a>
+      <span id="changeset-status" class="status-note" aria-live="polite"></span>
     </div>
   </section>
 </main>

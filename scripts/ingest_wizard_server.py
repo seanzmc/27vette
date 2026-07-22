@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
-"""Local dev server for the interactive ingest wizard (Passes A through C).
+"""Local server for the five-function current ingest path.
 
-Read-only toward the canonical workbook and raw exports; writes only
-run-scoped JSON under form-output/ingest-wizard/. Pass A: profile, roles,
-parse, candidates. Pass B: model selection, decision lanes, completeness.
-Pass C: dry-run apply plan and reviewer approval gate.
-See docs/ingest/pass-a/interactive-ingest-wizard-pass-a-spec.md and
-docs/ingest/ingest-wizard-end-to-end-completion-spec.md (Passes B-F).
+The server writes only run-scoped intake, profile, compile, typed-exception,
+and immutable ChangeSet artifacts. Historical decision/plan evidence is GET
+only; workbook approval and application belong to the shared workbook service.
 """
 
 from __future__ import annotations
@@ -23,6 +20,7 @@ SCRIPTS_DIR = ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
+from corvette_form_generator.ingest.wizard.legacy_reader import LegacyRunReader  # noqa: E402
 from corvette_form_generator.ingest.wizard.session import (  # noqa: E402
     WizardError,
     WizardSessionStore,
@@ -70,8 +68,26 @@ class WizardHandler(BaseHTTPRequestHandler):
         except (UnicodeDecodeError, json.JSONDecodeError) as exc:
             raise WizardError(f"Invalid JSON body: {exc}") from exc
         if not isinstance(payload, dict):
-            raise WizardError("JSON body must be an object.")
+            raise WizardError("Request body must be a JSON object.")
         return payload
+
+    @staticmethod
+    def _require_exact_fields(payload: dict, fields: set[str], label: str) -> None:
+        unknown = sorted(set(payload) - fields)
+        missing = sorted(fields - set(payload))
+        if unknown:
+            raise WizardError(f"{label} has unknown fields: {', '.join(unknown)}.")
+        if missing:
+            raise WizardError(f"{label} is missing fields: {', '.join(missing)}.")
+
+    @staticmethod
+    def _require_query_fields(query: dict[str, list[str]], allowed: set[str], label: str) -> None:
+        unknown = sorted(set(query) - allowed)
+        duplicates = sorted(key for key, values in query.items() if len(values) != 1)
+        if unknown or duplicates:
+            raise WizardError(
+                f"{label} query is invalid; unknown={unknown}, duplicate={duplicates}."
+            )
 
     def _serve_static(self, path: str) -> None:
         name, content_type = STATIC_FILES[path]
@@ -86,11 +102,22 @@ class WizardHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _legacy_detail(self, run_id: str, artifact: str) -> dict:
+        reader = LegacyRunReader(self.store.base)
+        try:
+            if artifact == "changeset":
+                return reader.changeset_detail(run_id)
+            return reader.plan_detail(run_id)
+        except FileNotFoundError as exc:
+            raise WizardError(str(exc), status=404) from exc
+        except ValueError as exc:
+            raise WizardError(str(exc)) from exc
+
     # ------------------------------------------------------------- routes
     def do_GET(self) -> None:  # noqa: N802 - stdlib naming
         split = urlsplit(self.path)
         path = unquote(split.path)
-        query = parse_qs(split.query)
+        query = parse_qs(split.query, keep_blank_values=True)
         try:
             if path in STATIC_FILES:
                 self._serve_static(path)
@@ -135,9 +162,41 @@ class WizardHandler(BaseHTTPRequestHandler):
             elif path.startswith("/api/wizard/sessions/") and path.endswith("/progress"):
                 run_id = path[len("/api/wizard/sessions/"):-len("/progress")]
                 self._send_json(self.store.progress(run_id))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/compile"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/compile")]
+                self._require_query_fields(query, set(), "Compile")
+                self._send_json(self.store.compiler_summary(run_id))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/exceptions"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/exceptions")]
+                self._require_query_fields(
+                    query,
+                    {"model", "decisionType", "decision", "sheet", "reviewState", "family", "reason", "severity", "state", "actionable", "q", "offset", "limit"},
+                    "Exceptions",
+                )
+                self._send_json(
+                    self.store.exception_queue_view(
+                        run_id,
+                        model=(query.get("model") or [""])[0],
+                        decision_type=(query.get("decisionType") or query.get("decision") or [""])[0],
+                        affected_sheet=(query.get("sheet") or [""])[0],
+                        review_state=(query.get("reviewState") or [""])[0],
+                        family=(query.get("family") or [""])[0],
+                        reason=(query.get("reason") or [""])[0],
+                        severity=(query.get("severity") or [""])[0],
+                        state=(query.get("state") or [""])[0],
+                        actionable=(query.get("actionable") or [""])[0],
+                        query=(query.get("q") or [""])[0],
+                        offset=(query.get("offset") or [0])[0],
+                        limit=(query.get("limit") or [50])[0],
+                    )
+                )
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/changeset"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/changeset")]
+                self._require_query_fields(query, set(), "ChangeSet")
+                self._send_json(self._legacy_detail(run_id, "changeset"))
             elif path.startswith("/api/wizard/sessions/") and path.endswith("/plan"):
                 run_id = path[len("/api/wizard/sessions/"):-len("/plan")]
-                self._send_json(self.store.plan_detail(run_id))
+                self._send_json(self._legacy_detail(run_id, "plan"))
             elif path.startswith("/api/wizard/sessions/"):
                 run_id = path[len("/api/wizard/sessions/"):]
                 self._send_json(self.store.session_detail(run_id))
@@ -151,7 +210,18 @@ class WizardHandler(BaseHTTPRequestHandler):
         path = unquote(split.path)
         query = parse_qs(split.query)
         try:
-            if path == "/api/wizard/upload":
+            retired_suffixes = (
+                "/decisions",
+                "/decisions/delete",
+                "/copy-decisions",
+                "/complete",
+                "/plan",
+                "/plan/approve",
+                "/write/approve",
+            )
+            if path.startswith("/api/wizard/sessions/") and path.endswith(retired_suffixes):
+                self._send_error_json("Historical ingest mutation is retired.", 410)
+            elif path == "/api/wizard/upload":
                 filename = (query.get("filename") or [""])[0]
                 saved = self.store.save_upload(filename, self._read_body())
                 self._send_json({"file": saved})
@@ -181,51 +251,74 @@ class WizardHandler(BaseHTTPRequestHandler):
                 if not isinstance(targets, list) or not isinstance(comparators, dict):
                     raise WizardError("Request body must carry targets (list) and comparators (object).")
                 self._send_json(self.store.select_models(run_id, [str(t) for t in targets], comparators))
-            elif path.startswith("/api/wizard/sessions/") and path.endswith("/decisions/delete"):
-                run_id = path[len("/api/wizard/sessions/"):-len("/decisions/delete")]
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/compile"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/compile")]
                 payload = self._json_body()
-                decision_ids = payload.get("decisionIds")
-                batch_id = str(payload.get("batchId") or "")
-                if decision_ids is not None and not isinstance(decision_ids, list):
-                    raise WizardError("decisionIds must be a list when present.")
+                self._require_exact_fields(payload, set(), "Compile request")
+                self.store.compile_canonical_rows(run_id)
+                self._send_json(self.store.compiler_summary(run_id))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/changeset"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/changeset")]
+                payload = self._json_body()
+                self._require_exact_fields(payload, set(), "ChangeSet request")
+                self._send_json(self.store.emit_changeset(run_id))
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/exceptions/preview"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/exceptions/preview")]
+                payload = self._json_body()
+                self._require_exact_fields(
+                    payload,
+                    {"subjectId", "subjectVersion", "action", "payload"},
+                    "Exception preview request",
+                )
+                typed_payload = payload.get("payload")
+                if not isinstance(typed_payload, dict):
+                    raise WizardError("Exception preview payload must be an object.")
                 self._send_json(
-                    self.store.delete_decisions(
+                    self.store.preview_exception(
                         run_id,
-                        decision_ids=[str(d) for d in decision_ids] if decision_ids else None,
-                        batch_id=batch_id,
+                        subject_id=str(payload.get("subjectId") or ""),
+                        subject_version=str(payload.get("subjectVersion") or ""),
+                        action=str(payload.get("action") or ""),
+                        payload=typed_payload,
                     )
                 )
-            elif path.startswith("/api/wizard/sessions/") and path.endswith("/decisions"):
-                run_id = path[len("/api/wizard/sessions/"):-len("/decisions")]
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/exceptions/resolve"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/exceptions/resolve")]
                 payload = self._json_body()
-                decisions = payload.get("decisions")
-                if not isinstance(decisions, list):
-                    raise WizardError("Request body must carry a decisions list.")
-                self._send_json(self.store.save_decisions(run_id, decisions))
-            elif path.startswith("/api/wizard/sessions/") and path.endswith("/copy-decisions"):
-                run_id = path[len("/api/wizard/sessions/"):-len("/copy-decisions")]
-                payload = self._json_body()
-                from_model = str(payload.get("fromModel") or "")
-                to_model = str(payload.get("toModel") or "")
-                if not from_model or not to_model:
-                    raise WizardError("Request body must carry fromModel and toModel.")
+                self._require_exact_fields(
+                    payload,
+                    {"subjectId", "subjectVersion", "action", "payload", "reviewer"},
+                    "Exception resolution request",
+                )
+                typed_payload = payload.get("payload")
+                if not isinstance(typed_payload, dict):
+                    raise WizardError("Exception resolution payload must be an object.")
                 self._send_json(
-                    self.store.copy_model_decisions(
-                        run_id, from_model, to_model, overwrite=bool(payload.get("overwrite"))
+                    self.store.resolve_exception(
+                        run_id,
+                        subject_id=str(payload.get("subjectId") or ""),
+                        subject_version=str(payload.get("subjectVersion") or ""),
+                        action=str(payload.get("action") or ""),
+                        payload=typed_payload,
+                        reviewer=str(payload.get("reviewer") or ""),
                     )
                 )
-            elif path.startswith("/api/wizard/sessions/") and path.endswith("/complete"):
-                run_id = path[len("/api/wizard/sessions/"):-len("/complete")]
-                self._json_body()  # accept and ignore an empty JSON body
-                self._send_json(self.store.mark_complete(run_id))
-            elif path.startswith("/api/wizard/sessions/") and path.endswith("/plan"):
-                run_id = path[len("/api/wizard/sessions/"):-len("/plan")]
-                self._json_body()  # accept and ignore an empty JSON body
-                self._send_json(self.store.build_apply_plan(run_id))
-            elif path.startswith("/api/wizard/sessions/") and path.endswith("/plan/approve"):
-                run_id = path[len("/api/wizard/sessions/"):-len("/plan/approve")]
+            elif path.startswith("/api/wizard/sessions/") and path.endswith("/exceptions/reopen"):
+                run_id = path[len("/api/wizard/sessions/"):-len("/exceptions/reopen")]
                 payload = self._json_body()
-                self._send_json(self.store.approve_plan(run_id, str(payload.get("approver") or "")))
+                self._require_exact_fields(
+                    payload,
+                    {"subjectId", "subjectVersion", "reviewer"},
+                    "Exception reopen request",
+                )
+                self._send_json(
+                    self.store.reopen_exception(
+                        run_id,
+                        subject_id=str(payload.get("subjectId") or ""),
+                        subject_version=str(payload.get("subjectVersion") or ""),
+                        reviewer=str(payload.get("reviewer") or ""),
+                    )
+                )
             else:
                 self._send_error_json("Not found.", 404)
         except WizardError as exc:

@@ -13,12 +13,15 @@ for entry in (ROOT / "scripts", ROOT / "tests"):
     if str(entry) not in sys.path:
         sys.path.insert(0, str(entry))
 
-from corvette_form_generator.ingest.wizard.parser import parse_confirmed_sheets  # noqa: E402
+from corvette_form_generator.ingest.wizard.parser import (  # noqa: E402
+    extract_option_candidates,
+    parse_confirmed_sheets,
+)
 from ingest_wizard_fixtures import build_raw_export  # noqa: E402
 
 ROLES = {
-    "Equipment Groups 1": "options",
-    "Equipment Groups 4": "options",
+    "Exterior 1": "options",
+    "Mechanical 4": "options",
     "Price Schedule": "price",
     "Standard Equipment 1": "exclude",
     "Color and Trim 1": "exclude",
@@ -39,16 +42,17 @@ class WizardParserTest(unittest.TestCase):
 
     def test_only_confirmed_options_sheets_produce_candidates(self) -> None:
         sheets = {c["sheetName"] for c in self.parsed["candidates"]}
-        self.assertEqual(sheets, {"Equipment Groups 1", "Equipment Groups 4"})
+        self.assertEqual(sheets, {"Exterior 1", "Mechanical 4"})
 
     def test_orderable_candidate_fields(self) -> None:
-        candidate = self.by_id["Equipment Groups 1:6"]
+        candidate = self.by_id["Exterior 1:6"]
         self.assertEqual(candidate["rpo"], "BV4")
         self.assertEqual(candidate["refOnlyRpo"], "")
         self.assertEqual(candidate["rowKind"], "orderable")
         self.assertEqual(candidate["sectionLabel"], "Equipment Groups")
         self.assertEqual(candidate["modelFamily"], "Stingray")
         self.assertIn("Personalized Plaque", candidate["description"])
+        self.assertEqual(candidate["detailRaw"], "Personalized Plaque. Not available with (PDB).")
         by_letter = {s["columnLetter"]: s for s in candidate["statuses"]}
         self.assertEqual(by_letter["D"]["raw"], "A1")
         self.assertEqual(by_letter["D"]["status"], "available")
@@ -57,22 +61,79 @@ class WizardParserTest(unittest.TestCase):
         self.assertEqual(candidate["sourceEvidence"]["cells"]["A6"], "BV4")
 
     def test_ref_only_candidate(self) -> None:
-        candidate = self.by_id["Equipment Groups 1:5"]
+        candidate = self.by_id["Exterior 1:5"]
         self.assertEqual(candidate["rowKind"], "ref_only")
         self.assertEqual(candidate["refOnlyRpo"], "UQH")
         self.assertEqual(candidate["rpo"], "")
 
     def test_unknown_status_symbol_is_unresolved(self) -> None:
-        candidate = self.by_id["Equipment Groups 1:8"]
+        candidate = self.by_id["Exterior 1:8"]
         by_letter = {s["columnLetter"]: s for s in candidate["statuses"]}
         self.assertEqual(by_letter["D"]["status"], "unresolved")
         self.assertIn("unknown_status_symbol", by_letter["D"]["flags"])
 
     def test_no_rpo_content_row_is_skipped_with_reason(self) -> None:
-        skipped = self.parsed["skippedRows"]["Equipment Groups 1"]
+        skipped = self.parsed["skippedRows"]["Exterior 1"]
         self.assertEqual(len(skipped), 1)
         self.assertEqual(skipped[0]["rowIndex"], 9)
         self.assertEqual(skipped[0]["reason"], "no_rpo_on_content_row")
+
+    def test_status_bearing_no_rpo_row_is_preserved_as_standard_candidate(self) -> None:
+        values = [
+            ["ZR1"],
+            ["Legend"],
+            ["Orderable RPO Code", "Ref. Only RPO Code", "Description", "ZR1 Coupe"],
+            ["", "", "Air filtration system with pollen filter", "S"],
+        ]
+        card = {
+            "sheetType": "options_matrix",
+            "headerRow": 3,
+            "modelFamily": "ZR1",
+            "modelFamilies": ["ZR1"],
+            "variantColumns": [
+                {
+                    "columnIndex": 4,
+                    "columnLetter": "D",
+                    "label": "ZR1 Coupe",
+                    "modelCode": "1YR07",
+                    "trim": "1LZ",
+                    "bodyStyle": "coupe",
+                }
+            ],
+        }
+
+        candidates, skipped = extract_option_candidates("Interior 5", values, card)
+
+        self.assertEqual(skipped, [])
+        self.assertEqual(len(candidates), 1)
+        candidate = candidates[0]
+        self.assertEqual(candidate["rowKind"], "standard_no_rpo")
+        self.assertEqual(candidate["rpo"], "")
+        self.assertEqual(candidate["refOnlyRpo"], "")
+        self.assertEqual(candidate["statuses"][0]["status"], "standard")
+        self.assertEqual(candidate["sourceEvidence"]["cells"]["C4"], "Air filtration system with pollen filter")
+
+    def test_exact_source_description_is_retained_separately_from_cleaned_copy(self) -> None:
+        values = [
+            ["ZR1"],
+            ["Legend"],
+            ["Orderable RPO Code", "Ref. Only RPO Code", "Description", "ZR1 Coupe"],
+            ["ABC", "", "  Exact source copy\nwith spacing  ", "A"],
+        ]
+        card = {
+            "sheetType": "options_matrix",
+            "headerRow": 3,
+            "modelFamily": "ZR1",
+            "modelFamilies": ["ZR1"],
+            "variantColumns": [
+                {"columnIndex": 4, "columnLetter": "D", "label": "ZR1 Coupe", "modelCode": "1YR07", "trim": "1LZ", "bodyStyle": "coupe"}
+            ],
+        }
+
+        candidates, _ = extract_option_candidates("Mechanical 4", values, card)
+
+        self.assertEqual(candidates[0]["description"], "Exact source copy\nwith spacing")
+        self.assertEqual(candidates[0]["detailRaw"], "  Exact source copy\nwith spacing  ")
 
     def test_price_rows(self) -> None:
         rows = self.parsed["priceRows"]
@@ -80,15 +141,25 @@ class WizardParserTest(unittest.TestCase):
         bv4 = rows[0]
         self.assertEqual(bv4["listPrice"], 395.0)
         self.assertEqual(bv4["qualifier"], "")
+        self.assertEqual(bv4["priceColumnEvidence"][0]["headerText"], "List")
         pdb = rows[1]
         self.assertEqual(pdb["qualifier"], "with ROY wheels")
         self.assertEqual(pdb["listPrice"], 16000.0)
+        self.assertEqual(pdb["priceColumnEvidence"][0]["cellCoordinate"], "E12")
+        self.assertEqual(pdb["priceColumnEvidence"][0]["headerCoordinate"], "E9")
+        self.assertEqual(pdb["priceColumnEvidence"][0]["headerText"], "Factory")
         self.assertTrue(bv4["sourceEvidence"]["cells"])
+        base = next(row for row in self.parsed["baseModelPriceRows"] if row["modelCode"] == "1YR07")
+        self.assertEqual(base["destinationCharge"], 2495.0)
+        self.assertEqual(base["destinationColumnEvidence"]["headerCoordinate"], "J4")
+        self.assertEqual(base["destinationColumnEvidence"]["headerText"], "DFC")
 
     def test_base_model_price_rows(self) -> None:
         base = self.parsed["baseModelPriceRows"]
         self.assertEqual([r["modelCode"] for r in base], ["1YC07", "1YR07"])
         self.assertEqual(base[0]["listPrice"], 71000.0)
+        self.assertEqual(base[0]["priceColumnEvidence"][0]["headerCoordinate"], "D4")
+        self.assertEqual(base[0]["priceColumnEvidence"][0]["headerText"], "List")
 
 
 if __name__ == "__main__":

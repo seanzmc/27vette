@@ -12,8 +12,9 @@ SCRIPTS_DIR = ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from corvette_form_generator.editor_ops import (  # noqa: E402
+from corvette_form_generator.workbook_domain.registry import (  # noqa: E402
     EDITOR_SHEET_META,
+    GLOBAL_SHEET_FAMILIES,
     SOURCE_ROLE_FAMILIES,
 )
 
@@ -54,6 +55,46 @@ class EditorSheetMetaTest(unittest.TestCase):
         self.assertEqual(
             tuple(meta["enums"]["status"]), ("standard", "available", "unavailable")
         )
+
+    def test_union_and_conditional_reference_contract_is_explicit(self):
+        self.assertEqual(
+            EDITOR_SHEET_META["rule_mapping"]["ref_unions"]["target_id"],
+            ("options", "interiors"),
+        )
+        self.assertEqual(
+            EDITOR_SHEET_META["price_rules"]["ref_unions"]["target_option_id"],
+            ("options", "interiors"),
+        )
+        conditional = EDITOR_SHEET_META["default_selection_rules"]["conditional_refs"]
+        self.assertEqual(conditional["always"], None)
+        self.assertEqual(conditional["unless_selected_rpo"], "option_rpos")
+        self.assertEqual(conditional["unless_selected_section"], "sections")
+        self.assertEqual(
+            conditional["when_selected_unless_selected_section"],
+            "options",
+        )
+
+    def test_global_canonical_families_are_registered(self):
+        self.assertEqual(GLOBAL_SHEET_FAMILIES["asset_map"], "asset_map")
+        self.assertEqual(GLOBAL_SHEET_FAMILIES["interior_components"], "interior_components")
+        self.assertEqual(
+            EDITOR_SHEET_META["asset_map"]["key"],
+            ("model_key", "target_type", "target_id"),
+        )
+        self.assertEqual(
+            EDITOR_SHEET_META["interior_components"]["key"],
+            ("model_key", "interior_id", "rpo", "component_type"),
+        )
+
+
+class WorkbookEditorSurfaceTest(unittest.TestCase):
+    def test_workbook_editor_has_no_ingest_review_navigation(self):
+        source = Path("visualizer/workbook-editor/editor.js").read_text()
+        self.assertNotIn(">Ingest Review<", source)
+        self.assertNotIn("/api/ingest/", source)
+
+    def test_dead_react_prototype_is_absent(self):
+        self.assertFalse(Path("visualizer/workbook-editor/workbook-editor.js").exists())
 
 
 if __name__ == "__main__":

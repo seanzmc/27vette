@@ -1,0 +1,80 @@
+Milestone 2 validation — 2026-07-13
+
+1. Syntax and focused Milestone 2 gate
+Command:
+PYTHONPATH=scripts .venv/bin/python -m py_compile scripts/ingest_wizard_server.py scripts/corvette_form_generator/ingest/wizard/session.py && node --check visualizer/ingest-wizard/wizard.js && git diff --check && .venv/bin/python -m pytest tests/test_ingest_wizard_exception_flow.py tests/test_ingest_wizard_server_milestone2.py tests/test_ingest_wizard_ui_milestone2.py -q
+Result:
+23 passed in 4.31s; Python syntax, JavaScript syntax, and diff whitespace checks passed.
+
+2. Broad affected gate
+Command:
+.venv/bin/python -m pytest tests/test_ingest_wizard*.py tests/test_runtime_metadata_guards.py tests/test_editor_ops_global_families.py tests/test_editor_ops_meta.py -q
+Result:
+298 passed, 6 subtests passed in 99.60s.
+
+3. Full repository suite on final implementation snapshot
+Command:
+.venv/bin/python -m pytest -q
+Result:
+584 passed, 13 subtests passed, 5 failed in 277.13s.
+Failure classification:
+- tests/test_editor_lints.py::RealWorkbookLintTest::test_d1_rwj_wks_collision — documented pre-existing live-workbook expectation failure.
+- tests/test_editor_lints.py::RealWorkbookCompareTest::test_c2_cj2_stingray_name_deviator — documented pre-existing live-workbook expectation failure.
+- tests/test_editor_lints.py::RealWorkbookCompareTest::test_r3_drz_pending_review — documented pre-existing live-workbook expectation failure.
+- tests/test_source_assembly_characterization.py::test_shared_assembler_preserves_stingray_runtime_drift_surfaces — documented pre-existing display_behavior characterization failure.
+- tests/test_fable5_loop_contract.py::test_repository_fable5_loop_contract_passes — expected while the current Milestone 2 receipt/verifier/STATE closeout was incomplete; rerun after closeout is recorded separately.
+No Milestone 2 implementation test failed.
+
+4. Workbook read-only gates
+Commands:
+.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+Results:
+- package: valid, issue_count=0
+- schema: valid, issue_count=0, error_count=0, warning_count=0
+
+5. Browser proof
+Evidence: browser-verification.md
+Results:
+- safe fixture resolve/reopen: blocker count 25→24→25; one record and one reopen audit event; no source/workbook mutation
+- retained real run: visible resume; 20-card pages; deterministic 1–20 then 21–40 of 92 compiler-complete reviewer actions; zero console errors; retained compiler hashes unchanged
+- mobile Chrome/CDP: 390px viewport, one-column filters/evidence, three-column wrapped stepper, zero horizontal stepper overflow, empty error banner
+
+6. Protected-surface proof after validation
+SHA-256:
+- stingray_master.xlsx: 03e8c9671185f238dde7f4bc8e7003da0f74d842d9cc2f76126f938cbb7b54d6
+- 2027 Chevrolet Car Corvette Export (4) (1).xlsx: 6ac9538d5bb8a823ade9afea70b2654057b793e1cf27c081c088545aa3add8a1
+- form-app/data.js: dd60534734c1330085ea74602515e1ab75aa964d3134c230abe0f26217b79e78
+Tracked diff across those three paths: none.
+Workbook/source sizes and mtimes still match the Milestone 1 no-write baseline.
+Full-suite generated timestamp churn in form-output/runtime/* and form-output/stingray-form-data.json was restored; those files are absent from the final diff.
+
+7. Retained Milestone 1 run read-only hash check
+The following current hashes exactly matched fable5loop/runs/2026-07-13-milestone1-headless-compiler/recompile-summary.json after browser smoke:
+- canonical-row-manifest.json: fcf262936422f5372f4ea925a7b03a300f89830896f7f277f35f850e9a2e0f18
+- comparator-evidence.json: 277a103d838dbec73899ad308cfd8ed5835130950c79a1abf82b68b7954613f8
+- compile-report.json: 93e60d28af3769ca6292fa4b2efaad7e3bc76e156d17a74a7ffc1980a4117a5b
+- exception-log.jsonl: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+- exception-queue.json: 1adf5d0a9e4a7945cf230d8d28f4d5ad58591c70d72436aea16270f66bfc2a3a
+- exception-resolutions.json: 4e43ee06b02dde0d74fcd182fb7cba6aa62340a76eed4a3da6ae54d34d215882
+
+8. Process cleanup
+Temporary fixture server, retained-run read-only server, and headless Chrome/CDP processes were stopped. No long-running Milestone 2 process remains.
+
+9. Independent verification
+Exact-snapshot verifier `deleg_2b1796e4` passed seven bounded criteria and found one strict blank-valued query defect. After the exact two-file repair, final-delta verifier `deleg_13c72781` returned PASS:
+- server/test hashes matched before and after;
+- four previously failing blank-valued unknown/duplicate requests returned 400;
+- ordinary q and severity filtering remained green;
+- `tests/test_ingest_wizard_server_milestone2.py`: 4 passed in 1.43s;
+- no verifier edits.
+
+10. Fable receipt/STATE closure
+Command:
+.venv/bin/python scripts/validate_fable5_loop.py && .venv/bin/python -m pytest tests/test_fable5_loop_contract.py::test_repository_fable5_loop_contract_passes -q && git diff --check
+Result:
+- Fable 5 loop validation passed.
+- repository Fable contract: 1 passed in 0.02s.
+- final diff whitespace check passed.
+
+This closes the fifth full-suite failure from the pre-receipt run. The four remaining full-suite failures are the documented pre-existing editor-lint/source-assembly expectations above; no Milestone 2 test failed.

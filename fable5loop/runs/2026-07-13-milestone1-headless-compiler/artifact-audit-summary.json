@@ -1,0 +1,25 @@
+{
+  "checks": {
+    "artifactGraphValidation": "pass",
+    "canonicalBooleanTypeViolations": 0,
+    "canonicalEnumViolations": 0,
+    "canonicalIntegerTypeViolations": 0,
+    "comparatorProposalParityMismatches": 0,
+    "comparatorProposalReferences": 120,
+    "compiledStatusFeatures": 4250,
+    "corroboratedComparatorClaims": 66,
+    "distinctTargetEvidenceFingerprints": 3,
+    "emptyTargetEvidenceFingerprints": 0,
+    "falseCompiledStatuses": 0,
+    "falseCorroboratedClaims": 0,
+    "globalPhysicalKeys": 5101,
+    "relationshipSemanticDuplicates": 0,
+    "stableUnchangedRecompile": true,
+    "statusFeaturesBoundToReadyOvs": 4250,
+    "uniqueGlobalPhysicalKeys": 5101,
+    "workbookEvidenceDependencyJoinMismatches": 0,
+    "workbookEvidenceEntries": 2405
+  },
+  "runId": "20260712-215133-64bfad",
+  "status": "pass"
+}

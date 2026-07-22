@@ -11,6 +11,7 @@ See workbook-editor-phase2-spec.md.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import shutil
 import tempfile
@@ -23,234 +24,26 @@ from corvette_form_generator.schema_validation import result_payload, validate_w
 from corvette_form_generator.workbook import (
     excel_lock_path,
     remove_table_sheet_auto_filters,
+    restore_workbook_backup,
     save_workbook_safely,
     workbook_truthy,
+)
+from corvette_form_generator.workbook_bool_hygiene import (
+    BOOL_TEXT_VALUES,
+    compare_bool_like_workbooks,
+    result_payload as bool_hygiene_result_payload,
+)
+# Compatibility aliases re-exported from workbook_domain.registry; the
+# canonical registry literals now live in that module.
+from corvette_form_generator.workbook_domain.registry import (
+    EDITOR_SHEET_META,
+    GLOBAL_SHEET_FAMILIES,
+    SOURCE_ROLE_FAMILIES,
 )
 from corvette_form_generator.workbook_package import assert_valid_workbook_package
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_LOG_PATH = ROOT / "form-output" / "workbook-edit-log.jsonl"
-
-# model_workbook_sources.source_role -> schema family
-SOURCE_ROLE_FAMILIES: dict[str, str] = {
-    "source_option_sheet": "options",
-    "status_sheet": "ovs",
-    "rule_mapping_sheet": "rule_mapping",
-    "rule_groups_sheet": "rule_groups",
-    "rule_group_members_sheet": "rule_group_members",
-    "exclusive_groups_sheet": "exclusive_groups",
-    "exclusive_group_members_sheet": "exclusive_members",
-    "price_rules_sheet": "price_rules",
-    "variant_option_overrides_sheet": "variant_overrides",
-    "color_overrides_sheet": "color_overrides",
-    "interior_source_sheet": "interiors",
-}
-
-# Per-family editing metadata. Columns absent from types/enums/refs are
-# free text. Headers always come from the sheet itself, never from here.
-EDITOR_SHEET_META: dict[str, dict] = {
-    "options": {
-        "key": ("option_id",),
-        "types": {
-            "price": "int",
-            "display_order": "int",
-            "selectable": "bool",
-            "active": "bool",
-        },
-        "enums": {
-            "display_behavior": (
-                "", "default_selected", "hidden", "display_only", "auto_only",
-            ),
-        },
-        "refs": {"section_id": "sections"},
-    },
-    "ovs": {
-        "key": ("option_id", "variant_id"),
-        "types": {},
-        "enums": {"status": ("standard", "available", "unavailable")},
-        "refs": {"option_id": "options", "variant_id": "variants"},
-    },
-    "rule_mapping": {
-        "key": ("rule_id",),
-        "types": {},
-        "enums": {
-            "rule_type": ("includes", "excludes", "requires"),
-            "body_style_scope": ("", "coupe", "convertible"),
-            "runtime_action": ("", "replace"),
-        },
-        "refs": {
-            "source_id": "options",
-            "target_id": "options",
-        },
-    },
-    "rule_groups": {
-        "key": ("group_id",),
-        "types": {"active": "bool"},
-        "enums": {"group_type": ("requires_any", "excludes_any")},
-        "refs": {"source_id": "options"},
-    },
-    "rule_group_members": {
-        "key": ("group_id", "target_id"),
-        "types": {"display_order": "int", "active": "bool"},
-        "enums": {},
-        "refs": {"group_id": "rule_groups", "target_id": "options"},
-    },
-    "exclusive_groups": {
-        "key": ("group_id",),
-        "types": {"active": "bool"},
-        "enums": {
-            "selection_mode": (
-                "single_within_group", "required_single_within_group",
-            ),
-        },
-        "refs": {},
-    },
-    "exclusive_members": {
-        "key": ("group_id", "option_id"),
-        "types": {"display_order": "int", "active": "bool"},
-        "enums": {},
-        "refs": {"group_id": "exclusive_groups", "option_id": "options"},
-    },
-    "price_rules": {
-        "key": ("price_rule_id",),
-        "types": {"price_value": "int"},
-        "enums": {"price_rule_type": ("override",)},
-        "refs": {
-            "condition_option_id": "options",
-            "target_option_id": "options",
-        },
-    },
-    "variant_overrides": {
-        "key": ("option_id", "variant_id"),
-        "types": {"active": "bool"},
-        "enums": {
-            "selectable": ("", "True", "False"),
-            "display_behavior": ("", "default_selected", "display_only", "hidden"),
-        },
-        "refs": {
-            "option_id": "options",
-            "variant_id": "variants",
-            "section_id": "sections",
-        },
-    },
-    "color_overrides": {
-        "key": ("interior_id", "option_id"),
-        "types": {},
-        "enums": {"rule_type": ("requires",)},
-        "refs": {"interior_id": "interiors", "option_id": "options"},
-    },
-    "interiors": {
-        "key": ("interior_id",),
-        "types": {
-            "Price": "int",
-            "active_for_stingray": "bool",
-            "requires_r6x": "bool",
-        },
-        "enums": {},
-        "refs": {"section_id": "sections", "included_option_id": "options"},
-    },
-    # ── Global (model-metadata and presentation) families ─────────────
-    # Reachable only through explicit sheet names in GLOBAL_SHEET_FAMILIES;
-    # the model registry (and therefore the workbook-editor UI and lints)
-    # never resolves to these, so existing editor behavior is unchanged.
-    "model_master": {
-        "key": ("model_key",),
-        "types": {"expected_variant_count": "int", "default_model": "bool", "active": "bool"},
-        "enums": {},
-        "refs": {},
-    },
-    "model_variants": {
-        "key": ("model_key", "variant_id"),
-        "types": {"display_order": "int", "active": "bool"},
-        "enums": {},
-        "refs": {},
-    },
-    "variant_master": {
-        "key": ("variant_id",),
-        "types": {"model_year": "int", "base_price": "int", "display_order": "int", "active": "bool"},
-        "enums": {},
-        "refs": {},
-    },
-    "model_workbook_sources": {
-        "key": ("model_key", "source_role"),
-        "types": {"active": "bool"},
-        "enums": {"source_role": tuple(SOURCE_ROLE_FAMILIES)},
-        "refs": {},
-    },
-    "model_registry_promotion": {
-        "key": ("model_key",),
-        "types": {"promoted_to_runtime": "bool", "default_model": "bool", "active": "bool", "display_order": "int"},
-        "enums": {},
-        "refs": {},
-    },
-    "model_interior_scope": {
-        "key": ("model_key", "interior_id", "trim_level"),
-        "types": {"active": "bool"},
-        "enums": {},
-        "refs": {},
-    },
-    "default_selection_rules": {
-        "key": ("model_key", "rule_id"),
-        "types": {"priority": "int", "active": "bool"},
-        "enums": {
-            "condition_type": (
-                "always",
-                "unless_selected_rpo",
-                "unless_selected_section",
-                "when_selected_unless_selected_section",
-            ),
-            "display_behavior": ("", "default_selected"),
-        },
-        "refs": {},
-    },
-    "runtime_steps_meta": {
-        "key": ("model_key", "step_key"),
-        "types": {"runtime_order": "int", "active": "bool"},
-        "enums": {},
-        "refs": {},
-    },
-    "section_presentation_meta": {
-        "key": ("model_key", "section_id"),
-        "types": {"section_display_order": "int", "active": "bool"},
-        "enums": {},
-        "refs": {"section_id": "sections"},
-    },
-    "context_section_master_meta": {
-        "key": ("model_key", "context_type", "section_id"),
-        "types": {"is_required": "bool", "section_display_order": "int", "active": "bool"},
-        "enums": {},
-        "refs": {},
-    },
-    "order_summary_sections_meta": {
-        "key": ("model_key", "section_key"),
-        "types": {"display_order": "int", "active": "bool"},
-        "enums": {},
-        "refs": {},
-    },
-    "step_order_summary_map_meta": {
-        "key": ("model_key", "step_key", "section_key"),
-        "types": {"active": "bool"},
-        "enums": {},
-        "refs": {},
-    },
-}
-
-# Fixed sheet-name -> family mapping for global sheets. Kept out of
-# model_sheet_registry on purpose: only batch preparation/apply consult it.
-GLOBAL_SHEET_FAMILIES: dict[str, str] = {
-    "model_master": "model_master",
-    "model_variants": "model_variants",
-    "variant_master": "variant_master",
-    "model_workbook_sources": "model_workbook_sources",
-    "model_registry_promotion": "model_registry_promotion",
-    "model_interior_scope": "model_interior_scope",
-    "default_selection_rules": "default_selection_rules",
-    "runtime_steps": "runtime_steps_meta",
-    "section_presentation": "section_presentation_meta",
-    "context_section_master": "context_section_master_meta",
-    "order_summary_sections": "order_summary_sections_meta",
-    "step_order_summary_map": "step_order_summary_map_meta",
-}
 
 
 # ─────────────────────────────────────────────────────────────
@@ -317,17 +110,37 @@ def model_sheet_registry(extract: dict) -> tuple[dict, dict]:
 # Op primitives: flatten, coalesce, coerce
 # ─────────────────────────────────────────────────────────────
 
+def _raw_effect(operation: dict, raw_index: int) -> dict:
+    return {
+        "index": raw_index,
+        "action": operation.get("action"),
+        "fields": sorted(
+            str(column)
+            for column in (operation.get("row") or {})
+            if not str(column).startswith("_")
+        ),
+    }
+
+
 def flatten_items(items) -> list[dict]:
     ops: list[dict] = []
+    raw_index = 0
     for item in items or []:
         if isinstance(item, dict) and item.get("kind") == "composite":
             label = item.get("label") or item.get("compositeType") or "composite"
             for member in item.get("ops", []):
                 member = dict(member)
                 member["_composite"] = label
+                member["_raw_indices"] = [raw_index]
+                member["_raw_effects"] = [_raw_effect(member, raw_index)]
                 ops.append(member)
+                raw_index += 1
         else:
-            ops.append(dict(item))
+            operation = dict(item)
+            operation["_raw_indices"] = [raw_index]
+            operation["_raw_effects"] = [_raw_effect(operation, raw_index)]
+            ops.append(operation)
+            raw_index += 1
     return ops
 
 
@@ -339,30 +152,128 @@ def _key_id(op: dict) -> tuple:
 def coalesce_ops(ops: list[dict]) -> list[dict]:
     result: list[dict | None] = []
     last_live: dict[tuple, int] = {}
-    for op in ops:
+    for raw_index, original in enumerate(ops):
+        op = dict(original)
+        op["_raw_indices"] = list(op.get("_raw_indices") or [raw_index])
+        op["_raw_effects"] = list(
+            op.get("_raw_effects") or [_raw_effect(op, op["_raw_indices"][0])]
+        )
+        op["_coverage_errors"] = list(op.get("_coverage_errors") or [])
         kid = _key_id(op)
         pos = last_live.get(kid)
         prev = result[pos] if pos is not None else None
         action = op.get("action")
-        if prev is None or prev.get("action") == "delete":
+        if prev is None:
             last_live[kid] = len(result)
             result.append(dict(op))
             continue
+        if prev.get("action") == "delete":
+            if action == "add":
+                last_live[kid] = len(result)
+                result.append(dict(op))
+                continue
+            prev["_raw_indices"].extend(op["_raw_indices"])
+            prev["_raw_effects"].extend(op["_raw_effects"])
+            prev["_coverage_errors"].extend(op["_coverage_errors"])
+            prev["_coverage_errors"].append(
+                f"dropped raw effect for {_key_id(op)!r}: delete followed by {action}"
+            )
+            continue
         prev_action = prev.get("action")
         if action == "update" and prev_action in ("add", "update"):
+            overlapping = set(prev.get("row") or {}) & set(op.get("row") or {})
+            contradictions = sorted(
+                column
+                for column in overlapping
+                if (prev.get("row") or {}).get(column) != (op.get("row") or {}).get(column)
+            )
+            if contradictions:
+                prev["_coverage_errors"].append(
+                    f"contradictory raw effects for {_key_id(op)!r}: "
+                    f"later {action} replaces {contradictions}"
+                )
             prev["row"] = {**(prev.get("row") or {}), **(op.get("row") or {})}
+            prev["_raw_indices"].extend(op["_raw_indices"])
+            prev["_raw_effects"].extend(op["_raw_effects"])
+            prev["_coverage_errors"].extend(op["_coverage_errors"])
         elif action == "delete" and prev_action == "add":
-            result[pos] = None
+            prev["_raw_indices"].extend(op["_raw_indices"])
+            prev["_raw_effects"].extend(op["_raw_effects"])
+            prev["_coverage_errors"].extend(op["_coverage_errors"])
+            prev["_coverage_errors"].append(
+                f"dropped raw effects for {_key_id(op)!r}: add followed by delete"
+            )
+            prev["_coverage_only"] = True
             last_live.pop(kid, None)
         elif action == "delete" and prev_action == "update":
-            result[pos] = dict(op)
+            replacement = dict(op)
+            replacement["_raw_indices"] = prev["_raw_indices"] + op["_raw_indices"]
+            replacement["_raw_effects"] = prev["_raw_effects"] + op["_raw_effects"]
+            replacement["_coverage_errors"] = (
+                list(prev.get("_coverage_errors") or [])
+                + list(op.get("_coverage_errors") or [])
+                + [f"dropped raw effect for {_key_id(op)!r}: update followed by delete"]
+            )
+            result[pos] = replacement
         else:  # e.g. add after add/update — leave both; validation flags it
             last_live[kid] = len(result)
-            result.append(dict(op))
+            result.append(op)
     return [op for op in result if op is not None]
 
 
-def coerce_value(family: str, column: str, value):
+def _bool_storage_for_sheet(extract: dict, sheet: str, family: str) -> dict[str, dict]:
+    meta = EDITOR_SHEET_META[family]
+    bool_columns = {column for column, kind in meta.get("types", {}).items() if kind == "bool"}
+    result: dict[str, dict] = {}
+    if not bool_columns:
+        return result
+    rows = extract["sheets"].get(sheet, {}).get("rows", [])
+    for column in bool_columns:
+        family_counts: dict[str, int] = {}
+        true_text_counts: dict[str, int] = {}
+        false_text_counts: dict[str, int] = {}
+        for row in rows:
+            value = row.get(column)
+            if isinstance(value, bool):
+                family_counts["excel_boolean"] = family_counts.get("excel_boolean", 0) + 1
+                continue
+            if isinstance(value, str) and value in BOOL_TEXT_VALUES:
+                family_counts["text"] = family_counts.get("text", 0) + 1
+                if value.lower() == "true":
+                    true_text_counts[value] = true_text_counts.get(value, 0) + 1
+                else:
+                    false_text_counts[value] = false_text_counts.get(value, 0) + 1
+        if len(family_counts) != 1:
+            continue
+        storage_family = next(iter(family_counts))
+        entry = {"storageFamily": storage_family}
+        if storage_family == "text":
+            entry["trueText"] = max(true_text_counts, key=lambda key: true_text_counts[key]) if true_text_counts else "True"
+            entry["falseText"] = max(false_text_counts, key=lambda key: false_text_counts[key]) if false_text_counts else "False"
+        result[column] = entry
+    return result
+
+
+def _bool_storage_conventions(extract: dict, sheet_family: dict[str, str], created_templates: dict[str, str]) -> dict[tuple[str, str], dict]:
+    conventions: dict[tuple[str, str], dict] = {}
+    for sheet, family in sheet_family.items():
+        source_sheet = created_templates.get(sheet, sheet)
+        for column, convention in _bool_storage_for_sheet(extract, source_sheet, family).items():
+            conventions[(sheet, column)] = convention
+    return conventions
+
+
+def _parse_bool_value(column: str, value) -> bool | None:
+    if value is None:
+        return None
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str) and value.strip().lower() in ("true", "false"):
+        return value.strip().lower() == "true"
+    raise ValueError(f"{column}: expected True/False, got {value!r}")
+
+
+def coerce_value(family: str, column: str, value, *, bool_storage: dict | None = None):
     meta = EDITOR_SHEET_META[family]
     if value == "":
         value = None
@@ -387,13 +298,12 @@ def coerce_value(family: str, column: str, value):
             return int(text)
         raise ValueError(f"{column}: expected integer, got {value!r}")
     if kind == "bool":
-        if value is None:
+        logical = _parse_bool_value(column, value)
+        if logical is None:
             return None
-        if isinstance(value, bool):
-            return value
-        if isinstance(value, str) and value.strip() in ("True", "False"):
-            return value.strip() == "True"
-        raise ValueError(f"{column}: expected True/False, got {value!r}")
+        if bool_storage and bool_storage.get("storageFamily") == "text":
+            return bool_storage.get("trueText", "True") if logical else bool_storage.get("falseText", "False")
+        return logical
     if value is None:
         return None
     return str(value).strip() or None
@@ -402,17 +312,6 @@ def coerce_value(family: str, column: str, value):
 # ─────────────────────────────────────────────────────────────
 # Batch validation (non-breaking writes only)
 # ─────────────────────────────────────────────────────────────
-
-CHILD_REFS_BY_FAMILY = {
-    "options": [("ovs", "option_id"), ("rule_mapping", "source_id"), ("rule_mapping", "target_id"),
-                ("rule_group_members", "target_id"), ("exclusive_members", "option_id"),
-                ("price_rules", "condition_option_id"), ("price_rules", "target_option_id"),
-                ("color_overrides", "option_id"), ("variant_overrides", "option_id"),
-                ("interiors", "included_option_id")],
-    "rule_groups": [("rule_group_members", "group_id")],
-    "exclusive_groups": [("exclusive_members", "group_id")],
-    "interiors": [("color_overrides", "interior_id")],
-}
 
 _REF_FAMILY = {"options": ("options", "option_id"), "rule_groups": ("rule_groups", "group_id"),
                "exclusive_groups": ("exclusive_groups", "group_id"),
@@ -446,9 +345,25 @@ def _sheet_key_index(extract, sheet, keycols):
     return index
 
 
-def _ref_domain(extract, maps, batch_adds, sheet, refkind):
+def _ref_kinds(refkind) -> tuple[str, ...]:
+    if isinstance(refkind, (tuple, list)):
+        return tuple(str(kind) for kind in refkind)
+    return (str(refkind),)
+
+
+def _reference_models(maps, sheet: str, row: dict | None = None) -> set[str]:
+    _registry, _sheet_family, models_by_sheet, _by_model_family = maps
+    model_key = str((row or {}).get("model_key") or "").strip()
+    if model_key == "*":
+        return set(_registry)
+    if model_key:
+        return {model_key}
+    return set(models_by_sheet.get(sheet, set()))
+
+
+def _single_ref_domain(extract, maps, batch_adds, sheet, refkind, *, models=None):
     _registry, _sheet_family, models_by_sheet, by_model_family = maps
-    models = models_by_sheet.get(sheet, set())
+    models = set(models) if models is not None else set(models_by_sheet.get(sheet, set()))
     if refkind == "sections":
         return {str(r.get("section_id")).strip()
                 for r in rows_of(extract, "section_master") if r.get("section_id")}
@@ -458,6 +373,19 @@ def _ref_domain(extract, maps, batch_adds, sheet, refkind):
                if r.get("model_key") in models and workbook_truthy(r.get("active"))}
         return ids or {str(r.get("variant_id")).strip()
                        for r in rows_of(extract, "variant_master") if r.get("variant_id")}
+    if refkind == "option_rpos":
+        rpos = set()
+        for model in models:
+            src = by_model_family.get((model, "options"))
+            if not src:
+                continue
+            rpos |= {str(r.get("rpo")).strip() for r in rows_of(extract, src) if r.get("rpo")}
+            rpos |= {
+                str((o.get("row") or {}).get("rpo")).strip()
+                for o in batch_adds.get(src, [])
+                if (o.get("row") or {}).get("rpo")
+            }
+        return rpos
     family, id_col = _REF_FAMILY[refkind]
     ids = set()
     for model in models:
@@ -470,17 +398,213 @@ def _ref_domain(extract, maps, batch_adds, sheet, refkind):
     return ids
 
 
+def _ref_domain(extract, maps, batch_adds, sheet, refkind, *, row=None):
+    models = _reference_models(maps, sheet, row)
+    domain: set[str] = set()
+    for kind in _ref_kinds(refkind):
+        domain |= _single_ref_domain(
+            extract,
+            maps,
+            batch_adds,
+            sheet,
+            kind,
+            models=models,
+        )
+    return domain
+
+
+def _ref_label(refkind) -> str:
+    return " or ".join(_ref_kinds(refkind))
+
+
+def _meta_ref_items(meta: dict):
+    refs = dict(meta.get("refs", {}))
+    refs.update(meta.get("ref_unions", {}))
+    return refs.items()
+
+
+def _conditional_ref_spec(meta: dict, row: dict) -> tuple[str, str | None] | None:
+    spec = meta.get("conditional_ref")
+    if not spec:
+        return None
+    discriminator = str(row.get(spec["discriminator"]) or "").strip().lower()
+    domains = meta.get("conditional_refs", {})
+    if discriminator not in domains:
+        return None
+    return spec["column"], domains[discriminator]
+
+
+def _final_rows_by_sheet(extract: dict, prepared: list[dict]) -> dict[str, list[dict]]:
+    final_rows = {
+        sheet: [dict(row) for row in data.get("rows", [])]
+        for sheet, data in extract["sheets"].items()
+    }
+    row_indexes: dict[str, dict[tuple[str, ...], dict]] = {}
+    deleted_row_ids: dict[str, set[int]] = {}
+    for operation in prepared:
+        if operation["action"] == "create_sheet":
+            final_rows.setdefault(operation["sheet"], [])
+            continue
+        sheet = operation["sheet"]
+        family = operation["_family"]
+        keycols = EDITOR_SHEET_META[family]["key"]
+        key = operation["_kt"]
+        rows = final_rows.setdefault(sheet, [])
+        if sheet not in row_indexes:
+            row_indexes[sheet] = {
+                tuple(str(row.get(column) or "").strip() for column in keycols): row
+                for row in rows
+            }
+        row_index = row_indexes[sheet]
+        match = row_index.get(key)
+        if operation["action"] == "delete":
+            if match is not None:
+                deleted_row_ids.setdefault(sheet, set()).add(id(match))
+            continue
+        if operation["action"] == "update":
+            if match is not None:
+                match.update(operation["_coerced_row"])
+            continue
+        row = dict(operation.get("key") or {})
+        row.update(operation["_coerced_row"])
+        rows.append(row)
+        row_index[key] = row
+    for sheet, deleted_ids in deleted_row_ids.items():
+        final_rows[sheet] = [row for row in final_rows[sheet] if id(row) not in deleted_ids]
+    return final_rows
+
+
+def _reference_row_models(row: dict, sheet: str, maps) -> set[str]:
+    _registry, _sheet_family, models_by_sheet, _by_model_family = maps
+    if sheet in GLOBAL_SHEET_FAMILIES:
+        model_key = str(row.get("model_key") or "").strip()
+        return {model_key} if model_key else set()
+    return set(models_by_sheet.get(sheet, set()))
+
+
+def _build_reverse_reference_index(
+    final_rows: dict[str, list[dict]],
+    maps,
+    sheet_family: dict[str, str],
+) -> tuple[dict[tuple[str, str, str], set[str]], dict[str, set[str]]]:
+    reverse_index: dict[tuple[str, str, str], set[str]] = {}
+    for sheet, family in sheet_family.items():
+        meta = EDITOR_SHEET_META.get(family)
+        if not meta:
+            continue
+        for row in final_rows.get(sheet, []):
+            models = _reference_row_models(row, sheet, maps)
+            if not models:
+                continue
+            for column, refkind in _meta_ref_items(meta):
+                value = str(row.get(column) or "").strip()
+                if not value:
+                    continue
+                for model in models:
+                    for kind in _ref_kinds(refkind):
+                        reverse_index.setdefault((model, kind, value), set()).add(f"{sheet}.{column}")
+            conditional = _conditional_ref_spec(meta, row)
+            if conditional is None:
+                continue
+            column, refkind = conditional
+            value = str(row.get(column) or "").strip()
+            if refkind is None or not value:
+                continue
+            for model in models:
+                reverse_index.setdefault((model, refkind, value), set()).add(f"{sheet}.{column}")
+
+    _registry, _sheet_family, _models_by_sheet, by_model_family = maps
+    option_rpos: dict[str, set[str]] = {}
+    option_models = {model for model, family in by_model_family if family == "options"}
+    for model in option_models:
+        option_sheet = by_model_family.get((model, "options"))
+        if not option_sheet:
+            continue
+        option_rpos[model] = {
+            str(row.get("rpo") or "").strip()
+            for row in final_rows.get(option_sheet, [])
+            if str(row.get("rpo") or "").strip()
+        }
+    return reverse_index, option_rpos
+
+
+def _incoming_references(
+    reverse_index: dict[tuple[str, str, str], set[str]],
+    final_option_rpos: dict[str, set[str]],
+    maps,
+    *,
+    deleted_sheet: str,
+    deleted_family: str,
+    target_id: str,
+    target_rpo: str = "",
+) -> list[str]:
+    _registry, _registered_families, models_by_sheet, _by_model_family = maps
+    target_models = set(models_by_sheet.get(deleted_sheet, set()))
+    references: set[str] = set()
+    for model in target_models:
+        references.update(reverse_index.get((model, deleted_family, target_id), set()))
+        references.update(reverse_index.get(("*", deleted_family, target_id), set()))
+        if deleted_family == "options" and target_rpo and target_rpo not in final_option_rpos.get(model, set()):
+            references.update(reverse_index.get((model, "option_rpos", target_rpo), set()))
+            references.update(reverse_index.get(("*", "option_rpos", target_rpo), set()))
+    return sorted(references)
+
+
+def reference_graph_summary(extract: dict) -> dict:
+    """Build the canonical reverse-reference graph without preparing writes."""
+
+    maps = _registry_maps(extract)
+    _registry, sheet_family, _models_by_sheet, _by_model_family = maps
+    sheet_family = {**GLOBAL_SHEET_FAMILIES, **sheet_family}
+    final_rows = {
+        sheet: [dict(row) for row in (payload.get("rows") or [])]
+        for sheet, payload in (extract.get("sheets") or {}).items()
+    }
+    reverse_index, option_rpos = _build_reverse_reference_index(
+        final_rows,
+        maps,
+        sheet_family,
+    )
+    return {
+        "graphBuilt": True,
+        "referenceKeys": len(reverse_index),
+        "referenceEdges": sum(len(locations) for locations in reverse_index.values()),
+        "models": sorted(option_rpos),
+    }
+
+
 def _prepare_batch(extract, batch):
     errors: list[str] = []
     warnings: list[dict] = []
     flat = flatten_items(batch.get("items") or [])
     creates = [o for o in flat if o.get("action") == "create_sheet"]
     ops = coalesce_ops([o for o in flat if o.get("action") != "create_sheet"])
+    coalescing_errors = [
+        error
+        for operation in ops
+        for error in operation.get("_coverage_errors", [])
+    ]
+    if coalescing_errors:
+        return coalescing_errors, warnings, []
     maps = _registry_maps(extract)
     _registry, sheet_family, models_by_sheet, by_model_family = maps
     sheet_family = {**GLOBAL_SHEET_FAMILIES, **sheet_family}
 
+    # Editing may target an existing scaffold sheet that is deliberately
+    # inactive for runtime discovery. Keep this edit-time registration local
+    # so model_sheet_registry() remains the active-only discovery boundary.
+    for row in rows_of(extract, "model_workbook_sources"):
+        model_key = str(row.get("model_key") or "").strip()
+        sheet_name = str(row.get("sheet_name") or "").strip()
+        family = SOURCE_ROLE_FAMILIES.get(row.get("source_role"))
+        if not (model_key and sheet_name in extract["sheets"] and family):
+            continue
+        sheet_family.setdefault(sheet_name, family)
+        models_by_sheet.setdefault(sheet_name, set()).add(model_key)
+        by_model_family.setdefault((model_key, family), sheet_name)
+
     prepared_creates: list[dict] = []
+    created_templates: dict[str, str] = {}
     for i, o in enumerate(creates):
         sheet = str(o.get("sheet") or "").strip()
         family = str(o.get("family") or "").strip()
@@ -507,19 +631,52 @@ def _prepare_batch(extract, batch):
         # Register the new sheet so later ops in this batch validate against it.
         extract["sheets"][sheet] = {"headers": headers, "rows": []}
         sheet_family[sheet] = family
+        created_templates[sheet] = template
         prepared_creates.append(
-            {"action": "create_sheet", "sheet": sheet, "_family": family, "_headers": headers}
+            {
+                "action": "create_sheet",
+                "sheet": sheet,
+                "_family": family,
+                "_headers": headers,
+                "_raw_indices": list(o.get("_raw_indices") or []),
+                "_raw_effects": list(o.get("_raw_effects") or []),
+            }
         )
+
+    # A scaffold plan can register model_workbook_sources and write to those
+    # sheets in the same combined batch. Reflect every pending registration in
+    # the edit-time maps even when it remains inactive for runtime discovery;
+    # the source-row operation itself is the explicit batch authority.
+    source_keycols = EDITOR_SHEET_META["model_workbook_sources"]["key"]
+    source_index = _sheet_key_index(extract, "model_workbook_sources", source_keycols)
+    for o in ops:
+        if o.get("sheet") != "model_workbook_sources" or o.get("action") not in ("add", "update"):
+            continue
+        key = o.get("key") or {}
+        row = dict(source_index.get(_key_tuple(key, source_keycols), {}))
+        row.update(key)
+        row.update(o.get("row") or {})
+        model_key = str(row.get("model_key") or "").strip()
+        source_role = str(row.get("source_role") or "").strip()
+        sheet_name = str(row.get("sheet_name") or "").strip()
+        family = SOURCE_ROLE_FAMILIES.get(source_role)
+        if not (model_key and sheet_name and family):
+            continue
+        sheet_family.setdefault(sheet_name, family)
+        models_by_sheet.setdefault(sheet_name, set()).add(model_key)
+        by_model_family[(model_key, family)] = sheet_name
+    bool_storage = (
+        {}
+        if batch.get("forceTypedBools") is True
+        else _bool_storage_conventions(extract, sheet_family, created_templates)
+    )
     promoted = {r.get("model_key"): workbook_truthy(r.get("promoted_to_runtime"))
                 for r in rows_of(extract, "model_registry_promotion")}
 
     batch_adds: dict[str, list] = {}
-    deleted_keys: set[tuple] = set()
     for o in ops:
         if o.get("action") == "add":
             batch_adds.setdefault(o.get("sheet"), []).append(o)
-        if o.get("action") == "delete":
-            deleted_keys.add(_key_id(o))
 
     key_indexes: dict[str, dict] = {}
     seen_adds: set = set()
@@ -562,23 +719,63 @@ def _prepare_batch(extract, batch):
         bad = False
         for col, val in row.items():
             try:
-                coerced[col] = coerce_value(family, col, val)
+                coerced[col] = coerce_value(family, col, val, bool_storage=bool_storage.get((str(sheet), str(col))))
             except ValueError as exc:
                 errors.append(f"{ctx}: {exc}")
                 bad = True
         if bad:
             continue
-        for col, refkind in meta.get("refs", {}).items():
-            if coerced.get(col) is not None:
-                domain = _ref_domain(extract, maps, batch_adds, sheet, refkind)
-                if str(coerced[col]) not in domain:
-                    errors.append(f"{ctx}: {col}={coerced[col]!r} not found in {refkind}")
-                    bad = True
-        if bad:
-            continue
         if sheet not in key_indexes:
             key_indexes[sheet] = _sheet_key_index(extract, sheet, keycols)
         kt = _key_tuple(key, keycols)
+        effective_row = dict(key_indexes[sheet].get(kt, {}))
+        effective_row.update(key)
+        effective_row.update(coerced)
+        for col, refkind in _meta_ref_items(meta):
+            if action == "delete":
+                continue
+            if action != "add" and col not in coerced and col not in key:
+                continue
+            value = effective_row.get(col)
+            if value is not None and str(value).strip():
+                domain = _ref_domain(extract, maps, batch_adds, sheet, refkind, row=effective_row)
+                if str(value) not in domain:
+                    errors.append(f"{ctx}: {col}={value!r} not found in {_ref_label(refkind)}")
+                    bad = True
+        conditional_meta = meta.get("conditional_ref") or {}
+        conditional_column = conditional_meta.get("column")
+        discriminator_column = conditional_meta.get("discriminator")
+        if action != "delete" and conditional_column and (
+            action == "add"
+            or conditional_column in coerced
+            or discriminator_column in coerced
+            or conditional_column in key
+            or discriminator_column in key
+        ):
+            conditional = _conditional_ref_spec(meta, effective_row)
+            if conditional is not None:
+                column, refkind = conditional
+                value = str(effective_row.get(column) or "").strip()
+                if refkind is None:
+                    if value:
+                        errors.append(
+                            f"{ctx}: {column} must be blank for "
+                            f"{discriminator_column}={effective_row.get(discriminator_column)!r}"
+                        )
+                        bad = True
+                elif not value:
+                    errors.append(
+                        f"{ctx}: {column} is required for "
+                        f"{discriminator_column}={effective_row.get(discriminator_column)!r}"
+                    )
+                    bad = True
+                else:
+                    domain = _ref_domain(extract, maps, batch_adds, sheet, refkind, row=effective_row)
+                    if value not in domain:
+                        errors.append(f"{ctx}: {column}={value!r} not found in {_ref_label(refkind)}")
+                        bad = True
+        if bad:
+            continue
         if action == "add":
             if any(str(coerced.get(k) or "").strip() != kt[idx] for idx, k in enumerate(keycols)):
                 errors.append(f"{ctx}: add row must include key columns matching the key")
@@ -657,7 +854,7 @@ def _prepare_batch(extract, batch):
                     str(row2.get("display_order") or "").strip() == str(dorder):
                 clash = True
         for p in prepared:
-            if p is o or p["sheet"] != sheet or p["action"] == "delete":
+            if p is o or p["sheet"] != sheet or p["action"] in ("create_sheet", "delete"):
                 continue
             p_group = p["_coerced_row"].get(group_col)
             if p_group is None:
@@ -671,40 +868,109 @@ def _prepare_batch(extract, batch):
                                         f"in {group_col}={group_val}"})
 
     # referenced-delete warnings
-    for o in prepared:
-        if o["action"] != "delete":
-            continue
+    delete_ops = [operation for operation in prepared if operation["action"] == "delete"]
+    if delete_ops:
+        final_rows = _final_rows_by_sheet(extract, prepared)
+        reverse_references, final_option_rpos = _build_reverse_reference_index(
+            final_rows,
+            maps,
+            sheet_family,
+        )
+    for o in delete_ops:
         family, sheet = o["_family"], o["sheet"]
-        child_specs = CHILD_REFS_BY_FAMILY.get(family)
-        if not child_specs:
-            continue
         target_id = o["_kt"][0]
-        models = models_by_sheet.get(sheet, set())
-        referencing = []
-        for child_family, ref_col in child_specs:
-            for model in models:
-                child_sheet = by_model_family.get((model, child_family))
-                if not child_sheet:
-                    continue
-                child_keycols = list(EDITOR_SHEET_META[child_family]["key"])
-                for row in rows_of(extract, child_sheet):
-                    if str(row.get(ref_col) or "").strip() != target_id:
-                        continue
-                    child_kt = tuple(str(row.get(k) or "").strip() for k in child_keycols)
-                    child_kid = (child_sheet, tuple(sorted(zip((str(k) for k in child_keycols), child_kt))))
-                    if child_kid not in deleted_keys:
-                        referencing.append(f"{child_sheet}.{ref_col}")
+        source_row = key_indexes.get(sheet, {}).get(o["_kt"], {})
+        referencing = _incoming_references(
+            reverse_references,
+            final_option_rpos,
+            maps,
+            deleted_sheet=sheet,
+            deleted_family=family,
+            target_id=target_id,
+            target_rpo=str(source_row.get("rpo") or "").strip(),
+        )
         if referencing:
             warnings.append({"id": f"refdel:{sheet}:{'+'.join(o['_kt'])}",
-                             "message": f"delete {target_id}: still referenced by {sorted(set(referencing))} "
-                                        f"(rule deletes are allowed for runtime-skipped rows after contract comparison; "
-                                        f"active references still require review)"})
+                             "message": f"delete {target_id}: still referenced by {referencing}"})
     return errors, warnings, prepared
 
 
 def validate_batch(extract, batch):
     errors, warnings, _prepared = _prepare_batch(extract, batch)
     return {"errors": errors, "warnings": warnings}
+
+
+def _operation_coverage(batch: dict, prepared: list[dict]) -> tuple[dict, list[str]]:
+    raw_count = len(flatten_items(batch.get("items") or []))
+    expected = set(range(raw_count))
+    occurrences: dict[int, int] = {}
+    invalid_indices: set[int] = set()
+    unknown: list[str] = []
+    errors: list[str] = []
+    for prepared_index, operation in enumerate(prepared):
+        raw_indices = list(operation.get("_raw_indices") or [])
+        effects = list(operation.get("_raw_effects") or [])
+        effect_indices = [effect.get("index") for effect in effects]
+        if raw_indices != effect_indices:
+            errors.append(
+                f"prepared operation {prepared_index} raw provenance differs: "
+                f"indices {raw_indices!r}, effects {effect_indices!r}"
+            )
+            invalid_indices.update(index for index in raw_indices if isinstance(index, int))
+            invalid_indices.update(index for index in effect_indices if isinstance(index, int))
+        for effect in effects:
+            raw_index = effect.get("index")
+            if not isinstance(raw_index, int) or raw_index not in expected:
+                unknown.append(repr(raw_index))
+                continue
+            occurrences[raw_index] = occurrences.get(raw_index, 0) + 1
+            raw_action = effect.get("action")
+            prepared_action = operation.get("action")
+            action_matches = (
+                raw_action == prepared_action
+                or (raw_action == "update" and prepared_action == "add")
+            )
+            if not action_matches:
+                errors.append(
+                    f"raw operation {raw_index} action {raw_action!r} does not map to "
+                    f"prepared action {prepared_action!r}"
+                )
+                invalid_indices.add(raw_index)
+            missing_fields = sorted(
+                set(effect.get("fields") or {})
+                - set(operation.get("_coerced_row") or {})
+            )
+            if missing_fields:
+                errors.append(
+                    f"raw operation {raw_index} fields are absent from its prepared effect: "
+                    f"{missing_fields}"
+                )
+                invalid_indices.add(raw_index)
+    duplicated = sorted(raw_index for raw_index, count in occurrences.items() if count > 1)
+    invalid_indices.update(duplicated)
+    covered = {
+        raw_index
+        for raw_index, count in occurrences.items()
+        if count == 1 and raw_index not in invalid_indices
+    }
+    missing = sorted(expected - covered)
+    if missing:
+        errors.append(f"raw operation coverage missing indices {missing}")
+    if duplicated:
+        errors.append(f"raw operation coverage duplicated indices {duplicated}")
+    if unknown:
+        errors.append(f"raw operation coverage contains unknown indices {sorted(unknown)}")
+    coverage = {
+        "rawCount": raw_count,
+        "rawCovered": len(covered),
+        "preparedCount": len(prepared),
+    }
+    if coverage["rawCovered"] != coverage["rawCount"]:
+        errors.append(
+            "raw operation coverage gate failed: "
+            f"{coverage['rawCovered']} != {coverage['rawCount']}"
+        )
+    return coverage, errors
 
 
 # ─────────────────────────────────────────────────────────────
@@ -725,6 +991,41 @@ GATE_COMMANDS = {
             "node --test tests/z06-contract-preview.test.mjs",
             "node --test tests/z06-form-data-draft.test.mjs"],
 }
+
+CONFIRMABLE_WARNING_KINDS = {"scaffold"}
+
+
+def warning_kind(warning_id: str) -> str:
+    return str(warning_id or "").partition(":")[0].strip()
+
+
+def warning_fingerprint(warnings) -> str:
+    warning_ids = sorted({str(warning.get("id") or "") for warning in warnings})
+    payload = json.dumps(warning_ids, separators=(",", ":"), ensure_ascii=True)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def classify_warnings(warnings) -> dict:
+    warning_list = list(warnings)
+    confirmable_ids: list[str] = []
+    blocking_ids: list[str] = []
+    unknown_ids: list[str] = []
+    known_kinds = CONFIRMABLE_WARNING_KINDS | {"dorder", "refdel"}
+    for warning in warning_list:
+        warning_id = str(warning.get("id") or "")
+        kind = warning_kind(warning_id)
+        if kind in CONFIRMABLE_WARNING_KINDS:
+            confirmable_ids.append(warning_id)
+        else:
+            blocking_ids.append(warning_id)
+            if kind not in known_kinds:
+                unknown_ids.append(warning_id)
+    return {
+        "confirmableIds": sorted(set(confirmable_ids)),
+        "blockingIds": sorted(set(blocking_ids)),
+        "unknownIds": sorted(set(unknown_ids)),
+        "fingerprint": warning_fingerprint(warning_list),
+    }
 
 
 def gate_reminders(models: set[str]) -> list[str]:
@@ -791,9 +1092,157 @@ def resize_sheet_tables(ws) -> None:
         table.ref = f"A1:{letters}{last}"
 
 
+def _save_scratch_workbook(workbook, path: Path) -> None:
+    """Single scratch-save seam so tests can corrupt the saved copy before readback."""
+    workbook.save(path)
+
+
+def _canonical_readback_key(values, columns: dict[str, int], key_columns) -> tuple[str, ...]:
+    return tuple(
+        str(values[columns[column]] or "").strip()
+        for column in key_columns
+    )
+
+
+def verify_prepared_workbook(path: Path, prepared: list[dict]) -> dict:
+    """Reopen ``path`` and verify every prepared effect exactly as saved."""
+    errors: list[str] = []
+    prepared_checked = 0
+    workbook = load_workbook(path, read_only=True, data_only=False)
+    try:
+        grouped: dict[tuple[str, str], list[dict]] = {}
+        for operation in prepared:
+            if operation.get("action") == "create_sheet":
+                continue
+            grouped.setdefault(
+                (str(operation.get("sheet") or ""), str(operation.get("_family") or "")),
+                [],
+            ).append(operation)
+
+        readback: dict[tuple[str, str], dict] = {}
+        for (sheet, family), operations in grouped.items():
+            if sheet not in workbook.sheetnames:
+                readback[(sheet, family)] = {"error": "target sheet is absent"}
+                continue
+            worksheet = workbook[sheet]
+            headers = [cell.value for cell in worksheet[1]]
+            columns = {
+                str(header): column_index
+                for column_index, header in enumerate(headers)
+                if header is not None
+            }
+            key_columns = tuple(EDITOR_SHEET_META.get(family, {}).get("key") or ())
+            missing_key_columns = [column for column in key_columns if column not in columns]
+            if missing_key_columns:
+                readback[(sheet, family)] = {
+                    "error": f"key columns are absent: {missing_key_columns}"
+                }
+                continue
+            requested_keys = {operation.get("_kt") for operation in operations}
+            matches_by_key = {key: [] for key in requested_keys}
+            for values in worksheet.iter_rows(min_row=2, values_only=True):
+                row_key = _canonical_readback_key(values, columns, key_columns)
+                if row_key in matches_by_key:
+                    matches_by_key[row_key].append(values)
+            readback[(sheet, family)] = {
+                "columns": columns,
+                "matches": matches_by_key,
+            }
+
+        for index, operation in enumerate(prepared):
+            action = operation.get("action")
+            sheet = str(operation.get("sheet") or "")
+            context = f"prepared[{index}] {action} {sheet}"
+            if action == "create_sheet":
+                if sheet not in workbook.sheetnames:
+                    errors.append(f"{context}: created sheet is absent")
+                    continue
+                actual_headers = [cell.value for cell in workbook[sheet][1]]
+                expected_headers = list(operation.get("_headers") or [])
+                if actual_headers != expected_headers:
+                    errors.append(
+                        f"{context}: exact headers differ; "
+                        f"expected {expected_headers!r}, got {actual_headers!r}"
+                    )
+                    continue
+                prepared_checked += 1
+                continue
+            family = operation.get("_family")
+            cached = readback[(sheet, str(family or ""))]
+            if cached.get("error"):
+                errors.append(f"{context}: {cached['error']}")
+                continue
+            columns = cached["columns"]
+            matches = cached["matches"].get(operation.get("_kt"), [])
+            if action == "delete":
+                if matches:
+                    errors.append(
+                        f"{context}: delete key {operation.get('_kt')!r} still exists "
+                        f"in {len(matches)} row(s)"
+                    )
+                    continue
+                prepared_checked += 1
+                continue
+            if action not in ("add", "update"):
+                errors.append(f"{context}: unsupported prepared action")
+                continue
+            if len(matches) != 1:
+                errors.append(
+                    f"{context}: key {operation.get('_kt')!r} matched {len(matches)} row(s), expected 1"
+                )
+                continue
+            actual_row = matches[0]
+            field_errors = []
+            for column, expected in (operation.get("_coerced_row") or {}).items():
+                if column not in columns:
+                    field_errors.append(f"field {column} is absent")
+                    continue
+                actual = actual_row[columns[column]]
+                if actual != expected:
+                    field_errors.append(
+                        f"field {column} expected {expected!r}, got {actual!r}"
+                    )
+            if field_errors:
+                errors.extend(f"{context}: {error}" for error in field_errors)
+                continue
+            prepared_checked += 1
+    finally:
+        workbook.close()
+    prepared_count = len(prepared)
+    if prepared_checked != prepared_count:
+        errors.append(
+            "prepared operation verification gate failed: "
+            f"{prepared_checked} != {prepared_count}"
+        )
+    return {
+        "ok": not errors,
+        "preparedChecked": prepared_checked,
+        "preparedCount": prepared_count,
+        "errors": errors,
+    }
+
+
+def _workbook_identity_matches(path: Path, expected_mtime_ns, expected_sha256) -> bool:
+    """True when the live file still matches the reviewed mtime/SHA identity."""
+    if str(path.stat().st_mtime_ns) != str(expected_mtime_ns):
+        return False
+    if expected_sha256 is not None:
+        actual = hashlib.sha256(path.read_bytes()).hexdigest()
+        if actual != expected_sha256:
+            return False
+    return True
+
+
 def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli",
                 log_path=None, allow_stale=False, run_schema_validation=True) -> dict:
     path = Path(path)
+    if write and not run_schema_validation:
+        return {
+            "ok": False,
+            "status": "schema_validation_required",
+            "errors": ["live workbook writes require schema validation"],
+            "warnings": [],
+        }
     lock = excel_lock_path(path)
     if lock.exists():
         return {"ok": False, "status": "locked",
@@ -804,19 +1253,68 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
         return {"ok": False, "status": "stale",
                 "errors": ["workbook changed since this batch was prepared; reload and re-verify"],
                 "warnings": []}
+    # Reviewed workbook identity: mtime always, SHA-256 when the batch carries
+    # one (ChangeSet-derived batches). Rechecked before live mutation and
+    # again before the safe save so mid-flight drift fails closed.
+    expected_mtime = batch.get("workbookMtimeNs")
+    expected_sha = batch.get("workbookSha256")
     extract = extract_workbook(path)
     errors, warnings, prepared = _prepare_batch(extract, batch)
-    if errors:
-        return {"ok": False, "status": "invalid", "errors": errors, "warnings": warnings}
+    operation_coverage, coverage_errors = _operation_coverage(batch, prepared)
+    if errors or coverage_errors:
+        return {
+            "ok": False,
+            "status": "invalid",
+            "errors": errors + coverage_errors,
+            "warnings": warnings,
+            "operationCoverage": operation_coverage,
+        }
     if not prepared:
-        return {"ok": False, "status": "empty", "errors": ["batch contains no operations"], "warnings": []}
+        return {
+            "ok": False,
+            "status": "empty",
+            "errors": ["batch contains no operations"],
+            "warnings": [],
+            "operationCoverage": operation_coverage,
+        }
     confirmed = set(confirmed_warnings or ())
-    unconfirmed = [w for w in warnings if w["id"] not in confirmed]
-    if write and unconfirmed:
-        return {"ok": False, "status": "needs_confirmation", "errors": [], "warnings": unconfirmed}
+    warning_policy = classify_warnings(warnings)
+    emitted_ids = {str(warning.get("id") or "") for warning in warnings}
+    stale_confirmations = sorted(confirmed - emitted_ids)
+    if write and stale_confirmations:
+        return {
+            "ok": False,
+            "status": "warning_confirmation_mismatch",
+            "errors": [f"confirmed warning IDs were not emitted: {stale_confirmations}"],
+            "warnings": warnings,
+            "warningPolicy": warning_policy,
+            "operationCoverage": operation_coverage,
+        }
+    if write and warning_policy["blockingIds"]:
+        return {
+            "ok": False,
+            "status": "warning_blocked",
+            "errors": ["batch emitted unconfirmable warning IDs"],
+            "warnings": warnings,
+            "warningPolicy": warning_policy,
+            "operationCoverage": operation_coverage,
+        }
+    unconfirmed_ids = set(warning_policy["confirmableIds"]) - confirmed
+    if write and unconfirmed_ids:
+        unconfirmed = [warning for warning in warnings if warning["id"] in unconfirmed_ids]
+        return {
+            "ok": False,
+            "status": "needs_confirmation",
+            "errors": [],
+            "warnings": unconfirmed,
+            "warningPolicy": warning_policy,
+            "operationCoverage": operation_coverage,
+        }
 
     _registry, sheet_family, models_by_sheet, _bmf = _registry_maps(extract)
     schema_result = None
+    bool_hygiene_result = None
+    verification = None
     with tempfile.TemporaryDirectory() as tmp_dir:
         tmp = Path(tmp_dir) / path.name
         shutil.copy2(path, tmp)
@@ -825,8 +1323,49 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
         for name in touched:
             resize_sheet_tables(wb_tmp[name])
         remove_table_sheet_auto_filters(wb_tmp)
-        wb_tmp.save(tmp)
+        _save_scratch_workbook(wb_tmp, tmp)
+        wb_tmp.close()
+        verification = verify_prepared_workbook(tmp, prepared)
+        if not verification["ok"]:
+            return {
+                "ok": False,
+                "status": "readback_failed",
+                "errors": verification["errors"],
+                "warnings": warnings,
+                "warningPolicy": warning_policy,
+                "operationCoverage": operation_coverage,
+                "verification": verification,
+            }
         assert_valid_workbook_package(tmp)
+        approved_bool_type_migrations = None
+        if batch.get("forceTypedBools") is True:
+            typed_sheet_family = dict(sheet_family)
+            for operation in prepared:
+                operation_sheet = str(operation.get("sheet") or "")
+                operation_family = str(operation.get("_family") or "")
+                if operation_sheet and operation_family:
+                    typed_sheet_family[operation_sheet] = operation_family
+            approved_bool_type_migrations = [
+                (sheet, column)
+                for sheet, family in typed_sheet_family.items()
+                for column, kind in EDITOR_SHEET_META.get(family, {}).get(
+                    "types", {}
+                ).items()
+                if kind == "bool"
+            ]
+        bool_issues = compare_bool_like_workbooks(
+            path,
+            tmp,
+            approved_bool_type_migrations=approved_bool_type_migrations,
+        )
+        bool_hygiene_result = bool_hygiene_result_payload(path, tmp, bool_issues)
+        bool_hygiene_result["issues"] = bool_hygiene_result["issues"][:20]
+        if bool_hygiene_result["error_count"]:
+            return {"ok": False, "status": "bool_hygiene_failed",
+                    "errors": [f"dry-run bool hygiene failed with "
+                               f"{bool_hygiene_result['error_count']} error(s)"],
+                    "warnings": warnings, "boolHygieneResult": bool_hygiene_result,
+                    "operationCoverage": operation_coverage, "verification": verification}
         if run_schema_validation:
             issues = validate_workbook_schema(str(tmp), check_live_contract=False)
             schema_result = result_payload(str(tmp), issues)
@@ -834,20 +1373,89 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
                 return {"ok": False, "status": "schema_failed",
                         "errors": [f"dry-run schema validation failed with "
                                    f"{schema_result['error_count']} error(s)"],
-                        "warnings": warnings, "schemaResult": schema_result}
+                        "warnings": warnings, "schemaResult": schema_result,
+                        "operationCoverage": operation_coverage, "verification": verification}
 
     models_touched = {m for s in touched for m in models_by_sheet.get(s, set())}
     base = {"opCount": len(prepared), "sheets": sorted(touched), "warnings": warnings,
-            "schemaResult": schema_result, "gateReminders": gate_reminders(models_touched)}
+            "warningPolicy": warning_policy,
+            "operationCoverage": operation_coverage, "verification": verification,
+            "schemaResult": schema_result, "boolHygieneResult": bool_hygiene_result,
+            "gateReminders": gate_reminders(models_touched)}
     if not write:
         return {"ok": True, "status": "validated", "errors": [], **base}
 
+    if not allow_stale and not _workbook_identity_matches(path, expected_mtime, expected_sha):
+        return {
+            "ok": False,
+            "status": "stale_before_save",
+            "workbookState": "untouched",
+            "errors": ["workbook changed after review but before live mutation; "
+                       "re-preview and re-approve"],
+            "warnings": warnings,
+            "warningPolicy": warning_policy,
+            "operationCoverage": operation_coverage,
+            "verification": verification,
+        }
     wb = load_workbook(path)
     loaded_mtime = path.stat().st_mtime_ns
     touched = apply_ops_to_workbook(wb, prepared, sheet_family)
     for name in touched:
         resize_sheet_tables(wb[name])
-    backup_path = save_workbook_safely(wb, path, loaded_mtime_ns=loaded_mtime)
+    if not allow_stale and not _workbook_identity_matches(path, expected_mtime, expected_sha):
+        return {
+            "ok": False,
+            "status": "stale_before_save",
+            "workbookState": "untouched",
+            "errors": ["workbook changed after live mutation but before save; "
+                       "re-preview and re-approve"],
+            "warnings": warnings,
+            "warningPolicy": warning_policy,
+            "operationCoverage": operation_coverage,
+            "verification": verification,
+        }
+    backup_path = save_workbook_safely(
+        wb,
+        path,
+        loaded_mtime_ns=int(expected_mtime) if not allow_stale else loaded_mtime,
+        approved_bool_type_migrations=approved_bool_type_migrations,
+    )
+    live_verification = verify_prepared_workbook(path, prepared)
+    if not live_verification["ok"]:
+        restore_error = None
+        try:
+            restore_workbook_backup(path, backup_path)
+            restored_ok = (
+                hashlib.sha256(path.read_bytes()).hexdigest()
+                == hashlib.sha256(backup_path.read_bytes()).hexdigest()
+            )
+        except Exception as exc:  # never claim the workbook is safe
+            restored_ok = False
+            restore_error = str(exc)
+        if not restored_ok:
+            return {
+                "ok": False,
+                "status": "workbook_restore_failed",
+                "workbookState": "unknown",
+                "errors": [
+                    "live readback failed and backup restoration could not be "
+                    f"verified; workbook path: {path}; backup path: {backup_path}"
+                    + (f"; restore error: {restore_error}" if restore_error else ""),
+                ],
+                "backupPath": str(backup_path),
+                "workbookPath": str(path),
+                **base,
+                "verification": live_verification,
+            }
+        return {
+            "ok": False,
+            "status": "apply_verification_failed_rolled_back",
+            "workbookState": "restored",
+            "errors": live_verification["errors"],
+            "backupPath": str(backup_path),
+            **base,
+            "verification": live_verification,
+        }
     log_file = Path(log_path) if log_path else DEFAULT_LOG_PATH
     log_file.parent.mkdir(parents=True, exist_ok=True)
     entry = {"ts": datetime.now().isoformat(timespec="seconds"), "source": source,
@@ -859,4 +1467,5 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
     with log_file.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(entry) + "\n")
     return {"ok": True, "status": "applied", "errors": [], "applied": len(prepared),
-            "backupPath": str(backup_path), "logPath": str(log_file), **base}
+            "backupPath": str(backup_path), "logPath": str(log_file), **base,
+            "verification": live_verification}

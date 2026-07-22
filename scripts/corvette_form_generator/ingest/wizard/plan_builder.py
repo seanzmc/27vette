@@ -18,6 +18,13 @@ from typing import Any
 
 from openpyxl import load_workbook
 
+from corvette_form_generator.editor_ops import (
+    EDITOR_SHEET_META,
+    GLOBAL_SHEET_FAMILIES,
+    SOURCE_ROLE_FAMILIES,
+    extract_workbook,
+    model_sheet_registry,
+)
 from corvette_form_generator.ingest.wizard.copy_split import propose_copy_split
 from corvette_form_generator.ingest.wizard.decisions import (
     MODEL_LABELS,
@@ -26,16 +33,17 @@ from corvette_form_generator.ingest.wizard.decisions import (
     candidate_needs_section_decision,
     scope_candidates,
 )
+from corvette_form_generator.model_configs import base_model_config
 from corvette_form_generator.workbook import rows_from_sheet, workbook_truthy
 
-SCHEMA_VERSION_C = "pass-c-1"
+SCHEMA_VERSION_C = "pass-c-2"
 
 # Per-model identity, per the approved end-to-end spec (resolved decisions).
 MODEL_PLAN_CONFIG: dict[str, dict[str, Any]] = {
     "grand_sport_x": {
         "sheetPrefix": "grandSportX_",
         "templatePrefix": "grandSport_",
-        "registryKey": "grandSportX",
+        "registryKey": "grand_sport_x",
         "exportSlug": "grand-sport-x",
         "label": "Grand Sport X",
         "interiorSheet": "lt_interiors",
@@ -250,7 +258,7 @@ def _planned_relationship_rpos(records: dict[str, dict[str, Any]]) -> set[str]:
 def plan_summary(plan: dict[str, Any]) -> dict[str, Any]:
     """UI-facing summary: everything except the raw op lists."""
 
-    return {
+    summary = {
         "schemaVersion": plan["schemaVersion"],
         "targets": plan["targets"],
         "valid": plan["valid"],
@@ -261,6 +269,12 @@ def plan_summary(plan: dict[str, Any]) -> dict[str, Any]:
         "workbookFingerprint": plan["workbookFingerprint"],
         "decisionsFingerprint": plan["decisionsFingerprint"],
     }
+    if plan.get("schemaVersion") == "pass-c-3":
+        summary["planReadiness"] = plan.get("planReadiness")
+        summary["canonicalManifestSemanticSha"] = plan.get(
+            "canonicalManifestSemanticSha"
+        )
+    return summary
 
 
 def plan_markdown(plan: dict[str, Any], dry_run: dict[str, Any]) -> str:
@@ -297,6 +311,36 @@ def plan_markdown(plan: dict[str, Any], dry_run: dict[str, Any]) -> str:
         lines += ["", "## Gaps"]
         lines += [f"- [{g['kind']}] {g['model']}: {g['detail']}" for g in report["gaps"]]
     return "\n".join(lines) + "\n"
+
+
+MANIFEST_STAGE1_FAMILIES = frozenset(
+    {
+        "model_master",
+        "model_variants",
+        "variant_master",
+        "model_workbook_sources",
+        "model_registry_promotion",
+    }
+)
+MANIFEST_ACTION_ORDER = {"add": 0, "update": 1, "delete": 2, "noop": 3}
+
+
+def _manifest_key_text(key: dict[str, Any]) -> str:
+    return canonical_json({str(column): key[column] for column in sorted(key)})
+
+
+def _manifest_normalized_row(family: str, row: dict[str, Any]) -> dict[str, Any]:
+    types = EDITOR_SHEET_META[family].get("types") or {}
+    normalized: dict[str, Any] = {}
+    for column, raw_value in row.items():
+        value = None if raw_value == "" else raw_value
+        if value is not None and types.get(column) == "int":
+            text = str(value).strip()
+            value = int(text) if text.lstrip("-").isdigit() else value
+        elif value is not None and types.get(column) == "bool":
+            value = workbook_truthy(value)
+        normalized[column] = value
+    return normalized
 
 
 def build_plan(
@@ -1008,7 +1052,6 @@ def build_plan(
                             "rule_type": rule_type,
                             "source_id": source_oid,
                             "target_id": target_oid,
-                            "active": True,
                         },
                     },
                     [record["decisionId"]],
@@ -1047,7 +1090,7 @@ def build_plan(
                     "action": "add",
                     "sheet": excl_groups_sheet,
                     "key": {"group_id": gid},
-                    "row": {"group_id": gid, "group_name": record["groupKey"], "selection_mode": "single_within_group", "active": True},
+                    "row": {"group_id": gid, "selection_mode": "single_within_group", "active": True, "notes": f"Review group: {record['groupKey']}"},
                 },
                 [record["decisionId"]],
             )
@@ -1164,6 +1207,25 @@ def build_plan(
         sheet_counts = per_sheet.setdefault(item["sheet"], {})
         sheet_counts[item["action"]] = sheet_counts.get(item["action"], 0) + 1
 
+    runtime_continuity: dict[str, dict[str, Any]] = {}
+    for model in targets:
+        config = MODEL_PLAN_CONFIG[model]
+        model_counts: dict[str, Any] = {"sourceOps": {}}
+        for surface, suffix in (
+            ("priceRules", "price_rules"),
+            ("ruleGroups", "rule_groups"),
+            ("ruleGroupMembers", "rule_group_members"),
+            ("exclusiveGroups", "exclusive_groups"),
+            ("exclusiveMembers", "exclusive_members"),
+            ("options", "options"),
+        ):
+            sheet = config["sheetPrefix"] + suffix
+            model_counts["sourceOps"][surface] = dict(per_sheet.get(sheet, {}))
+        model_counts["sourceOps"]["colorOverrides"] = dict(per_sheet.get("color_overrides", {}))
+        model_counts["sourceOps"]["interiorComponents"] = dict(per_sheet.get("interior_components", {}))
+        model_counts["sourceOps"]["assetMap"] = dict(per_sheet.get("asset_map", {}))
+        runtime_continuity[model] = model_counts
+
     blocking = [gap for gap in gaps if gap["kind"] in BLOCKING_GAP_KINDS]
 
     return {
@@ -1180,6 +1242,8 @@ def build_plan(
         "coverage": {"decisionToOps": coverage, "uncoveredApprovedDecisions": uncovered},
         "report": {
             "perSheetCounts": per_sheet,
+            "perSheetActionCounts": per_sheet,
+            "runtimeContinuity": runtime_continuity,
             "clearedRows": cleared_rows,
             "holds": holds,
             "deferrals": deferrals,

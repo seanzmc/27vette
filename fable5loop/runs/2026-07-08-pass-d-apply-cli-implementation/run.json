@@ -1,0 +1,78 @@
+{
+  "id": "2026-07-08-pass-d-apply-cli-implementation",
+  "started_at": "2026-07-08T15:00:00-04:00",
+  "completed_at": "2026-07-08T15:33:00-04:00",
+  "objective": "Implement the approved Pass D ingest wizard apply CLI, fixture tests, dry-run reports, and real-run dry-run evidence without live workbook --write.",
+  "changed_surface": "tooling + tests + docs + run-scoped dry-run report; no live workbook write, generated runtime refresh, runtime app change, or dealer-submission change",
+  "primary_artifacts": [
+    "scripts/ingest_wizard_apply.py",
+    "scripts/corvette_form_generator/ingest/wizard/session.py",
+    "scripts/corvette_form_generator/editor_ops.py",
+    "tests/test_ingest_wizard_apply.py",
+    "tests/test_editor_ops_global_families.py",
+    "docs/ingest/pass-d/pass-d-approved-workbook-apply-spec.md",
+    "docs/ingest/README.md",
+    "docs/ingest/ingest-wizard-end-to-end-completion-spec.md",
+    "form-output/ingest-wizard/20260707-193441-ea9e4c/apply-dry-run-report.json"
+  ],
+  "outcome_rubric": "fable5loop/runs/2026-07-08-pass-d-apply-cli-implementation/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-08-pass-d-apply-cli-implementation/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-08-pass-d-apply-cli-implementation/validation-output.txt",
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "delegation_id": "deleg_8d0d2369",
+    "followup_delegation_id": "deleg_29426206",
+    "verdict": "pass",
+    "initial_verdict": "fail",
+    "final_verdict": "pass_after_required_fix",
+    "cycles": 2,
+    "pattern": "independent-verification-plus-parent-fix",
+    "required_fix": "Lock select_models() after applied state and align Pass D report schema with spec fields.",
+    "fix_applied": true
+  },
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-08-pass-d-apply-cli-implementation/validation-output.txt"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-08-pass-d-apply-cli-implementation/validation-output.txt"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-08-pass-d-apply-cli-implementation/verifier-report.md",
+    "reason": "Added applied-state lock gap pitfall to 27vette-fable5-compounding after verifier found select_models() could reopen an applied run."
+  },
+  "boundaries_preserved": [
+    "stingray_master.xlsx live --write not run",
+    "generated runtime artifacts not refreshed",
+    "form-app/data.js untouched",
+    "runtime/dealer submission untouched",
+    "model promotion not run"
+  ],
+  "validation": [
+    {
+      "command": ".venv/bin/python -m pytest tests/test_ingest_wizard_apply.py -q",
+      "result": "pass after verifier fix: 5 passed in 2.17s"
+    },
+    {
+      "command": "PYTHONPATH=scripts .venv/bin/python -m py_compile scripts/ingest_wizard_apply.py scripts/corvette_form_generator/ingest/wizard/session.py scripts/corvette_form_generator/editor_ops.py && .venv/bin/python -m pytest tests/test_ingest_wizard_apply.py tests/test_ingest_wizard_plan.py tests/test_editor_ops_global_families.py tests/test_editor_ops_apply.py -q",
+      "result": "pass: 64 passed in 50.06s"
+    },
+    {
+      "command": "node --check visualizer/ingest-wizard/wizard.js && git diff --check",
+      "result": "pass: exit 0, no output"
+    },
+    {
+      "command": ".venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx && .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx",
+      "result": "pass: package valid; schema valid with 0 issues"
+    },
+    {
+      "command": ".venv/bin/python scripts/ingest_wizard_apply.py --run 20260707-193441-ea9e4c --workbook stingray_master.xlsx",
+      "result": "pass dry-run only: schemaVersion=pass-d-1 ok=true status=validated opCount=5771 warnings=41 errors=0 report=apply-dry-run-report.json"
+    }
+  ]
+}

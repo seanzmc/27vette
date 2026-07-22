@@ -1,0 +1,36 @@
+{
+  "checks": {
+    "artifactGraphErrors": 0,
+    "authorityErrors": 0,
+    "byteInstability": 0,
+    "physicalDuplicateKeys": 0,
+    "semanticDuplicateRows": 0,
+    "sourceFeatureDuplicates": 0
+  },
+  "acceptanceImplementationSha256": {
+    "compiler.py": "9284ac829d0abba3ddc289f284d6fff65c135c28deefa354f8e551f9fc43fc78",
+    "profile_compiler.py": "79f6b201d0febbdc1e7add4a6c4213460864da094477ee24b2e25d3e68fc1f31",
+    "relationship_compiler.py": "4cb6be12aabba36d42d9b0953176572b43366d488e472175a56f1b4ce547011c",
+    "session.py": "8e3095bd4e05b130f7517d02243575f1bdb0f1fe8740b5bb2a36899938da6b1c"
+  },
+  "acceptanceTestSha256": {
+    "test_ingest_wizard_canonical_compiler.py": "72169a96f613f35b075430a0450857d539aa0bbbaf839394a6bc08299203e17a",
+    "test_ingest_wizard_profile_compiler.py": "32f6e0ebcb51587727fef2ffadffb144b030d3025c882d45a4ef7e94571ab773",
+    "test_ingest_wizard_relationship_compiler.py": "ac90ed45e5b59ba474fecc5fcc1afd905af380a57797dc042f4d7c78068be44a"
+  },
+  "counts": {
+    "exceptionSubjects": 371,
+    "manifestRows": 5782,
+    "sourceFeatures": 18060
+  },
+  "deterministicArtifactSha256": {
+    "canonical-row-manifest.json": "85f4092797c0ce508ffe2937773dd594c28d3d0cef7c065843cd195bab50063f",
+    "comparator-evidence.json": "3b86f8296162f9eb14d82aa618f654f0b98d221052adb12cdd5c6ca4aca436a6",
+    "compile-report.json": "1167ae79def7e8ba0ffa85c0da0cee3ccc304a4a6f014b862dfe74d4969c83a4",
+    "exception-queue.json": "f9e081a5a49f7a9a2ce9753788dae3223a9732957ebd1fd751ccbf7ebf03ec37",
+    "exception-resolutions.json": "bec555e0ccb915727fab5d8dac9693385d645ac0ceb6ae34e71247ddfc8550a7"
+  },
+  "pass": true,
+  "runId": "20260714-133532-f9811b",
+  "schemaVersion": "milestone-2-2-proof-audit-2"
+}

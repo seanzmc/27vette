@@ -1,0 +1,72 @@
+Milestone 2.2 validation evidence
+Generated: 2026-07-14T18:00:56Z
+Current proof run: form-output/ingest-wizard/20260714-133532-f9811b
+
+TDD / independent-finding repair
+- Initial profile integration test established RED before implementation.
+- First independent review deleg_18326345: BLOCK on compiled_profile_effect public disposition, comparator paint status, and false role-only Color/Trim coverage. Reproduced and repaired.
+- Second review deleg_6542ec4e: BLOCK on metadata identity overwrite, unchecked presentation sections, ignored-token precedence, overbroad paint-step copying, and GSX EL9/Z25 option closure. Six focused RED failures reproduced these findings.
+- Third independent review `deleg_e9d8fae5`: BLOCK on ghost Color/Trim roles closing without sheet-specific evidence, comparator Z25 price/status substitution, and a stale resolution hash. Reproduced and repaired: sheet-profile is now an authority-bound compiler input; profile requirements provide only shared identity/placement; raw target candidates own option price/copy/status rows and exact status dependencies.
+- GREEN after final repair: 48 passed, 7 subtests passed for profile, relationship, and canonical compiler suites.
+- Stale review deleg_4a1f7760 described the abandoned excludedSheetEvidence parser approach. Current parser contains no such field and is unmodified. Current compiler uses an authority-bound real sheet-profile entry plus the source SHA and approved resolved_not_a_workbook_fact policy. The remaining unused contradictory profile disposition was removed; focused tests and artifacts stayed green/stable.
+- Earlier exact-byte verifier dispatches were stale after the third-review repair. Final current-snapshot verifier `deleg_30b5e24d` passed both bounded lanes with no edits: exact code/test sentinels and diff fingerprint were stable; exact proof hashes, graph, authority, Z25 source ownership, Color/Trim binding, and residual one-of predicates passed.
+
+Final affected tests
+- PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_ingest_wizard_profile_compiler.py tests/test_ingest_wizard_relationship_compiler.py tests/test_ingest_wizard_canonical_compiler.py -q
+  Result: 48 passed, 7 subtests passed.
+- PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_ingest_wizard*.py -q
+  Result after final repair: 299 passed, 18 subtests passed in 111.31s.
+
+Fresh real-source proof
+- Run: 20260714-133532-f9811b; state compiled_with_exceptions.
+- 5,782 canonical rows; 5,765 ready and 17 blocked.
+- 371 subjects; compiler-summary projectability 256 actionable and 115 actionless.
+- Residual reasons: ambiguous_existing_identity 10; comparator default 4; comparator exclusive 21; comparator price 49; comparator relationship 25; comparator rule group 21; missing_section 146; unresolved_price_scope 17; unresolved_relationship_identity 78.
+- Exact ten sec_pain_001 paint options for each target.
+- Model labels preserved as Grand Sport X, ZR1, ZR1X.
+- GSX Z25 closure: ready opt_z25_001 option uses target-authored $1,995 price and copy; available on 3lt_g07/3lt_g67; unavailable on 1lt_g07/1lt_g67/2lt_g07/2lt_g67; all 12 raw status features are exact manifest dependencies and compiled; four matching relationship features compile through the profile; former Z25 missing-section plus two false one-of subjects removed.
+- Typed ready relationship rows: 296. No impossible direct AND rows emitted for the remaining 78 multi-interior one-of/group subjects.
+- Color/Trim source sheets: resolved_not_a_workbook_fact under the comparator-profile policy, bound to each real sheet-profile entry plus source authority SHA 6ac9538d5bb8a823ade9afea70b2654057b793e1cf27c081c088545aa3add8a1; a nonexistent ghost role remains exception_open with unsupported_color_trim_source.
+- Artifact graph validation passed; physical duplicate keys 0; semantic duplicate rows 0; source-feature duplicates 0.
+- Same-run byte-stable SHA-256:
+  canonical-row-manifest.json 85f4092797c0ce508ffe2937773dd594c28d3d0cef7c065843cd195bab50063f
+  comparator-evidence.json 3b86f8296162f9eb14d82aa618f654f0b98d221052adb12cdd5c6ca4aca436a6
+  compile-report.json 1167ae79def7e8ba0ffa85c0da0cee3ccc304a4a6f014b862dfe74d4969c83a4
+  exception-queue.json f9e081a5a49f7a9a2ce9753788dae3223a9732957ebd1fd751ccbf7ebf03ec37
+  exception-resolutions.json bec555e0ccb915727fab5d8dac9693385d645ac0ceb6ae34e71247ddfc8550a7
+
+Lifecycle/browser
+- Disposable resolve -> automatic recompile -> reopen passed on one projectable default-selection subject; valid resolution count 0 -> 1 -> 0. The retained run directory was restored and all five hashes rechecked.
+- Desktop 1280x633: fresh run resumed, 20 missing-source/tooling cards rendered, zero horizontal overflow, zero application console errors.
+- Mobile Chrome/CDP 390x844: fresh run resumed, 20 missing-source/tooling cards rendered, body/document width 390, zero horizontal overflow, zero application console errors. Expected favicon 404 was separated from application errors.
+
+Read-only and syntax gates
+- .venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx: valid, zero issues.
+- .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx: valid, zero errors/warnings.
+- .venv/bin/python -m compileall -q scripts/corvette_form_generator/ingest/wizard: passed.
+- Static changed-Python scan: zero secret literals, unsafe shell/eval/exec/pickle patterns, TODO/FIXME/debugger markers.
+- git diff --check: passed.
+
+Node/runtime gate
+- node --test tests/*.test.mjs: 274 passed, one transient failure while parallel generator tests rewrote z06-runtime-contract.json.
+- After restoring generated outputs, node --test tests/z06-interior-accessory-cleanup.test.mjs: 7 passed, including the previously interrupted case.
+- Final serialized gate, node --test --test-concurrency=1 tests/*.test.mjs: 275 passed, 0 failed in 100.02s.
+- Generated timestamp churn in form-app/data.js and runtime contracts was restored.
+
+Full repository Python gate before the final role-invalid Color/Trim regression
+- PYTHONPATH=scripts .venv/bin/python -m pytest tests -q
+- Result: 616 passed, 23 subtests passed, 5 failed in 288.93s.
+- The final role-invalid Color/Trim guard was subsequently covered by the focused 48-test gate and full 299-test ingest gate above; the unrelated full repository suite was not repeated.
+- Four failures are documented baseline failures outside Milestone 2.2:
+  tests/test_editor_lints.py::RealWorkbookLintTest::test_d1_rwj_wks_collision
+  tests/test_editor_lints.py::RealWorkbookCompareTest::test_c2_cj2_stingray_name_deviator
+  tests/test_editor_lints.py::RealWorkbookCompareTest::test_r3_drz_pending_review
+  tests/test_source_assembly_characterization.py::test_shared_assembler_preserves_stingray_runtime_drift_surfaces
+- Fifth failure is the expected open receipt:
+  tests/test_fable5_loop_contract.py::test_repository_fable5_loop_contract_passes
+- After verifier-report.md, run.json, STATE.md, and final status updates were completed: the loop validator passed and all 13 Fable contract tests passed.
+
+Protected boundaries
+- shasum -a 256 -c /tmp/m22-protected-before.sha256: all 60 protected files passed after gate-churn restoration, including stingray_master.xlsx, form-app/**, and tracked runtime contracts.
+- Raw source was not modified.
+- No pass-c-3 projection, workbook write, generation/publication, registry promotion, deployment, or dealer change was authorized or performed.

@@ -1,0 +1,173 @@
+# Validation output · 2026-07-08 Pass C.2 real-data dry-run closure
+
+## Repo status before receipt/approval
+
+Command:
+
+```sh
+git status --short --branch && git log --oneline -5 --decorate
+```
+
+Observed:
+
+```text
+## ingest-wizard...origin/ingest-wizard
+
+a25d714 (HEAD -> ingest-wizard, origin/ingest-wizard) feat: close C.1 blocker and enhance dry-run plan with updated row mappings and notes
+519a3a8 (origin/main, origin/HEAD, main, claude/ingest-wizard-pass-c2-3ce2b1) feat: add detailed findings and remaining tasks for C.1 and update workbook edit log
+a5e34ae remove depricated raw export sheet.
+b8d9788 Add default selection rules support and related validations
+ce72076 feat: enhance blocker panel with collapsible functionality and state persistence
+```
+
+Note: at the start of this handoff the C.2 files were staged and uncommitted; while this closeout was running, the branch advanced to committed/pushed HEAD `a25d714` with those same C.2 changes. No commit/push was performed by this closeout.
+
+## Targeted validation gates
+
+Command:
+
+```sh
+.venv/bin/python -m pytest tests/test_ingest_wizard_plan.py tests/test_ingest_wizard_decisions.py tests/test_ingest_wizard_server_pass_b.py tests/test_editor_ops_global_families.py -q && node --check visualizer/ingest-wizard/wizard.js && git diff --check
+```
+
+Output:
+
+```text
+........................................................................ [100%]
+72 passed in 6.15s
+```
+
+Exit code: 0. `node --check` and `git diff --check` produced no stdout/stderr and exited 0.
+
+## Fable loop validator before receipt writes
+
+Command:
+
+```sh
+.venv/bin/python scripts/validate_fable5_loop.py
+```
+
+Output:
+
+```text
+Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.
+```
+
+Exit code: 0.
+
+## Artifact probe for run 20260707-193441-ea9e4c before approval
+
+Probe summary from `apply-plan.json`, `apply-plan-dryrun.json`, `session.json`, and current workbook/source fingerprints:
+
+```text
+session_state plan_built
+approval_exists False
+plan_valid True blockingGaps 0 gaps 0 uncovered 0
+stage_counts 52 5719
+dry validated applied validated errors 0 schema 0 warnings 41
+rule_bad_active 0 rule_keysets {('rule_id', 'rule_type', 'source_id', 'target_id'): 31}
+group_bad_group_name 0 group_keysets {('active', 'group_id', 'notes', 'selection_mode'): 15}
+count ('model_interior_scope', 'add') 117
+count ('runtime_steps', 'add') 42
+count ('section_presentation', 'add') 36
+count ('context_section_master', 'add') 6
+count ('order_summary_sections', 'add') 33
+count ('step_order_summary_map', 'add') 39
+per_sheet_selected {"('grandSportX_options', 'add')": 203, "('zr1_options', 'delete')": 213, "('zr1_ovs', 'delete')": 852, "('zr1_options', 'add')": 171, "('zr1_ovs', 'add')": 684, "('zr1x_options', 'delete')": 214, "('zr1x_ovs', 'delete')": 856, "('zr1x_options', 'add')": 172, "('zr1x_ovs', 'add')": 688}
+stingray_master.xlsx 03e8c9671185f238dde7f4bc8e7003da0f74d842d9cc2f76126f938cbb7b54d6 1783533702592245069 446684
+source export 6ac9538d5bb8a823ade9afea70b2654057b793e1cf27c081c088545aa3add8a1 1783533702348168859 1619319
+```
+
+## Live plan endpoint while server was available
+
+Command:
+
+```sh
+curl -i --max-time 3 http://127.0.0.1:8040/api/wizard/sessions/20260707-193441-ea9e4c/plan
+```
+
+Observed HTTP status: 200 OK.
+
+Key response values:
+
+```text
+session.state = plan_built
+plan.valid = true
+plan.stage1Count = 52
+plan.stage2Count = 5719
+plan.report.blockingGaps = []
+plan.report.gaps = []
+plan.report.unreviewedSplits counts = grand_sport_x 178, zr1 155, zr1x 156
+dryRun.ok = true
+dryRun.stage1.status = validated
+dryRun.stage1Scratch.status = applied
+dryRun.stage2.status = validated
+dryRun.stage2.errors = []
+dryRun.stage2.schemaErrors = 0
+dryRun.stage2.warnings count = 41
+approval = null
+```
+
+## Approval action
+
+The port-8040 dev server stopped before approval POST. Approval was applied through the same project method used by the endpoint:
+
+```sh
+PYTHONPATH=scripts .venv/bin/python - <<'PY'
+from pathlib import Path
+from corvette_form_generator.ingest.wizard.session import WizardSessionStore
+store = WizardSessionStore(Path('.'))
+result = store.approve_plan('20260707-193441-ea9e4c', 'Hermes Agent')
+print(result['session']['state'])
+print(result['approval']['approvedBy'])
+print(result['approval']['approvedAt'])
+print(result['approval']['planSha'])
+PY
+python3 - <<'PY'
+import json, pathlib
+run=pathlib.Path('form-output/ingest-wizard/20260707-193441-ea9e4c')
+print('approval_exists', (run/'plan-approval.json').exists())
+print('session_state', json.loads((run/'session.json').read_text())['state'])
+PY
+```
+
+Output:
+
+```text
+plan_approved
+Hermes Agent
+2026-07-08T14:39:45
+dbe3a3ed66e5374058a13ce8ee21d46ebb3e264e69b06c4009c7ccdd1c4b1422
+approval_exists True
+session_state plan_approved
+```
+
+Approval artifact:
+
+```json
+{
+  "schemaVersion": "pass-c-1",
+  "approvedBy": "Hermes Agent",
+  "approvedAt": "2026-07-08T14:39:45",
+  "planSha": "dbe3a3ed66e5374058a13ce8ee21d46ebb3e264e69b06c4009c7ccdd1c4b1422"
+}
+```
+
+## Fable loop validator after receipt/STATE closeout
+
+Command:
+
+```sh
+.venv/bin/python scripts/validate_fable5_loop.py && git status --short --branch && git diff --check
+```
+
+Output:
+
+```text
+Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.
+## ingest-wizard...origin/ingest-wizard
+ M fable5loop/STATE.md
+?? fable5loop/runs/2026-07-08-pass-c2-real-data-dry-run-closure/
+```
+
+Exit code: 0. `git diff --check` produced no stdout/stderr and exited 0.

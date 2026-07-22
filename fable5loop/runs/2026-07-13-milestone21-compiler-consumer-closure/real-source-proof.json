@@ -1,0 +1,151 @@
+{
+  "schemaVersion": "milestone-2-1-real-source-proof-1",
+  "recordedDate": "2026-07-13",
+  "sourceRun": "20260713-181910-7dc5bb",
+  "retainedMilestone2Run": "20260712-215133-64bfad",
+  "selection": {
+    "targets": ["grand_sport_x", "zr1", "zr1x"],
+    "comparators": {
+      "grand_sport_x": "grand_sport",
+      "zr1": "z06",
+      "zr1x": "z06"
+    }
+  },
+  "retainedBefore": {
+    "subjects": 800,
+    "actionable": 92,
+    "actionless": 708,
+    "noRpoUnsupportedSourceFeatures": 135
+  },
+  "freshAfter": {
+    "sessionState": "compiled_with_exceptions",
+    "subjects": 711,
+    "actionable": 257,
+    "actionless": 454,
+    "statusBearingNoRpoCandidates": 135,
+    "manifestRows": 5093,
+    "manifestReadyRows": 5076,
+    "manifestBlockedRows": 17,
+    "physicalDuplicateKeys": 0,
+    "compileReady": {
+      "grand_sport_x": false,
+      "zr1": false,
+      "zr1x": false
+    },
+    "blockerCounts": {
+      "grand_sport_x": 399,
+      "zr1": 158,
+      "zr1x": 158
+    },
+    "actionableByReason": {
+      "ambiguous_existing_identity": 10,
+      "comparator_only_default_selection_proposal": 4,
+      "comparator_only_exclusive_group_proposal": 19,
+      "comparator_only_price_rule_proposal": 30,
+      "comparator_only_relationship_proposal": 10,
+      "comparator_only_rule_group_proposal": 20,
+      "missing_section": 147,
+      "unresolved_price_scope": 17
+    },
+    "actionlessByReason": {
+      "comparator_only_exclusive_group_proposal": 2,
+      "comparator_only_price_rule_proposal": 19,
+      "comparator_only_relationship_proposal": 15,
+      "comparator_only_rule_group_proposal": 1,
+      "unresolved_relationship_endpoint": 396,
+      "unsupported_color_trim_source": 2,
+      "unsupported_global_family": 19
+    },
+    "actionlessByModel": {
+      "*": 2,
+      "grand_sport_x": 276,
+      "zr1": 88,
+      "zr1x": 88
+    },
+    "typedRelationshipEndpointCounts": {
+      "HVZ": 45,
+      "HAG": 45,
+      "GKZ": 24,
+      "HU2": 24,
+      "GPH": 24,
+      "ZR1X": 24,
+      "G26": 20,
+      "HU0": 20,
+      "GTR": 18,
+      "G4Z": 16,
+      "HU9": 14,
+      "GKA": 12,
+      "GBA": 12,
+      "HNK": 12,
+      "H8T": 12,
+      "ZR1": 12,
+      "GBK": 10,
+      "HU1": 8,
+      "G8G": 8,
+      "GT2": 8,
+      "HU7": 6,
+      "HU6": 6,
+      "H1Y": 6,
+      "HTJ": 6,
+      "EL9": 4
+    },
+    "unsupportedGlobalFamilies": {
+      "context_section_master_meta": 3,
+      "interior_components": 1,
+      "model_interior_scope": 1,
+      "model_master": 1,
+      "model_workbook_sources": 1,
+      "order_summary_sections_meta": 3,
+      "runtime_steps_meta": 3,
+      "section_presentation_meta": 3,
+      "step_order_summary_map_meta": 3
+    },
+    "mutationProjectabilityProbe": {
+      "subjectReason": "comparator_only_rule_group_proposal",
+      "availableActions": [],
+      "attemptedAction": "mark_not_applicable",
+      "httpEquivalentStatus": 409,
+      "aggregateUnchanged": true
+    }
+  },
+  "classification": {
+    "typedRelationshipEndpoints": "The 396 subjects are intentional tooling blockers for 25 typed color, interior, and model endpoints. They are actionless because an option-only targetOptionId payload would be invalid. A later typed-endpoint compiler must aggregate them by semantic relationship before reviewer controls are offered.",
+    "incompleteComparatorCatalogs": "Thirty-seven comparator proposals are actionless because at least one required target RPO lacks one unique ready option identity. GET and mutation paths use the same current projectability view: the service hides the whole mixed action set and rejects direct resolution attempts with 409 before artifact mutation. The compiler independently leaves manually crafted artifact resolutions pending rather than emitting rows through blocked endpoints.",
+    "colorTrim": "Two selected Color and Trim source sheets remain blocked until a deterministic Color/Trim parser exists. Each sheet produces one primary source-sheet blocker.",
+    "globalFamily": "Nineteen target/global metadata-family blockers remain. They require target metadata compilers or authoritative external evidence and are not reviewer-editable product facts.",
+    "conclusion": "Every action exposed by the service now has a finite compiler consumer and current unique-ready target catalog. Mutation authorization is derived from the same current queue view as GET rendering, so hidden actions cannot be persisted. Remaining actionless subjects are explicit typed-endpoint, incomplete-catalog, Color/Trim, or target-metadata tooling boundaries; no validator-accepted resolution is treated as complete without a recorded compiler effect."
+  },
+  "determinism": {
+    "sameRunRecompileByteIdentical": true,
+    "artifacts": {
+      "canonical-row-manifest.json": "5268f58da45e6c8b7884749834714a72795216a85a40c16b18a1451adbd1d861",
+      "comparator-evidence.json": "87f10132162c69785640ae06b7605f83fe0ef0d92f22efce1d7e2cb6376984d6",
+      "exception-queue.json": "7d13625a8006141131e8df4eda5629c264a1873946d3ad037dfbac33f349df41",
+      "exception-resolutions.json": "82e51064ae6003dbd49a6439acb10014d1f8df44bfb763d6ae966eae1e66e58f",
+      "compile-report.json": "d7221d454592d8c6428543313d2963c444da3d6ecf1a1d1f0a7464249380ded9"
+    },
+    "semanticShas": {
+      "queueSubjectFingerprint": "f44662d353a8e8b4451b975a79bf265eec24216a0b8f9f34552d31d7c49de100",
+      "resolutionSemanticSha": "c5a5ba71d49e3591fb1e4fb134a6ccd62e1f1bbd532bddebeac1e0d3de9c4c2b",
+      "manifestSemanticSha": "cff46ab6fd9c9d5eb5702b2515c63b425c47fa4ca6a2a77e1f817f9be63c8e2e",
+      "compileReportSemanticSha": "f83265db174ba47d46d24371d669e62146bb932247f1ca2d1b14c4ac2112b845"
+    }
+  },
+  "protectedHashes": {
+    "stingray_master.xlsx": "03e8c9671185f238dde7f4bc8e7003da0f74d842d9cc2f76126f938cbb7b54d6",
+    "rawSource": "6ac9538d5bb8a823ade9afea70b2654057b793e1cf27c081c088545aa3add8a1",
+    "form-app/data.js": "dd60534734c1330085ea74602515e1ab75aa964d3134c230abe0f26217b79e78",
+    "form-app/app.js": "4ffee7884159be813d5d20716bd6d6744b2b383679d8817c00b3638b891d6b77",
+    "retained/canonical-row-manifest.json": "fcf262936422f5372f4ea925a7b03a300f89830896f7f277f35f850e9a2e0f18",
+    "retained/comparator-evidence.json": "277a103d838dbec73899ad308cfd8ed5835130950c79a1abf82b68b7954613f8",
+    "retained/exception-queue.json": "1adf5d0a9e4a7945cf230d8d28f4d5ad58591c70d72436aea16270f66bfc2a3a",
+    "retained/exception-resolutions.json": "4e43ee06b02dde0d74fcd182fb7cba6aa62340a76eed4a3da6ae54d34d215882",
+    "retained/compile-report.json": "93e60d28af3769ca6292fa4b2efaad7e3bc76e156d17a74a7ffc1980a4117a5b"
+  },
+  "boundaries": {
+    "workbookWritten": false,
+    "passC3Projected": false,
+    "runtimePublished": false,
+    "dealerTouched": false
+  }
+}

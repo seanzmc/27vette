@@ -1,0 +1,12 @@
+{
+  "blockers": {"grandSportX": true, "zr1": true, "zr1x": true},
+  "consoleErrors": [],
+  "filterValue": "no",
+  "filteredCards": 20,
+  "horizontalOverflow": false,
+  "initialCards": 20,
+  "pass": true,
+  "runId": "20260714-133532-f9811b",
+  "runVisible": true,
+  "viewport": {"height": 844, "width": 390}
+}

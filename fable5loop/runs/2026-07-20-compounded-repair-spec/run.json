@@ -1,0 +1,32 @@
+{
+  "id": "2026-07-20-compounded-repair-spec",
+  "started_at": "2026-07-20T12:00:00-04:00",
+  "completed_at": "2026-07-20T12:45:00-04:00",
+  "objective": "Compare the two 7-20 audit-finding docs and synthesize one master repair spec (docs/ingest/7-20_compounded-repair-spec.md) for the gsx/zr1/zr1x options-sheet quality regression.",
+  "changed_surface": "docs",
+  "outcome_rubric": "fable5loop/runs/2026-07-20-compounded-repair-spec/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-20-compounded-repair-spec/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-20-compounded-repair-spec/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-20-compounded-repair-spec/verifier-report.md"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-20-compounded-repair-spec/verifier-report.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false
+  },
+  "boundaries_preserved": [
+    "workbook",
+    "generated artifacts",
+    "runtime app",
+    "dealer submission"
+  ]
+}

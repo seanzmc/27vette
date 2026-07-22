@@ -35,13 +35,14 @@ class WizardProfilerTest(unittest.TestCase):
         self.assertEqual(len(self.profile["sheets"]), 5)
 
     def test_options_matrix_card(self) -> None:
-        card = self.cards["Equipment Groups 1"]
+        card = self.cards["Exterior 1"]
         self.assertEqual(card["sheetType"], "options_matrix")
         self.assertEqual(card["contentSubtype"], "orderable_options")
         self.assertEqual(card["modelFamily"], "Stingray")
         self.assertEqual(card["modelFamilies"], ["Stingray"])
         self.assertEqual(card["headerRow"], 3)
         self.assertEqual(card["recommendedRole"], "options")
+        self.assertTrue(card["canonicalOptionSource"])
         self.assertEqual(len(card["variantColumns"]), 3)
         first = card["variantColumns"][0]
         self.assertEqual(first["columnLetter"], "D")
@@ -53,16 +54,30 @@ class WizardProfilerTest(unittest.TestCase):
         self.assertEqual(stats["refOnlyRpoRows"], 1)
         self.assertEqual(stats["sectionRows"], 1)
 
+    def test_equipment_groups_are_not_canonical_option_sources(self) -> None:
+        card = profiler.matrix_card(
+            "Equipment Groups 1",
+            [
+                ["Stingray"],
+                ["", "", "S = Standard Equipment  A = Available"],
+                ["Orderable RPO Code", "Ref. Only RPO Code", "Description", "Coupe\n1YC07\n1LT"],
+                ["J6D", "", "Brake calipers", "S"],
+            ],
+            3,
+        )
+        self.assertFalse(card["canonicalOptionSource"])
+        self.assertEqual(card["recommendedRole"], "exclude")
+
     def test_unknown_status_symbol_downgrades_confidence(self) -> None:
-        card = self.cards["Equipment Groups 1"]
+        card = self.cards["Exterior 1"]
         self.assertEqual(card["confidence"], "medium")
         self.assertTrue(any("?" in reason for reason in card["confidenceReasons"]))
-        clean_card = self.cards["Equipment Groups 4"]
+        clean_card = self.cards["Mechanical 4"]
         self.assertEqual(clean_card["confidence"], "high")
         self.assertEqual(clean_card["confidenceReasons"], [])
 
     def test_combined_model_family_is_mixed(self) -> None:
-        card = self.cards["Equipment Groups 4"]
+        card = self.cards["Mechanical 4"]
         self.assertEqual(card["modelFamily"], "mixed")
         self.assertEqual(card["modelFamilies"], ["ZR1", "ZR1X"])
 
