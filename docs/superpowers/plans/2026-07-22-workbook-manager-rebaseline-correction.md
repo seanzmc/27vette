@@ -1,7 +1,7 @@
 # Workbook Manager Rebaseline Correction Pass
 
 Date: 2026-07-22
-Status: source blocker resolved; implementation awaits the model-materialization decision below
+Status: ready for implementation; bounded three-model materialization selected
 Recommended reasoning level: high
 
 ## Goal
@@ -69,7 +69,7 @@ Use explicit internal meanings:
 - **Published models**: importable models whose active `model_registry_promotion` row has `promoted_to_runtime=True`. On the current workbook this is Stingray, Grand Sport, and Z06.
 
 The inspection proved that this distinction alone does not decide which models the
-Manager should materialize. Two internally consistent boundaries remain:
+Manager should materialize. Two internally consistent boundaries were evaluated:
 
 - **Bounded three-model PR:** profile all six, but materialize/edit/synchronize
   only the three published models. This preserves PR #8's approved title and
@@ -81,15 +81,15 @@ Manager should materialize. Two internally consistent boundaries remain:
   rule-mapping orphan references, so it pulls rehabilitation and exception-policy
   decisions into PR #8.
 
-Recommendation: use the bounded three-model boundary for PR #8, because its
+Selected boundary: use the bounded three-model boundary for PR #8, because its
 approved scope is “three live models” and `nextSteps_v2.md` explicitly deferred
-unpublished-model rehabilitation. Do not implement either boundary until the user
-confirms this choice.
+unpublished-model rehabilitation. The full six-model Manager remains the cleaner
+long-term destination, but belongs after that rehabilitation rather than being
+silently absorbed here.
 
 ### 2. Derive model population from the workbook snapshot
 
-After the materialization decision is confirmed, remove the ambiguous
-`LIVE_MODELS` model-population authority from
+Remove the ambiguous `LIVE_MODELS` model-population authority from
 `workbook-manager/backend/app/catalog.py`.
 
 The read-only profile owns discovery for a specific workbook snapshot. Downstream
