@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 
@@ -14,13 +15,13 @@ def test_forward_stepper_uses_compile_and_exception_stages() -> None:
     assert 'data-stage="exceptions"' in html
     assert 'id="stage-compile"' in html
     assert 'id="stage-exceptions"' in html
-    assert 'const STAGES = ["files", "sheets", "candidates", "models", "compile", "exceptions"];' in js
-    assert 'const LEGACY_STAGES = ["review", "plan"];' in js
-    assert 'renderReconciliation();' not in js[js.index('$("#confirm-models-btn")'):js.index('function renderReconciliation')]
-    assert 'await enterCompile();' in js[js.index('$("#confirm-models-btn")'):js.index('function renderReconciliation')]
+    assert 'const STAGES = ["files", "sheets", "candidates", "models", "compile", "exceptions", "changeset"];' in js
+    assert "LEGACY_STAGES" not in js
+    assert "renderReconciliation" not in js
+    assert 'await enterCompile();' in js[js.index('$("#confirm-models-btn")'):]
 
 
-def test_compile_summary_uses_compact_api_and_separate_readiness_gates() -> None:
+def test_compile_summary_uses_compact_api_and_compile_readiness() -> None:
     js = WIZARD_JS.read_text(encoding="utf-8")
 
     assert "async function enterCompile()" in js
@@ -28,11 +29,33 @@ def test_compile_summary_uses_compact_api_and_separate_readiness_gates() -> None
     assert "function renderCompilerSummary(summary)" in js
     assert "`/api/wizard/sessions/${state.session.runId}/compile`" in js
     assert '"compileReady"' in js
-    assert '"planReady"' in js
-    assert '"writeReady"' in js
-    assert '"deploymentReady"' in js
+    assert '"planReady"' not in js
+    assert '"writeReady"' not in js
+    assert '"deploymentReady"' not in js
     assert '$("#compile-btn").addEventListener("click", runCompile);' in js
     assert '$("#review-exceptions-btn").addEventListener("click", enterExceptions);' in js
+
+
+def test_compiled_ready_can_emit_changeset() -> None:
+    html = WIZARD_HTML.read_text(encoding="utf-8")
+    js = WIZARD_JS.read_text(encoding="utf-8")
+    assert 'id="compile-changeset-btn"' in html
+    assert 'id="stage-changeset"' in html
+    assert 'summary.session.state === "compiled_ready"' in js
+    assert '$("#compile-changeset-btn").addEventListener("click", createChangeSet);' in js
+    assert '$("#changeset-download").download = "workbook-change-set.json";' in js
+
+
+def test_current_browser_has_no_historical_mutation_bindings() -> None:
+    js = WIZARD_JS.read_text(encoding="utf-8")
+    for retired in (
+        "back-to-review",
+        "copy-decisions",
+        "mark-complete",
+        "approve-plan",
+        "write/approve",
+    ):
+        assert retired not in js
 
 
 def test_exception_cards_use_typed_controls_evidence_and_lifecycle_api() -> None:
@@ -48,6 +71,9 @@ def test_exception_cards_use_typed_controls_evidence_and_lifecycle_api() -> None
         "choose_section",
         "choose_relationship",
         "retain_existing",
+        "provide_option_copy",
+        "provide_option_behavior",
+        "confirm_mandatory_charge",
         "provide_typed_value",
         "approve_removal",
         "mark_not_applicable",
@@ -100,6 +126,15 @@ def test_exception_cards_use_typed_controls_evidence_and_lifecycle_api() -> None
     assert 'name="defaultDisplayBehavior"' in js
     assert 'displayBehavior: displayBehavior === "__blank__" ? "" : displayBehavior' in js
     assert 'reasonCode === "comparator_only_price_rule_proposal"' in js
+    assert 'name="optionName"' in js
+    assert 'name="description"' in js
+    assert 'name="active"' in js
+    assert 'name="selectable"' in js
+    assert ".copy-evidence-field textarea" in css
+    assert "Object.entries(values).slice" not in js
+    assert 'if (value === "" || value === null || value === undefined) return "blank";' in js
+    assert '"currentDescription"' in js
+    assert "requiredConflictFields.has(key)" in js
 
 
 def test_exception_layout_has_mobile_single_column_fallback() -> None:
@@ -134,6 +169,17 @@ def test_exception_review_is_one_expandable_decision_and_one_form() -> None:
     assert 'focusId === "__first__"' in js
 
 
+def test_expanded_exception_copy_is_not_line_clamped() -> None:
+    css = WIZARD_CSS.read_text(encoding="utf-8")
+
+    for selector in ("decision-sentence", "why-asked", "source-snippet"):
+        match = re.search(rf"\.{selector}\s*\{{([^}}]*)\}}", css)
+        assert match is not None
+        declarations = match.group(1)
+        assert "line-clamp" not in declarations
+        assert "overflow: hidden" not in declarations
+
+
 def test_exception_primary_surface_omits_empty_evidence_and_internal_gate_copy() -> None:
     js = WIZARD_JS.read_text(encoding="utf-8")
 
@@ -149,7 +195,7 @@ def test_exception_primary_surface_omits_empty_evidence_and_internal_gate_copy()
     assert '["remove", "removed"].includes(entry.effect)' in js
 
 
-def test_visible_resume_routes_current_and_historical_states() -> None:
+def test_visible_resume_routes_current_states() -> None:
     html = WIZARD_HTML.read_text(encoding="utf-8")
     js = WIZARD_JS.read_text(encoding="utf-8")
 
@@ -159,10 +205,10 @@ def test_visible_resume_routes_current_and_historical_states() -> None:
     assert 'class="primary resume-run"' in js
     assert 'case "models_selected":' in js
     assert 'case "compiled_ready":' in js
+    assert 'case "changeset_emitted":' in js
     assert 'case "compiled_with_exceptions":' in js
     assert "await enterCompile();" in js
-    assert 'case "decisions_in_progress":' in js
-    assert "await enterReview();" in js
+    assert 'case "decisions_in_progress":' not in js
 
 
 def test_forward_flow_has_keyboard_and_status_accessibility_hooks() -> None:

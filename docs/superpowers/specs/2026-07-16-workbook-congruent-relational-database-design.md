@@ -585,6 +585,13 @@ objective.
 
 ## 18. Completion Record
 
+> Rebaseline note (2026-07-22): this section records the verified 2026-07-17
+> snapshot; it is not a current acceptance verdict after stabilized `main`
+> unpublished Grand Sport X, ZR1, and ZR1X while retaining their active workbook
+> registrations. Current diagnosis, required corrections, and fresh gates are
+> owned by
+> `docs/superpowers/plans/2026-07-22-workbook-manager-rebaseline-correction.md`.
+
 Completed on 2026-07-17. The implementation replaced the workbook manager's
 conceptual shared-table database with central relational domains and identical
 17-role physical collections for Stingray, Grand Sport, and Z06. The completed

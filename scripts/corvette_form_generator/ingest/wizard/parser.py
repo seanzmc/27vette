@@ -90,6 +90,7 @@ def extract_option_candidates(
             continue
         rpo = first.upper() if RPO_RE.fullmatch(first.upper()) else ""
         ref_only = second.upper() if RPO_RE.fullmatch(second.upper()) else ""
+        detail_raw = str(row[2]) if len(row) > 2 and row[2] is not None else ""
         if not rpo and not ref_only:
             if third and any(status.get("status") == "standard" for status in statuses):
                 candidates.append(
@@ -104,6 +105,7 @@ def extract_option_candidates(
                         "rpo": "",
                         "refOnlyRpo": "",
                         "description": third,
+                        "detailRaw": detail_raw,
                         "statuses": statuses,
                         "sourceEvidence": row_evidence(sheet_name, row_number, row),
                     }
@@ -125,6 +127,7 @@ def extract_option_candidates(
                 "rpo": rpo,
                 "refOnlyRpo": ref_only,
                 "description": third,
+                "detailRaw": detail_raw,
                 "statuses": statuses,
                 "sourceEvidence": row_evidence(sheet_name, row_number, row),
             }

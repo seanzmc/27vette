@@ -6,7 +6,7 @@ live from the workbook — nothing is hardcoded that a workbook sheet owns.
 See workbook-editor-integration-spec.md (Phase 1 read surface),
 workbook-editor-phase2-spec.md (gated write API), and
 workbook-editor-phase3-spec.md (read-only Review endpoints:
-``/api/lints`` and ``/api/compare``), and ingest Pass 2 read-only review endpoints.
+``/api/lints`` and ``/api/compare``).
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ import json
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import parse_qs, unquote, urlsplit
+from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS_DIR = ROOT / "scripts"
@@ -36,11 +36,6 @@ from corvette_form_generator.editor_ops import (  # noqa: E402
     jsonable,
     model_sheet_registry,
     rows_of,
-)
-from corvette_form_generator.ingest.review_payload import (  # noqa: E402
-    IngestReviewStore,
-    disabled_summary,
-    validate_review_decisions,
 )
 from corvette_form_generator.workbook import workbook_truthy  # noqa: E402
 
@@ -275,11 +270,6 @@ CONTENT_TYPES = {
 }
 
 
-def _query_value(query: dict[str, list[str]], key: str, default: str = "") -> str:
-    values = query.get(key)
-    return values[0] if values else default
-
-
 class WorkbookCache:
     """Re-extract the workbook only when its mtime changes; derived Review
     payloads (lints/compare) are memoized on the same key plus, for compare,
@@ -321,7 +311,6 @@ class WorkbookCache:
 
 class EditorHandler(BaseHTTPRequestHandler):
     cache: WorkbookCache  # assigned in main()
-    ingest_review: IngestReviewStore | None = None
     log_path: Path | None = None  # test override; None -> editor_ops default
     MAX_BODY = 10_000_000
 
@@ -331,7 +320,7 @@ class EditorHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):  # noqa: N802 (stdlib API name)
         path = urlsplit(self.path).path
-        if path not in ("/api/validate", "/api/apply", "/api/ingest/review/validate", "/api/ingest/workbook-build/validate"):
+        if path not in ("/api/validate", "/api/apply"):
             self._send_json({"error": "not found"}, status=404)
             return
         origin = self.headers.get("Origin")
@@ -354,12 +343,7 @@ class EditorHandler(BaseHTTPRequestHandler):
             self._send_json({"error": "invalid JSON body"}, status=400)
             return
         try:
-            if path == "/api/ingest/review/validate":
-                self._send_json(validate_review_decisions(body))
-            elif path == "/api/ingest/workbook-build/validate":
-                store = self._require_ingest_review()
-                self._send_json(store.validate_workbook_build_decisions(body))
-            elif path == "/api/validate":
+            if path == "/api/validate":
                 batch = body.get("batch") or {}
                 result = apply_batch(self.cache.path, batch, write=False, source="server",
                                      log_path=self.log_path)
@@ -379,7 +363,6 @@ class EditorHandler(BaseHTTPRequestHandler):
     def do_GET(self):  # noqa: N802 (stdlib API name)
         parsed = urlsplit(self.path)
         path = parsed.path
-        query = parse_qs(parsed.query)
         try:
             if path == "/api/workbook":
                 self._send_json(build_payload(self.cache.extract()))
@@ -387,78 +370,6 @@ class EditorHandler(BaseHTTPRequestHandler):
                 self._send_json(self.cache.lints())
             elif path == "/api/compare":
                 self._send_json(self.cache.compare())
-            elif path == "/api/ingest/summary":
-                self._send_json(self._ingest_summary())
-            elif path == "/api/ingest/candidates":
-                store = self._require_ingest_review()
-                self._send_json(store.list_candidates(
-                    family=_query_value(query, "family", "options"),
-                    status=_query_value(query, "status"),
-                    model=_query_value(query, "model"),
-                    reason=_query_value(query, "reason"),
-                    q=_query_value(query, "q"),
-                    offset=int(_query_value(query, "offset", "0") or 0),
-                    limit=int(_query_value(query, "limit", "200") or 200),
-                ))
-            elif path == "/api/ingest/interpretations":
-                store = self._require_ingest_review()
-                self._send_json(store.list_interpretations(
-                    confidence=_query_value(query, "confidence"),
-                    model=_query_value(query, "model"),
-                    reason=_query_value(query, "reason"),
-                    duplicate=_query_value(query, "duplicate"),
-                    q=_query_value(query, "q"),
-                    include_auto=_query_value(query, "include_auto", "false").lower() == "true",
-                    offset=int(_query_value(query, "offset", "0") or 0),
-                    limit=int(_query_value(query, "limit", "200") or 200),
-                ))
-            elif path == "/api/ingest/workbook-build/selection":
-                store = self._require_ingest_review()
-                self._send_json(store.model_selection())
-            elif path == "/api/ingest/workbook-build/summary":
-                store = self._require_ingest_review()
-                self._send_json(store.workbook_build_summary())
-            elif path == "/api/ingest/workbook-build/units":
-                store = self._require_ingest_review()
-                self._send_json(store.list_workbook_build_units(
-                    lane=_query_value(query, "lane"),
-                    model=_query_value(query, "model"),
-                    action=_query_value(query, "action"),
-                    q=_query_value(query, "q"),
-                    offset=int(_query_value(query, "offset", "0") or 0),
-                    limit=int(_query_value(query, "limit", "200") or 200),
-                ))
-            elif path.startswith("/api/ingest/workbook-build/unit/"):
-                store = self._require_ingest_review()
-                review_unit_id = path[len("/api/ingest/workbook-build/unit/"):]
-                self._send_json(store.workbook_build_unit(review_unit_id))
-            elif path == "/api/ingest/interpretation/reports/duplicates":
-                store = self._require_ingest_review()
-                self._send_json({"items": store.interpretation_reports()["duplicates"]})
-            elif path == "/api/ingest/interpretation/reports/source-coverage":
-                store = self._require_ingest_review()
-                self._send_json({"items": store.interpretation_reports()["source_coverage"]})
-            elif path == "/api/ingest/interpretation/blocked":
-                store = self._require_ingest_review()
-                self._send_json(store.interpretation_reports()["blocked"])
-            elif path.startswith("/api/ingest/interpretation/"):
-                store = self._require_ingest_review()
-                interpretation_id = path[len("/api/ingest/interpretation/"):]
-                self._send_json(store.interpretation(interpretation_id))
-            elif path.startswith("/api/ingest/candidate/"):
-                store = self._require_ingest_review()
-                candidate_id = path[len("/api/ingest/candidate/"):]
-                self._send_json(store.candidate(candidate_id))
-            elif path.startswith("/api/ingest/unresolved/"):
-                store = self._require_ingest_review()
-                unresolved_id = path[len("/api/ingest/unresolved/"):]
-                self._send_json(store.unresolved(unresolved_id))
-            elif path == "/api/ingest/source":
-                store = self._require_ingest_review()
-                self._send_json(store.source(
-                    sheet=_query_value(query, "sheet"),
-                    row=int(_query_value(query, "row", "0") or 0),
-                ))
             elif path.startswith("/api/sheet/"):
                 name = unquote(path[len("/api/sheet/"):])
                 payload = sheet_payload(self.cache.extract(), name)
@@ -477,15 +388,6 @@ class EditorHandler(BaseHTTPRequestHandler):
         except Exception as exc:  # surface server faults to the UI
             self._send_json({"error": f"{type(exc).__name__}: {exc}"}, status=500)
 
-    def _ingest_summary(self) -> dict:
-        if self.ingest_review is None:
-            return disabled_summary()
-        return self.ingest_review.summary()
-
-    def _require_ingest_review(self) -> IngestReviewStore:
-        if self.ingest_review is None:
-            raise ValueError("No ingest evidence/candidate directories configured.")
-        return self.ingest_review
 
     def _send_json(self, payload: dict, status: int = 200) -> None:
         body = json.dumps(payload).encode("utf-8")
@@ -515,37 +417,18 @@ class EditorHandler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Local workbook editor and read-only ingest review server.")
+    parser = argparse.ArgumentParser(description="Local workbook editor server.")
     parser.add_argument("--port", type=int, default=8027)
     parser.add_argument("--workbook", default=str(DEFAULT_WORKBOOK))
-    parser.add_argument("--ingest-evidence-dir", default="")
-    parser.add_argument("--ingest-candidates-dir", default="")
-    parser.add_argument("--ingest-interpretation-dir", default="")
+
     args = parser.parse_args()
     workbook_path = Path(args.workbook)
     EditorHandler.cache = WorkbookCache(workbook_path)
-    if args.ingest_interpretation_dir and not (args.ingest_evidence_dir and args.ingest_candidates_dir):
-        raise SystemExit("--ingest-interpretation-dir requires --ingest-evidence-dir and --ingest-candidates-dir")
-    if args.ingest_evidence_dir or args.ingest_candidates_dir:
-        if not (args.ingest_evidence_dir and args.ingest_candidates_dir):
-            raise SystemExit("--ingest-evidence-dir and --ingest-candidates-dir must be provided together")
-        EditorHandler.ingest_review = IngestReviewStore(
-            evidence_dir=Path(args.ingest_evidence_dir),
-            candidates_dir=Path(args.ingest_candidates_dir),
-            interpretation_dir=Path(args.ingest_interpretation_dir) if args.ingest_interpretation_dir else None,
-            workbook_path=workbook_path,
-            workbook_mtime_ns=workbook_path.stat().st_mtime_ns,
-        )
-    else:
-        EditorHandler.ingest_review = None
+
     server = ThreadingHTTPServer(("127.0.0.1", args.port), EditorHandler)
     print(f"Workbook editor (read-only) at http://127.0.0.1:{args.port}/")
     print(f"Workbook: {args.workbook}")
-    if EditorHandler.ingest_review is not None:
-        print(f"Ingest evidence: {args.ingest_evidence_dir}")
-        print(f"Ingest candidates: {args.ingest_candidates_dir}")
-        if args.ingest_interpretation_dir:
-            print(f"Ingest interpretation: {args.ingest_interpretation_dir}")
+
     try:
         server.serve_forever()
     except KeyboardInterrupt:

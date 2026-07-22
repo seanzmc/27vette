@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-07-02T14:10:23+00:00",
+    "generated_at": "2026-07-21T16:10:14+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -41779,6 +41779,426 @@
       "disabled_reason": "GBA black paint blocks EDU exterior accent choice.",
       "active": "True",
       "notes": "Workbook-owned grouped exclusion metadata."
+    },
+    {
+      "group_id": "gs_group_dpb_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_dpb_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DPB blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Reverse exclusion for stripe vs Z15/heritage hash conflict; mirrors gs_group_z15_excludes_non_center_stripes. Spec: .hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md"
+    },
+    {
+      "group_id": "gs_group_dpc_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_dpc_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DPC blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Reverse exclusion for stripe vs Z15/heritage hash conflict; mirrors gs_group_z15_excludes_non_center_stripes. Spec: .hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md"
+    },
+    {
+      "group_id": "gs_group_dpg_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_dpg_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DPG blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Reverse exclusion for stripe vs Z15/heritage hash conflict; mirrors gs_group_z15_excludes_non_center_stripes. Spec: .hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md"
+    },
+    {
+      "group_id": "gs_group_dpl_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_dpl_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DPL blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Reverse exclusion for stripe vs Z15/heritage hash conflict; mirrors gs_group_z15_excludes_non_center_stripes. Spec: .hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md"
+    },
+    {
+      "group_id": "gs_group_dpt_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_dpt_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DPT blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Reverse exclusion for stripe vs Z15/heritage hash conflict; mirrors gs_group_z15_excludes_non_center_stripes. Spec: .hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md"
+    },
+    {
+      "group_id": "gs_group_dsy_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_dsy_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DSY blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Reverse exclusion for stripe vs Z15/heritage hash conflict; mirrors gs_group_z15_excludes_non_center_stripes. Spec: .hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md"
+    },
+    {
+      "group_id": "gs_group_dsz_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_dsz_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DSZ blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Reverse exclusion for stripe vs Z15/heritage hash conflict; mirrors gs_group_z15_excludes_non_center_stripes. Spec: .hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md"
+    },
+    {
+      "group_id": "gs_group_dt0_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_dt0_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DT0 blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Reverse exclusion for stripe vs Z15/heritage hash conflict; mirrors gs_group_z15_excludes_non_center_stripes. Spec: .hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md"
+    },
+    {
+      "group_id": "gs_group_dth_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_dth_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DTH blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Reverse exclusion for stripe vs Z15/heritage hash conflict; mirrors gs_group_z15_excludes_non_center_stripes. Spec: .hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md"
+    },
+    {
+      "group_id": "gs_group_dub_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_dub_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DUB blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Reverse exclusion for stripe vs Z15/heritage hash conflict; mirrors gs_group_z15_excludes_non_center_stripes. Spec: .hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md"
+    },
+    {
+      "group_id": "gs_group_due_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_due_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DUE blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Reverse exclusion for stripe vs Z15/heritage hash conflict; mirrors gs_group_z15_excludes_non_center_stripes. Spec: .hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md"
+    },
+    {
+      "group_id": "gs_group_duk_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_duk_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DUK blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Reverse exclusion for stripe vs Z15/heritage hash conflict; mirrors gs_group_z15_excludes_non_center_stripes. Spec: .hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md"
+    },
+    {
+      "group_id": "gs_group_duw_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_duw_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DUW blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Reverse exclusion for stripe vs Z15/heritage hash conflict; mirrors gs_group_z15_excludes_non_center_stripes. Spec: .hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md"
+    },
+    {
+      "group_id": "gs_group_dzu_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_dzu_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DZU blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Reverse exclusion for stripe vs Z15/heritage hash conflict; mirrors gs_group_z15_excludes_non_center_stripes. Spec: .hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md"
+    },
+    {
+      "group_id": "gs_group_dzv_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_dzv_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DZV blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Reverse exclusion for stripe vs Z15/heritage hash conflict; mirrors gs_group_z15_excludes_non_center_stripes. Spec: .hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md"
+    },
+    {
+      "group_id": "gs_group_dzx_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_dzx_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "DZX blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Reverse exclusion for stripe vs Z15/heritage hash conflict; mirrors gs_group_z15_excludes_non_center_stripes. Spec: .hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md"
+    },
+    {
+      "group_id": "gs_group_sht_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_sht_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "SHT blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Jake-graphics/heritage-hash reverse exclusion gap (see .hermes/plans/grand-sport-jake-heritage-hash-reverse-exclusions-spec.md)."
+    },
+    {
+      "group_id": "gs_group_pda_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_pda_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "PDA blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Jake-graphics/heritage-hash reverse exclusion gap (see .hermes/plans/grand-sport-jake-heritage-hash-reverse-exclusions-spec.md)."
+    },
+    {
+      "group_id": "gs_group_sne_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_sne_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "SNE blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Jake-graphics/heritage-hash reverse exclusion gap (see .hermes/plans/grand-sport-jake-heritage-hash-reverse-exclusions-spec.md)."
+    },
+    {
+      "group_id": "gs_group_vpo_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_vpo_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "VPO blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Jake-graphics/heritage-hash reverse exclusion gap (see .hermes/plans/grand-sport-jake-heritage-hash-reverse-exclusions-spec.md)."
+    },
+    {
+      "group_id": "gs_group_vpw_excludes_heritage_hash_and_z15",
+      "group_type": "excludes_any",
+      "source_id": "opt_vpw_001",
+      "target_ids": [
+        "opt_z15_001",
+        "opt_17a_001",
+        "opt_20a_001",
+        "opt_55a_001",
+        "opt_75a_001",
+        "opt_97a_001",
+        "opt_dx4_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "VPW blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
+      "active": "True",
+      "notes": "Jake-graphics/heritage-hash reverse exclusion gap (see .hermes/plans/grand-sport-jake-heritage-hash-reverse-exclusions-spec.md)."
     }
   ],
   "exclusiveGroups": [
@@ -41907,11 +42327,12 @@
       "group_id": "gs_excl_performance_aero",
       "option_ids": [
         "opt_t0e_001",
-        "opt_t0f_001"
+        "opt_t0f_001",
+        "opt_5zv_001"
       ],
       "selection_mode": "required_single_within_group",
       "active": "True",
-      "notes": "Grand Sport aero choices require one active aero selection; FEY-included T0F replaces the T0E default through generic group metadata."
+      "notes": "Grand Sport aero choices require one active aero selection; T0E, T0F, and 5ZV are alternate aero choices, while FEY-included T0F replaces the T0E default through generic group metadata."
     }
   ],
   "rules": [

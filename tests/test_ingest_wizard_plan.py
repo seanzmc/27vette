@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Pass C tests: plan builder, scratch dry-run, approval gate.
+"""Historical Pass C projection-library characterization tests.
 
-Fixture workbooks only; schema validation is off for the dry run because the
-compact fixture is not schema-complete (op-level validation still runs). The
-live workbook is never touched.
+The current ingest API no longer exposes plan mutation or approval. These
+fixture-only tests retain coverage for the read-only ``build_plan`` library
+used to interpret historical evidence; no current session enters plan state.
 """
 
 from __future__ import annotations
@@ -22,10 +22,8 @@ for entry in (ROOT / "scripts", ROOT / "tests"):
 
 from corvette_form_generator.ingest.wizard.plan_builder import build_plan  # noqa: E402
 from corvette_form_generator.ingest.wizard.session import (  # noqa: E402
-    WizardError,
     WizardSessionStore,
     read_json,
-    write_json,
 )
 from ingest_wizard_fixtures import build_master_workbook, build_raw_export  # noqa: E402
 
@@ -129,7 +127,6 @@ class PlanFlowTest(unittest.TestCase):
     def complete_all(self, *, zr1_extra: list[dict] | None = None) -> None:
         self.complete_model("zr1", extra=zr1_extra)
         self.complete_model("zr1x")
-        self.store.mark_complete(self.run_id)
 
     def plan_inputs(self) -> dict:
         run_dir = self.store.run_dir(self.run_id)
@@ -144,9 +141,6 @@ class PlanFlowTest(unittest.TestCase):
             "candidates_fingerprint": selection["candidatesFingerprint"],
         }
 
-    def test_plan_requires_decisions_complete(self) -> None:
-        with self.assertRaises(WizardError):
-            self.store.build_apply_plan(self.run_id, schema_validation=False)
 
     def test_plan_deterministic_and_covered(self) -> None:
         self.complete_all()
@@ -245,10 +239,8 @@ class PlanFlowTest(unittest.TestCase):
         self.assertNotIn("group_name", group_headers)
         self.assertIn("notes", group_headers)
 
-        result = self.store.build_apply_plan(self.run_id, schema_validation=False)
-        self.assertTrue(result["dryRun"]["stage2"]["ok"], result["dryRun"]["stage2"]["errors"])
-        self.assertEqual(result["session"]["state"], "plan_built")
-        plan = read_json(self.store.run_dir(self.run_id) / "apply-plan.json")
+        plan = build_plan(**self.plan_inputs())
+        self.assertTrue(plan["valid"], plan["report"]["blockingGaps"])
         rule = next(i for i in plan["stage2"]["items"] if i["sheet"] == "zr1_rule_mapping" and i["action"] == "add")
         group = next(i for i in plan["stage2"]["items"] if i["sheet"] == "zr1_exclusive_groups" and i["action"] == "add")
         self.assertNotIn("active", rule["row"])
@@ -481,97 +473,3 @@ class PlanFlowTest(unittest.TestCase):
         plan = build_plan(**{**self.plan_inputs(), "workbook_path": crippled})
         self.assertFalse(plan["valid"])
         self.assertIn("no_variants_mapped", {g["kind"] for g in plan["report"]["blockingGaps"]})
-
-    def test_store_flow_build_approve_and_invalidation(self) -> None:
-        self.complete_all()
-        before = self.master.read_bytes()
-        result = self.store.build_apply_plan(self.run_id, schema_validation=False)
-        self.assertTrue(result["dryRun"]["ok"], result["dryRun"])
-        self.assertEqual(result["session"]["state"], "plan_built")
-        self.assertEqual(self.master.read_bytes(), before)
-        run_dir = self.store.run_dir(self.run_id)
-        self.assertTrue((run_dir / "apply-plan.md").is_file())
-
-        approved = self.store.approve_plan(self.run_id, "sean")
-        self.assertEqual(approved["session"]["state"], "dry_run_approved")
-        self.assertTrue((run_dir / "plan-approval.json").is_file())
-        approval = read_json(run_dir / "plan-approval.json")
-        plan = read_json(run_dir / "apply-plan.json")
-        session = read_json(run_dir / "session.json")
-        self.assertEqual(approval["schemaVersion"], "plan-approval-2")
-        self.assertEqual(approval["scope"], "dry_run_evidence")
-        self.assertEqual(approval["runId"], self.run_id)
-        self.assertEqual(approval["targets"], ["zr1", "zr1x"])
-        self.assertEqual(approval["planSchemaVersion"], "pass-c-2")
-        self.assertEqual(
-            approval["planSha"],
-            __import__("hashlib").sha256((run_dir / "apply-plan.json").read_bytes()).hexdigest(),
-        )
-        self.assertEqual(approval["workbookFingerprint"], plan["workbookFingerprint"])
-        self.assertEqual(approval["sourceFingerprint"], session["fingerprint"])
-        self.assertEqual(approval["candidatesFingerprint"], plan["candidatesFingerprint"])
-        self.assertEqual(approval["decisionsFingerprint"], plan["decisionsFingerprint"])
-        self.assertEqual(
-            approval["modelSelectionSha"],
-            __import__("hashlib").sha256((run_dir / "model-selection.json").read_bytes()).hexdigest(),
-        )
-        for unavailable in ("canonicalManifestSha", "compileReportSha", "exceptionResolutionsSha"):
-            self.assertNotIn(unavailable, approval)
-
-        # A new decision reopens the run and invalidates the plan.
-        candidate = self.store.review_queue(self.run_id, "zr1", "section")["candidates"][0]
-        saved = self.store.save_decisions(
-            self.run_id,
-            [
-                {
-                    "model": "zr1",
-                    "lane": "section",
-                    "candidateId": candidate["candidateId"],
-                    "action": "assign_section",
-                    "payload": {"sectionId": "sec_pain_001"},
-                    "resolution": "approved_for_plan",
-                }
-            ],
-        )
-        self.assertEqual(saved["session"]["state"], "decisions_in_progress")
-        with self.assertRaises(WizardError):
-            self.store.approve_plan(self.run_id, "sean")
-
-    def test_workbook_change_blocks_approval(self) -> None:
-        self.complete_all()
-        self.store.build_apply_plan(self.run_id, schema_validation=False)
-        # Any workbook change after the build — even mtime-preserving — must
-        # fail the approval closed (sha256 compared, not just mtime).
-        import os
-
-        stat = self.master.stat()
-        data = self.master.read_bytes()
-        self.master.write_bytes(data + b"\x00")
-        os.utime(self.master, ns=(stat.st_atime_ns, stat.st_mtime_ns))
-        with self.assertRaises(WizardError):
-            self.store.approve_plan(self.run_id, "sean")
-
-    def test_approval_requires_built_plan_and_name(self) -> None:
-        self.complete_all()
-        with self.assertRaises(WizardError):
-            self.store.approve_plan(self.run_id, "sean")  # not built yet
-        self.store.build_apply_plan(self.run_id, schema_validation=False)
-        with self.assertRaises(WizardError):
-            self.store.approve_plan(self.run_id, "")
-
-    def test_pass_c3_plan_approval_requires_all_compiler_artifacts(self) -> None:
-        self.complete_all()
-        self.store.build_apply_plan(self.run_id, schema_validation=False)
-        run_dir = self.store.run_dir(self.run_id)
-        plan = read_json(run_dir / "apply-plan.json")
-        plan["schemaVersion"] = "pass-c-3"
-        write_json(run_dir / "apply-plan.json", plan)
-
-        with self.assertRaisesRegex(WizardError, "canonical-row-manifest.json"):
-            self.store.approve_plan(self.run_id, "sean")
-
-        self.assertFalse((run_dir / "plan-approval.json").exists())
-
-
-if __name__ == "__main__":
-    unittest.main()

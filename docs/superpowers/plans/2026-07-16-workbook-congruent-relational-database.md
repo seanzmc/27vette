@@ -1,6 +1,12 @@
 # Workbook-Congruent Relational Database Implementation Plan
 
-Status: completed and verified on 2026-07-17.
+Status: historical implementation completed on 2026-07-17; rebaseline correction pending.
+
+The 2026-07-22 merge of stabilized `main` changed the authoritative publication
+boundary and workbook inventory. The implementation remains the PR #8 baseline,
+but its old green-test receipt is no longer a current verdict. The bounded
+correction owner is
+`docs/superpowers/plans/2026-07-22-workbook-manager-rebaseline-correction.md`.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 

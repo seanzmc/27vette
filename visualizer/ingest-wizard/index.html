@@ -21,6 +21,7 @@
       <li class="step" data-stage="models">4 · Models</li>
       <li class="step" data-stage="compile">5 · Compile</li>
       <li class="step" data-stage="exceptions">6 · Exceptions</li>
+      <li class="step" data-stage="changeset">7 · ChangeSet</li>
     </ol>
   </nav>
   <div class="runinfo" id="run-info"></div>
@@ -93,6 +94,7 @@
     <div id="compile-summary"></div>
     <div class="sheet-actions">
       <button id="compile-btn" class="primary">Compile canonical rows</button>
+      <button id="compile-changeset-btn" class="primary hidden">Create ChangeSet</button>
       <button id="review-exceptions-btn" class="primary hidden">Review open exceptions</button>
       <button id="compile-back-models" class="ghost">Back to models</button>
       <span id="compile-status" class="status-note" aria-live="polite"></span>
@@ -130,68 +132,13 @@
     <div id="exception-pagination" class="sheet-actions"></div>
   </section>
 
-  <!-- Historical broad-decision and plan screens remain debug/resume compatibility only. -->
-  <section id="stage-review" class="stage hidden">
-    <h1>Review decisions</h1>
-    <div id="progress-chips" class="summary"></div>
-    <div class="filters">
-      <select id="review-model" title="Which target model you're reviewing"></select>
-      <select id="review-lane" title="Which kind of decision"></select>
-      <select id="review-source-section" title="Filter by where the row came from in the export"><option value="">All source groups</option></select>
-      <select id="review-decision-state" class="hidden" title="Filter by whether this lane already has a saved decision">
-        <option value="">All decision states</option>
-        <option value="undecided">Needs decision</option>
-        <option value="decided">Already decided</option>
-      </select>
-      <select id="review-price-state" class="hidden">
-        <option value="">All price states</option>
-        <option value="exact">Single price match</option>
-        <option value="ambiguous">Multiple prices</option>
-        <option value="none">No price</option>
-      </select>
-      <select id="review-price-presence" class="hidden" title="Filter by whether the export attached any price to the row">
-        <option value="">Priced or not</option>
-        <option value="unpriced">No price</option>
-        <option value="priced">Has price</option>
-      </select>
-      <select id="review-workbook-ref" class="hidden" title="Filter by whether the RPO already exists on a live workbook model">
-        <option value="">Workbook: all</option>
-        <option value="in_workbook">Already in workbook</option>
-        <option value="new">New to workbook</option>
-      </select>
-      <select id="review-section-state" class="hidden" title="Filter by whether you've already put the row in a form section">
-        <option value="">Section: all</option>
-        <option value="assigned">Section assigned</option>
-        <option value="unassigned">No section yet</option>
-      </select>
-      <input type="search" id="review-q" placeholder="Search RPO or description…">
-    </div>
-    <div class="filters actions-bar">
-      <button id="back-to-models" class="ghost">Back to models</button>
-      <span class="status-note">Reuse work between the models you're ingesting:</span>
-      <button id="copy-decisions-btn" class="ghost">Copy <span id="copy-from-label"></span>'s finished decisions to <span id="copy-to-label"></span></button>
-      <select id="copy-from-model" title="Which model's decisions to copy from"></select>
-      <label class="status-note" title="Off = rows you've already decided here are left alone."><input type="checkbox" id="copy-overwrite"> also replace decisions I've already made here</label>
-      <span id="copy-report" class="status-note"></span>
-      <button id="mark-complete-btn" class="primary">Mark decisions complete</button>
-      <button id="to-plan-btn" class="primary hidden">Build apply plan</button>
-    </div>
-    <div id="lane-help" class="lane-help"></div>
-    <div id="bulk-bar" class="filters"></div>
-    <div id="review-blockers"></div>
-    <div id="review-queue"></div>
-  </section>
-
-  <section id="stage-plan" class="stage hidden">
-    <h1>Diagnostic plan</h1>
-    <p class="hint">Review the plan checks and open items. Approval records reviewer sign-off for dry-run evidence only; it does not authorize a workbook write.</p>
-    <div id="plan-summary"></div>
+  <section id="stage-changeset" class="stage hidden">
+    <h1>ChangeSet created</h1>
+    <p class="hint">The compiler output is packaged for the shared workbook service. This browser cannot approve or apply it.</p>
+    <div id="changeset-summary"></div>
     <div class="sheet-actions">
-      <button id="rebuild-plan-btn" class="ghost">Rebuild plan</button>
-      <input id="plan-approver" placeholder="your name">
-      <button id="approve-plan-btn" class="primary">Approve for dry-run evidence</button>
-      <button id="back-to-review" class="ghost">Back to review</button>
-      <span id="plan-status" class="status-note"></span>
+      <a id="changeset-download" class="primary" href="#">Download ChangeSet</a>
+      <span id="changeset-status" class="status-note" aria-live="polite"></span>
     </div>
   </section>
 </main>

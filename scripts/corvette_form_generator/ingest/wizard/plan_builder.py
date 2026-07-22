@@ -18,6 +18,13 @@ from typing import Any
 
 from openpyxl import load_workbook
 
+from corvette_form_generator.editor_ops import (
+    EDITOR_SHEET_META,
+    GLOBAL_SHEET_FAMILIES,
+    SOURCE_ROLE_FAMILIES,
+    extract_workbook,
+    model_sheet_registry,
+)
 from corvette_form_generator.ingest.wizard.copy_split import propose_copy_split
 from corvette_form_generator.ingest.wizard.decisions import (
     MODEL_LABELS,
@@ -26,6 +33,7 @@ from corvette_form_generator.ingest.wizard.decisions import (
     candidate_needs_section_decision,
     scope_candidates,
 )
+from corvette_form_generator.model_configs import base_model_config
 from corvette_form_generator.workbook import rows_from_sheet, workbook_truthy
 
 SCHEMA_VERSION_C = "pass-c-2"
@@ -250,7 +258,7 @@ def _planned_relationship_rpos(records: dict[str, dict[str, Any]]) -> set[str]:
 def plan_summary(plan: dict[str, Any]) -> dict[str, Any]:
     """UI-facing summary: everything except the raw op lists."""
 
-    return {
+    summary = {
         "schemaVersion": plan["schemaVersion"],
         "targets": plan["targets"],
         "valid": plan["valid"],
@@ -261,6 +269,12 @@ def plan_summary(plan: dict[str, Any]) -> dict[str, Any]:
         "workbookFingerprint": plan["workbookFingerprint"],
         "decisionsFingerprint": plan["decisionsFingerprint"],
     }
+    if plan.get("schemaVersion") == "pass-c-3":
+        summary["planReadiness"] = plan.get("planReadiness")
+        summary["canonicalManifestSemanticSha"] = plan.get(
+            "canonicalManifestSemanticSha"
+        )
+    return summary
 
 
 def plan_markdown(plan: dict[str, Any], dry_run: dict[str, Any]) -> str:
@@ -297,6 +311,36 @@ def plan_markdown(plan: dict[str, Any], dry_run: dict[str, Any]) -> str:
         lines += ["", "## Gaps"]
         lines += [f"- [{g['kind']}] {g['model']}: {g['detail']}" for g in report["gaps"]]
     return "\n".join(lines) + "\n"
+
+
+MANIFEST_STAGE1_FAMILIES = frozenset(
+    {
+        "model_master",
+        "model_variants",
+        "variant_master",
+        "model_workbook_sources",
+        "model_registry_promotion",
+    }
+)
+MANIFEST_ACTION_ORDER = {"add": 0, "update": 1, "delete": 2, "noop": 3}
+
+
+def _manifest_key_text(key: dict[str, Any]) -> str:
+    return canonical_json({str(column): key[column] for column in sorted(key)})
+
+
+def _manifest_normalized_row(family: str, row: dict[str, Any]) -> dict[str, Any]:
+    types = EDITOR_SHEET_META[family].get("types") or {}
+    normalized: dict[str, Any] = {}
+    for column, raw_value in row.items():
+        value = None if raw_value == "" else raw_value
+        if value is not None and types.get(column) == "int":
+            text = str(value).strip()
+            value = int(text) if text.lstrip("-").isdigit() else value
+        elif value is not None and types.get(column) == "bool":
+            value = workbook_truthy(value)
+        normalized[column] = value
+    return normalized
 
 
 def build_plan(

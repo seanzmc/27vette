@@ -17,6 +17,7 @@ keyed by status footnote digits, plus known disclosure/boilerplate phrases).
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from typing import Any
 
 from corvette_form_generator.ingest.wizard.hints import PHRASE_PATTERNS
@@ -48,6 +49,12 @@ FLAG_ONE_WORD_NAME = "one_word_name"
 # than one candidate in the lane scope.
 FLAG_DUPLICATE_NAME = "duplicate_proposed_name"
 
+COPY_COMPARISON_STOPWORDS = frozenset(
+    {"a", "an", "and", "for", "in", "include", "includes", "lpo", "new", "of", "on", "or", "the", "to", "with"}
+)
+COPY_COMPARISON_TOKEN_RE = re.compile(r"[a-z0-9]+")
+GENERIC_ONE_WORD_NAMES = frozenset({"wheels", "calipers", "seats", "suspension", "trim"})
+
 SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+")
 TRAILING_MARKER_RE = re.compile(r"\s*\(?\d{1,2}\)?\s*$")
 # In-cell disclosure definition line: "1. Requires …" / "2) Not available …".
@@ -76,6 +83,41 @@ def candidate_disclosure_markers(candidate: dict[str, Any]) -> set[str]:
     return markers
 
 
+def comparator_copy_comparison(
+    target: Mapping[str, Any], comparator: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Compare complete target source copy with a comparator option name."""
+
+    target_text = " ".join(
+        value
+        for value in (
+            str(target.get("option_name") or "").strip(),
+            str(target.get("description") or "").strip(),
+            str(target.get("detail_raw") or target.get("detailRaw") or "").strip(),
+        )
+        if value
+    )
+    target_tokens = set(COPY_COMPARISON_TOKEN_RE.findall(target_text.lower())) - COPY_COMPARISON_STOPWORDS
+    comparator_name = str(comparator.get("option_name") or comparator.get("optionName") or "").strip()
+    comparator_tokens = set(COPY_COMPARISON_TOKEN_RE.findall(comparator_name.lower())) - COPY_COMPARISON_STOPWORDS
+    matched = target_tokens & comparator_tokens
+    coverage = len(matched) / len(comparator_tokens) if comparator_tokens else 1.0
+    return {
+        "materialDisagreement": bool(comparator_tokens) and coverage < 0.60,
+        "comparatorNameTokenCoverage": round(coverage, 6),
+        "comparatorNameTokens": sorted(comparator_tokens),
+        "matchedNameTokens": sorted(matched),
+        "targetRawText": target_text,
+    }
+
+
+def is_blocking_copy_proposal(proposal: Mapping[str, Any]) -> bool:
+    """Fail closed for every split flag and known generic one-word proposal."""
+
+    name = " ".join(str(proposal.get("name") or "").lower().split())
+    return bool(proposal.get("flags")) or name in GENERIC_ONE_WORD_NAMES
+
+
 def propose_copy_split(candidate: dict[str, Any]) -> dict[str, Any]:
     """Deterministic name/description/disclosure proposal for one candidate.
 
@@ -87,7 +129,8 @@ def propose_copy_split(candidate: dict[str, Any]) -> dict[str, Any]:
     silently.
     """
 
-    raw = str(candidate.get("description") or "").strip()
+    source_raw = str(candidate.get("detailRaw") if "detailRaw" in candidate else candidate.get("description") or "")
+    raw = source_raw.strip()
     flags: list[str] = []
     markers = candidate_disclosure_markers(candidate)
 
@@ -141,7 +184,7 @@ def propose_copy_split(candidate: dict[str, Any]) -> dict[str, Any]:
         "name": name,
         "description": " ".join(description_parts),
         "disclosure": " ".join(disclosure_parts),
-        "detailRaw": raw,
+        "detailRaw": source_raw,
         "markers": sorted(markers),
         "matchedMarkers": sorted(matched_markers),
         "flags": flags,

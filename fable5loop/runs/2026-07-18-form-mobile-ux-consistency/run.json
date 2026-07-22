@@ -1,0 +1,55 @@
+{
+ "id": "2026-07-18-form-mobile-ux-consistency",
+ "run": "2026-07-18-form-mobile-ux-consistency",
+ "started_at": "2026-07-18T14:10:00",
+ "completed_at": "2026-07-18T15:20:00",
+ "objective": "Fix five mobile UI/UX issues in the customer order form: floating tooltip detaching on scroll, absolutely-positioned hamburger with dead header space, oversized inconsistent build-summary tile, header-crowding Reset/Download/Submit actions, inconsistent sticky Next between Vehicle Setup and other steps",
+ "spec": ".hermes/plans/form-mobile-ux-consistency-spec.md",
+ "changed_surface": "runtime JS + styling + static HTML + mapped regression gate (mobile-only layout scope; desktop preserved)",
+ "changed_surfaces": [
+  "runtime_js",
+  "styling",
+  "static_html",
+  "tests"
+ ],
+ "changed_files": [
+  "form-app/app.js",
+  "form-app/index.html",
+  "form-app/styles.css",
+  "tests/stingray-form-regression.test.mjs"
+ ],
+ "outcome_rubric": "fable5loop/runs/2026-07-18-form-mobile-ux-consistency/outcome.md",
+ "verifier_report": "fable5loop/runs/2026-07-18-form-mobile-ux-consistency/verifier-report.md",
+ "validation_output": "fable5loop/runs/2026-07-18-form-mobile-ux-consistency/validation-output.txt",
+ "verifier": {
+  "required": true,
+  "independent_context": true,
+  "verdict": "pass",
+  "accepted_by_human": false,
+  "cycles": 1,
+  "pattern": "adversarial-verification",
+  "cycle1": "pass - independent subagent reproduced all 7 rubric criteria from artifacts: gates 89/89 + 47/47, in-flow header computed styles, disabled-state parity for relocated actions, 12-step footer-only walk incl. all 3 Vehicle Setup stages, dealer modal fields + Turnstile mount intact, zero generated-surface churn; one advisory (real-input scroll leg verified via synthetic document scroll dispatch because the automation pane drops programmatic scroll events; maker separately observed one real-input scroll closing the tooltip)"
+ },
+ "gates": {
+  "node_stingray_form_regression": "89/89",
+  "node_multi_model_runtime_switching": "47/47",
+  "generated_surface_churn": "none (form-app/data.js and form-output clean)"
+ },
+ "browser_proof": "375x812: tooltip closes on scroll (real input + synthetic dispatch), in-flow header grid with static hamburger and live-total pill, drawer actions with disabled parity, sticky Reset/Download/Submit on final step, single sticky Next on every step; 768x1024 and 1280x800: original toolbar/header rendering preserved, summary actions and setup footer hidden",
+ "state_updates": [
+  {
+   "section": "Verified facts",
+   "evidence": "fable5loop/runs/2026-07-18-form-mobile-ux-consistency/verifier-report.md"
+  },
+  {
+   "section": "Last session",
+   "evidence": "fable5loop/runs/2026-07-18-form-mobile-ux-consistency/validation-output.txt"
+  }
+ ],
+ "skill_update": {
+  "decision": "updated",
+  "evidence": "fable5loop/runs/2026-07-18-form-mobile-ux-consistency/verifier-report.md",
+  "detail": "Added 'Automation-pane scroll events' failure mode to the skill: programmatic scrolls (window.scrollBy/scrollIntoView) change scrollY without dispatching scroll events in the in-app browser pane, so scroll-listener behavior must be verified via real input or synthetic event dispatch; 'scrollY moved but listener silent' is an automation artifact, not a bug."
+ },
+ "boundaries_preserved": "workbook untouched; form-output and form-app/data.js untouched; dealer submission modal/payload/endpoint/Turnstile unchanged (Sean-approved entry-point relocation only); desktop >=761px header and toolbar unchanged per approved scope"
+}

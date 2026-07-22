@@ -24,6 +24,7 @@ from corvette_form_generator.schema_validation import result_payload, validate_w
 from corvette_form_generator.workbook import (
     excel_lock_path,
     remove_table_sheet_auto_filters,
+    restore_workbook_backup,
     save_workbook_safely,
     workbook_truthy,
 )
@@ -32,276 +33,17 @@ from corvette_form_generator.workbook_bool_hygiene import (
     compare_bool_like_workbooks,
     result_payload as bool_hygiene_result_payload,
 )
+# Compatibility aliases re-exported from workbook_domain.registry; the
+# canonical registry literals now live in that module.
+from corvette_form_generator.workbook_domain.registry import (
+    EDITOR_SHEET_META,
+    GLOBAL_SHEET_FAMILIES,
+    SOURCE_ROLE_FAMILIES,
+)
 from corvette_form_generator.workbook_package import assert_valid_workbook_package
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_LOG_PATH = ROOT / "form-output" / "workbook-edit-log.jsonl"
-
-# model_workbook_sources.source_role -> schema family
-SOURCE_ROLE_FAMILIES: dict[str, str] = {
-    "source_option_sheet": "options",
-    "status_sheet": "ovs",
-    "rule_mapping_sheet": "rule_mapping",
-    "rule_groups_sheet": "rule_groups",
-    "rule_group_members_sheet": "rule_group_members",
-    "exclusive_groups_sheet": "exclusive_groups",
-    "exclusive_group_members_sheet": "exclusive_members",
-    "price_rules_sheet": "price_rules",
-    "variant_option_overrides_sheet": "variant_overrides",
-    "color_overrides_sheet": "color_overrides",
-    "interior_source_sheet": "interiors",
-}
-
-# Per-family editing metadata. Columns absent from types/enums/refs are
-# free text. Headers always come from the sheet itself, never from here.
-EDITOR_SHEET_META: dict[str, dict] = {
-    "options": {
-        "key": ("option_id",),
-        "types": {
-            "price": "int",
-            "display_order": "int",
-            "selectable": "bool",
-            "active": "bool",
-        },
-        "enums": {
-            "display_behavior": (
-                "", "default_selected", "hidden", "display_only", "auto_only",
-            ),
-        },
-        "refs": {"section_id": "sections"},
-    },
-    "ovs": {
-        "key": ("option_id", "variant_id"),
-        "types": {},
-        "enums": {"status": ("standard", "available", "unavailable")},
-        "refs": {"option_id": "options", "variant_id": "variants"},
-    },
-    "rule_mapping": {
-        "key": ("rule_id",),
-        "types": {},
-        "enums": {
-            "rule_type": ("includes", "excludes", "requires"),
-            "body_style_scope": ("", "coupe", "convertible"),
-            "runtime_action": ("", "replace"),
-        },
-        "refs": {
-            "source_id": "options",
-            "target_id": "options",
-        },
-        "ref_unions": {
-            "source_id": ("options", "interiors"),
-            "target_id": ("options", "interiors"),
-        },
-    },
-    "rule_groups": {
-        "key": ("group_id",),
-        "types": {"active": "bool"},
-        "enums": {"group_type": ("requires_any", "excludes_any")},
-        "refs": {"source_id": "options"},
-    },
-    "rule_group_members": {
-        "key": ("group_id", "target_id"),
-        "types": {"display_order": "int", "active": "bool"},
-        "enums": {},
-        "refs": {"group_id": "rule_groups", "target_id": "options"},
-    },
-    "exclusive_groups": {
-        "key": ("group_id",),
-        "types": {"active": "bool"},
-        "enums": {
-            "selection_mode": (
-                "single_within_group", "required_single_within_group",
-            ),
-        },
-        "refs": {},
-    },
-    "exclusive_members": {
-        "key": ("group_id", "option_id"),
-        "types": {"display_order": "int", "active": "bool"},
-        "enums": {},
-        "refs": {"group_id": "exclusive_groups", "option_id": "options"},
-    },
-    "price_rules": {
-        "key": ("price_rule_id",),
-        "types": {"price_value": "int"},
-        "enums": {"price_rule_type": ("override",)},
-        "refs": {
-            "condition_option_id": "options",
-            "target_option_id": "options",
-        },
-        "ref_unions": {
-            "condition_option_id": ("options", "interiors"),
-            "target_option_id": ("options", "interiors"),
-        },
-    },
-    "variant_overrides": {
-        "key": ("option_id", "variant_id"),
-        "types": {"active": "bool"},
-        "enums": {
-            "selectable": ("", "True", "False"),
-            "display_behavior": ("", "default_selected", "display_only", "hidden"),
-        },
-        "refs": {
-            "option_id": "options",
-            "variant_id": "variants",
-            "section_id": "sections",
-        },
-    },
-    "color_overrides": {
-        "key": ("interior_id", "option_id"),
-        "types": {},
-        "enums": {"rule_type": ("requires",)},
-        "refs": {
-            "interior_id": "interiors",
-            "option_id": "options",
-            "adds_rpo": "options",
-        },
-    },
-    "interiors": {
-        "key": ("interior_id",),
-        "types": {
-            "Price": "int",
-            "active_for_stingray": "bool",
-            "requires_r6x": "bool",
-        },
-        "enums": {},
-        "refs": {"section_id": "sections", "included_option_id": "options"},
-    },
-    # ── Global (model-metadata and presentation) families ─────────────
-    # Reachable only through explicit sheet names in GLOBAL_SHEET_FAMILIES;
-    # the model registry (and therefore the workbook-editor UI and lints)
-    # never resolves to these, so existing editor behavior is unchanged.
-    "model_master": {
-        "key": ("model_key",),
-        "types": {"expected_variant_count": "int", "default_model": "bool", "active": "bool"},
-        "enums": {},
-        "refs": {},
-    },
-    "model_variants": {
-        "key": ("model_key", "variant_id"),
-        "types": {"display_order": "int", "active": "bool"},
-        "enums": {},
-        "refs": {},
-    },
-    "variant_master": {
-        "key": ("variant_id",),
-        "types": {"model_year": "int", "base_price": "int", "display_order": "int", "active": "bool"},
-        "enums": {},
-        "refs": {},
-    },
-    "model_workbook_sources": {
-        "key": ("model_key", "source_role"),
-        "types": {"active": "bool"},
-        "enums": {"source_role": tuple(SOURCE_ROLE_FAMILIES)},
-        "refs": {},
-    },
-    "model_registry_promotion": {
-        "key": ("model_key",),
-        "types": {"promoted_to_runtime": "bool", "default_model": "bool", "active": "bool", "display_order": "int"},
-        "enums": {},
-        "refs": {},
-    },
-    "model_interior_scope": {
-        "key": ("model_key", "interior_id", "trim_level"),
-        "types": {"active": "bool"},
-        "enums": {},
-        "refs": {"interior_id": "interiors", "requires_option_id": "options"},
-    },
-    "default_selection_rules": {
-        "key": ("model_key", "rule_id"),
-        "types": {"priority": "int", "active": "bool"},
-        "enums": {
-            "condition_type": (
-                "always",
-                "unless_selected_rpo",
-                "unless_selected_section",
-                "when_selected_unless_selected_section",
-            ),
-            "display_behavior": ("", "default_selected"),
-        },
-        "refs": {"target_option_id": "options"},
-        "conditional_ref": {"discriminator": "condition_type", "column": "condition_id"},
-        "conditional_refs": {
-            "always": None,
-            "unless_selected_rpo": "option_rpos",
-            "unless_selected_section": "sections",
-            "when_selected_unless_selected_section": "options",
-        },
-    },
-    "asset_map": {
-        "key": ("model_key", "target_type", "target_id"),
-        "types": {"active": "bool"},
-        "enums": {},
-        "refs": {},
-        "conditional_ref": {"discriminator": "target_type", "column": "target_id"},
-        "conditional_refs": {"option": "options"},
-    },
-    "interior_components": {
-        "key": ("model_key", "interior_id", "rpo", "component_type"),
-        "types": {"display_order": "int", "active": "bool"},
-        "enums": {},
-        "refs": {"interior_id": "interiors"},
-    },
-    "runtime_rule_exceptions": {
-        "key": ("model_key", "exception_id"),
-        "types": {"active": "bool"},
-        "enums": {},
-        "refs": {
-            "source_option_id": "options",
-            "target_option_id": "options",
-        },
-    },
-    "runtime_steps_meta": {
-        "key": ("model_key", "step_key"),
-        "types": {"runtime_order": "int", "active": "bool"},
-        "enums": {},
-        "refs": {},
-    },
-    "section_presentation_meta": {
-        "key": ("model_key", "section_id"),
-        "types": {"section_display_order": "int", "active": "bool"},
-        "enums": {},
-        "refs": {"section_id": "sections"},
-    },
-    "context_section_master_meta": {
-        "key": ("model_key", "context_type", "section_id"),
-        "types": {"is_required": "bool", "section_display_order": "int", "active": "bool"},
-        "enums": {},
-        "refs": {},
-    },
-    "order_summary_sections_meta": {
-        "key": ("model_key", "section_key"),
-        "types": {"display_order": "int", "active": "bool"},
-        "enums": {},
-        "refs": {},
-    },
-    "step_order_summary_map_meta": {
-        "key": ("model_key", "step_key", "section_key"),
-        "types": {"active": "bool"},
-        "enums": {},
-        "refs": {},
-    },
-}
-
-# Fixed sheet-name -> family mapping for global sheets. Kept out of
-# model_sheet_registry on purpose: only batch preparation/apply consult it.
-GLOBAL_SHEET_FAMILIES: dict[str, str] = {
-    "model_master": "model_master",
-    "model_variants": "model_variants",
-    "variant_master": "variant_master",
-    "model_workbook_sources": "model_workbook_sources",
-    "model_registry_promotion": "model_registry_promotion",
-    "model_interior_scope": "model_interior_scope",
-    "default_selection_rules": "default_selection_rules",
-    "asset_map": "asset_map",
-    "interior_components": "interior_components",
-    "runtime_rule_exceptions": "runtime_rule_exceptions",
-    "runtime_steps": "runtime_steps_meta",
-    "section_presentation": "section_presentation_meta",
-    "context_section_master": "context_section_master_meta",
-    "order_summary_sections": "order_summary_sections_meta",
-    "step_order_summary_map": "step_order_summary_map_meta",
-}
 
 
 # ─────────────────────────────────────────────────────────────
@@ -848,6 +590,19 @@ def _prepare_batch(extract, batch):
     _registry, sheet_family, models_by_sheet, by_model_family = maps
     sheet_family = {**GLOBAL_SHEET_FAMILIES, **sheet_family}
 
+    # Editing may target an existing scaffold sheet that is deliberately
+    # inactive for runtime discovery. Keep this edit-time registration local
+    # so model_sheet_registry() remains the active-only discovery boundary.
+    for row in rows_of(extract, "model_workbook_sources"):
+        model_key = str(row.get("model_key") or "").strip()
+        sheet_name = str(row.get("sheet_name") or "").strip()
+        family = SOURCE_ROLE_FAMILIES.get(row.get("source_role"))
+        if not (model_key and sheet_name in extract["sheets"] and family):
+            continue
+        sheet_family.setdefault(sheet_name, family)
+        models_by_sheet.setdefault(sheet_name, set()).add(model_key)
+        by_model_family.setdefault((model_key, family), sheet_name)
+
     prepared_creates: list[dict] = []
     created_templates: dict[str, str] = {}
     for i, o in enumerate(creates):
@@ -888,9 +643,10 @@ def _prepare_batch(extract, batch):
             }
         )
 
-    # A scaffold plan can activate/register model_workbook_sources and then
-    # write to those sheets in the same combined batch. Reflect those pending
-    # source rows in the registry maps before validating subsequent ops.
+    # A scaffold plan can register model_workbook_sources and write to those
+    # sheets in the same combined batch. Reflect every pending registration in
+    # the edit-time maps even when it remains inactive for runtime discovery;
+    # the source-row operation itself is the explicit batch authority.
     source_keycols = EDITOR_SHEET_META["model_workbook_sources"]["key"]
     source_index = _sheet_key_index(extract, "model_workbook_sources", source_keycols)
     for o in ops:
@@ -900,8 +656,6 @@ def _prepare_batch(extract, batch):
         row = dict(source_index.get(_key_tuple(key, source_keycols), {}))
         row.update(key)
         row.update(o.get("row") or {})
-        if not workbook_truthy(row.get("active")):
-            continue
         model_key = str(row.get("model_key") or "").strip()
         source_role = str(row.get("source_role") or "").strip()
         sheet_name = str(row.get("sheet_name") or "").strip()
@@ -911,7 +665,11 @@ def _prepare_batch(extract, batch):
         sheet_family.setdefault(sheet_name, family)
         models_by_sheet.setdefault(sheet_name, set()).add(model_key)
         by_model_family[(model_key, family)] = sheet_name
-    bool_storage = _bool_storage_conventions(extract, sheet_family, created_templates)
+    bool_storage = (
+        {}
+        if batch.get("forceTypedBools") is True
+        else _bool_storage_conventions(extract, sheet_family, created_templates)
+    )
     promoted = {r.get("model_key"): workbook_truthy(r.get("promoted_to_runtime"))
                 for r in rows_of(extract, "model_registry_promotion")}
 
@@ -1352,6 +1110,45 @@ def verify_prepared_workbook(path: Path, prepared: list[dict]) -> dict:
     prepared_checked = 0
     workbook = load_workbook(path, read_only=True, data_only=False)
     try:
+        grouped: dict[tuple[str, str], list[dict]] = {}
+        for operation in prepared:
+            if operation.get("action") == "create_sheet":
+                continue
+            grouped.setdefault(
+                (str(operation.get("sheet") or ""), str(operation.get("_family") or "")),
+                [],
+            ).append(operation)
+
+        readback: dict[tuple[str, str], dict] = {}
+        for (sheet, family), operations in grouped.items():
+            if sheet not in workbook.sheetnames:
+                readback[(sheet, family)] = {"error": "target sheet is absent"}
+                continue
+            worksheet = workbook[sheet]
+            headers = [cell.value for cell in worksheet[1]]
+            columns = {
+                str(header): column_index
+                for column_index, header in enumerate(headers)
+                if header is not None
+            }
+            key_columns = tuple(EDITOR_SHEET_META.get(family, {}).get("key") or ())
+            missing_key_columns = [column for column in key_columns if column not in columns]
+            if missing_key_columns:
+                readback[(sheet, family)] = {
+                    "error": f"key columns are absent: {missing_key_columns}"
+                }
+                continue
+            requested_keys = {operation.get("_kt") for operation in operations}
+            matches_by_key = {key: [] for key in requested_keys}
+            for values in worksheet.iter_rows(min_row=2, values_only=True):
+                row_key = _canonical_readback_key(values, columns, key_columns)
+                if row_key in matches_by_key:
+                    matches_by_key[row_key].append(values)
+            readback[(sheet, family)] = {
+                "columns": columns,
+                "matches": matches_by_key,
+            }
+
         for index, operation in enumerate(prepared):
             action = operation.get("action")
             sheet = str(operation.get("sheet") or "")
@@ -1370,27 +1167,13 @@ def verify_prepared_workbook(path: Path, prepared: list[dict]) -> dict:
                     continue
                 prepared_checked += 1
                 continue
-
-            if sheet not in workbook.sheetnames:
-                errors.append(f"{context}: target sheet is absent")
-                continue
-            worksheet = workbook[sheet]
-            headers = [cell.value for cell in worksheet[1]]
-            columns = {
-                str(header): column_index
-                for column_index, header in enumerate(headers)
-                if header is not None
-            }
             family = operation.get("_family")
-            key_columns = tuple(EDITOR_SHEET_META.get(family, {}).get("key") or ())
-            missing_key_columns = [column for column in key_columns if column not in columns]
-            if missing_key_columns:
-                errors.append(f"{context}: key columns are absent: {missing_key_columns}")
+            cached = readback[(sheet, str(family or ""))]
+            if cached.get("error"):
+                errors.append(f"{context}: {cached['error']}")
                 continue
-            matches = []
-            for values in worksheet.iter_rows(min_row=2, values_only=True):
-                if _canonical_readback_key(values, columns, key_columns) == operation.get("_kt"):
-                    matches.append(values)
+            columns = cached["columns"]
+            matches = cached["matches"].get(operation.get("_kt"), [])
             if action == "delete":
                 if matches:
                     errors.append(
@@ -1439,6 +1222,17 @@ def verify_prepared_workbook(path: Path, prepared: list[dict]) -> dict:
     }
 
 
+def _workbook_identity_matches(path: Path, expected_mtime_ns, expected_sha256) -> bool:
+    """True when the live file still matches the reviewed mtime/SHA identity."""
+    if str(path.stat().st_mtime_ns) != str(expected_mtime_ns):
+        return False
+    if expected_sha256 is not None:
+        actual = hashlib.sha256(path.read_bytes()).hexdigest()
+        if actual != expected_sha256:
+            return False
+    return True
+
+
 def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli",
                 log_path=None, allow_stale=False, run_schema_validation=True) -> dict:
     path = Path(path)
@@ -1459,6 +1253,11 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
         return {"ok": False, "status": "stale",
                 "errors": ["workbook changed since this batch was prepared; reload and re-verify"],
                 "warnings": []}
+    # Reviewed workbook identity: mtime always, SHA-256 when the batch carries
+    # one (ChangeSet-derived batches). Rechecked before live mutation and
+    # again before the safe save so mid-flight drift fails closed.
+    expected_mtime = batch.get("workbookMtimeNs")
+    expected_sha = batch.get("workbookSha256")
     extract = extract_workbook(path)
     errors, warnings, prepared = _prepare_batch(extract, batch)
     operation_coverage, coverage_errors = _operation_coverage(batch, prepared)
@@ -1538,7 +1337,27 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
                 "verification": verification,
             }
         assert_valid_workbook_package(tmp)
-        bool_issues = compare_bool_like_workbooks(path, tmp)
+        approved_bool_type_migrations = None
+        if batch.get("forceTypedBools") is True:
+            typed_sheet_family = dict(sheet_family)
+            for operation in prepared:
+                operation_sheet = str(operation.get("sheet") or "")
+                operation_family = str(operation.get("_family") or "")
+                if operation_sheet and operation_family:
+                    typed_sheet_family[operation_sheet] = operation_family
+            approved_bool_type_migrations = [
+                (sheet, column)
+                for sheet, family in typed_sheet_family.items()
+                for column, kind in EDITOR_SHEET_META.get(family, {}).get(
+                    "types", {}
+                ).items()
+                if kind == "bool"
+            ]
+        bool_issues = compare_bool_like_workbooks(
+            path,
+            tmp,
+            approved_bool_type_migrations=approved_bool_type_migrations,
+        )
         bool_hygiene_result = bool_hygiene_result_payload(path, tmp, bool_issues)
         bool_hygiene_result["issues"] = bool_hygiene_result["issues"][:20]
         if bool_hygiene_result["error_count"]:
@@ -1566,17 +1385,72 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
     if not write:
         return {"ok": True, "status": "validated", "errors": [], **base}
 
+    if not allow_stale and not _workbook_identity_matches(path, expected_mtime, expected_sha):
+        return {
+            "ok": False,
+            "status": "stale_before_save",
+            "workbookState": "untouched",
+            "errors": ["workbook changed after review but before live mutation; "
+                       "re-preview and re-approve"],
+            "warnings": warnings,
+            "warningPolicy": warning_policy,
+            "operationCoverage": operation_coverage,
+            "verification": verification,
+        }
     wb = load_workbook(path)
     loaded_mtime = path.stat().st_mtime_ns
     touched = apply_ops_to_workbook(wb, prepared, sheet_family)
     for name in touched:
         resize_sheet_tables(wb[name])
-    backup_path = save_workbook_safely(wb, path, loaded_mtime_ns=loaded_mtime)
-    live_verification = verify_prepared_workbook(path, prepared)
-    if not live_verification["ok"]:
+    if not allow_stale and not _workbook_identity_matches(path, expected_mtime, expected_sha):
         return {
             "ok": False,
-            "status": "apply_verification_failed",
+            "status": "stale_before_save",
+            "workbookState": "untouched",
+            "errors": ["workbook changed after live mutation but before save; "
+                       "re-preview and re-approve"],
+            "warnings": warnings,
+            "warningPolicy": warning_policy,
+            "operationCoverage": operation_coverage,
+            "verification": verification,
+        }
+    backup_path = save_workbook_safely(
+        wb,
+        path,
+        loaded_mtime_ns=int(expected_mtime) if not allow_stale else loaded_mtime,
+        approved_bool_type_migrations=approved_bool_type_migrations,
+    )
+    live_verification = verify_prepared_workbook(path, prepared)
+    if not live_verification["ok"]:
+        restore_error = None
+        try:
+            restore_workbook_backup(path, backup_path)
+            restored_ok = (
+                hashlib.sha256(path.read_bytes()).hexdigest()
+                == hashlib.sha256(backup_path.read_bytes()).hexdigest()
+            )
+        except Exception as exc:  # never claim the workbook is safe
+            restored_ok = False
+            restore_error = str(exc)
+        if not restored_ok:
+            return {
+                "ok": False,
+                "status": "workbook_restore_failed",
+                "workbookState": "unknown",
+                "errors": [
+                    "live readback failed and backup restoration could not be "
+                    f"verified; workbook path: {path}; backup path: {backup_path}"
+                    + (f"; restore error: {restore_error}" if restore_error else ""),
+                ],
+                "backupPath": str(backup_path),
+                "workbookPath": str(path),
+                **base,
+                "verification": live_verification,
+            }
+        return {
+            "ok": False,
+            "status": "apply_verification_failed_rolled_back",
+            "workbookState": "restored",
             "errors": live_verification["errors"],
             "backupPath": str(backup_path),
             **base,

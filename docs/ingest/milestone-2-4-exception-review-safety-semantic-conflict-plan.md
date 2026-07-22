@@ -1,6 +1,6 @@
 # Milestone 2.4 — Exception Review Safety and Semantic Conflict Closure
 
-Status: IMPLEMENTED 2026-07-15 and corrected by approved Milestone 2.4.1 on 2026-07-16. Joint independent closure review remains pending; exception review is paused outside disposable proof. Milestone 3 remains blocked and unapproved.
+Status: IMPLEMENTED 2026-07-15, corrected by approved Milestone 2.4.1 on 2026-07-16, and extended 2026-07-17 with an audited target-authoritative rejection path for conflicting comparator-only proposals. Milestone 3 remains blocked and unapproved.
 
 Recommended reasoning level: high.
 
@@ -57,9 +57,9 @@ Add a target-scoped semantic-overlap analyzer in `scripts/corvette_form_generato
 
 For each comparator proposal, compare against retained and already-derived target rows before exposing a confirming action:
 
-- `exclusive_groups`: classify exact match, subset, superset, partial overlap, or disjoint member set across both current member-family names. Exact represented facts are reconciled without review. Subset/superset/partial overlaps become non-confirmable `semantic_group_overlap` blockers carrying every conflicting group/member row.
-- `rule_groups`: compare source, group type, scopes, and complete member set. Exact represented facts reconcile. Different member sets become non-confirmable `semantic_group_overlap` blockers rather than validator-accepted/pending confirmations.
-- `rule_mapping`: compare the ordered endpoint pair and reverse pair across `requires`, `includes`, `excludes`, and `replaces`. Exact matches reconcile. Different or reverse semantics become non-confirmable `semantic_relationship_conflict` blockers with the existing rows attached.
+- `exclusive_groups`: classify exact match, subset, superset, partial overlap, or disjoint member set across both current member-family names. Exact represented facts are reconciled without review. Subset/superset/partial overlaps become non-confirmable `semantic_group_overlap` blockers carrying every conflicting group/member row. A reviewer may reject the entire comparator-only proposal and retain the target-authoritative rows; rejection emits no comparator rows and is recorded as `resolved_not_applicable`.
+- `rule_groups`: compare source, group type, scopes, and complete member set. Exact represented facts reconcile. Different member sets become non-confirmable `semantic_group_overlap` blockers rather than validator-accepted/pending confirmations. The same explicit whole-proposal rejection path may retain the target-authoritative group unchanged.
+- `rule_mapping`: compare the ordered endpoint pair and reverse pair across `requires`, `includes`, `excludes`, and `replaces`. Exact matches reconcile. Different or reverse semantics become non-confirmable `semantic_relationship_conflict` blockers with the existing rows attached. The reviewer may reject the conflicting comparator-only relationship while preserving the independently derived target relationship.
 - `price_rules` and defaults: retain the complete existing identity checks. Surface exact existing matches separately and fail closed on incompatible same-condition/target/type/scope overlaps.
 
 No overlap class may automatically merge, replace, delete, or broaden/narrow a target rule. Those require separate target-authoritative decisions.

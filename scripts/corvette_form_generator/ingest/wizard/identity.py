@@ -18,7 +18,12 @@ def _clean_text(value: Any) -> str:
 
 
 def _copy_identity(row: Mapping[str, Any]) -> str:
-    return _clean_text(row.get("description") or row.get("option_name"))
+    copy = str(row.get("description") or row.get("option_name") or "").splitlines()[0]
+    return re.sub(
+        r"[^a-z0-9]+",
+        " ",
+        _clean_text(copy),
+    ).strip()
 
 
 def _status_vector(row: Mapping[str, Any]) -> list[dict[str, str]]:
@@ -92,11 +97,17 @@ def match_option_occurrences(candidates: Sequence[Mapping[str, Any]], existing_r
         ),
         (
             "rpo_section_status_price",
-            lambda candidate, row: _stage_two_signature(row) == _stage_two_signature(candidate),
+            lambda candidate, row: bool(
+                str(candidate.get("rpo") or candidate.get("refOnlyRpo") or "").strip()
+            )
+            and _stage_two_signature(row) == _stage_two_signature(candidate),
         ),
         (
             "unique_remaining_occurrence",
-            lambda candidate, row: str(row.get("rpo") or "").upper()
+            lambda candidate, row: bool(
+                str(candidate.get("rpo") or candidate.get("refOnlyRpo") or "").strip()
+            )
+            and str(row.get("rpo") or "").upper()
             == str(candidate.get("rpo") or candidate.get("refOnlyRpo") or "").upper(),
         ),
     )
@@ -150,13 +161,29 @@ def _option_id_parts(identifier: str) -> tuple[str, int] | None:
     return (match.group(1), int(match.group(2))) if match else None
 
 
+def _next_numeric_option_id(reserved: set[str]) -> str:
+    used = {
+        int(match.group(1))
+        for identifier in reserved
+        if (match := re.fullmatch(r"opt_(\d{3})", identifier)) is not None
+    }
+    for number in range(1, 1000):
+        identifier = f"opt_{number:03d}"
+        if number not in used and identifier not in reserved:
+            return identifier
+    raise ValueError("Target-local sequential option IDs are exhausted (opt_001 through opt_999).")
+
+
 def allocate_ids(family: str, model: str, rows: Sequence[Mapping[str, Any]], *, reserved_ids: Iterable[str] = ()) -> list[dict[str, Any]]:
     if family != "options":
         return [
             {**dict(row), "semanticSignature": semantic_hash(row), "allocatedId": deterministic_family_id(family, model, row)}
             for row in rows
         ]
-    reserved = set(str(value) for value in reserved_ids)
+    reserved_values = [str(value) for value in reserved_ids]
+    if len(reserved_values) != len(set(reserved_values)):
+        raise ValueError("Target-local option ID collision exists in the reserved identity set.")
+    reserved = set(reserved_values)
     by_rpo: dict[str, list[tuple[str, Mapping[str, Any]]]] = defaultdict(list)
     for row in rows:
         raw_rpo = str(row.get("rpo") or row.get("refOnlyRpo") or "").strip()
@@ -167,12 +194,7 @@ def allocate_ids(family: str, model: str, rows: Sequence[Mapping[str, Any]], *, 
     for rpo, entries in sorted(by_rpo.items()):
         if not rpo:
             for signature, row in sorted(entries, key=lambda item: item[0]):
-                base = f"opt_std_{signature[:16]}"
-                identifier = base
-                suffix = 2
-                while identifier in reserved:
-                    identifier = f"{base}_{suffix}"
-                    suffix += 1
+                identifier = _next_numeric_option_id(reserved)
                 reserved.add(identifier)
                 allocated.append(
                     {**dict(row), "semanticSignature": signature, "allocatedId": identifier}
@@ -187,6 +209,10 @@ def allocate_ids(family: str, model: str, rows: Sequence[Mapping[str, Any]], *, 
         for signature, row in sorted(entries, key=lambda item: item[0]):
             while next_number in used_numbers or f"opt_{rpo}_{next_number:03d}" in reserved:
                 next_number += 1
+            if next_number > 999:
+                raise ValueError(
+                    f"Target-local option IDs are exhausted for RPO {rpo} (001 through 999)."
+                )
             identifier = f"opt_{rpo}_{next_number:03d}"
             reserved.add(identifier)
             used_numbers.add(next_number)

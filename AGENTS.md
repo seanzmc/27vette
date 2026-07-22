@@ -7,7 +7,7 @@ No-redundancy rule: every instruction fact has one owning file (this file = agen
 ## 1. First Principles and Context Gathering
 
 - Verify current repo state before relying on remembered architecture, old plans, or generated artifacts. Check `git status` before editing; never overwrite user work.
-- Classify the request by changed surface: docs, styling, runtime behavior, workbook/data, generator/tooling, validation/tests, ingest, or mixed.
+- Classify the request by changed surface: docs, styling, runtime behavior, workbook/data, asset/media data, generator/tooling, validation/tests, ingest, editor/workbook-service surfaces, or mixed.
 - Before editing: read the target and nearby files; search relevant symbols/RPOs/sheet names/tests; trace data definition-to-use; check manifests before assuming dependencies. Do not invent files, scripts, APIs, sheet ownership, selectors, test names, or contract fields.
 - Keep changes scoped. No unrelated refactors, data cleanup, redesigns, or artifact refreshes without approval.
 - This is a live customer-facing app. Preserve live-customer behavior, generated-data contracts, and dealer-submission boundaries unless explicitly approved.
@@ -29,6 +29,8 @@ Python — boring and general: read workbook, normalize, validate references, em
 Runtime JavaScript — consumes generated data; renders, manages interaction, generic validation/selection, summaries, model switching, downloads, dealer-submission UI. Not a hidden product-rule database: if JS seems to need product knowledge, it likely belongs in workbook data or generated metadata.
 
 CSS — presentation only. Styling changes must preserve data contracts, runtime state, validation semantics, payloads, and behavior; never use styling to hide broken data or logic.
+
+Asset/media maintenance — `asset_map` remains workbook-authored source data. The safe sync entry is `scripts/sync_asset_map.py`, with exact usage and report contracts owned by `docs/asset-map-sync.md` and README. Treat sync runs as dry-run/report-first review surfaces unless `--apply` is explicitly approved for specific reviewed row changes; wildcard authoring, blank-row seeding, stale-row deactivation, or schema/status-column changes are separate workbook-data work, not routine media maintenance.
 
 ## 4. Autonomy and Approval Gates
 
@@ -102,6 +104,8 @@ Separate approval is still required when the workbook edit would create or choos
 
 Do not recreate or hand-edit generated workbook sheets. Change source rows or generic generator logic, then regenerate.
 
+Workbook editor surfaces (`scripts/workbook_editor_server.py`, `scripts/apply_workbook_ops.py`, and `workbook-manager/`) are interfaces around the same workbook-write safety contract, not separate authorities. The workbook remains canonical unless a separately approved stage changes that. Any editor or manager write path must route through `editor_ops.apply_batch`/approved tooling and `save_workbook_safely()`, then regenerate and validate affected artifacts through the normal gates.
+
 ## 6. Dealer Submission (protected boundary)
 
 Do not change the dealer endpoint, payload shape, model scoping, security/Turnstile behavior, or submission UX without explicit approval. Near submission code: inspect runtime and tests first; validate modal behavior, required fields, payload construction, error handling, and safe failure states. No live dealer submissions as routine validation. In passes that don't touch it, report dealer behavior as preserved/untouched.
@@ -114,9 +118,11 @@ Classify the change: styling-only, behavior-only, data-only, or mixed. For behav
 
 Edge workflow for new-model intake or broad source refresh — never routine maintenance. Preflight is read-only evidence gathering: preserve raw evidence and provenance, invent nothing, keep candidate artifacts transient, and never mutate the workbook, generated artifacts, or `form-app/data.js`. Applying reviewed output later is a separate approved workbook pass with full §5 safety, regeneration, and gates. Detail: `Order-Guide_IngestPrompt.md` and `docs/ingest/`.
 
-Current ingest direction is browser-first for source intake, then compiler/exception driven for production continuation. The current entry path is `scripts/ingest_wizard_server.py`; the production direction is the canonical-row compiler plus typed exception queue in `docs/ingest/canonical-row-compiler-exception-queue-design.md`. Historical Pass B broad review lanes and Pass C/D.2 decision-to-plan artifacts remain evidence/debug surfaces, not production write authority.
+Current ingest direction is browser-first for source intake, then compiler/exception driven for production continuation. The current entry path is `scripts/ingest_wizard_server.py`; the production direction is the canonical-row compiler plus typed exception queue in `docs/ingest/canonical-row-compiler-exception-queue-design.md`, with the approved consolidation destination in `docs/ingest/ingest-separation-model-integration-editor-consolidation-spec.md`: ingest owns raw intake, profiling/target selection, canonical compilation, typed exception resolution, and shared ChangeSet emission only. Historical Pass B broad review lanes and Pass C/D.2 decision-to-plan artifacts remain evidence/debug surfaces, not production write authority.
 
-`scripts/ingest_wizard_apply.py` is diagnostic dry-run/report-only by default and never promotes runtime artifacts. A live workbook write requires the current compiler/readiness contract: a `pass-c-3` plan, scoped dry-run approval, eligible temporary-workbook proof, separate deployment-ready write approval, current hashes/fingerprints, schema validation enabled, no Excel lock/mtime drift, exact readback, and no deployment blockers. Older `pass-c-1`/`pass-c-2` plans or historical approvals are permanently non-writable even if a label sounds approved.
+The shared ChangeSet/workbook-service direction does not itself authorize live workbook writes, generated-artifact refresh, registry publication, runtime promotion, deployment, or dealer changes. Those remain separate approved steps with §5 workbook safety and normal regeneration/validation gates. During transition, do not let ingest, the workbook editor, or Workbook Manager keep parallel schemas, validators, writer authority, or canonical row stores when the shared workbook registry/service should own the contract.
+
+Current ingest stops after immutable `workbook-changeset-1` emission. Historical `pass-c-*` plans and approvals are GET-only evidence and never production write authority; `scripts/ingest_wizard_apply.py` is retired. Preview, approval, and any separately authorized workbook write use the shared service through `scripts/apply_workbook_changeset.py`, with exact ChangeSet/preview/approval/workbook binding, §5 workbook safety, and verified rollback. This path does not authorize generation, publication, promotion, deployment, or dealer changes.
 
 ## 9. Fable 5 Loop Workflows
 
@@ -130,6 +136,7 @@ Choose gates by changed surface and risk — don't run irrelevant gates from old
 
 - Docs-only: diff review + consistency with README/active docs.
 - Workbook writes: package/schema validation, verify saved file on disk, regenerate affected artifacts, review generated diffs.
+- Asset/media sync: review manifest/report outputs first; for deterministic checks prefer the fixture media list in README/docs; if a real workbook apply is approved, run workbook package/schema gates, then regenerate affected active models and registry only if workbook data changed.
 - Generator changes: representative generation + tests covering the changed contract behavior.
 - Registry/publication: verify published bundle and model switching.
 - Runtime JS: relevant automated tests + manual verification of affected workflows.

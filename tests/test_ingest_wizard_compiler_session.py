@@ -16,8 +16,10 @@ for entry in (ROOT / "scripts", ROOT / "tests"):
         sys.path.insert(0, str(entry))
 
 from corvette_form_generator.ingest.wizard.canonical_rows import canonical_bytes  # noqa: E402
+from corvette_form_generator.editor_ops import extract_workbook  # noqa: E402
 from corvette_form_generator.ingest.wizard.session import (  # noqa: E402
     COMPILER_ARTIFACTS,
+    STATE_CHANGESET_EMITTED,
     STATE_COMPILED_WITH_EXCEPTIONS,
     WizardError,
     WizardSessionStore,
@@ -240,6 +242,166 @@ class CompilerSessionTest(unittest.TestCase):
         self.store.compile_canonical_rows(self.run_id)
         lines_again = [json.loads(line) for line in (self.run_dir / "exception-log.jsonl").read_text().splitlines() if line]
         self.assertEqual(lines, lines_again)
+
+    # ------------------------------------------------------ changeset emission
+
+    def _compiled_ready_changeset_fixture(self) -> dict:
+        """Hand-write a coherent compiled artifact set bound to the setUp run."""
+        extract = extract_workbook(self.root / "stingray_master.xlsx")
+        zr1 = next(
+            row
+            for row in extract["sheets"]["model_master"]["rows"]
+            if row["model_key"] == "zr1"
+        )
+        option_row = dict(extract["sheets"]["zr1_options"]["rows"][0])
+        updated = {**option_row, "description": "Emitter session fixture update"}
+        rows = [
+            {
+                "model": "zr1",
+                "family": "model_master",
+                "sheet": "model_master",
+                "action": "noop",
+                "key": {"model_key": "zr1"},
+                "values": zr1,
+                "status": "ready",
+                "semanticSignature": {"fixture": ["model_master", {"model_key": "zr1"}]},
+                "derivationVersion": "fixture",
+            },
+            {
+                "model": "zr1",
+                "family": "options",
+                "sheet": "zr1_options",
+                "action": "update",
+                "key": {"option_id": option_row["option_id"]},
+                "values": updated,
+                "status": "ready",
+                "semanticSignature": {"fixture": ["zr1_options", option_row["option_id"]]},
+                "derivationVersion": "fixture",
+            },
+        ]
+        authority = {
+            "fingerprint": "fixture-authority",
+            "bindings": {"compilerPolicyVersion": "fixture"},
+        }
+        manifest = {
+            "schemaVersion": "canonical-row-manifest-v1",
+            "manifestSemanticSha": "fixture-manifest-semantic",
+            "runAuthorityFingerprint": authority,
+            "modelModes": {"zr1": "reprocess"},
+            "rows": rows,
+        }
+        report = {
+            "runAuthorityFingerprint": authority,
+            "queueSubjectFingerprint": "fixture-queue",
+            "comparatorEvidenceSemanticSha": "fixture-comparator",
+            "models": {"zr1": {"mode": "reprocess", "compileReady": True, "blockers": []}},
+            "deferrals": [],
+            "sourceFeatureCoverage": [],
+        }
+        queue = {
+            "queueSubjectFingerprint": "fixture-queue",
+            "comparatorEvidenceSemanticSha": "fixture-comparator",
+            "runAuthorityFingerprint": authority,
+            "subjects": [],
+        }
+        resolutions = {
+            "queueSubjectFingerprint": "fixture-queue",
+            "validEntries": [],
+        }
+        comparator = {
+            "comparatorEvidenceSemanticSha": "fixture-comparator",
+            "runAuthorityFingerprint": authority,
+            "targets": {"zr1": {}},
+        }
+        for name, payload in {
+            "canonical-row-manifest.json": manifest,
+            "compile-report.json": report,
+            "exception-resolutions.json": resolutions,
+            "exception-queue.json": queue,
+            "comparator-evidence.json": comparator,
+        }.items():
+            write_json(self.run_dir / name, payload)
+        session = read_json(self.run_dir / "session.json")
+        session["state"] = "compiled_ready"
+        write_json(self.run_dir / "session.json", session)
+        return {
+            "manifest": manifest,
+            "compileReport": report,
+            "exceptionQueue": queue,
+            "resolutions": resolutions,
+        }
+
+    def _emit_with_fixture(self, detail: dict) -> dict:
+        with mock.patch.object(self.store, "compiler_detail", return_value=detail), mock.patch.object(
+            self.store,
+            "_compiler_freshness",
+            return_value={"stale": False, "reasons": []},
+        ):
+            return self.store.emit_changeset(self.run_id)
+
+    def test_emit_changeset_writes_artifact_and_transitions_state(self) -> None:
+        detail = self._compiled_ready_changeset_fixture()
+        result = self._emit_with_fixture(detail)
+
+        self.assertEqual(result["session"]["state"], STATE_CHANGESET_EMITTED)
+        artifact = self.run_dir / "workbook-change-set.json"
+        self.assertTrue(artifact.is_file())
+        changeset = read_json(artifact)
+        self.assertEqual(changeset["schemaVersion"], "workbook-changeset-1")
+        self.assertEqual(
+            changeset["source"], {"kind": "ingest", "runId": self.run_id}
+        )
+        expected_manifest_sha = hashlib.sha256(
+            (self.run_dir / "canonical-row-manifest.json").read_bytes()
+        ).hexdigest()
+        self.assertEqual(
+            changeset["bindings"]["canonicalManifestSha"], expected_manifest_sha
+        )
+        self.assertEqual(
+            read_json(self.run_dir / "session.json")["state"], STATE_CHANGESET_EMITTED
+        )
+        listed = {
+            session["runId"]: session.get("state")
+            for session in self.store.list_sessions()
+        }
+        self.assertEqual(listed.get(self.run_id), STATE_CHANGESET_EMITTED)
+
+    def test_emit_changeset_reemission_is_byte_identical(self) -> None:
+        detail = self._compiled_ready_changeset_fixture()
+        self._emit_with_fixture(detail)
+        artifact = self.run_dir / "workbook-change-set.json"
+        first_bytes = artifact.read_bytes()
+        result = self._emit_with_fixture(detail)
+        self.assertEqual(result["session"]["state"], STATE_CHANGESET_EMITTED)
+        self.assertEqual(artifact.read_bytes(), first_bytes)
+
+    def test_emit_changeset_refuses_non_compiled_states(self) -> None:
+        self._compiled_ready_changeset_fixture()
+        session = read_json(self.run_dir / "session.json")
+        session["state"] = "profiled"
+        write_json(self.run_dir / "session.json", session)
+        with self.assertRaises(WizardError):
+            self.store.emit_changeset(self.run_id)
+        self.assertFalse((self.run_dir / "workbook-change-set.json").exists())
+
+    def test_emit_changeset_refuses_stale_inputs(self) -> None:
+        detail = self._compiled_ready_changeset_fixture()
+        with mock.patch.object(self.store, "compiler_detail", return_value=detail), mock.patch.object(
+            self.store,
+            "_compiler_freshness",
+            return_value={"stale": True, "reasons": ["workbook changed"]},
+        ):
+            with self.assertRaisesRegex(WizardError, "recompile"):
+                self.store.emit_changeset(self.run_id)
+        self.assertFalse((self.run_dir / "workbook-change-set.json").exists())
+
+    def test_emit_changeset_does_not_touch_plan_surfaces(self) -> None:
+        detail = self._compiled_ready_changeset_fixture()
+        decisions_before = (self.run_dir / "decisions.json").read_bytes()
+        self._emit_with_fixture(detail)
+        for name in ("apply-plan.json", "apply-plan-dryrun.json", "apply-plan.md"):
+            self.assertFalse((self.run_dir / name).exists(), name)
+        self.assertEqual((self.run_dir / "decisions.json").read_bytes(), decisions_before)
 
 
 if __name__ == "__main__":

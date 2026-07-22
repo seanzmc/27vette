@@ -74,6 +74,52 @@ class IdentityContractTest(unittest.TestCase):
         self.assertEqual(result[0]["optionId"], "opt_509")
         self.assertEqual(result[0]["matchStage"], "no_rpo_copy_identity")
 
+    def test_new_no_rpo_standard_row_does_not_match_unrelated_blank_rpo_rows(self) -> None:
+        candidate = self.candidate("", "OnStar Basics")
+        candidate["rowKind"] = "standard_no_rpo"
+        existing = [
+            self.existing("opt_673", "", "Custom Leather Wrapped Interior Package"),
+            self.existing("opt_863", "", "Intersection Automatic Emergency Braking"),
+        ]
+
+        result = match_option_occurrences([candidate], existing)
+
+        self.assertEqual(result[0]["status"], "new")
+        self.assertEqual(result[0]["matchStage"], "none")
+
+    def test_no_rpo_copy_identity_ignores_punctuation_spacing(self) -> None:
+        candidate = self.candidate("", "NEW!  Intersection Automatic Emergency Braking")
+        candidate["rowKind"] = "standard_no_rpo"
+        existing = self.existing(
+            "opt_863",
+            "",
+            "NEW!Intersection Automatic Emergency Braking",
+        )
+
+        result = match_option_occurrences([candidate], [existing])
+
+        self.assertEqual(result[0]["status"], "matched")
+        self.assertEqual(result[0]["optionId"], "opt_863")
+        self.assertEqual(result[0]["matchStage"], "no_rpo_copy_identity")
+
+    def test_no_rpo_copy_identity_uses_primary_copy_before_disclosure(self) -> None:
+        candidate = self.candidate(
+            "",
+            "Custom Leather Wrapped Interior Package\n1. Available on 3LZ only.",
+        )
+        candidate["rowKind"] = "standard_no_rpo"
+        existing = self.existing(
+            "opt_673",
+            "",
+            "Custom Leather Wrapped Interior Package",
+        )
+
+        result = match_option_occurrences([candidate], [existing])
+
+        self.assertEqual(result[0]["status"], "matched")
+        self.assertEqual(result[0]["optionId"], "opt_673")
+        self.assertEqual(result[0]["matchStage"], "no_rpo_copy_identity")
+
     def test_matching_stages_apply_globally_before_weaker_candidates(self) -> None:
         exact = self.candidate("PDB", "Carbon wheel package", price=16000)
         weaker = self.candidate("PDB", "Different copy", price=16000)
@@ -108,8 +154,36 @@ class IdentityContractTest(unittest.TestCase):
         by_signature = lambda rows: {row["semanticSignature"]: row["allocatedId"] for row in rows}
 
         self.assertEqual(by_signature(first), by_signature(second))
-        self.assertTrue(all(identifier.startswith("opt_std_") for identifier in by_signature(first).values()))
-        self.assertEqual(len(set(by_signature(first).values())), 2)
+        self.assertEqual(set(by_signature(first).values()), {"opt_001", "opt_002"})
+
+    def test_new_no_rpo_ids_use_lowest_unused_target_local_number(self) -> None:
+        candidate = {**self.candidate("", "Air filtration system"), "rowKind": "standard_no_rpo"}
+
+        result = allocate_ids(
+            "options",
+            "grand_sport_x",
+            [candidate],
+            reserved_ids={"opt_001", "opt_003", "opt_abc_001"},
+        )
+
+        self.assertEqual(result[0]["allocatedId"], "opt_002")
+
+    def test_option_id_collision_and_exhaustion_fail_explicitly(self) -> None:
+        candidate = {**self.candidate("", "Air filtration system"), "rowKind": "standard_no_rpo"}
+        with self.assertRaisesRegex(ValueError, "collision"):
+            allocate_ids(
+                "options",
+                "grand_sport_x",
+                [candidate],
+                reserved_ids=["opt_001", "opt_001"],
+            )
+        with self.assertRaisesRegex(ValueError, "exhausted"):
+            allocate_ids(
+                "options",
+                "grand_sport_x",
+                [candidate],
+                reserved_ids=[f"opt_{number:03d}" for number in range(1, 1000)],
+            )
 
     def test_non_option_id_format_is_stable_and_model_local(self) -> None:
         first = deterministic_family_id("rule_mapping", "zr1", {"sourceRpo": "PDB", "ruleType": "requires", "targetRpo": "PEF"})

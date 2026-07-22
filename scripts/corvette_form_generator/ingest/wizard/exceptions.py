@@ -23,20 +23,28 @@ ALLOWED_DEFERRAL_KINDS = {"asset_map_media_missing"}
 ALLOWED_ACTIONS = frozenset(
     {
         "provide_typed_value",
+        "provide_option_copy",
+        "provide_option_behavior",
+        "confirm_mandatory_charge",
         "retain_existing",
         "approve_removal",
         "mark_not_applicable",
         "record_allowed_deferral",
         "choose_section",
         "choose_relationship",
+        "keep_inactive_option",
     }
 )
 ALLOWED_DISPOSITIONS = frozenset({"resolved", "resolved_not_applicable", "retained_existing", "allowed_deferral"})
 ACTION_DISPOSITIONS = {
     "provide_typed_value": "resolved",
+    "provide_option_copy": "resolved",
+    "provide_option_behavior": "resolved",
+    "confirm_mandatory_charge": "resolved",
     "approve_removal": "resolved",
     "choose_section": "resolved",
     "choose_relationship": "resolved",
+    "keep_inactive_option": "resolved",
     "retain_existing": "retained_existing",
     "mark_not_applicable": "resolved_not_applicable",
     "record_allowed_deferral": "allowed_deferral",
@@ -45,7 +53,7 @@ ACTION_DISPOSITIONS = {
 REASON_ACTIONS = {
     "missing_price_scope": {"provide_typed_value"},
     "unresolved_price_scope": {"provide_typed_value"},
-    "missing_section": {"choose_section"},
+    "missing_section": {"choose_section", "keep_inactive_option", "mark_not_applicable"},
     "unresolved_relationship_endpoint": {"choose_relationship", "mark_not_applicable"},
     "unresolved_relationship_identity": {"choose_relationship", "mark_not_applicable"},
     "unsupported_relationship_type": {"choose_relationship", "mark_not_applicable"},
@@ -55,8 +63,14 @@ REASON_ACTIONS = {
     "comparator_only_exclusive_group_proposal": {"provide_typed_value", "mark_not_applicable"},
     "comparator_only_price_rule_proposal": {"provide_typed_value", "mark_not_applicable"},
     "comparator_only_default_selection_proposal": {"provide_typed_value", "mark_not_applicable"},
+    "semantic_group_overlap": {"mark_not_applicable"},
+    "semantic_relationship_conflict": {"mark_not_applicable"},
     "ambiguous_existing_identity": {"retain_existing"},
     "deletion_reference_impact": {"approve_removal", "retain_existing"},
+    "copy_review_required": {"provide_option_copy"},
+    "comparator_copy_conflict": {"provide_option_copy"},
+    "option_behavior_conflict": {"provide_option_behavior"},
+    "mandatory_charge_candidate": {"confirm_mandatory_charge"},
     "asset_map_media_missing": {"record_allowed_deferral"},
 }
 
@@ -137,6 +151,31 @@ def validate_resolution(resolution: Mapping[str, Any], subject: Mapping[str, Any
     if action == "choose_section":
         if set(payload) != {"sectionId"} or not isinstance(payload.get("sectionId"), str) or not payload["sectionId"].strip():
             raise ValueError("choose_section requires exactly one non-empty string sectionId.")
+    elif action == "keep_inactive_option":
+        if set(payload) != {"sectionId"} or not isinstance(payload.get("sectionId"), str) or not payload["sectionId"].strip():
+            raise ValueError(
+                "keep_inactive_option requires exactly one non-empty string sectionId."
+            )
+    elif action == "provide_option_copy":
+        if set(payload) != {"optionName", "description"}:
+            raise ValueError("provide_option_copy requires exact optionName and description fields.")
+        if not isinstance(payload.get("optionName"), str) or not payload["optionName"].strip():
+            raise ValueError("provide_option_copy optionName must be a non-empty string.")
+        if not isinstance(payload.get("description"), str):
+            raise ValueError("provide_option_copy description must be a string.")
+    elif action == "provide_option_behavior":
+        if set(payload) != {"active", "selectable"}:
+            raise ValueError("provide_option_behavior requires exact active and selectable fields.")
+        if not all(isinstance(payload.get(field), bool) for field in ("active", "selectable")):
+            raise ValueError("provide_option_behavior values must be booleans.")
+        if not payload["active"] and payload["selectable"]:
+            raise ValueError("An inactive option cannot be selectable.")
+    elif action == "confirm_mandatory_charge":
+        if set(payload) != {"priceValue"}:
+            raise ValueError("confirm_mandatory_charge requires exactly priceValue.")
+        value = payload.get("priceValue")
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
+            raise ValueError("confirm_mandatory_charge priceValue must be a positive number.")
     elif action == "choose_relationship":
         required = {"sourceOptionId", "ruleType", "targetOptionId"}
         if set(payload) != required or not all(isinstance(payload.get(key), str) and payload[key].strip() for key in required):
@@ -249,7 +288,13 @@ def classify_resolutions(entries: Iterable[Mapping[str, Any]], subjects: Iterabl
     return {"valid": sorted(valid, key=sort_key), "stale": sorted(stale, key=sort_key), "superseded": sorted(superseded, key=sort_key)}
 
 
-def _resolution_semantic_entry(entry: Mapping[str, Any]) -> dict[str, Any]:
+def resolution_semantic_entry(entry: Mapping[str, Any]) -> dict[str, Any]:
+    """Return only resolution fields that can change canonical behavior.
+
+    Reviewer identity and timestamps are audit metadata. They must not change
+    manifest dependencies, preview effects, or compiler semantic hashes.
+    """
+
     return {
         "subjectId": entry.get("subjectId"),
         "subjectVersion": entry.get("subjectVersion"),
@@ -274,7 +319,7 @@ def build_resolution_artifact(
             raise ValueError(f"Deferral kind {item.get('kind')!r} is not allowlisted.")
         checked_deferrals.append(item)
     valid = sorted((dict(entry) for entry in valid_entries), key=lambda item: str(item.get("subjectId") or ""))
-    semantic_entries = [_resolution_semantic_entry(entry) for entry in valid]
+    semantic_entries = [resolution_semantic_entry(entry) for entry in valid]
     return {
         "schemaVersion": EXCEPTION_RESOLUTIONS_SCHEMA,
         "queueSubjectFingerprint": str(queue_subject_fingerprint),

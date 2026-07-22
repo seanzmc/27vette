@@ -140,7 +140,11 @@ test("generated app registry promotes Z06 without changing default model", () =>
   const registry = loadDataWindow().CORVETTE_FORM_DATA;
 
   assert.equal(registry.defaultModelKey, "stingray");
-  assert.deepEqual(Object.keys(registry.models).sort(), ["grandSport", "stingray", "z06"]);
+  assert.deepEqual(Object.keys(registry.models).sort(), [
+    "grandSport",
+    "stingray",
+    "z06",
+  ]);
   assert.equal(registry.models.z06.key, "z06");
   assert.equal(registry.models.z06.label, "Z06");
   assert.equal(registry.models.z06.modelName, "Corvette Z06");

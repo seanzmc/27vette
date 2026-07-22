@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
-"""Run-state persistence and fail-closed state machine for the ingest wizard.
+"""Run-state persistence for the five-function current ingest path.
 
-States: profiled -> roles_confirmed -> parsed (Pass A), then
-models_selected -> decisions_in_progress -> decisions_complete (Pass B), then
-plan_built -> dry_run_approved -> dry_run_validated_* (Pass C/D evidence).
-Every transition persists JSON artifacts under
-form-output/ingest-wizard/<run-id>/ so a run can be reopened and later passes
-can consume the output. The canonical workbook is opened read-only for
-pickers, variant reconciliation, presentation prefill, and Pass C dry-runs;
-it and the raw source file are never written by this store.
+Current runs perform intake/profile, target selection, canonical compilation,
+typed exception resolution, and immutable ChangeSet emission. Historical
+decision/plan states remain readable evidence, but the server exposes no route
+that can enter or mutate them. The canonical workbook and raw source are never
+written by this store.
 """
 
 from __future__ import annotations
@@ -71,11 +68,6 @@ from corvette_form_generator.ingest.wizard.exceptions import (
 )
 from corvette_form_generator.ingest.wizard.hints import scan_candidates
 from corvette_form_generator.ingest.wizard.identity import option_occurrence_signature
-from corvette_form_generator.ingest.wizard.plan_builder import (
-    artifact_sha,
-    plan_markdown,
-    plan_summary,
-)
 from corvette_form_generator.ingest.wizard.joiner import join_prices
 from corvette_form_generator.ingest.wizard.parser import parse_confirmed_sheets
 from corvette_form_generator.ingest.wizard.profiler import (
@@ -88,6 +80,10 @@ from corvette_form_generator.ingest.wizard.profiler import (
     canonical_option_sheet_eligible,
     profile_workbook,
 )
+from corvette_form_generator.options_sheet_quality import (
+    DEFAULT_ALLOWLIST_PATH,
+    DEFAULT_ALLOWLIST_RELATIVE_PATH,
+)
 
 STATE_PROFILED = "profiled"
 STATE_ROLES_CONFIRMED = "roles_confirmed"
@@ -95,6 +91,8 @@ STATE_PARSED = "parsed"
 STATE_MODELS_SELECTED = "models_selected"
 STATE_COMPILED_READY = "compiled_ready"
 STATE_COMPILED = STATE_COMPILED_READY
+# Marks successful ChangeSet emission (workbook-change-set.json written).
+STATE_CHANGESET_EMITTED = "changeset_emitted"
 STATE_COMPILED_WITH_EXCEPTIONS = "compiled_with_exceptions"
 STATE_DECISIONS_IN_PROGRESS = "decisions_in_progress"
 STATE_DECISIONS_COMPLETE = "decisions_complete"
@@ -117,9 +115,6 @@ WRITABLE_PLAN_SCHEMA = "pass-c-3"
 ALLOWED_WRITE_DEFERRAL_KINDS = {"asset_map_media_missing"}
 COMPILE_READINESS_FIELDS = (
     "compileReady",
-    "planReady",
-    "writeReady",
-    "deploymentReady",
 )
 NOT_APPLICABLE_DEPLOYMENT_FAMILIES = {
     "asset_map",
@@ -131,6 +126,8 @@ COMPILER_ARTIFACT_BINDINGS = (
     ("canonical-row-manifest.json", "canonicalManifestSha"),
     ("compile-report.json", "compileReportSha"),
     ("exception-resolutions.json", "exceptionResolutionsSha"),
+    ("exception-queue.json", "exceptionQueueSha"),
+    ("comparator-evidence.json", "comparatorEvidenceSha"),
 )
 DECISION_STATES = (
     STATE_MODELS_SELECTED,
@@ -160,6 +157,15 @@ COMPILER_CACHE_ARTIFACTS = tuple(
 )
 COMPILER_MUTATION_FILES = (*COMPILER_ARTIFACTS, "exception-log.jsonl", "session.json")
 COMPILER_STATES = (STATE_COMPILED, STATE_COMPILED_WITH_EXCEPTIONS)
+COMPILER_EVIDENCE_STATES = COMPILER_STATES + (
+    STATE_CHANGESET_EMITTED,
+    STATE_PLAN_BUILT,
+    STATE_PLAN_APPROVED,
+    STATE_DRY_RUN_APPROVED,
+    STATE_DRY_RUN_VALIDATED_WRITE_BLOCKED,
+    STATE_DRY_RUN_VALIDATED_WRITE_ELIGIBLE,
+    STATE_WRITE_APPROVED,
+)
 COMPILER_DOWNSTREAM_ARTIFACTS = (
     "apply-plan.json",
     "apply-plan-dryrun.json",
@@ -506,6 +512,8 @@ class WizardSessionStore:
                 continue
             model = str(item.get("model") or "")
             family = str(item.get("family") or "")
+            if family not in NOT_APPLICABLE_DEPLOYMENT_FAMILIES:
+                continue
             evidence_ids = item.get("evidenceIds") or []
             valid_evidence = (
                 isinstance(evidence_ids, list)
@@ -513,10 +521,10 @@ class WizardSessionStore:
                 and all(isinstance(value, str) and value.strip() for value in evidence_ids)
                 and len(set(evidence_ids)) == len(evidence_ids)
             )
-            if model not in target_set or family not in NOT_APPLICABLE_DEPLOYMENT_FAMILIES:
+            if model not in target_set:
                 raise WizardError(
                     "Compile report resolved_not_applicable coverage must bind a selected target "
-                    "and known deployment family.",
+                    "for a known deployment family.",
                     status=409,
                 )
             if not valid_evidence:
@@ -760,7 +768,9 @@ class WizardSessionStore:
         self, run_id: str, *, allow_compiled: bool = False
     ) -> tuple[dict[str, Any], Path, list[dict[str, Any]]]:
         session = self.load_session(run_id, verify_source=False)
-        allowed = (STATE_PARSED,) + DECISION_STATES + (COMPILER_STATES if allow_compiled else ())
+        allowed = (STATE_PARSED,) + DECISION_STATES + (
+            COMPILER_STATES + (STATE_CHANGESET_EMITTED,) if allow_compiled else ()
+        )
         if session["state"] not in allowed:
             raise WizardError("Run the parse before Pass B model selection.")
         candidates_file = self.run_dir(run_id) / "option-candidates.json"
@@ -877,6 +887,7 @@ class WizardSessionStore:
             "priceRows": run_dir / "price-rows.json",
             "joinReport": run_dir / "join-report.json",
             "modelSelection": run_dir / "model-selection.json",
+            "optionsQualityAllowlist": DEFAULT_ALLOWLIST_PATH,
         }
         missing = [label for label, path in input_paths.items() if not path.is_file()]
         if missing:
@@ -906,6 +917,10 @@ class WizardSessionStore:
         authority_bindings = {
             "compilerPolicyVersion": COMPILER_POLICY_VERSION,
             "files": before,
+            "optionsSheetQualityAllowlist": {
+                "path": DEFAULT_ALLOWLIST_RELATIVE_PATH.as_posix(),
+                "sha256": before["optionsQualityAllowlist"]["sha256"],
+            },
             "modelWorkbookSources": source_role_rows,
             "rulePhraseMap": phrase_rows,
         }
@@ -1025,7 +1040,7 @@ class WizardSessionStore:
         """Load and cross-validate one coherent compiled artifact set."""
 
         session = self.load_session(run_id, verify_source=False)
-        if session.get("state") not in COMPILER_STATES:
+        if session.get("state") not in COMPILER_EVIDENCE_STATES:
             raise WizardError("Compile canonical rows first.", status=404)
         run_dir = self.run_dir(run_id)
         missing = [name for name in COMPILER_ARTIFACTS if not (run_dir / name).is_file()]
@@ -1220,6 +1235,8 @@ class WizardSessionStore:
             action = str(raw_action)
             if action == "choose_section":
                 projectable.append(action)
+            elif action == "keep_inactive_option" and reason == "missing_section":
+                projectable.append(action)
             elif action == "choose_relationship" and reason in {
                 "unsupported_relationship_type",
                 "unsupported_relationship_direction",
@@ -1227,6 +1244,15 @@ class WizardSessionStore:
             } and proposal_catalog_complete:
                 projectable.append(action)
             elif action == "retain_existing" and reason == "ambiguous_existing_identity":
+                projectable.append(action)
+            elif action == "provide_option_copy" and reason in {
+                "copy_review_required",
+                "comparator_copy_conflict",
+            }:
+                projectable.append(action)
+            elif action == "provide_option_behavior" and reason == "option_behavior_conflict":
+                projectable.append(action)
+            elif action == "confirm_mandatory_charge" and reason == "mandatory_charge_candidate":
                 projectable.append(action)
             elif action == "provide_typed_value" and reason in {
                 "unresolved_price_scope",
@@ -1237,6 +1263,7 @@ class WizardSessionStore:
             } and proposal_catalog_complete:
                 projectable.append(action)
             elif action == "mark_not_applicable" and reason in {
+                "missing_section",
                 "unsupported_relationship_type",
                 "unsupported_relationship_direction",
                 "comparator_only_relationship_proposal",
@@ -1245,6 +1272,11 @@ class WizardSessionStore:
                 "comparator_only_price_rule_proposal",
                 "comparator_only_default_selection_proposal",
             } and proposal_catalog_complete:
+                projectable.append(action)
+            elif action == "mark_not_applicable" and reason in {
+                "semantic_group_overlap",
+                "semantic_relationship_conflict",
+            }:
                 projectable.append(action)
             else:
                 unsupported_row_actions.append(action)
@@ -1504,20 +1536,18 @@ class WizardSessionStore:
         else:
             summary = str(subject.get("question") or "Provide the missing target evidence before this can compile.")
 
-        source_label = next(
-            (
-                self._presentation_option_text(
-                    self._presentation_option(
-                        str(row.get("rpo") or row.get("refOnlyRpo") or ""),
-                        model_options,
-                        source_rows,
-                    )
+        source_label = ""
+        for row in source_rows:
+            source_rpo = str(row.get("rpo") or row.get("refOnlyRpo") or "").strip()
+            source_description = str(row.get("description") or "").strip()
+            if source_rpo:
+                source_label = self._presentation_option_text(
+                    self._presentation_option(source_rpo, model_options, source_rows)
                 )
-                for row in source_rows
-                if str(row.get("rpo") or row.get("refOnlyRpo") or row.get("description") or "")
-            ),
-            "",
-        )
+            elif source_description:
+                source_label = source_description
+            if source_label:
+                break
         if source_label:
             why_asked = f"The target source identifies {source_label}."
         elif evidence.get("workbookReferences"):
@@ -1544,17 +1574,20 @@ class WizardSessionStore:
             "source": Path(session["sourcePath"]),
             "workbook": self.workbook_path,
             "sheetRoles": run_dir / "sheet-roles.json",
+            "sheetProfile": run_dir / "sheet-profile.json",
             "optionCandidates": run_dir / "option-candidates.json",
             "priceRows": run_dir / "price-rows.json",
             "joinReport": run_dir / "join-report.json",
             "modelSelection": run_dir / "model-selection.json",
+            "optionsQualityAllowlist": DEFAULT_ALLOWLIST_PATH,
         }
-        expected = (
-            report.get("runAuthorityFingerprint", {})
-            .get("bindings", {})
-            .get("files", {})
+        authority_bindings = (
+            report.get("runAuthorityFingerprint", {}).get("bindings", {})
         )
+        expected = authority_bindings.get("files", {})
         reasons = []
+        if authority_bindings.get("compilerPolicyVersion") != COMPILER_POLICY_VERSION:
+            reasons.append("compiler policy changed after compile")
         for label, path in paths.items():
             if not path.is_file():
                 reasons.append(f"{label} is missing")
@@ -2140,7 +2173,7 @@ class WizardSessionStore:
             resolution = validate_resolution(resolution, subject)
         except ValueError as exc:
             raise WizardError(f"Invalid exception resolution: {exc}") from exc
-        if action == "choose_section":
+        if action in {"choose_section", "keep_inactive_option"}:
             allowed_sections = {
                 str(section.get("sectionId") or "")
                 for section in workbook_sections(self._require_workbook())
@@ -2154,16 +2187,16 @@ class WizardSessionStore:
         }:
             allowed_scopes = {
                 (
-                    str(scope.get("bodyStyleScope") or ""),
-                    str(scope.get("trimLevelScope") or ""),
-                    str(scope.get("variantScope") or ""),
+                    str(scope.get("bodyStyleScope") or "").casefold(),
+                    str(scope.get("trimLevelScope") or "").casefold(),
+                    str(scope.get("variantScope") or "").casefold(),
                 )
                 for scope in subject_view["choices"].get("priceScopes") or []
             }
             requested_scope = (
-                str(resolution["payload"].get("bodyStyleScope") or ""),
-                str(resolution["payload"].get("trimLevelScope") or ""),
-                str(resolution["payload"].get("variantScope") or ""),
+                str(resolution["payload"].get("bodyStyleScope") or "").casefold(),
+                str(resolution["payload"].get("trimLevelScope") or "").casefold(),
+                str(resolution["payload"].get("variantScope") or "").casefold(),
             )
             if requested_scope not in allowed_scopes:
                 raise WizardError("Price scope is not a current target variant or canonical wildcard choice.")
@@ -2396,7 +2429,7 @@ class WizardSessionStore:
             resolution = validate_resolution(resolution, subject)
         except ValueError as exc:
             raise WizardError(f"Invalid exception resolution: {exc}") from exc
-        if action == "choose_section":
+        if action in {"choose_section", "keep_inactive_option"}:
             allowed_sections = {
                 str(section.get("sectionId") or "")
                 for section in workbook_sections(self._require_workbook())
@@ -2410,16 +2443,16 @@ class WizardSessionStore:
         }:
             allowed_scopes = {
                 (
-                    str(scope.get("bodyStyleScope") or ""),
-                    str(scope.get("trimLevelScope") or ""),
-                    str(scope.get("variantScope") or ""),
+                    str(scope.get("bodyStyleScope") or "").casefold(),
+                    str(scope.get("trimLevelScope") or "").casefold(),
+                    str(scope.get("variantScope") or "").casefold(),
                 )
                 for scope in subject_view["choices"].get("priceScopes") or []
             }
             requested_scope = (
-                str(resolution["payload"].get("bodyStyleScope") or ""),
-                str(resolution["payload"].get("trimLevelScope") or ""),
-                str(resolution["payload"].get("variantScope") or ""),
+                str(resolution["payload"].get("bodyStyleScope") or "").casefold(),
+                str(resolution["payload"].get("trimLevelScope") or "").casefold(),
+                str(resolution["payload"].get("variantScope") or "").casefold(),
             )
             if requested_scope not in allowed_scopes:
                 raise WizardError("Price scope is not a current target variant or canonical wildcard choice.")
@@ -2456,17 +2489,30 @@ class WizardSessionStore:
         try:
             replace_json_artifact_set(run_dir, {"exception-resolutions.json": current})
             self.compile_canonical_rows(run_id)
-            refreshed = self.exception_queue_view(run_id, query=str(subject_id), limit=100)
-            subject_view = next(
+            refreshed_detail = self.compiler_detail(run_id)
+            accepted_resolution = next(
                 (
-                    item
-                    for item in refreshed["items"]
-                    if item["subject"].get("subjectId") == subject_id
+                    entry
+                    for entry in refreshed_detail["resolutions"].get("validEntries") or []
+                    if entry.get("subjectId") == subject_id
+                    and entry.get("subjectVersion") == subject_version
                 ),
                 None,
             )
-            if subject_view is None:
-                raise WizardError("Resolved subject disappeared from the current queue.", status=409)
+            if accepted_resolution is None:
+                raise WizardError("Compiler did not accept the saved exception resolution.", status=409)
+            blocker_subjects = {
+                str(blocker.get("subjectId") or "")
+                for model_entry in (refreshed_detail["compileReport"].get("models") or {}).values()
+                for blocker in model_entry.get("blockers") or []
+            }
+            pending_projection = subject_id in blocker_subjects
+            subject_view = {
+                **subject_view,
+                "state": "resolved_pending_projection" if pending_projection else "resolved",
+                "reviewState": "pending_projection" if pending_projection else "resolved",
+                "resolution": dict(accepted_resolution),
+            }
             result = {"summary": self.compiler_summary(run_id), "subject": subject_view}
         except Exception:
             self._restore_run_files(run_dir, snapshot)
@@ -3024,1317 +3070,57 @@ class WizardSessionStore:
         return report
 
     # ------------------------------------------------------ pass c: plan
-    def build_apply_plan(self, run_id: str, *, schema_validation: bool = True) -> dict[str, Any]:
-        """Build the two-stage op plan and dry-run it. Stage 1 validates
-        against the live extract; stage 2 against a scratch copy with stage 1
-        applied. The live workbook is never written here.
+    def emit_changeset(self, run_id: str) -> dict[str, Any]:
+        """Emit the signed ``workbook-changeset-1`` artifact for a compiled run.
 
-        schema_validation=False exists for fixture-scale tests whose compact
-        workbooks are not schema-complete; real runs keep it on."""
+        Projects the exact-current canonical manifest through the decision-free
+        changeset emitter and atomically replaces workbook-change-set.json plus
+        session.json. Re-emission from identical inputs is a byte-identical
+        no-op; the run must be recompiled first when compiler inputs went
+        stale."""
 
-        import shutil
-        import tempfile
-
-        from corvette_form_generator.editor_ops import apply_batch
-        from corvette_form_generator.ingest.wizard.plan_builder import build_plan
+        from corvette_form_generator.ingest.wizard.changeset_emitter import (
+            emit_manifest_changeset,
+        )
 
         session = self.load_session(run_id, verify_source=False)
         self._refuse_if_applied(session)
-        if session["state"] not in (
-            STATE_DECISIONS_COMPLETE,
-            STATE_PLAN_BUILT,
-            STATE_PLAN_APPROVED,
-            STATE_DRY_RUN_APPROVED,
-            STATE_DRY_RUN_VALIDATED_WRITE_BLOCKED,
-            STATE_DRY_RUN_VALIDATED_WRITE_ELIGIBLE,
-        ):
-            raise WizardError("Mark decisions complete before building the apply plan.", status=409)
+        if session["state"] not in (STATE_COMPILED_READY, STATE_CHANGESET_EMITTED):
+            raise WizardError(
+                "Resolve compiler blockers before emitting the ChangeSet.",
+                status=409,
+            )
         run_dir = self.run_dir(run_id)
-        _, candidates_file, candidates = self._parsed_candidates(run_id)
+        _, candidates_file, _candidates = self._parsed_candidates(
+            run_id, allow_compiled=True
+        )
         selection = self._load_selection(run_id, candidates_file)
-        state = self._decision_state(run_id, candidates, selection)
         workbook = self._require_workbook()
-        plan = build_plan(
+        detail = self.compiler_detail(run_id)
+        freshness = self._compiler_freshness(run_id, detail["compileReport"])
+        if freshness["stale"]:
+            raise WizardError(
+                "Compiler inputs changed; recompile before emitting the ChangeSet: "
+                + ", ".join(freshness["reasons"]),
+                status=409,
+            )
+        bindings = self._compiler_artifact_bindings(run_dir)
+        changeset = emit_manifest_changeset(
             workbook_path=workbook,
+            run_id=run_id,
+            manifest=detail["manifest"],
+            compile_report=detail["compileReport"],
             selection=selection,
-            candidates=candidates,
-            decisions=state["decisions"],
-            candidates_fingerprint=selection["candidatesFingerprint"],
-        )
-
-        def summarize(result: dict[str, Any]) -> dict[str, Any]:
-            return {
-                "ok": result.get("ok", False),
-                "status": result.get("status", ""),
-                "errors": result.get("errors", []),
-                "warnings": result.get("warnings", []),
-                "opCount": result.get("opCount"),
-                "schemaErrors": (result.get("schemaResult") or {}).get("error_count"),
-            }
-
-        dry_run: dict[str, Any] = {}
-        stage1_batch = {
-            "workbookMtimeNs": str(workbook.stat().st_mtime_ns),
-            "items": plan["stage1"]["items"],
-        }
-        dry_run["stage1"] = summarize(
-            apply_batch(workbook, stage1_batch, write=False, run_schema_validation=False)
-        )
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            scratch = Path(tmp_dir) / workbook.name
-            shutil.copy2(workbook, scratch)
-            stage1_scratch = dict(stage1_batch, workbookMtimeNs=str(scratch.stat().st_mtime_ns))
-            applied = apply_batch(
-                # A scratch save still goes through the service-level write
-                # boundary. Compact tests patch the schema scan to an empty
-                # issue list; production never disables it for a write call.
-                scratch, stage1_scratch, write=True, run_schema_validation=True,
-                confirmed_warnings=[w["id"] for w in dry_run["stage1"]["warnings"]],
-                log_path=run_dir / "scratch-apply-log.jsonl",
-            )
-            dry_run["stage1Scratch"] = summarize(applied)
-            if applied.get("ok"):
-                stage2_batch = {
-                    "workbookMtimeNs": str(scratch.stat().st_mtime_ns),
-                    "items": plan["stage2"]["items"],
-                }
-                dry_run["stage2"] = summarize(
-                    apply_batch(scratch, stage2_batch, write=False, run_schema_validation=schema_validation)
-                )
-            else:
-                dry_run["stage2"] = {"ok": False, "status": "skipped", "errors": ["stage 1 scratch apply failed"], "warnings": []}
-        dry_run["ok"] = bool(
-            plan["valid"] and dry_run["stage1"]["ok"] and dry_run["stage1Scratch"]["ok"] and dry_run["stage2"]["ok"]
-        )
-
-        write_json(run_dir / "apply-plan.json", plan)
-        write_json(run_dir / "apply-plan-dryrun.json", dry_run)
-        (run_dir / "apply-plan.md").write_text(plan_markdown(plan, dry_run), encoding="utf-8")
-        session["state"] = STATE_PLAN_BUILT if dry_run["ok"] else STATE_DECISIONS_COMPLETE
-        write_json(run_dir / "session.json", session)
-        return {"session": session, "plan": plan_summary(plan), "dryRun": dry_run}
-
-    def plan_detail(self, run_id: str) -> dict[str, Any]:
-        run_dir = self.run_dir(run_id)
-        plan_file = run_dir / "apply-plan.json"
-        if not plan_file.is_file():
-            raise WizardError("Build the apply plan first.", status=404)
-        plan = read_json(plan_file)
-        dry_file = run_dir / "apply-plan-dryrun.json"
-        approval_file = run_dir / "plan-approval.json"
-        return {
-            "session": self.load_session(run_id, verify_source=False),
-            "plan": plan_summary(plan),
-            "dryRun": read_json(dry_file) if dry_file.is_file() else None,
-            "approval": read_json(approval_file) if approval_file.is_file() else None,
-        }
-
-    def approve_plan(self, run_id: str, approver: str) -> dict[str, Any]:
-        session = self.load_session(run_id, verify_source=False)
-        if session["state"] not in (
-            STATE_PLAN_BUILT,
-            STATE_PLAN_APPROVED,
-            STATE_DRY_RUN_APPROVED,
-            STATE_DRY_RUN_VALIDATED_WRITE_BLOCKED,
-            STATE_DRY_RUN_VALIDATED_WRITE_ELIGIBLE,
-        ):
-            raise WizardError("Plan must be built (and dry-run clean) before approval.", status=409)
-        if not str(approver or "").strip():
-            raise WizardError("Approval needs a reviewer name.")
-        run_dir = self.run_dir(run_id)
-        plan = read_json(run_dir / "apply-plan.json")
-        # Fail closed if anything shifted since the plan was built.
-        _, candidates_file, candidates = self._parsed_candidates(run_id)
-        selection = self._load_selection(run_id, candidates_file)
-        state = self._decision_state(run_id, candidates, selection)
-        if plan["decisionsFingerprint"] != artifact_sha(state["decisions"]):
-            raise WizardError("Decisions changed after the plan was built; rebuild the plan.", status=409)
-        workbook = self._require_workbook()
-        if plan["workbookFingerprint"]["mtimeNs"] != str(workbook.stat().st_mtime_ns) or plan[
-            "workbookFingerprint"
-        ]["sha256"] != hashlib.sha256(workbook.read_bytes()).hexdigest():
-            raise WizardError("Workbook changed after the plan was built; rebuild the plan.", status=409)
-        if plan.get("schemaVersion") == WRITABLE_PLAN_SCHEMA:
-            self._require_compiler_bindings(run_dir, plan)
-            semantic_blockers = self._option_semantic_blockers(plan)
-            if semantic_blockers:
-                raise WizardError(
-                    f"{WRITABLE_PLAN_SCHEMA} plan approval requires explicit typed "
-                    "selectable and active values on every emitted option row.",
-                    status=409,
-                )
-        approval = {
-            "schemaVersion": PLAN_APPROVAL_SCHEMA,
-            "scope": PLAN_APPROVAL_SCOPE,
-            "approvedBy": str(approver).strip(),
-            "approvedAt": time.strftime("%Y-%m-%dT%H:%M:%S"),
-            **self._approval_bindings(run_id, session, plan, run_dir),
-        }
-        write_json(run_dir / "plan-approval.json", approval)
-        self._append_approval_audit(run_dir, approval)
-        (run_dir / "write-approval.json").unlink(missing_ok=True)
-        session["state"] = STATE_DRY_RUN_APPROVED
-        write_json(run_dir / "session.json", session)
-        return {"session": session, "approval": approval}
-
-    # ------------------------------------------------------ pass d: apply
-    def _combined_plan_batch(self, plan: dict[str, Any], workbook: Path) -> dict[str, Any]:
-        return {
-            "workbookMtimeNs": str(workbook.stat().st_mtime_ns),
-            "items": [*plan["stage1"]["items"], *plan["stage2"]["items"]],
-        }
-
-    def _per_sheet_action_counts(self, items: list[dict[str, Any]]) -> dict[str, dict[str, int]]:
-        counts: dict[str, dict[str, int]] = {}
-        for item in items:
-            sheet = item.get("sheet")
-            action = item.get("action")
-            if not sheet or not action:
-                continue
-            sheet_counts = counts.setdefault(str(sheet), {})
-            sheet_counts[str(action)] = sheet_counts.get(str(action), 0) + 1
-        return {sheet: dict(sorted(actions.items())) for sheet, actions in sorted(counts.items())}
-
-    def _deployment_continuity_from_plan(self, plan: dict[str, Any]) -> dict[str, Any]:
-        """Action-aware source-coverage diagnostic for the dry-run report.
-
-        The temp generation probe added by Pass D.1 can enrich these entries;
-        this source-op layer is intentionally conservative and never treats
-        create/delete-only sheet activity as runtime coverage.
-        """
-
-        report = plan.get("report") or {}
-        plan_continuity = report.get("runtimeContinuity") or {}
-        output: dict[str, Any] = {}
-        for model in plan.get("targets") or []:
-            source_ops = (plan_continuity.get(model) or {}).get("sourceOps") or {}
-            price_adds = sum((source_ops.get("priceRules") or {}).get(action, 0) for action in ("add", "update"))
-            rule_group_adds = sum((source_ops.get("ruleGroups") or {}).get(action, 0) for action in ("add", "update"))
-            color_adds = sum((source_ops.get("colorOverrides") or {}).get(action, 0) for action in ("add", "update"))
-            component_adds = sum((source_ops.get("interiorComponents") or {}).get(action, 0) for action in ("add", "update"))
-            asset_adds = sum((source_ops.get("assetMap") or {}).get(action, 0) for action in ("add", "update"))
-            blockers: list[dict[str, str]] = []
-            deferrals: list[dict[str, str]] = []
-            if model in {"zr1", "zr1x"} and price_adds == 0:
-                blockers.append({"kind": "price_rules_required_for_runtime", "detail": "no price-rule add/update ops"})
-            if model in {"zr1", "zr1x"} and rule_group_adds == 0:
-                blockers.append({"kind": "rule_groups_required_for_runtime", "detail": "no rule-group add/update ops"})
-            output[model] = {
-                "status": "not_deployment_ready" if blockers else "source_ops_diagnostic",
-                "registryLoadable": None,
-                "registryLoadableNote": "temp generation probe not run in source-op diagnostic layer",
-                "sourceOps": source_ops,
-                "sourceCoverage": {
-                    "priceRuleAddOrUpdateCount": price_adds,
-                    "ruleGroupAddOrUpdateCount": rule_group_adds,
-                    "colorOverrideAddOrUpdateCount": color_adds,
-                    "interiorComponentAddOrUpdateCount": component_adds,
-                    "assetMapAddOrUpdateCount": asset_adds,
-                },
-                "deploymentBlockers": blockers,
-                "deploymentDeferrals": deferrals,
-            }
-        return output
-
-    def _activate_probe_models(self, workbook: Path, models: list[str]) -> None:
-        from openpyxl import load_workbook
-
-        wb = load_workbook(workbook)
-        try:
-            targets = set(models)
-            variant_ids: set[str] = set()
-            if "model_variants" in wb.sheetnames:
-                ws = wb["model_variants"]
-                headers = {str(cell.value): index + 1 for index, cell in enumerate(ws[1]) if cell.value is not None}
-                model_col = headers.get("model_key")
-                variant_col = headers.get("variant_id")
-                if model_col and variant_col:
-                    for row in range(2, ws.max_row + 1):
-                        model_key = str(ws.cell(row=row, column=model_col).value or "").strip().lower()
-                        if model_key in targets:
-                            variant_id = str(ws.cell(row=row, column=variant_col).value or "").strip()
-                            if variant_id:
-                                variant_ids.add(variant_id)
-            for sheet_name, fields in {
-                "model_master": {"active": True},
-                "model_variants": {"active": True},
-                "model_workbook_sources": {"active": True},
-                "model_registry_promotion": {"active": True, "promoted_to_runtime": True},
-            }.items():
-                if sheet_name not in wb.sheetnames:
-                    continue
-                ws = wb[sheet_name]
-                headers = {str(cell.value): index + 1 for index, cell in enumerate(ws[1]) if cell.value is not None}
-                model_col = headers.get("model_key")
-                if not model_col:
-                    continue
-                for row in range(2, ws.max_row + 1):
-                    model_key = str(ws.cell(row=row, column=model_col).value or "").strip().lower()
-                    if model_key not in targets:
-                        if sheet_name == "model_master" and "active" in headers:
-                            ws.cell(row=row, column=headers["active"], value=False)
-                        continue
-                    for column, value in fields.items():
-                        if column in headers:
-                            ws.cell(row=row, column=headers[column], value=value)
-                    if sheet_name == "model_registry_promotion":
-                        if "artifact_type" in headers:
-                            ws.cell(row=row, column=headers["artifact_type"], value="runtime_contract")
-                        if "artifact_path" in headers:
-                            ws.cell(
-                                row=row,
-                                column=headers["artifact_path"],
-                                value=f"form-output/runtime/{model_key.replace('_', '-')}-runtime-contract.json",
-                            )
-            if variant_ids and "variant_master" in wb.sheetnames:
-                ws = wb["variant_master"]
-                headers = {str(cell.value): index + 1 for index, cell in enumerate(ws[1]) if cell.value is not None}
-                variant_col = headers.get("variant_id")
-                active_col = headers.get("active")
-                if variant_col and active_col:
-                    for row in range(2, ws.max_row + 1):
-                        variant_id = str(ws.cell(row=row, column=variant_col).value or "").strip()
-                        if variant_id in variant_ids:
-                            ws.cell(row=row, column=active_col, value=True)
-            wb.save(workbook)
-        finally:
-            wb.close()
-
-    def _source_count(self, payload: dict[str, Any], key: str) -> int:
-        value = payload.get(key)
-        return len(value) if isinstance(value, list) else 0
-
-    def _deployment_continuity_probe(
-        self,
-        workbook: Path,
-        batch: dict[str, Any],
-        plan: dict[str, Any],
-        *,
-        schema_validation: bool,
-    ) -> dict[str, Any]:
-        """Apply the plan to a temp workbook and run temp-only generation probes."""
-
-        import shutil
-        import tempfile
-
-        from corvette_form_generator.contract import ASSET_IMAGE_FIELDS
-        from corvette_form_generator.editor_ops import apply_batch
-        from corvette_form_generator.model_configs import discover_generation_model_configs
-        from corvette_form_generator.source_assembly import assemble_model_source
-
-        targets = [str(model) for model in plan.get("targets") or []]
-        continuity = self._deployment_continuity_from_plan(plan)
-        if not targets:
-            return continuity
-        with tempfile.TemporaryDirectory(prefix="ingest-d1-deployment-") as tmp_dir:
-            tmp_root = Path(tmp_dir)
-            tmp_workbook = tmp_root / workbook.name
-            shutil.copy2(workbook, tmp_workbook)
-            temp_batch = dict(batch, workbookMtimeNs=str(tmp_workbook.stat().st_mtime_ns))
-            preview = apply_batch(tmp_workbook, temp_batch, write=False, run_schema_validation=schema_validation)
-            confirmed = [warning["id"] for warning in preview.get("warnings", [])]
-            applied = apply_batch(
-                tmp_workbook,
-                temp_batch,
-                write=True,
-                confirmed_warnings=confirmed,
-                source="ingest_wizard_deployment_probe",
-                log_path=tmp_root / "probe-edit-log.jsonl",
-                # This is a saved scratch workbook, so the writer boundary
-                # always keeps schema validation enabled. Compact tests patch
-                # the issue scan rather than disabling the write gate.
-                run_schema_validation=True,
-            )
-            if not applied.get("ok"):
-                error = "; ".join(applied.get("errors", [])) or str(applied.get("status"))
-                for model in targets:
-                    entry = continuity.setdefault(model, {})
-                    blockers = list(entry.get("deploymentBlockers") or [])
-                    blockers.append({"kind": "deployment_probe_apply_failed", "detail": error})
-                    entry.update(
-                        {
-                            "status": "probe_apply_failed",
-                            "registryLoadable": False,
-                            "registryError": error,
-                            "deploymentBlockers": blockers,
-                        }
-                    )
-                return continuity
-
-            self._activate_probe_models(tmp_workbook, targets)
-            try:
-                configs = discover_generation_model_configs(tmp_workbook)
-            except Exception as exc:
-                configs = {}
-                discovery_error = str(exc)
-            else:
-                discovery_error = ""
-
-            for model in targets:
-                entry = continuity.setdefault(model, {})
-                blockers = list(entry.get("deploymentBlockers") or [])
-                deferrals = list(entry.get("deploymentDeferrals") or [])
-                config = configs.get(model)
-                if config is None:
-                    error = discovery_error or f"model {model!r} was not discoverable after temp activation"
-                    blockers.append({"kind": "registry_load_failed", "detail": error})
-                    entry.update(
-                        {
-                            "status": "not_deployment_ready",
-                            "registryLoadable": False,
-                            "registryError": error,
-                            "deploymentBlockers": blockers,
-                            "deploymentDeferrals": deferrals,
-                        }
-                    )
-                    continue
-
-                config = config.with_overrides(
-                    workbook_path=tmp_workbook,
-                    output_dir=tmp_root / "form-output",
-                    app_dir=tmp_root / "form-app",
-                )
-                try:
-                    assembly = assemble_model_source(config)
-                except Exception as exc:
-                    blockers.append({"kind": "registry_load_failed", "detail": str(exc)})
-                    entry.update(
-                        {
-                            "status": "not_deployment_ready",
-                            "registryLoadable": False,
-                            "registryError": str(exc),
-                            "deploymentBlockers": blockers,
-                            "deploymentDeferrals": deferrals,
-                        }
-                    )
-                    continue
-
-                source = assembly.source_data
-                raw_validation = source.get("validation")
-                validation: list[dict[str, Any]] = raw_validation if isinstance(raw_validation, list) else []
-                pricing_deferred = any(row.get("check_id") == "pricing_deferred" for row in validation if isinstance(row, dict))
-                raw_choices = source.get("choices")
-                choices: list[dict[str, Any]] = raw_choices if isinstance(raw_choices, list) else []
-                raw_interiors = source.get("interiors")
-                interiors: list[dict[str, Any]] = raw_interiors if isinstance(raw_interiors, list) else []
-                media_count = sum(
-                    1
-                    for choice in choices
-                    if isinstance(choice, dict) and any(choice.get(field) for field in ASSET_IMAGE_FIELDS)
-                )
-                component_count = sum(
-                    len(interior.get("interior_components") or [])
-                    for interior in interiors
-                    if isinstance(interior, dict) and isinstance(interior.get("interior_components"), list)
-                )
-                counts = {
-                    "choices": len(choices),
-                    "directRules": self._source_count(source, "rules"),
-                    "ruleGroups": self._source_count(source, "ruleGroups"),
-                    "exclusiveGroups": self._source_count(source, "exclusiveGroups"),
-                    "priceRules": self._source_count(source, "priceRules"),
-                    "pricingDeferred": pricing_deferred,
-                    "colorOverrides": self._source_count(source, "colorOverrides"),
-                    "interiors": len(interiors),
-                    "interiorComponentLineItems": component_count,
-                    "optionMediaCoveredChoices": media_count,
-                    "optionMediaTotalChoices": len(choices),
-                    "validationWarnings": sum(1 for row in validation if isinstance(row, dict) and row.get("severity") == "warning"),
-                    "validationErrors": sum(1 for row in validation if isinstance(row, dict) and row.get("severity") == "error"),
-                }
-                if counts["validationErrors"]:
-                    blockers.append(
-                        {
-                            "kind": "generated_validation_errors",
-                            "detail": (
-                                f"generated contract has {counts['validationErrors']} validation error(s)"
-                            ),
-                        }
-                    )
-                if model in {"zr1", "zr1x"} and counts["priceRules"] == 0 and pricing_deferred:
-                    blockers.append({"kind": "price_rules_required_for_runtime", "detail": "generated contract has pricing_deferred and zero priceRules"})
-                if model in {"zr1", "zr1x"} and counts["ruleGroups"] == 0:
-                    blockers.append({"kind": "rule_groups_required_for_runtime", "detail": "generated contract has zero ruleGroups"})
-                if counts["colorOverrides"] == 0:
-                    blockers.append(
-                        {
-                            "kind": "color_overrides_missing_or_unproven",
-                            "detail": "generated contract has zero colorOverrides without not-applicable proof",
-                        }
-                    )
-                if counts["interiors"] == 0:
-                    blockers.append(
-                        {
-                            "kind": "interiors_missing_or_unproven",
-                            "detail": "generated contract has zero interiors without not-applicable proof",
-                        }
-                    )
-                if counts["interiorComponentLineItems"] == 0:
-                    blockers.append(
-                        {
-                            "kind": "interior_components_missing_or_unproven",
-                            "detail": (
-                                "generated contract has zero interior component line items "
-                                "without not-applicable proof"
-                            ),
-                        }
-                    )
-                if counts["optionMediaCoveredChoices"] == 0:
-                    blockers.append(
-                        {
-                            "kind": "asset_map_media_missing",
-                            "detail": "generated choices have zero option/card asset fields",
-                        }
-                    )
-                entry.update(
-                    {
-                        "status": "not_deployment_ready" if blockers else "deployment_probe_passed",
-                        "registryLoadable": True,
-                        "registryError": "",
-                        "counts": counts,
-                        "deploymentBlockers": blockers,
-                        "deploymentDeferrals": deferrals,
-                    }
-                )
-            return continuity
-
-    def _validate_plan_approval(
-        self,
-        run_id: str,
-        session: dict[str, Any],
-        plan: dict[str, Any],
-        approval: dict[str, Any],
-        run_dir: Path,
-        *,
-        allow_legacy: bool,
-    ) -> bool:
-        """Validate current scoped authority; return True for a legacy record."""
-
-        plan_sha = hashlib.sha256((run_dir / "apply-plan.json").read_bytes()).hexdigest()
-        if approval.get("schemaVersion") != PLAN_APPROVAL_SCHEMA:
-            if (
-                allow_legacy
-                and approval.get("schemaVersion") in {"pass-c-1", "pass-c-2"}
-                and not approval.get("scope")
-                and approval.get("planSha") == plan_sha
-            ):
-                return True
-            raise WizardError(
-                f"Apply requires {PLAN_APPROVAL_SCHEMA} {PLAN_APPROVAL_SCOPE} approval.",
-                status=409,
-            )
-        if approval.get("scope") != PLAN_APPROVAL_SCOPE:
-            raise WizardError("Plan approval scope must be dry_run_evidence.", status=409)
-        expected = self._approval_bindings(run_id, session, plan, run_dir)
-        for field, value in expected.items():
-            if approval.get(field) != value:
-                raise WizardError(
-                    f"Plan approval binding {field} changed; rebuild and re-approve.",
-                    status=409,
-                )
-        return False
-
-    def _validate_current_plan_inputs(
-        self,
-        run_id: str,
-        session: dict[str, Any],
-        plan: dict[str, Any],
-    ) -> tuple[Path, dict[str, Any]]:
-        _, candidates_file, candidates = self._parsed_candidates(run_id)
-        selection = self._load_selection(run_id, candidates_file)
-        state = self._decision_state(run_id, candidates, selection)
-        if plan.get("decisionsFingerprint") != artifact_sha(state["decisions"]):
-            raise WizardError("Decisions changed after the plan was approved; rebuild the plan.", status=409)
-        source_fingerprint = plan.get("sourceFingerprint") or selection.get("sourceFingerprint") or {}
-        if source_fingerprint.get("sha256") != session.get("fingerprint", {}).get("sha256"):
-            raise WizardError("Source fingerprint changed after the plan was approved; start a new run.", status=409)
-        workbook = self._require_workbook()
-        before = file_fingerprint(workbook)
-        expected = plan.get("workbookFingerprint") or {}
-        if expected.get("mtimeNs") != str(before["mtimeNs"]) or expected.get("sha256") != before["sha256"]:
-            raise WizardError("Workbook changed after the plan was approved; rebuild the plan.", status=409)
-        return workbook, before
-
-    def _option_semantic_blockers(self, plan: dict[str, Any]) -> list[dict[str, Any]]:
-        from corvette_form_generator.editor_ops import flatten_items
-        from corvette_form_generator.ingest.wizard.plan_builder import MODEL_PLAN_CONFIG
-
-        blockers: list[dict[str, Any]] = []
-        items = flatten_items(
-            [
-                *(plan.get("stage1", {}).get("items") or []),
-                *(plan.get("stage2", {}).get("items") or []),
-            ]
-        )
-        for model in plan.get("targets") or []:
-            config = MODEL_PLAN_CONFIG.get(model) or {}
-            options_sheet = f"{config.get('sheetPrefix', '')}options"
-            missing: list[dict[str, Any]] = []
-            for item in items:
-                if item.get("sheet") != options_sheet or item.get("action") not in {"add", "update"}:
-                    continue
-                values = item.get("row") or {}
-                absent = [field for field in ("selectable", "active") if not isinstance(values.get(field), bool)]
-                if absent:
-                    missing.append(
-                        {
-                            "optionId": str((item.get("key") or {}).get("option_id") or values.get("option_id") or ""),
-                            "fields": absent,
-                        }
-                    )
-            if missing:
-                blockers.append(
-                    {
-                        "kind": "blank_option_semantics",
-                        "model": model,
-                        "detail": f"{len(missing)} emitted option row(s) lack typed selectable/active values",
-                        "examples": missing[:10],
-                    }
-                )
-        return blockers
-
-    def _identity_churn_blockers(
-        self,
-        workbook: Path,
-        plan: dict[str, Any],
-    ) -> list[dict[str, Any]]:
-        from corvette_form_generator.editor_ops import extract_workbook, flatten_items
-        from corvette_form_generator.ingest.wizard.plan_builder import MODEL_PLAN_CONFIG
-
-        extract = extract_workbook(workbook)
-        items = flatten_items(
-            [
-                *(plan.get("stage1", {}).get("items") or []),
-                *(plan.get("stage2", {}).get("items") or []),
-            ]
-        )
-        blockers: list[dict[str, Any]] = []
-        for model in plan.get("targets") or []:
-            config = MODEL_PLAN_CONFIG.get(model) or {}
-            sheet = f"{config.get('sheetPrefix', '')}options"
-            existing = {
-                str(row.get("option_id") or "").strip(): str(row.get("rpo") or "").strip().upper()
-                for row in extract.get("sheets", {}).get(sheet, {}).get("rows", [])
-            }
-            deleted = {
-                option_id: existing.get(option_id, "")
-                for item in items
-                if item.get("sheet") == sheet and item.get("action") == "delete"
-                if (option_id := str((item.get("key") or {}).get("option_id") or "").strip())
-            }
-            additions = [
-                item.get("row") or {}
-                for item in items
-                if item.get("sheet") == sheet and item.get("action") == "add"
-            ]
-            churn: list[dict[str, str]] = []
-            for old_id, rpo in deleted.items():
-                if not rpo:
-                    continue
-                for row in additions:
-                    new_id = str(row.get("option_id") or "").strip()
-                    if str(row.get("rpo") or "").strip().upper() == rpo and new_id and new_id != old_id:
-                        churn.append({"rpo": rpo, "oldOptionId": old_id, "newOptionId": new_id})
-            if churn:
-                blockers.append(
-                    {
-                        "kind": "identity_churn",
-                        "model": model,
-                        "detail": f"{len(churn)} matched option identity replacement(s) require reconciliation",
-                        "examples": churn[:10],
-                    }
-                )
-        return blockers
-
-    def _write_eligibility(
-        self,
-        *,
-        workbook: Path,
-        plan: dict[str, Any],
-        approval: dict[str, Any],
-        legacy_approval: bool,
-        schema_validation: bool,
-        result: dict[str, Any],
-        deployment: dict[str, Any],
-    ) -> dict[str, Any]:
-        from corvette_form_generator.editor_ops import classify_warnings
-
-        global_blockers: list[dict[str, Any]] = []
-        target_blockers: dict[str, list[dict[str, Any]]] = {
-            str(model): [] for model in plan.get("targets") or []
-        }
-        target_deferrals: dict[str, list[dict[str, Any]]] = {
-            str(model): [] for model in plan.get("targets") or []
-        }
-        compile_deferrals: list[dict[str, Any]] = []
-        not_applicable_families: set[tuple[str, str]] = set()
-        if not schema_validation or result.get("schemaResult") is None:
-            global_blockers.append(
-                {
-                    "kind": "schema_validation_not_run",
-                    "detail": "schema-disabled diagnostics cannot establish live-write eligibility",
-                }
-            )
-        if plan.get("schemaVersion") != WRITABLE_PLAN_SCHEMA:
-            global_blockers.append(
-                {
-                    "kind": "plan_schema_not_writable",
-                    "detail": (
-                        f"plan schema {plan.get('schemaVersion')!r} is permanently diagnostic; "
-                        f"{WRITABLE_PLAN_SCHEMA} is required"
-                    ),
-                }
-            )
-        if legacy_approval:
-            global_blockers.append(
-                {
-                    "kind": "approval_schema_not_writable",
-                    "detail": f"historical plan approval is diagnostic only; {PLAN_APPROVAL_SCHEMA} is required",
-                }
-            )
-        compiler_bindings = (
-            self._compiler_artifact_bindings(self.run_dir(str(approval["runId"])))
-            if approval.get("runId")
-            else {}
-        )
-        if plan.get("schemaVersion") == WRITABLE_PLAN_SCHEMA:
-            for field in ("canonicalManifestSha", "compileReportSha", "exceptionResolutionsSha"):
-                if not compiler_bindings.get(field) or plan.get(field) != compiler_bindings.get(field):
-                    global_blockers.append(
-                        {"kind": "compiler_binding_missing", "detail": f"{field} is absent or stale"}
-                    )
-            try:
-                targets = [str(model) for model in plan.get("targets") or []]
-                self._require_compile_report_readiness(
-                    self.run_dir(str(approval["runId"])),
-                    targets,
-                )
-                compile_deferrals = self._compile_report_allowed_deferrals(
-                    self.run_dir(str(approval["runId"])),
-                    targets,
-                )
-                not_applicable_families = self._compile_report_not_applicable_families(
-                    self.run_dir(str(approval["runId"])),
-                    targets,
-                )
-            except WizardError as exc:
-                global_blockers.append(
-                    {"kind": "compile_deferral_policy_invalid", "detail": str(exc)}
-                )
-
-        def media_deferral_for(model: str) -> dict[str, Any] | None:
-            matches = [
-                item
-                for item in compile_deferrals
-                if item.get("kind") == "asset_map_media_missing"
-                and str(item.get("model") or "") == model
-            ]
-            return dict(matches[0]) if len(matches) == 1 else None
-
-        semantic_blockers = self._option_semantic_blockers(plan) + self._identity_churn_blockers(workbook, plan)
-        for blocker in semantic_blockers:
-            model = str(blocker.get("model") or "")
-            if model in target_blockers:
-                target_blockers[model].append(blocker)
-            else:
-                global_blockers.append(blocker)
-
-        coverage = result.get("operationCoverage") or {}
-        if coverage.get("rawCovered") != coverage.get("rawCount"):
-            global_blockers.append(
-                {"kind": "operation_coverage_failed", "detail": "raw operation coverage is incomplete"}
-            )
-        verification = result.get("verification") or {}
-        if not verification.get("ok") or verification.get("preparedChecked") != coverage.get("preparedCount"):
-            global_blockers.append(
-                {"kind": "readback_failed", "detail": "prepared operation readback is incomplete"}
-            )
-
-        warning_policy = result.get("warningPolicy") or classify_warnings(result.get("warnings") or [])
-        for warning_id in warning_policy.get("blockingIds") or []:
-            warning_kind = str(warning_id).partition(":")[0]
-            kind = {
-                "refdel": "referenced_delete",
-                "dorder": "display_order_collision",
-            }.get(warning_kind, "unknown_warning")
-            global_blockers.append({"kind": kind, "detail": str(warning_id), "warningId": str(warning_id)})
-
-        effective_deployment_blockers: dict[str, list[dict[str, Any]]] = {
-            model: [] for model in target_blockers
-        }
-        for model in target_blockers:
-            entry = deployment.get(model) or {}
-            for blocker in entry.get("deploymentBlockers") or []:
-                not_applicable_family = {
-                    "color_overrides_missing_or_unproven": "color_overrides",
-                    "interiors_missing_or_unproven": "interiors",
-                    "interior_components_missing_or_unproven": "interior_components",
-                    "asset_map_media_missing": "asset_map",
-                }.get(str(blocker.get("kind") or ""))
-                if not_applicable_family and (model, not_applicable_family) in not_applicable_families:
-                    continue
-                if blocker.get("kind") == "asset_map_media_missing":
-                    media_deferral = media_deferral_for(model)
-                    if media_deferral is not None:
-                        if media_deferral not in target_deferrals[model]:
-                            target_deferrals[model].append(media_deferral)
-                        continue
-                effective_deployment_blockers[model].append(
-                    {
-                        "kind": str(blocker.get("kind") or "deployment_blocked"),
-                        "model": model,
-                        "detail": str(blocker.get("detail") or "deployment continuity failed"),
-                    }
-                )
-            for deferral in entry.get("deploymentDeferrals") or []:
-                effective_deployment_blockers[model].append(
-                    {
-                        "kind": "unknown_deferral",
-                        "model": model,
-                        "detail": str(deferral.get("kind") or ""),
-                    }
-                )
-            target_blockers[model].extend(effective_deployment_blockers[model])
-
-        accepted_warning_ids: list[str] = []
-        for warning_id in warning_policy.get("confirmableIds") or []:
-            matched_model = next(
-                (
-                    model
-                    for model in target_blockers
-                    if str(warning_id).partition(":")[2].startswith(
-                        {"grand_sport_x": "grandSportX_"}.get(model, f"{model}_")
-                    )
-                ),
-                "",
-            )
-            entry = deployment.get(matched_model) or {}
-            if (
-                matched_model
-                and not effective_deployment_blockers.get(matched_model)
-                and entry.get("registryLoadable") is True
-            ):
-                accepted_warning_ids.append(str(warning_id))
-            else:
-                global_blockers.append(
-                    {
-                        "kind": "scaffold_warning_not_confirmable",
-                        "detail": f"{warning_id} lacks a clean target scratch-generation probe",
-                        "warningId": str(warning_id),
-                    }
-                )
-
-        targets: dict[str, Any] = {}
-        all_blockers = list(global_blockers)
-        all_deferrals: list[dict[str, Any]] = []
-        for model in target_blockers:
-            blockers = target_blockers[model]
-            deferrals = target_deferrals[model]
-            all_blockers.extend(blockers)
-            all_deferrals.extend(deferrals)
-            targets[model] = {
-                "eligible": not global_blockers and not blockers,
-                "blockers": blockers,
-                "deferrals": deferrals,
-            }
-        return {
-            "eligible": bool(targets) and not all_blockers and all(
-                entry["eligible"] for entry in targets.values()
-            ),
-            "blockers": all_blockers,
-            "deferrals": all_deferrals,
-            "targets": targets,
-            "acceptedWarningIds": sorted(accepted_warning_ids),
-            "warningFingerprint": warning_policy.get("fingerprint"),
-        }
-
-    def _eligible_report_contract(
-        self,
-        run_id: str,
-        plan: dict[str, Any],
-        report: dict[str, Any],
-        run_dir: Path,
-    ) -> None:
-        from corvette_form_generator.editor_ops import classify_warnings, flatten_items
-
-        if report.get("schemaVersion") != SCHEMA_VERSION_D:
-            raise WizardError(f"Write approval requires a {SCHEMA_VERSION_D} dry-run report.", status=409)
-        if not report.get("ok") or report.get("status") != "validated_write_eligible":
-            raise WizardError("Write approval requires a validated_write_eligible dry-run report.", status=409)
-        eligibility = report.get("writeEligibility") or {}
-        if not eligibility.get("eligible"):
-            raise WizardError("Dry-run report is not write eligible.", status=409)
-        if eligibility.get("blockers"):
-            raise WizardError("Write-eligible report still contains blockers.", status=409)
-        targets = list(plan.get("targets") or [])
-        report_targets = eligibility.get("targets") or {}
-        if set(report_targets) != set(targets) or any(
-            not (report_targets.get(model) or {}).get("eligible")
-            or bool((report_targets.get(model) or {}).get("blockers"))
-            for model in targets
-        ):
-            raise WizardError("Every target in the atomic plan must be write eligible.", status=409)
-        plan_sha = hashlib.sha256((run_dir / "apply-plan.json").read_bytes()).hexdigest()
-        if report.get("runId") != run_id or report.get("planSha") != plan_sha:
-            raise WizardError("Dry-run report is stale for the current plan.", status=409)
-        if report.get("planSchemaVersion") != WRITABLE_PLAN_SCHEMA:
-            raise WizardError(f"Write approval requires {WRITABLE_PLAN_SCHEMA}.", status=409)
-        if report.get("write"):
-            raise WizardError("Write approval must bind a dry-run report.", status=409)
-        if (
-            report.get("schemaValidationEnabled") is not True
-            or (report.get("schemaResult") or {}).get("error_count") != 0
-        ):
-            raise WizardError("Write approval requires a schema-validated eligible report.", status=409)
-        reported_policy = report.get("warningPolicy") or (report.get("applyResult") or {}).get("warningPolicy")
-        current_policy = classify_warnings(report.get("warnings") or [])
-        if not reported_policy or reported_policy.get("fingerprint") != current_policy.get("fingerprint"):
-            raise WizardError("Dry-run warning policy fingerprint is inconsistent.", status=409)
-        if current_policy.get("blockingIds") or current_policy.get("unknownIds"):
-            raise WizardError("Dry-run report contains blocking or unknown warnings.", status=409)
-        if sorted(eligibility.get("acceptedWarningIds") or []) != sorted(
-            current_policy.get("confirmableIds") or []
-        ) or eligibility.get("warningFingerprint") != current_policy.get("fingerprint"):
-            raise WizardError("Dry-run warning agreement is stale.", status=409)
-        coverage = report.get("operationCoverage") or {}
-        verification = report.get("verification") or {}
-        apply_result = report.get("applyResult") or {}
-        if coverage != (apply_result.get("operationCoverage") or {}):
-            raise WizardError("Dry-run report does not match editor operation coverage.", status=409)
-        if verification != (apply_result.get("verification") or {}):
-            raise WizardError("Dry-run report does not match editor prepared readback.", status=409)
-        combined_raw_count = len(
-            flatten_items(
-                [
-                    *(plan.get("stage1", {}).get("items") or []),
-                    *(plan.get("stage2", {}).get("items") or []),
-                ]
-            )
-        )
-        if coverage.get("rawCount") != combined_raw_count:
-            raise WizardError("Dry-run raw operation count does not match the bound plan.", status=409)
-        if coverage.get("rawCovered") != coverage.get("rawCount"):
-            raise WizardError("Dry-run raw operation coverage is incomplete.", status=409)
-        if not verification.get("ok") or verification.get("preparedChecked") != coverage.get("preparedCount"):
-            raise WizardError("Dry-run prepared readback is incomplete.", status=409)
-        deferrals = eligibility.get("deferrals") or []
-        nested_deferrals = [
-            item
-            for model in targets
-            for item in (report_targets.get(model) or {}).get("deferrals") or []
-        ]
-        def normalized(values: list[dict[str, Any]]) -> list[str]:
-            return sorted(
-                json.dumps(item, sort_keys=True, separators=(",", ":"))
-                for item in values
-            )
-        if normalized(deferrals) != normalized(nested_deferrals):
-            raise WizardError("Dry-run target deferrals do not match the atomic plan total.", status=409)
-        self._require_compile_report_readiness(run_dir, targets)
-        self._compile_report_not_applicable_families(run_dir, targets)
-        self._validate_report_deferrals(run_dir, deferrals, targets)
-
-    def approve_write(self, run_id: str, approver: str) -> dict[str, Any]:
-        """Create write authority solely from current stored proof artifacts."""
-
-        session = self.load_session(run_id)
-        self._refuse_if_applied(session)
-        if not str(approver or "").strip():
-            raise WizardError("Write approval needs a reviewer name.")
-        run_dir = self.run_dir(run_id)
-        plan_file = run_dir / "apply-plan.json"
-        plan_approval_file = run_dir / "plan-approval.json"
-        report_file = run_dir / "apply-dry-run-report.json"
-        if not plan_file.is_file() or not plan_approval_file.is_file() or not report_file.is_file():
-            raise WizardError("Write approval requires plan, scoped approval, and dry-run report.", status=409)
-        plan = read_json(plan_file)
-        if plan.get("schemaVersion") != WRITABLE_PLAN_SCHEMA:
-            raise WizardError(
-                f"Write approval requires {WRITABLE_PLAN_SCHEMA}; older plans are diagnostic only.",
-                status=409,
-            )
-        plan_approval = read_json(plan_approval_file)
-        self._validate_plan_approval(
-            run_id, session, plan, plan_approval, run_dir, allow_legacy=False
-        )
-        workbook, before = self._validate_current_plan_inputs(run_id, session, plan)
-        del workbook
-        self._require_compiler_bindings(
-            run_dir,
-            plan,
-            (PLAN_APPROVAL_SCHEMA, plan_approval),
-        )
-        report = read_json(report_file)
-        if report.get("approval") != plan_approval:
-            raise WizardError("Dry-run report does not bind the current plan approval.", status=409)
-        self._eligible_report_contract(run_id, plan, report, run_dir)
-        if report.get("workbookBefore") != before or report.get("workbookAfter") != before:
-            raise WizardError("Dry-run report workbook fingerprint is stale.", status=409)
-        eligibility = report["writeEligibility"]
-        approval = {
-            "schemaVersion": WRITE_APPROVAL_SCHEMA,
-            "scope": WRITE_APPROVAL_SCOPE,
-            "approvedBy": str(approver).strip(),
-            "approvedAt": time.strftime("%Y-%m-%dT%H:%M:%S"),
-            **self._approval_bindings(run_id, session, plan, run_dir),
-            "planApprovalSha": hashlib.sha256(plan_approval_file.read_bytes()).hexdigest(),
-            "eligibleDryRunReportSha": hashlib.sha256(report_file.read_bytes()).hexdigest(),
-            "acceptedWarningIds": list(eligibility.get("acceptedWarningIds") or []),
-            "warningFingerprint": eligibility.get("warningFingerprint"),
-            "allowedDeferrals": list(eligibility.get("deferrals") or []),
-        }
-        write_json(run_dir / "write-approval.json", approval)
-        self._append_approval_audit(run_dir, approval)
-        session["state"] = STATE_WRITE_APPROVED
-        write_json(run_dir / "session.json", session)
-        return {"session": session, "approval": approval}
-
-    def _prewrite_authority(
-        self,
-        run_id: str,
-        session: dict[str, Any],
-        plan: dict[str, Any],
-        plan_approval: dict[str, Any],
-        run_dir: Path,
-        *,
-        schema_validation: bool,
-    ) -> tuple[Path, dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
-        """Repeat every refusal check before the first possible live mutation."""
-
-        from corvette_form_generator.editor_ops import apply_batch, classify_warnings
-        from corvette_form_generator.workbook import excel_lock_path
-
-        if not schema_validation:
-            raise WizardError("Live write requires schema validation.", status=409)
-        if plan.get("schemaVersion") != WRITABLE_PLAN_SCHEMA:
-            raise WizardError(
-                f"Live write requires {WRITABLE_PLAN_SCHEMA}; older plans are permanently dry-run-only.",
-                status=409,
-            )
-        self._validate_plan_approval(
-            run_id, session, plan, plan_approval, run_dir, allow_legacy=False
-        )
-        if session.get("state") != STATE_WRITE_APPROVED:
-            raise WizardError("Live write requires deployment_ready_write approval.", status=409)
-        write_approval_file = run_dir / "write-approval.json"
-        report_file = run_dir / "apply-dry-run-report.json"
-        if not write_approval_file.is_file():
-            raise WizardError("Live write requires write-approval.json.", status=409)
-        if not report_file.is_file():
-            raise WizardError("Live write requires the eligible dry-run report.", status=409)
-        write_approval = read_json(write_approval_file)
-        if write_approval.get("schemaVersion") != WRITE_APPROVAL_SCHEMA:
-            raise WizardError(f"Live write requires {WRITE_APPROVAL_SCHEMA}.", status=409)
-        if write_approval.get("scope") != WRITE_APPROVAL_SCOPE:
-            raise WizardError("Write approval scope must be deployment_ready_write.", status=409)
-        self._require_compiler_bindings(
-            run_dir,
-            plan,
-            (PLAN_APPROVAL_SCHEMA, plan_approval),
-            (WRITE_APPROVAL_SCHEMA, write_approval),
-        )
-        expected_bindings = self._approval_bindings(run_id, session, plan, run_dir)
-        for field, value in expected_bindings.items():
-            if write_approval.get(field) != value:
-                raise WizardError(f"Write approval binding {field} changed.", status=409)
-        if write_approval.get("planApprovalSha") != hashlib.sha256(
-            (run_dir / "plan-approval.json").read_bytes()
-        ).hexdigest():
-            raise WizardError("Plan approval changed after write approval.", status=409)
-        report_sha = hashlib.sha256(report_file.read_bytes()).hexdigest()
-        if write_approval.get("eligibleDryRunReportSha") != report_sha:
-            raise WizardError("Eligible dry-run report SHA changed after write approval.", status=409)
-        report = read_json(report_file)
-        if report.get("approval") != plan_approval:
-            raise WizardError("Eligible report no longer matches plan approval.", status=409)
-        self._eligible_report_contract(run_id, plan, report, run_dir)
-
-        workbook, before = self._validate_current_plan_inputs(run_id, session, plan)
-        if excel_lock_path(workbook).exists():
-            raise WizardError("Excel lock file is present; close Excel before live write.", status=409)
-        if report.get("workbookBefore") != before or report.get("workbookAfter") != before:
-            raise WizardError("Eligible report workbook fingerprint changed.", status=409)
-        eligibility = report["writeEligibility"]
-        approved_deferrals = write_approval.get("allowedDeferrals") or []
-        if approved_deferrals != (eligibility.get("deferrals") or []):
-            raise WizardError("Allowed deferral set drifted after write approval.", status=409)
-        self._validate_report_deferrals(
-            run_dir,
-            approved_deferrals,
-            [str(model) for model in plan.get("targets") or []],
-        )
-
-        batch = self._combined_plan_batch(plan, workbook)
-        preview = apply_batch(
-            workbook,
-            batch,
-            write=False,
-            run_schema_validation=True,
-        )
-        if not preview.get("ok"):
-            raise WizardError(
-                "Pre-write temporary-workbook proof no longer passes: "
-                + "; ".join(preview.get("errors") or [str(preview.get("status"))]),
-                status=409,
-            )
-        current_policy = preview.get("warningPolicy") or classify_warnings(preview.get("warnings") or [])
-        if current_policy.get("blockingIds"):
-            raise WizardError("Pre-write proof emitted blocking or unknown warnings.", status=409)
-        if write_approval.get("warningFingerprint") != current_policy.get("fingerprint"):
-            raise WizardError("Warning set drifted after write approval.", status=409)
-        if sorted(write_approval.get("acceptedWarningIds") or []) != sorted(
-            current_policy.get("confirmableIds") or []
-        ):
-            raise WizardError("Accepted warning IDs drifted after write approval.", status=409)
-        coverage = preview.get("operationCoverage") or {}
-        verification = preview.get("verification") or {}
-        if coverage != (report.get("operationCoverage") or {}):
-            raise WizardError("Pre-write operation coverage drifted from the eligible report.", status=409)
-        if verification != (report.get("verification") or {}):
-            raise WizardError("Pre-write prepared readback drifted from the eligible report.", status=409)
-        if coverage.get("rawCovered") != coverage.get("rawCount"):
-            raise WizardError("Pre-write raw operation coverage is incomplete.", status=409)
-        if not verification.get("ok") or verification.get("preparedChecked") != coverage.get("preparedCount"):
-            raise WizardError("Pre-write prepared readback is incomplete.", status=409)
-        return workbook, before, write_approval, preview, report
-
-    def apply_approved_plan(
-        self,
-        run_id: str,
-        *,
-        write: bool = False,
-        confirm_plan_warnings: bool = False,
-        schema_validation: bool = True,
-    ) -> dict[str, Any]:
-        """Produce bound dry-run evidence or execute separately approved write authority."""
-
-        from corvette_form_generator.editor_ops import apply_batch, flatten_items
-
-        started_at = datetime.now().isoformat(timespec="seconds")
-        session = self.load_session(run_id)
-        self._refuse_if_applied(session)
-        if session["state"] not in {
-            STATE_PLAN_APPROVED,
-            STATE_DRY_RUN_APPROVED,
-            STATE_DRY_RUN_VALIDATED_WRITE_BLOCKED,
-            STATE_DRY_RUN_VALIDATED_WRITE_ELIGIBLE,
-            STATE_WRITE_APPROVED,
-        }:
-            raise WizardError("Apply requires an approved plan.", status=409)
-
-        run_dir = self.run_dir(run_id)
-        plan_file = run_dir / "apply-plan.json"
-        approval_file = run_dir / "plan-approval.json"
-        if not plan_file.is_file() or not approval_file.is_file():
-            raise WizardError("Apply requires apply-plan.json and plan-approval.json.", status=409)
-
-        plan = read_json(plan_file)
-        approval = read_json(approval_file)
-        plan_sha = hashlib.sha256(plan_file.read_bytes()).hexdigest()
-        if not plan.get("valid"):
-            raise WizardError("Apply plan is not valid; rebuild before applying.", status=409)
-        if write and not schema_validation:
-            raise WizardError("Live write requires schema validation.", status=409)
-        if write and plan.get("schemaVersion") != WRITABLE_PLAN_SCHEMA:
-            raise WizardError(
-                f"Live write requires {WRITABLE_PLAN_SCHEMA}; older plans are permanently dry-run-only.",
-                status=409,
-            )
-        if write and confirm_plan_warnings:
-            raise WizardError("Blanket plan-warning confirmation is retired.", status=409)
-
-        legacy_approval = self._validate_plan_approval(
-            run_id,
-            session,
-            plan,
-            approval,
-            run_dir,
-            allow_legacy=not write,
-        )
-        if write:
-            workbook, before, write_approval, _preview, approved_report = self._prewrite_authority(
-                run_id,
-                session,
-                plan,
-                approval,
-                run_dir,
-                schema_validation=schema_validation,
-            )
-        else:
-            workbook, before = self._validate_current_plan_inputs(run_id, session, plan)
-            write_approval = None
-            approved_report = None
-
-        batch = self._combined_plan_batch(plan, workbook)
-        per_sheet_action_counts = self._per_sheet_action_counts(batch["items"])
-        per_sheet_counts: dict[str, int] = {}
-        for item in batch["items"]:
-            sheet = item.get("sheet")
-            if sheet:
-                per_sheet_counts[str(sheet)] = per_sheet_counts.get(str(sheet), 0) + 1
-        confirmed_warnings = list((write_approval or {}).get("acceptedWarningIds") or [])
-        log_path = run_dir / "apply-workbook-edit-log.jsonl"
-        result = apply_batch(
-            workbook,
-            batch,
-            write=write,
-            source="ingest_wizard_apply",
-            confirmed_warnings=confirmed_warnings,
-            log_path=log_path,
-            run_schema_validation=schema_validation,
-        )
-        # A pre-mutation refusal must not create or replace report evidence.
-        if write and not result.get("ok") and not result.get("backupPath"):
-            return result
-        after = file_fingerprint(workbook)
-        completed_at = datetime.now().isoformat(timespec="seconds")
-        verification = result.get("verification") or {
-            "ok": False,
-            "preparedChecked": 0,
-            "preparedCount": 0,
-            "errors": ["editor result did not include prepared readback"],
-        }
-        if result.get("ok") and write:
-            deployment_continuity = dict((approved_report or {}).get("deploymentContinuity") or {})
-        elif result.get("ok"):
-            deployment_continuity = self._deployment_continuity_probe(
-                workbook,
-                batch,
-                plan,
-                schema_validation=schema_validation,
-            )
-        else:
-            deployment_continuity = {}
-        if result.get("ok"):
-            if write:
-                write_eligibility = dict((approved_report or {}).get("writeEligibility") or {})
-            else:
-                write_eligibility = self._write_eligibility(
-                    workbook=workbook,
-                    plan=plan,
-                    approval=approval,
-                    legacy_approval=legacy_approval,
-                    schema_validation=schema_validation,
-                    result=result,
-                    deployment=deployment_continuity,
-                )
-        else:
-            execution_blocker = {
-                "kind": "mechanical_validation_failed",
-                "detail": "; ".join(result.get("errors") or [str(result.get("status"))]),
-            }
-            write_eligibility = {
-                "eligible": False,
-                "blockers": [execution_blocker],
-                "deferrals": [],
-                "targets": {
-                    str(model): {"eligible": False, "blockers": [execution_blocker], "deferrals": []}
-                    for model in plan.get("targets") or []
-                },
-                "acceptedWarningIds": [],
-                "warningFingerprint": (result.get("warningPolicy") or {}).get("fingerprint"),
-            }
-        diagnostic_status = (
-            "validated_write_eligible" if write_eligibility["eligible"] else "validated_write_blocked"
-        )
-        status = result.get("status") if not result.get("ok") or write else diagnostic_status
-        blocked_reason = None
-        if not write_eligibility["eligible"]:
-            blockers = write_eligibility.get("blockers") or []
-            blocked_reason = str((blockers[0] if blockers else {}).get("detail") or "write eligibility is blocked")
-        report = {
-            "schemaVersion": SCHEMA_VERSION_D,
-            "planSchemaVersion": plan.get("schemaVersion"),
-            "planSupersededForWrite": plan.get("schemaVersion") != WRITABLE_PLAN_SCHEMA,
-            "liveWriteBlockedReason": blocked_reason,
-            "writeEligibility": write_eligibility,
-            "runId": run_id,
-            "startedAt": started_at,
-            "completedAt": completed_at,
-            "appliedAt": completed_at,
-            "write": write,
-            "schemaValidationEnabled": bool(schema_validation),
-            "status": status,
-            "ok": result["ok"],
-            "planSha": plan_sha,
-            "approvedBy": approval.get("approvedBy"),
-            "approvedAt": approval.get("approvedAt"),
-            "approval": approval,
-            "opCounts": {
-                "stage1": len(flatten_items(plan["stage1"]["items"])),
-                "stage2": len(flatten_items(plan["stage2"]["items"])),
-                "combinedRaw": (result.get("operationCoverage") or {}).get("rawCount", 0),
-                "prepared": (result.get("operationCoverage") or {}).get(
-                    "preparedCount", 0
-                ),
+            compiler_bindings=bindings,
+            authority_artifacts={
+                "exceptionQueue": detail["exceptionQueue"],
+                "resolutions": detail["resolutions"],
+                "comparatorEvidence": read_json(run_dir / "comparator-evidence.json"),
             },
-            "perSheetCounts": dict(sorted(per_sheet_counts.items())),
-            "perSheetActionCounts": per_sheet_action_counts,
-            "runtimeContinuity": (plan.get("report") or {}).get("runtimeContinuity", {}),
-            "deploymentContinuity": deployment_continuity,
-            "workbookBefore": before,
-            "workbookAfter": after,
-            "warnings": result.get("warnings", []),
-            "confirmedWarnings": confirmed_warnings,
-            "warningsConfirmed": confirmed_warnings,
-            "applyResult": result,
-            "warningPolicy": result.get("warningPolicy"),
-            "operationCoverage": result.get("operationCoverage"),
-            "schemaResult": result.get("schemaResult"),
-            "boolHygieneResult": result.get("boolHygieneResult"),
-            "gateReminders": result.get("gateReminders", []),
-            "sheets": result.get("sheets", []),
-            "backupPath": result.get("backupPath"),
-            "workbookEditLogPath": result.get("logPath"),
-            "verification": verification,
-        }
-        report_path = run_dir / ("apply-report.json" if write else "apply-dry-run-report.json")
-        write_json(report_path, report)
-        if not result.get("ok"):
-            result["reportPath"] = str(report_path)
-            result["verification"] = verification
-            result["writeEligibility"] = write_eligibility
-            result["liveWriteBlockedReason"] = blocked_reason
-            if write and result.get("status") == "apply_verification_failed":
-                session["state"] = STATE_APPLY_VERIFICATION_FAILED
-                session["applyReport"] = "apply-report.json"
-                write_json(run_dir / "session.json", session)
-            return result
-        if write:
-            session["state"] = STATE_APPLIED
-            session["appliedAt"] = report["appliedAt"]
-            session["applyReport"] = "apply-report.json"
-            write_json(run_dir / "session.json", session)
-        else:
-            session["state"] = (
-                STATE_DRY_RUN_VALIDATED_WRITE_ELIGIBLE
-                if write_eligibility["eligible"]
-                else STATE_DRY_RUN_VALIDATED_WRITE_BLOCKED
-            )
-            session["dryRunReport"] = "apply-dry-run-report.json"
-            write_json(run_dir / "session.json", session)
-        result["reportPath"] = str(report_path)
-        result["verification"] = verification
-        result["status"] = status
-        result["writeEligibility"] = write_eligibility
-        result["liveWriteBlockedReason"] = blocked_reason
-        return result
-
-    def mark_complete(self, run_id: str) -> dict[str, Any]:
-        session = self.load_session(run_id, verify_source=False)
-        self._refuse_if_applied(session)
-        report = self.progress(run_id)
-        if not report["allComplete"]:
-            blockers = {
-                model: entry["blockers"] for model, entry in report["models"].items() if entry["blockers"]
-            }
-            raise WizardError(
-                "Decisions are not complete; blocking items remain: " + json.dumps(blockers)[:2000],
-                status=409,
-            )
-        run_dir = self.run_dir(run_id)
-        session = self.load_session(run_id, verify_source=False)
-        session["state"] = STATE_DECISIONS_COMPLETE
-        write_json(run_dir / "session.json", session)
-        report["session"] = session
-        return report
+        )
+        session["state"] = STATE_CHANGESET_EMITTED
+        replace_json_artifact_set(
+            run_dir,
+            {"workbook-change-set.json": changeset, "session.json": session},
+        )
+        return {"session": session, "changeSet": changeset}

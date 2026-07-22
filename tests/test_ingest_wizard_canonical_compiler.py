@@ -14,7 +14,7 @@ for entry in (ROOT / "scripts", ROOT / "tests"):
         sys.path.insert(0, str(entry))
 
 from corvette_form_generator.editor_ops import EDITOR_SHEET_META  # noqa: E402
-from corvette_form_generator.ingest.wizard.canonical_rows import canonical_bytes, semantic_hash, validate_artifact_graph  # noqa: E402
+from corvette_form_generator.ingest.wizard.canonical_rows import COMPILER_POLICY_VERSION, canonical_bytes, semantic_hash, validate_artifact_graph  # noqa: E402
 from corvette_form_generator.ingest.wizard import compiler as compiler_module  # noqa: E402
 from corvette_form_generator.ingest.wizard.comparator_evidence import build_comparator_evidence  # noqa: E402
 from corvette_form_generator.ingest.wizard.compiler import (  # noqa: E402
@@ -30,6 +30,10 @@ from corvette_form_generator.ingest.wizard.identity import option_occurrence_sig
 from corvette_form_generator.ingest.wizard.joiner import join_prices  # noqa: E402
 from corvette_form_generator.ingest.wizard.parser import parse_confirmed_sheets  # noqa: E402
 from corvette_form_generator.ingest.wizard.profiler import profile_workbook  # noqa: E402
+from corvette_form_generator.options_sheet_quality import (  # noqa: E402
+    DEFAULT_ALLOWLIST_PATH,
+    DEFAULT_ALLOWLIST_RELATIVE_PATH,
+)
 from ingest_wizard_fixtures import build_master_workbook, build_raw_export  # noqa: E402
 
 ROLES = {
@@ -54,7 +58,7 @@ class CanonicalCompilerTest(unittest.TestCase):
         raw_wb.close()
         master_wb = load_workbook(self.master)
         master_wb["z06_options"].append(["opt_bv4_001", "BV4", 395, "Personalized Plaque", "Fixture endpoint", "", "sec_whee_001", True, 15, True, ""])
-        master_wb["zr1_options"].append(["opt_bv4_001", "BV4", 395, "Personalized Plaque", "Existing target identity", "", "sec_whee_001", True, 20, False, ""])
+        master_wb["zr1_options"].append(["opt_bv4_001", "BV4", 395, "Personalized Plaque", "Existing target identity", "", "sec_whee_001", False, 20, False, ""])
         master_wb.save(self.master)
         master_wb.close()
         parsed = parse_confirmed_sheets(self.raw, ROLES)
@@ -69,7 +73,15 @@ class CanonicalCompilerTest(unittest.TestCase):
         self.roles_payload = {"schemaVersion": "pass-a-1", "roles": ROLES}
         self.sheet_profile = profile_workbook(self.raw)
         self.selection = {"targets": ["zr1"], "comparators": {"zr1": "z06"}}
-        authority_bindings = {"sourceSha256": "a" * 64, "workbookSha256": "b" * 64, "compilerPolicyVersion": "milestone-1-v1"}
+        authority_bindings = {
+            "sourceSha256": "a" * 64,
+            "workbookSha256": "b" * 64,
+            "compilerPolicyVersion": COMPILER_POLICY_VERSION,
+            "optionsSheetQualityAllowlist": {
+                "path": DEFAULT_ALLOWLIST_RELATIVE_PATH.as_posix(),
+                "sha256": hashlib.sha256(DEFAULT_ALLOWLIST_PATH.read_bytes()).hexdigest(),
+            },
+        }
         self.authority = {
             "fingerprint": hashlib.sha256(canonical_bytes(authority_bindings)).hexdigest(),
             "bindings": authority_bindings,
@@ -138,6 +150,65 @@ class CanonicalCompilerTest(unittest.TestCase):
         self.assertEqual(registry["zr1"]["source_option_sheet"]["headers"][0], "option_id")
         self.assertIn("rule_group_members_sheet", registry["zr1"])
 
+    def test_family_registry_isolates_greenfield_model_rule_sheets(self) -> None:
+        registry = build_family_registry(self.master, ["future_x"])["future_x"]
+
+        self.assertEqual(registry["price_rules_sheet"]["sheetName"], "future_x_price_rules")
+        self.assertEqual(registry["rule_mapping_sheet"]["sheetName"], "future_x_rule_mapping")
+        self.assertEqual(registry["rule_groups_sheet"]["sheetName"], "future_x_rule_groups")
+        self.assertEqual(
+            registry["rule_group_members_sheet"]["sheetName"],
+            "future_x_rule_members",
+        )
+        self.assertEqual(
+            registry["exclusive_groups_sheet"]["sheetName"],
+            "future_x_exclusive_groups",
+        )
+        self.assertEqual(
+            registry["exclusive_group_members_sheet"]["sheetName"],
+            "future_x_exclusive_members",
+        )
+        self.assertEqual(
+            registry["color_overrides_sheet"]["sheetName"],
+            "future_x_color_overrides",
+        )
+        self.assertEqual(registry["interior_source_sheet"]["sheetName"], "lt_interiors")
+        self.assertTrue(
+            all(len(entry["sheetName"]) <= 31 for entry in registry.values())
+        )
+
+    def test_unchanged_detail_raw_preserves_valid_curated_target_copy_without_review(self) -> None:
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(self.master)
+        sheet = workbook["zr1_options"]
+        for row in sheet.iter_rows(min_row=2):
+            if row[0].value == "opt_bv4_001":
+                row[3].value = "Curated Personalized Plaque"
+                row[4].value = "Customer-provided personalization text"
+                row[5].value = "Personalized Plaque"
+                break
+        workbook.save(self.master)
+        workbook.close()
+
+        result = self.compile()
+        option = next(
+            row
+            for row in result["canonical-row-manifest.json"]["rows"]
+            if row["family"] == "options" and row["values"].get("option_id") == "opt_bv4_001"
+        )
+
+        self.assertEqual(option["values"]["option_name"], "Curated Personalized Plaque")
+        self.assertEqual(option["values"]["description"], "Customer-provided personalization text")
+        self.assertEqual(option["values"]["detail_raw"], "Personalized Plaque")
+        self.assertFalse(
+            any(
+                subject["reasonCode"] in {"copy_review_required", "comparator_copy_conflict"}
+                and "opt_bv4_001" in str(subject.get("proposedRows") or [])
+                for subject in result["exception-queue.json"]["subjects"]
+            )
+        )
+
     def test_interior_profile_metadata_does_not_replace_target_option_evidence(self) -> None:
         option_payload = copy.deepcopy(self.option_payload)
         component = copy.deepcopy(
@@ -150,6 +221,7 @@ class CanonicalCompilerTest(unittest.TestCase):
                 "rpoNormalized": "N2Z",
                 "rpoDisplay": "N2Z",
                 "description": "Suede-wrapped interior trim",
+                "detailRaw": "Suede-wrapped interior trim",
                 "listPrice": 9999,
                 "priceMatch": "exact",
                 "priceRows": [
@@ -377,7 +449,7 @@ class CanonicalCompilerTest(unittest.TestCase):
         self.assertEqual(conflict["reasonCode"], "semantic_group_overlap")
         self.assertEqual(conflict["semanticConflict"]["overlapKind"], "proposed_subset")
         self.assertEqual(conflict["semanticConflict"]["affectedSheets"], ["zr1_exclusive_groups", "zr1_exclusive_members"])
-        self.assertEqual(conflict["allowedActions"], [])
+        self.assertEqual(conflict["allowedActions"], ["mark_not_applicable"])
         self.assertIn(subject["subjectId"], conflict_subject_ids)
         self.assertFalse(
             any(
@@ -427,7 +499,7 @@ class CanonicalCompilerTest(unittest.TestCase):
         )
         self.assertEqual(conflict["reasonCode"], "semantic_relationship_conflict")
         self.assertEqual(conflict["semanticConflict"]["overlapKind"], "same_direction_different_type")
-        self.assertEqual(conflict["allowedActions"], [])
+        self.assertEqual(conflict["allowedActions"], ["mark_not_applicable"])
         self.assertIn(subject["subjectId"], conflict_subject_ids)
 
     def test_semantic_gate_blocks_rule_group_member_mismatch(self) -> None:
@@ -486,7 +558,7 @@ class CanonicalCompilerTest(unittest.TestCase):
         )
         self.assertEqual(conflict["reasonCode"], "semantic_group_overlap")
         self.assertEqual(conflict["semanticConflict"]["overlapKind"], "member_set_mismatch")
-        self.assertEqual(conflict["allowedActions"], [])
+        self.assertEqual(conflict["allowedActions"], ["mark_not_applicable"])
         self.assertIn(subject["subjectId"], conflict_subject_ids)
 
     def test_requirement_for_target_standard_on_every_variant_is_not_a_rule_question(self) -> None:
@@ -735,7 +807,7 @@ class CanonicalCompilerTest(unittest.TestCase):
         workbook["default_selection_rules"].append(
             [
                 "zr1", "zr1_default_bv4", "opt_bv4_001", "always", "",
-                "*", "*", "*", 105, True, "Existing target default", "",
+                "*", "*", "*", 105, True, "Existing target default", "default_selected",
             ]
         )
         workbook["default_selection_rules"].append(
@@ -806,13 +878,17 @@ class CanonicalCompilerTest(unittest.TestCase):
             and row["values"].get("rpo") == "BV4"
         )
         self.assertTrue(bv4["values"]["active"])
+        self.assertTrue(
+            bv4["values"]["selectable"],
+            "an exact target default in a selectable section must remain user-selectable",
+        )
         self.assertFalse(
             any(
-                subject["reasonCode"] == "comparator_only_default_selection_proposal"
+                subject["reasonCode"] == "option_behavior_conflict"
                 and subject["model"] == "zr1"
-                and subject["proposedRows"][0].get("targetRpo") == "BV4"
+                and "opt_bv4_001" in str(subject.get("proposedRows") or [])
                 for subject in subjects
-            )
+            ),
         )
         retained_default = next(
             row
@@ -820,11 +896,12 @@ class CanonicalCompilerTest(unittest.TestCase):
             if row["family"] == "default_selection_rules"
             and row["values"].get("rule_id") == "zr1_default_bv4"
         )
-        self.assertTrue(
+        self.assertFalse(
             any(
                 dependency["evidenceId"].startswith("comparator:default_selection:")
                 for dependency in retained_default["evidenceDependencies"]
-            )
+            ),
+            "comparator-only default evidence is not target behavior authority",
         )
         source_supported_default = next(
             row
@@ -840,9 +917,9 @@ class CanonicalCompilerTest(unittest.TestCase):
             and row["family"] == "options"
             and row["values"].get("rpo") == "DFT"
         )
-        self.assertTrue(
+        self.assertFalse(
             dft["values"]["selectable"],
-            "a standard default in a required single-select section must remain selectable",
+            "a same-compile comparator proposal cannot replace exact target default evidence",
         )
         self.assertEqual(
             dft["values"]["price"],
@@ -854,11 +931,11 @@ class CanonicalCompilerTest(unittest.TestCase):
         )
         self.assertFalse(
             any(
-                subject["reasonCode"] == "comparator_only_default_selection_proposal"
-                and subject["model"] == "zr1"
-                and subject["proposedRows"][0].get("targetRpo") == "DFT"
+                subject["reasonCode"] == "option_behavior_conflict"
+                and "opt_dft_001" in str(subject.get("proposedRows") or [])
                 for subject in subjects
-            )
+            ),
+            "an optional single-select section does not require target default evidence",
         )
 
     def test_ambiguous_target_price_uses_raw_base_and_canonical_conditional_rules(self) -> None:
@@ -1296,6 +1373,7 @@ class CanonicalCompilerTest(unittest.TestCase):
                 "rpoNormalized": "ZTK",
                 "rpoDisplay": "ZTK",
                 "description": "Track Performance Package",
+                "detailRaw": "Track Performance Package",
                 "listPrice": None,
                 "priceRows": [],
             }
@@ -1638,6 +1716,41 @@ class CanonicalCompilerTest(unittest.TestCase):
             join_report=report,
             comparator_artifact=comparator,
         )
+        copy_subject = next(
+            item
+            for item in result["exception-queue.json"]["subjects"]
+            if item["reasonCode"] == "comparator_copy_conflict"
+            and item["proposedRows"][0].get("optionId") == "opt_z25_001"
+        )
+        proposal = copy_subject["proposedRows"][0]
+        self.assertEqual(
+            {
+                "targetStatuses",
+                "behaviorEvidence",
+                "placementEvidence",
+                "priceEvidence",
+            }
+            - set(proposal),
+            set(),
+        )
+        result = self.compile(
+            option_payload=option_payload,
+            price_payload=price_payload,
+            join_report=report,
+            comparator_artifact=comparator,
+            resolution_entries=[
+                {
+                    "subjectId": copy_subject["subjectId"],
+                    "subjectVersion": copy_subject["subjectVersion"],
+                    "action": "provide_option_copy",
+                    "payload": {
+                        "optionName": proposal["proposedOptionName"],
+                        "description": proposal["proposedDescription"],
+                    },
+                    "disposition": "resolved",
+                }
+            ],
+        )
         self.assertTrue(
             any(
                 item["family"] == "rule_mapping"
@@ -1675,7 +1788,7 @@ class CanonicalCompilerTest(unittest.TestCase):
             and row["status"] == "ready"
         )
         self.assertEqual(z25_option["values"]["price"], 0)
-        self.assertFalse(z25_option["values"]["selectable"])
+        self.assertTrue(z25_option["values"]["selectable"])
         self.assertEqual(z25_option["values"]["display_behavior"], "auto_only")
         self.assertTrue(
             any(
@@ -1889,6 +2002,21 @@ class CanonicalCompilerTest(unittest.TestCase):
                 "",
             ]
         )
+        workbook["zr1_options"].append(
+            [
+                "opt_std_other",
+                "",
+                0,
+                "Unrelated no-RPO standard equipment",
+                "",
+                "Unrelated no-RPO standard equipment",
+                "sec_stan_001",
+                False,
+                41,
+                False,
+                "",
+            ]
+        )
         workbook.save(self.master)
         workbook.close()
         option_payload = copy.deepcopy(self.option_payload)
@@ -1899,7 +2027,7 @@ class CanonicalCompilerTest(unittest.TestCase):
                 "rowIndex": 4,
                 "modelFamily": "ZR1",
                 "modelFamilies": ["ZR1"],
-                "sectionLabel": "Wheels",
+                "sectionLabel": "",
                 "rowKind": "standard_no_rpo",
                 "rpo": "",
                 "refOnlyRpo": "",
@@ -1938,7 +2066,8 @@ class CanonicalCompilerTest(unittest.TestCase):
         )
 
         self.assertEqual(option["values"]["option_id"], "opt_std_existing")
-        self.assertIs(option["values"]["active"], True)
+        self.assertEqual(option["values"]["section_id"], "sec_whee_001")
+        self.assertIs(option["values"]["active"], False)
         self.assertIs(option["values"]["selectable"], False)
         ovs = next(
             row
@@ -1952,6 +2081,522 @@ class CanonicalCompilerTest(unittest.TestCase):
                 subject["reasonCode"] == "unsupported_source_feature"
                 and "Interior 5:4" in subject.get("evidenceReferences", [])
                 for subject in result["exception-queue.json"]["subjects"]
+            )
+        )
+
+    def test_all_unavailable_duplicate_rpo_does_not_compete_for_target_identity(self) -> None:
+        option_payload = copy.deepcopy(self.option_payload)
+        target_candidate = next(
+            candidate
+            for candidate in option_payload["candidates"]
+            if candidate.get("rpo") == "BV4"
+        )
+        sibling = copy.deepcopy(target_candidate)
+        sibling["candidateId"] = "Mechanical 4:999"
+        sibling["description"] = "ZR1X Personalized Plaque"
+        sibling["sourceEvidence"] = {
+            **sibling["sourceEvidence"],
+            "rowIndex": 999,
+        }
+        sibling["statuses"] = [
+            {
+                **status,
+                "raw": "--",
+                "status": "unavailable",
+                "disclosureMarker": "",
+                "flags": [],
+            }
+            for status in sibling["statuses"]
+        ]
+        option_payload["candidates"].append(sibling)
+        join_report = join_prices(
+            option_payload["candidates"],
+            self.price_payload["priceRows"],
+        )
+
+        result = self.compile(
+            option_payload=option_payload,
+            join_report=join_report,
+        )
+
+        self.assertFalse(
+            any(
+                subject["reasonCode"] == "ambiguous_existing_identity"
+                and any(row.get("rpo") == "BV4" for row in subject["proposedRows"])
+                for subject in result["exception-queue.json"]["subjects"]
+            )
+        )
+        options = [
+            row
+            for row in result["canonical-row-manifest.json"]["rows"]
+            if row["model"] == "zr1"
+            and row["family"] == "options"
+            and row["values"].get("rpo") == "BV4"
+        ]
+        self.assertEqual(len(options), 1)
+        self.assertEqual(options[0]["values"]["option_id"], "opt_bv4_001")
+
+    def test_all_unavailable_target_occurrence_is_not_an_exception(self) -> None:
+        option_payload = copy.deepcopy(self.option_payload)
+        unavailable = copy.deepcopy(
+            next(
+                candidate
+                for candidate in option_payload["candidates"]
+                if candidate.get("rpo") == "BV4"
+            )
+        )
+        unavailable.update(
+            {
+                "candidateId": "Mechanical 4:998",
+                "rpo": "ZZZ",
+                "refOnlyRpo": "",
+                "description": "Unavailable target-only option",
+                "priceMatch": None,
+                "listPrice": None,
+                "priceRows": [],
+            }
+        )
+        unavailable["sourceEvidence"] = {
+            **unavailable["sourceEvidence"],
+            "rowIndex": 998,
+        }
+        unavailable["statuses"] = [
+            {
+                **status,
+                "raw": "--",
+                "status": "unavailable",
+                "disclosureMarker": "",
+                "flags": [],
+            }
+            for status in unavailable["statuses"]
+        ]
+        option_payload["candidates"].append(unavailable)
+        join_report = join_prices(
+            option_payload["candidates"],
+            self.price_payload["priceRows"],
+        )
+        scoped_signature = option_occurrence_signature(
+            {
+                **unavailable,
+                "statuses": model_scoped_statuses(unavailable, "zr1"),
+            }
+        )
+
+        result = self.compile(
+            option_payload=option_payload,
+            join_report=join_report,
+        )
+
+        self.assertFalse(
+            any(
+                scoped_signature in subject.get("evidenceReferences", [])
+                for subject in result["exception-queue.json"]["subjects"]
+            )
+        )
+        self.assertFalse(
+            any(
+                row["model"] == "zr1"
+                and row["family"] == "options"
+                and row["values"].get("rpo") == "ZZZ"
+                for row in result["canonical-row-manifest.json"]["rows"]
+            )
+        )
+        source_feature = next(
+            item
+            for item in result["compile-report.json"]["sourceFeatureCoverage"]
+            if item["family"] == "options"
+            and item["featureId"]
+            == f"candidate:zr1:{_candidate_feature_index(option_payload['candidates'])[unavailable['candidateId']]}"
+        )
+        self.assertEqual(source_feature["disposition"], "resolved_not_applicable")
+
+    def test_all_unavailable_target_occurrence_deletes_existing_option_and_ovs(self) -> None:
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(self.master)
+        workbook["zr1_options"].append(
+            [
+                "opt_zzz_001",
+                "ZZZ",
+                0,
+                "Unavailable target-only option",
+                "",
+                "",
+                "sec_whee_001",
+                False,
+                30,
+                True,
+                "",
+            ]
+        )
+        ovs = workbook.create_sheet("zr1_ovs")
+        ovs.append(["option_id", "variant_id", "status"])
+        ovs.append(["opt_zzz_001", "1lz_r07", "unavailable"])
+        ovs.append(["opt_zzz_001", "3lz_r67", "unavailable"])
+        rules = workbook.create_sheet("zr1_rule_mapping")
+        rules.append(
+            [
+                "rule_id",
+                "source_id",
+                "rule_type",
+                "target_id",
+                "original_detail_raw",
+                "body_style_scope",
+                "runtime_action",
+                "disabled_reason",
+            ]
+        )
+        rules.append(
+            [
+                "zr1_rule_existing_requires_zzz",
+                "opt_bv4_001",
+                "requires",
+                "opt_zzz_001",
+                "",
+                "",
+                "",
+                "",
+            ]
+        )
+        workbook.save(self.master)
+        workbook.close()
+
+        option_payload = copy.deepcopy(self.option_payload)
+        unavailable = copy.deepcopy(
+            next(
+                candidate
+                for candidate in option_payload["candidates"]
+                if candidate.get("rpo") == "BV4"
+            )
+        )
+        unavailable.update(
+            {
+                "candidateId": "Mechanical 4:998",
+                "rpo": "ZZZ",
+                "refOnlyRpo": "",
+                "description": "Unavailable target-only option",
+                "priceMatch": None,
+                "listPrice": None,
+                "priceRows": [],
+            }
+        )
+        unavailable["sourceEvidence"] = {
+            **unavailable["sourceEvidence"],
+            "rowIndex": 998,
+        }
+        unavailable["statuses"] = [
+            {
+                **status,
+                "raw": "--",
+                "status": "unavailable",
+                "disclosureMarker": "",
+                "flags": [],
+            }
+            for status in unavailable["statuses"]
+        ]
+        option_payload["candidates"].append(unavailable)
+
+        result = self.compile(
+            option_payload=option_payload,
+            join_report=join_prices(
+                option_payload["candidates"],
+                self.price_payload["priceRows"],
+            ),
+        )
+        rows = result["canonical-row-manifest.json"]["rows"]
+
+        option = next(
+            row
+            for row in rows
+            if row["model"] == "zr1"
+            and row["family"] == "options"
+            and row["values"].get("option_id") == "opt_zzz_001"
+        )
+        self.assertEqual(option["action"], "delete")
+        self.assertEqual(option["disposition"], "resolved_not_applicable")
+        target_ovs = [
+            row
+            for row in rows
+            if row["model"] == "zr1"
+            and row["family"] == "ovs"
+            and row["values"].get("option_id") == "opt_zzz_001"
+        ]
+        self.assertEqual(len(target_ovs), 2)
+        self.assertEqual({row["action"] for row in target_ovs}, {"delete"})
+        self.assertEqual(
+            {row["disposition"] for row in target_ovs},
+            {"resolved_not_applicable"},
+        )
+        relationship = next(
+            row
+            for row in rows
+            if row["model"] == "zr1"
+            and row["family"] == "rule_mapping"
+            and row["values"].get("rule_id") == "zr1_rule_existing_requires_zzz"
+        )
+        self.assertEqual(relationship["action"], "delete")
+        self.assertEqual(relationship["disposition"], "resolved_not_applicable")
+
+    def test_all_unavailable_deletion_requires_complete_target_variant_coverage(self) -> None:
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(self.master)
+        workbook["zr1_options"].append(
+            ["opt_zzz_001", "ZZZ", 0, "Partially observed option", "", "", "sec_whee_001", False, 30, True, ""]
+        )
+        workbook.save(self.master)
+        workbook.close()
+
+        option_payload = copy.deepcopy(self.option_payload)
+        unavailable = copy.deepcopy(
+            next(candidate for candidate in option_payload["candidates"] if candidate.get("rpo") == "BV4")
+        )
+        unavailable.update(
+            {
+                "candidateId": "Mechanical 4:998",
+                "rpo": "ZZZ",
+                "description": "Partially observed option",
+                "priceMatch": None,
+                "listPrice": None,
+                "priceRows": [],
+                "statuses": [
+                    {
+                        **unavailable["statuses"][0],
+                        "raw": "--",
+                        "status": "unavailable",
+                        "disclosureMarker": "",
+                        "flags": [],
+                    }
+                ],
+            }
+        )
+        option_payload["candidates"].append(unavailable)
+        sheet_profile = copy.deepcopy(self.sheet_profile)
+        mechanical = next(
+            sheet for sheet in sheet_profile["sheets"] if sheet["sheetName"] == "Mechanical 4"
+        )
+        mechanical["variantColumns"].append(
+            {
+                "columnIndex": 6,
+                "columnLetter": "F",
+                "rawHeader": "ZR1 Convertible\n1YR67\n3LZ",
+                "label": "ZR1 Convertible",
+                "modelCode": "1YR67",
+                "trim": "3LZ",
+                "bodyStyle": "convertible",
+            }
+        )
+
+        result = self.compile(
+            option_payload=option_payload,
+            join_report=join_prices(option_payload["candidates"], self.price_payload["priceRows"]),
+            sheet_profile=sheet_profile,
+        )
+
+        option = next(
+            row
+            for row in result["canonical-row-manifest.json"]["rows"]
+            if row["family"] == "options" and row["values"].get("option_id") == "opt_zzz_001"
+        )
+        self.assertNotEqual(option["action"], "delete")
+
+    def test_mixed_standard_unavailable_default_is_selectable_and_included_at_zero(self) -> None:
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(self.master)
+        workbook["z06_options"].append(
+            ["opt_qzz_001", "QZZ", 1195, "Standard target choice", "Comparator charge", "", "sec_whee_001", True, 30, True, ""]
+        )
+        workbook["zr1_options"].append(
+            ["opt_qzz_001", "QZZ", "", "Standard target choice", "", "", "sec_whee_001", False, 30, False, "default_selected"]
+        )
+        workbook.save(self.master)
+        workbook.close()
+
+        option_payload = copy.deepcopy(self.option_payload)
+        candidate = copy.deepcopy(
+            next(item for item in option_payload["candidates"] if item.get("rpo") == "BV4")
+        )
+        candidate.update(
+            {
+                "candidateId": "Mechanical 4:998",
+                "rpo": "QZZ",
+                "description": "Standard target choice",
+                "priceMatch": None,
+                "listPrice": None,
+                "priceRows": [],
+            }
+        )
+        candidate["statuses"] = [
+            {**candidate["statuses"][0], "raw": "S", "status": "standard"},
+            {**candidate["statuses"][1], "raw": "--", "status": "unavailable"},
+        ]
+        option_payload["candidates"].append(candidate)
+        comparator = build_comparator_evidence(
+            self.master,
+            self.selection["comparators"],
+            run_authority_fingerprint=self.authority,
+        )
+
+        result = self.compile(
+            option_payload=option_payload,
+            join_report=join_prices(option_payload["candidates"], self.price_payload["priceRows"]),
+            comparator_artifact=comparator,
+        )
+        option = next(
+            row
+            for row in result["canonical-row-manifest.json"]["rows"]
+            if row["family"] == "options" and row["values"].get("option_id") == "opt_qzz_001"
+        )
+
+        self.assertTrue(option["values"]["active"])
+        self.assertTrue(option["values"]["selectable"])
+        self.assertEqual(option["values"]["price"], 0)
+
+    def test_display_only_included_comparator_charge_is_fixed_at_zero(self) -> None:
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(self.master)
+        for row in workbook["section_master"].iter_rows(min_row=2):
+            if row[0].value == "sec_std_001":
+                row[2].value = "display_only"
+        workbook["z06_options"].append(
+            ["opt_cfv_001", "CFV", 4495, "Included carbon feature", "Comparator charge", "", "sec_std_001", True, 30, True, ""]
+        )
+        workbook["zr1_options"].append(
+            ["opt_cfv_001", "CFV", "", "Included carbon feature", "", "", "sec_std_001", False, 30, True, ""]
+        )
+        workbook.save(self.master)
+        workbook.close()
+
+        option_payload = copy.deepcopy(self.option_payload)
+        candidate = copy.deepcopy(
+            next(item for item in option_payload["candidates"] if item.get("rpo") == "BV4")
+        )
+        candidate.update(
+            {
+                "candidateId": "Mechanical 4:998",
+                "rpo": "CFV",
+                "description": "Included carbon feature",
+                "sectionLabel": "Standard Equipment",
+                "priceMatch": None,
+                "listPrice": None,
+                "priceRows": [],
+                "statuses": [
+                    {**status, "raw": "S", "status": "standard"}
+                    for status in candidate["statuses"]
+                ],
+            }
+        )
+        option_payload["candidates"].append(candidate)
+        comparator = build_comparator_evidence(
+            self.master,
+            self.selection["comparators"],
+            run_authority_fingerprint=self.authority,
+        )
+
+        result = self.compile(
+            option_payload=option_payload,
+            join_report=join_prices(option_payload["candidates"], self.price_payload["priceRows"]),
+            comparator_artifact=comparator,
+        )
+        option = next(
+            row
+            for row in result["canonical-row-manifest.json"]["rows"]
+            if row["family"] == "options" and row["values"].get("option_id") == "opt_cfv_001"
+        )
+
+        self.assertTrue(option["values"]["active"])
+        self.assertFalse(option["values"]["selectable"])
+        self.assertEqual(option["values"]["price"], 0)
+
+    def test_invalid_option_behavior_resolution_remains_blocked(self) -> None:
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(self.master)
+        for row in workbook["section_master"].iter_rows(min_row=2):
+            if row[0].value == "sec_std_001":
+                row[2].value = "display_only"
+        for row in workbook["zr1_options"].iter_rows(min_row=2):
+            if row[0].value == "opt_bv4_001":
+                row[6].value = "sec_std_001"
+                row[7].value = True
+                row[9].value = True
+        workbook.save(self.master)
+        workbook.close()
+
+        first = self.compile()
+        subject = next(
+            item
+            for item in first["exception-queue.json"]["subjects"]
+            if item["reasonCode"] == "option_behavior_conflict"
+            and "opt_bv4_001" in str(item.get("proposedRows") or [])
+        )
+        resolution = {
+            "subjectId": subject["subjectId"],
+            "subjectVersion": subject["subjectVersion"],
+            "action": "provide_option_behavior",
+            "payload": {"active": True, "selectable": True},
+            "disposition": "resolved",
+        }
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "incompatible with the target status and section contract",
+        ):
+            self.compile(resolution_entries=[resolution])
+
+    def test_all_unavailable_deletion_blocks_when_target_identity_is_ambiguous(self) -> None:
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(self.master)
+        for option_id in ("opt_zzz_001", "opt_zzz_002"):
+            workbook["zr1_options"].append(
+                [option_id, "ZZZ", 0, "Ambiguous unavailable option", "", "", "sec_whee_001", False, 30, False, ""]
+            )
+        workbook.save(self.master)
+        workbook.close()
+
+        option_payload = copy.deepcopy(self.option_payload)
+        unavailable = copy.deepcopy(
+            next(candidate for candidate in option_payload["candidates"] if candidate.get("rpo") == "BV4")
+        )
+        unavailable.update(
+            {
+                "candidateId": "Mechanical 4:998",
+                "rpo": "ZZZ",
+                "refOnlyRpo": "",
+                "description": "Ambiguous unavailable option",
+                "detailRaw": "Ambiguous unavailable option",
+                "priceMatch": None,
+                "listPrice": None,
+                "priceRows": [],
+                "statuses": [
+                    {**status, "raw": "--", "status": "unavailable", "disclosureMarker": "", "flags": []}
+                    for status in unavailable["statuses"]
+                ],
+            }
+        )
+        option_payload["candidates"].append(unavailable)
+
+        result = self.compile(
+            option_payload=option_payload,
+            join_report=join_prices(option_payload["candidates"], self.price_payload["priceRows"]),
+        )
+
+        self.assertTrue(
+            any(
+                subject["reasonCode"] == "ambiguous_deletion_identity"
+                and subject["allowedActions"] == []
+                for subject in result["exception-queue.json"]["subjects"]
+            )
+        )
+        self.assertFalse(
+            any(
+                row["family"] == "options"
+                and row["values"].get("rpo") == "ZZZ"
+                and row["action"] == "delete"
+                for row in result["canonical-row-manifest.json"]["rows"]
             )
         )
 
@@ -2148,6 +2793,123 @@ class CanonicalCompilerTest(unittest.TestCase):
             self.assertEqual(len(ledger_entries), 1)
             self.assertEqual(ledger_entries[0]["disposition"], "resolved_not_applicable")
 
+    def test_mark_not_applicable_updates_comparator_evidence_disposition(self) -> None:
+        evidence_id = "comparator:direct_rule:variant-scoped"
+        subject = compiler_module._typed_exception(
+            "zr1",
+            "rule_mapping",
+            "comparator_only_relationship_proposal",
+            ["PBC", "requires", "ZZ3"],
+            [],
+            evidence_references=[evidence_id],
+            proposed_rows=[
+                {
+                    "sourceRpo": "PBC",
+                    "ruleType": "requires",
+                    "targetRpo": "ZZ3",
+                    "bodyStyleScope": "*",
+                    "trimLevelScope": "*",
+                    "variantScope": "*",
+                }
+            ],
+            allowed_actions=["choose_relationship", "mark_not_applicable"],
+            question="Confirm or reject this comparator relationship.",
+        )
+        resolution = {
+            "subjectId": subject["subjectId"],
+            "subjectVersion": subject["subjectVersion"],
+            "action": "mark_not_applicable",
+            "payload": {"reason": "The target status matrix makes the rule unnecessary."},
+            "disposition": "resolved_not_applicable",
+        }
+        relationship_result = {
+            "rows": [],
+            "exceptions": [subject],
+            "dispositions": [
+                {
+                    "featureId": "derived:relationship:proposal",
+                    "evidenceIds": [evidence_id],
+                    "disposition": "proposed_exception",
+                }
+            ],
+        }
+
+        _, _, consumed, overrides = compiler_module._relationship_rows(
+            {"sheets": {"zr1_rule_mapping": {"headers": [], "rows": []}}},
+            "zr1",
+            {"rule_mapping_sheet": {"sheetName": "zr1_rule_mapping", "headers": []}},
+            {},
+            set(),
+            set(),
+            relationship_result,
+            [resolution],
+        )
+
+        self.assertIn(subject["subjectId"], consumed)
+        self.assertEqual(overrides[evidence_id], "resolved_not_applicable")
+        self.assertEqual(
+            overrides["derived:relationship:proposal"],
+            "resolved_not_applicable",
+        )
+
+    def test_comparator_coverage_disposition_is_scoped_by_target(self) -> None:
+        evidence_id = "comparator:direct_rule:shared"
+        relationship_dispositions = [
+            {
+                "featureId": evidence_id,
+                "model": "zr1",
+                "evidenceIds": [evidence_id],
+                "disposition": "resolved_not_applicable",
+            },
+            {
+                "featureId": evidence_id,
+                "model": "zr1x",
+                "evidenceIds": [evidence_id],
+                "disposition": "proposed_exception",
+            },
+        ]
+        comparator_artifact = {
+            "targets": {
+                model: {
+                    "facts": [
+                        {
+                            "evidenceId": evidence_id,
+                            "factType": "direct_rule",
+                        }
+                    ]
+                }
+                for model in ("zr1", "zr1x")
+            }
+        }
+
+        ledger = compiler_module._source_feature_ledger(
+            ["zr1", "zr1x"],
+            {"candidates": [], "skippedRows": []},
+            {"priceRows": [], "baseModelPriceRows": [], "skippedPriceRows": []},
+            {"roles": {}},
+            {"sheets": []},
+            {},
+            relationship_dispositions,
+            comparator_artifact,
+            set(),
+            set(),
+            set(),
+            set(),
+            set(),
+            set(),
+            {},
+            {},
+        )
+        dispositions = {
+            item["model"]: item["disposition"]
+            for item in ledger
+            if evidence_id in item["evidenceIds"]
+            and item["featureId"].startswith("comparator:")
+        }
+
+        self.assertEqual(dispositions["zr1"], "resolved_not_applicable")
+        self.assertEqual(dispositions["zr1x"], "exception_open")
+
     def test_choose_relationship_replaces_uses_canonical_excludes_runtime_action(self) -> None:
         option_payload, price_payload, join_report, first, subject = (
             self.compile_with_ready_comparator_relationship()
@@ -2295,12 +3057,37 @@ class CanonicalCompilerTest(unittest.TestCase):
             join_report=join_report,
             resolution_entries=resolutions,
         )
+        resolved_subject_ids = {subject["subjectId"] for subject in subjects.values()}
+        self.assertTrue(
+            resolved_subject_ids
+            <= {
+                subject["subjectId"]
+                for subject in second["exception-queue.json"]["subjects"]
+            }
+        )
+        self.assertTrue(
+            resolved_subject_ids
+            <= {
+                entry["subjectId"]
+                for entry in second["exception-resolutions.json"]["validEntries"]
+            }
+        )
+        self.assertTrue(
+            resolved_subject_ids.isdisjoint(
+                entry["subjectId"]
+                for entry in second["exception-resolutions.json"]["supersededEntries"]
+            )
+        )
         rows = second["canonical-row-manifest.json"]["rows"]
+        self.assertTrue(
+            all(row["family"] in EDITOR_SHEET_META for row in rows),
+            sorted({row["family"] for row in rows} - set(EDITOR_SHEET_META)),
+        )
         for family in (
             "rule_groups",
             "rule_group_members",
             "exclusive_groups",
-            "exclusive_group_members",
+            "exclusive_members",
             "price_rules",
         ):
             with self.subTest(family=family):
@@ -2767,12 +3554,160 @@ class CanonicalCompilerTest(unittest.TestCase):
             and row["values"].get("rpo") == candidate.get("rpo")
             and row["values"].get("section_id") == "sec_whee_001"
         )
-        self.assertEqual(option["status"], "ready")
+        self.assertEqual(option["status"], "blocked")
+        self.assertTrue(
+            any(
+                item["reasonCode"] == "copy_review_required"
+                and candidate_id in item.get("evidenceReferences", [])
+                for item in second["exception-queue.json"]["subjects"]
+            )
+        )
         blocker_ids = {
             item["subjectId"]
             for item in second["compile-report.json"]["models"]["zr1"]["blockers"]
         }
         self.assertNotIn(subject["subjectId"], blocker_ids)
+
+    def test_missing_section_can_be_resolved_by_omitting_the_source_option(self) -> None:
+        option_payload = copy.deepcopy(self.option_payload)
+        omitted_candidate = next(
+            item for item in option_payload["candidates"] if item.get("rpo") == "CC3"
+        )
+        omitted_candidate["description"] = (
+            "Roof panel, transparent\n1. Requires (CC2) painted roof panel."
+        )
+        join_report = join_prices(
+            option_payload["candidates"], self.price_payload["priceRows"]
+        )
+        first = self.compile(
+            option_payload=option_payload,
+            join_report=join_report,
+        )
+        candidate_id = option_occurrence_signature(
+            {
+                **omitted_candidate,
+                "statuses": model_scoped_statuses(omitted_candidate, "zr1"),
+            }
+        )
+        subject = next(
+            item
+            for item in first["exception-queue.json"]["subjects"]
+            if item["reasonCode"] == "missing_section"
+            and item["evidenceReferences"] == [candidate_id]
+        )
+        candidate = omitted_candidate
+        resolution = {
+            "subjectId": subject["subjectId"],
+            "subjectVersion": subject["subjectVersion"],
+            "action": "mark_not_applicable",
+            "payload": {"reason": "Reviewer omitted this target option."},
+            "disposition": "resolved_not_applicable",
+        }
+
+        second = self.compile(
+            option_payload=option_payload,
+            join_report=join_report,
+            resolution_entries=[resolution],
+        )
+
+        self.assertFalse(
+            any(
+                row["family"] == "options"
+                and row["values"].get("rpo") == candidate.get("rpo")
+                for row in second["canonical-row-manifest.json"]["rows"]
+            )
+        )
+        self.assertNotIn(
+            subject["subjectId"],
+            {
+                blocker["subjectId"]
+                for blocker in second["compile-report.json"]["models"]["zr1"]["blockers"]
+            },
+        )
+        self.assertIn(
+            subject["subjectId"],
+            {
+                entry["subjectId"]
+                for entry in second["exception-resolutions.json"]["validEntries"]
+            },
+        )
+        omitted_status_coverage = [
+            item
+            for item in second["compile-report.json"]["sourceFeatureCoverage"]
+            if item["family"] == "ovs"
+            and str(item["featureId"]).startswith(
+                f"status:{option_occurrence_signature(candidate)}:"
+            )
+        ]
+        self.assertTrue(omitted_status_coverage)
+        self.assertEqual(
+            {item["disposition"] for item in omitted_status_coverage},
+            {"resolved_not_applicable"},
+        )
+        omitted_relationship_coverage = [
+            item
+            for item in second["compile-report.json"]["sourceFeatureCoverage"]
+            if item["family"] == "rule_mapping"
+            and f"candidate:{option_occurrence_signature(candidate)}"
+            in item["evidenceIds"]
+        ]
+        self.assertTrue(omitted_relationship_coverage)
+        self.assertEqual(
+            {item["disposition"] for item in omitted_relationship_coverage},
+            {"resolved_not_applicable"},
+        )
+
+    def test_missing_section_can_keep_an_inactive_nonselectable_unpriced_option(self) -> None:
+        first = self.compile()
+        subject = next(
+            item
+            for item in first["exception-queue.json"]["subjects"]
+            if item["reasonCode"] == "missing_section"
+        )
+        candidate_id = subject["evidenceReferences"][0]
+        candidate = next(
+            item
+            for item in self.option_payload["candidates"]
+            if option_occurrence_signature(
+                {**item, "statuses": model_scoped_statuses(item, "zr1")}
+            )
+            == candidate_id
+        )
+        resolution = {
+            "subjectId": subject["subjectId"],
+            "subjectVersion": subject["subjectVersion"],
+            "action": "keep_inactive_option",
+            "payload": {"sectionId": "sec_whee_001"},
+            "disposition": "resolved",
+        }
+
+        second = self.compile(resolution_entries=[resolution])
+
+        option = next(
+            row
+            for row in second["canonical-row-manifest.json"]["rows"]
+            if row["family"] == "options"
+            and row["values"].get("rpo") == candidate.get("rpo")
+        )
+        self.assertEqual(option["status"], "blocked")
+        self.assertEqual(option["values"]["section_id"], "sec_whee_001")
+        self.assertEqual(option["values"]["price"], "")
+        self.assertFalse(option["values"]["active"])
+        self.assertFalse(option["values"]["selectable"])
+        self.assertTrue(
+            any(
+                item["reasonCode"] == "copy_review_required"
+                and candidate_id in item.get("evidenceReferences", [])
+                for item in second["exception-queue.json"]["subjects"]
+            )
+        )
+        self.assertNotIn(
+            subject["subjectId"],
+            {
+                blocker["subjectId"]
+                for blocker in second["compile-report.json"]["models"]["zr1"]["blockers"]
+            },
+        )
 
     def test_typed_price_scope_resolution_is_consumed_into_price_rule(self) -> None:
         first = self.compile()
@@ -2807,18 +3742,127 @@ class CanonicalCompilerTest(unittest.TestCase):
         }
         self.assertNotIn(subject["subjectId"], blocker_ids)
 
+    def test_current_resolution_projects_when_stale_history_has_same_subject_id(self) -> None:
+        first = self.compile()
+        subject = next(
+            item
+            for item in first["exception-queue.json"]["subjects"]
+            if item["reasonCode"] == "unresolved_price_scope"
+        )
+        stale = {
+            "subjectId": subject["subjectId"],
+            "subjectVersion": "superseded-subject-version",
+            "action": "provide_typed_value",
+            "payload": {"priceValue": 695},
+            "disposition": "resolved",
+        }
+        current = {
+            "subjectId": subject["subjectId"],
+            "subjectVersion": subject["subjectVersion"],
+            "action": "provide_typed_value",
+            "payload": {
+                "bodyStyleScope": "*",
+                "trimLevelScope": "*",
+                "variantScope": "*",
+                "priceValue": 695,
+            },
+            "disposition": "resolved",
+        }
+
+        second = self.compile(resolution_entries=[stale, current])
+
+        price_rule = next(
+            row
+            for row in second["canonical-row-manifest.json"]["rows"]
+            if row["family"] == "price_rules"
+            and row["values"].get("body_style_scope") == "*"
+            and row["values"].get("trim_level_scope") == "*"
+            and row["values"].get("variant_scope") == "*"
+            and row["values"].get("price_value") == 695
+        )
+        self.assertEqual(price_rule["status"], "ready")
+        self.assertNotIn(
+            subject["subjectId"],
+            {
+                item["subjectId"]
+                for item in second["compile-report.json"]["models"]["zr1"]["blockers"]
+            },
+        )
+
     def test_artifacts_are_deterministic_and_resolution_independent_queue(self) -> None:
         first = self.compile()
         second = self.compile()
         for name in ("comparator-evidence.json", "canonical-row-manifest.json", "exception-queue.json", "exception-resolutions.json", "compile-report.json"):
             self.assertEqual(canonical_bytes(first[name]), canonical_bytes(second[name]), name)
         self.assertNotIn("resolutionSemanticSha", canonical_bytes(first["exception-queue.json"]).decode())
+        projected_options = [
+            row["values"]
+            for row in first["canonical-row-manifest.json"]["rows"]
+            if row["model"] == "zr1"
+            and row["family"] == "options"
+            and row["action"] != "delete"
+        ]
+        for section_id in {str(row.get("section_id") or "") for row in projected_options}:
+            orders = [
+                int(row["display_order"])
+                for row in projected_options
+                if str(row.get("section_id") or "") == section_id
+                and str(row.get("display_order") or "").isdigit()
+            ]
+            self.assertEqual(len(orders), len(set(orders)), section_id)
 
     def test_compiler_refuses_join_report_drift(self) -> None:
         drifted = copy.deepcopy(self.join_report)
         drifted["exactMatches"] += 1
         with self.assertRaisesRegex(ValueError, "Join report exactMatches"):
             self.compile(join_report=drifted)
+
+    def test_compiler_refuses_stale_options_quality_allowlist_authority(self) -> None:
+        stale_authority = copy.deepcopy(self.authority)
+        stale_authority["bindings"]["optionsSheetQualityAllowlist"]["sha256"] = "0" * 64
+        stale_authority["fingerprint"] = hashlib.sha256(
+            canonical_bytes(stale_authority["bindings"])
+        ).hexdigest()
+
+        with self.assertRaisesRegex(ValueError, "quality allowlist path and bytes"):
+            self.compile(run_authority_fingerprint=stale_authority)
+
+    def test_complete_projected_options_quality_blocks_retained_invalid_row(self) -> None:
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(self.master)
+        workbook["zr1_options"].append(
+            [
+                "opt_bad_001",
+                "BAD",
+                0,
+                "LPO",
+                "Retained invalid fixture",
+                "",
+                "sec_whee_001",
+                True,
+                "",
+                True,
+                "",
+            ]
+        )
+        workbook.save(self.master)
+        workbook.close()
+
+        result = self.compile()
+
+        quality_subjects = [
+            subject
+            for subject in result["exception-queue.json"]["subjects"]
+            if subject["reasonCode"] == "projected_options_quality"
+            and subject["proposedRows"][0].get("optionId") == "opt_bad_001"
+        ]
+        self.assertEqual(
+            {subject["proposedRows"][0]["checkId"] for subject in quality_subjects},
+            {"active_option_missing_display_order", "bare_lpo_option_name"},
+        )
+        self.assertTrue(all(subject["allowedActions"] == [] for subject in quality_subjects))
+        self.assertFalse(result["compile-report.json"]["models"]["zr1"]["compileReady"])
 
     def test_source_row_reorder_preserves_option_semantics(self) -> None:
         reordered = copy.deepcopy(self.option_payload)

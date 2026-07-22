@@ -58,6 +58,9 @@ class WizardServerTest(unittest.TestCase):
     def post_json(self, path: str, payload: dict) -> tuple[int, dict]:
         return self.request("POST", path, json.dumps(payload).encode("utf-8"))
 
+    def get_json(self, path: str) -> tuple[int, dict]:
+        return self.request("GET", path)
+
     def test_full_wizard_flow(self) -> None:
         status, files = self.request("GET", "/api/wizard/files")
         self.assertEqual(status, 200)
@@ -121,47 +124,70 @@ class WizardServerTest(unittest.TestCase):
         )
         self.assertEqual(status, 400)
 
-    def test_plan_approval_endpoint_returns_dry_run_evidence_scope(self) -> None:
+    def test_current_compiled_ready_session_emits_changeset(self) -> None:
         run_id = "20260709-120000-abcdef"
         expected = {
-            "session": {"runId": run_id, "state": "dry_run_approved"},
-            "approval": {
-                "schemaVersion": "plan-approval-2",
-                "scope": "dry_run_evidence",
-                "approvedBy": "sean",
-            },
+            "session": {"runId": run_id, "state": "changeset_emitted"},
+            "changeSet": {"schemaVersion": "workbook-changeset-1"},
         }
-        with patch.object(self.server.RequestHandlerClass.store, "approve_plan", return_value=expected) as approve:
-            status, payload = self.post_json(
-                f"/api/wizard/sessions/{run_id}/plan/approve",
-                {"approver": "sean", "scope": "deployment_ready_write"},
-            )
+        with patch.object(
+            self.server.RequestHandlerClass.store, "emit_changeset", return_value=expected
+        ) as emit:
+            status, payload = self.post_json(f"/api/wizard/sessions/{run_id}/changeset", {})
 
         self.assertEqual(status, 200)
-        self.assertEqual(payload["approval"]["schemaVersion"], "plan-approval-2")
-        self.assertEqual(payload["approval"]["scope"], "dry_run_evidence")
-        approve.assert_called_once_with(run_id, "sean")
+        self.assertEqual(payload["changeSet"]["schemaVersion"], "workbook-changeset-1")
+        self.assertEqual(payload["session"]["state"], "changeset_emitted")
+        emit.assert_called_once_with(run_id)
 
-    def test_write_approval_endpoint_refuses_pre_c3_without_artifact(self) -> None:
+    def test_sessions_list_exposes_changeset_emitted_state(self) -> None:
         status, created = self.post_json("/api/wizard/sessions", {"file": "raw.xlsx"})
         self.assertEqual(status, 200)
         run_id = created["session"]["runId"]
         run_dir = self.root / "form-output" / "ingest-wizard" / run_id
-        write_json(run_dir / "apply-plan.json", {"schemaVersion": "pass-c-2"})
-        write_json(run_dir / "plan-approval.json", {})
-        write_json(run_dir / "apply-dry-run-report.json", {})
+        session = created["session"]
+        session["state"] = "changeset_emitted"
+        write_json(run_dir / "session.json", session)
+        write_json(
+            run_dir / "workbook-change-set.json",
+            {"schemaVersion": "workbook-changeset-1", "sourceRunId": run_id},
+        )
 
-        store = self.server.RequestHandlerClass.store
-        with patch.object(store, "approve_write", wraps=store.approve_write) as approve:
-            status, payload = self.post_json(
-                f"/api/wizard/sessions/{run_id}/write/approve",
-                {"approver": "sean", "acceptedWarningIds": ["mystery:override"]},
-            )
+        status, payload = self.get_json("/api/wizard/sessions")
+        self.assertEqual(status, 200)
+        emitted = {
+            entry["runId"]
+            for entry in payload["sessions"]
+            if entry.get("state") == "changeset_emitted"
+        }
+        self.assertIn(run_id, emitted)
 
-        self.assertEqual(status, 409)
-        self.assertIn("pass-c-3", payload["error"])
-        approve.assert_called_once_with(run_id, "sean")
-        self.assertFalse((run_dir / "write-approval.json").exists())
+        status, detail = self.get_json(
+            f"/api/wizard/sessions/{run_id}/changeset"
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(detail["changeSet"]["schemaVersion"], "workbook-changeset-1")
+        self.assertEqual(detail["session"]["state"], "changeset_emitted")
+
+    def test_retired_mutation_routes_are_gone(self) -> None:
+        run_id = "20260709-120000-abcdef"
+        for suffix in (
+            "/decisions",
+            "/decisions/delete",
+            "/copy-decisions",
+            "/complete",
+            "/plan",
+            "/plan/approve",
+            "/write/approve",
+        ):
+            with self.subTest(suffix=suffix):
+                status, payload = self.post_json(
+                    f"/api/wizard/sessions/{run_id}{suffix}", {}
+                )
+                self.assertEqual(status, 410)
+                self.assertEqual(
+                    payload["error"], "Historical ingest mutation is retired."
+                )
 
 
 if __name__ == "__main__":

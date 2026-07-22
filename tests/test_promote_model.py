@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -15,6 +16,7 @@ if str(SCRIPTS_DIR) not in sys.path:
 
 from corvette_form_generator.model_configs import REQUIRED_GENERATION_SOURCE_ROLES  # noqa: E402
 from corvette_form_generator.workbook import rows_from_sheet  # noqa: E402
+import promote_model as promotion_module  # noqa: E402
 from promote_model import model_promotion_plan, promote_model, verify_workbook  # noqa: E402
 
 
@@ -149,7 +151,7 @@ def promotion_workbook(*, missing_source_role: str | None = None) -> Workbook:
             "model_key": "zr1",
             "source_role": role,
             "sheet_name": f"zr1_{role}",
-            "active": True,
+            "active": False,
         }
         for role in REQUIRED_GENERATION_SOURCE_ROLES
         if role != missing_source_role
@@ -189,6 +191,23 @@ def test_promotion_activates_exact_target_memberships_and_preserves_unrelated_ro
         ("zr1x", "1lz_s07"): "False",
     }
     assert variants == {"1lz_r07": "True", "3lz_r67": "True", "1lz_s07": "False"}
+    wb.close()
+
+
+def test_promotion_activates_every_existing_generation_source_row() -> None:
+    wb = promotion_workbook()
+    plan = model_promotion_plan(wb, "zr1")
+
+    changes = promote_model(wb, "zr1", plan)
+
+    source_rows = [
+        row
+        for row in rows_from_sheet(wb, "model_workbook_sources")
+        if row["model_key"] == "zr1"
+    ]
+    assert len(source_rows) == len(REQUIRED_GENERATION_SOURCE_ROLES)
+    assert all(row["active"] == "True" for row in source_rows)
+    assert sum(change["sheet"] == "model_workbook_sources" for change in changes) == len(source_rows)
     wb.close()
 
 
@@ -249,3 +268,77 @@ def test_verify_workbook_captures_incomplete_source_metadata_as_structured_evide
     assert verification["discovery"]["error"]["type"] == "ValueError"
     assert "missing required active model_workbook_sources roles: status_sheet" in verification["discovery"]["error"]["message"]
     assert any("generator discovery failed" in item for item in verification["failures"])
+
+
+def test_atomic_write_preflight_failure_leaves_canonical_file_unchanged(tmp_path: Path) -> None:
+    path = tmp_path / "incomplete-promotion.xlsx"
+    wb = promotion_workbook(missing_source_role="status_sheet")
+    wb.save(path)
+    wb.close()
+    before = path.read_bytes()
+
+    execute = getattr(promotion_module, "execute_promotion", None)
+    assert callable(execute), "promotion command needs an atomic preflight API"
+    result = execute(path, ["zr1"], write=True)
+
+    assert result["ok"] is False
+    assert result["status"] == "preflight_failed"
+    assert path.read_bytes() == before
+    assert "backup_path" not in result
+
+
+def test_post_save_verification_failure_restores_exact_original_workbook(tmp_path: Path, monkeypatch) -> None:
+    path = tmp_path / "post-save-failure.xlsx"
+    wb = promotion_workbook()
+    wb.save(path)
+    wb.close()
+    before = path.read_bytes()
+    real_verify = promotion_module.verify_promotions
+    call_count = 0
+
+    def fail_second_verification(candidate_path, plans):
+        nonlocal call_count
+        call_count += 1
+        if call_count == 1:
+            return real_verify(candidate_path, plans)
+        return {"ok": False, "models": {}, "failures": ["forced post-save failure"]}
+
+    monkeypatch.setattr(promotion_module, "verify_promotions", fail_second_verification)
+
+    result = promotion_module.execute_promotion(path, ["zr1"], write=True)
+
+    assert result["ok"] is False
+    assert result["status"] == "post_save_verification_failed_restored"
+    assert result["restored"] is True
+    assert path.read_bytes() == before
+
+
+def test_cli_routes_repeated_models_through_one_atomic_execution(tmp_path: Path, monkeypatch, capsys) -> None:
+    path = tmp_path / "three-model-promotion.xlsx"
+    calls = []
+
+    def execute(workbook_path, model_keys, *, write=False):
+        calls.append((Path(workbook_path), model_keys, write))
+        return {"ok": True, "status": "validated", "model_keys": model_keys, "write": write}
+
+    monkeypatch.setattr(promotion_module, "execute_promotion", execute)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "promote_model.py",
+            "--workbook",
+            str(path),
+            "--model",
+            "grand_sport_x",
+            "--model",
+            "zr1",
+            "--model",
+            "zr1x",
+        ],
+    )
+
+    promotion_module.main()
+
+    assert calls == [(path, ["grand_sport_x", "zr1", "zr1x"], False)]
+    assert json.loads(capsys.readouterr().out)["status"] == "validated"

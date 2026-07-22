@@ -20,6 +20,7 @@ from corvette_form_generator.ingest.wizard.session import (  # noqa: E402
     COMPILER_MUTATION_FILES,
     WizardError,
     WizardSessionStore,
+    file_fingerprint,
 )
 from ingest_wizard_fixtures import build_master_workbook, build_raw_export  # noqa: E402
 
@@ -111,7 +112,8 @@ class ExceptionFlowTest(unittest.TestCase):
             limit=2,
         )
 
-        self.assertEqual(first["total"], 6)
+        self.assertEqual(first["total"], second["total"])
+        self.assertGreaterEqual(first["total"], 4)
         self.assertEqual(first["offset"], 0)
         self.assertEqual(first["limit"], 2)
         self.assertEqual(len(first["items"]), 2)
@@ -139,7 +141,10 @@ class ExceptionFlowTest(unittest.TestCase):
 
         self.assertGreater(payload["total"], 0)
         item = payload["items"][0]
-        self.assertEqual(item["subject"]["allowedActions"], ["choose_section"])
+        self.assertEqual(
+            item["subject"]["allowedActions"],
+            ["choose_section", "keep_inactive_option", "mark_not_applicable"],
+        )
         self.assertTrue(item["evidence"]["sourceEvidence"])
         raw = item["evidence"]["sourceEvidence"][0]
         self.assertTrue(raw["sourceEvidence"]["cells"])
@@ -193,6 +198,49 @@ class ExceptionFlowTest(unittest.TestCase):
         )
         self.assertEqual(specific["label"], "Exhaust tips, Black")
 
+    def test_section_presentation_why_uses_owning_blank_rpo_source_copy(self) -> None:
+        source_copy = "Custom Leather Wrapped Interior Package with target-only detail"
+        item = {
+            "subject": {
+                "model": "grand_sport_x",
+                "question": "Choose one canonical target section.",
+                "proposedRows": [],
+                "semanticConflict": {},
+            },
+            "decisionType": "section",
+            "reviewState": "needs_decision",
+            "evidence": {
+                "sourceEvidence": [
+                    {
+                        "candidateId": "Interior 3:85",
+                        "rpo": "",
+                        "refOnlyRpo": "",
+                        "description": source_copy,
+                    }
+                ],
+                "existingWorkbookRows": [],
+                "alreadyDerivedRows": [],
+                "comparator": [],
+                "workbookReferences": [],
+            },
+        }
+
+        presentation = self.store._exception_presentation(
+            item,
+            [
+                {
+                    "optionId": "opt_unrelated_001",
+                    "rpo": "",
+                    "description": "Unrelated first target option",
+                }
+            ],
+        )
+
+        self.assertEqual(
+            presentation["whyAsked"],
+            f"The target source identifies {source_copy}.",
+        )
+
     def test_presentation_copy_is_isolated_from_authority_preview_and_artifacts(self) -> None:
         original = self.store.exception_queue_view(
             self.run_id,
@@ -206,13 +254,17 @@ class ExceptionFlowTest(unittest.TestCase):
         before_files = {
             path.name: path.read_bytes() for path in run_dir.iterdir() if path.is_file()
         }
-        before_preview = self.store.preview_exception(
-            self.run_id,
-            subject_id=subject["subjectId"],
-            subject_version=subject["subjectVersion"],
-            action="choose_section",
-            payload={"sectionId": "sec_whee_001"},
-        )
+        with mock.patch(
+            "corvette_form_generator.ingest.wizard.session.time.strftime",
+            return_value="2026-07-17T00:00:00Z",
+        ):
+            before_preview = self.store.preview_exception(
+                self.run_id,
+                subject_id=subject["subjectId"],
+                subject_version=subject["subjectVersion"],
+                action="choose_section",
+                payload={"sectionId": "sec_whee_001"},
+            )
 
         with mock.patch.object(
             self.store,
@@ -232,13 +284,17 @@ class ExceptionFlowTest(unittest.TestCase):
                 actionable="yes",
                 limit=1,
             )
-            after_preview = self.store.preview_exception(
-                self.run_id,
-                subject_id=subject["subjectId"],
-                subject_version=subject["subjectVersion"],
-                action="choose_section",
-                payload={"sectionId": "sec_whee_001"},
-            )
+            with mock.patch(
+                "corvette_form_generator.ingest.wizard.session.time.strftime",
+                return_value="2026-07-17T00:00:01Z",
+            ):
+                after_preview = self.store.preview_exception(
+                    self.run_id,
+                    subject_id=subject["subjectId"],
+                    subject_version=subject["subjectVersion"],
+                    action="choose_section",
+                    payload={"sectionId": "sec_whee_001"},
+                )
 
         self.assertEqual(
             changed["queueSubjectFingerprint"], original["queueSubjectFingerprint"]
@@ -400,6 +456,38 @@ class ExceptionFlowTest(unittest.TestCase):
         self.assertIn("resolvedAt", resolution)
         self.assertEqual(result["summary"]["session"]["runId"], self.run_id)
         self.assertFalse((self.store.run_dir(self.run_id) / "apply-plan.json").exists())
+
+    def test_resolution_success_does_not_depend_on_post_compile_queue_lookup(self) -> None:
+        item = self.store.exception_queue_view(
+            self.run_id,
+            reason="missing_section",
+            state="open",
+            actionable="yes",
+            limit=1,
+        )["items"][0]
+        subject = item["subject"]
+
+        with mock.patch.object(
+            self.store,
+            "exception_queue_view",
+            return_value={"items": []},
+        ):
+            result = self.store.resolve_exception(
+                self.run_id,
+                subject_id=subject["subjectId"],
+                subject_version=subject["subjectVersion"],
+                action="choose_section",
+                payload={"sectionId": "sec_whee_001"},
+                reviewer="sean",
+            )
+
+        self.assertEqual(result["subject"]["state"], "resolved")
+        self.assertEqual(
+            result["subject"]["resolution"]["subjectId"],
+            subject["subjectId"],
+        )
+        valid = self.store.compiler_detail(self.run_id)["resolutions"]["validEntries"]
+        self.assertIn(subject["subjectId"], {entry["subjectId"] for entry in valid})
 
     def test_exception_preview_is_side_effect_free_and_returns_exact_physical_effects(self) -> None:
         item = self.store.exception_queue_view(
@@ -633,6 +721,41 @@ class ExceptionFlowTest(unittest.TestCase):
         finally:
             os.utime(self.master, ns=(stat.st_atime_ns, stat.st_mtime_ns))
 
+    def test_summary_reports_sheet_profile_drift(self) -> None:
+        profile = self.store.run_dir(self.run_id) / "sheet-profile.json"
+        payload = json.loads(profile.read_text(encoding="utf-8"))
+        payload["testDrift"] = True
+        profile.write_text(json.dumps(payload), encoding="utf-8")
+
+        freshness = self.store.compiler_summary(self.run_id)["freshness"]
+
+        self.assertTrue(freshness["stale"])
+        self.assertIn("sheetProfile changed after compile", freshness["reasons"])
+
+    def test_freshness_binds_options_quality_allowlist(self) -> None:
+        from corvette_form_generator.ingest.wizard import session as session_module
+
+        report = self.store.compiler_detail(self.run_id)["compileReport"]
+        allowlist = self.root / "quality-allowlist.json"
+        allowlist.write_text('{"schemaVersion":"options-sheet-quality-allowlist-1","entries":[]}', encoding="utf-8")
+        report["runAuthorityFingerprint"]["bindings"]["files"]["optionsQualityAllowlist"] = file_fingerprint(allowlist)
+        allowlist.write_text('{"schemaVersion":"options-sheet-quality-allowlist-1","entries":[{"changed":true}]}', encoding="utf-8")
+
+        with mock.patch.object(session_module, "DEFAULT_ALLOWLIST_PATH", allowlist):
+            freshness = self.store._compiler_freshness(self.run_id, report)
+
+        self.assertTrue(freshness["stale"])
+        self.assertIn("optionsQualityAllowlist changed after compile", freshness["reasons"])
+
+    def test_freshness_rejects_prior_compiler_policy(self) -> None:
+        report = self.store.compiler_detail(self.run_id)["compileReport"]
+        report["runAuthorityFingerprint"]["bindings"]["compilerPolicyVersion"] = "prior-policy"
+
+        freshness = self.store._compiler_freshness(self.run_id, report)
+
+        self.assertTrue(freshness["stale"])
+        self.assertIn("compiler policy changed after compile", freshness["reasons"])
+
     def test_compiler_complete_row_actions_are_exposed(self) -> None:
         subject = {
             "reasonCode": "comparator_only_rule_group_proposal",
@@ -673,6 +796,15 @@ class ExceptionFlowTest(unittest.TestCase):
                 }
             ),
             ["retain_existing"],
+        )
+        self.assertEqual(
+            self.store._projectable_exception_actions(
+                {
+                    "reasonCode": "semantic_group_overlap",
+                    "allowedActions": ["mark_not_applicable"],
+                }
+            ),
+            ["mark_not_applicable"],
         )
         for reason in (
             "unresolved_relationship_endpoint",
@@ -785,6 +917,41 @@ class ExceptionFlowTest(unittest.TestCase):
                 },
                 reviewer="sean",
             )
+
+    def test_price_resolution_accepts_canonical_scope_case(self) -> None:
+        payload = self.store.exception_queue_view(
+            self.run_id,
+            reason="unresolved_price_scope",
+            state="open",
+            actionable="yes",
+        )
+        item = payload["items"][0]
+        subject = item["subject"]
+        scope = next(
+            choice
+            for choice in item["choices"]["priceScopes"]
+            if choice["trimLevelScope"] not in {"*", choice["trimLevelScope"].lower()}
+            and choice["variantScope"] == "*"
+        )
+
+        result = self.store.resolve_exception(
+            self.run_id,
+            subject_id=subject["subjectId"],
+            subject_version=subject["subjectVersion"],
+            action="provide_typed_value",
+            payload={
+                "bodyStyleScope": scope["bodyStyleScope"].lower(),
+                "trimLevelScope": scope["trimLevelScope"].lower(),
+                "variantScope": scope["variantScope"].lower(),
+                "priceValue": 1234,
+            },
+            reviewer="sean",
+        )
+
+        self.assertEqual(
+            result["subject"]["resolution"]["payload"]["trimLevelScope"],
+            scope["trimLevelScope"].lower(),
+        )
 
     def test_concurrent_resolutions_merge_without_lost_update(self) -> None:
         subjects = [

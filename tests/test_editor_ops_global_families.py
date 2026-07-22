@@ -65,6 +65,11 @@ class GlobalFamilyOpsTest(unittest.TestCase):
                 log_path=Path(self._tmp.name) / "edit-log.jsonl",
             )
 
+    def test_editor_ops_aliases_shared_registry(self) -> None:
+        from corvette_form_generator.workbook_domain import registry as shared_registry
+        self.assertIs(editor_ops.GLOBAL_SHEET_FAMILIES, shared_registry.GLOBAL_SHEET_FAMILIES)
+        self.assertIs(editor_ops.SOURCE_ROLE_FAMILIES, shared_registry.SOURCE_ROLE_FAMILIES)
+
     def test_asset_map_and_interior_components_accept_canonical_operations(self) -> None:
         result = self.run_batch(
             [
@@ -436,6 +441,87 @@ class GlobalFamilyOpsTest(unittest.TestCase):
         added = next(row for row in rows[1:] if row[0] == "opt_zzz_001")
         self.assertEqual(added[7], "False")
         self.assertEqual(added[9], "True")
+
+    def test_existing_inactive_source_sheet_is_editable_without_source_update(self) -> None:
+        extract = editor_ops.extract_workbook(self.path)
+        registry, sheet_family = editor_ops.model_sheet_registry(extract)
+        self.assertNotIn("zr1", registry)
+        self.assertNotIn("zr1_options", sheet_family)
+        source_rows_before = list(extract["sheets"]["model_workbook_sources"]["rows"])
+        items = [
+            {
+                "action": "add",
+                "sheet": "zr1_options",
+                "key": {"option_id": "opt_inactive_001"},
+                "row": {
+                    "option_id": "opt_inactive_001",
+                    "rpo": "INA",
+                    "option_name": "Inactive source option",
+                    "section_id": "sec_whee_001",
+                    "selectable": True,
+                    "active": False,
+                },
+            }
+        ]
+
+        preview = self.run_batch(items)
+        result = self.run_batch(
+            items,
+            write=True,
+            confirmed=tuple(warning["id"] for warning in preview["warnings"]),
+        )
+
+        self.assertTrue(result["ok"], result)
+        saved = editor_ops.extract_workbook(self.path)
+        self.assertEqual(
+            saved["sheets"]["model_workbook_sources"]["rows"],
+            source_rows_before,
+        )
+        self.assertIn(
+            "opt_inactive_001",
+            {row["option_id"] for row in saved["sheets"]["zr1_options"]["rows"]},
+        )
+
+    def test_pending_inactive_source_registration_validates_same_batch_references(self) -> None:
+        items = [
+            {
+                "action": "update",
+                "sheet": "model_workbook_sources",
+                "key": {"model_key": "zr1", "source_role": "source_option_sheet"},
+                "row": {"sheet_name": "zr1_options", "active": False},
+            },
+            {
+                "action": "add",
+                "sheet": "zr1_options",
+                "key": {"option_id": "opt_pending_001"},
+                "row": {
+                    "option_id": "opt_pending_001",
+                    "rpo": "PND",
+                    "option_name": "Pending inactive source option",
+                    "section_id": "sec_whee_001",
+                    "selectable": True,
+                    "active": False,
+                },
+            },
+            {
+                "action": "add",
+                "sheet": "default_selection_rules",
+                "key": {"model_key": "zr1", "rule_id": "zr1_pending_default"},
+                "row": {
+                    "model_key": "zr1",
+                    "rule_id": "zr1_pending_default",
+                    "target_option_id": "opt_pending_001",
+                    "condition_type": "always",
+                    "condition_id": "",
+                    "priority": 1,
+                    "active": False,
+                },
+            },
+        ]
+
+        result = self.run_batch(items)
+
+        self.assertTrue(result["ok"], result)
 
     def test_create_sheet_failures(self) -> None:
         result = self.run_batch(

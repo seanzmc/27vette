@@ -3,6 +3,7 @@
 
 Usage:
     python scripts/promote_model.py --model z06 [--write]
+    python scripts/promote_model.py --model grand_sport_x --model zr1 --model zr1x [--write]
 
 All promotion values derive from workbook metadata: ``model_master`` supplies
 the label, year, registry key, and export slug; ``model_variants`` supplies
@@ -15,7 +16,10 @@ would make and leaves the workbook untouched.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import shutil
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -23,7 +27,13 @@ from openpyxl import load_workbook
 
 from corvette_form_generator.model_configs import WORKBOOK_PATH, discover_generation_model_configs
 from corvette_form_generator.registry_promotion import export_slug, registry_model_key, runtime_contract_artifact_path
-from corvette_form_generator.workbook import clean, excel_lock_path, rows_from_sheet, save_workbook_safely
+from corvette_form_generator.workbook import (
+    clean,
+    excel_lock_path,
+    restore_workbook_backup,
+    rows_from_sheet,
+    save_workbook_safely,
+)
 
 
 def headers_for(ws) -> dict[str, int]:
@@ -150,6 +160,20 @@ def promote_model(wb, model_key: str, plan: dict[str, Any]) -> list[dict[str, An
         membership_row = row_by_membership(membership_ws, model_key, variant_id)
         set_cell(membership_ws, membership_row, membership_headers, "active", True, changes)
 
+    source_ws = wb["model_workbook_sources"]
+    source_headers = headers_for(source_ws)
+    if "model_key" not in source_headers:
+        raise ValueError("model_workbook_sources is missing required column 'model_key'")
+    source_rows = [
+        row_idx
+        for row_idx in range(2, source_ws.max_row + 1)
+        if clean(source_ws.cell(row_idx, source_headers["model_key"]).value).lower() == model_key.lower()
+    ]
+    if not source_rows:
+        raise ValueError(f"model_workbook_sources has no rows for model_key {model_key!r}")
+    for source_row in source_rows:
+        set_cell(source_ws, source_row, source_headers, "active", True, changes)
+
     return changes
 
 
@@ -240,41 +264,90 @@ def verify_workbook(path: Path, model_key: str, plan: dict[str, Any]) -> dict[st
     }
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--model", required=True, help="model key to promote (e.g. z06)")
-    parser.add_argument("--write", action="store_true", help="write changes to stingray_master.xlsx")
-    args = parser.parse_args()
-    model_key = clean(args.model).lower()
+def verify_promotions(path: Path, plans: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    models = {
+        model_key: verify_workbook(path, model_key, plan)
+        for model_key, plan in plans.items()
+    }
+    failures = [
+        f"{model_key}: {failure}"
+        for model_key, verification in models.items()
+        for failure in verification["failures"]
+    ]
+    return {"ok": not failures, "models": models, "failures": failures}
 
-    workbook_path = Path(WORKBOOK_PATH)
+
+def execute_promotion(workbook_path: Path, model_keys: list[str], *, write: bool = False) -> dict[str, Any]:
+    workbook_path = Path(workbook_path)
+    normalized_keys = list(dict.fromkeys(clean(model_key).lower() for model_key in model_keys if clean(model_key)))
+    if not normalized_keys:
+        raise ValueError("at least one model key is required")
     lock_path = excel_lock_path(workbook_path)
     if lock_path.exists():
-        raise SystemExit(f"Refusing to run; Excel lock file is present: {lock_path}. Close Excel first.")
+        raise RuntimeError(f"Refusing to run; Excel lock file is present: {lock_path}. Close Excel first.")
 
     loaded_mtime_ns = workbook_path.stat().st_mtime_ns
     wb = load_workbook(workbook_path)
     try:
-        plan = model_promotion_plan(wb, model_key)
-        changes = promote_model(wb, model_key, plan)
+        plans = {model_key: model_promotion_plan(wb, model_key) for model_key in normalized_keys}
+        changes: list[dict[str, Any]] = []
+        for model_key in normalized_keys:
+            changes.extend(promote_model(wb, model_key, plans[model_key]))
         result: dict[str, Any] = {
+            "ok": False,
+            "status": "pending",
             "workbook": str(workbook_path),
-            "model_key": model_key,
-            "write": args.write,
-            "plan": plan,
+            "model_keys": normalized_keys,
+            "write": write,
+            "plans": plans,
             "change_count": len(changes),
             "changes": changes,
         }
-        if args.write:
-            backup_path = save_workbook_safely(wb, workbook_path, loaded_mtime_ns=loaded_mtime_ns)
-            verification = verify_workbook(workbook_path, model_key, plan)
-            result["backup_path"] = str(backup_path)
-            result["verification"] = verification
-            if verification["failures"]:
-                raise SystemExit(json.dumps(result, indent=2))
-        print(json.dumps(result, indent=2))
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            scratch_path = Path(tmp_dir) / workbook_path.name
+            shutil.copy2(workbook_path, scratch_path)
+            scratch_mtime_ns = scratch_path.stat().st_mtime_ns
+            save_workbook_safely(wb, scratch_path, loaded_mtime_ns=scratch_mtime_ns)
+            preflight = verify_promotions(scratch_path, plans)
+            result["preflight"] = preflight
+            if not preflight["ok"]:
+                result["status"] = "preflight_failed"
+                return result
+
+        if not write:
+            result["ok"] = True
+            result["status"] = "validated"
+            return result
+
+        backup_path = save_workbook_safely(wb, workbook_path, loaded_mtime_ns=loaded_mtime_ns)
+        result["backup_path"] = str(backup_path)
+        verification = verify_promotions(workbook_path, plans)
+        result["verification"] = verification
+        if verification["ok"]:
+            result["ok"] = True
+            result["status"] = "applied"
+            return result
+
+        restore_workbook_backup(workbook_path, backup_path)
+        restored = hashlib.sha256(workbook_path.read_bytes()).hexdigest() == hashlib.sha256(backup_path.read_bytes()).hexdigest()
+        result["status"] = "post_save_verification_failed_restored" if restored else "restore_failed"
+        result["restored"] = restored
+        return result
     finally:
         wb.close()
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--model", action="append", required=True, help="model key to promote; repeat for one atomic batch")
+    parser.add_argument("--workbook", default=str(WORKBOOK_PATH), help="workbook to inspect or promote")
+    parser.add_argument("--write", action="store_true", help="write changes to stingray_master.xlsx")
+    args = parser.parse_args()
+    result = execute_promotion(Path(args.workbook), args.model, write=args.write)
+    print(json.dumps(result, indent=2))
+    if not result["ok"]:
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":

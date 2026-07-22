@@ -135,7 +135,7 @@ const expectedGrandSportExclusiveGroups = [
   },
   {
     group_id: "gs_excl_performance_aero",
-    option_ids: ["opt_t0e_001", "opt_t0f_001"],
+    option_ids: ["opt_t0e_001", "opt_t0f_001", "opt_5zv_001"],
     selection_mode: "required_single_within_group",
   },
   {

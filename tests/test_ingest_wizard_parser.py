@@ -52,6 +52,7 @@ class WizardParserTest(unittest.TestCase):
         self.assertEqual(candidate["sectionLabel"], "Equipment Groups")
         self.assertEqual(candidate["modelFamily"], "Stingray")
         self.assertIn("Personalized Plaque", candidate["description"])
+        self.assertEqual(candidate["detailRaw"], "Personalized Plaque. Not available with (PDB).")
         by_letter = {s["columnLetter"]: s for s in candidate["statuses"]}
         self.assertEqual(by_letter["D"]["raw"], "A1")
         self.assertEqual(by_letter["D"]["status"], "available")
@@ -111,6 +112,28 @@ class WizardParserTest(unittest.TestCase):
         self.assertEqual(candidate["refOnlyRpo"], "")
         self.assertEqual(candidate["statuses"][0]["status"], "standard")
         self.assertEqual(candidate["sourceEvidence"]["cells"]["C4"], "Air filtration system with pollen filter")
+
+    def test_exact_source_description_is_retained_separately_from_cleaned_copy(self) -> None:
+        values = [
+            ["ZR1"],
+            ["Legend"],
+            ["Orderable RPO Code", "Ref. Only RPO Code", "Description", "ZR1 Coupe"],
+            ["ABC", "", "  Exact source copy\nwith spacing  ", "A"],
+        ]
+        card = {
+            "sheetType": "options_matrix",
+            "headerRow": 3,
+            "modelFamily": "ZR1",
+            "modelFamilies": ["ZR1"],
+            "variantColumns": [
+                {"columnIndex": 4, "columnLetter": "D", "label": "ZR1 Coupe", "modelCode": "1YR07", "trim": "1LZ", "bodyStyle": "coupe"}
+            ],
+        }
+
+        candidates, _ = extract_option_candidates("Mechanical 4", values, card)
+
+        self.assertEqual(candidates[0]["description"], "Exact source copy\nwith spacing")
+        self.assertEqual(candidates[0]["detailRaw"], "  Exact source copy\nwith spacing  ")
 
     def test_price_rows(self) -> None:
         rows = self.parsed["priceRows"]
