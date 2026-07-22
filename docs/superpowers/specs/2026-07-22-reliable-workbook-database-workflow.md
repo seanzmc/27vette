@@ -151,6 +151,132 @@ or to enforce verified import ownership/references. Do not create per-model
 physical table families, a compiler framework, ORM layer, plugin system, or new
 database dependency.
 
+### 3.6 Keep the projection semantic and keep the workbook physical
+
+Do not build a second cell store inside SQLite. The bound source workbook already
+owns exact headers, cell values/types, formulas, formatting, and opaque columns.
+Duplicating every cell in lineage tables would add storage and reconstruction
+logic without making a field-level ChangeSet safer.
+
+The projection stores only registry-owned semantic rows plus minimal lineage:
+source workbook SHA-256/mtime, sheet name, source row, family, physical key, and
+model context. Semantic values use the existing registry/editor coercion.
+
+Mapping is pinned as follows:
+
+- an allowed blank reference or optional typed value becomes SQL `NULL`;
+- a required key, reference, boolean, integer, or enum with a blank value is a
+  blocking import finding;
+- nonblank unresolved references block promotion;
+- required/optional field and reference metadata is writable contract behavior,
+  so add it to `workbook_domain.registry` where currently absent;
+- `editor_ops._prepare_batch()` must enforce that requiredness against each
+  effective final row so import and later ChangeSet writes cannot disagree.
+
+SQLite enforces primary/composite uniqueness only. Do not add a parallel SQL
+foreign-key model. Ordinary, union, conditional, `option_rpos`, section/variant,
+and model-scoped references all remain shared projected-final-state semantic
+checks. This avoids encoding only a misleading subset of the workbook graph in
+DDL while the shared service remains the actual write authority.
+
+Comparison export and parity reconstruction start from a temporary copy of the
+exact bound source workbook. They refuse SHA-256/mtime drift and overlay only
+registry-owned projected fields or draft ChangeSet fields through the shared
+editor operation path. Untouched sheets, columns, cells, formulas, and formatting
+therefore remain workbook-owned without being copied into SQLite.
+
+### 3.7 Use one complete projection/import catalog
+
+`catalog.py` must classify every workbook sheet before import and every column on
+a managed sheet. It does not copy unmanaged sheet contents into SQLite.
+
+The current catalog classes are:
+
+1. **Source-role writable families** from `SOURCE_ROLE_FAMILIES`:
+   `options`, `ovs`, `rule_mapping`, `rule_groups`, `rule_group_members`,
+   `exclusive_groups`, `exclusive_members`, `price_rules`,
+   `variant_overrides`, `color_overrides`, and `interiors`. Physical sheet names
+   come only from active `model_workbook_sources` rows.
+2. **Fixed-sheet writable families** from `GLOBAL_SHEET_FAMILIES`:
+   `model_master`, `model_variants`, `variant_master`,
+   `model_workbook_sources`, `model_registry_promotion`,
+   `model_interior_scope`, `default_selection_rules`, `asset_map`,
+   `interior_components`, `runtime_steps_meta`,
+   `section_presentation_meta`, `context_section_master_meta`,
+   `order_summary_sections_meta`, and `step_order_summary_map_meta`.
+3. **Managed read-only sheet**: `section_master`, used for section/step lookup
+   and Form Structure fallback. It is projected but cannot emit a ChangeSet.
+4. **Known workbook-preserved sheets**: `PriceRef`, `context_choice_copy`,
+   `rule_phrase_map`, and `runtime_rule_exceptions`. Record their sheet
+   disposition but leave their contents in the bound workbook.
+5. **All remaining workbook sheets**: `workbook_preserved_unknown`. Record the
+   disposition only. Encountering one is informational, not permission to
+   interpret, edit, or duplicate it in SQLite.
+
+Required sheet ownership comes from `schema_validation.REQUIRED_SHEETS` plus
+active source-role registrations. Required columns, optional columns, keys, and
+writable fields come from the shared registry/schema-validation owners. The
+adapter assembles those sources mechanically and fails if they disagree; it
+does not copy their lists by hand.
+
+For every managed sheet, column reconciliation is name-based and deterministic:
+
+- reordered unique known headers are accepted;
+- a duplicate header is blocking because owned-cell identity is ambiguous;
+- a missing required header is blocking;
+- a missing optional header remains absent;
+- a renamed header is treated as one missing required/optional header plus one
+  unknown header; no fuzzy rename is allowed;
+- an extra header is recorded as opaque and remains untouched in the workbook;
+- blank trailing rows are not source rows;
+- every nonblank managed row receives one import or blocking-exclusion
+  disposition; workbook-preserved rows are not copied into the projection.
+
+Candidate reconciliation must prove both the sheet and managed-row accounting:
+
+```text
+all workbook sheets
+  = managed writable sheets + managed read-only sheets + workbook-preserved sheets
+
+managed nonblank rows
+  = imported managed rows + explicit blocking exclusions
+```
+
+The candidate report includes sheet dispositions, managed-row dispositions, and
+opaque managed-column names. Comparison export follows Section 3.6; it never
+rebuilds an unmanaged sheet or fills unknown headers from database defaults.
+
+### 3.8 Pin isolated generated-contract execution
+
+Add `workbook-manager/backend/app/contract_parity.py` with one public helper:
+
+```text
+generate_contract_snapshot(workbook_path, output_root, model_key)
+```
+
+The helper calls `discover_generation_model_configs(workbook_path)`, selects the
+requested discovered config, and uses `ModelConfig.with_overrides()` to set all
+of `root=output_root`, `workbook_path=workbook_path`,
+`output_dir=output_root/form-output`, and `app_dir=output_root/form-app`.
+
+Before this helper is used, fix
+`production.write_stingray_compatibility_artifacts()` to write through
+`config.output_dir` rather than module-level output paths. This is the
+single approved isolation fix; do not patch globals or change cwd/environment.
+Add a direct Stingray regression proving an injected temporary config writes
+every compatibility/runtime artifact under that root and leaves the canonical
+`form-output/` and `form-app/` hashes unchanged.
+
+The helper then calls `generate_model_artifacts()` with inspection disabled,
+asserts that every returned path resolves under `output_root`, and returns the
+generated runtime-contract path. It must not change process cwd, module globals,
+environment variables, tracked outputs, or the source workbook.
+
+Pass 4 runs this helper once per current published model for both the source and
+reconstructed workbook in separate temporary roots. Compare those outputs with
+`scripts/compare-generated-contracts.mjs`; expected timestamp fields are
+ignored, every other difference blocks promotion.
+
 ## 4. State and transition contract
 
 Persist exact immutable artifacts and a small manager state machine. Status is
@@ -169,12 +295,22 @@ changeset_emitted
   -> stale
   -> cancelled
 
-preview_failed | stale
+preview_failed
+  -> changeset_emitted
+  -> cancelled
+
+stale
   -> cancelled
 
 preview_ready
   -> approved
+  -> approval_failed
   -> stale
+  -> cancelled
+
+approval_failed
+  -> changeset_emitted
+  -> preview_ready
   -> cancelled
 
 approved
@@ -185,16 +321,13 @@ approved
 applying
   -> applied
   -> apply_failed
+  -> approval_failed
+  -> stale
   -> restored
   -> workbook_state_unknown
 
 apply_failed | restored
-  -> retry_pending
-  -> cancelled
-
-retry_pending
   -> applying
-  -> stale
   -> cancelled
 
 workbook_state_unknown
@@ -206,9 +339,14 @@ workbook_state_unknown
 Rules:
 
 - `draft` is mutable; emitted ChangeSets and lifecycle artifacts are immutable.
-- Retry reuses the exact ChangeSet, preview, and approval identities. It is
-  allowed only if the workbook still matches the bound SHA-256/mtime and the
-  prior receipt proves `untouched` or `restored`.
+- Preview retry reuses the immutable ChangeSet but emits a new preview artifact.
+  It is allowed only for a transient `locked`/read failure while the workbook
+  still matches the ChangeSet identity. Invalid, stale, empty, or semantically
+  failed proposals must be cancelled and recreated.
+- Apply retry reuses the exact ChangeSet, preview, and approval identities. It
+  is allowed only when the workbook still matches the bound SHA-256/mtime and
+  the prior attempt proves `untouched` for a transient pre-save failure or a
+  formal receipt proves `restored`.
 - `workbook_state_unknown` blocks retry, import, and new write approval until a
   manual recovery step records the live workbook hash and resolves the outcome:
   `restored` only when the base hash is proven, `applied` only when exact final
@@ -224,6 +362,36 @@ Rules:
   record with their original JSON and status. If any are staged or unsynced,
   keep import/write containment active until they are explicitly cancelled or
   recreated as a reviewed draft.
+
+### 4.1 Shared-service outcome mapping
+
+Do not extend the public ChangeSet/preview/approval/receipt schemas to carry
+manager status. Persist each returned dictionary unchanged, record whether it
+is a formal schema artifact or an early refusal, and derive manager state with
+this mapping:
+
+| Service phase/outcome | `workbookState` | Manager state | Allowed next action |
+|---|---|---|---|
+| Preview `validated` and `ok=true` | n/a | `preview_ready` | approve or cancel |
+| Preview `invalid_changeset`, `invalid`, `empty`, `bool_hygiene_failed`, `schema_failed`, or `warning_blocked` | n/a | `preview_failed` | cancel and recreate |
+| Preview `stale` | n/a | `stale` | cancel, verified import, recreate |
+| Preview `locked` or transient read exception with unchanged workbook identity | n/a | `preview_failed` | retry preview or cancel |
+| Preview `readback_failed` | n/a | `preview_failed` | retry preview only after the environmental cause is corrected, otherwise cancel |
+| Approval success | n/a | `approved` | apply or cancel |
+| Approval `warning_confirmation_mismatch` | n/a | `preview_ready` | resubmit exact warning IDs or cancel |
+| Approval `preview_not_validated`, `binding_mismatch`, or `warning_blocked` | n/a | `approval_failed` | return to exact ChangeSet preview where valid, or cancel/recreate |
+| Apply `applied` | `saved` | `applied` | no further write; mark projection/generated/publication state stale |
+| Apply `stale` or `stale_before_save` | `untouched` | `stale` | cancel, verified import, recreate |
+| Apply `locked` with base SHA/mtime still proven | `untouched` | `apply_failed` | exact-artifact retry or cancel |
+| Apply `approval_invalid`, `binding_mismatch`, `warning_confirmation_mismatch`, `warning_blocked`, or `needs_confirmation` | `untouched` | `approval_failed` | re-preview/reapprove where valid, otherwise cancel |
+| Apply `invalid`, `empty`, `schema_validation_required`, `readback_failed`, `bool_hygiene_failed`, or `schema_failed` | `untouched` | `apply_failed` | cancel/recreate; no blind retry |
+| Apply `apply_verification_failed_rolled_back` | `restored` | `restored` | exact-artifact retry if base SHA/mtime is proven, or cancel |
+| Apply `workbook_restore_failed` or any uncontained exception after save may have begun | `unknown` | `workbook_state_unknown` | manual resolution only |
+
+An exception before `apply_changeset()` reaches the shared writer is
+`untouched` only when the live SHA-256 proves the original base. Otherwise it is
+`workbook_state_unknown`. Early refusal dictionaries are attempt evidence, not
+fabricated `workbook-change-receipt-1` artifacts.
 
 ## 5. Model and schema authority
 
@@ -263,22 +431,47 @@ Do not duplicate the generation predicate. Reuse
 registry-promotion reader for publication state.
 
 Unknown models are always rejected. A model need not be published to be a valid
-editable/importable workbook model. For families routed through
-`SOURCE_ROLE_FAMILIES`, an edit requires an active exact
-`(model_key, source_role)` registration and resolvable source sheet. For
-fixed-sheet families routed through `GLOBAL_SHEET_FAMILIES`, use the fixed sheet
-plus that family's key/model semantics and the appropriate known/active-model
-predicate; do not require or invent a `model_workbook_sources` row.
+editable/importable workbook model. Apply this ownership matrix; do not reduce
+it to one generic `model_scoped` boolean:
 
-Replace the stale scaffold test with lifecycle assertions derived from a
-disposable workbook fixture: unknown rejected, inactive source role rejected,
-active source-backed unpublished model accepted, fixed-sheet model-key family
-accepted without an invented source-role row, and publication state does not
-grant edit ownership.
+| Family class | Families | Context/routing | Ownership predicate | `*` | Add/bootstrap policy |
+|---|---|---|---|---|---|
+| Model-scoped source-role rows | `options`, `ovs`, `rule_mapping`, `rule_groups`, `rule_group_members`, `exclusive_groups`, `exclusive_members`, `price_rules`, `variant_overrides` | request `model_key` plus exact active source-role registration and physical sheet | model is known and active; exact `(model_key, source_role)` is active; sheet exists and matches imported lineage | rejected | rows may be added only for an existing active model/role |
+| Shared/physical source-role rows | `interiors`, `color_overrides` | physical source sheet and row lineage; record the set of active registrations resolving to that sheet | at least one active registration for the family's role resolves to the exact sheet; emit one physical operation even when several models share it | rejected | no manager-created source sheet or source registration |
+| Model definition | `model_master` | fixed sheet; row's `model_key` | existing row defines known identity; active is not required to edit that row | rejected | adding a new `model_master` key is outside this implementation |
+| Model topology | `model_workbook_sources`, `model_variants` | fixed sheet; row's `model_key` | model already exists in `model_master`; active is not required so an existing inactive scaffold can be completed; referenced sheet/variant must exist before activation | rejected | may add topology for an existing model; cannot create a new model |
+| Publication metadata | `model_registry_promotion` | fixed sheet; row's `model_key` | model is known; setting an active/promoted state requires the model to be active and generatable | rejected | may add a row for an existing model only; publication remains a separate authorized decision |
+| Active-model fixed-sheet content | `model_interior_scope`, `default_selection_rules`, `interior_components`, `runtime_steps_meta`, `section_presentation_meta`, `context_section_master_meta`, `order_summary_sections_meta`, `step_order_summary_map_meta` | fixed sheet; row's `model_key` | model is known and active; family references validate in that model's projected final graph | rejected | no rows for unknown/inactive models |
+| Wildcard-capable assets | `asset_map` | fixed sheet; row's `model_key` | concrete key requires a known active model; `*` is a reserved shared scope, not a model | allowed only here | `*` target must resolve for at least one active imported model and may not bypass `target_type -> target_id` validation |
+| Model-independent definitions | `variant_master` | fixed sheet; no model owner | family key/reference contract only | n/a | normal row add through ChangeSet |
+| Managed read-only | `section_master` | fixed sheet | browse/reference target only | n/a | no ChangeSet emission |
+
+For manager-writable families, no wildcard or blank model key is accepted
+except the exact `asset_map` `*` case above. A concrete model key and `*` remain
+distinct physical keys. Wildcard semantic validation evaluates the target
+against the union of active imported model domains; it does not invent one
+target model or require the target in every model. Workbook-preserved sheets such
+as `context_choice_copy` may contain `*`; those tokens remain workbook-owned and
+do not grant manager write authority.
+
+New-model bootstrap is deliberately not implemented by this reliability pass.
+Creating a new `model_master` key, its source sheets, source-role rows, variant
+memberships, and publication metadata remains an existing workbook-tooling task
+with separate business/source approval. The manager may complete or edit rows
+for an already-known inactive scaffold according to the matrix, but it may not
+create the defining model identity. This avoids both circular unknown-model
+guards and a new bootstrap workflow.
+
+Replace the stale scaffold test with matrix-derived fixture assertions:
+unknown rejected, inactive model content rejected, inactive topology editable,
+inactive source role rejected, active source-backed unpublished model accepted,
+shared physical rows emitted once, fixed-sheet model-key families accepted
+without invented source-role rows, `asset_map` `*` accepted only under its
+special rule, and publication state does not grant edit ownership.
 
 ## 6. Implementation passes
 
-Implement in order. Keep containment active until Pass 6 explicitly re-enables
+Implement in order. Keep containment active until Pass 7 explicitly re-enables
 the reviewed ChangeSet write path. Each pass is a reviewable vertical slice;
 do not reorganize the repository first.
 
@@ -308,22 +501,57 @@ destructively replace an existing projection database.
 
 Required changes:
 
-1. Add the registry-derived `catalog.py` adapter and parity tests.
-2. Move current `specs.py` consumers to the adapter without changing product
+1. Extend the shared registry with required/optional column and reference
+   metadata needed by Section 3.6; do not add SQL-specific policy there.
+2. Add the registry/schema-validation-derived `catalog.py` adapter, the complete
+   sheet/column classifications in Section 3.7, and parity tests.
+3. Implement the pinned blank/NULL mapping and minimal row lineage. Do not add
+   per-cell physical-value tables or copy workbook-preserved sheets into SQLite.
+4. Move current `specs.py` consumers to the adapter without changing product
    behavior or SQL naming merely for cleanup.
-3. Carry model context for both physically model-scoped tables and families
+5. Carry model context for both physically model-scoped tables and families
    whose key includes `model_key`.
-4. Enforce family-specific source ownership before a draft can be created.
-5. Expose ordinary, union, and conditional references in the API schema.
-6. Render finite controls where the registry defines finite values. Keep free
+6. Enforce the Section 5.2 family ownership matrix before a draft can be
+   created.
+7. Expose ordinary, union, conditional, and derived reference metadata in the
+   API schema without presenting any of them as SQL-owned business rules.
+8. Render finite controls where the registry defines finite values. Keep free
    text only where the shared contract is actually free text.
-7. Correct the stale lifecycle test using derived workbook predicates.
-8. Delete `specs.py` only after the mechanical no-consumer and parity gates pass.
+9. Correct the stale lifecycle test using matrix-derived workbook predicates.
+10. Delete `specs.py` only after the mechanical no-consumer and parity gates
+    pass.
 
-Pass 2 exit gate: every manager-writable family has one key/type/enum/reference
-definition and unknown or unowned models cannot create drafts.
+Pass 2 exit gate: every manager-writable family has one
+key/type/enum/reference/requiredness definition, every sheet and managed column
+has one catalog disposition, shared preview rejects blank required fields, and
+unknown or unowned models cannot create drafts.
 
-### Pass 3 — Build and atomically promote a verified projection
+### Pass 3 — Establish request connections and promotion coordination
+
+Required changes:
+
+1. Initialize paths and both database schemas through FastAPI lifespan before
+   serving requests.
+2. Replace the global `_conn` with request-scoped projection and durable-state
+   connections. Keep WAL and a bounded busy timeout on every connection; use
+   SQLite foreign keys only for durable manager-state tables whose relationships
+   are database-owned, never as a second workbook reference model.
+3. Add one process-local mutation lock covering durable-state mutations,
+   candidate promotion, and workbook apply. Add a projection reader gate that
+   blocks new readers and waits for current request-scoped projection
+   connections to close before replacement. Do not add a second durable
+   projection-generation state machine; the promoted projection's own import
+   manifest and source fingerprint identify the current snapshot.
+4. Keep the supported deployment single-process through `run.sh`. Document
+   multi-worker serving as unsupported; do not add distributed locking.
+5. Add concurrent first-load and reader-drain tests before candidate promotion
+   code is allowed to call `os.replace()`.
+
+Pass 3 exit gate: concurrent first-load/status requests use independent
+connections without lock errors, promotion can quiesce readers deterministically,
+and subsequent requests open the promoted projection manifest.
+
+### Pass 4 — Build and atomically promote a verified projection
 
 Required changes:
 
@@ -331,41 +559,46 @@ Required changes:
    candidate work begins.
 2. Build a new candidate projection file in the same filesystem as the active
    projection. Never clear or mutate the active file during compilation.
-3. Enable SQLite foreign-key enforcement on candidate and request connections.
-4. Record exact sheet, row, family, physical key, model ownership, and source
-   disposition for every nonblank source row.
-5. Reconcile each source row to exactly one disposition:
-   `imported`, `preserved_raw`, or `excluded`. An exclusion must include sheet,
-   row, field, value, reason token, and contract impact.
+3. Enforce primary/composite uniqueness in SQLite and validate all workbook
+   references through the shared semantic contract from Section 3.6.
+4. Record the source workbook identity plus exact sheet, row, family, physical
+   key, model ownership, and source disposition for every managed nonblank row.
+5. Reconcile each managed source row to exactly one disposition: `imported` or
+   `excluded`. Record one disposition for every workbook-preserved sheet without
+   copying or counting its rows. An exclusion must include sheet, row, field,
+   value, reason token, and contract impact.
 6. Treat missing required sheets/columns, blank or duplicate keys, unresolved or
    ambiguous references, unproved model ownership, incomplete row
    reconciliation, and generated-contract drift as blocking. Do not promote an
    `imported_with_issues` candidate.
-7. Preserve unowned sheets/columns losslessly for comparison export; do not
-   interpret them as writable families.
-8. Run `PRAGMA foreign_key_check` and reconstruct a comparison workbook in a
-   temporary output root.
+7. Apply the complete catalog and column-reconciliation rules in Section 3.7.
+   Leave workbook-preserved sheets and opaque columns in the workbook; do not
+   duplicate or interpret them in SQLite.
+8. Reconstruct a comparison workbook from an identity-verified temporary copy
+   of the source workbook by overlaying projected managed values through the
+   shared editor operation path.
 9. Generate contracts for the current **published** set from both the source
-   workbook and reconstructed comparison workbook in isolated output roots, then
+   workbook and reconstructed comparison workbook through
+   `contract_parity.generate_contract_snapshot()` in isolated roots, then
    compare them with the repository comparator (timestamp-insensitive).
 10. Recheck the source workbook SHA-256/mtime. Checkpoint and close the candidate
     so promotion does not depend on candidate `-wal` or `-shm` sidecars.
 11. Under the projection-promotion lock, block new projection requests and drain
     existing projection connections. Atomically replace the projection file,
     fsync the file and parent directory as supported, remove only proven-stale
-    projection sidecars, then reopen subsequent requests against the new
-    projection generation. Durable-state connections remain independent.
+    projection sidecars, then reopen subsequent requests against the promoted
+    projection manifest. Durable-state connections remain independent.
 12. On any exception or blocking finding, delete/quarantine the candidate and
     leave the prior projection bytes unchanged.
 
 Do not make exact row counts part of the contract. Tests should derive counts
 from their fixture/source workbook.
 
-Pass 3 exit gate: malformed or incomplete imports leave the prior projection
-byte-for-byte unchanged; only a reconciled, relationally valid, contract-parity
+Pass 4 exit gate: malformed or incomplete imports leave the prior projection
+byte-for-byte unchanged; only a reconciled, semantically valid, contract-parity
 candidate becomes current.
 
-### Pass 4 — Replace staged full rows with draft-to-ChangeSet emission
+### Pass 5 — Replace staged full rows with draft-to-ChangeSet emission
 
 Required changes:
 
@@ -384,11 +617,11 @@ Required changes:
 8. Keep legacy full-row history visible as read-only recovery evidence, not
    write authority.
 
-Pass 4 exit gate: sequential same-row edits emit one operation; valid
+Pass 5 exit gate: sequential same-row edits emit one operation; valid
 parent/member additions and coordinated deletes preview together; invalid final
 graphs cannot produce an approvable preview.
 
-### Pass 5 — Harden the shared write boundary and recovery
+### Pass 6 — Harden the shared write boundary and recovery
 
 Required changes:
 
@@ -403,45 +636,40 @@ Required changes:
 4. Preserve the original failure and any restoration failure in the result.
 5. Drive manager apply only through `workbook_domain.service.apply_changeset()`
    with the exact ChangeSet, preview, and approval artifacts.
-6. Persist every attempt and receipt. Implement retry and cancel according to
-   Section 4; do not mark individual operations applied after an atomic batch
+6. Persist every early refusal, formal artifact, attempt, and receipt unchanged.
+   Map service outcomes and expose retry/cancel verbs exactly as Section 4.1
+   defines; do not mark individual operations applied after an atomic batch
    failure.
 7. Read back exact affected rows before terminal `applied` status. Mark the
    projection stale after success.
 
-Pass 5 exit gate: injected failures after physical save restore and hash-verify
+Pass 6 exit gate: injected failures after physical save restore and hash-verify
 the backup; failed/restored work remains visible and retryable; repeated retry
 cannot duplicate a workbook mutation.
 
-### Pass 6 — Repair connection lifecycle and make the UI a thin client
+### Pass 7 — Make the API and UI a thin client
 
 Required changes:
 
-1. Initialize paths/schema through FastAPI lifespan. Use request-scoped SQLite
-   connections; do not share `_conn` across threads.
-2. Keep WAL and a bounded busy timeout. Serialize state mutations, candidate
-   promotion, and workbook apply with one process-local mutation lock. The
-   supported deployment remains the single-process `run.sh`; document that
-   multi-worker serving is unsupported rather than adding distributed locking.
-3. Resolve API resources only from the allowlisted catalog; never accept a raw
+1. Resolve API resources only from the allowlisted catalog; never accept a raw
    SQL table name outside it.
-4. Fix Form Structure section-to-step fallback using the workbook master
+2. Fix Form Structure section-to-step fallback using the workbook master
    section metadata already imported by the manager.
-5. Carry model context through schema response, form payload, draft, ChangeSet,
+3. Carry model context through schema response, form payload, draft, ChangeSet,
    preview, history, and receipt for every model-owned family.
-6. Show lineage, blocking findings, exact ChangeSet/preview identity, warnings,
+4. Show projected values, source row lineage, blocking findings, exact
+   ChangeSet/preview identity, warnings,
    failure detail, retry/cancel controls, and separate workflow statuses.
-7. Do not report generated artifacts or runtime publication current after a
+5. Do not report generated artifacts or runtime publication current after a
    workbook write. This pass does not run or publish generators; report those
    states as stale/unverified until separately proven outside the manager.
-8. Re-enable the browser/API workbook write action only after Passes 1–6 gates
+6. Re-enable the browser/API workbook write action only after Passes 1–7 gates
    pass. The action must require the exact approved artifacts, not a typed
    `SYNC` string plus mtime.
 
-Pass 6 exit gate: concurrent first-load requests do not lock or fail; a real
-unchanged model-owned row round-trips through the API/browser payload without
-losing model context or changing meaning; only the bound ChangeSet service can
-reach a live write.
+Pass 7 exit gate: a real unchanged model-owned row round-trips through the
+API/browser payload without losing model context or blank/reference meaning;
+only the bound ChangeSet service can reach a live write.
 
 A manager `applied` receipt means only that the workbook write and exact
 readback were proven. It is not repository or customer-runtime completion. The
@@ -469,7 +697,12 @@ Expected existing owners:
 - `workbook-manager/frontend/src/components/ChangesSync.jsx`
 - `workbook-manager/frontend/src/components/FormStructure.jsx`
 - `tests/test_workbook_manager.py`
+- `tests/test_workbook_changeset_service.py`
+- `tests/test_editor_ops_apply.py`
+- `tests/test_generate_form_model_discovery_cli.py`
 - `scripts/corvette_form_generator/workbook_domain/registry.py`
+- `scripts/corvette_form_generator/model_generation.py`
+- `scripts/corvette_form_generator/production.py`
 - `scripts/corvette_form_generator/editor_ops.py`
 - `workbook-manager/README.md`
 - `README.md`
@@ -478,32 +711,45 @@ Expected existing owners:
 Expected new owner:
 
 - `workbook-manager/backend/app/catalog.py`
+- `workbook-manager/backend/app/contract_parity.py`
+- `tests/test_workbook_manager_catalog.py`
+- `tests/test_workbook_manager_import_projection.py`
+- `tests/test_workbook_manager_generated_parity.py`
+- `tests/test_workbook_manager_changeset_lifecycle.py`
+- `tests/test_workbook_manager_api_concurrency.py`
 
-Small focused test modules or state/import helpers may be added when they make a
-pass independently testable. Do not create the broad module tree from the
-superseded plan, move all current tests preemptively, or refactor unrelated
-generator/runtime code.
+State/import helpers may be added only when required to implement these pinned
+owners. Do not create the broad module tree from the superseded plan, move all
+current tests preemptively, or refactor unrelated generator/runtime code.
 
 ## 8. Acceptance matrix
 
-Implementation is complete only when disposable tests prove:
+Implementation is complete only when these named owners prove:
 
-| Audit risk | Required proof |
-|---|---|
-| Destructive import | malformed candidate preserves the prior projection SHA-256 |
-| Import with issues | blocking findings prevent promotion and current-status claims |
-| Journal loss on projection swap | drafts/artifacts remain unchanged across candidate promotion |
-| Stale overwrite | any workbook hash/mtime drift blocks preview/apply; no external field is overwritten |
-| Per-row validation | parent/member adds and coordinated deletes pass as one valid final graph |
-| Sequential edits | one physical row appears once with original-to-final field pairs |
-| Schema drift | manager catalog mechanically matches the shared registry |
-| Unknown model | unknown/unowned model cannot create a draft or ChangeSet |
-| Failed sync | failure remains visible with retry/cancel; retry is idempotent |
-| Weak write binding | tampered ChangeSet, preview, approval, SHA, or mtime is rejected |
-| Readback exception | backup is restored and hash-verified, or state is explicitly unknown |
-| Connection race | concurrent first-load/status requests succeed without database lock errors |
-| UI context loss | unchanged real model-key rows round-trip with the correct model and references |
-| False readiness | workbook save leaves generated/publication status stale or unverified |
+| Audit risk | Required proof | Owning test module |
+|---|---|---|
+| Unsafe legacy path | live sync and destructive re-import remain refused until final enablement | `tests/test_workbook_manager.py` |
+| Registry drift | every writable family matches shared key/type/enum/reference/requiredness metadata | `tests/test_workbook_manager_catalog.py` |
+| Blank/NULL drift | optional SQL `NULL` and required-blank behavior follow Section 3.6 | `tests/test_workbook_manager_catalog.py` |
+| Reference mismatch | ordinary/union/conditional/derived references all validate through the shared semantic contract | `tests/test_workbook_manager_catalog.py` |
+| Ownership ambiguity | every matrix row, writable `asset_map` `*`, workbook-preserved wildcard, shared physical family, inactive scaffold, and bootstrap refusal is enforced | `tests/test_workbook_manager_catalog.py` |
+| Column safety | reordered/extra/missing/duplicate/renamed managed headers follow Section 3.7 while opaque workbook columns remain untouched | `tests/test_workbook_manager_import_projection.py` |
+| Destructive import | malformed candidate preserves the prior projection SHA-256 | `tests/test_workbook_manager_import_projection.py` |
+| Import with issues | blocking findings prevent promotion and current-status claims | `tests/test_workbook_manager_import_projection.py` |
+| Row reconciliation | every nonblank row has one catalog/import disposition | `tests/test_workbook_manager_import_projection.py` |
+| Journal loss on projection swap | drafts/artifacts remain unchanged across WAL-safe candidate promotion | `tests/test_workbook_manager_import_projection.py` |
+| Isolated generated parity | source/reconstruction contracts match and every generated path stays in its temporary root | `tests/test_workbook_manager_generated_parity.py` |
+| Stingray output isolation | injected temporary `ModelConfig` keeps compatibility/runtime outputs under that root and leaves canonical outputs unchanged | `tests/test_generate_form_model_discovery_cli.py` |
+| Connection race | concurrent first-load/status requests and reader-draining promotion succeed without lock errors | `tests/test_workbook_manager_api_concurrency.py` |
+| Stale overwrite | workbook SHA/mtime drift maps to `stale`; no external field is overwritten | `tests/test_workbook_manager_changeset_lifecycle.py` |
+| Per-row validation | parent/member adds and coordinated deletes pass as one valid final graph | `tests/test_workbook_manager_changeset_lifecycle.py` |
+| Sequential edits | one physical row appears once with original-to-final field pairs | `tests/test_workbook_manager_changeset_lifecycle.py` |
+| Service mapping | every Section 4.1 service outcome maps to one state and exact allowed verbs | `tests/test_workbook_manager_changeset_lifecycle.py` |
+| Failed sync | failure remains visible with the permitted retry/cancel path; retry is idempotent | `tests/test_workbook_manager_changeset_lifecycle.py` |
+| Weak write binding | tampered ChangeSet, preview, approval, SHA, or mtime is rejected by the shared service | `tests/test_workbook_changeset_service.py` |
+| Readback/log exception | every post-save exception restores and hash-verifies backup or reports unknown | `tests/test_editor_ops_apply.py` |
+| UI context loss | unchanged real model-key rows round-trip with correct model/reference/source-lineage metadata | `tests/test_workbook_manager.py` plus disposable browser smoke |
+| False readiness | workbook save leaves projection/generated/publication status stale or unverified | `tests/test_workbook_manager_changeset_lifecycle.py` |
 
 ## 9. Validation and execution rules
 
@@ -517,21 +763,15 @@ For every pass:
    artifacts, runtime registry, deployment, and dealer code did not change.
 6. Record the pass result in this specification before moving to the next pass.
 
-Required final gates:
+The README owns exact commands. Add any new focused modules from Section 8 to its
+Workbook Manager validation table, then run the current documented manager,
+shared ChangeSet service, shared writer, slow copied-workbook, frontend build,
+workbook package/schema, and diff checks. The named modules in Section 8 own the
+acceptance proofs; do not substitute an unnamed smoke test for them.
 
-```sh
-.venv/bin/python -m pytest tests/test_workbook_manager.py -q
-WBM_SLOW_GATE=1 .venv/bin/python -m pytest tests/test_workbook_manager.py -q
-cd workbook-manager/frontend && npm run build
-.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
-.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
-git diff --check
-```
-
-Additional required focused tests include the shared ChangeSet service and
-`editor_ops` fault-injection tests covering the changed write boundary. Run
-generated-contract comparisons only in temporary workbooks/output roots; do not
-refresh tracked `form-output/` or `form-app/data.js` as implementation output.
+Generated-contract comparisons run only through the isolated helper against
+temporary workbooks/output roots; do not refresh tracked `form-output/` or
+`form-app/data.js` as implementation output.
 
 Browser-smoke the built manager against a copied workbook and temporary state/
 projection databases. Cover model navigation, structure mapping, an unchanged
@@ -568,8 +808,10 @@ validation, editing workbook rows, or hiding unsafe actions only in the UI.
 - A new workbook compiler framework, ORM, API version, frontend framework, or
   dependency.
 - Rewriting the fallback workbook editor or ingest workflow.
-- Editing option availability, pricing, defaults, relationships, copy, ordering,
-  lifecycle, or publication rows.
+- Changing canonical option availability, pricing, defaults, relationships,
+  copy, ordering, lifecycle, or publication decisions as implementation data.
+  The manager may support already-authorized future edits through the matrix;
+  this reliability implementation does not make those business decisions.
 - Automatic generation, registry publication, deployment, or dealer submission
   inside the manager. The enclosing approved workbook workflow still performs
   the required post-write generation and verification before overall completion.
@@ -585,7 +827,11 @@ Companion disposition:
 - Shared registry: reused; only generic metadata needed by existing writable
   families may be added.
 - Shared ChangeSet contract/service: reused; no parallel contract.
-- Shared writer: hardened only for post-save restoration correctness.
+- Shared writer: consumes registry-requiredness and is hardened for post-save
+  restoration correctness.
+- Model generation: output contracts unchanged; Stingray compatibility output
+  paths become `ModelConfig`-scoped so disposable parity cannot touch tracked
+  outputs.
 - Workbook Manager docs and root README pointer: updated to match actual safety
   state and commands.
 - Superseded relational design/plan: retained as historical, not edited back
