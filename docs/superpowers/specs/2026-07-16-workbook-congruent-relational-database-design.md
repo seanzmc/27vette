@@ -1,6 +1,8 @@
 # Workbook-Congruent Relational Database Design
 
-Status: approved in conversation on 2026-07-16; written-spec review pending.
+Status: superseded on 2026-07-22 by
+`2026-07-22-reliable-workbook-database-workflow.md`. Retained as historical
+design evidence; do not implement directly.
 
 ## 1. Objective
 

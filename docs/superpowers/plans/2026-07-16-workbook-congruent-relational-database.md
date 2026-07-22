@@ -1,5 +1,10 @@
 # Workbook-Congruent Relational Database Implementation Plan
 
+Status: superseded on 2026-07-22 by
+`../specs/2026-07-22-reliable-workbook-database-workflow.md`. Retained as a
+historical plan; its fixed file layout and model assumptions are not current
+implementation instructions.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Replace the workbook manager's conceptual shared-table SQLite schema with a workbook-traceable, hardened relational schema whose identical Stingray, Grand Sport, and Z06 table collections use `option_id` primary keys and reproduce all three current runtime contracts.
