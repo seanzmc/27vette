@@ -1,7 +1,7 @@
 # Workbook Manager Rebaseline Correction Pass
 
 Date: 2026-07-22
-Status: ready for implementation after PR #8 rebaseline
+Status: diagnosis complete; model/registry correction is ready, but final import acceptance is blocked by one workbook source decision
 Recommended reasoning level: high
 
 ## Goal
@@ -23,6 +23,18 @@ The current workbook state is authoritative:
 - `central_compiler.compile_central_tables()` then iterates every active `model_variants` row but validates it only against the three promoted model rows. The first Grand Sport X row fails with `model_variant_model_reference_missing` at `model_variants` row 8.
 - A direct profile/import probe on the merged snapshot returned 77 workbook sheets, six known models, three promoted models, 949 informational unpublished-row exclusions, and one blocking Grand Sport X model-variant finding.
 
+After bypassing the first population failure in a read-only probe, the compiler
+exposed a second, independent source inconsistency:
+
+- active Z06 options `opt_pdb_001`, `opt_pdd_001`, and `opt_pdf_001` reference
+  `sec_z06_pkg_001`;
+- no workbook cell outside those three references defines that section;
+- the retained published Z06 runtime contract contains a rendered definition,
+  but a generated artifact is not authority for silently authoring the missing
+  workbook row; and
+- the manager is correct to keep this orphan reference blocking once population
+  handling reaches it.
+
 Fresh gates on that snapshot:
 
 - Workbook Manager backend: `44 failed, 46 passed, 107 errors`.
@@ -30,8 +42,14 @@ Fresh gates on that snapshot:
 - Frontend contract: `14 passed`.
 - Frontend Vite build: passed.
 - Shared editor/writer gate after removing the dead React prototype: `83 passed, 7 subtests passed`.
+- Real-workbook editor lints: `4 failed, 22 passed`; one failure includes the
+  three `sec_z06_pkg_001` orphan references. The other three lint failures are
+  existing workbook-review findings and are not folded into this correction.
 
-The backend failure fan-out is setup fallout from the one population-boundary defect plus stale fixed snapshot assertions. It is not evidence for 151 independent defects.
+The backend failure fan-out is primarily setup fallout from the population-boundary
+defect plus stale fixed snapshot assertions. It is not evidence for 151
+independent defects. After that boundary is corrected, the published Z06 section
+orphan remains a real independent blocker and must not be suppressed in code.
 
 ## Decisions
 
@@ -75,7 +93,12 @@ Workbook Manager may retain only manager-specific relational metadata:
 
 Replace the duplicated `ROLE_KEYS`, `ROLE_BOOLEAN_COLUMNS`, `ROLE_ENUMS`, and `ROLE_EDITOR_FAMILY` literals in `workbook-manager/backend/app/catalog.py` with a narrow adapter over the shared registry plus explicit SQL alias mappings where workbook and relational column names differ.
 
-Audit `workbook-manager/backend/app/specs.py` on the same rule. Do not delete SQL table definitions merely because some fields resemble workbook headers; remove or derive only literals whose authority already exists in the shared registry. Add contract tests that compare the adapter to the shared registry so drift fails immediately.
+The unused `workbook-manager/backend/app/specs.py` duplicate was removed during
+rebaseline cleanup after repository and AST searches proved it had zero consumers.
+Do not recreate it. Keep projection-specific SQL DDL and compiler metadata in
+`catalog.py`/`db.py`; remove or derive only literals whose workbook authority
+already exists in the shared registry. Add contract tests that compare the adapter
+to the shared registry so drift fails immediately.
 
 ## Expected implementation surface
 
@@ -94,7 +117,6 @@ Primary backend files:
 - `workbook-manager/backend/app/export_adapter.py`
 - `workbook-manager/backend/app/staging.py`
 - `workbook-manager/backend/app/sync.py`
-- `workbook-manager/backend/app/specs.py` only where the audit proves duplicated workbook authority
 
 Tests and owner docs:
 
@@ -115,7 +137,8 @@ No frontend source change is expected unless the unchanged API contract cannot b
 
 1. Assert the real workbook profile discovers six known/importable models and exactly three published models.
 2. Assert active source registrations for Grand Sport X, ZR1, and ZR1X are retained as registered-unpublished evidence.
-3. Assert a real-workbook import validates and materializes only the published three-model relational families.
+3. Assert compilation targets only the published three-model relational families;
+   the current snapshot may then stop on the separately proven Z06 section orphan.
 4. Assert an active model-scoped row for a known unpublished model is nonblocking.
 5. Assert the same row with a model absent from `model_master` remains blocking.
 
@@ -136,7 +159,8 @@ Run focused profile, compiler, import, and completion tests.
 1. Add one manager adapter from relational role names to shared workbook registry families.
 2. Derive workbook keys, booleans, enums, and editor-family bindings from `workbook_domain.registry`.
 3. Keep explicit, tested aliases only where relational destination columns intentionally differ from workbook columns.
-4. Remove redundant copies from `catalog.py` and any proven duplicates in `specs.py`.
+4. Remove redundant copies from `catalog.py`; keep the deleted, zero-consumer
+   `specs.py` module absent.
 5. Add tests covering every editable role and proving shared-registry drift is detected.
 
 Run catalog/schema and staging/sync tests.
@@ -148,7 +172,20 @@ Run catalog/schema and staging/sync tests.
 3. Keep the three-model completion contract, 17 physical roles per published model, foreign-key checks, lineage coverage, audit authorization, atomic promotion, rollback, and guarded sync assertions.
 4. Update owner docs to say published rather than active/live where publication is the actual boundary.
 
-### Task 5 — Run the correction acceptance gate
+### Task 5 — Resolve the source-owned Z06 section blocker
+
+Do not infer a workbook row from the generated runtime contract. Before final
+import acceptance, obtain or identify an authoritative workbook-source definition
+for `sec_z06_pkg_001`, including its label, selection mode, required/default
+semantics, display order, and runtime-step placement. Apply any approved workbook
+correction only through the guarded workbook write path with the full workbook
+safety, regeneration, and review gates in `AGENTS.md` §5.
+
+If repository evidence instead proves that these option rows legally own an
+inline section definition, document that existing contract and correct the generic
+compiler. Do not add a Z06-specific exception.
+
+### Task 6 — Run the correction acceptance gate
 
 Run in this order:
 
@@ -160,14 +197,20 @@ Run in this order:
 6. Workbook package and schema validation, read-only.
 7. `git diff --check` and protected-surface diff review.
 
-Acceptance requires:
+Code-correction acceptance before the workbook decision requires:
+
+- six known/importable workbook models represented in profile evidence;
+- exactly three published compile targets;
+- no decision finding for registered unpublished model rows;
+- unknown model rows still blocked;
+- the current Z06 orphan still surfaced as blocking, not hidden; and
+- shared registry adapter coverage for every editable role.
+
+Final PR acceptance additionally requires:
 
 - one successful real-workbook import;
 - exactly three published model families in the canonical database;
-- six known/importable workbook models represented in profile evidence;
-- no decision finding for registered unpublished model rows;
-- unknown model rows still blocked;
-- shared registry adapter coverage for every editable role;
+- an authoritative, reviewed resolution for `sec_z06_pkg_001`;
 - rollback and guarded writer tests green;
 - no workbook, runtime contract, registry publication, dealer, dependency, or deployment change.
 
@@ -180,6 +223,7 @@ Acceptance requires:
 - Workbook writes still route through the shared ChangeSet/workbook service and guarded editor path.
 - `scripts/ingest_wizard_apply.py` stays retired.
 - The dead `visualizer/workbook-editor/workbook-editor.js` prototype stays absent.
+- The dead, zero-consumer `workbook-manager/backend/app/specs.py` registry stays absent.
 - Dealer submission, public payloads, Turnstile behavior, dependencies, build system, and deployment are untouched.
 
 ## Rollback
