@@ -1,7 +1,8 @@
 # Reliable Workbook–Database Workflow Implementation Specification
 
-Status: implementation in progress; Pass 1 completed 2026-07-22 on
-`db-workflow`; Passes 2–7 not started. Revised 2026-07-22 after final
+Status: implementation in progress; Pass 1 completed 2026-07-22 and Pass 2
+completed 2026-07-23 on `db-workflow`; Passes 3–7 not started. Revised
+2026-07-22 after final
 specification review. All fourteen review findings are resolved: primary-
 runtime-only parity, strict publication selection, current baseline, outcome-
 specific lifecycle states, interrupted-apply recovery, exception evidence,
@@ -761,6 +762,62 @@ manager-writable family has one
 key/type/enum/reference/requiredness definition, every sheet and managed column
 has one catalog disposition, shared preview rejects blank required fields, and
 unknown or unowned models cannot create drafts.
+
+Pass 2 result — completed 2026-07-23:
+
+- Split storage now keeps `WBM_DB` as durable workflow/recovery state and uses
+  `WBM_PROJECTION_DB` for the disposable workbook projection. Startup runs the
+  locked bootstrap before either connection accessor can serve a consumer.
+- First-start migration checkpoints and hashes the legacy database, verifies a
+  same-directory hash-derived archive, builds both stores under
+  `BEGIN IMMEDIATE`, records matching schema/migration/source markers plus
+  per-table row-count/fingerprint evidence, replaces the disposable projection
+  first and durable state last, and fsyncs files/directories. Restart probes
+  cover partial and ambiguous archive temporaries and interruption before,
+  between, and after replacements. Exact legacy pending/history payloads remain
+  read-only recovery records; unresolved records continue to block import.
+- The shared workbook-domain registry now owns complete writable columns,
+  keys, scalar types, finite domains, ordinary/union/conditional/derived
+  references, optional columns, and both requiredness sets. The manager-only
+  `catalog.py` adapter owns SQL routing, labels, collection placement, and
+  display prefixes. Optional blanks project to SQL `NULL`; required blanks are
+  blocking findings and shared preview errors.
+- Every live sheet and managed column receives one catalog disposition. Shared
+  physical interiors/color rows are projected once per physical key with all
+  registered model contexts. Preserved-known and preserved-unknown sheets stay
+  workbook-owned; their cells are not copied into SQLite.
+- Projection reads and imports now use the projection connection; staged/
+  committed legacy workflow state, blockers, sync evidence, and backups use the
+  durable connection. Model context is retained for physically scoped and
+  `model_key`-keyed families.
+- Staging enforces workbook-derived known/active/generatable/source-ownership
+  predicates, fixed-sheet topology exceptions, publication preflight, and the
+  sole writable `asset_map` wildcard. Runtime publication does not grant edit
+  ownership. The stale scaffold rejection test was replaced by matrix-derived
+  active, inactive, fixed, source-backed, publication, wildcard, and unknown-model
+  coverage.
+- All production/test consumers moved from duplicate `app/specs.py` metadata to
+  the catalog; the no-consumer search passed and `specs.py` was deleted. The
+  backend schema payload now reports model context, requiredness, optionality,
+  finite/free-text kind, and ordinary/union/conditional/derived references.
+- Gates: focused manager/catalog/migration `56 passed, 2 skipped`; slow copied-
+  workbook manager `45 passed`; shared writer `83 passed, 7 subtests passed`;
+  shared ChangeSet `50 passed`; Python compile and `git diff --check` passed;
+  frontend build passed; workbook package and schema validation both passed
+  with zero issues. The only warning was the existing FastAPI/Starlette
+  `httpx` deprecation warning.
+- Disposable browser smoke imported a copied workbook into temporary split
+  stores, retained the persistent read-only/provisional and unverified state,
+  loaded Stingray and ZR1 model-specific options plus shared collections, and
+  produced zero browser console errors. No canonical workbook write occurred.
+- Protected-path diff was empty for `stingray_master.xlsx`, `form-output/`, and
+  `form-app/data.js`. Current hashes are respectively
+  `c5f986f6793205e00124db5640248e9e8c57ebb930679a92c2b3e8c56fb62154` and
+  `802afa1fea4e9e802f7d82635556c5569d3c73b2f4ae59267f64dd8157f9bceb` for the
+  workbook and runtime registry. Product data, generated contracts,
+  publication, deployment, customer form behavior, and dealer submission were
+  unchanged. Pass 1 write containment remains active; Pass 3 connection/
+  promotion coordination is still not started.
 
 ### Pass 3 — Establish request connections and promotion coordination
 

@@ -19,7 +19,9 @@ import json
 import sqlite3
 from datetime import datetime, timezone
 
-from .specs import SPEC_BY_TABLE, TableSpec
+from corvette_form_generator.model_configs import discover_generation_model_configs
+
+from .catalog import SPEC_BY_TABLE, TableSpec
 from .validation import find_dependents, validate_record
 
 
@@ -43,35 +45,131 @@ def _fetch_row(conn, spec: TableSpec, model_id: str, key: dict):
         f"SELECT * FROM {spec.table} WHERE {where}", params).fetchone()
 
 
-def _editable_guard(conn, spec: TableSpec, model_id: str) -> list[dict]:
+def _editable_guard(
+    conn,
+    spec: TableSpec,
+    model_id: str,
+    *,
+    op: str,
+    key: dict,
+    record: dict | None,
+) -> list[dict]:
+    def reject(message: str) -> list[dict]:
+        return [{
+            "table": spec.table,
+            "model_id": model_id,
+            "field": "model_key",
+            "entity_key": "",
+            "message": message,
+        }]
+
     if not spec.editable:
-        return [{"table": spec.table, "model_id": model_id, "field": "",
-                 "entity_key": "",
-                 "message": f"{spec.table} is read-only in phase 1 (no gated "
-                            "workbook write path exists for its sheet)"}]
-    if spec.model_scoped and model_id:
+        return reject(
+            f"{spec.table} is read-only in phase 1 (no gated workbook write "
+            "path exists for its sheet)"
+        )
+
+    row_model = str((record or {}).get("model_key") or key.get("model_key") or "")
+    candidate_model = str(model_id or row_model).strip()
+    if row_model and model_id and row_model != model_id:
+        return reject(
+            f"model context {model_id!r} does not match row model_key {row_model!r}"
+        )
+    if candidate_model == "*":
+        if spec.editor_family != "asset_map":
+            return reject("wildcard model scope is writable only for asset_map")
+        return []
+
+    model_definition = spec.editor_family == "model_master"
+    topology = spec.editor_family in {"model_workbook_sources", "model_variants"}
+    publication = spec.editor_family == "model_registry_promotion"
+    active_fixed = spec.editor_family in {
+        "model_interior_scope",
+        "default_selection_rules",
+        "interior_components",
+        "runtime_steps_meta",
+        "section_presentation_meta",
+        "context_section_master_meta",
+        "order_summary_sections_meta",
+        "step_order_summary_map_meta",
+        "asset_map",
+    }
+    model_owned = spec.model_scoped or bool(spec.role) or model_definition or topology or publication or active_fixed
+    if not model_owned:
+        return []
+    if not candidate_model:
+        return reject(f"{spec.table} requires a concrete model context")
+
+    model = conn.execute(
+        "SELECT active FROM models WHERE model_key=?", (candidate_model,)
+    ).fetchone()
+    if model is None:
+        return reject(f"unknown model {candidate_model!r}")
+    model_active = str(model["active"]).strip().lower() in {"true", "1", "yes"}
+
+    if model_definition:
+        if op == "add":
+            return reject("adding a new model_master identity is outside this workflow")
+        return []
+    if topology:
+        return []
+    if not model_active:
+        return reject(f"inactive model {candidate_model!r} cannot own {spec.table} content")
+
+    if publication and record:
+        publishing = str(record.get("active") or "").lower() in {"true", "1", "yes"} and str(
+            record.get("promoted_to_runtime") or ""
+        ).lower() in {"true", "1", "yes"}
+        if publishing:
+            from . import config
+
+            generatable = discover_generation_model_configs(config.DEFAULT_WORKBOOK)
+            if candidate_model not in generatable:
+                return reject(
+                    f"model {candidate_model!r} cannot be promoted because it is not generatable"
+                )
+
+    if spec.role:
         reg = conn.execute(
-            "SELECT active FROM sheet_registry WHERE model_key=? AND "
-            "source_role=?", (model_id, spec.role)).fetchone()
-        if reg and reg["active"] not in ("True", "1", "TRUE", "true"):
-            return [{"table": spec.table, "model_id": model_id, "field": "",
-                     "entity_key": "",
-                     "message": f"model {model_id!r} registers "
-                                f"{spec.table} as inactive scaffold; editing "
-                                "is blocked until the source is activated"}]
+            "SELECT sheet_name, active FROM sheet_registry WHERE model_key=? AND "
+            "source_role=?",
+            (candidate_model, spec.role),
+        ).fetchone()
+        if reg is None:
+            return reject(
+                f"model {candidate_model!r} has no {spec.role!r} source registration"
+            )
+        if str(reg["active"]).strip().lower() not in {"true", "1", "yes"}:
+            return reject(
+                f"model {candidate_model!r} registers {spec.table} as an inactive "
+                "source role"
+            )
+        if not str(reg["sheet_name"] or "").strip():
+            return reject(
+                f"model {candidate_model!r} has no physical source sheet for {spec.table}"
+            )
     return []
 
 
 def stage_change(conn: sqlite3.Connection, *, table: str, model_id: str,
                  op: str, key: dict, record: dict | None,
-                 session_id: str = "", confirm_dependencies: bool = False
+                 session_id: str = "", confirm_dependencies: bool = False,
+                 state_conn: sqlite3.Connection | None = None,
                  ) -> dict:
+    state = state_conn or conn
     spec = SPEC_BY_TABLE.get(table)
     if spec is None:
         raise StagingError([{"table": table, "field": "", "entity_key": "",
                              "model_id": model_id,
                              "message": f"unknown table {table!r}"}])
-    guard = _editable_guard(conn, spec, model_id)
+    guard = _editable_guard(
+        conn,
+        spec,
+        model_id,
+        op=op,
+        key=key,
+        record=record,
+    )
     if guard:
         raise StagingError(guard)
 
@@ -104,7 +202,7 @@ def stage_change(conn: sqlite3.Connection, *, table: str, model_id: str,
 
     old_json = json.dumps({k: old_row[k] for k in old_row.keys()}) \
         if old_row is not None else None
-    cur = conn.execute(
+    cur = state.execute(
         "INSERT INTO pending_changes(ts, session_id, table_name, model_id, "
         "entity_key_json, op, old_json, new_json, status, validation_json, "
         "confirmed_dependencies) VALUES(?,?,?,?,?,?,?,?,?,?,?)",
@@ -113,8 +211,8 @@ def stage_change(conn: sqlite3.Connection, *, table: str, model_id: str,
          "staged", json.dumps({"errors": [], "dependents": dependents}),
          1 if confirm_dependencies else 0),
     )
-    conn.commit()
-    return get_change(conn, cur.lastrowid)
+    state.commit()
+    return get_change(state, cur.lastrowid)
 
 
 def get_change(conn, change_id: int) -> dict:
@@ -154,12 +252,15 @@ def discard_change(conn, change_id: int) -> dict:
     return get_change(conn, change_id)
 
 
-def revalidate_staged(conn) -> dict:
+def revalidate_staged(
+    conn, state_conn: sqlite3.Connection | None = None
+) -> dict:
     """Batch validation of all staged changes against current data, plus
     cross-change checks (duplicate keys among staged adds)."""
     results = []
     ok = True
-    staged = list_changes(conn, "staged")
+    state = state_conn or conn
+    staged = list_changes(state, "staged")
     # cross-change: two staged adds claiming the same (table, model, key)
     seen_adds: dict[tuple, int] = {}
     add_collisions: dict[int, int] = {}
@@ -216,7 +317,7 @@ def revalidate_staged(conn) -> dict:
                            "field": "", "entity_key": "",
                            "message": "record no longer exists (conflict "
                                       "since staging)"})
-        conn.execute(
+        state.execute(
             "UPDATE pending_changes SET validation_json=? WHERE id=?",
             (json.dumps({"errors": errors, "dependents": dependents}),
              change["id"]))
@@ -224,38 +325,49 @@ def revalidate_staged(conn) -> dict:
             ok = False
         results.append({"change_id": change["id"], "errors": errors,
                         "dependents": dependents})
-    conn.commit()
+    state.commit()
     return {"ok": ok, "results": results}
 
 
-def commit_staged(conn, actor: str = "") -> dict:
+def commit_staged(
+    conn, actor: str = "", state_conn: sqlite3.Connection | None = None
+) -> dict:
     """Apply all staged changes in one DB transaction + audit rows."""
-    validation = revalidate_staged(conn)
+    state = state_conn or conn
+    validation = revalidate_staged(conn, state)
     if not validation["ok"]:
         return {"ok": False, "status": "invalid", "validation": validation,
                 "committed": 0}
-    changes = list_changes(conn, "staged")
+    changes = list_changes(state, "staged")
     if not changes:
         return {"ok": False, "status": "empty", "committed": 0,
                 "validation": validation}
     try:
         conn.execute("BEGIN")
+        if state is not conn:
+            state.execute("BEGIN")
         for change in changes:
             spec = SPEC_BY_TABLE[change["table_name"]]
             _apply_change(conn, spec, change)
-            _append_history(conn, spec, change, actor)
-            conn.execute(
+            _append_history(state, conn, spec, change, actor)
+            state.execute(
                 "UPDATE pending_changes SET status='committed' WHERE id=?",
                 (change["id"],))
         conn.commit()
+        if state is not conn:
+            state.commit()
     except sqlite3.IntegrityError as exc:
         conn.rollback()
+        if state is not conn:
+            state.rollback()
         return {"ok": False, "status": "constraint_failed", "committed": 0,
                 "validation": validation,
                 "errors": [f"database constraint rejected the batch; "
                            f"nothing was committed: {exc}"]}
     except Exception:
         conn.rollback()
+        if state is not conn:
+            state.rollback()
         raise
     return {"ok": True, "status": "committed", "committed": len(changes),
             "validation": validation}
@@ -300,9 +412,11 @@ def _apply_change(conn, spec: TableSpec, change: dict) -> None:
         conn.execute(f"DELETE FROM {spec.table} WHERE {where}", params)
 
 
-def _append_history(conn, spec: TableSpec, change: dict, actor: str) -> None:
+def _append_history(
+    state_conn, projection_conn, spec: TableSpec, change: dict, actor: str
+) -> None:
     old = change["old"] or {}
-    conn.execute(
+    state_conn.execute(
         "INSERT INTO change_history(ts, actor, entity_type, entity_id, "
         "model_id, op, old_json, new_json, src_sheet, src_row, "
         "validation_result, status, sync_status, pending_change_id) "
@@ -313,7 +427,7 @@ def _append_history(conn, spec: TableSpec, change: dict, actor: str) -> None:
          json.dumps(change["old"]) if change["old"] else None,
          json.dumps(change["new"]) if change["new"] else None,
          old.get("src_sheet", "") or target_sheet_for(
-             conn, spec, change["model_id"]) or "",
+             projection_conn, spec, change["model_id"]) or "",
          old.get("src_row"),
          "passed", "committed",
          "pending" if spec.editable else "n/a",

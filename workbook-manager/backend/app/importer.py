@@ -1,10 +1,10 @@
 """Workbook -> SQLite import adapter (openpyxl lives only behind this API).
 
-Import is lossless and tolerant: rows with duplicate identifiers or
+Import is tolerant: rows with duplicate identifiers or
 unresolved references are still ingested (first occurrence wins for
 duplicates) and every problem is recorded in ``import_issues`` so nothing
-fails silently. Sheets without a normalized table are preserved verbatim in
-``raw_sheet_rows`` so a regenerated workbook keeps unmanaged content.
+fails silently. Sheets without a normalized table remain workbook-owned and
+are classified without copying their cells into a second SQLite store.
 """
 
 from __future__ import annotations
@@ -16,13 +16,17 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from openpyxl import load_workbook
+from corvette_form_generator.schema_validation import REQUIRED_SHEETS
 
 from . import db as dbmod
-from .specs import (
+from .catalog import (
     RAW_PRESERVED_SHEETS,
     SPEC_BY_TABLE,
     TABLE_SPECS,
     TableSpec,
+    RequiredValueError,
+    projection_value,
+    reconcile_columns,
 )
 from .validation import check_references
 
@@ -60,7 +64,7 @@ def _sheet_rows(ws) -> tuple[list[str], list[tuple[int, dict]]]:
 
 def _registry_rows(wb) -> list[dict]:
     _, rows = _sheet_rows(wb["model_workbook_sources"])
-    return [r for _, r in rows]
+    return [r for _, r in rows if _truthy(r.get("active", ""))]
 
 
 def _truthy(value: str) -> bool:
@@ -102,15 +106,18 @@ class Importer:
             else:
                 self._import_fixed(wb, spec, handled_sheets, sheet_names)
 
-        # Preserve every remaining sheet verbatim (declared raw + anything new).
+        # Preserved and unknown sheets remain workbook-owned. Record only their
+        # disposition/count; never create a second SQLite cell store.
         for name in wb.sheetnames:
             if name in handled_sheets:
                 continue
+            _headers, rows = _sheet_rows(wb[name])
+            disposition = "preserved" if name in RAW_PRESERVED_SHEETS else "unknown"
+            self.row_counts[f"{disposition}:{name}"] = len(rows)
             if name not in RAW_PRESERVED_SHEETS:
                 self.issue("warning", "unmanaged_sheet", sheet=name,
                            message=f"sheet {name!r} has no normalized table; "
-                                   "imported verbatim into raw_sheet_rows")
-            self._import_raw(wb, name)
+                                   "left workbook-owned without cell projection")
 
         wb.close()
 
@@ -161,9 +168,10 @@ class Importer:
         total = 0
         for sheet in spec.sheet:
             if sheet not in names:
-                self.issue("error", "missing_sheet", sheet=sheet,
-                           table=spec.table,
-                           message=f"expected sheet {sheet!r} not found")
+                if sheet in REQUIRED_SHEETS:
+                    self.issue("error", "missing_sheet", sheet=sheet,
+                               table=spec.table,
+                               message=f"expected sheet {sheet!r} not found")
                 continue
             handled.add(sheet)
             total += self._ingest_sheet(wb, sheet, spec, model_id=None)
@@ -172,7 +180,14 @@ class Importer:
     def _import_model_scoped(self, wb, spec: TableSpec, registry, handled,
                              names):
         total = 0
-        seen_sheets: set[tuple[str, str]] = set()
+        seen_sheets: set[tuple[str, ...]] = set()
+        shared_models: dict[str, set[str]] = {}
+        if not spec.model_scoped:
+            for row in registry:
+                if row.get("source_role") == spec.role and row.get("sheet_name"):
+                    shared_models.setdefault(row["sheet_name"], set()).add(
+                        row.get("model_key", "")
+                    )
         for row in registry:
             if row.get("source_role") != spec.role:
                 continue
@@ -180,9 +195,10 @@ class Importer:
             sheet = row.get("sheet_name", "")
             if not model or not sheet:
                 continue
-            if (model, sheet) in seen_sheets:
+            sheet_identity = (model, sheet) if spec.model_scoped else (sheet,)
+            if sheet_identity in seen_sheets:
                 continue
-            seen_sheets.add((model, sheet))
+            seen_sheets.add(sheet_identity)
             if sheet not in names:
                 self.issue("error", "missing_sheet", sheet=sheet, model=model,
                            table=spec.table,
@@ -193,36 +209,47 @@ class Importer:
             # a model-scoped spec re-registering a shared sheet is skipped when
             # another table already owns that sheet.
             handled.add(sheet)
-            total += self._ingest_sheet(wb, sheet, spec, model_id=model)
+            total += self._ingest_sheet(
+                wb,
+                sheet,
+                spec,
+                model_id=model if spec.model_scoped else None,
+                model_context=sorted(shared_models.get(sheet, ())),
+            )
         self.row_counts[spec.table] = total
 
-    def _import_raw(self, wb, sheet: str):
-        headers, rows = _sheet_rows(wb[sheet])
-        self.conn.executemany(
-            "INSERT INTO raw_sheet_rows(sheet, src_row, data_json) VALUES(?,?,?)",
-            [(sheet, idx, json.dumps(rec, ensure_ascii=False))
-             for idx, rec in rows],
-        )
-        self.row_counts[f"raw:{sheet}"] = len(rows)
 
-    def _ingest_sheet(self, wb, sheet: str, spec: TableSpec,
-                      model_id: str | None) -> int:
+    def _ingest_sheet(
+        self,
+        wb,
+        sheet: str,
+        spec: TableSpec,
+        model_id: str | None,
+        model_context: list[str] | None = None,
+    ) -> int:
         headers, rows = _sheet_rows(wb[sheet])
-        expected = [c.header for c in spec.columns]
-        missing = [h for h in expected if h not in headers]
-        extra = [h for h in headers if h and h not in expected]
-        if missing:
+        reconciliation = reconcile_columns(spec, headers)
+        if reconciliation.duplicate:
+            self.issue(
+                "error",
+                "duplicate_headers",
+                sheet=sheet,
+                table=spec.table,
+                model=model_id or "",
+                message=f"duplicate managed headers {list(reconciliation.duplicate)}",
+            )
+        if reconciliation.missing_required:
             self.issue("error", "missing_columns", sheet=sheet,
                        table=spec.table, model=model_id or "",
-                       message=f"missing columns {missing}; these fields "
-                               "import as blank")
-        if extra:
+                       message=f"missing required columns "
+                               f"{list(reconciliation.missing_required)}")
+        if reconciliation.opaque:
             self.issue("warning", "unmapped_columns", sheet=sheet,
                        table=spec.table, model=model_id or "",
-                       message=f"unmapped columns {extra} preserved via raw "
-                               "export copy only")
+                       message=f"opaque managed-sheet columns "
+                               f"{list(reconciliation.opaque)} remain workbook-owned")
 
-        sql_cols = ["src_sheet", "src_row"]
+        sql_cols = ["src_sheet", "src_row", "src_family", "physical_key", "model_context"]
         if spec.model_scoped:
             sql_cols.append("model_id")
         sql_cols += [c.sql_name() for c in spec.columns]
@@ -250,10 +277,39 @@ class Importer:
                                    f"row {idx}; first occurrence kept")
                 continue
             seen_keys.add(key_id)
-            values = [sheet, idx]
+            row_context = list(model_context or ([model_id] if model_id else []))
+            if spec.has_model_key_column:
+                row_model = str(rec.get("model_key") or "").strip()
+                row_context = [row_model] if row_model else []
+            values = [
+                sheet,
+                idx,
+                spec.editor_family or spec.family,
+                json.dumps(list(keyvals), separators=(",", ":")),
+                json.dumps(row_context),
+            ]
             if spec.model_scoped:
                 values.append(model_id)
-            values += [rec.get(c.header, "") for c in spec.columns]
+            projected_values = []
+            for column in spec.columns:
+                try:
+                    projected_values.append(
+                        projection_value(column, rec.get(column.header, ""))
+                    )
+                except RequiredValueError as exc:
+                    self.issue(
+                        "error",
+                        "missing_required_value",
+                        sheet=sheet,
+                        src_row=idx,
+                        table=spec.table,
+                        model=model_id or "",
+                        key=key_label,
+                        field=column.header,
+                        message=str(exc),
+                    )
+                    projected_values.append(None)
+            values += projected_values
             try:
                 self.conn.execute(insert, values)
                 count += 1

@@ -11,9 +11,10 @@ All messages carry exact entity ids, field names, and sheet references.
 
 from __future__ import annotations
 
+import json
 import sqlite3
 
-from .specs import SPEC_BY_TABLE, TABLE_SPECS, RefSpec, TableSpec
+from .catalog import SPEC_BY_TABLE, TABLE_SPECS, RefSpec, TableSpec
 
 
 def _interior_models(conn: sqlite3.Connection) -> dict[str, set[str]]:
@@ -90,6 +91,15 @@ def check_references(conn: sqlite3.Connection) -> list[dict]:
         for row in rows:
             model_id = row["model_id"] if spec.model_scoped else (
                 row["model_key"] if spec.has_model_key_column else "")
+            model_context = [model_id] if model_id else []
+            if not model_context and "model_context" in row.keys():
+                try:
+                    model_context = [
+                        str(value) for value in json.loads(row["model_context"] or "[]")
+                        if str(value)
+                    ]
+                except (TypeError, ValueError):
+                    model_context = []
             key_label = "/".join(str(row[k]) for k in spec.key)
             for ref in spec.refs:
                 value = str(row[ref.column] or "")
@@ -100,12 +110,17 @@ def check_references(conn: sqlite3.Connection) -> list[dict]:
                                              f"required reference "
                                              f"{ref.column} is blank"))
                     continue
-                if not _ref_exists(conn, ref, value, model_id, interior_scope):
+                contexts = model_context if ref.scope != "global" else [""]
+                if not any(
+                    _ref_exists(conn, ref, value, context, interior_scope)
+                    for context in contexts
+                ):
+                    display_context = ",".join(contexts)
                     issues.append(_issue(
                         spec, row, ref, key_label, model_id,
                         f"{spec.table}.{ref.column}={value!r} does not match "
                         f"any {ref.target_table}.{ref.target_column}"
-                        + (f" for model {model_id!r}" if ref.scope != "global"
+                        + (f" for model context {display_context!r}" if ref.scope != "global"
                            else "")))
     return issues
 

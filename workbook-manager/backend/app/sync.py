@@ -23,7 +23,7 @@ from pathlib import Path
 from . import config  # ensures scripts/ on sys.path
 from corvette_form_generator import editor_ops  # noqa: E402
 
-from .specs import SPEC_BY_TABLE
+from .catalog import SPEC_BY_TABLE
 from .staging import target_sheet_for
 
 
@@ -38,8 +38,9 @@ def pending_history(conn) -> list[dict]:
     return [dict(r) for r in rows]
 
 
-def build_batch(conn, workbook_path: Path) -> dict:
+def build_batch(conn, workbook_path: Path, projection_conn=None) -> dict:
     """editor_ops batch from committed-but-unsynced history rows."""
+    projection = projection_conn or conn
     items = []
     skipped = []
     for row in pending_history(conn):
@@ -52,7 +53,7 @@ def build_batch(conn, workbook_path: Path) -> dict:
         old = json.loads(row["old_json"]) if row["old_json"] else {}
         new = json.loads(row["new_json"]) if row["new_json"] else {}
         sheet = old.get("src_sheet") or target_sheet_for(
-            conn, spec, row["model_id"])
+            projection, spec, row["model_id"])
         if not sheet:
             skipped.append({"history_id": row["id"],
                             "reason": "target sheet could not be resolved"})
@@ -79,8 +80,9 @@ def build_batch(conn, workbook_path: Path) -> dict:
 
 def sync_workbook(conn: sqlite3.Connection, workbook_path: Path, *,
                   write: bool = False, confirmed_warnings=(),
-                  expected_mtime_ns: str | None = None) -> dict:
-    batch = build_batch(conn, workbook_path)
+                  expected_mtime_ns: str | None = None,
+                  projection_conn=None) -> dict:
+    batch = build_batch(conn, workbook_path, projection_conn)
     if not batch["items"]:
         return {"ok": False, "status": "empty", "errors":
                 ["no committed changes are pending synchronization"],

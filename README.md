@@ -139,7 +139,9 @@ and every `POST /api/sync` request with `write=true` is refused. Dry-run sync,
 browsing, history, and verified-projection disposable comparison export remain
 available; generated-artifact and publication state are not inferred. The
 workbook remains canonical. Setup, current containment behavior, and test
-commands: `workbook-manager/README.md`. Tests:
+commands: `workbook-manager/README.md`. Focused tests:
+`tests/test_workbook_manager_catalog.py`,
+`tests/test_workbook_manager_import_projection.py`, and
 `tests/test_workbook_manager.py`.
 
 ## Workbook And Generator Workflows

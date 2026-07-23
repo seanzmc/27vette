@@ -731,6 +731,19 @@ def _prepare_batch(extract, batch):
         effective_row = dict(key_indexes[sheet].get(kt, {}))
         effective_row.update(key)
         effective_row.update(coerced)
+        required_columns = set(meta.get("required_on_add", ())) if action == "add" else set()
+        effective_is_active = "active" not in meta.get("columns", ()) or workbook_truthy(
+            effective_row.get("active")
+        )
+        if effective_is_active:
+            required_columns.update(meta.get("required_on_effective_active_row", ()))
+        for required_column in sorted(required_columns):
+            value = effective_row.get(required_column)
+            if value is None or not str(value).strip():
+                errors.append(f"{ctx}: required field {required_column} is blank")
+                bad = True
+        if bad:
+            continue
         for col, refkind in _meta_ref_items(meta):
             if action == "delete":
                 continue

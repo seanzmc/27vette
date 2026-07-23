@@ -26,8 +26,9 @@ from .schemas import (
     SyncRequest,
     TableSchemaOut,
 )
-from .specs import (
+from .catalog import (
     MODEL_COLLECTIONS,
+    SPEC_BY_FAMILY,
     SHARED_TABLES,
     SPEC_BY_TABLE,
     STRUCTURE_TABLES,
@@ -39,6 +40,8 @@ from .validation import find_dependents
 app = FastAPI(title="27vette Workbook Manager", version="0.1.0")
 
 _conn = None
+_state_conn = None
+_storage_bootstrapped = False
 
 PROVISIONAL_MODE = "read_only_provisional"
 IMPORT_TERMINAL_ALLOWLIST = (
@@ -51,12 +54,22 @@ IMPORT_TERMINAL_ALLOWLIST = (
 
 
 def get_conn():
-    global _conn
-    if _conn is None:
+    global _conn, _storage_bootstrapped
+    if not _storage_bootstrapped:
         config.ensure_dirs()
-        _conn = dbmod.connect(config.DEFAULT_DB)
-        dbmod.init_schema(_conn)
+        dbmod.bootstrap_storage(config.DEFAULT_DB, config.DEFAULT_PROJECTION_DB)
+        _storage_bootstrapped = True
+    if _conn is None:
+        _conn = dbmod.connect(config.DEFAULT_PROJECTION_DB)
     return _conn
+
+
+def get_state_conn():
+    global _state_conn
+    get_conn()
+    if _state_conn is None:
+        _state_conn = dbmod.connect(config.DEFAULT_DB)
+    return _state_conn
 
 
 def _staging_error(exc: StagingError):
@@ -122,11 +135,20 @@ def _import_blockers(conn) -> dict:
     ).fetchone()["c"]
     committed_unsynchronized = committed_history + committed_without_history
     failed = failed_history + failed_pending
+    legacy_recovery = 0
+    if conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' "
+        "AND name='legacy_recovery_records'"
+    ).fetchone():
+        legacy_recovery = conn.execute(
+            "SELECT COUNT(*) c FROM legacy_recovery_records WHERE unresolved=1"
+        ).fetchone()["c"]
     return {
         "staged": staged,
         "committed_unsynchronized": committed_unsynchronized,
         "failed": failed,
-        "unresolved_total": staged + committed_unsynchronized + failed,
+        "legacy_recovery": legacy_recovery,
+        "unresolved_total": staged + committed_unsynchronized + failed + legacy_recovery,
     }
 
 
@@ -159,20 +181,21 @@ def _projection_state(conn, run, workbook: dict) -> dict:
 @app.get("/api/status")
 def status():
     conn = get_conn()
+    state_conn = get_state_conn()
     counts = {s.table: conn.execute(
         f"SELECT COUNT(*) c FROM {s.table}").fetchone()["c"]
         for s in TABLE_SPECS}
-    staged = conn.execute(
+    staged = state_conn.execute(
         "SELECT COUNT(*) c FROM pending_changes WHERE status='staged'"
     ).fetchone()["c"]
-    unsynced = conn.execute(
+    unsynced = state_conn.execute(
         "SELECT COUNT(*) c FROM change_history WHERE sync_status='pending'"
     ).fetchone()["c"]
     run = conn.execute(
         "SELECT * FROM import_runs ORDER BY id DESC LIMIT 1").fetchone()
     workbook = _workbook_state(conn)
     projection = _projection_state(conn, run, workbook)
-    blockers = _import_blockers(conn)
+    blockers = _import_blockers(state_conn)
     return {
         "mode": PROVISIONAL_MODE,
         "projection": projection,
@@ -200,11 +223,12 @@ def status():
 @app.post("/api/import")
 def run_import():
     conn = get_conn()
+    state_conn = get_state_conn()
     if not config.DEFAULT_WORKBOOK.exists():
         raise HTTPException(404, f"workbook not found: "
                                  f"{config.DEFAULT_WORKBOOK}")
     active_projection = _projection_active(conn)
-    blockers = _import_blockers(conn)
+    blockers = _import_blockers(state_conn)
     if active_projection or blockers["unresolved_total"]:
         reasons = []
         if active_projection:
@@ -367,19 +391,70 @@ def tables():
 def _schema_dict(conn, spec, model_key: str | None) -> dict:
     cols = []
     ref_by_col = {r.column: r for r in spec.refs}
+    conditional = dict(spec.conditional_ref)
+    conditional_column = conditional.get("column", "")
+    conditional_targets = dict(spec.conditional_refs)
     for c in spec.columns:
         ref = ref_by_col.get(c.sql_name())
+        reference = None
+        field_kind = "free_text"
+        finite_values = list(c.enum)
+        if c.ctype == "bool" and not finite_values:
+            finite_values = ["True", "False"]
+        if ref:
+            reference = {
+                "kind": "union" if ref.union_tables else "ordinary",
+                "table": ref.target_table,
+                "column": ref.target_column,
+                "scope": ref.scope,
+                "union": list(ref.union_tables),
+            }
+            field_kind = "reference"
+        elif c.header == conditional_column:
+            targets = []
+            for value, family in conditional_targets.items():
+                if family is None:
+                    targets.append({"value": value, "target": None, "derived": False})
+                    continue
+                target_table = SPEC_BY_FAMILY[family].table if family in SPEC_BY_FAMILY else family
+                targets.append({
+                    "value": value,
+                    "target": target_table,
+                    "derived": family not in SPEC_BY_FAMILY,
+                })
+            reference = {
+                "kind": "conditional",
+                "discriminator": conditional.get("discriminator", ""),
+                "targets": targets,
+            }
+            field_kind = "reference"
+        elif finite_values:
+            field_kind = "finite"
         cols.append({
             "name": c.sql_name(), "header": c.header,
             "label": humanize(c.sql_name()), "ctype": c.ctype,
             "enum": list(c.enum), "is_key": c.sql_name() in spec.key,
-            "ref": {"table": ref.target_table, "column": ref.target_column,
-                    "scope": ref.scope,
-                    "union": list(ref.union_tables)} if ref else None,
+            "optional": c.header in spec.optional_columns,
+            "required_on_add": c.header in spec.required_on_add,
+            "required_on_effective_active_row": (
+                c.header in spec.required_on_effective_active_row
+            ),
+            "field_kind": field_kind,
+            "finite_values": finite_values,
+            "reference": reference,
+            # Retain the existing response member through Pass 7's UI update.
+            "ref": reference if ref else None,
         })
     return {
         "table": spec.table, "label": spec.label or humanize(spec.table),
         "key": list(spec.key), "model_scoped": spec.model_scoped,
+        "model_context": {
+            "required": bool(spec.model_scoped or spec.has_model_key_column or spec.role),
+            "source": "row_model_key" if spec.has_model_key_column else (
+                "physical_source_registration" if spec.role else "none"
+            ),
+            "value": model_key,
+        },
         "editable": spec.editable,
         "sheet_for_model": staging.target_sheet_for(conn, spec, model_key or "")
         if (model_key or spec.sheet) else None,
@@ -447,25 +522,26 @@ def dependencies_post(table: str, body: dict):
 @app.post("/api/changes", response_model=ChangeOut)
 def stage(payload: StageChangeRequest):
     conn = get_conn()
+    state_conn = get_state_conn()
     try:
         return staging.stage_change(
             conn, table=payload.table, model_id=payload.model_id,
             op=payload.op, key=payload.key, record=payload.record,
             session_id=payload.session_id,
-            confirm_dependencies=payload.confirm_dependencies)
+            confirm_dependencies=payload.confirm_dependencies,
+            state_conn=state_conn)
     except StagingError as exc:
         raise _staging_error(exc)
 
 
 @app.get("/api/changes")
 def changes(status: str = "staged"):
-    conn = get_conn()
-    return {"changes": staging.list_changes(conn, status)}
+    return {"changes": staging.list_changes(get_state_conn(), status)}
 
 
 @app.delete("/api/changes/{change_id}", response_model=ChangeOut)
 def discard(change_id: int):
-    conn = get_conn()
+    conn = get_state_conn()
     try:
         return staging.discard_change(conn, change_id)
     except StagingError as exc:
@@ -474,14 +550,14 @@ def discard(change_id: int):
 
 @app.post("/api/changes/validate")
 def validate_changes():
-    conn = get_conn()
-    return staging.revalidate_staged(conn)
+    return staging.revalidate_staged(get_conn(), get_state_conn())
 
 
 @app.post("/api/changes/commit")
 def commit(payload: CommitRequest):
-    conn = get_conn()
-    return staging.commit_staged(conn, actor=payload.actor)
+    return staging.commit_staged(
+        get_conn(), actor=payload.actor, state_conn=get_state_conn()
+    )
 
 
 # ── history / sync / export / backup ─────────────────────────────────
@@ -489,7 +565,7 @@ def commit(payload: CommitRequest):
 @app.get("/api/history")
 def history(model: str = "", entity_type: str = "", sync_status: str = "",
             limit: int = Query(200, le=2000), offset: int = 0):
-    conn = get_conn()
+    conn = get_state_conn()
     where, params = [], []
     if model:
         where.append("model_id=?")
@@ -518,7 +594,7 @@ def history(model: str = "", entity_type: str = "", sync_status: str = "",
 
 @app.post("/api/sync")
 def sync_endpoint(payload: SyncRequest):
-    conn = get_conn()
+    conn = get_state_conn()
     if payload.write:
         raise HTTPException(409, detail={
             "status": PROVISIONAL_MODE,
@@ -529,7 +605,8 @@ def sync_endpoint(payload: SyncRequest):
     return syncmod.sync_workbook(
         conn, config.DEFAULT_WORKBOOK, write=payload.write,
         confirmed_warnings=tuple(payload.confirmed_warnings),
-        expected_mtime_ns=payload.expected_mtime_ns)
+        expected_mtime_ns=payload.expected_mtime_ns,
+        projection_conn=get_conn())
 
 
 @app.post("/api/export")
@@ -550,7 +627,7 @@ def export():
 
 @app.post("/api/backup")
 def backup():
-    conn = get_conn()
+    conn = get_state_conn()
     return syncmod.backup_database(conn, config.DEFAULT_DB)
 
 

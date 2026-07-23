@@ -10,7 +10,9 @@ React interface (frontend/, Vite build served by FastAPI)
     ↓
 FastAPI API + validation layer (backend/app/)
     ↓
-SQLite database (var/workbook_manager.sqlite3 — normalized, auditable)
+Disposable verified projection (var/workbook_projection.sqlite3)
+    +
+Durable workflow/recovery state (var/workbook_manager.sqlite3)
     ↕
 openpyxl import/export adapter (backend/app/importer.py, sync.py)
     ↓
@@ -19,7 +21,8 @@ stingray_master.xlsx (canonical source)
 
 ## Current safety status: read-only / provisional
 
-Pass 1 containment is active:
+Pass 1 containment remains active. Pass 2 split storage and the shared backend
+catalog contract are implemented:
 
 - `POST /api/sync` refuses every `write=true` request. The browser has no live
   write control; dry-run remains available for inspection only.
@@ -35,6 +38,10 @@ Pass 1 containment is active:
 - Comparison export is available only from a `current` verified projection.
   Outputs are explicitly named `DISPOSABLE-comparison-*.xlsx` under
   `workbook-manager/var/exports/`; they are never write or publication inputs.
+- First start migrates a legacy combined `WBM_DB` into the two stores before a
+  consumer can open either one. Exact legacy staged/history rows are retained
+  as read-only recovery evidence; unresolved records keep import containment
+  active. The hashed legacy archive is retained beside `WBM_DB`.
 
 The existing stage/validate/commit tables remain legacy provisional workflow
 state, not workbook write authority. SQLite-canonical operation is not an
@@ -58,7 +65,8 @@ cd workbook-manager/frontend && npm install && npm run build
 cd workbook-manager/frontend && npm run dev   # :5183, proxies /api → :8050
 ```
 
-Environment overrides: `WBM_WORKBOOK`, `WBM_DB`, `WBM_VAR_DIR`, `WBM_PORT`.
+Environment overrides: `WBM_WORKBOOK`, `WBM_DB` (durable state),
+`WBM_PROJECTION_DB` (disposable projection), `WBM_VAR_DIR`, `WBM_PORT`.
 
 ## Workflow
 
@@ -77,7 +85,7 @@ Environment overrides: `WBM_WORKBOOK`, `WBM_DB`, `WBM_VAR_DIR`, `WBM_PORT`.
    scoped uniqueness, references) and queued in `pending_changes`. Undo
    discards a staged change without touching data or audit history.
    Deletes are blocked while dependents exist unless explicitly confirmed.
-4. **Commit** — batch revalidation, then one SQLite transaction; every
+4. **Commit (legacy provisional)** — batch revalidation; every
    change lands in the append-only `change_history` table (timestamp,
    actor, entity, model, op, old/new values, source sheet/row, validation
    result, sync status).
@@ -96,23 +104,27 @@ Environment overrides: `WBM_WORKBOOK`, `WBM_DB`, `WBM_VAR_DIR`, `WBM_PORT`.
 - Canonical IDs are never rewritten. Display names/ids (`Title Case`,
   confirmed-prefix stripping like `opt_z51_001 → Z51 001`) are derived at
   display time only (`naming.py` / `naming.js`) and are reversible.
-- Workbook coordinates are traceability metadata (`src_sheet`, `src_row`),
-  never record identity.
+- Workbook coordinates and ownership (`src_sheet`, `src_row`, family, physical
+  key, model context) are traceability metadata. Shared physical source rows are
+  projected once per physical sheet/key even when several models register them.
 - `section_master` and the raw-preserved sheets (`PriceRef`,
   `context_choice_copy`, `rule_phrase_map`, `runtime_rule_exceptions`) are
-  read-only in phase 1 because no gated write family exists for them;
-  ZR1/ZR1X scaffolds are visible but locked while their
-  `model_workbook_sources` rows are inactive.
+  read-only because no gated write family exists for them. Edit ownership is
+  derived from the workbook model/source lifecycle matrix, not runtime
+  publication state.
 
 ## Tests
 
 ```sh
-.venv/bin/python -m pytest tests/test_workbook_manager.py -q
+.venv/bin/python -m pytest \
+  tests/test_workbook_manager_catalog.py \
+  tests/test_workbook_manager_import_projection.py \
+  tests/test_workbook_manager.py -q
 # optional direct shared-writer scratch-copy tests (not an enabled API route):
 WBM_SLOW_GATE=1 .venv/bin/python -m pytest tests/test_workbook_manager.py -q
 ```
 
 API tests skip automatically until the backend requirements are installed.
-The focused suite currently retains two assigned baseline failures: inactive
-scaffold ownership is Pass 2 work, and exact `PriceRef` physical-row preservation
-is Pass 4 work. See the active reliability specification for those assignments.
+The normal suite skips two explicit scratch-copy shared-writer tests unless
+`WBM_SLOW_GATE=1` is set. Candidate projection promotion and exact preserved-
+sheet reconstruction remain Pass 4 work.

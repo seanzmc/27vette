@@ -59,6 +59,12 @@ class ColumnOut(BaseModel):
     ctype: str
     enum: list[str] = Field(default_factory=list)
     is_key: bool = False
+    optional: bool = False
+    required_on_add: bool = False
+    required_on_effective_active_row: bool = False
+    field_kind: str
+    finite_values: list[str] = Field(default_factory=list)
+    reference: Optional[dict] = None
     ref: Optional[dict] = None
 
 
@@ -67,6 +73,7 @@ class TableSchemaOut(BaseModel):
     label: str
     key: list[str]
     model_scoped: bool
+    model_context: dict
     editable: bool
     sheet_for_model: Optional[str] = None
     columns: list[ColumnOut]
