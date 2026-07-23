@@ -2,8 +2,8 @@
 
 Status: implementation in progress; Pass 1 completed 2026-07-22 and Pass 2
 completed 2026-07-23 on `db-workflow`; Passes 3–7 not started. Revised
-2026-07-22 after final
-specification review. All fourteen review findings are resolved: primary-
+2026-07-23 to record the completed workbook-owned Vehicle Setup copy contract;
+the final specification review previously resolved all fourteen findings: primary-
 runtime-only parity, strict publication selection, current baseline, outcome-
 specific lifecycle states, interrupted-apply recovery, exception evidence,
 acceptance-only generated parity, single readback authority, complete writable-
@@ -253,6 +253,22 @@ from the physical sheet cannot be synthesized by an ordinary row edit; adding a
 header is a separate schema-authoring operation outside this pass. Opaque
 columns are preserved by copy-plus-overlay but never appear in manager draft,
 update, or ChangeSet payloads.
+
+Vehicle Setup presentation copy is an explicit compatibility requirement of
+this workflow. The completed migration owned by
+`.hermes/plans/vehicle-setup-copy-workbook-ownership-spec.md` added these seven
+manager-writable free-text columns to `model_master`:
+`setup_card_subtitle`, `setup_eyebrow`, `setup_title`, `setup_description`,
+`setup_fact_1`, `setup_fact_2`, and `setup_fact_3`. Pass 2 includes them in the
+shared registry/catalog and imports them for every active model. They remain
+optional for an unpromoted model definition, while the existing shared schema
+and registry-promotion validation require all seven for a promoted model. Pass
+4 must preserve them through candidate import, semantic readback, and
+copy-plus-overlay reconstruction. Pass 5 preview must surface the shared
+validation failure if a ChangeSet would clear required promoted-model setup
+copy. Pass 7 must round-trip the seven fields through schema metadata, API,
+browser form, draft, ChangeSet, and immutable history without changing their
+workbook ownership or moving them into SQLite-only state.
 
 SQLite enforces primary/composite uniqueness only. Do not add a parallel SQL
 foreign-key model. Ordinary, union, conditional, `option_rpos`, section/variant,
@@ -1065,6 +1081,7 @@ Implementation is complete only when these named owners prove:
 | Weak write binding | tampered ChangeSet, preview, approval, SHA, or mtime is rejected by the shared service | `tests/test_workbook_changeset_service.py` |
 | Readback/log exception | every post-save exception restores and hash-verifies backup or reports unknown | `tests/test_editor_ops_apply.py` |
 | UI context loss | unchanged real model-key rows round-trip with correct model/reference/source-lineage metadata | `tests/test_workbook_manager.py` plus disposable browser smoke |
+| Vehicle Setup copy loss | all seven workbook-owned `model_master` setup-copy fields survive import/reconstruction and API/browser/ChangeSet round-trip; clearing one for a promoted model fails shared preview validation | `tests/test_workbook_manager.py`, `tests/test_workbook_manager_import_projection.py`, and `tests/test_workbook_manager_changeset_lifecycle.py` |
 | False readiness | workbook save leaves projection/generated/publication status stale or unverified | `tests/test_workbook_manager_changeset_lifecycle.py` |
 | Stale projection authority | stale ChangeSet permits cancel only; after cancellation, stale projection permits labeled browse/history and verified re-import but blocks export/draft/preview/approval/apply until that import succeeds | `tests/test_workbook_manager_changeset_lifecycle.py` |
 
