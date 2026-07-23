@@ -6,6 +6,17 @@ window.CORVETTE_FORM_DATA = {
       "label": "Stingray",
       "modelName": "Corvette Stingray",
       "exportSlug": "stingray",
+      "vehicleSetup": {
+        "cardSubtitle": "Refreshed everyday supercar",
+        "eyebrow": "Refreshed everyday supercar",
+        "title": "Next-generation LS6 power for the everyday supercar",
+        "description": "The 2027 Stingray moves to Corvette\u2019s next-generation LS6 6.7L V8, pairing 535 horsepower with the familiar rear-drive Stingray foundation before you choose colors and options.",
+        "facts": [
+          "LS6 6.7L V8",
+          "535 hp / 520 lb-ft",
+          "Available center-exit exhaust"
+        ]
+      },
       "data": {
         "dataset": {
           "name": "2027 Corvette Stingray operational form",
@@ -50996,6 +51007,17 @@ window.CORVETTE_FORM_DATA = {
       "label": "Grand Sport",
       "modelName": "Corvette Grand Sport",
       "exportSlug": "grand-sport",
+      "vehicleSetup": {
+        "cardSubtitle": "Purist, rear-wheel-drive performance",
+        "eyebrow": "PURIST, REAR-WHEEL-DRIVE PERFORMANCE",
+        "title": "The reborn legend, tuned for a pure rear-drive sweet spot",
+        "description": "The 2027 Grand Sport pairs Corvette's next-generation LS6 6.7L V8 with a wide-body stance and heritage styling for a focused rear-drive balance of street and track.",
+        "facts": [
+          "LS6 6.7L V8",
+          "535 hp / 520 lb-ft",
+          "Available quad center exhaust"
+        ]
+      },
       "data": {
         "dataset": {
           "name": "2027 Corvette Grand Sport operational form",
@@ -104250,6 +104272,17 @@ window.CORVETTE_FORM_DATA = {
       "label": "Z06",
       "modelName": "Corvette Z06",
       "exportSlug": "z06",
+      "vehicleSetup": {
+        "cardSubtitle": "Track-born, street-legal supercar",
+        "eyebrow": "TRACK-BORN, STREET-LEGAL SUPERCAR",
+        "title": "The most powerful naturally aspirated V8 ever built",
+        "description": "The Z06 pairs the hand-built LT6 5.5L flat-plane V8 \u2014 670 horsepower to an 8,600 rpm redline \u2014 with a wide-body stance, aggressive aero and quad center exhaust.",
+        "facts": [
+          "LT6 5.5L V8",
+          "670 hp / 8,600 rpm",
+          "Quad center exhaust"
+        ]
+      },
       "data": {
         "dataset": {
           "name": "2027 Corvette Z06 operational form",

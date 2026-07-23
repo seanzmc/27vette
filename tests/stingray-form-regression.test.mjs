@@ -4,13 +4,14 @@ import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
-function loadData() {
+function loadRegistry() {
   const context = { window: {} };
   vm.runInNewContext(fs.readFileSync("form-app/data.js", "utf8"), context);
-  return context.window.STINGRAY_FORM_DATA;
+  return context.window.CORVETTE_FORM_DATA;
 }
 
-const data = loadData();
+const registry = loadRegistry();
+const data = registry.models.stingray.data;
 const appSource = fs.readFileSync("form-app/app.js", "utf8");
 const htmlSource = fs.readFileSync("form-app/index.html", "utf8");
 const stylesSource = fs.readFileSync("form-app/styles.css", "utf8");
@@ -134,7 +135,7 @@ function makeElement() {
   };
 }
 
-function loadRuntime({ fetchImpl, turnstileAvailable = true } = {}) {
+function loadRuntime({ fetchImpl, turnstileAvailable = true, formDataRegistry } = {}) {
   const downloads = [];
   const elements = new Map();
   const docListeners = {};
@@ -157,6 +158,7 @@ function loadRuntime({ fetchImpl, turnstileAvailable = true } = {}) {
   };
   const context = {
     window: {
+      CORVETTE_FORM_DATA: formDataRegistry,
       STINGRAY_FORM_DATA: data,
       __downloads: downloads,
       __lastBlobContent: "",
@@ -1003,7 +1005,7 @@ test("step rail checkmarks only appear for satisfied previous steps", () => {
 });
 
 test("vehicle setup exposes paced readability hooks without changing option step content", () => {
-  const runtime = loadRuntime();
+  const runtime = loadRuntime({ formDataRegistry: registry });
   runtime.render();
 
   const setupHtml = runtime.elements.get("#stepContent").innerHTML;
@@ -1026,15 +1028,9 @@ test("vehicle setup exposes paced readability hooks without changing option step
   assert.match(setupHtml, /Next-generation LS6 power for the everyday supercar/);
   assert.match(setupHtml, /LS6 6\.7L V8/);
   assert.match(setupHtml, /535 hp \/ 520 lb-ft/);
-  assert.match(appSource, /cardSubtitle: "Purist, rear-wheel-drive performance"/);
-  assert.match(appSource, /eyebrow: "PURIST, REAR-WHEEL-DRIVE PERFORMANCE"/);
-  assert.match(appSource, /The reborn legend, tuned for a pure rear-drive sweet spot/);
-  assert.match(appSource, /Available quad center exhaust/);
-  assert.match(appSource, /cardSubtitle: "Track-born, street-legal supercar"/);
-  assert.match(appSource, /eyebrow: "TRACK-BORN, STREET-LEGAL SUPERCAR"/);
-  assert.match(appSource, /The most powerful naturally aspirated V8 ever built/);
-  assert.match(appSource, /LT6 5\.5L V8/);
-  assert.match(appSource, /670 hp \/ 8,600 rpm/);
+  assert.doesNotMatch(appSource, /vehicleSetupHighlights/);
+  assert.match(appSource, /model\?\.vehicleSetup/);
+  assert.equal(registry.models.stingray.vehicleSetup.title, "Next-generation LS6 power for the everyday supercar");
   assert.match(appSource, /highlight\.cardSubtitle \|\| highlight\.eyebrow/);
   assert.match(appSource, /When this starting point looks right, continue with/);
   assert.doesNotMatch(appSource, /When this foundation feels right, continue with/);
@@ -1118,6 +1114,22 @@ test("vehicle setup exposes paced readability hooks without changing option step
   runtime.render();
   assert.equal(runtime.elements.get("#stepContent").dataset.activeStep, "paint");
   assert.equal(runtime.elements.get("#stepContent").dataset.stepKind, "option");
+});
+
+test("vehicle setup uses generic defaults for partially malformed registry metadata", () => {
+  const malformedRegistry = structuredClone(registry);
+  malformedRegistry.models.stingray.vehicleSetup = {
+    cardSubtitle: "",
+    eyebrow: "Legacy partial metadata",
+    facts: "not-an-array",
+  };
+  const runtime = loadRuntime({ formDataRegistry: malformedRegistry });
+  runtime.render();
+  const setupHtml = runtime.elements.get("#stepContent").innerHTML;
+  assert.match(setupHtml, /Corvette performance/);
+  assert.match(setupHtml, /Legacy partial metadata/);
+  assert.match(setupHtml, /Stingray sets the starting personality/);
+  assert.match(setupHtml, /Corvette Stingray/);
 });
 
 test("card media support is optional and data-driven", () => {

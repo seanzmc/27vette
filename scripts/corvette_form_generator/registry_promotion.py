@@ -41,6 +41,15 @@ RUNTIME_CHOICE_ROW_TRIM_FIELDS = frozenset(
 )
 RUNTIME_STANDARD_EQUIPMENT_ROW_TRIM_FIELDS = frozenset(("source_detail_raw",))
 VALID_ARTIFACT_TYPES = {"current_generation", "draft_artifact", "runtime_contract"}
+VEHICLE_SETUP_FIELDS = (
+    "setup_card_subtitle",
+    "setup_eyebrow",
+    "setup_title",
+    "setup_description",
+    "setup_fact_1",
+    "setup_fact_2",
+    "setup_fact_3",
+)
 
 
 @dataclass(frozen=True)
@@ -54,6 +63,13 @@ class RegistryPromotion:
     legacy_alias: str
     default_model: bool
     display_order: int
+    setup_card_subtitle: str
+    setup_eyebrow: str
+    setup_title: str
+    setup_description: str
+    setup_fact_1: str
+    setup_fact_2: str
+    setup_fact_3: str
     notes: str = ""
 
 
@@ -220,6 +236,12 @@ def load_registry_promotions(wb: Any) -> list[RegistryPromotion]:
             raise ValueError(f"model_registry_promotion promoted model_key {model_key!r} is missing from model_master")
         if not truthy(model.get("active"), default=True):
             raise ValueError(f"model_registry_promotion promoted model_key {model_key!r} is inactive in model_master")
+        missing_setup_fields = [field for field in VEHICLE_SETUP_FIELDS if not clean(model.get(field))]
+        if missing_setup_fields:
+            raise ValueError(
+                f"model_registry_promotion promoted model_key {model_key!r} requires complete vehicle setup copy; "
+                f"missing {', '.join(missing_setup_fields)}"
+            )
         expected_registry_key = clean(model.get("registry_key")) or registry_model_key(model_key)
         if registry_key != expected_registry_key:
             raise ValueError(
@@ -243,6 +265,13 @@ def load_registry_promotions(wb: Any) -> list[RegistryPromotion]:
                 legacy_alias=clean(row.get("legacy_alias")),
                 default_model=truthy(row.get("default_model"), default=False),
                 display_order=intish(row.get("display_order"), len(promotions) + 1),
+                setup_card_subtitle=clean(model.get("setup_card_subtitle")),
+                setup_eyebrow=clean(model.get("setup_eyebrow")),
+                setup_title=clean(model.get("setup_title")),
+                setup_description=clean(model.get("setup_description")),
+                setup_fact_1=clean(model.get("setup_fact_1")),
+                setup_fact_2=clean(model.get("setup_fact_2")),
+                setup_fact_3=clean(model.get("setup_fact_3")),
                 notes=clean(row.get("notes")),
             )
         )
@@ -324,6 +353,13 @@ def model_registry_entry(
         "label": promotion.model_label,
         "modelName": f"Corvette {promotion.model_label}",
         "exportSlug": promotion.export_slug,
+        "vehicleSetup": {
+            "cardSubtitle": promotion.setup_card_subtitle,
+            "eyebrow": promotion.setup_eyebrow,
+            "title": promotion.setup_title,
+            "description": promotion.setup_description,
+            "facts": [promotion.setup_fact_1, promotion.setup_fact_2, promotion.setup_fact_3],
+        },
         "data": data,
     }
     if asset and asset.get("image_url"):

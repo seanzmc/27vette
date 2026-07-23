@@ -33,6 +33,16 @@ ACTIVE_GROUP_HEADERS = ["group_id", "active"]
 ACTIVE_MEMBER_HEADERS = ["group_id", "option_id", "active"]
 VARIANT_OVERRIDE_HEADERS = ["option_id", "variant_id", "active", "selectable"]
 INTERIOR_HEADERS = ["interior_id", "Trim", "Price", "active_for_stingray", "requires_r6x", "Seat"]
+MODEL_MASTER_HEADERS = [
+    "model_key", "registry_key", "model_label", "model_year", "dataset_name", "export_slug",
+    "expected_variant_count", "default_model", "active", "setup_card_subtitle", "setup_eyebrow",
+    "setup_title", "setup_description", "setup_fact_1", "setup_fact_2", "setup_fact_3", "notes",
+]
+SETUP_COPY = {
+    "setup_card_subtitle": "Card subtitle", "setup_eyebrow": "EYEBROW", "setup_title": "Title",
+    "setup_description": "Description", "setup_fact_1": "Fact one", "setup_fact_2": "Fact two",
+    "setup_fact_3": "Fact three",
+}
 
 
 def source_rows(model_key: str, role_to_sheet: dict[str, str], *, active: bool = True) -> list[dict[str, object]]:
@@ -113,18 +123,7 @@ def minimal_schema_workbook(
     append_sheet(
         wb,
         "model_master",
-        [
-            "model_key",
-            "registry_key",
-            "model_label",
-            "model_year",
-            "dataset_name",
-            "export_slug",
-            "expected_variant_count",
-            "default_model",
-            "active",
-            "notes",
-        ],
+        MODEL_MASTER_HEADERS,
         extra_model_rows or [],
     )
     append_sheet(
@@ -169,6 +168,51 @@ def validate_temp_workbook(wb: Workbook):
 
 
 class SchemaValidationMetadataTests(unittest.TestCase):
+    def test_promoted_model_requires_complete_vehicle_setup_copy(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "stingray", "registry_key": "stingray", "active": True, **SETUP_COPY}],
+            extra_sheets={
+                "model_registry_promotion": (
+                    ["model_key", "promoted_to_runtime", "active"],
+                    [{"model_key": "stingray", "promoted_to_runtime": True, "active": True}],
+                ),
+            },
+        )
+        headers = [cell.value for cell in wb["model_master"][1]]
+        wb["model_master"].cell(row=2, column=headers.index("setup_fact_2") + 1).value = None
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(
+            any(issue.check_id == "promoted_model_setup_copy_incomplete" and issue.column == "setup_fact_2" for issue in issues),
+            issues,
+        )
+
+    def test_inactive_promoted_model_reports_inactive_without_setup_copy_noise(self) -> None:
+        wb = minimal_schema_workbook(
+            extra_model_rows=[{"model_key": "stingray", "registry_key": "stingray", "active": False}],
+            extra_sheets={
+                "model_registry_promotion": (
+                    [
+                        "model_key", "registry_key", "promoted_to_runtime", "default_model",
+                        "artifact_path", "artifact_type", "legacy_alias", "active",
+                        "display_order", "notes",
+                    ],
+                    [{
+                        "model_key": "stingray", "registry_key": "stingray",
+                        "promoted_to_runtime": True, "default_model": True,
+                        "artifact_type": "current_generation", "active": True,
+                        "display_order": 1,
+                    }],
+                ),
+            },
+        )
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(any(issue.check_id == "registry_promotion_inactive_model" for issue in issues), issues)
+        self.assertFalse(any(issue.check_id == "promoted_model_setup_copy_incomplete" for issue in issues), issues)
+
     def test_model_master_asset_map_shaped_headers_are_rejected_directly(self) -> None:
         wb = minimal_schema_workbook(
             extra_sheets={
@@ -954,7 +998,9 @@ class SchemaValidationMetadataTests(unittest.TestCase):
 
     def test_live_app_registry_must_match_promoted_artifacts(self) -> None:
         wb = minimal_schema_workbook(
-            extra_model_rows=[{"model_key": "stingray", "registry_key": "stingray", "active": True}],
+            extra_model_rows=[
+                {"model_key": "stingray", "registry_key": "stingray", "active": True, **SETUP_COPY}
+            ],
             extra_sheets={
                 "model_registry_promotion": (
                     [

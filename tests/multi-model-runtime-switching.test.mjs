@@ -543,6 +543,20 @@ test("runtime renders vehicle setup as one paced visible foundation step", () =>
   assert.doesNotMatch(setupHtml, /Continue to Exterior Paint/);
 });
 
+test("generated registry supplies complete workbook-authored vehicle setup copy", () => {
+  const registry = loadDataWindow().CORVETTE_FORM_DATA;
+  for (const model of Object.values(registry.models)) {
+    assert.equal(typeof model.vehicleSetup.cardSubtitle, "string");
+    assert.equal(typeof model.vehicleSetup.eyebrow, "string");
+    assert.equal(typeof model.vehicleSetup.title, "string");
+    assert.equal(typeof model.vehicleSetup.description, "string");
+    assert.equal(model.vehicleSetup.facts.length, 3);
+    assert.equal(model.vehicleSetup.facts.every(Boolean), true);
+  }
+  assert.equal(registry.models.grandSport.vehicleSetup.cardSubtitle, "Purist, rear-wheel-drive performance");
+  assert.equal(registry.models.z06.vehicleSetup.cardSubtitle, "Track-born, street-legal supercar");
+});
+
 test("runtime progressively advances vehicle setup panels before exterior paint", () => {
   const runtime = loadRuntime();
   const convertible = runtime.data.contextChoices.find((choice) => choice.context_choice_id === "body_style__convertible");

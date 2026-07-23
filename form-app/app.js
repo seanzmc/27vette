@@ -106,31 +106,6 @@ const modelStep = {
 };
 const vehicleSetupStepKeys = new Set(["model", "body_style", "trim_level"]);
 const vehicleSetupStages = ["model", "body_style", "trim_level"];
-const vehicleSetupHighlights = {
-  stingray: {
-    eyebrow: "Refreshed everyday supercar",
-    title: "Next-generation LS6 power for the everyday supercar",
-    description:
-      "The 2027 Stingray moves to Corvette’s next-generation LS6 6.7L V8, pairing 535 horsepower with the familiar rear-drive Stingray foundation before you choose colors and options.",
-    facts: ["LS6 6.7L V8", "535 hp / 520 lb-ft", "Available center-exit exhaust"],
-  },
-  grandSport: {
-    cardSubtitle: "Purist, rear-wheel-drive performance",
-    eyebrow: "PURIST, REAR-WHEEL-DRIVE PERFORMANCE",
-    title: "The reborn legend, tuned for a pure rear-drive sweet spot",
-    description:
-      "The 2027 Grand Sport pairs Corvette's next-generation LS6 6.7L V8 with a wide-body stance and heritage styling for a focused rear-drive balance of street and track.",
-    facts: ["LS6 6.7L V8", "535 hp / 520 lb-ft", "Available quad center exhaust"],
-  },
-  z06: {
-    cardSubtitle: "Track-born, street-legal supercar",
-    eyebrow: "TRACK-BORN, STREET-LEGAL SUPERCAR",
-    title: "The most powerful naturally aspirated V8 ever built",
-    description:
-      "The Z06 pairs the hand-built LT6 5.5L flat-plane V8 — 670 horsepower to an 8,600 rpm redline — with a wide-body stance, aggressive aero and quad center exhaust.",
-    facts: ["LT6 5.5L V8", "670 hp / 8,600 rpm", "Quad center exhaust"],
-  },
-};
 let runtimeSteps = [];
 let variants = [];
 let pendingConfirmationAction = null;
@@ -2191,14 +2166,27 @@ function modelEntries() {
 
 function activeModelHighlight(modelKey = activeModelKey) {
   const model = registry.models?.[modelKey] || activeModel;
-  return (
-    vehicleSetupHighlights[modelKey] || {
-      eyebrow: "Corvette foundation",
-      title: `${model?.label || "Corvette"} sets the starting personality`,
-      description: "Choose the model that best matches how this build should feel before moving into body style, trim, colors, and options.",
-      facts: [model?.modelName || model?.label || "Corvette"],
-    }
-  );
+  const fallback = {
+    cardSubtitle: "Corvette performance",
+    eyebrow: "Corvette foundation",
+    title: `${model?.label || "Corvette"} sets the starting personality`,
+    description: "Choose the model that best matches how this build should feel before moving into body style, trim, colors, and options.",
+    facts: [model?.modelName || model?.label || "Corvette"],
+  };
+  const setup = model?.vehicleSetup;
+  if (!setup || typeof setup !== "object" || Array.isArray(setup)) return fallback;
+  const textOrFallback = (value, fallbackValue) =>
+    typeof value === "string" && value.trim() ? value : fallbackValue;
+  const facts = Array.isArray(setup.facts)
+    ? setup.facts.filter((fact) => typeof fact === "string" && fact.trim())
+    : [];
+  return {
+    cardSubtitle: textOrFallback(setup.cardSubtitle, fallback.cardSubtitle),
+    eyebrow: textOrFallback(setup.eyebrow, fallback.eyebrow),
+    title: textOrFallback(setup.title, fallback.title),
+    description: textOrFallback(setup.description, fallback.description),
+    facts: facts.length ? facts : fallback.facts,
+  };
 }
 
 function bodyStyleHighlight(bodyStyle = state.bodyStyle) {

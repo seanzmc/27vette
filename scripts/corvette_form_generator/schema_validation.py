@@ -113,8 +113,16 @@ MODEL_MASTER_HEADERS: tuple[str, ...] = (
     "expected_variant_count",
     "default_model",
     "active",
+    "setup_card_subtitle",
+    "setup_eyebrow",
+    "setup_title",
+    "setup_description",
+    "setup_fact_1",
+    "setup_fact_2",
+    "setup_fact_3",
     "notes",
 )
+MODEL_SETUP_COPY_FIELDS: tuple[str, ...] = MODEL_MASTER_HEADERS[9:16]
 
 MODEL_REGISTRY_PROMOTION_HEADERS: tuple[str, ...] = (
     "model_key",
@@ -812,7 +820,8 @@ def validate_registry_promotion_metadata(wb, issues: list[SchemaIssue]) -> None:
                 value={"model_key": model_key, "registry_key": registry_key, "expected": expected_registry_key},
                 message=f"Promoted runtime registry_key for {model_key!r} must match model_master.registry_key {expected_registry_key!r}.",
             )
-        if not truthy(model_row.get("active"), default=True):
+        model_is_active = truthy(model_row.get("active"), default=True)
+        if not model_is_active:
             add_issue(
                 issues,
                 "error",
@@ -823,6 +832,19 @@ def validate_registry_promotion_metadata(wb, issues: list[SchemaIssue]) -> None:
                 value=model_key,
                 message=f"Promoted runtime model {model_key!r} is inactive in model_master.",
             )
+        if model_is_active:
+            for field in MODEL_SETUP_COPY_FIELDS:
+                if clean_text(model_row.get(field)):
+                    continue
+                add_issue(
+                    issues,
+                    "error",
+                    "promoted_model_setup_copy_incomplete",
+                    sheet="model_master",
+                    column=field,
+                    value={"model_key": model_key, "field": field},
+                    message=f"Promoted runtime model {model_key!r} requires nonblank {field}.",
+                )
         if artifact_type not in VALID_REGISTRY_PROMOTION_ARTIFACT_TYPES:
             add_issue(
                 issues,

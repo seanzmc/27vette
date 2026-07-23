@@ -129,6 +129,27 @@ class TestImportFidelity(ImportedWorkbookCase):
         self.assertGreater(row["c"], 1,
                            "expected shared option_ids across models")
 
+    def test_model_setup_copy_columns_are_managed_and_imported(self):
+        expected = {
+            "setup_card_subtitle", "setup_eyebrow", "setup_title", "setup_description",
+            "setup_fact_1", "setup_fact_2", "setup_fact_3",
+        }
+        model_spec = SPEC_BY_TABLE["models"]
+        self.assertTrue(expected.issubset({column.header for column in model_spec.columns}))
+        rows = self.conn.execute(
+            "SELECT * FROM models WHERE active IN ('True', '1', 'TRUE', 'true') "
+            "ORDER BY model_key"
+        ).fetchall()
+        self.assertEqual(
+            [row["model_key"] for row in rows],
+            ["grand_sport", "grand_sport_x", "stingray", "z06", "zr1", "zr1x"],
+        )
+        for row in rows:
+            self.assertTrue(
+                all(row[column] for column in expected),
+                f"active model {row['model_key']} must have complete setup copy",
+            )
+
     def test_import_reports_are_queryable(self):
         self.assertIn(self.report["run"]["status"],
                       ("imported", "imported_with_issues"))
@@ -329,6 +350,20 @@ class TestSyncBatch(ImportedWorkbookCase):
         self.assertTrue(result["ok"], result)
         return row, record
 
+    def _commit_model_setup_edit(self):
+        row = self.conn.execute(
+            "SELECT * FROM models WHERE model_key='stingray'"
+        ).fetchone()
+        record = {c.sql_name(): row[c.sql_name()]
+                  for c in SPEC_BY_TABLE["models"].columns}
+        record["setup_title"] = f"{record['setup_title']} (reviewed)"
+        staging.stage_change(
+            self.conn, table="models", model_id="", op="update",
+            key={"model_key": row["model_key"]}, record=record)
+        result = staging.commit_staged(self.conn, actor="test")
+        self.assertTrue(result["ok"], result)
+        return row, record
+
     def test_batch_targets_registered_sheet_with_header_names(self):
         row, record = self._commit_price_edit()
         batch = syncmod.build_batch(self.conn, WORKBOOK)
@@ -338,6 +373,16 @@ class TestSyncBatch(ImportedWorkbookCase):
         self.assertEqual(op["action"], "update")
         self.assertEqual(op["key"], {"option_id": row["option_id"]})
         self.assertEqual(op["row"]["price"], record["price"])
+
+    def test_model_setup_edit_builds_model_master_editor_op(self):
+        row, record = self._commit_model_setup_edit()
+        batch = syncmod.build_batch(self.conn, WORKBOOK)
+        self.assertEqual(len(batch["items"]), 1)
+        op = batch["items"][0]
+        self.assertEqual(op["sheet"], "model_master")
+        self.assertEqual(op["action"], "update")
+        self.assertEqual(op["key"], {"model_key": row["model_key"]})
+        self.assertEqual(op["row"]["setup_title"], record["setup_title"])
 
     def test_dry_run_batch_passes_editor_ops_validation(self):
         """Fast slice of the gate: batch preparation + validation only."""
@@ -425,6 +470,11 @@ class TestComparisonExport(ImportedWorkbookCase):
         # managed sheet keeps its row count
         self.assertEqual(len(rows(orig, "stingray_options")),
                          len(rows(regen, "stingray_options")))
+        self.assertEqual(
+            rows(orig, "model_master"),
+            rows(regen, "model_master"),
+            "managed model_master setup copy must round-trip without drift",
+        )
         orig.close()
         regen.close()
 

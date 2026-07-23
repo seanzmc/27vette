@@ -32,6 +32,17 @@ def append_sheet(wb: Workbook, name: str, headers: list[str], rows: list[dict[st
         ws.append([row.get(header, None) for header in headers])
 
 
+SETUP_COPY = {
+    "setup_card_subtitle": "Workbook-authored card subtitle",
+    "setup_eyebrow": "WORKBOOK-AUTHORED EYEBROW",
+    "setup_title": "Workbook-authored title",
+    "setup_description": "Workbook-authored description.",
+    "setup_fact_1": "Fact one",
+    "setup_fact_2": "Fact two",
+    "setup_fact_3": "Fact three",
+}
+
+
 def workbook_with_promotions(promotion_rows: list[dict[str, object]] | None = None) -> Workbook:
     wb = Workbook()
     del wb[wb.sheetnames[0]]
@@ -48,6 +59,13 @@ def workbook_with_promotions(promotion_rows: list[dict[str, object]] | None = No
             "expected_variant_count",
             "default_model",
             "active",
+            "setup_card_subtitle",
+            "setup_eyebrow",
+            "setup_title",
+            "setup_description",
+            "setup_fact_1",
+            "setup_fact_2",
+            "setup_fact_3",
             "notes",
         ],
         [
@@ -57,6 +75,7 @@ def workbook_with_promotions(promotion_rows: list[dict[str, object]] | None = No
                 "model_label": "Stingray",
                 "export_slug": "stingray",
                 "active": True,
+                **SETUP_COPY,
             },
             {
                 "model_key": "grand_sport",
@@ -64,6 +83,7 @@ def workbook_with_promotions(promotion_rows: list[dict[str, object]] | None = No
                 "model_label": "Grand Sport",
                 "export_slug": "grand-sport",
                 "active": True,
+                **SETUP_COPY,
             },
             {
                 "model_key": "z06",
@@ -71,6 +91,7 @@ def workbook_with_promotions(promotion_rows: list[dict[str, object]] | None = No
                 "model_label": "Z06",
                 "export_slug": "z06",
                 "active": False,
+                **SETUP_COPY,
             },
         ],
     )
@@ -187,6 +208,16 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
         self.assertEqual(registry["models"]["stingray"]["image_url"], "stingray.png")
         self.assertEqual(registry["models"]["grandSport"]["label"], "Grand Sport")
         self.assertEqual(registry["models"]["grandSport"]["exportSlug"], "grand-sport")
+        self.assertEqual(
+            registry["models"]["grandSport"]["vehicleSetup"],
+            {
+                "cardSubtitle": "Workbook-authored card subtitle",
+                "eyebrow": "WORKBOOK-AUTHORED EYEBROW",
+                "title": "Workbook-authored title",
+                "description": "Workbook-authored description.",
+                "facts": ["Fact one", "Fact two", "Fact three"],
+            },
+        )
         self.assertEqual(registry["models"]["grandSport"]["data"]["dataset"]["source_sheet"], "grandSport_options")
         choice = registry["models"]["grandSport"]["data"]["choices"][0]
         self.assertEqual(choice["choice_id"], "gs-choice")
@@ -261,7 +292,17 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
         self.assertEqual(list(registry["models"].keys()), ["stingray", "grandSport"])
         self.assertEqual(registry["models"]["stingray"]["data"]["dataset"]["source_sheet"], "stingray_options")
         self.assertEqual(registry["models"]["grandSport"]["data"]["dataset"]["status"], "runtime_active")
+        self.assertEqual(registry["models"]["stingray"]["vehicleSetup"]["facts"], ["Fact one", "Fact two", "Fact three"])
         self.assertEqual(registry["legacyAliases"], {"STINGRAY_FORM_DATA": "stingray"})
+
+    def test_promoted_model_requires_complete_vehicle_setup_copy(self) -> None:
+        wb = workbook_with_promotions([promoted_stingray_row()])
+        headers = [cell.value for cell in wb["model_master"][1]]
+        title_col = headers.index("setup_title") + 1
+        wb["model_master"].cell(row=2, column=title_col).value = None
+
+        with self.assertRaisesRegex(ValueError, "setup_title"):
+            load_registry_promotions(wb)
 
     def test_promoted_artifact_with_draft_fields_fails_fast(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
