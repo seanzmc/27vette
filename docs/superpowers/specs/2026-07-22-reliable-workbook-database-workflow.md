@@ -360,7 +360,7 @@ canonical workbook
 For this manager pass, generation is isolated acceptance or an external
 post-write gate. Registry publication remains outside the manager. No
 compatibility JSON/CSV writer, current-generation/draft promotion input, legacy
-fallback/alias behavior, ingest deployment proof, publication, or deployment is
+fallback/alias behavior, retired ingest deployment proof, publication, or deployment is
 part of manager execution.
 
 Add `workbook-manager/backend/app/contract_parity.py` with one public helper:
@@ -1143,7 +1143,7 @@ validation, editing workbook rows, or hiding unsafe actions only in the UI.
 - Per-model physical SQL table families.
 - A new workbook compiler framework, ORM, API version, frontend framework, or
   dependency.
-- Rewriting the fallback workbook editor or ingest workflow.
+- Rewriting the fallback workbook editor or restoring the retired ingest workflow.
 - Changing canonical option availability, pricing, defaults, relationships,
   copy, ordering, lifecycle, or publication decisions as implementation data.
   The manager may support already-authorized future edits through the matrix;

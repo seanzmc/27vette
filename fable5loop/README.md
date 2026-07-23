@@ -76,4 +76,4 @@ Before declaring done:
 
 ## Protected 27vette boundaries
 
-The loop does not override `AGENTS.md`. Workbook writes, generated artifacts, runtime behavior, styling, dealer submission, and ingest passes keep their normal spec/approval/validation requirements.
+The loop does not override `AGENTS.md`. Workbook writes, generated artifacts, runtime behavior, styling, and dealer submission keep their normal spec/approval/validation requirements. The retired ingest workflow cannot be restored through a Fable run without a new approved design.

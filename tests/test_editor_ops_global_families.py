@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pass C editor_ops extensions: global sheet families + create_sheet ops.
+"""Editor operations for global sheet families and create-sheet batches.
 
 Fixture workbooks only. Write tests keep schema validation enabled while
 mocking a successful schema issue scan for the compact workbook; the live
@@ -23,7 +23,7 @@ for entry in (ROOT / "scripts", ROOT / "tests"):
 
 import corvette_form_generator.editor_ops as editor_ops  # noqa: E402
 from corvette_form_generator.editor_ops import apply_batch  # noqa: E402
-from ingest_wizard_fixtures import build_master_workbook  # noqa: E402
+from workbook_domain_fixtures import build_master_workbook  # noqa: E402
 
 
 def batch(path: Path, items: list[dict]) -> dict:

@@ -16,6 +16,10 @@ Condensed 2026-07-05 from the completed audit program logs. Pass-by-pass history
 - `generate_registry.py` is the only writer of `form-app/data.js`.
 - `scripts/compare-generated-contracts.mjs` strips only timestamp keys then deep-compares — a strict no-drift parity check, not a validator for approved shape/path migrations.
 
+**Retired raw ingest**
+
+The former ingest wizard, canonical compiler/exception queue, ChangeSet emitter, ingest-specific deployment proof, and browser UI were removed on 2026-07-23 because their imported data was not trustworthy enough to remain an executable route. Historical evidence is archived under `docs/archive/retired-ingest/2026-07-23/`; it is not a current route or implementation template. The generic workbook-domain ChangeSet service remains only as the approved target write contract for later Workbook Manager passes.
+
 ## Philosophy constraints
 
 - The workbook owns Corvette product data and business rules; `form-output/*` and `form-app/data.js` are outputs — never hand-edit as source-of-truth fixes.

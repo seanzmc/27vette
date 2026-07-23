@@ -33,7 +33,6 @@ scripts/
   apply_workbook_changeset.py shared ChangeSet preview/approval/write CLI
   apply_workbook_ops.py       gated workbook writes from exported ops batches
   workbook_editor_server.py   localhost workbook review/edit UI
-  ingest_wizard_server.py     localhost ingest wizard UI (raw order-guide intake)
 workbook-manager/             React + FastAPI + SQLite workbook editor
                               (staged edits, SQL audit, gated sync; see its README)
   compare-generated-contracts.mjs  contract diff ignoring timestamps
@@ -44,8 +43,7 @@ form-output/                  generated artifacts (never hand-edit);
                               inspection/ = opt-in review
 form-app/                     index.html, styles.css, app.js + generated data.js
 tests/                        node --test *.mjs + pytest gates
-docs/, .hermes/plans/         active specs, reviews, ingest docs
-Order-Guide_IngestPrompt.md   raw ingest workflow prompt
+docs/, .hermes/plans/         active specs, reviews, and plans
 ```
 
 Other dirs (`product/`, `dist_updates/`, `archive/`, `backups/`, `visualizer/`) are reference/archive/visualizer surfaces — inspect only when a task names them. `visualizer/workbook-editor/intentional-differences.json` is the committed allowlist of intentional cross-model option differences (`status: intentional` suppresses; `pending-review` annotates); editing it is a normal file change, not a workbook write.
@@ -96,19 +94,13 @@ python -m pip install -r requirements.txt
 
 Do not commit `.venv/`. Always run Python tooling with `.venv/bin/python` or the activated venv.
 
-## Ingest Wizard Workflow
+## Raw Order-Guide Ingest
 
-`scripts/ingest_wizard_server.py` serves the localhost-only five-function path for raw order-guide intake: intake/profile, target selection, canonical compilation, typed exception resolution, and immutable `workbook-changeset-1` emission. Saved current runs resume at their current stage. Historical broad-review and plan artifacts are GET-only evidence; their mutation routes return HTTP 410. The browser cannot approve or apply a ChangeSet and cannot run generation, publication, promotion, deployment, or dealer work. Run artifacts stay under `form-output/ingest-wizard/<run-id>/`; detail lives in `docs/ingest/`.
-
-```sh
-.venv/bin/python scripts/ingest_wizard_server.py [--port 8040]
-```
-
-The completed 2026-07-20 compounded recovery remains documented as historical evidence in `docs/ingest/7-20_compounded-repair-spec.md`; its one-use projection and ChangeSet commands are retired.
+The prior ingest wizard/compiler workflow is retired and has no supported command. Its code was removed because its imported data was not trustworthy enough to remain an executable workspace path. Historical prompts, plans, and reports are archived under `docs/archive/retired-ingest/2026-07-23/`; they are evidence, not current procedure. A future raw-source intake workflow requires a new approved design.
 
 ## Workbook Editor Workflow
 
-`scripts/workbook_editor_server.py` serves the fallback localhost-only UI for routine review/editing of `stingray_master.xlsx`; it derives models, sheet registries, schemas, and reference domains from the live workbook. Its obsolete embedded Ingest Review workflow is retired; raw ingest uses the separate wizard above.
+`scripts/workbook_editor_server.py` serves the fallback localhost-only UI for routine review/editing of `stingray_master.xlsx`; it derives models, sheet registries, schemas, and reference domains from the live workbook. Its obsolete embedded Ingest Review workflow remains retired.
 
 ```sh
 .venv/bin/python scripts/workbook_editor_server.py [--port 8030] [--workbook <path>]
@@ -118,7 +110,7 @@ Open `http://127.0.0.1:8027/`. Review tab: `/api/lints` (informational structura
 
 Apply behavior: edits queue client-side as typed operations; only sheet families registered in `model_workbook_sources` are editable; adding an option requires OVS coverage for every active variant; Apply runs the full gate internally (batch validation, dry-run on temp copy, package + schema validation, `save_workbook_safely()` lock/mtime checks, backup, atomic replace, table-ref maintenance, `form-output/workbook-edit-log.jsonl` entry); warnings block until confirmed.
 
-Shared ChangeSet operator path (preview is the default; approval never writes; write requires the exact bound preview and approval):
+Shared ChangeSet operator path (preview is the default; approval never writes; write requires the exact bound preview and approval). This is the approved target write contract for Workbook Manager; there is no current non-ingest producer until the Manager implements its later passes:
 
 ```sh
 .venv/bin/python scripts/apply_workbook_changeset.py change-set.json --workbook stingray_master.xlsx --preview-out preview.json
@@ -126,7 +118,7 @@ Shared ChangeSet operator path (preview is the default; approval never writes; w
 .venv/bin/python scripts/apply_workbook_changeset.py change-set.json --workbook stingray_master.xlsx --write --preview preview.json --approval approval.json --receipt-out receipt.json
 ```
 
-The fallback editor still uses its existing typed-operation Apply path until Workbook Manager parity is proven in Phase 3; `scripts/apply_workbook_ops.py` remains only for that transition and is not an ingest continuation.
+The fallback editor still uses its existing typed-operation Apply path until Workbook Manager parity is proven in Phase 3; `scripts/apply_workbook_ops.py` remains only for that transition.
 
 An Apply is only the workbook-write step — afterwards regenerate affected model artifacts, run the relevant gates below, and review diffs.
 

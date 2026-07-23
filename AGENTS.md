@@ -2,7 +2,7 @@
 
 Durable operating guide for AI agents in this repo: source-of-truth boundaries, workflow expectations, validation strategy, and handoff requirements. `README.md` owns the project overview, repository map, and all exact commands. If this guide and the live repo disagree, inspect code/workbook/tests/docs first, then flag the discrepancy.
 
-No-redundancy rule: every instruction fact has one owning file (this file = agent conduct/boundaries/validation/handoff; README = overview/map/commands; `Order-Guide_IngestPrompt.md` + `docs/ingest/` = ingest detail). When updating guidance, edit the owner and fix pointers; never duplicate prose across these files.
+No-redundancy rule: every instruction fact has one owning file (this file = agent conduct/boundaries/validation/handoff; README = overview/map/commands; archived ingest material = historical evidence only). When updating guidance, edit the owner and fix pointers; never duplicate prose across these files.
 
 ## 1. First Principles and Context Gathering
 
@@ -114,19 +114,19 @@ Do not change the dealer endpoint, payload shape, model scoping, security/Turnst
 
 Classify the change: styling-only, behavior-only, data-only, or mixed. For behavior work, inspect generated data fields and runtime consumers before editing JS. Preserve stable identifiers and generated keys unless a scoped migration is approved. Verify affected customer workflows (model switching, body/trim/variant selection, required steps, option select/deselect, include/require/exclude, summaries, totals, download, dealer modal/payload scoping) as relevant — not just visual appearance. Check mobile/responsive behavior for customer-facing changes. Prefer customer-friendly, mobile-first, visually clear UI. Avoid depending on exact selectors/internals unless they are stable conventions.
 
-## 8. Raw Order-Guide Ingest (summary)
+## 8. Raw Order-Guide Ingest (retired)
 
-Edge workflow for new-model intake or broad source refresh — never routine maintenance. Preflight is read-only evidence gathering: preserve raw evidence and provenance, invent nothing, keep candidate artifacts transient, and never mutate the workbook, generated artifacts, or `form-app/data.js`. Applying reviewed output later is a separate approved workbook pass with full §5 safety, regeneration, and gates. Detail: `Order-Guide_IngestPrompt.md` and `docs/ingest/`.
+The raw order-guide ingest wizard, compiler/exception queue, ChangeSet emitter, deployment proof, browser UI, and helper libraries were retired on 2026-07-23 because their imported data was not trustworthy enough to remain an executable workspace workflow. There is no supported raw-ingest command or active ingest code path.
 
-Current ingest direction is browser-first for source intake, then compiler/exception driven for production continuation. The current entry path is `scripts/ingest_wizard_server.py`; the production direction is the canonical-row compiler plus typed exception queue in `docs/ingest/canonical-row-compiler-exception-queue-design.md`, with the approved consolidation destination in `docs/ingest/ingest-separation-model-integration-editor-consolidation-spec.md`: ingest owns raw intake, profiling/target selection, canonical compilation, typed exception resolution, and shared ChangeSet emission only. Historical Pass B broad review lanes and Pass C/D.2 decision-to-plan artifacts remain evidence/debug surfaces, not production write authority.
+Historical specifications, reports, and prompts live under `docs/archive/retired-ingest/2026-07-23/`; Fable receipts remain chronological evidence. They are not current architecture, test authority, or instructions to resume the retired implementation. Preserve raw source files and ignored local run artifacts as evidence unless a separately approved cleanup names them.
 
-The shared ChangeSet/workbook-service direction does not itself authorize live workbook writes, generated-artifact refresh, registry publication, runtime promotion, deployment, or dealer changes. Those remain separate approved steps with §5 workbook safety and normal regeneration/validation gates. During transition, do not let ingest, the workbook editor, or Workbook Manager keep parallel schemas, validators, writer authority, or canonical row stores when the shared workbook registry/service should own the contract.
+Any future raw-source intake requires a new evidence-first specification and explicit approval. It must not restore archived behavior merely because code or tests once existed. Workbook writes, generation, publication, promotion, deployment, and dealer changes remain separately governed by §§5–7 and §10.
 
-Current ingest stops after immutable `workbook-changeset-1` emission. Historical `pass-c-*` plans and approvals are GET-only evidence and never production write authority; `scripts/ingest_wizard_apply.py` is retired. Preview, approval, and any separately authorized workbook write use the shared service through `scripts/apply_workbook_changeset.py`, with exact ChangeSet/preview/approval/workbook binding, §5 workbook safety, and verified rollback. This path does not authorize generation, publication, promotion, deployment, or dealer changes.
+The generic `workbook-changeset-1` parser/service remains the approved target contract for reliable Workbook Manager writes. That contract is independent of ingest and does not imply a current non-ingest producer until the Manager's owning specification implements one.
 
 ## 9. Fable 5 Loop Workflows
 
-Fable 5 loop artifacts under `fable5loop/` are orchestration/memory infrastructure for large, multi-stage work; they do not override this guide's spec, workbook, generated-artifact, runtime, styling, dealer, or ingest boundaries. For any Fable 5 run, start from `fable5loop/README.md`, preserve run receipts/state updates, and run the loop validator when loop artifacts change. Use `docs/fable-ex-tasks.md` as routing guidance for when the loop is appropriate; keep routine model/workbook/runtime edits on the normal repo path unless a task explicitly needs the loop.
+Fable 5 loop artifacts under `fable5loop/` are orchestration/memory infrastructure for large, multi-stage work; they do not override this guide's spec, workbook, generated-artifact, runtime, styling, or dealer boundaries. For any Fable 5 run, start from `fable5loop/README.md`, preserve run receipts/state updates, and run the loop validator when loop artifacts change. Use `docs/fable-ex-tasks.md` as routing guidance for when the loop is appropriate; keep routine model/workbook/runtime edits on the normal repo path unless a task explicitly needs the loop.
 
 Claude Code project files under `.claude/` are thin launch/wrapper surfaces for this repo. They may point agents into `AGENTS.md` and `fable5loop/`, but durable workflow procedure belongs in the repo-owned guides and Fable loop files, not duplicated in `.claude/` wrappers.
 
