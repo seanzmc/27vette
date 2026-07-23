@@ -7,8 +7,9 @@ Excel-lock refusal, mtime staleness, batch validation, dry-run on a temp
 copy, package + schema validation, automatic backup, and atomic replacement.
 This module never writes the workbook through any other path (AGENTS.md §5).
 
-Dry-run is the default; a live write requires ``write=True`` plus the exact
-``workbook_mtime_ns`` captured by the dry-run the user reviewed.
+Dry-run is the only API-exposed mode during provisional containment. This
+legacy helper still accepts ``write=True`` for direct scratch-copy regression
+tests, but ``POST /api/sync`` refuses that mode until Pass 7.
 """
 
 from __future__ import annotations
@@ -156,7 +157,7 @@ def export_comparison_workbook(conn: sqlite3.Connection,
     from openpyxl import load_workbook
 
     config.ensure_dirs()
-    out_path = config.EXPORT_DIR / f"regenerated-{_now_slug()}.xlsx"
+    out_path = config.EXPORT_DIR / f"DISPOSABLE-comparison-{_now_slug()}.xlsx"
     shutil.copy2(workbook_path, out_path)
     wb = load_workbook(out_path)
 
@@ -200,7 +201,12 @@ def export_comparison_workbook(conn: sqlite3.Connection,
                 ws.append(values)
             rewritten[sheet] = rewritten.get(sheet, 0) + len(rows)
     wb.save(out_path)
-    return {"ok": True, "path": str(out_path), "rewritten": rewritten}
+    return {
+        "ok": True,
+        "disposable": True,
+        "path": str(out_path),
+        "rewritten": rewritten,
+    }
 
 
 def backup_database(conn: sqlite3.Connection, db_path: Path) -> dict:

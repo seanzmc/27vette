@@ -40,6 +40,15 @@ app = FastAPI(title="27vette Workbook Manager", version="0.1.0")
 
 _conn = None
 
+PROVISIONAL_MODE = "read_only_provisional"
+IMPORT_TERMINAL_ALLOWLIST = (
+    "applied",
+    "cancelled",
+    "manually_resolved_restored",
+    "manually_resolved_applied",
+    "abandoned_unknown",
+)
+
 
 def get_conn():
     global _conn
@@ -58,13 +67,90 @@ def _workbook_state(conn) -> dict:
     path = config.DEFAULT_WORKBOOK
     imported_mtime = dbmod.get_meta(conn, "workbook_mtime_ns")
     current_mtime = str(path.stat().st_mtime_ns) if path.exists() else ""
+    if not path.exists():
+        state = "missing"
+    elif not imported_mtime:
+        state = "unbound"
+    elif imported_mtime != current_mtime:
+        state = "stale"
+    else:
+        state = "current"
     return {
+        "state": state,
         "workbook_path": str(path),
         "exists": path.exists(),
         "imported_mtime_ns": imported_mtime,
         "current_mtime_ns": current_mtime,
         "stale": bool(imported_mtime) and imported_mtime != current_mtime,
         "excel_lock": (path.parent / f"~${path.name}").exists(),
+    }
+
+
+def _projection_active(conn) -> bool:
+    if dbmod.get_meta(conn, "workbook_sha256"):
+        return True
+    if conn.execute("SELECT 1 FROM import_runs LIMIT 1").fetchone():
+        return True
+    if conn.execute("SELECT 1 FROM raw_sheet_rows LIMIT 1").fetchone():
+        return True
+    return any(conn.execute(
+        f"SELECT 1 FROM {spec.table} LIMIT 1").fetchone()
+        for spec in TABLE_SPECS)
+
+
+def _import_blockers(conn) -> dict:
+    staged = conn.execute(
+        "SELECT COUNT(*) c FROM pending_changes WHERE status='staged'"
+    ).fetchone()["c"]
+    committed_history = conn.execute(
+        "SELECT COUNT(*) c FROM change_history WHERE status='committed' "
+        "AND sync_status='pending'"
+    ).fetchone()["c"]
+    committed_without_history = conn.execute(
+        "SELECT COUNT(*) c FROM pending_changes p WHERE p.status='committed' "
+        "AND NOT EXISTS (SELECT 1 FROM change_history h WHERE "
+        "h.pending_change_id=p.id)"
+    ).fetchone()["c"]
+    failed_history = conn.execute(
+        "SELECT COUNT(*) c FROM change_history WHERE status='failed' "
+        "OR sync_status='sync_failed'"
+    ).fetchone()["c"]
+    failed_pending = conn.execute(
+        "SELECT COUNT(*) c FROM pending_changes p WHERE "
+        "p.status IN ('failed', 'sync_failed') AND NOT EXISTS (SELECT 1 FROM "
+        "change_history h WHERE h.pending_change_id=p.id)"
+    ).fetchone()["c"]
+    committed_unsynchronized = committed_history + committed_without_history
+    failed = failed_history + failed_pending
+    return {
+        "staged": staged,
+        "committed_unsynchronized": committed_unsynchronized,
+        "failed": failed,
+        "unresolved_total": staged + committed_unsynchronized + failed,
+    }
+
+
+def _projection_state(conn, run, workbook: dict) -> dict:
+    active = _projection_active(conn)
+    blocking_findings = 0
+    if run:
+        blocking_findings = conn.execute(
+            "SELECT COUNT(*) c FROM import_issues WHERE run_id=? "
+            "AND severity='error'", (run["id"],)
+        ).fetchone()["c"]
+    if not active:
+        state = "missing"
+    elif workbook["state"] == "stale":
+        state = "stale"
+    elif not run or run["status"] != "imported" or blocking_findings:
+        state = "unverified"
+    else:
+        state = "current"
+    return {
+        "state": state,
+        "active": active,
+        "blocking_findings": blocking_findings,
+        "reimport_allowed": not active,
     }
 
 
@@ -84,8 +170,26 @@ def status():
     ).fetchone()["c"]
     run = conn.execute(
         "SELECT * FROM import_runs ORDER BY id DESC LIMIT 1").fetchone()
+    workbook = _workbook_state(conn)
+    projection = _projection_state(conn, run, workbook)
+    blockers = _import_blockers(conn)
     return {
-        "workbook": _workbook_state(conn),
+        "mode": PROVISIONAL_MODE,
+        "projection": projection,
+        "draft": {
+            "state": "blocked" if blockers["unresolved_total"] else "clear",
+            **blockers,
+            "terminal_import_allowlist": list(IMPORT_TERMINAL_ALLOWLIST),
+        },
+        "workbook": workbook,
+        "generated_artifacts": {
+            "state": "unverified",
+            "reason": "generation is outside the provisional manager workflow",
+        },
+        "publication": {
+            "state": "unverified",
+            "reason": "runtime publication is outside the manager workflow",
+        },
         "tables": counts,
         "staged_changes": staged,
         "unsynced_committed_changes": unsynced,
@@ -99,13 +203,28 @@ def run_import():
     if not config.DEFAULT_WORKBOOK.exists():
         raise HTTPException(404, f"workbook not found: "
                                  f"{config.DEFAULT_WORKBOOK}")
-    staged = conn.execute(
-        "SELECT COUNT(*) c FROM pending_changes WHERE status='staged'"
-    ).fetchone()["c"]
-    if staged:
-        raise HTTPException(409, "staged changes exist; commit or discard "
-                                 "them before re-importing")
-    return importer.import_workbook(conn, config.DEFAULT_WORKBOOK)
+    active_projection = _projection_active(conn)
+    blockers = _import_blockers(conn)
+    if active_projection or blockers["unresolved_total"]:
+        reasons = []
+        if active_projection:
+            reasons.append("an active projection already exists; candidate "
+                           "promotion is not implemented until Pass 4")
+        if blockers["unresolved_total"]:
+            reasons.append("unresolved legacy draft/synchronization work exists")
+        raise HTTPException(409, detail={
+            "status": PROVISIONAL_MODE,
+            "message": "re-import refused: " + "; ".join(reasons),
+            "active_projection": active_projection,
+            "import_blockers": blockers,
+        })
+    report = importer.import_workbook(conn, config.DEFAULT_WORKBOOK)
+    workbook = _workbook_state(conn)
+    projection = _projection_state(conn, report["run"], workbook)
+    report["projection"] = projection
+    report["verified"] = projection["state"] == "current"
+    report["mode"] = PROVISIONAL_MODE
+    return report
 
 
 @app.get("/api/import/latest")
@@ -400,11 +519,13 @@ def history(model: str = "", entity_type: str = "", sync_status: str = "",
 @app.post("/api/sync")
 def sync_endpoint(payload: SyncRequest):
     conn = get_conn()
-    if payload.write and payload.confirm != "SYNC":
-        raise HTTPException(400, "live workbook writes require confirm='SYNC'")
-    if payload.write and payload.expected_mtime_ns is None:
-        raise HTTPException(400, "live workbook writes require the "
-                                 "expected_mtime_ns from a reviewed dry-run")
+    if payload.write:
+        raise HTTPException(409, detail={
+            "status": PROVISIONAL_MODE,
+            "message": "live workbook writes are disabled during the "
+                       "read-only provisional workflow; only the exact bound "
+                       "ChangeSet service may be enabled in Pass 7",
+        })
     return syncmod.sync_workbook(
         conn, config.DEFAULT_WORKBOOK, write=payload.write,
         confirmed_warnings=tuple(payload.confirmed_warnings),
@@ -414,6 +535,16 @@ def sync_endpoint(payload: SyncRequest):
 @app.post("/api/export")
 def export():
     conn = get_conn()
+    workbook = _workbook_state(conn)
+    run = conn.execute(
+        "SELECT * FROM import_runs ORDER BY id DESC LIMIT 1").fetchone()
+    projection = _projection_state(conn, run, workbook)
+    if projection["state"] != "current":
+        raise HTTPException(409, detail={
+            "status": "projection_not_current",
+            "message": "comparison export requires a current verified projection",
+            "projection": projection,
+        })
     return syncmod.export_comparison_workbook(conn, config.DEFAULT_WORKBOOK)
 
 

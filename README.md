@@ -133,14 +133,14 @@ An Apply is only the workbook-write step — afterwards regenerate affected mode
 ## Workbook Manager Workflow
 
 `workbook-manager/` is a React (Vite) + FastAPI + SQLite editor for
-`stingray_master.xlsx`: import into a normalized database with full
-duplicate/unresolved-reference reporting, staged form-based edits with
-batch validation and an append-only SQL audit trail, and workbook
-synchronization exclusively through the existing
-`editor_ops.apply_batch` → `save_workbook_safely()` gate (dry-run first,
-explicit confirmation, automatic backup). Setup, run, and test commands:
-`workbook-manager/README.md`. Tests: `tests/test_workbook_manager.py`
-(add `WBM_SLOW_GATE=1` for the full dry-run/live-write gate tests).
+`stingray_master.xlsx`. It is currently **read-only / provisional**: a first
+import into an empty projection is allowed, replacement re-import is contained,
+and every `POST /api/sync` request with `write=true` is refused. Dry-run sync,
+browsing, history, and verified-projection disposable comparison export remain
+available; generated-artifact and publication state are not inferred. The
+workbook remains canonical. Setup, current containment behavior, and test
+commands: `workbook-manager/README.md`. Tests:
+`tests/test_workbook_manager.py`.
 
 ## Workbook And Generator Workflows
 

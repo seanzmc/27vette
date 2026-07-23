@@ -1,8 +1,9 @@
 # Workbook Manager (React + FastAPI + SQLite)
 
-Interactive editor for `stingray_master.xlsx`: investigate, add, edit,
-validate, and remove workbook records through a form-based UI instead of
-direct spreadsheet manipulation.
+Provisional interface for investigating the disposable SQLite projection of
+`stingray_master.xlsx` and collecting legacy staged edits. The workbook remains
+canonical. Live manager-to-workbook writes are disabled until the reviewed
+ChangeSet route is enabled in Pass 7 of the reliability specification.
 
 ```text
 React interface (frontend/, Vite build served by FastAPI)
@@ -13,19 +14,31 @@ SQLite database (var/workbook_manager.sqlite3 — normalized, auditable)
     ↕
 openpyxl import/export adapter (backend/app/importer.py, sync.py)
     ↓
-stingray_master.xlsx (canonical in Stage 1)
+stingray_master.xlsx (canonical source)
 ```
 
-## Stage 1 status (current)
+## Current safety status: read-only / provisional
 
-The workbook remains canonical. Import populates SQLite; edits are staged,
-validated, and committed to SQLite with an append-only audit trail; approved
-changes synchronize back to the workbook **only** through the repo's existing
-gated pipeline (`editor_ops.apply_batch` → `save_workbook_safely()`), which
-enforces Excel-lock refusal, staleness checks, batch validation, temp-copy
-dry-run, package + schema validation, automatic backup, and atomic replace.
-Stage 2 (SQLite canonical, Excel becomes import/export format) requires no
-API or React changes — only the sync direction flips.
+Pass 1 containment is active:
+
+- `POST /api/sync` refuses every `write=true` request. The browser has no live
+  write control; dry-run remains available for inspection only.
+- `POST /api/import` permits only the first import into a new empty projection.
+  It refuses replacement of an active projection until atomic candidate
+  promotion is implemented in Pass 4.
+- Import is also refused while legacy staged, committed-unsynchronized, or
+  failed work exists. An import with blocking findings is labeled `unverified`,
+  never verified/current.
+- Status reports projection, draft, workbook, generated-artifact, and
+  publication states separately. Generated artifacts and publication are
+  always `unverified` in this provisional manager workflow.
+- Comparison export is available only from a `current` verified projection.
+  Outputs are explicitly named `DISPOSABLE-comparison-*.xlsx` under
+  `workbook-manager/var/exports/`; they are never write or publication inputs.
+
+The existing stage/validate/commit tables remain legacy provisional workflow
+state, not workbook write authority. SQLite-canonical operation is not an
+approved direction.
 
 ## Setup
 
@@ -49,11 +62,11 @@ Environment overrides: `WBM_WORKBOOK`, `WBM_DB`, `WBM_VAR_DIR`, `WBM_PORT`.
 
 ## Workflow
 
-1. **Import** — `POST /api/import` (the UI triggers this on first load).
+1. **Initial import** — `POST /api/import` (the UI triggers this only when no
+   projection exists).
    Every duplicate identifier, missing sheet/column, and unresolved
-   relationship is reported with sheet/row/entity detail; nothing is
-   silently dropped (rows with issues still import; first occurrence wins
-   on duplicates).
+   relationship is reported with sheet/row/entity detail. Blocking findings
+   make the projection `unverified`. Re-import is contained until Pass 4.
 2. **Edit** — Form Structure workspace (models, runtime steps, section
    presentation/order, context sections, variants) and Model Operations
    workspace (options, OVS, exclusive groups + members, rule mapping, rule
@@ -68,13 +81,12 @@ Environment overrides: `WBM_WORKBOOK`, `WBM_DB`, `WBM_VAR_DIR`, `WBM_PORT`.
    change lands in the append-only `change_history` table (timestamp,
    actor, entity, model, op, old/new values, source sheet/row, validation
    result, sync status).
-5. **Sync** — dry-run first (full gate, no write), then an explicit
-   confirmation writes the workbook with an automatic timestamped backup
-   (`backups/`) and an entry in `form-output/workbook-edit-log.jsonl`.
-   After a live write, regenerate artifacts per the repo README gates.
-6. **Export** — `POST /api/export` regenerates a comparison workbook under
-   `var/exports/` from the database (unmanaged sheets preserved verbatim)
-   for diffing against the live workbook.
+5. **Sync preview only** — `POST /api/sync` with `write=false` can run the
+   existing dry-run gate. `write=true` is refused by the API regardless of
+   confirmation text or mtime.
+6. **Disposable export** — `POST /api/export` can create a comparison workbook
+   under `var/exports/` only when projection state is `current`. The file is
+   labeled disposable and must not replace the workbook or feed generation.
 
 ## Identity and normalization rules
 
@@ -96,8 +108,11 @@ Environment overrides: `WBM_WORKBOOK`, `WBM_DB`, `WBM_VAR_DIR`, `WBM_PORT`.
 
 ```sh
 .venv/bin/python -m pytest tests/test_workbook_manager.py -q
-# full editor_ops dry-run + scratch-copy live-write gates (slower):
+# optional direct shared-writer scratch-copy tests (not an enabled API route):
 WBM_SLOW_GATE=1 .venv/bin/python -m pytest tests/test_workbook_manager.py -q
 ```
 
 API tests skip automatically until the backend requirements are installed.
+The focused suite currently retains two assigned baseline failures: inactive
+scaffold ownership is Pass 2 work, and exact `PriceRef` physical-row preservation
+is Pass 4 work. See the active reliability specification for those assignments.

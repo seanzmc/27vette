@@ -393,6 +393,16 @@ class TestSyncBatch(ImportedWorkbookCase):
 
 
 class TestComparisonExport(ImportedWorkbookCase):
+    def test_export_is_explicitly_disposable(self):
+        from app import config
+        config.VAR_DIR = self.tmpdir / "var"
+        config.EXPORT_DIR = config.VAR_DIR / "exports"
+        config.DB_BACKUP_DIR = config.VAR_DIR / "db-backups"
+        result = syncmod.export_comparison_workbook(self.conn, WORKBOOK)
+        self.assertTrue(result["disposable"])
+        self.assertIn("DISPOSABLE-comparison-", Path(result["path"]).name)
+        self.assertTrue(Path(result["path"]).is_relative_to(config.EXPORT_DIR))
+
     def test_export_preserves_unmanaged_and_row_counts(self):
         import os
         os.environ.setdefault("WBM_VAR_DIR", str(self.tmpdir / "var"))
@@ -434,6 +444,17 @@ class TestDependencyInspection(ImportedWorkbookCase):
             self.assertTrue(d["src_sheet"])
 
 
+class TestPass1BrowserContainment(unittest.TestCase):
+    def test_browser_has_persistent_provisional_banner_and_no_write_control(self):
+        app_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                      "App.jsx").read_text()
+        sync_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                       "components" / "ChangesSync.jsx").read_text()
+        self.assertIn("Read-only / provisional", app_source)
+        self.assertNotIn("write: true", sync_source)
+        self.assertNotIn("Write to stingray_master.xlsx", sync_source)
+
+
 @unittest.skipUnless(HAVE_FASTAPI, "fastapi not installed; install "
                      "workbook-manager/backend/requirements.txt")
 class TestApi(unittest.TestCase):
@@ -454,8 +475,9 @@ class TestApi(unittest.TestCase):
             if mod == "app" or mod.startswith("app."):
                 del sys.modules[mod]
         from fastapi.testclient import TestClient
-        from app.main import app as fastapi_app
-        cls.client = TestClient(fastapi_app)
+        from app import main as mainmod
+        cls.mainmod = mainmod
+        cls.client = TestClient(mainmod.app)
         cls.client.post("/api/import")
 
     @classmethod
@@ -468,6 +490,16 @@ class TestApi(unittest.TestCase):
         models = self.client.get("/api/models").json()["models"]
         keys = {m["model_key"] for m in models}
         self.assertLessEqual({"stingray", "grand_sport", "z06"}, keys)
+
+    def test_status_reports_provisional_surfaces_separately(self):
+        status = self.client.get("/api/status").json()
+        self.assertEqual(status["mode"], "read_only_provisional")
+        self.assertEqual(status["projection"]["state"], "unverified")
+        self.assertTrue(status["projection"]["active"])
+        self.assertEqual(status["draft"]["state"], "clear")
+        self.assertIn("state", status["workbook"])
+        self.assertEqual(status["generated_artifacts"]["state"], "unverified")
+        self.assertEqual(status["publication"]["state"], "unverified")
 
     def test_structure_and_collections(self):
         structure = self.client.get("/api/structure/stingray").json()
@@ -494,9 +526,76 @@ class TestApi(unittest.TestCase):
                                             "search": "Z51"}).json()
         self.assertGreater(resp["total"], 0)
 
-    def test_live_sync_requires_confirmation(self):
-        resp = self.client.post("/api/sync", json={"write": True})
-        self.assertEqual(resp.status_code, 400)
+    def test_live_sync_is_provisionally_read_only_even_when_fully_confirmed(self):
+        current_mtime = str(WORKBOOK.stat().st_mtime_ns)
+        resp = self.client.post("/api/sync", json={
+            "write": True,
+            "confirm": "SYNC",
+            "expected_mtime_ns": current_mtime,
+        })
+        self.assertEqual(resp.status_code, 409)
+        detail = resp.json()["detail"]
+        self.assertEqual(detail["status"], "read_only_provisional")
+        self.assertIn("Pass 7", detail["message"])
+
+    def test_reimport_refuses_to_replace_an_active_projection(self):
+        conn = self.mainmod.get_conn()
+        before_runs = conn.execute("SELECT COUNT(*) c FROM import_runs").fetchone()["c"]
+        before_options = conn.execute("SELECT COUNT(*) c FROM options").fetchone()["c"]
+        resp = self.client.post("/api/import")
+        self.assertEqual(resp.status_code, 409)
+        detail = resp.json()["detail"]
+        self.assertTrue(detail["active_projection"])
+        self.assertEqual(detail["status"], "read_only_provisional")
+        self.assertEqual(
+            conn.execute("SELECT COUNT(*) c FROM import_runs").fetchone()["c"],
+            before_runs,
+        )
+        self.assertEqual(
+            conn.execute("SELECT COUNT(*) c FROM options").fetchone()["c"],
+            before_options,
+        )
+
+    def test_unverified_projection_refuses_comparison_export(self):
+        status = self.client.get("/api/status").json()
+        self.assertEqual(status["projection"]["state"], "unverified")
+        resp = self.client.post("/api/export")
+        self.assertEqual(resp.status_code, 409)
+        detail = resp.json()["detail"]
+        self.assertEqual(detail["status"], "projection_not_current")
+
+    def test_import_reports_all_unresolved_legacy_workflow_blockers(self):
+        conn = self.mainmod.get_conn()
+        pending_id = conn.execute(
+            "INSERT INTO pending_changes(ts, table_name, entity_key_json, op, "
+            "status) VALUES('test', 'options', '{}', 'update', 'staged')"
+        ).lastrowid
+        pending_history_id = conn.execute(
+            "INSERT INTO change_history(ts, entity_type, entity_id, op, status, "
+            "sync_status) VALUES('test', 'options', 'one', 'update', "
+            "'committed', 'pending')"
+        ).lastrowid
+        failed_history_id = conn.execute(
+            "INSERT INTO change_history(ts, entity_type, entity_id, op, status, "
+            "sync_status) VALUES('test', 'options', 'two', 'update', "
+            "'committed', 'sync_failed')"
+        ).lastrowid
+        conn.commit()
+        try:
+            resp = self.client.post("/api/import")
+            self.assertEqual(resp.status_code, 409)
+            blockers = resp.json()["detail"]["import_blockers"]
+            self.assertEqual(blockers["staged"], 1)
+            self.assertEqual(blockers["committed_unsynchronized"], 1)
+            self.assertEqual(blockers["failed"], 1)
+            self.assertEqual(blockers["unresolved_total"], 3)
+        finally:
+            conn.execute("DELETE FROM pending_changes WHERE id=?", (pending_id,))
+            conn.execute(
+                "DELETE FROM change_history WHERE id IN (?, ?)",
+                (pending_history_id, failed_history_id),
+            )
+            conn.commit()
 
 
 if __name__ == "__main__":

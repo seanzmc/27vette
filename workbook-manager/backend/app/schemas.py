@@ -49,7 +49,7 @@ class SyncRequest(BaseModel):
     write: bool = False
     confirmed_warnings: list[str] = Field(default_factory=list)
     expected_mtime_ns: Optional[str] = None
-    confirm: str = ""  # must equal "SYNC" for live writes
+    confirm: str = ""  # legacy payload field; provisional API writes are refused
 
 
 class ColumnOut(BaseModel):

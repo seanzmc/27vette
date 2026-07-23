@@ -56,6 +56,19 @@ export default function App() {
 
   return (
     <div>
+      <div className="provisional-banner" role="status">
+        <div>
+          <strong>Read-only / provisional</strong>
+          <span>Live workbook writes and replacement re-imports are disabled.</span>
+        </div>
+        <div className="status-surfaces" aria-label="Workbook Manager states">
+          <span className="chip">projection: {status?.projection?.state || "loading"}</span>
+          <span className="chip">draft: {status?.draft?.state || "loading"}</span>
+          <span className="chip">workbook: {status?.workbook?.state || "loading"}</span>
+          <span className="chip">generated artifacts: {status?.generated_artifacts?.state || "loading"}</span>
+          <span className="chip">publication: {status?.publication?.state || "loading"}</span>
+        </div>
+      </div>
       <header className="app-header">
         <div className="app-title">
           <Database size={20} color="var(--accent)" />
@@ -65,12 +78,12 @@ export default function App() {
               {status?.workbook?.workbook_path?.split("/").pop() || "…"}
               {status?.workbook?.stale && (
                 <span className="chip warn" style={{ marginLeft: 8 }}>
-                  workbook changed on disk — re-import recommended
+                  workbook changed on disk — verified re-import required
                 </span>
               )}
               {status?.workbook?.excel_lock && (
                 <span className="chip err" style={{ marginLeft: 8 }}>
-                  Excel lock present — close Excel before sync
+                  Excel lock present
                 </span>
               )}
             </div>

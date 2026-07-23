@@ -1,7 +1,8 @@
 # Reliable Workbook–Database Workflow Implementation Specification
 
-Status: implementation-ready revision; not started. Revised 2026-07-22 after
-final specification review. All fourteen review findings are resolved: primary-
+Status: implementation in progress; Pass 1 completed 2026-07-22 on
+`db-workflow`; Passes 2–7 not started. Revised 2026-07-22 after final
+specification review. All fourteen review findings are resolved: primary-
 runtime-only parity, strict publication selection, current baseline, outcome-
 specific lifecycle states, interrupted-apply recovery, exception evidence,
 acceptance-only generated parity, single readback authority, complete writable-
@@ -686,6 +687,42 @@ Required changes:
 
 Pass 1 exit gate: no API or browser path can mutate `stingray_master.xlsx` or
 destructively replace an existing projection database.
+
+Pass 1 result — completed 2026-07-22:
+
+- Added seven disposable containment regressions and observed all seven fail
+  against the pre-pass implementation before production edits. They now pass.
+- `POST /api/sync` returns `409 read_only_provisional` for every `write=true`
+  payload, including a fully populated legacy confirmation payload. The browser
+  write control was removed; only `write=false` dry-run remains callable.
+- Initial import into an empty projection remains available. Replacement import
+  returns `409` before importer invocation whenever a projection is active or
+  unresolved staged, committed-unsynchronized, or failed legacy work exists.
+  The existing projection row/import-run counts remain unchanged on refusal.
+- `/api/status` now reports `projection`, `draft`, `workbook`,
+  `generated_artifacts`, and `publication` separately. The current canonical
+  first import has 34 blocking findings and is therefore labeled `unverified`,
+  not verified/current. Comparison export is refused in that state; direct
+  current-projection exports are labeled `DISPOSABLE-comparison-*.xlsx` and
+  remain under the configured untracked export directory.
+- The built browser was smoked against a copied workbook and temporary database.
+  It showed the persistent `Read-only / provisional` banner, separate state
+  labels, disabled replacement-import/export controls, `WRITE DISABLED`, and no
+  live write control. Browser console: zero errors. Direct copied-workbook API
+  probes returned 409 for write and re-import; copied-workbook SHA-256 remained
+  `5d133540769ea5c2e744a1402ef9d4d49e8bd110a9772ff50a6031ed0fc89850`.
+- Gates: focused containment `7 passed`; shared ChangeSet/writer
+  `75 passed, 7 subtests passed`; frontend build passed; Python compile passed;
+  workbook package and schema validation both passed with zero issues. The
+  normal manager suite remained at its assigned baseline (`2 failed, 32 passed,
+  2 skipped`); the slow scratch-copy run remained at the same two assigned
+  failures (`2 failed, 34 passed`). No new failure was introduced.
+- Canonical workbook and `form-app/data.js` hashes remained respectively
+  `5d133540769ea5c2e744a1402ef9d4d49e8bd110a9772ff50a6031ed0fc89850` and
+  `a34d1fdc80b04fe48f7ef2e77e37f67da038017bcaaca21ff1425767a4381a59`.
+  Tracked generated/runtime artifacts, publication, deployment, customer form,
+  and dealer submission were unchanged. Pass 1 temporary test-log churn was
+  restored before closeout.
 
 ### Pass 2 — Split storage and adopt the shared backend contract
 
