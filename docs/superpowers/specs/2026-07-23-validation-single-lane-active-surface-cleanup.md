@@ -1,6 +1,6 @@
 # Validation Single-Lane and Active-Surface Cleanup Specification
 
-Status: ACTIVE — Pass 0A inventory and Pass 0C boundary complete; approved Pass I ingest retirement completed 2026-07-23. The Pass 0B generation/runtime executable slice and approved Pass G1 fail-closed generation boundary completed 2026-07-24; semantic viability remains open for the other non-ingest surfaces. Broad Pass 1 remains unapproved.
+Status: ACTIVE — Pass 0A inventory and Pass 0C boundary complete; approved Pass I ingest retirement completed 2026-07-23. The Pass 0B generation/runtime executable slice, approved Pass G1 fail-closed generation boundary, and bounded Pass G2 Z06 source repair completed 2026-07-24; semantic viability remains open for the other non-ingest surfaces. Broad Pass 1 remains unapproved.
 Date: 2026-07-23
 Recommended implementation reasoning: high
 Branch: `db-workflow`
@@ -198,6 +198,30 @@ Validation receipt:
 - `git diff --check`: passed. Workbook/package/schema writes were not run because the canonical workbook was not modified. Browser candidate proof remains correctly blocked because no complete fresh six-model candidate set exists.
 
 Next bounded pass: Pass G2 should resolve only the current Z06 stale-derivation blocker from authoritative workbook/rule evidence and add its regression proof. It must not unify builders, repair unrelated model data, refresh retained artifacts, or publish the registry. After Z06 is independently green, the next structural gate must compose workbook package/schema and options-quality checks with all-six strict candidate generation before any complete candidate-registry/browser proof.
+
+### 2.6 Pass G2 — Z06 canonical section restoration — completed 2026-07-24
+
+Diagnosis and authority:
+
+- Fresh Z06 assembly omitted active/selectable PDB, PDD, and PDF because `z06_options` rows 242–244 referenced `sec_z06_pkg_001`, which was absent from `section_master`. Rule assembly therefore discarded their authored includes rows as invalid references, and the derivation anti-surprise gate correctly rejected the resulting stale `(z06, opt_pdd_001, opt_cbf_001)` allowlist pair.
+- The retained runtime contract was not used as authoring authority. Canonical workbook commit `43b4ecafcda86a658641ee501ca94b307ff93339` and the completed Z06 source specifications establish the exact missing `section_master` row: `Z06 Carbon Fiber Wheel and Brake Packages`, `single_select_opt`, not required, display order 15, `user_selected`, step `wheels`.
+
+Implemented:
+
+- Restored that one exact `section_master` row through `save_workbook_safely()`. Backup: `backups/stingray_master-20260724-155528.xlsx`.
+- Removed Z06 from the isolated generation gate's known-blocker exception. Every workbook-discovered model must now generate a strict contract successfully under the isolated output root.
+- No option row, rule row, generator implementation, retained runtime/inspection artifact, compatibility artifact, published registry, browser runtime, promotion metadata, or dealer boundary changed.
+
+Validation receipt:
+
+- TDD RED reproduced `StaleDerivationAllowlistError` after removing the test exception; GREEN passed after the canonical row restoration.
+- Workbook semantic comparison against the safe-save backup found exactly seven added cells, all fields of the one restored `section_master` row; no existing cell changed. On-disk readback and backup verification passed.
+- Workbook package validation: valid, zero issues. Source/schema validation with `--skip-live-contract`: valid, zero issues. The complete schema command remains red only on the already-recorded strict rejection of the retained legacy Stingray contract; G2 intentionally did not refresh or publish retained artifacts.
+- Exact README Python generation/metadata gate: `107 passed, 8 subtests passed`. Its isolated six-model test now generated all six strict contracts with no model exception and no tracked output mutation.
+- Focused isolated Z06 generation: zero validation errors; all 18 PDB/PDD/PDF choices remained in `sec_z06_pkg_001` under step `wheels`; the exact five approved Z06-to-CBF derived pairs emitted; manifest counts remained 12 candidates, 5 emitted, 0 shadowed, and 6 not emitted.
+- Options-quality gate remains red only on the separately classified Grand Sport X SWP row-233 name-length failure. `git diff --check` passed.
+
+Next bounded pass: compose workbook package/source-schema and options-quality authority with all-six strict candidate generation in one isolated structural gate. That pass must address the already-classified Grand Sport X row-233 source-quality failure and the retained-artifact-relative schema split without refreshing retained artifacts, publishing a registry, or beginning source-builder convergence by implication.
 
 ## 3. Authority model after completion
 

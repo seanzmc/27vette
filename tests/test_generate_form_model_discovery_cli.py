@@ -21,7 +21,6 @@ if str(SCRIPTS_DIR) not in sys.path:
 from corvette_form_generator.model_configs import discover_generation_model_configs  # noqa: E402
 
 EXPECTED_MODELS = {"stingray", "grand_sport", "grand_sport_x", "z06", "zr1", "zr1x"}
-KNOWN_BLOCKERS = {"z06": "StaleDerivationAllowlistError"}
 
 REQUIRED_STDOUT_KEYS = {
     "model_key",
@@ -74,13 +73,6 @@ def test_cli_executes_every_discovered_model_under_isolated_root(tmp_path: Path)
             str(candidate_root),
         )
         observed.add(model_key)
-
-        if model_key in KNOWN_BLOCKERS:
-            assert result.returncode != 0
-            assert KNOWN_BLOCKERS[model_key] in result.stderr
-            expected_runtime = candidate_root / "form-output" / "runtime" / "z06-runtime-contract.json"
-            assert not expected_runtime.exists()
-            continue
 
         assert result.returncode == 0, result.stderr
         output = json.loads(result.stdout)
