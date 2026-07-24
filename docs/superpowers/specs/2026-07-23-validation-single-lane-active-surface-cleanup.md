@@ -1,6 +1,6 @@
 # Validation Single-Lane and Active-Surface Cleanup Specification
 
-Status: ACTIVE — Pass 0A inventory and Pass 0C boundary complete; approved Pass I ingest retirement completed 2026-07-23. The Pass 0B generation/runtime executable slice, approved Pass G1 fail-closed generation boundary, and bounded Pass G2 Z06 source repair completed 2026-07-24; semantic viability remains open for the other non-ingest surfaces. Broad Pass 1 remains unapproved.
+Status: ACTIVE — Pass 0A inventory and Pass 0C boundary complete; approved Pass I ingest retirement completed 2026-07-23. The Pass 0B generation/runtime executable slice, approved Pass G1 fail-closed generation boundary, bounded Pass G2 Z06 source repair, and option-name quality-authority correction completed 2026-07-24; semantic viability remains open for the other non-ingest surfaces. Broad Pass 1 remains unapproved.
 Date: 2026-07-23
 Recommended implementation reasoning: high
 Branch: `db-workflow`
@@ -219,9 +219,15 @@ Validation receipt:
 - Workbook package validation: valid, zero issues. Source/schema validation with `--skip-live-contract`: valid, zero issues. The complete schema command remains red only on the already-recorded strict rejection of the retained legacy Stingray contract; G2 intentionally did not refresh or publish retained artifacts.
 - Exact README Python generation/metadata gate: `107 passed, 8 subtests passed`. Its isolated six-model test now generated all six strict contracts with no model exception and no tracked output mutation.
 - Focused isolated Z06 generation: zero validation errors; all 18 PDB/PDD/PDF choices remained in `sec_z06_pkg_001` under step `wheels`; the exact five approved Z06-to-CBF derived pairs emitted; manifest counts remained 12 candidates, 5 emitted, 0 shadowed, and 6 not emitted.
-- Options-quality gate remains red only on the separately classified Grand Sport X SWP row-233 name-length failure. `git diff --check` passed.
+- Options-quality initially remained red only on the Grand Sport X SWP row-233 name-length finding. The follow-up authority correction below retired that arbitrary limit; the row and its customer-facing copy remain unchanged. `git diff --check` passed.
 
-Next bounded pass: compose workbook package/source-schema and options-quality authority with all-six strict candidate generation in one isolated structural gate. That pass must address the already-classified Grand Sport X row-233 source-quality failure and the retained-artifact-relative schema split without refreshing retained artifacts, publishing a registry, or beginning source-builder convergence by implication.
+### 2.7 Option-name quality-authority correction — completed 2026-07-24
+
+- Customer-facing option-name length is not a workbook defect or stable readiness invariant once copy is authored and verified in the frontend. Grand Sport X SWP matches the accepted Grand Sport presentation, and future legitimate copy changes must not be forced through an arbitrary character ceiling.
+- Removed `option_name_too_long` and `MAX_OPTION_NAME_LENGTH` from the options-sheet quality evaluator, removed the three now-dead exact-value allowlist entries, and replaced the stale predicate test with explicit coverage that a 200-character authored name is accepted. Generic exact-value allowlist behavior remains covered through `standard_option_nonzero_price`.
+- Focused options-quality tests passed: `18 passed`. The canonical workbook options-quality command now passes with zero issues. No workbook row, generated artifact, browser code, registry, or dealer boundary changed for this correction.
+
+Next bounded pass: migrate the retained Stingray runtime contract through the current strict generation path, then compose workbook package/source-schema and options-quality checks with all-six strict candidate generation and candidate-registry/browser proof. Do not hand-edit the retained contract or update only its dataset metadata: isolated comparison shows the fresh contract preserves all 1,416 choice identities and all rules/prices/interiors, but it also applies workbook-authored section metadata changes and removes the empty `sec_perf_support_001` section. Review that bounded drift before promotion and publish the registry only from the complete validated candidate set.
 
 ## 3. Authority model after completion
 

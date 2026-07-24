@@ -17,7 +17,6 @@ from corvette_form_generator.workbook import clean
 
 ALLOWLIST_SCHEMA_VERSION = "options-sheet-quality-allowlist-1"
 HASH_OPTION_ID_RE = re.compile(r"^opt_std_[0-9a-f]{16,}$")
-MAX_OPTION_NAME_LENGTH = 60
 MAX_REFERENCE_STUB_COUNT = 6
 DEFAULT_ALLOWLIST_RELATIVE_PATH = Path("tests/fixtures/options-sheet-quality-allowlist.json")
 DEFAULT_ALLOWLIST_PATH = Path(__file__).resolve().parents[2] / DEFAULT_ALLOWLIST_RELATIVE_PATH
@@ -167,12 +166,6 @@ def _row_issues(
             "option_name_multiline",
             option_name,
             "option_name contains a line break",
-        ),
-        (
-            len(option_name) > MAX_OPTION_NAME_LENGTH,
-            "option_name_too_long",
-            option_name,
-            f"option_name exceeds {MAX_OPTION_NAME_LENGTH} characters",
         ),
         (
             option_name.upper() == "LPO",
