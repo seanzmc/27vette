@@ -21,6 +21,7 @@ class ModelSourceAssembly:
     preview: dict[str, Any] | None = None
     draft: dict[str, Any] | None = None
     compatibility_source: bool = False
+    derivation_manifest: dict[str, Any] | None = None
 
 
 def assemble_model_source(config: ModelConfig) -> ModelSourceAssembly:
@@ -41,6 +42,7 @@ def assemble_model_source(config: ModelConfig) -> ModelSourceAssembly:
             source_data=source_data,
             runtime_contract=build_model_runtime_contract(config, source_data),
             compatibility_source=True,
+            derivation_manifest=source_data.get("_derivationManifest"),
         )
 
     report = inspect_model_sources(config)
@@ -53,4 +55,5 @@ def assemble_model_source(config: ModelConfig) -> ModelSourceAssembly:
         report=report,
         preview=preview,
         draft=draft,
+        derivation_manifest=draft.get("_derivationManifest"),
     )

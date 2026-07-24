@@ -1037,7 +1037,32 @@ class SchemaValidationMetadataTests(unittest.TestCase):
             output_dir = root / "form-output"
             app_dir.mkdir()
             output_dir.mkdir()
-            fresh_data = {"dataset": {"source_sheet": "stingray_options"}, "choices": [{"choice_id": "fresh"}]}
+            fresh_data = {
+                "dataset": {
+                    "name": "2027 Corvette Stingray operational form",
+                    "model": "Stingray",
+                    "model_year": "2027",
+                    "status": "runtime_active",
+                    "source_sheet": "stingray_options",
+                },
+                "variants": [{"variant_id": "test-variant"}],
+                "steps": [{"step_key": "test-step"}],
+                "sections": [{"section_id": "test-section"}],
+                "contextChoices": [{"context_choice_id": "test-context"}],
+                "choices": [{"choice_id": "fresh"}],
+                "standardEquipment": [],
+                "ruleGroups": [],
+                "exclusiveGroups": [],
+                "rules": [],
+                "priceRules": [],
+                "interiors": [],
+                "colorOverrides": [],
+                "defaultSelectionRules": [],
+                "validation": [],
+                "orderSummary": {},
+            }
+            stale_data = json.loads(json.dumps(fresh_data))
+            stale_data["choices"] = [{"choice_id": "stale"}]
             stale_registry = {
                 "defaultModelKey": "stingray",
                 "models": {
@@ -1046,7 +1071,7 @@ class SchemaValidationMetadataTests(unittest.TestCase):
                         "label": "Stingray",
                         "modelName": "Corvette Stingray",
                         "exportSlug": "stingray",
-                        "data": {"dataset": {"source_sheet": "stingray_options"}, "choices": [{"choice_id": "stale"}]},
+                        "data": stale_data,
                     }
                 },
             }

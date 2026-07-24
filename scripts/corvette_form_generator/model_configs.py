@@ -297,7 +297,13 @@ def _require_generation_variants(wb, model_key: str, model_row: dict[str, str]) 
         )
 
 
-def discover_generation_model_configs(workbook_path: Path = WORKBOOK_PATH) -> dict[str, ModelConfig]:
+def discover_generation_model_configs(
+    workbook_path: Path = WORKBOOK_PATH,
+    *,
+    root: Path = ROOT,
+    output_dir: Path | None = None,
+    app_dir: Path | None = None,
+) -> dict[str, ModelConfig]:
     """Return workbook-discovered configs for active/generatable models.
 
     Discovery is stricter than runtime compatibility fallback metadata: a model
@@ -313,7 +319,13 @@ def discover_generation_model_configs(workbook_path: Path = WORKBOOK_PATH) -> di
             model_key = clean(model_row.get("model_key")).lower()
             _require_generation_sources(wb, model_key)
             _require_generation_variants(wb, model_key, model_row)
-            configs[model_key] = load_model_config_overrides(wb, base_model_config(model_key))
+            base_config = base_model_config(model_key).with_overrides(
+                root=root,
+                workbook_path=workbook_path,
+                output_dir=output_dir or root / "form-output",
+                app_dir=app_dir or root / "form-app",
+            )
+            configs[model_key] = load_model_config_overrides(wb, base_config)
         return configs
     finally:
         wb.close()

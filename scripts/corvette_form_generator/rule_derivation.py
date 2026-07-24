@@ -25,9 +25,11 @@ authored replace rules in the runtime contract (no ``derived*`` fields).
 
 from __future__ import annotations
 
-import json
 from pathlib import Path
 from typing import Any
+
+from corvette_form_generator.model_config import validate_model_key
+from corvette_form_generator.output import write_json_output
 
 # Approved derived-swap emissions: (model_key, source_id, target_id).
 # Spec: docs/archive/completed-specs/derived-swap-eviction-spec-2026-07-02.md §2 A1/A3 — the only
@@ -214,8 +216,9 @@ def derive_swap_rules(
 
 
 def write_derivation_manifest(output_dir: Path, model_key: str, manifest: dict[str, Any]) -> Path:
-    slug = model_key.replace("_", "-")
-    path = output_dir / "inspection" / f"{slug}-{MANIFEST_SUFFIX}"
+    slug = validate_model_key(model_key).replace("_", "-")
+    inspection_dir = output_dir / "inspection"
+    path = inspection_dir / f"{slug}-{MANIFEST_SUFFIX}"
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(manifest, indent=2) + "\n")
+    write_json_output(path, manifest)
     return path

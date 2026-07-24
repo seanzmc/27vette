@@ -1089,6 +1089,7 @@ def build_form_data_draft(config: ModelConfig, *, preview: dict[str, Any] | None
     ]
 
     wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
+    derivation_manifests: list[dict[str, Any]] = []
     try:
         color_overrides = build_color_overrides(wb, config, interiors, option_rows)
         rules = build_draft_rules(
@@ -1099,6 +1100,7 @@ def build_form_data_draft(config: ModelConfig, *, preview: dict[str, Any] | None
             interiors,
             grouped_requirement_pairs(rule_groups),
             grouped_exclusion_pairs(rule_groups) | exclusive_group_pairs(exclusive_groups),
+            derivation_manifests,
         )
         price_rules, price_rule_validation, price_rule_source_rows = build_draft_price_rules(
             wb,
@@ -1203,6 +1205,7 @@ def build_form_data_draft(config: ModelConfig, *, preview: dict[str, Any] | None
         "colorOverrides": color_overrides,
         "defaultSelectionRules": default_selection_rules,
         "validation": validation,
+        "_derivationManifest": derivation_manifests[0],
         "draftMetadata": {
             "sourcePreviewStatus": preview["dataset"]["status"],
             "candidateAvailableOrStandardChoices": len(preview["choices"]),

@@ -47,7 +47,7 @@ from corvette_form_generator.rules import (
     section_selection_mode,
     truncate_reason,
 )
-from corvette_form_generator.registry_promotion import runtime_contract_artifact_path
+from corvette_form_generator.registry_promotion import export_slug
 from corvette_form_generator.runtime_contract import build_model_runtime_contract
 from corvette_form_generator.runtime_metadata import (
     derived_default_selected_display_behavior,
@@ -67,10 +67,6 @@ from corvette_form_generator.workbook import clean, intish, money, rows_from_she
 
 
 MODEL_CONFIG = base_model_config("stingray")
-ROOT = MODEL_CONFIG.root
-WORKBOOK_PATH = MODEL_CONFIG.workbook_path
-OUTPUT_DIR = MODEL_CONFIG.output_dir
-APP_DIR = MODEL_CONFIG.app_dir
 STEP_ORDER = list(MODEL_CONFIG.step_order)
 STEP_LABELS = dict(MODEL_CONFIG.step_labels)
 CONTEXT_SECTIONS = [dict(section) for section in MODEL_CONFIG.context_sections]
@@ -165,8 +161,9 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
 
     global MODEL_CONFIG
 
-    wb = load_workbook(WORKBOOK_PATH)
-    MODEL_CONFIG = load_model_config_overrides(wb, config or base_model_config("stingray"))
+    requested_config = config or base_model_config("stingray")
+    wb = load_workbook(requested_config.workbook_path)
+    MODEL_CONFIG = load_model_config_overrides(wb, requested_config)
     if MODEL_CONFIG.model_key != "stingray":
         raise ValueError("current-generation compatibility source assembly supports only Stingray")
 
@@ -495,7 +492,13 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
             }
         )
 
-    extend_with_derived_swap_rules(MODEL_CONFIG, raw_rules, options_by_id, interiors_by_id, sections)
+    derivation_manifest = extend_with_derived_swap_rules(
+        MODEL_CONFIG,
+        raw_rules,
+        options_by_id,
+        interiors_by_id,
+        sections,
+    )
 
     price_rules = [
         {
@@ -630,7 +633,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
     data = {
         "dataset": {
             "name": MODEL_CONFIG.dataset_name,
-            "source_workbook": WORKBOOK_PATH.name,
+            "source_workbook": MODEL_CONFIG.workbook_path.name,
             "generated_at": generated_at,
         },
         "variants": active_variants,
@@ -649,6 +652,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
         "interiors": [row for row in interiors if row["active_for_stingray"]],
         "colorOverrides": color_overrides,
         "validation": validation_rows,
+        "_derivationManifest": derivation_manifest,
     }
     wb.close()
     return data
@@ -664,11 +668,10 @@ def write_stingray_compatibility_artifacts(
     if config.model_key != "stingray":
         raise ValueError("compatibility artifact writer supports only stingray")
 
-    OUTPUT_DIR.mkdir(exist_ok=True)
-    APP_DIR.mkdir(exist_ok=True)
-    json_path = OUTPUT_DIR / "stingray-form-data.json"
+    config.output_dir.mkdir(parents=True, exist_ok=True)
+    json_path = config.output_dir / "stingray-form-data.json"
     write_json_output(json_path, runtime_data)
-    csv_path = OUTPUT_DIR / "stingray-form-data.csv"
+    csv_path = config.output_dir / "stingray-form-data.csv"
     with csv_path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(
             handle,
@@ -697,15 +700,20 @@ def write_stingray_compatibility_artifacts(
 
 
 def generate_production_artifacts(config: ModelConfig | None = None) -> dict[str, Any]:
-    source_data = build_production_source_data(config)
-    runtime_data = build_model_runtime_contract(MODEL_CONFIG, source_data)
-    runtime_json_path = runtime_contract_artifact_path(ROOT, MODEL_CONFIG.model_key)
+    resolved_config = config or MODEL_CONFIG
+    source_data = build_production_source_data(resolved_config)
+    runtime_data = build_model_runtime_contract(resolved_config, source_data)
+    runtime_json_path = (
+        resolved_config.output_dir
+        / "runtime"
+        / f"{export_slug(resolved_config.model_key)}-runtime-contract.json"
+    )
     runtime_json_path.parent.mkdir(parents=True, exist_ok=True)
     write_json_output(runtime_json_path, runtime_data)
-    compatibility_artifacts = write_stingray_compatibility_artifacts(MODEL_CONFIG, source_data, runtime_data)
+    compatibility_artifacts = write_stingray_compatibility_artifacts(resolved_config, source_data, runtime_data)
 
     return {
-        "workbook": str(WORKBOOK_PATH),
+        "workbook": str(resolved_config.workbook_path),
         "workbook_backup": None,
         "json": compatibility_artifacts["json"],
         "runtime_contract_json": str(runtime_json_path),

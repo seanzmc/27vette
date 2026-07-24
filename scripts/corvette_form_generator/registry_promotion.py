@@ -7,6 +7,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from corvette_form_generator.model_config import validate_model_key
+from corvette_form_generator.runtime_contract import assert_runtime_contract, live_contract_data
 from corvette_form_generator.runtime_metadata import truthy
 from corvette_form_generator.workbook import clean, intish, rows_from_sheet
 
@@ -23,23 +25,6 @@ MODEL_REGISTRY_PROMOTION_HEADERS = [
     "display_order",
     "notes",
 ]
-DRAFT_ONLY_TOP_LEVEL_FIELDS = ("draftMetadata",)
-DRAFT_ONLY_CHOICE_FIELDS = ("source_option_name", "source_description", "text_cleanup_notes")
-DRAFT_ONLY_PROVENANCE_FIELDS = (
-    "copy_from_model_key",
-    "suggested_copy_from",
-    "raw_source_sheet",
-    "raw_source_sheets",
-    "review_status",
-    "review_flags",
-)
-DRAFT_ONLY_LIVE_CONTRACT_FIELDS = frozenset(
-    (*DRAFT_ONLY_TOP_LEVEL_FIELDS, *DRAFT_ONLY_CHOICE_FIELDS, *DRAFT_ONLY_PROVENANCE_FIELDS)
-)
-RUNTIME_CHOICE_ROW_TRIM_FIELDS = frozenset(
-    ("source_detail_raw", "choice_mode", "selection_mode", "selection_mode_label")
-)
-RUNTIME_STANDARD_EQUIPMENT_ROW_TRIM_FIELDS = frozenset(("source_detail_raw",))
 VALID_ARTIFACT_TYPES = {"current_generation", "draft_artifact", "runtime_contract"}
 VEHICLE_SETUP_FIELDS = (
     "setup_card_subtitle",
@@ -78,114 +63,8 @@ def registry_model_key(model_key: str) -> str:
 
 
 def export_slug(model_key: str) -> str:
-    return model_key.replace("_", "-")
+    return validate_model_key(model_key).replace("_", "-")
 
-
-def _runtime_payload_trim_fields(path: tuple[str, ...]) -> frozenset[str]:
-    if path == ("choices", "[]"):
-        return RUNTIME_CHOICE_ROW_TRIM_FIELDS
-    if path == ("standardEquipment", "[]"):
-        return RUNTIME_STANDARD_EQUIPMENT_ROW_TRIM_FIELDS
-    return frozenset()
-
-
-def _strip_live_contract_provenance(value: Any, path: tuple[str, ...] = ()) -> Any:
-    if isinstance(value, dict):
-        runtime_payload_fields = _runtime_payload_trim_fields(path)
-        return {
-            key: _strip_live_contract_provenance(child, (*path, key))
-            for key, child in value.items()
-            if key not in DRAFT_ONLY_LIVE_CONTRACT_FIELDS and key not in runtime_payload_fields
-        }
-    if isinstance(value, list):
-        return [_strip_live_contract_provenance(item, (*path, "[]")) for item in value]
-    return value
-
-
-def find_draft_only_fields(value: Any, path: str = "$") -> list[str]:
-    """Return JSON paths of fields that must not ship in a runtime contract."""
-
-    leaks: list[str] = []
-    path_parts = _json_path_parts(path)
-    if isinstance(value, dict):
-        runtime_payload_fields = _runtime_payload_trim_fields(path_parts)
-        for key, child in value.items():
-            child_path = f"{path}.{key}"
-            if key in DRAFT_ONLY_LIVE_CONTRACT_FIELDS or key in runtime_payload_fields:
-                leaks.append(child_path)
-            else:
-                leaks.extend(find_draft_only_fields(child, child_path))
-    elif isinstance(value, list):
-        for index, child in enumerate(value):
-            leaks.extend(find_draft_only_fields(child, f"{path}[{index}]"))
-    return leaks
-
-
-def _json_path_parts(path: str) -> tuple[str, ...]:
-    if path == "$":
-        return ()
-    parts: list[str] = []
-    for part in path.removeprefix("$.").split("."):
-        if "[" in part and part.endswith("]"):
-            name = part.split("[", 1)[0]
-            if name:
-                parts.append(name)
-            parts.append("[]")
-        else:
-            parts.append(part)
-    return tuple(parts)
-
-
-def assert_runtime_contract(data: dict[str, Any], *, source: str) -> None:
-    """Fail fast when a promoted artifact still carries draft-only content.
-
-    Promotion no longer strips draft provenance at load time; the draft
-    generation pathway emits a clean ``*-runtime-contract.json`` alongside the
-    draft artifacts, and that contract is embedded verbatim.
-    """
-
-    problems: list[str] = []
-    leaks = find_draft_only_fields(data)
-    if leaks:
-        problems.append(f"draft-only fields present: {', '.join(leaks[:5])}{'...' if len(leaks) > 5 else ''}")
-    dataset = data.get("dataset")
-    status = dataset.get("status") if isinstance(dataset, dict) else None
-    if status not in (None, "", "runtime_active"):
-        problems.append(f"dataset.status is {status!r}, expected 'runtime_active' or absent")
-    if problems:
-        raise ValueError(
-            f"Promoted artifact {source} is not a clean runtime contract ({'; '.join(problems)}). "
-            "Regenerate it with scripts/generate_form.py --model <key>."
-        )
-
-
-def live_contract_data(data: dict[str, Any]) -> dict[str, Any]:
-    """Derive the clean runtime contract from a draft dataset.
-
-    Runs at draft-generation emit time (see
-    ``inspection.write_runtime_contract_artifact``); promotion loads the
-    emitted contract verbatim and only validates it.
-    """
-
-    cleaned = _strip_live_contract_provenance(json.loads(json.dumps(data)))
-    dataset = cleaned.get("dataset")
-    if isinstance(dataset, dict) and dataset.get("status") == "draft_not_runtime_active":
-        dataset["status"] = "runtime_active"
-        name = dataset.get("name")
-        if isinstance(name, str):
-            dataset["name"] = name.replace(" form data draft", " operational form")
-    validation = cleaned.get("validation")
-    if isinstance(validation, list):
-        cleaned["validation"] = [
-            row
-            for row in validation
-            if not (
-                isinstance(row, dict)
-                and row.get("severity") == "warning"
-                and str(row.get("check_id", "")).endswith("_draft_status")
-            )
-        ]
-    return cleaned
 
 
 def _rows(wb: Any, sheet_name: str) -> list[dict[str, str]]:
@@ -282,17 +161,20 @@ def load_registry_promotions(wb: Any) -> list[RegistryPromotion]:
     return sorted(promotions, key=lambda promotion: (promotion.display_order, promotion.registry_key))
 
 
-def resolve_artifact_path(root: Path, artifact_path: str) -> Path:
+def resolve_artifact_path(root: Path, artifact_path: str | Path) -> Path:
     path = Path(artifact_path)
-    if path.is_absolute():
-        return path
-    return root / path
+    root_resolved = root.resolve()
+    candidate = path if path.is_absolute() else root_resolved / path
+    resolved = candidate.resolve()
+    if not resolved.is_relative_to(root_resolved):
+        raise ValueError(f"Promoted artifact path resolves outside root {root_resolved}: {artifact_path}")
+    return resolved
 
 
 def current_generation_artifact_path(root: Path, promotion: RegistryPromotion) -> Path:
     if promotion.artifact_path:
         return resolve_artifact_path(root, promotion.artifact_path)
-    return root / "form-output" / f"{promotion.export_slug}-form-data.json"
+    return resolve_artifact_path(root, Path("form-output") / f"{export_slug(promotion.model_key)}-form-data.json")
 
 
 def runtime_contract_artifact_path(root: Path, model_key: str) -> Path:
@@ -323,13 +205,18 @@ def load_promotion_data(
             raise ValueError(
                 f"current_generation promotion {promotion.model_key!r} does not match current generated model {current_model_key!r}"
             )
+        assert_runtime_contract(
+            current_data,
+            source=f"current generated model {current_model_key}",
+            expected_model_label=promotion.model_label,
+        )
         return current_data
 
     artifact = resolve_artifact_path(root, promotion.artifact_path)
     if not artifact.exists():
         raise FileNotFoundError(f"Promoted model artifact does not exist for {promotion.model_key}: {artifact}")
     data = json.loads(artifact.read_text(encoding="utf-8"))
-    assert_runtime_contract(data, source=str(artifact))
+    assert_runtime_contract(data, source=str(artifact), expected_model_label=promotion.model_label)
     return data
 
 
@@ -338,8 +225,7 @@ def load_promotion_artifact_data(promotion: RegistryPromotion, *, root: Path) ->
     if not artifact.exists():
         raise FileNotFoundError(f"Promoted model artifact does not exist for {promotion.model_key}: {artifact}")
     data = json.loads(artifact.read_text(encoding="utf-8"))
-    if promotion_requires_runtime_contract_assertion(promotion):
-        assert_runtime_contract(data, source=str(artifact))
+    assert_runtime_contract(data, source=str(artifact), expected_model_label=promotion.model_label)
     return data
 
 

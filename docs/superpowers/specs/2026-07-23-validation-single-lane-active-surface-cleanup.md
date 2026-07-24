@@ -1,6 +1,6 @@
 # Validation Single-Lane and Active-Surface Cleanup Specification
 
-Status: ACTIVE — Pass 0A inventory and Pass 0C boundary complete; approved Pass I ingest retirement completed 2026-07-23. The Pass 0B generation/runtime executable slice completed 2026-07-24; semantic viability remains open for the other non-ingest surfaces. Pass 1 is not approved.
+Status: ACTIVE — Pass 0A inventory and Pass 0C boundary complete; approved Pass I ingest retirement completed 2026-07-23. The Pass 0B generation/runtime executable slice and approved Pass G1 fail-closed generation boundary completed 2026-07-24; semantic viability remains open for the other non-ingest surfaces. Broad Pass 1 remains unapproved.
 Date: 2026-07-23
 Recommended implementation reasoning: high
 Branch: `db-workflow`
@@ -165,6 +165,39 @@ The existing Pass 1 registry-authority proposal is not the first safe implementa
 7. Only then proceed with shared workbook-registry authority, source-builder convergence, complete candidate-registry/browser proof, and atomic registry-publication cleanup as separately reviewed passes.
 
 Pass 0B remains open for the other retained non-ingest surfaces. This receipt authorizes no implementation, workbook change, retained artifact refresh, registry publication, model promotion, or dealer change.
+
+### 2.5 Pass G1 — Fail-closed generation boundary — completed 2026-07-24
+
+Approved outcome: establish the smallest safe generation boundary before source-builder convergence, model-data repair, registry publication, or promotion work.
+
+Implemented:
+
+- `discover_generation_model_configs()` now binds every returned `ModelConfig` to the caller-selected workbook snapshot, root, output directory, and app directory. Runtime publication uses `config.output_dir` rather than reconstructing it from `config.root`, and model keys are validated before source assembly so they cannot escape the selected root. `generate_form.py` exposes `--workbook` and `--output-root`, preserving repository defaults for the release command while making the validation lane isolated.
+- Stingray source assembly now opens `config.workbook_path`; both its retained production entrypoint and compatibility JSON/CSV writer use `config.output_dir`. No generation path in this slice addresses the old workbook/output globals.
+- `runtime_contract.py` is now the single cleanup and strict-validation owner. It requires a complete dataset identity, `dataset.status == runtime_active`, all runtime collections with their required container and row types, no draft-only fields, and zero error-severity validation findings. Generation also verifies workbook-derived model identity from `ModelConfig`.
+- Runtime JSON writes now use same-directory temporary files, flush/fsync, and `os.replace()`. A replacement failure preserves the previous destination and removes the temporary file.
+- Derivation-manifest computation is now pure during source assembly. The manifest is retained in the assembly result, stripped from the browser contract, and written atomically only after the contract passes strict validation. Invalid generation therefore writes no runtime, compatibility, inspection, draft, preview, or derivation artifact.
+- The executable CLI gate now copies one workbook snapshot, discovers/exercises the exact six current models under one temporary output root, verifies successful contracts, records Z06's existing `StaleDerivationAllowlistError` as the separate known model blocker, and byte-checks that `stingray_master.xlsx`, `form-output/`, and `form-app/data.js` remain unchanged.
+- Registry loading consumes the same strict validator, binds `dataset.model` to the workbook promotion label, and rejects artifact paths that resolve outside the selected root. Current retained Stingray publication now fails closed because that retained contract lacks `dataset.model`, `dataset.model_year`, and `dataset.status`; the failed registry command leaves `form-app/data.js` byte-identical.
+- `README.md` now owns the exact normal and isolated generation commands and includes the fail-closed generation gate in the Python validation command.
+
+Preserved and excluded:
+
+- No workbook row, generated repository artifact, published registry, promotion metadata, browser runtime, dealer submission boundary, schema, dependency, or deployment path changed.
+- Stingray and non-Stingray source builders remain separate. Pass G1 did not choose parity semantics, repair Z06 derivation, repair Grand Sport X row 233, clean orphan rules, refresh retained artifacts, publish a registry, or activate a model.
+- Compatibility JSON/CSV remains a secondary Stingray output under the explicit selected output root; its consumer/provenance retirement decision remains later work.
+
+Validation receipt:
+
+- RED/GREEN safety coverage proves explicit config paths, no global Stingray output escape, strict malformed/error-bearing rejection, fail-before-write behavior, pure derivation assembly, and atomic JSON replacement failure handling.
+- Focused module compilation passed. The exact README Python generation/metadata gate returned `107 passed, 8 subtests passed`.
+- Isolated six-model executable gate: passed; Stingray, Grand Sport, Grand Sport X, ZR1, and ZR1X generated strict contracts; Z06 failed before runtime output with the known stale derivation allowlist error; protected surfaces remained byte-identical.
+- Full Python suite: `439 passed, 2 skipped, 7 failed, 15 subtests passed`. The seven failures are the already classified current-workbook/test-authority gaps: four stale editor lint/compare expectations, Grand Sport X row-233 option-name quality, and two retained-artifact-relative source-assembly assertions. No Pass G1 safety or isolated-generation test failed, and the full run left all protected surfaces unchanged.
+- Direct retained registry attempt: exited `1` on strict Stingray contract validation; `form-app/data.js` SHA-256 remained `802afa1fea4e9e802f7d82635556c5569d3c73b2f4ae59267f64dd8157f9bceb` before and after.
+- Final independent blocking review: `PASS`. It reproduced and confirmed closure of output-root ownership, model-key traversal, promoted-artifact traversal including symlink fallback, validation severity, promotion identity, validation-before-write, and atomic replacement concerns.
+- `git diff --check`: passed. Workbook/package/schema writes were not run because the canonical workbook was not modified. Browser candidate proof remains correctly blocked because no complete fresh six-model candidate set exists.
+
+Next bounded pass: Pass G2 should resolve only the current Z06 stale-derivation blocker from authoritative workbook/rule evidence and add its regression proof. It must not unify builders, repair unrelated model data, refresh retained artifacts, or publish the registry. After Z06 is independently green, the next structural gate must compose workbook package/schema and options-quality checks with all-six strict candidate generation before any complete candidate-registry/browser proof.
 
 ## 3. Authority model after completion
 

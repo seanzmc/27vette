@@ -4,7 +4,16 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
 from pathlib import Path
+import re
 from typing import Any, Mapping
+
+
+def validate_model_key(model_key: str) -> str:
+    """Return a path-safe model key or fail before any artifact I/O."""
+
+    if re.fullmatch(r"[a-z][a-z0-9_]*", model_key) is None:
+        raise ValueError(f"Invalid model_key {model_key!r}; expected lowercase letters, digits, and underscores")
+    return model_key
 
 
 @dataclass(frozen=True)

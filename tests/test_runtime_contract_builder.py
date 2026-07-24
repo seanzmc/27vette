@@ -40,6 +40,18 @@ class RuntimeContractBuilderTests(unittest.TestCase):
                 }
             ],
             "standardEquipment": [{"equipment_id": "std-1", "source_detail_raw": "raw note"}],
+            "variants": [{"variant_id": "test-variant"}],
+            "steps": [{"step_key": "test-step"}],
+            "sections": [{"section_id": "test-section"}],
+            "contextChoices": [{"context_choice_id": "test-context"}],
+            "orderSummary": {},
+            "ruleGroups": [],
+            "exclusiveGroups": [],
+            "rules": [],
+            "priceRules": [],
+            "interiors": [],
+            "colorOverrides": [],
+            "defaultSelectionRules": [],
             "validation": [
                 {
                     "check_id": "grand_sport_draft_status",
@@ -60,6 +72,14 @@ class RuntimeContractBuilderTests(unittest.TestCase):
         }
 
         expected = live_contract_data(draft)
+        expected["dataset"].update(
+            {
+                "name": BASE_GRAND_SPORT_CONFIG.dataset_name,
+                "model": BASE_GRAND_SPORT_CONFIG.model_label,
+                "model_year": BASE_GRAND_SPORT_CONFIG.model_year,
+                "status": "runtime_active",
+            }
+        )
         actual = build_model_runtime_contract(BASE_GRAND_SPORT_CONFIG, draft)
 
         self.assertEqual(actual, expected)
@@ -78,7 +98,7 @@ class RuntimeContractBuilderTests(unittest.TestCase):
         self.assertIn("from corvette_form_generator.runtime_contract import build_model_runtime_contract", production_source)
         self.assertIn("from corvette_form_generator.runtime_contract import build_model_runtime_contract", inspection_source)
         self.assertIn("from corvette_form_generator.runtime_contract import build_model_runtime_contract", assembly_source)
-        self.assertIn("build_model_runtime_contract(MODEL_CONFIG, source_data)", production_source)
+        self.assertIn("build_model_runtime_contract(resolved_config, source_data)", production_source)
         self.assertIn("build_model_runtime_contract(config, draft)", inspection_source)
         self.assertIn("build_model_runtime_contract(config, source_data)", assembly_source)
         self.assertIn("build_model_runtime_contract(config, draft)", assembly_source)

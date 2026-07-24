@@ -43,6 +43,49 @@ SETUP_COPY = {
 }
 
 
+def runtime_contract_data(
+    model_label: str,
+    source_sheet: str,
+    *,
+    choices: list[dict[str, object]] | None = None,
+    rules: list[dict[str, object]] | None = None,
+) -> dict[str, object]:
+    data: dict[str, object] = {
+        "dataset": {
+            "name": f"2027 Corvette {model_label} operational form",
+            "model": model_label,
+            "model_year": "2027",
+            "source_sheet": source_sheet,
+            "status": "runtime_active",
+        },
+        "orderSummary": {},
+    }
+    for field in (
+        "variants",
+        "steps",
+        "sections",
+        "contextChoices",
+        "choices",
+        "standardEquipment",
+        "ruleGroups",
+        "exclusiveGroups",
+        "rules",
+        "priceRules",
+        "interiors",
+        "colorOverrides",
+        "defaultSelectionRules",
+        "validation",
+    ):
+        data[field] = []
+    data["variants"] = [{"variant_id": "test-variant"}]
+    data["steps"] = [{"step_key": "test-step"}]
+    data["sections"] = [{"section_id": "test-section"}]
+    data["contextChoices"] = [{"context_choice_id": "test-context"}]
+    data["choices"] = choices or [{"choice_id": "test-choice"}]
+    data["rules"] = rules or []
+    return data
+
+
 def workbook_with_promotions(promotion_rows: list[dict[str, object]] | None = None) -> Workbook:
     wb = Workbook()
     del wb[wb.sheetnames[0]]
@@ -155,17 +198,15 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
             artifact_path.parent.mkdir(parents=True)
             artifact_path.write_text(
                 json.dumps(
-                    {
-                        "dataset": {
-                            "source_sheet": "grandSport_options",
-                            "status": "runtime_active",
-                        },
-                        "choices": [
+                    runtime_contract_data(
+                        "Grand Sport",
+                        "grandSport_options",
+                        choices=[
                             {
                                 "choice_id": "gs-choice",
                             }
                         ],
-                        "rules": [
+                        rules=[
                             {
                                 "rule_id": "rule-1",
                                 "source_id": "opt_sht_001",
@@ -173,7 +214,7 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
                                 "source_note": "runtime rule note",
                             }
                         ],
-                    }
+                    )
                 ),
                 encoding="utf-8",
             )
@@ -195,7 +236,7 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
             registry = build_registry_from_promotions(
                 wb,
                 current_model_key="stingray",
-                current_data={"dataset": {"source_sheet": "stingray_options"}, "choices": []},
+                current_data=runtime_contract_data("Stingray", "stingray_options"),
                 model_assets={"stingray": {"image_url": "stingray.png"}, "grandSport": {"image_url": "gs.png"}},
                 root=root,
             )
@@ -264,11 +305,11 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
             gs_path = root / "form-output" / "runtime" / "grand-sport-runtime-contract.json"
             gs_path.parent.mkdir(parents=True)
             stingray_path.write_text(
-                json.dumps({"dataset": {"source_sheet": "stingray_options", "status": "runtime_active"}, "choices": []}),
+                json.dumps(runtime_contract_data("Stingray", "stingray_options")),
                 encoding="utf-8",
             )
             gs_path.write_text(
-                json.dumps({"dataset": {"source_sheet": "grandSport_options", "status": "runtime_active"}, "choices": []}),
+                json.dumps(runtime_contract_data("Grand Sport", "grandSport_options")),
                 encoding="utf-8",
             )
             wb = workbook_with_promotions(
@@ -322,7 +363,7 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
             wb = workbook_with_promotions(
                 [promoted_grand_sport_row(display_order=2), promoted_stingray_row(display_order=1)]
             )
-            with self.assertRaisesRegex(ValueError, "not a clean runtime contract"):
+            with self.assertRaisesRegex(ValueError, "not publishable"):
                 build_registry_from_promotions(
                     wb,
                     current_model_key="stingray",

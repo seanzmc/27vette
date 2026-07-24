@@ -14,7 +14,9 @@ from corvette_form_generator.inspection import (
 from corvette_form_generator.model_config import ModelConfig
 from corvette_form_generator.output import write_json_output
 from corvette_form_generator.production import write_stingray_compatibility_artifacts
-from corvette_form_generator.registry_promotion import export_slug, runtime_contract_artifact_path
+from corvette_form_generator.registry_promotion import export_slug
+from corvette_form_generator.rule_derivation import write_derivation_manifest
+from corvette_form_generator.runtime_contract import assert_runtime_contract
 from corvette_form_generator.source_assembly import ModelSourceAssembly, assemble_model_source
 from corvette_form_generator.validation import validation_error_count
 
@@ -49,8 +51,12 @@ def _validation_error_count(rows: list[dict[str, Any]]) -> int:
     return sum(1 for row in rows if row.get("severity") == "error")
 
 
+def _runtime_contract_path(config: ModelConfig) -> Path:
+    return config.output_dir / "runtime" / f"{export_slug(config.model_key)}-runtime-contract.json"
+
+
 def _runtime_contract_json(config: ModelConfig) -> str:
-    return str(runtime_contract_artifact_path(config.root, config.model_key))
+    return str(_runtime_contract_path(config))
 
 
 def _inspection_output_dir(config: ModelConfig, options: GenerationOptions) -> Path:
@@ -58,7 +64,7 @@ def _inspection_output_dir(config: ModelConfig, options: GenerationOptions) -> P
 
 
 def _write_runtime_contract_artifact(config: ModelConfig, runtime_contract: dict[str, Any]) -> dict[str, str]:
-    runtime_json_path = runtime_contract_artifact_path(config.root, config.model_key)
+    runtime_json_path = _runtime_contract_path(config)
     runtime_json_path.parent.mkdir(parents=True, exist_ok=True)
     write_json_output(runtime_json_path, runtime_contract)
     return {"json": str(runtime_json_path)}
@@ -182,12 +188,20 @@ def _reviewable_result(config: ModelConfig, assembly: ModelSourceAssembly, optio
 def generate_model_artifacts(config: ModelConfig, *, options: GenerationOptions | None = None) -> dict[str, Any]:
     """Generate artifacts for one workbook-discovered active model."""
 
-    options = options or GenerationOptions()
+    export_slug(config.model_key)
+    resolved_options = options or GenerationOptions()
     assembly = assemble_model_source(config)
+    assert_runtime_contract(
+        assembly.runtime_contract,
+        source=f"generated {config.model_key}",
+        config=config,
+    )
+    if assembly.derivation_manifest is not None:
+        write_derivation_manifest(config.output_dir, config.model_key, assembly.derivation_manifest)
     if assembly.compatibility_source:
         result = _compatibility_result(config, assembly)
     else:
-        result = _reviewable_result(config, assembly, options)
+        result = _reviewable_result(config, assembly, resolved_options)
 
     missing_keys = [key for key in REQUIRED_RESULT_KEYS if key not in result]
     if missing_keys:

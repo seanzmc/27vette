@@ -106,6 +106,34 @@ def discover_temp_configs(wb: Workbook):
 
 
 class ModelConfigMetadataTests(unittest.TestCase):
+    def test_generation_discovery_binds_configs_to_explicit_paths(self) -> None:
+        wb = workbook_with_model_metadata(
+            model_rows=[stingray_model_row()],
+            source_rows=required_source_rows("stingray"),
+            variant_rows=[
+                {"model_key": "stingray", "variant_id": "a_variant", "display_order": 1, "active": True},
+                {"model_key": "stingray", "variant_id": "z_variant", "display_order": 2, "active": True},
+            ],
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            target_root = Path(tmpdir) / "candidate"
+            workbook_path = Path(tmpdir) / "model-discovery.xlsx"
+            output_dir = target_root / "generated"
+            app_dir = target_root / "browser"
+            wb.save(workbook_path)
+
+            config = discover_generation_model_configs(
+                workbook_path,
+                root=target_root,
+                output_dir=output_dir,
+                app_dir=app_dir,
+            )["stingray"]
+
+        self.assertEqual(config.workbook_path, workbook_path)
+        self.assertEqual(config.root, target_root)
+        self.assertEqual(config.output_dir, output_dir)
+        self.assertEqual(config.app_dir, app_dir)
+
     def test_header_only_metadata_falls_back_to_constants(self) -> None:
         wb = workbook_with_model_metadata()
         resolved = load_model_config_overrides(wb, BASE_STINGRAY_CONFIG)

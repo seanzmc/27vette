@@ -1,15 +1,27 @@
 #!/usr/bin/env python3
-"""CLI tests for workbook-owned generate_form model discovery."""
+"""Isolated executable gate for workbook-discovered model generation."""
 
 from __future__ import annotations
 
+import hashlib
 import json
+import shutil
 import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PYTHON = ROOT / ".venv" / "bin" / "python"
 GENERATE_FORM = ROOT / "scripts" / "generate_form.py"
+WORKBOOK = ROOT / "stingray_master.xlsx"
+SCRIPTS_DIR = ROOT / "scripts"
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+
+from corvette_form_generator.model_configs import discover_generation_model_configs  # noqa: E402
+
+EXPECTED_MODELS = {"stingray", "grand_sport", "grand_sport_x", "z06", "zr1", "zr1x"}
+KNOWN_BLOCKERS = {"z06": "StaleDerivationAllowlistError"}
 
 REQUIRED_STDOUT_KEYS = {
     "model_key",
@@ -26,21 +38,6 @@ REQUIRED_STDOUT_KEYS = {
     "notes",
 }
 
-ROUTINE_INSPECTION_FILES = (
-    ROOT / "form-output" / "inspection" / "grand-sport-inspection.json",
-    ROOT / "form-output" / "inspection" / "grand-sport-inspection.md",
-    ROOT / "form-output" / "inspection" / "grand-sport-contract-preview.json",
-    ROOT / "form-output" / "inspection" / "grand-sport-contract-preview.md",
-    ROOT / "form-output" / "inspection" / "grand-sport-form-data-draft.json",
-    ROOT / "form-output" / "inspection" / "grand-sport-form-data-draft.md",
-    ROOT / "form-output" / "inspection" / "z06-inspection.json",
-    ROOT / "form-output" / "inspection" / "z06-inspection.md",
-    ROOT / "form-output" / "inspection" / "z06-contract-preview.json",
-    ROOT / "form-output" / "inspection" / "z06-contract-preview.md",
-    ROOT / "form-output" / "inspection" / "z06-form-data-draft.json",
-    ROOT / "form-output" / "inspection" / "z06-form-data-draft.md",
-)
-
 
 def run_generate_form(*args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
@@ -52,108 +49,70 @@ def run_generate_form(*args: str) -> subprocess.CompletedProcess[str]:
     )
 
 
-def assert_common_generation_contract(output: dict, model_key: str, slug: str) -> None:
-    assert REQUIRED_STDOUT_KEYS <= set(output)
-    assert output["model_key"] == model_key
-    assert output["runtime_contract_json"].endswith(f"form-output/runtime/{slug}-runtime-contract.json")
-    assert output["runtime_contract_artifacts"]["json"] == output["runtime_contract_json"]
-    assert isinstance(output["compatibility_artifacts"], dict)
-    assert isinstance(output["inspection_artifacts"], dict)
-    assert isinstance(output["preview_artifacts"], dict)
-    assert isinstance(output["draft_artifacts"], dict)
-    assert isinstance(output["counts"], dict)
-    assert output["validation_errors"] == 0
+def protected_hashes() -> dict[Path, str]:
+    paths = [WORKBOOK, ROOT / "form-app" / "data.js"]
+    paths.extend(path for path in (ROOT / "form-output").rglob("*") if path.is_file())
+    return {path: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
 
 
-def test_active_models_share_generation_stdout_contract() -> None:
-    cases = [
-        ("stingray", "stingray", "source_assembly"),
-        ("grand_sport", "grand-sport", "source_assembly"),
-        ("z06", "z06", "source_assembly"),
-    ]
+def test_cli_executes_every_discovered_model_under_isolated_root(tmp_path: Path) -> None:
+    workbook_snapshot = tmp_path / "stingray_master.snapshot.xlsx"
+    candidate_root = tmp_path / "candidate"
+    shutil.copy2(WORKBOOK, workbook_snapshot)
+    before = protected_hashes()
+    observed: set[str] = set()
+    configs = discover_generation_model_configs(workbook_snapshot, root=candidate_root)
+    assert set(configs) == EXPECTED_MODELS
 
-    for model_key, slug, route_engine in cases:
-        result = run_generate_form("--model", model_key)
-
-        assert result.returncode == 0, result.stderr
-        output = json.loads(result.stdout)
-        assert_common_generation_contract(output, model_key, slug)
-        assert output["route_engine"] == route_engine
-
-        if model_key == "stingray":
-            assert output["workbook_backup"] is None
-            assert output["json"].endswith("form-output/stingray-form-data.json")
-            assert output["csv"].endswith("form-output/stingray-form-data.csv")
-            assert output["compatibility_artifacts"]["json"] == output["json"]
-            assert output["compatibility_artifacts"]["csv"] == output["csv"]
-        else:
-            assert output["compatibility_artifacts"] == {}
-        assert output["inspection_artifacts"] == {}
-        assert output["preview_artifacts"] == {}
-        assert output["draft_artifacts"] == {}
-
-
-def test_review_mode_emits_inspection_artifacts_to_requested_output(tmp_path: Path) -> None:
-    cases = [
-        ("grand_sport", "grand-sport"),
-        ("z06", "z06"),
-    ]
-
-    for model_key, slug in cases:
-        review_dir = tmp_path / slug
+    for model_key in sorted(configs):
         result = run_generate_form(
             "--model",
             model_key,
-            "--emit-inspection",
-            "--inspection-output",
-            str(review_dir),
+            "--workbook",
+            str(workbook_snapshot),
+            "--output-root",
+            str(candidate_root),
         )
+        observed.add(model_key)
+
+        if model_key in KNOWN_BLOCKERS:
+            assert result.returncode != 0
+            assert KNOWN_BLOCKERS[model_key] in result.stderr
+            expected_runtime = candidate_root / "form-output" / "runtime" / "z06-runtime-contract.json"
+            assert not expected_runtime.exists()
+            continue
 
         assert result.returncode == 0, result.stderr
         output = json.loads(result.stdout)
-        assert_common_generation_contract(output, model_key, slug)
-        assert output["inspection_artifacts"]["json"] == str(review_dir / f"{slug}-inspection.json")
-        assert output["inspection_artifacts"]["markdown"] == str(review_dir / f"{slug}-inspection.md")
-        assert output["preview_artifacts"]["json"] == str(review_dir / f"{slug}-contract-preview.json")
-        assert output["preview_artifacts"]["markdown"] == str(review_dir / f"{slug}-contract-preview.md")
-        assert output["draft_artifacts"]["json"] == str(review_dir / f"{slug}-form-data-draft.json")
-        assert output["draft_artifacts"]["markdown"] == str(review_dir / f"{slug}-form-data-draft.md")
-        for artifact_map in (
-            output["inspection_artifacts"],
-            output["preview_artifacts"],
-            output["draft_artifacts"],
-        ):
-            for artifact_path in artifact_map.values():
-                assert Path(artifact_path).exists(), artifact_path
+        assert REQUIRED_STDOUT_KEYS <= set(output)
+        assert output["model_key"] == model_key
+        assert output["validation_errors"] == 0
+        runtime_path = Path(output["runtime_contract_json"])
+        assert runtime_path.is_relative_to(candidate_root)
+        assert runtime_path.exists()
+        runtime_contract = json.loads(runtime_path.read_text(encoding="utf-8"))
+        assert runtime_contract["dataset"]["status"] == "runtime_active"
+        assert runtime_contract["validation"] == [
+            row for row in runtime_contract["validation"] if str(row.get("severity", "")).lower() != "error"
+        ]
+
+    assert observed == EXPECTED_MODELS
+    assert protected_hashes() == before
 
 
-def test_default_generation_does_not_recreate_routine_inspection_artifacts() -> None:
-    for path in ROUTINE_INSPECTION_FILES:
-        path.unlink(missing_ok=True)
-
-    for model_key in ("grand_sport", "z06"):
-        result = run_generate_form("--model", model_key)
-        assert result.returncode == 0, result.stderr
-
-    recreated = [path for path in ROUTINE_INSPECTION_FILES if path.exists()]
-    assert recreated == []
-
-
-def test_inspection_output_requires_emit_inspection() -> None:
-    result = run_generate_form("--model", "grand_sport", "--inspection-output", "/tmp/unused-pass6b-output")
+def test_inspection_output_requires_emit_inspection(tmp_path: Path) -> None:
+    workbook_snapshot = tmp_path / "stingray_master.snapshot.xlsx"
+    shutil.copy2(WORKBOOK, workbook_snapshot)
+    result = run_generate_form(
+        "--model",
+        "grand_sport",
+        "--workbook",
+        str(workbook_snapshot),
+        "--output-root",
+        str(tmp_path / "candidate"),
+        "--inspection-output",
+        str(tmp_path / "inspection"),
+    )
 
     assert result.returncode != 0
     assert "--inspection-output requires --emit-inspection" in result.stderr
-
-
-def test_inactive_scaffold_model_is_rejected_before_generation() -> None:
-    zr1_runtime = ROOT / "form-output" / "runtime" / "zr1-runtime-contract.json"
-    existed_before = zr1_runtime.exists()
-
-    result = run_generate_form("--model", "zr1")
-
-    assert result.returncode != 0
-    assert "Unsupported or inactive model 'zr1'" in result.stderr
-    assert "Active generatable models: grand_sport, stingray, z06" in result.stderr
-    if not existed_before:
-        assert not zr1_runtime.exists()

@@ -141,11 +141,21 @@ commands: `workbook-manager/README.md`. Focused tests:
 Model refresh (from repo root, venv python):
 
 ```sh
-.venv/bin/python scripts/generate_form.py --model <stingray|grand_sport|z06>
+.venv/bin/python scripts/generate_form.py --model <model_key>
 .venv/bin/python scripts/generate_registry.py
 ```
 
-The Stingray run also writes compatibility outputs (`form-output/stingray-form-data.json/.csv`); all models write clean runtime contracts under `form-output/runtime/`. Add `--emit-inspection --inspection-output <dir>` for optional review artifacts. Generator runs never mutate `form-app/data.js` directly; `generate_registry.py` publishes the promoted registry.
+`<model_key>` must be active and complete in workbook-owned `model_master`, `model_workbook_sources`, and `model_variants` metadata. The Stingray run also writes compatibility outputs (`form-output/stingray-form-data.json/.csv`); all models write strictly validated runtime contracts under `form-output/runtime/`. Add `--emit-inspection --inspection-output <dir>` for optional review artifacts. Generator runs never mutate `form-app/data.js` directly; `generate_registry.py` validates every selected retained contract before publishing the promoted registry.
+
+For isolated candidate validation, copy/freeze the workbook first and bind every output to a temporary root:
+
+```sh
+.venv/bin/python scripts/generate_form.py --model <model_key> \
+  --workbook /tmp/stingray_master.snapshot.xlsx \
+  --output-root /tmp/27vette-candidate
+```
+
+This command exits nonzero and writes no model artifacts when source assembly or strict runtime-contract validation fails. A successful single-model run is not registry or browser release-readiness proof.
 
 Promotion verify/reapply (workbook-owned; repeat `--model` to validate and write one atomic multi-model batch):
 
@@ -202,7 +212,7 @@ Test-to-surface map (run each with `node --test tests/<name>.test.mjs`):
 Python metadata gates:
 
 ```sh
-.venv/bin/python -m pytest tests/test_model_config_metadata.py tests/test_promote_model.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py tests/test_rule_derivation.py -q
+.venv/bin/python -m pytest tests/test_generation_safety.py tests/test_generate_form_model_discovery_cli.py tests/test_runtime_contract_builder.py tests/test_model_config_metadata.py tests/test_promote_model.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py tests/test_rule_derivation.py -q
 ```
 
 Full default validation = schema gate + all rows of the table + the pytest gate. Choose gates by changed surface per AGENTS.md §10.
