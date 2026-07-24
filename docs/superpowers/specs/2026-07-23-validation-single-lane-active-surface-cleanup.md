@@ -1,6 +1,6 @@
 # Validation Single-Lane and Active-Surface Cleanup Specification
 
-Status: ACTIVE — Pass 0A inventory and Pass 0C boundary complete; approved Pass I ingest retirement completed 2026-07-23. Pass 0B semantic viability remains in progress for non-ingest surfaces. Pass 1 is not approved.
+Status: ACTIVE — Pass 0A inventory and Pass 0C boundary complete; approved Pass I ingest retirement completed 2026-07-23. The Pass 0B generation/runtime executable slice completed 2026-07-24; semantic viability remains open for the other non-ingest surfaces. Pass 1 is not approved.
 Date: 2026-07-23
 Recommended implementation reasoning: high
 Branch: `db-workflow`
@@ -78,7 +78,6 @@ Source construction is not shared:
 - `README.md` calls ZR1/ZR1X source sheets inactive scaffolds and describes a default gate that mixes runtime authority with draft/inspection tests.
 - `docs/route-map.md` hardcodes three model choices and says all active promotion rows are runtime contracts even though three active/generatable models remain unpromoted.
 - Several completed `.hermes/plans` remain in the active plans directory and still contain commands and artifact names from prior shapes.
-- `Order-Guide_IngestPrompt.md` and `docs/ingest/README.md` still present retired `pass-c-*` or milestone continuation language as current.
 - Several source docstrings still describe active models as “draft models” or refer to a distinct “draft artifact path.”
 
 ### Pass 0B semantic findings to date
@@ -87,8 +86,8 @@ The source-level audit separates current roots from code that is merely reachabl
 
 - Current customer release roots are `generate_form.py`, `generate_registry.py`, and `form-app/app.js` consuming `window.CORVETTE_FORM_DATA`. `promote_model.py` mutates promotion metadata safely, but does not generate candidates, validate contracts strictly, build the complete would-be-published registry, or run browser proof; it is not release-promotion authority.
 - Current workbook shape/edit authority is `workbook_domain/registry.py` plus the guarded `editor_ops.apply_batch()` write boundary. `schema_validation.py` remains necessary for cross-row and semantic invariants, but its duplicated headers, required-sheet constants, role types, and artifact vocabulary are misplaced structural authority.
-- The ingest wizard is still wired as an executable path: the browser posts to `/changeset`, `ingest_wizard_server.py` calls `WizardSessionStore.emit_changeset()`, and that method imports `changeset_emitter.emit_manifest_changeset()`. This proves active wiring only. It does not prove the workflow is used successfully or should remain. The user has withdrawn the wizard/compiler/exception/emitter chain as a desired workflow because its imported data proved harmful; the whole ingest surface is now a retirement candidate.
-- `apply_workbook_changeset.py` and `workbook_domain.service` are the implemented generic ChangeSet operator boundary, but ingest is their only current artifact producer. They remain because the separately approved reliable Workbook Manager specification explicitly adopts them as its Passes 3–7 write contract; this is approved target architecture, not present-use evidence. `apply_workbook_ops.py` and the fallback editor remain transitional until that parity exists.
+- The raw order-guide ingest wizard/compiler/emitter surface was retired in Pass I. It is not a current root or a candidate implementation dependency.
+- `apply_workbook_changeset.py` and `workbook_domain.service` are the implemented generic ChangeSet operator boundary, but no current producer emits that contract after ingest retirement. They remain because the separately approved reliable Workbook Manager specification explicitly adopts them as its Passes 3–7 write contract; this is approved target architecture, not present-use evidence. `apply_workbook_ops.py` and the fallback editor remain transitional until that parity exists.
 - The release path is still split: `production.py` independently assembles Stingray while `inspection.py` independently assembles every other model. `source_assembly.py` labels both branches with one facade but does not unify their behavior or workbook snapshot.
 - Runtime finalization is inverted: `runtime_contract.py` delegates to `registry_promotion.live_contract_data()`, and the resulting validator checks only known draft-field absence plus a permissive status. Generation writes the artifact before counting error findings.
 - Registry freshness is artifact-relative. It can prove `data.js` matches retained artifacts, not that those artifacts were freshly produced from the current workbook.
@@ -96,6 +95,76 @@ The source-level audit separates current roots from code that is merely reachabl
 - Mixed release/editor modules still require symbol-level extraction: `registry_promotion.py`, `rules.py`, and Workbook Manager staging/sync combine current behavior with legacy or transitional behavior. Ingest-specific symbols are not preserved merely because they once appeared reusable; only independently necessary generic workbook-domain behavior may cross the retirement boundary.
 
 This is strong semantic source evidence, but not yet full execution viability. The audit did not execute every CLI/test or characterize every retained `KEEP_*` path in an isolated current-workbook run. Pass 0B therefore remains open until the path ledger records execution or an explicit safe source-only characterization for every retained item.
+
+### 2.4 Pass 0B generation/runtime executable receipt — 2026-07-24
+
+This slice is bound to commit `667aad5fe433e588a7d87fcc31dbbcb476d153e1` and workbook SHA-256 `c5f986f6793205e00124db5640248e9e8c57ebb930679a92c2b3e8c56fb62154`. It used a copied workbook, immutable per-model config rebinding, temporary output/app roots, and no tracked artifact publication.
+
+#### Exact source and path findings
+
+| Surface | Current necessary behavior | Executed/source finding | Revised disposition |
+|---|---|---|---|
+| `generate_form.py` | Select a workbook-discovered model and invoke generation | The CLI delegates correctly but exposes no workbook or output-root override, so its normal path writes repository outputs and cannot itself provide isolated readiness proof. | `KEEP_CURRENT_AUTHORITY`, but add an explicit generation context/isolated output boundary before treating the CLI as a gate. |
+| `model_configs.discover_generation_model_configs()` | Discover the exact active/generatable set and model metadata from a selected workbook | Passing a temporary workbook discovers six models from that copy, but every returned `ModelConfig.workbook_path` still points to the repository workbook. The caller must manually replace `root`, `workbook_path`, `output_dir`, and `app_dir` to get one frozen snapshot. | `KEEP_CURRENT_AUTHORITY`; fix path propagation before route convergence. |
+| `model_generation.generate_model_artifacts()` | Orchestrate source assembly and runtime output | A synthetic error-bearing contract was written and returned successfully with `validation_errors: 1`. The runtime file is written before the function counts error findings, and `generate_form.py` does not turn returned validation errors into a nonzero exit. | `KEEP_CURRENT_AUTHORITY`; rewrite as validate-then-atomic-write and fail on any error finding. |
+| `source_assembly.assemble_model_source()` | Present one model-neutral assembly API | Execution still branches to `production.build_production_source_data()` for Stingray and inspection/preview/draft construction for the other five models. One facade is not one source builder. | `CONSOLIDATE_INTO_CURRENT_OWNER`; retain only as the future model-neutral boundary. |
+| `production.py` | Preserve current Stingray source semantics until parity is proven | It opens module-global `WORKBOOK_PATH`, mutates module-global `MODEL_CONFIG`, later calls helpers with `config.workbook_path`, and writes compatibility outputs through global directories. A mismatched config can therefore address two workbooks in one assembly. | `CONSOLIDATE_INTO_CURRENT_OWNER`; remove globals and migrate necessary Stingray behavior behind explicit context. |
+| `inspection.py` | Provide optional inspection/report behavior and currently assemble non-Stingray data | Production source construction remains coupled to preview/draft/report structures. `inspect_model_sources()` runs during every non-Stingray generation even without `--emit-inspection`; it and `build_contract_preview()` open read-only workbooks without deterministic closure. `cleanup_display_text()` also hardcodes a customer-copy correction that belongs in the workbook. | `SPLIT_MIXED_OWNER`; optional reports may remain, but they cannot own runtime input construction, every workbook handle must close deterministically, and the copy fix must move to workbook data rather than a shared builder. |
+| `runtime_contract.py` | Finalize and strictly validate a publishable runtime contract | `build_model_runtime_contract()` ignores its `config` argument and delegates finalization back into `registry_promotion.live_contract_data()`. `assert_runtime_contract()` accepted `{}`, `{"dataset": {}}`, and a runtime-active payload containing an error-severity finding; the generated Stingray payload also lacked `dataset.status` and was accepted. | `CONSOLIDATE_INTO_CURRENT_OWNER`; make this module the strict contract/finalization authority, validate model identity from config, and remove the reverse dependency. |
+| `generate_registry.py` / artifact registry builder | Publish workbook-selected runtime contracts into `form-app/data.js` | Building from retained repository artifacts succeeded for Stingray, Grand Sport, and Z06. Building the same registry from freshly generated temporary artifacts failed because current-workbook Z06 generation failed. Retained-artifact success therefore does not prove workbook freshness. The current publisher writes `data.js` directly rather than atomically. | `KEEP_CURRENT_AUTHORITY`, but require a complete fresh candidate registry, strict validation, and atomic replacement before publication. |
+| `promote_model.py` | Safely edit model activation and registry-selection metadata | Dry-run/preflight verifies workbook row mutations and discovery only, yet reports `status: "validated"`. It does not generate a target, validate a strict contract, build the complete candidate registry, exercise browser/runtime behavior, or run the full workbook schema gate as part of `save_workbook_safely()`. | `REWRITE_CURRENT_LANE`; treat and label this as activation-metadata editing, not promotion-readiness proof, and run the separately required schema gate after an approved write. |
+| `registry_promotion.py` | Parse workbook publication rows, load contracts, build registry entries, and parse published data | The module mixes workbook metadata parsing, legacy artifact types, runtime cleanup, permissive validation, artifact loading, and registry construction. | `SPLIT_MIXED_OWNER`; retain workbook publication parsing and registry construction, move strict runtime validation/finalization to `runtime_contract.py`, and retire non-runtime promotable types. |
+| `schema_validation.validate_app_registry_freshness()` | Compare the existing published registry with existing selected artifacts | It ignores generated timestamps and detects artifact-to-registry disagreement, but matching stale artifacts and stale registry pass together. | `KEEP_FOCUSED_REGRESSION`; rename/reframe as artifact-to-registry equality and add a separate workbook-to-fresh-candidate gate. |
+
+Function-level closure inside those mixed modules is also required: `production.generate_production_artifacts()` and `production.main()` are superseded dormant routes with no current entry-point caller; `inspection.write_runtime_contract_artifact()` duplicates `model_generation._write_runtime_contract_artifact()` and has no current caller; `registry_promotion.build_registry_from_promotions()` has no production caller and survives only in fixture tests. Classify all four as `RETIRE_DEAD_LEGACY` after exact compatibility/provenance closure and deletion approval. `production.write_stingray_compatibility_artifacts()` remains only as a temporary secondary exporter until the current browser/download consumer is either proven or migrated; it is not source or promotion authority. `inspection.render_contract_preview_markdown()` and `render_form_data_draft_markdown()` also need corrected safety wording because their current claim that generation writes only inspection files is false.
+
+#### Isolated six-model execution
+
+| Model | Fresh isolated result | Runtime result |
+|---|---|---|
+| `stingray` | generated | Temporary runtime and compatibility artifacts written; zero reported errors, but `dataset.status` was absent. |
+| `grand_sport` | generated | Temporary runtime artifact written; zero reported errors. |
+| `grand_sport_x` | generated | Temporary runtime artifact written; zero reported errors despite the separate known row-233 option-name quality failure. |
+| `z06` | failed before runtime output | `StaleDerivationAllowlistError` for `(z06, opt_pdd_001, opt_cbf_001)`. |
+| `zr1` | generated | Temporary runtime artifact written with `runtime_active`; zero reported errors. |
+| `zr1x` | generated | Temporary runtime artifact written with `runtime_active`; zero reported errors. |
+
+This proves that workbook discovery currently treats all six models as generatable; the retained CLI test expecting ZR1 rejection is stale. It also proves that generation's own error count is not a complete quality/readiness gate: Grand Sport X can report zero while the separate options-quality gate rejects its source row.
+
+The retained registry built successfully from the three tracked runtime contracts. The equivalent registry build against the isolated candidate root failed on the missing fresh Z06 contract. No browser candidate proof was possible, and the retained registry result cannot substitute for it.
+
+#### Generation/runtime test viability
+
+| Test surface | Actual authority and side effects | Disposition |
+|---|---|---|
+| `test_generate_form_model_discovery_cli.py` | Invokes the CLI at repository-default paths, rewrites runtime/compatibility artifacts, deletes routine inspection files, hardcodes three models, and expects now-generatable ZR1 to be rejected. | `REWRITE_CURRENT_LANE` around an isolated six-model harness; remove tracked-path mutation and the stale model list. |
+| `test_model_generation_route.py` | Reads source strings only. It proves facade spelling/import shape while preserving compatibility/draft keys; it never executes either source branch. | `RETIRE_STALE`; replace only necessary behavior in the isolated executable generation gate. |
+| `test_source_assembly_characterization.py` | Reads the live workbook and compares fresh assembly to retained contracts. It is read-only but artifact-relative, and currently fails for both Stingray and Grand Sport section drift (`2 failed`). | `REWRITE_CURRENT_LANE`; compare stable identities under reviewed drift rules in an isolated candidate lane, not positional retained artifacts. |
+| `test_runtime_contract_builder.py` | Fixture/source-string focused regression. It proves cleanup behavior but delegates expected behavior to `live_contract_data()` and has no malformed/incomplete/error-bearing rejection cases. | `KEEP_FOCUSED_REGRESSION` plus strict negative contract tests; not a release-readiness gate by itself. |
+| `test_registry_promotion_metadata.py` | Uses temporary fixtures safely, but its accepted runtime fixtures are structurally minimal enough to encode the permissive validator. | `KEEP_FOCUSED_REGRESSION`; strengthen fixtures and negative cases with the strict contract. |
+| `test_promote_model.py` | Uses fixture/temporary workbooks to prove metadata edits, safe-save behavior, and discovery after activation. It never generates or exercises the planned artifact. | `KEEP_FOCUSED_REGRESSION` for the metadata editor only; remove any promotion-readiness label. |
+| `test_schema_validation_metadata.py` | Mostly temporary workbook fixtures; retains local schema/header authority and legacy artifact-freshness shapes. | `REWRITE_CURRENT_LANE` to consume registry metadata and runtime-contract-only publication vocabulary. |
+| Grand Sport/Z06 preview and draft Node tests | Request inspection output under `/tmp`, but the invoked CLI still writes repository runtime artifacts first. They protect transitional preview/draft shapes, not the publishable lane. | `OPTIONAL_DIAGNOSTIC` after full output isolation; otherwise retire when inspection stops owning source construction. |
+| `z06-runtime-promotion.test.mjs` | Most assertions read the retained published registry; one assertion invokes `generate_registry.py` and rewrites `form-app/data.js`. | Split: `KEEP_CURRENT_PUBLISHED_RUNTIME_GATE` for read-only runtime behavior; `REWRITE_CURRENT_LANE` for isolated publication. |
+| `unpublished-runtime-contracts.test.mjs` | Reads retained unpublished GSX/ZR1/ZR1X artifacts only. | `RETIRE_STALE`; migrate an assertion to fresh candidate coverage only if workbook or an approved product source independently establishes that behavior. |
+| `multi-model-runtime-switching.test.mjs` | Exercises `app.js` against retained `form-app/data.js` without writes. | `KEEP_CURRENT_PUBLISHED_RUNTIME_GATE`; it proves current published behavior, not workbook freshness. |
+| `stingray-generator-stability.test.mjs` | Mixes live workbook assertions, retained output assertions, source-string checks, temporary workbook probes, and legacy compatibility expectations in one large file. | `CONSOLIDATE_INTO_CURRENT_GATE`; split workbook schema, fresh candidate generation, published runtime, and optional compatibility coverage. |
+
+A safe focused Python run of the source-string/runtime-builder/source-assembly/registry/schema group returned `50 passed, 2 failed`; both failures were the retained-contract drift assertions in `test_source_assembly_characterization.py`. A separate temporary-fixture registry/promotion/schema group returned `55 passed`. The green source-string and fixture tests did not offset the drift failures and are not fresh-generation proof.
+
+#### Resulting implementation order
+
+The existing Pass 1 registry-authority proposal is not the first safe implementation pass. Before source unification, promotion changes, or publication, add a smaller fail-closed generation boundary:
+
+1. Introduce one explicit generation context carrying the exact workbook snapshot, root, runtime output directory, optional report directory, and compatibility-output policy. Discovery must return configs bound to that context.
+2. Make `runtime_contract.py` own strict required-shape validation, required `dataset.status == runtime_active`, and zero error-severity findings.
+3. Validate before writing and publish runtime artifacts atomically; invalid generation writes nothing and exits nonzero.
+4. Rewrite the CLI generation gate to execute all workbook-discovered models under a temporary root and assert no tracked changes.
+5. Resolve the Z06 stale derivation separately as a model-specific blocker, then obtain a complete six-model candidate result.
+6. Before source-builder convergence, explicitly characterize and resolve the two builders' differences in standard-equipment deduplication, hidden/display behavior, variant overrides, invalid-reference filtering, rule assembly, and price validation. Do not choose these semantics in generic code when the workbook can express them.
+7. Only then proceed with shared workbook-registry authority, source-builder convergence, complete candidate-registry/browser proof, and atomic registry-publication cleanup as separately reviewed passes.
+
+Pass 0B remains open for the other retained non-ingest surfaces. This receipt authorizes no implementation, workbook change, retained artifact refresh, registry publication, model promotion, or dealer change.
 
 ## 3. Authority model after completion
 
@@ -674,7 +743,7 @@ Pass 4 requires a separately reviewed exact deletion list; this draft is not del
 
 Pass 5 plan moves/deletions require the completed/no-status classification receipt from Pass 0A and the current-consumer/necessary-behavior proof from Pass 0B.
 
-Current recommendation: continue Pass 0B viability work for the remaining non-ingest surfaces. Do not approve Pass 1 merely because the separately bounded Pass I retirement is complete.
+Current recommendation: continue Pass 0B viability work for the remaining non-ingest surfaces. When implementation is separately approved, start with the small fail-closed generation-context/strict-validation/atomic-write boundary recorded in §2.4 rather than the current broad Pass 1 registry proposal. Do not unify source builders, repair Z06 semantics, refresh artifacts, or publish a registry in that structural safety pass.
 
 ## 9. Bound audit inventory
 
@@ -814,7 +883,7 @@ Top-level side-effect boundary:
 - `tests/z06-performance-package-interactions.test.mjs`
 - `tests/z06-runtime-rule-corrections.test.mjs`
 
-`KEEP_FOCUSED_REGRESSION` — 20:
+`KEEP_FOCUSED_REGRESSION` — 22:
 
 - `tests/fixtures/asset-map-sync-media-urls.txt`
 - `tests/test_asset_map_sync.py`
@@ -827,6 +896,8 @@ Top-level side-effect boundary:
 - `tests/test_editor_server_write_api.py`
 - `tests/test_fable5_loop_contract.py`
 - `tests/test_promote_model.py` — metadata activation and rollback only; not customer-release readiness.
+- `tests/test_registry_promotion_metadata.py` — workbook publication metadata/registry construction fixtures; strengthen strict-contract cases before using them as runtime validation evidence.
+- `tests/test_runtime_contract_builder.py` — runtime finalization regression; add malformed, incomplete, and error-bearing rejection cases.
 - `tests/test_runtime_metadata_guards.py`
 - `tests/test_workbook_bool_hygiene.py`
 - `tests/test_workbook_changeset.py`
@@ -837,35 +908,33 @@ Top-level side-effect boundary:
 - `tests/test_workbook_manager_import_projection.py`
 - `tests/workbook-visual-copy-standardization.test.mjs`
 
-`REWRITE_TO_CURRENT_LANE` — 11:
+`REWRITE_TO_CURRENT_LANE` — 7:
 
 - `tests/grand-sport-draft-data.test.mjs`
-- `tests/stingray-generator-stability.test.mjs`
 - `tests/test_generate_form_model_discovery_cli.py`
-- `tests/test_model_generation_route.py`
-- `tests/test_registry_promotion_metadata.py`
-- `tests/test_runtime_contract_builder.py`
 - `tests/test_schema_validation_metadata.py`
 - `tests/test_source_assembly_characterization.py`
 - `tests/z06-form-data-draft.test.mjs`
 - `tests/z06-interior-accessory-cleanup.test.mjs`
 - `tests/z06-runtime-promotion.test.mjs`
 
-`MOVE_TO_OPTIONAL_DIAGNOSTIC` — 3:
+`MOVE_TO_OPTIONAL_DIAGNOSTIC` — 2:
 
 - `tests/grand-sport-contract-preview.test.mjs`
-- `tests/unpublished-runtime-contracts.test.mjs`
 - `tests/z06-contract-preview.test.mjs`
 
-`CONSOLIDATE_DUPLICATE` — 2:
+`CONSOLIDATE_DUPLICATE` — 3:
 
 - `tests/nonruntime-option-source-purge.test.mjs`
+- `tests/stingray-generator-stability.test.mjs`
 - `tests/workbook-schema-standardization.test.mjs`
 
-`RETIRE_STALE` — 32 at baseline; 31 ingest/proof entries removed in Pass I and the seat test remains pending:
+`RETIRE_STALE` — 34 after the Pass 0B generation/runtime reclassification; 31 ingest/proof entries were removed in Pass I, while the seat, source-string route, and retained-unpublished-contract tests remain pending exact deletion approval:
 
 - `tests/ingest_wizard_fixtures.py`
 - `tests/seat-canonicalization-diff.test.mjs`
+- `tests/test_model_generation_route.py`
+- `tests/unpublished-runtime-contracts.test.mjs`
 - `tests/test_ingest_wizard_canonical_compiler.py`
 - `tests/test_ingest_wizard_canonical_rows.py`
 - `tests/test_ingest_wizard_changeset.py`
@@ -1009,7 +1078,7 @@ Tests known to rewrite tracked artifacts until isolated:
 
 ## 10. Completion record
 
-Pass 0A and approved Pass I completed 2026-07-23; Pass 0B remains open:
+Pass 0A and approved Pass I completed 2026-07-23; the Pass 0B generation/runtime executable slice completed 2026-07-24 and Pass 0B remains open for other non-ingest surfaces:
 
 - Classified all 74 tracked script files and all 76 tracked test files at commit `786e936`.
 - Classified all 29 tracked `.hermes/plans` entries without treating ambiguous/no-status plans as completed.
@@ -1020,7 +1089,8 @@ Pass 0A and approved Pass I completed 2026-07-23; Pass 0B remains open:
 - Independent review's ten initial plan blockers were amended. Re-review found only missing Pass 1 regression gates; `test_editor_ops_global_families.py`, `test_registry_promotion_metadata.py`, and conditional `test_promote_model.py` coverage are now explicit alongside Workbook Manager projection gates.
 - Correction after semantic-viability challenge: importer/caller coverage is only a reachability guard. It does not prove a module, function, route, output, or test remains necessary. Pass 0B must trace authoritative roots and revise every keep/retire decision before implementation approval.
 - Pass 0B source-level subaudit traced customer release, workbook schema/write, promotion/publication, ingest/ChangeSet, fallback editor, and Workbook Manager roots. It reclassified `promote_model.py`, `apply_workbook_ops.py`, deployment proof, migration/repair, mixed ingest session/decision modules, legacy importer libraries, and false-green/compatibility-preserving tests by actual behavior rather than importer count.
-- After the ingest-retirement decision, the revised test partition is 8 current gates, 20 focused regressions, 11 current-lane rewrites, 3 optional diagnostics, 2 duplicate consolidations, and 32 stale retirements. Thirty-one of the retirements belong to ingest or its ingest-specific proof; the seat canonicalization test is separate. The 74-script and 76-test inventories remain exact complete partitions with no missing, extra, or duplicate paths.
+- Pass 0B generation/runtime execution at commit `667aad5` proved six-model discovery, five successful isolated generations, the Z06 stale-derivation failure, split source construction, incomplete config path binding, permissive runtime validation, write-before-validation behavior, retained-artifact registry false confidence, and tracked-path test hazards. The evidence and revised implementation ordering are recorded in §2.4; no protected artifact changed.
+- After the Pass 0B generation/runtime reclassification, the revised test partition is 8 current gates, 22 focused regressions, 7 current-lane rewrites, 2 optional diagnostics, 3 duplicate consolidations, and 34 stale retirements. Thirty-one retirements belong to ingest or its ingest-specific proof; the seat canonicalization, source-string route, and retained unpublished-contract tests are separate pending retirement candidates. The 74-script and 76-test inventories remain exact complete partitions with no missing, extra, or duplicate paths.
 - User decision: the ingest wizard's data-import behavior caused enough harm that the workspace should not carry the wizard/compiler/exception/emitter chain forward. `changeset_emitter.py` and `plan_builder.py` therefore retire together; no constant migration is justified solely to preserve the emitter. Generic workbook-domain ChangeSet/service safety remains independent.
 - Pass I executed the exact reviewed retirement boundary and produced the receipt in §2. The active inventory is now 44 scripts and 46 tests; no retired ingest import, launcher, UI, or active documentation path remains.
 - Pass 0B is not complete: the subaudit was read-only source/API/UI tracing and did not execute every retained CLI/test. Per-path execution or an explicit safe source-only characterization is still required before a `KEEP_*` disposition becomes final implementation/deletion authority.
