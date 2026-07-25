@@ -29,7 +29,7 @@ from corvette_form_generator.mapping import (
     normalize_mode,
     selection_mode_label as shared_selection_mode_label,
     status_to_label,
-    step_for_section as shared_step_for_section,
+    step_for_section,
 )
 from corvette_form_generator.model_config import ModelConfig
 from corvette_form_generator.model_configs import base_model_config
@@ -58,6 +58,8 @@ from corvette_form_generator.runtime_metadata import (
     load_order_summary_metadata,
     load_runtime_rule_exceptions,
     load_runtime_steps,
+    step_label_lookup,
+    workbook_step_label,
     load_section_presentation,
     load_variant_option_overrides,
     presentation_bool,
@@ -66,29 +68,8 @@ from corvette_form_generator.workbook import clean, intish, money, rows_from_she
 
 
 MODEL_CONFIG = base_model_config("stingray")
-STEP_ORDER = list(MODEL_CONFIG.step_order)
-STEP_LABELS = dict(MODEL_CONFIG.step_labels)
-CONTEXT_SECTIONS = [dict(section) for section in MODEL_CONFIG.context_sections]
-SECTION_STEP_OVERRIDES = dict(MODEL_CONFIG.section_step_overrides)
 BODY_STYLE_DISPLAY_ORDER = dict(MODEL_CONFIG.body_style_display_order)
 SELECTION_MODE_LABELS = dict(MODEL_CONFIG.selection_mode_labels)
-STANDARD_SECTIONS = set(MODEL_CONFIG.standard_sections)
-
-
-def step_for_section(
-    section_id: str,
-    section_name: str,
-    section_step_key: str = "",
-    *,
-    standard_sections: set[str] | frozenset[str] | None = None,
-) -> str:
-    return shared_step_for_section(
-        section_id,
-        section_name,
-        section_step_key=section_step_key,
-        standard_sections=standard_sections or STANDARD_SECTIONS,
-        section_step_overrides=SECTION_STEP_OVERRIDES,
-    )
 
 
 def selection_mode_label(selection_mode: str) -> str:
@@ -180,10 +161,11 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
     default_selection_display_rules = load_default_selection_display_rules(wb, MODEL_CONFIG.model_key)
     runtime_rule_exceptions = load_runtime_rule_exceptions(wb, MODEL_CONFIG.model_key)
     order_summary_metadata = load_order_summary_metadata(wb, MODEL_CONFIG.model_key)
-    runtime_steps = load_runtime_steps(wb, MODEL_CONFIG.model_key, MODEL_CONFIG.step_order, MODEL_CONFIG.step_labels)
+    runtime_steps = load_runtime_steps(wb, MODEL_CONFIG.model_key)
+    step_labels = step_label_lookup(runtime_steps)
     context_sections = [
         {**row, "selection_mode_label": selection_mode_label(row.get("selection_mode", ""))}
-        for row in load_context_sections(wb, MODEL_CONFIG.model_key, MODEL_CONFIG.context_sections)
+        for row in load_context_sections(wb, MODEL_CONFIG.model_key)
     ]
     section_presentation_rows = load_section_presentation(wb, MODEL_CONFIG.model_key)
     section_presentation = {row["section_id"]: row for row in section_presentation_rows}
@@ -191,7 +173,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
         section_id
         for section_id, presentation in section_presentation.items()
         if presentation_bool(presentation, "standard_equipment_bucket", default=False)
-    } or set(STANDARD_SECTIONS)
+    }
     variant_option_override_rows = load_variant_option_overrides(
         wb, MODEL_CONFIG.model_key, MODEL_CONFIG.variant_option_overrides_sheet
     )
@@ -244,12 +226,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
         presentation = section_presentation.get(section_id, {})
         section_name = clean(presentation.get("display_label")) or section.get("section_name", "")
         presentation_step_key = clean(presentation.get("step_key"))
-        step_key = step_for_section(
-            section_id,
-            section_name,
-            presentation_step_key or section.get("step_key", ""),
-            standard_sections=standard_section_ids,
-        )
+        step_key = step_for_section(section_id, presentation_step_key or section.get("step_key", ""))
         selection_mode = section.get("selection_mode", "")
         section_display_order = (
             intish(presentation.get("section_display_order"))
@@ -267,7 +244,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
                 "standard_behavior": section.get("standard_behavior", ""),
                 "section_display_order": section_display_order,
                 "step_key": step_key,
-                "step_label": STEP_LABELS.get(step_key, step_key.replace("_", " ").title()),
+                "step_label": workbook_step_label(step_labels, step_key),
             }
         )
 
@@ -287,12 +264,7 @@ def build_production_source_data(config: ModelConfig | None = None) -> dict[str,
         presentation = section_presentation.get(section_id, {})
         section_name = clean(presentation.get("display_label")) or section.get("section_name", "")
         presentation_step_key = clean(presentation.get("step_key"))
-        step_key = step_for_section(
-            section_id,
-            section_name,
-            presentation_step_key or section.get("step_key", ""),
-            standard_sections=standard_section_ids,
-        )
+        step_key = step_for_section(section_id, presentation_step_key or section.get("step_key", ""))
         mode = section.get("selection_mode", "")
         return {
             "section_name": section_name,

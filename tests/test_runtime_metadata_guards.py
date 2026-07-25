@@ -76,7 +76,12 @@ def append_sheet(wb: Workbook, name: str, headers: list[str], rows: list[dict[st
         ws.append([row.get(header, None) for header in headers])
 
 
-def metadata_workbook(*, promoted: bool, runtime_rows: list[dict[str, object]] | None = None) -> Workbook:
+def metadata_workbook(
+    *,
+    promoted: bool,
+    runtime_rows: list[dict[str, object]] | None = None,
+    context_rows: list[dict[str, object]] | None = None,
+) -> Workbook:
     wb = Workbook()
     del wb[wb.sheetnames[0]]
     append_sheet(
@@ -97,7 +102,7 @@ def metadata_workbook(*, promoted: bool, runtime_rows: list[dict[str, object]] |
         ],
     )
     append_sheet(wb, "runtime_steps", RUNTIME_STEP_HEADERS, runtime_rows or [])
-    append_sheet(wb, "context_section_master", CONTEXT_SECTION_HEADERS, [])
+    append_sheet(wb, "context_section_master", CONTEXT_SECTION_HEADERS, context_rows or [])
     append_sheet(wb, "order_summary_sections", ORDER_SUMMARY_HEADERS, [])
     append_sheet(wb, "step_order_summary_map", STEP_SUMMARY_HEADERS, [])
     append_sheet(wb, "default_selection_rules", DEFAULT_SELECTION_HEADERS, [])
@@ -157,20 +162,23 @@ def default_selection_workbook() -> Workbook:
 
 
 class RuntimeMetadataGuardTests(unittest.TestCase):
-    def test_unpromoted_models_can_still_use_runtime_step_fallback(self) -> None:
+    def test_unpromoted_models_cannot_use_a_runtime_step_fallback_either(self) -> None:
+        """No Python fallback for any active model — promotion is irrelevant."""
+
         wb = metadata_workbook(promoted=False)
 
-        rows = load_runtime_steps(wb, "z06", ["body_style"], {"body_style": "Body Style"})
-
-        self.assertEqual(rows, [{"step_key": "body_style", "step_label": "Body Style", "runtime_order": 1, "source": "fallback_config"}])
+        with self.assertRaisesRegex(ValueError, "requires active workbook-owned runtime_steps rows"):
+            load_runtime_steps(wb, "z06")
 
     def test_promoted_models_cannot_use_runtime_step_fallback(self) -> None:
         wb = metadata_workbook(promoted=True)
 
-        with self.assertRaisesRegex(ValueError, "requires workbook-owned runtime_steps rows"):
-            load_runtime_steps(wb, "z06", ["body_style"], {"body_style": "Body Style"})
+        with self.assertRaisesRegex(ValueError, "requires active workbook-owned runtime_steps rows"):
+            load_runtime_steps(wb, "z06")
 
-    def test_promoted_models_cannot_use_incomplete_runtime_steps(self) -> None:
+    def test_incomplete_runtime_steps_fail_against_workbook_referenced_steps(self) -> None:
+        """Completeness is measured against the workbook's own section metadata."""
+
         wb = metadata_workbook(
             promoted=True,
             runtime_rows=[
@@ -183,16 +191,26 @@ class RuntimeMetadataGuardTests(unittest.TestCase):
                     "active": True,
                 }
             ],
+            context_rows=[
+                {
+                    "model_key": "z06",
+                    "context_type": "trim_level",
+                    "section_id": "sec_context_trim_level",
+                    "section_name": "Trim Level",
+                    "step_key": "trim_level",
+                    "active": True,
+                }
+            ],
         )
 
         with self.assertRaisesRegex(ValueError, "missing step_key values: trim_level"):
-            load_runtime_steps(wb, "z06", ["body_style", "trim_level"], {"body_style": "Body Style", "trim_level": "Trim Level"})
+            load_runtime_steps(wb, "z06")
 
     def test_promoted_models_cannot_use_context_section_fallback(self) -> None:
         wb = metadata_workbook(promoted=True)
 
-        with self.assertRaisesRegex(ValueError, "requires workbook-owned context_section_master rows"):
-            load_context_sections(wb, "z06", [{"section_id": "sec_context_body_style"}])
+        with self.assertRaisesRegex(ValueError, "requires active workbook-owned context_section_master rows"):
+            load_context_sections(wb, "z06")
 
     def test_promoted_models_cannot_use_browser_order_summary_fallback(self) -> None:
         wb = metadata_workbook(promoted=True)

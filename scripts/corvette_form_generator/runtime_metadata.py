@@ -1,14 +1,12 @@
 """Safe workbook-owned runtime metadata readers.
 
-This module is intentionally substrate-only.  It provides generic loaders for
-optional metadata sheets created by the workbook metadata migration without
-changing generator or runtime behavior.  Missing or header-only sheets return
-empty structures or caller-provided fallbacks.
+Generic loaders for the workbook's metadata sheets. The workbook is the only
+authority for anything these sheets can express: a missing required row for an
+active model raises rather than falling back to a Python default.
 """
 
 from __future__ import annotations
 
-from copy import deepcopy
 from typing import Any, Iterable, Mapping
 
 from corvette_form_generator.model_config import ModelConfig
@@ -92,84 +90,157 @@ def promoted_runtime_model(wb: Any, model_key: str) -> bool:
 
 
 def _require_workbook_metadata(wb: Any, model_key: str, sheet_name: str) -> None:
-    if promoted_runtime_model(wb, model_key):
-        raise ValueError(
-            f"Promoted runtime model {model_key!r} requires workbook-owned {sheet_name} rows; "
-            "fallback metadata is only allowed for unpromoted compatibility paths."
-        )
+    """Fail rather than substitute a Python default for workbook-owned metadata.
+
+    The workbook is the only authority for anything a workbook column can
+    express. A Python fallback here would make the shipped runtime impossible
+    to predict from the source of truth, so a missing row is an error for every
+    active/generatable model, not only promoted ones.
+    """
+
+    raise ValueError(
+        f"Model {model_key!r} requires active workbook-owned {sheet_name} rows. "
+        "Author them in the workbook; generation does not substitute defaults."
+    )
 
 
-def _copy_mapping_rows(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
-    return [dict(deepcopy(row)) for row in rows]
+# One measured workbook gap, expressed as two SEPARATE facts. Conflating them is
+# unsafe: adding a key to supply a label would otherwise also exempt that key
+# from the completeness guard, silently re-opening the defect this guard exists
+# to catch.
+#
+# Fact 1 -- ``standard_equipment`` is a bucket, not a navigable step, so no model
+# authors a ``runtime_steps`` row for it and the completeness check must not
+# demand one.
+BUCKET_STEP_KEYS = frozenset({"standard_equipment"})
+
+# Fact 2 -- it still needs a display string. This is the last Python-authored
+# display string in the generator. It only ever lands in ``sections[].step_label``,
+# which no consumer reads: ``form-app/app.js`` and every test read
+# ``steps[].step_label`` instead. Removing it requires six workbook rows.
+UNAUTHORED_BUCKET_STEP_LABELS = {"standard_equipment": "Standard Equipment"}
 
 
-def load_runtime_steps(
-    wb: Any,
-    model_key: str,
-    fallback_order: Iterable[str],
-    fallback_labels: Mapping[str, Any],
-) -> list[dict[str, Any]]:
-    """Load runtime step metadata.
+def _referenced_step_keys(wb: Any, model_key: str) -> set[str]:
+    """Every step_key the workbook itself points at for this model.
 
-    Promoted runtime models must have workbook-owned rows. Fallback
-    order/labels are compatibility defaults for unpromoted models and the
-    expected-key set for promoted completeness checks.
+    Derived from the workbook, never from a Python list, so the completeness
+    check cannot become its own authority over what steps must exist.
+    """
+
+    # Model-scoped sheets only. ``section_master`` is model-agnostic, so its step
+    # keys span every model and cannot speak for the one being generated.
+    referenced: set[str] = set()
+    for sheet_name in ("section_presentation", "context_section_master", "step_order_summary_map"):
+        referenced |= {clean(row.get("step_key")) for row in active_rows(wb, sheet_name, model_key)}
+    referenced |= _steps_any_other_active_model_authors(wb, model_key)
+    # The recorded bucket-step gap is exempt: it is a bucket, not a navigable
+    # step, so it has no runtime_steps row to find. Tracked in one place.
+    return {step_key for step_key in referenced if step_key} - BUCKET_STEP_KEYS
+
+
+def _steps_any_other_active_model_authors(wb: Any, model_key: str) -> set[str]:
+    """Steps authored by any other active model, so this one must author them too.
+
+    The model-scoped sheets above cannot see a terminal step such as ``summary``,
+    which no section or order-summary row points at. Rather than reintroduce a
+    Python list of expected steps, require consistency with the rest of the
+    workbook.
+
+    This is a UNION, not an intersection. An intersection is defeated by dropping
+    the same step from two models, or by deactivating a single peer row -- both
+    ordinary authoring actions. A union survives both: every remaining peer still
+    demands the step.
+
+    Known limit, deliberately accepted: dropping a step from EVERY active model
+    passes, because nothing is left to compare against. That is a wholesale
+    workbook change rather than a drifting edit. A model that legitimately needs a
+    different step set will fail loudly here and must author the row -- the right
+    failure direction for a lane whose whole point is that the workbook decides.
+    """
+
+    model = clean(model_key).lower()
+    active_models = {clean(row.get("model_key")).lower() for row in active_rows(wb, "model_master")}
+    peer_steps: set[str] = set()
+    for row in active_rows(wb, "runtime_steps"):
+        other = clean(row.get("model_key")).lower()
+        step_key = clean(row.get("step_key"))
+        if not step_key or other == model or other not in active_models:
+            continue
+        peer_steps.add(step_key)
+    return peer_steps
+
+
+def step_label_lookup(runtime_steps: list[dict[str, Any]]) -> dict[str, str]:
+    """Step labels come from workbook-owned ``runtime_steps`` rows only."""
+
+    return {row["step_key"]: row["step_label"] for row in runtime_steps}
+
+
+def workbook_step_label(step_labels: Mapping[str, str], step_key: str) -> str:
+    """Return the workbook-authored label for one step.
+
+    Raises unless the workbook authors the step, or it is the single recorded
+    bucket-step gap above.
+    """
+
+    if step_key in step_labels:
+        return step_labels[step_key]
+    if step_key in UNAUTHORED_BUCKET_STEP_LABELS:
+        return UNAUTHORED_BUCKET_STEP_LABELS[step_key]
+    raise ValueError(
+        f"Step {step_key!r} has no workbook-owned runtime_steps row to supply its label. "
+        "Author the runtime_steps row; generation does not invent step labels."
+    )
+
+
+def load_runtime_steps(wb: Any, model_key: str) -> list[dict[str, Any]]:
+    """Load workbook-owned runtime step metadata.
+
+    Every active/generatable model must author its own rows. Completeness is
+    checked against the step keys the workbook's own section metadata
+    references, so no Python constant decides which steps exist.
     """
 
     rows = active_rows(wb, "runtime_steps", model_key)
     if not rows:
         _require_workbook_metadata(wb, model_key, "runtime_steps")
-        return [
-            {
-                "step_key": clean(step_key),
-                "step_label": clean(fallback_labels.get(step_key, step_key)),
-                "runtime_order": index,
-                "source": "fallback_config",
-            }
-            for index, step_key in enumerate(fallback_order, start=1)
-            if clean(step_key)
-        ]
 
     steps: list[dict[str, Any]] = []
-    expected_step_keys = [clean(step_key) for step_key in fallback_order if clean(step_key)]
     for row in rows:
         step_key = clean(row.get("step_key"))
         if not step_key:
             continue
+        step_label = clean(row.get("step_label"))
+        if not step_label:
+            raise ValueError(
+                f"Model {model_key!r} runtime_steps row {step_key!r} has a blank step_label. "
+                "Author it; generation does not fall back to the raw step key."
+            )
         steps.append(
             {
                 "step_key": step_key,
-                "step_label": clean(row.get("step_label")) or clean(fallback_labels.get(step_key, step_key)),
+                "step_label": step_label,
                 "runtime_order": intish(row.get("runtime_order"), len(steps) + 1),
                 "source": clean(row.get("source")) or "workbook",
             }
         )
-    if promoted_runtime_model(wb, model_key):
-        actual_step_keys = {row["step_key"] for row in steps}
-        missing_step_keys = [step_key for step_key in expected_step_keys if step_key not in actual_step_keys]
-        if missing_step_keys:
-            raise ValueError(
-                f"Promoted runtime model {model_key!r} has incomplete workbook-owned runtime_steps rows; "
-                f"missing step_key values: {', '.join(missing_step_keys)}"
-            )
+    actual_step_keys = {row["step_key"] for row in steps}
+    missing_step_keys = sorted(_referenced_step_keys(wb, model_key) - actual_step_keys)
+    if missing_step_keys:
+        raise ValueError(
+            f"Model {model_key!r} has incomplete workbook-owned runtime_steps rows; "
+            f"its section metadata references missing step_key values: {', '.join(missing_step_keys)}"
+        )
     return sorted(steps, key=lambda row: (row["runtime_order"], row["step_key"]))
 
 
-def load_context_sections(
-    wb: Any,
-    model_key: str,
-    fallback_sections: Iterable[Mapping[str, Any]],
-) -> list[dict[str, Any]]:
-    """Load context section metadata.
-
-    Promoted runtime models must have workbook-owned rows. Caller-provided
-    fallback sections are compatibility defaults for unpromoted models only.
-    """
+def load_context_sections(wb: Any, model_key: str) -> list[dict[str, Any]]:
+    """Load workbook-owned context section metadata."""
 
     rows = active_rows(wb, "context_section_master", model_key)
     if not rows:
         _require_workbook_metadata(wb, model_key, "context_section_master")
-        return _copy_mapping_rows(fallback_sections)
 
     sections: list[dict[str, Any]] = []
     for row in rows:
@@ -487,112 +558,6 @@ def load_model_interior_scope_map(wb: Any, model_key: str) -> dict[str, dict[str
             raise ValueError(f"Duplicate active model_interior_scope row for model {model_key}: interior_id={interior_id}")
         scope_map[interior_id] = row
     return scope_map
-
-
-def _split_phrase_list(value: Any) -> tuple[str, ...]:
-    text = clean(value)
-    if not text:
-        return ()
-    parts = text.split("|") if "|" in text else text.split(",")
-    return tuple(part for part in (part.strip() for part in parts) if part)
-
-
-_LEGACY_RULE_PHRASE_FALLBACKS: dict[str, dict[str, Any]] = {
-    "not available with": {
-        "rule_type": "excludes",
-        "direction": "source_to_mentioned",
-        "stop_phrases": (),
-        "review_flag_default": True,
-    },
-    "requires": {
-        "rule_type": "requires",
-        "direction": "source_to_mentioned",
-        "stop_phrases": (" or included with", " included with"),
-        "review_flag_default": True,
-    },
-    "includes": {
-        "rule_type": "includes",
-        "direction": "source_to_mentioned",
-        "stop_phrases": (" requires",),
-        "review_flag_default": True,
-    },
-    "included and only available with": {
-        "rule_type": "includes",
-        "direction": "mentioned_to_source",
-        "stop_phrases": (),
-        "review_flag_default": True,
-    },
-    "included with": {
-        "rule_type": "includes",
-        "direction": "mentioned_to_source",
-        "stop_phrases": (),
-        "review_flag_default": True,
-    },
-    "only available with": {
-        "rule_type": "requires",
-        "direction": "source_to_mentioned",
-        "stop_phrases": (),
-        "review_flag_default": True,
-    },
-}
-
-
-def _normalized_rule_phrase_row(row: Mapping[str, Any], *, fallback: bool = False) -> dict[str, Any]:
-    phrase = clean(row.get("phrase"))
-    return {
-        "phrase": phrase,
-        "rule_type": clean(row.get("rule_type")),
-        "direction": clean(row.get("direction")),
-        "stop_phrases": _split_phrase_list(row.get("stop_phrases")),
-        "review_flag_default": truthy(row.get("review_flag_default"), default=False),
-        "notes": clean(row.get("notes")) or ("fallback_config" if fallback else ""),
-    }
-
-
-def _fallback_rule_phrase_row(value: Any) -> dict[str, Any] | None:
-    if isinstance(value, Mapping):
-        row = _normalized_rule_phrase_row(value, fallback=True)
-        return row if row["phrase"] else None
-
-    phrase = clean(value)
-    if not phrase:
-        return None
-    legacy = _LEGACY_RULE_PHRASE_FALLBACKS.get(phrase.lower(), {})
-    return {
-        "phrase": phrase,
-        "rule_type": clean(legacy.get("rule_type")),
-        "direction": clean(legacy.get("direction")) or "review_only",
-        "stop_phrases": tuple(legacy.get("stop_phrases", ())),
-        "review_flag_default": bool(legacy.get("review_flag_default", False)),
-        "notes": "fallback_config",
-    }
-
-
-def load_rule_phrase_map(wb: Any, fallback_phrases: Iterable[Any] = ()) -> list[dict[str, Any]]:
-    """Load workbook-authored rule phrase parser metadata.
-
-    Missing or header-only workbooks fall back to legacy-equivalent parser
-    metadata.  If the workbook sheet contains rows, active workbook rows are
-    authoritative; disabled rows do not silently re-enable Python fallbacks.
-    """
-
-    workbook_rows = optional_rows(wb, "rule_phrase_map")
-    rows = [row for row in workbook_rows if truthy(row.get("active", "True"), default=True)]
-    if workbook_rows:
-        phrase_rows: list[dict[str, Any]] = []
-        seen: set[str] = set()
-        for row in rows:
-            phrase = clean(row.get("phrase"))
-            if not phrase:
-                continue
-            phrase_key = phrase.lower()
-            if phrase_key in seen:
-                raise ValueError(f"Duplicate active rule_phrase_map row: phrase={phrase}")
-            seen.add(phrase_key)
-            phrase_rows.append(_normalized_rule_phrase_row(row))
-        return phrase_rows
-
-    return [row for row in (_fallback_rule_phrase_row(phrase) for phrase in fallback_phrases) if row]
 
 
 def load_model_metadata(wb: Any, model_key: str) -> dict[str, Any]:

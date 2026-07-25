@@ -14,7 +14,6 @@ from corvette_form_generator.pricing import (
     price_ref_component_prices,
     price_ref_prices,
 )
-from corvette_form_generator.rules import runtime_authored_rule
 from corvette_form_generator.runtime_metadata import (
     load_interior_components,
     load_model_interior_scope_map,
@@ -122,14 +121,6 @@ def build_model_interiors(config: ModelConfig, wb: Any | None = None) -> list[di
     try:
         interior_rows = rows_from_sheet(wb, config.interior_source_sheet)
         price_ref_rows = rows_from_sheet(wb, "PriceRef")
-        rule_rows = rows_from_sheet(wb, config.rule_mapping_sheet)
-        z25_interior_ids = {
-            row.get("source_id", "")
-            for row in rule_rows
-            if row.get("rule_type", "").lower() == "includes"
-            and row.get("target_id", "") == "opt_z25_001"
-            and runtime_authored_rule(row)
-        }
         interior_price_ref = price_ref_prices(price_ref_rows)
         interior_component_price_ref = price_ref_component_prices(price_ref_rows)
         workbook_components_by_interior_id = load_interior_components(wb, config.model_key)
@@ -158,8 +149,8 @@ def build_model_interiors(config: ModelConfig, wb: Any | None = None) -> list[di
             "interior_id": interior_id,
             "source_sheet": config.interior_source_sheet,
             **active_flags,
-            "requires_z25": "True" if requires_option_id == "opt_z25_001" or interior_id in z25_interior_ids else "False",
-            "trim_level": clean(scope_row.get("trim_level")) or trim.replace("_R6X", ""),
+            "requires_z25": "True" if requires_option_id == "opt_z25_001" else "False",
+            "trim_level": clean(scope_row.get("trim_level")),
             "requires_r6x": "True" if "_R6X" in trim or interior_id.endswith("_R6X") else "False",
             "seat_code": clean(row.get("Seat", "")),
             "interior_code": clean(row.get("Interior Code", "")),

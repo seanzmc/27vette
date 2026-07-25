@@ -1,0 +1,45 @@
+{
+  "id": "2026-07-25-pass2-shadow-authority-purge",
+  "started_at": "2026-07-25T17:00:00-04:00",
+  "completed_at": "2026-07-25T21:30:00-04:00",
+  "objective": "Pass 2 receipt B: sweep the generation lane for Python-side values that override, default, or rewrite workbook-authored ones; prove reachability against the canonical workbook for all six active/generatable models; delete the dead ones; make missing active-model presentation metadata fail instead of silently falling back to a Python default.",
+  "changed_surface": "generator source and tests only",
+  "outcome_rubric": "fable5loop/runs/2026-07-25-pass2-shadow-authority-purge/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-25-pass2-shadow-authority-purge/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-25-pass2-shadow-authority-purge/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-25-pass2-shadow-authority-purge/verifier-report.md"
+    },
+    {
+      "section": "Open failures",
+      "evidence": "fable5loop/runs/2026-07-25-pass2-shadow-authority-purge/validation-output.txt"
+    },
+    {
+      "section": "General rules",
+      "evidence": "fable5loop/runs/2026-07-25-pass2-shadow-authority-purge/outcome.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-25-pass2-shadow-authority-purge/outcome.md"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-25-pass2-shadow-authority-purge/verifier-report.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "fail",
+    "accepted_by_human": false,
+    "cycles": 2
+  },
+  "boundaries_preserved": [
+    "workbook",
+    "generated artifacts",
+    "runtime app",
+    "dealer submission"
+  ]
+}

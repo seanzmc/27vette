@@ -37,24 +37,27 @@ def normalize_mode(selection_mode: str) -> str:
 def selection_mode_label(selection_mode: str, labels: Mapping[str, str]) -> str:
     if not selection_mode:
         return ""
-    return labels.get(selection_mode, selection_mode.replace("_", " ").title())
+    if selection_mode not in labels:
+        raise ValueError(
+            f"Selection mode {selection_mode!r} has no authored label. "
+            "Add it to the workbook's selection-mode labels rather than title-casing the key."
+        )
+    return labels[selection_mode]
 
 
-def step_for_section(
-    section_id: str,
-    section_name: str,
-    *,
-    section_step_key: str = "",
-    standard_sections: set[str] | frozenset[str],
-    section_step_overrides: Mapping[str, str],
-) -> str:
-    if section_step_key:
-        return section_step_key
-    if section_id in section_step_overrides:
-        return section_step_overrides[section_id]
-    if section_id in standard_sections:
-        return "standard_equipment"
-    name = section_name.lower()
-    if "stripe" in name or "spoiler" in name or "lpo" in name or "exhaust" in name or "wheel accessory" in name:
-        return "aero_exhaust_stripes_accessories"
-    return "standard_equipment"
+def step_for_section(section_id: str, section_step_key: str = "") -> str:
+    """Return the workbook-authored step for one section.
+
+    ``section_master.step_key`` is the only authority. The former Python
+    override map, standard-section set, and section-name substring heuristic
+    were all unreachable against the canonical workbook and are gone: a section
+    with no authored step is a workbook defect, not something to guess at.
+    """
+
+    step_key = clean(section_step_key)
+    if not step_key:
+        raise ValueError(
+            f"Section {section_id!r} has no workbook-authored step_key. "
+            "Author section_master.step_key; generation does not infer it."
+        )
+    return step_key

@@ -8,12 +8,22 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
 
 ROOT = Path(__file__).resolve().parents[1]
+WORKBOOK = ROOT / "stingray_master.xlsx"
 SCRIPTS_DIR = ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
+
+from corvette_form_generator.model_generation import generate_model_artifacts  # noqa: E402
+
+
+def generated_steps(result: dict) -> list[dict]:
+    import json
+
+    contract = json.loads(Path(result["runtime_contract_json"]).read_text(encoding="utf-8"))
+    return contract["steps"]
 
 from corvette_form_generator.model_configs import (  # noqa: E402
     REQUIRED_GENERATION_SOURCE_ROLES,
@@ -382,6 +392,126 @@ class ModelConfigMetadataTests(unittest.TestCase):
         configs = discover_temp_configs(wb)
 
         self.assertIn("stingray", configs)
+
+
+class WorkbookOwnedPresentationMetadataTests(unittest.TestCase):
+    """Requirement 9: presentation metadata is workbook-owned for EVERY active model.
+
+    Falling back to a Python constant when a workbook row is missing makes the
+    runtime unpredictable from the source of truth. It must fail instead — and
+    for unpromoted active models too, not only promoted ones.
+    """
+
+    def workbook_without(self, sheet_name: str, model_key: str) -> Path:
+        """Copy the canonical workbook with one model's rows on one sheet removed."""
+
+        target = Path(self.tmpdir.name) / f"without-{sheet_name}-{model_key}.xlsx"
+        wb = load_workbook(WORKBOOK)
+        ws = wb[sheet_name]
+        headers = [cell.value for cell in ws[1]]
+        model_column = headers.index("model_key") + 1
+        for row_index in range(ws.max_row, 1, -1):
+            value = ws.cell(row_index, model_column).value
+            if str(value or "").strip().lower() == model_key:
+                ws.delete_rows(row_index)
+        wb.save(target)
+        wb.close()
+        return target
+
+    def setUp(self) -> None:
+        self.tmpdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmpdir.cleanup)
+
+    def test_missing_presentation_rows_fail_for_an_unpromoted_active_model(self) -> None:
+        # zr1 is active and generatable but NOT promoted to the runtime registry.
+        for sheet_name in ("runtime_steps", "context_section_master"):
+            with self.subTest(sheet=sheet_name):
+                snapshot = self.workbook_without(sheet_name, "zr1")
+                configs = discover_generation_model_configs(snapshot, root=Path(self.tmpdir.name) / "out")
+                self.assertIn("zr1", configs)
+
+                with self.assertRaisesRegex(ValueError, sheet_name):
+                    generate_model_artifacts(configs["zr1"])
+
+    def workbook_without_step(self, model_key: str, step_key: str, source: Path | None = None) -> Path:
+        target = Path(self.tmpdir.name) / f"without-step-{model_key}-{step_key}.xlsx"
+        wb = load_workbook(source or WORKBOOK)
+        ws = wb["runtime_steps"]
+        headers = [cell.value for cell in ws[1]]
+        model_column = headers.index("model_key") + 1
+        step_column = headers.index("step_key") + 1
+        for row_index in range(ws.max_row, 1, -1):
+            same_model = str(ws.cell(row_index, model_column).value or "").strip().lower() == model_key
+            same_step = str(ws.cell(row_index, step_column).value or "").strip() == step_key
+            if same_model and same_step:
+                ws.delete_rows(row_index)
+        wb.save(target)
+        wb.close()
+        return target
+
+    def assert_generation_rejects(self, snapshot: Path, model_key: str, label: str) -> None:
+        configs = discover_generation_model_configs(snapshot, root=Path(self.tmpdir.name) / f"out-{label}")
+        with self.assertRaisesRegex(ValueError, "incomplete workbook-owned runtime_steps rows"):
+            generate_model_artifacts(configs[model_key])
+
+    def test_dropping_any_single_runtime_step_fails_generation(self) -> None:
+        """Every authored step is load-bearing, for every active model.
+
+        The earlier version of this check compared the workbook against a Python
+        list of expected steps and only ran for promoted models. Its replacement
+        must not be weaker: dropping ANY one of ANY model's steps must fail,
+        promoted or not.
+        """
+
+        configs = discover_generation_model_configs(WORKBOOK, root=Path(self.tmpdir.name) / "base")
+        self.assertEqual(len(configs), 6)
+
+        for model_key in sorted(configs):
+            step_keys = [step["step_key"] for step in generated_steps(generate_model_artifacts(configs[model_key]))]
+            self.assertGreaterEqual(len(step_keys), 10)
+
+            for step_key in step_keys:
+                with self.subTest(model=model_key, step=step_key):
+                    self.assert_generation_rejects(
+                        self.workbook_without_step(model_key, step_key),
+                        model_key,
+                        f"{model_key}-{step_key}",
+                    )
+
+    def test_dropping_one_step_from_two_models_still_fails(self) -> None:
+        """The cross-model rule is a union, so surviving peers still demand the step.
+
+        An intersection rule was defeated by dropping the same step from two
+        models, or by deactivating one peer row. Both must fail.
+        """
+
+        snapshot = self.workbook_without_step("z06", "summary")
+        snapshot = self.workbook_without_step("zr1", "summary", source=snapshot)
+
+        for model_key in ("z06", "zr1"):
+            with self.subTest(model=model_key):
+                self.assert_generation_rejects(snapshot, model_key, f"two-model-{model_key}")
+
+    def test_workbook_scoped_sources_catch_a_step_no_peer_authors(self) -> None:
+        """Pin the model-scoped sheets independently of the cross-model rule.
+
+        Without this, a future change narrowing the check back to peer comparison
+        alone would pass every other case in this class.
+        """
+
+        snapshot = WORKBOOK
+        for model_key in sorted(discover_generation_model_configs(WORKBOOK, root=Path(self.tmpdir.name) / "peers")):
+            snapshot = self.workbook_without_step(model_key, "paint", source=snapshot)
+
+        # No peer authors `paint` any more, so only step_order_summary_map can catch it.
+        self.assert_generation_rejects(snapshot, "z06", "no-peer-paint")
+
+    def test_missing_presentation_rows_still_fail_for_a_promoted_model(self) -> None:
+        snapshot = self.workbook_without("runtime_steps", "z06")
+        configs = discover_generation_model_configs(snapshot, root=Path(self.tmpdir.name) / "out-z06")
+
+        with self.assertRaisesRegex(ValueError, "runtime_steps"):
+            generate_model_artifacts(configs["z06"])
 
 
 if __name__ == "__main__":

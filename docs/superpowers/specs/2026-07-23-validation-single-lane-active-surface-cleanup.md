@@ -378,7 +378,7 @@ Remaining work after the completed Passes 0A/0B(partial)/0C/I/G1/G2 is exactly f
 | 3 | Retained Stingray contract migrated; composed candidate verifier (§3.7); promotion/publication prove the candidate | End-to-end database→form runs |
 | 4 | Migrate remaining guidance/tests, execute the approved deletion list, archive completed plans | Repository convergence |
 
-Pass 1 landed 2026-07-25. Pass 3's prerequisite landed the same date: the retained runtime contracts were regenerated through the strict path and the registry republished, so the full schema gate is valid with 0 issues and an end-to-end workbook→form run now completes. Pass 2 receipt A (requirements 1, 4 partial, 6, 7) landed 2026-07-25 as well. The remaining critical path is **Pass 2 receipt B** — requirements 2, 3, 5, 8, 9, 10, the actual builder convergence — followed by Pass 3 proper.
+Pass 1 landed 2026-07-25. Pass 3's prerequisite landed the same date: the retained runtime contracts were regenerated through the strict path and the registry republished, so the full schema gate is valid with 0 issues and an end-to-end workbook→form run now completes. Pass 2 receipts A (requirements 1, 4 partial, 6, 7) and B (requirements 5 and 9) both landed 2026-07-25. The remaining critical path is **Pass 2 receipt C** — requirements 2, 3, 8, 10, the actual builder convergence — followed by Pass 3 proper. Receipt B also surfaced six Python-side values that still decide customer-visible runtime content and need workbook columns; those need separate approval because they require a canonical workbook write.
 
 ### Pass 0A — Freeze the active-surface inventory
 
@@ -671,7 +671,7 @@ Required behavior, in order:
 2. **State convergence as deletion, not merger (§2.8 S2).** The workbook-driven builder becomes the only source builder for all six models. `build_form_data_draft()` and `build_contract_preview()` stop producing runtime input. `production.build_production_source_data()` is absorbed; `production.py` retains no mutable module globals (`MODEL_CONFIG`, `WORKBOOK_PATH`, `ROOT`, `OUTPUT_DIR`, `APP_DIR`) on any path that survives.
 3. Before that absorption, characterize and resolve the two builders' differences in standard-equipment deduplication, hidden/display behavior, variant overrides, invalid-reference filtering, rule assembly, and price validation. Prefer expressing each difference in workbook data over encoding it in generic code. Do not hide differences behind count-only assertions.
 4. The single builder operates on one loaded, frozen workbook snapshot. Optional inspection/report output consumes that in-memory result; it never reopens or reconstructs the workbook. Every workbook handle closes deterministically.
-5. Move `cleanup_display_text()`'s hardcoded customer-copy correction into workbook data.
+5. ~~Move `cleanup_display_text()`'s hardcoded customer-copy correction into workbook data.~~ **Corrected 2026-07-25 (receipt B): there was nothing to move.** The function fired on 0 of 2,248 calls across all six models — every one of its five transforms was inert — so it was deleted outright. Measure reachability before assuming a hardcoded value is load-bearing.
 6. Move runtime cleanup/finalization out of `registry_promotion.live_contract_data()` into `runtime_contract.py`; promotion consumes and validates a completed contract rather than owning generation transformation.
 7. Fold `validation.py`'s two helpers into `runtime_contract.py` and delete the module (§2.8 S5).
 8. Preserve Stingray compatibility JSON/CSV only as secondary outputs while current consumers remain; compare JSON with `compare-generated-contracts.mjs` and CSV byte-for-byte.
@@ -777,6 +777,72 @@ change rather than a relocation.
 `tests/test_source_assembly_characterization.py::test_shared_assembler_preserves_stingray_runtime_drift_surfaces`
 (`display_behavior` present on `opt_uqt_002` choices) is a live instance of exactly the
 builder divergence requirement 3 must characterize. Resolve it there; do not suppress it.
+
+#### Pass 2 receipt B — requirements 5 and 9 completed 2026-07-25
+
+Bound to base commit `bdf6690` and workbook SHA-256 `8858cff4…5b2166`. Receipt:
+`fable5loop/runs/2026-07-25-pass2-shadow-authority-purge/`. Independent verifier: **FAIL on both
+cycles**, all findings fixed and re-validated; no cycle-3 verification was run.
+
+Reordered ahead of requirements 2/3 at the user's direction, under one standing rule that now
+governs this lane: **the workbook is the only authority for anything a workbook column can express.**
+What the user sees in the workbook or the Workbook Manager is what ships. A Python constant, override
+map, default, name heuristic, or text rewrite that can change a workbook-authored value is a defect,
+because it makes the shipped runtime impossible to predict from the source of truth.
+
+**Method.** Every candidate on the generation lane was measured by instrumenting the real call path
+against the canonical workbook for all six active/generatable models. Zero hits → deleted, with the
+44 byte-identical artifacts as the proof it was inert. Non-zero hits → reported as a workbook defect,
+not fixed in Python.
+
+**Requirement 5 — done, and larger than the spec assumed.** `cleanup_display_text()` did not need its
+hardcoded `"New Ground effects"` correction *moved* to the workbook: the entire function fired on
+**0 of 2,248** calls. All five transforms were inert and are deleted. The spec text said "move into
+workbook data"; there was nothing to move.
+
+**Requirement 9 — done, and stronger than written.** Missing presentation metadata now fails for
+every active/generatable model, not only promoted ones. The promoted-only completeness check against
+the Python `STEP_ORDER` tuple is replaced by a workbook-derived one: step keys referenced by the
+model's own `section_presentation`, `context_section_master`, and `step_order_summary_map` rows,
+unioned with steps any other active model authors. Dropping any one of a model's 14 steps now fails
+for all six models — 84 of 84 cases, versus 14/14 promoted and 0/14 unpromoted at baseline.
+
+**Also deleted** (all zero-hit): `SECTION_STEP_OVERRIDES` (24 entries), `STANDARD_SECTIONS` (8), the
+section-name substring heuristic, `STATUS_ALIASES`, `_LEGACY_RULE_PHRASE_FALLBACKS` and
+`load_rule_phrase_map` (zero callers; the `rule_phrase_map` sheet already authors all six rows), the
+`runtime_steps`/`context_section_master` Python fallbacks, the rule-derived z25 interior set, the
+`or set(STANDARD_SECTIONS)` and `or trim.replace("_R6X","")` fallbacks, and the `step_order`,
+`step_labels`, `context_sections`, `standard_sections`, `section_step_overrides`, and `text_cleanup`
+`ModelConfig` fields. Net **−221 lines** of generator code.
+
+**Verifier cycles.** Cycle 1 proved the replacement completeness check was *weaker* than the Python
+list it replaced — `section_presentation` authors zero `step_key` values, so it saw 2 of 14 keys and
+z06's `summary` could be dropped silently — and that the accompanying test had been shaped to the
+implementation. Cycle 2 proved the fix used an intersection across peers, defeated by dropping a step
+from two models or by one `active=False` cell, and found a label/exemption set conflation plus a new
+blank-`step_label` fallback shipping raw snake_case keys as customer-visible labels. All fixed.
+
+**Blocking the workbook-only goal, and needing a canonical workbook write (user approval):**
+
+| Python-side value | Scale | Customer-visible |
+|---|---|---|
+| `production.py` composes `disabled_reason` | 734 of 790 rule rows; only 56 authored | Yes — seven `app.js` sites. **The workbook already has the column.** |
+| `mapping.status_to_label` display strings | 1,434 choices on z06 | Yes — `app.js:1983` |
+| `SELECTION_MODE_LABELS` | 4 strings | Yes — `app.js:2009` |
+| `BODY_STYLE_DISPLAY_ORDER` | 2 entries | Ordering only |
+| `presentation_bool(..., default=False)` | 11/57 and 51/57 blank cells | Bucket membership |
+| `STEP_LABELS["standard_equipment"]` | 48 | No — lands in `sections[].step_label`, which nothing reads |
+
+**Deliberately kept**, because they are generation *logic* rather than shadowed values, and belong to
+requirement 3's characterization: `production.standard_equipment_preference`'s hardcoded
+`sec_stan_002` ranking, and `interiors.py`'s `opt_z25_001` (the comparison value is workbook-owned;
+only the constant and the field name are Python — renaming the field is a runtime-contract shape
+change that touches `app.js`).
+
+**Open.** One disclosed hole: dropping a step from *every* active model passes, because the
+cross-model union has nothing left to compare against. `summary` is the only exposed key.
+
+**Receipt C is next and owns requirements 2, 3, 8, 10** — the builder convergence.
 
 ### Pass 3 — Make promotion and publication prove the candidate runtime
 
