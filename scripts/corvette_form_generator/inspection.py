@@ -424,7 +424,16 @@ def build_draft_price_rules(
 
 
 def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
+    """Report on one model's source rows from a single frozen workbook snapshot."""
+
     wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
+    try:
+        return _inspect_model_sources(config, wb)
+    finally:
+        wb.close()
+
+
+def _inspect_model_sources(config: ModelConfig, wb: Any) -> dict[str, Any]:
     raw_rows = rows_from_sheet(wb, config.source_option_sheet)
     variants_raw = rows_from_sheet(wb, "variant_master")
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
@@ -644,7 +653,16 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
 
 
 def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
+    """Build one model's contract preview from a single frozen workbook snapshot."""
+
     wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
+    try:
+        return _build_contract_preview(config, wb)
+    finally:
+        wb.close()
+
+
+def _build_contract_preview(config: ModelConfig, wb: Any) -> dict[str, Any]:
     raw_rows = rows_from_sheet(wb, config.source_option_sheet)
     variants_raw = rows_from_sheet(wb, "variant_master")
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
@@ -969,19 +987,25 @@ def write_contract_preview_artifacts(preview: dict[str, Any], output_dir: Path, 
 
 
 def build_form_data_draft(config: ModelConfig, *, preview: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Build one model's draft payload from a single frozen workbook snapshot."""
+
     if preview is None:
         preview = build_contract_preview(config)
-    variants_by_id = {row["variant_id"]: row for row in preview["variants"]}
-    sections_by_id = {row["section_id"]: row for row in preview["sections"]}
     wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
     try:
-        interiors = build_model_interiors(config, wb=wb)
-        asset_map = load_asset_map(wb, config.model_key)
-        rule_groups = load_rule_groups(wb, config)
-        exclusive_groups = load_exclusive_groups(wb, config)
-        default_selection_rules = load_default_selection_rules(wb, config.model_key)
+        return _build_form_data_draft(config, preview, wb)
     finally:
         wb.close()
+
+
+def _build_form_data_draft(config: ModelConfig, preview: dict[str, Any], wb: Any) -> dict[str, Any]:
+    variants_by_id = {row["variant_id"]: row for row in preview["variants"]}
+    sections_by_id = {row["section_id"]: row for row in preview["sections"]}
+    interiors = build_model_interiors(config, wb=wb)
+    asset_map = load_asset_map(wb, config.model_key)
+    rule_groups = load_rule_groups(wb, config)
+    exclusive_groups = load_exclusive_groups(wb, config)
+    default_selection_rules = load_default_selection_rules(wb, config.model_key)
     option_rows: dict[str, dict[str, Any]] = {}
     statuses_by_option: defaultdict[str, dict[str, str]] = defaultdict(dict)
     order_by_option: dict[str, int] = {}
@@ -1088,28 +1112,24 @@ def build_form_data_draft(config: ModelConfig, *, preview: dict[str, Any] | None
         if choice["status"] == "standard"
     ]
 
-    wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
     derivation_manifests: list[dict[str, Any]] = []
-    try:
-        color_overrides = build_color_overrides(wb, config, interiors, option_rows)
-        rules = build_draft_rules(
-            wb,
-            config,
-            option_rows,
-            sections_by_id,
-            interiors,
-            grouped_requirement_pairs(rule_groups),
-            grouped_exclusion_pairs(rule_groups) | exclusive_group_pairs(exclusive_groups),
-            derivation_manifests,
-        )
-        price_rules, price_rule_validation, price_rule_source_rows = build_draft_price_rules(
-            wb,
-            config,
-            option_rows,
-            interiors,
-        )
-    finally:
-        wb.close()
+    color_overrides = build_color_overrides(wb, config, interiors, option_rows)
+    rules = build_draft_rules(
+        wb,
+        config,
+        option_rows,
+        sections_by_id,
+        interiors,
+        grouped_requirement_pairs(rule_groups),
+        grouped_exclusion_pairs(rule_groups) | exclusive_group_pairs(exclusive_groups),
+        derivation_manifests,
+    )
+    price_rules, price_rule_validation, price_rule_source_rows = build_draft_price_rules(
+        wb,
+        config,
+        option_rows,
+        interiors,
+    )
 
     validation = [
         {

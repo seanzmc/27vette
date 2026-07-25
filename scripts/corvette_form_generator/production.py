@@ -48,7 +48,7 @@ from corvette_form_generator.rules import (
     truncate_reason,
 )
 from corvette_form_generator.registry_promotion import export_slug
-from corvette_form_generator.runtime_contract import build_model_runtime_contract
+from corvette_form_generator.runtime_contract import build_model_runtime_contract, validation_error_count
 from corvette_form_generator.runtime_metadata import (
     derived_default_selected_display_behavior,
     load_context_sections,
@@ -62,7 +62,6 @@ from corvette_form_generator.runtime_metadata import (
     load_variant_option_overrides,
     presentation_bool,
 )
-from corvette_form_generator.validation import validation_error_count
 from corvette_form_generator.workbook import clean, intish, money, rows_from_sheet
 
 

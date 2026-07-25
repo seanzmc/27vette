@@ -378,7 +378,7 @@ Remaining work after the completed Passes 0A/0B(partial)/0C/I/G1/G2 is exactly f
 | 3 | Retained Stingray contract migrated; composed candidate verifier (§3.7); promotion/publication prove the candidate | End-to-end database→form runs |
 | 4 | Migrate remaining guidance/tests, execute the approved deletion list, archive completed plans | Repository convergence |
 
-Pass 1 landed 2026-07-25 (receipt below). The next pass on the critical path is **Pass 3's prerequisite**: the retained Stingray runtime contract fails strict validation, so `generate_registry.py` cannot rebuild `form-app/data.js` and no end-to-end database→form run can finish. Pass 2 is independently startable.
+Pass 1 landed 2026-07-25. Pass 3's prerequisite landed the same date: the retained runtime contracts were regenerated through the strict path and the registry republished, so the full schema gate is valid with 0 issues and an end-to-end workbook→form run now completes. Pass 2 receipt A (requirements 1, 4 partial, 6, 7) landed 2026-07-25 as well. The remaining critical path is **Pass 2 receipt B** — requirements 2, 3, 5, 8, 9, 10, the actual builder convergence — followed by Pass 3 proper.
 
 ### Pass 0A — Freeze the active-surface inventory
 
@@ -726,6 +726,57 @@ Additional proof:
 - Compare current-route and unified-route contracts with `scripts/compare-generated-contracts.mjs` where parity is required.
 - Compare preserved compatibility JSON with the same comparator and CSV byte-for-byte.
 - Review every non-timestamp difference; no blanket allowlist.
+
+#### Pass 2 receipt A — requirements 1, 4 (partial), 6, 7 completed 2026-07-25
+
+Bound to base commit `ed3692a` and workbook SHA-256 `8858cff4…5b2166`. Receipt:
+`fable5loop/runs/2026-07-25-pass2-summary-and-snapshot-authority/`. Independent verifier: **PASS**.
+
+**Requirement 1 (§2.8 S1) — done.** `_compatibility_result()` and `_reviewable_result()` are replaced
+by one `_summary_from_runtime_contract()`. Counts are the validated contract's own collection
+lengths over `REQUIRED_RUNTIME_LIST_FIELDS`, so the summary cannot disagree with the artifact it
+describes, and every model reports the same shape. `assemble_model_source()` gained
+`include_reports=`; `inspect_model_sources()` no longer runs during normal generation. Traced at the
+`openpyxl.load_workbook` call site, workbook opens per non-Stingray model went **4 → 2** (0.67-0.71s
+→ 0.54-0.62s); `--emit-inspection` went 4 → 3. The predicted "two workbook reconstructions per model
+per run" is confirmed and removed.
+
+**Requirement 4 — partial, and the remainder is recorded as open.** Each of the three inspection
+builders now loads the workbook once inside a `try/finally`. The verifier found a genuine
+pre-existing leak in the process: `inspect_model_sources()` and `build_contract_preview()` never
+closed their handles at all, on success or failure. Both are fixed, with
+`test_workbook_handles_close_when_a_builder_raises` injecting a `RuntimeError` into each builder.
+**Still open:** a non-Stingray assembly opens two workbooks (three with `--emit-inspection`), so
+"one loaded, frozen workbook snapshot" per *assembly*, and "optional report output never reopens the
+workbook", are not met. They need requirement 2's single builder and belong to receipt B.
+
+**Requirement 6 — already satisfied.** `live_contract_data()` was already defined in
+`runtime_contract.py` at `ed3692a`, with `registry_promotion.py` consuming it. No change was needed;
+this corrects the §2.4 disposition, which still described the reverse dependency.
+
+**Requirement 7 (§2.8 S5) — done with one deviation.** `validation_error_count` folded into
+`runtime_contract.py`; `validation.py` deleted. `validation_row` was **deleted rather than ported** —
+`git grep` at `ed3692a` confirms zero callers. Porting dead code into the module this pass makes
+authoritative would work against the pass.
+
+**Proof.** All 44 generated artifacts across all six discoverable models (6 runtime contracts, 30
+review files, 6 derived-swap manifests, 2 Stingray compatibility files) are byte-identical to the
+`ed3692a` baseline apart from one `generated_at` line each. The verifier regenerated both sides
+itself from a `git worktree` of `ed3692a` rather than trusting the maker's numbers. Pass 2 gate set
+went 55 → 60 passing with the same single pre-existing failure. Full Python suite and all 16 node
+gates unchanged. Full `validate_workbook_schema.py` remains valid, 0 issues. No workbook, generated
+artifact, registry, or dealer write.
+
+**Recorded, not fixed.** `validation_errors` in the summary is now structurally always `0` —
+`assert_runtime_contract()` raises before a nonzero value could be printed — so it must not be cited
+as evidence of a clean run. `warnings` is no longer on normal-generation stdout, and
+`validation_warnings` counts contract rows rather than draft rows (z06: 1 → 0), which is a value
+change rather than a relocation.
+
+**Receipt B is next and owns requirements 2, 3, 5, 8, 9, 10.**
+`tests/test_source_assembly_characterization.py::test_shared_assembler_preserves_stingray_runtime_drift_surfaces`
+(`display_behavior` present on `opt_uqt_002` choices) is a live instance of exactly the
+builder divergence requirement 3 must characterize. Resolve it there; do not suppress it.
 
 ### Pass 3 — Make promotion and publication prove the candidate runtime
 

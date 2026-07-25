@@ -44,6 +44,21 @@ REQUIRED_NON_EMPTY_RUNTIME_LIST_FIELDS = frozenset(("variants", "steps", "sectio
 VALID_VALIDATION_SEVERITIES = frozenset(("pass", "info", "warning", "error"))
 
 
+def validation_severity_count(rows: Any, severity: str) -> int:
+    """Count validation rows carrying one severity."""
+
+    if not isinstance(rows, list):
+        return 0
+    wanted = severity.strip().lower()
+    return sum(
+        1 for row in rows if isinstance(row, dict) and str(row.get("severity", "")).strip().lower() == wanted
+    )
+
+
+def validation_error_count(rows: Any) -> int:
+    return validation_severity_count(rows, "error")
+
+
 def _runtime_payload_trim_fields(path: tuple[str, ...]) -> frozenset[str]:
     if path == ("choices", "[]"):
         return RUNTIME_CHOICE_ROW_TRIM_FIELDS
@@ -160,11 +175,7 @@ def assert_runtime_contract(
         )
         if invalid_severities:
             problems.append(f"validation contains invalid severities: {invalid_severities!r}")
-        error_count = sum(
-            1
-            for row in validation
-            if isinstance(row, dict) and str(row.get("severity", "")).strip().lower() == "error"
-        )
+        error_count = validation_error_count(validation)
         if error_count:
             problems.append(f"contains {error_count} error-severity validation finding(s)")
 
