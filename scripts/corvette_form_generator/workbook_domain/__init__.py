@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from importlib import import_module
+
 from corvette_form_generator.workbook_domain.changeset import (
     ChangeSetError,
     canonical_json,
@@ -17,11 +19,23 @@ from corvette_form_generator.workbook_domain.registry import (
     family_spec,
     registered_sheet_families,
 )
-from corvette_form_generator.workbook_domain.service import (
-    apply_changeset,
-    approve_changeset,
-    preview_changeset,
-)
+_SERVICE_EXPORTS = ("apply_changeset", "approve_changeset", "preview_changeset")
+
+
+def __getattr__(name: str):
+    """Load the guarded write service lazily.
+
+    ``service`` pulls in ``editor_ops`` and ``schema_validation``, both of which
+    read this package's registry metadata. Importing it eagerly makes any module
+    that only needs registry shape participate in that cycle.
+    """
+
+    if name in _SERVICE_EXPORTS or name == "service":
+        # import_module, not `from . import service`: the from-import form calls
+        # getattr on this package and recurses back into __getattr__.
+        service = import_module("corvette_form_generator.workbook_domain.service")
+        return service if name == "service" else getattr(service, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 __all__ = [
     "ChangeSetError",

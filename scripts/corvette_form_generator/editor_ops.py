@@ -712,6 +712,16 @@ def _prepare_batch(extract, batch):
         if unknown:
             errors.append(f"{ctx}: unknown column(s) {unknown}")
             continue
+        # A physical Excel column is not writable authority. The shared registry
+        # owns the writable set, so a rogue column that exists only in the sheet
+        # is rejected even though it passes the header check above.
+        unregistered = sorted(c for c in row if c not in EDITOR_SHEET_META[family]["columns"])
+        if unregistered:
+            errors.append(
+                f"{ctx}: column(s) {unregistered} are not owned by family {family!r} "
+                "in the shared workbook registry"
+            )
+            continue
         if action == "update" and any(c in row for c in keycols):
             errors.append(f"{ctx}: key columns are immutable on update")
             continue

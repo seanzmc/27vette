@@ -380,6 +380,19 @@ class ValidateBatchTest(OpsFixtureBase):
         self.assertTrue(self.errors_of(op("update", "section_master", {"section_id": "sec_a"}, {"section_name": "X"})))
         self.assertTrue(self.errors_of(op("update", "nope", {"option_id": "a"}, {})))
 
+    def test_rogue_physical_column_outside_the_registry_is_rejected(self):
+        """A column that exists in Excel but not in the shared registry is not writable."""
+
+        drifted = copy.deepcopy(self.extract)
+        drifted["sheets"]["stingray_options"]["headers"].append("rogue_column")
+
+        errors = validate_batch(
+            drifted,
+            batch(op("update", "stingray_options", {"option_id": "opt_one_001"}, {"rogue_column": "x"})),
+        )["errors"]
+
+        self.assertTrue(any("rogue_column" in error for error in errors), errors)
+
     def test_unknown_column_and_immutable_key(self):
         self.assertTrue(self.errors_of(op("update", "stingray_options", {"option_id": "opt_one_001"}, {"bogus": 1})))
         self.assertTrue(self.errors_of(op("update", "stingray_options", {"option_id": "opt_one_001"}, {"option_id": "x"})))

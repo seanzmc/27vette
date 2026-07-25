@@ -16,8 +16,10 @@ SCRIPTS_DIR = ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
+from corvette_form_generator import registry_promotion, schema_validation  # noqa: E402
 from corvette_form_generator.model_configs import REQUIRED_GENERATION_SOURCE_ROLES  # noqa: E402
 from corvette_form_generator.schema_validation import live_contract_provenance_leaks, validate_workbook_schema  # noqa: E402
+from corvette_form_generator.workbook_domain import registry  # noqa: E402
 
 
 OPTION_HEADERS = ["option_id", "rpo", "selectable", "active", "price", "section_id", "display_order"]
@@ -158,6 +160,109 @@ def minimal_schema_workbook(
             del wb[name]
         append_sheet(wb, name, headers, rows)
     return wb
+
+
+def grand_sport_source_map() -> dict[str, str]:
+    return {
+        "source_option_sheet": "grandSport_options",
+        "status_sheet": "grandSport_ovs",
+        "rule_mapping_sheet": "grandSport_rule_mapping",
+        "price_rules_sheet": "grandSport_price_rules",
+        "rule_groups_sheet": "grandSport_rule_groups",
+        "rule_group_members_sheet": "grandSport_rule_group_members",
+        "exclusive_groups_sheet": "grandSport_exclusive_groups",
+        "exclusive_group_members_sheet": "grandSport_exclusive_members",
+        "color_overrides_sheet": "color_overrides",
+        "interior_source_sheet": "lt_interiors",
+    }
+
+
+def registry_columns(family: str) -> list[str]:
+    return list(registry.WRITABLE_COLUMNS[family])
+
+
+def registry_shaped_workbook() -> Workbook:
+    """A workbook whose every registered family sheet carries exactly the
+    registry-owned columns. Mutate it per test to express one drift shape."""
+
+    wb = Workbook()
+    del wb[wb.sheetnames[0]]
+
+    source_maps = {
+        "stingray": stingray_source_map(),
+        "grand_sport": grand_sport_source_map(),
+        "z06": z06_source_map(),
+    }
+    model_rows = [
+        {"model_key": key, "registry_key": key, "model_label": key, "model_year": 2027,
+         "dataset_name": key, "export_slug": key, "expected_variant_count": 1,
+         "default_model": key == "stingray", "active": True, "notes": "", **SETUP_COPY}
+        for key in source_maps
+    ]
+    source_row_data = [
+        row
+        for model_key, role_map in source_maps.items()
+        for row in source_rows(model_key, role_map)
+    ]
+
+    append_sheet(wb, "model_master", registry_columns("model_master"), model_rows)
+    append_sheet(wb, "model_workbook_sources", registry_columns("model_workbook_sources"), source_row_data)
+    append_sheet(
+        wb, "model_variants", registry_columns("model_variants"),
+        [{"model_key": key, "variant_id": f"{key}_v1", "display_order": 1, "active": True} for key in source_maps],
+    )
+    append_sheet(
+        wb, "variant_master", registry_columns("variant_master"),
+        [{"variant_id": f"{key}_v1", "model_year": 2027, "trim_level": "1LT", "body_style": "coupe",
+          "display_name": key, "base_price": 1, "display_order": 1, "active": True} for key in source_maps],
+    )
+    append_sheet(
+        wb, "model_registry_promotion", registry_columns("model_registry_promotion"),
+        [{"model_key": "stingray", "registry_key": "stingray", "promoted_to_runtime": False,
+          "default_model": True, "artifact_path": "", "artifact_type": "runtime_contract",
+          "legacy_alias": "", "active": True, "display_order": 1, "notes": ""}],
+    )
+    append_sheet(wb, "model_interior_scope", registry_columns("model_interior_scope"))
+    append_sheet(wb, "interior_components", registry_columns("interior_components"))
+    append_sheet(wb, "section_master", ["section_id", "section_name", "selection_mode", "is_required",
+                                        "display_order", "standard_behavior", "step_key"])
+    append_sheet(wb, "PriceRef", ["OptionType", "Trim", "Code", "Price"])
+
+    role_families = registry.SOURCE_ROLE_FAMILIES
+    written: set[str] = set()
+    for model_key, role_map in source_maps.items():
+        for role, sheet in role_map.items():
+            if sheet in written:
+                continue
+            written.add(sheet)
+            family = role_families[role]
+            rows: list[dict[str, object]] = []
+            if family == "options":
+                rows = [{"option_id": f"opt_{model_key}", "rpo": "ABC", "option_name": "Known option",
+                         "price": 0, "selectable": True, "active": True, "display_order": 1}]
+            elif family == "ovs":
+                rows = [{"option_id": f"opt_{model_key}", "variant_id": f"{model_key}_v1", "status": "available"}]
+            append_sheet(wb, sheet, registry_columns(family), rows)
+    for sheet in ("lt_interiors", "LZ_Interiors"):
+        if sheet not in wb.sheetnames:
+            append_sheet(wb, sheet, registry_columns("interiors"))
+    return wb
+
+
+def _header_cells(ws) -> list[str]:
+    return [str(cell.value).strip() if cell.value is not None else "" for cell in ws[1]]
+
+
+def drop_column(ws, header: str) -> None:
+    ws.delete_cols(_header_cells(ws).index(header) + 1)
+
+
+def rename_column(ws, header: str, new_header: str) -> None:
+    ws.cell(row=1, column=_header_cells(ws).index(header) + 1).value = new_header
+
+
+def append_column(ws, header: str) -> None:
+    ws.cell(row=1, column=len(_header_cells(ws)) + 1).value = header
 
 
 def validate_temp_workbook(wb: Workbook):
@@ -1156,6 +1261,158 @@ class SchemaValidationMetadataTests(unittest.TestCase):
             issues = validate_workbook_schema(workbook_path, check_live_contract=True)
 
         self.assertFalse(any(issue.check_id == "app_registry_stale" for issue in issues), issues)
+
+
+class RegistryOwnedShapeAuthorityTests(unittest.TestCase):
+    """Pass 1: the shared registry is the only workbook-shape authority.
+
+    These are the export-gate cases. A database-backed editor writes the
+    canonical workbook, so `validate_workbook_schema` must reject shape drift
+    instead of reporting zero issues over it.
+    """
+
+    def test_schema_validation_headers_are_the_shared_registry_objects(self) -> None:
+        self.assertEqual(
+            tuple(schema_validation.MODEL_MASTER_HEADERS),
+            registry.WRITABLE_COLUMNS["model_master"],
+        )
+        self.assertEqual(
+            tuple(schema_validation.MODEL_REGISTRY_PROMOTION_HEADERS),
+            registry.WRITABLE_COLUMNS["model_registry_promotion"],
+        )
+        self.assertEqual(
+            set(schema_validation.VALID_REGISTRY_PROMOTION_ARTIFACT_TYPES),
+            set(registry.REGISTRY_PROMOTION_ARTIFACT_TYPES),
+        )
+        self.assertEqual(
+            tuple(schema_validation.MODEL_SETUP_COPY_FIELDS),
+            tuple(registry_promotion.VEHICLE_SETUP_FIELDS),
+        )
+
+    def test_registry_promotion_headers_are_the_shared_registry_object(self) -> None:
+        self.assertEqual(
+            tuple(registry_promotion.MODEL_REGISTRY_PROMOTION_HEADERS),
+            registry.WRITABLE_COLUMNS["model_registry_promotion"],
+        )
+        self.assertEqual(
+            set(registry_promotion.VALID_ARTIFACT_TYPES),
+            set(registry.REGISTRY_PROMOTION_ARTIFACT_TYPES),
+        )
+
+    def test_active_registered_sheet_missing_a_registry_column_is_rejected(self) -> None:
+        wb = registry_shaped_workbook()
+        drop_column(wb["z06_options"], "option_name")
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(
+            any(
+                issue.check_id == "registry_family_columns_missing"
+                and issue.sheet == "z06_options"
+                and issue.column == "option_name"
+                for issue in issues
+            ),
+            issues,
+        )
+
+    def test_active_registered_sheet_with_a_rogue_physical_column_is_rejected(self) -> None:
+        wb = registry_shaped_workbook()
+        append_column(wb["z06_options"], "rogue_column")
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(
+            any(
+                issue.check_id == "registry_family_columns_unregistered"
+                and issue.sheet == "z06_options"
+                and issue.column == "rogue_column"
+                for issue in issues
+            ),
+            issues,
+        )
+
+    def test_coordinated_rename_across_every_active_sheet_is_rejected(self) -> None:
+        """Cross-sheet equality alone cannot catch this: all sheets agree."""
+
+        wb = registry_shaped_workbook()
+        for sheet in ("stingray_options", "grandSport_options", "z06_options"):
+            rename_column(wb[sheet], "option_name", "option_title")
+
+        issues = validate_temp_workbook(wb)
+
+        renamed = [
+            issue
+            for issue in issues
+            if issue.check_id
+            in ("registry_family_columns_missing", "registry_family_columns_unregistered")
+        ]
+        self.assertEqual(
+            {issue.sheet for issue in renamed},
+            {"stingray_options", "grandSport_options", "z06_options"},
+            issues,
+        )
+        self.assertFalse(
+            any(issue.check_id == "source_role_header_mismatch" for issue in issues),
+            "cross-sheet equality still passes; only registry ownership catches this",
+        )
+
+    def test_blank_artifact_type_on_an_active_promotion_row_is_rejected(self) -> None:
+        """The registry owns the artifact-type domain and blank is not in it.
+
+        The write path now requires this column on an effective-active row, so
+        schema validation must not report a blank one as green — that would be an
+        export that validates and is then un-editable.
+        """
+
+        wb = registry_shaped_workbook()
+        headers = _header_cells(wb["model_registry_promotion"])
+        wb["model_registry_promotion"].cell(
+            row=2, column=headers.index("artifact_type") + 1
+        ).value = None
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(
+            any(
+                issue.check_id == "registry_promotion_blank_artifact_type"
+                and issue.column == "artifact_type"
+                for issue in issues
+            ),
+            issues,
+        )
+
+    def test_invalid_artifact_type_on_an_active_promotion_row_is_rejected(self) -> None:
+        """Domain membership is checked on every active row, not only promoted ones."""
+
+        wb = registry_shaped_workbook()
+        headers = _header_cells(wb["model_registry_promotion"])
+        wb["model_registry_promotion"].cell(
+            row=2, column=headers.index("artifact_type") + 1
+        ).value = "not_a_real_type"
+
+        issues = validate_temp_workbook(wb)
+
+        self.assertTrue(
+            any(
+                issue.check_id == "registry_promotion_unknown_artifact_type"
+                and issue.column == "artifact_type"
+                for issue in issues
+            ),
+            issues,
+        )
+
+    def test_registry_shaped_workbook_reports_no_registry_column_issue(self) -> None:
+        issues = validate_temp_workbook(registry_shaped_workbook())
+
+        self.assertEqual(
+            [
+                issue
+                for issue in issues
+                if issue.check_id.startswith("registry_family_columns")
+            ],
+            [],
+            issues,
+        )
 
 
 if __name__ == "__main__":

@@ -16,6 +16,7 @@ from corvette_form_generator.workbook import workbook_truthy
 from corvette_form_generator.workbook_domain.registry import (
     EDITOR_SHEET_META,
     GLOBAL_SHEET_FAMILIES,
+    READONLY_SHEET_META,
     SOURCE_ROLE_FAMILIES,
 )
 
@@ -232,27 +233,24 @@ WRITABLE_FAMILIES = tuple(EDITOR_SHEET_META)
 WRITABLE_SPECS = tuple(_build_spec(family) for family in WRITABLE_FAMILIES)
 SPEC_BY_FAMILY = {spec.family: spec for spec in WRITABLE_SPECS}
 
-_SECTION_SPEC = TableSpec(
-    table="form_sections",
-    family="sections",
-    sheet=("section_master",),
-    key=("section_id",),
-    columns=tuple(
-        ColumnSpec(header, ctype)
-        for header, ctype in (
-            ("section_id", "text"),
-            ("section_name", "text"),
-            ("selection_mode", "text"),
-            ("is_required", "bool"),
-            ("display_order", "int"),
-            ("standard_behavior", "text"),
-            ("step_key", "text"),
-        )
-    ),
-    editable=False,
-    id_prefixes=("sec_",),
-    label="Sections (master)",
-)
+def _build_readonly_spec(family: str, table: str) -> TableSpec:
+    meta = READONLY_SHEET_META[family]
+    return TableSpec(
+        table=table,
+        family=family,
+        sheet=(meta["sheet"],),
+        key=tuple(sanitize_identifier(key) for key in meta["key"]),
+        columns=tuple(
+            ColumnSpec(header, meta.get("types", {}).get(header, "text"))
+            for header in meta["columns"]
+        ),
+        editable=False,
+        id_prefixes=meta.get("id_prefixes", ()),
+        label=meta.get("label", ""),
+    )
+
+
+_SECTION_SPEC = _build_readonly_spec("sections", "form_sections")
 
 TABLE_SPECS = (*WRITABLE_SPECS, _SECTION_SPEC)
 SPEC_BY_TABLE = {spec.table: spec for spec in TABLE_SPECS}

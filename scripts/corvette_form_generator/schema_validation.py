@@ -12,11 +12,18 @@ from openpyxl import load_workbook
 from corvette_form_generator.contract import load_model_asset_map
 from corvette_form_generator.model_configs import OPTIONAL_GENERATION_SOURCE_ROLES, REQUIRED_GENERATION_SOURCE_ROLES
 from corvette_form_generator.registry_promotion import (
+    VEHICLE_SETUP_FIELDS,
     build_registry_from_artifacts,
     parse_app_data_registry,
     registry_model_key,
 )
 from corvette_form_generator.workbook import workbook_truthy
+from corvette_form_generator.workbook_domain.registry import (
+    GLOBAL_SHEET_FAMILIES,
+    REGISTRY_PROMOTION_ARTIFACT_TYPES,
+    SOURCE_ROLE_FAMILIES,
+    WRITABLE_COLUMNS,
+)
 
 
 BOOLEAN_COLUMNS: dict[str, tuple[str, ...]] = {
@@ -103,40 +110,14 @@ RUNTIME_STANDARD_EQUIPMENT_ROW_TRIM_FIELDS: set[str] = {"source_detail_raw"}
 FORBIDDEN_LIVE_LINEAGE_VALUE_TOKENS: tuple[str, ...] = ("grand_sport:",)
 GENERATED_TIMESTAMP_KEYS: frozenset[str] = frozenset(("generated_at", "sourceGeneratedAt", "generatedAt"))
 
-MODEL_MASTER_HEADERS: tuple[str, ...] = (
-    "model_key",
-    "registry_key",
-    "model_label",
-    "model_year",
-    "dataset_name",
-    "export_slug",
-    "expected_variant_count",
-    "default_model",
-    "active",
-    "setup_card_subtitle",
-    "setup_eyebrow",
-    "setup_title",
-    "setup_description",
-    "setup_fact_1",
-    "setup_fact_2",
-    "setup_fact_3",
-    "notes",
-)
-MODEL_SETUP_COPY_FIELDS: tuple[str, ...] = MODEL_MASTER_HEADERS[9:16]
+# Workbook shape is owned by workbook_domain.registry. These names remain for
+# readability and existing consumers, but they are the shared objects — this
+# module holds no independent header, column, or artifact-type authority.
+MODEL_MASTER_HEADERS: tuple[str, ...] = WRITABLE_COLUMNS["model_master"]
+MODEL_SETUP_COPY_FIELDS: tuple[str, ...] = VEHICLE_SETUP_FIELDS
 
-MODEL_REGISTRY_PROMOTION_HEADERS: tuple[str, ...] = (
-    "model_key",
-    "registry_key",
-    "promoted_to_runtime",
-    "default_model",
-    "artifact_path",
-    "artifact_type",
-    "legacy_alias",
-    "active",
-    "display_order",
-    "notes",
-)
-VALID_REGISTRY_PROMOTION_ARTIFACT_TYPES: set[str] = {"current_generation", "draft_artifact", "runtime_contract"}
+MODEL_REGISTRY_PROMOTION_HEADERS: tuple[str, ...] = WRITABLE_COLUMNS["model_registry_promotion"]
+VALID_REGISTRY_PROMOTION_ARTIFACT_TYPES: set[str] = set(REGISTRY_PROMOTION_ARTIFACT_TYPES)
 DEFAULT_SELECTION_DISPLAY_BEHAVIORS: frozenset[str] = frozenset(("default_selected",))
 
 
@@ -773,6 +754,40 @@ def validate_registry_promotion_metadata(wb, issues: list[SchemaIssue]) -> None:
         for _, row in records(wb["model_master"])
         if clean_text(row.get("model_key"))
     }
+    # The shared registry owns the artifact-type domain and blank is not in it.
+    # editor_ops requires the column on any effective-active row, so a blank one
+    # must not validate green here: that would be an export that passes the gate
+    # and is then rejected by the write path.
+    for row_number, row in records(wb["model_registry_promotion"]):
+        if not truthy(row.get("active"), default=True):
+            continue
+        row_artifact_type = clean_text(row.get("artifact_type"))
+        if not row_artifact_type:
+            add_issue(
+                issues,
+                "error",
+                "registry_promotion_blank_artifact_type",
+                sheet="model_registry_promotion",
+                row=row_number,
+                column="artifact_type",
+                value=clean_text(row.get("model_key")),
+                message=(
+                    "Active model_registry_promotion rows require an explicit artifact_type "
+                    f"from {sorted(VALID_REGISTRY_PROMOTION_ARTIFACT_TYPES)}."
+                ),
+            )
+        elif row_artifact_type not in VALID_REGISTRY_PROMOTION_ARTIFACT_TYPES:
+            add_issue(
+                issues,
+                "error",
+                "registry_promotion_unknown_artifact_type",
+                sheet="model_registry_promotion",
+                row=row_number,
+                column="artifact_type",
+                value=row_artifact_type,
+                message=f"Unsupported runtime promotion artifact_type {row_artifact_type!r}.",
+            )
+
     promoted_rows: list[tuple[int, dict[str, Any]]] = []
     seen_registry_keys: set[str] = set()
     for row_number, row in records(wb["model_registry_promotion"]):
@@ -845,17 +860,9 @@ def validate_registry_promotion_metadata(wb, issues: list[SchemaIssue]) -> None:
                     value={"model_key": model_key, "field": field},
                     message=f"Promoted runtime model {model_key!r} requires nonblank {field}.",
                 )
-        if artifact_type not in VALID_REGISTRY_PROMOTION_ARTIFACT_TYPES:
-            add_issue(
-                issues,
-                "error",
-                "registry_promotion_unknown_artifact_type",
-                sheet="model_registry_promotion",
-                row=row_number,
-                column="artifact_type",
-                value=artifact_type,
-                message=f"Unsupported runtime promotion artifact_type {artifact_type!r}.",
-            )
+        # Blank and out-of-domain artifact types are reported once, above, for
+        # every active row. Promoted rows are a subset of those, so repeating the
+        # membership check here would double-report the same cell.
         if artifact_type != "current_generation" and not artifact_path:
             add_issue(
                 issues,
@@ -957,6 +964,62 @@ def merge_sheet_columns(
     return merged
 
 
+def registered_family_sheets(source_graph: dict[str, dict[str, str]]) -> dict[str, str]:
+    """Map every sheet the workbook registers to its shared-registry family."""
+
+    sheet_families: dict[str, str] = dict(GLOBAL_SHEET_FAMILIES)
+    for sources in source_graph.values():
+        for source_role, sheet_name in sources.items():
+            family = SOURCE_ROLE_FAMILIES.get(source_role)
+            if family and sheet_name:
+                sheet_families[sheet_name] = family
+    return sheet_families
+
+
+def validate_registry_family_columns(wb, source_graph: dict[str, dict[str, str]], issues: list[SchemaIssue]) -> None:
+    """Require the exact registry-owned columns on every registered sheet.
+
+    Cross-sheet header equality cannot catch coordinated drift: if every active
+    options sheet is renamed together they still agree with each other. Only
+    comparing against the shared registry rejects that, which is what makes this
+    a real gate for a database-backed workbook export.
+    """
+
+    for sheet_name, family in sorted(registered_family_sheets(source_graph).items()):
+        if sheet_name not in wb.sheetnames:
+            continue
+        expected = WRITABLE_COLUMNS[family]
+        actual = nonblank_headers(wb[sheet_name])
+        for column in expected:
+            if column not in actual:
+                add_issue(
+                    issues,
+                    "error",
+                    "registry_family_columns_missing",
+                    sheet=sheet_name,
+                    column=column,
+                    value={"family": family, "actual": actual},
+                    message=(
+                        f"{sheet_name} is missing registry-owned column {column!r} "
+                        f"for family {family!r}."
+                    ),
+                )
+        for column in actual:
+            if column not in expected:
+                add_issue(
+                    issues,
+                    "error",
+                    "registry_family_columns_unregistered",
+                    sheet=sheet_name,
+                    column=column,
+                    value={"family": family, "expected": list(expected)},
+                    message=(
+                        f"{sheet_name} has column {column!r}, which family {family!r} "
+                        "does not own in the shared workbook registry."
+                    ),
+                )
+
+
 def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool = True) -> list[SchemaIssue]:
     workbook = Path(workbook)
     wb = load_workbook(workbook, read_only=True, data_only=True)
@@ -978,6 +1041,8 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
         model_master_valid = validate_model_master_metadata(wb, issues)
         source_graph = metadata_source_graph(wb, issues)
         source_sheets_by_role = sheets_by_role(source_graph)
+        validate_registry_family_columns(wb, source_graph, issues)
+
         if model_master_valid:
             validate_model_variant_topology(wb, issues)
             validate_registry_promotion_metadata(wb, issues)

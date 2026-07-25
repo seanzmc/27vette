@@ -26,6 +26,14 @@ SOURCE_ROLE_FAMILIES: dict[str, str] = {
     "interior_source_sheet": "interiors",
 }
 
+# Promotable artifact-type domain. Owned here so schema validation, promotion
+# parsing, and the editor cannot drift into three different vocabularies.
+REGISTRY_PROMOTION_ARTIFACT_TYPES: tuple[str, ...] = (
+    "current_generation",
+    "draft_artifact",
+    "runtime_contract",
+)
+
 # Per-family editing metadata. Columns absent from types/enums/refs are
 # free text. Headers always come from the sheet itself, never from here.
 EDITOR_SHEET_META: dict[str, dict] = {
@@ -172,7 +180,7 @@ EDITOR_SHEET_META: dict[str, dict] = {
     "model_registry_promotion": {
         "key": ("model_key",),
         "types": {"promoted_to_runtime": "bool", "default_model": "bool", "active": "bool", "display_order": "int"},
-        "enums": {},
+        "enums": {"artifact_type": REGISTRY_PROMOTION_ARTIFACT_TYPES},
         "refs": {},
     },
     "model_interior_scope": {
@@ -348,6 +356,30 @@ GLOBAL_SHEET_FAMILIES: dict[str, str] = {
 }
 
 
+# Read-only workbook families. These are never writable through the editor or
+# the Workbook Manager, but their shape is still shared contract: the manager
+# projects them and reference validation resolves against them. Keeping them
+# here stops consumers from hand-authoring a second copy of the columns.
+READONLY_SHEET_META: dict[str, dict] = {
+    "sections": {
+        "sheet": "section_master",
+        "key": ("section_id",),
+        "columns": (
+            "section_id",
+            "section_name",
+            "selection_mode",
+            "is_required",
+            "display_order",
+            "standard_behavior",
+            "step_key",
+        ),
+        "types": {"is_required": "bool", "display_order": "int"},
+        "label": "Sections (master)",
+        "id_prefixes": ("sec_",),
+    },
+}
+
+
 def family_spec(name: str) -> dict:
     try:
         return EDITOR_SHEET_META[name]
@@ -366,3 +398,51 @@ def registered_sheet_families(extract: dict) -> dict[str, str]:
         if family and sheet:
             result[sheet] = family
     return result
+
+
+def active_model_keys(extract: dict) -> set[str]:
+    rows = extract.get("sheets", {}).get("model_master", {}).get("rows", [])
+    return {
+        str(row.get("model_key")).strip()
+        for row in rows
+        if workbook_truthy(row.get("active")) and str(row.get("model_key") or "").strip()
+    }
+
+
+def models_for_write_targets(extract: dict, targets) -> set[str]:
+    """Return the models a set of workbook write targets can affect.
+
+    Deliberately widening, never narrowing. A row in a global family can change
+    any model's generated output, so a global target marks every active model as
+    touched. Callers use this for *reporting* which models changed; it must
+    never be used to skip generating or validating a model.
+    """
+
+    sheet_families = registered_sheet_families(extract)
+    models_by_sheet: dict[str, set[str]] = {}
+    for row in extract.get("sheets", {}).get("model_workbook_sources", {}).get("rows", []):
+        if not workbook_truthy(row.get("active")):
+            continue
+        sheet = str(row.get("sheet_name") or "")
+        model_key = str(row.get("model_key") or "").strip()
+        if sheet and model_key:
+            models_by_sheet.setdefault(sheet, set()).add(model_key)
+
+    touched: set[str] = set()
+    saw_global = False
+    for target in targets:
+        sheet = str(target.get("sheet") or "").strip()
+        if sheet not in sheet_families:
+            raise KeyError(f"Unregistered workbook sheet: {sheet!r}")
+        if sheet in GLOBAL_SHEET_FAMILIES:
+            saw_global = True
+            continue
+        touched.update(models_by_sheet.get(sheet, set()))
+    if saw_global:
+        # Union, never replace. model_master activeness and source-sheet
+        # registration disagree for scaffold models, and a target already
+        # collected must not be dropped by widening.
+        touched.update(active_model_keys(extract))
+        for owners in models_by_sheet.values():
+            touched.update(owners)
+    return touched

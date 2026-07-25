@@ -11,29 +11,17 @@ from corvette_form_generator.model_config import validate_model_key
 from corvette_form_generator.runtime_contract import assert_runtime_contract, live_contract_data
 from corvette_form_generator.runtime_metadata import truthy
 from corvette_form_generator.workbook import clean, intish, rows_from_sheet
+from corvette_form_generator.workbook_domain.registry import (
+    REGISTRY_PROMOTION_ARTIFACT_TYPES,
+    WRITABLE_COLUMNS,
+)
 
 MODEL_REGISTRY_PROMOTION_SHEET = "model_registry_promotion"
-MODEL_REGISTRY_PROMOTION_HEADERS = [
-    "model_key",
-    "registry_key",
-    "promoted_to_runtime",
-    "default_model",
-    "artifact_path",
-    "artifact_type",
-    "legacy_alias",
-    "active",
-    "display_order",
-    "notes",
-]
-VALID_ARTIFACT_TYPES = {"current_generation", "draft_artifact", "runtime_contract"}
-VEHICLE_SETUP_FIELDS = (
-    "setup_card_subtitle",
-    "setup_eyebrow",
-    "setup_title",
-    "setup_description",
-    "setup_fact_1",
-    "setup_fact_2",
-    "setup_fact_3",
+# Shape authority lives in workbook_domain.registry; these are that object.
+MODEL_REGISTRY_PROMOTION_HEADERS = WRITABLE_COLUMNS[MODEL_REGISTRY_PROMOTION_SHEET]
+VALID_ARTIFACT_TYPES = set(REGISTRY_PROMOTION_ARTIFACT_TYPES)
+VEHICLE_SETUP_FIELDS = tuple(
+    column for column in WRITABLE_COLUMNS["model_master"] if column.startswith("setup_")
 )
 
 

@@ -373,12 +373,12 @@ Remaining work after the completed Passes 0A/0B(partial)/0C/I/G1/G2 is exactly f
 
 | Pass | Purpose | Unblocks |
 |---|---|---|
-| 1 | Shared registry becomes the only workbook-shape authority, so post-export validation is a real gate | Safe database→workbook export |
+| 1 | Shared registry becomes the only workbook-shape authority, so post-export validation is a real gate — **completed 2026-07-25** | Safe database→workbook export |
 | 2 | One builder for all six models; result summary derived from the contract; `validation.py` folded in | "Single controlled pathway for all models" |
 | 3 | Retained Stingray contract migrated; composed candidate verifier (§3.7); promotion/publication prove the candidate | End-to-end database→form runs |
 | 4 | Migrate remaining guidance/tests, execute the approved deletion list, archive completed plans | Repository convergence |
 
-Pass 1 is the highest-value next pass and the one the database workflow is blocked on: §2.1.1 shows `validate_workbook_schema.py` currently reports zero issues while real per-model drift exists, and §2.1 items 5–7 name the cause. Until Pass 1 lands, a database export can write a structurally drifted workbook that validates green.
+Pass 1 landed 2026-07-25 (receipt below). The next pass on the critical path is **Pass 3's prerequisite**: the retained Stingray runtime contract fails strict validation, so `generate_registry.py` cannot rebuild `form-app/data.js` and no end-to-end database→form run can finish. Pass 2 is independently startable.
 
 ### Pass 0A — Freeze the active-surface inventory
 
@@ -604,6 +604,37 @@ Pass 1 gates:
 node --test tests/workbook-schema-standardization.test.mjs
 git diff --check
 ```
+
+#### Pass 1 receipt — completed 2026-07-25
+
+Bound to commit `d5db8bb7744097078fb0ef84b8df772fbc2e1f6f`, workbook SHA-256 `8858cff40ea7eaeda6b7921714f3697a6ee9d1bbc99c84e564d7b118e45b2166`.
+
+Diagnosis confirmed by RED before any implementation:
+
+- Renaming `option_name` in **every** active options sheet at once produced **zero** schema issues. Cross-sheet header equality cannot see coordinated drift, because the compared sheets still agree with each other.
+- A write to a column that exists physically in Excel but is not owned by the family produced **zero** editor errors.
+
+Implemented:
+
+- `workbook_domain/registry.py` gained `REGISTRY_PROMOTION_ARTIFACT_TYPES`, the `model_registry_promotion.artifact_type` enum, a read-only `sections` family (`READONLY_SHEET_META`), `active_model_keys()`, and `models_for_write_targets()` for §3.7.1.
+- `schema_validation.py` and `registry_promotion.py` no longer hold header, setup-copy, or artifact-type lists; all derive from the registry.
+- New checks: `registry_family_columns_missing`, `registry_family_columns_unregistered`, and `registry_promotion_blank_artifact_type`. The last one exists because the write path now requires `artifact_type` on any effective-active row; without it, a blank export would validate green and then be rejected by the editor.
+- `editor_ops._prepare_batch()` rejects writes to physical columns outside the family registry, in addition to the existing physical-header check.
+- `workbook-manager/backend/app/catalog.py` derives `_SECTION_SPEC` from `READONLY_SHEET_META`; no hand-authored column metadata remains in the Manager.
+- `workbook_domain/__init__.py` loads the guarded write service lazily to break the `registry_promotion → workbook_domain → service → editor_ops → schema_validation → registry_promotion` cycle.
+
+Validation receipt:
+
+- Canonical workbook required **no** change: an openpyxl probe over all 72 registered sheets found 0 missing and 0 extra columns, and all six promotion rows already carry `artifact_type=runtime_contract`.
+- `validate_workbook_package.py`: valid, 0 issues. `validate_workbook_schema.py --skip-live-contract`: valid, 0 issues.
+- The full schema command remains red only on the already-recorded strict rejection of the retained Stingray runtime contract. That is the Pass 3 prerequisite, not a Pass 1 regression.
+- Pass 1 focused gate: `209 passed, 2 skipped, 7 subtests`. Full Python suite: `454 passed, 2 skipped`, with the same pre-existing failures (four editor lint/compare, two retained-artifact source-assembly). Both `workbook-schema-standardization.test.mjs` failures reproduce identically with the change stashed.
+- Protected surfaces byte-clean; `git diff --check` clean.
+- Independent verifier: cycle 1 returned **FAIL** on one real defect — `models_for_write_targets()` early-returned the global set and therefore *narrowed* when a global target followed a source-sheet target owned by a model inactive in `model_master`. Fixed by unioning at the end over both activeness sources; the regression test asserts the subset relation rather than an exact set.
+
+Scope note: the column gate covers writable registered families only. The read-only `sections` family is registered for Manager projection but not gated, because fixture and canonical `section_master` shapes differ in ways Pass 1 was not authorized to decide.
+
+Not changed: no workbook row, generated artifact, published registry, promotion metadata, browser runtime, or dealer boundary. Source builders remain split (Pass 2). The retained Stingray contract was not regenerated (Pass 3).
 
 ### Pass 2 — Validate before writing and converge source assembly
 
