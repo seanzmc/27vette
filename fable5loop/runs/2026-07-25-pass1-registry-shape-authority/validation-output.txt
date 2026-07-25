@@ -142,3 +142,18 @@ promoted-loop copy removed. Now every active promotion row is domain-checked.
 212 passed, 2 skipped, 1 warning, 7 subtests passed in 93.80s (0:01:33)
 
 --- full Python suite (final source) ---
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_editor_lints.py::RealWorkbookLintTest::test_d1_rwj_wks_collision
+FAILED tests/test_editor_lints.py::RealWorkbookLintTest::test_negative_no_duplicate_keys_or_orphan_refs
+FAILED tests/test_editor_lints.py::RealWorkbookCompareTest::test_c2_cj2_stingray_name_deviator
+FAILED tests/test_editor_lints.py::RealWorkbookCompareTest::test_r3_drz_pending_review
+FAILED tests/test_fable5_loop_contract.py::test_repository_fable5_loop_contract_passes
+FAILED tests/test_source_assembly_characterization.py::test_shared_assembler_preserves_stingray_runtime_drift_surfaces
+FAILED tests/test_source_assembly_characterization.py::test_shared_assembler_preserves_grand_sport_runtime_drift_surfaces
+7 failed, 455 passed, 2 skipped, 1 warning, 15 subtests passed in 267.38s (0:04:27)
+
+--- protected surfaces / diff check ---
+(no lines = clean)
+8858cff40ea7eaeda6b7921714f3697a6ee9d1bbc99c84e564d7b118e45b2166  stingray_master.xlsx
+diff --check clean

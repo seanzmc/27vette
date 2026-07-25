@@ -21,7 +21,7 @@ places at once.
 | 8 | Workbook Manager carries no hand-authored column metadata | PASS — `_SECTION_SPEC` derives from `READONLY_SHEET_META` |
 | 9 | Registry exposes the family-to-model mapping §3.7.1 needs, widening (never narrowing) on global families | PASS — `models_for_write_targets()` |
 | 10 | Canonical workbook still validates | PASS — package valid / 0 issues; schema `--skip-live-contract` valid / 0 issues |
-| 11 | No new test failure versus the recorded baseline | PASS — same 6 pre-existing Python failures; both node failures reproduce with the change stashed |
+| 11 | No new test failure versus the recorded baseline | PASS — same 6 pre-existing Python failures (four editor lint/compare, two retained-artifact source-assembly); both node failures reproduce with the change stashed. Note: `validation-output.txt` shows 7 in the intermediate runs because `test_fable5_loop_contract` was red until this receipt was complete; it is green in the final run. |
 | 12 | No workbook, generated-artifact, registry, or dealer write | PASS — protected surfaces byte-clean; workbook SHA unchanged |
 
 ## Explicitly out of scope

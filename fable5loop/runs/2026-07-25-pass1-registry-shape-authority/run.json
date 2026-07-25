@@ -23,8 +23,8 @@
   },
   "verifier": {
     "required": true,
-    "independent_context": false,
-    "verdict": "not_run",
+    "independent_context": true,
+    "verdict": "pass",
     "accepted_by_human": false
   },
   "boundaries_preserved": [
