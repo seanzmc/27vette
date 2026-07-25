@@ -1,7 +1,23 @@
 # Validation Single-Lane and Active-Surface Cleanup Specification
 
-Status: ACTIVE — Pass 0A inventory and Pass 0C boundary complete; approved Pass I ingest retirement completed 2026-07-23. The Pass 0B generation/runtime executable slice, approved Pass G1 fail-closed generation boundary, bounded Pass G2 Z06 source repair, and option-name quality-authority correction completed 2026-07-24; semantic viability remains open for the other non-ingest surfaces. Broad Pass 1 remains unapproved.
-Date: 2026-07-23
+Status: ACTIVE — Pass 0A inventory and Pass 0C boundary complete; approved Pass I ingest retirement completed 2026-07-23. The Pass 0B generation/runtime executable slice, approved Pass G1 fail-closed generation boundary, bounded Pass G2 Z06 source repair, and option-name quality-authority correction completed 2026-07-24; semantic viability remains open for the other non-ingest surfaces. Pass 1 is the next recommended implementation pass and remains unapproved.
+Date: 2026-07-23 (revised 2026-07-24 for database-workflow sufficiency and simplification)
+
+Consuming workflow: this specification is the structural prerequisite for the database-backed workbook editor described in `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md`. The end state that both specifications must jointly deliver is one controlled repeatable pathway:
+
+```text
+editor user edit
+  -> durable draft state
+  -> ChangeSet (workbook-changeset-1)
+  -> guarded canonical workbook write
+  -> workbook package + source/schema validation (real gate)
+  -> discover promoted set, generate every promoted model in an isolated candidate root
+  -> strict runtime-contract validation
+  -> candidate registry + browser proof
+  -> explicit publication of form-app/data.js
+```
+
+This specification owns everything from the workbook write boundary rightward. The database specification owns everything leftward. Neither may invent a second lane.
 Recommended implementation reasoning: high
 Branch: `db-workflow`
 
@@ -229,6 +245,24 @@ Validation receipt:
 
 Next bounded pass: migrate the retained Stingray runtime contract through the current strict generation path, then compose workbook package/source-schema and options-quality checks with all-six strict candidate generation and candidate-registry/browser proof. Do not hand-edit the retained contract or update only its dataset metadata: isolated comparison shows the fresh contract preserves all 1,416 choice identities and all rules/prices/interiors, but it also applies workbook-authored section metadata changes and removes the empty `sec_perf_support_001` section. Review that bounded drift before promotion and publish the registry only from the complete validated candidate set.
 
+### 2.8 Simplification audit — 2026-07-24
+
+Read-only structural audit of the retained (post-Pass-I) surface, looking only for complexity that can be removed without losing the goal. Findings are ordered by value.
+
+**S1 — Three source payloads are constructed where one is required.** `source_assembly.assemble_model_source()` calls `inspect_model_sources()`, `build_contract_preview()`, and `build_form_data_draft()` for every non-Stingray model on every generation. Only the draft feeds the runtime contract. `model_generation.py:119` then *requires* all three to be non-`None` and reads `report["status"]`, `report["counts"]`, `report["warnings"]`, and eleven `preview`/`draft` counts solely to build the CLI result summary. That summary is derivable from the validated runtime contract. Deriving it from the contract makes report and preview genuinely optional, removes two full workbook reconstructions per model per run, and removes the strongest remaining reason `inspection.py` (1,472 lines) owns production source construction. **Do this before builder convergence; it shrinks what has to converge.**
+
+**S2 — Convergence is cheaper stated as deletion than as merger.** §2.4 and Pass 2 currently frame the work as unifying two builders across sixteen numbered requirements. The simpler equivalent statement: the workbook-driven builder becomes the only builder for all six models, and the preview/draft path stops producing runtime input at all. Stingray's genuinely different semantics are then a bounded list of behaviors to move into the single builder or into workbook data, not a merge negotiation. The characterization work in §2.4 item 6 is still required; only the framing and the requirement count shrink.
+
+**S3 — Workbook Manager catalog duplication is smaller than assumed.** `workbook-manager/backend/app/catalog.py:232` already derives `WRITABLE_SPECS` from registry `WRITABLE_FAMILIES` via `_build_spec()`. Only `_SECTION_SPEC` is hand-authored. Pass 1's Manager scope is therefore one spec plus its tests, not a catalog rewrite. Do not budget a Manager migration pass for this.
+
+**S4 — Manager full-row staging is scheduled for replacement; do not harden it.** `workbook-manager/backend/app/staging.py` (447 lines) and `sync.py:81 sync_workbook(write=True)` implement a direct full-row write path that the database specification's Pass 5 replaces with draft-to-ChangeSet emission. Every hour spent strengthening staging semantics is discarded work. Freeze staging at its current behavior with characterization tests only, and go ChangeSet-first. This removes an entire parallel write lane from the plan rather than migrating it.
+
+**S5 — `validation.py` is a 26-line, two-function module** (`validation_row`, `validation_error_count`) with no independent authority. Fold into `runtime_contract.py` during Pass 2 and delete the module. Trivial, but it is already classified `CONSOLIDATE_INTO_CURRENT_OWNER` and costs nothing.
+
+**S6 — Governance itself is over-complicated.** The completed work spans Passes 0A, 0B, 0C, I, G1, G2, plus a lettered correction, while the remaining work is numbered 1, 2, 3, 4A, 4B, 5, and the database specification adds Passes 1–7. Remaining work in this specification is collapsed to four passes in §4. Do not add further lettered sub-passes; use bounded receipts inside a pass instead.
+
+**S7 — Deliberately not simplified.** `model_config.py` (the `ModelConfig` dataclass) versus `model_configs.py` (workbook discovery) is a genuinely confusing name pair, but renaming touches every importer for readability only. `editor_ops.py` (1,484 lines) and `schema_validation.py` (1,177 lines) are large but are the guarded write boundary and the semantic validator; they are targets for extraction of misplaced *authority* (Pass 1), not for size-driven splitting. `asset_map_sync.py` (1,272 lines) is outside this lane entirely. Record these as non-goals so later passes do not reopen them.
+
 ## 3. Authority model after completion
 
 ### 3.1 Workbook structure
@@ -293,9 +327,58 @@ The browser ingest wizard, its compiler/exception/session/ChangeSet-emitter pack
 
 The generic `workbook-changeset-1` parser/normalizer, guarded workbook-domain service, `editor_ops.apply_batch()`, and `apply_workbook_changeset.py` remain only because they serve workbook/editor and future Workbook Manager safety independently of ingest. No ingest-produced artifact is required by those owners.
 
+### 3.7 The composed candidate lane
+
+Every piece below already exists or is owned by a pass in this specification, but nothing currently names their composition. The composition is itself a deliverable: one operator-invocable, read-only-by-default command that takes a candidate workbook and returns a pass/fail readiness verdict.
+
+Owner: `scripts/verify_workbook_candidate.py` (new in Pass 3). Exact ordered stages:
+
+1. Accept `--workbook <path>` (default: canonical) and an optional `--changed-model` list. Copy the selected workbook into a temporary candidate root; every later stage reads only that copy.
+2. `validate_workbook_package` on the candidate copy. Fail closed.
+3. `validate_workbook_schema` on the candidate copy, using the Pass 1 shared-registry authority. Fail closed.
+4. `options_sheet_quality` on the candidate copy. Fail closed.
+5. `discover_generation_model_configs(candidate_workbook)` bound to the temporary root; determine the complete promoted set plus every active/generatable model.
+6. Generate **every** model in that set into the temporary root through the single builder. Changed-model scoping never reduces what is generated; see §3.7.1.
+7. Validate every contract through `runtime_contract.assert_runtime_contract()` with config-bound identity. Zero error-severity findings.
+8. Build a complete candidate registry from exactly those fresh contracts into the temporary root.
+9. Run the browser/runtime harness against the candidate registry via a test-harness data-path override.
+10. Emit one machine-readable readiness report (§3.7.1) and exit nonzero on any stage failure.
+11. Assert `stingray_master.xlsx`, `form-output/`, and `form-app/data.js` are byte-identical to their pre-run state.
+
+Publication remains a separate explicitly approved command. This verifier never writes a tracked path.
+
+#### 3.7.1 Changed-model scoping is a reporting contract, not a generation filter
+
+The database workflow needs to know which models a ChangeSet touched. That knowledge must not become a generation filter, because a rule, section, price, or global-family row can affect a model other than the one edited.
+
+Required behavior:
+
+1. The caller may supply the touched `model_key` set, derived from the applied ChangeSet's target rows via the shared registry's family-to-model mapping. Rows in global families (`GLOBAL_SHEET_FAMILIES`) mark the touched set as **all models**.
+2. Generation, strict validation, and candidate-registry construction always cover the complete promoted plus active/generatable set regardless of that input.
+3. The readiness report partitions results into `changed`, `unchanged`, and `unexpected_drift`. A model outside the declared touched set whose fresh contract differs semantically from its retained contract is `unexpected_drift` and fails the run. This is the check that catches a bad global-family edit.
+4. The report records, per model: `model_key`, `generated`, `validation_findings`, `contract_sha256`, `declared_changed`, and `semantic_drift_vs_retained`.
+5. No stage may use the touched set to skip validation, skip generation, or narrow the registry.
+
+### 3.8 Cross-specification reconciliation
+
+The database specification `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md` §3.8 instructs its parity helper to validate via `registry_promotion.assert_runtime_contract()`. After Pass G1 the owner is `runtime_contract.assert_runtime_contract()`, and the strict identity checks require the `config` and `expected_model_label` arguments. The old spelling still resolves through a re-export, so a stale call site validates more weakly than intended without failing. That reference is corrected in the database specification; any future change to the validator's owner or signature must update both specifications in the same pass.
+
+Standing rule: `runtime_contract.py` is the only strict runtime-contract validator. No consumer — generation, registry publication, promotion preflight, Workbook Manager parity, or candidate verification — may define, wrap, or weaken a second acceptance check.
+
 ## 4. Pass sequence
 
 Each pass is independently reviewable. Do not start the next pass while the preceding pass has unexplained drift or retained red gates.
+
+Remaining work after the completed Passes 0A/0B(partial)/0C/I/G1/G2 is exactly four passes. Per §2.8 S6, do not add lettered sub-passes; record bounded receipts inside a pass instead.
+
+| Pass | Purpose | Unblocks |
+|---|---|---|
+| 1 | Shared registry becomes the only workbook-shape authority, so post-export validation is a real gate | Safe database→workbook export |
+| 2 | One builder for all six models; result summary derived from the contract; `validation.py` folded in | "Single controlled pathway for all models" |
+| 3 | Retained Stingray contract migrated; composed candidate verifier (§3.7); promotion/publication prove the candidate | End-to-end database→form runs |
+| 4 | Migrate remaining guidance/tests, execute the approved deletion list, archive completed plans | Repository convergence |
+
+Pass 1 is the highest-value next pass and the one the database workflow is blocked on: §2.1.1 shows `validate_workbook_schema.py` currently reports zero issues while real per-model drift exists, and §2.1 items 5–7 name the cause. Until Pass 1 lands, a database export can write a structurally drifted workbook that validates green.
 
 ### Pass 0A — Freeze the active-surface inventory
 
@@ -462,6 +545,8 @@ Pass I receipt — completed 2026-07-23:
 
 Purpose: remove parallel workbook-shape ownership and make validators fail when all source sheets drift together.
 
+This is the post-export gate for the database workflow. Scope note from §2.8 S3: `catalog.py` already derives its writable specs from registry families; only `_SECTION_SPEC` is hand-authored, so the Workbook Manager side of this pass is one spec plus its tests.
+
 Exact files:
 
 - Modify `scripts/corvette_form_generator/workbook_domain/registry.py`
@@ -490,6 +575,9 @@ Required behavior:
 5. Keep opaque/read-only columns importable only when explicitly classified; never make them writable by physical existence.
 6. Replace hand-authored stale test headers with registry-derived fixtures.
 7. Add adversarial tests proving coordinated all-sheet drift fails.
+8. Prove the export gate on a mutated candidate copy, never on the canonical workbook. Required RED cases, each of which must fail `validate_workbook_schema.py`: an added physical column outside the family registry; a removed canonical column present in the registry; a renamed header matching the old spelling in every sheet at once; a reference value pointing at an absent key; and a write attempt through `editor_ops._prepare_batch()` targeting the rogue physical column.
+9. Derive `catalog.py`'s remaining hand-authored `_SECTION_SPEC` from the shared registry, or record why the registry cannot express it. No new independent Manager metadata is permitted either way.
+10. Add the registry's family-to-model mapping helper required by §3.7.1 changed-model derivation: given a set of `(family, sheet, model_key)` write targets, return the touched model set, returning all models for any global-family target. Cover the global-family case explicitly.
 
 Stop conditions:
 
@@ -542,24 +630,20 @@ Exact files:
 - Create `tests/test_all_model_runtime_generation.py`
 - Modify this specification for the Pass 2 receipt.
 
-Required behavior:
+Already delivered by Passes G1/G2 and not repeated here: the strict validator, validate-before-write, atomic writes, nonzero CLI status, candidate-bound `ModelConfig` paths, pure derivation manifests, the isolated six-model gate, and Z06 green. Passes 2A/2B are collapsed; the sequencing they encoded is now the ordering of the requirements below.
 
-1. Add one strict runtime-contract validator with complete required-field, identity, model, variant, structure, and zero-error checks.
-2. Build and validate the complete contract before any canonical artifact write.
-3. Return a nonzero CLI status on assembly or validation failure.
-4. Generate into a caller-selected temporary root for readiness and tests.
-5. Bind every discovered `ModelConfig.workbook_path`, `root`, `output_dir`, and `app_dir` to the caller-selected candidate workspace; discovering from a scratch workbook must never return a config that later reads the canonical workbook.
-6. Ensure source assembly is side-effect-free; `rules.py`/`rule_derivation.py` return derived manifest data in memory and write it only through an explicit diagnostic/report emission request.
-7. Make the canonical model builder operate on one loaded/frozen workbook snapshot. Inspection must consume that canonical in-memory result rather than reopen and reconstruct the workbook through report, preview, and draft phases.
-8. Remove `production.py` generation dependence on mutable module globals (`MODEL_CONFIG`, `WORKBOOK_PATH`, `ROOT`, `OUTPUT_DIR`, `APP_DIR`); every read/write path must come from the bound candidate config until the module is fully absorbed.
-9. Move runtime cleanup/finalization out of `registry_promotion.live_contract_data()` into `runtime_contract.py`; promotion consumes and validates a completed contract rather than owning generation transformation.
-10. Exercise all workbook-discovered active/generatable models through the same executable test harness.
-11. Treat strict validation, validate-before-write, and temp-root plumbing as Pass 2A. Pass 2A may close with the exact bound Z06 `StaleDerivationAllowlistError` asserted as a known negative result, but the overall Pass 2 remains open.
-12. Resolve the Z06 source/allowlist blocker in a separately authorized workbook/source pass; do not suppress it in generic generation code.
-13. Start Pass 2B only after that blocker is green. Pass 2B runs fresh six-model generation and then migrates Stingray source construction to the same model-neutral assembler after direct characterization proves intended payload equivalence. Do not hide differences behind count-only assertions.
-14. Preserve Stingray compatibility JSON/CSV only as secondary outputs while current consumers remain; compare them explicitly.
-15. Keep inspection/preview/draft builders only for explicit opt-in diagnostics after the canonical assembler owns source construction. They are not readiness artifacts and cannot remain a separate non-Stingray builder.
-16. Require complete workbook-owned generation/runtime metadata for every active/generatable model. Python defaults may support isolated fixtures or explicit compatibility diagnostics only; readiness fails rather than silently filling missing active-model step, section, context, summary, source-role, or required presentation metadata.
+Required behavior, in order:
+
+1. **Cut the summary's dependency on report and preview first (§2.8 S1).** Derive `generate_model_artifacts()`'s result summary from the validated runtime contract instead of `assembly.report` and `assembly.preview`. Then stop constructing report and preview during normal generation; they are produced only on explicit request. This removes two workbook reconstructions per model per run and must land before any builder change.
+2. **State convergence as deletion, not merger (§2.8 S2).** The workbook-driven builder becomes the only source builder for all six models. `build_form_data_draft()` and `build_contract_preview()` stop producing runtime input. `production.build_production_source_data()` is absorbed; `production.py` retains no mutable module globals (`MODEL_CONFIG`, `WORKBOOK_PATH`, `ROOT`, `OUTPUT_DIR`, `APP_DIR`) on any path that survives.
+3. Before that absorption, characterize and resolve the two builders' differences in standard-equipment deduplication, hidden/display behavior, variant overrides, invalid-reference filtering, rule assembly, and price validation. Prefer expressing each difference in workbook data over encoding it in generic code. Do not hide differences behind count-only assertions.
+4. The single builder operates on one loaded, frozen workbook snapshot. Optional inspection/report output consumes that in-memory result; it never reopens or reconstructs the workbook. Every workbook handle closes deterministically.
+5. Move `cleanup_display_text()`'s hardcoded customer-copy correction into workbook data.
+6. Move runtime cleanup/finalization out of `registry_promotion.live_contract_data()` into `runtime_contract.py`; promotion consumes and validates a completed contract rather than owning generation transformation.
+7. Fold `validation.py`'s two helpers into `runtime_contract.py` and delete the module (§2.8 S5).
+8. Preserve Stingray compatibility JSON/CSV only as secondary outputs while current consumers remain; compare JSON with `compare-generated-contracts.mjs` and CSV byte-for-byte.
+9. Require complete workbook-owned generation/runtime metadata for every active/generatable model. Python defaults may support isolated fixtures or explicit compatibility diagnostics only; readiness fails rather than silently filling missing active-model step, section, context, summary, source-role, or required presentation metadata.
+10. Exercise all workbook-discovered active/generatable models through the same executable test harness, and require a six-model-green assertion. Pass 2 is not complete, and Pass 3 cannot start, until that assertion passes.
 
 Strict runtime-contract rejection matrix:
 
@@ -580,7 +664,7 @@ Do not use stale checked-in runtime contracts as the sole before-state. Capture 
 
 Known current blocker and sequencing boundary:
 
-- Z06 currently raises `StaleDerivationAllowlistError` for `(z06, opt_pdd_001, opt_cbf_001)`. If still present on the rebased Pass 2A snapshot, reproduce it exactly in the isolated harness. A separately authorized source/allowlist pass must establish whether to remove or re-approve the stale entry. Pass 2B and Pass 3 cannot start until Z06 generates green.
+- Resolved. Pass G2 restored the canonical `section_master` row for `sec_z06_pkg_001`, and the isolated gate now generates all six models with no model exception. Pass 2 therefore starts from a six-model-green snapshot and must require it, not reintroduce the exception. If a rebase reopens this failure, stop and treat it as a separate authorized source pass rather than suppressing it in generic generation code.
 
 Pass 2 gates:
 
@@ -602,9 +686,6 @@ PYTHONPATH=scripts .venv/bin/python -m pytest \
   tests/test_all_model_runtime_generation.py -q
 ```
 
-- If the bound Z06 blocker still exists when Pass 2A starts, its all-model test must assert that exact negative result, prove the other five assemble under strict validation, and prove no tracked write; its receipt must say six-model readiness remains blocked. If the rebased current snapshot is already green, require Z06 green rather than preserving or reintroducing the stale failure.
-- Once Z06 is green—either on the rebased starting snapshot or after the separately authorized source/allowlist correction—Pass 2B must require a six-model-green assertion. Pass 2 is not complete, and Pass 3 cannot start, until that assertion passes.
-
 Additional proof:
 
 - Generate every discoverable model into one isolated temporary root.
@@ -615,10 +696,14 @@ Additional proof:
 
 ### Pass 3 — Make promotion and publication prove the candidate runtime
 
-Purpose: prevent a candidate from being called validated until its exact runtime contracts and temporary registry have passed.
+Purpose: prevent a candidate from being called validated until its exact runtime contracts and temporary registry have passed, and deliver the composed candidate lane the database workflow calls.
+
+Blocking prerequisite inside this pass: the retained Stingray runtime contract currently fails strict validation because it lacks `dataset.model`, `dataset.model_year`, and `dataset.status`, so `generate_registry.py` exits nonzero and `form-app/data.js` cannot be rebuilt. Until this is resolved, no end-to-end database→form run can finish. Resolve it by regenerating the contract through the current strict path — never by hand-editing the retained artifact or patching only its dataset metadata. Isolated comparison shows the fresh contract preserves all 1,416 choice identities and all rules, prices, and interiors, but also applies workbook-authored section metadata changes and removes the empty `sec_perf_support_001` section. Review that exact bounded drift, record it in the receipt, and publish only from the complete validated candidate set.
 
 Exact files:
 
+- Create `scripts/verify_workbook_candidate.py` per §3.7
+- Create `tests/test_verify_workbook_candidate.py`
 - Modify `scripts/promote_model.py`
 - Modify `scripts/generate_registry.py`
 - Modify `scripts/corvette_form_generator/registry_promotion.py`
@@ -641,7 +726,10 @@ Required behavior:
 6. Split `z06-runtime-promotion.test.mjs` so read-only assertions do not run `generate_registry.py` against the tracked app.
 7. After fixture, active-code, active-doc, and external/operator compatibility closure is recorded, restrict promotion artifact metadata to `runtime_contract` and remove acceptance/production consumers of `current_generation` and `draft_artifact`. If external compatibility remains, stop for a separate explicit decision rather than silently preserving the fallback as release authority.
 8. Remove `build_registry_from_promotions()` and old artifact-resolution fallbacks after the consumer scan is empty.
-9. `generate_registry.py` remains the only real `form-app/data.js` writer and operates only after separately approved promotion/artifact changes.
+9. `generate_registry.py` remains the only real `form-app/data.js` writer and operates only after separately approved promotion/artifact changes. Its write becomes atomic.
+10. Implement `scripts/verify_workbook_candidate.py` as the single composed entrypoint defined in §3.7, including the §3.7.1 changed-model reporting contract. Promotion preflight and the database workflow's post-export gate both call this one command; neither reimplements the stage sequence.
+11. Emit the readiness report as JSON to a caller-selected path, with a stable schema version. The database workflow consumes this report; it does not scrape console output.
+12. The verifier's own test proves: all stages run in order against a candidate copy; a workbook defect fails at the earliest applicable stage; an undeclared model's semantic drift is reported as `unexpected_drift` and fails; a declared changed model does not reduce the generated set; and the canonical workbook, `form-output/`, and `form-app/data.js` are byte-identical afterward.
 
 Pass 3 gates:
 
@@ -654,7 +742,9 @@ Pass 3 gates:
 
 Purpose: first move current behavior, provenance, tests, and active guidance to authoritative owners; only then delete the exact separately approved zero-consumer list.
 
-#### Pass 4A — Consumer, provenance, test, and guidance migration
+Pass 4 runs as three ordered stages in one pass. Former Pass 5 is Stage C; it is no longer a separate pass. References elsewhere in this document to "Pass 4A", "Pass 4B", and "Pass 5" mean Stages A, B, and C.
+
+#### Stage A (formerly Pass 4A) — Consumer, provenance, test, and guidance migration
 
 Pinned active-guidance owners:
 
@@ -682,7 +772,7 @@ Initial rewrite/consolidation set already supported by audit evidence:
 Required README result:
 
 - One parameterized current model-generation command driven by workbook discovery.
-- One exact gate matrix separated into source/schema, generation/runtime contract, publication, browser/runtime, optional diagnostics, ingest, editor/manager, and Fable surfaces.
+- One exact gate matrix separated into source/schema, generation/runtime contract, candidate verification (§3.7), publication, browser/runtime, optional diagnostics, editor/manager, and Fable surfaces. No ingest row: that workflow is retired.
 - Every default command is read-only or explicitly temp-rooted.
 - No “all tests” formulation that mixes publication writers and optional diagnostic suites.
 - Promotion instructions name candidate generation/runtime proof as part of preflight.
@@ -701,7 +791,7 @@ Pass 4A exit criteria:
 - Current guidance names only the post-migration path and remains accurate before deletion.
 - Re-run the bound inventory and publish the exact Pass 4B `git rm` list for separate approval.
 
-#### Pass 4B — Exact approved deletion
+#### Stage B (formerly Pass 4B) — Exact approved deletion
 
 Initial retirement candidates requiring final Pass 0B semantic confirmation:
 
@@ -741,7 +831,7 @@ Pass 4 gates:
 - Run the new canonical all-model generation and candidate-promotion gates.
 - Confirm default gates do not write tracked files.
 
-### Pass 5 — Archive historical inputs, clear generated review clutter, and close
+#### Stage C (formerly Pass 5) — Archive historical inputs, clear generated review clutter, and close
 
 Purpose: after active guidance and executable cleanup are complete, leave future agents with no active completed-plan pile or redundant generated-review outputs.
 
@@ -771,7 +861,8 @@ Pass 5 gates:
 | `form-app/data.js` | Preserved during cleanup/preflight; only explicit publication may change it. |
 | Runtime JS | Inspected and exercised; no product behavior change expected. Candidate-registry injection belongs in the Node test harness, not production `app.js`. |
 | Dealer submission | Preserved. Candidate runtime tests must remain local and must not submit live dealer requests. |
-| Workbook Manager | Registry consumers updated for parity only; Passes 3–7 of its owning spec remain separately scoped. |
+| Workbook Manager | Registry consumers updated for parity only; Passes 3–7 of its owning spec remain separately scoped. Per §2.8 S4, `staging.py` and `sync_workbook(write=True)` are frozen with characterization tests only — do not harden a write lane the ChangeSet migration replaces. |
+| Database workflow | Consumes Pass 1's validators and Pass 3's `verify_workbook_candidate.py` report; it does not reimplement validation, generation, or registry construction. |
 | Ingest | Entire wizard/compiler/emitter/proof surface retired in Pass I; generic workbook-domain ChangeSet parsing/service remains independent. |
 | README/route map | Must be updated to the final single lane. |
 | `.hermes/plans` | Explicit completed plans archived; open/ambiguous plans classified individually. |
@@ -789,8 +880,9 @@ Pass 5 gates:
 ## 7. Non-goals
 
 - Fixing GSX/ZR1/ZR1X product rules, groups, pricing, or copy.
-- Resolving the Z06 stale CBF derivation allowlist inside structural Pass 2A; it requires the separately authorized source/allowlist decision before Pass 2B.
 - Promoting or publishing any model.
+- Renaming `model_config.py`/`model_configs.py`, splitting `editor_ops.py` or `schema_validation.py` for size, or touching `asset_map_sync.py` (§2.8 S7).
+- Building the database editor's UI, draft state, or ChangeSet emission; that is the database specification's scope.
 - Completing Workbook Manager Passes 3–7.
 - Redesigning the customer form or visualizer.
 - Deleting historical archives merely because they mention retired paths.
@@ -806,7 +898,11 @@ Pass 4 requires a separately reviewed exact deletion list; this draft is not del
 
 Pass 5 plan moves/deletions require the completed/no-status classification receipt from Pass 0A and the current-consumer/necessary-behavior proof from Pass 0B.
 
-Current recommendation: continue Pass 0B viability work for the remaining non-ingest surfaces. When implementation is separately approved, start with the small fail-closed generation-context/strict-validation/atomic-write boundary recorded in §2.4 rather than the current broad Pass 1 registry proposal. Do not unify source builders, repair Z06 semantics, refresh artifacts, or publish a registry in that structural safety pass.
+Current recommendation (revised 2026-07-24): the §2.4 fail-closed generation boundary is delivered (Pass G1) and Z06 is green (Pass G2), so the next approval should be **Pass 1**. It is the post-export gate the database workflow is blocked on, and §2.1.1 proves the current schema validator reports zero issues over real drift. Continue remaining Pass 0B viability work for non-ingest surfaces in parallel where it does not gate Pass 1 — Pass 0B evidence is required before Pass 4 deletion, not before Pass 1 authority consolidation.
+
+Pass 1 must not unify source builders, repair model semantics, refresh retained artifacts, or publish a registry.
+
+Database-workflow readiness checkpoints, in order: Pass 1 makes export validation real; Pass 2 makes one pathway serve all six models; Pass 3 makes an end-to-end candidate run possible and gives the editor a machine-readable readiness report. The database specification's Passes 3–7 may proceed in parallel up to the point where they need a trustworthy post-export gate; they must not ship a write path that depends on today's permissive schema validation.
 
 ## 9. Bound audit inventory
 
@@ -1158,4 +1254,5 @@ Pass 0A and approved Pass I completed 2026-07-23; the Pass 0B generation/runtime
 - Pass I executed the exact reviewed retirement boundary and produced the receipt in §2. The active inventory is now 44 scripts and 46 tests; no retired ingest import, launcher, UI, or active documentation path remains.
 - Pass 0B is not complete: the subaudit was read-only source/API/UI tracing and did not execute every retained CLI/test. Per-path execution or an explicit safe source-only characterization is still required before a `KEEP_*` disposition becomes final implementation/deletion authority.
 - No workbook, generated runtime contract, registry, runtime JS, dealer surface, promotion row, or deployment path changed.
-- Next boundary: continue Pass 0B for non-ingest surfaces; do not approve Pass 1 yet.
+- 2026-07-24 revision: added the database-workflow end-state lane at the head of this document, the §2.8 simplification audit, the §3.7 composed candidate lane with its §3.7.1 changed-model reporting contract, the §3.8 single-validator rule and cross-specification reconciliation, Pass 1 export-gate RED cases and the family-to-model mapping helper, the Pass 3 retained-Stingray-contract prerequisite, and the collapse of remaining work to four passes. Corrected the database specification's stale validator-owner reference.
+- Next boundary: approve Pass 1. Continue remaining Pass 0B viability work in parallel; its evidence gates Pass 4 deletion, not Pass 1 authority consolidation.

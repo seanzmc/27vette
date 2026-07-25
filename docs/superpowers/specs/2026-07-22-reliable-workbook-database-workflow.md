@@ -375,9 +375,18 @@ requested discovered config, and uses `ModelConfig.with_overrides()` to set
 `output_dir=output_root/form-output`, and `app_dir=output_root/form-app`. It then
 calls `source_assembly.assemble_model_source(config)`, takes only
 `assembly.runtime_contract`, validates that contract with
-`registry_promotion.assert_runtime_contract()`, and writes only
+`runtime_contract.assert_runtime_contract()`, and writes only
 `runtime_contract_artifact_path(output_root, model_key)` through the repository
 JSON writer.
+
+Corrected 2026-07-24: `runtime_contract.py` is the strict-validation owner after
+Pass G1 of `docs/superpowers/specs/2026-07-23-validation-single-lane-active-surface-cleanup.md`.
+The older `registry_promotion.assert_runtime_contract()` spelling still resolves
+through a re-export but omits the identity binding, so it validates more weakly
+than intended without failing. Pass the discovered `config` and the workbook
+promotion label as `expected_model_label` so dataset identity is checked against
+the candidate snapshot. Any future change to this validator's owner or signature
+must update both specifications in the same pass.
 
 Do not call `generate_model_artifacts()`,
 `write_stingray_compatibility_artifacts()`, any inspection/preview/draft writer,
@@ -1168,6 +1177,15 @@ Companion disposition:
 - Model generation: implementation and output contracts unchanged. Acceptance
   calls canonical source assembly and writes only a temporary canonical runtime
   contract; no compatibility writer or publication path is changed or exercised.
+- Post-export gate: once Pass 3 of the single-lane specification lands
+  `scripts/verify_workbook_candidate.py`, this workflow calls that one command
+  after an approved workbook write and consumes its JSON readiness report. It
+  does not reimplement the package/schema/quality/generation/registry stage
+  sequence, and it does not use touched-model information to narrow what is
+  generated or validated — see §3.7.1 of that specification.
+- Staging: `staging.py` and `sync_workbook(write=True)` are frozen with
+  characterization tests only until Pass 5 replaces them with draft-to-ChangeSet
+  emission. Do not harden a write lane that is scheduled for removal.
 - Workbook Manager docs and root README pointer: updated to match actual safety
   state and commands.
 - Superseded relational design/plan: retained as historical, not edited back
