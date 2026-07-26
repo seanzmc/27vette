@@ -378,7 +378,7 @@ Remaining work after the completed Passes 0A/0B(partial)/0C/I/G1/G2 is exactly f
 | 3 | Retained Stingray contract migrated; composed candidate verifier (§3.7); promotion/publication prove the candidate | End-to-end database→form runs |
 | 4 | Migrate remaining guidance/tests, execute the approved deletion list, archive completed plans | Repository convergence |
 
-Pass 1 landed 2026-07-25. Pass 3's prerequisite landed the same date: the retained runtime contracts were regenerated through the strict path and the registry republished, so the full schema gate is valid with 0 issues and an end-to-end workbook→form run now completes. Pass 2 receipts A (requirements 1, 4 partial, 6, 7) and B (requirements 5 and 9) both landed 2026-07-25. The remaining critical path is **Pass 2 receipt C** — requirements 2, 3, 8, 10, the actual builder convergence — followed by Pass 3 proper. Receipt B also surfaced six Python-side values that still decide customer-visible runtime content and need workbook columns; those need separate approval because they require a canonical workbook write.
+Pass 1 landed 2026-07-25. Pass 3's prerequisite landed the same date: the retained runtime contracts were regenerated through the strict path and the registry republished, so the full schema gate is valid with 0 issues and an end-to-end workbook→form run now completes. Pass 2 receipts A (requirements 1, 4 partial, 6, 7) and B (requirements 5 and 9) both landed 2026-07-25. The remaining critical path is **Pass 2 receipt C** — requirements 2, 3, 8, 10, the actual builder convergence — followed by Pass 3 proper. Receipt B also surfaced Python-side values that still decide runtime content. One is a code defect (`contract.label_for()` for interiors) and is folded into receipt C; the rest need canonical workbook writes and are deferred pending separate approval.
 
 ### Pass 0A — Freeze the active-surface inventory
 
@@ -822,16 +822,29 @@ implementation. Cycle 2 proved the fix used an intersection across peers, defeat
 from two models or by one `active=False` cell, and found a label/exemption set conflation plus a new
 blank-`step_label` fallback shipping raw snake_case keys as customer-visible labels. All fixed.
 
-**Blocking the workbook-only goal, and needing a canonical workbook write (user approval):**
+**Python-side values that still decide runtime content, with the 2026-07-25 disposition:**
 
-| Python-side value | Scale | Customer-visible |
-|---|---|---|
-| `production.py` composes `disabled_reason` | 734 of 790 rule rows; only 56 authored | Yes — seven `app.js` sites. **The workbook already has the column.** |
-| `mapping.status_to_label` display strings | 1,434 choices on z06 | Yes — `app.js:1983` |
-| `SELECTION_MODE_LABELS` | 4 strings | Yes — `app.js:2009` |
-| `BODY_STYLE_DISPLAY_ORDER` | 2 entries | Ordering only |
-| `presentation_bool(..., default=False)` | 11/57 and 51/57 blank cells | Bucket membership |
-| `STEP_LABELS["standard_equipment"]` | 48 | No — lands in `sections[].step_label`, which nothing reads |
+| Python-side value | Scale | Actually rendered? | Disposition |
+|---|---|---|---|
+| `contract.label_for()` for interiors | 21 strings | Yes | **Defect — folded into receipt C.** See below. |
+| `production.py` composes `disabled_reason` | 298 composed / 56 authored across the 3 published models (excludes 131, includes 125, requires 42) | Only when the rule fires against current selections — an "Unavailable" pill (`app.js:1999`), an eviction toast (`:1620`), or auto-add/requirement copy (`:853`, `:870`). Not ambient. | Optional authoring pass over the 131 excludes, at the user's discretion. No obligation; the generic sentence is accurate. |
+| `mapping.status_to_label` display strings | 867 tooltips, not the 1,434 first reported | Only as a tooltip fallback when a choice has no `description`, and `descriptiveTooltipText` (`app.js:331`) discards `"Available"` — so only `Standard` (720) and `Not Available` (147) ever render | Deferred. A new sheet to own three cells is the wrong shape; the 867 affected choices have no description at all, which is a content question rather than a schema one. |
+| `SELECTION_MODE_LABELS` | 4 strings | Yes — `app.js:2009` | Deferred; needs a new column. |
+| `BODY_STYLE_DISPLAY_ORDER` | 2 entries | Ordering only | Deferred; needs a new column. |
+| `presentation_bool(..., default=False)` | 11/57 and 51/57 blank cells | Bucket membership | Deferred; columns exist, so this is a data fill plus making the default fail-closed. |
+| `STEP_LABELS["standard_equipment"]` | 48 | No — lands in `sections[].step_label`, which nothing reads | Deferred; lowest value. |
+
+**`contract.label_for()` interior defect — folded into receipt C.** For an option it returns
+`f"{rpo} {label}"`, which is correct because the RPO is customer-facing. For an interior it returns
+`f"{interior_id} {interior_name}"`, leaking the internal key: *"Included with 3LT_AE4_HUF_N26 Natural
+Dipped Suede."* All 21 occurrences are `includes` rules; zero are excludes.
+
+`form-app/app.js` already does this correctly — `getInteriorCustomerLabel()` (`app.js:832`) prefers
+`interior_leaf_label || interior_name`. But the browser reads `rule.disabled_reason || <compose>`, so
+the baked Python string **overrides** the correct label the browser would have produced. Fixing
+`label_for` therefore also removes a third authority: the same sentence is composed in Python at
+generation time and in JavaScript at render time. Receipt C must reconcile both, and the 21 changed
+strings need review before publication because they alter customer-visible copy.
 
 **Deliberately kept**, because they are generation *logic* rather than shadowed values, and belong to
 requirement 3's characterization: `production.standard_equipment_preference`'s hardcoded
@@ -842,7 +855,8 @@ change that touches `app.js`).
 **Open.** One disclosed hole: dropping a step from *every* active model passes, because the
 cross-model union has nothing left to compare against. `summary` is the only exposed key.
 
-**Receipt C is next and owns requirements 2, 3, 8, 10** — the builder convergence.
+**Receipt C is next and owns requirements 2, 3, 8, 10** — the builder convergence — plus the
+`contract.label_for()` interior defect above, folded in at the user's direction 2026-07-25.
 
 ### Pass 3 — Make promotion and publication prove the candidate runtime
 

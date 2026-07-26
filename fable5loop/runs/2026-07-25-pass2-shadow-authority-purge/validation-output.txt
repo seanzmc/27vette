@@ -229,3 +229,60 @@ It now raises, matching the module docstring and `workbook_step_label`.
   all 16 node gates:                            counts unchanged from baseline
   validate_workbook_schema.py:                  valid, 0 issues
   git status:                                   9 changed files + receipt dir; no tracked artifact change
+
+# ── Post-run measurement corrections and dispositions (2026-07-25) ────────────
+
+Two figures reported to the user were wrong and are corrected here.
+
+## status_to_label renders 867 times, not 1434
+
+`choice.status_label` is read at ONE site, `app.js:1983`, and only as a fallback when the choice has
+no `description`. `descriptiveTooltipText` (`app.js:331`) then discards `"available"` outright.
+
+  suppressed by descriptiveTooltipText  447
+  RENDERS: Standard                     720
+  RENDERS: Not Available                147
+                                        ---
+  actually rendered                     867     (across stingray, grand-sport, z06)
+
+The 1,434 figure was the count of choices carrying a `status_label` field on z06, not the count that
+reaches a screen. Deferred: adding a sheet to own three cells is the wrong shape, and the 867
+affected choices have no `description` at all — a content question, not a schema one.
+
+## disabled_reason: 298 composed across the 3 published models, and it is not ambient copy
+
+The earlier "734 of 790" was workbook rows across all six models' rule sheets. Across the three
+PUBLISHED models the shipped figure is:
+
+  rule_type   authored   composed
+  excludes          10        131
+  includes          44        125
+  requires           2         42
+
+It renders only when a rule fires against the customer's current selections — the "Unavailable" pill
+at `app.js:1999`, the eviction toast at `:1620`, and auto-add/requirement copy at `:853`/`:870`.
+Unselected, nothing shows. Disposition: an optional authoring pass over the 131 composed excludes,
+at the user's discretion. No obligation — the generic sentence is accurate.
+
+## The 21 raw-id strings are a code defect, not a missing workbook value
+
+`contract.label_for()` (`contract.py:257`):
+
+    if entity_id in options:        return f"{option.get('rpo')} {option.get('label')}"      # correct
+    if entity_id in interiors_by_id: return f"{interior['interior_id']} {interior['interior_name']}"
+
+The interior branch leaks the internal key: "Included with 3LT_AE4_HUF_N26 Natural Dipped Suede."
+All 21 occurrences are `includes` rules; zero are excludes.
+
+`form-app/app.js:832 getInteriorCustomerLabel()` already prefers `interior_leaf_label ||
+interior_name` — the browser gets it right. But the browser reads `rule.disabled_reason ||
+<compose>`, so the baked Python string OVERRIDES the correct label. The same sentence is composed in
+two places, Python at generation and JS at render.
+
+**Disposition: folded into Pass 2 receipt C at the user's direction.** Receipt C must reconcile both
+composers, and the 21 changed strings need review before publication.
+
+## Decision recorded
+
+No canonical workbook write was authorized in this session. All workbook-column items above remain
+deferred.

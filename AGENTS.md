@@ -32,6 +32,8 @@ CSS — presentation only. Styling changes must preserve data contracts, runtime
 
 Asset/media maintenance — `asset_map` remains workbook-authored source data. The safe sync entry is `scripts/sync_asset_map.py`, with exact usage and report contracts owned by `docs/asset-map-sync.md` and README. Treat sync runs as dry-run/report-first review surfaces unless `--apply` is explicitly approved for specific reviewed row changes; wildcard authoring, blank-row seeding, stale-row deactivation, or schema/status-column changes are separate workbook-data work, not routine media maintenance.
 
+Workbook shape authority — `scripts/corvette_form_generator/workbook_domain/registry.py` owns registered sheet families, writable columns, and shared workbook-domain enums such as `model_registry_promotion.artifact_type`. Schema validation, promotion parsing, editor operations, and Workbook Manager projections must derive from that registry instead of adding parallel header, writeability, or artifact-type lists.
+
 ## 4. Autonomy and Approval Gates
 
 User review is required for unresolved decisions, not for every non-trivial edit.
@@ -142,6 +144,8 @@ Choose gates by changed surface and risk — don't run irrelevant gates from old
 - Runtime JS: relevant automated tests + manual verification of affected workflows.
 - Styling: inspect affected UI at relevant viewports; confirm behavior preserved.
 - Dealer submission: targeted tests/manual checks in a safe context; report untested live behavior.
+
+For generation validation, do not cite `generate_form.py` stdout `validation_errors: 0` as independent proof of a clean artifact; strict runtime-contract errors abort before that summary can print. Use the workbook schema gate, relevant targeted tests, regenerated artifact diffs, and isolated byte comparisons where parity is the success condition.
 
 Report every check run with its result, and every relevant gate not run with the reason. Never claim validation passed without real tool output.
 
