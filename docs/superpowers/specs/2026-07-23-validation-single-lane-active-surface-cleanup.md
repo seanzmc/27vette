@@ -858,6 +858,42 @@ cross-model union has nothing left to compare against. `summary` is the only exp
 **Receipt C is next and owns requirements 2, 3, 8, 10** — the builder convergence — plus the
 `contract.label_for()` interior defect above, folded in at the user's direction 2026-07-25.
 
+#### Pass 2 receipt C — requirements 2 and 3 completed 2026-07-26
+
+Base `993d920`, committed `8c005a8`. Receipt: `fable5loop/runs/2026-07-26-pass2-builder-characterization/`.
+Independent verifier: **FAIL on completeness, PASS on every behavioral claim** — all findings fixed,
+no code rolled back.
+
+**Requirement 2 — done.** `assemble_model_source()` has no model-keyed source fork; one builder
+assembles all six models. `production.py` went 731 → 62 lines and retains no mutable module globals
+and no workbook access — it is the Stingray compatibility JSON/CSV export only. Workbook opens for a
+six-model run: **13 → 7**, one frozen snapshot per assembly, closed deterministically including on
+exception paths. This also completes requirement 4, left partial by receipt A.
+
+**Requirement 3 — done, via a read-only ledger first.** Every difference between the builders traced
+to one cause: the retired builder shipped rows referencing entities outside Stingray's scope.
+Standard-equipment deduplication, price validation and variant overrides had **zero** difference;
+`display_behavior` differed only as absent-vs-empty. The user approved dropping the dangling rows and
+chose "omit when blank" for `display_behavior`.
+
+**Folded-in fix.** `contract.label_for()` named interiors by internal key and, because the browser
+prefers a baked `disabled_reason` over its own composition, that string overrode the correct label.
+71 composed reasons corrected across five models; z06's 22 are workbook-authored and untouched.
+
+**What the verifier caught.** Because this receipt could not be proved by byte-identity, its whole
+burden was delta completeness — and eight published deltas were unlisted, including
+`rules.source_selection_mode`, which stage 1 had explicitly flagged as an open item for stage 2. Two
+receipt statements were false. A *passing* test assertion (`requires_z25 not in row`) was deleted
+along with the file and not replaced. All eight deltas proved browser-inert and all eight align
+Stingray with the field set the other five models already shipped; that shared shape is now pinned by
+`test_every_model_ships_the_same_contract_shape`.
+
+**Open.** Three of the retired builder's conditional validation checks have no equivalent; the new
+builder filters dangling rules where the old one flagged them, which is a change in reporting as well
+as payload.
+
+**Not published.** Requirements 8 and 10 and the republication of `form-app/data.js` remain.
+
 ### Pass 3 — Make promotion and publication prove the candidate runtime
 
 Purpose: prevent a candidate from being called validated until its exact runtime contracts and temporary registry have passed, and deliver the composed candidate lane the database workflow calls.

@@ -1,0 +1,463 @@
+{
+  "bindings": {},
+  "changeSetId": "57b8836bdf5ef56442df1073",
+  "noops": [],
+  "rowChanges": [
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AE4_H8T."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ae4_h8t_includes_opt_3a9_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AE4_HAG."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ae4_hag_includes_opt_3a9_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AE4_HNK."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ae4_hnk_includes_opt_3f9_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AE4_HUF_N2Z."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ae4_huf_n2z_includes_opt_3n9_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AE4_HUW."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ae4_huw_includes_opt_379_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AE4_HUX_N2Z."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ae4_hux_n2z_includes_opt_379_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AE4_HZN."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ae4_hzn_includes_opt_3n9_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AH2_H8T."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ah2_h8t_includes_opt_3a9_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AH2_HAG."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ah2_hag_includes_opt_3a9_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AH2_HNK."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ah2_hnk_includes_opt_3f9_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AH2_HUF_N2Z."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ah2_huf_n2z_includes_opt_3n9_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AH2_HUW."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ah2_huw_includes_opt_379_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AH2_HUX_N2Z."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ah2_hux_n2z_includes_opt_379_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AH2_HZN."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ah2_hzn_includes_opt_3n9_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AUP_HAG."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_aup_hag_includes_opt_3a9_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AH2_HVZ."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ah2_hvz_includes_opt_3f9_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AE4_HVZ."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ae4_hvz_includes_opt_3f9_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AUP_HVZ."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_aup_hvz_includes_opt_3f9_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AH2_EJH."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ah2_ejh_includes_opt_3n9_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AE4_EJH."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ae4_ejh_includes_opt_3n9_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AH2_EPX_N2Z."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ah2_epx_n2z_includes_opt_3n9_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    },
+    {
+      "action": "update",
+      "family": "rule_mapping",
+      "fields": {
+        "disabled_reason": {
+          "after": null,
+          "before": "Included with 3LZ_AE4_EPX_N2Z."
+        }
+      },
+      "key": {
+        "rule_id": "z06_rule_3lz_ae4_epx_n2z_includes_opt_3n9_001"
+      },
+      "provenance": [
+        {
+          "id": "2026-07-26-clear-z06-interior-id-copy",
+          "kind": "decision"
+        }
+      ],
+      "sheet": "z06_rule_mapping"
+    }
+  ],
+  "schemaVersion": "workbook-changeset-1",
+  "semanticFingerprint": "57b8836bdf5ef56442df10733e5f1a32c50b88506a34dba4332ed683a8383139",
+  "sheetCreates": [],
+  "source": {
+    "id": "pass2-receipt-c-z06-interior-copy",
+    "kind": "operator",
+    "note": "Clear disabled_reason on 22 z06 rules that name an interior by its internal id so the generator composes the customer label instead."
+  },
+  "targets": [
+    "z06"
+  ],
+  "warningAcknowledgementsRequested": [],
+  "workbook": {
+    "mtimeNs": "1784922924189292254",
+    "sha256": "8858cff40ea7eaeda6b7921714f3697a6ee9d1bbc99c84e564d7b118e45b2166"
+  }
+}

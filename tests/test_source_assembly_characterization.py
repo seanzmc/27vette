@@ -131,3 +131,38 @@ def test_one_builder_serves_every_model() -> None:
 
     assert 'config.model_key == "stingray"' not in source
     assert "build_production_source_data" not in source
+
+
+def test_every_model_ships_the_same_contract_shape() -> None:
+    """One builder means one field set, modulo the per-model activeness flag.
+
+    Convergence gave Stingray eight fields the other five already shipped
+    (`interiors.requires_z25`, `sections.source_section_name`, variant
+    provenance, `dataset.source_sheet`) and dropped `rules.source_selection_mode`
+    from it. That is Stingray joining the shared shape, not drift -- but nothing
+    pinned it, so a future builder change could diverge one model silently.
+    """
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        configs = discover_generation_model_configs(WORKBOOK, root=Path(tmpdir))
+        shapes = {}
+        for model_key in MODEL_KEYS:
+            contract = assemble_model_source(configs[model_key]).runtime_contract
+            shapes[model_key] = {
+                collection: frozenset(
+                    field
+                    for row in contract[collection]
+                    for field in row
+                    if not field.startswith("active_for_")  # model-scoped by design
+                )
+                for collection in ("interiors", "variants", "sections", "rules", "choices")
+            }
+
+    baseline = shapes["stingray"]
+    for model_key, shape in shapes.items():
+        for collection, fields in baseline.items():
+            assert shape[collection] == fields, (
+                f"{model_key}.{collection} diverges from the shared shape: "
+                f"only-here={sorted(shape[collection] - fields)} "
+                f"only-stingray={sorted(fields - shape[collection])}"
+            )

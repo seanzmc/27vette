@@ -154,3 +154,120 @@ STINGRAY: production builder (current release) vs workbook builder (target)
 === tracked surface ===
 $ git status --porcelain
 ?? fable5loop/runs/2026-07-26-pass2-builder-characterization/
+
+# ══ STAGE 2 — convergence ══════════════════════════════════════════════════
+# base commit: 8c005a8  |  workbook SHA-256: 8858cff40ea7eaeda6b7921714f3697a6ee9d1bbc99c84e564d7b118e45b2166
+
+## Workbook opens, six-model run in one process
+  before pass 2:  23   (1 discovery + 22 generation)
+  after receipt B: 13   (1 discovery + 12 generation)
+  after receipt C:  7   (1 discovery +  6 generation)  -- one frozen snapshot per assembly
+
+## Module sizes
+  production.py: 731 lines ->       62 lines (Stingray compatibility export only)
+
+$ .venv/bin/python -m py_compile <changed generator modules>
+OK (exit 0)
+
+$ PYTHONPATH=scripts .venv/bin/python -m pytest tests/ -q
+5 failed, 495 passed, 2 skipped, 103 subtests passed
+  test_editor_lints.py x4        pre-existing; all four diagnosed in the receipt
+  test_fable5_loop_contract.py   self-referential: this receipt incomplete at run time
+  (baseline at HEAD: 5 failed, 467 passed)
+
+$ node --test <all 16 browser/runtime gates>
+  stingray-generator-stability: ℹ pass 15 ℹ fail 0 
+  stingray-form-regression: ℹ pass 90 ℹ fail 0 
+  multi-model-runtime-switching: ℹ pass 48 ℹ fail 0 
+  z06-runtime-promotion: ℹ pass 5 ℹ fail 0 
+  z06-performance-package-interactions: ℹ pass 21 ℹ fail 0 
+  z06-runtime-rule-corrections: ℹ pass 15 ℹ fail 0 
+  z06-interior-accessory-cleanup: ℹ pass 7 ℹ fail 0 
+  z06-contract-preview: ℹ pass 3 ℹ fail 0 
+  z06-form-data-draft: ℹ pass 24 ℹ fail 0 
+  nonruntime-option-source-purge: ℹ pass 6 ℹ fail 0 
+  unpublished-runtime-contracts: ℹ pass 2 ℹ fail 0 
+  workbook-schema-standardization: ℹ pass 7 ℹ fail 2 
+  workbook-visual-copy-standardization: ℹ pass 8 ℹ fail 0 
+  seat-canonicalization-diff: ℹ pass 2 ℹ fail 0 
+  grand-sport-contract-preview: ℹ pass 5 ℹ fail 1 
+  grand-sport-draft-data: ℹ pass 18 ℹ fail 1 
+
+  Node gate notes:
+    workbook-schema-standardization 7/2 -- one is the pre-existing `active explicit excludes`
+      failure (confirmed by `git stash` + re-run: it fails at HEAD too); the other is the
+      live-app-contract check, stale because form-app/data.js is NOT republished. Publication
+      is deliberately deferred until after verification.
+    grand-sport-contract-preview 5/1 and grand-sport-draft-data 18/1 -- both pre-existing,
+      owned by Pass 4A.
+
+## Validation checks the retired Stingray builder had
+
+Ported: `missing_r6x_included_option_{interior_id}` -> `interiors._require_r6x_included_options`,
+raised as a hard failure rather than an error-severity row (assert_runtime_contract rejects those
+anyway). Latent-live: 15 interiors carry requires_r6x, 0 violate today.
+
+NOT ported, recorded as open:
+  - redundant_{rule_id}                same-section single-select excludes
+  - active_variant_count / availability_row_count   count-mismatch guards
+  - missing_{key}_{rule_id}            rule referencing an unknown entity; the new builder
+                                       FILTERS dangling rules instead of flagging them, so this
+                                       is a change in reporting, not only in payload
+  - heuristic_section_step_key_{id}    now structurally impossible: step_for_section raises
+
+## Published-artifact delta (generated to an isolated root, not published)
+
+  stingray       sections     50 ->  32   (-18, all carrying zero Stingray rows)
+  stingray       rules       145 -> 114   (-31, all referencing active=False options)
+  stingray       colorOverrides 245 -> 237 (-8, interiors outside Stingray's model_interior_scope)
+  stingray       rules        19 reasons corrected by the label_for interior fix
+  grand_sport / grand_sport_x / zr1 / zr1x   2 / 18 / 16 / 16 reasons corrected
+  z06            0 corrected -- its 22 leaks are workbook-authored, not composed
+  all six        display_behavior key dropped where blank (1340-1355 choices each)
+
+  Zero rows added or removed anywhere except Stingray's three approved collections.
+  Stingray choices lose `standard_equipment_group_type` on 62 rows; app.js reads that field from
+  data.standardEquipment (unchanged), never from choices, so it is inert.
+
+## Tracked surface
+
+  git status --porcelain shows only source, tests, and this receipt. No workbook write, no
+  artifact publication, no registry change.
+
+# ══ WORKBOOK WRITE — clear 22 z06 disabled_reason cells ═══════════════════════
+
+Approved by Sean 2026-07-26. First canonical workbook write through the guarded
+ChangeSet path, which is the same boundary the planned SQL-backed editor will use.
+
+  changeSetId          57b8836bdf5ef56442df1073
+  workbook SHA before  8858cff40ea7eaeda6b7921714f3697a6ee9d1bbc99c84e564d7b118e45b2166
+  workbook SHA after   d11674e3213a8858b13f5e4283b82868046ed34335c96419a8fe909034760bfd
+  artifacts retained   z06-clear-reasons.changeset.json, preview.json, approval.json
+  journal              form-output/workbook-edit-log.jsonl
+
+Preview (never touches the workbook): status=validated, ok=true, operationCoverage
+22/22 prepared and covered, verification 22/22 checked, schemaResult valid with 0
+issues on the simulated workbook, 0 warnings, 0 errors. Workbook SHA unchanged after
+both preview and approve.
+
+Semantic diff of the applied write, whole-workbook cell comparison against HEAD:
+
+  cells removed: 22   added: 0   value-changed: 0
+  sheets touched: ['z06_rule_mapping']
+
+Why clear rather than rewrite: a blank `disabled_reason` makes the generator compose
+the sentence from the interior's customer label, which is what the other five models
+already do and what stays correct if an interior is renamed. Rewriting the prose would
+have re-pinned the copy to a snapshot of today's interior names.
+
+Result in the published registry, read from the running form:
+
+  stingray    rawIdTooltips 0   e.g. "Included with Santorini Blue."
+  grandSport  rawIdTooltips 0
+  z06         rawIdTooltips 0   (was 22)
+
+Gates after the write: validate_workbook_schema valid / 0 issues; z06 regenerated with
+validation_errors 0; registry republished; Python 501 passed / 0 failed; every node gate
+at baseline (the lone `workbook-schema-standardization` failure is the pre-existing
+`active explicit excludes` one, and the two grand-sport gates remain the pre-existing
+Pass 4A failures).

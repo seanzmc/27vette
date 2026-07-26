@@ -2028,18 +2028,21 @@ test("runtime defaults and RPO exceptions are workbook-generated metadata", () =
     JSON.parse(JSON.stringify(data.defaultSelectionRules.map((rule) => rule.rule_id).sort())),
     ["default_719", "default_bc7", "default_fe1", "default_nga"]
   );
+  // Receipt C: the key is omitted entirely when a model owns no exceptions,
+  // rather than shipped as an empty list. app.js guards with Array.isArray.
+  const runtimeRuleExceptions = data.runtimeRuleExceptions || [];
   assert.deepEqual(
-    JSON.parse(JSON.stringify(data.runtimeRuleExceptions.map((exception) => exception.exception_id).sort())),
+    JSON.parse(JSON.stringify(runtimeRuleExceptions.map((exception) => exception.exception_id).sort())),
     []
   );
-  assert.equal(data.runtimeRuleExceptions.length, 0, "Stingray runtime-rule exception sheet should no longer own active behavior");
+  assert.equal(runtimeRuleExceptions.length, 0, "Stingray runtime-rule exception sheet should no longer own active behavior");
   assert.equal(
-    data.runtimeRuleExceptions.some((exception) => exception.exception_id === "ex_gba_zyc"),
+    runtimeRuleExceptions.some((exception) => exception.exception_id === "ex_gba_zyc"),
     false,
     "Stingray GBA/ZYC conflict should be owned by grouped exclusion metadata"
   );
   assert.equal(
-    data.runtimeRuleExceptions.some((exception) => exception.exception_id === "ex_nwi_nga"),
+    runtimeRuleExceptions.some((exception) => exception.exception_id === "ex_nwi_nga"),
     false,
     "Stingray NGA/NWI replacement should be owned by the exhaust exclusive group plus NGA default metadata"
   );
@@ -2193,7 +2196,7 @@ test("FE3 disabled tile explains that Z51 includes it without duplicating the RP
 });
 
 test("ZF1 requires Z51, replaces T0A, and is auto-added by high wing spoilers only with Z51", () => {
-  for (const sourceId of ["opt_5zz_001", "opt_5zu_001", "opt_5zw_001"]) {
+  for (const sourceId of ["opt_5zz_001", "opt_5zu_001"]) {
     const rule = data.rules.find((item) => item.source_id === sourceId && item.target_id === "opt_zf1_001");
     assert.ok(rule, `${sourceId} should include ZF1`);
     assert.equal(rule.rule_type, "includes");
@@ -2468,10 +2471,10 @@ test("stripe sections use the requested order", () => {
     .sort((a, b) => Number(a.section_display_order) - Number(b.section_display_order))
     .map((section) => section.section_name);
 
-  assert.deepEqual(
-    JSON.parse(JSON.stringify(sectionNames)),
-    ["Stripes", "Jake Graphics Package", "Hash Marks", "GS Hash Marks", "GS Center Stripes"]
-  );
+  // Receipt C: sections carrying zero Stingray rows are no longer shipped. The
+  // three that dropped (Jake Graphics Package, GS Hash Marks, GS Center Stripes)
+  // rendered nothing -- renderStepContent builds sections from choices.
+  assert.deepEqual(JSON.parse(JSON.stringify(sectionNames)), ["Stripes", "Hash Marks"]);
   assert.match(appSource, /section_display_order/);
 });
 
@@ -2579,7 +2582,7 @@ test("spoiler replacement ownership preserves ZYC and keeps T0A replacement beha
     const rule = data.rules.find((item) => item.source_id === sourceId && item.target_id === "opt_t0a_001");
     assert.equal(rule, undefined, `${sourceId} should use grp_spoiler_high_wing instead of a direct T0A replace row`);
   }
-  for (const sourceId of ["opt_5zw_001", "opt_zf1_001"]) {
+  for (const sourceId of ["opt_zf1_001"]) {
     const rule = data.rules.find((item) => item.source_id === sourceId && item.target_id === "opt_t0a_001");
     assert.ok(rule, `${sourceId} should preserve direct T0A replacement`);
     assert.equal(rule.runtime_action, "replace");
@@ -2901,4 +2904,20 @@ test("standard equipment grouping is data-driven by workbook metadata", () => {
   assert.equal(trimRows.every((item) => ["sec_1lte_001", "sec_2lte_001", "sec_3lte_001"].includes(item.section_id)), true);
   assert.doesNotMatch(appSource, /LT Equipment\$\.test/);
   assert.match(appSource, /standard_equipment_group_type === "trim_equipment"/);
+});
+
+test("options deactivated in the workbook ship neither choices nor rules", () => {
+  // Receipt C: setting active=False in stingray_options now removes the option AND
+  // every rule that references it. Before, Stingray kept 31 such rules as dead payload.
+  const optionIds = new Set(data.choices.map((choice) => choice.option_id));
+  const interiorIds = new Set(data.interiors.map((interior) => interior.interior_id));
+  for (const deactivated of ["opt_5vm_001", "opt_5w8_001", "opt_5zw_001", "opt_ryq_001"]) {
+    assert.equal(optionIds.has(deactivated), false, `${deactivated} should not ship as a choice`);
+  }
+  const dangling = data.rules.filter(
+    (rule) =>
+      (!optionIds.has(rule.source_id) && !interiorIds.has(rule.source_id)) ||
+      (!optionIds.has(rule.target_id) && !interiorIds.has(rule.target_id))
+  );
+  assert.deepEqual(JSON.parse(JSON.stringify(dangling.map((rule) => rule.rule_id))), []);
 });

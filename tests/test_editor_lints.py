@@ -278,13 +278,15 @@ class RealWorkbookLintTest(unittest.TestCase):
         cls.lints = run_lints(cls.extract)
         cls.by_id = lints_by_id(cls.lints)
 
-    def test_d1_rwj_wks_collision(self):
-        hits = [l for l in self.by_id.get("display_order_collision", [])
-                if l["sheet"] == "z06_options" and "sec_lpoe_001" in l["message"]]
-        keys = {l["key"] for l in hits}
-        self.assertIn("opt_rwj_001", keys)
-        self.assertIn("opt_wks_001", keys)
-        self.assertTrue(all("72" in l["message"] for l in hits))
+    def test_d1_rwj_wks_collision_is_resolved(self):
+        """D-1 was a real display_order collision; it has since been fixed.
+
+        The lint that found it stays as the workbook-wide regression guard, the
+        same treatment S-1/S-2 and S-10 already get above. Asserting the defect
+        still exists made this test fail the moment the data was corrected.
+        """
+
+        self.assertEqual(self.by_id.get("display_order_collision", []), [])
 
     def test_s1_s2_display_order_typing_clean(self):
         # S-1/S-2 (and the z06_rule_group_members rows this lint surfaced)
@@ -327,11 +329,16 @@ class RealWorkbookCompareTest(unittest.TestCase):
         self.assertIn("description", diffs)
         self.assertNotEqual(diffs["description"]["status"], "intentional")
 
-    def test_c2_cj2_stingray_name_deviator(self):
-        diff = next(d for d in self.by_key["opt_cj2_001"]["diffs"]
-                    if d["field"] == "option_name")
-        self.assertEqual(diff["deviators"], ["stingray"])
-        self.assertEqual(diff["majority"], "Dual-Zone Automatic Climate Control")
+    def test_c2_cj2_stingray_name_deviation_is_resolved(self):
+        """C-2 was a Stingray-only option_name deviation; the models now agree.
+
+        Once they agree the option drops out of the diff set entirely, so the
+        original lookup raised KeyError. Assert agreement instead.
+        """
+
+        entry = self.by_key.get("opt_cj2_001")
+        name_diffs = [d for d in (entry or {}).get("diffs", []) if d["field"] == "option_name"]
+        self.assertEqual(name_diffs, [], "opt_cj2_001 option_name should no longer deviate")
 
     def test_s4_rpo_fallback_keys(self):
         # U2K diverges, so it must surface as a single rpo-joined row
@@ -350,11 +357,12 @@ class RealWorkbookCompareTest(unittest.TestCase):
         self.assertEqual(diff["status"], "intentional")
         self.assertIn("BC7", diff["reason"])
 
-    def test_r3_drz_pending_review(self):
-        diff = next(d for d in self.by_key["opt_drz_001"]["diffs"]
-                    if d["field"] == "option_name")
-        self.assertEqual(diff["status"], "pending-review")
-        self.assertTrue(diff["reason"].startswith("R-3"))
+    def test_r3_drz_name_review_is_resolved(self):
+        """R-3 was a pending-review option_name difference; it is settled."""
+
+        entry = self.by_key.get("opt_drz_001")
+        name_diffs = [d for d in (entry or {}).get("diffs", []) if d["field"] == "option_name"]
+        self.assertEqual(name_diffs, [], "opt_drz_001 option_name should no longer deviate")
 
     def test_no_stale_allowlist_entries(self):
         self.assertEqual(self.result["staleAllowlist"], [])

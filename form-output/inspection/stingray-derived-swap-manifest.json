@@ -1,94 +1,10 @@
 {
   "model_key": "stingray",
-  "candidate_count": 9,
+  "candidate_count": 1,
   "emitted_count": 0,
-  "shadowed_count": 3,
-  "not_emitted_count": 6,
+  "shadowed_count": 1,
+  "not_emitted_count": 0,
   "entries": [
-    {
-      "disposition": "candidate_not_emitted",
-      "source_id": "opt_5zu_001",
-      "target_id": "opt_5vm_001",
-      "derived_via": {
-        "includes_path": [
-          "opt_5zu_001",
-          "opt_zf1_001"
-        ],
-        "primitive_rule_id": "rule_opt_5vm_001_excludes_opt_zf1_001",
-        "conflict_id": "opt_zf1_001"
-      },
-      "allowlisted": false
-    },
-    {
-      "disposition": "candidate_not_emitted",
-      "source_id": "opt_5zu_001",
-      "target_id": "opt_5w8_001",
-      "derived_via": {
-        "includes_path": [
-          "opt_5zu_001",
-          "opt_zf1_001"
-        ],
-        "primitive_rule_id": "rule_opt_5w8_001_excludes_opt_zf1_001",
-        "conflict_id": "opt_zf1_001"
-      },
-      "allowlisted": false
-    },
-    {
-      "disposition": "candidate_not_emitted",
-      "source_id": "opt_5zw_001",
-      "target_id": "opt_5vm_001",
-      "derived_via": {
-        "includes_path": [
-          "opt_5zw_001",
-          "opt_zf1_001"
-        ],
-        "primitive_rule_id": "rule_opt_5vm_001_excludes_opt_zf1_001",
-        "conflict_id": "opt_zf1_001"
-      },
-      "allowlisted": false
-    },
-    {
-      "disposition": "candidate_not_emitted",
-      "source_id": "opt_5zw_001",
-      "target_id": "opt_5w8_001",
-      "derived_via": {
-        "includes_path": [
-          "opt_5zw_001",
-          "opt_zf1_001"
-        ],
-        "primitive_rule_id": "rule_opt_5w8_001_excludes_opt_zf1_001",
-        "conflict_id": "opt_zf1_001"
-      },
-      "allowlisted": false
-    },
-    {
-      "disposition": "candidate_not_emitted",
-      "source_id": "opt_5zz_001",
-      "target_id": "opt_5vm_001",
-      "derived_via": {
-        "includes_path": [
-          "opt_5zz_001",
-          "opt_zf1_001"
-        ],
-        "primitive_rule_id": "rule_opt_5vm_001_excludes_opt_zf1_001",
-        "conflict_id": "opt_zf1_001"
-      },
-      "allowlisted": false
-    },
-    {
-      "disposition": "candidate_not_emitted",
-      "source_id": "opt_5zz_001",
-      "target_id": "opt_5w8_001",
-      "derived_via": {
-        "includes_path": [
-          "opt_5zz_001",
-          "opt_zf1_001"
-        ],
-        "primitive_rule_id": "rule_opt_5w8_001_excludes_opt_zf1_001",
-        "conflict_id": "opt_zf1_001"
-      },
-      "allowlisted": false
-    },
     {
       "disposition": "shadowed_by_authored",
       "source_id": "opt_pcu_001",
@@ -99,34 +15,6 @@
           "opt_sti_001"
         ],
         "primitive_rule_id": "rule_opt_5v7_001_excludes_opt_sti_001",
-        "conflict_id": "opt_sti_001"
-      },
-      "allowlisted": false
-    },
-    {
-      "disposition": "shadowed_by_authored",
-      "source_id": "opt_pcu_001",
-      "target_id": "opt_5vm_001",
-      "derived_via": {
-        "includes_path": [
-          "opt_pcu_001",
-          "opt_sti_001"
-        ],
-        "primitive_rule_id": "rule_opt_5vm_001_excludes_opt_sti_001",
-        "conflict_id": "opt_sti_001"
-      },
-      "allowlisted": false
-    },
-    {
-      "disposition": "shadowed_by_authored",
-      "source_id": "opt_pcu_001",
-      "target_id": "opt_5w8_001",
-      "derived_via": {
-        "includes_path": [
-          "opt_pcu_001",
-          "opt_sti_001"
-        ],
-        "primitive_rule_id": "rule_opt_5w8_001_excludes_opt_sti_001",
         "conflict_id": "opt_sti_001"
       },
       "allowlisted": false

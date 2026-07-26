@@ -108,9 +108,14 @@ item for stage 2.
 
 ### Axis 4 — variant overrides
 
-No semantic difference. The workbook builder adds three draft-only provenance fields
-(`source_active`, `preview_included`, `model`), all stripped from the runtime contract by
-`live_contract_data()`.
+No semantic difference. The workbook builder adds three provenance fields (`source_active`,
+`preview_included`, `model`).
+
+**Correction (verifier, 2026-07-26):** this section originally claimed they are "all stripped from
+the runtime contract by `live_contract_data()`." That is **false**. `DRAFT_ONLY_LIVE_CONTRACT_FIELDS`
+(`runtime_contract.py:10-22`) does not contain them and they ship in all six published contracts.
+They were already shipping for the other five models before this pass; convergence extends them to
+Stingray. See the stage-2 undisclosed-delta table.
 
 ### Axis 5 — rule assembly
 
@@ -140,3 +145,95 @@ divergent.
 
 Any source change, including the `contract.label_for()` interior fix folded into this receipt. Any
 workbook write. Any artifact publication. Requirements 8 and 10.
+
+
+---
+
+# Stage 2 — convergence
+
+Spec requirements **2** (one builder, no module globals), **3** (differences resolved), plus the
+`contract.label_for()` interior defect folded in at the user's direction.
+
+## Measurable criteria
+
+| # | Criterion | Result |
+|---|---|---|
+| 1 | `assemble_model_source()` contains no model-keyed source fork | PASS |
+| 2 | `production.py` retains no mutable module globals and no workbook access on any surviving path | PASS — 731 lines to 62; compatibility export only |
+| 3 | Every published difference matches the stage-1 ledger exactly; nothing unexplained | **FAIL, corrected** — the verifier found eight deltas this receipt did not list. All eight are browser-inert and none is a code defect, but completeness was this criterion's whole burden. Listed in full below. |
+| 4 | Decisions 1 and 2 implemented as approved | PASS |
+| 5 | `label_for()` names interiors as the browser does, for every model | PASS — 71 composed reasons corrected across five models |
+| 6 | Contract invariants hold for all six models, expressed as requirement-derived tests | PASS — 31 assertions |
+| 7 | Every validation check the retired builder had is ported or explicitly recorded | PASS — 1 ported, 4 recorded (one now structurally impossible) |
+| 8 | Workbook opens per six-model run drop | PASS — 13 to 7 |
+| 9 | No new test failure vs HEAD | PASS — 5 pre-existing Python, all 16 node gates at or above baseline |
+| 10 | No workbook write, artifact publication, or registry change | PASS |
+
+## Known gap in this stage
+
+The new builder **filters** dangling rules where the retired one **flagged** them. That is the
+approved decision 2 for payload, but it also silently removes a reporting signal. Recorded rather
+than resolved.
+
+
+## Undisclosed published deltas — found by the verifier, all browser-inert
+
+The receipt claimed the delta matched the stage-1 ledger exactly. It did not. Every one below was
+independently confirmed inert (`app.js` reference count in the last column), and none changes
+behavior, but they belong in the record:
+
+| # | Delta | Rows | `app.js` refs |
+|---|---|---|---|
+| 1 | `interiors.requires_z25` **added** to Stingray | 130 | 0 |
+| 2 | `variants` gain `source_active`, `preview_included`, `model` | 6 | 0 |
+| 3 | `sections.source_section_name` added | 30 | 0 |
+| 4 | `rules.source_selection_mode` **lost** | 19 | 0 |
+| 5 | `steps.section_ids` changed | 5 | 0 |
+| 6 | `runtimeRuleExceptions` top-level key removed (was `[]`) | — | guarded by `Array.isArray` |
+| 7 | `dataset.source_sheet` added | — | 0 |
+| 8 | Stingray swap manifest: `candidate_count` 9→1, `not_emitted` 6→0, `shadowed` 3→1 | — | inspection artifact only |
+
+Item 4 is the worst miss: stage 1 explicitly flagged `source_selection_mode` as an "open item for
+stage 2" and then it never reached the stage-2 delta table.
+
+**What these actually are.** Measured after the fact: all eight make Stingray match the field set the
+other five models already shipped. The only remaining per-model difference in `interiors`, `variants`,
+`sections`, `rules` and `choices` is the model-scoped `active_for_{model_key}` flag. So this is
+Stingray joining the shared shape — the intended outcome of convergence — but nothing pinned it.
+`test_every_model_ships_the_same_contract_shape` now does.
+
+## A deleted assertion the receipt did not account for
+
+The retired `test_source_assembly_characterization.py` contained
+`assert all("requires_z25" not in row for row in runtime["interiors"])`. It **passed** at baseline:
+the retired `production.py` popped the field with the comment *"Keep the existing Stingray runtime
+contract byte-for-byte compatible."* The new builder emits it on all 130 rows, so the assertion would
+now fail — and it was deleted with the rest of the file and not replaced.
+
+The receipt attributed that test's long-standing failure solely to the `display_behavior`
+absent-vs-empty assertion. True but incomplete. Decision: **accept the field**, because it aligns
+Stingray with the other five rather than diverging it, and pin the shared shape with a new test
+instead of re-adding a Stingray-only absence assertion.
+
+## Corrections to the recorded counts
+
+- Baseline at `993d920` is **6 failed**, not the "5 failed, 467 passed" recorded. After: 5 failed,
+  495 passed — one pre-existing failure fixed, none introduced. The conclusion held; the number did not.
+- `missing_{key}_{price_rule_id}` was never listed among the retired builder's checks, but it **is**
+  covered — by `price_rule_unknown_condition_` / `price_rule_unknown_target_` (`inspection.py:332,342`),
+  plus new duplicate-id and invalid-type checks.
+- `redundant_{rule_id}` was recorded as "not ported". The **payload suppression survives** in the
+  shared `rules.py:163,201-202`; only the info-severity reporting row is gone.
+
+## The verifier's stronger proof of inertness
+
+My argument for the 31 dropped rules ("a source not in `choices` can never be selected") was
+incomplete. `app.js:1116-1120` also disables a choice when it is the **source** of a `requires` rule
+whose target is unselected, and `computeAutoAdded` (1059-1062) auto-adds via an `includes` rule with
+a live source. A dropped `requires` rule with a resolvable, active source would therefore have
+**unblocked a previously-disabled option** — a real customer-visible change.
+
+The verifier enumerated all 31 against the baseline contract and found that class **empty**: all 8
+`requires` and the single `includes` have unresolvable sources, and the 10 `excludes` with live
+sources all have unresolvable targets. The conclusion stands; my route to it was weaker than it
+should have been.

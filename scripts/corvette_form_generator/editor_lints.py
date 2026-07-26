@@ -121,6 +121,11 @@ def _lint_duplicate_keys(extract, maps):
 # trim/seat/color combo rows like 3LT_AE4_H8T. Keyed by (family, column).
 _REF_DOMAIN_UNIONS = {
     ("rule_mapping", "source_id"): ("interiors",),
+    # A rule may TARGET an interior as well as be sourced from one -- e.g. the
+    # z06/zr1/zr1x "<interior> includes <seat belt colour>" rows. The generator
+    # resolves both endpoints against options | interiors, so linting target_id
+    # against options alone reported 129 valid rows as orphans.
+    ("rule_mapping", "target_id"): ("interiors",),
     ("price_rules", "condition_option_id"): ("interiors",),
 }
 
