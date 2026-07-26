@@ -29,7 +29,6 @@ from corvette_form_generator.rules import (
     load_exclusive_groups,
     load_rule_groups,
 )
-from corvette_form_generator.runtime_contract import build_model_runtime_contract
 from corvette_form_generator.runtime_metadata import (
     derived_default_selected_display_behavior,
     load_context_sections,
@@ -367,14 +366,16 @@ def build_draft_price_rules(
     return price_rules, validation_rows, len(raw_rows)
 
 
-def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
+def inspect_model_sources(config: ModelConfig, *, wb: Any | None = None) -> dict[str, Any]:
     """Report on one model's source rows from a single frozen workbook snapshot."""
 
-    wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
-    try:
+    if wb is not None:
         return _inspect_model_sources(config, wb)
+    snapshot = load_workbook(config.workbook_path, data_only=True, read_only=True)
+    try:
+        return _inspect_model_sources(config, snapshot)
     finally:
-        wb.close()
+        snapshot.close()
 
 
 def _inspect_model_sources(config: ModelConfig, wb: Any) -> dict[str, Any]:
@@ -596,14 +597,16 @@ def _inspect_model_sources(config: ModelConfig, wb: Any) -> dict[str, Any]:
     }
 
 
-def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
+def build_contract_preview(config: ModelConfig, *, wb: Any | None = None) -> dict[str, Any]:
     """Build one model's contract preview from a single frozen workbook snapshot."""
 
-    wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
-    try:
+    if wb is not None:
         return _build_contract_preview(config, wb)
+    snapshot = load_workbook(config.workbook_path, data_only=True, read_only=True)
+    try:
+        return _build_contract_preview(config, snapshot)
     finally:
-        wb.close()
+        snapshot.close()
 
 
 def _build_contract_preview(config: ModelConfig, wb: Any) -> dict[str, Any]:
@@ -798,6 +801,10 @@ def _build_contract_preview(config: ModelConfig, wb: Any) -> dict[str, Any]:
                 choice, config.model_key, default_selection_display_rules, exclusive_groups
             ):
                 choice["display_behavior"] = "default_selected"
+            if not str(choice["display_behavior"]).strip():
+                # Carry the key only when it has a value; a blank one says nothing
+                # and the browser treats absent and empty identically.
+                del choice["display_behavior"]
             choices.append(choice)
             section_ids_with_choices.add(choice_section_id)
             if status == "standard":
@@ -930,16 +937,21 @@ def write_contract_preview_artifacts(preview: dict[str, Any], output_dir: Path, 
     return {"json": str(json_path), "markdown": str(md_path)}
 
 
-def build_form_data_draft(config: ModelConfig, *, preview: dict[str, Any] | None = None) -> dict[str, Any]:
+def build_form_data_draft(
+    config: ModelConfig,
+    *,
+    preview: dict[str, Any] | None = None,
+    wb: Any | None = None,
+) -> dict[str, Any]:
     """Build one model's draft payload from a single frozen workbook snapshot."""
 
-    if preview is None:
-        preview = build_contract_preview(config)
-    wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
+    if wb is not None:
+        return _build_form_data_draft(config, preview or build_contract_preview(config, wb=wb), wb)
+    snapshot = load_workbook(config.workbook_path, data_only=True, read_only=True)
     try:
-        return _build_form_data_draft(config, preview, wb)
+        return _build_form_data_draft(config, preview or build_contract_preview(config, wb=snapshot), snapshot)
     finally:
-        wb.close()
+        snapshot.close()
 
 
 def _build_form_data_draft(config: ModelConfig, preview: dict[str, Any], wb: Any) -> dict[str, Any]:
@@ -1026,13 +1038,17 @@ def _build_form_data_draft(config: ModelConfig, preview: dict[str, Any], wb: Any
                 "selection_mode": section.get("selection_mode", ""),
                 "selection_mode_label": section.get("selection_mode_label", ""),
                 "base_price": option["base_price"],
-                "display_behavior": choice_source.get("display_behavior", ""),
                 "display_order": option.get("display_order") or order_by_option[option_id],
                 "source_detail_raw": option["source_detail_raw"],
                 "source_option_name": option["source_option_name"],
                 "source_description": option["source_description"],
                 "text_cleanup_notes": option["text_cleanup_notes"],
             }
+            display_behavior = str(choice_source.get("display_behavior", "") or "").strip()
+            if display_behavior:
+                # Carry the key only when it has a value; the browser treats
+                # absent and empty identically, so a blank one is dead payload.
+                draft_choice["display_behavior"] = display_behavior
             merge_option_asset_fields(draft_choice, option_rows, only_if_image_present=True)
             draft_choices.append(draft_choice)
 
@@ -1189,24 +1205,6 @@ def write_form_data_draft_artifacts(draft: dict[str, Any], output_dir: Path, art
     json_path.write_text(json.dumps(draft, indent=2), encoding="utf-8")
     md_path.write_text(render_form_data_draft_markdown(draft), encoding="utf-8")
     return {"json": str(json_path), "markdown": str(md_path)}
-
-
-def write_runtime_contract_artifact(
-    config: ModelConfig,
-    draft: dict[str, Any],
-    output_dir: Path,
-    artifact_prefix: str,
-) -> dict[str, str]:
-    """Emit the clean runtime contract that registry promotion embeds verbatim.
-
-    Draft-only decoration (draftMetadata, source_* provenance, cleanup notes,
-    draft status wording) lives only in the draft artifacts; this contract is
-    what ``model_registry_promotion`` rows should reference via artifact_path.
-    """
-    output_dir.mkdir(parents=True, exist_ok=True)
-    json_path = output_dir / f"{artifact_prefix}.json"
-    json_path.write_text(json.dumps(build_model_runtime_contract(config, draft), indent=2), encoding="utf-8")
-    return {"json": str(json_path)}
 
 
 def write_inspection_artifacts(report: dict[str, Any], output_dir: Path, artifact_prefix: str) -> dict[str, str]:

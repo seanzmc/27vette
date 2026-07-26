@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from openpyxl import load_workbook
+
 from corvette_form_generator.inspection import build_contract_preview, build_form_data_draft, inspect_model_sources
 from corvette_form_generator.model_config import ModelConfig
 from corvette_form_generator.runtime_contract import build_model_runtime_contract
@@ -28,34 +30,36 @@ class ModelSourceAssembly:
     derivation_manifest: dict[str, Any] | None = None
 
 
+# Temporary: the only model still exporting the legacy JSON/CSV compatibility
+# pair, kept while a current consumer remains (spec Pass 2 requirement 8). It
+# selects a secondary OUTPUT, never a source-construction path.
+COMPATIBILITY_EXPORT_MODEL_KEYS = frozenset({"stingray"})
+
+
 def assemble_model_source(config: ModelConfig, *, include_reports: bool = False) -> ModelSourceAssembly:
     """Assemble workbook source rows for one active model.
 
-    The orchestration layer calls this single facade for every active model.
-    Stingray retains its legacy compatibility source payload while the other
-    workbook-discovered models build through the draft path; all paths finalize
-    through ``build_model_runtime_contract``.
+    One builder serves every workbook-discovered model. There is no model-keyed
+    source fork: the payload is built the same way for all six, and all of them
+    finalize through ``build_model_runtime_contract``.
     """
 
-    if config.model_key == "stingray":
-        from corvette_form_generator.production import build_production_source_data
+    # One frozen snapshot for the whole assembly: every builder reads the same
+    # open workbook, and the handle closes deterministically.
+    snapshot = load_workbook(config.workbook_path, data_only=True, read_only=True)
+    try:
+        preview = build_contract_preview(config, wb=snapshot)
+        draft = build_form_data_draft(config, preview=preview, wb=snapshot)
+        report = inspect_model_sources(config, wb=snapshot) if include_reports else None
+    finally:
+        snapshot.close()
 
-        source_data = build_production_source_data(config)
-        return ModelSourceAssembly(
-            config=config,
-            source_data=source_data,
-            runtime_contract=build_model_runtime_contract(config, source_data),
-            compatibility_source=True,
-            derivation_manifest=source_data.get("_derivationManifest"),
-        )
-
-    preview = build_contract_preview(config)
-    draft = build_form_data_draft(config, preview=preview)
     return ModelSourceAssembly(
         config=config,
         source_data=draft,
         runtime_contract=build_model_runtime_contract(config, draft),
-        report=inspect_model_sources(config) if include_reports else None,
+        report=report,
         preview=preview if include_reports else None,
+        compatibility_source=config.model_key in COMPATIBILITY_EXPORT_MODEL_KEYS,
         derivation_manifest=draft.get("_derivationManifest"),
     )

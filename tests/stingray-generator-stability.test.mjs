@@ -25,6 +25,10 @@ function loadAppData() {
 const jsonData = JSON.parse(fs.readFileSync("form-output/stingray-form-data.json", "utf8"));
 const appData = loadAppData();
 const generatorSource = fs.readFileSync("scripts/corvette_form_generator/production.py", "utf8");
+// Pass 2 receipt C: the single source builder lives here now. production.py is the
+// Stingray compatibility exporter only.
+const builderSource = fs.readFileSync("scripts/corvette_form_generator/inspection.py", "utf8");
+const builderAndExporterSource = generatorSource + builderSource;
 const generateFormSource = fs.readFileSync("scripts/generate_form.py", "utf8");
 const runtimeMetadataSource = fs.readFileSync("scripts/corvette_form_generator/runtime_metadata.py", "utf8");
 const stingrayVariantIds = ["1lt_c07", "2lt_c07", "3lt_c07", "1lt_c67", "2lt_c67", "3lt_c67"];
@@ -355,13 +359,17 @@ test("workbook package validation rejects duplicate worksheet AutoFilters on tab
   );
 });
 
-test("Stingray generator no longer performs routine workbook generated-sheet writes", () => {
+test("the Stingray compatibility exporter never touches the workbook", () => {
+  // production.py is no longer a generator. Pass 2 receipt C absorbed the Stingray
+  // source builder into the single workbook-driven builder, leaving only the legacy
+  // JSON/CSV export here -- so it must not read, write, or back up the workbook.
   assert.doesNotMatch(generatorSource, /save_workbook_safely/);
   assert.doesNotMatch(generatorSource, /write_sheet\(/);
-  assert.doesNotMatch(generatorSource, /workbook_backup_path/);
-  assert.match(generatorSource, /"workbook_backup": None/);
-  assert.doesNotMatch(generatorSource, /\bwb\.save\(WORKBOOK_PATH\)/);
+  assert.doesNotMatch(generatorSource, /workbook_backup/);
+  assert.doesNotMatch(generatorSource, /load_workbook/);
+  assert.doesNotMatch(generatorSource, /\bwb\.save\(/);
   assert.doesNotMatch(generatorSource, /write_app_data_registry/);
+  assert.doesNotMatch(generatorSource, /build_production_source_data/);
 });
 
 test("generate_form model discovery is workbook-owned, not a hardcoded active-model map", () => {
@@ -470,10 +478,11 @@ else:
 wb.save(workbook_path)
 
 sys.path.insert(0, "scripts")
-from corvette_form_generator import production
+from corvette_form_generator.model_configs import discover_generation_model_configs
+from corvette_form_generator.source_assembly import assemble_model_source
 
-production.WORKBOOK_PATH = workbook_path
-data = production.build_production_source_data()
+config = discover_generation_model_configs(Path(workbook_path), root=Path(workbook_path).parent)["stingray"]
+data = assemble_model_source(config).source_data
 choice = next(row for row in data["choices"] if row["choice_id"] == "2lt_c07__opt_uqt_002")
 standard = next((row for row in data["standardEquipment"] if row["equipment_id"] == "std_2lt_c07__opt_uqt_002"), None)
 print(json.dumps({
@@ -579,13 +588,18 @@ test("Stingray Phase 4 availability rules are workbook-owned", () => {
   assert.ok(r6xInteriors.length > 0, "expected active Stingray R6X interiors");
   assert.equal(r6xInteriors.every((row) => row.included_option_id === "opt_r6x_001"), true);
 
-  assert.match(generatorSource, /load_variant_option_overrides/);
-  assert.match(generatorSource, /load_section_presentation/);
+  assert.match(builderSource, /load_variant_option_overrides/);
+  assert.match(builderSource, /load_section_presentation/);
   assert.doesNotMatch(runtimeMetadataSource, /optional_rows\(wb, ["']variant_option_overrides["']\)/);
-  assert.doesNotMatch(generatorSource, /option_id\s*==\s*["']opt_uqt_002["']/);
-  assert.doesNotMatch(generatorSource, /HIDDEN_SECTION_IDS/);
-  assert.doesNotMatch(generatorSource, /opt_r6x_001["']\s+if\s+active_for_stingray\s+and\s+requires_r6x/);
-  assert.match(generatorSource, /missing_r6x_included_option_/);
+  assert.doesNotMatch(builderAndExporterSource, /option_id\s*==\s*["']opt_uqt_002["']/);
+  assert.doesNotMatch(builderAndExporterSource, /HIDDEN_SECTION_IDS/);
+  assert.doesNotMatch(builderAndExporterSource, /opt_r6x_001["']\s+if\s+active_for_stingray\s+and\s+requires_r6x/);
+  // Ported to interiors.py in Pass 2 receipt C, as a hard failure rather than a
+  // validation row -- assert_runtime_contract rejects error-severity rows anyway.
+  assert.match(
+    fs.readFileSync("scripts/corvette_form_generator/interiors.py", "utf8"),
+    /R6X interiors require included_option_id/
+  );
 });
 
 test("Stingray Phase 5 interior components are workbook-owned", () => {
@@ -632,9 +646,9 @@ test("Stingray Phase 5 interior components are workbook-owned", () => {
     }
   }
 
-  assert.match(generatorSource, /build_model_interiors\(MODEL_CONFIG\)/);
-  assert.doesNotMatch(generatorSource, /workbook_interior_component_metadata/);
-  assert.doesNotMatch(generatorSource, /missing_workbook_components_/);
+  assert.match(builderSource, /build_model_interiors\(config, wb=wb\)/);
+  assert.doesNotMatch(builderAndExporterSource, /workbook_interior_component_metadata/);
+  assert.doesNotMatch(builderAndExporterSource, /missing_workbook_components_/);
 });
 
 test("section_master owns section step placement without category", () => {
@@ -720,10 +734,10 @@ test("Phase 6 step and presentation metadata are workbook-owned", () => {
   assert.equal(presentationByKey.get("grand_sport::sec_spec_001")?.display_label, "Special Edition");
   assert.equal(presentationByKey.get("grand_sport::sec_colo_001")?.display_label, "Color Combination Override");
 
-  assert.match(generatorSource, /load_runtime_steps/);
-  assert.match(generatorSource, /load_context_sections/);
-  assert.match(generatorSource, /standard_equipment_group_type/);
-  assert.doesNotMatch(generatorSource, /STINGRAY_SECTION_DISPLAY_ORDER_OVERRIDES\s*=\s*\{/);
+  assert.match(builderSource, /load_runtime_steps/);
+  assert.match(builderSource, /load_context_sections/);
+  assert.match(builderSource, /standard_equipment_group_type/);
+  assert.doesNotMatch(builderAndExporterSource, /STINGRAY_SECTION_DISPLAY_ORDER_OVERRIDES\s*=\s*\{/);
 });
 
 test("Grand Sport draft rule source sheets use workbook-backed contracts", () => {

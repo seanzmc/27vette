@@ -127,14 +127,14 @@ Production emits 3 rows; the workbook builder emits 7 — a superset covering in
 and color overrides, plus the `*_draft_status` warning that `live_contract_data()` strips. Richer, not
 divergent.
 
-## Decisions needed before stage 2
+## Decisions taken 2026-07-26
 
-1. **`display_behavior` on the 1,385 choices with no value** — emit `""` (workbook builder) or omit
-   the key (production)? Behaviorally identical; it changes the published artifact and the
-   characterization test's assertion.
-2. **Dropping the 31 rules, 8 colorOverrides, and 18 sections from Stingray's published contract.**
-   Measured inert, but it is a visible change to `form-app/data.js` and should be an explicit call
-   rather than a side effect of convergence.
+1. **`display_behavior`: omit the key when there is no value.** User's instruction was "whatever is
+   the least change" — omitting matches what ships today, so the 1,385 choices are untouched and only
+   the 31 with a real value carry the field. The characterization test's
+   `"display_behavior" not in choice` assertion stays valid as written.
+2. **Drop the 31 rules, 8 colorOverrides, and 18 sections** from Stingray's published contract.
+   Approved. All measured inert in the browser.
 
 ## Explicitly out of scope for stage 1
 

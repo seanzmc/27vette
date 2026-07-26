@@ -24,6 +24,7 @@ from corvette_form_generator.registry_promotion import (  # noqa: E402
 )
 from corvette_form_generator.rule_derivation import write_derivation_manifest  # noqa: E402
 from corvette_form_generator.rules import extend_with_derived_swap_rules  # noqa: E402
+from corvette_form_generator import source_assembly  # noqa: E402
 from corvette_form_generator.source_assembly import ModelSourceAssembly  # noqa: E402
 
 
@@ -117,14 +118,16 @@ class GenerationPathSafetyTests(unittest.TestCase):
             self.assertEqual(manifest["model_key"], "stingray")
             self.assertFalse(output_dir.exists())
 
-    def test_stingray_source_builder_opens_config_workbook(self) -> None:
+    def test_the_single_source_builder_opens_the_config_workbook(self) -> None:
+        """The one builder reads the candidate workbook, never a module global."""
+
         config = base_model_config("stingray").with_overrides(workbook_path=Path("/tmp/candidate-workbook.xlsx"))
 
-        with patch.object(production, "load_workbook", side_effect=RuntimeError("stop after path capture")) as loader:
+        with patch.object(source_assembly, "load_workbook", side_effect=RuntimeError("stop after path capture")) as loader:
             with self.assertRaisesRegex(RuntimeError, "stop after path capture"):
-                production.build_production_source_data(config)
+                source_assembly.assemble_model_source(config)
 
-        loader.assert_called_once_with(config.workbook_path)
+        loader.assert_called_once_with(config.workbook_path, data_only=True, read_only=True)
 
     def test_stingray_compatibility_writer_uses_config_output_dir(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -144,30 +147,6 @@ class GenerationPathSafetyTests(unittest.TestCase):
 
             self.assertEqual(Path(artifacts["json"]), target_output / "stingray-form-data.json")
             self.assertEqual(Path(artifacts["csv"]), target_output / "stingray-form-data.csv")
-
-    def test_legacy_production_entrypoint_honors_explicit_config_paths(self) -> None:
-        with tempfile.TemporaryDirectory() as tmpdir:
-            temp_root = Path(tmpdir)
-            config = base_model_config("stingray").with_overrides(
-                root=temp_root / "unowned-root",
-                output_dir=temp_root / "owned-output",
-                app_dir=temp_root / "owned-app",
-            )
-            compatibility = {
-                "json": str(config.output_dir / "stingray-form-data.json"),
-                "csv": str(config.output_dir / "stingray-form-data.csv"),
-            }
-            with patch.object(production, "build_production_source_data", return_value=runtime_contract()), patch.object(
-                production,
-                "write_stingray_compatibility_artifacts",
-                return_value=compatibility,
-            ):
-                result = production.generate_production_artifacts(config)
-
-            expected = config.output_dir / "runtime" / "stingray-runtime-contract.json"
-            self.assertEqual(Path(result["runtime_contract_json"]), expected)
-            self.assertTrue(expected.exists())
-            self.assertFalse((config.root / "form-output").exists())
 
 
 class RuntimeContractSafetyTests(unittest.TestCase):

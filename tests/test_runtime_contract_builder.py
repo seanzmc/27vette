@@ -90,21 +90,31 @@ class RuntimeContractBuilderTests(unittest.TestCase):
         self.assertEqual([row["check_id"] for row in actual["validation"]], ["active_variants"])
         self.assertNotIn("draftMetadata", actual)
 
-    def test_active_routes_use_shared_runtime_contract_builder(self) -> None:
-        production_source = (ROOT / "scripts" / "corvette_form_generator" / "production.py").read_text()
-        inspection_source = (ROOT / "scripts" / "corvette_form_generator" / "inspection.py").read_text()
-        assembly_source = (ROOT / "scripts" / "corvette_form_generator" / "source_assembly.py").read_text()
+    def test_exactly_one_module_finalizes_the_runtime_contract(self) -> None:
+        """One route, one finalizer. No module-keyed second path may reappear."""
 
-        self.assertIn("from corvette_form_generator.runtime_contract import build_model_runtime_contract", production_source)
-        self.assertIn("from corvette_form_generator.runtime_contract import build_model_runtime_contract", inspection_source)
-        self.assertIn("from corvette_form_generator.runtime_contract import build_model_runtime_contract", assembly_source)
-        self.assertIn("build_model_runtime_contract(resolved_config, source_data)", production_source)
-        self.assertIn("build_model_runtime_contract(config, draft)", inspection_source)
-        self.assertIn("build_model_runtime_contract(config, source_data)", assembly_source)
+        package = ROOT / "scripts" / "corvette_form_generator"
+        callers = sorted(
+            path.name
+            for path in package.glob("*.py")
+            if "build_model_runtime_contract(" in path.read_text().split('"""', 2)[-1]
+        )
+
+        self.assertEqual(callers, ["runtime_contract.py", "source_assembly.py"])
+
+        assembly_source = (package / "source_assembly.py").read_text()
+        self.assertIn(
+            "from corvette_form_generator.runtime_contract import build_model_runtime_contract",
+            assembly_source,
+        )
         self.assertIn("build_model_runtime_contract(config, draft)", assembly_source)
-        self.assertNotIn("from corvette_form_generator.registry_promotion import live_contract_data", production_source)
-        self.assertNotIn("from corvette_form_generator.registry_promotion import live_contract_data", inspection_source)
-        self.assertNotIn("from corvette_form_generator.registry_promotion import live_contract_data", assembly_source)
+
+        # The reverse dependency on registry_promotion must stay retired.
+        for name in ("production.py", "inspection.py", "source_assembly.py"):
+            self.assertNotIn(
+                "from corvette_form_generator.registry_promotion import live_contract_data",
+                (package / name).read_text(),
+            )
 
 
 if __name__ == "__main__":

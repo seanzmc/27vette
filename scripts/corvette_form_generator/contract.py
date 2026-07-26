@@ -263,6 +263,22 @@ def label_for(
         option = options[entity_id]
         return f"{option.get('rpo') or ''} {option.get('label', '')}".strip()
     if entity_id in interiors_by_id:
-        interior = interiors_by_id[entity_id]
-        return f"{interior.get('interior_id')} {interior.get('interior_name')}".strip()
+        return interior_customer_label(interiors_by_id[entity_id])
     return entity_id
+
+
+def interior_customer_label(interior: dict[str, Any]) -> str:
+    """Name an interior the way the browser does.
+
+    Mirrors ``getInteriorCustomerLabel`` in ``form-app/app.js``. The former
+    ``f"{interior_id} {interior_name}"`` leaked the internal key into customer
+    copy ("Included with 3LT_AE4_HUF_N26 Natural Dipped Suede.") and, because the
+    browser prefers a baked ``disabled_reason`` over its own composition, that bad
+    string overrode the correct one.
+    """
+
+    for field in ("interior_leaf_label", "interior_name", "interior_code", "interior_id"):
+        value = str(interior.get(field) or "").strip()
+        if value:
+            return value
+    return ""

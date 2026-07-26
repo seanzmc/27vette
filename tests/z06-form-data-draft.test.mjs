@@ -226,7 +226,8 @@ test("Z06 gas guzzler tax drafts as standard-equipment default charge with T0F/T
     assert.equal(choice.base_price, 2600);
     assert.equal(choice.status, "standard");
     assert.equal(choice.selectable, "True");
-    assert.equal(choice.display_behavior, "");
+    // Receipt C decision 2026-07-26: the key is carried only when it has a value.
+    assert.equal(choice.display_behavior, undefined);
     assert.equal(choice.step_key, "standard_equipment");
   }
 
