@@ -1,0 +1,156 @@
+# Pass 2 receipt C stage 1 — characterization output (read-only)
+# base commit: 38f340b  |  workbook SHA-256: 8858cff40ea7eaeda6b7921714f3697a6ee9d1bbc99c84e564d7b118e45b2166
+
+==============================================================================
+STINGRAY: production builder (current release) vs workbook builder (target)
+==============================================================================
+
+--- top-level fields ---
+  choices                  production=    1416  workbook=    1416
+  colorOverrides           production=     245  workbook=     237   <-- DIFFERS
+  contextChoices           production=       8  workbook=       8
+  defaultSelectionRules    production=       4  workbook=       4
+  draftMetadata            workbook-only (dict)
+  exclusiveGroups          production=      10  workbook=      10
+  interiors                production=     130  workbook=     130
+  priceRules               production=      49  workbook=      49
+  ruleGroups               production=      27  workbook=      27
+  rules                    production=     145  workbook=     114   <-- DIFFERS
+  runtimeRuleExceptions    production=       0  workbook=  ABSENT   <-- DIFFERS
+  sections                 production=      50  workbook=      32   <-- DIFFERS
+  standardEquipment        production=     467  workbook=     467
+  steps                    production=      14  workbook=      14
+  validation               production=       3  workbook=       7   <-- DIFFERS
+  variants                 production=       6  workbook=       6
+
+--- variants (key=variant_id) ---
+  production-only: 0   workbook-only: 0   field-changed: 6
+    changed columns: {'preview_included': 6, 'model': 6, 'source_active': 6}
+    e.g. 1lt_c07: {"preview_included": [null, true], "model": [null, "Stingray"], "source_active": [null, "True"]}
+    e.g. 1lt_c67: {"preview_included": [null, true], "model": [null, "Stingray"], "source_active": [null, "True"]}
+    e.g. 2lt_c07: {"preview_included": [null, true], "model": [null, "Stingray"], "source_active": [null, "True"]}
+
+--- steps (key=step_key) ---
+  production-only: 0   workbook-only: 0   field-changed: 5
+    changed columns: {'section_ids': 5}
+    e.g. aero_exhaust_stripes_accessories: {"section_ids": ["sec_gsce_001|sec_gsha_001|sec_hash_001|sec_jake_001|sec_stri_001", "sec_hash_001|sec_stri_001"]}
+    e.g. base_interior: {"section_ids": ["sec_intc_001|sec_intc_002|sec_intc_003|sec_lzint_001|sec_lzint_002|sec_lzint_003", ""]}
+    e.g. interior_trim: {"section_ids": ["sec_colo_001|sec_cust_002|sec_inte_001|sec_onst_001", "sec_colo_001|sec_inte_001"]}
+
+--- sections (key=section_id) ---
+  production-only: 18   workbook-only: 0   field-changed: 30
+    only in production: sec_cust_002
+    only in production: sec_gsce_001
+    only in production: sec_gsha_001
+    only in production: sec_intc_001
+    only in production: sec_intc_002
+    only in production: sec_intc_003
+    only in production: sec_jake_001
+    only in production: sec_lzint_001
+    only in production: sec_lzint_002
+    only in production: sec_lzint_003
+    only in production: sec_onst_001
+    only in production: sec_perf_aero_001
+    ... and 6 more
+    changed columns: {'source_section_name': 30}
+    e.g. sec_1lte_001: {"source_section_name": [null, "1LT Equipment"]}
+    e.g. sec_2lte_001: {"source_section_name": [null, "2LT Equipment"]}
+    e.g. sec_3lte_001: {"source_section_name": [null, "3LT Equipment"]}
+
+--- choices (key=choice_id) ---
+  production-only: 0   workbook-only: 0   field-changed: 1416
+    changed columns: {'source_description': 1416, 'source_option_name': 1416, 'text_cleanup_notes': 1416, 'display_behavior': 1385, 'standard_equipment_group_type': 62}
+    e.g. 1lt_c07__opt_001: {"standard_equipment_group_type": ["trim_equipment", ""], "source_description": [null, "Features leather-wrapped upper instrument panel, door trim panels and console"], "display_behavior": [null, ""], "source_option_name": [null, "Custom Le
+    e.g. 1lt_c07__opt_002: {"source_description": [null, "Includes 2 remote transmitters that enable automatic door unlock and open by touching door switch"], "display_behavior": [null, ""], "source_option_name": [null, "Keyless Open and Start"], "text_cleanup_notes"
+    e.g. 1lt_c07__opt_003: {"source_description": [null, ""], "display_behavior": [null, ""], "source_option_name": [null, "All-Speed Traction Control"], "text_cleanup_notes": [null, []]}
+
+--- rules (key=rule_id) ---
+  production-only: 31   workbook-only: 0   field-changed: 19
+    only in production: rule_opt_5v7_001_excludes_opt_5vm_001
+    only in production: rule_opt_5v7_001_excludes_opt_5w8_001
+    only in production: rule_opt_5vm_001_excludes_opt_5v7_001
+    only in production: rule_opt_5vm_001_excludes_opt_5w8_001
+    only in production: rule_opt_5vm_001_excludes_opt_sti_001
+    only in production: rule_opt_5vm_001_excludes_opt_tvs_001
+    only in production: rule_opt_5vm_001_excludes_opt_zf1_001
+    only in production: rule_opt_5vm_001_requires_opt_5zu_001
+    only in production: rule_opt_5vm_001_requires_opt_5zw_001
+    only in production: rule_opt_5vm_001_requires_opt_5zz_001
+    only in production: rule_opt_5vm_001_requires_opt_z51_001
+    only in production: rule_opt_5w8_001_excludes_opt_5v7_001
+    ... and 19 more
+    changed columns: {'source_selection_mode': 19}
+    e.g. rule_3lt_ae4_ejh_includes_opt_3n9_001: {"source_selection_mode": ["single_select_req", ""]}
+    e.g. rule_3lt_ae4_epx_n26_includes_opt_3n9_001: {"source_selection_mode": ["single_select_req", ""]}
+    e.g. rule_3lt_ae4_h8t_includes_opt_3a9_001: {"source_selection_mode": ["single_select_req", ""]}
+
+--- interiors (key=interior_id) ---
+  production-only: 0   workbook-only: 0   field-changed: 130
+    changed columns: {'requires_z25': 130}
+    e.g. 1LT_AE4_HTJ_N26: {"requires_z25": [null, "False"]}
+    e.g. 1LT_AQ9_HTA: {"requires_z25": [null, "False"]}
+    e.g. 1LT_AQ9_HUP: {"requires_z25": [null, "False"]}
+
+--- colorOverrides (key=override_id) ---
+  production-only: 8   workbook-only: 0   field-changed: 207
+    only in production: co_238
+    only in production: co_239
+    only in production: co_240
+    only in production: co_241
+    only in production: co_242
+    only in production: co_243
+    only in production: co_244
+    only in production: co_245
+    changed columns: {'interior_id': 203, 'option_id': 102}
+    e.g. co_031: {"interior_id": ["3LT_AE4_EL9", "3LT_AE4_EPX_N26"], "option_id": ["opt_g26_001", "opt_g4z_001"]}
+    e.g. co_032: {"interior_id": ["3LT_AE4_EL9", "3LT_AE4_EPX_N26"], "option_id": ["opt_g4z_001", "opt_gkz_001"]}
+    e.g. co_033: {"interior_id": ["3LT_AE4_EL9", "3LT_AE4_H8T"], "option_id": ["opt_gbk_001", "opt_g26_001"]}
+
+--- validation rows ---
+  production:
+    [pass   ] active_variants: 6 active Stingray variants exported.
+    [pass   ] availability_rows: 1416 choice rows exported ({'standard': 467, 'unavailable': 140, 'available': 809}).
+    [pass   ] rules: 145 active compatibility rules exported from 145 source rules.
+  workbook:
+    [warning] stingray_draft_status: Stingray form data is a draft inspection artifact and is not runtime active.
+    [pass   ] active_variants: 6 configured Stingray variants included by model config; workbook active flags are unchanged.
+    [pass   ] availability_rows: 1416 draft choice rows exported from the Stingray variant matrix.
+    [pass   ] rules: 114 active compatibility rules exported from rule_mapping.
+    [pass   ] interior_contract: 130 model-scoped Stingray LT interiors exported.
+    [pass   ] price_rules: 49 active price rules exported from price_rules.
+    [pass   ] color_overrides: 237 color override rows exported from color_overrides.
+
+=== scope checks ===
+18 production-only sections — does any Stingray row live in them?
+   sec_cust_002           choices=False  standardEquipment=False
+   sec_gsce_001           choices=False  standardEquipment=False
+   sec_gsha_001           choices=False  standardEquipment=False
+   sec_intc_001           choices=False  standardEquipment=False
+   sec_intc_002           choices=False  standardEquipment=False
+   sec_intc_003           choices=False  standardEquipment=False
+   sec_jake_001           choices=False  standardEquipment=False
+   sec_lzint_001          choices=False  standardEquipment=False
+   sec_lzint_002          choices=False  standardEquipment=False
+   sec_lzint_003          choices=False  standardEquipment=False
+   sec_onst_001           choices=False  standardEquipment=False
+   sec_perf_aero_001      choices=False  standardEquipment=False
+   sec_perf_brake_001     choices=False  standardEquipment=False
+   sec_perf_ground_001    choices=False  standardEquipment=False
+   sec_perf_z52_001       choices=False  standardEquipment=False
+   sec_spec_001           choices=False  standardEquipment=False
+   sec_z06_cf_whee_001    choices=False  standardEquipment=False
+   sec_z06_pkg_001        choices=False  standardEquipment=False
+
+8 production-only colorOverrides:
+   interior=3LT_AE4_EL9      option=opt_g26_001    option_active=True  interior_in_stingray_scope=False scope_active=None
+   interior=3LT_AE4_EL9      option=opt_g4z_001    option_active=True  interior_in_stingray_scope=False scope_active=None
+   interior=3LT_AE4_EL9      option=opt_gbk_001    option_active=True  interior_in_stingray_scope=False scope_active=None
+   interior=3LT_AE4_EL9      option=opt_gph_001    option_active=True  interior_in_stingray_scope=False scope_active=None
+   interior=3LT_AH2_EL9      option=opt_g26_001    option_active=True  interior_in_stingray_scope=False scope_active=None
+   interior=3LT_AH2_EL9      option=opt_g4z_001    option_active=True  interior_in_stingray_scope=False scope_active=None
+   interior=3LT_AH2_EL9      option=opt_gbk_001    option_active=True  interior_in_stingray_scope=False scope_active=None
+   interior=3LT_AH2_EL9      option=opt_gph_001    option_active=True  interior_in_stingray_scope=False scope_active=None
+
+=== tracked surface ===
+$ git status --porcelain
+?? fable5loop/runs/2026-07-26-pass2-builder-characterization/
