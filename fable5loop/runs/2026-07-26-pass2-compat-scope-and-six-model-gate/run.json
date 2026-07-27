@@ -1,0 +1,45 @@
+{
+  "id": "2026-07-26-pass2-compat-scope-and-six-model-gate",
+  "started_at": "2026-07-26T18:40:00-04:00",
+  "completed_at": "2026-07-26T21:30:00-04:00",
+  "objective": "Close the last two open Pass 2 requirements: 8 (prove the Stingray compatibility JSON/CSV are secondary outputs, scan their real consumers, prove parity against the collapsed builder, and state a disposition) and 10 (create the six-model executable harness that gates the start of Pass 3).",
+  "changed_surface": "tests only; no generator source, no workbook write, no artifact published",
+  "outcome_rubric": "fable5loop/runs/2026-07-26-pass2-compat-scope-and-six-model-gate/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-26-pass2-compat-scope-and-six-model-gate/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-26-pass2-compat-scope-and-six-model-gate/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-26-pass2-compat-scope-and-six-model-gate/validation-output.txt"
+    },
+    {
+      "section": "Open failures",
+      "evidence": "fable5loop/runs/2026-07-26-pass2-compat-scope-and-six-model-gate/verifier-report.md"
+    },
+    {
+      "section": "Lessons learned",
+      "evidence": "fable5loop/runs/2026-07-26-pass2-compat-scope-and-six-model-gate/verifier-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-26-pass2-compat-scope-and-six-model-gate/outcome.md"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-26-pass2-compat-scope-and-six-model-gate/verifier-report.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 1
+  },
+  "boundaries_preserved": [
+    "workbook",
+    "generated artifacts",
+    "runtime app",
+    "dealer submission"
+  ]
+}

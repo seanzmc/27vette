@@ -34,6 +34,7 @@ from corvette_form_generator.workbook import (
     rows_from_sheet,
     save_workbook_safely,
 )
+from verify_workbook_candidate import verify_candidate
 
 
 def headers_for(ws) -> dict[str, int]:
@@ -277,7 +278,21 @@ def verify_promotions(path: Path, plans: dict[str, dict[str, Any]]) -> dict[str,
     return {"ok": not failures, "models": models, "failures": failures}
 
 
-def execute_promotion(workbook_path: Path, model_keys: list[str], *, write: bool = False) -> dict[str, Any]:
+def execute_promotion(
+    workbook_path: Path,
+    model_keys: list[str],
+    *,
+    write: bool = False,
+    run_candidate_lane: bool = True,
+) -> dict[str, Any]:
+    """Promote models, gated on the composed candidate lane.
+
+    ``run_candidate_lane=False`` exists for tests that exercise the promotion
+    bookkeeping itself; the CLI never disables it. Without the lane, "validated"
+    means only that the workbook rows were written as planned — the exact claim
+    spec §2.1 item 2 recorded as false confidence.
+    """
+
     workbook_path = Path(workbook_path)
     normalized_keys = list(dict.fromkeys(clean(model_key).lower() for model_key in model_keys if clean(model_key)))
     if not normalized_keys:
@@ -314,6 +329,19 @@ def execute_promotion(workbook_path: Path, model_keys: list[str], *, write: bool
             if not preflight["ok"]:
                 result["status"] = "preflight_failed"
                 return result
+
+            # Spec Pass 3 requirements 1-5: the post-promotion promoted set is
+            # discovered from this exact scratch workbook, every would-be-published
+            # model is generated and strictly validated in an isolated root, and a
+            # complete candidate registry is proven in the browser — before the
+            # canonical workbook is touched. The promoted models are declared
+            # changed; drift in any other model is unexpected and fails here.
+            if run_candidate_lane:
+                readiness = verify_candidate(scratch_path, changed_models=normalized_keys)
+                result["candidate_readiness"] = readiness
+                if not readiness["ok"]:
+                    result["status"] = "candidate_lane_failed"
+                    return result
 
         if not write:
             result["ok"] = True

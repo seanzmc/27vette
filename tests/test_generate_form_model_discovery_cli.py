@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Isolated executable gate for workbook-discovered model generation."""
+"""CLI-argument behavior for ``scripts/generate_form.py``.
+
+The six-model generation gate moved to ``tests/test_all_model_runtime_generation.py``
+(spec Pass 2 requirement 10: one executable harness, not two). What stays here is
+the argument handling that harness does not exercise — the flags an operator can
+get wrong, proven against a workbook snapshot rather than the canonical file.
+"""
 
 from __future__ import annotations
 
@@ -18,25 +24,6 @@ SCRIPTS_DIR = ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from corvette_form_generator.model_configs import discover_generation_model_configs  # noqa: E402
-
-EXPECTED_MODELS = {"stingray", "grand_sport", "grand_sport_x", "z06", "zr1", "zr1x"}
-
-REQUIRED_STDOUT_KEYS = {
-    "model_key",
-    "model_label",
-    "route_engine",
-    "runtime_contract_json",
-    "runtime_contract_artifacts",
-    "compatibility_artifacts",
-    "inspection_artifacts",
-    "preview_artifacts",
-    "draft_artifacts",
-    "counts",
-    "validation_errors",
-    "notes",
-}
-
 
 def run_generate_form(*args: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
@@ -54,42 +41,49 @@ def protected_hashes() -> dict[Path, str]:
     return {path: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
 
 
-def test_cli_executes_every_discovered_model_under_isolated_root(tmp_path: Path) -> None:
+def test_output_root_confines_every_written_path(tmp_path: Path) -> None:
+    """``--output-root`` must redirect the whole write set, not only the contract."""
+
     workbook_snapshot = tmp_path / "stingray_master.snapshot.xlsx"
     candidate_root = tmp_path / "candidate"
     shutil.copy2(WORKBOOK, workbook_snapshot)
     before = protected_hashes()
-    observed: set[str] = set()
-    configs = discover_generation_model_configs(workbook_snapshot, root=candidate_root)
-    assert set(configs) == EXPECTED_MODELS
 
-    for model_key in sorted(configs):
-        result = run_generate_form(
-            "--model",
-            model_key,
-            "--workbook",
-            str(workbook_snapshot),
-            "--output-root",
-            str(candidate_root),
-        )
-        observed.add(model_key)
+    result = run_generate_form(
+        "--model",
+        "stingray",
+        "--workbook",
+        str(workbook_snapshot),
+        "--output-root",
+        str(candidate_root),
+    )
 
-        assert result.returncode == 0, result.stderr
-        output = json.loads(result.stdout)
-        assert REQUIRED_STDOUT_KEYS <= set(output)
-        assert output["model_key"] == model_key
-        assert output["validation_errors"] == 0
-        runtime_path = Path(output["runtime_contract_json"])
-        assert runtime_path.is_relative_to(candidate_root)
-        assert runtime_path.exists()
-        runtime_contract = json.loads(runtime_path.read_text(encoding="utf-8"))
-        assert runtime_contract["dataset"]["status"] == "runtime_active"
-        assert runtime_contract["validation"] == [
-            row for row in runtime_contract["validation"] if str(row.get("severity", "")).lower() != "error"
-        ]
+    assert result.returncode == 0, result.stderr
+    output = json.loads(result.stdout)
+    written = [Path(output["runtime_contract_json"])]
+    written.extend(Path(value) for value in output["runtime_contract_artifacts"].values())
+    written.extend(Path(value) for value in output["compatibility_artifacts"].values())
+    escaped = [path for path in written if not path.is_relative_to(candidate_root)]
 
-    assert observed == EXPECTED_MODELS
+    assert escaped == [], f"paths written outside --output-root: {escaped}"
     assert protected_hashes() == before
+
+
+def test_unknown_model_fails_instead_of_generating(tmp_path: Path) -> None:
+    workbook_snapshot = tmp_path / "stingray_master.snapshot.xlsx"
+    shutil.copy2(WORKBOOK, workbook_snapshot)
+
+    result = run_generate_form(
+        "--model",
+        "corvette_zora",
+        "--workbook",
+        str(workbook_snapshot),
+        "--output-root",
+        str(tmp_path / "candidate"),
+    )
+
+    assert result.returncode != 0
+    assert "corvette_zora" in result.stderr
 
 
 def test_inspection_output_requires_emit_inspection(tmp_path: Path) -> None:

@@ -34,9 +34,15 @@ function makeElement() {
   };
 }
 
+// Pass 3 §3.7 stage 9: the candidate lane points this harness at a temporary
+// registry. No fallback if the override is set but unreadable — silently
+// reading the published data.js would make the candidate stage pass while
+// proving nothing about the candidate.
+const DATA_JS_PATH = process.env.CORVETTE_FORM_DATA_JS || "form-app/data.js";
+
 function loadDataWindow() {
   const context = { window: {} };
-  vm.runInNewContext(fs.readFileSync("form-app/data.js", "utf8"), context);
+  vm.runInNewContext(fs.readFileSync(DATA_JS_PATH, "utf8"), context);
   return context.window;
 }
 

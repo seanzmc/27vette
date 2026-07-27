@@ -894,6 +894,73 @@ as payload.
 
 **Not published.** Requirements 8 and 10 and the republication of `form-app/data.js` remain.
 
+#### Pass 2 receipt D — requirements 8 and 10 completed 2026-07-26; Pass 2 complete
+
+**Requirement 10.** `tests/test_all_model_runtime_generation.py` is the six-model executable gate.
+Every model the workbook activates is generated through `scripts/generate_form.py` — the real
+operator entrypoint, as a subprocess — into one isolated `--output-root`. Each written artifact is
+then re-read from disk and passed through `runtime_contract.assert_runtime_contract()` bound to its
+config: the same validator generation uses, no second weaker check. The set is asserted from both
+directions, because neither alone is sufficient — against `model_master` read directly from the
+workbook, which catches a discovery regression, and against the six named keys, which catches a model
+leaving the workbook and shrinking the gate's own coverage with it. The three per-model parametrized
+tests are pinned to the named keys for the same reason. Variant counts and uniqueness are checked
+against `model_master.expected_variant_count`; `dataset.source_workbook` is checked against the
+snapshot; every protected surface is SHA-256 hashed before and after and asserted unchanged. A
+negative proof pins the strict validator's necessity: a payload with `runtime_active` status and zero
+error-severity rows — which the previous gate accepted — is rejected for empty `steps` and a missing
+`orderSummary`.
+
+The duplicate six-model loop in `tests/test_generate_form_model_discovery_cli.py` was removed;
+requirement 10 asks for one harness, not two. That file now covers CLI-argument behavior only:
+`--output-root` confinement over the whole write set, unknown model, and the `--inspection-output`
+guard. The Pass 2 gate command block above runs green as written for the first time — the block
+previously failed at collection because `tests/test_all_model_runtime_generation.py` did not exist.
+104 passed / 88 subtests.
+
+**Requirement 8.** Parity of the compatibility export against the collapsed builder is clean:
+regenerating Stingray from the unchanged canonical workbook into an isolated root gives
+`compare-generated-contracts.mjs` exit 0 and a byte-identical CSV. Zero non-timestamp differences, no
+allowlist. The isolated snapshot must keep the canonical filename or `dataset.source_workbook` alone
+manufactures one spurious difference.
+
+Consumer disposition, corrected during the run. A filename grep is not a sufficient consumer scan
+here: `registry_promotion.current_generation_artifact_path()` constructs
+`form-output/{export_slug}-form-data.json` by f-string, so it is a real reader that no search for
+that string finds. It is reached from `generate_registry.py:49` whenever a promotion row declares
+`artifact_type=current_generation`. Resolving all six `model_registry_promotion` rows through the real
+resolver shows every one declares `runtime_contract` with an explicit `artifact_path`, so nothing
+resolves to the compatibility JSON today — but the branch is live code, not documentation.
+
+- `stingray-form-data.json` — **retained.** One test consumer
+  (`tests/stingray-generator-stability.test.mjs:25`) plus the dormant registry fallback above.
+  Deletion is blocked until Pass 3 requirement 7 removes `current_generation` as an accepted
+  artifact type.
+- `stingray-form-data.csv` — **retained, zero consumers.** No reader, no constructed path, no code
+  branch. Recorded as an explicit Pass 4 Stage B deletion candidate; Stage B owns approved deletion.
+
+**Found and recorded, not fixed here.** `assert_runtime_contract()` does not implement two clauses of
+the rejection matrix above. Probed with the real config against a real contract: dropping a variant,
+duplicating a variant, renaming a `variant_id`, dropping a choice, and a wrong `dataset.source_workbook`
+are all accepted. The gate compensates for both today, but the validator should own them. Separately,
+`registry_promotion.promotion_requires_runtime_contract_assertion()` returns False for
+`current_generation` — a switch that skips the strict assertion, which §3.8's standing rule forbids —
+and has **zero callers**. Both belong to Pass 3 requirement 7.
+
+**Independent verifier: PASS with should-fix**, all fixed. It reproduced every number and found no
+false claim, but proved by workbook mutation that the discovery comparison could not fail on any
+workbook change while its docstring claimed otherwise, and that named membership — one of eleven
+assertions in the removed CLI loop, and the only one not carried over — had been silently dropped.
+Two receipt phrasings were imprecise. Receipt:
+`fable5loop/runs/2026-07-26-pass2-compat-scope-and-six-model-gate/`.
+
+**Boundaries.** Tests only. No generator source changed, no workbook write, nothing published;
+`stingray_master.xlsx` SHA-256 unchanged. Python 523 passed (baseline 501); all 16 node gates at
+baseline, with the three known failures unchanged (two Pass 4A grand-sport tests, one
+`active explicit excludes`).
+
+**Pass 2 is complete.** The requirement-10 six-model-green assertion passes, so Pass 3 may start.
+
 ### Pass 3 — Make promotion and publication prove the candidate runtime
 
 Purpose: prevent a candidate from being called validated until its exact runtime contracts and temporary registry have passed, and deliver the composed candidate lane the database workflow calls.
@@ -936,6 +1003,72 @@ Required behavior:
 10. Implement `scripts/verify_workbook_candidate.py` as the single composed entrypoint defined in §3.7, including the §3.7.1 changed-model reporting contract. Promotion preflight and the database workflow's post-export gate both call this one command; neither reimplements the stage sequence.
 11. Emit the readiness report as JSON to a caller-selected path, with a stable schema version. The database workflow consumes this report; it does not scrape console output.
 12. The verifier's own test proves: all stages run in order against a candidate copy; a workbook defect fails at the earliest applicable stage; an undeclared model's semantic drift is reported as `unexpected_drift` and fails; a declared changed model does not reduce the generated set; and the canonical workbook, `form-output/`, and `form-app/data.js` are byte-identical afterward.
+
+#### Pass 3 receipt — stage 1: requirements 1–6 and 10–12 completed 2026-07-27
+
+**Pass 3 is NOT complete.** Requirements 7, 8, and 9 are open and are listed again below.
+
+`scripts/verify_workbook_candidate.py` is the composed lane of §3.7: one operator-invocable command
+that copies the candidate workbook into a temporary root and runs ten stages in order —
+`copy_candidate`, `workbook_package`, `workbook_schema`, `options_sheet_quality`, `discover_models`,
+`generate_models`, `validate_contracts`, `candidate_registry`, `browser_harness`, `semantic_drift` —
+failing closed at the earliest stage that can see a defect. Stages after a failure genuinely do not
+run: a deleted `section_master` stops at `workbook_schema` with `generate_models` in `stagesNotRun`
+and `models` empty. A caller-skipped stage is reported separately from an unreached one.
+
+Requirements 1–5 are delivered through `promote_model.py`, which now calls the lane on the exact
+post-promotion scratch workbook before the canonical write, declaring the promoted models changed.
+`--model z06` now exits 1 with `candidate_lane_failed` where the same command on `HEAD` reported
+`validated` — the §2.1 item 2 false-confidence path, closed. An exception escaping the lane aborts
+before `save_workbook_safely` rather than writing.
+
+Requirement 6 is delivered: the one assertion that ran `generate_registry.py` against the tracked app
+moved to `tests/z06-registry-publication.test.mjs`. `tests/z06-runtime-promotion.test.mjs` is now
+read-only — 4/0, and running it no longer dirties `form-app/data.js`.
+
+Requirement 11's readiness report is versioned JSON (`workbook-candidate-readiness-1`) at a
+caller-selected path, carrying per model exactly the §3.7.1.4 field set. §3.7.1's scoping contract is
+enforced, not merely intended: the declared set is read at one site plus report assembly, and a run
+declaring one model generates, validates, and registers the identical set as a run declaring none.
+`'*'` marks every model touched. Drift is keyed on stable entity identity, falls back to a
+content-sensitive multiset when that identity is not unique, and recurses into nested lists, so a
+section reorder is not drift while a duplicated row is.
+
+**The lane's first real run found something no gate had caught.** With nothing declared changed it
+exits 1 on `unexpected_drift` for `grand_sport_x`, `zr1`, and `zr1x`, whose retained contracts differ
+from fresh generation in `choices`, `rules`, `sections`, `standardEquipment`, and `steps`. That is the
+staleness §Pass 3's prerequisite receipt recorded as unflagged precisely because those models are
+unpublished — which is why §3.7 requires generating the complete promoted-plus-generatable set. Any
+promotion is blocked until those three are regenerated or explicitly declared.
+
+Requirement 4's harness override is `CORVETTE_FORM_DATA_JS`, read by
+`tests/multi-model-runtime-switching.test.mjs` with **no fallback** when set. Independently measured:
+env unset 48/48, empty registry 0/48, nonexistent path 0/48, byte-identical copy 48/48, copy missing
+`z06` 42/6. A silent fallback would have let stage 9 pass while proving nothing about the candidate.
+
+**Independent verifier: FAIL on cycle 1**, six findings, all fixed and re-proved. Requirement 6 was
+inside the claimed scope, undelivered, and its damage misattributed to Pass 4A. Stage 10 ran after a
+stage-7 failure. The byte-identity assertion did not cover exception or interrupt paths. Two of
+requirement 12's proofs caught nothing — against a weakened lane, hardcoding `boundaryViolations` and
+deleting stage 9 outright were both invisible, because every assertion only ever observed the check
+passing and every test disabled the browser stage for speed. Drift collapsed duplicate identities and
+compared `orderSummary.sections` positionally. One duplicate acceptance check was unreachable. The
+verifier confirmed under adversarial testing that scoping never narrows, the harness has no fallback,
+promotion is genuinely gated, and the drift failure is real rather than synthetic. Receipt:
+`fable5loop/runs/2026-07-26-pass3-candidate-lane/`.
+
+**Still open in Pass 3:** requirement 7 (restrict promotion artifact metadata; remove the
+`current_generation` and `draft_artifact` consumers), requirement 8 (remove
+`build_registry_from_promotions()` and the artifact-resolution fallbacks), requirement 9 (atomic
+`generate_registry.py` write, which is also what will let `z06-registry-publication.test.mjs` stop
+rewriting a tracked artifact). Two findings from Pass 2 receipt D feed requirement 7 directly:
+`promotion_requires_runtime_contract_assertion()` is a zero-caller switch that skips the strict
+assertion, and `assert_runtime_contract()` still does not implement the rejection matrix's variant and
+workbook-binding clauses.
+
+**Boundaries.** No workbook write, no model promoted, nothing published; `stingray_master.xlsx`,
+`form-output/`, and `form-app/data.js` byte-identical throughout. Python 542 passed (baseline 523);
+all 16 node gates at baseline.
 
 Pass 3 gates:
 

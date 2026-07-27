@@ -305,7 +305,10 @@ def test_post_save_verification_failure_restores_exact_original_workbook(tmp_pat
 
     monkeypatch.setattr(promotion_module, "verify_promotions", fail_second_verification)
 
-    result = promotion_module.execute_promotion(path, ["zr1"], write=True)
+    # The candidate lane is exercised by tests/test_verify_workbook_candidate.py
+    # and by test_candidate_lane_gates_promotion below; this fixture workbook is
+    # a minimal promotion scaffold, not a generatable one.
+    result = promotion_module.execute_promotion(path, ["zr1"], write=True, run_candidate_lane=False)
 
     assert result["ok"] is False
     assert result["status"] == "post_save_verification_failed_restored"
@@ -342,3 +345,38 @@ def test_cli_routes_repeated_models_through_one_atomic_execution(tmp_path: Path,
 
     assert calls == [(path, ["grand_sport_x", "zr1", "zr1x"], False)]
     assert json.loads(capsys.readouterr().out)["status"] == "validated"
+
+
+def test_candidate_lane_gates_promotion(tmp_path: Path, monkeypatch) -> None:
+    """Spec Pass 3 requirements 1-5: promotion cannot report success without the lane.
+
+    Breaks if `execute_promotion` ever reaches the canonical write while the
+    composed candidate lane reports a failure — the exact "validated without
+    generating or runtime-testing the candidate" shape §2.1 item 2 recorded.
+    """
+
+    path = tmp_path / "candidate-lane-gate.xlsx"
+    wb = promotion_workbook()
+    wb.save(path)
+    wb.close()
+    before = path.read_bytes()
+    seen: list[dict] = []
+
+    def failing_lane(candidate, *, changed_models=None, **kwargs):
+        seen.append({"candidate": Path(candidate), "changed_models": list(changed_models or [])})
+        return {"ok": False, "failedStage": "generate_models", "models": {}}
+
+    monkeypatch.setattr(promotion_module, "verify_candidate", failing_lane)
+
+    result = promotion_module.execute_promotion(path, ["zr1"], write=True)
+
+    assert result["ok"] is False
+    assert result["status"] == "candidate_lane_failed"
+    assert result["candidate_readiness"]["failedStage"] == "generate_models"
+    assert path.read_bytes() == before, "canonical workbook was written despite a failing candidate lane"
+    assert "backup_path" not in result
+    # The lane must see the post-promotion scratch workbook, not the canonical one,
+    # and must be told which models the promotion touched.
+    assert len(seen) == 1
+    assert seen[0]["candidate"] != path
+    assert seen[0]["changed_models"] == ["zr1"]
