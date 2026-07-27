@@ -42,6 +42,7 @@ REQUIRED_MODEL_FIELDS = {
 }
 
 ALL_MODEL_KEYS = {"stingray", "grand_sport", "grand_sport_x", "z06", "zr1", "zr1x"}
+DECLARED_SUBSET = ["grand_sport_x", "zr1", "zr1x"]
 
 
 # The lane generates six models per invocation, so every full run in this file
@@ -58,17 +59,61 @@ def undeclared_run(tmp_path_factory) -> dict:
 
 @pytest.fixture(scope="module")
 def declared_run(tmp_path_factory) -> dict:
-    """The same workbook, declaring the three models whose artifacts are stale."""
+    """The same workbook, declaring a subset of models changed."""
 
     report_path = tmp_path_factory.mktemp("declared") / "readiness.json"
     report = verify_candidate(
         WORKBOOK,
-        changed_models=["grand_sport_x", "zr1", "zr1x"],
+        changed_models=DECLARED_SUBSET,
         report_path=report_path,
         run_harness=False,
     )
     report["_report_path"] = str(report_path)
     return report
+
+
+def workbook_with_a_drifting_model(directory: Path) -> Path:
+    """A candidate workbook whose zr1 output differs from the retained artifact.
+
+    Drift used to be supplied for free by three stale retained contracts. Those
+    were regenerated on 2026-07-27, so the drift is manufactured here instead —
+    which is the better shape anyway: the test now controls its own input rather
+    than depending on a defect elsewhere in the tree staying broken.
+    """
+
+    candidate = directory / WORKBOOK.name
+    shutil.copy2(WORKBOOK, candidate)
+    workbook = load_workbook(candidate)
+    sheet = workbook["zr1_options"]
+    headers = {cell.value: idx for idx, cell in enumerate(sheet[1], start=1) if cell.value}
+    for row in range(2, sheet.max_row + 1):
+        if str(sheet.cell(row, headers["rpo"]).value or "").strip().upper() == "EFR":
+            cell = sheet.cell(row, headers["option_name"])
+            cell.value = f"{cell.value} (drift probe)"
+            break
+    else:  # pragma: no cover - the row exists; this guards a silent no-op
+        raise AssertionError("zr1_options has no EFR row to perturb")
+    workbook.save(candidate)
+    workbook.close()
+    return candidate
+
+
+@pytest.fixture(scope="module")
+def drifting_undeclared(tmp_path_factory) -> dict:
+    """The drifting workbook with nothing declared: zr1 must be unexpected_drift."""
+
+    directory = tmp_path_factory.mktemp("drift-undeclared")
+    return verify_candidate(workbook_with_a_drifting_model(directory), run_harness=False)
+
+
+@pytest.fixture(scope="module")
+def drifting_declared(tmp_path_factory) -> dict:
+    """The same drifting workbook, declaring zr1 changed: the run must pass."""
+
+    directory = tmp_path_factory.mktemp("drift-declared")
+    return verify_candidate(
+        workbook_with_a_drifting_model(directory), changed_models=["zr1"], run_harness=False
+    )
 
 
 def test_every_stage_runs_in_order_against_a_candidate_copy(declared_run) -> None:
@@ -102,23 +147,27 @@ def test_a_workbook_defect_fails_at_the_earliest_applicable_stage(tmp_path) -> N
     assert report["models"] == {}
 
 
-def test_undeclared_semantic_drift_is_reported_and_fails(undeclared_run) -> None:
-    """Breaks if a stale retained artifact stops being caught.
+def test_undeclared_semantic_drift_is_reported_and_fails(drifting_undeclared) -> None:
+    """Breaks if a model whose output moved without being declared stops failing the run.
 
-    The three unpromoted models' retained contracts predate a workbook section
-    change, so a run that declares nothing must fail on them. If those artifacts
-    are later regenerated this test must be re-pointed rather than deleted — the
-    behavior it pins is that undeclared drift fails, not that these three drift.
+    This is the check that catches a bad global-family edit: one workbook cell
+    changed, nobody declared it, the run must refuse.
     """
 
-    drifted = set(undeclared_run["partition"]["unexpected_drift"])
-
-    assert drifted, "no model drifted; re-point this test at a model that does"
-    assert undeclared_run["ok"] is False
-    assert undeclared_run["failedStage"] == "semantic_drift"
-    for model_key in drifted:
-        assert undeclared_run["models"][model_key]["declared_changed"] is False
-        assert undeclared_run["models"][model_key]["semantic_drift_vs_retained"]
+    assert drifting_undeclared["partition"]["unexpected_drift"] == ["zr1"]
+    assert drifting_undeclared["ok"] is False
+    assert drifting_undeclared["failedStage"] == "semantic_drift"
+    assert drifting_undeclared["models"]["zr1"]["declared_changed"] is False
+    # EFR is standard on zr1, so renaming it moves both collections that carry
+    # its label. Asserting the exact set, not just "non-empty", keeps this from
+    # passing on unrelated drift.
+    assert drifting_undeclared["models"]["zr1"]["semantic_drift_vs_retained"] == [
+        "choices",
+        "standardEquipment",
+    ]
+    # Only the edited model moves; the other five must stay clean, or the drift
+    # signal is noise rather than a pointer.
+    assert set(drifting_undeclared["partition"]["unchanged"]) == ALL_MODEL_KEYS - {"zr1"}
 
 
 def test_declaring_a_changed_model_does_not_reduce_the_generated_set(declared_run, undeclared_run) -> None:
@@ -137,12 +186,28 @@ def test_declaring_a_changed_model_does_not_reduce_the_generated_set(declared_ru
         )
 
 
-def test_declaring_drift_moves_it_out_of_unexpected_and_passes(declared_run) -> None:
+def test_declaring_drift_moves_it_out_of_unexpected_and_passes(drifting_declared) -> None:
     """Breaks if declaring a model stops suppressing its expected drift."""
 
-    assert declared_run["partition"]["unexpected_drift"] == []
-    assert set(declared_run["partition"]["changed"]) == {"grand_sport_x", "zr1", "zr1x"}
-    assert declared_run["ok"] is True
+    assert drifting_declared["partition"]["unexpected_drift"] == []
+    assert drifting_declared["partition"]["changed"] == ["zr1"]
+    assert drifting_declared["models"]["zr1"]["semantic_drift_vs_retained"] == [
+        "choices",
+        "standardEquipment",
+    ]
+    assert drifting_declared["ok"] is True
+
+
+def test_the_canonical_workbook_has_no_undeclared_drift(undeclared_run) -> None:
+    """The tree is clean: every retained contract matches what the workbook generates.
+
+    Breaks the moment a retained artifact goes stale again — which is exactly the
+    class of defect that went unnoticed until this lane existed.
+    """
+
+    assert undeclared_run["partition"]["unexpected_drift"] == []
+    assert set(undeclared_run["partition"]["unchanged"]) == ALL_MODEL_KEYS
+    assert undeclared_run["ok"] is True
 
 
 def test_all_models_marker_declares_every_model(tmp_path) -> None:

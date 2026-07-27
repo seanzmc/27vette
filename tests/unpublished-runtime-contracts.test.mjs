@@ -26,11 +26,18 @@ function sectionRpoOrder(data, sectionId) {
 }
 
 test("retained unpublished contracts preserve reviewed roof-option baselines", () => {
+  // Ordering is owned by `grand_sport_x_options.display_order` (10,20,30,40,50,60,70).
+  // Updated 2026-07-27 when the stale GSX contract was regenerated: the previous
+  // expectation pinned the artifact's order, which the workbook had since moved
+  // past. If this fails again, read the workbook column before editing the list.
   assert.deepEqual(
     sectionRpoOrder(contracts.grand_sport_x, "sec_roof_001"),
-    ["CM9", "C2Z", "D84", "D86", "CF7", "CC3", "CF8"]
+    ["CF7", "C2Z", "CC3", "CM9", "CF8", "D84", "D86"]
   );
-  assert.deepEqual(sectionRpoOrder(contracts.zr1, "sec_roof_001"), ["C2Z"]);
+  // zr1 carries CFC (Visible Carbon Fiber Retractable Hardtop) in sec_roof_001;
+  // zr1x files the same option under sec_stan_001 instead. That asymmetry is
+  // workbook-authored — see zr1_options / zr1x_options `section_id`.
+  assert.deepEqual(sectionRpoOrder(contracts.zr1, "sec_roof_001"), ["C2Z", "CFC"]);
   assert.deepEqual(sectionRpoOrder(contracts.zr1x, "sec_roof_001"), ["C2Z"]);
 });
 

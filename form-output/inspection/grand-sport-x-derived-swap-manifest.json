@@ -1,0 +1,135 @@
+{
+  "model_key": "grand_sport_x",
+  "candidate_count": 9,
+  "emitted_count": 0,
+  "shadowed_count": 0,
+  "not_emitted_count": 9,
+  "entries": [
+    {
+      "disposition": "candidate_not_emitted",
+      "source_id": "opt_pda_001",
+      "target_id": "opt_dmv_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_pda_001",
+          "opt_z15_001"
+        ],
+        "primitive_rule_id": "grand_sport_x_rule_dmv_excludes_z15_efff6be2d49c",
+        "conflict_id": "opt_z15_001"
+      },
+      "allowlisted": false
+    },
+    {
+      "disposition": "candidate_not_emitted",
+      "source_id": "opt_pda_001",
+      "target_id": "opt_dmw_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_pda_001",
+          "opt_z15_001"
+        ],
+        "primitive_rule_id": "grand_sport_x_rule_dmw_excludes_z15_668cfc553ec9",
+        "conflict_id": "opt_z15_001"
+      },
+      "allowlisted": false
+    },
+    {
+      "disposition": "candidate_not_emitted",
+      "source_id": "opt_pda_001",
+      "target_id": "opt_dmx_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_pda_001",
+          "opt_z15_001"
+        ],
+        "primitive_rule_id": "grand_sport_x_rule_dmx_excludes_z15_769ab7a4b9c1",
+        "conflict_id": "opt_z15_001"
+      },
+      "allowlisted": false
+    },
+    {
+      "disposition": "candidate_not_emitted",
+      "source_id": "opt_pda_001",
+      "target_id": "opt_dmy_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_pda_001",
+          "opt_z15_001"
+        ],
+        "primitive_rule_id": "grand_sport_x_rule_dmy_excludes_z15_2d9e81f4308c",
+        "conflict_id": "opt_z15_001"
+      },
+      "allowlisted": false
+    },
+    {
+      "disposition": "candidate_not_emitted",
+      "source_id": "opt_pda_001",
+      "target_id": "opt_vpo_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_pda_001",
+          "opt_z15_001"
+        ],
+        "primitive_rule_id": "grand_sport_x_rule_vpo_excludes_z15_895a4460e92a",
+        "conflict_id": "opt_z15_001"
+      },
+      "allowlisted": false
+    },
+    {
+      "disposition": "candidate_not_emitted",
+      "source_id": "opt_pda_001",
+      "target_id": "opt_vpw_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_pda_001",
+          "opt_z15_001"
+        ],
+        "primitive_rule_id": "grand_sport_x_rule_vpw_excludes_z15_063cc870eca2",
+        "conflict_id": "opt_z15_001"
+      },
+      "allowlisted": false
+    },
+    {
+      "disposition": "candidate_not_emitted",
+      "source_id": "opt_zyc_001",
+      "target_id": "opt_d84_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_zyc_001",
+          "opt_gba_001"
+        ],
+        "primitive_rule_id": "grand_sport_x_rule_d84_excludes_gba_68654f8c2779",
+        "conflict_id": "opt_gba_001"
+      },
+      "allowlisted": false
+    },
+    {
+      "disposition": "candidate_not_emitted",
+      "source_id": "opt_zyc_001",
+      "target_id": "opt_d86_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_zyc_001",
+          "opt_gba_001"
+        ],
+        "primitive_rule_id": "grand_sport_x_rule_d86_excludes_gba_9e9777b926da",
+        "conflict_id": "opt_gba_001"
+      },
+      "allowlisted": false
+    },
+    {
+      "disposition": "candidate_not_emitted",
+      "source_id": "opt_zyc_001",
+      "target_id": "opt_edu_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_zyc_001",
+          "opt_gba_001"
+        ],
+        "primitive_rule_id": "grand_sport_x_rule_edu_excludes_gba_2093f05e68b1",
+        "conflict_id": "opt_gba_001"
+      },
+      "allowlisted": false
+    }
+  ]
+}

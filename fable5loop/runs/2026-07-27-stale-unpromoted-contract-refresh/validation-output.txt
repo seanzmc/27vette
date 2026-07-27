@@ -1,0 +1,305 @@
+Run: 2026-07-27-stale-unpromoted-contract-refresh
+Scope: regenerate the three stale unpromoted runtime contracts so the Pass 3
+       candidate lane stops blocking promotion.
+Workbook SHA-256 start and end: d11674e3213a8858b13f5e4283b82868046ed34335c96419a8fe909034760bfd
+       (unchanged — no workbook write this run)
+
+
+================================================================
+WHY
+================================================================
+
+The candidate lane built in the previous run refused every promotion:
+
+  $ .venv/bin/python scripts/verify_workbook_candidate.py
+  exit 1, failedStage=semantic_drift
+  unexpected_drift=[grand_sport_x, zr1, zr1x]
+
+Those three retained contracts had gone stale across several passes and no gate
+had ever flagged them, because the models are unpublished.
+
+
+================================================================
+ISOLATED DIFF REVIEW (before any tracked write)
+================================================================
+
+All three regenerated into a temporary --output-root first. Every field compared
+by entity identity, timestamps excluded.
+
+Bulk of the diff, expected:
+
+  Choice field-change counts, HEAD vs written, keyed by choice_id
+  (GSX / zr1 / zr1x):
+
+    display_behavior               1371 / 800 / 800   key dropped when blank
+    display_order                  1242 /   0 /   4
+    description                     708 /   0 /   0
+    label                           672 /   0 /   0
+    section_name                     24 /  88 /  80
+    standard_equipment_group_type     0 /  36 /  36
+    section_id and step_key          30 /  20 /  12
+    base_price                       12 /   0 /   0
+    selectable                       12 /  24 /   8
+    auto_added_summary_required       6 /   0 /   0
+
+  display_behavior — the "least change, omit the key" decision from Pass 2
+      receipt C, propagating to models not regenerated since. This one IS a
+      generator serialization behavior: the workbook cell is blank and the
+      generator now omits the key instead of emitting "". It is not a new
+      adjustment made this run.
+  display_order (1242 on GSX) — workbook-authored moves, e.g. UQH 220->20
+      (grand_sport_x_options row 7), DSZ 280->70 (row 203), K7A ->30 (row 4),
+      zr1x CJ2 10->11 (zr1x_options row 130).
+  sec_perf_support_001 -> sec_perf_001        30 /  20 /  12
+      — the section move the three published models already absorbed.
+  label / description corrections            672 / 708 (GSX)
+      — workbook copy: title casing, "LPO." prefixes.
+  "2LZ Equipment" -> "2LT Equipment"                88 /  80
+  section display-order shuffles            ~10 each (sections[].section_display_order,
+      distinct from the 1242 choice-level display_order moves above)
+  zr1 gains sec_perf_ground_001 "Ground Effects"
+  zr1x drops price rule zr1x_pr_uqt_uqt_b30b73f1a614, an ingest-era $1,495
+      override. Precisely: the row was DELETED from zr1x_price_rules, not
+      deactivated — that sheet has 11 rows and no `active` column at all. Its
+      validation row moves 12 -> 11 active price rules exported.
+
+Every value above was checked against the workbook. No adjustment was made
+generator-side this run.
+
+
+================================================================
+PRODUCT DECISIONS (Sean, this session)
+================================================================
+
+D1 J57 Carbon Ceramic Brakes $9,000 -> $0 on Grand Sport X.
+   Workbook `grand_sport_x_options` authors price=0 and there is no price rule
+   supplying 9,000. Sean: correct, it is standard equipment on that model.
+
+D2 FED Sport Performance Package $0 -> $500.
+   Sean: intentional. The price schedule shows ZER, the order guide shows FED;
+   manufacturer's to reconcile. Judgement call made, left as generated.
+
+D3 selectable False -> True on standard-status options.
+   GSX: NGA, T0E. ZR1: AH2, AQ9, EYT, NGA, SOJ. ZR1X: NGA.
+   Sean: correct — those standard options have selectable alternatives, so they
+   must be selectable.
+
+D4 EFR must NOT be selectable on ZR1 and ZR1X (no alternative on those models).
+
+   CORRECTION recorded: the first summary listed EFR among the False->True
+   flips. That was wrong — the direction was the opposite. Measured per RPO:
+
+     grand_sport_x   NGA False->True x6   T0E False->True x6
+     zr1             AH2/AQ9/EYT/NGA/SOJ False->True x4 each
+                     EFR  True->False x4
+     zr1x            NGA False->True x4
+                     EFR  True->False x4
+
+   The workbook already authors selectable=False for EFR on zr1_options and
+   zr1x_options (both row 52). Regeneration alone satisfies D4; no workbook
+   ChangeSet was needed.
+
+
+================================================================
+WRITTEN ARTIFACTS — DECISIONS VERIFIED ON DISK
+================================================================
+
+  $ for m in grand_sport_x zr1 zr1x; do .venv/bin/python scripts/generate_form.py --model $m; done
+  grand_sport_x  errors=0 warnings=0
+  zr1            errors=0 warnings=0
+  zr1x           errors=0 warnings=0
+
+  model          EFR.selectable  J57.base_price  FED.base_price
+  grand_sport_x  ['True']        [0]             [500]
+  zr1            ['False']       -               -
+  zr1x           ['False']       -               -
+
+  Actual selectable FLIPS this run (HEAD -> written), which is the number that
+  matters and which an earlier version of this table conflated with "RPOs
+  currently selectable=True":
+    grand_sport_x   NGA x6, T0E x6                       False -> True
+    zr1             AH2, AQ9, EYT, NGA, SOJ  x4 each     False -> True
+    zr1             EFR  x4                              True  -> False
+    zr1x            NGA  x4                              False -> True
+    zr1x            EFR  x4                              True  -> False
+  AH2/AQ9/EYT were already True on GSX at HEAD, and T0E was already True on
+  zr1x at HEAD; they are not flips.
+
+  D1 ✓  D2 ✓  D3 ✓  D4 ✓ (EFR False on zr1 and zr1x; unchanged True on GSX,
+  which Sean's exception did not cover)
+
+
+================================================================
+C4 — THE BLOCKER IS CLEARED
+================================================================
+
+  $ .venv/bin/python scripts/verify_workbook_candidate.py --report <path>
+  exit 0
+  ok True   failedStage ''
+  partition {"changed": [], "unchanged": ["grand_sport","grand_sport_x",
+             "stingray","z06","zr1","zr1x"], "unexpected_drift": []}
+  stagesRun 10 of 10
+  boundaryViolations []
+
+All six models now match what the workbook generates. Promotion is unblocked.
+
+
+================================================================
+C6 — TESTS THAT BROKE, AND WHY THEY WERE CHANGED
+================================================================
+
+Two failures, both investigated at the workbook before any expectation moved.
+
+1. tests/unpublished-runtime-contracts.test.mjs — "preserve reviewed roof-option
+   baselines". Two separate defects in one assertion:
+
+   a. Grand Sport X roof order. Got ['CF7','C2Z','CC3','CM9','CF8','D84','D86'],
+      expected ['CM9','C2Z','D84','D86','CF7','CC3','CF8'] — same 7 RPOs,
+      different order. Read the authority:
+
+        workbook grand_sport_x_options, sec_roof_001, by display_order:
+          10 CF7 Body-Color Roof Panel
+          20 C2Z Visible Carbon Fiber Roof Panel
+          30 CC3 Transparent Roof Panel
+          40 CM9 Body-Color Power Convertible Hardtop
+          50 CF8 Electrochromic Dimming Roof Panel
+          60 D84 Carbon Flash Convertible Top
+          70 D86 Body-Color Roof, Carbon Flash-painted
+
+      A clean 10..70 sequence. The test was pinning the stale artifact's order,
+      not a workbook decision. Expectation updated to the workbook order, with a
+      comment naming the owning column.
+
+   b. ZR1 roof gained CFC. Read the authority:
+
+        zr1_options : opt_cfc_002 CFC "Visible Carbon Fiber Retractable Hardtop"
+                      section_id=sec_roof_001  display_order=380  active=True
+        zr1x_options: opt_cfc_002 CFC  same option, section_id=sec_stan_001
+
+      So ZR1 legitimately carries CFC in the roof section and ZR1X files it under
+      standard equipment. Expectations updated to ['C2Z','CFC'] and ['C2Z'], with
+      that asymmetry recorded in a comment.
+
+      Flagged, not fixed: the same option living in a different section on two
+      sibling models is a workbook inconsistency worth a look. It is not a
+      generator defect and not this run's scope.
+
+2. tests/test_verify_workbook_candidate.py — two drift tests depended on these
+   three artifacts *staying stale* to supply drift. Their own docstring said to
+   re-point rather than delete them. Re-pointed to a manufactured drift source:
+   `workbook_with_a_drifting_model()` copies the workbook and renames one option,
+   so the test now controls its own input instead of depending on a defect
+   elsewhere staying broken. A new test asserts the opposite direction —
+   `test_the_canonical_workbook_has_no_undeclared_drift` fails the moment a
+   retained artifact goes stale again.
+
+   One assertion in the re-pointed pair was written too narrowly (expected drift
+   in `choices` only). EFR is standard on zr1, so renaming it also moves
+   `standardEquipment`. The lane was right; the expectation was corrected to the
+   exact two-collection set rather than loosened to "non-empty".
+
+
+================================================================
+C7 — GATE PARITY
+================================================================
+
+Python full suite:
+  546 passed, 2 skipped, 103 subtests passed in 1083.35s   (0 failed)
+  Previous run: 542 passed. +4 = one new drift test, plus the re-pointed pair
+  splitting across two new module-scoped fixtures.
+
+Node gates:
+  grand-sport-contract-preview            5 / 1   pre-existing (Pass 4A)
+  grand-sport-draft-data                 18 / 1   pre-existing (Pass 4A)
+  multi-model-runtime-switching          48 / 0
+  nonruntime-option-source-purge          6 / 0
+  seat-canonicalization-diff              2 / 0
+  stingray-form-regression               91 / 0
+  stingray-generator-stability           15 / 0
+  unpublished-runtime-contracts           2 / 0   <- 1/1 before the fix above
+  workbook-schema-standardization         8 / 1   pre-existing (active explicit excludes)
+  workbook-visual-copy-standardization    8 / 0
+  z06-contract-preview                    3 / 0
+  z06-form-data-draft                    24 / 0
+  z06-interior-accessory-cleanup          7 / 0
+  z06-performance-package-interactions   21 / 0
+  z06-registry-publication                1 / 0
+  z06-runtime-promotion                   4 / 0
+  z06-runtime-rule-corrections           15 / 0
+
+Workbook schema gate: valid, 0 issues, 0 warnings.
+
+Gate churn: the node gates again rewrote `form-app/data.js` and the grand-sport
+and z06 contracts by `generated_at` (Pass 4A). Reverted with `git checkout --`;
+the three target contracts were of course not reverted.
+
+
+================================================================
+BOUNDARIES
+================================================================
+
+  stingray_master.xlsx   unchanged (SHA identical start and end)
+  form-app/data.js       unchanged — all three models are unpromoted, so no
+                         customer-visible surface moved
+  Modified: the three target runtime contracts, and two test files.
+  New, untracked: form-output/inspection/{grand-sport-x,zr1,zr1x}-derived-swap-manifest.json
+    Generator-owned companions, same class as the three already tracked for the
+    published models (all three new ones report emitted_count 0). Left untracked
+    — whether they join the repo is a commit decision, not this run's.
+
+
+================================================================
+INDEPENDENT VERIFIER (separate context) — verdict: PASS
+================================================================
+
+No blocking findings. The verifier's strongest result closes C1 mechanically:
+regenerating all three models into a temporary root and comparing path-by-path
+against the committed files gives exactly ONE differing path per model,
+`/dataset/generated_at`. Nothing was hand-edited, so every field in the diff is
+generator output from the unchanged workbook by construction. The three untracked
+swap manifests are byte-identical to regenerated output.
+
+It independently confirmed, at the workbook rather than the artifact:
+  - EFR selectable=False is authored in zr1_options and zr1x_options row 52, so
+    regeneration alone satisfies D4 and no workbook write was needed. GSX EFR
+    stays True because row 54 authors True — the exception correctly did not
+    extend there.
+  - J57 price=0 (row 125) and FED price=500 (row 129) on GSX.
+  - The old roof expectation matched the HEAD artifact's order exactly and the
+    new one matches the workbook's display_order exactly — "pinning the stale
+    artifact" is literally true, verified by re-deriving the order from
+    `git show HEAD:`.
+  - zr1_options row 116 puts CFC in sec_roof_001; zr1x_options row 165 puts it in
+    sec_stan_001.
+  - The three models are absent from form-app/data.js (`models: [stingray,
+    grandSport, z06]`) and `promoted_to_runtime=False` in the workbook, so "no
+    customer-visible surface moved" holds.
+  - All 17 node gate tallies reproduce exactly, and it restored the same
+    `generated_at`-only churn.
+  - Mutation test on the re-pointed drift tests: exactly one model drifts, the
+    other five stay clean, and with `semantic_drift` stubbed to return [] the
+    assertions cannot hold. The tests depend on the behavior they claim to pin.
+    `tests/test_verify_workbook_candidate.py` -> 15 passed.
+
+Four documentation findings, all fixed above:
+  V1 The "WRITTEN ARTIFACTS" table's last column was labeled "selectable-true
+     flips" but listed RPOs currently selectable=True — which contradicted the
+     correct flip table three sections earlier. Column removed and replaced with
+     an explicit flip table.
+  V2 The diff-review summary omitted the second-largest bucket (1242 GSX
+     display_order moves) and two smaller ones. Full field-count table added,
+     with workbook citations for the display_order sample.
+  V3 "an inactive ingest-era override" was imprecise: the row was deleted from
+     the sheet, which has no `active` column. Corrected.
+  V4 "Nothing is generator-side" was loose — display_behavior omission IS
+     generator serialization behavior, just not a new one. Reworded.
+
+Verifier process note, worth keeping: the lane's byte-identity boundary check is
+not safe to run concurrently with the node gates. The verifier saw three spurious
+`boundaryViolations` failures caused by its own parallel gate run rewriting
+`grand-sport-runtime-contract.json`. Run them serially.
+
+Not verified by the verifier: the full Python suite tally (bounded run; the
+changed file was run, 15 passed), the browser_harness stage (--skip-harness), and
+the pre-existing status of the three node failures (argued from their content
+rather than measured).

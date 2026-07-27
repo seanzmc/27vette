@@ -1,0 +1,27 @@
+{
+  "id": "2026-07-27-stale-unpromoted-contract-refresh",
+  "started_at": "2026-07-27T00:30:00-04:00",
+  "completed_at": "2026-07-27T03:45:00-04:00",
+  "objective": "Regenerate the three stale unpromoted runtime contracts (grand_sport_x, zr1, zr1x) that the Pass 3 candidate lane flagged as unexpected drift, implementing Sean's four product decisions, so promotion is no longer blocked. No workbook write, no republication.",
+  "changed_surface": "three unpromoted runtime contracts plus their generator-owned swap manifests; two test files re-anchored to workbook authority",
+  "outcome_rubric": "fable5loop/runs/2026-07-27-stale-unpromoted-contract-refresh/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-27-stale-unpromoted-contract-refresh/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-27-stale-unpromoted-contract-refresh/validation-output.txt",
+  "state_updates": [
+    {"section": "Verified facts", "evidence": "fable5loop/runs/2026-07-27-stale-unpromoted-contract-refresh/validation-output.txt"},
+    {"section": "Open failures", "evidence": "fable5loop/runs/2026-07-27-stale-unpromoted-contract-refresh/verifier-report.md"},
+    {"section": "Last session", "evidence": "fable5loop/runs/2026-07-27-stale-unpromoted-contract-refresh/outcome.md"}
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-27-stale-unpromoted-contract-refresh/verifier-report.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 1
+  },
+  "boundaries_preserved": ["workbook", "runtime app", "dealer submission"]
+}
