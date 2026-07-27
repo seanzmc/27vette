@@ -46,7 +46,14 @@ tests/                        node --test *.mjs + pytest gates
 docs/, .hermes/plans/         active specs, reviews, and plans
 ```
 
-Other dirs (`product/`, `dist_updates/`, `archive/`, `backups/`, `visualizer/`) are reference/archive/visualizer surfaces — inspect only when a task names them. `visualizer/workbook-editor/intentional-differences.json` is the committed allowlist of intentional cross-model option differences (`status: intentional` suppresses; `pending-review` annotates); editing it is a normal file change, not a workbook write.
+Other dirs (`product/`, `dist_updates/`, `archive/`, `backups/`) are reference/archive surfaces — inspect only when a task names them.
+
+## Planned / In-Progress Modules
+
+Not yet part of the live customer path; inspect before assuming either is production-ready.
+
+- **Workbook Manager (SQL-based editor)** — `workbook-manager/`: React + FastAPI + SQLite editor for `stingray_master.xlsx`, currently **read-only / provisional** (write path not yet enabled). See Workbook Manager Workflow below for details, setup, and tests.
+- **Visualizer** — `visualizer/`: prototype build-and-price visual configurator (stacked exterior/interior image layers driven by selected options) plus its companion `workbook-editor/` review UI. `visualizer/workbook-editor/intentional-differences.json` is the committed allowlist of intentional cross-model option differences (`status: intentional` suppresses; `pending-review` annotates); editing it is a normal file change, not a workbook write. Full visualizer integration into the order form is tracked in `docs/roadmap_wishes.md` and is not yet wired into `form-app/`.
 
 ## Workbook Source Surfaces
 
@@ -94,9 +101,9 @@ python -m pip install -r requirements.txt
 
 Do not commit `.venv/`. Always run Python tooling with `.venv/bin/python` or the activated venv.
 
-## Raw Order-Guide Ingest
+## Raw Order-Guide Ingest (retired)
 
-The prior ingest wizard/compiler workflow is retired and has no supported command. Its code was removed because its imported data was not trustworthy enough to remain an executable workspace path. Historical prompts, plans, and reports are archived under `docs/archive/retired-ingest/2026-07-23/`; they are evidence, not current procedure. A future raw-source intake workflow requires a new approved design.
+Retired 2026-07-23; no supported ingest command exists. See AGENTS.md §8 for boundaries and `docs/archive/retired-ingest/2026-07-23/` for historical evidence only.
 
 ## Workbook Editor Workflow
 
@@ -224,3 +231,9 @@ Close Excel before any script that writes `stingray_master.xlsx`; treat `~$sting
 ## Roadmap
 
 Keep moving model rules/defaults/pricing/presentation into workbook-authored tables; keep the three live models structurally consistent source-to-contract; complete ZR1/ZR1X source review before any promotion; retire draft/inspection naming once the promotion path is proven; manage image assets via workbook asset maps; simplify customer UX without losing ordering accuracy or dealer detail; strengthen promotion gates; reduce monolithic runtime logic as rules become fully data-owned.
+
+Larger candidate initiatives (not yet scoped/approved, see `docs/roadmap_wishes.md`):
+
+- Site restyle to the new homepage design system, replacing Elementor while keeping Formidable Forms and wpDataTables.
+- Visualizer integration into the order form (see Planned/In-Progress Modules above) — grouped exterior/interior option presentation feeding a real-time build-and-price view, no change to rule/pricing/submission behavior.
+- Workbook Manager write-path enablement (Pass 7+ of its reliability spec) to move it from read-only projection to an approved SQL-based workbook-write surface.
