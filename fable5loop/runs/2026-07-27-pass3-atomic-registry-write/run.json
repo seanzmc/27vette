@@ -1,0 +1,19 @@
+{
+  "id": "2026-07-27-pass3-atomic-registry-write",
+  "started_at": "2026-07-27T04:00:00-04:00",
+  "completed_at": "2026-07-27T07:30:00-04:00",
+  "objective": "Pass 3 requirement 9: make the form-app/data.js write atomic, give generate_registry.py an isolated output path, and stop the node gate set from rewriting the published registry. Requirements 7 and 8 remain open.",
+  "changed_surface": "output writer, registry entrypoint, one node gate retargeted to a temp path, new atomicity tests; no workbook write, nothing published",
+  "outcome_rubric": "fable5loop/runs/2026-07-27-pass3-atomic-registry-write/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-27-pass3-atomic-registry-write/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-27-pass3-atomic-registry-write/validation-output.txt",
+  "state_updates": [
+    {"section": "Verified facts", "evidence": "fable5loop/runs/2026-07-27-pass3-atomic-registry-write/validation-output.txt"},
+    {"section": "Open failures", "evidence": "fable5loop/runs/2026-07-27-pass3-atomic-registry-write/validation-output.txt"},
+    {"section": "Lessons learned", "evidence": "fable5loop/runs/2026-07-27-pass3-atomic-registry-write/verifier-report.md"},
+    {"section": "Last session", "evidence": "fable5loop/runs/2026-07-27-pass3-atomic-registry-write/outcome.md"}
+  ],
+  "skill_update": {"decision": "updated", "evidence": "fable5loop/runs/2026-07-27-pass3-atomic-registry-write/verifier-report.md"},
+  "verifier": {"required": true, "independent_context": true, "verdict": "fail", "accepted_by_human": false, "cycles": 1},
+  "boundaries_preserved": ["workbook", "generated artifacts", "runtime app", "dealer submission"]
+}

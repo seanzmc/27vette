@@ -1070,6 +1070,52 @@ workbook-binding clauses.
 `form-output/`, and `form-app/data.js` byte-identical throughout. Python 542 passed (baseline 523);
 all 16 node gates at baseline.
 
+#### Pass 3 receipt — stage 2: requirement 9 completed 2026-07-27
+
+**Pass 3 is still NOT complete.** Requirements 7 and 8 remain open.
+
+`write_app_data_registry()` was a bare `path.write_text()`. It now routes through a
+shared `write_text_atomic()` that stages a temp file beside the target, fsyncs the
+payload, sets the destination's own mode, `os.replace()`s, and fsyncs the parent
+directory. `write_json_output()` already had the staging pattern and now shares the
+same helper. `generate_registry.py` gained `--workbook` / `--root` / `--output`;
+`--root` moves both sides at once, so a caller cannot read a candidate's contracts
+and publish them over the tracked app by forgetting a flag, and an empty `--root`
+fails closed rather than falling back to the repository.
+
+**The practical payoff is measured, not asserted.** `tests/z06-registry-publication.test.mjs`
+now publishes to a temporary path, so hashing `form-app/data.js` around all 17
+`tests/*.test.mjs` files gives an identical digest. The same gate at `HEAD` in a
+detached worktree does rewrite it. Running the gates no longer dirties the
+published registry. The two runtime contracts still churn — five node files invoke
+`generate_form.py` without `--output-root` (`grand-sport-contract-preview`,
+`grand-sport-draft-data`, `z06-contract-preview`, `z06-form-data-draft`,
+`z06-interior-accessory-cleanup`) — which is Pass 4A's scope.
+
+Atomicity is proven by failure injection, not by reading the code: an `OSError`
+raised inside `os.replace` — after the temp file is complete, before it lands —
+leaves the destination byte-identical with no temp file remaining. Five weakened
+builds are each caught by at least one test: plain `write_text`, staging in the
+system temp directory, fsync removed, chmod removed, and the stale-temp sweep
+removed. The first version of the suite caught only the first two.
+
+**Independent verifier: FAIL on cycle 1**, ten findings, all fixed. The important
+one was a regression the change introduced: `os.replace` swaps the inode, so the
+destination inherited `tempfile`'s 0600 and `form-app/data.js` silently went from
+0644 to 0600 — invisible to git, and surfacing only on the machine that publishes.
+Also fixed: no directory fsync (so the rename was not durable); a fsync no test
+covered; SIGKILL debris nothing reaped; two near-vacuous tests; a misattribution of
+the remaining gate churn; and a wrong claim, repeated in three places, that a
+cross-filesystem `os.replace` silently copies — it raises `EXDEV`. The verifier
+independently confirmed the isolation flags, the byte-identity of the default path,
+that no second writer of `form-app/data.js` exists (including constructed paths and
+the editor server), and that the candidate lane's stage-8 registry still lands
+inside its temporary root. Receipt: `fable5loop/runs/2026-07-27-pass3-atomic-registry-write/`.
+
+**Boundaries.** No workbook write, no model promoted, nothing published;
+`stingray_master.xlsx` and `form-app/data.js` byte-identical, and the registry's
+file mode preserved. Python 555 passed / 0 failed; all 17 node gates at baseline.
+
 Pass 3 gates:
 
 - Focused Python promotion/registry/schema tests.

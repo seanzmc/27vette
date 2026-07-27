@@ -1,0 +1,298 @@
+Run: 2026-07-27-pass3-atomic-registry-write
+Scope: spec Pass 3 requirement 9 only. Requirements 7 and 8 remain open.
+Workbook SHA-256 start and end: d11674e3213a8858b13f5e4283b82868046ed34335c96419a8fe909034760bfd
+       (unchanged — no workbook write)
+
+
+================================================================
+WHAT CHANGED
+================================================================
+
+  scripts/corvette_form_generator/output.py   MOD  new `write_text_atomic()` and
+                                                   `render_app_data_registry()`;
+                                                   `write_app_data_registry` and
+                                                   `write_json_output` both route
+                                                   through the atomic writer
+  scripts/generate_registry.py                MOD  --workbook / --root / --output;
+                                                   `generate_registry()` importable
+  tests/test_atomic_registry_write.py         NEW  the atomicity proofs
+  tests/z06-registry-publication.test.mjs     MOD  publishes to a temp path, and
+                                                   asserts the tracked registry is
+                                                   untouched
+
+`write_json_output` already used the temp-file + fsync + os.replace pattern.
+`write_app_data_registry` did not — it was a bare `path.write_text()`. The
+pattern is now one shared helper rather than duplicated, and the registry uses it.
+
+
+================================================================
+R9.1 / R9.2 — THE WRITE IS ATOMIC, PROVEN BY FAILURE INJECTION
+================================================================
+
+  $ PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_atomic_registry_write.py -q
+  6 passed
+
+The load-bearing test injects an OSError into `os.replace` — i.e. fails AFTER the
+temporary file is fully written and BEFORE it lands — and asserts the destination
+is byte-identical to its previous contents with no leftover temp file. A
+`path.write_text()` implementation cannot pass it, because write_text truncates
+the destination before writing a byte; there is no window in which the old
+content survives.
+
+Also proven: a render failure never creates the destination at all; the temporary
+file is staged in the destination's own directory (a temp file elsewhere would
+make os.replace a cross-device copy, which is not atomic); repeated writes are
+stable; and the bytes written equal the rendered registry exactly.
+
+X2 — five weakened builds, each shadowed via PYTHONPATH. Every property the
+implementation claims has at least one test that fails without it:
+
+  w1  bare path.write_text (the pre-change code)     5 failed, 4 passed
+        leaves_the_previous_file_intact / lands_beside_the_target /
+        creates_missing_parents / is_fsynced_before_the_replace /
+        temp_left_by_a_killed_write_is_swept
+  w2  temp staged in the SYSTEM temp dir             1 failed, 8 passed
+        lands_beside_the_target
+  w3  fsync removed, everything else intact          1 failed, 8 passed
+        is_fsynced_before_the_replace
+  w4  chmod removed (the 0600 regression)            2 failed, 7 passed
+        destinations_permissions_survive_the_replace /
+        a_new_file_gets_normal_permissions_not_0600
+  w5  stale-temp sweep removed                       1 failed, 8 passed
+        temp_left_by_a_killed_write_is_swept
+
+The first version of this suite caught only w1 and w2. w3, w4, and w5 were
+invisible to it — see the verifier section.
+
+
+================================================================
+R9.3 / R9.4 — ISOLATED OUTPUT, DEFAULT UNCHANGED
+================================================================
+
+`generate_registry.py` now takes `--workbook`, `--root`, and `--output`.
+`--root` moves both sides at once: promoted artifacts resolve from it and the
+registry is written inside it, so a caller cannot read a candidate's contracts
+and publish them over the tracked app by omitting one flag.
+
+Default behavior with no arguments is unchanged:
+
+  $ .venv/bin/python scripts/generate_registry.py
+  exit 0, output /Users/seandm/Projects/27vette/form-app/data.js
+  models ['stingray', 'grandSport', 'z06']
+
+  R9.4 default-path registry == HEAD modulo timestamps: true
+  leftover temp files in form-app/: 0
+
+Compared by parsing both registries and stripping only `generated_at` /
+`generatedAt` / `sourceGeneratedAt`. The tracked file was restored afterwards
+(`git checkout --`) and its SHA-256 confirmed identical to before the run.
+
+
+================================================================
+R9.5 — THE GATE CHURN IS ACTUALLY GONE
+================================================================
+
+This is the practical payoff and the reason requirement 9 was sequenced first.
+
+  $ H1=$(shasum -a 256 form-app/data.js)
+  $ node --test tests/z06-registry-publication.test.mjs      -> pass 2, fail 0
+  $ H2=$(shasum -a 256 form-app/data.js)
+  form-app/data.js unchanged by the gate: YES
+
+And across the whole gate set, which is the claim that matters:
+
+  $ H1=$(shasum -a 256 form-app/data.js)
+  $ for t in tests/*.test.mjs; do node --test "$t"; done
+  $ H2=$(shasum -a 256 form-app/data.js)
+  form-app/data.js unchanged by the ENTIRE node gate set: YES
+
+Before this change, running the gates rewrote `form-app/data.js` every time.
+
+Remaining churn after a full gate run is now only:
+  M form-output/runtime/grand-sport-runtime-contract.json
+  M form-output/runtime/z06-runtime-contract.json
+both `generated_at` only. Five node files invoke `generate_form.py` without
+`--output-root` and cause this between them — `grand-sport-contract-preview`,
+`grand-sport-draft-data`, `z06-contract-preview`, `z06-form-data-draft`, and
+`z06-interior-accessory-cleanup`. (An earlier version of this receipt attributed
+both files to the two grand-sport tests; the z06 contract is written by the z06
+tests. Isolated per-file runs confirm the split.) That is Pass 4A's scope, not
+requirement 9's, and it is explicitly still open.
+
+
+================================================================
+R9.6 — STILL THE ONLY REAL WRITER
+================================================================
+
+Scan of `scripts/` for anything that writes `form-app/data.js`:
+
+  scripts/generate_registry.py            the writer
+  scripts/verify_workbook_candidate.py    writes only <temp candidate root>/form-app/data.js
+                                          (line 387/406) — never the tracked path
+  schema_validation.py                    reads it (staleness check)
+  everything else                          documentation strings only
+
+No second writer exists.
+
+
+================================================================
+R9.7 — NOTHING ELSE REGRESSED
+================================================================
+
+The candidate lane's stage 8 builds its registry through the same
+`write_app_data_registry`, now atomic:
+
+  $ .venv/bin/python scripts/verify_workbook_candidate.py --skip-harness
+  lane exit 0, ok True, boundaryViolations []
+  candidate_registry ok True, models ['grandSport','stingray','z06']
+  data_js /var/folders/.../candidate-verify-kh5yn97m/candidate/form-app/data.js
+
+Inside the temp root, as required.
+
+One defect found and fixed during this run: the new node parity test first failed
+with "Values have same structure but are not reference-equal". `vm.runInNewContext`
+evaluates each registry in its own realm, so the objects carry different
+prototypes and `assert.deepEqual` (strict, via `node:assert/strict`) rejects them
+even when contents match. Switched to comparing serialized JSON.
+
+
+================================================================
+GATE PARITY
+================================================================
+
+Node gates (per file, pass/fail):
+  grand-sport-contract-preview            5 / 1   pre-existing (Pass 4A)
+  grand-sport-draft-data                 18 / 1   pre-existing (Pass 4A)
+  multi-model-runtime-switching          48 / 0
+  nonruntime-option-source-purge          6 / 0
+  seat-canonicalization-diff              2 / 0
+  stingray-form-regression               91 / 0
+  stingray-generator-stability           15 / 0
+  unpublished-runtime-contracts           2 / 0
+  workbook-schema-standardization         8 / 1   pre-existing (active explicit excludes)
+  workbook-visual-copy-standardization    8 / 0
+  z06-contract-preview                    3 / 0
+  z06-form-data-draft                    24 / 0
+  z06-interior-accessory-cleanup          7 / 0
+  z06-performance-package-interactions   21 / 0
+  z06-registry-publication                2 / 0   <- 1/0 before; gained the parity test
+  z06-runtime-promotion                   4 / 0
+  z06-runtime-rule-corrections           15 / 0
+
+Identical to the previous run's tallies apart from `z06-registry-publication`
+gaining one test. The three failures are unchanged and pre-existing; this run
+touched no generator source that any of them reads.
+
+Python full suite, final:
+  555 passed, 2 skipped, 103 subtests passed in 1119.47s   (0 failed)
+
+  Previous run was 546 passed / 0 failed; this run adds 9 atomicity tests.
+  The mid-run measurement was 551 passed / 1 failed, where the failure was
+  `tests/test_fable5_loop_contract.py` complaining about this run's own
+  then-incomplete receipt (no `run.json`, no verifier report, no STATE.md
+  pointer). It cleared at closeout, and the three tests added while fixing the
+  verifier's findings account for 551 -> 555.
+
+Node gates, final: `form-app/data.js` unchanged by the full set, and its mode is
+still `-rw-r--r--` after publishing.
+
+
+================================================================
+BOUNDARIES
+================================================================
+
+  stingray_master.xlsx   unchanged
+  form-app/data.js       unchanged — the one deliberate default-path run for R9.4
+                         was reverted and its SHA re-confirmed
+  form-output/           unchanged (gate churn reverted)
+  No model promoted. Nothing published.
+
+Still open in Pass 3: requirement 7 (restrict promotion artifact metadata; remove
+the `current_generation` and `draft_artifact` consumers) and requirement 8
+(remove `build_registry_from_promotions()` and the artifact-resolution
+fallbacks). Pass 3 is NOT complete.
+
+
+================================================================
+INDEPENDENT VERIFIER (separate context) — cycle 1 verdict: FAIL
+================================================================
+
+It reproduced the headline claim exactly — hashing `form-app/data.js` around the
+full node gate set gives an identical digest, and the same gate at HEAD in a
+detached worktree *does* rewrite it, so the payoff is measured rather than
+asserted. It also confirmed the isolation flags fail closed (an empty `--root`
+raises `FileNotFoundError` instead of falling back to the repo), that
+`write_json_output` is behaviorally unchanged, and that the three node failures
+reproduce identically at HEAD. It failed the run on the following.
+
+V1 (medium, REAL REGRESSION I INTRODUCED) — the atomic write silently changed
+   `form-app/data.js` from mode 0644 to 0600. `NamedTemporaryFile` creates at
+   0600 and `os.replace` swaps the inode, so the destination inherits it; the
+   old `path.write_text()` preserved the existing mode. For a browser-served
+   asset that means it stops being readable by anything but the publishing user,
+   and git does not track the bit — so it would only ever manifest on the machine
+   that publishes.
+   FIXED: `_destination_mode()` preserves an existing file's mode and uses
+   `0o666 & ~umask` for a new one; the temp file is chmod'ed before the replace.
+     $ stat -f '%Sp' form-app/data.js   ->  -rw-r--r--
+     $ .venv/bin/python scripts/generate_registry.py
+     $ stat -f '%Sp' form-app/data.js   ->  -rw-r--r--   (was -rw-------)
+
+V2 (medium) — no directory fsync after `os.replace`, so the rename itself is not
+   durable. The verifier correctly noted this cannot produce a *truncated* file
+   (the data blocks are fsynced before the rename, so the worst case is the
+   previous complete file surviving) — but R9.1 claimed more than was implemented.
+   FIXED: the parent directory is opened and fsynced after the replace.
+
+V3 (medium) — removing the fsync entirely was invisible to the whole suite. The
+   suite discriminated on staging location and non-truncation, not on the one
+   property fsync exists for.
+   FIXED: `test_the_payload_is_fsynced_before_the_replace` records the fsync and
+   replace call order and asserts payload-fsync -> replace -> directory-fsync.
+
+V4 (low/medium) — SIGKILL between the temp write and the replace leaves a
+   full-size hidden `.data.js.*.tmp` in the served directory, and nothing reaped
+   it. The `finally` covers exceptions; SIGKILL cannot be caught.
+   FIXED: `_sweep_stale_temporaries()` reaps this destination's own debris at the
+   start of each write, and a test proves it does not touch another file's.
+
+V5 (low) — the receipt misattributed the remaining gate churn. Corrected above.
+
+V6 (low) — the X2 numbers were specific to one weakening. Replaced with the
+   five-build matrix above.
+
+V7 (low, TECHNICAL ERROR) — "a temp file elsewhere would make os.replace a
+   cross-device copy, which is not atomic" is wrong in three places. `os.replace`
+   never copies; cross-device raises `OSError(EXDEV)`. The test is still worth
+   having — the consequence is a hard failure on any host where the repo and
+   /tmp are separate volumes — but the stated rationale was false.
+   FIXED in the docstring, the test docstring, and this receipt.
+
+V8 (low) — two tests were near-vacuous. `test_the_written_bytes_match_the_rendered_registry`
+   compared the writer's output against the same renderer the writer uses, so it
+   could only catch mangling in transit; `test_repeated_writes_are_stable` passed
+   under every weakening including plain `write_text`, which is idempotent by
+   construction.
+   FIXED: replaced with `test_the_file_on_disk_is_loadable_javascript_with_the_expected_globals`,
+   which asserts against literal structure and parses the payload back to the
+   input dict.
+
+V9 (medium) — this receipt said "Python full suite: recorded below" and recorded
+   nothing, and the run directory had no `run.json` or verifier report, which is
+   what made the loop-contract test fail. Both fixed at closeout; the number is
+   now recorded above.
+
+V10 (info) — the new node parity test compares the isolated rebuild against the
+   *tracked* `data.js`, so it now also functions as a staleness gate: regenerate
+   an artifact without republishing and it goes red. That overlaps
+   `schema_validation`'s `app_registry_stale` check. Kept deliberately, and named
+   here so the failure mode is not a surprise.
+
+Post-fix:
+  $ PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_atomic_registry_write.py -q
+  9 passed
+  weakened-build matrix: all five caught (see X2 above)
+
+Not verified by the verifier: the full Python suite (bounded run; it confirmed
+554 collected and that the 551/1 arithmetic is consistent), real power-loss
+durability as opposed to SIGKILL, and a genuine cross-device `os.replace`.
