@@ -1,0 +1,354 @@
+Run: 2026-07-27-pass3-promotion-type-closure
+Scope: spec Pass 3 requirements 7 and 8
+Workbook SHA-256 start and end: d11674e3213a8858b13f5e4283b82868046ed34335c96419a8fe909034760bfd
+       (unchanged — no workbook write, nothing published)
+
+
+================================================================
+C1 / C2 — THE CONSUMER CLOSURE, RECORDED BEFORE THE DELETION
+================================================================
+
+Requirement 7 gates the deletion on a recorded closure and says to STOP if any
+external/operator consumer remains. The answer is that none does. Full inventory:
+
+ACTIVE CODE — the acceptance and production consumers being removed
+  registry_promotion.py:97    blank artifact_type defaulted to "draft_artifact"
+  registry_promotion.py:122   `!= "current_generation"` exempted a row from
+                              needing an artifact_path
+  registry_promotion.py:162   current_generation_artifact_path() — built
+                              `form-output/{export_slug}-form-data.json` by
+                              f-string, so no filename search could find it
+  registry_promotion.py:173   artifact_path_for_promotion() branched on it
+  registry_promotion.py:181   promotion_requires_runtime_contract_assertion() —
+                              returned False for current_generation, i.e. skipped
+                              the strict assertion. ZERO callers.
+  registry_promotion.py:191   load_promotion_data() — the current_generation arm
+  registry_promotion.py:244   build_registry_from_promotions() (requirement 8)
+  schema_validation.py:800    same blank default
+  schema_validation.py:866    same artifact_path exemption
+  workbook_domain/registry.py:31  the shared vocabulary listing all three types
+
+FIXTURES — updated, not deleted
+  test_registry_promotion_metadata.py   the promoted_stingray_row default was
+                                        `current_generation` with a blank path
+  test_schema_validation_metadata.py    4 promotion fixtures + 2 freshness writes
+  test_workbook_domain_registry.py      the vocabulary assertion
+
+ACTIVE DOCS — none instructing use of either type. `README.md`, `AGENTS.md`, and
+  `docs/` (excluding `docs/archive/`) contain no operator instruction naming them.
+  The one non-archive hit outside this spec is
+  `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md:407`,
+  which lists both types among shapes that must be "a blocking preflight error,
+  never a silently excluded row" — it agrees with the narrowing, so requirement
+  7's stop condition is not triggered. Named here rather than excluded by
+  category.
+
+EXTERNAL / OPERATOR — none.
+  - No form-app code references artifact_type at all.
+  - `workbook_editor_server.py` does not either; the editor's dropdown for that
+    column is driven by `REGISTRY_PROMOTION_ARTIFACT_TYPES`, so narrowing the
+    tuple narrows the UI in the same edit.
+  - The canonical workbook: all six `model_registry_promotion` rows already
+    declare `artifact_type=runtime_contract` with an explicit `artifact_path`.
+    Counted from the sheet: {'runtime_contract': 6}.
+
+HISTORICAL, left alone deliberately
+  `.hermes/plans/generator-simplification-pass2-runtime-payload-trim.md:54-56`
+  describes a former state ("stingray is promoted as artifact_type=current_generation").
+  It is a historical plan, not an active instruction; rewriting it would falsify
+  a record. Pass 4 Stage C owns archiving historical inputs.
+
+Conclusion: closure is complete and requirement 7 proceeds. No separate decision
+is required.
+
+
+================================================================
+C3 / C4 / C5 / C6 — WHAT WAS REMOVED
+================================================================
+
+C3  `REGISTRY_PROMOTION_ARTIFACT_TYPES` is now `("runtime_contract",)`, with a
+    new `DEFAULT_REGISTRY_PROMOTION_ARTIFACT_TYPE`. It is one tuple in
+    `workbook_domain/registry.py`, and schema validation, promotion parsing, and
+    the editor enum all derive from it — so the vocabulary cannot be narrowed in
+    one module and left wide in another.
+
+C4  A blank `artifact_type` cell now means `runtime_contract`. It used to mean
+    `draft_artifact` — a review artifact promoted to production by omission.
+
+    Scoped precisely: this is a real behavior change in the acceptance path
+    (`registry_promotion.py`), and reverting that default there fails two tests.
+    At the schema layer the default is cosmetic — a blank cell is already an
+    unconditional `registry_promotion_blank_artifact_type` error before the
+    default is consumed, and the defaulted value survives only inside another
+    issue's payload. Reverting `schema_validation.py`'s default alone is
+    therefore undetectable, and saying otherwise would overstate it.
+
+C5  `artifact_path` is unconditionally required, in both `registry_promotion.py`
+    and `schema_validation.py`.
+
+    Falsifiability differs between the two files, and an earlier version of this
+    receipt got it wrong by claiming neither was testable.
+
+    `registry_promotion.py` — genuinely not falsifiable. The vocabulary check at
+    line 121 RAISES before the path check at line 123, so with the narrowed
+    vocabulary `artifact_type != "current_generation"` is unconditionally true
+    there. Restoring the exemption leaves all promotion tests green. The
+    exemption became dead the moment C3 landed; removing it is cleanup, and the
+    vocabulary test is the real guard.
+
+    `schema_validation.py` — IS falsifiable, and now tested. That layer
+    accumulates issues instead of raising, so `artifact_type` can still be
+    `current_generation` when the path check runs, and the exemption was live.
+    Restoring it silently drops `registry_promotion_missing_artifact_path` for a
+    blank-path row while every other test stays green. Proven:
+
+      working tree:  {registry_promotion_missing_artifact_path,
+                      registry_promotion_unknown_artifact_type}
+      exemption restored:  {registry_promotion_unknown_artifact_type}   <- one lost
+
+    Covered by `test_a_retired_type_with_a_blank_path_reports_both_defects`,
+    which fails against the restored exemption (1 failed, 45 passed).
+
+C6  Deleted outright:
+      current_generation_artifact_path()
+      promotion_requires_runtime_contract_assertion()   (was already zero-caller)
+      load_promotion_data()
+      build_registry_from_promotions()                  (requirement 8)
+    `registry_promotion.py` went 312 -> 251 lines.
+    `artifact_path_for_promotion()` survives because it has two real callers
+    (`generate_registry.py` and `load_promotion_artifact_data`), and no longer
+    branches — it is now the single place a promoted row becomes a file.
+
+
+================================================================
+C7 — WHERE EACH REMOVED GUARANTEE WENT
+================================================================
+
+Every test in `tests/test_registry_promotion_metadata.py` that touched a removed
+function was retargeted, not dropped. The mapping:
+
+  header-only sheet returns no promotions, and the registry builder returns None
+    -> `test_header_only_promotion_sheet_refuses_to_build_a_registry`.
+       The `load_registry_promotions(wb) == []` half is unchanged. The None half
+       is gone with the function; the surviving builder RAISES on an empty
+       promotion set rather than answering None, which is stronger, and the test
+       now asserts that.
+
+  ordered registry, legacy aliases, labels, exportSlug, image assets, vehicle
+  setup copy, and artifact data content
+    -> same test, retargeted to `build_registry_from_artifacts`, with the
+       Stingray row now file-backed like every other row.
+
+  file-backed loading of both artifact types
+    -> `test_every_promoted_row_is_loaded_from_its_named_runtime_contract`.
+       There is only one type now, so the test's subject changed from "both types
+       load" to "every row loads from the file it names".
+
+  a promoted artifact carrying draft fields fails fast
+    -> same test, retargeted to `build_registry_from_artifacts`. Still asserts
+       "not publishable".
+
+  non-current rows require artifact_path
+    -> `test_every_promoted_row_requires_an_artifact_path`, now exercised on the
+       default row rather than on a deliberately non-current one.
+
+Unchanged and still covered: exactly-one-default-model, duplicate registry keys,
+registry_key must match model_master, complete vehicle setup copy, and
+`live_contract_data` trimming.
+
+New coverage this run:
+  test_a_retired_artifact_type_is_rejected_by_name          (both types, subtests)
+  test_runtime_contract_is_the_only_promotable_artifact_type
+  test_a_blank_artifact_type_defaults_to_runtime_contract
+  test_the_retired_promotion_artifact_types_are_rejected_by_name  (schema level)
+
+
+================================================================
+C8 / X2 — THE NEGATIVE PROOFS, AND WHAT THEY ACTUALLY CATCH
+================================================================
+
+A workbook naming a retired type is rejected at both layers, and both messages
+now name the allowed set (C8 requires it; the first version of these messages did
+not, and only the blank-value path named it):
+
+  load_registry_promotions -> ValueError
+    "Unsupported model_registry_promotion artifact_type 'current_generation' for
+     'stingray'; expected one of ['runtime_contract']"
+  validate_workbook_schema -> SchemaIssue
+    check_id=registry_promotion_unknown_artifact_type, value='current_generation'
+    "Unsupported runtime promotion artifact_type 'current_generation'; expected
+     one of ['runtime_contract']."
+
+X2 by shadow build — widening the vocabulary back to three values:
+
+  $ PYTHONPATH=<widened>:scripts pytest <the three test files> -q
+  6 failed, 65 passed
+  FAILED test_runtime_contract_is_the_only_promotable_artifact_type
+  FAILED test_registry_owns_promotion_artifact_type_domain
+  (plus the four retired-type subtests)
+
+The generic "not_a_real_type" test that already existed would NOT have caught
+this, because a re-added value is no longer unknown. That is why the retired
+types are now named explicitly in two places.
+
+
+================================================================
+C9 — PUBLICATION IS UNCHANGED
+================================================================
+
+  $ .venv/bin/python scripts/generate_registry.py --output <temp>
+  C9 registry identical to published, modulo timestamps: true
+
+  $ .venv/bin/python scripts/verify_workbook_candidate.py --skip-harness
+  lane exit 0, ok True, boundaryViolations []
+  candidate_registry ok True, models ['grandSport','stingray','z06']
+
+  $ .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+  error_count 0, warning_count 0, issues []
+
+
+================================================================
+GATE PARITY
+================================================================
+
+Python full suite, final:
+  560 passed, 2 skipped, 107 subtests passed in 1129.70s   (0 failed)
+
+  Mid-run measurement was 1 failed / 558 passed, where the failure was
+  `tests/test_fable5_loop_contract.py` complaining about this run's own
+  then-incomplete receipt. It cleared at closeout; the two tests added while
+  fixing the verifier's findings account for 558 -> 560.
+
+Mid-run detail (kept for the arithmetic):
+  1 failed, 558 passed, 2 skipped, 107 subtests passed in 1156.04s
+
+  Previous run was 555 passed / 0 failed. The +3 is this run's new coverage
+  (retired-type rejection at both layers, the vocabulary assertion, and the
+  blank-default assertion), and the subtest count moved 103 -> 107 for the
+  parametrized retired-type cases. The single failure is
+  `tests/test_fable5_loop_contract.py`, complaining that this run's own receipt
+  directory has no `run.json` or verifier report yet. It clears at closeout.
+
+Node gates (per file, pass/fail):
+  grand-sport-contract-preview            5 / 1   pre-existing (Pass 4A)
+  grand-sport-draft-data                 18 / 1   pre-existing (Pass 4A)
+  multi-model-runtime-switching          48 / 0
+  nonruntime-option-source-purge          6 / 0
+  seat-canonicalization-diff              2 / 0
+  stingray-form-regression               91 / 0
+  stingray-generator-stability           15 / 0
+  unpublished-runtime-contracts           2 / 0
+  workbook-schema-standardization         8 / 1   pre-existing (active explicit excludes)
+  workbook-visual-copy-standardization    8 / 0
+  z06-contract-preview                    3 / 0
+  z06-form-data-draft                    24 / 0
+  z06-interior-accessory-cleanup          7 / 0
+  z06-performance-package-interactions   21 / 0
+  z06-registry-publication                2 / 0
+  z06-runtime-promotion                   4 / 0
+  z06-runtime-rule-corrections           15 / 0
+
+  Identical to the previous run. `form-app/data.js` unchanged by the full set
+  (requirement 9's guarantee still holding). The three failures are unchanged and
+  pre-existing; this run touched no code any of them reads.
+
+
+================================================================
+BOUNDARIES
+================================================================
+
+  stingray_master.xlsx   unchanged
+  form-app/data.js       unchanged
+  form-output/           unchanged
+  No model promoted. Nothing published.
+
+
+================================================================
+X5 — WHAT THIS COMPLETES, AND WHAT IT UNBLOCKS
+================================================================
+
+**Pass 3 is complete.** Requirements 1-6 and 10-12 landed in the candidate-lane
+stage, requirement 9 in the atomic-write stage, and 7 and 8 here. Nothing in
+Pass 3 is outstanding.
+
+This lifts a block recorded earlier in the spec. Pass 2 receipt D retained
+`form-output/stingray-form-data.json` partly because the `current_generation`
+fallback could resolve to it — "deletion is blocked until Pass 3 requirement 7
+removes `current_generation` as an accepted artifact type". That fallback is now
+gone, so the JSON has exactly one consumer left
+(`tests/stingray-generator-stability.test.mjs:25`) and no code path. Together with
+the CSV, which has had zero consumers since Pass 2, both are now unblocked Pass 4
+Stage B deletion candidates. Neither is deleted here — Stage B owns approved
+deletion.
+
+Pass 4 also still owns: retargeting and isolating the five node files that invoke
+`generate_form.py` without `--output-root` (the remaining tracked-artifact churn),
+and `assert_runtime_contract()`'s unimplemented variant and workbook-binding
+clauses from the rejection matrix.
+
+
+================================================================
+INDEPENDENT VERIFIER (separate context) — verdict: PASS with should-fix
+================================================================
+
+It redid the consumer closure independently at HEAD, symbol by symbol, and
+confirmed every one is removed or retargeted with nothing in the working tree
+still referencing a removed name. Stronger than this receipt claimed in two
+places: it proved the editor chain end-to-end
+(`EDITOR_SHEET_META -> workbook_editor_server.py:92 -> editor.js:133-137`, no
+hardcoded list anywhere, offered enum now `('runtime_contract',)`), and it
+AST-enumerated all 33 assertions in the HEAD version of
+`test_registry_promotion_metadata.py` against the working tree: the two retargeted
+tests are byte-identical in all 18 of their assertion expressions, and the only
+genuinely deleted assertion is the `assertIsNone` whose guarantee is now stronger.
+It also confirmed `draft_artifacts` / `draft_artifact_prefix` were not conflated
+with the promotion type (72 passed across the generation/inspection tests).
+
+Findings, all fixed:
+
+  V1 (moderate) — the C5 non-falsifiability admission was only half true. The
+     reasoning holds for `registry_promotion.py`, which raises before the path
+     check, but NOT for `schema_validation.py`, which accumulates and keeps going
+     — so the exemption was live and testable there, and untested.
+     FIXED: `test_a_retired_type_with_a_blank_path_reports_both_defects` added and
+     proven to fail against the restored exemption; C5 above rewritten to
+     distinguish the two files.
+
+  V1b (minor) — `test_every_promoted_row_requires_an_artifact_path`'s docstring
+     claimed it breaks if the escape hatch returns. It does not.
+     FIXED: docstring now states its real scope and points at the test that does.
+
+  V2 (minor) — C4 was stated without the caveat that the schema-layer default is
+     cosmetic. FIXED above.
+
+  V3 (minor) — `load_registry_promotions`'s docstring still described the
+     "legacy hardcoded registry fallback" that requirement 8 deleted. FIXED.
+
+  V4 (nit) — line count was 315; actual HEAD is 312. FIXED.
+
+  V5 (minor) — C8 requires a message naming the allowed set; neither rejection
+     message did. FIXED in both layers.
+
+  V6 (X5) — the receipt did not say whether Pass 3 is complete, and omitted that
+     this run lifts the compat-JSON deletion block. FIXED in the section above.
+
+  V7 (note) — the docs scan excluded "the specs themselves" as a category, which
+     skipped a second spec that mentions both types. Read and found consistent
+     with the narrowing. FIXED by naming it explicitly.
+
+Verifier disclosure: its own node gate run rewrote the two runtime contracts by
+`generated_at`; restored with `git checkout --`. It notes the receipt's
+"form-output/ unchanged" boundary holds for the change itself but that a full node
+gate run dirties those two files — which is the Pass 4A defect, and which this run
+also restored.
+
+Not verified by the verifier: the full Python suite (bounded run; it reproduced
+the single claimed failure in isolation with its exact cause and checked the
+arithmetic), the candidate lane's harness stage (--skip-harness), and the prior
+run's baselines.
+
+Post-fix:
+  $ PYTHONPATH=scripts .venv/bin/python -m pytest \
+      tests/test_schema_validation_metadata.py tests/test_registry_promotion_metadata.py \
+      tests/test_workbook_domain_registry.py -q
+  68 passed, 4 subtests passed

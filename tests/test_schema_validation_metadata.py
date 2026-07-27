@@ -306,7 +306,8 @@ class SchemaValidationMetadataTests(unittest.TestCase):
                     [{
                         "model_key": "stingray", "registry_key": "stingray",
                         "promoted_to_runtime": True, "default_model": True,
-                        "artifact_type": "current_generation", "active": True,
+                        "artifact_type": "runtime_contract",
+                            "artifact_path": "form-output/runtime/stingray-runtime-contract.json", "active": True,
                         "display_order": 1,
                     }],
                 ),
@@ -1041,7 +1042,8 @@ class SchemaValidationMetadataTests(unittest.TestCase):
                             "registry_key": "stingray",
                             "promoted_to_runtime": True,
                             "default_model": False,
-                            "artifact_type": "current_generation",
+                            "artifact_type": "runtime_contract",
+                            "artifact_path": "form-output/runtime/stingray-runtime-contract.json",
                             "active": True,
                             "display_order": 1,
                         },
@@ -1126,7 +1128,8 @@ class SchemaValidationMetadataTests(unittest.TestCase):
                             "registry_key": "stingray",
                             "promoted_to_runtime": True,
                             "default_model": True,
-                            "artifact_type": "current_generation",
+                            "artifact_type": "runtime_contract",
+                            "artifact_path": "form-output/runtime/stingray-runtime-contract.json",
                             "legacy_alias": "STINGRAY_FORM_DATA",
                             "active": True,
                             "display_order": 1,
@@ -1181,7 +1184,9 @@ class SchemaValidationMetadataTests(unittest.TestCase):
                 },
             }
             wb.save(workbook_path)
-            (output_dir / "stingray-form-data.json").write_text(json.dumps(fresh_data), encoding="utf-8")
+            runtime_dir = output_dir / "runtime"
+            runtime_dir.mkdir(parents=True, exist_ok=True)
+            (runtime_dir / "stingray-runtime-contract.json").write_text(json.dumps(fresh_data), encoding="utf-8")
             (app_dir / "data.js").write_text(
                 f"window.CORVETTE_FORM_DATA = {json.dumps(stale_registry)};\n"
                 "window.STINGRAY_FORM_DATA = window.CORVETTE_FORM_DATA.models.stingray.data;\n",
@@ -1215,7 +1220,8 @@ class SchemaValidationMetadataTests(unittest.TestCase):
                             "registry_key": "stingray",
                             "promoted_to_runtime": True,
                             "default_model": True,
-                            "artifact_type": "current_generation",
+                            "artifact_type": "runtime_contract",
+                            "artifact_path": "form-output/runtime/stingray-runtime-contract.json",
                             "legacy_alias": "STINGRAY_FORM_DATA",
                             "active": True,
                             "display_order": 1,
@@ -1251,7 +1257,9 @@ class SchemaValidationMetadataTests(unittest.TestCase):
                 },
             }
             wb.save(workbook_path)
-            (output_dir / "stingray-form-data.json").write_text(json.dumps(fresh_data), encoding="utf-8")
+            runtime_dir = output_dir / "runtime"
+            runtime_dir.mkdir(parents=True, exist_ok=True)
+            (runtime_dir / "stingray-runtime-contract.json").write_text(json.dumps(fresh_data), encoding="utf-8")
             (app_dir / "data.js").write_text(
                 f"window.CORVETTE_FORM_DATA = {json.dumps(timestamp_only_registry)};\n"
                 "window.STINGRAY_FORM_DATA = window.CORVETTE_FORM_DATA.models.stingray.data;\n",
@@ -1400,6 +1408,57 @@ class RegistryOwnedShapeAuthorityTests(unittest.TestCase):
             ),
             issues,
         )
+
+    def test_the_retired_promotion_artifact_types_are_rejected_by_name(self) -> None:
+        """Breaks if `current_generation` or `draft_artifact` is re-accepted.
+
+        The generic unknown-type test above would keep passing if either were put
+        back in the shared vocabulary, because they would no longer be unknown.
+        Both published something other than a strictly validated runtime contract
+        (spec Pass 3 requirement 7).
+        """
+
+        for retired in ("current_generation", "draft_artifact"):
+            with self.subTest(artifact_type=retired):
+                wb = registry_shaped_workbook()
+                headers = _header_cells(wb["model_registry_promotion"])
+                wb["model_registry_promotion"].cell(
+                    row=2, column=headers.index("artifact_type") + 1
+                ).value = retired
+
+                issues = validate_temp_workbook(wb)
+
+                self.assertTrue(
+                    any(
+                        issue.check_id == "registry_promotion_unknown_artifact_type"
+                        and issue.value == retired
+                        for issue in issues
+                    ),
+                    issues,
+                )
+
+    def test_a_retired_type_with_a_blank_path_reports_both_defects(self) -> None:
+        """The schema layer does not short-circuit, so both checks must fire.
+
+        `registry_promotion.py` raises on the unknown type before it ever looks at
+        `artifact_path`, which makes the exemption there unreachable. Schema
+        validation instead accumulates issues and keeps going, so the
+        `!= "current_generation"` exemption WAS live here — restoring it silently
+        drops `registry_promotion_missing_artifact_path` while every other test
+        stays green. This is the test that notices.
+        """
+
+        wb = registry_shaped_workbook()
+        sheet = wb["model_registry_promotion"]
+        headers = _header_cells(sheet)
+        sheet.cell(row=2, column=headers.index("artifact_type") + 1).value = "current_generation"
+        sheet.cell(row=2, column=headers.index("artifact_path") + 1).value = None
+        sheet.cell(row=2, column=headers.index("promoted_to_runtime") + 1).value = True
+
+        reported = {issue.check_id for issue in validate_temp_workbook(wb)}
+
+        self.assertIn("registry_promotion_unknown_artifact_type", reported)
+        self.assertIn("registry_promotion_missing_artifact_path", reported)
 
     def test_registry_shaped_workbook_reports_no_registry_column_issue(self) -> None:
         issues = validate_temp_workbook(registry_shaped_workbook())

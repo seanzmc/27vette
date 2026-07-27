@@ -1116,6 +1116,59 @@ inside its temporary root. Receipt: `fable5loop/runs/2026-07-27-pass3-atomic-reg
 `stingray_master.xlsx` and `form-app/data.js` byte-identical, and the registry's
 file mode preserved. Python 555 passed / 0 failed; all 17 node gates at baseline.
 
+#### Pass 3 receipt — stage 3: requirements 7 and 8 completed 2026-07-27; **Pass 3 complete**
+
+**The closure first, because requirement 7 gates the deletion on it.** Every consumer of
+`current_generation`, `draft_artifact`, and `build_registry_from_promotions()` was enumerated and
+classified. Active code: ten sites across `registry_promotion.py`, `schema_validation.py`, and the
+shared vocabulary. Fixtures: three test modules, updated rather than deleted. Active docs: none
+instructing use of either type; the one non-archive mention outside this spec is the database
+workflow spec's §407, which lists both among shapes that must be "a blocking preflight error, never a
+silently excluded row" — consistent with the narrowing. **External/operator: none.** No form-app code
+references `artifact_type`; the editor's dropdown derives from `REGISTRY_PROMOTION_ARTIFACT_TYPES`
+through `workbook_editor_server.py` to `editor.js` with no hardcoded list anywhere in the chain; and
+all six canonical promotion rows already declare `runtime_contract` with an explicit `artifact_path`.
+Requirement 7's stop condition was therefore never triggered.
+
+`REGISTRY_PROMOTION_ARTIFACT_TYPES` is now `("runtime_contract",)`. A blank `artifact_type` means
+`runtime_contract` instead of `draft_artifact` — a review artifact was previously promoted to
+production by omission. `artifact_path` is unconditionally required. Deleted:
+`current_generation_artifact_path()`, `promotion_requires_runtime_contract_assertion()` (already
+zero-caller), `load_promotion_data()`, and `build_registry_from_promotions()`.
+`registry_promotion.py` went 312 → 251 lines. `artifact_path_for_promotion()` survives with two real
+callers and no branch — it is now the single place a promoted row becomes a file.
+
+Every retargeted test was audited assertion by assertion rather than rewritten. The verifier
+AST-enumerated all 33 assertions in the prior version: the two retargeted tests are byte-identical in
+all 18 of their assertion expressions, and the only genuinely deleted assertion —
+`assertIsNone(build_registry_from_promotions(...))` — is replaced by a stronger one, since the
+surviving builder raises on an empty promotion set rather than answering `None`. New coverage names
+both retired types explicitly at both layers, because the pre-existing "unknown type" test would keep
+passing if either were put back in the vocabulary.
+
+**Independent verifier: PASS with should-fix**, six findings, all fixed. The important one corrected a
+false claim in the receipt itself: the removed `!= "current_generation"` artifact-path exemption was
+described as untestable, which held for `registry_promotion.py` — where the vocabulary check raises
+first — but not for `schema_validation.py`, which accumulates issues and continues. The exemption was
+live there, and restoring it silently dropped `registry_promotion_missing_artifact_path` while every
+test stayed green. Now covered by a test proven to fail against the restored exemption. Also fixed: a
+docstring claiming a breaker it does not catch, an overstated C4, a stale docstring describing the
+deleted registry fallback, and two rejection messages that did not name the allowed set. Receipt:
+`fable5loop/runs/2026-07-27-pass3-promotion-type-closure/`.
+
+**This lifts the block on `form-output/stingray-form-data.json`.** Pass 2 receipt D retained it partly
+because the `current_generation` fallback could resolve to it. That fallback is gone, so the JSON has
+one consumer left (`tests/stingray-generator-stability.test.mjs:25`) and no code path; with the
+zero-consumer CSV, both are now unblocked Pass 4 Stage B deletion candidates. Neither is deleted here.
+
+**Boundaries.** No workbook write, no model promoted, nothing published; `stingray_master.xlsx`,
+`form-output/`, and `form-app/data.js` byte-identical. Python 558 passed; all 17 node gates at
+baseline, with `form-app/data.js` still unchanged by the full set.
+
+**Pass 3 is complete.** Pass 4 inherits: retargeting the five node files that invoke
+`generate_form.py` without `--output-root` (the last tracked-artifact churn), the approved deletion
+list, and `assert_runtime_contract()`'s unimplemented variant and workbook-binding rejection clauses.
+
 Pass 3 gates:
 
 - Focused Python promotion/registry/schema tests.

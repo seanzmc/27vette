@@ -51,11 +51,10 @@ def test_registered_sheet_families_uses_live_workbook_rows():
 
 
 def test_registry_owns_promotion_artifact_type_domain():
-    assert REGISTRY_PROMOTION_ARTIFACT_TYPES == (
-        "current_generation",
-        "draft_artifact",
-        "runtime_contract",
-    )
+    # Pass 3 requirement 7 narrowed this to one value. `current_generation` and
+    # `draft_artifact` published something other than a strictly validated runtime
+    # contract; breaking this assertion means one of them came back.
+    assert REGISTRY_PROMOTION_ARTIFACT_TYPES == ("runtime_contract",)
     promotion = family_spec("model_registry_promotion")
     assert promotion["enums"]["artifact_type"] == REGISTRY_PROMOTION_ARTIFACT_TYPES
 

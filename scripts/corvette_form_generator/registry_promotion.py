@@ -12,6 +12,7 @@ from corvette_form_generator.runtime_contract import assert_runtime_contract, li
 from corvette_form_generator.runtime_metadata import truthy
 from corvette_form_generator.workbook import clean, intish, rows_from_sheet
 from corvette_form_generator.workbook_domain.registry import (
+    DEFAULT_REGISTRY_PROMOTION_ARTIFACT_TYPE,
     REGISTRY_PROMOTION_ARTIFACT_TYPES,
     WRITABLE_COLUMNS,
 )
@@ -77,9 +78,10 @@ def promotion_sheet_has_rows(wb: Any) -> bool:
 def load_registry_promotions(wb: Any) -> list[RegistryPromotion]:
     """Load active/promoted registry rows.
 
-    Missing or header-only sheets return an empty list so callers can preserve
-    the legacy hardcoded registry fallback. Once rows exist, this sheet is
-    authoritative for runtime promotion.
+    Missing or header-only sheets return an empty list; the registry builder then
+    refuses rather than guessing. (It used to fall back to a hardcoded registry —
+    that fallback went with `build_registry_from_promotions()` in Pass 3
+    requirement 8.) This sheet is authoritative for runtime promotion.
     """
 
     promotion_rows = _rows(wb, MODEL_REGISTRY_PROMOTION_SHEET)
@@ -94,7 +96,7 @@ def load_registry_promotions(wb: Any) -> list[RegistryPromotion]:
             continue
         model_key = clean(row.get("model_key")).lower()
         registry_key = clean(row.get("registry_key")) or registry_model_key(model_key)
-        artifact_type = clean(row.get("artifact_type")) or "draft_artifact"
+        artifact_type = clean(row.get("artifact_type")) or DEFAULT_REGISTRY_PROMOTION_ARTIFACT_TYPE
         artifact_path = clean(row.get("artifact_path"))
         if not model_key:
             raise ValueError("model_registry_promotion promoted rows require model_key")
@@ -118,8 +120,11 @@ def load_registry_promotions(wb: Any) -> list[RegistryPromotion]:
             raise ValueError(f"Duplicate promoted registry_key {registry_key!r} in model_registry_promotion")
         seen_registry_keys.add(registry_key)
         if artifact_type not in VALID_ARTIFACT_TYPES:
-            raise ValueError(f"Unsupported model_registry_promotion artifact_type {artifact_type!r} for {model_key!r}")
-        if artifact_type != "current_generation" and not artifact_path:
+            raise ValueError(
+                f"Unsupported model_registry_promotion artifact_type {artifact_type!r} for {model_key!r}; "
+                f"expected one of {sorted(VALID_ARTIFACT_TYPES)}"
+            )
+        if not artifact_path:
             raise ValueError(f"model_registry_promotion artifact_path is required for promoted {model_key!r}")
         promotions.append(
             RegistryPromotion(
@@ -159,53 +164,20 @@ def resolve_artifact_path(root: Path, artifact_path: str | Path) -> Path:
     return resolved
 
 
-def current_generation_artifact_path(root: Path, promotion: RegistryPromotion) -> Path:
-    if promotion.artifact_path:
-        return resolve_artifact_path(root, promotion.artifact_path)
-    return resolve_artifact_path(root, Path("form-output") / f"{export_slug(promotion.model_key)}-form-data.json")
-
-
 def runtime_contract_artifact_path(root: Path, model_key: str) -> Path:
     return root / "form-output" / "runtime" / f"{export_slug(model_key)}-runtime-contract.json"
 
 
 def artifact_path_for_promotion(root: Path, promotion: RegistryPromotion) -> Path:
-    if promotion.artifact_type == "current_generation":
-        return current_generation_artifact_path(root, promotion)
+    """The one place a promoted row turns into a file.
+
+    Pass 3 requirement 7 removed the `current_generation` branch, which resolved
+    to whatever sat at `form-output/<slug>-form-data.json` regardless of what the
+    row said — a second, weaker route into publication built from an f-string, so
+    no search for the filename could find it.
+    """
+
     return resolve_artifact_path(root, promotion.artifact_path)
-
-
-def promotion_requires_runtime_contract_assertion(promotion: RegistryPromotion) -> bool:
-    if promotion.artifact_type == "runtime_contract":
-        return True
-    return promotion.artifact_type != "current_generation"
-
-
-def load_promotion_data(
-    promotion: RegistryPromotion,
-    *,
-    current_model_key: str,
-    current_data: dict[str, Any],
-    root: Path,
-) -> dict[str, Any]:
-    if promotion.artifact_type == "current_generation":
-        if promotion.model_key != current_model_key:
-            raise ValueError(
-                f"current_generation promotion {promotion.model_key!r} does not match current generated model {current_model_key!r}"
-            )
-        assert_runtime_contract(
-            current_data,
-            source=f"current generated model {current_model_key}",
-            expected_model_label=promotion.model_label,
-        )
-        return current_data
-
-    artifact = resolve_artifact_path(root, promotion.artifact_path)
-    if not artifact.exists():
-        raise FileNotFoundError(f"Promoted model artifact does not exist for {promotion.model_key}: {artifact}")
-    data = json.loads(artifact.read_text(encoding="utf-8"))
-    assert_runtime_contract(data, source=str(artifact), expected_model_label=promotion.model_label)
-    return data
 
 
 def load_promotion_artifact_data(promotion: RegistryPromotion, *, root: Path) -> dict[str, Any]:
@@ -239,35 +211,6 @@ def model_registry_entry(
     if asset and asset.get("image_url"):
         entry.update(asset)
     return entry
-
-
-def build_registry_from_promotions(
-    wb: Any,
-    *,
-    current_model_key: str,
-    current_data: dict[str, Any],
-    model_assets: dict[str, dict[str, str]],
-    root: Path,
-) -> dict[str, Any] | None:
-    promotions = load_registry_promotions(wb)
-    if not promotions:
-        return None
-
-    models: dict[str, dict[str, Any]] = {}
-    legacy_aliases: dict[str, str] = {}
-    default_model_key = ""
-    for promotion in promotions:
-        data = load_promotion_data(promotion, current_model_key=current_model_key, current_data=current_data, root=root)
-        models[promotion.registry_key] = model_registry_entry(promotion, data, model_assets.get(promotion.registry_key))
-        if promotion.default_model:
-            default_model_key = promotion.registry_key
-        if promotion.legacy_alias:
-            legacy_aliases[promotion.legacy_alias] = promotion.registry_key
-    return {
-        "defaultModelKey": default_model_key,
-        "models": models,
-        "legacyAliases": legacy_aliases,
-    }
 
 
 def build_registry_from_artifacts(

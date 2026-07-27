@@ -20,6 +20,7 @@ from corvette_form_generator.registry_promotion import (
 from corvette_form_generator.workbook import workbook_truthy
 from corvette_form_generator.workbook_domain.registry import (
     GLOBAL_SHEET_FAMILIES,
+    DEFAULT_REGISTRY_PROMOTION_ARTIFACT_TYPE,
     REGISTRY_PROMOTION_ARTIFACT_TYPES,
     SOURCE_ROLE_FAMILIES,
     WRITABLE_COLUMNS,
@@ -785,7 +786,10 @@ def validate_registry_promotion_metadata(wb, issues: list[SchemaIssue]) -> None:
                 row=row_number,
                 column="artifact_type",
                 value=row_artifact_type,
-                message=f"Unsupported runtime promotion artifact_type {row_artifact_type!r}.",
+                message=(
+                    f"Unsupported runtime promotion artifact_type {row_artifact_type!r}; "
+                    f"expected one of {sorted(VALID_REGISTRY_PROMOTION_ARTIFACT_TYPES)}."
+                ),
             )
 
     promoted_rows: list[tuple[int, dict[str, Any]]] = []
@@ -797,7 +801,7 @@ def validate_registry_promotion_metadata(wb, issues: list[SchemaIssue]) -> None:
         model_key = clean_text(row.get("model_key")).lower()
         registry_key = clean_text(row.get("registry_key"))
         artifact_path = clean_text(row.get("artifact_path"))
-        artifact_type = clean_text(row.get("artifact_type")) or "draft_artifact"
+        artifact_type = clean_text(row.get("artifact_type")) or DEFAULT_REGISTRY_PROMOTION_ARTIFACT_TYPE
         if registry_key in seen_registry_keys:
             add_issue(
                 issues,
@@ -863,7 +867,7 @@ def validate_registry_promotion_metadata(wb, issues: list[SchemaIssue]) -> None:
         # Blank and out-of-domain artifact types are reported once, above, for
         # every active row. Promoted rows are a subset of those, so repeating the
         # membership check here would double-report the same cell.
-        if artifact_type != "current_generation" and not artifact_path:
+        if not artifact_path:
             add_issue(
                 issues,
                 "error",
@@ -872,7 +876,7 @@ def validate_registry_promotion_metadata(wb, issues: list[SchemaIssue]) -> None:
                 row=row_number,
                 column="artifact_path",
                 value={"model_key": model_key, "artifact_type": artifact_type},
-                message="Promoted non-current-generation runtime models must provide artifact_path.",
+                message="Promoted runtime models must name the runtime contract they publish.",
             )
 
     default_count = sum(1 for _, row in promoted_rows if truthy(row.get("default_model"), default=False))

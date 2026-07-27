@@ -28,11 +28,14 @@ SOURCE_ROLE_FAMILIES: dict[str, str] = {
 
 # Promotable artifact-type domain. Owned here so schema validation, promotion
 # parsing, and the editor cannot drift into three different vocabularies.
-REGISTRY_PROMOTION_ARTIFACT_TYPES: tuple[str, ...] = (
-    "current_generation",
-    "draft_artifact",
-    "runtime_contract",
-)
+#
+# Pass 3 requirement 7 narrowed this to one value. `current_generation` published
+# whatever happened to sit at a generator's output path, and `draft_artifact`
+# published a review artifact; both bypassed the guarantee that what reaches the
+# browser is a strictly validated runtime contract. A promoted row now names its
+# contract explicitly or it does not publish.
+REGISTRY_PROMOTION_ARTIFACT_TYPES: tuple[str, ...] = ("runtime_contract",)
+DEFAULT_REGISTRY_PROMOTION_ARTIFACT_TYPE = "runtime_contract"
 
 # Per-family editing metadata. Columns absent from types/enums/refs are
 # free text. Headers always come from the sheet itself, never from here.
