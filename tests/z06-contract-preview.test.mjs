@@ -3,31 +3,46 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
 
+import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
+
 const reviewDir = "/tmp/27vette-z06-contract-preview-test";
+const outputRoot = `${reviewDir}/output-root`;
 const previewPath = `${reviewDir}/z06-contract-preview.json`;
 const previewMarkdownPath = `${reviewDir}/z06-contract-preview.md`;
-const appDataPath = "form-app/data.js";
 const expectedVariantIds = ["1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67", "3lz_h67"];
 
-function generatePreviewWithoutAppMutation() {
+function generatePreviewWithoutTrackedMutation() {
   fs.rmSync(reviewDir, { recursive: true, force: true });
-  const beforeAppData = fs.readFileSync(appDataPath, "utf8");
+  fs.mkdirSync(outputRoot, { recursive: true });
+  const before = readTrackedArtifacts();
   execFileSync(
     ".venv/bin/python",
-    ["scripts/generate_form.py", "--model", "z06", "--emit-inspection", "--inspection-output", reviewDir],
+    [
+      "scripts/generate_form.py",
+      "--model",
+      "z06",
+      "--output-root",
+      outputRoot,
+      "--emit-inspection",
+      "--inspection-output",
+      reviewDir,
+    ],
     {
       encoding: "utf8",
       stdio: "pipe",
     }
   );
-  const afterAppData = fs.readFileSync(appDataPath, "utf8");
-  assert.equal(afterAppData, beforeAppData, "Z06 preview generation must not mutate form-app/data.js");
+  assertTrackedArtifactsUnchanged(before);
+  assert.ok(
+    fs.existsSync(`${outputRoot}/form-output/runtime/z06-runtime-contract.json`),
+    "--output-root must receive the runtime contract this gate would otherwise write over the tracked one"
+  );
   assert.ok(fs.existsSync(previewPath), "Z06 contract preview JSON should exist");
   assert.ok(fs.existsSync(previewMarkdownPath), "Z06 contract preview Markdown should exist");
   return JSON.parse(fs.readFileSync(previewPath, "utf8"));
 }
 
-const preview = generatePreviewWithoutAppMutation();
+const preview = generatePreviewWithoutTrackedMutation();
 
 test("Z06 contract preview has the expected read-only contract shape", () => {
   assert.equal(preview.dataset.status, "read_only_preview");

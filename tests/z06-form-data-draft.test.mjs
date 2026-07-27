@@ -3,10 +3,12 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
 
+import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
+
 const reviewDir = "/tmp/27vette-z06-form-data-draft-test";
+const outputRoot = `${reviewDir}/output-root`;
 const draftPath = `${reviewDir}/z06-form-data-draft.json`;
 const draftMarkdownPath = `${reviewDir}/z06-form-data-draft.md`;
-const appDataPath = "form-app/data.js";
 const expectedVariantIds = ["1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67", "3lz_h67"];
 const standardSections = new Set([
   "sec_stan_001",
@@ -47,25 +49,38 @@ const fullLengthStripeOptionIds = [
   "opt_dth_001", "opt_dub_001", "opt_due_001", "opt_duk_001", "opt_duw_001", "opt_dzu_001", "opt_dzv_001", "opt_dzx_001",
 ];
 
-function generateDraftWithoutAppMutation() {
+function generateDraftWithoutTrackedMutation() {
   fs.rmSync(reviewDir, { recursive: true, force: true });
-  const beforeAppData = fs.readFileSync(appDataPath, "utf8");
+  fs.mkdirSync(outputRoot, { recursive: true });
+  const before = readTrackedArtifacts();
   execFileSync(
     ".venv/bin/python",
-    ["scripts/generate_form.py", "--model", "z06", "--emit-inspection", "--inspection-output", reviewDir],
+    [
+      "scripts/generate_form.py",
+      "--model",
+      "z06",
+      "--output-root",
+      outputRoot,
+      "--emit-inspection",
+      "--inspection-output",
+      reviewDir,
+    ],
     {
       encoding: "utf8",
       stdio: "pipe",
     }
   );
-  const afterAppData = fs.readFileSync(appDataPath, "utf8");
-  assert.equal(afterAppData, beforeAppData, "Z06 draft generation must not mutate form-app/data.js");
+  assertTrackedArtifactsUnchanged(before);
+  assert.ok(
+    fs.existsSync(`${outputRoot}/form-output/runtime/z06-runtime-contract.json`),
+    "--output-root must receive the runtime contract this gate would otherwise write over the tracked one"
+  );
   assert.ok(fs.existsSync(draftPath), "Z06 draft JSON should exist");
   assert.ok(fs.existsSync(draftMarkdownPath), "Z06 draft Markdown should exist");
   return JSON.parse(fs.readFileSync(draftPath, "utf8"));
 }
 
-const draft = generateDraftWithoutAppMutation();
+const draft = generateDraftWithoutTrackedMutation();
 
 test("Z06 draft preserves the live generated-data top-level contract", () => {
   for (const key of [

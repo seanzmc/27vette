@@ -3,30 +3,45 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
 
+import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
+
 const reviewDir = "/tmp/27vette-grand-sport-contract-preview-test";
+const outputRoot = `${reviewDir}/output-root`;
 const previewPath = `${reviewDir}/grand-sport-contract-preview.json`;
 const previewMarkdownPath = `${reviewDir}/grand-sport-contract-preview.md`;
-const appDataPath = "form-app/data.js";
 
-function generatePreviewWithoutAppMutation() {
+function generatePreviewWithoutTrackedMutation() {
   fs.rmSync(reviewDir, { recursive: true, force: true });
-  const beforeAppData = fs.readFileSync(appDataPath, "utf8");
+  fs.mkdirSync(outputRoot, { recursive: true });
+  const before = readTrackedArtifacts();
   execFileSync(
     ".venv/bin/python",
-    ["scripts/generate_form.py", "--model", "grand_sport", "--emit-inspection", "--inspection-output", reviewDir],
+    [
+      "scripts/generate_form.py",
+      "--model",
+      "grand_sport",
+      "--output-root",
+      outputRoot,
+      "--emit-inspection",
+      "--inspection-output",
+      reviewDir,
+    ],
     {
       encoding: "utf8",
       stdio: "pipe",
     }
   );
-  const afterAppData = fs.readFileSync(appDataPath, "utf8");
-  assert.equal(afterAppData, beforeAppData, "Grand Sport preview generation must not mutate form-app/data.js");
+  assertTrackedArtifactsUnchanged(before);
+  assert.ok(
+    fs.existsSync(`${outputRoot}/form-output/runtime/grand-sport-runtime-contract.json`),
+    "--output-root must receive the runtime contract this gate would otherwise write over the tracked one"
+  );
   assert.ok(fs.existsSync(previewPath), "contract preview JSON should exist");
   assert.ok(fs.existsSync(previewMarkdownPath), "contract preview Markdown should exist");
   return JSON.parse(fs.readFileSync(previewPath, "utf8"));
 }
 
-const preview = generatePreviewWithoutAppMutation();
+const preview = generatePreviewWithoutTrackedMutation();
 
 test("Grand Sport contract preview has the expected read-only contract shape", () => {
   assert.equal(preview.dataset.status, "read_only_preview");
@@ -64,8 +79,9 @@ test("Grand Sport section placement is owned by section_master step_key", () => 
   assert.equal(sectionById.get("sec_gsce_001")?.step_key, "aero_exhaust_stripes_accessories");
   assert.equal(sectionById.get("sec_exha_001")?.step_key, "packages_performance");
   assert.equal(sectionById.get("sec_whee_001")?.step_key, "wheels");
-  assert.equal(sectionById.get("sec_perf_support_001")?.step_key, "wheels");
-  assert.equal(sectionById.get("sec_perf_support_001")?.section_name, "Mechanical");
+  assert.equal(sectionById.get("sec_perf_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_perf_001")?.section_name, "Mechanical");
+  assert.equal(sectionById.has("sec_perf_support_001"), false, "sec_perf_support_001 was removed from section_master");
   assert.equal(sectionById.get("sec_perf_brake_001")?.step_key, "packages_performance");
   assert.equal(sectionById.get("sec_perf_z52_001")?.step_key, "packages_performance");
   assert.equal(sectionById.get("sec_perf_aero_001")?.step_key, "packages_performance");

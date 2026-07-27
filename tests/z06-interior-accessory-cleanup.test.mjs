@@ -4,7 +4,10 @@ import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
+import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
+
 const reviewDir = "/tmp/27vette-z06-interior-accessory-draft-test";
+const outputRoot = `${reviewDir}/output-root`;
 const draftPath = `${reviewDir}/z06-form-data-draft.json`;
 let cachedDraft;
 
@@ -137,13 +140,29 @@ function autoAddedRpos(runtime) {
 function draftData() {
   if (cachedDraft) return cachedDraft;
   fs.rmSync(reviewDir, { recursive: true, force: true });
+  fs.mkdirSync(outputRoot, { recursive: true });
+  const before = readTrackedArtifacts();
   execFileSync(
     ".venv/bin/python",
-    ["scripts/generate_form.py", "--model", "z06", "--emit-inspection", "--inspection-output", reviewDir],
+    [
+      "scripts/generate_form.py",
+      "--model",
+      "z06",
+      "--output-root",
+      outputRoot,
+      "--emit-inspection",
+      "--inspection-output",
+      reviewDir,
+    ],
     {
       encoding: "utf8",
       stdio: "pipe",
     }
+  );
+  assertTrackedArtifactsUnchanged(before);
+  assert.ok(
+    fs.existsSync(`${outputRoot}/form-output/runtime/z06-runtime-contract.json`),
+    "--output-root must receive the runtime contract this gate would otherwise write over the tracked one"
   );
   cachedDraft = JSON.parse(fs.readFileSync(draftPath, "utf8"));
   return cachedDraft;

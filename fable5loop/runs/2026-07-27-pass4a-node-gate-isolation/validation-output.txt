@@ -1,0 +1,231 @@
+Run: 2026-07-27-pass4a-node-gate-isolation
+Base commit at start: 0f9c97b (README ingest-retirement doc commit, made by Sean during this session)
+Workbook: stingray_master.xlsx  sha256 d11674e3213a8858b13f5e4283b82868046ed34335c96419a8fe909034760bfd
+Workbook unchanged for the whole run (git reports no modification to the tracked file at any point).
+
+================================================================================
+C1 — RED baseline: the churn is measured at HEAD, not inherited from STATE.md
+================================================================================
+Each of the five files run individually at the pre-change HEAD, `git status
+--porcelain -- form-output form-app` captured immediately after, worktree
+restored between runs:
+
+  tests/grand-sport-contract-preview.test.mjs      -> M form-output/runtime/grand-sport-runtime-contract.json
+  tests/grand-sport-draft-data.test.mjs            -> M form-output/runtime/grand-sport-runtime-contract.json
+  tests/z06-contract-preview.test.mjs              -> M form-output/runtime/z06-runtime-contract.json
+  tests/z06-form-data-draft.test.mjs               -> M form-output/runtime/z06-runtime-contract.json
+  tests/z06-interior-accessory-cleanup.test.mjs    -> M form-output/runtime/z06-runtime-contract.json
+
+All five confirmed. Note what the old in-test guard covered: each of the first
+four asserted only that `form-app/data.js` was unchanged, and that assertion
+PASSED on every run — the file these gates actually rewrote was never checked.
+tests/z06-interior-accessory-cleanup.test.mjs had no boundary assertion at all.
+
+Pre-change test results at HEAD (same runs):
+  grand-sport-contract-preview   6 tests, 5 pass, 1 fail
+      FAIL "Grand Sport section placement is owned by section_master step_key"
+      actual undefined, expected 'wheels'   (sec_perf_support_001 no longer exists)
+  grand-sport-draft-data        19 tests, 18 pass, 1 fail
+      FAIL "Grand Sport draft section placement follows section_master step_key"
+      actual 35, expected 40                (sec_exha_001 display order)
+  z06-contract-preview           3 tests, 3 pass
+  z06-form-data-draft           24 tests, 24 pass
+  z06-interior-accessory-cleanup 7 tests, 7 pass
+
+================================================================================
+C5 — every retargeted expectation traced to the workbook cell that owns it
+================================================================================
+openpyxl read of section_master in the canonical workbook (read_only, data_only):
+
+  sec_perf_001        Mechanical            step=packages_performance  order=10
+  sec_perf_z52_001    Performance Packages  step=packages_performance  order=11
+  sec_perf_brake_001  Performance Brakes    step=packages_performance  order=20
+  sec_exha_001        Exhaust               step=packages_performance  order=35
+  sec_perf_aero_001   Aero Packages         step=packages_performance  order=40
+  sec_perf_ground_001 Ground Effects        step=packages_performance  order=50
+  sec_whee_001        Wheel Accessory       step=wheels                order=30
+  sec_cali_001        Caliper Color         step=wheels                order=20
+  sec_gsha_001 / sec_gsce_001 / sec_stri_001  step=aero_exhaust_stripes_accessories  order=10/20/30
+  sec_lpow_001 / sec_lpoe_001 / sec_lpoi_001  step=accessories                       order=10/20/30
+
+  sec_perf_support_001: ABSENT from section_master.
+
+Independent fresh generation into a scratch --output-root agrees with the
+workbook on every one of those rows (section_display_order 10/11/20/35/40/50,
+10/20/30, 20/30, 20/30), and emits neither sec_perf_support_001 nor
+sec_lpow_001. So the workbook and a fresh artifact agree, and the checked-in
+expectations disagreed with both.
+
+Three expectations were stale, not one:
+  sec_perf_support_001 step_key 'wheels' / name 'Mechanical'
+      -> sec_perf_001 step_key 'packages_performance' / name 'Mechanical'
+         (+ section_display_order 10 in the draft test)
+  sec_exha_001 section_display_order 40  -> 35
+  sec_perf_z52_001 section_display_order 10 -> 11
+What is measured for the last two: the workbook owns 35 and 11 today, a fresh
+generation emits 35 and 11, and the checked-in expectations (40 and 10)
+disagreed with both. Nothing here establishes WHEN the workbook changed — a
+binary .xlsx does not support that claim, and the receipt does not make it.
+Neither expectation was edited to match "whatever the generator emits"; both
+were read from section_master first.
+
+C6: sec_perf_support_001 is now pinned as absent in both files
+    (`assert.equal(sectionById.has("sec_perf_support_001"), false, ...)`),
+    so a silent return is a failure rather than a no-op.
+
+================================================================================
+C3 — break-one: the boundary assertion can fail
+================================================================================
+A copy of tests/z06-contract-preview.test.mjs with only the two
+`--output-root outputRoot` argv lines removed:
+
+  AssertionError [ERR_ASSERTION]: generation must not write tracked generated
+  artifacts: form-output/runtime/z06-runtime-contract.json (modified)
+  ✖ 1 test, 0 pass, 1 fail
+
+and `git status` after that run confirms the same file really was modified
+(worktree restored, copy deleted). The assertion fires from inside the gate, so
+the failure mode is a red gate rather than a dirty worktree noticed later.
+(The verifier reproduced this independently. The message text is now
+"repository generated artifacts" — the helper was widened past the git index
+after the verdict; see Post-verifier re-run.)
+
+================================================================================
+C4 — the boundary helper is not vacuous
+================================================================================
+tests/tracked-artifacts-guard.test.mjs, 5 tests, all pass:
+  - readTrackedArtifacts() returns >1 entry, includes form-app/data.js and
+    form-output/runtime/z06-runtime-contract.json, every value a sha256 hex
+  - unchanged surface passes
+  - modified artifact throws, message names the path
+  - added artifact throws
+  - removed artifact throws
+An empty-map or never-comparing helper fails these, so it cannot silently
+disable the guard in the five gates that depend on it. The verifier confirmed
+this by building three weakened helpers — empty Map, no-op assert, and
+form-app/data.js-only hashing — and each was caught (1/4, 2/3, 1/4 fail), while
+all five gates passed under every one of them. That is the vacuity these tests
+exist to catch.
+
+Now 7 tests: the added and removed cases above were synthetic (they moved the
+`before` map, not the filesystem), so two cases that move real files were added
+after the verifier's notes 5 and 6. See Post-verifier re-run.
+
+================================================================================
+C7 — no assertion lost
+================================================================================
+`assert.` occurrences, HEAD vs worktree:
+  grand-sport-contract-preview     54 -> 55
+  grand-sport-draft-data          231 -> 233
+  z06-contract-preview             28 -> 28
+  z06-form-data-draft             143 -> 143
+  z06-interior-accessory-cleanup   48 -> 49
+Accounting: each of the first four dropped the single
+`assert.equal(afterAppData, beforeAppData)` (superseded by the wider
+assertTrackedArtifactsUnchanged call, which is not an `assert.` token) and
+gained one `assert.ok(fs.existsSync(<outputRoot runtime contract>))`. The two
+grand-sport files each gained the sec_perf_support_001-absent assertion, and
+the draft file also gained sec_perf_001 section_display_order. The interior
+file had no prior boundary assertion and gained the existsSync one.
+The two retargeted assertions were changed in place, not removed.
+
+================================================================================
+C2 / C8 — full gate results after the change
+================================================================================
+Node, all 18 tests/*.test.mjs run serially, `git status -- form-output form-app`
+captured after each:
+
+  grand-sport-contract-preview        6/6    churn []
+  grand-sport-draft-data             19/19   churn []
+  multi-model-runtime-switching      48/48   churn []
+  nonruntime-option-source-purge      6/6    churn []
+  seat-canonicalization-diff          2/2    churn []
+  stingray-form-regression           91/91   churn []
+  stingray-generator-stability       15/15   churn []
+  tracked-artifacts-guard             5/5    churn []   (new)
+  unpublished-runtime-contracts       2/2    churn []
+  workbook-schema-standardization     8/9    churn []   1 FAIL, pre-existing
+  workbook-visual-copy-standardization 8/8   churn []
+  z06-contract-preview                3/3    churn []
+  z06-form-data-draft                24/24   churn []
+  z06-interior-accessory-cleanup      7/7    churn []
+  z06-performance-package-interactions 21/21 churn []
+  z06-registry-publication            2/2    churn []
+  z06-runtime-promotion               4/4    churn []
+  z06-runtime-rule-corrections       15/15   churn []
+
+  Zero tracked churn on every file in the set.
+  The one failure — "active explicit excludes do not duplicate active
+  exclusive-group peers" — is the known baseline failure recorded in STATE.md on
+  2026-07-26; it is not touched by this run.
+
+Schema gate:
+  .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+  {"status": "valid", "issue_count": 0, "error_count": 0, "warning_count": 0}
+
+Python:
+  PYTHONPATH=scripts .venv/bin/python -m pytest tests/ -q
+  1 failed, 559 passed, 2 skipped, 107 subtests passed in 1060.90s
+  The single failure is
+  tests/test_fable5_loop_contract.py::test_repository_fable5_loop_contract_passes
+  reporting "missing run receipt artifact:
+  fable5loop/runs/2026-07-27-pass4a-node-gate-isolation/{verifier-report.md,
+  validation-output.txt, run.json}" — this receipt folder, incomplete at the
+  time the suite ran. Self-inflicted and cleared by receipt completion; re-run
+  recorded below.
+
+  Note: tests/test_fable5_loop_contract.py::test_validator_rejects_stale_last_session_pointer,
+  recorded in STATE.md 2026-07-05 as a pre-existing failure, PASSED in this run.
+  The verifier established why, which qualifies the closure: the test stales
+  whichever run folder is latest AND has a run.json. This run's folder had none
+  at the time, so "Last session" still correctly resolved to the Pass 3 receipt
+  and the validator correctly reported an issue. The 2026-07-05 entry is marked
+  CLOSED in STATE.md with that mechanism recorded, not silently deleted.
+
+Boundaries:
+  form-output/ and form-app/ byte-identical for the entire run.
+  No workbook write. Nothing published. No promotion. No generator, runtime,
+  app, or dealer-submission change.
+
+================================================================================
+Post-verifier re-run
+================================================================================
+Verifier verdict: PASS with should-fix, one cycle. Seven findings; findings 5
+and 6 were real gaps in tests/lib/tracked-artifacts.mjs and were fixed rather
+than accepted, so the affected gates were re-run.
+
+Helper changes after the verdict:
+  - artifactPaths() now unions `git ls-files` with a recursive directory walk of
+    form-output/ and form-app/, so a brand-new untracked file written into a
+    protected root is seen. Under git-index enumeration alone it was invisible.
+  - a missing path now carries a sentinel digest instead of throwing ENOENT out
+    of the digest loop, so a deleted artifact is classified "(removed)" by the
+    guard rather than crashing before the comparison runs.
+  - the two previously synthetic-only branches now have tests that move real
+    files: one writes a stray JSON into form-output/inspection/ and asserts
+    "(added)"; one deletes form-output/runtime/z06-runtime-contract.json,
+    asserts "(removed)", and restores it. Both restore in `finally` and then
+    re-assert the surface is unchanged.
+
+  tests/tracked-artifacts-guard.test.mjs      7/7    churn []   (was 5/5)
+  tests/grand-sport-contract-preview.test.mjs 6/6    churn []
+  tests/grand-sport-draft-data.test.mjs      19/19   churn []
+  tests/z06-contract-preview.test.mjs         3/3    churn []
+  tests/z06-form-data-draft.test.mjs         24/24   churn []
+  tests/z06-interior-accessory-cleanup.test.mjs 7/7  churn []
+
+Loop validator, after the receipt was completed:
+  .venv/bin/python scripts/validate_fable5_loop.py
+  Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude
+  setup, memory, skill, routine, outcomes, and eval rubric are present.
+  exit=0
+
+  First attempt failed on receipt shape, not on this run's work: run.json carried
+  verdict "pass_with_should_fix" (the contract's enum is pass/fail/blocked) and
+  the verifier report was missing six required section headings. Both corrected.
+
+Loop contract pytest, after receipt completion:
+  PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_fable5_loop_contract.py -q
+  (recorded below)
+.............                                                            [100%]
+13 passed in 0.74s

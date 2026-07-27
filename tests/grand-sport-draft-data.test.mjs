@@ -3,24 +3,39 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
 
+import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
+
 const reviewDir = "/tmp/27vette-grand-sport-draft-data-test";
+const outputRoot = `${reviewDir}/output-root`;
 const draftPath = `${reviewDir}/grand-sport-form-data-draft.json`;
 const draftMarkdownPath = `${reviewDir}/grand-sport-form-data-draft.md`;
-const appDataPath = "form-app/data.js";
 
-function generateDraftWithoutAppMutation() {
+function generateDraftWithoutTrackedMutation() {
   fs.rmSync(reviewDir, { recursive: true, force: true });
-  const beforeAppData = fs.readFileSync(appDataPath, "utf8");
+  fs.mkdirSync(outputRoot, { recursive: true });
+  const before = readTrackedArtifacts();
   execFileSync(
     ".venv/bin/python",
-    ["scripts/generate_form.py", "--model", "grand_sport", "--emit-inspection", "--inspection-output", reviewDir],
+    [
+      "scripts/generate_form.py",
+      "--model",
+      "grand_sport",
+      "--output-root",
+      outputRoot,
+      "--emit-inspection",
+      "--inspection-output",
+      reviewDir,
+    ],
     {
       encoding: "utf8",
       stdio: "pipe",
     }
   );
-  const afterAppData = fs.readFileSync(appDataPath, "utf8");
-  assert.equal(afterAppData, beforeAppData, "Grand Sport draft generation must not mutate form-app/data.js");
+  assertTrackedArtifactsUnchanged(before);
+  assert.ok(
+    fs.existsSync(`${outputRoot}/form-output/runtime/grand-sport-runtime-contract.json`),
+    "--output-root must receive the runtime contract this gate would otherwise write over the tracked one"
+  );
   assert.ok(fs.existsSync(draftPath), "Grand Sport draft JSON should exist");
   assert.ok(fs.existsSync(draftMarkdownPath), "Grand Sport draft Markdown should exist");
   return JSON.parse(fs.readFileSync(draftPath, "utf8"));
@@ -52,7 +67,7 @@ function workbookRows(sheetName) {
   return JSON.parse(output);
 }
 
-const draft = generateDraftWithoutAppMutation();
+const draft = generateDraftWithoutTrackedMutation();
 const inspectionSource = fs.readFileSync("scripts/corvette_form_generator/inspection.py", "utf8");
 const interiorsSource = fs.readFileSync("scripts/corvette_form_generator/interiors.py", "utf8");
 const activeInteriorPipelineSources = [
@@ -821,14 +836,16 @@ test("Grand Sport draft section placement follows section_master step_key", () =
   assert.equal(sectionById.get("sec_stri_001")?.step_key, "aero_exhaust_stripes_accessories");
   assert.equal(sectionById.get("sec_stri_001")?.section_display_order, 30);
   assert.equal(sectionById.get("sec_exha_001")?.step_key, "packages_performance");
-  assert.equal(sectionById.get("sec_exha_001")?.section_display_order, 40);
+  assert.equal(sectionById.get("sec_exha_001")?.section_display_order, 35);
   assert.equal(sectionById.get("sec_whee_001")?.step_key, "wheels");
-  assert.equal(sectionById.get("sec_perf_support_001")?.step_key, "wheels");
-  assert.equal(sectionById.get("sec_perf_support_001")?.section_name, "Mechanical");
+  assert.equal(sectionById.get("sec_perf_001")?.step_key, "packages_performance");
+  assert.equal(sectionById.get("sec_perf_001")?.section_name, "Mechanical");
+  assert.equal(sectionById.get("sec_perf_001")?.section_display_order, 10);
+  assert.equal(sectionById.has("sec_perf_support_001"), false, "sec_perf_support_001 was removed from section_master");
   assert.equal(sectionById.get("sec_perf_ground_001")?.step_key, "packages_performance");
   assert.equal(sectionById.get("sec_perf_ground_001")?.section_display_order, 50);
   assert.equal(sectionById.get("sec_perf_z52_001")?.step_key, "packages_performance");
-  assert.equal(sectionById.get("sec_perf_z52_001")?.section_display_order, 10);
+  assert.equal(sectionById.get("sec_perf_z52_001")?.section_display_order, 11);
   assert.equal(sectionById.get("sec_perf_aero_001")?.step_key, "packages_performance");
   assert.equal(sectionById.get("sec_perf_aero_001")?.section_display_order, 40);
   assert.equal(sectionById.get("sec_perf_brake_001")?.step_key, "packages_performance");

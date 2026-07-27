@@ -215,6 +215,9 @@ Test-to-surface map (run each with `node --test tests/<name>.test.mjs`):
 | Z06 | `z06-contract-preview`, `z06-form-data-draft`, `z06-interior-accessory-cleanup`, `z06-performance-package-interactions`, `z06-runtime-rule-corrections` |
 | Promotion / switching | `z06-runtime-promotion`, `multi-model-runtime-switching` |
 | Workbook standardization | `workbook-schema-standardization`, `workbook-visual-copy-standardization` |
+| Generated-artifact boundary | `tracked-artifacts-guard` |
+
+Five of those tests invoke `scripts/generate_form.py` — `grand-sport-contract-preview`, `grand-sport-draft-data`, `z06-contract-preview`, `z06-form-data-draft`, `z06-interior-accessory-cleanup`. Each generates into a temporary `--output-root` and asserts every file under `form-output/` and `form-app/` is byte-identical afterwards. That check reads both roots whole, so run these five serially — a concurrent gate writing a runtime contract is reported as a boundary violation.
 
 Python metadata gates:
 
