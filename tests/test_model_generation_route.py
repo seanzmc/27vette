@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import sys
 from collections.abc import Iterator
@@ -10,16 +11,19 @@ from contextlib import contextmanager
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[1]
 WORKBOOK = ROOT / "stingray_master.xlsx"
 SCRIPTS_DIR = ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from corvette_form_generator import inspection, source_assembly  # noqa: E402
+from corvette_form_generator import inspection, model_generation, source_assembly  # noqa: E402
 from corvette_form_generator.model_configs import discover_generation_model_configs  # noqa: E402
 from corvette_form_generator.model_generation import (  # noqa: E402
     REQUIRED_RESULT_KEYS,
+    ROUTE_ENGINE,
     GenerationOptions,
     generate_model_artifacts,
 )
@@ -30,47 +34,107 @@ def generated_contract(result: dict) -> dict:
     return json.loads(Path(result["runtime_contract_json"]).read_text(encoding="utf-8"))
 
 
-def test_generate_form_delegates_to_shared_model_generation_module() -> None:
-    source = (ROOT / "scripts" / "generate_form.py").read_text()
+def load_generate_form_cli():
+    """Import scripts/generate_form.py as a module so its main() can be driven."""
 
-    assert "from corvette_form_generator.model_generation import GenerationOptions, generate_model_artifacts" in source
-    assert "generate_model_artifacts(base_config, options=options)" in source
-    assert "--emit-inspection" in source
-    assert "--inspection-output" in source
-    assert "def run_production" not in source
-    assert "def run_draft" not in source
-    assert "PRODUCTION_MODEL_KEYS" not in source
-    assert "from corvette_form_generator import production" not in source
-    assert "from corvette_form_generator.inspection import" not in source
+    spec = importlib.util.spec_from_file_location("generate_form_cli", ROOT / "scripts" / "generate_form.py")
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
-def test_model_generation_uses_shared_source_assembly_without_temporary_route_split() -> None:
-    module_path = ROOT / "scripts" / "corvette_form_generator" / "model_generation.py"
-    source_assembly_path = ROOT / "scripts" / "corvette_form_generator" / "source_assembly.py"
-    assert module_path.exists()
-    assert source_assembly_path.exists()
+@contextmanager
+def counted_source_assembly() -> Iterator[list[object]]:
+    """Record every config handed to the shared builder, delegating to the real one."""
 
-    source = module_path.read_text()
-    retired_route_table = "TEMPORARY" + "_ROUTE_ENGINES"
-    retired_route_value = "inspection" + "_draft"
+    calls: list[object] = []
+    real = model_generation.assemble_model_source
 
-    assert "class GenerationOptions" in source
-    assert "emit_inspection: bool = False" in source
-    assert "inspection_output_dir" in source
-    assert "def generate_model_artifacts" in source
-    assert "assemble_model_source" in source
-    assert retired_route_table not in source
-    assert retired_route_value not in source
-    assert "source_assembly" in source
-    assert "runtime_contract_json" in source
-    assert "compatibility_artifacts" in source
-    assert "inspection_artifacts" in source
-    assert "draft_artifacts" in source
-    # The emit-inspection gate itself is asserted behaviorally below, not by source string.
-    assert "options.emit_inspection" in source
-    # The result summary must not be reconstructed from review payloads.
-    assert "assembly.report[" not in source
-    assert "assembly.preview[" not in source
+    def counting(config, **kwargs):
+        calls.append(config)
+        return real(config, **kwargs)
+
+    with patch.object(model_generation, "assemble_model_source", counting):
+        yield calls
+
+
+def discovered_model_keys() -> list[str]:
+    return sorted(discover_generation_model_configs(WORKBOOK, root=ROOT))
+
+
+@pytest.mark.parametrize("model_key", discovered_model_keys())
+def test_every_discovered_model_routes_through_the_shared_source_assembly(model_key: str, tmp_path: Path) -> None:
+    """One builder for all of them — asserted per model, not by reading the module's text.
+
+    Parametrized over workbook discovery, so a newly activated model is covered
+    the moment it exists rather than when someone remembers to add it here.
+    """
+
+    config = discover_generation_model_configs(WORKBOOK, root=tmp_path)[model_key]
+
+    with counted_source_assembly() as calls:
+        result = generate_model_artifacts(config)
+
+    assert calls == [config], f"{model_key} did not reach assemble_model_source exactly once"
+    assert result["route_engine"] == ROUTE_ENGINE
+    assert set(result) == set(REQUIRED_RESULT_KEYS), f"{model_key} reports a different summary shape"
+    assert Path(result["runtime_contract_json"]).is_relative_to(tmp_path)
+
+
+@pytest.mark.parametrize("model_key", discovered_model_keys())
+def test_no_model_can_generate_around_the_shared_builder(model_key: str, tmp_path: Path) -> None:
+    """Break the one builder and every model must fail.
+
+    This is the executable form of the retired route-table guard: if any model
+    kept a private assembly path, disabling the shared one would leave it green.
+    """
+
+    config = discover_generation_model_configs(WORKBOOK, root=tmp_path)[model_key]
+
+    with patch.object(model_generation, "assemble_model_source", side_effect=RuntimeError("shared builder disabled")):
+        with pytest.raises(RuntimeError, match="shared builder disabled"):
+            generate_model_artifacts(config)
+
+    assert not (tmp_path / "form-output").exists(), f"{model_key} wrote an artifact without the shared builder"
+
+
+@pytest.mark.parametrize("model_key", discovered_model_keys())
+def test_the_cli_delegates_generation_to_the_shared_entry_point(model_key: str, tmp_path: Path) -> None:
+    """generate_form.py owns argument parsing and discovery, nothing else.
+
+    Parametrized over every model because a legacy branch keyed to one model —
+    the shape the retired ``PRODUCTION_MODEL_KEYS`` route had — passes a
+    single-model test. Generation is faked here, so the cost is parsing.
+    """
+
+    cli = load_generate_form_cli()
+    captured: dict[str, object] = {}
+
+    def fake_generate(config, *, options=None):
+        captured["config"] = config
+        captured["options"] = options
+        return {"model_key": config.model_key}
+
+    argv = [
+        "generate_form.py",
+        "--model",
+        model_key,
+        "--output-root",
+        str(tmp_path),
+        "--emit-inspection",
+        "--inspection-output",
+        str(tmp_path / "review"),
+    ]
+    with patch.object(cli, "generate_model_artifacts", fake_generate), patch.object(sys, "argv", argv):
+        cli.main()
+
+    config = captured["config"]
+    options = captured["options"]
+    assert config.model_key == model_key
+    assert config.output_dir.is_relative_to(tmp_path), "the CLI must honour --output-root"
+    assert options.emit_inspection is True
+    assert options.inspection_output_dir == tmp_path / "review"
 
 
 def test_normal_generation_never_builds_the_inspection_report(tmp_path: Path) -> None:
@@ -96,10 +160,13 @@ def test_generation_summary_is_derived_from_the_validated_runtime_contract(tmp_p
     configs = discover_generation_model_configs(WORKBOOK, root=tmp_path)
 
     for model_key in ("stingray", "z06"):
+        # No review payloads on this path — assembly.report and assembly.preview
+        # are None — so a summary rebuilt from them would come back short.
         result = generate_model_artifacts(configs[model_key])
         contract = generated_contract(result)
 
-        assert set(REQUIRED_RESULT_KEYS) <= set(result)
+        assert set(result) == set(REQUIRED_RESULT_KEYS)
+        assert all(result["counts"][field] > 0 for field in ("choices", "sections", "steps")), result["counts"]
         assert result["status"] == "runtime_active"
         assert result["status"] == contract["dataset"]["status"]
         assert result["dataset_name"] == contract["dataset"]["name"]

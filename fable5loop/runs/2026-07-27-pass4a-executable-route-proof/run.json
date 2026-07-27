@@ -1,0 +1,21 @@
+{
+  "id": "2026-07-27-pass4a-executable-route-proof",
+  "started_at": "2026-07-27T16:45:00-04:00",
+  "completed_at": "2026-07-27T18:30:00-04:00",
+  "objective": "Pass 4 Stage A, second slice: replace the source-text assertions in tests/test_model_generation_route.py and the self-referential live_contract_data() equality in tests/test_runtime_contract_builder.py with executable per-model route proof, a break-one, and an explicit expected contract plus a rejection matrix. Stage A remains open.",
+  "changed_surface": "two Python test modules; no production code, no workbook write, nothing published",
+  "outcome_rubric": "fable5loop/runs/2026-07-27-pass4a-executable-route-proof/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-27-pass4a-executable-route-proof/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-27-pass4a-executable-route-proof/validation-output.txt",
+  "process_deviations": [
+    "The outcome rubric was written after the edits rather than before. Recorded in outcome.md; the verifier was told to weigh it and judged the rubric spec-derived rather than shaped to the result."
+  ],
+  "state_updates": [
+    {"section": "Verified facts", "evidence": "fable5loop/runs/2026-07-27-pass4a-executable-route-proof/validation-output.txt"},
+    {"section": "Lessons learned", "evidence": "fable5loop/runs/2026-07-27-pass4a-executable-route-proof/verifier-report.md"},
+    {"section": "Last session", "evidence": "fable5loop/runs/2026-07-27-pass4a-executable-route-proof/outcome.md"}
+  ],
+  "skill_update": {"decision": "updated", "evidence": "fable5loop/runs/2026-07-27-pass4a-executable-route-proof/verifier-report.md"},
+  "verifier": {"required": true, "independent_context": true, "verdict": "pass", "accepted_by_human": false, "cycles": 1},
+  "boundaries_preserved": ["workbook", "generated artifacts", "runtime app", "dealer submission"]
+}
