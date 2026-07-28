@@ -214,18 +214,39 @@ Test-to-surface map (run each with `node --test tests/<name>.test.mjs`):
 | Grand Sport | `grand-sport-contract-preview`, `grand-sport-draft-data` |
 | Z06 | `z06-contract-preview`, `z06-form-data-draft`, `z06-interior-accessory-cleanup`, `z06-performance-package-interactions`, `z06-runtime-rule-corrections` |
 | Promotion / switching | `z06-runtime-promotion`, `multi-model-runtime-switching` |
+| Registry publication | `z06-registry-publication` |
 | Workbook standardization | `workbook-schema-standardization`, `workbook-visual-copy-standardization` |
+| Source-row purge | `nonruntime-option-source-purge`, `seat-canonicalization-diff` |
+| Unpublished retained artifacts | `unpublished-runtime-contracts` |
 | Generated-artifact boundary | `tracked-artifacts-guard` |
+
+That table is the complete set of `tests/*.test.mjs`; a new node gate must be added here.
 
 Five of those tests invoke `scripts/generate_form.py` — `grand-sport-contract-preview`, `grand-sport-draft-data`, `z06-contract-preview`, `z06-form-data-draft`, `z06-interior-accessory-cleanup`. Each generates into a temporary `--output-root` and asserts every file under `form-output/` and `form-app/` is byte-identical afterwards. That check reads both roots whole, so run these five serially — a concurrent gate writing a runtime contract is reported as a boundary violation.
 
-Python metadata gates:
+Python metadata gate — the default for generation/contract/promotion changes:
 
 ```sh
-.venv/bin/python -m pytest tests/test_generation_safety.py tests/test_generate_form_model_discovery_cli.py tests/test_runtime_contract_builder.py tests/test_model_config_metadata.py tests/test_promote_model.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py tests/test_rule_derivation.py -q
+.venv/bin/python -m pytest tests/test_generation_safety.py tests/test_generate_form_model_discovery_cli.py tests/test_runtime_contract_builder.py tests/test_model_config_metadata.py tests/test_promote_model.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py tests/test_rule_derivation.py tests/test_model_generation_route.py tests/test_all_model_runtime_generation.py -q
 ```
 
-Full default validation = schema gate + all rows of the table + the pytest gate. Choose gates by changed surface per AGENTS.md §10.
+The remaining `tests/test_*.py` files are not in that gate and are chosen by changed surface:
+
+| Surface | Tests |
+|---|---|
+| Workbook write path / editor | `test_editor_ops_apply`, `test_editor_ops_meta`, `test_editor_ops_global_families`, `test_editor_lints`, `test_editor_server_payload`, `test_editor_server_write_api` |
+| Workbook domain / ChangeSet | `test_workbook_domain_registry`, `test_workbook_changeset`, `test_workbook_changeset_service`, `test_workbook_bool_hygiene` |
+| Workbook Manager | `test_workbook_manager`, `test_workbook_manager_catalog`, `test_workbook_manager_import_projection` |
+| Source assembly / runtime metadata | `test_source_assembly_characterization`, `test_runtime_metadata_guards`, `test_corvette_form_generator_contract` |
+| Publication | `test_atomic_registry_write` |
+| Asset map | `test_asset_map_sync` |
+| Options-sheet quality | `test_options_sheet_quality` |
+| Promotion preflight (slow) | `test_verify_workbook_candidate` |
+| Fable 5 loop | `test_fable5_loop_contract` |
+
+`.venv/bin/python -m pytest tests/ -q` runs everything (589 tests, ~18 min). Three tests in `test_verify_workbook_candidate.py` are ~63s each because each runs the full ten-stage candidate lane over six models; everything outside the slowest ~15 tests is sub-second. Reserve the full run for canonical-workbook writes and publication, per AGENTS.md §10.
+
+Full default validation = schema gate + all rows of the node table + the metadata gate. Choose gates by changed surface per AGENTS.md §10.
 
 ## Workbook Safety
 

@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "zr1x_options",
-    "generated_at": "2026-07-27T04:33:47+00:00",
+    "generated_at": "2026-07-28T02:18:59+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -25094,24 +25094,6 @@
       "source_note": ""
     },
     {
-      "rule_id": "zr1x_rule_fa6_excludes_fa5_72a9810cbe2d",
-      "source_id": "opt_fa6_001",
-      "rule_type": "excludes",
-      "target_id": "opt_fa5_001",
-      "target_type": "option",
-      "source_type": "option",
-      "source_section": "sec_inte_001",
-      "target_section": "sec_inte_001",
-      "source_selection_mode": "multi_select_opt",
-      "target_selection_mode": "multi_select_opt",
-      "body_style_scope": "",
-      "disabled_reason": "Blocked by FA6 Level 2 Carbon Fiber Interior Trim.",
-      "auto_add": "False",
-      "active": "True",
-      "runtime_action": "active",
-      "source_note": ""
-    },
-    {
       "rule_id": "zr1x_rule_pcq_includes_vwe_6a173897b92c",
       "source_id": "opt_pcq_001",
       "rule_type": "includes",
@@ -25287,42 +25269,6 @@
       "body_style_scope": "",
       "disabled_reason": "Included with R8C Corvette Museum Delivery.",
       "auto_add": "True",
-      "active": "True",
-      "runtime_action": "active",
-      "source_note": ""
-    },
-    {
-      "rule_id": "zr1x_rule_rik_excludes_sl8_5167f82881dc",
-      "source_id": "opt_rik_001",
-      "rule_type": "excludes",
-      "target_id": "opt_sl8_001",
-      "target_type": "option",
-      "source_type": "option",
-      "source_section": "sec_lpoe_001",
-      "target_section": "sec_lpoe_001",
-      "source_selection_mode": "multi_select_opt",
-      "target_selection_mode": "multi_select_opt",
-      "body_style_scope": "",
-      "disabled_reason": "Blocked by RIK Torch Red Rear Corvette Script Badge.",
-      "auto_add": "False",
-      "active": "True",
-      "runtime_action": "active",
-      "source_note": ""
-    },
-    {
-      "rule_id": "zr1x_rule_rin_excludes_sl8_00b2ad9eea2e",
-      "source_id": "opt_rin_001",
-      "rule_type": "excludes",
-      "target_id": "opt_sl8_001",
-      "target_type": "option",
-      "source_type": "option",
-      "source_section": "sec_lpoe_001",
-      "target_section": "sec_lpoe_001",
-      "source_selection_mode": "multi_select_opt",
-      "target_selection_mode": "multi_select_opt",
-      "body_style_scope": "",
-      "disabled_reason": "Blocked by RIN Arctic White Rear Corvette Script Badge.",
-      "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
       "source_note": ""
@@ -30891,7 +30837,7 @@
       "severity": "pass",
       "entity_type": "rule",
       "entity_id": "",
-      "message": "112 active compatibility rules exported from zr1x_rule_mapping."
+      "message": "109 active compatibility rules exported from zr1x_rule_mapping."
     },
     {
       "check_id": "interior_contract",

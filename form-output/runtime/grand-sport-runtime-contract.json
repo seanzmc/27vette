@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-07-26T21:03:19+00:00",
+    "generated_at": "2026-07-28T02:18:57+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -42152,24 +42152,6 @@
       "source_note": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package."
     },
     {
-      "rule_id": "gs_rule_opt_5zv_001_excludes_opt_t0f_001",
-      "source_id": "opt_5zv_001",
-      "rule_type": "excludes",
-      "target_id": "opt_t0f_001",
-      "target_type": "option",
-      "source_type": "option",
-      "source_section": "sec_perf_aero_001",
-      "target_section": "sec_perf_aero_001",
-      "source_selection_mode": "single_select_req",
-      "target_selection_mode": "single_select_req",
-      "body_style_scope": "",
-      "disabled_reason": "Blocked by 5ZV Carbon Flash Metallic Three-Stanchion High Wing Spoiler.",
-      "auto_add": "False",
-      "active": "False",
-      "runtime_action": "omit_redundant_same_section_exclude",
-      "source_note": "1. Not available with (T0F) Carbon Flash-painted Carbon Fiber Aero Package or (FEY) Z52 Track Performance Package."
-    },
-    {
       "rule_id": "gs_rule_opt_roy_001_requires_opt_j57_001",
       "source_id": "opt_roy_001",
       "rule_type": "requires",
@@ -51859,7 +51841,7 @@
       "severity": "pass",
       "entity_type": "rule",
       "entity_id": "",
-      "message": "124 active compatibility rules exported from grandSport_rule_mapping."
+      "message": "123 active compatibility rules exported from grandSport_rule_mapping."
     },
     {
       "check_id": "interior_contract",

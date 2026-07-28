@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grand_sport_x_options",
-    "generated_at": "2026-07-27T04:33:45+00:00",
+    "generated_at": "2026-07-28T02:18:58+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -42578,42 +42578,6 @@
       "source_note": ""
     },
     {
-      "rule_id": "grand_sport_x_rule_rik_excludes_sl8_5167f82881dc",
-      "source_id": "opt_rik_001",
-      "rule_type": "excludes",
-      "target_id": "opt_sl8_001",
-      "target_type": "option",
-      "source_type": "option",
-      "source_section": "sec_lpoe_001",
-      "target_section": "sec_lpoe_001",
-      "source_selection_mode": "multi_select_opt",
-      "target_selection_mode": "multi_select_opt",
-      "body_style_scope": "",
-      "disabled_reason": "Blocked by RIK Torch Red Rear Corvette Script Badge.",
-      "auto_add": "False",
-      "active": "True",
-      "runtime_action": "active",
-      "source_note": ""
-    },
-    {
-      "rule_id": "grand_sport_x_rule_rin_excludes_sl8_00b2ad9eea2e",
-      "source_id": "opt_rin_001",
-      "rule_type": "excludes",
-      "target_id": "opt_sl8_001",
-      "target_type": "option",
-      "source_type": "option",
-      "source_section": "sec_lpoe_001",
-      "target_section": "sec_lpoe_001",
-      "source_selection_mode": "multi_select_opt",
-      "target_selection_mode": "multi_select_opt",
-      "body_style_scope": "",
-      "disabled_reason": "Blocked by RIN Arctic White Rear Corvette Script Badge.",
-      "auto_add": "False",
-      "active": "True",
-      "runtime_action": "active",
-      "source_note": ""
-    },
-    {
       "rule_id": "grand_sport_x_rule_s47_excludes_roy_fb28f7a0ea02",
       "source_id": "opt_s47_001",
       "rule_type": "excludes",
@@ -51761,7 +51725,7 @@
       "severity": "pass",
       "entity_type": "rule",
       "entity_id": "",
-      "message": "216 active compatibility rules exported from grand_sport_x_rule_mapping."
+      "message": "214 active compatibility rules exported from grand_sport_x_rule_mapping."
     },
     {
       "check_id": "interior_contract",

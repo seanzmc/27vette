@@ -1199,7 +1199,7 @@ Initial rewrite/consolidation set already supported by audit evidence:
 - Rewrite `tests/test_runtime_contract_builder.py` from self-referential `live_contract_data()` equality/source-string checks to explicit expected contracts and malformed/error-contract rejection cases.
 - Rewrite `tests/test_registry_promotion_metadata.py` to remove `current_generation`, `draft_artifact`, header-only fallback, and obsolete `build_registry_from_promotions()` coverage after compatibility closure; retain ordering/default/setup-copy/duplicate-key behavior against strict runtime contracts.
 - Rewrite `tests/test_schema_validation_metadata.py` fixtures from the shared registry.
-- Rewrite `tests/workbook-schema-standardization.test.mjs` to consume registry/source-role metadata rather than hardcoded three-model/future-model structures.
+- Rewrite `tests/workbook-schema-standardization.test.mjs` to consume registry/source-role metadata rather than hardcoded three-model/future-model structures. **Completed 2026-07-28** — see the Stage A slice receipt below.
 - Split/rewrite `tests/stingray-generator-stability.test.mjs`: retain package-integrity and focused workbook invariants, but move retained-artifact counts and JSON-to-published-registry checks out of fresh-generation authority.
 - Rewrite/split `tests/z06-runtime-promotion.test.mjs` into explicit publication and read-only verification surfaces.
 - Move unique runtime assertions out of `tests/grand-sport-contract-preview.test.mjs`, `tests/grand-sport-draft-data.test.mjs`, `tests/z06-contract-preview.test.mjs`, and `tests/z06-form-data-draft.test.mjs`; then delete or reclassify those files as optional diagnostics.
@@ -1228,6 +1228,30 @@ Pass 4A exit criteria:
 - Every proposed Pass 4B deletion has zero current code, test, active-doc, current-provenance, or operator-command consumer.
 - Current guidance names only the post-migration path and remains accurate before deletion.
 - Re-run the bound inventory and publish the exact Pass 4B `git rm` list for separate approval.
+
+#### Stage A slice receipt — `workbook-schema-standardization`, completed 2026-07-28
+
+**Scope deviation, approved in-session.** §6 of this specification withholds workbook-write and publication authority. Sean granted both explicitly ("You may edit the workbook to fix the grand sport rows when you get to a logical point to do so") after the diagnosis below. The write and republish are recorded here rather than in a separate spec because they are the direct remedy for the defect this gate exposed.
+
+**The baseline failure was a live bug, not a stale expectation.** The retired gate's one known failure — `active explicit excludes`, carried since 2026-07-26 — was flagging `gs_rule_opt_5zv_001_excludes_opt_t0f_001`, an explicit `excludes` between two members of the active `gs_excl_performance_aero` group (`required_single_within_group`). It is not redundant decoration: `app.js` skips same-group peers in the loop over rules that TARGET a choice (`:1101`) but not in the loop over rules the choice is the SOURCE of (`:1122`), so the row disables one direction of the swap. Measured against the published registry, Grand Sport coupe 1LT — select FEB + J57 + T0F, click 5ZV, aero stays T0F; delete the row, the same click swaps. It read as inert under casual checking because T0F is normally gated behind `Requires FEB … or FEY` and the FEY path blocks 5ZV for an unrelated reason.
+
+Generation had already marked the row `active: "False"` / `omit_redundant_same_section_exclude`. Neither field is consulted on that path, so the marking suppressed nothing. Confirmed by isolating the input: forcing `active: "True"`, and dropping 5ZV from the group, each left behavior unchanged; only deleting the rule row changed it.
+
+**The hardcoded gate saw one instance; the registry-derived sweep found nine.** 1 `grand_sport` (published), 2 `grand_sport_x`, 3 `zr1`, 3 `zr1x`. The other eight were invisible to the browser only because those three models are unpromoted. All nine deleted via `apply_workbook_ops.py` (dry-run first: 9 ops, 9 covered, 0 errors, 3 expected scaffold warnings); the four affected models regenerated and the registry republished. Generated diffs are exactly the nine rule rows plus their `generated_at` and active-rule-count lines — no other drift.
+
+Rewritten:
+
+- New `tests/lib/workbook-registry-snapshot.mjs` derives every sheet, family, typed column, and model from `registered_sheet_families()` / `model_sheet_registry()` plus `model_master`. One Python launch. The retired file hardcoded 9 canonical source sheets, a 25-entry future-model sheet list, and a three-model block naming z06/zr1/zr1x with literal variant ids and eleven literal sheet names each — every one a stale subset once six models went active.
+- 9 tests → 11. Coverage widened from 3 models to 6 and from 2 named rule sheets to all 73 registered sheets.
+- Each derived sweep is paired with a named expectation (`EXPECTED_MODEL_KEYS`, `EXPECTED_SOURCE_ROLES`, `BLOCKER_CLUSTER_RPOS`, `KNOWN_TYPE_DRIFT`), so no assertion compares a derived set only against itself.
+
+**Found by widening, recorded not fixed:** nine registry-declared typed columns hold text where the registry declares bool/int. Generation reads them through `workbook.clean()` so they are tolerated today, but the editor's coercion path expects the declared type. Pinned exactly as `KNOWN_TYPE_DRIFT`; a tenth entry fails the gate. Fixing them is a separate workbook write.
+
+**One assertion of mine was wrong and the workbook was right:** `grand_sport_x` stores `model_variants` body-style-interleaved (display_order 1,4,2,5,3,6 in row order) where the others are trim-major. Both are dense 1..N. Compared as a sorted set — physical row order is not a contract.
+
+**Validation.** 10 mutations injected into real workbook copies, all 10 caught: duplicate group-peer excludes, bool cell retyped to text, source role pointed at a missing sheet, source role deactivated, retired column reintroduced, variant display_order duplicated, `variant_master` fact deactivated, interior header divergence, stacked replace between group peers, ungrouped blocker-cluster excludes. Gate 11/11. Companion node gates 204 passed / 0 failed across `multi-model-runtime-switching` (48), `stingray-form-regression` (91), `z06-runtime-promotion` (4), `z06-runtime-rule-corrections` (15), `z06-performance-package-interactions` (21), `grand-sport-contract-preview` (6), `grand-sport-draft-data` (19). Workbook package and schema gates both valid, 0 issues. Backup at `backups/stingray_master-20260727-221721.xlsx`.
+
+**Still open:** the `app.js` peer-guard asymmetry itself is unfixed — the nine rows are gone and the gate blocks re-adding them, but the runtime remains one bad authoring row away from the same class of defect. Recorded in `fable5loop/STATE.md` under Open failures; closing it is a runtime behavior change needing its own approval.
 
 #### Stage B (formerly Pass 4B) — Exact approved deletion
 
