@@ -1,5 +1,7 @@
 # Rule-Audit Orphan Retirement Spec (Simplification Pass 2)
 
+> **Execution status (2026-07-29): SUPERSEDED.** Commands and compatibility-artifact paths below describe an older generator topology and are historical evidence only. Use `README.md` and Pass 4 Stage A of `docs/superpowers/specs/2026-07-23-validation-single-lane-active-surface-cleanup.md` for current commands. The underlying completed record is unchanged.
+
 Date: 2026-07-05
 Status: Completed 2026-07-05. See completion record at end.
 

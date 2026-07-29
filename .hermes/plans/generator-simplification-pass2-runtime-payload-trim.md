@@ -1,5 +1,7 @@
 # Generator Simplification Pass 2 Spec: Runtime Payload Trim
 
+> **Execution status (2026-07-29): SUPERSEDED.** This plan records an older generator/artifact topology. Do not run its commands or treat its compatibility paths, `production.py` route, artifact types, or retired test names as current guidance. Current commands and authority are owned by `README.md` and Pass 4 Stage A of `docs/superpowers/specs/2026-07-23-validation-single-lane-active-surface-cleanup.md`. Historical evidence below is preserved verbatim pending Stage C archival.
+
 ## Diagnosis
 
 Pass 1 now leaves the repo on a unified publication workflow: `scripts/generate_form.py --model <model>` emits a model artifact, then `scripts/generate_registry.py` is the only entry point that writes `form-app/data.js` from workbook-promoted artifacts. Pass 2 should reinforce that single path to runtime across all active models; it should not reintroduce direct app-registry writes from the Stingray production generator.

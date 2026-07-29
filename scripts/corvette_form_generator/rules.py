@@ -218,8 +218,8 @@ def extend_with_derived_swap_rules(
 ) -> dict[str, Any]:
     """Append allowlist-approved derived swap rules and return the manifest.
 
-    Shared by both rule-assembly routes (draft models via ``build_draft_rules``,
-    Stingray via ``production.py``) so derivation behavior cannot diverge.
+    Called through ``build_draft_rules`` for every model so derivation behavior
+    cannot diverge by model.
     Returns the derivation manifest.
     """
 

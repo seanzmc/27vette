@@ -1,5 +1,7 @@
 # Asset Map Exterior Color URL Refresh Spec
 
+> **Execution status (2026-07-29): SUPERSEDED FOR COMMANDS.** Compatibility-artifact paths and generation commands below describe an older topology and are not operator guidance. Use `README.md` and Pass 4 Stage A of `docs/superpowers/specs/2026-07-23-validation-single-lane-active-surface-cleanup.md` for current commands. This notice does not decide any still-open asset-data work.
+
 ## Request
 
 Use the newly pasted exterior color image URLs in `asset_map` to replace the currently active exterior paint image URLs used by Stingray and Grand Sport, and fill the missing metadata columns for the newly pasted asset rows where the target can be identified safely.

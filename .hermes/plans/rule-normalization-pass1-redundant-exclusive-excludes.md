@@ -1,5 +1,7 @@
 # Rule Normalization Pass 1 — Redundant Same-Group Excludes
 
+> **Execution status (2026-07-29): SUPERSEDED.** Commands and compatibility-artifact paths below describe an older generator topology and are historical evidence only. Use `README.md` and Pass 4 Stage A of `docs/superpowers/specs/2026-07-23-validation-single-lane-active-surface-cleanup.md` for current commands. The underlying product record is unchanged.
+
 ## Status
 
 Spec for approval. No implementation has been done in this pass.

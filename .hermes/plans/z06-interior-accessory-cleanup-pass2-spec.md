@@ -1,5 +1,7 @@
 # Z06 Interior / Accessory Cleanup Pass 2 Spec
 
+> **Execution status (2026-07-29): SUPERSEDED.** Commands and compatibility-artifact paths below describe an older generator topology and are historical evidence only. Use `README.md` and Pass 4 Stage A of `docs/superpowers/specs/2026-07-23-validation-single-lane-active-surface-cleanup.md` for current commands. The underlying completed/product record is unchanged.
+
 > **For Hermes:** This is a spec-first 27vette workbook/runtime pass. Do not implement until approved. Use workbook-authored source rows wherever the workbook can represent the rule; do not add Z06/RPO-specific JavaScript or Python business-rule exceptions.
 
 **Goal:** Clean up the remaining Z06 interior, seat, component, and accessory-package presentation issues after Pass 1 runtime-rule closure passed.

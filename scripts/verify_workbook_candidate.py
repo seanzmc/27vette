@@ -105,7 +105,11 @@ class StageFailure(Exception):
 
 def protected_surface_hashes(root: Path) -> dict[str, str]:
     paths = [root / "stingray_master.xlsx", root / "form-app" / "data.js"]
-    paths.extend(path for path in (root / "form-output").rglob("*") if path.is_file())
+    paths.extend(
+        path
+        for path in (root / "form-output").rglob("*")
+        if path.is_file() and path.name != ".DS_Store"
+    )
     return {
         str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
         for path in sorted(paths)

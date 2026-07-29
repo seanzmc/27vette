@@ -1,5 +1,7 @@
 # Live Runtime Merge Readiness Spec: Intentional Image Artifact Sync + Red-Gate Cleanup
 
+> **Execution status (2026-07-29): SUPERSEDED.** This plan records an older generator/artifact topology. Do not run its commands or treat its compatibility paths, `production.py` route, artifact types, or retired test names as current guidance. Current commands and authority are owned by `README.md` and Pass 4 Stage A of `docs/superpowers/specs/2026-07-23-validation-single-lane-active-surface-cleanup.md`. Historical evidence below is preserved verbatim pending Stage C archival.
+
 Recommended reasoning level for Sean/Codex: high. This is a narrow ASAP merge-readiness pass. The new option-card images are intentional and should ship. Preserve runtime logic/selection/dealer behavior while allowing the intended workbook-owned image metadata to flow into generated runtime artifacts.
 
 ## Diagnosis

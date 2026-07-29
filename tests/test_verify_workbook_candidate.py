@@ -327,6 +327,14 @@ def test_the_harness_override_env_var_is_the_one_the_harness_reads() -> None:
     assert f"process.env.{HARNESS_DATA_JS_ENV}" in harness_source
 
 
+def test_protected_surface_hashes_ignore_macos_finder_metadata(tmp_path) -> None:
+    form_output = tmp_path / "form-output"
+    form_output.mkdir()
+    (form_output / ".DS_Store").write_bytes(b"finder metadata")
+
+    assert "form-output/.DS_Store" not in protected_surface_hashes(tmp_path)
+
+
 def test_the_lane_detects_and_reports_a_protected_path_write(monkeypatch) -> None:
     """Proves the in-tool boundary check can actually fire.
 

@@ -1,5 +1,7 @@
 # Stingray Engine Appearance Display Order Match Grand Sport Spec
 
+> **Execution status (2026-07-29): SUPERSEDED.** This plan records an older generator/artifact topology. Do not run its commands or treat its compatibility paths, `production.py` route, artifact types, or retired test names as current guidance. Current commands and authority are owned by `README.md` and Pass 4 Stage A of `docs/superpowers/specs/2026-07-23-validation-single-lane-active-surface-cleanup.md`. Historical evidence below is preserved verbatim pending Stage C archival.
+
 ## Diagnosis
 
 The requested change is workbook-owned display ordering for Stingray Engine Appearance choices. The source of truth is `stingray_master.xlsx`, specifically `stingray_options.display_order` for active rows in `section_id = sec_engi_001`.

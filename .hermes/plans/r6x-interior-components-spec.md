@@ -1,5 +1,7 @@
 # Spec: Retire R6X special-casing; R6X as a workbook interior component at $995 (Pass 2)
 
+> **Execution status (2026-07-29): SUPERSEDED FOR COMMANDS.** `production.py` references and generator commands below describe an older topology and are not operator guidance. Use `README.md` and Pass 4 Stage A of `docs/superpowers/specs/2026-07-23-validation-single-lane-active-surface-cleanup.md` for current commands. The product-contract evidence remains historical context.
+
 Date: 2026-06-10
 Branch: work/27vette-copy-2026-06-09 (local copy). Follows pass 1 (J57 + app.js).
 Recommended reasoning level if handed to Sean: high (pricing flow has an

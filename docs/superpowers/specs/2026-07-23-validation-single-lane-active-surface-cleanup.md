@@ -1,6 +1,6 @@
 # Validation Single-Lane and Active-Surface Cleanup Specification
 
-Status: ACTIVE — Passes 0–3 and Pass 4 Stage A are complete. Stage B is the next step and requires Sean's separate approval of the exact deletion list recorded below; no Stage B deletion is authorized yet. Stage C follows only after Stage B.
+Status: ACTIVE — Passes 0–3 and Pass 4 Stage A are complete, including the 2026-07-29 macOS candidate-boundary hardening below. Stage B remains unstarted and requires Sean's separate approval of the exact deletion list recorded below. Stage C follows only after Stage B.
 Date: 2026-07-23 (revised through 2026-07-29 Stage A closeout)
 
 Consuming workflow: this specification is the structural prerequisite for the database-backed workbook editor described in `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md`. The end state that both specifications must jointly deliver is one controlled repeatable pathway:
@@ -1270,6 +1270,22 @@ Exact Stage B `git rm` list, published for separate approval and **not executed*
 
 Stage A already removed the compatibility writer/import/result wiring and current test consumers. Stage B is deletion-only for the exact files above plus removal of their candidate wording from active guidance.
 
+#### Stage A verification follow-up — macOS candidate boundary, completed 2026-07-29
+
+Sean's completion check found one remaining Stage A exit-gate defect before any Stage B deletion began. During two fresh full candidate-suite runs, macOS recreated ignored `form-output/.DS_Store` metadata. `protected_surface_hashes()` recursively included every file below `form-output/`, so both runs failed with a false boundary violation despite all 18 serial Node gates passing and tracked `form-output/` / `form-app/` hashes remaining identical.
+
+The repaired hasher excludes only the exact `.DS_Store` basename. A focused test was observed RED before the source edit, a temporary-root probe proves arbitrary untracked files remain visible, and the full candidate suite then passed 16/16 while Finder metadata was recreated during the run. Package/schema remained clean; the fresh unaffected Stage A gates remained 189 Python tests plus 111 subtests, 59 editor tests plus 7 subtests, and all 18 Node files. Independent verifier `deleg_982c3aa8` returned PASS. Receipt: `fable5loop/runs/2026-07-29-pass4a-macos-boundary-hardening/`.
+
+Per Sean's conditional instruction, finding this incomplete Stage A gate stopped the sequence. The exact six Stage B candidates remain tracked; Stage B did not start.
+
+#### Stage A verification follow-up — late zero-reference correction, completed 2026-07-29
+
+The first independent verifier dispatched before the macOS failure was found completed later and returned FAIL on C9. Its code/test/gate grades were otherwise green, but it found one stale active source docstring (`rules.py` still described Stingray as using `production.py`) and ten `.hermes/plans` files whose old compatibility paths or executable commands lacked an explicit superseded/historical classification.
+
+The source comment now describes the actual one-route call through `build_draft_rules`. Each affected plan carries a top-of-file execution-status notice: old compatibility paths, `production.py` routes, artifact types, and retired test names are historical evidence and must not be executed; `README.md` and this Stage A section own current commands. This preserves Stage C's archive/classification boundary without leaving the files as operator-command consumers. The underlying open product/data decisions in plans marked `SUPERSEDED FOR COMMANDS` remain undecided.
+
+This correction changes comments/guidance only. It does not delete or alter any Stage B candidate, workbook row, generated artifact, publication output, runtime behavior, or dealer path. The zero-reference verifier was rerun after the correction; see the amended Stage A receipt.
+
 #### Stage B (formerly Pass 4B) — Exact approved deletion
 
 Initial retirement candidates requiring final Pass 0B semantic confirmation:
@@ -1696,6 +1712,8 @@ Tests known to rewrite tracked artifacts until isolated:
 - `.hermes/plans/rule-normalization-pass7b-failed-fix-correction.md`
 
 `NEEDS_DECISION` before archive or deletion:
+
+Pass 4 Stage A execution-guidance override (2026-07-29): the following files may retain historical mentions of compatibility artifacts or retiring filenames, but their top-of-file notices explicitly supersede every such command/path as operator guidance: `asset-map-exterior-color-url-refresh.md`, `generator-simplification-pass2-runtime-payload-trim.md`, `live-runtime-merge-readiness-no-behavior-change-spec.md`, `r6x-interior-components-spec.md`, `route-map-condensation-pass6-spec.md`, `rule-audit-orphan-retirement-pass2-spec.md`, `rule-normalization-pass1-redundant-exclusive-excludes.md`, `rule-normalization-pass2-grouped-excludes.md`, `stingray-engine-appearance-display-order-match-grand-sport.md`, and `z06-interior-accessory-cleanup-pass2-spec.md`. Their underlying archival or still-open product/data status remains governed by the lists below; they are no longer current generation guidance.
 
 - `.hermes/plans/asset-map-exterior-color-url-refresh.md`
 - `.hermes/plans/color-override-normalization-spec.md`
