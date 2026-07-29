@@ -1,5 +1,7 @@
 # Spec: Integrate live-only deltas (GS J57 rule group + app.js requires_any fix) into local structure
 
+> **Archive closure (2026-07-29): COMPLETED.** Implementation is present at `0b116da` (J57 generated/runtime/test integration) and `b42ce5e` (`requires_any` selection/runtime correction). Any trailing approval request is historical; current operator commands are owned by `README.md`. Stage C approved this completed plan for archival.
+
 Date: 2026-06-10
 Branch context: local repo /Users/seandm/Projects/27vette-vis on work/27vette-copy-2026-06-09.
 End goal: local organization + live business rules, landing on 27vette main when safe.

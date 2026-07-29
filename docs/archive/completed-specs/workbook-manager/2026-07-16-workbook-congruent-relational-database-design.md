@@ -1,7 +1,7 @@
 # Workbook-Congruent Relational Database Design
 
 Status: superseded on 2026-07-22 by
-`2026-07-22-reliable-workbook-database-workflow.md`. Retained as historical
+`docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md`. Retained as historical
 design evidence; do not implement directly.
 
 ## 1. Objective

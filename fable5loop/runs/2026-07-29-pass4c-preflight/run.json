@@ -1,0 +1,51 @@
+{
+  "id": "2026-07-29-pass4c-preflight",
+  "started_at": "2026-07-29T11:31:00-04:00",
+  "completed_at": "2026-07-29T11:57:30-04:00",
+  "objective": "Rebase the complete Pass 4 Stage C plan/document/review inventory, produce an exact separately approval-gated implementation manifest, and stop before every move or deletion.",
+  "source_commit": "3515f72",
+  "changed_surface": "Owning-spec preflight status and approval-boundary correction, STATE preflight closeout/lesson, and this receipt only. No plan/doc move or deletion; no workbook, code/test, generated/published artifact, runtime application, dealer submission, schema, dependency, or Stage C implementation change.",
+  "outcome_rubric": "fable5loop/runs/2026-07-29-pass4c-preflight/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-29-pass4c-preflight/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-29-pass4c-preflight/validation-output.txt",
+  "process_deviations": [
+    "Independent verifier cycle 1 found that the initial 19-plan archive class mixed ten top-level-closed plans with nine landed plans that retained approval prompts or lacked top-level closure. The manifest now separates PROPOSE_ARCHIVE_ALREADY_CLOSED from PROPOSE_CLOSE_THEN_ARCHIVE and requires an exact closure note before each of the nine may move.",
+    "Cycle 1 ran the Fable validator before verifier-report.md and run.json existed; it correctly reported those two incomplete receipt artifacts. Final Fable gates were rerun only after the corrected verifier PASS and complete receipt."
+  ],
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-29-pass4c-preflight/preflight-report.md"
+    },
+    {
+      "section": "Lessons learned",
+      "evidence": "fable5loop/runs/2026-07-29-pass4c-preflight/preflight-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-29-pass4c-preflight/verifier-report.md"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-29-pass4c-preflight/preflight-report.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 2,
+    "delegation_id": "deleg_cb040293"
+  },
+  "boundaries_preserved": [
+    "canonical workbook",
+    "code and tests",
+    "generated and published artifacts",
+    "runtime application",
+    "dealer submission",
+    "standing guidance owners",
+    "existing archives and prior receipts",
+    "Stage C implementation approval"
+  ]
+}

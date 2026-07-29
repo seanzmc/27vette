@@ -35,7 +35,7 @@ Workbook Manager implementation direction.
 
 ## 2. Current evidence and baseline
 
-The audit in `docs/db_audit-7-22.md` proved these defects against disposable
+The audit in `docs/archive/old-reports/db_audit-7-22.md` proved these defects against disposable
 workbooks and databases:
 
 1. Import clears and commits the active projection before the new source is
@@ -256,7 +256,7 @@ update, or ChangeSet payloads.
 
 Vehicle Setup presentation copy is an explicit compatibility requirement of
 this workflow. The completed migration owned by
-`.hermes/plans/vehicle-setup-copy-workbook-ownership-spec.md` added these seven
+`docs/archive/completed-specs/vehicle-setup-copy-workbook-ownership-spec.md` added these seven
 manager-writable free-text columns to `model_master`:
 `setup_card_subtitle`, `setup_eyebrow`, `setup_title`, `setup_description`,
 `setup_fact_1`, `setup_fact_2`, and `setup_fact_3`. Pass 2 includes them in the

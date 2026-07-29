@@ -1,5 +1,7 @@
 # Asset Map Exterior Color URL Refresh Spec
 
+> **Archive closure (2026-07-29): COMPLETED.** Implementation is present at `bc68fdd`. Any trailing approval request is historical; current operator commands are owned by `README.md`. Stage C approved this completed plan for archival.
+
 > **Execution status (2026-07-29): SUPERSEDED FOR COMMANDS.** Compatibility-artifact paths and generation commands below describe an older topology and are not operator guidance. Use `README.md` and Pass 4 Stage A of `docs/superpowers/specs/2026-07-23-validation-single-lane-active-surface-cleanup.md` for current commands. This notice does not decide any still-open asset-data work.
 
 ## Request

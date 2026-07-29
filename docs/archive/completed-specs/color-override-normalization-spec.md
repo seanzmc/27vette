@@ -1,5 +1,7 @@
 # Spec: Color-combination override (D30) normalization across models + EL9 closure (Pass 3)
 
+> **Archive closure (2026-07-29): COMPLETED.** Implementation is present at `6e4d052` with retained D30/R6X coverage. Any trailing approval request is historical; current operator commands are owned by `README.md`. Stage C approved this completed plan for archival.
+
 Date: 2026-06-10
 Branch: work/27vette-copy-2026-06-09. Follows pass 2 (R6X components).
 Recommended reasoning level if handed to Sean: medium.

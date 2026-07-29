@@ -47,7 +47,7 @@ The generator run only produced expected timestamp/workbook-save churn during ve
 Evidence inspected before writing this spec:
 
 - `AGENTS.md` and `codex-context.md` source-of-truth / gate requirements.
-- Existing Pass 1 spec: `.hermes/plans/z06-runtime-rule-correction-spec.md`.
+- Existing Pass 1 spec: `docs/archive/completed-specs/z06-runtime-rule-correction-spec.md`.
 - Current Pass 1 script/test surfaces:
   - `scripts/apply_z06_runtime_rule_corrections.py`
   - `tests/z06-runtime-rule-corrections.test.mjs`

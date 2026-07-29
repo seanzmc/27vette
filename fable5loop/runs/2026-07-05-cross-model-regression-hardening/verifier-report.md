@@ -44,3 +44,7 @@ None blocking. Two clarifications (applied by maker after verdict, spec + outcom
 ## File Edit Statement
 
 Verifier did not edit files and did not run mutating gates; all inspection read-only (git show/log/status, file reads, grep, receipt logs).
+
+## Raw-log retirement note — 2026-07-29
+
+The independent verifier originally inspected `stingray-form-regression-full.log` and `multi-model-runtime-switching-full.log`. Pass 4 Stage C retired those redundant raw logs after confirming that their decisive gate results, classifications, and verifier judgment remain in this report, `validation-output.txt`, and `outcome.md`. This append-only note records the evidence migration; it does not alter the original criteria or verdict.

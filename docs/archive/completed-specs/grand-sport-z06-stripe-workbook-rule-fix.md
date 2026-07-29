@@ -1,5 +1,7 @@
 # Spec: Grand Sport/Z06 stripe workbook rule fix
 
+> **Archive closure (2026-07-29): COMPLETED.** Implementation is present at `ee2bf7c`. Any trailing approval request is historical; current operator commands are owned by `README.md`. Stage C approved this completed plan for archival.
+
 ## Diagnosis
 
 The requested behavior is workbook-owned, not runtime-owned.

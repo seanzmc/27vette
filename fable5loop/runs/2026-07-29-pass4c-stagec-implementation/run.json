@@ -1,0 +1,54 @@
+{
+  "id": "2026-07-29-pass4c-stagec-implementation",
+  "started_at": "2026-07-29T12:07:00-04:00",
+  "completed_at": "2026-07-29T12:25:37-04:00",
+  "objective": "Execute the independently verified Pass 4 Stage C docs/path cleanup manifest without changing protected workbook, code/test, generated/published, runtime, dealer, schema, dependency, or deployment surfaces.",
+  "source_commit": "3515f72",
+  "changed_surface": "Exactly 19 completed-plan archival moves, nine pre-move closure notes, four historical-document moves, three evidence-preserving deletions, exact active-pointer updates, one append-only prior-verifier evidence note, compact STATE navigation, owning-spec closure, and Stage C receipts.",
+  "outcome_rubric": "fable5loop/runs/2026-07-29-pass4c-stagec-implementation/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-29-pass4c-stagec-implementation/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-29-pass4c-stagec-implementation/validation-output.txt",
+  "process_deviations": [
+    "The first exact git-mv sequence stopped safely when the new workbook-manager archive parent directory was absent. No unintended move occurred; the directory was created and only the exact remaining approved moves/deletions were executed.",
+    "The initial receipt hash comparison included a Finder-created fable5loop/runs/.DS_Store. Verification now excludes only exact basename .DS_Store, consistent with the established Stage A policy; all arbitrary content and metadata drift remains detectable.",
+    "The first final Fable run selected the same-day preflight directory as latest because its slug sorted after pass4c-implementation. The implementation receipt was renamed to pass4c-stagec-implementation, all current pointers were updated, and both final Fable gates then passed."
+  ],
+  "state_updates": [
+    {
+      "section": "Current authority",
+      "evidence": "fable5loop/runs/2026-07-29-pass4c-stagec-implementation/validation-output.txt"
+    },
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-29-pass4c-stagec-implementation/verifier-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-29-pass4c-stagec-implementation/validation-output.txt"
+    }
+  ],
+  "skill_update": {
+    "decision": "not_applicable",
+    "evidence": "fable5loop/runs/2026-07-29-pass4c-stagec-implementation/outcome.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 1,
+    "delegation_id": "deleg_82348cd1"
+  },
+  "boundaries_preserved": [
+    "canonical workbook",
+    "scripts and tests",
+    "generated and published artifacts",
+    "runtime application and dealer submission",
+    "schemas, dependencies, and deployment",
+    "AGENTS.md, README.md, and docs/route-map.md",
+    "pre-existing archive payloads",
+    "prior receipts except the exact July 5 verifier append and two approved log deletions",
+    "six open plans, two workbook-provenance plan paths, and one pricing-decision plan",
+    "commit and push approval"
+  ]
+}

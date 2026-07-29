@@ -1,5 +1,7 @@
 # Spec: Retire R6X special-casing; R6X as a workbook interior component at $995 (Pass 2)
 
+> **Archive closure (2026-07-29): COMPLETED.** Implementation is present at `bc61572` with retained `$995` component and D30-independence coverage. Any trailing approval request is historical; current operator commands are owned by `README.md`. Stage C approved this completed plan for archival.
+
 > **Execution status (2026-07-29): SUPERSEDED FOR COMMANDS.** `production.py` references and generator commands below describe an older topology and are not operator guidance. Use `README.md` and Pass 4 Stage A of `docs/superpowers/specs/2026-07-23-validation-single-lane-active-surface-cleanup.md` for current commands. The product-contract evidence remains historical context.
 
 Date: 2026-06-10

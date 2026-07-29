@@ -1,5 +1,7 @@
 # Z06 Runtime Rule Correction Spec
 
+> **Archive closure (2026-07-29): COMPLETED.** Implementation is present at `ef9769e`, and the later Pass 2 plan records this pass complete with green evidence. Any trailing approval request, including the original pre-approval warning below, is historical; current operator commands are owned by `README.md`. Stage C approved this completed plan for archival.
+
 > **For Hermes:** This is a spec-first 27vette workbook/runtime pass. Do not implement until approved. Use workbook-authored source rows wherever the workbook can represent the rule; do not add Z06/RPO-specific JavaScript or Python business-rule exceptions.
 
 **Goal:** Correct the Z06 runtime-facing option/rule logic that is making the front end behave unlike the intended workbook/product model, while preventing another destructive future-model review script incident.

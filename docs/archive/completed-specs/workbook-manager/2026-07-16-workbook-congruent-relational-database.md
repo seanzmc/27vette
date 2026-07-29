@@ -1,7 +1,7 @@
 # Workbook-Congruent Relational Database Implementation Plan
 
 Status: superseded on 2026-07-22 by
-`../specs/2026-07-22-reliable-workbook-database-workflow.md`. Retained as a
+`docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md`. Retained as a
 historical plan; its fixed file layout and model assumptions are not current
 implementation instructions.
 
@@ -28,7 +28,7 @@ implementation instructions.
 - Existing guarded workbook writes remain `editor_ops.apply_batch()` -> `save_workbook_safely()`.
 - Use test-driven development: write and observe each failing test before production code.
 - Preserve the user's unstaged changes in `tests/test_workbook_manager.py` and `fable5loop/runs/2026-07-15-workbook-manager-stage1/validation-output.txt`. Never stage the Fable receipt. The legacy test file requires the explicit Task 8 approval gate below before it may be migrated or staged.
-- Reference design: `docs/superpowers/specs/2026-07-16-workbook-congruent-relational-database-design.md`.
+- Reference design: `docs/archive/completed-specs/workbook-manager/2026-07-16-workbook-congruent-relational-database-design.md`.
 
 ---
 
@@ -1279,7 +1279,7 @@ git commit -m "feat: show canonical tables and import findings"
 - Create: `tests/workbook_manager/test_completion_audit.py`
 - Modify: `workbook-manager/README.md`
 - Modify: `README.md` only for command-table/pointer ownership
-- Modify: `docs/superpowers/specs/2026-07-16-workbook-congruent-relational-database-design.md`
+- Modify: `docs/archive/completed-specs/workbook-manager/2026-07-16-workbook-congruent-relational-database-design.md`
 - Modify: this plan only to check completed steps and record results during execution
 
 **Interfaces:**
@@ -1385,7 +1385,7 @@ validation results, residual risks, and `none implied` follow-up when true.
 - [ ] **Step 5: Commit documentation and completion audit**
 
 ```bash
-git add tests/workbook_manager/test_completion_audit.py workbook-manager/README.md README.md docs/superpowers/specs/2026-07-16-workbook-congruent-relational-database-design.md docs/superpowers/plans/2026-07-16-workbook-congruent-relational-database.md
+git add tests/workbook_manager/test_completion_audit.py workbook-manager/README.md README.md docs/archive/completed-specs/workbook-manager/2026-07-16-workbook-congruent-relational-database-design.md docs/archive/completed-specs/workbook-manager/2026-07-16-workbook-congruent-relational-database.md
 git commit -m "docs: verify relational workbook database migration"
 ```
 

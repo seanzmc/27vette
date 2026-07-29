@@ -1,5 +1,7 @@
 # Generator Simplification Pass 2 Spec: Runtime Payload Trim
 
+> **Archive closure (2026-07-29): COMPLETED.** Implementation is present at `3d41f6b` with current path-aware trim coverage. Any trailing approval request is historical; current operator commands are owned by `README.md`. Stage C approved this completed plan for archival.
+
 > **Execution status (2026-07-29): SUPERSEDED.** This plan records an older generator/artifact topology. Do not run its commands or treat its compatibility paths, `production.py` route, artifact types, or retired test names as current guidance. Current commands and authority are owned by `README.md` and Pass 4 Stage A of `docs/superpowers/specs/2026-07-23-validation-single-lane-active-surface-cleanup.md`. Historical evidence below is preserved verbatim pending Stage C archival.
 
 ## Diagnosis

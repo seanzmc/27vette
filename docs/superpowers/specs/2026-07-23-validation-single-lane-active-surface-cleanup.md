@@ -1,7 +1,7 @@
 # Validation Single-Lane and Active-Surface Cleanup Specification
 
-Status: ACTIVE — Passes 0–3 and Pass 4 Stages A–B are complete. Stage B retired exactly the separately approved six-file boundary on 2026-07-29. Stage C remains unstarted and requires separate approval.
-Date: 2026-07-23 (revised through 2026-07-29 Stage B closeout)
+Status: COMPLETED — Passes 0–3 and Pass 4 Stages A–C are complete. Stage C executed its exact approved docs/path manifest on 2026-07-29 and passed independent implementation verification.
+Date: 2026-07-23 (revised through 2026-07-29 Stage C implementation)
 
 Consuming workflow: this specification is the structural prerequisite for the database-backed workbook editor described in `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md`. The end state that both specifications must jointly deliver is one controlled repeatable pathway:
 
@@ -1332,26 +1332,25 @@ Pass 4 gates:
 - Run the new canonical all-model generation and candidate-promotion gates.
 - Confirm default gates do not write tracked files.
 
-#### Stage C (formerly Pass 5) — Archive historical inputs, clear generated review clutter, and close
+#### Stage C — Archive historical inputs, clear generated review clutter, and close
 
-Purpose: after active guidance and executable cleanup are complete, leave future agents with no active completed-plan pile or redundant generated-review outputs.
+Stage C was separately approved and executed on 2026-07-29 from the exact
+manifest in `fable5loop/runs/2026-07-29-pass4c-preflight/preflight-report.md`.
+It closed nine landed-but-unclosed plans before moving them, archived nineteen
+plans and four historical documents, deleted three redundant review/log files
+after preserving their evidence disposition, repaired exact current pointers,
+and added a compact current-authority header to `fable5loop/STATE.md` without
+rewriting chronology.
 
-Pinned owners; the bound Pass 0 plan disposition appears in §9.4 and must be rebased before Pass 5 approval:
+Six explicitly open plans, two completed Grand Sport plans whose paths are
+canonical workbook provenance, and one Z06 pricing plan requiring a separate
+product/runtime closure decision remain current by design. Stage C did not
+write the workbook, regenerate or publish artifacts, change runtime/dealer
+behavior, or resolve those nine retained plans.
 
-- Move explicit completed `.hermes/plans/*.md` files to `docs/archive/completed-specs/` after reference updates.
-- Review the two explicitly open plans and keep them active only if still intended.
-- Resolve the one ambiguous plan and 14 no-status plans individually; do not mass-delete them.
-- The active ingest documentation tree is archived as retired in Pass I. Pass 5 must not retain a canonical compiler design or consolidation plan as current architecture.
-- Decide whether `fable5loop/STATE.md` needs a compact authoritative current-state header above its chronological history; do not delete required receipts or history.
-- Delete the exact generated-review/log list in §9.3 only after its unique evidence has been migrated to retained receipts.
-- Modify this specification to `Completed` with per-pass receipts.
-
-Pass 5 gates:
-
-- `git diff --check`
-- Targeted stale-reference scan over active non-archive files.
-- Read-back of every moved/updated current guidance file.
-- Final repo status showing only approved code/test/docs/deletion changes and no generated churn.
+Required closeout gates are the exact manifest/reference/read-back assertions,
+protected-surface byte proof against `3515f72`, `git diff --check`, the Fable
+validator and contract tests, and independent implementation verification.
 
 ## 5. Companion-file impact matrix
 
@@ -1391,23 +1390,28 @@ Pass 5 gates:
 
 ## 8. Approval boundaries
 
-Pass 0A is complete as a read-only file inventory. Pass 0B is still required to prove semantic viability; Pass 1 implementation approval is premature until that evidence revises the downstream file lists.
+Every implementation stage in this specification received its own bounded
+authorization. Pass 4 Stage B's six-file deletion and Stage C's exact rebased
+manifest were separately reviewed and approved on 2026-07-29; neither approval
+expanded into adjacent product, workbook, generated-artifact, runtime, dealer,
+schema, dependency, deployment, commit, or push work.
 
-Passes 2–3 require review of fresh route-characterization evidence before source-route or promotion changes.
+Stage C's authority was the independently verified preflight receipt at
+`fable5loop/runs/2026-07-29-pass4c-preflight/`. Implementation followed its
+exact 10 already-closed / 9 close-then-archive / 6 open / 2 historical-input /
+1 needs-decision partition, four document moves, three conditional deletions,
+pointer list, `STATE.md` navigation decision, and protected boundaries.
 
-Pass 4 Stage B's exact six-file deletion list was separately reviewed, approved, and completed on 2026-07-29. This does not authorize Stage C.
-
-Pass 5 plan moves/deletions require the completed/no-status classification receipt from Pass 0A and the current-consumer/necessary-behavior proof from Pass 0B.
-
-Current recommendation (revised 2026-07-29): Stage C is the next cleanup stage. It requires separate approval and must use the bound plan classification before moving completed plans or deleting generated review clutter; Stage B authorizes none of those changes.
-
-Pass 1 must not unify source builders, repair model semantics, refresh retained artifacts, or publish a registry.
+No remaining plan in §9.4 is implicitly approved by this completed cleanup.
+Any workbook provenance migration, product/runtime closure, generation,
+publication, database-workflow implementation, commit, or push requires its own
+current authority.
 
 Database-workflow readiness checkpoints, in order: Pass 1 makes export validation real; Pass 2 makes one pathway serve all six models; Pass 3 makes an end-to-end candidate run possible and gives the editor a machine-readable readiness report. The database specification's Passes 3–7 may proceed in parallel up to the point where they need a trustworthy post-export gate; they must not ship a write path that depends on today's permissive schema validation.
 
 ## 9. Bound audit inventory
 
-Sections 9.1–9.4 preserve the commit-`786e936` baseline and approved dispositions as an audit/deletion receipt. After Pass I, the active filesystem contains 44 script files and 46 test files; the 30 retired script files and 31 retired tests remain listed below only to show the reviewed boundary. The completed docs-archival plan is likewise listed at its original path as a rename receipt.
+Sections 9.1–9.2 preserve the commit-`786e936` script/test baseline as historical audit evidence. Sections 9.3–9.4 are the Stage C final current disposition. Old baseline paths in §§9.1–9.2 are not current commands or unresolved deletion authority.
 
 This inventory is the draft Pass 0A evidence at commit `786e936`. It binds all 74 tracked script files and all 76 tracked test files, but does not by itself prove semantic viability. Rebase it against the current tree and apply the Pass 0B criteria before approving implementation or deletion if the commit changes.
 
@@ -1636,126 +1640,83 @@ Tests known to rewrite tracked artifacts until isolated:
 - `tests/z06-interior-accessory-cleanup.test.mjs`
 - `tests/z06-runtime-promotion.test.mjs`
 
-### 9.3 Active guidance and historical-input disposition
+### 9.3 Stage C final historical-document and review disposition
 
-`UPDATE_CURRENT_GUIDANCE`:
+Stage C replaced the audit-baseline proposal with the independently verified
+manifest in `fable5loop/runs/2026-07-29-pass4c-preflight/`.
 
-- `AGENTS.md`
-- `README.md`
-- `docs/route-map.md`
-- `.claude/launch.json`
-- `scripts/generate_form.py`
-- `scripts/promote_model.py`
-- `scripts/corvette_form_generator/runtime_contract.py`
-- `scripts/corvette_form_generator/production.py`
-- `scripts/corvette_form_generator/rules.py`
-- `scripts/corvette_form_generator/workbook_domain/__init__.py`
-- `scripts/corvette_form_generator/workbook_domain/changeset.py`
-- `tests/test_editor_ops_global_families.py`
-- `workbook-manager/backend/app/staging.py`
+Archived historical documents:
 
-`ARCHIVE_RETIRED_INGEST_GUIDANCE` in Pass I:
+- `docs/archive/old-reports/db_audit-7-22.md`
+- `docs/archive/completed-specs/workbook-manager/2026-07-16-workbook-congruent-relational-database.md`
+- `docs/archive/completed-specs/workbook-manager/2026-07-16-workbook-congruent-relational-database-design.md`
+- `docs/archive/completed-specs/workbook-manager/react-editor-prompt.md`
 
-- `Order-Guide_IngestPrompt.md`
-- `docs/ingest/` — all 36 tracked Markdown files as one retired historical tree.
-- `docs/c1-review_codex.md`
-- `docs/c1-review_hermes.md`
-- `docs/ingest-impl-grade-review.md`
-- `docs/workbook-manager-v-editor-v-ingest.md`
-
-`ARCHIVE_COMPLETED_OR_HISTORICAL` after pointer review:
-
-- `docs/db_audit-7-22.md`
-- `docs/superpowers/plans/2026-07-16-workbook-congruent-relational-database.md`
-- `docs/superpowers/specs/2026-07-16-workbook-congruent-relational-database-design.md`
-- `docs/react-editor prompt.md`
-- `.hermes/plans/docs-archival-pass4-spec.md`
-- `.hermes/plans/route-map-condensation-pass6-spec.md`
-- `.hermes/plans/rule-audit-orphan-retirement-pass2-spec.md`
-- `.hermes/plans/src-images-retirement-pass5-spec.md`
-- `.hermes/plans/superpowers-untrack-pass1-spec.md`
-- `.hermes/plans/fable5-source-doc-rename-pass7-spec.md`
-- `.hermes/plans/cross-model-stale-gate-expectations-spec.md`
-- `.hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md`
-- `.hermes/plans/vehicle-setup-copy-workbook-ownership-spec.md`
-
-`DELETE_AFTER_CONSUMER_MIGRATION`:
+Deleted redundant review/log files after evidence migration:
 
 - `docs/claude_output-workbookEditor.md`
 - `fable5loop/runs/2026-07-05-cross-model-regression-hardening/multi-model-runtime-switching-full.log`
 - `fable5loop/runs/2026-07-05-cross-model-regression-hardening/stingray-form-regression-full.log`
 
-`KEEP_CURRENT` includes `AGENTS.md`, the 2026-07-22 reliable-workflow spec, current Workbook Manager README, current Codex/Claude configuration after ingest launch removal, required Fable receipts, generic workbook-domain ChangeSet/service owners, and all three tracked derived-swap manifests. No ingest compiler, emitter, deployment proof, or active ingest design remains current.
+The July 5 verifier report carries the append-only raw-log retirement note and
+retains the independent verdict. Current pointers in the reliable-workflow spec,
+the retained Z06 Pass 2 plan, and the two moved July 16 documents now target the
+archived destinations or current owner. Historical receipts and chronology were
+not rewritten solely to modernize old paths.
 
-`NEEDS_DECISION`:
+Measured at Stage C source commit `3515f72`, the active executable inventories
+are 42 tracked `scripts/**/*.py|*.mjs` entries and 47 test entrypoints: 31
+`tests/test_*.py` files plus 16 `tests/*.test.mjs` files. The three helper/fixture
+modules are not test entrypoints. All six tracked
+`form-output/inspection/*-derived-swap-manifest.json` files remain retained.
+Future generated-contract migrations remain outside this specification.
 
-- Legacy `artifact_type` support in `registry_promotion.py` and `schema_validation.py` — remove after fixture/external-consumer closure.
-- Draft-prefixed generated filenames — rename only with coordinated consumer migration.
-- `.hermes/plans/` entries without explicit completed/open state — classify individually.
-- `.hermes/plans/form-mobile-ux-consistency-spec.md` — status says implemented on another branch but pending Sean's device check/push direction; verify whether its behavior landed here before archiving.
-- `.hermes/plans/grand-sport-jake-heritage-hash-reverse-exclusions-spec.md` — top status still says implementing although a closeout exists; reconcile status with current workbook/runtime evidence before archiving.
-- `fable5loop/STATE.md` — retain; decide whether to add a compact authoritative current-state header above chronological history.
+### 9.4 `.hermes/plans` final active inventory — 9
 
-### 9.4 `.hermes/plans` — 29 at audit baseline; 28 active after Pass I
+Stage C archived nineteen completed plans under
+`docs/archive/completed-specs/`. Nine plans remain current, classified exactly
+and non-overlappingly as follows.
 
-`ARCHIVE_COMPLETED_OR_HISTORICAL` after pointer review:
-
-- `.hermes/plans/asset-map-sync-legacy-retirement-pass3-spec.md`
-- `.hermes/plans/cross-model-stale-gate-expectations-spec.md`
-- `.hermes/plans/docs-archival-pass4-spec.md`
-- `.hermes/plans/fable5-source-doc-rename-pass7-spec.md`
-- `.hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md`
-- `.hermes/plans/paint-accent-progress-checkmarks-spec.md`
-- `.hermes/plans/route-map-condensation-pass6-spec.md`
-- `.hermes/plans/rule-audit-orphan-retirement-pass2-spec.md`
-- `.hermes/plans/src-images-retirement-pass5-spec.md`
-- `.hermes/plans/superpowers-untrack-pass1-spec.md`
-- `.hermes/plans/vehicle-setup-copy-workbook-ownership-spec.md`
-
-`KEEP_OPEN`:
+`KEEP_OPEN` — 6:
 
 - `.hermes/plans/layered-visualizer-integration-spec.md`
-- `.hermes/plans/rule-normalization-pass7b-failed-fix-correction.md`
-
-`NEEDS_DECISION` before archive or deletion:
-
-Pass 4 Stage A execution-guidance override (2026-07-29): the following files may retain historical mentions of compatibility artifacts or retiring filenames, but their top-of-file notices explicitly supersede every such command/path as operator guidance: `asset-map-exterior-color-url-refresh.md`, `generator-simplification-pass2-runtime-payload-trim.md`, `live-runtime-merge-readiness-no-behavior-change-spec.md`, `r6x-interior-components-spec.md`, `route-map-condensation-pass6-spec.md`, `rule-audit-orphan-retirement-pass2-spec.md`, `rule-normalization-pass1-redundant-exclusive-excludes.md`, `rule-normalization-pass2-grouped-excludes.md`, `stingray-engine-appearance-display-order-match-grand-sport.md`, and `z06-interior-accessory-cleanup-pass2-spec.md`. Their underlying archival or still-open product/data status remains governed by the lists below; they are no longer current generation guidance.
-
-- `.hermes/plans/asset-map-exterior-color-url-refresh.md`
-- `.hermes/plans/color-override-normalization-spec.md`
-- `.hermes/plans/form-mobile-ux-consistency-spec.md`
-- `.hermes/plans/generator-simplification-pass2-runtime-payload-trim.md`
-- `.hermes/plans/grand-sport-jake-heritage-hash-reverse-exclusions-spec.md`
-- `.hermes/plans/grand-sport-z06-stripe-workbook-rule-fix.md`
-- `.hermes/plans/live-deltas-into-local-spec.md`
-- `.hermes/plans/live-runtime-merge-readiness-no-behavior-change-spec.md`
-- `.hermes/plans/r6x-interior-components-spec.md`
 - `.hermes/plans/rule-normalization-pass1-redundant-exclusive-excludes.md`
 - `.hermes/plans/rule-normalization-pass2-grouped-excludes.md`
-- `.hermes/plans/stingray-engine-appearance-display-order-match-grand-sport.md`
+- `.hermes/plans/rule-normalization-pass7b-failed-fix-correction.md`
 - `.hermes/plans/z06-carbon-wheel-package-disabled-state-spec.md`
 - `.hermes/plans/z06-interior-accessory-cleanup-pass2-spec.md`
+
+`KEEP_HISTORICAL_INPUT` — 2:
+
+- `.hermes/plans/grand-sport-stripe-heritage-reverse-exclusions-spec.md`
+- `.hermes/plans/grand-sport-jake-heritage-hash-reverse-exclusions-spec.md`
+
+Those two completed plans remain at their exact paths because 21 canonical
+`grandSport_rule_groups` workbook cells embed the names as provenance and the
+paths are emitted into the Grand Sport runtime contract and published bundle.
+Moving them requires a separately authorized workbook provenance migration,
+regeneration, publication, and protected-lane validation.
+
+`NEEDS_DECISION` — 1:
+
 - `.hermes/plans/z06-package-pricing-cascade-spec.md`
-- `.hermes/plans/z06-runtime-rule-correction-spec.md`
+
+Its partial implementation history does not prove the plan's complete intended
+runtime behavior. Stage C did not choose product/runtime closure for it.
+
+The nineteen archived-plan paths, their evidence, and the nine dated closure
+notes added before archival are bound by
+`fable5loop/runs/2026-07-29-pass4c-preflight/preflight-report.md` and the Stage C
+implementation receipt. No age-, filename-, or bulk-deletion rule was used.
 
 ## 10. Completion record
 
-Pass 0A and approved Pass I completed 2026-07-23; the Pass 0B generation/runtime executable slice completed 2026-07-24 and Pass 0B remains open for other non-ingest surfaces:
+Status at 2026-07-29 closeout:
 
-- Classified all 74 tracked script files and all 76 tracked test files at commit `786e936`.
-- Classified all 29 tracked `.hermes/plans` entries without treating ambiguous/no-status plans as completed.
-- Identified seven tests that can rewrite tracked generated artifacts.
-- Classified active guidance, historical-input, generated-review, and plan cleanup candidates.
-- Verified the script and test categories are complete partitions with no missing, extra, or duplicate paths.
-- Bound the current-route audit to commit `786e9367d39563c91e6554b5e1d0d5a4b6f5b8bb`, workbook SHA-256 `c5f986f6793205e00124db5640248e9e8c57ebb930679a92c2b3e8c56fb62154`, isolated outputs, exact per-model diff categories, and a clean protected-surface diff.
-- Independent review's ten initial plan blockers were amended. Re-review found only missing Pass 1 regression gates; `test_editor_ops_global_families.py`, `test_registry_promotion_metadata.py`, and conditional `test_promote_model.py` coverage are now explicit alongside Workbook Manager projection gates.
-- Correction after semantic-viability challenge: importer/caller coverage is only a reachability guard. It does not prove a module, function, route, output, or test remains necessary. Pass 0B must trace authoritative roots and revise every keep/retire decision before implementation approval.
-- Pass 0B source-level subaudit traced customer release, workbook schema/write, promotion/publication, ingest/ChangeSet, fallback editor, and Workbook Manager roots. It reclassified `promote_model.py`, `apply_workbook_ops.py`, deployment proof, migration/repair, mixed ingest session/decision modules, legacy importer libraries, and false-green/compatibility-preserving tests by actual behavior rather than importer count.
-- Pass 0B generation/runtime execution at commit `667aad5` proved six-model discovery, five successful isolated generations, the Z06 stale-derivation failure, split source construction, incomplete config path binding, permissive runtime validation, write-before-validation behavior, retained-artifact registry false confidence, and tracked-path test hazards. The evidence and revised implementation ordering are recorded in §2.4; no protected artifact changed.
-- After the Pass 0B generation/runtime reclassification, the revised test partition is 8 current gates, 22 focused regressions, 7 current-lane rewrites, 2 optional diagnostics, 3 duplicate consolidations, and 34 stale retirements. Thirty-one retirements belong to ingest or its ingest-specific proof; the seat canonicalization, source-string route, and retained unpublished-contract tests are separate pending retirement candidates. The 74-script and 76-test inventories remain exact complete partitions with no missing, extra, or duplicate paths.
-- User decision: the ingest wizard's data-import behavior caused enough harm that the workspace should not carry the wizard/compiler/exception/emitter chain forward. `changeset_emitter.py` and `plan_builder.py` therefore retire together; no constant migration is justified solely to preserve the emitter. Generic workbook-domain ChangeSet/service safety remains independent.
-- Pass I executed the exact reviewed retirement boundary and produced the receipt in §2. The active inventory is now 44 scripts and 46 tests; no retired ingest import, launcher, UI, or active documentation path remains.
-- Pass 0B is not complete: the subaudit was read-only source/API/UI tracing and did not execute every retained CLI/test. Per-path execution or an explicit safe source-only characterization is still required before a `KEEP_*` disposition becomes final implementation/deletion authority.
-- No workbook, generated runtime contract, registry, runtime JS, dealer surface, promotion row, or deployment path changed.
-- 2026-07-24 revision: added the database-workflow end-state lane at the head of this document, the §2.8 simplification audit, the §3.7 composed candidate lane with its §3.7.1 changed-model reporting contract, the §3.8 single-validator rule and cross-specification reconciliation, Pass 1 export-gate RED cases and the family-to-model mapping helper, the Pass 3 retained-Stingray-contract prerequisite, and the collapse of remaining work to four passes. Corrected the database specification's stale validator-owner reference.
-- Next boundary: approve Pass 1. Continue remaining Pass 0B viability work in parallel; its evidence gates Pass 4 deletion, not Pass 1 authority consolidation.
+- Pass 0A and Pass I classified the original surface and retired the untrusted ingest workflow.
+- Pass 0B and Passes 1–3 established executable source/schema validation, one six-model generation lane, candidate verification, and runtime-contract-only publication metadata.
+- Pass 4 Stage A made current gates authoritative and isolated; Stage B deleted the exact six zero-consumer compatibility/tool/test files.
+- Stage C executed exactly 23 archival moves and three evidence-preserving deletions, retained the nine individually classified current plans, repaired active pointers, and added the compact `STATE.md` current-authority header.
+- The implementation receipt is `fable5loop/runs/2026-07-29-pass4c-stagec-implementation/`; final gates and independent verification are recorded there.
+- Workbook, generated/published artifacts, runtime behavior, dealer submission, schemas, dependencies, and standing guidance owners were preserved.
+- Residual open plans and the separately governed database-workflow implementation are not unfinished work in this cleanup specification. No additional cleanup pass is implied.
