@@ -5,13 +5,11 @@ import test from "node:test";
 
 import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
 
-const reviewDir = "/tmp/27vette-grand-sport-draft-data-test";
-const outputRoot = `${reviewDir}/output-root`;
-const draftPath = `${reviewDir}/grand-sport-form-data-draft.json`;
-const draftMarkdownPath = `${reviewDir}/grand-sport-form-data-draft.md`;
+const outputRoot = "/tmp/27vette-grand-sport-runtime-contract-test";
+const runtimePath = `${outputRoot}/form-output/runtime/grand-sport-runtime-contract.json`;
 
-function generateDraftWithoutTrackedMutation() {
-  fs.rmSync(reviewDir, { recursive: true, force: true });
+function generateRuntimeContractWithoutTrackedMutation() {
+  fs.rmSync(outputRoot, { recursive: true, force: true });
   fs.mkdirSync(outputRoot, { recursive: true });
   const before = readTrackedArtifacts();
   execFileSync(
@@ -22,9 +20,6 @@ function generateDraftWithoutTrackedMutation() {
       "grand_sport",
       "--output-root",
       outputRoot,
-      "--emit-inspection",
-      "--inspection-output",
-      reviewDir,
     ],
     {
       encoding: "utf8",
@@ -33,12 +28,10 @@ function generateDraftWithoutTrackedMutation() {
   );
   assertTrackedArtifactsUnchanged(before);
   assert.ok(
-    fs.existsSync(`${outputRoot}/form-output/runtime/grand-sport-runtime-contract.json`),
-    "--output-root must receive the runtime contract this gate would otherwise write over the tracked one"
+    fs.existsSync(runtimePath),
+    "--output-root must receive the strict runtime contract this gate consumes"
   );
-  assert.ok(fs.existsSync(draftPath), "Grand Sport draft JSON should exist");
-  assert.ok(fs.existsSync(draftMarkdownPath), "Grand Sport draft Markdown should exist");
-  return JSON.parse(fs.readFileSync(draftPath, "utf8"));
+  return JSON.parse(fs.readFileSync(runtimePath, "utf8"));
 }
 
 function workbookRows(sheetName) {
@@ -67,17 +60,7 @@ function workbookRows(sheetName) {
   return JSON.parse(output);
 }
 
-const draft = generateDraftWithoutTrackedMutation();
-const inspectionSource = fs.readFileSync("scripts/corvette_form_generator/inspection.py", "utf8");
-const interiorsSource = fs.readFileSync("scripts/corvette_form_generator/interiors.py", "utf8");
-const activeInteriorPipelineSources = [
-  inspectionSource,
-  interiorsSource,
-  fs.readFileSync("scripts/corvette_form_generator/model_config.py", "utf8"),
-  fs.readFileSync("scripts/corvette_form_generator/model_configs.py", "utf8"),
-  fs.readFileSync("scripts/corvette_form_generator/production.py", "utf8"),
-  fs.readFileSync("scripts/generate_form.py", "utf8"),
-].join("\n");
+const draft = generateRuntimeContractWithoutTrackedMutation();
 const heritageHashOptionIds = ["opt_17a_001", "opt_20a_001", "opt_55a_001", "opt_75a_001", "opt_97a_001", "opt_dx4_001"];
 const heritageCenterStripeOptionIds = ["opt_dmu_001", "opt_dmv_001", "opt_dmw_001", "opt_dmx_001", "opt_dmy_001"];
 const nonCenterStripeOptionIds = [
@@ -169,7 +152,7 @@ const expectedGrandSportExclusiveGroups = [
   },
 ];
 
-test("Grand Sport draft preserves the live generated-data top-level contract", () => {
+test("Grand Sport fresh runtime contract preserves the required top-level contract", () => {
   for (const key of [
     "dataset",
     "variants",
@@ -190,7 +173,7 @@ test("Grand Sport draft preserves the live generated-data top-level contract", (
   ]) {
     assert.ok(Object.hasOwn(draft, key), `draft is missing ${key}`);
   }
-  assert.equal(draft.dataset.status, "draft_not_runtime_active");
+  assert.equal(draft.dataset.status, "runtime_active");
   assert.equal(draft.dataset.model, "Grand Sport");
   assert.deepEqual(
     draft.variants.map((variant) => variant.variant_id),
@@ -198,7 +181,7 @@ test("Grand Sport draft preserves the live generated-data top-level contract", (
   );
 });
 
-test("Grand Sport draft includes the full variant matrix and standard equipment rows", () => {
+test("Grand Sport runtime contract includes the full variant matrix and standard equipment rows", () => {
   assert.equal(draft.variants.length, 6);
   assert.equal(draft.contextChoices.length, 8);
   assert.equal(draft.steps.length, 14);
@@ -327,8 +310,8 @@ test("Grand Sport seat availability comes from grandSport_ovs by trim", () => {
   ]);
 });
 
-test("Grand Sport draft emits color overrides and workbook-backed package price rules", () => {
-  assert.equal(draft.rules.length > 0, true, "Grand Sport draft should include normalized compatibility rules");
+test("Grand Sport runtime contract emits color overrides and workbook-backed package price rules", () => {
+  assert.equal(draft.rules.length > 0, true, "Grand Sport runtime contract should include normalized compatibility rules");
   assert.equal(draft.priceRules.length >= requiredPackagePriceRules.length, true);
   const priceRuleKeys = new Set(
     draft.priceRules.map((rule) => [rule.price_rule_id, rule.condition_option_id, rule.target_option_id, rule.price_rule_type, rule.price_value].join("::"))
@@ -376,15 +359,13 @@ test("Grand Sport draft emits color overrides and workbook-backed package price 
   );
   const warnings = new Set(draft.validation.filter((row) => row.severity === "warning").map((row) => row.check_id));
   const passes = new Set(draft.validation.filter((row) => row.severity === "pass").map((row) => row.check_id));
-  assert.ok(warnings.has("grand_sport_draft_status"));
   assert.equal(warnings.has("pricing_deferred"), false);
   assert.ok(passes.has("price_rules"));
   assert.equal(warnings.has("rules_deferred"), false);
   assert.equal(warnings.has("color_overrides"), false);
-  assert.deepEqual(draft.draftMetadata.deferredSurfaces, []);
 });
 
-test("Grand Sport draft emits the approved model-scoped exclusive groups", () => {
+test("Grand Sport runtime contract emits the approved model-scoped exclusive groups", () => {
   assert.equal(draft.exclusiveGroups.length, expectedGrandSportExclusiveGroups.length);
   const byId = new Map(draft.exclusiveGroups.map((group) => [group.group_id, group]));
   const choiceOptionIds = new Set(draft.choices.map((choice) => choice.option_id));
@@ -409,7 +390,7 @@ test("Grand Sport draft emits the approved model-scoped exclusive groups", () =>
   }
 });
 
-test("Grand Sport draft emits deterministic option rules from copied Stingray rows and raw detail", () => {
+test("Grand Sport runtime contract emits deterministic option rules from workbook rows", () => {
   const ruleKeys = new Set(
     draft.rules.map((rule) => [
       rule.source_id,
@@ -550,7 +531,7 @@ test("Grand Sport draft emits deterministic option rules from copied Stingray ro
   );
 });
 
-test("Grand Sport draft suppresses reviewed inactive/deferred option rows without hiding selectable seatbelts", () => {
+test("Grand Sport runtime contract suppresses inactive option rows without hiding selectable seatbelts", () => {
   const optionIds = new Set(draft.choices.map((choice) => choice.option_id));
   for (const optionId of ["opt_36s_001", "opt_37s_001", "opt_38s_001", "opt_r6p_001", "opt_r9v_001", "opt_r9w_001", "opt_r9y_001", "opt_u2k_001"]) {
     assert.equal(optionIds.has(optionId), false, `${optionId} should not be emitted as an active Grand Sport option`);
@@ -738,7 +719,7 @@ test("interior grouping metadata is workbook-owned for active runtime models", (
   assert.equal(z06Custom?.interior_leaf_label, "Adrenaline Red interior / Jet Black seats");
 });
 
-test("Grand Sport draft includes model-scoped LT interiors with EL9 launch edition metadata", () => {
+test("Grand Sport runtime contract includes model-scoped LT interiors with EL9 launch edition metadata", () => {
   assert.equal(draft.interiors.length, 132);
   assert.equal(draft.interiors.every((interior) => interior.active_for_grand_sport === true), true);
   assert.equal(draft.interiors.every((interior) => interior.active_for_stingray === false), true);
@@ -760,22 +741,6 @@ test("Grand Sport draft includes model-scoped LT interiors with EL9 launch editi
     componentRows.length,
     "active Grand Sport interior component keys should be unique"
   );
-  assert.match(interiorsSource, /load_model_interior_scope_map/);
-  assert.match(interiorsSource, /load_interior_components/);
-  assert.match(interiorsSource, /build_model_interiors/);
-  assert.match(interiorsSource, /config\.interior_source_sheet/);
-  assert.match(inspectionSource, /build_model_interiors/);
-  assert.doesNotMatch(interiorsSource, /rows_from_sheet\(wb, ["']lt_interiors["']\)/);
-  assert.doesNotMatch(interiorsSource, /source_sheet["']?: ["']lt_interiors["']/);
-  assert.doesNotMatch(interiorsSource, /read_interior_reference|grouping_fields_for_interior|fallback_interior_trims|interior_component_metadata/);
-  assert.doesNotMatch(inspectionSource, /rows_from_sheet\(wb, ["']lt_interiors["']\)/);
-  assert.doesNotMatch(inspectionSource, /source_sheet["']?: ["']lt_interiors["']/);
-  assert.doesNotMatch(
-    activeInteriorPipelineSources,
-    /interior_reference_path|stingray_interiors_refactor\.csv|grand_sport_interiors_refactor\.csv/,
-    "active interior generation must not keep stale CSV reference config surfaces"
-  );
-
   assert.equal(draft.interiors.every((interior) => interior.source_sheet === "lt_interiors"), true);
   const byId = new Map(draft.interiors.map((interior) => [interior.interior_id, interior]));
   for (const interiorId of ["3LT_AE4_EL9", "3LT_AH2_EL9"]) {
@@ -799,16 +764,16 @@ test("Grand Sport draft includes model-scoped LT interiors with EL9 launch editi
   );
 });
 
-test("Grand Sport draft keeps normalized display fields and raw rule evidence", () => {
+test("Grand Sport runtime contract keeps normalized display fields and strips raw rule evidence", () => {
   const cfl = draft.choices.find((choice) => choice.choice_id === "1lt_e07__opt_cfl_001");
-  assert.ok(cfl, "CFL should be present in the draft");
+  assert.ok(cfl, "CFL should be present in the runtime contract");
   assert.equal(cfl.label, "Extended Front Splitter, Carbon Flash");
-  assert.equal(cfl.source_option_name, "Extended Front Splitter, Carbon Flash");
-  assert.equal(cfl.source_detail_raw, "1. Not available with (CFV/CFZ) ground effects.");
+  assert.equal(Object.hasOwn(cfl, "source_option_name"), false);
+  assert.equal(Object.hasOwn(cfl, "source_detail_raw"), false);
   assert.equal(cfl.step_key, "packages_performance");
 });
 
-test("Grand Sport draft applies active option assets from asset_map", () => {
+test("Grand Sport runtime contract applies active option assets from asset_map", () => {
   const brightRedCaliperChoices = draft.choices.filter((choice) => choice.option_id === "opt_j6f_001");
   assert.equal(brightRedCaliperChoices.length, 6);
   for (const choice of brightRedCaliperChoices) {
@@ -827,7 +792,7 @@ test("Grand Sport draft applies active option assets from asset_map", () => {
   assert.equal(Object.hasOwn(unmappedChoice, "image_alt"), false);
 });
 
-test("Grand Sport draft section placement follows section_master step_key", () => {
+test("Grand Sport runtime contract section placement follows section_master step_key", () => {
   const sectionById = new Map(draft.sections.map((section) => [section.section_id, section]));
   assert.equal(sectionById.get("sec_gsha_001")?.step_key, "aero_exhaust_stripes_accessories");
   assert.equal(sectionById.get("sec_gsha_001")?.section_display_order, 10);
@@ -852,11 +817,11 @@ test("Grand Sport draft section placement follows section_master step_key", () =
   assert.equal(sectionById.get("sec_perf_brake_001")?.section_display_order, 20);
   assert.equal(sectionById.get("sec_cali_001")?.step_key, "wheels");
   assert.equal(sectionById.get("sec_lpoe_001")?.step_key, "accessories");
-  assert.equal(sectionById.has("sec_lpow_001"), false, "LPO Wheels has no active Grand Sport choices in the draft");
+  assert.equal(sectionById.has("sec_lpow_001"), false, "LPO Wheels has no active Grand Sport runtime choices");
   assert.equal(sectionById.get("sec_lpoi_001")?.step_key, "accessories");
 });
 
-test("Grand Sport draft standard equipment grouping is workbook-owned", () => {
+test("Grand Sport runtime contract standard equipment grouping is workbook-owned", () => {
   const trimRows = draft.standardEquipment.filter((item) => item.standard_equipment_group_type === "trim_equipment");
   assert.ok(trimRows.length > 0, "trim equipment rows should be tagged by generated workbook metadata");
   assert.equal(trimRows.every((item) => ["sec_1lte_001", "sec_2lte_001", "sec_3lte_001"].includes(item.section_id)), true);
@@ -927,14 +892,4 @@ test("Grand Sport Jake graphics are selectable choices with rear hash graphics i
       .map((rule) => `${rule.target_option_id}:${rule.price_value}`)
   );
   assert.deepEqual([...pdaPriceRules].sort(), ["opt_sne_001:0", "opt_vpw_001:0"]);
-});
-
-test("Grand Sport draft preserves rule hot spots and normalization metadata for later phases", () => {
-  assert.equal(draft.draftMetadata.candidateAvailableOrStandardChoices, 1290);
-  assert.equal(draft.draftMetadata.fullVariantMatrixChoices, 1428);
-  assert.equal(draft.draftMetadata.ruleDetailHotSpots.rows.length, 112);
-  assert.equal(draft.draftMetadata.ruleDetailHotSpots.counts.special_package_review, 27);
-  assert.equal(draft.draftMetadata.normalization.unresolvedIssues.length, 0);
-  assert.equal(draft.draftMetadata.priceRuleSourceRows, draft.priceRules.length);
-  assert.deepEqual(draft.draftMetadata.deferredSurfaces, []);
 });

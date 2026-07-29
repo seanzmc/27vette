@@ -7,7 +7,7 @@ import path from "node:path";
 import test from "node:test";
 import vm from "node:vm";
 
-// Spec Pass 3 requirements 6 and 9. Split out of `z06-runtime-promotion.test.mjs`
+// Spec Pass 3 requirements 6 and 9. Split out of the published-runtime gate
 // so the read-only promotion assertions never invoke the publisher, then given an
 // isolated `--output` by requirement 9 so this file no longer rewrites the tracked
 // `form-app/data.js` either. Running the whole node gate set is now read-only with

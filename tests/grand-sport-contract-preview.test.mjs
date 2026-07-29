@@ -73,25 +73,6 @@ test("all Grand Sport preview choices resolve section, step, and raw detail fiel
   assert.equal(preview.validation.length, 0);
 });
 
-test("Grand Sport section placement is owned by section_master step_key", () => {
-  const sectionById = new Map(preview.sections.map((section) => [section.section_id, section]));
-  assert.equal(sectionById.get("sec_gsha_001")?.step_key, "aero_exhaust_stripes_accessories");
-  assert.equal(sectionById.get("sec_gsce_001")?.step_key, "aero_exhaust_stripes_accessories");
-  assert.equal(sectionById.get("sec_exha_001")?.step_key, "packages_performance");
-  assert.equal(sectionById.get("sec_whee_001")?.step_key, "wheels");
-  assert.equal(sectionById.get("sec_perf_001")?.step_key, "packages_performance");
-  assert.equal(sectionById.get("sec_perf_001")?.section_name, "Mechanical");
-  assert.equal(sectionById.has("sec_perf_support_001"), false, "sec_perf_support_001 was removed from section_master");
-  assert.equal(sectionById.get("sec_perf_brake_001")?.step_key, "packages_performance");
-  assert.equal(sectionById.get("sec_perf_z52_001")?.step_key, "packages_performance");
-  assert.equal(sectionById.get("sec_perf_aero_001")?.step_key, "packages_performance");
-  assert.equal(sectionById.get("sec_perf_ground_001")?.step_key, "packages_performance");
-  assert.equal(sectionById.get("sec_cali_001")?.step_key, "wheels");
-  assert.equal(sectionById.get("sec_lpoe_001")?.step_key, "accessories");
-  assert.equal(sectionById.has("sec_lpow_001"), false, "LPO Wheels has no active Grand Sport preview choices");
-  assert.equal(sectionById.get("sec_lpoi_001")?.step_key, "accessories");
-});
-
 test("filled Grand Sport source sections do not require blank-section config", () => {
   assert.deepEqual(preview.normalization.blankSectionOverrides, []);
   const choicesByRpo = new Map(preview.choices.map((choice) => [choice.rpo, choice]));

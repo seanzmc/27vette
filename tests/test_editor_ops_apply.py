@@ -152,22 +152,35 @@ class CoerceTest(unittest.TestCase):
 
 
 class GateRemindersTest(unittest.TestCase):
-    def test_grand_sport_default_reminders_exclude_optional_audit_gate(self):
+    def test_grand_sport_reminders_use_the_current_candidate_lane(self):
         reminders = gate_reminders({"grand_sport"})
 
         self.assertIn(".venv/bin/python scripts/generate_form.py --model grand_sport", reminders)
+        self.assertIn(".venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx", reminders)
         self.assertIn(".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx", reminders)
-        self.assertIn("node --test tests/grand-sport-contract-preview.test.mjs", reminders)
-        self.assertIn("node --test tests/grand-sport-draft-data.test.mjs", reminders)
-        self.assertFalse(any("rule-audit" in command for command in reminders), reminders)
+        self.assertIn(
+            ".venv/bin/python scripts/verify_workbook_candidate.py --workbook stingray_master.xlsx "
+            "--changed-model grand_sport --report /tmp/27vette-workbook-candidate.json",
+            reminders,
+        )
+        candidate_index = next(index for index, command in enumerate(reminders) if "verify_workbook_candidate.py" in command)
+        generation_index = reminders.index(".venv/bin/python scripts/generate_form.py --model grand_sport")
+        publication_index = reminders.index(".venv/bin/python scripts/generate_registry.py")
+        self.assertLess(candidate_index, generation_index)
+        self.assertLess(generation_index, publication_index)
+        self.assertFalse(any("preview" in command or "draft" in command or "rule-audit" in command for command in reminders), reminders)
 
-    def test_multi_model_reminders_dedupe_schema_validation(self):
+    def test_multi_model_reminders_dedupe_shared_validation_and_scope_candidate_report(self):
         reminders = gate_reminders({"stingray", "grand_sport"})
 
         self.assertEqual(
             reminders.count(".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx"),
             1,
         )
+        candidate = [command for command in reminders if "verify_workbook_candidate.py" in command]
+        self.assertEqual(len(candidate), 1)
+        self.assertIn("--changed-model grand_sport", candidate[0])
+        self.assertIn("--changed-model stingray", candidate[0])
 
 
 # ─────────────────────────────────────────────────────────────

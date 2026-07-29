@@ -1,0 +1,39 @@
+{
+  "id": "2026-07-28-pass4a-gate-authority-closeout",
+  "started_at": "2026-07-28T23:28:26-04:00",
+  "completed_at": "2026-07-29T00:32:51-04:00",
+  "objective": "Complete Pass 4 Stage A by assigning source/schema, fresh runtime-contract, published runtime/registry, and optional diagnostic authority; update active guidance; prove a no-churn validation lane; and publish an exact unexecuted Stage B deletion list for separate approval.",
+  "changed_surface": "README and route-map guidance; editor gate reminders and tests; four renamed Node gate surfaces plus preview/runtime assertion migrations; shared generation/source assembly compatibility-output retirement; fresh all-model migration of retained-artifact assertions; Fable receipt, owning spec, and STATE. No canonical workbook, generated runtime contract, published registry, runtime app, dealer flow, or Stage B deletion.",
+  "outcome_rubric": "fable5loop/runs/2026-07-28-pass4a-gate-authority-closeout/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-28-pass4a-gate-authority-closeout/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-28-pass4a-gate-authority-closeout/validation-output.txt",
+  "process_deviations": [
+    "The closeout rubric file was created after the first implementation edits; its criteria were taken from the already-approved Stage A specification and stated session definition of done.",
+    "Several verifier dispatches were superseded because receipt content or the acceptance fingerprint changed; the final accepted verifier cycle binds to the complete git diff HEAD fingerprint and completed loop receipt.",
+    "Late exit-inventory review found two missing Stage A obligations: migrate the retained unpublished-contract assertions and disconnect active compatibility producers/consumers before proposing deletion. Both were corrected and all affected gates rerun before the accepted verifier cycle."
+  ],
+  "state_updates": [
+    {"section": "Verified facts", "evidence": "fable5loop/runs/2026-07-28-pass4a-gate-authority-closeout/validation-output.txt"},
+    {"section": "Lessons learned", "evidence": "fable5loop/runs/2026-07-28-pass4a-gate-authority-closeout/verifier-report.md"},
+    {"section": "Last session", "evidence": "fable5loop/runs/2026-07-28-pass4a-gate-authority-closeout/outcome.md"}
+  ],
+  "skill_update": {
+    "decision": "deferred",
+    "evidence": "fable5loop/runs/2026-07-28-pass4a-gate-authority-closeout/outcome.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 2
+  },
+  "boundaries_preserved": [
+    "canonical workbook",
+    "generated runtime contracts",
+    "published registry",
+    "runtime and dealer submission",
+    "Stage B deletion approval",
+    "concurrent form-app/index.html favicon change"
+  ]
+}

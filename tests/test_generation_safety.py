@@ -14,7 +14,6 @@ SCRIPTS_DIR = ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
-from corvette_form_generator import production  # noqa: E402
 from corvette_form_generator import model_generation, output  # noqa: E402
 from corvette_form_generator.model_configs import base_model_config  # noqa: E402
 from corvette_form_generator.registry_promotion import (  # noqa: E402
@@ -106,7 +105,7 @@ class GenerationPathSafetyTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "outside root"):
                 resolve_artifact_path(root, outside)
             with self.assertRaisesRegex(ValueError, "outside root"):
-                resolve_artifact_path(root, "form-output/stingray-form-data.json")
+                resolve_artifact_path(root, "form-output/runtime/stingray-runtime-contract.json")
 
     def test_rule_derivation_does_not_write_during_source_assembly(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -129,26 +128,6 @@ class GenerationPathSafetyTests(unittest.TestCase):
 
         loader.assert_called_once_with(config.workbook_path, data_only=True, read_only=True)
 
-    def test_stingray_compatibility_writer_uses_config_output_dir(self) -> None:
-        with tempfile.TemporaryDirectory() as tmpdir:
-            temp_root = Path(tmpdir)
-            target_output = temp_root / "candidate" / "form-output"
-            config = base_model_config("stingray").with_overrides(
-                root=temp_root / "candidate",
-                output_dir=target_output,
-                app_dir=temp_root / "candidate" / "form-app",
-            )
-
-            artifacts = production.write_stingray_compatibility_artifacts(
-                config,
-                {"choices": []},
-                {"dataset": {"status": "runtime_active"}},
-            )
-
-            self.assertEqual(Path(artifacts["json"]), target_output / "stingray-form-data.json")
-            self.assertEqual(Path(artifacts["csv"]), target_output / "stingray-form-data.csv")
-
-
 class RuntimeContractSafetyTests(unittest.TestCase):
     def test_runtime_artifact_uses_config_output_dir(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -163,7 +142,6 @@ class RuntimeContractSafetyTests(unittest.TestCase):
                 config=config,
                 source_data=contract,
                 runtime_contract=contract,
-                compatibility_source=True,
             )
 
             with patch.object(model_generation, "assemble_model_source", return_value=assembly):
@@ -233,7 +211,6 @@ class RuntimeContractSafetyTests(unittest.TestCase):
                     "interiors": [],
                 },
                 runtime_contract=invalid_contract,
-                compatibility_source=True,
             )
 
             with patch.object(model_generation, "assemble_model_source", return_value=assembly):

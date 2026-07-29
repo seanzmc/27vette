@@ -5,10 +5,8 @@ import test from "node:test";
 
 import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
 
-const reviewDir = "/tmp/27vette-z06-form-data-draft-test";
-const outputRoot = `${reviewDir}/output-root`;
-const draftPath = `${reviewDir}/z06-form-data-draft.json`;
-const draftMarkdownPath = `${reviewDir}/z06-form-data-draft.md`;
+const outputRoot = "/tmp/27vette-z06-runtime-contract-test";
+const runtimePath = `${outputRoot}/form-output/runtime/z06-runtime-contract.json`;
 const expectedVariantIds = ["1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67", "3lz_h67"];
 const standardSections = new Set([
   "sec_stan_001",
@@ -49,8 +47,8 @@ const fullLengthStripeOptionIds = [
   "opt_dth_001", "opt_dub_001", "opt_due_001", "opt_duk_001", "opt_duw_001", "opt_dzu_001", "opt_dzv_001", "opt_dzx_001",
 ];
 
-function generateDraftWithoutTrackedMutation() {
-  fs.rmSync(reviewDir, { recursive: true, force: true });
+function generateRuntimeContractWithoutTrackedMutation() {
+  fs.rmSync(outputRoot, { recursive: true, force: true });
   fs.mkdirSync(outputRoot, { recursive: true });
   const before = readTrackedArtifacts();
   execFileSync(
@@ -61,9 +59,6 @@ function generateDraftWithoutTrackedMutation() {
       "z06",
       "--output-root",
       outputRoot,
-      "--emit-inspection",
-      "--inspection-output",
-      reviewDir,
     ],
     {
       encoding: "utf8",
@@ -72,17 +67,15 @@ function generateDraftWithoutTrackedMutation() {
   );
   assertTrackedArtifactsUnchanged(before);
   assert.ok(
-    fs.existsSync(`${outputRoot}/form-output/runtime/z06-runtime-contract.json`),
-    "--output-root must receive the runtime contract this gate would otherwise write over the tracked one"
+    fs.existsSync(runtimePath),
+    "--output-root must receive the strict runtime contract this gate consumes"
   );
-  assert.ok(fs.existsSync(draftPath), "Z06 draft JSON should exist");
-  assert.ok(fs.existsSync(draftMarkdownPath), "Z06 draft Markdown should exist");
-  return JSON.parse(fs.readFileSync(draftPath, "utf8"));
+  return JSON.parse(fs.readFileSync(runtimePath, "utf8"));
 }
 
-const draft = generateDraftWithoutTrackedMutation();
+const draft = generateRuntimeContractWithoutTrackedMutation();
 
-test("Z06 draft preserves the live generated-data top-level contract", () => {
+test("Z06 fresh runtime contract preserves the required top-level contract", () => {
   for (const key of [
     "dataset",
     "variants",
@@ -103,7 +96,7 @@ test("Z06 draft preserves the live generated-data top-level contract", () => {
   ]) {
     assert.ok(Object.hasOwn(draft, key), `draft is missing ${key}`);
   }
-  assert.equal(draft.dataset.status, "draft_not_runtime_active");
+  assert.equal(draft.dataset.status, "runtime_active");
   assert.equal(draft.dataset.model, "Z06");
   assert.equal(draft.dataset.source_sheet, "z06_options");
   assert.deepEqual(
@@ -115,8 +108,8 @@ test("Z06 draft preserves the live generated-data top-level contract", () => {
   assert.equal(Object.keys(draft.orderSummary.stepMap).length, 14);
   assert.equal(draft.orderSummary.stepMap.packages_performance, "performance_mechanical");
   assert.equal(draft.orderSummary.stepMap.standard_equipment, "required_charges");
-  assert.ok(draft.choices.length > 0, "Z06 draft should include choices");
-  assert.ok(draft.standardEquipment.length > 0, "Z06 draft should include standard equipment rows");
+  assert.ok(draft.choices.length > 0, "Z06 runtime contract should include choices");
+  assert.ok(draft.standardEquipment.length > 0, "Z06 runtime contract should include standard equipment rows");
 });
 
 test("Z06 shared forged and carbon wheel choices follow the cross-model order", () => {
@@ -199,7 +192,7 @@ test("Z06 rear hash graphics draft outside the stripe radio section", () => {
   assert.deepEqual([...sectionsByRpo.get("PDA")].sort(), ["sec_jake_001"]);
 });
 
-test("Z06 draft unifies carbon fiber wheels into the Wheels section and keeps package/Z07 placements", () => {
+test("Z06 runtime contract unifies carbon fiber wheels into the Wheels section and keeps package/Z07 placements", () => {
   const sectionsByRpo = new Map();
   for (const choice of draft.choices) {
     if (!sectionsByRpo.has(choice.rpo)) {
@@ -217,7 +210,7 @@ test("Z06 draft unifies carbon fiber wheels into the Wheels section and keeps pa
   assert.deepEqual([...sectionsByRpo.get("Z07")].sort(), ["sec_perf_z52_001"], "Z07 should stay in the adjacent Z52 package section");
 });
 
-test("Z06 draft keeps default-selected options selectable", () => {
+test("Z06 runtime contract keeps default-selected options selectable", () => {
   for (const rpo of ["EFR", "T0E", "J56", "719", "EYT", "J6A", "CF7", "CM9", "AQ9", "SOE"]) {
     const choices = draft.choices.filter((choice) => choice.rpo === rpo);
     assert.ok(choices.length > 0, `${rpo} should be emitted`);
@@ -344,7 +337,7 @@ test("Z06 seatbelt colors are exclusive peers for interior-included locks", () =
 });
 
 
-test("Z06 draft emits approved package/wheel, Z07, and engine-lighting price rules", () => {
+test("Z06 runtime contract emits approved package/wheel, Z07, and engine-lighting price rules", () => {
   const priceRuleById = new Map(draft.priceRules.map((rule) => [rule.price_rule_id, rule]));
   for (const [ruleId, conditionOptionId, targetOptionId, priceValue] of [
     ["z06_pr_z07_j57_zero", "opt_z07_001", "opt_j57_001", 0],
@@ -375,7 +368,7 @@ test("Z06 indoor car cover exclusive group includes WKS", () => {
   assert.deepEqual(group.option_ids, ["opt_rwh_001", "opt_wkr_001", "opt_wks_001"]);
 });
 
-test("Z06 draft emits forced Z07 aero and package wheel defaults", () => {
+test("Z06 runtime contract emits forced Z07 aero and package wheel defaults", () => {
   const activeIncludePairs = new Set(
     draft.rules
       .filter((rule) => rule.rule_type === "includes" && rule.active === "True")
@@ -404,7 +397,7 @@ test("Z06 draft emits forced Z07 aero and package wheel defaults", () => {
   }
 });
 
-test("Z06 draft emits workbook-owned Jake graphic stripe conflict groups", () => {
+test("Z06 runtime contract emits workbook-owned Jake graphic stripe conflict groups", () => {
   const groupsById = new Map(draft.ruleGroups.map((group) => [group.group_id, group]));
   for (const [groupId, sourceId, targetIds] of [
     ["z06_group_pda_excludes_dual_racing_stripes", "opt_pda_001", fullLengthStripeOptionIds],
@@ -430,7 +423,7 @@ test("Z06 draft emits workbook-owned Jake graphic stripe conflict groups", () =>
   assert.equal(activeIncludePairs.has("opt_pda_001->opt_vpw_001"), true);
 });
 
-test("Z06 draft emits strict Z07/PDB blocker groups for invalid brake and aero peers", () => {
+test("Z06 runtime contract emits strict Z07/PDB blocker groups for invalid brake and aero peers", () => {
   const groupsById = new Map(draft.ruleGroups.map((group) => [group.group_id, group]));
   for (const [groupId, sourceId, targetIds, reasonPattern] of [
     ["z06_group_z07_excludes_non_z07_aero", "opt_z07_001", ["opt_t0e_001", "opt_5zv_001"], /Z07|T0F|T0G|aero/i],
@@ -446,7 +439,7 @@ test("Z06 draft emits strict Z07/PDB blocker groups for invalid brake and aero p
   }
 });
 
-test("Z06 draft emits carbon-wheel package blockers for aluminum wheel peers", () => {
+test("Z06 runtime contract emits carbon-wheel package blockers for aluminum wheel peers", () => {
   const groupsById = new Map(draft.ruleGroups.map((group) => [group.group_id, group]));
   const aluminumWheelIds = [
     "opt_soe_002",
@@ -478,7 +471,7 @@ test("Z06 draft emits carbon-wheel package blockers for aluminum wheel peers", (
   }
 });
 
-test("Z06 draft keeps BCW price override without auto-adding BCW from B6P", () => {
+test("Z06 runtime contract keeps BCW price override without auto-adding BCW from B6P", () => {
   const b6pBcwPrice = draft.priceRules.find((rule) => rule.price_rule_id === "z06_pr_b6p_bcw_895_coupe");
   assert.ok(b6pBcwPrice, "B6P should still own the BCW price override");
   assert.equal(b6pBcwPrice.condition_option_id, "opt_b6p_001");
@@ -496,7 +489,7 @@ test("Z06 draft keeps BCW price override without auto-adding BCW from B6P", () =
   );
 });
 
-test("Z06 draft keeps suspension out of customer choice sections and in equipment summaries", () => {
+test("Z06 runtime contract keeps suspension out of customer choice sections and in equipment summaries", () => {
   const visibleSuspensionChoices = draft.choices.filter(
     (choice) => choice.section_id === "sec_susp_001" && choice.step_key !== "standard_equipment"
   );
@@ -582,7 +575,7 @@ test("Z06 N26, suede, two-tone, and custom stitch source rows do not render as s
   }
 });
 
-test("Z06 draft does not emit priced standard-equipment choices", () => {
+test("Z06 runtime contract does not emit priced standard-equipment choices", () => {
   const pricedStandardChoices = draft.choices.filter(
     (choice) => choice.option_id !== "opt_r8e_002" && standardSections.has(choice.section_id) && Number(choice.base_price || 0) > 0
   );
@@ -592,7 +585,7 @@ test("Z06 draft does not emit priced standard-equipment choices", () => {
   );
 });
 
-test("Z06 draft source-data guards keep runtime-review rows canonical", () => {
+test("Z06 runtime contract keeps source-data rows canonical", () => {
   const missingDisplayOrder = draft.choices.filter((choice) => choice.display_order === "" || choice.display_order == null);
   assert.deepEqual(
     missingDisplayOrder.map((choice) => `${choice.choice_id}:${choice.rpo}:${choice.section_id}`),

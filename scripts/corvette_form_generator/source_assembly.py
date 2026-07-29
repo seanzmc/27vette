@@ -26,14 +26,7 @@ class ModelSourceAssembly:
     runtime_contract: dict[str, Any]
     report: dict[str, Any] | None = None
     preview: dict[str, Any] | None = None
-    compatibility_source: bool = False
     derivation_manifest: dict[str, Any] | None = None
-
-
-# Temporary: the only model still exporting the legacy JSON/CSV compatibility
-# pair, kept while a current consumer remains (spec Pass 2 requirement 8). It
-# selects a secondary OUTPUT, never a source-construction path.
-COMPATIBILITY_EXPORT_MODEL_KEYS = frozenset({"stingray"})
 
 
 def assemble_model_source(config: ModelConfig, *, include_reports: bool = False) -> ModelSourceAssembly:
@@ -60,6 +53,5 @@ def assemble_model_source(config: ModelConfig, *, include_reports: bool = False)
         runtime_contract=build_model_runtime_contract(config, draft),
         report=report,
         preview=preview if include_reports else None,
-        compatibility_source=config.model_key in COMPATIBILITY_EXPORT_MODEL_KEYS,
         derivation_manifest=draft.get("_derivationManifest"),
     )

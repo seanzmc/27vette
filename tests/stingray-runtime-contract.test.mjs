@@ -4,33 +4,27 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import vm from "node:vm";
 
-function withoutGeneratedAt(data) {
-  return JSON.parse(JSON.stringify({
-    ...data,
-    dataset: {
-      ...data.dataset,
-      generated_at: "<timestamp>",
-    },
-  }));
+import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
+
+const outputRoot = "/tmp/27vette-stingray-runtime-contract-test";
+const runtimePath = `${outputRoot}/form-output/runtime/stingray-runtime-contract.json`;
+
+function generateRuntimeContractWithoutTrackedMutation() {
+  fs.rmSync(outputRoot, { recursive: true, force: true });
+  fs.mkdirSync(outputRoot, { recursive: true });
+  const before = readTrackedArtifacts();
+  execFileSync(
+    ".venv/bin/python",
+    ["scripts/generate_form.py", "--model", "stingray", "--output-root", outputRoot],
+    { encoding: "utf8", stdio: "pipe" }
+  );
+  assertTrackedArtifactsUnchanged(before);
+  assert.ok(fs.existsSync(runtimePath), "isolated generation must write the strict Stingray runtime contract");
+  return JSON.parse(fs.readFileSync(runtimePath, "utf8"));
 }
 
-function loadAppData() {
-  const context = { window: {} };
-  vm.runInNewContext(fs.readFileSync("form-app/data.js", "utf8"), context);
-  return context.window.STINGRAY_FORM_DATA;
-}
-
-const jsonData = JSON.parse(fs.readFileSync("form-output/stingray-form-data.json", "utf8"));
-const appData = loadAppData();
-const generatorSource = fs.readFileSync("scripts/corvette_form_generator/production.py", "utf8");
-// Pass 2 receipt C: the single source builder lives here now. production.py is the
-// Stingray compatibility exporter only.
-const builderSource = fs.readFileSync("scripts/corvette_form_generator/inspection.py", "utf8");
-const builderAndExporterSource = generatorSource + builderSource;
-const generateFormSource = fs.readFileSync("scripts/generate_form.py", "utf8");
-const runtimeMetadataSource = fs.readFileSync("scripts/corvette_form_generator/runtime_metadata.py", "utf8");
+const jsonData = generateRuntimeContractWithoutTrackedMutation();
 const stingrayVariantIds = ["1lt_c07", "2lt_c07", "3lt_c07", "1lt_c67", "2lt_c67", "3lt_c67"];
 const grandSportVariantIds = ["1lt_e07", "2lt_e07", "3lt_e07", "1lt_e67", "2lt_e67", "3lt_e67"];
 const optionSourceHeaders = [
@@ -359,44 +353,13 @@ test("workbook package validation rejects duplicate worksheet AutoFilters on tab
   );
 });
 
-test("the Stingray compatibility exporter never touches the workbook", () => {
-  // production.py is no longer a generator. Pass 2 receipt C absorbed the Stingray
-  // source builder into the single workbook-driven builder, leaving only the legacy
-  // JSON/CSV export here -- so it must not read, write, or back up the workbook.
-  assert.doesNotMatch(generatorSource, /save_workbook_safely/);
-  assert.doesNotMatch(generatorSource, /write_sheet\(/);
-  assert.doesNotMatch(generatorSource, /workbook_backup/);
-  assert.doesNotMatch(generatorSource, /load_workbook/);
-  assert.doesNotMatch(generatorSource, /\bwb\.save\(/);
-  assert.doesNotMatch(generatorSource, /write_app_data_registry/);
-  assert.doesNotMatch(generatorSource, /build_production_source_data/);
-});
-
-test("generate_form model discovery is workbook-owned, not a hardcoded active-model map", () => {
-  assert.doesNotMatch(generateFormSource, /MODEL_CONFIGS\s*[:=]/);
-  assert.doesNotMatch(generateFormSource, /choices\s*=\s*sorted\(MODEL_CONFIGS\)/);
-  assert.doesNotMatch(generateFormSource, /STINGRAY_MODEL|GRAND_SPORT_MODEL|Z06_MODEL/);
-  assert.match(generateFormSource, /discover_generation_model_configs/);
-});
-
-test("generated JSON and static app data stay synchronized apart from timestamp", () => {
-  assert.deepEqual(withoutGeneratedAt(appData), withoutGeneratedAt(jsonData));
-});
-
-test("Stingray generated contract keeps the closed-out shape", () => {
+test("fresh Stingray runtime contract keeps its workbook-bound identity", () => {
   assert.equal(jsonData.dataset.name, "2027 Corvette Stingray operational form");
+  assert.equal(jsonData.dataset.status, "runtime_active");
   assert.deepEqual(
     jsonData.variants.map((variant) => variant.variant_id),
     ["1lt_c07", "2lt_c07", "3lt_c07", "1lt_c67", "2lt_c67", "3lt_c67"]
   );
-  assert.equal(jsonData.variants.length, 6);
-  assert.equal(jsonData.contextChoices.length, 8);
-  assert.equal(jsonData.choices.length, 1416);
-  assert.equal(jsonData.standardEquipment.length, 467);
-  // Receipt C: 31 rules referencing active=False options were dropped as dead payload.
-  assert.equal(jsonData.rules.length, 114);
-  assert.equal(jsonData.priceRules.length, 49);
-  assert.equal(jsonData.interiors.length, 130);
   assert.equal(jsonData.validation.filter((row) => row.severity === "error").length, 0);
 });
 
@@ -589,18 +552,6 @@ test("Stingray Phase 4 availability rules are workbook-owned", () => {
   assert.ok(r6xInteriors.length > 0, "expected active Stingray R6X interiors");
   assert.equal(r6xInteriors.every((row) => row.included_option_id === "opt_r6x_001"), true);
 
-  assert.match(builderSource, /load_variant_option_overrides/);
-  assert.match(builderSource, /load_section_presentation/);
-  assert.doesNotMatch(runtimeMetadataSource, /optional_rows\(wb, ["']variant_option_overrides["']\)/);
-  assert.doesNotMatch(builderAndExporterSource, /option_id\s*==\s*["']opt_uqt_002["']/);
-  assert.doesNotMatch(builderAndExporterSource, /HIDDEN_SECTION_IDS/);
-  assert.doesNotMatch(builderAndExporterSource, /opt_r6x_001["']\s+if\s+active_for_stingray\s+and\s+requires_r6x/);
-  // Ported to interiors.py in Pass 2 receipt C, as a hard failure rather than a
-  // validation row -- assert_runtime_contract rejects error-severity rows anyway.
-  assert.match(
-    fs.readFileSync("scripts/corvette_form_generator/interiors.py", "utf8"),
-    /R6X interiors require included_option_id/
-  );
 });
 
 test("Stingray Phase 5 interior components are workbook-owned", () => {
@@ -647,9 +598,6 @@ test("Stingray Phase 5 interior components are workbook-owned", () => {
     }
   }
 
-  assert.match(builderSource, /build_model_interiors\(config, wb=wb\)/);
-  assert.doesNotMatch(builderAndExporterSource, /workbook_interior_component_metadata/);
-  assert.doesNotMatch(builderAndExporterSource, /missing_workbook_components_/);
 });
 
 test("section_master owns section step placement without category", () => {
@@ -735,10 +683,6 @@ test("Phase 6 step and presentation metadata are workbook-owned", () => {
   assert.equal(presentationByKey.get("grand_sport::sec_spec_001")?.display_label, "Special Edition");
   assert.equal(presentationByKey.get("grand_sport::sec_colo_001")?.display_label, "Color Combination Override");
 
-  assert.match(builderSource, /load_runtime_steps/);
-  assert.match(builderSource, /load_context_sections/);
-  assert.match(builderSource, /standard_equipment_group_type/);
-  assert.doesNotMatch(builderAndExporterSource, /STINGRAY_SECTION_DISPLAY_ORDER_OVERRIDES\s*=\s*\{/);
 });
 
 test("Grand Sport draft rule source sheets use workbook-backed contracts", () => {
@@ -783,10 +727,4 @@ test("generator-owned compatibility groups are authored in workbook source sheet
   assert.deepEqual(workbookHeaders("rule_group_members"), ["group_id", "target_id", "display_order", "active"]);
   assert.deepEqual(workbookHeaders("exclusive_groups"), ["group_id", "selection_mode", "active", "notes"]);
   assert.deepEqual(workbookHeaders("exclusive_group_members"), ["group_id", "option_id", "display_order", "active"]);
-  assert.doesNotMatch(generatorSource, /^RULE_GROUPS = \[/m);
-  assert.doesNotMatch(generatorSource, /^EXCLUSIVE_GROUPS = \[/m);
-  assert.doesNotMatch(generatorSource, /^FIVE_V7_OR_REQUIREMENT_TARGET_IDS = /m);
-  assert.doesNotMatch(generatorSource, /^FIVE_ZU_OR_REQUIREMENT_TARGET_IDS = /m);
-  assert.doesNotMatch(generatorSource, /^T0A_REPLACEMENT_OPTION_IDS = /m);
-  assert.doesNotMatch(generatorSource, /^def rule_body_style_scope\(/m);
 });

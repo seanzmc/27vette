@@ -1000,21 +1000,6 @@ def _operation_coverage(batch: dict, prepared: list[dict]) -> tuple[dict, list[s
 # Apply pipeline
 # ─────────────────────────────────────────────────────────────
 
-GATE_COMMANDS = {
-    "stingray": [".venv/bin/python scripts/generate_form.py --model stingray",
-                 ".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx",
-                 "node --test tests/stingray-form-regression.test.mjs",
-                 "node --test tests/stingray-generator-stability.test.mjs"],
-    "grand_sport": [".venv/bin/python scripts/generate_form.py --model grand_sport",
-                    ".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx",
-                    "node --test tests/grand-sport-contract-preview.test.mjs",
-                    "node --test tests/grand-sport-draft-data.test.mjs"],
-    "z06": [".venv/bin/python scripts/generate_form.py --model z06",
-            ".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx",
-            "node --test tests/z06-contract-preview.test.mjs",
-            "node --test tests/z06-form-data-draft.test.mjs"],
-}
-
 CONFIRMABLE_WARNING_KINDS = {"scaffold"}
 
 
@@ -1052,13 +1037,28 @@ def classify_warnings(warnings) -> dict:
 
 
 def gate_reminders(models: set[str]) -> list[str]:
-    commands: list[str] = []
-    for model in sorted(models):
-        commands.extend(GATE_COMMANDS.get(model, [
-            f".venv/bin/python scripts/generate_form.py --model {model}",
-            ".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx"]))
-    seen = set()
-    return [c for c in commands if not (c in seen or seen.add(c))]
+    """Return the current post-write route; README owns the full gate matrix.
+
+    Preview/draft tests are optional diagnostics, not readiness authority. The
+    composed candidate lane is the one current command that performs complete
+    fresh generation, strict validation, registry construction, and browser
+    proof without writing tracked artifacts.
+    """
+
+    model_keys = sorted(models)
+    changed_models = " ".join(f"--changed-model {model}" for model in model_keys)
+    commands = [
+        ".venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx",
+        ".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx",
+    ]
+    if changed_models:
+        commands.append(
+            ".venv/bin/python scripts/verify_workbook_candidate.py --workbook stingray_master.xlsx "
+            f"{changed_models} --report /tmp/27vette-workbook-candidate.json"
+        )
+    commands.extend(f".venv/bin/python scripts/generate_form.py --model {model}" for model in model_keys)
+    commands.append(".venv/bin/python scripts/generate_registry.py")
+    return commands
 
 
 def apply_ops_to_workbook(wb, prepared_ops, sheet_family) -> set[str]:

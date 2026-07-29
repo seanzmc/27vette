@@ -62,7 +62,6 @@ def test_output_root_confines_every_written_path(tmp_path: Path) -> None:
     output = json.loads(result.stdout)
     written = [Path(output["runtime_contract_json"])]
     written.extend(Path(value) for value in output["runtime_contract_artifacts"].values())
-    written.extend(Path(value) for value in output["compatibility_artifacts"].values())
     escaped = [path for path in written if not path.is_relative_to(candidate_root)]
 
     assert escaped == [], f"paths written outside --output-root: {escaped}"

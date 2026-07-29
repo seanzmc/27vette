@@ -40,9 +40,8 @@ from corvette_form_generator.runtime_contract import assert_runtime_contract  # 
 # the silent-coverage-loss case requirement 10 exists to prevent.
 EXPECTED_MODEL_KEYS = frozenset({"stingray", "grand_sport", "grand_sport_x", "z06", "zr1", "zr1x"})
 
-# Every model reports the same keys. ``compatibility_artifacts`` is present for
-# all six and populated only for Stingray (spec Pass 2 requirement 8), so an
-# absent key is a route change, not a per-model difference.
+# Every model reports the same keys. An absent key is a route change, not a
+# per-model difference.
 REQUIRED_SUMMARY_KEYS = frozenset(
     {
         "model_key",
@@ -50,7 +49,6 @@ REQUIRED_SUMMARY_KEYS = frozenset(
         "route_engine",
         "runtime_contract_json",
         "runtime_contract_artifacts",
-        "compatibility_artifacts",
         "inspection_artifacts",
         "preview_artifacts",
         "draft_artifacts",
@@ -147,6 +145,19 @@ def contract_for(generated: dict, model_key: str) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def section_rpo_order(contract: dict, section_id: str) -> list[str]:
+    """Return one RPO per active choice in its lowest authored display order."""
+
+    order_by_rpo: dict[str, int] = {}
+    for choice in contract["choices"]:
+        if choice["section_id"] != section_id or choice["active"] != "True":
+            continue
+        rpo = choice["rpo"]
+        order = int(choice["display_order"])
+        order_by_rpo[rpo] = min(order, order_by_rpo.get(rpo, order))
+    return [rpo for rpo, _ in sorted(order_by_rpo.items(), key=lambda item: (item[1], item[0]))]
+
+
 def test_discovery_matches_the_workbooks_own_active_model_set(generated) -> None:
     """Breaks if `discover_generation_model_configs()` stops returning what the workbook activates.
 
@@ -225,6 +236,35 @@ def test_reported_summary_agrees_with_the_written_artifact(model_key, generated)
     assert summary["status"] == contract["dataset"]["status"] == "runtime_active"
     for field, count in summary["counts"].items():
         assert count == len(contract[field]), f"{model_key}.{field}: summary {count} vs artifact {len(contract[field])}"
+
+
+def test_fresh_unpublished_contracts_preserve_workbook_owned_roof_order(generated) -> None:
+    """Migrate the only product assertion from the retained-artifact gate to fresh generation."""
+
+    assert section_rpo_order(contract_for(generated, "grand_sport_x"), "sec_roof_001") == [
+        "CF7",
+        "C2Z",
+        "CC3",
+        "CM9",
+        "CF8",
+        "D84",
+        "D86",
+    ]
+    assert section_rpo_order(contract_for(generated, "zr1"), "sec_roof_001") == ["C2Z", "CFC"]
+    assert section_rpo_order(contract_for(generated, "zr1x"), "sec_roof_001") == ["C2Z"]
+
+
+def test_fresh_unpublished_contracts_preserve_generated_order_summary_metadata(generated) -> None:
+    """Move retained-artifact metadata assertions into the current all-model generation owner."""
+
+    for model_key in ("grand_sport_x", "zr1", "zr1x"):
+        contract = contract_for(generated, model_key)
+        expects_required_charges = model_key in {"zr1", "zr1x"}
+        assert len(contract["steps"]) == 14
+        assert len(contract["orderSummary"]["sections"]) == (12 if expects_required_charges else 11)
+        assert len(contract["orderSummary"]["stepMap"]) == (14 if expects_required_charges else 13)
+        assert contract["orderSummary"]["stepMap"]["base_interior"] == "seats_interior"
+        assert ("standard_equipment" in contract["orderSummary"]["stepMap"]) is expects_required_charges
 
 
 def test_strict_validation_rejects_what_a_status_and_error_scan_would_accept(generated) -> None:

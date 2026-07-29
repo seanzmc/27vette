@@ -152,7 +152,7 @@ Model refresh (from repo root, venv python):
 .venv/bin/python scripts/generate_registry.py
 ```
 
-`<model_key>` must be active and complete in workbook-owned `model_master`, `model_workbook_sources`, and `model_variants` metadata. The Stingray run also writes compatibility outputs (`form-output/stingray-form-data.json/.csv`); all models write strictly validated runtime contracts under `form-output/runtime/`. Add `--emit-inspection --inspection-output <dir>` for optional review artifacts. Generator runs never mutate `form-app/data.js` directly; `generate_registry.py` validates every selected retained contract before publishing the promoted registry.
+`<model_key>` must be active and complete in workbook-owned `model_master`, `model_workbook_sources`, and `model_variants` metadata. All models write one strictly validated runtime contract under `form-output/runtime/`; retained Stingray compatibility JSON/CSV are no longer produced and await separately approved Stage B deletion. Add `--emit-inspection --inspection-output <dir>` for optional review artifacts. Generator runs never mutate `form-app/data.js` directly; `generate_registry.py` validates every selected retained contract before publishing the promoted registry.
 
 For isolated candidate validation, copy/freeze the workbook first and bind every output to a temporary root:
 
@@ -206,23 +206,23 @@ Workbook package integrity / repair (also run if Excel reports recovery):
 .venv/bin/python scripts/repair_workbook_tables.py stingray_master.xlsx
 ```
 
-Test-to-surface map (run each with `node --test tests/<name>.test.mjs`):
+Node gate matrix (run each with `node --test tests/<name>.test.mjs`):
 
-| Surface | Tests |
+| Authority / purpose | Default readiness gates |
 |---|---|
-| Stingray | `stingray-form-regression`, `stingray-generator-stability` |
-| Grand Sport | `grand-sport-contract-preview`, `grand-sport-draft-data` |
-| Z06 | `z06-contract-preview`, `z06-form-data-draft`, `z06-interior-accessory-cleanup`, `z06-performance-package-interactions`, `z06-runtime-rule-corrections` |
-| Promotion / switching | `z06-runtime-promotion`, `multi-model-runtime-switching` |
-| Registry publication | `z06-registry-publication` |
-| Workbook standardization | `workbook-schema-standardization`, `workbook-visual-copy-standardization` |
-| Source-row purge | `nonruntime-option-source-purge`, `seat-canonicalization-diff` |
-| Unpublished retained artifacts | `unpublished-runtime-contracts` |
-| Generated-artifact boundary | `tracked-artifacts-guard` |
+| Workbook source and schema | `workbook-schema-standardization`, `workbook-visual-copy-standardization`, `nonruntime-option-source-purge` |
+| Fresh generation and strict runtime contracts | `stingray-runtime-contract`, `grand-sport-runtime-contract`, `z06-runtime-contract`, `z06-interior-accessory-cleanup` |
+| Published registry and browser runtime | `stingray-form-regression`, `z06-published-runtime`, `multi-model-runtime-switching`, `z06-performance-package-interactions`, `z06-runtime-rule-corrections` |
+| Isolated registry publication | `z06-registry-publication` |
+| Generated-artifact boundary helper | `tracked-artifacts-guard` |
 
-That table is the complete set of `tests/*.test.mjs`; a new node gate must be added here.
+Optional inspection diagnostics (not readiness gates): `grand-sport-contract-preview`, `z06-contract-preview`. They retain raw-source/provenance evidence for investigations; customer/runtime assertions belong in the strict runtime-contract gates above.
 
-Five of those tests invoke `scripts/generate_form.py` — `grand-sport-contract-preview`, `grand-sport-draft-data`, `z06-contract-preview`, `z06-form-data-draft`, `z06-interior-accessory-cleanup`. Each generates into a temporary `--output-root` and asserts every file under `form-output/` and `form-app/` is byte-identical afterwards. That check reads both roots whole, so run these five serially — a concurrent gate writing a runtime contract is reported as a boundary violation.
+Stage B retirement candidates (not readiness gates): `seat-canonicalization-diff` and `unpublished-runtime-contracts`. The first is the self-test for a completed one-use comparison tool. The second reads retained unpublished artifacts; its workbook-owned roof-order and generated-metadata assertions now live in `test_all_model_runtime_generation.py` against fresh isolated output. Deletion still requires the separately reviewed Stage B list.
+
+Those tables are the complete set of `tests/*.test.mjs`; a new node gate must be added here and assigned one authority. Default gates are read-only or write only below a temporary root. Publication verification is explicit and isolated from the published `form-app/data.js` path.
+
+Six node files invoke `scripts/generate_form.py` — the three strict model runtime-contract gates, the two optional preview diagnostics, and `z06-interior-accessory-cleanup`. Each generates into a temporary `--output-root` and asserts every file under `form-output/` and `form-app/` is byte-identical afterwards. That check reads both roots whole, so run those files serially — a concurrent process writing a protected artifact is reported as a boundary violation.
 
 Python metadata gate — the default for generation/contract/promotion changes:
 
@@ -246,7 +246,7 @@ The remaining `tests/test_*.py` files are not in that gate and are chosen by cha
 
 `.venv/bin/python -m pytest tests/ -q` runs everything (589 tests, ~18 min). Three tests in `test_verify_workbook_candidate.py` are ~63s each because each runs the full ten-stage candidate lane over six models; everything outside the slowest ~15 tests is sub-second. Reserve the full run for canonical-workbook writes and publication, per AGENTS.md §10.
 
-Full default validation = schema gate + all rows of the node table + the metadata gate. Choose gates by changed surface per AGENTS.md §10.
+Full default validation = schema gate + every default-readiness row of the node matrix + the Python metadata gate. Optional inspection diagnostics run only when their raw-source evidence is relevant. Choose additional gates by changed surface per AGENTS.md §10.
 
 ## Workbook Safety
 

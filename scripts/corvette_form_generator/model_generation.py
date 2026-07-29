@@ -13,7 +13,6 @@ from corvette_form_generator.inspection import (
 )
 from corvette_form_generator.model_config import ModelConfig
 from corvette_form_generator.output import write_json_output
-from corvette_form_generator.production import write_stingray_compatibility_artifacts
 from corvette_form_generator.registry_promotion import export_slug
 from corvette_form_generator.rule_derivation import write_derivation_manifest
 from corvette_form_generator.runtime_contract import (
@@ -49,7 +48,6 @@ REQUIRED_RESULT_KEYS = (
     "expected_variant_count",
     "runtime_contract_json",
     "runtime_contract_artifacts",
-    "compatibility_artifacts",
     "inspection_artifacts",
     "preview_artifacts",
     "draft_artifacts",
@@ -91,7 +89,7 @@ def _write_review_artifacts(
         "preview_artifacts": {},
         "draft_artifacts": {},
     }
-    if not options.emit_inspection or assembly.compatibility_source:
+    if not options.emit_inspection:
         return empty
     if assembly.report is None or assembly.preview is None:
         raise ValueError(f"{config.model_key} review output was requested without review payloads")
@@ -163,13 +161,6 @@ def generate_model_artifacts(config: ModelConfig, *, options: GenerationOptions 
     if assembly.derivation_manifest is not None:
         write_derivation_manifest(config.output_dir, config.model_key, assembly.derivation_manifest)
 
-    compatibility_artifacts: dict[str, str] = {}
-    if assembly.compatibility_source:
-        compatibility_artifacts = write_stingray_compatibility_artifacts(
-            config,
-            assembly.source_data,
-            runtime_contract,
-        )
     runtime_contract_artifacts = _write_runtime_contract_artifact(config, runtime_contract)
 
     return _summary_from_runtime_contract(
@@ -178,7 +169,6 @@ def generate_model_artifacts(config: ModelConfig, *, options: GenerationOptions 
         {
             "runtime_contract_json": runtime_contract_artifacts["json"],
             "runtime_contract_artifacts": runtime_contract_artifacts,
-            "compatibility_artifacts": compatibility_artifacts,
             **_write_review_artifacts(config, assembly, resolved_options),
         },
     )

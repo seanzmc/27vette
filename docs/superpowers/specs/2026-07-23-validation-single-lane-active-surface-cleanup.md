@@ -1,7 +1,7 @@
 # Validation Single-Lane and Active-Surface Cleanup Specification
 
-Status: ACTIVE — Pass 0A inventory and Pass 0C boundary complete; approved Pass I ingest retirement completed 2026-07-23. The Pass 0B generation/runtime executable slice, approved Pass G1 fail-closed generation boundary, bounded Pass G2 Z06 source repair, and option-name quality-authority correction completed 2026-07-24; semantic viability remains open for the other non-ingest surfaces. Pass 1 is the next recommended implementation pass and remains unapproved.
-Date: 2026-07-23 (revised 2026-07-24 for database-workflow sufficiency and simplification)
+Status: ACTIVE — Passes 0–3 and Pass 4 Stage A are complete. Stage B is the next step and requires Sean's separate approval of the exact deletion list recorded below; no Stage B deletion is authorized yet. Stage C follows only after Stage B.
+Date: 2026-07-23 (revised through 2026-07-29 Stage A closeout)
 
 Consuming workflow: this specification is the structural prerequisite for the database-backed workbook editor described in `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md`. The end state that both specifications must jointly deliver is one controlled repeatable pathway:
 
@@ -1252,6 +1252,23 @@ Rewritten:
 **Validation.** 10 mutations injected into real workbook copies, all 10 caught: duplicate group-peer excludes, bool cell retyped to text, source role pointed at a missing sheet, source role deactivated, retired column reintroduced, variant display_order duplicated, `variant_master` fact deactivated, interior header divergence, stacked replace between group peers, ungrouped blocker-cluster excludes. Gate 11/11. Companion node gates 204 passed / 0 failed across `multi-model-runtime-switching` (48), `stingray-form-regression` (91), `z06-runtime-promotion` (4), `z06-runtime-rule-corrections` (15), `z06-performance-package-interactions` (21), `grand-sport-contract-preview` (6), `grand-sport-draft-data` (19). Workbook package and schema gates both valid, 0 issues. Backup at `backups/stingray_master-20260727-221721.xlsx`.
 
 **Still open:** the `app.js` peer-guard asymmetry itself is unfixed — the nine rows are gone and the gate blocks re-adding them, but the runtime remains one bad authoring row away from the same class of defect. Recorded in `fable5loop/STATE.md` under Open failures; closing it is a runtime behavior change needing its own approval.
+
+#### Stage A closeout receipt — gate-authority migration, completed 2026-07-29
+
+The remaining gate split is complete. Fresh strict runtime contracts now own Stingray, Grand Sport, and Z06 generation assertions; Grand Sport/Z06 preview tests are optional provenance diagnostics; Z06 published-runtime verification and isolated registry publication are separate; `z06-interior-accessory-cleanup` reads the strict runtime contract; editor reminders invoke package, schema, composed candidate, affected-model generation, and publication in executable order. The compatibility exporter is disconnected from generation and current tests, and the retained unpublished-artifact assertions moved to fresh all-model generation. README and `docs/route-map.md` now describe the same authority split.
+
+Validation: after the final zero-consumer migration, all 18 Node gates passed serially with tracked `form-output/` and `form-app/` hashes unchanged; workbook package/schema were valid with zero issues; the Python metadata/route/all-model set passed 189 tests plus 111 subtests; editor apply passed 59 tests plus 7 subtests; and one real composed candidate run completed all ten stages for all six changed models with no boundary violation, validation finding, or unexpected drift. No workbook, generated runtime contract, published registry, runtime app, or dealer boundary changed in this slice. Receipt: `fable5loop/runs/2026-07-28-pass4a-gate-authority-closeout/`.
+
+Exact Stage B `git rm` list, published for separate approval and **not executed**:
+
+- `form-output/stingray-form-data.json`
+- `form-output/stingray-form-data.csv`
+- `scripts/corvette_form_generator/production.py`
+- `scripts/seat-canonicalization-diff.mjs`
+- `tests/seat-canonicalization-diff.test.mjs`
+- `tests/unpublished-runtime-contracts.test.mjs`
+
+Stage A already removed the compatibility writer/import/result wiring and current test consumers. Stage B is deletion-only for the exact files above plus removal of their candidate wording from active guidance.
 
 #### Stage B (formerly Pass 4B) — Exact approved deletion
 

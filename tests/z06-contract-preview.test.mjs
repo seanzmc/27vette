@@ -76,21 +76,3 @@ test("all Z06 preview choices resolve section, step, and raw detail fields", () 
   assert.equal(preview.normalization.unresolvedIssues.length, 0);
   assert.equal(preview.validation.length, 0);
 });
-
-test("Z06 preview unifies carbon fiber wheels into the Wheels section and keeps the package section", () => {
-  const sectionsByRpo = new Map();
-  for (const choice of preview.choices) {
-    if (!sectionsByRpo.has(choice.rpo)) {
-      sectionsByRpo.set(choice.rpo, new Set());
-    }
-    sectionsByRpo.get(choice.rpo).add(choice.resolved_section_id);
-  }
-
-  for (const rpo of ["PDB", "PDD", "PDF"]) {
-    assert.deepEqual([...sectionsByRpo.get(rpo)].sort(), ["sec_z06_pkg_001"], `${rpo} should preview in the Z06 wheel/brake package section`);
-  }
-  for (const rpo of ["ROY", "ROZ", "STZ"]) {
-    assert.deepEqual([...sectionsByRpo.get(rpo)].sort(), ["sec_whee_002"], `${rpo} should preview in the unified Wheels section`);
-  }
-  assert.deepEqual([...sectionsByRpo.get("Z07")].sort(), ["sec_perf_z52_001"], "Z07 should stay in the adjacent Z52 package section");
-});
