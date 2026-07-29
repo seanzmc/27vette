@@ -1,0 +1,47 @@
+{
+  "id": "2026-07-29-pass4b-exact-retirement",
+  "started_at": "2026-07-29T10:43:00-04:00",
+  "completed_at": "2026-07-29T11:10:17-04:00",
+  "objective": "Delete the exact six separately approved Pass 4 Stage B zero-consumer files, remove their pending-candidate wording from current guidance, validate the canonical lane, and stop before Stage C.",
+  "source_commit": "2bb1e76",
+  "changed_surface": "Six exact tracked deletions, README/route-map current-guidance cleanup, owning-spec/STATE closeout, and this receipt. No workbook, retained generated artifact, registry, runtime application, dealer submission, schema, dependency, public interface, or Stage C change.",
+  "outcome_rubric": "fable5loop/runs/2026-07-29-pass4b-exact-retirement/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-29-pass4b-exact-retirement/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-29-pass4b-exact-retirement/validation-output.txt",
+  "process_deviations": [
+    "The broad validation reached the loop validator before receipt/STATE closeout and correctly stopped because the new receipt was incomplete; product, generator, Node, protected-hash, and candidate gates had already passed.",
+    "The first independent verifier found two additional current-guidance lines that still described Stage B as pending. Those lines were corrected, all current owners were rescanned, and a fresh independent verifier passed C1-C7."
+  ],
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-29-pass4b-exact-retirement/validation-output.txt"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-29-pass4b-exact-retirement/verifier-report.md"
+    }
+  ],
+  "skill_update": {
+    "decision": "not_applicable",
+    "evidence": "fable5loop/skills/27vette-fable5-compounding.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 2,
+    "delegation_id": "deleg_6140e07e"
+  },
+  "boundaries_preserved": [
+    "canonical workbook",
+    "retained runtime and inspection artifacts",
+    "published registry",
+    "runtime application",
+    "dealer submission",
+    "schemas and dependencies",
+    "historical evidence",
+    "Stage C approval boundary"
+  ]
+}

@@ -1,7 +1,7 @@
 # Validation Single-Lane and Active-Surface Cleanup Specification
 
-Status: ACTIVE — Passes 0–3 and Pass 4 Stage A are complete, including the 2026-07-29 macOS candidate-boundary hardening below. Stage B remains unstarted and requires Sean's separate approval of the exact deletion list recorded below. Stage C follows only after Stage B.
-Date: 2026-07-23 (revised through 2026-07-29 Stage A closeout)
+Status: ACTIVE — Passes 0–3 and Pass 4 Stages A–B are complete. Stage B retired exactly the separately approved six-file boundary on 2026-07-29. Stage C remains unstarted and requires separate approval.
+Date: 2026-07-23 (revised through 2026-07-29 Stage B closeout)
 
 Consuming workflow: this specification is the structural prerequisite for the database-backed workbook editor described in `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md`. The end state that both specifications must jointly deliver is one controlled repeatable pathway:
 
@@ -1259,7 +1259,7 @@ The remaining gate split is complete. Fresh strict runtime contracts now own Sti
 
 Validation: after the final zero-consumer migration, all 18 Node gates passed serially with tracked `form-output/` and `form-app/` hashes unchanged; workbook package/schema were valid with zero issues; the Python metadata/route/all-model set passed 189 tests plus 111 subtests; editor apply passed 59 tests plus 7 subtests; and one real composed candidate run completed all ten stages for all six changed models with no boundary violation, validation finding, or unexpected drift. No workbook, generated runtime contract, published registry, runtime app, or dealer boundary changed in this slice. Receipt: `fable5loop/runs/2026-07-28-pass4a-gate-authority-closeout/`.
 
-Exact Stage B `git rm` list, published for separate approval and **not executed**:
+Exact Stage B `git rm` list, separately approved and executed on 2026-07-29:
 
 - `form-output/stingray-form-data.json`
 - `form-output/stingray-form-data.csv`
@@ -1286,7 +1286,13 @@ The source comment now describes the actual one-route call through `build_draft_
 
 This correction changes comments/guidance only. It does not delete or alter any Stage B candidate, workbook row, generated artifact, publication output, runtime behavior, or dealer path. The zero-reference verifier was rerun after the correction; see the amended Stage A receipt.
 
-#### Stage B (formerly Pass 4B) — Exact approved deletion
+#### Stage B (formerly Pass 4B) — Exact approved deletion, completed 2026-07-29
+
+Sean separately approved Stage B after the Stage A hardening commit `2bb1e76`. `git rm` removed exactly the six listed compatibility artifacts, exporter/tool files, and retired tests; no other file was deleted. README and the current route map no longer describe those files or Stage B as pending.
+
+Post-deletion active scans found zero retired artifact names, exporter symbols, or stale test filenames in tracked `scripts/`, `tests/`, README, and `docs/route-map.md`. The unpublished roof-order and order-summary assertions remain owned by fresh isolated all-model generation; the seat-diff pair contained only its retired one-use tool's self-tests.
+
+Validation: package/schema valid with zero issues; Python metadata/route/all-model 189 tests plus 111 subtests; all 16 remaining Node files and 281 tests passed serially; retained tracked-artifact hashes remained identical; full candidate lane 16 passed in 661.20s. Initial verifier `deleg_93c5c1ec` found two stale pending-guidance lines; both were removed, and final verifier `deleg_6140e07e` passed C1–C7 with no blockers. Workbook, retained generated artifacts, publication, runtime, dealer submission, and Stage C remained untouched. Receipt: `fable5loop/runs/2026-07-29-pass4b-exact-retirement/`.
 
 Initial retirement candidates requiring final Pass 0B semantic confirmation:
 
@@ -1389,11 +1395,11 @@ Pass 0A is complete as a read-only file inventory. Pass 0B is still required to 
 
 Passes 2–3 require review of fresh route-characterization evidence before source-route or promotion changes.
 
-Pass 4 requires a separately reviewed exact deletion list; this draft is not deletion approval.
+Pass 4 Stage B's exact six-file deletion list was separately reviewed, approved, and completed on 2026-07-29. This does not authorize Stage C.
 
 Pass 5 plan moves/deletions require the completed/no-status classification receipt from Pass 0A and the current-consumer/necessary-behavior proof from Pass 0B.
 
-Current recommendation (revised 2026-07-24): the §2.4 fail-closed generation boundary is delivered (Pass G1) and Z06 is green (Pass G2), so the next approval should be **Pass 1**. It is the post-export gate the database workflow is blocked on, and §2.1.1 proves the current schema validator reports zero issues over real drift. Continue remaining Pass 0B viability work for non-ingest surfaces in parallel where it does not gate Pass 1 — Pass 0B evidence is required before Pass 4 deletion, not before Pass 1 authority consolidation.
+Current recommendation (revised 2026-07-29): Stage C is the next cleanup stage. It requires separate approval and must use the bound plan classification before moving completed plans or deleting generated review clutter; Stage B authorizes none of those changes.
 
 Pass 1 must not unify source builders, repair model semantics, refresh retained artifacts, or publish a registry.
 

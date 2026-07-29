@@ -152,7 +152,7 @@ Model refresh (from repo root, venv python):
 .venv/bin/python scripts/generate_registry.py
 ```
 
-`<model_key>` must be active and complete in workbook-owned `model_master`, `model_workbook_sources`, and `model_variants` metadata. All models write one strictly validated runtime contract under `form-output/runtime/`; retained Stingray compatibility JSON/CSV are no longer produced and await separately approved Stage B deletion. Add `--emit-inspection --inspection-output <dir>` for optional review artifacts. Generator runs never mutate `form-app/data.js` directly; `generate_registry.py` validates every selected retained contract before publishing the promoted registry.
+`<model_key>` must be active and complete in workbook-owned `model_master`, `model_workbook_sources`, and `model_variants` metadata. All models write one strictly validated runtime contract under `form-output/runtime/`. Add `--emit-inspection --inspection-output <dir>` for optional review artifacts. Generator runs never mutate `form-app/data.js` directly; `generate_registry.py` validates every selected retained contract before publishing the promoted registry.
 
 For isolated candidate validation, copy/freeze the workbook first and bind every output to a temporary root:
 
@@ -217,8 +217,6 @@ Node gate matrix (run each with `node --test tests/<name>.test.mjs`):
 | Generated-artifact boundary helper | `tracked-artifacts-guard` |
 
 Optional inspection diagnostics (not readiness gates): `grand-sport-contract-preview`, `z06-contract-preview`. They retain raw-source/provenance evidence for investigations; customer/runtime assertions belong in the strict runtime-contract gates above.
-
-Stage B retirement candidates (not readiness gates): `seat-canonicalization-diff` and `unpublished-runtime-contracts`. The first is the self-test for a completed one-use comparison tool. The second reads retained unpublished artifacts; its workbook-owned roof-order and generated-metadata assertions now live in `test_all_model_runtime_generation.py` against fresh isolated output. Deletion still requires the separately reviewed Stage B list.
 
 Those tables are the complete set of `tests/*.test.mjs`; a new node gate must be added here and assigned one authority. Default gates are read-only or write only below a temporary root. Publication verification is explicit and isolated from the published `form-app/data.js` path.
 

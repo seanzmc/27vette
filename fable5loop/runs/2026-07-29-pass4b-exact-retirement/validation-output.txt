@@ -1,0 +1,63 @@
+Pass 4 Stage B exact retirement validation
+Date: 2026-07-29
+Source commit: 2bb1e76
+
+SCOPE
+- `git rm` exact approved six-file list only.
+- Remove candidate/pending-deletion wording from README and current route map.
+- Preserve workbook, retained generated artifacts, publication/runtime/dealer boundaries, historical evidence, and Stage C.
+
+PRE-DELETE AUTHORITY
+- Pass 4 Stage A proved the compatibility exporter/artifacts and both test files had zero active consumers.
+- The retained unpublished-contract roof-order and order-summary assertions are owned by fresh isolated generation in `tests/test_all_model_runtime_generation.py`.
+- The seat-canonicalization pair tested only its completed one-use comparison executable and carried no independent current product/runtime assertion.
+
+EXACT DELETION
+- form-output/stingray-form-data.json
+- form-output/stingray-form-data.csv
+- scripts/corvette_form_generator/production.py
+- scripts/seat-canonicalization-diff.mjs
+- tests/seat-canonicalization-diff.test.mjs
+- tests/unpublished-runtime-contracts.test.mjs
+- Exact deletion-set comparison: passed; no other deletion.
+
+POST-DELETE CURRENT-SURFACE SCANS
+- Active `scripts/`: 0 retired artifact/test/exporter-name hits.
+- Active `tests/`: 0 retired artifact/test/exporter-name hits.
+- README: 0 Stage B/candidate/retired-name hits after final guidance correction.
+- `docs/route-map.md`: 0 Stage B/candidate/retired-name hits after final guidance correction.
+- Historical specs, plans, receipts, and archives were preserved.
+- Actual `tests/*.test.mjs`: 16; README matrix: 16; missing 0, extra 0.
+
+BROAD POST-DELETION VALIDATION
+Source transcript: `/tmp/27vette-pass4b-validation.txt`.
+
+- Workbook package: valid, 0 issues.
+- Workbook schema: valid, 0 issues, 0 errors, 0 warnings.
+- Python metadata/route/all-model gate: 189 passed plus 111 subtests in 172.48s.
+- All 16 remaining Node files ran serially: 281 tests passed, 0 failed.
+- Retained tracked `form-output/` and `form-app/` hashes: identical before/after all Node gates.
+- Full candidate-promotion lane: 16 passed in 661.20s.
+- The initial loop-validator invocation then failed only because this new run receipt and `STATE.md` closeout did not yet exist. That was an expected closeout dependency, not a product/generator/deletion failure.
+
+INDEPENDENT VERIFICATION
+- Initial verifier `deleg_93c5c1ec`: FAIL only because two additional current-guidance lines still described Stage B as pending (`README.md` generator workflow and `docs/route-map.md` open follow-up). All deletion, assertion-ownership, history, protected-boundary, and Stage C checks passed.
+- Both guidance blockers were removed; whole-file scans returned zero.
+- Final verifier `deleg_6140e07e`: PASS C1-C7, no blockers, no edits.
+
+PROTECTED BOUNDARIES
+- `stingray_master.xlsx`: unchanged from 2bb1e76.
+- Retained `form-output/runtime/`: unchanged.
+- Retained `form-output/inspection/`: unchanged.
+- `form-app/`, including published `data.js`: unchanged.
+- Runtime application and dealer submission: untouched.
+- No Stage C move, archive, or deletion began.
+
+CLOSEOUT GATES
+- Final Fable loop validator: passed.
+- Fable contract tests: 13 passed in 0.90s.
+- `git diff --check`: passed.
+- Exact six-file deletion-set comparison: passed.
+- Retained protected-surface diff against `2bb1e76`: empty.
+- Final active tracked-source stale-name scan: 0.
+- Final marker: `STAGE_B_CLOSEOUT_OK`.
