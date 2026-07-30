@@ -137,10 +137,15 @@ import into an empty projection is allowed, replacement re-import is contained,
 and every `POST /api/sync` request with `write=true` is refused. Dry-run sync,
 browsing, history, and verified-projection disposable comparison export remain
 available; generated-artifact and publication state are not inferred. The
-workbook remains canonical. Setup, current containment behavior, and test
-commands: `workbook-manager/README.md`. Focused tests:
-`tests/test_workbook_manager_catalog.py`,
-`tests/test_workbook_manager_import_projection.py`, and
+workbook remains canonical. Storage bootstrap runs in the FastAPI lifespan,
+every request opens and closes its own projection and durable-state connection,
+and one process-local lock plus a projection reader gate serialize durable
+mutations and any future candidate promotion — so supported serving is
+**single-process only** and `run.sh` refuses `--workers`. Setup, current
+containment behavior, and test commands: `workbook-manager/README.md`. Focused
+tests: `tests/test_workbook_manager_catalog.py`,
+`tests/test_workbook_manager_import_projection.py`,
+`tests/test_workbook_manager_api_concurrency.py`, and
 `tests/test_workbook_manager.py`.
 
 ## Workbook And Generator Workflows
@@ -234,7 +239,7 @@ The remaining `tests/test_*.py` files are not in that gate and are chosen by cha
 |---|---|
 | Workbook write path / editor | `test_editor_ops_apply`, `test_editor_ops_meta`, `test_editor_ops_global_families`, `test_editor_lints`, `test_editor_server_payload`, `test_editor_server_write_api` |
 | Workbook domain / ChangeSet | `test_workbook_domain_registry`, `test_workbook_changeset`, `test_workbook_changeset_service`, `test_workbook_bool_hygiene` |
-| Workbook Manager | `test_workbook_manager`, `test_workbook_manager_catalog`, `test_workbook_manager_import_projection` |
+| Workbook Manager | `test_workbook_manager`, `test_workbook_manager_catalog`, `test_workbook_manager_import_projection`, `test_workbook_manager_api_concurrency` |
 | Source assembly / runtime metadata | `test_source_assembly_characterization`, `test_runtime_metadata_guards`, `test_corvette_form_generator_contract` |
 | Publication | `test_atomic_registry_write` |
 | Asset map | `test_asset_map_sync` |

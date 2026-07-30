@@ -156,7 +156,12 @@ class TestSplitStoreMigration(unittest.TestCase):
             state_marker = dbmod.storage_manifest(state)
             self.assertEqual(projection_marker["migration_id"], state_marker["migration_id"])
             self.assertEqual(projection_marker["source_sha256"], state_marker["source_sha256"])
-            self.assertEqual(projection_marker["schema_version"], 1)
+            # Both stores must carry the version the code currently builds; a
+            # literal here would go stale the moment a schema change lands.
+            self.assertEqual(
+                projection_marker["schema_version"], dbmod.SCHEMA_VERSION
+            )
+            self.assertEqual(state_marker["schema_version"], dbmod.SCHEMA_VERSION)
         finally:
             projection.close()
             state.close()

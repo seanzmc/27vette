@@ -10,10 +10,14 @@ or use ``workbook-manager/run.sh``.
 
 from __future__ import annotations
 
+import contextlib
 import json
+import os
+import time
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Query
+import anyio
+from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -37,12 +41,6 @@ from .catalog import (
 from .staging import StagingError
 from .validation import find_dependents
 
-app = FastAPI(title="27vette Workbook Manager", version="0.1.0")
-
-_conn = None
-_state_conn = None
-_storage_bootstrapped = False
-
 PROVISIONAL_MODE = "read_only_provisional"
 IMPORT_TERMINAL_ALLOWLIST = (
     "applied",
@@ -52,24 +50,114 @@ IMPORT_TERMINAL_ALLOWLIST = (
     "abandoned_unknown",
 )
 
+# Bounded wait for a request to become a projection reader while a promotion
+# holds the gate. Requests fail closed with 503 instead of hanging.
+READER_WAIT_SECONDS = float(os.environ.get("WBM_READER_WAIT_SECONDS", "10"))
+# Bounded wait for the shared durable-state lock. Also fails closed with 503.
+STATE_LOCK_WAIT_SECONDS = float(os.environ.get("WBM_STATE_LOCK_WAIT_SECONDS", "30"))
 
-def get_conn():
-    global _conn, _storage_bootstrapped
-    if not _storage_bootstrapped:
-        config.ensure_dirs()
-        dbmod.bootstrap_storage(config.DEFAULT_DB, config.DEFAULT_PROJECTION_DB)
-        _storage_bootstrapped = True
-    if _conn is None:
-        _conn = dbmod.connect(config.DEFAULT_PROJECTION_DB)
-    return _conn
+_STORAGE_READY = False
 
 
-def get_state_conn():
-    global _state_conn
-    get_conn()
-    if _state_conn is None:
-        _state_conn = dbmod.connect(config.DEFAULT_DB)
-    return _state_conn
+@contextlib.asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Bootstrap/migrate storage before the app serves any request."""
+    global _STORAGE_READY
+    config.ensure_dirs()
+    app.state.storage_bootstrap = dbmod.bootstrap_storage(
+        config.DEFAULT_DB, config.DEFAULT_PROJECTION_DB
+    )
+    _STORAGE_READY = True
+    try:
+        yield
+    finally:
+        _STORAGE_READY = False
+
+
+def _require_storage_ready() -> None:
+    """Fail with an explicit reason when the app is served without its lifespan."""
+    if not _STORAGE_READY:
+        raise HTTPException(503, detail={
+            "status": "storage_not_bootstrapped",
+            "message": "storage bootstrap runs in the FastAPI lifespan; serve "
+                       "the app through its lifespan (uvicorn, or TestClient "
+                       "entered as a context manager) before issuing requests",
+        })
+
+
+app = FastAPI(
+    title="27vette Workbook Manager", version="0.1.0", lifespan=lifespan
+)
+
+
+def open_projection_connection():
+    """Open one disposable-projection connection. The caller closes it."""
+    return dbmod.connect(config.DEFAULT_PROJECTION_DB)
+
+
+def open_state_connection():
+    """Open one durable-state connection with manager-owned FK enforcement."""
+    return dbmod.connect(config.DEFAULT_DB, foreign_keys=True)
+
+
+def projection_connection():
+    """Request-scoped projection connection held under the reader gate."""
+    _require_storage_ready()
+    stack = contextlib.ExitStack()
+    try:
+        stack.enter_context(
+            dbmod.PROJECTION_GATE.reader(timeout=READER_WAIT_SECONDS)
+        )
+    except dbmod.ProjectionBusyError as exc:
+        raise HTTPException(503, detail={
+            "status": "projection_promotion_in_progress",
+            "message": str(exc),
+        }) from exc
+    conn = open_projection_connection()
+    try:
+        yield conn
+    finally:
+        conn.close()
+        stack.close()
+
+
+def state_connection():
+    """Request-scoped durable-state connection."""
+    _require_storage_ready()
+    conn = open_state_connection()
+    try:
+        yield conn
+    finally:
+        conn.close()
+
+
+async def durable_write_lock():
+    """Serialize durable-state mutation, promotion, and workbook apply.
+
+    Declared before ``projection_connection`` on every mutating endpoint so the
+    lock is always taken before a projection reader; promotion takes the lock
+    and then quiesces readers, so the two orders cannot deadlock.
+
+    Deliberately an ``async`` dependency that polls ``acquire(blocking=False)``:
+    blocking on the lock from a threadpool worker parks an anyio thread token,
+    and once every token is parked the lock holder can never get a thread to
+    finish and release it — a permanent process wedge. Waiting on the event loop
+    consumes no token, and the wait is bounded so contention degrades to 503
+    rather than hanging.
+    """
+    deadline = time.monotonic() + STATE_LOCK_WAIT_SECONDS
+    while not dbmod.STATE_LOCK.acquire(blocking=False):
+        if time.monotonic() >= deadline:
+            raise HTTPException(503, detail={
+                "status": "state_lock_busy",
+                "message": "another durable-state operation held the manager "
+                           f"lock for more than {STATE_LOCK_WAIT_SECONDS}s",
+            })
+        await anyio.sleep(0.01)
+    try:
+        yield
+    finally:
+        dbmod.STATE_LOCK.release()
 
 
 def _staging_error(exc: StagingError):
@@ -152,6 +240,17 @@ def _import_blockers(conn) -> dict:
     }
 
 
+def _projection_manifest(conn) -> dict:
+    """Identity of the projection this request actually opened."""
+    manifest = dbmod.storage_manifest(conn) or {}
+    return {
+        "store_kind": manifest.get("store_kind", ""),
+        "migration_id": manifest.get("migration_id", ""),
+        "source_sha256": manifest.get("source_sha256", ""),
+        "schema_version": manifest.get("schema_version"),
+    }
+
+
 def _projection_state(conn, run, workbook: dict) -> dict:
     active = _projection_active(conn)
     blocking_findings = 0
@@ -173,15 +272,17 @@ def _projection_state(conn, run, workbook: dict) -> dict:
         "active": active,
         "blocking_findings": blocking_findings,
         "reimport_allowed": not active,
+        "manifest": _projection_manifest(conn),
     }
 
 
 # ── status / import ──────────────────────────────────────────────────
 
 @app.get("/api/status")
-def status():
-    conn = get_conn()
-    state_conn = get_state_conn()
+def status(
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
     counts = {s.table: conn.execute(
         f"SELECT COUNT(*) c FROM {s.table}").fetchone()["c"]
         for s in TABLE_SPECS}
@@ -221,9 +322,11 @@ def status():
 
 
 @app.post("/api/import")
-def run_import():
-    conn = get_conn()
-    state_conn = get_state_conn()
+def run_import(
+    _lock=Depends(durable_write_lock),
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
     if not config.DEFAULT_WORKBOOK.exists():
         raise HTTPException(404, f"workbook not found: "
                                  f"{config.DEFAULT_WORKBOOK}")
@@ -252,8 +355,7 @@ def run_import():
 
 
 @app.get("/api/import/latest")
-def latest_import():
-    conn = get_conn()
+def latest_import(conn=Depends(projection_connection)):
     report = importer.latest_report(conn)
     if report is None:
         raise HTTPException(404, "no import has run yet")
@@ -263,8 +365,7 @@ def latest_import():
 # ── models / structure ───────────────────────────────────────────────
 
 @app.get("/api/models")
-def models():
-    conn = get_conn()
+def models(conn=Depends(projection_connection)):
     rows = conn.execute(
         "SELECT m.*, p.promoted_to_runtime, p.display_order AS "
         "promotion_order FROM models m LEFT JOIN model_registry_promotion p "
@@ -285,8 +386,7 @@ def models():
 
 
 @app.get("/api/structure/{model_key}")
-def structure(model_key: str):
-    conn = get_conn()
+def structure(model_key: str, conn=Depends(projection_connection)):
 
     def rows(table, order):
         spec = SPEC_BY_TABLE[table]
@@ -327,8 +427,7 @@ def structure(model_key: str):
 
 
 @app.get("/api/models/{model_key}/collections")
-def collections(model_key: str):
-    conn = get_conn()
+def collections(model_key: str, conn=Depends(projection_connection)):
     out = []
     for table in MODEL_COLLECTIONS:
         spec = SPEC_BY_TABLE[table]
@@ -380,8 +479,7 @@ def collections(model_key: str):
 
 
 @app.get("/api/tables")
-def tables():
-    conn = get_conn()
+def tables(conn=Depends(projection_connection)):
     return {"structure_tables": [
         _schema_dict(conn, SPEC_BY_TABLE[t], None) for t in STRUCTURE_TABLES]}
 
@@ -463,8 +561,9 @@ def _schema_dict(conn, spec, model_key: str | None) -> dict:
 
 
 @app.get("/api/records/{table}/schema", response_model=TableSchemaOut)
-def record_schema(table: str, model: str = ""):
-    conn = get_conn()
+def record_schema(
+    table: str, model: str = "", conn=Depends(projection_connection)
+):
     spec = SPEC_BY_TABLE.get(table)
     if spec is None:
         raise HTTPException(404, f"unknown table {table!r}")
@@ -473,8 +572,8 @@ def record_schema(table: str, model: str = ""):
 
 @app.get("/api/records/{table}")
 def records(table: str, model: str = "", search: str = "",
-            limit: int = Query(200, le=2000), offset: int = 0):
-    conn = get_conn()
+            limit: int = Query(200, le=2000), offset: int = 0,
+            conn=Depends(projection_connection)):
     spec = SPEC_BY_TABLE.get(table)
     if spec is None:
         raise HTTPException(404, f"unknown table {table!r}")
@@ -507,8 +606,9 @@ def records(table: str, model: str = "", search: str = "",
 
 
 @app.post("/api/records/{table}/dependencies")
-def dependencies_post(table: str, body: dict):
-    conn = get_conn()
+def dependencies_post(
+    table: str, body: dict, conn=Depends(projection_connection)
+):
     spec = SPEC_BY_TABLE.get(table)
     if spec is None:
         raise HTTPException(404, f"unknown table {table!r}")
@@ -520,9 +620,12 @@ def dependencies_post(table: str, body: dict):
 # ── staged changes ───────────────────────────────────────────────────
 
 @app.post("/api/changes", response_model=ChangeOut)
-def stage(payload: StageChangeRequest):
-    conn = get_conn()
-    state_conn = get_state_conn()
+def stage(
+    payload: StageChangeRequest,
+    _lock=Depends(durable_write_lock),
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
     try:
         return staging.stage_change(
             conn, table=payload.table, model_id=payload.model_id,
@@ -535,37 +638,47 @@ def stage(payload: StageChangeRequest):
 
 
 @app.get("/api/changes")
-def changes(status: str = "staged"):
-    return {"changes": staging.list_changes(get_state_conn(), status)}
+def changes(status: str = "staged", state_conn=Depends(state_connection)):
+    return {"changes": staging.list_changes(state_conn, status)}
 
 
 @app.delete("/api/changes/{change_id}", response_model=ChangeOut)
-def discard(change_id: int):
-    conn = get_state_conn()
+def discard(
+    change_id: int,
+    _lock=Depends(durable_write_lock),
+    state_conn=Depends(state_connection),
+):
     try:
-        return staging.discard_change(conn, change_id)
+        return staging.discard_change(state_conn, change_id)
     except StagingError as exc:
         raise _staging_error(exc)
 
 
 @app.post("/api/changes/validate")
-def validate_changes():
-    return staging.revalidate_staged(get_conn(), get_state_conn())
+def validate_changes(
+    _lock=Depends(durable_write_lock),
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
+    return staging.revalidate_staged(conn, state_conn)
 
 
 @app.post("/api/changes/commit")
-def commit(payload: CommitRequest):
-    return staging.commit_staged(
-        get_conn(), actor=payload.actor, state_conn=get_state_conn()
-    )
+def commit(
+    payload: CommitRequest,
+    _lock=Depends(durable_write_lock),
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
+    return staging.commit_staged(conn, actor=payload.actor, state_conn=state_conn)
 
 
 # ── history / sync / export / backup ─────────────────────────────────
 
 @app.get("/api/history")
 def history(model: str = "", entity_type: str = "", sync_status: str = "",
-            limit: int = Query(200, le=2000), offset: int = 0):
-    conn = get_state_conn()
+            limit: int = Query(200, le=2000), offset: int = 0,
+            conn=Depends(state_connection)):
     where, params = [], []
     if model:
         where.append("model_id=?")
@@ -593,8 +706,12 @@ def history(model: str = "", entity_type: str = "", sync_status: str = "",
 
 
 @app.post("/api/sync")
-def sync_endpoint(payload: SyncRequest):
-    conn = get_state_conn()
+def sync_endpoint(
+    payload: SyncRequest,
+    _lock=Depends(durable_write_lock),
+    projection=Depends(projection_connection),
+    conn=Depends(state_connection),
+):
     if payload.write:
         raise HTTPException(409, detail={
             "status": PROVISIONAL_MODE,
@@ -606,12 +723,11 @@ def sync_endpoint(payload: SyncRequest):
         conn, config.DEFAULT_WORKBOOK, write=payload.write,
         confirmed_warnings=tuple(payload.confirmed_warnings),
         expected_mtime_ns=payload.expected_mtime_ns,
-        projection_conn=get_conn())
+        projection_conn=projection)
 
 
 @app.post("/api/export")
-def export():
-    conn = get_conn()
+def export(conn=Depends(projection_connection)):
     workbook = _workbook_state(conn)
     run = conn.execute(
         "SELECT * FROM import_runs ORDER BY id DESC LIMIT 1").fetchone()
@@ -626,8 +742,10 @@ def export():
 
 
 @app.post("/api/backup")
-def backup():
-    conn = get_state_conn()
+def backup(
+    _lock=Depends(durable_write_lock),
+    conn=Depends(state_connection),
+):
     return syncmod.backup_database(conn, config.DEFAULT_DB)
 
 

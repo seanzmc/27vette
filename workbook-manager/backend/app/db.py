@@ -9,26 +9,66 @@ Storage conventions:
   composite UNIQUE constraint over ``(model_id, *key)``.
 - ``src_sheet``/``src_row`` are traceability metadata only, never identity.
 - Real FOREIGN KEY clauses are declared for single-table refs so the schema
-  documents relationships; enforcement is code-level (PRAGMA foreign_keys
-  stays OFF) because import must ingest unresolved rows and *report* them.
+  documents relationships; enforcement of *workbook* references is code-level
+  (projection connections keep PRAGMA foreign_keys OFF) because import must
+  ingest unresolved rows and *report* them. SQLite enforcement is enabled only
+  for durable manager-state relationships the database itself owns, such as
+  ``change_history.pending_change_id`` -> ``pending_changes.id``. SQLite is
+  never a second workbook reference model.
+
+Process coordination (Pass 3):
+- ``STATE_LOCK`` is the one process-local lock. It covers first-start
+  bootstrap/migration, durable-state mutations, candidate promotion, and
+  workbook apply. Supported serving is single-process; multi-worker serving is
+  unsupported and no distributed lock is added.
+- ``PROJECTION_GATE`` blocks new projection readers and waits for open
+  request-scoped projection connections to close before the projection file is
+  replaced. Every wait is bounded and fails closed with ``ProjectionBusyError``
+  rather than hanging.
+- Lock ordering is ``STATE_LOCK`` first, then a projection reader. Promotion
+  therefore takes ``STATE_LOCK`` and only then quiesces readers, so a request
+  never holds a reader while waiting for the lock a promoter owns.
 """
 
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import json
 import os
 import shutil
 import sqlite3
 import threading
+import time
 import uuid
 from pathlib import Path
 
 from .catalog import TABLE_SPECS, TableSpec
 
 
-SCHEMA_VERSION = 1
-_BOOTSTRAP_LOCK = threading.RLock()
+# 2 (Pass 3): durable ``change_history.pending_change_id`` declares
+# ``REFERENCES pending_changes(id)``. A store built at version 1 carries the old
+# DDL, so enabling PRAGMA foreign_keys on it would enforce nothing; bootstrap
+# upgrades such a store in place.
+SCHEMA_VERSION = 2
+# One process-local lock for bootstrap, durable-state mutation, candidate
+# promotion, and workbook apply.
+#
+# Deliberately a plain ``Lock``, not an ``RLock``: FastAPI runs a synchronous
+# generator dependency's enter and exit on separate threadpool threads, and an
+# ``RLock`` can only be released by the thread that acquired it — holding one
+# across the dependency's ``yield`` leaks the lock and wedges every later
+# request. A plain ``Lock`` may be released from another thread. It is therefore
+# NOT reentrant: no code path may acquire it while already holding it.
+#
+# Request paths must never *block* on this lock from a threadpool worker either:
+# a parked worker consumes an anyio thread token, and once every token is parked
+# the lock holder cannot get a thread to finish and release. ``main.py`` acquires
+# it from an async dependency with non-blocking polling and a bounded deadline.
+STATE_LOCK = threading.Lock()
+_BOOTSTRAP_LOCK = STATE_LOCK
+BUSY_TIMEOUT_MS = int(os.environ.get("WBM_BUSY_TIMEOUT_MS", "5000"))
+READER_DRAIN_SECONDS = float(os.environ.get("WBM_READER_DRAIN_SECONDS", "10"))
 _ARCHIVE_TEMP_PREFIX = ".wbm-split-archive-"
 _CANDIDATE_PREFIX = ".wbm-split-candidate-"
 _PROJECTION_META_KEYS = (
@@ -38,12 +78,108 @@ _PROJECTION_META_KEYS = (
 )
 
 
-def connect(db_path: Path) -> sqlite3.Connection:
+def connect(db_path: Path, *, foreign_keys: bool = False) -> sqlite3.Connection:
+    """Open one connection with WAL and a bounded busy timeout.
+
+    ``foreign_keys`` is enabled only for durable manager-state connections; the
+    projection keeps enforcement off so unresolved workbook references import
+    and are reported as findings.
+    """
     db_path.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(db_path, check_same_thread=False)
+    conn = sqlite3.connect(
+        db_path, check_same_thread=False, timeout=BUSY_TIMEOUT_MS / 1000
+    )
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
+    # The busy timeout comes from the driver ``timeout=`` above, which sets the
+    # same handler; a second explicit PRAGMA here would be unobservable dead
+    # code (deleting it changes nothing), so the configured value is asserted
+    # instead of restated.
+    conn.execute(f"PRAGMA foreign_keys={'ON' if foreign_keys else 'OFF'}")
     return conn
+
+
+class ProjectionBusyError(RuntimeError):
+    """Raised when a bounded projection gate wait expires."""
+
+
+class ProjectionGate:
+    """Reader gate that lets promotion replace the projection file safely.
+
+    Readers are request-scoped projection connections. Promotion blocks new
+    readers, waits for open readers to close, and only then replaces the file.
+    The gate holds no state about *which* projection is current: the promoted
+    projection's own import manifest and source fingerprint identify it.
+    """
+
+    def __init__(self) -> None:
+        self._cond = threading.Condition()
+        self._readers = 0
+        self._blocked = False
+
+    @property
+    def active_readers(self) -> int:
+        with self._cond:
+            return self._readers
+
+    @property
+    def blocked(self) -> bool:
+        with self._cond:
+            return self._blocked
+
+    @contextlib.contextmanager
+    def reader(self, timeout: float = READER_DRAIN_SECONDS):
+        deadline = time.monotonic() + timeout
+        with self._cond:
+            while self._blocked:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise ProjectionBusyError(
+                        "projection readers are gated while a candidate "
+                        "projection is promoted"
+                    )
+                self._cond.wait(remaining)
+            self._readers += 1
+        try:
+            yield
+        finally:
+            with self._cond:
+                self._readers -= 1
+                self._cond.notify_all()
+
+    @contextlib.contextmanager
+    def quiesce(self, timeout: float = READER_DRAIN_SECONDS):
+        """Block new readers, drain open readers, then yield for replacement."""
+        deadline = time.monotonic() + timeout
+        with self._cond:
+            while self._blocked:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise ProjectionBusyError(
+                        "another projection promotion holds the gate"
+                    )
+                self._cond.wait(remaining)
+            self._blocked = True
+            while self._readers:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    stuck = self._readers
+                    self._blocked = False
+                    self._cond.notify_all()
+                    raise ProjectionBusyError(
+                        f"{stuck} projection reader(s) did not drain within "
+                        f"{timeout}s; projection was not replaced"
+                    )
+                self._cond.wait(remaining)
+        try:
+            yield
+        finally:
+            with self._cond:
+                self._blocked = False
+                self._cond.notify_all()
+
+
+PROJECTION_GATE = ProjectionGate()
 
 
 def _table_ddl(spec: TableSpec) -> str:
@@ -138,7 +274,8 @@ SUPPORT_DDL = [
       status TEXT NOT NULL,            -- committed | rolled_back
       sync_status TEXT NOT NULL DEFAULT 'pending',  -- pending | synced | sync_failed | n/a
       sync_detail TEXT NOT NULL DEFAULT '',
-      pending_change_id INTEGER
+      -- Database-owned relationship: enforced on durable connections only.
+      pending_change_id INTEGER REFERENCES pending_changes(id)
     )""",
     """CREATE TABLE IF NOT EXISTS meta (
       key TEXT PRIMARY KEY,
@@ -281,7 +418,7 @@ def _sha256(path: Path) -> str:
 def _checkpoint_legacy(path: Path) -> None:
     if not path.exists():
         return
-    conn = sqlite3.connect(path)
+    conn = connect(path)
     try:
         conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
     finally:
@@ -575,12 +712,117 @@ def _replace_candidate(candidate: Path, target: Path) -> None:
     _fsync_dir(target.parent)
 
 
+def _replace_projection(candidate: Path, target: Path) -> None:
+    """Replace the projection file only while the reader gate is quiesced.
+
+    Bootstrap runs before the app serves requests, so there is nothing to drain
+    today. Routing every projection replacement through the gate keeps that
+    invariant true for the Pass 4 promotion path rather than leaving an ungated
+    ``os.replace`` for it to copy.
+    """
+    with PROJECTION_GATE.quiesce():
+        _replace_candidate(candidate, target)
+
+
 def _read_manifest_path(path: Path) -> dict | None:
     if not path.exists():
         return None
     conn = connect(path)
     try:
         return storage_manifest(conn)
+    finally:
+        conn.close()
+
+
+def _durable_history_declares_pending_fk(conn: sqlite3.Connection) -> bool:
+    return any(
+        row["table"] == "pending_changes" and row["from"] == "pending_change_id"
+        for row in conn.execute('PRAGMA foreign_key_list("change_history")')
+    )
+
+
+def _upgrade_durable_store(state_path: Path, manifest: dict) -> bool:
+    """Bring a durable store built by an earlier schema version up to date.
+
+    Schema 2 adds the database-owned ``change_history.pending_change_id`` ->
+    ``pending_changes.id`` foreign key. A store created at schema 1 keeps the old
+    DDL forever, so enabling ``PRAGMA foreign_keys`` on it would enforce nothing.
+    Rebuild that one table in place, preserving every row, and record the new
+    version in the manifest. Returns True when an upgrade was applied.
+    """
+    stored_version = int(manifest.get("schema_version") or 0)
+    if stored_version >= SCHEMA_VERSION:
+        return False
+    if stored_version < 1:
+        raise RuntimeError(
+            f"durable store schema version {stored_version} is not upgradable"
+        )
+    conn = connect(state_path)
+    try:
+        if _durable_history_declares_pending_fk(conn):
+            conn.execute(
+                "UPDATE storage_manifest SET schema_version=?", (SCHEMA_VERSION,)
+            )
+            conn.commit()
+            return True
+        columns = [
+            row["name"] for row in conn.execute('PRAGMA table_info("change_history")')
+        ]
+        quoted = ", ".join(f'"{column}"' for column in columns)
+        conn.execute("BEGIN IMMEDIATE")
+        before = int(
+            conn.execute("SELECT COUNT(*) c FROM change_history").fetchone()["c"]
+        )
+        conn.execute("ALTER TABLE change_history RENAME TO change_history_schema1")
+        for ddl in DURABLE_SUPPORT_DDL:
+            if "CREATE TABLE IF NOT EXISTS change_history " in ddl:
+                conn.execute(ddl)
+                break
+        conn.execute(
+            f"INSERT INTO change_history ({quoted}) "
+            f"SELECT {quoted} FROM change_history_schema1"
+        )
+        after = int(
+            conn.execute("SELECT COUNT(*) c FROM change_history").fetchone()["c"]
+        )
+        if after != before:
+            conn.rollback()
+            raise RuntimeError(
+                f"durable schema upgrade lost rows: {before} -> {after}"
+            )
+        conn.execute("DROP TABLE change_history_schema1")
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_history_entity "
+            "ON change_history(entity_type, entity_id)"
+        )
+        conn.execute(
+            "UPDATE storage_manifest SET schema_version=?", (SCHEMA_VERSION,)
+        )
+        conn.commit()
+        conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        return True
+    finally:
+        conn.close()
+
+
+def durable_orphan_history_rows(state_path: Path) -> int:
+    """Count durable history rows whose ``pending_change_id`` has no parent.
+
+    The upgrade copies rows with enforcement off so pre-existing legacy evidence
+    is preserved rather than dropped or refused. SQLite only checks a foreign key
+    on write, so such a row stays invisible unless it is counted explicitly.
+    """
+    if not state_path.exists():
+        return 0
+    conn = connect(state_path)
+    try:
+        if not _table_exists(conn, "change_history"):
+            return 0
+        return sum(
+            1
+            for row in conn.execute("PRAGMA foreign_key_check")
+            if row[0] == "change_history"
+        )
     finally:
         conn.close()
 
@@ -594,9 +836,12 @@ def bootstrap_storage(state_path: Path, projection_path: Path) -> dict:
     state_path.parent.mkdir(parents=True, exist_ok=True)
     projection_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with _BOOTSTRAP_LOCK:
+    with STATE_LOCK:
         state_manifest = _read_manifest_path(state_path)
         if state_manifest and state_manifest.get("store_kind") == "durable":
+            upgraded = _upgrade_durable_store(state_path, state_manifest)
+            if upgraded:
+                state_manifest = _read_manifest_path(state_path) or state_manifest
             projection_manifest = _read_manifest_path(projection_path)
             matching = (
                 projection_manifest
@@ -608,6 +853,10 @@ def bootstrap_storage(state_path: Path, projection_path: Path) -> dict:
             if matching:
                 return {
                     "status": "ready",
+                    "schema_upgraded": upgraded,
+                    "orphan_history_rows": (
+                        durable_orphan_history_rows(state_path) if upgraded else 0
+                    ),
                     "migration_id": state_manifest["migration_id"],
                     "archive_path": state_manifest.get("archive_path", ""),
                 }
@@ -620,9 +869,13 @@ def bootstrap_storage(state_path: Path, projection_path: Path) -> dict:
                 source_sha256=state_manifest["source_sha256"],
                 archive_path=source,
             )
-            _replace_candidate(candidate, projection_path)
+            _replace_projection(candidate, projection_path)
             return {
                 "status": "projection_rebuilt",
+                "schema_upgraded": upgraded,
+                "orphan_history_rows": (
+                    durable_orphan_history_rows(state_path) if upgraded else 0
+                ),
                 "migration_id": state_manifest["migration_id"],
                 "archive_path": str(source or ""),
             }
@@ -643,10 +896,12 @@ def bootstrap_storage(state_path: Path, projection_path: Path) -> dict:
                 source_sha256="",
                 archive_path=None,
             )
-            _replace_candidate(projection_candidate, projection_path)
+            _replace_projection(projection_candidate, projection_path)
             _replace_candidate(durable_candidate, state_path)
             return {
                 "status": "initialized",
+                "schema_upgraded": False,
+                "orphan_history_rows": 0,
                 "migration_id": migration_id,
                 "archive_path": "",
             }
@@ -672,7 +927,7 @@ def bootstrap_storage(state_path: Path, projection_path: Path) -> dict:
                 source_sha256=source_hash,
                 archive_path=archive,
             )
-            _replace_candidate(projection_candidate, projection_path)
+            _replace_projection(projection_candidate, projection_path)
             projection_candidate = None
             _replace_candidate(durable_candidate, state_path)
             durable_candidate = None
@@ -683,6 +938,8 @@ def bootstrap_storage(state_path: Path, projection_path: Path) -> dict:
                 durable_candidate.unlink(missing_ok=True)
         return {
             "status": "migrated",
+            "schema_upgraded": False,
+            "orphan_history_rows": 0,
             "migration_id": migration_id,
             "archive_path": str(archive),
         }

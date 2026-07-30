@@ -1,0 +1,112 @@
+{
+  "id": "2026-07-30-dbpass3-request-connections",
+  "started_at": "2026-07-30T09:00:00-04:00",
+  "completed_at": "2026-07-30T13:40:00-04:00",
+  "objective": "Implement Pass 3 of the reliable-workbook-database specification: lifespan storage bootstrap, request-scoped projection/durable connections, one process-local lock plus a bounded projection reader gate, single-process-only serving, and the concurrency/reader-drain proofs required before any Pass 4 promotion may call os.replace().",
+  "changed_surface": "tooling/tests/docs",
+  "source_commit_at_start": "fa0eee7",
+  "branch": "db-workflow",
+  "owning_specification": "docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md",
+  "outcome_rubric": "fable5loop/runs/2026-07-30-dbpass3-request-connections/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-30-dbpass3-request-connections/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-30-dbpass3-request-connections/validation-output.txt",
+  "files_changed": [
+    "workbook-manager/backend/app/db.py",
+    "workbook-manager/backend/app/main.py",
+    "workbook-manager/run.sh",
+    "workbook-manager/README.md",
+    "README.md",
+    "docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md",
+    "tests/test_workbook_manager_api_concurrency.py (new)",
+    "tests/test_workbook_manager.py",
+    "tests/test_workbook_manager_import_projection.py",
+    "fable5loop/STATE.md",
+    "fable5loop/skills/27vette-fable5-compounding.md"
+  ],
+  "validation": {
+    "red_reproduction": "first draft 16 failed / 5 passed against fa0eee7 in a throwaway worktree; the final module fails 21 of 25 there (verifier-reproduced)",
+    "new_module": "31 passed",
+    "manager_suites": "87 passed, 2 skipped (documented order and reverse order)",
+    "fable_loop": "validator passed; tests/test_fable5_loop_contract.py 13 passed",
+    "slow_copied_workbook_gate": "45 passed",
+    "shared_changeset_and_writer": "76 passed, 7 subtests passed",
+    "frontend_build": "passed",
+    "workbook_package_validation": "valid, 0 issues",
+    "workbook_schema_validation": "valid, 0 issues, 0 errors, 0 warnings",
+    "run_sh_refusals": "--workers rc=2; WEB_CONCURRENCY=4 rc=2",
+    "mutation_proofs": [
+      "synchronous blocking lock dependency -> thread-starvation test fails",
+      "lock dependency removed from any one of import/sync/backup/discard -> lock-coverage test fails",
+      "quiesce removed from _replace_projection -> both projection-swap gating tests fail",
+      "durable schema upgrade call removed -> both upgrade tests fail"
+    ],
+    "protected_paths": "git status empty for stingray_master.xlsx, form-output/, form-app/data.js",
+    "gates_not_run": [
+      "full repo pytest suite (no workbook write, no generation, no publication in this pass)",
+      "node runtime/browser gates (no runtime, generated-artifact, or styling change)",
+      "manager browser smoke (spec ties it to the ChangeSet lifecycle passes; no UI change here)"
+    ]
+  },
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-30-dbpass3-request-connections/validation-output.txt"
+    },
+    {
+      "section": "Lessons learned",
+      "evidence": "fable5loop/runs/2026-07-30-dbpass3-request-connections/verifier-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-30-dbpass3-request-connections/validation-output.txt"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "lesson": "Concurrency primitives held across a FastAPI dependency's yield: an RLock cannot be released (enter/exit run on different threadpool threads) and any blocking acquire from a threadpool worker can wedge the process once every anyio token is parked. Plus: 'refuse the flag' is not 'refuse the capability' — argv guards must also cover the environment variable the tool reads.",
+    "evidence": "fable5loop/runs/2026-07-30-dbpass3-request-connections/verifier-report.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "cycles": 3,
+    "cycle_1": {
+      "agent": "deleg independent verifier",
+      "verdict": "fail",
+      "blockers": [
+        "C12: run.json and STATE.md missing",
+        "C5: blocking lock in a sync dependency wedges the process under threadpool starvation",
+        "C9: WEB_CONCURRENCY bypasses the run.sh multi-worker refusal",
+        "C10: lock-coverage test could not fail for import/discard/sync"
+      ]
+    },
+    "cycle_2": {
+      "agent": "deleg independent verifier (fresh context)",
+      "verdict": "pass",
+      "non_blocking_findings": [
+        "no schema-upgrade path for the new durable foreign key (closed in cycle 3)",
+        "_replace_projection gating untested (closed in cycle 3)",
+        "explicit busy_timeout pragma unobservable (removed in cycle 3)",
+        "run.json/STATE pre-recorded a pass verdict before that cycle ran (corrected here)",
+        "RED count understated (corrected to 21 of 25)"
+      ]
+    },
+    "cycle_3": {
+      "scope": "closed three cycle-2 non-blocking findings plus receipt corrections; re-verified by the same verifier on the delta",
+      "verdict": "pass"
+    },
+    "verdict": "pass",
+    "accepted_by_human": false
+  },
+  "boundaries_preserved": [
+    "workbook",
+    "generated artifacts",
+    "registry publication",
+    "runtime app",
+    "dealer submission",
+    "Pass 1 write containment (sync write=true still refused)",
+    "no Pass 4 promotion, Pass 5 ChangeSet emission, or Pass 7 UI work",
+    "no new dependency",
+    "no commit or push"
+  ]
+}

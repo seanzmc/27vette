@@ -1,7 +1,8 @@
 # Reliable Workbook–Database Workflow Implementation Specification
 
-Status: implementation in progress; Pass 1 completed 2026-07-22 and Pass 2
-completed 2026-07-23 on `db-workflow`; Passes 3–7 not started. Revised
+Status: implementation in progress; Pass 1 completed 2026-07-22, Pass 2
+completed 2026-07-23, and Pass 3 completed 2026-07-30 on `db-workflow`; Passes
+4–7 not started. Revised
 2026-07-23 to record the completed workbook-owned Vehicle Setup copy contract;
 the final specification review previously resolved all fourteen findings: primary-
 runtime-only parity, strict publication selection, current baseline, outcome-
@@ -125,7 +126,10 @@ The current `WBM_DB` can contain both imported projection tables and durable
 before any storage consumer changes.
 
 - Keep `WBM_DB` as the durable-state path and add `WBM_PROJECTION_DB` for the
-  projection path. New installations initialize both at schema version 1.
+  projection path. New installations initialize both at the current
+  `SCHEMA_VERSION` (1 as written in Pass 2; 2 since Pass 3 added the durable
+  `change_history.pending_change_id` foreign key, with an in-place upgrade for
+  stores built at 1).
 - At startup, under a Pass 2 process-local startup/migration lock and before
   any storage consumer runs,
   checkpoint and close the legacy database, hash it, and copy it to a unique
@@ -868,6 +872,91 @@ Required changes:
 Pass 3 exit gate: concurrent first-load/status requests use independent
 connections without lock errors, promotion can quiesce readers deterministically,
 and subsequent requests open the promoted projection manifest.
+
+Pass 3 result — completed 2026-07-30:
+
+- Storage bootstrap/migration now runs in the FastAPI `lifespan` and records its
+  result on `app.state.storage_bootstrap`. Entering the app lifespan with no
+  request builds both stores with matching manifests; no request path bootstraps
+  lazily. `TestClient` must therefore be entered as a context manager.
+- The global `_conn`/`_state_conn`/`_storage_bootstrapped` accessors are gone.
+  `projection_connection()` and `state_connection()` are request-scoped
+  generator dependencies that open one connection each and close it when the
+  request ends; `open_projection_connection()`/`open_state_connection()` are the
+  non-request helpers. Every connection sets WAL plus an explicit
+  `busy_timeout` (`WBM_BUSY_TIMEOUT_MS`, default 5000 ms).
+- SQLite foreign keys are enforced only on durable manager-state connections,
+  where `change_history.pending_change_id` now declares
+  `REFERENCES pending_changes(id)`. Projection connections keep enforcement off,
+  so an unresolved workbook reference still imports and is reported as a finding
+  rather than rejected by SQL. Both directions are asserted. Because that DDL
+  change is invisible to a durable store Pass 2 already created, `SCHEMA_VERSION`
+  is now 2 and bootstrap upgrades a version-1 durable store in place — rebuilding
+  only `change_history` with the foreign key, preserving every row under
+  `BEGIN IMMEDIATE`, refusing on any row-count change, and recording the new
+  version in the manifest. The upgrade is idempotent across restarts and is
+  reported as `schema_upgraded` in the bootstrap result.
+- `STATE_LOCK` is the one process-local lock and now covers bootstrap plus every
+  durable-state mutating route (`/api/import`, stage, discard, validate, commit,
+  `/api/sync`, `/api/backup`) and, by contract, candidate promotion and workbook
+  apply. Two concurrency defects were found and fixed while proving it, both
+  worth recording because they are invisible to ordinary request-path reasoning:
+  - An `RLock` held across a *synchronous* generator dependency's `yield` cannot
+    be released, because FastAPI runs that dependency's enter and exit on
+    different threadpool threads. The lock is now a plain `Lock` (releasable
+    from any thread) and is therefore non-reentrant.
+  - Blocking on that lock from a threadpool worker parks an anyio thread token,
+    and once every token is parked the lock holder can never obtain a thread to
+    finish and release — a permanent, unrecoverable process wedge, reproduced
+    deterministically with the thread limiter shrunk to four tokens. The lock is
+    now taken in an `async` dependency that polls a non-blocking acquire on the
+    event loop under a bounded deadline (`WBM_STATE_LOCK_WAIT_SECONDS`, default
+    30 s), so contention degrades to `503` instead of hanging. Lock *ordering*
+    (lock-then-reader) was never the risk; thread starvation was.
+- `PROJECTION_GATE` blocks new readers, drains open request-scoped projection
+  connections, and only then permits replacement. Both waits are bounded and
+  fail closed (`ProjectionBusyError`; `WBM_READER_WAIT_SECONDS` and
+  `WBM_READER_DRAIN_SECONDS`, default 10 s each). A request arriving during a
+  promotion returns `503`; a promotion whose readers do not drain replaces
+  nothing and re-admits readers. Lock ordering is lock-then-reader — mutating
+  endpoints declare the lock dependency first — so promotion (lock, then
+  quiesce) cannot deadlock against an in-flight request. No second durable
+  projection-generation state machine was added: `/api/status` now reports the
+  opened projection's own `storage_manifest` identity. The bootstrap projection
+  swap itself now runs through the gate, so Pass 4 inherits a gated replacement
+  path rather than an ungated `os.replace` to copy.
+- Requests to an app whose lifespan never ran fail closed with
+  `503 storage_not_bootstrapped` naming the lifespan requirement, instead of an
+  opaque `no such table` error plus stray empty database files.
+- `run.sh` refuses `--workers` **and** a `WEB_CONCURRENCY` other than `1`:
+  uvicorn reads the worker count from the environment when the flag is absent, so
+  refusing only argv would have left multi-worker serving reachable. No
+  distributed locking was added. `workbook-manager/README.md` and the root README
+  record the Pass 3 behavior, the new environment overrides, and the new test
+  module.
+- No promotion code calls `os.replace()` yet; Pass 4 owns that. The gate and its
+  reader-drain proofs land first, as required.
+- Gates: new `tests/test_workbook_manager_api_concurrency.py` `31 passed`. Its
+  final form fails `21` of `25` against pre-implementation `fa0eee7` in a
+  throwaway worktree (the first 16-criterion draft failed 16 there), and each
+  later test was observed failing against the intermediate build it fixes:
+  thread starvation, full lock coverage, the `WEB_CONCURRENCY` bypass, the
+  lifespan guard, the gated projection swap, and the durable schema upgrade. The
+  busy-timeout test is the exception and is recorded as such: it cannot fail
+  against the intermediate build, because the explicit pragma there set the same
+  value the driver already sets — which is why that line was deleted rather than
+  defended. The four manager suites together `87 passed, 2 skipped`
+  in documented and reverse order; `WBM_SLOW_GATE=1 tests/test_workbook_manager.py`
+  `45 passed`; shared ChangeSet plus shared writer `76 passed, 7 subtests passed`;
+  frontend build passed; workbook package and schema validation both valid with
+  zero issues.
+- Protected-path `git status` was empty for `stingray_master.xlsx`,
+  `form-output/`, and `form-app/data.js`; current hashes are
+  `16415b913935b6d644fd1fbdcb5f6818d119e62cb6ef1fd077cff0f4b8d870e1` and
+  `7d97dba5294d09de4a622ec410810bad4c1d1955c043d5c69e6105896258b91c`. Product
+  data, generated contracts, publication, deployment, customer form behavior, and
+  dealer submission were unchanged. Pass 1 write containment remains active;
+  `write=true` sync is still refused. Pass 4 candidate promotion is not started.
 
 ### Pass 4 — Build and atomically promote a verified projection
 

@@ -21,8 +21,9 @@ stingray_master.xlsx (canonical source)
 
 ## Current safety status: read-only / provisional
 
-Pass 1 containment remains active. Pass 2 split storage and the shared backend
-catalog contract are implemented:
+Pass 1 containment remains active. Pass 2 split storage plus the shared backend
+catalog contract, and Pass 3 request connections plus promotion coordination,
+are implemented:
 
 - `POST /api/sync` refuses every `write=true` request. The browser has no live
   write control; dry-run remains available for inspection only.
@@ -42,6 +43,30 @@ catalog contract are implemented:
   consumer can open either one. Exact legacy staged/history rows are retained
   as read-only recovery evidence; unresolved records keep import containment
   active. The hashed legacy archive is retained beside `WBM_DB`.
+- Storage bootstrap/migration runs in the FastAPI lifespan, so it completes
+  before the app serves any request. No request path bootstraps lazily.
+- Every request opens its own projection and durable-state connection and
+  closes it when the request ends. Both carry WAL and a bounded busy timeout
+  (`WBM_BUSY_TIMEOUT_MS`, default 5000 ms). SQLite foreign keys are enforced
+  only on durable manager-state connections, where the relationships are
+  database-owned; the projection keeps them off so unresolved workbook
+  references still import and are *reported* as findings.
+- One process-local lock covers bootstrap/migration, durable-state mutations,
+  candidate promotion, and workbook apply. Requests take it from an `async`
+  dependency that polls a non-blocking acquire with a bounded deadline
+  (`WBM_STATE_LOCK_WAIT_SECONDS`, default 30 s → `503`); blocking on it from a
+  threadpool worker would park an anyio thread token and can wedge the process
+  once every token is parked.
+- A projection reader gate blocks new readers and waits for open request-scoped
+  projection connections to close before the projection file is replaced — the
+  bootstrap swap already goes through it. Requests that arrive while a promotion
+  holds the gate fail closed with `503` (`WBM_READER_WAIT_SECONDS`, default
+  10 s); a promotion whose readers do not drain (`WBM_READER_DRAIN_SECONDS`,
+  default 10 s) refuses to replace anything and re-admits readers. Lock ordering
+  is lock-then-reader.
+- The app must be served through its lifespan. Requests to an app whose lifespan
+  never ran fail closed with `503 storage_not_bootstrapped` instead of an opaque
+  missing-table error, so `TestClient` must be entered as a context manager.
 
 The existing stage/validate/commit tables remain legacy provisional workflow
 state, not workbook write authority. SQLite-canonical operation is not an
@@ -65,8 +90,15 @@ cd workbook-manager/frontend && npm install && npm run build
 cd workbook-manager/frontend && npm run dev   # :5183, proxies /api → :8050
 ```
 
+Supported serving is **single-process only**. `run.sh` refuses both `--workers`
+and `WEB_CONCURRENCY` (uvicorn reads the worker count from either), because
+manager locks and the projection reader gate are process-local; multi-worker
+serving is unsupported and no distributed locking exists.
+
 Environment overrides: `WBM_WORKBOOK`, `WBM_DB` (durable state),
-`WBM_PROJECTION_DB` (disposable projection), `WBM_VAR_DIR`, `WBM_PORT`.
+`WBM_PROJECTION_DB` (disposable projection), `WBM_VAR_DIR`, `WBM_PORT`,
+`WBM_BUSY_TIMEOUT_MS`, `WBM_READER_WAIT_SECONDS`, `WBM_READER_DRAIN_SECONDS`,
+`WBM_STATE_LOCK_WAIT_SECONDS`.
 
 ## Workflow
 
@@ -119,6 +151,7 @@ Environment overrides: `WBM_WORKBOOK`, `WBM_DB` (durable state),
 .venv/bin/python -m pytest \
   tests/test_workbook_manager_catalog.py \
   tests/test_workbook_manager_import_projection.py \
+  tests/test_workbook_manager_api_concurrency.py \
   tests/test_workbook_manager.py -q
 # optional direct shared-writer scratch-copy tests (not an enabled API route):
 WBM_SLOW_GATE=1 .venv/bin/python -m pytest tests/test_workbook_manager.py -q

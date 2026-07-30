@@ -729,11 +729,15 @@ class TestApi(unittest.TestCase):
         from fastapi.testclient import TestClient
         from app import main as mainmod
         cls.mainmod = mainmod
+        # The client must be entered as a context manager: storage bootstrap
+        # runs in the FastAPI lifespan, not lazily inside a request.
         cls.client = TestClient(mainmod.app)
+        cls.client.__enter__()
         cls.client.post("/api/import")
 
     @classmethod
     def tearDownClass(cls):
+        cls.client.__exit__(None, None, None)
         shutil.rmtree(cls.tmpdir, ignore_errors=True)
 
     def test_status_and_models(self):
@@ -813,7 +817,8 @@ class TestApi(unittest.TestCase):
         self.assertIn("Pass 7", detail["message"])
 
     def test_reimport_refuses_to_replace_an_active_projection(self):
-        conn = self.mainmod.get_conn()
+        conn = self.mainmod.open_projection_connection()
+        self.addCleanup(conn.close)
         before_runs = conn.execute("SELECT COUNT(*) c FROM import_runs").fetchone()["c"]
         before_options = conn.execute("SELECT COUNT(*) c FROM options").fetchone()["c"]
         resp = self.client.post("/api/import")
@@ -839,7 +844,8 @@ class TestApi(unittest.TestCase):
         self.assertEqual(detail["status"], "projection_not_current")
 
     def test_import_reports_all_unresolved_legacy_workflow_blockers(self):
-        conn = self.mainmod.get_state_conn()
+        conn = self.mainmod.open_state_connection()
+        self.addCleanup(conn.close)
         pending_id = conn.execute(
             "INSERT INTO pending_changes(ts, table_name, entity_key_json, op, "
             "status) VALUES('test', 'options', '{}', 'update', 'staged')"
