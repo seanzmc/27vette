@@ -17,10 +17,12 @@ from __future__ import annotations
 import json
 import shutil
 import sqlite3
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
-from . import config  # ensures scripts/ on sys.path
+from . import config, importer  # ensures scripts/ on sys.path
+from . import db as dbmod
 from corvette_form_generator import editor_ops  # noqa: E402
 
 from .catalog import SPEC_BY_TABLE
@@ -129,86 +131,83 @@ def sync_workbook(conn: sqlite3.Connection, workbook_path: Path, *,
 
 # ── comparison export ────────────────────────────────────────────────
 
-def _coerce_export(raw: str, ctype: str):
-    """Best-effort native typing for the comparison artifact (display diffing
-    only; the live workbook write path coerces via editor_ops instead)."""
-    text = "" if raw is None else str(raw)
-    if text == "":
-        return ""
-    if ctype == "int":
-        try:
-            return int(text.replace(",", ""))
-        except ValueError:
-            return text
-    if ctype == "bool":
-        if text in ("True", "False"):
-            return text == "True"
-        return text
-    return text
-
-
-
 def export_comparison_workbook(conn: sqlite3.Connection,
                                workbook_path: Path) -> dict:
-    """Regenerate a workbook copy from the database for diffing.
+    """Create an identity-bound, semantically verified comparison copy.
 
-    Starts from a byte copy of the current workbook (preserving unmanaged
-    sheets, formatting, and tables), then rewrites the data rows of every
-    managed sheet from the normalized tables. Never touches the original.
+    Pass 4 has no draft overlay, so a freshly imported projection normally emits
+    no operations and remains byte-identical. If registry-owned projected fields
+    differ, reconstruction overlays them through ``editor_ops.apply_batch``;
+    opaque workbook surfaces remain owned by the bound source copy.
     """
-    from openpyxl import load_workbook
 
     config.ensure_dirs()
-    out_path = config.EXPORT_DIR / f"DISPOSABLE-comparison-{_now_slug()}.xlsx"
-    shutil.copy2(workbook_path, out_path)
-    wb = load_workbook(out_path)
-
-    rewritten: dict[str, int] = {}
-    for spec in SPEC_BY_TABLE.values():
-        sheets: list[tuple[str, str | None]] = []
-        if spec.sheet:
-            sheets = [(s, None) for s in spec.sheet]
-        elif spec.role:
-            regs = conn.execute(
-                "SELECT model_key, sheet_name FROM sheet_registry WHERE "
-                "source_role=?", (spec.role,)).fetchall()
-            sheets = [(r["sheet_name"], r["model_key"]) for r in regs]
-        for sheet, model in sheets:
-            if sheet not in wb.sheetnames:
-                continue
-            ws = wb[sheet]
-            headers = [c.value for c in ws[1]]
-            if spec.sheet and len(spec.sheet) > 1:
-                where, params = "src_sheet=?", [sheet]
-            elif spec.model_scoped:
-                where, params = "model_id=?", [model]
-            else:
-                where, params = "1=1", []
-            order = ", ".join(f'"{k}"' for k in ("src_row", *spec.key))
-            rows = conn.execute(
-                f"SELECT * FROM {spec.table} WHERE {where} "
-                f"ORDER BY {order}", params).fetchall()
-            header_to_col = {c.header: c for c in spec.columns}
-            if ws.max_row > 1:
-                ws.delete_rows(2, ws.max_row - 1)
-            for row in rows:
-                values = []
-                for h in headers:
-                    col = header_to_col.get(h)
-                    if col is None:
-                        values.append("")
-                        continue
-                    raw = row[col.sql_name()]
-                    values.append(_coerce_export(raw, col.ctype))
-                ws.append(values)
-            rewritten[sheet] = rewritten.get(sheet, 0) + len(rows)
-    wb.save(out_path)
-    return {
-        "ok": True,
-        "disposable": True,
-        "path": str(out_path),
-        "rewritten": rewritten,
+    bound_identity = {
+        "sha256": dbmod.get_meta(conn, "workbook_sha256") or "",
+        "mtime_ns": int(dbmod.get_meta(conn, "workbook_mtime_ns") or 0),
     }
+    identity = importer.workbook_identity(workbook_path)
+    if bound_identity != identity:
+        return {
+            "ok": False,
+            "status": "stale",
+            "errors": ["source workbook identity differs from the promoted projection"],
+        }
+    out_path = config.EXPORT_DIR / f"DISPOSABLE-comparison-{_now_slug()}.xlsx"
+    candidate = out_path.with_name(
+        f".{out_path.stem}.{uuid.uuid4().hex}.candidate.xlsx"
+    )
+    try:
+        shutil.copy2(workbook_path, candidate)
+        copied_identity = importer.workbook_identity(candidate)
+        live_identity = importer.workbook_identity(workbook_path)
+        if copied_identity != bound_identity or live_identity != bound_identity:
+            return {
+                "ok": False,
+                "status": "stale",
+                "errors": ["source workbook changed while comparison export was copied"],
+            }
+        (
+            package_valid,
+            schema_valid,
+            semantic_equal,
+            issues,
+        ) = (
+            importer._validate_reconstruction(
+                workbook_path,
+                conn,
+                reconstruction_path=candidate,
+            )
+        )
+        if not (
+            package_valid
+            and schema_valid
+            and semantic_equal
+        ):
+            return {
+                "ok": False,
+                "status": "reconstruction_failed",
+                "errors": [issue.get("message", str(issue)) for issue in issues],
+            }
+        if importer.workbook_identity(workbook_path) != bound_identity:
+            return {
+                "ok": False,
+                "status": "stale",
+                "errors": ["source workbook changed during comparison reconstruction"],
+            }
+        byte_identical = candidate.read_bytes() == workbook_path.read_bytes()
+        dbmod._replace_candidate(candidate, out_path)
+        return {
+            "ok": True,
+            "disposable": True,
+            "path": str(out_path),
+            "byte_identical": byte_identical,
+            "semantic_readback_verified": True,
+            "generated_contract_parity_verified": True,
+            "rewritten": {} if byte_identical else {"registry_owned_fields": "overlaid"},
+        }
+    finally:
+        candidate.unlink(missing_ok=True)
 
 
 def backup_database(conn: sqlite3.Connection, db_path: Path) -> dict:

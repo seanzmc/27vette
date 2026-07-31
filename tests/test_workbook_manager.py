@@ -640,12 +640,21 @@ class TestSyncBatch(ImportedWorkbookCase):
 
 
 class TestComparisonExport(ImportedWorkbookCase):
+    def setUp(self):
+        super().setUp()
+        self.workbook = self.tmpdir / "valid-source.xlsx"
+        shutil.copy2(WORKBOOK, self.workbook)
+        report = importer.import_workbook(self.conn, self.workbook)
+        self.assertFalse(
+            [issue for issue in report["issues"] if issue["severity"] == "error"]
+        )
+
     def test_export_is_explicitly_disposable(self):
         from app import config
         config.VAR_DIR = self.tmpdir / "var"
         config.EXPORT_DIR = config.VAR_DIR / "exports"
         config.DB_BACKUP_DIR = config.VAR_DIR / "db-backups"
-        result = syncmod.export_comparison_workbook(self.conn, WORKBOOK)
+        result = syncmod.export_comparison_workbook(self.conn, self.workbook)
         self.assertTrue(result["disposable"])
         self.assertIn("DISPOSABLE-comparison-", Path(result["path"]).name)
         self.assertTrue(Path(result["path"]).is_relative_to(config.EXPORT_DIR))
@@ -657,10 +666,12 @@ class TestComparisonExport(ImportedWorkbookCase):
         config.VAR_DIR = self.tmpdir / "var"
         config.EXPORT_DIR = config.VAR_DIR / "exports"
         config.DB_BACKUP_DIR = config.VAR_DIR / "db-backups"
-        result = syncmod.export_comparison_workbook(self.conn, WORKBOOK)
+        result = syncmod.export_comparison_workbook(self.conn, self.workbook)
         self.assertTrue(result["ok"])
+        self.assertTrue(result["byte_identical"])
+        self.assertEqual(Path(result["path"]).read_bytes(), self.workbook.read_bytes())
         from openpyxl import load_workbook
-        orig = load_workbook(WORKBOOK, read_only=True)
+        orig = load_workbook(self.workbook, read_only=True)
         regen = load_workbook(result["path"], read_only=True)
         self.assertEqual(set(orig.sheetnames), set(regen.sheetnames),
                          "regenerated workbook must keep every sheet")
@@ -679,6 +690,66 @@ class TestComparisonExport(ImportedWorkbookCase):
         )
         orig.close()
         regen.close()
+
+    def test_export_overlays_registry_owned_projection_fields(self):
+        from app import config
+        from openpyxl import load_workbook
+
+        config.VAR_DIR = self.tmpdir / "var"
+        config.EXPORT_DIR = config.VAR_DIR / "exports"
+        config.DB_BACKUP_DIR = config.VAR_DIR / "db-backups"
+        row = self.conn.execute(
+            "SELECT id, src_sheet, src_row FROM sheet_registry "
+            "ORDER BY id LIMIT 1"
+        ).fetchone()
+        self.assertIsNotNone(row)
+        value = "pass4-overlay-proof"
+        self.conn.execute(
+            "UPDATE sheet_registry SET notes=? WHERE id=?",
+            (value, row["id"]),
+        )
+        self.conn.commit()
+
+        result = syncmod.export_comparison_workbook(self.conn, self.workbook)
+
+        self.assertTrue(result["ok"], result)
+        self.assertFalse(result["byte_identical"])
+        self.assertEqual(result["rewritten"], {"registry_owned_fields": "overlaid"})
+        exported = load_workbook(result["path"], read_only=True, data_only=False)
+        try:
+            sheet = exported[row["src_sheet"]]
+            headers = [cell.value for cell in sheet[1]]
+            column = headers.index("notes") + 1
+            self.assertEqual(sheet.cell(row["src_row"], column).value, value)
+        finally:
+            exported.close()
+
+    def test_export_refuses_source_drift_during_copy(self):
+        import os
+        from unittest import mock
+        from app import config
+
+        config.VAR_DIR = self.tmpdir / "var"
+        config.EXPORT_DIR = config.VAR_DIR / "exports"
+        original = self.workbook.read_bytes()
+        mtime_ns = self.workbook.stat().st_mtime_ns
+        real_copy = shutil.copy2
+
+        def copy_then_drift(source, destination):
+            result = real_copy(source, destination)
+            self.workbook.write_bytes(original + b"drift")
+            os.utime(self.workbook, ns=(mtime_ns, mtime_ns))
+            return result
+
+        try:
+            with mock.patch.object(syncmod.shutil, "copy2", side_effect=copy_then_drift):
+                result = syncmod.export_comparison_workbook(self.conn, self.workbook)
+            self.assertFalse(result["ok"])
+            self.assertEqual(result["status"], "stale")
+            self.assertFalse(list(config.EXPORT_DIR.glob("*.candidate.xlsx")))
+        finally:
+            self.workbook.write_bytes(original)
+            os.utime(self.workbook, ns=(mtime_ns, mtime_ns))
 
 
 class TestDependencyInspection(ImportedWorkbookCase):
@@ -714,8 +785,12 @@ class TestApi(unittest.TestCase):
     def setUpClass(cls):
         import os
         cls.tmpdir = Path(tempfile.mkdtemp(prefix="wbm-api-"))
+        cls.workbook = cls.tmpdir / "source.xlsx"
+        shutil.copy2(WORKBOOK, cls.workbook)
+        cls.previous_workbook_env = os.environ.get("WBM_WORKBOOK")
         os.environ["WBM_DB"] = str(cls.tmpdir / "api.sqlite3")
         os.environ["WBM_VAR_DIR"] = str(cls.tmpdir / "var")
+        os.environ["WBM_WORKBOOK"] = str(cls.workbook)
         # Force a FULL re-import of the app package so config re-reads the
         # env vars above. The bare "app" entry must be deleted too: leaving
         # the package object in sys.modules makes `from . import staging`
@@ -737,7 +812,13 @@ class TestApi(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        import os
+
         cls.client.__exit__(None, None, None)
+        if cls.previous_workbook_env is None:
+            os.environ.pop("WBM_WORKBOOK", None)
+        else:
+            os.environ["WBM_WORKBOOK"] = cls.previous_workbook_env
         shutil.rmtree(cls.tmpdir, ignore_errors=True)
 
     def test_status_and_models(self):
@@ -750,12 +831,31 @@ class TestApi(unittest.TestCase):
     def test_status_reports_provisional_surfaces_separately(self):
         status = self.client.get("/api/status").json()
         self.assertEqual(status["mode"], "read_only_provisional")
-        self.assertEqual(status["projection"]["state"], "unverified")
+        self.assertEqual(status["projection"]["state"], "current")
         self.assertTrue(status["projection"]["active"])
+        self.assertTrue(status["projection"]["reimport_allowed"])
         self.assertEqual(status["draft"]["state"], "clear")
         self.assertIn("state", status["workbook"])
         self.assertEqual(status["generated_artifacts"]["state"], "unverified")
         self.assertEqual(status["publication"]["state"], "unverified")
+
+    def test_same_mtime_hash_drift_is_stale_and_allows_verified_reimport(self):
+        import os
+
+        original = self.workbook.read_bytes()
+        mtime_ns = self.workbook.stat().st_mtime_ns
+        try:
+            mutated = bytearray(original)
+            mutated[-1] ^= 1
+            self.workbook.write_bytes(mutated)
+            os.utime(self.workbook, ns=(mtime_ns, mtime_ns))
+            status = self.client.get("/api/status").json()
+            self.assertEqual(status["workbook"]["state"], "stale")
+            self.assertEqual(status["projection"]["state"], "stale")
+            self.assertTrue(status["projection"]["reimport_allowed"])
+        finally:
+            self.workbook.write_bytes(original)
+            os.utime(self.workbook, ns=(mtime_ns, mtime_ns))
 
     def test_structure_and_collections(self):
         structure = self.client.get("/api/structure/stingray").json()
@@ -816,32 +916,28 @@ class TestApi(unittest.TestCase):
         self.assertEqual(detail["status"], "read_only_provisional")
         self.assertIn("Pass 7", detail["message"])
 
-    def test_reimport_refuses_to_replace_an_active_projection(self):
+    def test_reimport_atomically_replaces_an_active_projection(self):
+        conn = self.mainmod.open_projection_connection()
+        before_manifest = self.mainmod._projection_manifest(conn)
+        before_options = conn.execute("SELECT COUNT(*) c FROM options").fetchone()["c"]
+        conn.close()
+        resp = self.client.post("/api/import")
+        self.assertEqual(resp.status_code, 200, resp.text)
+        self.assertTrue(resp.json()["promoted"])
         conn = self.mainmod.open_projection_connection()
         self.addCleanup(conn.close)
-        before_runs = conn.execute("SELECT COUNT(*) c FROM import_runs").fetchone()["c"]
-        before_options = conn.execute("SELECT COUNT(*) c FROM options").fetchone()["c"]
-        resp = self.client.post("/api/import")
-        self.assertEqual(resp.status_code, 409)
-        detail = resp.json()["detail"]
-        self.assertTrue(detail["active_projection"])
-        self.assertEqual(detail["status"], "read_only_provisional")
+        self.assertNotEqual(self.mainmod._projection_manifest(conn), before_manifest)
         self.assertEqual(
-            conn.execute("SELECT COUNT(*) c FROM import_runs").fetchone()["c"],
-            before_runs,
-        )
-        self.assertEqual(
-            conn.execute("SELECT COUNT(*) c FROM options").fetchone()["c"],
-            before_options,
+            conn.execute("SELECT COUNT(*) c FROM options").fetchone()["c"], before_options
         )
 
-    def test_unverified_projection_refuses_comparison_export(self):
+    def test_current_projection_allows_verified_comparison_export(self):
         status = self.client.get("/api/status").json()
-        self.assertEqual(status["projection"]["state"], "unverified")
+        self.assertEqual(status["projection"]["state"], "current")
         resp = self.client.post("/api/export")
-        self.assertEqual(resp.status_code, 409)
-        detail = resp.json()["detail"]
-        self.assertEqual(detail["status"], "projection_not_current")
+        self.assertEqual(resp.status_code, 200, resp.text)
+        self.assertTrue(resp.json()["byte_identical"])
+        self.assertTrue(resp.json()["semantic_readback_verified"])
 
     def test_import_reports_all_unresolved_legacy_workflow_blockers(self):
         conn = self.mainmod.open_state_connection()

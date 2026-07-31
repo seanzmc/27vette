@@ -41,16 +41,19 @@ import sqlite3
 import threading
 import time
 import uuid
+from datetime import datetime, timezone
 from pathlib import Path
+from typing import Callable
 
 from .catalog import TABLE_SPECS, TableSpec
 
 
 # 2 (Pass 3): durable ``change_history.pending_change_id`` declares
-# ``REFERENCES pending_changes(id)``. A store built at version 1 carries the old
-# DDL, so enabling PRAGMA foreign_keys on it would enforce nothing; bootstrap
-# upgrades such a store in place.
-SCHEMA_VERSION = 2
+# ``REFERENCES pending_changes(id)``. 3 (Pass 4): the disposable projection
+# records sheet and managed-row dispositions. Durable version 2 stores already
+# have their final DDL and advance their manifest in place; projection version 2
+# stores are rebuilt through the existing disposable-candidate path.
+SCHEMA_VERSION = 3
 # One process-local lock for bootstrap, durable-state mutation, candidate
 # promotion, and workbook apply.
 #
@@ -283,7 +286,31 @@ SUPPORT_DDL = [
     )""",
 ]
 
-PROJECTION_SUPPORT_DDL = SUPPORT_DDL[:3] + [SUPPORT_DDL[-1]]
+PROJECTION_SUPPORT_DDL = SUPPORT_DDL[:3] + [
+    """CREATE TABLE IF NOT EXISTS sheet_dispositions (
+      sheet TEXT PRIMARY KEY,
+      disposition TEXT NOT NULL,
+      family TEXT NOT NULL DEFAULT '',
+      model_context TEXT NOT NULL DEFAULT '[]',
+      opaque_columns_json TEXT NOT NULL DEFAULT '[]'
+    )""",
+    """CREATE TABLE IF NOT EXISTS managed_row_dispositions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sheet TEXT NOT NULL,
+      src_row INTEGER NOT NULL,
+      family TEXT NOT NULL,
+      physical_key TEXT NOT NULL DEFAULT '',
+      model_context TEXT NOT NULL DEFAULT '[]',
+      disposition TEXT NOT NULL,
+      blocking INTEGER NOT NULL DEFAULT 0,
+      field TEXT NOT NULL DEFAULT '',
+      value TEXT NOT NULL DEFAULT '',
+      reason_token TEXT NOT NULL DEFAULT '',
+      contract_impact TEXT NOT NULL DEFAULT '',
+      UNIQUE(sheet, src_row, family)
+    )""",
+    SUPPORT_DDL[-1],
+]
 
 DURABLE_SUPPORT_DDL = SUPPORT_DDL[3:5] + [
     """CREATE TABLE IF NOT EXISTS legacy_recovery_records (
@@ -322,6 +349,8 @@ def init_schema(conn: sqlite3.Connection) -> None:
     for spec in TABLE_SPECS:
         conn.execute(_table_ddl(spec))
     for ddl in SUPPORT_DDL:
+        conn.execute(ddl)
+    for ddl in PROJECTION_SUPPORT_DDL[3:-1]:
         conn.execute(ddl)
     conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_history_entity "
@@ -712,7 +741,11 @@ def _replace_candidate(candidate: Path, target: Path) -> None:
     _fsync_dir(target.parent)
 
 
-def _replace_projection(candidate: Path, target: Path) -> None:
+def _replace_projection(
+    candidate: Path,
+    target: Path,
+    verify: Callable[[Path], None] | None = None,
+) -> None:
     """Replace the projection file only while the reader gate is quiesced.
 
     Bootstrap runs before the app serves requests, so there is nothing to drain
@@ -721,7 +754,74 @@ def _replace_projection(candidate: Path, target: Path) -> None:
     ``os.replace`` for it to copy.
     """
     with PROJECTION_GATE.quiesce():
-        _replace_candidate(candidate, target)
+        rollback = target.with_name(f".{target.name}.rollback-{uuid.uuid4().hex}")
+        had_target = target.exists()
+        target_sidecars = tuple(Path(f"{target}{suffix}") for suffix in ("-wal", "-shm"))
+        rollback_sidecars = tuple(
+            rollback.with_name(f"{rollback.name}{suffix}") for suffix in ("-wal", "-shm")
+        )
+        original_sidecars: set[int] = set()
+        backed_up = False
+        try:
+            if had_target:
+                shutil.copy2(target, rollback)
+                _fsync_file(rollback)
+                for index, (sidecar, sidecar_backup) in enumerate(
+                    zip(target_sidecars, rollback_sidecars)
+                ):
+                    if sidecar.exists():
+                        shutil.copy2(sidecar, sidecar_backup)
+                        _fsync_file(sidecar_backup)
+                        original_sidecars.add(index)
+                _fsync_dir(target.parent)
+                backed_up = True
+                checkpoint = connect(target)
+                try:
+                    result = checkpoint.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone()
+                    if result[0] != 0 or result[1] != result[2]:
+                        raise ProjectionBusyError(
+                            "active projection WAL could not be fully checkpointed"
+                        )
+                finally:
+                    checkpoint.close()
+                # A complete, reader-drained checkpoint proves any remaining
+                # sidecars stale. Remove them before binding the path to the
+                # promoted main database, while retaining byte-for-byte copies
+                # for rollback until reopen verification succeeds.
+                for sidecar in target_sidecars:
+                    sidecar.unlink(missing_ok=True)
+                _fsync_dir(target.parent)
+            _replace_candidate(candidate, target)
+            if verify is not None:
+                verify(target)
+        except Exception as promotion_error:
+            if backed_up or not had_target:
+                try:
+                    for sidecar in target_sidecars:
+                        sidecar.unlink(missing_ok=True)
+                    if backed_up:
+                        _replace_candidate(rollback, target)
+                        for index, (sidecar, sidecar_backup) in enumerate(
+                            zip(target_sidecars, rollback_sidecars)
+                        ):
+                            if index in original_sidecars:
+                                shutil.copy2(sidecar_backup, sidecar)
+                                _fsync_file(sidecar)
+                        _fsync_dir(target.parent)
+                    else:
+                        target.unlink(missing_ok=True)
+                        _fsync_dir(target.parent)
+                except Exception as restore_error:
+                    raise RuntimeError(
+                        "projection replacement failed and prior projection could not "
+                        f"be restored: promotion={promotion_error!r}; "
+                        f"restore={restore_error!r}"
+                    ) from restore_error
+            raise
+        finally:
+            rollback.unlink(missing_ok=True)
+            for sidecar_backup in rollback_sidecars:
+                sidecar_backup.unlink(missing_ok=True)
 
 
 def _read_manifest_path(path: Path) -> dict | None:
@@ -745,10 +845,10 @@ def _upgrade_durable_store(state_path: Path, manifest: dict) -> bool:
     """Bring a durable store built by an earlier schema version up to date.
 
     Schema 2 adds the database-owned ``change_history.pending_change_id`` ->
-    ``pending_changes.id`` foreign key. A store created at schema 1 keeps the old
-    DDL forever, so enabling ``PRAGMA foreign_keys`` on it would enforce nothing.
-    Rebuild that one table in place, preserving every row, and record the new
-    version in the manifest. Returns True when an upgrade was applied.
+    ``pending_changes.id`` foreign key. Schema 3 changes only the disposable
+    projection, so a schema-2 durable store advances its manifest without a DDL
+    rewrite. Rebuild the history table only when its foreign key is absent,
+    preserving every row. Returns True when an upgrade was applied.
     """
     stored_version = int(manifest.get("schema_version") or 0)
     if stored_version >= SCHEMA_VERSION:
@@ -843,12 +943,24 @@ def bootstrap_storage(state_path: Path, projection_path: Path) -> dict:
             if upgraded:
                 state_manifest = _read_manifest_path(state_path) or state_manifest
             projection_manifest = _read_manifest_path(projection_path)
+            verified_import = (
+                projection_manifest
+                and str(projection_manifest.get("migration_id") or "").startswith("import-")
+                and bool(projection_manifest.get("source_sha256"))
+            )
             matching = (
                 projection_manifest
                 and projection_manifest.get("store_kind") == "projection"
-                and projection_manifest.get("migration_id") == state_manifest.get("migration_id")
-                and projection_manifest.get("source_sha256") == state_manifest.get("source_sha256")
                 and int(projection_manifest.get("schema_version")) == SCHEMA_VERSION
+                and (
+                    verified_import
+                    or (
+                        projection_manifest.get("migration_id")
+                        == state_manifest.get("migration_id")
+                        and projection_manifest.get("source_sha256")
+                        == state_manifest.get("source_sha256")
+                    )
+                )
             )
             if matching:
                 return {

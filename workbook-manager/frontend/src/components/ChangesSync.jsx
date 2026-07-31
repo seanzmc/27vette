@@ -178,10 +178,10 @@ export default function ChangesSync({ status, onChanged }) {
         <div className="panel-body toolbar">
           <button
             className="btn"
-            disabled={!!busy || status?.projection?.active}
-            title={status?.projection?.active
-              ? "Re-import is disabled until candidate promotion is implemented."
-              : "Import the workbook into an empty projection."}
+            disabled={!!busy || !status?.projection?.reimport_allowed}
+            title={status?.projection?.reimport_allowed
+              ? "Build, verify, and atomically promote a candidate projection."
+              : "Import is blocked until the projection or unresolved workflow state is recoverable."}
             onClick={() => run("import", async () => {
               const r = await api.runImport();
               setImportReport(r);

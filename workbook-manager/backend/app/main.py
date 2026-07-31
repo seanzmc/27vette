@@ -167,12 +167,15 @@ def _staging_error(exc: StagingError):
 def _workbook_state(conn) -> dict:
     path = config.DEFAULT_WORKBOOK
     imported_mtime = dbmod.get_meta(conn, "workbook_mtime_ns")
-    current_mtime = str(path.stat().st_mtime_ns) if path.exists() else ""
+    imported_sha = dbmod.get_meta(conn, "workbook_sha256")
+    identity = importer.workbook_identity(path) if path.exists() else None
+    current_mtime = str(identity["mtime_ns"]) if identity else ""
+    current_sha = str(identity["sha256"]) if identity else ""
     if not path.exists():
         state = "missing"
-    elif not imported_mtime:
+    elif not imported_mtime or not imported_sha:
         state = "unbound"
-    elif imported_mtime != current_mtime:
+    elif imported_mtime != current_mtime or imported_sha != current_sha:
         state = "stale"
     else:
         state = "current"
@@ -182,7 +185,9 @@ def _workbook_state(conn) -> dict:
         "exists": path.exists(),
         "imported_mtime_ns": imported_mtime,
         "current_mtime_ns": current_mtime,
-        "stale": bool(imported_mtime) and imported_mtime != current_mtime,
+        "imported_sha256": imported_sha,
+        "current_sha256": current_sha,
+        "stale": state == "stale",
         "excel_lock": (path.parent / f"~${path.name}").exists(),
     }
 
@@ -261,7 +266,7 @@ def _projection_state(conn, run, workbook: dict) -> dict:
         ).fetchone()["c"]
     if not active:
         state = "missing"
-    elif workbook["state"] == "stale":
+    elif workbook["state"] != "current":
         state = "stale"
     elif not run or run["status"] != "imported" or blocking_findings:
         state = "unverified"
@@ -271,7 +276,7 @@ def _projection_state(conn, run, workbook: dict) -> dict:
         "state": state,
         "active": active,
         "blocking_findings": blocking_findings,
-        "reimport_allowed": not active,
+        "reimport_allowed": state in {"current", "stale", "missing", "unverified"},
         "manifest": _projection_manifest(conn),
     }
 
@@ -297,6 +302,11 @@ def status(
     workbook = _workbook_state(conn)
     projection = _projection_state(conn, run, workbook)
     blockers = _import_blockers(state_conn)
+    projection["reimport_allowed"] = (
+        workbook["exists"]
+        and projection["state"] in {"current", "stale", "missing", "unverified"}
+        and blockers["unresolved_total"] == 0
+    )
     return {
         "mode": PROVISIONAL_MODE,
         "projection": projection,
@@ -324,30 +334,40 @@ def status(
 @app.post("/api/import")
 def run_import(
     _lock=Depends(durable_write_lock),
-    conn=Depends(projection_connection),
     state_conn=Depends(state_connection),
 ):
     if not config.DEFAULT_WORKBOOK.exists():
         raise HTTPException(404, f"workbook not found: "
                                  f"{config.DEFAULT_WORKBOOK}")
-    active_projection = _projection_active(conn)
     blockers = _import_blockers(state_conn)
-    if active_projection or blockers["unresolved_total"]:
-        reasons = []
-        if active_projection:
-            reasons.append("an active projection already exists; candidate "
-                           "promotion is not implemented until Pass 4")
-        if blockers["unresolved_total"]:
-            reasons.append("unresolved legacy draft/synchronization work exists")
+    if blockers["unresolved_total"]:
         raise HTTPException(409, detail={
             "status": PROVISIONAL_MODE,
-            "message": "re-import refused: " + "; ".join(reasons),
-            "active_projection": active_projection,
+            "message": "re-import refused: unresolved legacy "
+                       "draft/synchronization work exists",
             "import_blockers": blockers,
         })
-    report = importer.import_workbook(conn, config.DEFAULT_WORKBOOK)
-    workbook = _workbook_state(conn)
-    projection = _projection_state(conn, report["run"], workbook)
+    try:
+        report = importer.promote_verified_projection(
+            config.DEFAULT_WORKBOOK, config.DEFAULT_PROJECTION_DB
+        )
+    except dbmod.ProjectionBusyError as exc:
+        raise HTTPException(503, detail={
+            "status": "projection_readers_busy",
+            "message": str(exc),
+        }) from exc
+    if not report["promoted"]:
+        status_code = 409 if report["status"] == "source_changed" else 422
+        raise HTTPException(status_code, detail=report)
+    conn = open_projection_connection()
+    try:
+        latest = importer.latest_report(conn)
+        if latest is None:
+            raise RuntimeError("promoted projection is missing its import manifest")
+        workbook = _workbook_state(conn)
+        projection = _projection_state(conn, latest["run"], workbook)
+    finally:
+        conn.close()
     report["projection"] = projection
     report["verified"] = projection["state"] == "current"
     report["mode"] = PROVISIONAL_MODE

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import shutil
 import sqlite3
 import sys
 import tempfile
@@ -19,6 +20,8 @@ for path in (BACKEND, SCRIPTS):
         sys.path.insert(0, str(path))
 
 from app import db as dbmod  # noqa: E402
+from app import catalog  # noqa: E402
+from app import importer  # noqa: E402
 
 
 class TestSplitStoreMigration(unittest.TestCase):
@@ -285,6 +288,391 @@ class TestSplitStoreMigration(unittest.TestCase):
         result = dbmod.bootstrap_storage(self.state_path, self.projection_path)
         self.assertEqual(result["status"], "ready")
         self._assert_exact_recovery()
+
+
+class TestAtomicProjectionPromotion(unittest.TestCase):
+    def setUp(self):
+        self.tempdir = tempfile.TemporaryDirectory(prefix="wbm-pass4-promotion-")
+        self.root = Path(self.tempdir.name)
+        self.workbook = self.root / "source.xlsx"
+        shutil.copy2(ROOT / "stingray_master.xlsx", self.workbook)
+        self.projection = self.root / "workbook_projection.sqlite3"
+        conn = dbmod.connect(self.projection)
+        try:
+            dbmod.init_projection_schema(conn)
+            conn.execute(
+                "INSERT INTO meta(key, value) VALUES('sentinel', 'prior-projection')"
+            )
+            conn.commit()
+            conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        finally:
+            conn.close()
+
+    def tearDown(self):
+        self.tempdir.cleanup()
+
+    def _projection_hash(self) -> str:
+        return hashlib.sha256(self.projection.read_bytes()).hexdigest()
+
+    def test_incomplete_asset_rows_block_promotion(self):
+        from openpyxl import load_workbook
+
+        canonical = self.root / "canonical.xlsx"
+        shutil.copy2(ROOT / "stingray_master.xlsx", canonical)
+        workbook = load_workbook(canonical)
+        sheet = workbook["asset_map"]
+        headers = {cell.value: cell.column for cell in sheet[1]}
+        self.assertTrue(
+            all(isinstance(headers[name], int) for name in ("model_key", "image_url", "active"))
+        )
+        sheet.insert_rows(30, 2)
+        for row, suffix in ((30, "2"), (31, "1")):
+            sheet.cell(row, headers["model_key"]).value = "stingray"
+            sheet.cell(row, headers["image_url"]).value = (
+                "https://example.invalid/unresolved-c-07-" + suffix + ".png"
+            )
+            sheet.cell(row, headers["active"]).value = False
+        workbook.save(canonical)
+        workbook.close()
+        before = self._projection_hash()
+
+        result = importer.promote_verified_projection(canonical, self.projection)
+
+        self.assertFalse(result["promoted"])
+        self.assertEqual(result["status"], "blocked")
+        self.assertEqual(
+            [issue["category"] for issue in result["issues"]],
+            ["missing_identifier", "missing_identifier"],
+        )
+        self.assertEqual(self._projection_hash(), before)
+
+    def test_unresolved_reference_disposition_records_offending_value(self):
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(self.workbook)
+        sheet = workbook["rule_mapping"]
+        missing_target = "missing_target_for_pass4_test"
+        sheet["D2"] = missing_target
+        workbook.save(self.workbook)
+        workbook.close()
+
+        result = importer.promote_verified_projection(self.workbook, self.projection)
+
+        self.assertFalse(result["promoted"])
+        disposition = next(
+            row for row in result["import"]["managed_row_dispositions"]
+            if row["sheet"] == "rule_mapping" and row["src_row"] == 2
+        )
+        self.assertEqual(disposition["disposition"], "excluded")
+        self.assertEqual(disposition["field"], "target_id")
+        self.assertEqual(disposition["value"], missing_target)
+        self.assertTrue(disposition["blocking"])
+
+    def test_post_replace_failure_restores_prior_projection_bytes(self):
+        before = self.projection.read_bytes()
+        candidate = self.root / "candidate.sqlite3"
+        candidate.write_bytes(b"replacement bytes")
+        real_replace = dbmod._replace_candidate
+
+        def fail_after_replace(source, target):
+            if source == candidate:
+                source.replace(target)
+                raise OSError("forced post-replace durability failure")
+            return real_replace(source, target)
+
+        with mock.patch.object(dbmod, "_replace_candidate", side_effect=fail_after_replace):
+            with self.assertRaisesRegex(OSError, "post-replace"):
+                dbmod._replace_projection(candidate, self.projection)
+
+        self.assertEqual(self.projection.read_bytes(), before)
+        self.assertFalse(list(self.root.glob(".workbook_projection.sqlite3.rollback-*")))
+
+    def test_file_fsync_failure_restores_prior_projection_bytes(self):
+        before = self.projection.read_bytes()
+        candidate = self.root / "candidate-file-fsync.sqlite3"
+        candidate.write_bytes(b"replacement bytes")
+        real_fsync = dbmod._fsync_file
+        failed = False
+
+        def fail_target_fsync(path):
+            nonlocal failed
+            if path == self.projection and not failed:
+                failed = True
+                raise OSError("forced target file fsync failure")
+            return real_fsync(path)
+
+        with mock.patch.object(dbmod, "_fsync_file", side_effect=fail_target_fsync):
+            with self.assertRaisesRegex(OSError, "file fsync"):
+                dbmod._replace_projection(candidate, self.projection)
+        self.assertEqual(self.projection.read_bytes(), before)
+
+    def test_directory_fsync_failure_restores_prior_projection_bytes(self):
+        before = self.projection.read_bytes()
+        candidate = self.root / "candidate-dir-fsync.sqlite3"
+        candidate.write_bytes(b"replacement bytes")
+        real_fsync = dbmod._fsync_dir
+        calls = 0
+
+        def fail_replacement_dir_fsync(path):
+            nonlocal calls
+            calls += 1
+            if calls == 3:
+                raise OSError("forced directory fsync failure")
+            return real_fsync(path)
+
+        with mock.patch.object(dbmod, "_fsync_dir", side_effect=fail_replacement_dir_fsync):
+            with self.assertRaisesRegex(OSError, "directory fsync"):
+                dbmod._replace_projection(candidate, self.projection)
+        self.assertEqual(self.projection.read_bytes(), before)
+
+    def test_reopen_verification_failure_restores_prior_projection_bytes(self):
+        before = self.projection.read_bytes()
+        candidate = self.root / "candidate-reopen.sqlite3"
+        candidate.write_bytes(b"replacement bytes")
+
+        def fail_verification(_path):
+            raise RuntimeError("forced manifest verification failure")
+
+        with self.assertRaisesRegex(RuntimeError, "manifest verification"):
+            dbmod._replace_projection(
+                candidate,
+                self.projection,
+                verify=fail_verification,
+            )
+        self.assertEqual(self.projection.read_bytes(), before)
+
+    def test_residual_sidecar_refuses_replacement_without_deleting_it(self):
+        before = self.projection.read_bytes()
+        candidate = self.root / "candidate-sidecar.sqlite3"
+        candidate.write_bytes(b"replacement bytes")
+        sidecar = Path(f"{self.projection}-wal")
+        sidecar.write_bytes(b"residual WAL")
+
+        class Checkpoint:
+            def execute(self, _sql):
+                return self
+
+            def fetchone(self):
+                return (1, 1, 0)
+
+            def close(self):
+                pass
+
+        with mock.patch.object(dbmod, "connect", return_value=Checkpoint()):
+            with self.assertRaisesRegex(
+                dbmod.ProjectionBusyError, "could not be fully checkpointed"
+            ):
+                dbmod._replace_projection(candidate, self.projection)
+        self.assertEqual(self.projection.read_bytes(), before)
+        self.assertEqual(sidecar.read_bytes(), b"residual WAL")
+
+    def test_malformed_candidate_leaves_prior_projection_byte_identical(self):
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(self.workbook)
+        del workbook["model_master"]
+        workbook.save(self.workbook)
+        workbook.close()
+        before = self._projection_hash()
+
+        result = importer.promote_verified_projection(self.workbook, self.projection)
+
+        self.assertFalse(result["promoted"])
+        self.assertEqual(result["status"], "blocked")
+        self.assertEqual(self._projection_hash(), before)
+        self.assertFalse(list(self.root.glob(".wbm-import-candidate-*")))
+
+    def test_verified_candidate_replaces_projection_and_reopens_its_manifest(self):
+        state = self.root / "workbook_manager.sqlite3"
+        dbmod.bootstrap_storage(state, self.projection)
+        result = importer.promote_verified_projection(self.workbook, self.projection)
+
+        self.assertTrue(result["promoted"], result)
+        self.assertEqual(result["status"], "promoted")
+        self.assertEqual(result["blocking_findings"], 0)
+        self.assertTrue(result["semantic_readback_verified"])
+        self.assertTrue(result["package_valid"])
+        self.assertTrue(result["schema_valid"])
+        self.assertEqual(
+            result["source_sha256"], hashlib.sha256(self.workbook.read_bytes()).hexdigest()
+        )
+        self.assertFalse(list(self.root.glob(".wbm-import-candidate-*")))
+
+        conn = dbmod.connect(self.projection)
+        try:
+            self.assertEqual(
+                dbmod.get_meta(conn, "workbook_sha256"), result["source_sha256"]
+            )
+            self.assertEqual(
+                dbmod.storage_manifest(conn)["source_sha256"], result["source_sha256"]
+            )
+        finally:
+            conn.close()
+        promoted_hash = self._projection_hash()
+        restart = dbmod.bootstrap_storage(state, self.projection)
+        self.assertEqual(restart["status"], "ready")
+        self.assertEqual(self._projection_hash(), promoted_hash)
+
+    def test_every_managed_physical_row_has_exactly_one_disposition(self):
+        from openpyxl import load_workbook
+
+        result = importer.promote_verified_projection(self.workbook, self.projection)
+        self.assertTrue(result["promoted"], result)
+        workbook = load_workbook(self.workbook, read_only=True, data_only=False)
+        try:
+            classifications = catalog.classify_workbook_sheets(workbook)
+            expected_sheets = len(workbook.sheetnames)
+            expected = 0
+            for sheet_name, classification in classifications.items():
+                if classification.spec is None:
+                    continue
+                for values in workbook[sheet_name].iter_rows(min_row=2, values_only=True):
+                    if any(value is not None and value != "" for value in values):
+                        expected += 1
+        finally:
+            workbook.close()
+        conn = dbmod.connect(self.projection)
+        try:
+            actual = conn.execute(
+                "SELECT COUNT(*) c FROM managed_row_dispositions"
+            ).fetchone()["c"]
+            sheet_dispositions = conn.execute(
+                "SELECT COUNT(*) c FROM sheet_dispositions"
+            ).fetchone()["c"]
+            duplicates = conn.execute(
+                "SELECT COUNT(*) c FROM ("
+                "SELECT sheet, src_row, family, COUNT(*) n "
+                "FROM managed_row_dispositions GROUP BY sheet, src_row, family "
+                "HAVING n <> 1)"
+            ).fetchone()["c"]
+            self.assertEqual(actual, expected)
+            self.assertEqual(sheet_dispositions, expected_sheets)
+            self.assertEqual(duplicates, 0)
+        finally:
+            conn.close()
+
+    def test_blocking_import_findings_never_call_atomic_replace(self):
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(self.workbook)
+        workbook["model_master"].cell(2, 1).value = None
+        workbook.save(self.workbook)
+        workbook.close()
+        before = self._projection_hash()
+
+        with mock.patch.object(dbmod, "_replace_projection") as replace:
+            result = importer.promote_verified_projection(self.workbook, self.projection)
+
+        self.assertFalse(result["promoted"])
+        replace.assert_not_called()
+        self.assertEqual(self._projection_hash(), before)
+
+    def test_atomic_replace_failure_leaves_prior_projection_byte_identical(self):
+        before = self._projection_hash()
+
+        with mock.patch.object(
+            dbmod, "_replace_projection", side_effect=OSError("forced replace failure")
+        ):
+            result = importer.promote_verified_projection(self.workbook, self.projection)
+
+        self.assertFalse(result["promoted"])
+        self.assertEqual(result["status"], "blocked")
+        self.assertEqual(result["issues"][0]["category"], "candidate_build_exception")
+        self.assertEqual(self._projection_hash(), before)
+        self.assertFalse(list(self.root.glob(".wbm-import-candidate-*")))
+
+    def test_projection_swap_does_not_touch_durable_state_store(self):
+        state = self.root / "workbook_manager.sqlite3"
+        conn = dbmod.connect(state, foreign_keys=True)
+        try:
+            dbmod.init_durable_schema(conn)
+            conn.execute(
+                "INSERT INTO pending_changes(ts, table_name, entity_key_json, op) "
+                "VALUES('test', 'options', '{}', 'update')"
+            )
+            conn.commit()
+            conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        finally:
+            conn.close()
+        before = state.read_bytes()
+
+        result = importer.promote_verified_projection(self.workbook, self.projection)
+
+        self.assertTrue(result["promoted"], result)
+        self.assertEqual(state.read_bytes(), before)
+
+    def test_source_identity_drift_blocks_before_replacement(self):
+        before = self._projection_hash()
+        real_identity = importer.workbook_identity
+        calls = 0
+
+        def drift_on_recheck(path):
+            nonlocal calls
+            calls += 1
+            identity = real_identity(path)
+            if calls > 1:
+                return {**identity, "mtime_ns": identity["mtime_ns"] + 1}
+            return identity
+
+        with mock.patch.object(
+            importer, "workbook_identity", side_effect=drift_on_recheck
+        ):
+            result = importer.promote_verified_projection(self.workbook, self.projection)
+
+        self.assertFalse(result["promoted"])
+        self.assertEqual(result["status"], "source_changed")
+        self.assertEqual(self._projection_hash(), before)
+
+
+class TestReconstructionPreservation(unittest.TestCase):
+    def test_only_declared_registry_owned_cells_may_change(self):
+        from openpyxl import Workbook, load_workbook
+
+        with tempfile.TemporaryDirectory(prefix="wbm-preservation-") as tempdir:
+            workbook_path = Path(tempdir) / "source.xlsx"
+            workbook = Workbook()
+            managed = workbook.create_sheet("managed")
+            workbook.remove(workbook["Sheet"])
+            managed.append(["id", "owned", "opaque"])
+            managed.append(["row_1", "before", "keep"])
+            preserved = workbook.create_sheet("preserved")
+            preserved["A1"] = "=1+1"
+            workbook.save(workbook_path)
+            workbook.close()
+            before = importer._workbook_preservation_snapshot(workbook_path)
+
+            workbook = load_workbook(workbook_path)
+            workbook["managed"]["B2"] = "after"
+            workbook.save(workbook_path)
+            workbook.close()
+            operations = [{
+                "sheet": "managed",
+                "_src_row": 2,
+                "row": {"owned": "after"},
+            }]
+            self.assertEqual(
+                importer._preservation_issues(
+                    before,
+                    importer._workbook_preservation_snapshot(workbook_path),
+                    operations,
+                    workbook_path,
+                ),
+                [],
+            )
+
+            workbook = load_workbook(workbook_path)
+            workbook["preserved"]["A1"] = "=2+2"
+            workbook.save(workbook_path)
+            workbook.close()
+            issues = importer._preservation_issues(
+                before,
+                importer._workbook_preservation_snapshot(workbook_path),
+                operations,
+                workbook_path,
+            )
+            self.assertIn("reconstruction_cell_drift", {
+                issue["category"] for issue in issues
+            })
 
 
 if __name__ == "__main__":

@@ -22,14 +22,17 @@ stingray_master.xlsx (canonical source)
 ## Current safety status: read-only / provisional
 
 Pass 1 containment remains active. Pass 2 split storage plus the shared backend
-catalog contract, and Pass 3 request connections plus promotion coordination,
-are implemented:
+catalog contract, Pass 3 request connections plus promotion coordination, and
+Pass 4 verified candidate promotion are implemented:
 
 - `POST /api/sync` refuses every `write=true` request. The browser has no live
   write control; dry-run remains available for inspection only.
-- `POST /api/import` permits only the first import into a new empty projection.
-  It refuses replacement of an active projection until atomic candidate
-  promotion is implemented in Pass 4.
+- `POST /api/import` builds a same-filesystem candidate, validates package and
+  schema integrity, proves semantic readback, rechecks source SHA-256 plus mtime,
+  and atomically replaces the active projection only after every production gate
+  passes. Primary-runtime generated-contract parity remains a separate slow
+  acceptance test and is not part of manager import/export execution.
+  A failed candidate is deleted and leaves the prior projection byte-identical.
 - Import is also refused while legacy staged, committed-unsynchronized, or
   failed work exists. An import with blocking findings is labeled `unverified`,
   never verified/current.
@@ -102,11 +105,11 @@ Environment overrides: `WBM_WORKBOOK`, `WBM_DB` (durable state),
 
 ## Workflow
 
-1. **Initial import** — `POST /api/import` (the UI triggers this only when no
-   projection exists).
+1. **Import/re-import** — `POST /api/import` (the UI enables this for a missing
+   projection or a current verified projection with no unresolved durable work).
    Every duplicate identifier, missing sheet/column, and unresolved
    relationship is reported with sheet/row/entity detail. Blocking findings
-   make the projection `unverified`. Re-import is contained until Pass 4.
+   block candidate promotion and leave the current projection untouched.
 2. **Edit** — Form Structure workspace (models, runtime steps, section
    presentation/order, context sections, variants) and Model Operations
    workspace (options, OVS, exclusive groups + members, rule mapping, rule
@@ -151,6 +154,7 @@ Environment overrides: `WBM_WORKBOOK`, `WBM_DB` (durable state),
 .venv/bin/python -m pytest \
   tests/test_workbook_manager_catalog.py \
   tests/test_workbook_manager_import_projection.py \
+  tests/test_workbook_manager_generated_parity.py \
   tests/test_workbook_manager_api_concurrency.py \
   tests/test_workbook_manager.py -q
 # optional direct shared-writer scratch-copy tests (not an enabled API route):
@@ -159,5 +163,6 @@ WBM_SLOW_GATE=1 .venv/bin/python -m pytest tests/test_workbook_manager.py -q
 
 API tests skip automatically until the backend requirements are installed.
 The normal suite skips two explicit scratch-copy shared-writer tests unless
-`WBM_SLOW_GATE=1` is set. Candidate projection promotion and exact preserved-
-sheet reconstruction remain Pass 4 work.
+`WBM_SLOW_GATE=1` is set. Pass 4 comparison reconstruction is an exact identity
+copy while no draft overlay exists; package/schema validation and independent
+semantic readback must pass before the disposable file is returned.
