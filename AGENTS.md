@@ -108,6 +108,8 @@ Do not recreate or hand-edit generated workbook sheets. Change source rows or ge
 
 Workbook editor surfaces (`scripts/workbook_editor_server.py`, `scripts/apply_workbook_ops.py`, and `workbook-manager/`) are interfaces around the same workbook-write safety contract, not separate authorities. The workbook remains canonical unless a separately approved stage changes that. Any editor or manager write path must route through `editor_ops.apply_batch`/approved tooling and `save_workbook_safely()`, then regenerate and validate affected artifacts through the normal gates.
 
+Workbook Manager remains read-only/provisional for live workbook writes: its SQLite projection is disposable/rebuildable, durable manager state is recovery/audit state, and comparison exports are explicitly `DISPOSABLE-*` review artifacts, never workbook replacements or generation inputs. Serve it only through the single-process lifespan path documented in `workbook-manager/README.md`/`workbook-manager/run.sh`; do not use multiple uvicorn workers or bypass lifespan in tests. Package/schema validation and semantic readback prove projection reconstruction, not primary runtime-contract parity unless the separate generated-parity gate has actually run.
+
 ## 6. Dealer Submission (protected boundary)
 
 Do not change the dealer endpoint, payload shape, model scoping, security/Turnstile behavior, or submission UX without explicit approval. Near submission code: inspect runtime and tests first; validate modal behavior, required fields, payload construction, error handling, and safe failure states. No live dealer submissions as routine validation. In passes that don't touch it, report dealer behavior as preserved/untouched.
@@ -142,6 +144,7 @@ Choose gates by changed surface and risk — don't run irrelevant gates from old
 - Generator changes: representative generation + tests covering the changed contract behavior.
 - Registry/publication: verify published bundle and model switching.
 - Runtime JS: relevant automated tests + manual verification of affected workflows.
+- Workbook Manager import/projection/export: use the focused manager gates in `workbook-manager/README.md`; include the generated-parity acceptance test before claiming reconstructed workbooks preserve primary runtime contracts.
 - Styling: inspect affected UI at relevant viewports; confirm behavior preserved.
 - Dealer submission: targeted tests/manual checks in a safe context; report untested live behavior.
 
