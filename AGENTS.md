@@ -132,6 +132,8 @@ The generic `workbook-changeset-1` parser/service remains the approved target co
 
 Fable 5 loop artifacts under `fable5loop/` are orchestration/memory infrastructure for large, multi-stage work; they do not override this guide's spec, workbook, generated-artifact, runtime, styling, or dealer boundaries. For any Fable 5 run, start from `fable5loop/README.md`, preserve run receipts/state updates, and run the loop validator when loop artifacts change. Use `docs/fable-ex-tasks.md` as routing guidance for when the loop is appropriate; keep routine model/workbook/runtime edits on the normal repo path unless a task explicitly needs the loop.
 
+Keep workflow progress in at most two live files: the owning specification is the sole detailed tracker for status, requirements, validation, blockers, and next steps; `fable5loop/STATE.md` is only the compact program-level pointer and latest-receipt index. Run receipts are immutable evidence, not parallel progress trackers. Update the owning specification during the pass and reconcile the `STATE.md` pointer at closeout.
+
 Claude Code project files under `.claude/` are thin launch/wrapper surfaces for this repo. They may point agents into `AGENTS.md` and `fable5loop/`, but durable workflow procedure belongs in the repo-owned guides and Fable loop files, not duplicated in `.claude/` wrappers.
 
 ## 10. Validation Strategy
