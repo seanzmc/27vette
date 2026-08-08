@@ -658,6 +658,7 @@ class TestComparisonExport(ImportedWorkbookCase):
         self.assertTrue(result["disposable"])
         self.assertIn("DISPOSABLE-comparison-", Path(result["path"]).name)
         self.assertTrue(Path(result["path"]).is_relative_to(config.EXPORT_DIR))
+        self.assertFalse(result["generated_contract_parity_verified"])
 
     def test_export_preserves_unmanaged_and_row_counts(self):
         import os

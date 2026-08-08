@@ -1,0 +1,114 @@
+# Database Workflow Pass 4 Closeout Validation
+
+Date: 2026-08-08
+Implementation commit: `e02dd0a`
+
+## Canonical workbook delta classification
+
+Compared `e02dd0a^:stingray_master.xlsx` with the current workbook through
+openpyxl values/dimensions and XLSX package members. Only `asset_map` changed:
+two rows removed, zero rows added. Both removed rows had `active=False` and
+notes identifying them as unresolved pasted assets:
+
+- `c-07-2.png`
+- `c-07-1.png`
+
+Sean authorized retaining the deletion on 2026-08-08.
+
+## Manager acceptance inventory
+
+The complete command collected 111 tests. It was intentionally interrupted
+after prolonged real-workbook execution:
+
+```text
+98 passed, 2 skipped, 1 warning in 868.01s
+```
+
+Those 100 completed tests cover catalog, import/projection, generated parity,
+concurrency, and manager tests through the pre-API classes. The remaining API
+class was then run directly:
+
+```text
+11 passed, 1 warning in 213.08s
+slowest: comparison export 71.47s; re-import 71.15s; initial promotion 70.23s
+```
+
+Together the two serial invocations cover all 111 collected tests with no
+failure. The two normal skips are the explicit `WBM_SLOW_GATE` scratch-copy
+tests, which were then run directly:
+
+```text
+2 passed in 151.65s
+dry-run through editor_ops: 72.06s
+scratch-copy live write: 77.68s
+```
+
+## Candidate readiness
+
+Initial command:
+
+```sh
+.venv/bin/python scripts/verify_workbook_candidate.py \
+  --workbook stingray_master.xlsx --changed-model '*'
+```
+
+It completed all ten stages:
+
+```text
+ok: true
+failedStage: ""
+stagesNotRun: []
+boundaryViolations: []
+generated models: grand_sport, grand_sport_x, stingray, z06, zr1, zr1x
+unexpected_drift: []
+```
+
+Because `*` declares every model changed, this initial result proves complete
+generation and boundary safety but does not by itself prove zero semantic
+drift. The lane was rerun without any declared changed model:
+
+```sh
+.venv/bin/python scripts/verify_workbook_candidate.py \
+  --workbook stingray_master.xlsx \
+  --report /tmp/27vette-pass4-closeout-candidate.json
+```
+
+The rerun passed all ten stages with `declaredChangedModels: []`,
+`unexpected_drift: []`, and `boundaryViolations: []`. Every generated model —
+`grand_sport`, `grand_sport_x`, `stingray`, `z06`, `zr1`, and `zr1x` — reported
+`semantic_drift_vs_retained: []`. This is the zero-drift proof for the
+authorized inactive-row removal.
+
+## Companion gates
+
+```text
+test_workbook_changeset_service.py + test_editor_ops_apply.py:
+76 passed, 7 subtests passed in 88.56s
+
+workbook-manager/frontend npm run build:
+1518 modules transformed; build completed in 723ms
+
+validate_workbook_package.py:
+status valid; issue_count 0
+
+validate_workbook_schema.py:
+status valid; issue_count 0; error_count 0; warning_count 0
+
+pre-edit fable5loop validator:
+passed
+
+git diff --check:
+passed
+```
+
+The built Workbook Manager was browser-smoked against a copied workbook and
+temporary durable/projection databases on port 8051. The initial import
+completed, status showed projection/workbook `current` while generated and
+publication remained `unverified`, Stingray-to-Grand Sport navigation loaded
+the correct model rows, live write controls remained absent/disabled, and the
+comparison export completed to a `DISPOSABLE-comparison-*.xlsx` file. The
+canonical workbook, copied source, and exported workbook all retained SHA-256
+`624f1fa15c89e0a288f4ba0d74eb7eb32bfdedce2e1ec7a168ce3f0fe18292ec`.
+
+Post-closeout loop validation and independent receipt verification are recorded
+in `verifier-report.md`.

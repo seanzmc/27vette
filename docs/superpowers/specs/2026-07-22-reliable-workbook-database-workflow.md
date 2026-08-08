@@ -1,8 +1,8 @@
 # Reliable Workbook–Database Workflow Implementation Specification
 
 Status: implementation in progress; Pass 1 completed 2026-07-22, Pass 2
-completed 2026-07-23, and Pass 3 completed 2026-07-30 on `db-workflow`; Passes
-4–7 not started. Revised
+completed 2026-07-23, Pass 3 completed 2026-07-30, and Pass 4 completed
+2026-08-08 on `db-workflow`; Passes 5–7 not started. Revised
 2026-07-23 to record the completed workbook-owned Vehicle Setup copy contract;
 the final specification review previously resolved all fourteen findings: primary-
 runtime-only parity, strict publication selection, current baseline, outcome-
@@ -10,7 +10,8 @@ specific lifecycle states, interrupted-apply recovery, exception evidence,
 acceptance-only generated parity, single readback authority, complete writable-
 column ownership, non-circular write enablement, crash-safe two-store migration,
 distinct restored outcomes, stale-projection permissions, and deferred UI work.
-Recommended implementation reasoning: high.
+Recommended implementation reasoning: medium. Escalate only for a specific
+unresolved data-integrity, crash-recovery, or concurrency judgment.
 
 ## 1. Goal and authority boundary
 
@@ -1012,6 +1013,27 @@ byte-for-byte unchanged; only a reconciled, semantically read-back,
 package/schema-valid candidate becomes current. The slow primary-runtime-only
 source/reconstruction acceptance regression is also green.
 
+Pass 4 result (completed 2026-08-08): commit `e02dd0a` implemented candidate
+row/sheet dispositions, fail-closed package/schema/reference/reconciliation
+checks, identity-copy-plus-overlay reconstruction, semantic readback, source
+identity recheck, WAL-safe candidate closure, reader-gated atomic promotion and
+rollback, comparison export, generated-contract parity acceptance, and the
+re-import UI/status changes. The canonical workbook delta in that commit was
+separately reviewed and authorized on 2026-08-08: it removes only two already
+inactive, unresolved `asset_map` rows for `c-07-1.png` and `c-07-2.png`. The
+ten-stage candidate verifier was rerun without declaring any model changed;
+all six models reported empty `semantic_drift_vs_retained` arrays and there
+were zero boundary violations. No tracked generated artifact or published
+registry changed. The complete 111-test manager acceptance inventory
+was covered in two serial invocations (the first was interrupted after 98
+passed / 2 expected skips; the remaining `TestApi` class then passed 11/11), the
+two explicit slow scratch-copy writer gates passed, shared ChangeSet/writer
+tests passed, the frontend built, and workbook package/schema validation was
+clean. A copied-workbook browser smoke then confirmed honest current/unverified
+status, model navigation, write containment, and a byte-identical disposable
+comparison export. Evidence:
+`fable5loop/runs/2026-08-08-dbpass4-verified-projection-closeout/`.
+
 ### Pass 5 — Replace staged full rows with draft-to-ChangeSet emission
 
 Required changes:
@@ -1192,7 +1214,10 @@ For every pass:
 3. Make the smallest change through the owners above.
 4. Run the focused test, then the current manager suite.
 5. Recheck `git status` and prove the canonical workbook, tracked generated
-   artifacts, runtime registry, deployment, and dealer code did not change.
+   artifacts, runtime registry, deployment, and dealer code did not change. If
+   a separately authorized workbook cleanup shares the implementation commit,
+   enumerate that exact delta and run its normal workbook/runtime gates instead
+   of calling the workbook unchanged.
 6. Record the pass result in this specification before moving to the next pass.
 
 The README owns exact commands. Add any new focused modules from Section 8 to its
@@ -1200,6 +1225,17 @@ Workbook Manager validation table, then run the current documented manager,
 shared ChangeSet service, shared writer, slow copied-workbook, frontend build,
 workbook package/schema, and diff checks. The named modules in Section 8 own the
 acceptance proofs; do not substitute an unnamed smoke test for them.
+
+Use those checks in tiers rather than rerunning every real-workbook acceptance
+case after every edit. During implementation, run the exact affected test or
+class; at a pass checkpoint, run the complete named acceptance inventory once.
+The end-to-end promotion, comparison export, scratch-copy write, and generated-
+parity cases remain required because they prove distinct protected boundaries.
+Passes 5–7 may reduce runtime by cloning a verified imported-projection fixture
+and using compact workbooks for negative cases, provided at least one real-
+workbook success and one real-workbook fail-closed case continue to exercise
+each complete boundary. Runtime reduction must not replace package/schema,
+semantic-readback, atomic-rollback, or generated-contract acceptance.
 
 Generated-contract acceptance runs only through the primary-runtime-only helper
 against temporary workbooks/output roots; it is not part of production import.
@@ -1254,7 +1290,10 @@ validation, editing workbook rows, or hiding unsafe actions only in the UI.
 
 Companion disposition:
 
-- Workbook source data: unchanged; hash/status proof required.
+- Workbook source data: no Pass 4 behavior depends on a product-data change.
+  Commit `e02dd0a` also removed two inactive unresolved `asset_map` rows; that
+  exact cleanup was separately reviewed, authorized, and proven runtime-neutral
+  during the 2026-08-08 closeout.
 - Generated artifacts and `form-app/data.js`: inspected-no-change; temporary
   parity outputs only.
 - Customer form and dealer submission: unchanged.
@@ -1289,5 +1328,6 @@ Follow `AGENTS.md` handoff requirements. Also report:
 - post-save restoration hash proof;
 - concurrent API result;
 - browser-smoke result;
-- proof that the canonical workbook and tracked generated/runtime surfaces were
+- proof that the canonical workbook was unchanged or carries only an exact
+  separately authorized delta, and that tracked generated/runtime surfaces were
   unchanged.

@@ -203,7 +203,9 @@ def export_comparison_workbook(conn: sqlite3.Connection,
             "path": str(out_path),
             "byte_identical": byte_identical,
             "semantic_readback_verified": True,
-            "generated_contract_parity_verified": True,
+            # Runtime-contract parity is proven by the separate slow acceptance
+            # gate; comparison export itself verifies only semantic readback.
+            "generated_contract_parity_verified": False,
             "rewritten": {} if byte_identical else {"registry_owned_fields": "overlaid"},
         }
     finally:

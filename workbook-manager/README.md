@@ -150,6 +150,11 @@ Environment overrides: `WBM_WORKBOOK`, `WBM_DB` (durable state),
 
 ## Tests
 
+Use the exact affected test or class while editing. The command below is the
+Pass/checkpoint acceptance inventory, not the inner edit loop: several Pass 4
+cases intentionally run a complete real-workbook promotion, comparison export,
+or scratch-copy write and currently take about 70–78 seconds each.
+
 ```sh
 .venv/bin/python -m pytest \
   tests/test_workbook_manager_catalog.py \
@@ -166,3 +171,8 @@ The normal suite skips two explicit scratch-copy shared-writer tests unless
 `WBM_SLOW_GATE=1` is set. Pass 4 comparison reconstruction is an exact identity
 copy while no draft overlay exists; package/schema validation and independent
 semantic readback must pass before the disposable file is returned.
+
+Future test-speed work may share a verified imported-projection fixture and use
+compact workbooks for isolated negative cases. Keep the real-workbook promotion,
+fail-closed preservation, comparison-export, scratch-write, and generated-parity
+acceptance cases intact and run them once at each pass checkpoint.
