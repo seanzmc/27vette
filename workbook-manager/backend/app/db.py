@@ -50,10 +50,10 @@ from .catalog import TABLE_SPECS, TableSpec
 
 # 2 (Pass 3): durable ``change_history.pending_change_id`` declares
 # ``REFERENCES pending_changes(id)``. 3 (Pass 4): the disposable projection
-# records sheet and managed-row dispositions. Durable version 2 stores already
-# have their final DDL and advance their manifest in place; projection version 2
-# stores are rebuilt through the existing disposable-candidate path.
-SCHEMA_VERSION = 3
+# records sheet and managed-row dispositions. 4 (Pass 5): durable workflow
+# drafts and their coalesced physical-row operations. Projection stores are
+# disposable and rebuild when their manifest trails this shared storage version.
+SCHEMA_VERSION = 4
 # One process-local lock for bootstrap, durable-state mutation, candidate
 # promotion, and workbook apply.
 #
@@ -313,6 +313,35 @@ PROJECTION_SUPPORT_DDL = SUPPORT_DDL[:3] + [
 ]
 
 DURABLE_SUPPORT_DDL = SUPPORT_DDL[3:5] + [
+    """CREATE TABLE IF NOT EXISTS workflow_drafts (
+      id TEXT PRIMARY KEY,
+      created_ts TEXT NOT NULL,
+      updated_ts TEXT NOT NULL,
+      session_id TEXT NOT NULL DEFAULT '',
+      actor TEXT NOT NULL DEFAULT '',
+      status TEXT NOT NULL DEFAULT 'draft',
+      base_workbook_sha256 TEXT NOT NULL,
+      base_workbook_mtime_ns TEXT NOT NULL
+    )""",
+    """CREATE TABLE IF NOT EXISTS draft_operations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      draft_id TEXT NOT NULL REFERENCES workflow_drafts(id),
+      created_ts TEXT NOT NULL,
+      updated_ts TEXT NOT NULL,
+      table_name TEXT NOT NULL,
+      family TEXT NOT NULL,
+      model_id TEXT NOT NULL DEFAULT '',
+      source_sheet TEXT NOT NULL,
+      source_row INTEGER,
+      physical_key TEXT NOT NULL,
+      entity_key_json TEXT NOT NULL,
+      action TEXT NOT NULL,
+      original_json TEXT,
+      final_json TEXT,
+      changed_fields_json TEXT NOT NULL,
+      model_context_json TEXT NOT NULL DEFAULT '[]',
+      UNIQUE(draft_id, source_sheet, family, physical_key)
+    )""",
     """CREATE TABLE IF NOT EXISTS legacy_recovery_records (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       migration_id TEXT NOT NULL,
@@ -406,6 +435,10 @@ def init_durable_schema(conn: sqlite3.Connection) -> None:
     conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_history_entity "
         "ON change_history(entity_type, entity_id)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_draft_operations_draft "
+        "ON draft_operations(draft_id, id)"
     )
     conn.commit()
 
@@ -846,9 +879,9 @@ def _upgrade_durable_store(state_path: Path, manifest: dict) -> bool:
 
     Schema 2 adds the database-owned ``change_history.pending_change_id`` ->
     ``pending_changes.id`` foreign key. Schema 3 changes only the disposable
-    projection, so a schema-2 durable store advances its manifest without a DDL
-    rewrite. Rebuild the history table only when its foreign key is absent,
-    preserving every row. Returns True when an upgrade was applied.
+    projection. Schema 4 adds durable draft tables. Rebuild the history table
+    only when its foreign key is absent, preserve every row, and create all
+    missing durable objects idempotently. Returns True when an upgrade applied.
     """
     stored_version = int(manifest.get("schema_version") or 0)
     if stored_version >= SCHEMA_VERSION:
@@ -860,6 +893,12 @@ def _upgrade_durable_store(state_path: Path, manifest: dict) -> bool:
     conn = connect(state_path)
     try:
         if _durable_history_declares_pending_fk(conn):
+            for ddl in DURABLE_SUPPORT_DDL:
+                conn.execute(ddl)
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_draft_operations_draft "
+                "ON draft_operations(draft_id, id)"
+            )
             conn.execute(
                 "UPDATE storage_manifest SET schema_version=?", (SCHEMA_VERSION,)
             )
@@ -891,9 +930,15 @@ def _upgrade_durable_store(state_path: Path, manifest: dict) -> bool:
                 f"durable schema upgrade lost rows: {before} -> {after}"
             )
         conn.execute("DROP TABLE change_history_schema1")
+        for ddl in DURABLE_SUPPORT_DDL:
+            conn.execute(ddl)
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_history_entity "
             "ON change_history(entity_type, entity_id)"
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_draft_operations_draft "
+            "ON draft_operations(draft_id, id)"
         )
         conn.execute(
             "UPDATE storage_manifest SET schema_version=?", (SCHEMA_VERSION,)

@@ -21,11 +21,12 @@ from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import config, db as dbmod, importer, staging, sync as syncmod
+from . import config, db as dbmod, drafts, importer, staging, sync as syncmod
 from .naming import display_id, humanize, sheet_display_name
 from .schemas import (
     ChangeOut,
     CommitRequest,
+    DraftOperationRequest,
     StageChangeRequest,
     SyncRequest,
     TableSchemaOut,
@@ -164,6 +165,17 @@ def _staging_error(exc: StagingError):
     return HTTPException(status_code=422, detail={"errors": exc.errors})
 
 
+def _draft_error(exc: drafts.DraftError):
+    status_code = 409 if exc.code in {
+        "projection_not_current", "draft_not_mutable", "draft_binding_mismatch"
+    } else 422
+    return HTTPException(status_code=status_code, detail={
+        "status": exc.code,
+        "message": str(exc),
+        "errors": exc.errors,
+    })
+
+
 def _workbook_state(conn) -> dict:
     path = config.DEFAULT_WORKBOOK
     imported_mtime = dbmod.get_meta(conn, "workbook_mtime_ns")
@@ -205,6 +217,12 @@ def _projection_active(conn) -> bool:
 
 
 def _import_blockers(conn) -> dict:
+    terminal_placeholders = ",".join("?" for _ in IMPORT_TERMINAL_ALLOWLIST)
+    active = conn.execute(
+        f"SELECT COUNT(*) c FROM workflow_drafts WHERE status NOT IN "
+        f"({terminal_placeholders})",
+        IMPORT_TERMINAL_ALLOWLIST,
+    ).fetchone()["c"]
     staged = conn.execute(
         "SELECT COUNT(*) c FROM pending_changes WHERE status='staged'"
     ).fetchone()["c"]
@@ -237,11 +255,14 @@ def _import_blockers(conn) -> dict:
             "SELECT COUNT(*) c FROM legacy_recovery_records WHERE unresolved=1"
         ).fetchone()["c"]
     return {
+        "active": active,
         "staged": staged,
         "committed_unsynchronized": committed_unsynchronized,
         "failed": failed,
         "legacy_recovery": legacy_recovery,
-        "unresolved_total": staged + committed_unsynchronized + failed + legacy_recovery,
+        "unresolved_total": (
+            active + staged + committed_unsynchronized + failed + legacy_recovery
+        ),
     }
 
 
@@ -638,6 +659,45 @@ def dependencies_post(
 
 
 # ── staged changes ───────────────────────────────────────────────────
+
+@app.post("/api/drafts/{draft_id}/operations")
+def save_draft_operation(
+    draft_id: str,
+    payload: DraftOperationRequest,
+    _lock=Depends(durable_write_lock),
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
+    workbook = _workbook_state(conn)
+    run = conn.execute(
+        "SELECT * FROM import_runs ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    projection = _projection_state(conn, run, workbook)
+    try:
+        return drafts.save_operation(
+            conn,
+            state_conn,
+            projection_state=projection["state"],
+            base_workbook_sha256=workbook["imported_sha256"],
+            base_workbook_mtime_ns=workbook["imported_mtime_ns"],
+            draft_id=draft_id,
+            table=payload.table,
+            model_id=payload.model_id,
+            op=payload.op,
+            key=payload.key,
+            record=payload.record,
+            session_id=payload.session_id,
+            actor=payload.actor,
+        )
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
+
+
+@app.get("/api/drafts/{draft_id}/operations")
+def draft_operations(draft_id: str, state_conn=Depends(state_connection)):
+    return {"draft_id": draft_id, "operations": drafts.list_operations(
+        state_conn, draft_id
+    )}
 
 @app.post("/api/changes", response_model=ChangeOut)
 def stage(

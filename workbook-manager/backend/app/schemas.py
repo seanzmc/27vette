@@ -26,6 +26,16 @@ class StageChangeRequest(BaseModel):
     confirm_dependencies: bool = False
 
 
+class DraftOperationRequest(BaseModel):
+    table: str
+    model_id: str = ""
+    op: str = Field(pattern="^(add|update|delete)$")
+    key: dict[str, str] = Field(default_factory=dict)
+    record: Optional[dict[str, Any]] = None
+    session_id: str = ""
+    actor: str = ""
+
+
 class ChangeOut(BaseModel):
     id: int
     ts: str

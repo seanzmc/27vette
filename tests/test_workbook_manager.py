@@ -917,6 +917,60 @@ class TestApi(unittest.TestCase):
         self.assertEqual(detail["status"], "read_only_provisional")
         self.assertIn("Pass 7", detail["message"])
 
+    def test_pass5_draft_api_roots_durable_update_without_projection_mutation(self):
+        projected = self.client.get(
+            "/api/records/options", params={"model": "stingray", "limit": 1}
+        ).json()["records"][0]
+        option_id = projected["option_id"]
+        original_name = projected["option_name"]
+        draft_id = "api-draft-test"
+        response = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "options",
+                "model_id": "stingray",
+                "op": "update",
+                "key": {"option_id": option_id},
+                "record": {"option_name": f"{original_name} changed"},
+                "session_id": "api-test",
+                "actor": "test",
+            },
+        )
+        try:
+            self.assertEqual(response.status_code, 200, response.text)
+            operation = response.json()
+            self.assertEqual(operation["draft_id"], draft_id)
+            self.assertEqual(operation["source_sheet"], "stingray_options")
+            self.assertEqual(
+                operation["changed_fields"],
+                {
+                    "option_name": {
+                        "before": original_name,
+                        "after": f"{original_name} changed",
+                    }
+                },
+            )
+            listed = self.client.get(f"/api/drafts/{draft_id}/operations")
+            self.assertEqual(listed.status_code, 200, listed.text)
+            self.assertEqual(len(listed.json()["operations"]), 1)
+            status = self.client.get("/api/status").json()
+            self.assertEqual(status["draft"]["active"], 1)
+            self.assertEqual(status["draft"]["state"], "blocked")
+            self.assertFalse(status["projection"]["reimport_allowed"])
+            unchanged = self.client.get(
+                "/api/records/options",
+                params={"model": "stingray", "search": option_id, "limit": 1},
+            ).json()["records"][0]
+            self.assertEqual(unchanged["option_name"], original_name)
+        finally:
+            conn = self.mainmod.open_state_connection()
+            try:
+                conn.execute("DELETE FROM draft_operations WHERE draft_id=?", (draft_id,))
+                conn.execute("DELETE FROM workflow_drafts WHERE id=?", (draft_id,))
+                conn.commit()
+            finally:
+                conn.close()
+
     def test_reimport_atomically_replaces_an_active_projection(self):
         conn = self.mainmod.open_projection_connection()
         before_manifest = self.mainmod._projection_manifest(conn)
