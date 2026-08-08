@@ -5,7 +5,9 @@ This directory is the repo-local operating system for Fable 5 runs on 27vette. I
 ## Start here for every Fable 5 run
 
 1. Read this file.
-2. Read `STATE.md` to resume from verified facts, general rules, open failures, lessons learned, and the last-session pointer.
+2. Read `STATE.md` for the short program-level pointer, durable cross-task
+   facts/lessons, open failures, and latest receipt. Follow its owning-spec
+   link for detailed task progress.
 3. Read `skills/27vette-fable5-compounding.md` for the procedural loop.
 4. Read `outcomes/27vette-loop-outcomes.md` and choose or write the task-specific outcome rubric before editing.
 5. Check `fable5-loop-contract.json` so the run knows the three tiers, four compound-stack layers, and required artifacts.
@@ -67,12 +69,28 @@ Before declaring done:
    - `validation-output.txt`,
    - `run.json`.
 4. Update `STATE.md`:
-   - verified facts with evidence,
+   - the owning-spec pointer and one-line current pass/blocker state,
+   - verified cross-task facts with evidence only when reusable,
    - general rules only when they are reusable,
    - unresolved failures with reproduction steps,
    - last-session resume pointer.
 5. Update `skills/27vette-fable5-compounding.md` only for durable procedural lessons; otherwise record a `not_applicable` or `deferred` decision in `run.json`.
 6. Report what changed, what did not change, validation results, gates not run, and residual risk.
+
+## Live progress ownership
+
+Keep at most two live progress surfaces for a workflow:
+
+1. The owning specification is the sole detailed tracker for task status,
+   checklists, validation, blockers, and next steps.
+2. `STATE.md` is a compact program-level index pointing to that specification
+   and the latest receipt.
+
+Run receipts remain required evidence, but they are not working progress files.
+Do not copy detailed pass narratives, test counts, or active next-step lists
+from the specification into `STATE.md` or receipts. A receipt records what a
+finished run proved; the specification remains authoritative for what happens
+next.
 
 ## Protected 27vette boundaries
 

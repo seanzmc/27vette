@@ -36,13 +36,23 @@ Use one of these patterns explicitly:
 
 Update `fable5loop/STATE.md` before ending a run:
 
-- Verified facts: only facts backed by tool output, source files, workbook evidence, or verifier results.
+- Current authority: point to the owning specification and summarize only the
+  current pass, blocker state, and latest receipt. Do not duplicate the
+  specification's detailed progress, validation matrix, or next-step list.
+- Verified facts: add only reusable cross-task facts backed by tool output,
+  source files, workbook evidence, or verifier results. One-run completion
+  detail belongs in the receipt and owning specification.
 - General rules: reusable rules that will help future runs.
 - Open failures: failed criteria, reproduction steps, logs, hypotheses clearly marked as hypotheses.
 - Lessons learned: durable insights that have been verified.
 - Last session: one concise resume pointer with next action.
 - Each new memory bullet: ISO date or timestamp plus `Evidence:` reference.
 - Each non-trivial run: receipt folder under `fable5loop/runs/YYYY-MM-DD-slug/`.
+
+The owning specification is the sole detailed live progress tracker. Receipts
+are immutable evidence, not a third current-status surface. If a receipt and
+the specification disagree about what is next, correct the specification and
+reduce `STATE.md` to a pointer; do not maintain three synchronized narratives.
 
 ## Skill improvement contract
 

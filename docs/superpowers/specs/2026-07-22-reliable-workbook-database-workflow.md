@@ -13,6 +13,17 @@ distinct restored outcomes, stale-projection permissions, and deferred UI work.
 Recommended implementation reasoning: medium. Escalate only for a specific
 unresolved data-integrity, crash-recovery, or concurrency judgment.
 
+## Working progress authority
+
+This specification is the sole detailed progress file for this workflow. It
+owns pass status, completed requirements, current blockers, validation state,
+and the next implementation step. Update it in place as Passes 5–7 proceed.
+
+`fable5loop/STATE.md` may carry only a short program-level pointer to this file,
+the current pass/blocker state, and the latest evidence receipt. Fable run
+receipts are immutable closeout evidence, not parallel progress trackers; they
+must not introduce a competing current status or next-step narrative.
+
 ## 1. Goal and authority boundary
 
 Make the Workbook Manager a reliable editing interface around
