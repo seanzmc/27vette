@@ -1075,6 +1075,26 @@ Pass 5 exit gate: sequential same-row edits emit one operation; valid
 parent/member additions and coordinated deletes preview together; invalid final
 graphs cannot produce an approvable preview.
 
+#### Pass 5 checkpoint 1 — durable update intent (2026-08-08)
+
+Checkpoint 1 is complete at implementation commit `94e059e`, with closeout
+evidence under
+`fable5loop/runs/2026-08-08-dbpass5-durable-draft-coalescing/`. It delivers only
+requirements 1–4 for update operations: the durable store owns draft intent;
+authoring requires a current projection; lineage and ownership resolve before
+persistence; repeated edits to one physical row coalesce from the first
+projected value to the final changed field pairs; and a full reversion removes
+the operation. The disposable projection and legacy staged/history rows remain
+unchanged, and active drafts participate in re-import containment.
+
+Requirements 5–8 and the full Pass 5 exit gate remain open: exact immutable
+`workbook-changeset-1` emission, complete final-graph preview through the shared
+service, exact approval persistence/mapping, coordinated add/delete behavior,
+and removal of the dependency-confirmation bypass. The next checkpoint must
+start with a failing regression in
+`tests/test_workbook_manager_changeset_lifecycle.py`; it must not extend the
+legacy full-row writer or enable live workbook writes.
+
 ### Pass 6 — Harden the shared write boundary and recovery
 
 Required changes:

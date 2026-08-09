@@ -1,9 +1,11 @@
 # Workbook Manager (React + FastAPI + SQLite)
 
 Provisional interface for investigating the disposable SQLite projection of
-`stingray_master.xlsx` and collecting legacy staged edits. The workbook remains
-canonical. Live manager-to-workbook writes are disabled until the reviewed
-ChangeSet route is enabled in Pass 7 of the reliability specification.
+`stingray_master.xlsx`. The first Pass 5 checkpoint adds manager-owned durable
+draft updates while the browser still exposes only the legacy staged-edit flow.
+The workbook remains canonical. Live manager-to-workbook writes are disabled
+until the reviewed ChangeSet route is enabled in Pass 7 of the reliability
+specification.
 
 ```text
 React interface (frontend/, Vite build served by FastAPI)
@@ -23,7 +25,9 @@ stingray_master.xlsx (canonical source)
 
 Pass 1 containment remains active. Pass 2 split storage plus the shared backend
 catalog contract, Pass 3 request connections plus promotion coordination, and
-Pass 4 verified candidate promotion are implemented:
+Pass 4 verified candidate promotion are implemented. Pass 5 now has one bounded
+backend checkpoint for durable update intent; ChangeSet emission, final-graph
+preview, and approval are not implemented yet:
 
 - `POST /api/sync` refuses every `write=true` request. The browser has no live
   write control; dry-run remains available for inspection only.
@@ -34,8 +38,14 @@ Pass 4 verified candidate promotion are implemented:
   acceptance test and is not part of manager import/export execution.
   A failed candidate is deleted and leaves the prior projection byte-identical.
 - Import is also refused while legacy staged, committed-unsynchronized, or
-  failed work exists. An import with blocking findings is labeled `unverified`,
-  never verified/current.
+  failed work exists, or while a nonterminal durable draft exists. An import
+  with blocking findings is labeled `unverified`, never verified/current.
+- `POST /api/drafts/{draft_id}/operations` accepts update intent only when the
+  projection is `current`. It resolves workbook lineage and ownership first,
+  coalesces sequential edits to one physical row, records original-to-final
+  changed field pairs in durable state, and never mutates the projection or
+  legacy history. `GET /api/drafts/{draft_id}/operations` returns that intent.
+  These are backend checkpoint routes, not an enabled browser write workflow.
 - Status reports projection, draft, workbook, generated-artifact, and
   publication states separately. Generated artifacts and publication are
   always `unverified` in this provisional manager workflow.
@@ -110,24 +120,29 @@ Environment overrides: `WBM_WORKBOOK`, `WBM_DB` (durable state),
    Every duplicate identifier, missing sheet/column, and unresolved
    relationship is reported with sheet/row/entity detail. Blocking findings
    block candidate promotion and leave the current projection untouched.
-2. **Edit** — Form Structure workspace (models, runtime steps, section
+2. **Edit (legacy browser)** — Form Structure workspace (models, runtime steps, section
    presentation/order, context sections, variants) and Model Operations
    workspace (options, OVS, exclusive groups + members, rule mapping, rule
    groups + members, pricing, variant overrides, assets, interior scope,
    components; shared interiors/color overrides). Collections come from the
    workbook's own `model_workbook_sources` registry, not a hardcoded list.
-3. **Stage** — every add/update/delete is validated (keys, types, enums,
+3. **Stage (legacy provisional)** — every add/update/delete is validated (keys, types, enums,
    scoped uniqueness, references) and queued in `pending_changes`. Undo
    discards a staged change without touching data or audit history.
    Deletes are blocked while dependents exist unless explicitly confirmed.
-4. **Commit (legacy provisional)** — batch revalidation; every
+4. **Durable draft checkpoint (backend only)** — update requests against a
+   current projection resolve one physical workbook target and persist one
+   coalesced original-to-final operation in `WBM_DB`. Re-import remains blocked
+   until the nonterminal draft has a later lifecycle disposition. No ChangeSet,
+   preview, approval, apply, or browser migration is implied by this checkpoint.
+5. **Commit (legacy provisional)** — batch revalidation; every
    change lands in the append-only `change_history` table (timestamp,
    actor, entity, model, op, old/new values, source sheet/row, validation
    result, sync status).
-5. **Sync preview only** — `POST /api/sync` with `write=false` can run the
+6. **Sync preview only** — `POST /api/sync` with `write=false` can run the
    existing dry-run gate. `write=true` is refused by the API regardless of
    confirmation text or mtime.
-6. **Disposable export** — `POST /api/export` can create a comparison workbook
+7. **Disposable export** — `POST /api/export` can create a comparison workbook
    under `var/exports/` only when projection state is `current`. The file is
    labeled disposable and must not replace the workbook or feed generation.
 
@@ -161,6 +176,7 @@ or scratch-copy write and currently take about 70–78 seconds each.
   tests/test_workbook_manager_import_projection.py \
   tests/test_workbook_manager_generated_parity.py \
   tests/test_workbook_manager_api_concurrency.py \
+  tests/test_workbook_manager_drafts.py \
   tests/test_workbook_manager.py -q
 # optional direct shared-writer scratch-copy tests (not an enabled API route):
 WBM_SLOW_GATE=1 .venv/bin/python -m pytest tests/test_workbook_manager.py -q

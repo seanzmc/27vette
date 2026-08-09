@@ -51,9 +51,11 @@ from .catalog import TABLE_SPECS, TableSpec
 # 2 (Pass 3): durable ``change_history.pending_change_id`` declares
 # ``REFERENCES pending_changes(id)``. 3 (Pass 4): the disposable projection
 # records sheet and managed-row dispositions. 4 (Pass 5): durable workflow
-# drafts and their coalesced physical-row operations. Projection stores are
-# disposable and rebuild when their manifest trails this shared storage version.
+# drafts and their coalesced physical-row operations. Version 4 did not change
+# projection shape, so a verified version-3 projection remains compatible while
+# its durable store upgrades independently.
 SCHEMA_VERSION = 4
+PROJECTION_SCHEMA_VERSION = 3
 # One process-local lock for bootstrap, durable-state mutation, candidate
 # promotion, and workbook apply.
 #
@@ -996,7 +998,9 @@ def bootstrap_storage(state_path: Path, projection_path: Path) -> dict:
             matching = (
                 projection_manifest
                 and projection_manifest.get("store_kind") == "projection"
-                and int(projection_manifest.get("schema_version")) == SCHEMA_VERSION
+                and PROJECTION_SCHEMA_VERSION
+                <= int(projection_manifest.get("schema_version") or 0)
+                <= SCHEMA_VERSION
                 and (
                     verified_import
                     or (

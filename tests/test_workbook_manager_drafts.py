@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import sqlite3
 import sys
 import tempfile
 import unittest
@@ -14,11 +13,7 @@ for path in (str(BACKEND), str(REPO_ROOT / "scripts")):
     if path not in sys.path:
         sys.path.insert(0, path)
 
-from app import db as dbmod  # noqa: E402
-try:  # RED phase: the Pass 5 draft service does not exist yet.
-    from app import drafts  # noqa: E402
-except ImportError:
-    drafts = None
+from app import db as dbmod, drafts  # noqa: E402
 
 
 class TestDurableDraftSchema(unittest.TestCase):
@@ -84,7 +79,6 @@ class TestDurableDraftEditing(unittest.TestCase):
         return projection, state
 
     def test_draft_creation_requires_current_projection(self):
-        self.assertIsNotNone(drafts, "Pass 5 durable draft service is missing")
         with tempfile.TemporaryDirectory(prefix="wbm-draft-state-") as raw:
             root = Path(raw)
             projection = dbmod.connect(root / "projection.sqlite3")
@@ -180,6 +174,40 @@ class TestDurableDraftEditing(unittest.TestCase):
                 )
                 self.assertIsNone(reverted)
                 self.assertEqual(drafts.list_operations(state, "draft-1"), [])
+            finally:
+                projection.close()
+                state.close()
+
+    def test_unresolved_physical_target_is_rejected_before_persistence(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-draft-lineage-") as raw:
+            projection, state = self._stores(Path(raw))
+            try:
+                projection.execute(
+                    "UPDATE options SET src_sheet='' WHERE model_id='stingray' "
+                    "AND option_id='opt_test'"
+                )
+                projection.commit()
+                with self.assertRaises(drafts.DraftError) as ctx:
+                    drafts.save_operation(
+                        projection,
+                        state,
+                        projection_state="current",
+                        base_workbook_sha256="sha",
+                        base_workbook_mtime_ns="1",
+                        draft_id="draft-1",
+                        table="options",
+                        model_id="stingray",
+                        op="update",
+                        key={"option_id": "opt_test"},
+                        record={"option_name": "Changed"},
+                    )
+                self.assertEqual(ctx.exception.code, "physical_target_unresolved")
+                self.assertEqual(
+                    state.execute(
+                        "SELECT COUNT(*) c FROM workflow_drafts"
+                    ).fetchone()["c"],
+                    0,
+                )
             finally:
                 projection.close()
                 state.close()

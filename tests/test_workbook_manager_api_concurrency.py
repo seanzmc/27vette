@@ -315,6 +315,15 @@ class TestDurableSchemaUpgrade(unittest.TestCase):
                 ),
                 dbmod.SCHEMA_VERSION,
             )
+            durable_tables = {
+                row["name"]
+                for row in conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'"
+                )
+            }
+            self.assertTrue(
+                {"workflow_drafts", "draft_operations"} <= durable_tables
+            )
             with self.assertRaises(sqlite3.IntegrityError):
                 conn.execute(
                     "INSERT INTO change_history(ts, entity_type, entity_id, op, "
@@ -392,6 +401,81 @@ class TestDurableSchemaUpgrade(unittest.TestCase):
             )
         finally:
             conn.close()
+
+    def test_v3_durable_upgrade_preserves_a_verified_v3_projection(self):
+        state = dbmod.connect(self.state_path)
+        projection = dbmod.connect(self.projection_path)
+        try:
+            dbmod.init_durable_schema(state)
+            state.execute("DROP TABLE draft_operations")
+            state.execute("DROP TABLE workflow_drafts")
+            dbmod._write_manifest(
+                state,
+                store_kind="durable",
+                migration_id="split-v3",
+                source_sha256="legacy-sha",
+                source_path=self.state_path,
+                archive_path=None,
+                table_counts={},
+            )
+            state.execute("UPDATE storage_manifest SET schema_version=3")
+            state.commit()
+
+            dbmod.init_projection_schema(projection)
+            projection.execute(
+                "INSERT INTO models(src_sheet, src_row, model_key, active) "
+                "VALUES('model_master', 2, 'sentinel', 'True')"
+            )
+            projection.execute(
+                "INSERT INTO import_runs(ts, workbook_path, "
+                "workbook_mtime_ns, workbook_sha256, status) "
+                "VALUES('t', '/tmp/source.xlsx', '123', 'verified-sha', 'imported')"
+            )
+            dbmod._write_manifest(
+                projection,
+                store_kind="projection",
+                migration_id="import-verified-v3",
+                source_sha256="verified-sha",
+                source_path=Path("/tmp/source.xlsx"),
+                archive_path=None,
+                table_counts={"models": 1},
+            )
+            projection.execute("UPDATE storage_manifest SET schema_version=3")
+            projection.commit()
+        finally:
+            state.close()
+            projection.close()
+
+        first = dbmod.bootstrap_storage(self.state_path, self.projection_path)
+        self.assertEqual(first["status"], "ready")
+        self.assertTrue(first["schema_upgraded"])
+
+        projection = dbmod.connect(self.projection_path)
+        state = dbmod.connect(self.state_path)
+        try:
+            self.assertEqual(
+                projection.execute(
+                    "SELECT model_key FROM models WHERE model_key='sentinel'"
+                ).fetchone()["model_key"],
+                "sentinel",
+            )
+            self.assertEqual(
+                dbmod.storage_manifest(projection)["migration_id"],
+                "import-verified-v3",
+            )
+            self.assertIsNotNone(
+                state.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table' "
+                    "AND name='workflow_drafts'"
+                ).fetchone()
+            )
+        finally:
+            projection.close()
+            state.close()
+
+        second = dbmod.bootstrap_storage(self.state_path, self.projection_path)
+        self.assertEqual(second["status"], "ready")
+        self.assertFalse(second["schema_upgraded"])
 
 
 class TestProjectionReaderGate(unittest.TestCase):
