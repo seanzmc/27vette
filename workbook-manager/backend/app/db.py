@@ -52,10 +52,10 @@ from .catalog import TABLE_SPECS, TableSpec
 # ``REFERENCES pending_changes(id)``. 3 (Pass 4): the disposable projection
 # records sheet and managed-row dispositions. 4 (Pass 5): durable workflow
 # drafts and their coalesced physical-row operations. 5 (Pass 5): immutable
-# emitted ChangeSet payloads. Versions 4 and 5 did not change projection shape,
-# so a verified version-3 projection remains compatible while its durable store
-# upgrades independently.
-SCHEMA_VERSION = 5
+# emitted ChangeSet payloads. 6 (Pass 5): immutable preview-attempt evidence.
+# Versions 4–6 did not change projection shape, so a verified version-3
+# projection remains compatible while its durable store upgrades independently.
+SCHEMA_VERSION = 6
 PROJECTION_SCHEMA_VERSION = 3
 # One process-local lock for bootstrap, durable-state mutation, candidate
 # promotion, and workbook apply.
@@ -362,6 +362,33 @@ DURABLE_SUPPORT_DDL = SUPPORT_DDL[3:5] + [
     BEGIN
       SELECT RAISE(ABORT, 'draft ChangeSet artifacts are immutable');
     END""",
+    """CREATE TABLE IF NOT EXISTS draft_preview_attempts (
+      id TEXT PRIMARY KEY,
+      draft_id TEXT NOT NULL REFERENCES workflow_drafts(id),
+      change_set_id TEXT NOT NULL,
+      semantic_fingerprint TEXT NOT NULL,
+      started_ts TEXT NOT NULL,
+      completed_ts TEXT NOT NULL,
+      artifact_kind TEXT NOT NULL,
+      result_json TEXT,
+      exception_class TEXT NOT NULL DEFAULT '',
+      exception_message TEXT NOT NULL DEFAULT '',
+      workbook_identity_state TEXT NOT NULL,
+      observed_workbook_sha256 TEXT NOT NULL DEFAULT '',
+      observed_workbook_mtime_ns TEXT NOT NULL DEFAULT '',
+      manager_state TEXT NOT NULL,
+      allowed_verbs_json TEXT NOT NULL
+    )""",
+    """CREATE TRIGGER IF NOT EXISTS draft_preview_attempts_immutable_update
+    BEFORE UPDATE ON draft_preview_attempts
+    BEGIN
+      SELECT RAISE(ABORT, 'draft preview attempt artifacts are immutable');
+    END""",
+    """CREATE TRIGGER IF NOT EXISTS draft_preview_attempts_immutable_delete
+    BEFORE DELETE ON draft_preview_attempts
+    BEGIN
+      SELECT RAISE(ABORT, 'draft preview attempt artifacts are immutable');
+    END""",
     """CREATE TABLE IF NOT EXISTS legacy_recovery_records (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       migration_id TEXT NOT NULL,
@@ -459,6 +486,10 @@ def init_durable_schema(conn: sqlite3.Connection) -> None:
     conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_draft_operations_draft "
         "ON draft_operations(draft_id, id)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_draft_preview_attempts_draft "
+        "ON draft_preview_attempts(draft_id, started_ts)"
     )
     conn.commit()
 
@@ -900,9 +931,10 @@ def _upgrade_durable_store(state_path: Path, manifest: dict) -> bool:
     Schema 2 adds the database-owned ``change_history.pending_change_id`` ->
     ``pending_changes.id`` foreign key. Schema 3 changes only the disposable
     projection. Schema 4 adds durable draft tables; schema 5 adds immutable
-    emitted ChangeSet artifacts. Rebuild the history table only when its foreign
-    key is absent, preserve every row, and create all missing durable objects
-    idempotently. Returns True when an upgrade applied.
+    emitted ChangeSet artifacts; schema 6 adds immutable preview-attempt
+    evidence. Rebuild the history table only when its foreign key is absent,
+    preserve every row, and create all missing durable objects idempotently.
+    Returns True when an upgrade applied.
     """
     stored_version = int(manifest.get("schema_version") or 0)
     if stored_version >= SCHEMA_VERSION:
@@ -919,6 +951,10 @@ def _upgrade_durable_store(state_path: Path, manifest: dict) -> bool:
             conn.execute(
                 "CREATE INDEX IF NOT EXISTS idx_draft_operations_draft "
                 "ON draft_operations(draft_id, id)"
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_draft_preview_attempts_draft "
+                "ON draft_preview_attempts(draft_id, started_ts)"
             )
             conn.execute(
                 "UPDATE storage_manifest SET schema_version=?", (SCHEMA_VERSION,)
@@ -960,6 +996,10 @@ def _upgrade_durable_store(state_path: Path, manifest: dict) -> bool:
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_draft_operations_draft "
             "ON draft_operations(draft_id, id)"
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_draft_preview_attempts_draft "
+            "ON draft_preview_attempts(draft_id, started_ts)"
         )
         conn.execute(
             "UPDATE storage_manifest SET schema_version=?", (SCHEMA_VERSION,)

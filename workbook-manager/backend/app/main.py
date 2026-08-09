@@ -712,6 +712,29 @@ def commit_draft(
         raise _draft_error(exc)
 
 
+@app.post("/api/drafts/{draft_id}/preview")
+def preview_draft_changeset(
+    draft_id: str,
+    _lock=Depends(durable_write_lock),
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
+    workbook = _workbook_state(conn)
+    run = conn.execute(
+        "SELECT * FROM import_runs ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    projection = _projection_state(conn, run, workbook)
+    try:
+        return drafts.preview_draft(
+            state_conn,
+            draft_id=draft_id,
+            projection_state=projection["state"],
+            workbook_path=config.DEFAULT_WORKBOOK,
+        )
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
+
+
 @app.post("/api/changes", response_model=ChangeOut)
 def stage(
     payload: StageChangeRequest,

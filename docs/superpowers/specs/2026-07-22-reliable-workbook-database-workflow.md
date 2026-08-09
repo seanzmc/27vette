@@ -2,8 +2,8 @@
 
 Status: implementation in progress; Pass 1 completed 2026-07-22, Pass 2
 completed 2026-07-23, Pass 3 completed 2026-07-30, and Pass 4 completed
-2026-08-08 on `db-workflow`; Pass 5 Checkpoints 1–2 are implemented with
-requirements 6–8 and the full exit gate still open; Passes 6–7 have not
+completed 2026-08-08 on `db-workflow`; Pass 5 Checkpoints 1–3 are implemented with
+requirements 7–8 and the full exit gate still open; Passes 6–7 have not
 started. Revised
 2026-07-23 to record the completed workbook-owned Vehicle Setup copy contract;
 the final specification review previously resolved all fourteen findings: primary-
@@ -1127,6 +1127,36 @@ preview lifecycle regression in
 `tests/test_workbook_manager_changeset_lifecycle.py` and route the immutable
 ChangeSet through `workbook_domain.service.preview_changeset()` without
 reproducing its validation logic.
+
+#### Pass 5 checkpoint 3 — durable shared-service preview lifecycle (2026-08-09)
+
+Checkpoint 3 completes requirement 6. `POST
+/api/drafts/{draft_id}/preview` accepts only an emitted or retryable immutable
+ChangeSet against a current verified projection and invokes only
+`workbook_domain.service.preview_changeset()`. Durable schema 6 stores one
+immutable attempt envelope per call with the exact returned dictionary or the
+exception class/message, independently observed workbook identity, ChangeSet
+identity, timestamps, resulting Section 4.1 manager state, and exact allowed
+verbs. Formal previews, early refusals, freshness refusals, retryable transient
+exceptions, rejected exceptions, identity loss, and distinct retry attempts are
+covered without mutating the projection or workbook.
+
+The focused lifecycle file passes 13 tests plus 12 mapping/exception subtests;
+the draft/lifecycle/concurrency inventory passes 50 tests plus 12 subtests, and
+the shared ChangeSet/service inventory passes 50 tests. The remaining manager
+acceptance inventory and independent verifier result are recorded in
+`fable5loop/runs/2026-08-09-dbpass5-preview-lifecycle/` rather than duplicated
+here.
+
+Requirements 7–8 and the full Pass 5 exit gate remain open: exact approval
+persistence/mapping, coordinated add/delete behavior, removal of the legacy
+dependency-confirmation bypass, valid parent/member and coordinated-delete
+final-graph proof, and proof that invalid final graphs cannot become approvable.
+The next checkpoint must start with a failing approval-lifecycle regression in
+`tests/test_workbook_manager_changeset_lifecycle.py` and route the exact stored
+ChangeSet and formal preview through
+`workbook_domain.service.approve_changeset()` without enabling apply or live
+workbook writes.
 
 ### Pass 6 — Harden the shared write boundary and recovery
 

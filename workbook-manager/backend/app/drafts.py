@@ -2,15 +2,18 @@
 
 The disposable projection remains unchanged while a mutable draft records
 original-to-final semantic row intent in the durable manager database. Exact
-ChangeSet emission is durable and immutable; shared-service preview remains a
-later Pass 5 layer.
+ChangeSet emission and shared-service preview attempts are durable and
+immutable. Approval remains a later Pass 5 layer.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sqlite3
+import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 from corvette_form_generator import editor_ops
@@ -19,6 +22,7 @@ from corvette_form_generator.workbook_domain.changeset import (
     changeset_fingerprint,
     parse_changeset,
 )
+from corvette_form_generator.workbook_domain import service as workbook_service
 
 from .catalog import SPEC_BY_TABLE, projection_value
 from .staging import _editable_guard, _fetch_row
@@ -31,6 +35,9 @@ class DraftError(ValueError):
         super().__init__(message)
         self.code = code
         self.errors = errors or []
+
+
+TRANSIENT_PREVIEW_EXCEPTIONS = (BlockingIOError, PermissionError, TimeoutError)
 
 
 def _now() -> str:
@@ -191,6 +198,191 @@ def emit_changeset(state_conn: sqlite3.Connection, *, draft_id: str) -> dict:
         state_conn.rollback()
         raise
     return payload
+
+
+def _workbook_identity(path: Path, expected: dict) -> dict:
+    """Measure workbook identity independently of the shared preview service."""
+    try:
+        observed = {
+            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+            "mtimeNs": str(path.stat().st_mtime_ns),
+        }
+    except OSError:
+        return {"state": "unavailable", "sha256": "", "mtimeNs": ""}
+    return {
+        "state": "unchanged" if observed == expected else "mismatched",
+        **observed,
+    }
+
+
+def _preview_attempt_dict(row) -> dict:
+    result = dict(row)
+    raw_result = result.pop("result_json")
+    result["result"] = json.loads(raw_result) if raw_result else None
+    result["allowed_verbs"] = json.loads(result.pop("allowed_verbs_json"))
+    return result
+
+
+def _map_preview_result(result: dict, identity_state: str) -> tuple[str, list[str]]:
+    """Map one shared-service result through specification section 4.1."""
+    if identity_state != "unchanged":
+        return "stale", ["cancel"]
+    status = result.get("status")
+    if status == "validated" and result.get("ok") is True:
+        return "preview_ready", ["approve", "cancel"]
+    if status in {"locked", "readback_failed"}:
+        return "preview_retryable", ["retry_preview", "cancel"]
+    if status == "stale":
+        return "stale", ["cancel"]
+    return "preview_rejected", ["cancel"]
+
+
+def _persist_preview_attempt(
+    state_conn: sqlite3.Connection,
+    *,
+    draft_id: str,
+    changeset: dict,
+    started: str,
+    artifact_kind: str,
+    result: dict | None,
+    exception: BaseException | None,
+    identity: dict,
+    manager_state: str,
+    allowed_verbs: list[str],
+) -> dict:
+    completed = _now()
+    attempt_id = uuid.uuid4().hex
+    state_conn.execute("BEGIN IMMEDIATE")
+    try:
+        state_conn.execute(
+            "INSERT INTO draft_preview_attempts(id, draft_id, change_set_id, "
+            "semantic_fingerprint, started_ts, completed_ts, artifact_kind, "
+            "result_json, exception_class, exception_message, "
+            "workbook_identity_state, observed_workbook_sha256, "
+            "observed_workbook_mtime_ns, manager_state, allowed_verbs_json) "
+            "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (
+                attempt_id,
+                draft_id,
+                changeset["changeSetId"],
+                changeset["semanticFingerprint"],
+                started,
+                completed,
+                artifact_kind,
+                _json(result) if result is not None else None,
+                type(exception).__name__ if exception is not None else "",
+                str(exception) if exception is not None else "",
+                identity["state"],
+                identity["sha256"],
+                identity["mtimeNs"],
+                manager_state,
+                _json(allowed_verbs),
+            ),
+        )
+        state_conn.execute(
+            "UPDATE workflow_drafts SET status=?, updated_ts=? WHERE id=?",
+            (manager_state, completed, draft_id),
+        )
+        state_conn.commit()
+    except Exception:
+        state_conn.rollback()
+        raise
+    return _preview_attempt_dict(
+        state_conn.execute(
+            "SELECT * FROM draft_preview_attempts WHERE id=?", (attempt_id,)
+        ).fetchone()
+    )
+
+
+def preview_draft(
+    state_conn: sqlite3.Connection,
+    *,
+    draft_id: str,
+    projection_state: str,
+    workbook_path: Path,
+) -> dict:
+    """Preview one immutable draft ChangeSet through the shared service."""
+    draft = state_conn.execute(
+        "SELECT * FROM workflow_drafts WHERE id=?", (draft_id,)
+    ).fetchone()
+    if draft is None:
+        raise DraftError("draft_not_found", f"draft {draft_id!r} was not found")
+    if draft["status"] not in {"changeset_emitted", "preview_retryable"}:
+        raise DraftError(
+            "draft_not_previewable",
+            f"draft {draft_id!r} is {draft['status']!r}, not previewable",
+        )
+    stored = state_conn.execute(
+        "SELECT * FROM draft_changesets WHERE draft_id=?", (draft_id,)
+    ).fetchone()
+    if stored is None:
+        raise DraftError(
+            "changeset_not_found", f"draft {draft_id!r} has no emitted ChangeSet"
+        )
+    changeset = json.loads(stored["payload_json"])
+    started = _now()
+    if projection_state != "current":
+        refusal = DraftError(
+            "projection_not_current",
+            "ChangeSet preview requires a current verified projection",
+        )
+        _persist_preview_attempt(
+            state_conn,
+            draft_id=draft_id,
+            changeset=changeset,
+            started=started,
+            artifact_kind="manager_refusal",
+            result=None,
+            exception=refusal,
+            identity=_workbook_identity(Path(workbook_path), changeset["workbook"]),
+            manager_state="stale",
+            allowed_verbs=["cancel"],
+        )
+        raise refusal
+    try:
+        result = workbook_service.preview_changeset(Path(workbook_path), changeset)
+    except Exception as exc:
+        identity = _workbook_identity(Path(workbook_path), changeset["workbook"])
+        if identity["state"] != "unchanged":
+            manager_state = "stale"
+            allowed_verbs = ["cancel"]
+        elif isinstance(exc, TRANSIENT_PREVIEW_EXCEPTIONS):
+            manager_state = "preview_retryable"
+            allowed_verbs = ["retry_preview", "cancel"]
+        else:
+            manager_state = "preview_rejected"
+            allowed_verbs = ["cancel"]
+        return _persist_preview_attempt(
+            state_conn,
+            draft_id=draft_id,
+            changeset=changeset,
+            started=started,
+            artifact_kind="exception",
+            result=None,
+            exception=exc,
+            identity=identity,
+            manager_state=manager_state,
+            allowed_verbs=allowed_verbs,
+        )
+    identity = _workbook_identity(Path(workbook_path), changeset["workbook"])
+    manager_state, allowed_verbs = _map_preview_result(result, identity["state"])
+    artifact_kind = (
+        "formal_preview"
+        if result.get("schemaVersion") == workbook_service.PREVIEW_SCHEMA
+        else "early_refusal"
+    )
+    return _persist_preview_attempt(
+        state_conn,
+        draft_id=draft_id,
+        changeset=changeset,
+        started=started,
+        artifact_kind=artifact_kind,
+        result=result,
+        exception=None,
+        identity=identity,
+        manager_state=manager_state,
+        allowed_verbs=allowed_verbs,
+    )
 
 
 def _ensure_mutable_draft(

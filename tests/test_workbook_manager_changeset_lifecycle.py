@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sqlite3
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BACKEND = REPO_ROOT / "workbook-manager" / "backend"
@@ -196,7 +198,346 @@ class TestImmutableChangeSetEmission(unittest.TestCase):
                 state.close()
 
 
-class TestSchema5Migration(unittest.TestCase):
+class TestDurablePreviewLifecycle(unittest.TestCase):
+    def _stores(self, root: Path):
+        return TestImmutableChangeSetEmission()._stores(root)
+
+    def _emitted_draft(self, root: Path, *, draft_id: str = "draft-preview"):
+        projection, state = self._stores(root)
+        workbook = root / "fixture.xlsx"
+        workbook.write_bytes(b"preview-fixture")
+        workbook_sha = hashlib.sha256(workbook.read_bytes()).hexdigest()
+        workbook_mtime = str(workbook.stat().st_mtime_ns)
+        drafts.save_operation(
+            projection,
+            state,
+            projection_state="current",
+            base_workbook_sha256=workbook_sha,
+            base_workbook_mtime_ns=workbook_mtime,
+            draft_id=draft_id,
+            table="options",
+            model_id="stingray",
+            op="update",
+            key={"option_id": "opt_test"},
+            record={"price": "150"},
+        )
+        changeset = drafts.emit_changeset(state, draft_id=draft_id)
+        return projection, state, workbook, changeset
+
+    def test_preview_result_mapping_matches_section_4_1(self):
+        cases = (
+            ({"ok": True, "status": "validated"}, "preview_ready", ["approve", "cancel"]),
+            ({"ok": False, "status": "invalid_changeset"}, "preview_rejected", ["cancel"]),
+            ({"ok": False, "status": "invalid"}, "preview_rejected", ["cancel"]),
+            ({"ok": False, "status": "empty"}, "preview_rejected", ["cancel"]),
+            ({"ok": False, "status": "bool_hygiene_failed"}, "preview_rejected", ["cancel"]),
+            ({"ok": False, "status": "schema_failed"}, "preview_rejected", ["cancel"]),
+            ({"ok": False, "status": "warning_blocked"}, "preview_rejected", ["cancel"]),
+            ({"ok": False, "status": "stale"}, "stale", ["cancel"]),
+            ({"ok": False, "status": "locked"}, "preview_retryable", ["retry_preview", "cancel"]),
+            ({"ok": False, "status": "readback_failed"}, "preview_retryable", ["retry_preview", "cancel"]),
+        )
+        for result, expected_state, expected_verbs in cases:
+            with self.subTest(status=result["status"]):
+                self.assertEqual(
+                    drafts._map_preview_result(result, "unchanged"),
+                    (expected_state, expected_verbs),
+                )
+        self.assertEqual(
+            drafts._map_preview_result({"ok": True, "status": "validated"}, "mismatched"),
+            ("stale", ["cancel"]),
+        )
+
+    def test_preview_persists_exact_shared_service_artifact_and_lifecycle(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-preview-lifecycle-") as raw:
+            projection, state, workbook, changeset = self._emitted_draft(Path(raw))
+            service_result = {
+                "ok": True,
+                "schemaVersion": "workbook-change-preview-1",
+                "changeSetId": changeset["changeSetId"],
+                "semanticFingerprint": changeset["semanticFingerprint"],
+                "workbook": changeset["workbook"],
+                "status": "validated",
+                "errors": [],
+                "warnings": [],
+                "previewFingerprint": "f" * 64,
+            }
+            try:
+                with patch.object(
+                    drafts.workbook_service,
+                    "preview_changeset",
+                    return_value=service_result,
+                ) as preview_changeset:
+                    attempt = drafts.preview_draft(
+                        state,
+                        draft_id="draft-preview",
+                        projection_state="current",
+                        workbook_path=workbook,
+                    )
+
+                preview_changeset.assert_called_once_with(workbook, changeset)
+                self.assertEqual(attempt["result"], service_result)
+                self.assertEqual(attempt["artifact_kind"], "formal_preview")
+                self.assertEqual(attempt["manager_state"], "preview_ready")
+                self.assertEqual(attempt["allowed_verbs"], ["approve", "cancel"])
+                stored = state.execute(
+                    "SELECT * FROM draft_preview_attempts WHERE id=?",
+                    (attempt["id"],),
+                ).fetchone()
+                self.assertEqual(json.loads(stored["result_json"]), service_result)
+                self.assertEqual(
+                    state.execute(
+                        "SELECT status FROM workflow_drafts WHERE id='draft-preview'"
+                    ).fetchone()["status"],
+                    "preview_ready",
+                )
+                with self.assertRaisesRegex(
+                    sqlite3.IntegrityError, "preview attempt artifacts are immutable"
+                ):
+                    state.execute(
+                        "UPDATE draft_preview_attempts SET result_json='{}' WHERE id=?",
+                        (attempt["id"],),
+                    )
+                state.rollback()
+            finally:
+                projection.close()
+                state.close()
+
+    def test_invalid_shared_preview_maps_to_rejected_cancel_only(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-preview-rejected-") as raw:
+            projection, state, workbook, _ = self._emitted_draft(Path(raw))
+            refusal = {
+                "ok": False,
+                "status": "schema_failed",
+                "errors": ["final graph is invalid"],
+            }
+            try:
+                with patch.object(
+                    drafts.workbook_service,
+                    "preview_changeset",
+                    return_value=refusal,
+                ):
+                    attempt = drafts.preview_draft(
+                        state,
+                        draft_id="draft-preview",
+                        projection_state="current",
+                        workbook_path=workbook,
+                    )
+
+                self.assertEqual(attempt["result"], refusal)
+                self.assertEqual(attempt["artifact_kind"], "early_refusal")
+                self.assertEqual(attempt["manager_state"], "preview_rejected")
+                self.assertEqual(attempt["allowed_verbs"], ["cancel"])
+            finally:
+                projection.close()
+                state.close()
+
+    def test_preview_refuses_noncurrent_projection_without_calling_service(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-preview-freshness-") as raw:
+            projection, state, workbook, _ = self._emitted_draft(Path(raw))
+            try:
+                with patch.object(
+                    drafts.workbook_service, "preview_changeset"
+                ) as preview_changeset:
+                    with self.assertRaises(drafts.DraftError) as ctx:
+                        drafts.preview_draft(
+                            state,
+                            draft_id="draft-preview",
+                            projection_state="stale",
+                            workbook_path=workbook,
+                        )
+
+                self.assertEqual(ctx.exception.code, "projection_not_current")
+                preview_changeset.assert_not_called()
+                stored = state.execute(
+                    "SELECT * FROM draft_preview_attempts WHERE draft_id='draft-preview'"
+                ).fetchone()
+                self.assertIsNotNone(stored)
+                self.assertEqual(stored["artifact_kind"], "manager_refusal")
+                self.assertEqual(stored["manager_state"], "stale")
+                self.assertEqual(json.loads(stored["allowed_verbs_json"]), ["cancel"])
+                self.assertEqual(
+                    state.execute(
+                        "SELECT status FROM workflow_drafts WHERE id='draft-preview'"
+                    ).fetchone()["status"],
+                    "stale",
+                )
+            finally:
+                projection.close()
+                state.close()
+
+    def test_transient_preview_exception_with_unchanged_identity_is_retryable(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-preview-exception-") as raw:
+            projection, state, workbook, _ = self._emitted_draft(Path(raw))
+            try:
+                with patch.object(
+                    drafts.workbook_service,
+                    "preview_changeset",
+                    side_effect=TimeoutError("workbook reader timed out"),
+                ):
+                    attempt = drafts.preview_draft(
+                        state,
+                        draft_id="draft-preview",
+                        projection_state="current",
+                        workbook_path=workbook,
+                    )
+
+                self.assertIsNone(attempt["result"])
+                self.assertEqual(attempt["artifact_kind"], "exception")
+                self.assertEqual(attempt["exception_class"], "TimeoutError")
+                self.assertEqual(
+                    attempt["exception_message"], "workbook reader timed out"
+                )
+                self.assertEqual(attempt["workbook_identity_state"], "unchanged")
+                self.assertEqual(attempt["manager_state"], "preview_retryable")
+                self.assertEqual(
+                    attempt["allowed_verbs"], ["retry_preview", "cancel"]
+                )
+            finally:
+                projection.close()
+                state.close()
+
+    def test_preview_endpoint_returns_persisted_attempt_without_writing(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-preview-endpoint-") as raw:
+            projection, state, workbook, changeset = self._emitted_draft(Path(raw))
+            service_result = {
+                "ok": True,
+                "schemaVersion": "workbook-change-preview-1",
+                "changeSetId": changeset["changeSetId"],
+                "semanticFingerprint": changeset["semanticFingerprint"],
+                "workbook": changeset["workbook"],
+                "status": "validated",
+                "previewFingerprint": "e" * 64,
+            }
+            try:
+                with (
+                    patch.object(main.config, "DEFAULT_WORKBOOK", workbook),
+                    patch.object(
+                        main,
+                        "_workbook_state",
+                        return_value={"state": "current"},
+                    ),
+                    patch.object(
+                        main,
+                        "_projection_state",
+                        return_value={"state": "current"},
+                    ),
+                    patch.object(
+                        drafts.workbook_service,
+                        "preview_changeset",
+                        return_value=service_result,
+                    ),
+                ):
+                    attempt = main.preview_draft_changeset(
+                        "draft-preview",
+                        _lock=None,
+                        conn=projection,
+                        state_conn=state,
+                    )
+
+                self.assertEqual(attempt["result"], service_result)
+                self.assertEqual(attempt["manager_state"], "preview_ready")
+                self.assertEqual(
+                    state.execute(
+                        "SELECT COUNT(*) c FROM draft_preview_attempts"
+                    ).fetchone()["c"],
+                    1,
+                )
+                self.assertEqual(
+                    projection.execute(
+                        "SELECT price FROM options WHERE option_id='opt_test'"
+                    ).fetchone()["price"],
+                    "100",
+                )
+                self.assertEqual(workbook.read_bytes(), b"preview-fixture")
+            finally:
+                projection.close()
+                state.close()
+
+    def test_preview_retry_reuses_changeset_and_creates_distinct_attempt(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-preview-retry-") as raw:
+            projection, state, workbook, changeset = self._emitted_draft(Path(raw))
+            locked = {"ok": False, "status": "locked", "errors": ["busy"]}
+            validated = {
+                "ok": True,
+                "schemaVersion": "workbook-change-preview-1",
+                "changeSetId": changeset["changeSetId"],
+                "semanticFingerprint": changeset["semanticFingerprint"],
+                "workbook": changeset["workbook"],
+                "status": "validated",
+                "previewFingerprint": "d" * 64,
+            }
+            try:
+                with patch.object(
+                    drafts.workbook_service,
+                    "preview_changeset",
+                    side_effect=[locked, validated],
+                ) as preview_changeset:
+                    first = drafts.preview_draft(
+                        state,
+                        draft_id="draft-preview",
+                        projection_state="current",
+                        workbook_path=workbook,
+                    )
+                    second = drafts.preview_draft(
+                        state,
+                        draft_id="draft-preview",
+                        projection_state="current",
+                        workbook_path=workbook,
+                    )
+
+                self.assertEqual(first["manager_state"], "preview_retryable")
+                self.assertEqual(second["manager_state"], "preview_ready")
+                self.assertNotEqual(first["id"], second["id"])
+                self.assertEqual(preview_changeset.call_count, 2)
+                for call in preview_changeset.call_args_list:
+                    self.assertEqual(call.args, (workbook, changeset))
+                self.assertEqual(
+                    state.execute(
+                        "SELECT COUNT(*) c FROM draft_preview_attempts"
+                    ).fetchone()["c"],
+                    2,
+                )
+            finally:
+                projection.close()
+                state.close()
+
+    def test_nontransient_exception_and_identity_loss_fail_closed(self):
+        cases = (
+            (ValueError("unexpected parser failure"), False, "preview_rejected"),
+            (TimeoutError("reader timed out"), True, "stale"),
+        )
+        for exception, remove_workbook, expected_state in cases:
+            with self.subTest(expected_state=expected_state):
+                with tempfile.TemporaryDirectory(prefix="wbm-preview-failclosed-") as raw:
+                    projection, state, workbook, _ = self._emitted_draft(Path(raw))
+
+                    def fail_preview(*_args):
+                        if remove_workbook:
+                            workbook.unlink()
+                        raise exception
+
+                    try:
+                        with patch.object(
+                            drafts.workbook_service,
+                            "preview_changeset",
+                            side_effect=fail_preview,
+                        ):
+                            attempt = drafts.preview_draft(
+                                state,
+                                draft_id="draft-preview",
+                                projection_state="current",
+                                workbook_path=workbook,
+                            )
+                        self.assertEqual(attempt["manager_state"], expected_state)
+                        self.assertEqual(attempt["allowed_verbs"], ["cancel"])
+                        self.assertEqual(attempt["exception_class"], type(exception).__name__)
+                    finally:
+                        projection.close()
+                        state.close()
+
+
+class TestDurableSchemaMigrations(unittest.TestCase):
     def test_v4_durable_upgrade_preserves_draft_and_verified_projection(self):
         with tempfile.TemporaryDirectory(prefix="wbm-schema5-upgrade-") as raw:
             root = Path(raw)
@@ -265,6 +606,12 @@ class TestSchema5Migration(unittest.TestCase):
                         "AND name='draft_changesets'"
                     ).fetchone()
                 )
+                self.assertIsNotNone(
+                    state.execute(
+                        "SELECT name FROM sqlite_master WHERE type='table' "
+                        "AND name='draft_preview_attempts'"
+                    ).fetchone()
+                )
                 self.assertEqual(
                     state.execute(
                         "SELECT COUNT(*) c FROM draft_operations "
@@ -289,6 +636,57 @@ class TestSchema5Migration(unittest.TestCase):
             second = dbmod.bootstrap_storage(state_path, projection_path)
             self.assertEqual(second["status"], "ready")
             self.assertFalse(second["schema_upgraded"])
+
+    def test_v5_upgrade_preserves_emitted_changeset(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-schema6-upgrade-") as raw:
+            state_path = Path(raw) / "state.sqlite3"
+            state = dbmod.connect(state_path)
+            try:
+                dbmod.init_durable_schema(state)
+                state.execute("DROP TABLE draft_preview_attempts")
+                state.execute(
+                    "INSERT INTO workflow_drafts(id, created_ts, updated_ts, status, "
+                    "base_workbook_sha256, base_workbook_mtime_ns) "
+                    "VALUES('emitted', 't', 't', 'changeset_emitted', ?, '123')",
+                    ("e" * 64,),
+                )
+                state.execute(
+                    "INSERT INTO draft_changesets(draft_id, created_ts, change_set_id, "
+                    "semantic_fingerprint, payload_json) VALUES('emitted', 't', "
+                    "'change-set-sentinel', 'fingerprint-sentinel', '{\"sentinel\":true}')"
+                )
+                dbmod._write_manifest(
+                    state,
+                    store_kind="durable",
+                    migration_id="durable-v5",
+                    source_sha256="source-sha",
+                    source_path=state_path,
+                    archive_path=None,
+                    table_counts={},
+                )
+                state.execute("UPDATE storage_manifest SET schema_version=5")
+                state.commit()
+            finally:
+                state.close()
+
+            manifest = dbmod._read_manifest_path(state_path)
+            self.assertTrue(dbmod._upgrade_durable_store(state_path, manifest))
+            state = dbmod.connect(state_path)
+            try:
+                stored = state.execute(
+                    "SELECT * FROM draft_changesets WHERE draft_id='emitted'"
+                ).fetchone()
+                self.assertEqual(stored["change_set_id"], "change-set-sentinel")
+                self.assertEqual(json.loads(stored["payload_json"]), {"sentinel": True})
+                self.assertIsNotNone(
+                    state.execute(
+                        "SELECT name FROM sqlite_master WHERE type='table' "
+                        "AND name='draft_preview_attempts'"
+                    ).fetchone()
+                )
+                self.assertEqual(dbmod.storage_manifest(state)["schema_version"], 6)
+            finally:
+                state.close()
 
 
 if __name__ == "__main__":

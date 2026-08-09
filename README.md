@@ -134,9 +134,11 @@ An Apply is only the workbook-write step — afterwards regenerate affected mode
 `workbook-manager/` is a React (Vite) + FastAPI + SQLite editor for
 `stingray_master.xlsx`. It is currently **read-only / provisional**: a first
 import into an empty projection is allowed, replacement re-import is contained,
-and every `POST /api/sync` request with `write=true` is refused. Dry-run sync,
-browsing, history, and verified-projection disposable comparison export remain
-available; generated-artifact and publication state are not inferred. The
+durable update drafts can emit and preview immutable ChangeSets through the
+shared service, and every `POST /api/sync` request with `write=true` is refused.
+Dry-run sync, browsing, history, and verified-projection disposable comparison
+export remain available; generated-artifact and publication state are not
+inferred. The
 workbook remains canonical. Storage bootstrap runs in the FastAPI lifespan,
 every request opens and closes its own projection and durable-state connection,
 and one process-local lock plus a projection reader gate serialize durable
