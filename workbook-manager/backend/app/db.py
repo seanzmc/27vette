@@ -51,10 +51,11 @@ from .catalog import TABLE_SPECS, TableSpec
 # 2 (Pass 3): durable ``change_history.pending_change_id`` declares
 # ``REFERENCES pending_changes(id)``. 3 (Pass 4): the disposable projection
 # records sheet and managed-row dispositions. 4 (Pass 5): durable workflow
-# drafts and their coalesced physical-row operations. Version 4 did not change
-# projection shape, so a verified version-3 projection remains compatible while
-# its durable store upgrades independently.
-SCHEMA_VERSION = 4
+# drafts and their coalesced physical-row operations. 5 (Pass 5): immutable
+# emitted ChangeSet payloads. Versions 4 and 5 did not change projection shape,
+# so a verified version-3 projection remains compatible while its durable store
+# upgrades independently.
+SCHEMA_VERSION = 5
 PROJECTION_SCHEMA_VERSION = 3
 # One process-local lock for bootstrap, durable-state mutation, candidate
 # promotion, and workbook apply.
@@ -344,6 +345,23 @@ DURABLE_SUPPORT_DDL = SUPPORT_DDL[3:5] + [
       model_context_json TEXT NOT NULL DEFAULT '[]',
       UNIQUE(draft_id, source_sheet, family, physical_key)
     )""",
+    """CREATE TABLE IF NOT EXISTS draft_changesets (
+      draft_id TEXT PRIMARY KEY REFERENCES workflow_drafts(id),
+      created_ts TEXT NOT NULL,
+      change_set_id TEXT NOT NULL UNIQUE,
+      semantic_fingerprint TEXT NOT NULL UNIQUE,
+      payload_json TEXT NOT NULL
+    )""",
+    """CREATE TRIGGER IF NOT EXISTS draft_changesets_immutable_update
+    BEFORE UPDATE ON draft_changesets
+    BEGIN
+      SELECT RAISE(ABORT, 'draft ChangeSet artifacts are immutable');
+    END""",
+    """CREATE TRIGGER IF NOT EXISTS draft_changesets_immutable_delete
+    BEFORE DELETE ON draft_changesets
+    BEGIN
+      SELECT RAISE(ABORT, 'draft ChangeSet artifacts are immutable');
+    END""",
     """CREATE TABLE IF NOT EXISTS legacy_recovery_records (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       migration_id TEXT NOT NULL,
@@ -881,9 +899,10 @@ def _upgrade_durable_store(state_path: Path, manifest: dict) -> bool:
 
     Schema 2 adds the database-owned ``change_history.pending_change_id`` ->
     ``pending_changes.id`` foreign key. Schema 3 changes only the disposable
-    projection. Schema 4 adds durable draft tables. Rebuild the history table
-    only when its foreign key is absent, preserve every row, and create all
-    missing durable objects idempotently. Returns True when an upgrade applied.
+    projection. Schema 4 adds durable draft tables; schema 5 adds immutable
+    emitted ChangeSet artifacts. Rebuild the history table only when its foreign
+    key is absent, preserve every row, and create all missing durable objects
+    idempotently. Returns True when an upgrade applied.
     """
     stored_version = int(manifest.get("schema_version") or 0)
     if stored_version >= SCHEMA_VERSION:

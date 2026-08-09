@@ -1095,6 +1095,37 @@ start with a failing regression in
 `tests/test_workbook_manager_changeset_lifecycle.py`; it must not extend the
 legacy full-row writer or enable live workbook writes.
 
+#### Pass 5 checkpoint 2 — immutable update ChangeSet emission (2026-08-09)
+
+Checkpoint 2 is implemented in the current working tree. It completes
+requirement 5 for the update-only draft surface: one nonempty mutable draft
+commit emits one exact `workbook-changeset-1`, converts typed field pairs through
+the shared editor coercion, validates the payload through the shared parser,
+persists the exact canonical payload in the durable store, and transitions the
+batch to `changeset_emitted`. Database triggers refuse artifact update or
+deletion. `POST /api/drafts/{draft_id}/commit` exposes only this emission step;
+it does not preview, approve, apply, mutate the projection, or write the
+workbook.
+
+The schema-5 migration regression was observed failing against detached
+baseline `bef0cbb` because a version-4 durable store was not upgraded, then
+passed against this implementation while preserving a draft-operation sentinel
+and verified version-3 projection across first and second restart. The new
+lifecycle file passes 4 tests; the focused draft/concurrency/shared-ChangeSet
+inventory passes 91 tests and the complete API class passes 12 tests, each with
+one third-party deprecation warning. Two broader manager inventory attempts
+exceeded the 600-second foreground limit after printing progress and therefore
+are not counted as green.
+
+Requirements 6–8 and the full Pass 5 exit gate remain open: complete
+final-graph preview and exact attempt persistence/mapping, exact approval
+persistence/mapping, coordinated add/delete behavior, and removal of the legacy
+dependency-confirmation bypass. The next checkpoint must start with a failing
+preview lifecycle regression in
+`tests/test_workbook_manager_changeset_lifecycle.py` and route the immutable
+ChangeSet through `workbook_domain.service.preview_changeset()` without
+reproducing its validation logic.
+
 ### Pass 6 — Harden the shared write boundary and recovery
 
 Required changes:

@@ -146,7 +146,9 @@ containment behavior, and test commands: `workbook-manager/README.md`. Focused
 tests: `tests/test_workbook_manager_catalog.py`,
 `tests/test_workbook_manager_import_projection.py`,
 `tests/test_workbook_manager_api_concurrency.py`,
-`tests/test_workbook_manager_drafts.py`, and `tests/test_workbook_manager.py`.
+`tests/test_workbook_manager_drafts.py`,
+`tests/test_workbook_manager_changeset_lifecycle.py`, and
+`tests/test_workbook_manager.py`.
 
 ## Workbook And Generator Workflows
 

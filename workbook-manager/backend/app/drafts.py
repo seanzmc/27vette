@@ -2,7 +2,8 @@
 
 The disposable projection remains unchanged while a mutable draft records
 original-to-final semantic row intent in the durable manager database. Exact
-ChangeSet emission and shared-service preview are later Pass 5 layers.
+ChangeSet emission is durable and immutable; shared-service preview remains a
+later Pass 5 layer.
 """
 
 from __future__ import annotations
@@ -11,6 +12,13 @@ import json
 import sqlite3
 from datetime import datetime, timezone
 from typing import Any
+
+from corvette_form_generator import editor_ops
+from corvette_form_generator.workbook_domain.changeset import (
+    SCHEMA_VERSION as CHANGESET_SCHEMA_VERSION,
+    changeset_fingerprint,
+    parse_changeset,
+)
 
 from .catalog import SPEC_BY_TABLE, projection_value
 from .staging import _editable_guard, _fetch_row
@@ -56,6 +64,133 @@ def list_operations(state_conn: sqlite3.Connection, draft_id: str) -> list[dict]
         "SELECT * FROM draft_operations WHERE draft_id=? ORDER BY id", (draft_id,)
     ).fetchall()
     return [_operation_dict(row) for row in rows]
+
+
+def _changeset_value(family: str, field: str, value: Any) -> Any:
+    """Use the shared editor coercion for ChangeSet before/after values."""
+    return editor_ops.coerce_value(family, field, value)
+
+
+def emit_changeset(state_conn: sqlite3.Connection, *, draft_id: str) -> dict:
+    """Commit a mutable draft as one exact immutable workbook-changeset-1."""
+    draft = state_conn.execute(
+        "SELECT * FROM workflow_drafts WHERE id=?", (draft_id,)
+    ).fetchone()
+    if draft is None:
+        raise DraftError("draft_not_found", f"draft {draft_id!r} was not found")
+    if draft["status"] != "draft":
+        raise DraftError(
+            "draft_not_mutable", f"draft {draft_id!r} is {draft['status']!r}, not mutable"
+        )
+    operations = list_operations(state_conn, draft_id)
+    if not operations:
+        raise DraftError("empty_draft", "a draft must contain an operation before commit")
+
+    targets: set[str] = set()
+    row_changes = []
+    for operation in operations:
+        spec = SPEC_BY_TABLE.get(operation["table_name"])
+        if spec is None:
+            raise DraftError(
+                "unknown_table",
+                f"stored draft operation references unknown table {operation['table_name']!r}",
+            )
+        if operation["action"] != "update":
+            raise DraftError(
+                "draft_action_not_implemented",
+                "this Pass 5 checkpoint emits update operations only",
+            )
+        context = operation.get("model_context") or []
+        targets.update(str(model) for model in context if str(model))
+        if operation.get("model_id"):
+            targets.add(str(operation["model_id"]))
+
+        key = {}
+        for name, value in (operation.get("entity_key") or {}).items():
+            column = spec.column_by_name(name)
+            if column is None:
+                raise DraftError(
+                    "unknown_fields",
+                    f"stored draft key contains unregistered field {name!r}",
+                )
+            key[column.header] = _changeset_value(
+                operation["family"], column.header, value
+            )
+        fields = {}
+        for name, pair in (operation.get("changed_fields") or {}).items():
+            column = spec.column_by_name(name)
+            if column is None:
+                raise DraftError(
+                    "unknown_fields",
+                    f"stored draft change contains unregistered field {name!r}",
+                )
+            fields[column.header] = {
+                side: _changeset_value(operation["family"], column.header, pair[side])
+                for side in ("before", "after")
+            }
+        row_changes.append({
+            "action": operation["action"],
+            "sheet": operation["source_sheet"],
+            "family": operation["family"],
+            "key": key,
+            "fields": fields,
+            "provenance": [{
+                "kind": "workbook-manager-draft-operation",
+                "id": str(operation["id"]),
+            }],
+        })
+
+    if not targets:
+        raise DraftError("draft_targets_empty", "draft operations resolve no model targets")
+    payload = {
+        "schemaVersion": CHANGESET_SCHEMA_VERSION,
+        "source": {"kind": "workbook-manager", "runId": draft_id},
+        "targets": sorted(targets),
+        "workbook": {
+            "sha256": draft["base_workbook_sha256"],
+            "mtimeNs": draft["base_workbook_mtime_ns"],
+        },
+        "sheetCreates": [],
+        "rowChanges": row_changes,
+        "noops": [],
+        "warningAcknowledgementsRequested": [],
+        "bindings": {},
+    }
+    payload["semanticFingerprint"] = changeset_fingerprint(payload)
+    payload["changeSetId"] = payload["semanticFingerprint"][:24]
+    payload = parse_changeset(payload)
+
+    timestamp = _now()
+    state_conn.execute("BEGIN IMMEDIATE")
+    try:
+        current = state_conn.execute(
+            "SELECT status FROM workflow_drafts WHERE id=?", (draft_id,)
+        ).fetchone()
+        if current is None or current["status"] != "draft":
+            raise DraftError(
+                "draft_not_mutable", f"draft {draft_id!r} is no longer mutable"
+            )
+        state_conn.execute(
+            "INSERT INTO draft_changesets(draft_id, created_ts, change_set_id, "
+            "semantic_fingerprint, payload_json) VALUES(?,?,?,?,?)",
+            (
+                draft_id,
+                timestamp,
+                payload["changeSetId"],
+                payload["semanticFingerprint"],
+                _json(payload),
+            ),
+        )
+        state_conn.execute(
+            "UPDATE workflow_drafts SET status='changeset_emitted', updated_ts=? "
+            "WHERE id=?",
+            (timestamp, draft_id),
+        )
+        state_conn.commit()
+    except Exception:
+        state_conn.rollback()
+        raise
+    return payload
 
 
 def _ensure_mutable_draft(

@@ -699,6 +699,19 @@ def draft_operations(draft_id: str, state_conn=Depends(state_connection)):
         state_conn, draft_id
     )}
 
+
+@app.post("/api/drafts/{draft_id}/commit")
+def commit_draft(
+    draft_id: str,
+    _lock=Depends(durable_write_lock),
+    state_conn=Depends(state_connection),
+):
+    try:
+        return drafts.emit_changeset(state_conn, draft_id=draft_id)
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
+
+
 @app.post("/api/changes", response_model=ChangeOut)
 def stage(
     payload: StageChangeRequest,
