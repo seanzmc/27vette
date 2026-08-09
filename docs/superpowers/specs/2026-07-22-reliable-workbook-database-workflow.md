@@ -2,7 +2,9 @@
 
 Status: implementation in progress; Pass 1 completed 2026-07-22, Pass 2
 completed 2026-07-23, Pass 3 completed 2026-07-30, and Pass 4 completed
-2026-08-08 on `db-workflow`; Passes 5–7 not started. Revised
+2026-08-08 on `db-workflow`; Pass 5 Checkpoints 1–2 are implemented with
+requirements 6–8 and the full exit gate still open; Passes 6–7 have not
+started. Revised
 2026-07-23 to record the completed workbook-owned Vehicle Setup copy contract;
 the final specification review previously resolved all fourteen findings: primary-
 runtime-only parity, strict publication selection, current baseline, outcome-
@@ -1097,7 +1099,7 @@ legacy full-row writer or enable live workbook writes.
 
 #### Pass 5 checkpoint 2 — immutable update ChangeSet emission (2026-08-09)
 
-Checkpoint 2 is implemented in the current working tree. It completes
+Checkpoint 2 is implemented at commit `60fd263`. It completes
 requirement 5 for the update-only draft surface: one nonempty mutable draft
 commit emits one exact `workbook-changeset-1`, converts typed field pairs through
 the shared editor coercion, validates the payload through the shared parser,

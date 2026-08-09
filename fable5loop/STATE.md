@@ -1,21 +1,28 @@
 # Fable 5 Project Memory · 27vette
 
-This file is the compact program-level memory/index for Fable 5 work. Detailed
-workflow progress belongs only in the owning specification; receipts are
-immutable evidence. Read this file to locate the current spec, blockers, and
-latest receipt, not as a duplicate task tracker.
+This file is the centralized operational handoff plus durable Fable memory.
+Read `Current handoff` first. Overwrite every field in that block after each
+substantive repository task; do not append competing current-status narratives.
+Detailed requirements and acceptance evidence belong in the owning
+specification, while receipts remain immutable evidence.
 
 ## Memory entry contract
 
 Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `Lessons learned` must include an ISO date or timestamp and an `Evidence:` reference to a source file, run receipt, validator output, verifier report, command output, or reproducible investigation note. Do not record speculative claims as verified facts. `Last session` must reference the latest `fable5loop/runs/YYYY-MM-DD-slug/` receipt folder.
 
-## Current authority
+## Current handoff
 
-- **Owning specification:** `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md` is the sole detailed progress tracker.
-- **Current checkpoint:** Passes 1–4 complete; Pass 5 is next; no current blocker. See the owning specification for scope, gates, and next steps.
-- **Latest evidence:** `fable5loop/runs/2026-08-08-dbpass4-verified-projection-closeout/` (independent verifier PASS).
-- **Separate boundaries:** push, deployment, live workbook writes, retained open-plan work, Grand Sport provenance migration, and Z06 pricing closure remain separately governed.
-- **Supersession rule:** this compact header points to current authority; lower sections are chronological memory/evidence and are not live task status.
+- **Updated:** 2026-08-09
+- **Owning specification:** `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md`
+- **Active workflow:** Reliable Workbook–Database Workflow, Pass 5
+- **Branch/commit:** `db-workflow` working tree atop `60fd263`; the handoff-contract changes are not committed.
+- **Last completed:** Replaced the loose progress-pointer rule with an enforced fixed handoff contract: `STATE.md` is now the mandatory centralized resume surface after every substantive task, while the owning specification changes only when requirement-level facts change.
+- **Current status:** The handoff guidance, machine-readable contract, validator, regression coverage, live Pass 5 status, and owning-spec header are reconciled in the working tree. Pass 5 itself remains in progress with requirements 6–8, coordinated add/delete behavior, and the full exit gate open.
+- **Validation:** All 13 independent Fable contract mutation tests passed; `git diff --check` passed. The repository-level loop validator now accepts the handoff and fails only on the three pre-existing missing Checkpoint 1 receipt artifacts.
+- **Next action:** Start with a failing preview-lifecycle regression in `tests/test_workbook_manager_changeset_lifecycle.py`, then route the immutable ChangeSet through `workbook_domain.service.preview_changeset()` without duplicating validation logic.
+- **Blockers or closeout gaps:** No product-decision blocker. Checkpoint 1's receipt folder is incomplete, and Checkpoint 2 has no receipt; do not describe either checkpoint as independently closed.
+- **Latest completed receipt:** `fable5loop/runs/2026-08-08-dbpass4-verified-projection-closeout/`
+- **Protected boundaries:** Live workbook writes, generated artifacts, registry publication, customer runtime, dealer submission, deployment, and push authorization remain separately governed.
 
 ## Verified facts
 
@@ -172,10 +179,11 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 
 ## Last session
 
-2026-08-08: Pass 4 closeout receipt is
-`fable5loop/runs/2026-08-08-dbpass4-verified-projection-closeout/` (verifier
-PASS). Resume from the owning specification's Pass 5 section; do not reconstruct
-current progress from older entries below.
+2026-08-09: The latest run directory is
+`fable5loop/runs/2026-08-08-dbpass5-durable-draft-coalescing/`, but its receipt
+is incomplete and does not independently close Checkpoint 1. Checkpoint 2 is
+implemented at `60fd263` without a receipt. Resume from `Current handoff` and
+the owning specification; do not reconstruct current progress from chronology.
 
 2026-07-30 (database workflow Pass 3 — request connections and promotion coordination): **Pass 3 complete on `db-workflow`; independent verifier passed on cycle 2.** Implemented exactly the five required changes of the owning specification's Pass 3: lifespan bootstrap, request-scoped projection/durable connections with WAL plus a configured busy timeout, durable-only foreign-key enforcement, one process-local lock extended over every mutating route, a bounded fail-closed projection reader gate, single-process-only serving, and the concurrency/reader-drain proofs that must land before Pass 4 promotion may call `os.replace()`. Cycle 1's verifier found four real blockers — a missing receipt/STATE update, a reproducible process wedge from blocking the lock inside a synchronous dependency, a `WEB_CONCURRENCY` bypass of the multi-worker refusal, and a lock-coverage test that could not fail for three routes — all fixed and mutation-proved in cycle 2, which passed. Cycle 3 then closed three of that verifier's non-blocking findings: the missing schema-upgrade path for durable stores Pass 2 created, the untested `_replace_projection` gating, and a redundant unobservable busy-timeout pragma. Gates: new module 31 passed (21 of 25 RED against `fa0eee7`), manager suites 87 passed / 2 skipped in both orders, slow gate 45, shared ChangeSet plus writer 76 plus 7 subtests, loop contract 13, frontend build passed, workbook package/schema valid with zero issues. Workbook, generated artifacts, publication, runtime, and dealer submission unchanged; Pass 1 write containment still active. No commit or push occurred. Receipt: `fable5loop/runs/2026-07-30-dbpass3-request-connections/`. Next action: Pass 4 (build and atomically promote a verified projection) — it must route its replacement through `PROJECTION_GATE`; commit or push only with separate authorization.
 
