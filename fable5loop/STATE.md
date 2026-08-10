@@ -14,13 +14,13 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 
 - **Updated:** 2026-08-09
 - **Owning specification:** `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md`
-- **Active workflow:** Reliable Workbook–Database Workflow, Pass 5 complete; Pass 6 next
-- **Branch/commit:** `db-workflow` working tree atop `1a359af`; Checkpoint 4 closeout/verifier hardening and Checkpoint 5 are uncommitted.
-- **Last completed:** Completed Pass 5 requirement 8 and its exit gate: durable add/delete intent, coordinated parent/member and dependent-delete final-graph preview, cancel-only invalid graphs, and removal of the legacy dependency-confirmation bypass. No apply or workbook write was enabled.
-- **Current status:** Pass 5 requirements 1–8 and the complete exit gate are implemented. Pass 6 has not started.
-- **Validation:** Required RED failures were observed; lifecycle passed 26 plus 17 subtests, named manager inventory 142 with 2 expected skips plus 17 subtests, explicit slow manager inventory 49, shared ChangeSet/service 50, shared writer 59 plus 7 subtests, frontend build, workbook package/schema, and diff checks passed. The Fable validator remains red only on the six already-recorded missing Checkpoint 1/preview receipt artifacts. Protected workbook, generated, publication, runtime, dealer, and deployment surfaces are unchanged.
-- **Next action:** Start Pass 6 with a failing shared-writer regression for a post-save exception, then harden restoration and route manager apply only through the exact bound ChangeSet service artifacts.
-- **Blockers or closeout gaps:** No product-decision blocker. Requirement 8 used the normal repository path and has no Fable receipt; the latest receipt remains Checkpoint 4. Older Checkpoint 1 and preview receipt folders remain incomplete historical closeout debt.
+- **Active workflow:** Reliable Workbook–Database Workflow, Pass 5 complete; simplified Pass 6A is next
+- **Branch/commit:** clean `db-workflow` working tree at `b11e21a`.
+- **Last completed:** Updated the owning specification in place to three bounded remaining checkpoints: Pass 6A shared-writer post-save restoration, Pass 6B durable manager apply/idempotency/recovery, and Pass 7 minimal lifecycle UI plus final copied-workbook enablement. The legacy `POST /api/sync write=true` lane is now explicitly permanently refused.
+- **Current status:** Pass 5 remains complete. Pass 6A is the exact next implementation checkpoint; Pass 6B and Pass 7 have not started. Pass 7 now treats catalog allowlisting and separate readiness status as existing behavior to characterize, keeps manager context outside immutable shared artifacts, and replaces rather than extends the legacy staged-row browser workflow.
+- **Validation:** Specification consistency searches found no stale active Pass 6/remaining-pass wording; `git diff --check` passed. The Fable validator remains red only on the six already-recorded missing Checkpoint 1/preview receipt artifacts. No implementation or protected-surface change was made. Workbook, generated, publication, runtime, dealer, and deployment surfaces are unchanged.
+- **Next action:** Start Pass 6A with failing shared-writer regressions for thrown post-save readback/package/schema/log failures, then implement the narrow restoration boundary.
+- **Blockers or closeout gaps:** No product or architecture decision blocker. Older Checkpoint 1 and preview receipt folders remain incomplete historical closeout debt; the latest receipt remains Checkpoint 4.
 - **Latest completed receipt:** `fable5loop/runs/2026-08-09-dbpass5-requirement7-approval-lifecycle/`
 - **Protected boundaries:** Live workbook writes, generated artifacts, registry publication, customer runtime, dealer submission, deployment, and push authorization remain separately governed.
 
