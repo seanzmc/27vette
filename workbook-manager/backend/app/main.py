@@ -24,6 +24,7 @@ from fastapi.staticfiles import StaticFiles
 from . import config, db as dbmod, drafts, importer, staging, sync as syncmod
 from .naming import display_id, humanize, sheet_display_name
 from .schemas import (
+    ApprovalRequest,
     ChangeOut,
     CommitRequest,
     DraftOperationRequest,
@@ -730,6 +731,31 @@ def preview_draft_changeset(
             draft_id=draft_id,
             projection_state=projection["state"],
             workbook_path=config.DEFAULT_WORKBOOK,
+        )
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
+
+
+@app.post("/api/drafts/{draft_id}/approve")
+def approve_draft_changeset(
+    draft_id: str,
+    payload: ApprovalRequest,
+    _lock=Depends(durable_write_lock),
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
+    workbook = _workbook_state(conn)
+    run = conn.execute(
+        "SELECT * FROM import_runs ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    projection = _projection_state(conn, run, workbook)
+    try:
+        return drafts.approve_draft(
+            state_conn,
+            draft_id=draft_id,
+            projection_state=projection["state"],
+            actor=payload.actor,
+            warning_ids=payload.warning_ids,
         )
     except drafts.DraftError as exc:
         raise _draft_error(exc)

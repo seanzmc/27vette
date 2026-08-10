@@ -2,8 +2,8 @@
 
 The disposable projection remains unchanged while a mutable draft records
 original-to-final semantic row intent in the durable manager database. Exact
-ChangeSet emission and shared-service preview attempts are durable and
-immutable. Approval remains a later Pass 5 layer.
+ChangeSet emission plus shared-service preview and approval attempts are durable
+and immutable. Apply remains a later pass.
 """
 
 from __future__ import annotations
@@ -237,6 +237,28 @@ def _map_preview_result(result: dict, identity_state: str) -> tuple[str, list[st
     return "preview_rejected", ["cancel"]
 
 
+def _approval_attempt_dict(row) -> dict:
+    result = dict(row)
+    raw_result = result.pop("result_json")
+    result["result"] = json.loads(raw_result) if raw_result else None
+    result["warning_ids"] = json.loads(result.pop("warning_ids_json"))
+    result["allowed_verbs"] = json.loads(result.pop("allowed_verbs_json"))
+    return result
+
+
+def _map_approval_result(result: dict) -> tuple[str, list[str]]:
+    """Map one shared-service approval result through specification §4.1."""
+    status = result.get("status")
+    if (
+        result.get("ok") is True
+        and result.get("schemaVersion") == workbook_service.APPROVAL_SCHEMA
+    ):
+        return "approved", ["apply", "cancel"]
+    if status == "warning_confirmation_mismatch":
+        return "approval_confirmation_required", ["approve", "cancel"]
+    return "approval_repreview_required", ["retry_preview", "cancel"]
+
+
 def _persist_preview_attempt(
     state_conn: sqlite3.Connection,
     *,
@@ -307,7 +329,11 @@ def preview_draft(
     ).fetchone()
     if draft is None:
         raise DraftError("draft_not_found", f"draft {draft_id!r} was not found")
-    if draft["status"] not in {"changeset_emitted", "preview_retryable"}:
+    if draft["status"] not in {
+        "changeset_emitted",
+        "preview_retryable",
+        "approval_repreview_required",
+    }:
         raise DraftError(
             "draft_not_previewable",
             f"draft {draft_id!r} is {draft['status']!r}, not previewable",
@@ -380,6 +406,174 @@ def preview_draft(
         result=result,
         exception=None,
         identity=identity,
+        manager_state=manager_state,
+        allowed_verbs=allowed_verbs,
+    )
+
+
+def _persist_approval_attempt(
+    state_conn: sqlite3.Connection,
+    *,
+    draft_id: str,
+    changeset: dict,
+    preview_attempt,
+    preview: dict,
+    actor: str,
+    warning_ids: list[str],
+    started: str,
+    artifact_kind: str,
+    result: dict | None,
+    exception: BaseException | None,
+    manager_state: str,
+    allowed_verbs: list[str],
+) -> dict:
+    completed = _now()
+    attempt_id = uuid.uuid4().hex
+    state_conn.execute("BEGIN IMMEDIATE")
+    try:
+        state_conn.execute(
+            "INSERT INTO draft_approval_attempts(id, draft_id, preview_attempt_id, "
+            "change_set_id, semantic_fingerprint, preview_fingerprint, actor, "
+            "warning_ids_json, started_ts, completed_ts, artifact_kind, result_json, "
+            "exception_class, exception_message, manager_state, allowed_verbs_json) "
+            "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (
+                attempt_id,
+                draft_id,
+                preview_attempt["id"],
+                changeset["changeSetId"],
+                changeset["semanticFingerprint"],
+                preview["previewFingerprint"],
+                actor,
+                _json(warning_ids),
+                started,
+                completed,
+                artifact_kind,
+                _json(result) if result is not None else None,
+                type(exception).__name__ if exception is not None else "",
+                str(exception) if exception is not None else "",
+                manager_state,
+                _json(allowed_verbs),
+            ),
+        )
+        state_conn.execute(
+            "UPDATE workflow_drafts SET status=?, updated_ts=? WHERE id=?",
+            (manager_state, completed, draft_id),
+        )
+        state_conn.commit()
+    except Exception:
+        state_conn.rollback()
+        raise
+    return _approval_attempt_dict(
+        state_conn.execute(
+            "SELECT * FROM draft_approval_attempts WHERE id=?", (attempt_id,)
+        ).fetchone()
+    )
+
+
+def approve_draft(
+    state_conn: sqlite3.Connection,
+    *,
+    draft_id: str,
+    projection_state: str,
+    actor: str,
+    warning_ids: list[str],
+) -> dict:
+    """Approve the exact stored ChangeSet/preview only through the shared service."""
+    draft = state_conn.execute(
+        "SELECT * FROM workflow_drafts WHERE id=?", (draft_id,)
+    ).fetchone()
+    if draft is None:
+        raise DraftError("draft_not_found", f"draft {draft_id!r} was not found")
+    if draft["status"] not in {"preview_ready", "approval_confirmation_required"}:
+        raise DraftError(
+            "draft_not_approvable",
+            f"draft {draft_id!r} is {draft['status']!r}, not approvable",
+        )
+    stored_changeset = state_conn.execute(
+        "SELECT * FROM draft_changesets WHERE draft_id=?", (draft_id,)
+    ).fetchone()
+    if stored_changeset is None:
+        raise DraftError(
+            "changeset_not_found", f"draft {draft_id!r} has no emitted ChangeSet"
+        )
+    preview_attempt = state_conn.execute(
+        "SELECT * FROM draft_preview_attempts WHERE draft_id=? "
+        "AND artifact_kind='formal_preview' AND manager_state='preview_ready' "
+        "ORDER BY completed_ts DESC, rowid DESC LIMIT 1",
+        (draft_id,),
+    ).fetchone()
+    if preview_attempt is None:
+        raise DraftError(
+            "preview_not_found",
+            f"draft {draft_id!r} has no exact validated preview artifact",
+        )
+    changeset = json.loads(stored_changeset["payload_json"])
+    preview = json.loads(preview_attempt["result_json"])
+    accepted_warning_ids = [str(warning_id) for warning_id in warning_ids]
+    started = _now()
+    if projection_state != "current":
+        refusal = DraftError(
+            "projection_not_current",
+            "ChangeSet approval requires a current verified projection",
+        )
+        _persist_approval_attempt(
+            state_conn,
+            draft_id=draft_id,
+            changeset=changeset,
+            preview_attempt=preview_attempt,
+            preview=preview,
+            actor=actor,
+            warning_ids=accepted_warning_ids,
+            started=started,
+            artifact_kind="manager_refusal",
+            result=None,
+            exception=refusal,
+            manager_state="stale",
+            allowed_verbs=["cancel"],
+        )
+        raise refusal
+    try:
+        result = workbook_service.approve_changeset(
+            changeset,
+            preview,
+            actor=actor,
+            warning_ids=accepted_warning_ids,
+        )
+    except Exception as exc:
+        return _persist_approval_attempt(
+            state_conn,
+            draft_id=draft_id,
+            changeset=changeset,
+            preview_attempt=preview_attempt,
+            preview=preview,
+            actor=actor,
+            warning_ids=accepted_warning_ids,
+            started=started,
+            artifact_kind="exception",
+            result=None,
+            exception=exc,
+            manager_state="approval_rejected",
+            allowed_verbs=["cancel"],
+        )
+    manager_state, allowed_verbs = _map_approval_result(result)
+    artifact_kind = (
+        "formal_approval"
+        if result.get("schemaVersion") == workbook_service.APPROVAL_SCHEMA
+        else "early_refusal"
+    )
+    return _persist_approval_attempt(
+        state_conn,
+        draft_id=draft_id,
+        changeset=changeset,
+        preview_attempt=preview_attempt,
+        preview=preview,
+        actor=actor,
+        warning_ids=accepted_warning_ids,
+        started=started,
+        artifact_kind=artifact_kind,
+        result=result,
+        exception=None,
         manager_state=manager_state,
         allowed_verbs=allowed_verbs,
     )

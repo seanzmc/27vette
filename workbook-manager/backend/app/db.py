@@ -53,9 +53,10 @@ from .catalog import TABLE_SPECS, TableSpec
 # records sheet and managed-row dispositions. 4 (Pass 5): durable workflow
 # drafts and their coalesced physical-row operations. 5 (Pass 5): immutable
 # emitted ChangeSet payloads. 6 (Pass 5): immutable preview-attempt evidence.
-# Versions 4–6 did not change projection shape, so a verified version-3
+# 7 (Pass 5): immutable approval-attempt evidence. Versions 4–7 did not change
+# projection shape, so a verified version-3
 # projection remains compatible while its durable store upgrades independently.
-SCHEMA_VERSION = 6
+SCHEMA_VERSION = 7
 PROJECTION_SCHEMA_VERSION = 3
 # One process-local lock for bootstrap, durable-state mutation, candidate
 # promotion, and workbook apply.
@@ -389,6 +390,34 @@ DURABLE_SUPPORT_DDL = SUPPORT_DDL[3:5] + [
     BEGIN
       SELECT RAISE(ABORT, 'draft preview attempt artifacts are immutable');
     END""",
+    """CREATE TABLE IF NOT EXISTS draft_approval_attempts (
+      id TEXT PRIMARY KEY,
+      draft_id TEXT NOT NULL REFERENCES workflow_drafts(id),
+      preview_attempt_id TEXT NOT NULL REFERENCES draft_preview_attempts(id),
+      change_set_id TEXT NOT NULL,
+      semantic_fingerprint TEXT NOT NULL,
+      preview_fingerprint TEXT NOT NULL,
+      actor TEXT NOT NULL DEFAULT '',
+      warning_ids_json TEXT NOT NULL,
+      started_ts TEXT NOT NULL,
+      completed_ts TEXT NOT NULL,
+      artifact_kind TEXT NOT NULL,
+      result_json TEXT,
+      exception_class TEXT NOT NULL DEFAULT '',
+      exception_message TEXT NOT NULL DEFAULT '',
+      manager_state TEXT NOT NULL,
+      allowed_verbs_json TEXT NOT NULL
+    )""",
+    """CREATE TRIGGER IF NOT EXISTS draft_approval_attempts_immutable_update
+    BEFORE UPDATE ON draft_approval_attempts
+    BEGIN
+      SELECT RAISE(ABORT, 'draft approval attempt artifacts are immutable');
+    END""",
+    """CREATE TRIGGER IF NOT EXISTS draft_approval_attempts_immutable_delete
+    BEFORE DELETE ON draft_approval_attempts
+    BEGIN
+      SELECT RAISE(ABORT, 'draft approval attempt artifacts are immutable');
+    END""",
     """CREATE TABLE IF NOT EXISTS legacy_recovery_records (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       migration_id TEXT NOT NULL,
@@ -490,6 +519,10 @@ def init_durable_schema(conn: sqlite3.Connection) -> None:
     conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_draft_preview_attempts_draft "
         "ON draft_preview_attempts(draft_id, started_ts)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_draft_approval_attempts_draft "
+        "ON draft_approval_attempts(draft_id, started_ts)"
     )
     conn.commit()
 
@@ -932,7 +965,8 @@ def _upgrade_durable_store(state_path: Path, manifest: dict) -> bool:
     ``pending_changes.id`` foreign key. Schema 3 changes only the disposable
     projection. Schema 4 adds durable draft tables; schema 5 adds immutable
     emitted ChangeSet artifacts; schema 6 adds immutable preview-attempt
-    evidence. Rebuild the history table only when its foreign key is absent,
+    evidence; schema 7 adds immutable approval-attempt evidence. Rebuild the
+    history table only when its foreign key is absent,
     preserve every row, and create all missing durable objects idempotently.
     Returns True when an upgrade applied.
     """
@@ -955,6 +989,10 @@ def _upgrade_durable_store(state_path: Path, manifest: dict) -> bool:
             conn.execute(
                 "CREATE INDEX IF NOT EXISTS idx_draft_preview_attempts_draft "
                 "ON draft_preview_attempts(draft_id, started_ts)"
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_draft_approval_attempts_draft "
+                "ON draft_approval_attempts(draft_id, started_ts)"
             )
             conn.execute(
                 "UPDATE storage_manifest SET schema_version=?", (SCHEMA_VERSION,)
@@ -1000,6 +1038,10 @@ def _upgrade_durable_store(state_path: Path, manifest: dict) -> bool:
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_draft_preview_attempts_draft "
             "ON draft_preview_attempts(draft_id, started_ts)"
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_draft_approval_attempts_draft "
+            "ON draft_approval_attempts(draft_id, started_ts)"
         )
         conn.execute(
             "UPDATE storage_manifest SET schema_version=?", (SCHEMA_VERSION,)

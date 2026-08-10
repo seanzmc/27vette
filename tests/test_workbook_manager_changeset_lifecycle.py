@@ -537,6 +537,329 @@ class TestDurablePreviewLifecycle(unittest.TestCase):
                         state.close()
 
 
+class TestDurableApprovalLifecycle(unittest.TestCase):
+    def _preview_ready(self, root: Path):
+        helper = TestDurablePreviewLifecycle()
+        projection, state, workbook, changeset = helper._emitted_draft(
+            root, draft_id="draft-approval"
+        )
+        preview = {
+            "ok": True,
+            "schemaVersion": "workbook-change-preview-1",
+            "changeSetId": changeset["changeSetId"],
+            "semanticFingerprint": changeset["semanticFingerprint"],
+            "workbook": changeset["workbook"],
+            "status": "validated",
+            "warningPolicy": {"blockingIds": [], "confirmableIds": ["warn-1"]},
+            "previewFingerprint": "a" * 64,
+        }
+        with patch.object(
+            drafts.workbook_service, "preview_changeset", return_value=preview
+        ):
+            preview_attempt = drafts.preview_draft(
+                state,
+                draft_id="draft-approval",
+                projection_state="current",
+                workbook_path=workbook,
+            )
+        return projection, state, changeset, preview, preview_attempt
+
+    def test_approval_persists_exact_shared_service_artifact_and_lifecycle(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-approval-lifecycle-") as raw:
+            projection, state, changeset, preview, preview_attempt = (
+                self._preview_ready(Path(raw))
+            )
+            approval = {
+                "ok": True,
+                "schemaVersion": "workbook-change-approval-1",
+                "actor": "Sean",
+                "changeSetId": changeset["changeSetId"],
+                "semanticFingerprint": changeset["semanticFingerprint"],
+                "previewFingerprint": preview["previewFingerprint"],
+                "workbook": changeset["workbook"],
+                "acceptedWarningIds": ["warn-1"],
+                "approvalFingerprint": "b" * 64,
+            }
+            try:
+                with patch.object(
+                    drafts.workbook_service,
+                    "approve_changeset",
+                    return_value=approval,
+                ) as approve_changeset:
+                    attempt = drafts.approve_draft(
+                        state,
+                        draft_id="draft-approval",
+                        projection_state="current",
+                        actor="Sean",
+                        warning_ids=["warn-1"],
+                    )
+
+                approve_changeset.assert_called_once_with(
+                    changeset, preview, actor="Sean", warning_ids=["warn-1"]
+                )
+                self.assertEqual(attempt["result"], approval)
+                self.assertEqual(attempt["preview_attempt_id"], preview_attempt["id"])
+                self.assertEqual(attempt["artifact_kind"], "formal_approval")
+                self.assertEqual(attempt["manager_state"], "approved")
+                self.assertEqual(attempt["allowed_verbs"], ["apply", "cancel"])
+                stored = state.execute(
+                    "SELECT * FROM draft_approval_attempts WHERE id=?",
+                    (attempt["id"],),
+                ).fetchone()
+                self.assertEqual(json.loads(stored["result_json"]), approval)
+                self.assertEqual(stored["preview_fingerprint"], "a" * 64)
+                with self.assertRaisesRegex(
+                    sqlite3.IntegrityError, "approval attempt artifacts are immutable"
+                ):
+                    state.execute(
+                        "UPDATE draft_approval_attempts SET result_json='{}' WHERE id=?",
+                        (attempt["id"],),
+                    )
+                state.rollback()
+                with self.assertRaisesRegex(
+                    sqlite3.IntegrityError, "approval attempt artifacts are immutable"
+                ):
+                    state.execute(
+                        "DELETE FROM draft_approval_attempts WHERE id=?", (attempt["id"],)
+                    )
+                state.rollback()
+            finally:
+                projection.close()
+                state.close()
+
+    def test_approval_result_mapping_matches_section_4_1(self):
+        cases = (
+            (
+                {"ok": True, "schemaVersion": "workbook-change-approval-1"},
+                "approved",
+                ["apply", "cancel"],
+            ),
+            (
+                {"ok": False, "status": "warning_confirmation_mismatch"},
+                "approval_confirmation_required",
+                ["approve", "cancel"],
+            ),
+            (
+                {"ok": False, "status": "preview_not_validated"},
+                "approval_repreview_required",
+                ["retry_preview", "cancel"],
+            ),
+            (
+                {"ok": False, "status": "binding_mismatch"},
+                "approval_repreview_required",
+                ["retry_preview", "cancel"],
+            ),
+            (
+                {"ok": False, "status": "warning_blocked"},
+                "approval_repreview_required",
+                ["retry_preview", "cancel"],
+            ),
+        )
+        for result, expected_state, expected_verbs in cases:
+            with self.subTest(result=result):
+                self.assertEqual(
+                    drafts._map_approval_result(result),
+                    (expected_state, expected_verbs),
+                )
+
+    def test_approval_refuses_noncurrent_projection_without_calling_service(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-approval-freshness-") as raw:
+            projection, state, _, _, _ = self._preview_ready(Path(raw))
+            try:
+                with patch.object(
+                    drafts.workbook_service, "approve_changeset"
+                ) as approve_changeset:
+                    with self.assertRaises(drafts.DraftError) as ctx:
+                        drafts.approve_draft(
+                            state,
+                            draft_id="draft-approval",
+                            projection_state="stale",
+                            actor="Sean",
+                            warning_ids=[],
+                        )
+                self.assertEqual(ctx.exception.code, "projection_not_current")
+                approve_changeset.assert_not_called()
+                stored = state.execute(
+                    "SELECT * FROM draft_approval_attempts WHERE draft_id='draft-approval'"
+                ).fetchone()
+                self.assertEqual(stored["artifact_kind"], "manager_refusal")
+                self.assertEqual(stored["manager_state"], "stale")
+                self.assertEqual(json.loads(stored["allowed_verbs_json"]), ["cancel"])
+            finally:
+                projection.close()
+                state.close()
+
+    def test_approval_exception_is_rejected_without_fabricated_artifact(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-approval-exception-") as raw:
+            projection, state, _, _, _ = self._preview_ready(Path(raw))
+            try:
+                with patch.object(
+                    drafts.workbook_service,
+                    "approve_changeset",
+                    side_effect=RuntimeError("approval service failed"),
+                ):
+                    attempt = drafts.approve_draft(
+                        state,
+                        draft_id="draft-approval",
+                        projection_state="current",
+                        actor="Sean",
+                        warning_ids=[],
+                    )
+                self.assertIsNone(attempt["result"])
+                self.assertEqual(attempt["artifact_kind"], "exception")
+                self.assertEqual(attempt["exception_class"], "RuntimeError")
+                self.assertEqual(attempt["exception_message"], "approval service failed")
+                self.assertEqual(attempt["manager_state"], "approval_rejected")
+                self.assertEqual(attempt["allowed_verbs"], ["cancel"])
+            finally:
+                projection.close()
+                state.close()
+
+    def test_confirmation_retry_reuses_exact_changeset_and_preview(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-approval-confirm-") as raw:
+            projection, state, changeset, preview, preview_attempt = (
+                self._preview_ready(Path(raw))
+            )
+            mismatch = {
+                "ok": False,
+                "status": "warning_confirmation_mismatch",
+                "errors": ["confirm warn-1"],
+            }
+            approved = {
+                "ok": True,
+                "schemaVersion": "workbook-change-approval-1",
+                "approvalFingerprint": "c" * 64,
+            }
+            try:
+                with patch.object(
+                    drafts.workbook_service,
+                    "approve_changeset",
+                    side_effect=[mismatch, approved],
+                ) as approve_changeset:
+                    first = drafts.approve_draft(
+                        state,
+                        draft_id="draft-approval",
+                        projection_state="current",
+                        actor="Sean",
+                        warning_ids=[],
+                    )
+                    second = drafts.approve_draft(
+                        state,
+                        draft_id="draft-approval",
+                        projection_state="current",
+                        actor="Sean",
+                        warning_ids=["warn-1"],
+                    )
+                self.assertEqual(first["manager_state"], "approval_confirmation_required")
+                self.assertEqual(second["manager_state"], "approved")
+                self.assertNotEqual(first["id"], second["id"])
+                self.assertEqual(first["preview_attempt_id"], preview_attempt["id"])
+                self.assertEqual(second["preview_attempt_id"], preview_attempt["id"])
+                self.assertEqual(approve_changeset.call_args_list[0].args, (changeset, preview))
+                self.assertEqual(approve_changeset.call_args_list[1].args, (changeset, preview))
+            finally:
+                projection.close()
+                state.close()
+
+    def test_repreview_required_binds_later_approval_to_new_preview(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-approval-repreview-") as raw:
+            projection, state, changeset, _, first_preview_attempt = (
+                self._preview_ready(Path(raw))
+            )
+            refusal = {"ok": False, "status": "binding_mismatch", "errors": ["stale"]}
+            new_preview = {
+                "ok": True,
+                "schemaVersion": "workbook-change-preview-1",
+                "changeSetId": changeset["changeSetId"],
+                "semanticFingerprint": changeset["semanticFingerprint"],
+                "workbook": changeset["workbook"],
+                "status": "validated",
+                "previewFingerprint": "d" * 64,
+            }
+            approval = {
+                "ok": True,
+                "schemaVersion": "workbook-change-approval-1",
+                "approvalFingerprint": "e" * 64,
+            }
+            try:
+                with patch.object(
+                    drafts.workbook_service, "approve_changeset", return_value=refusal
+                ):
+                    rejected = drafts.approve_draft(
+                        state,
+                        draft_id="draft-approval",
+                        projection_state="current",
+                        actor="Sean",
+                        warning_ids=[],
+                    )
+                self.assertEqual(rejected["manager_state"], "approval_repreview_required")
+                with patch.object(
+                    drafts.workbook_service, "preview_changeset", return_value=new_preview
+                ):
+                    second_preview_attempt = drafts.preview_draft(
+                        state,
+                        draft_id="draft-approval",
+                        projection_state="current",
+                        workbook_path=Path(raw) / "fixture.xlsx",
+                    )
+                self.assertNotEqual(second_preview_attempt["id"], first_preview_attempt["id"])
+                with patch.object(
+                    drafts.workbook_service, "approve_changeset", return_value=approval
+                ) as approve_changeset:
+                    approved_attempt = drafts.approve_draft(
+                        state,
+                        draft_id="draft-approval",
+                        projection_state="current",
+                        actor="Sean",
+                        warning_ids=[],
+                    )
+                approve_changeset.assert_called_once_with(
+                    changeset, new_preview, actor="Sean", warning_ids=[]
+                )
+                self.assertEqual(
+                    approved_attempt["preview_attempt_id"], second_preview_attempt["id"]
+                )
+            finally:
+                projection.close()
+                state.close()
+
+    def test_approval_endpoint_returns_attempt_without_apply_or_write(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-approval-endpoint-") as raw:
+            projection, state, _, _, _ = self._preview_ready(Path(raw))
+            approval = {
+                "ok": True,
+                "schemaVersion": "workbook-change-approval-1",
+                "approvalFingerprint": "f" * 64,
+            }
+            try:
+                with (
+                    patch.object(main, "_workbook_state", return_value={"state": "current"}),
+                    patch.object(main, "_projection_state", return_value={"state": "current"}),
+                    patch.object(
+                        drafts.workbook_service,
+                        "approve_changeset",
+                        return_value=approval,
+                    ),
+                ):
+                    attempt = main.approve_draft_changeset(
+                        "draft-approval",
+                        main.ApprovalRequest(actor="Sean", warning_ids=["warn-1"]),
+                        _lock=None,
+                        conn=projection,
+                        state_conn=state,
+                    )
+                self.assertEqual(attempt["manager_state"], "approved")
+                self.assertEqual(
+                    projection.execute(
+                        "SELECT price FROM options WHERE option_id='opt_test'"
+                    ).fetchone()["price"],
+                    "100",
+                )
+            finally:
+                projection.close()
+                state.close()
+
+
 class TestDurableSchemaMigrations(unittest.TestCase):
     def test_v4_durable_upgrade_preserves_draft_and_verified_projection(self):
         with tempfile.TemporaryDirectory(prefix="wbm-schema5-upgrade-") as raw:
@@ -612,6 +935,12 @@ class TestDurableSchemaMigrations(unittest.TestCase):
                         "AND name='draft_preview_attempts'"
                     ).fetchone()
                 )
+                self.assertIsNotNone(
+                    state.execute(
+                        "SELECT name FROM sqlite_master WHERE type='table' "
+                        "AND name='draft_approval_attempts'"
+                    ).fetchone()
+                )
                 self.assertEqual(
                     state.execute(
                         "SELECT COUNT(*) c FROM draft_operations "
@@ -684,7 +1013,76 @@ class TestDurableSchemaMigrations(unittest.TestCase):
                         "AND name='draft_preview_attempts'"
                     ).fetchone()
                 )
-                self.assertEqual(dbmod.storage_manifest(state)["schema_version"], 6)
+                self.assertIsNotNone(
+                    state.execute(
+                        "SELECT name FROM sqlite_master WHERE type='table' "
+                        "AND name='draft_approval_attempts'"
+                    ).fetchone()
+                )
+                self.assertEqual(dbmod.storage_manifest(state)["schema_version"], 7)
+            finally:
+                state.close()
+
+    def test_v6_upgrade_preserves_preview_attempt(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-schema7-upgrade-") as raw:
+            state_path = Path(raw) / "state.sqlite3"
+            state = dbmod.connect(state_path)
+            try:
+                dbmod.init_durable_schema(state)
+                state.execute("DROP TABLE draft_approval_attempts")
+                state.execute(
+                    "INSERT INTO workflow_drafts(id, created_ts, updated_ts, status, "
+                    "base_workbook_sha256, base_workbook_mtime_ns) "
+                    "VALUES('previewed', 't', 't', 'preview_ready', ?, '123')",
+                    ("f" * 64,),
+                )
+                state.execute(
+                    "INSERT INTO draft_changesets(draft_id, created_ts, change_set_id, "
+                    "semantic_fingerprint, payload_json) VALUES('previewed', 't', "
+                    "'change-set-preview', 'semantic-preview', '{\"sentinel\":true}')"
+                )
+                state.execute(
+                    "INSERT INTO draft_preview_attempts(id, draft_id, change_set_id, "
+                    "semantic_fingerprint, started_ts, completed_ts, artifact_kind, "
+                    "result_json, workbook_identity_state, manager_state, "
+                    "allowed_verbs_json) VALUES('preview-attempt', 'previewed', "
+                    "'change-set-preview', 'semantic-preview', 't', 't', "
+                    "'formal_preview', '{\"previewFingerprint\":\"sentinel\"}', "
+                    "'unchanged', 'preview_ready', '[\"approve\",\"cancel\"]')"
+                )
+                dbmod._write_manifest(
+                    state,
+                    store_kind="durable",
+                    migration_id="durable-v6",
+                    source_sha256="source-sha",
+                    source_path=state_path,
+                    archive_path=None,
+                    table_counts={},
+                )
+                state.execute("UPDATE storage_manifest SET schema_version=6")
+                state.commit()
+            finally:
+                state.close()
+
+            manifest = dbmod._read_manifest_path(state_path)
+            self.assertTrue(dbmod._upgrade_durable_store(state_path, manifest))
+            state = dbmod.connect(state_path)
+            try:
+                stored = state.execute(
+                    "SELECT * FROM draft_preview_attempts WHERE id='preview-attempt'"
+                ).fetchone()
+                self.assertEqual(stored["manager_state"], "preview_ready")
+                self.assertEqual(
+                    json.loads(stored["result_json"]),
+                    {"previewFingerprint": "sentinel"},
+                )
+                self.assertIsNotNone(
+                    state.execute(
+                        "SELECT name FROM sqlite_master WHERE type='table' "
+                        "AND name='draft_approval_attempts'"
+                    ).fetchone()
+                )
+                self.assertEqual(dbmod.storage_manifest(state)["schema_version"], 7)
             finally:
                 state.close()
 
