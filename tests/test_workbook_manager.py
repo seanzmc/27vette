@@ -15,6 +15,7 @@ import sqlite3
 import sys
 import tempfile
 import unittest
+from copy import deepcopy
 from pathlib import Path
 from unittest import mock
 
@@ -36,6 +37,12 @@ from app.validation import find_dependents      # noqa: E402
 
 WORKBOOK = REPO_ROOT / "stingray_master.xlsx"
 
+_IMMUTABLE_FIXTURE_ROOT: Path | None = None
+_IMMUTABLE_PROJECTION: Path | None = None
+_IMMUTABLE_PROJECTION_SHA256 = ""
+_IMMUTABLE_WORKBOOK_SHA256 = ""
+_IMMUTABLE_IMPORT_REPORT: dict | None = None
+
 try:
     import fastapi  # noqa: F401
     HAVE_FASTAPI = True
@@ -49,8 +56,51 @@ def fresh_db(tmpdir: Path) -> sqlite3.Connection:
     return conn
 
 
+def _sha256(path: Path) -> str:
+    import hashlib
+
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def setUpModule() -> None:
+    """Build the real-workbook imported projection once; tests clone it only."""
+    global _IMMUTABLE_FIXTURE_ROOT
+    global _IMMUTABLE_PROJECTION
+    global _IMMUTABLE_PROJECTION_SHA256
+    global _IMMUTABLE_WORKBOOK_SHA256
+    global _IMMUTABLE_IMPORT_REPORT
+
+    _IMMUTABLE_FIXTURE_ROOT = Path(tempfile.mkdtemp(prefix="wbm-import-base-"))
+    connection = fresh_db(_IMMUTABLE_FIXTURE_ROOT)
+    try:
+        import_report = importer.import_workbook(connection, WORKBOOK)
+        _IMMUTABLE_IMPORT_REPORT = import_report
+        errors = [
+            issue
+            for issue in import_report["issues"]
+            if issue["severity"] == "error"
+        ]
+        if errors:
+            raise AssertionError(f"immutable imported fixture has errors: {errors}")
+        connection.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    finally:
+        connection.close()
+    _IMMUTABLE_PROJECTION = _IMMUTABLE_FIXTURE_ROOT / "test.sqlite3"
+    _IMMUTABLE_PROJECTION_SHA256 = _sha256(_IMMUTABLE_PROJECTION)
+    _IMMUTABLE_WORKBOOK_SHA256 = _sha256(WORKBOOK)
+
+
+def tearDownModule() -> None:
+    """Prove sharing did not mutate either reusable source."""
+    assert _IMMUTABLE_PROJECTION is not None
+    assert _IMMUTABLE_FIXTURE_ROOT is not None
+    assert _sha256(_IMMUTABLE_PROJECTION) == _IMMUTABLE_PROJECTION_SHA256
+    assert _sha256(WORKBOOK) == _IMMUTABLE_WORKBOOK_SHA256
+    shutil.rmtree(_IMMUTABLE_FIXTURE_ROOT, ignore_errors=True)
+
+
 class ImportedWorkbookCase(unittest.TestCase):
-    """Shared imported-database fixture (imported once per class)."""
+    """Focused behavior fixture cloned from one immutable real import."""
 
     tmpdir: Path
     conn: sqlite3.Connection
@@ -58,14 +108,21 @@ class ImportedWorkbookCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        assert _IMMUTABLE_PROJECTION is not None
+        assert _IMMUTABLE_IMPORT_REPORT is not None
         cls.tmpdir = Path(tempfile.mkdtemp(prefix="wbm-test-"))
-        cls.conn = fresh_db(cls.tmpdir)
-        cls.report = importer.import_workbook(cls.conn, WORKBOOK)
+        projection = cls.tmpdir / "test.sqlite3"
+        shutil.copy2(_IMMUTABLE_PROJECTION, projection)
+        cls.conn = dbmod.connect(projection)
+        cls.report = deepcopy(_IMMUTABLE_IMPORT_REPORT)
 
     @classmethod
     def tearDownClass(cls):
+        assert _IMMUTABLE_PROJECTION is not None
         cls.conn.close()
         shutil.rmtree(cls.tmpdir, ignore_errors=True)
+        assert _sha256(_IMMUTABLE_PROJECTION) == _IMMUTABLE_PROJECTION_SHA256
+        assert _sha256(WORKBOOK) == _IMMUTABLE_WORKBOOK_SHA256
 
 
 class TestImportFidelity(ImportedWorkbookCase):
@@ -639,59 +696,73 @@ class TestSyncBatch(ImportedWorkbookCase):
 
 
 class TestComparisonExport(ImportedWorkbookCase):
-    def setUp(self):
-        super().setUp()
-        self.workbook = self.tmpdir / "valid-source.xlsx"
-        shutil.copy2(WORKBOOK, self.workbook)
-        report = importer.import_workbook(self.conn, self.workbook)
-        self.assertFalse(
-            [issue for issue in report["issues"] if issue["severity"] == "error"]
-        )
+    """Real acceptance exports; the unchanged success is executed exactly once."""
 
-    def test_export_is_explicitly_disposable(self):
-        from app import config
-        config.VAR_DIR = self.tmpdir / "var"
-        config.EXPORT_DIR = config.VAR_DIR / "exports"
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        from app import config  # type: ignore[import-not-found]
+
+        cls.workbook = cls.tmpdir / "valid-source.xlsx"
+        shutil.copy2(WORKBOOK, cls.workbook)
+        cls._previous_config = (
+            config.VAR_DIR,
+            config.EXPORT_DIR,
+            config.DB_BACKUP_DIR,
+        )
+        config.VAR_DIR = cls.tmpdir / "var"
+        cls.unchanged_export_dir = config.VAR_DIR / "unchanged-export"
+        config.EXPORT_DIR = cls.unchanged_export_dir
         config.DB_BACKUP_DIR = config.VAR_DIR / "db-backups"
-        result = syncmod.export_comparison_workbook(self.conn, self.workbook)
+        cls.unchanged_export = syncmod.export_comparison_workbook(
+            cls.conn, cls.workbook
+        )
+        config.EXPORT_DIR = config.VAR_DIR / "per-test-exports"
+
+    @classmethod
+    def tearDownClass(cls):
+        from app import config  # type: ignore[import-not-found]
+
+        config.VAR_DIR, config.EXPORT_DIR, config.DB_BACKUP_DIR = cls._previous_config
+        super().tearDownClass()
+
+    def test_acceptance_export_is_disposable_and_preserves_unchanged_workbook(self):
+        """Own the complete real-workbook unchanged comparison-export proof."""
+        result = self.unchanged_export
+        self.assertTrue(result["ok"], result)
         self.assertTrue(result["disposable"])
         self.assertIn("DISPOSABLE-comparison-", Path(result["path"]).name)
-        self.assertTrue(Path(result["path"]).is_relative_to(config.EXPORT_DIR))
+        self.assertTrue(
+            Path(result["path"]).is_relative_to(self.unchanged_export_dir)
+        )
         self.assertFalse(result["generated_contract_parity_verified"])
-
-    def test_export_preserves_unmanaged_and_row_counts(self):
-        import os
-        os.environ.setdefault("WBM_VAR_DIR", str(self.tmpdir / "var"))
-        from app import config
-        config.VAR_DIR = self.tmpdir / "var"
-        config.EXPORT_DIR = config.VAR_DIR / "exports"
-        config.DB_BACKUP_DIR = config.VAR_DIR / "db-backups"
-        result = syncmod.export_comparison_workbook(self.conn, self.workbook)
-        self.assertTrue(result["ok"])
         self.assertTrue(result["byte_identical"])
         self.assertEqual(Path(result["path"]).read_bytes(), self.workbook.read_bytes())
         from openpyxl import load_workbook
         orig = load_workbook(self.workbook, read_only=True)
         regen = load_workbook(result["path"], read_only=True)
-        self.assertEqual(set(orig.sheetnames), set(regen.sheetnames),
-                         "regenerated workbook must keep every sheet")
-        # unmanaged sheet content preserved verbatim (PriceRef)
-        def rows(wb, sheet):
-            return [tuple(str(c) if c is not None else "" for c in r)
-                    for r in wb[sheet].iter_rows(values_only=True)]
-        self.assertEqual(rows(orig, "PriceRef"), rows(regen, "PriceRef"))
-        # managed sheet keeps its row count
-        self.assertEqual(len(rows(orig, "stingray_options")),
-                         len(rows(regen, "stingray_options")))
-        self.assertEqual(
-            rows(orig, "model_master"),
-            rows(regen, "model_master"),
-            "managed model_master setup copy must round-trip without drift",
-        )
-        orig.close()
-        regen.close()
+        try:
+            self.assertEqual(set(orig.sheetnames), set(regen.sheetnames),
+                             "regenerated workbook must keep every sheet")
+            # unmanaged sheet content preserved verbatim (PriceRef)
+            def rows(wb, sheet):
+                return [tuple(str(c) if c is not None else "" for c in r)
+                        for r in wb[sheet].iter_rows(values_only=True)]
+            self.assertEqual(rows(orig, "PriceRef"), rows(regen, "PriceRef"))
+            # managed sheet keeps its row count
+            self.assertEqual(len(rows(orig, "stingray_options")),
+                             len(rows(regen, "stingray_options")))
+            self.assertEqual(
+                rows(orig, "model_master"),
+                rows(regen, "model_master"),
+                "managed model_master setup copy must round-trip without drift",
+            )
+        finally:
+            orig.close()
+            regen.close()
 
     def test_export_overlays_registry_owned_projection_fields(self):
+        """Own the complete real-workbook changed-overlay acceptance proof."""
         from app import config
         from openpyxl import load_workbook
 
@@ -725,6 +796,7 @@ class TestComparisonExport(ImportedWorkbookCase):
             exported.close()
 
     def test_export_refuses_source_drift_during_copy(self):
+        """Own the real-workbook comparison-export source-drift refusal."""
         import os
         from unittest import mock
         from app import config

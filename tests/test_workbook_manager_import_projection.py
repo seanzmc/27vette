@@ -314,6 +314,43 @@ class TestAtomicProjectionPromotion(unittest.TestCase):
     def _projection_hash(self) -> str:
         return hashlib.sha256(self.projection.read_bytes()).hexdigest()
 
+    def _assert_complete_managed_row_dispositions(self) -> None:
+        """Focused assertions over the already-promoted acceptance projection."""
+        from openpyxl import load_workbook
+
+        workbook = load_workbook(self.workbook, read_only=True, data_only=False)
+        try:
+            classifications = catalog.classify_workbook_sheets(workbook)
+            expected_sheets = len(workbook.sheetnames)
+            expected = 0
+            for sheet_name, classification in classifications.items():
+                if classification.spec is None:
+                    continue
+                for values in workbook[sheet_name].iter_rows(min_row=2, values_only=True):
+                    if any(value is not None and value != "" for value in values):
+                        expected += 1
+        finally:
+            workbook.close()
+        conn = dbmod.connect(self.projection)
+        try:
+            actual = conn.execute(
+                "SELECT COUNT(*) c FROM managed_row_dispositions"
+            ).fetchone()["c"]
+            sheet_dispositions = conn.execute(
+                "SELECT COUNT(*) c FROM sheet_dispositions"
+            ).fetchone()["c"]
+            duplicates = conn.execute(
+                "SELECT COUNT(*) c FROM ("
+                "SELECT sheet, src_row, family, COUNT(*) n "
+                "FROM managed_row_dispositions GROUP BY sheet, src_row, family "
+                "HAVING n <> 1)"
+            ).fetchone()["c"]
+            self.assertEqual(actual, expected)
+            self.assertEqual(sheet_dispositions, expected_sheets)
+            self.assertEqual(duplicates, 0)
+        finally:
+            conn.close()
+
     def test_incomplete_asset_rows_block_promotion(self):
         from openpyxl import load_workbook
 
@@ -482,9 +519,21 @@ class TestAtomicProjectionPromotion(unittest.TestCase):
         self.assertEqual(self._projection_hash(), before)
         self.assertFalse(list(self.root.glob(".wbm-import-candidate-*")))
 
-    def test_verified_candidate_replaces_projection_and_reopens_its_manifest(self):
+    def test_real_workbook_acceptance_promotes_verified_projection_once(self):
+        """Own success, manifest, row reconciliation, and state-store isolation."""
         state = self.root / "workbook_manager.sqlite3"
         dbmod.bootstrap_storage(state, self.projection)
+        conn = dbmod.connect(state, foreign_keys=True)
+        try:
+            conn.execute(
+                "INSERT INTO pending_changes(ts, table_name, entity_key_json, op) "
+                "VALUES('test', 'options', '{}', 'update')"
+            )
+            conn.commit()
+            conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        finally:
+            conn.close()
+        state_before = state.read_bytes()
         result = importer.promote_verified_projection(self.workbook, self.projection)
 
         self.assertTrue(result["promoted"], result)
@@ -512,44 +561,8 @@ class TestAtomicProjectionPromotion(unittest.TestCase):
         restart = dbmod.bootstrap_storage(state, self.projection)
         self.assertEqual(restart["status"], "ready")
         self.assertEqual(self._projection_hash(), promoted_hash)
-
-    def test_every_managed_physical_row_has_exactly_one_disposition(self):
-        from openpyxl import load_workbook
-
-        result = importer.promote_verified_projection(self.workbook, self.projection)
-        self.assertTrue(result["promoted"], result)
-        workbook = load_workbook(self.workbook, read_only=True, data_only=False)
-        try:
-            classifications = catalog.classify_workbook_sheets(workbook)
-            expected_sheets = len(workbook.sheetnames)
-            expected = 0
-            for sheet_name, classification in classifications.items():
-                if classification.spec is None:
-                    continue
-                for values in workbook[sheet_name].iter_rows(min_row=2, values_only=True):
-                    if any(value is not None and value != "" for value in values):
-                        expected += 1
-        finally:
-            workbook.close()
-        conn = dbmod.connect(self.projection)
-        try:
-            actual = conn.execute(
-                "SELECT COUNT(*) c FROM managed_row_dispositions"
-            ).fetchone()["c"]
-            sheet_dispositions = conn.execute(
-                "SELECT COUNT(*) c FROM sheet_dispositions"
-            ).fetchone()["c"]
-            duplicates = conn.execute(
-                "SELECT COUNT(*) c FROM ("
-                "SELECT sheet, src_row, family, COUNT(*) n "
-                "FROM managed_row_dispositions GROUP BY sheet, src_row, family "
-                "HAVING n <> 1)"
-            ).fetchone()["c"]
-            self.assertEqual(actual, expected)
-            self.assertEqual(sheet_dispositions, expected_sheets)
-            self.assertEqual(duplicates, 0)
-        finally:
-            conn.close()
+        self.assertEqual(state.read_bytes(), state_before)
+        self._assert_complete_managed_row_dispositions()
 
     def test_blocking_import_findings_never_call_atomic_replace(self):
         from openpyxl import load_workbook
@@ -568,6 +581,7 @@ class TestAtomicProjectionPromotion(unittest.TestCase):
         self.assertEqual(self._projection_hash(), before)
 
     def test_atomic_replace_failure_leaves_prior_projection_byte_identical(self):
+        """Own the complete real-workbook atomic-replace fail-closed proof."""
         before = self._projection_hash()
 
         with mock.patch.object(
@@ -581,27 +595,8 @@ class TestAtomicProjectionPromotion(unittest.TestCase):
         self.assertEqual(self._projection_hash(), before)
         self.assertFalse(list(self.root.glob(".wbm-import-candidate-*")))
 
-    def test_projection_swap_does_not_touch_durable_state_store(self):
-        state = self.root / "workbook_manager.sqlite3"
-        conn = dbmod.connect(state, foreign_keys=True)
-        try:
-            dbmod.init_durable_schema(conn)
-            conn.execute(
-                "INSERT INTO pending_changes(ts, table_name, entity_key_json, op) "
-                "VALUES('test', 'options', '{}', 'update')"
-            )
-            conn.commit()
-            conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
-        finally:
-            conn.close()
-        before = state.read_bytes()
-
-        result = importer.promote_verified_projection(self.workbook, self.projection)
-
-        self.assertTrue(result["promoted"], result)
-        self.assertEqual(state.read_bytes(), before)
-
     def test_source_identity_drift_blocks_before_replacement(self):
+        """Own the complete real-workbook source-drift fail-closed proof."""
         before = self._projection_hash()
         real_identity = importer.workbook_identity
         calls = 0

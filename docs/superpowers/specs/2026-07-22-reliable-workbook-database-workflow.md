@@ -1289,6 +1289,51 @@ No manager apply state, API/UI route, public ChangeSet artifact, canonical
 workbook, generated/publication surface, customer runtime, dealer, dependency,
 deployment, commit, or push change was made. Pass 6B is the exact next action.
 
+#### Validation-efficiency checkpoint between Pass 6A and Pass 6B (2026-08-10)
+
+This bounded test-only checkpoint is complete; Pass 6B remains unstarted. The
+historical pre-Pass-6A timing audit was 932.51 seconds at `138 passed, 2 skipped,
+17 subtests passed`; it is context only, not the optimization baseline. The
+same-version Pass 6A receipt records the actual pre-optimization inventory as
+`142 passed, 2 skipped, 17 subtests passed` in 966.50 seconds.
+
+The manager behavior tests now import the canonical workbook once into an
+immutable SQLite base, clone that base per behavior class, and assert both the
+base projection and canonical workbook SHA-256 remain unchanged. One complete
+unchanged comparison export owns disposable labeling, byte identity, unmanaged
+sheet preservation, managed row counts, Vehicle Setup copy round-trip, and the
+explicit absence of generated-parity authority. One complete successful
+projection promotion owns package/schema validation, semantic readback,
+manifest reopening, row-disposition reconciliation, and durable-state-store
+isolation. No unique assertion was removed.
+
+Distinct complete acceptance owners remain for changed-overlay reconstruction,
+comparison source drift, projection atomic-replace failure, projection source
+drift, API lifespan import/re-import/export, and generated-contract parity. The
+generated-parity gate still reconstructs from a real imported projection and
+compares source/reconstruction contracts for all three promoted models. Focused
+blocking-import and low-level atomic replacement cases remain separate; no
+production validator or claimed behavior is mocked or bypassed.
+
+The documented seven-module inventory ran exactly once after the slice with
+`--durations=30`: `139 passed, 2 skipped, 17 subtests passed` in 791.25 seconds.
+That is 175.25 seconds and 18.13% below the same-version 966.50-second Pass 6A
+baseline. The 25% target time is 724.88 seconds; this result remains 66.37 seconds
+above it. The checkpoint stops here rather than broadening scope or weakening a
+distinct proof. The slowest retained owners were changed-overlay export 213.42
+seconds, generated parity 74.87 seconds, API setup/import 71.45 seconds, API
+re-import 69.69 seconds, unchanged export 69.47 seconds, API export 68.78
+seconds, promotion success 68.44 seconds, promotion source drift 67.92 seconds,
+and atomic-replace failure 67.86 seconds.
+
+Focused editing evidence passed (`6 passed` in 348.78 seconds), and the isolated
+post-review unchanged-export owner passed in 70.74 seconds. Protected-surface
+and final diff evidence is retained in
+`fable5loop/runs/2026-08-10-workbook-manager-validation-efficiency/`. Remaining
+risk is runtime only: the complete checkpoint still takes about 13 minutes, but
+further reduction requires a separately bounded design over retained acceptance
+owners. Pass 6B is still the exact next implementation action.
+
 ### Pass 6B — Add durable manager apply, idempotency, and recovery
 
 Build on the proven Pass 6A writer and the immutable preview/approval attempt

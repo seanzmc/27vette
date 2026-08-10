@@ -210,9 +210,12 @@ Environment overrides: `WBM_WORKBOOK`, `WBM_DB` (durable state),
 ## Tests
 
 Use the exact affected test or class while editing. The command below is the
-Pass/checkpoint acceptance inventory, not the inner edit loop: several Pass 4
-cases intentionally run a complete real-workbook promotion, comparison export,
-or scratch-copy write and currently take about 70–78 seconds each.
+Pass/checkpoint acceptance inventory, not the inner edit loop. At the 2026-08-10
+validation-efficiency checkpoint it completed in 791.25 seconds. Complete
+real-workbook promotion, unchanged comparison export, API import/export, and
+generated-parity owners take about 68–75 seconds each; the changed-overlay
+comparison-export owner takes about 213 seconds because it exercises the full
+overlay write and reconstruction-validation path.
 
 ```sh
 .venv/bin/python -m pytest \
@@ -233,7 +236,11 @@ The normal suite skips two explicit scratch-copy shared-writer tests unless
 copy while no draft overlay exists; package/schema validation and independent
 semantic readback must pass before the disposable file is returned.
 
-Future test-speed work may share a verified imported-projection fixture and use
-compact workbooks for isolated negative cases. Keep the real-workbook promotion,
-fail-closed preservation, comparison-export, scratch-write, and generated-parity
-acceptance cases intact and run them once at each pass checkpoint.
+Focused manager behavior classes clone one immutable real-workbook import and
+assert that the base projection and canonical workbook hashes remain unchanged.
+The unchanged comparison-export assertions and successful projection-promotion
+assertions each consume one complete successful result. Keep the distinct real-
+workbook promotion success, atomic-replace and source-drift failures, unchanged
+and changed-overlay comparison exports, API import/export, scratch-write, and
+generated-parity acceptance owners intact and run them once at each pass
+checkpoint.
