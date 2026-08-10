@@ -1275,7 +1275,7 @@ def _post_save_failure_result(
 ) -> dict:
     """Restore and hash-verify a backup while retaining original failure evidence."""
     restoration = {
-        "attempted": True,
+        "attempted": False,
         "verified": False,
         "backupSha256": None,
         "workbookSha256": None,
@@ -1284,6 +1284,7 @@ def _post_save_failure_result(
     restore_error = None
     try:
         restoration["backupSha256"] = hashlib.sha256(backup_path.read_bytes()).hexdigest()
+        restoration["attempted"] = True
         restore_workbook_backup(path, backup_path)
         restoration["workbookSha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
         restoration["verified"] = (
@@ -1546,7 +1547,7 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
                     backup_path,
                     failure=failure,
                     errors=[failure["detail"]],
-                    restored_status="post_save_failed_rolled_back",
+                    restored_status="apply_verification_failed_rolled_back",
                     base=base,
                     extra={
                         "verification": live_verification,
@@ -1585,7 +1586,7 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
             backup_path,
             failure=failure,
             errors=[detail],
-            restored_status="post_save_failed_rolled_back",
+            restored_status="apply_verification_failed_rolled_back",
             base=base,
             extra={
                 "verification": locals().get("live_verification"),

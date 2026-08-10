@@ -1259,6 +1259,16 @@ and restoration error evidence; only a proved hash match reports
 `workbookState="unknown"` and `workbook_restore_failed` without losing the
 original cause.
 
+The first independent verification cycle found two contract defects in that
+implementation: backup-hash failure could claim restoration was attempted before
+the restore helper ran, and some verified rollbacks introduced an unrecognized
+public receipt status. The final implementation leaves `attempted=false` until
+backup hashing succeeds and restoration is about to run, and every verified
+post-save rollback reuses the existing
+`apply_verification_failed_rolled_back` status from Section 4.1. Both repairs
+were observed RED before implementation and the independent re-verifier passed
+criteria 1–8 and 10 with no new blocker.
+
 These detailed `failure` and `restoration` fields remain internal shared-writer
 result evidence. Pass 6A does not extend the public
 `workbook-change-receipt-1` schema: the service receipt retains the existing
@@ -1266,12 +1276,17 @@ status, `workbookState`, errors, backup path, and verification fields, while
 Pass 6B separately owns durable attempt evidence and independently observed
 workbook identity as specified below.
 
-The focused regressions were first observed red because a thrown live readback
-escaped and live package/schema/log checks did not run after save. Final gate
-counts and independent verification are retained in
-`fable5loop/runs/2026-08-10-dbpass6a-shared-writer-restoration/`. No manager
-apply state, API/UI route, public ChangeSet artifact, canonical workbook,
-generated/publication surface, customer runtime, dealer, dependency,
+The detached-parent regressions produced seven intended failures before the
+implementation. The verifier-repair regressions then produced six intended
+failures before their narrow repair. Final evidence: complete named manager
+inventory `142 passed, 2 skipped, 17 subtests passed`; explicit slow copied-
+workbook inventory `49 passed`; shared writer/service inventory `80 passed, 13
+subtests passed`; frontend build passed; workbook package and schema checks both
+returned valid with zero issues; protected-surface status and `git diff --check`
+were clean; and the independent re-verifier returned PASS. Detailed output is
+retained in `fable5loop/runs/2026-08-10-dbpass6a-shared-writer-restoration/`.
+No manager apply state, API/UI route, public ChangeSet artifact, canonical
+workbook, generated/publication surface, customer runtime, dealer, dependency,
 deployment, commit, or push change was made. Pass 6B is the exact next action.
 
 ### Pass 6B — Add durable manager apply, idempotency, and recovery

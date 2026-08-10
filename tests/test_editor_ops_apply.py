@@ -1051,7 +1051,7 @@ class ApplyBatchTest(unittest.TestCase):
                 )
 
             self.assertFalse(result["ok"], result)
-            self.assertEqual(result["status"], "post_save_failed_rolled_back")
+            self.assertEqual(result["status"], "apply_verification_failed_rolled_back")
             self.assertEqual(result["workbookState"], "restored")
             self.assertEqual(result["failure"]["phase"], phase)
             self.assertEqual(result["failure"]["kind"], "exception")
@@ -1095,7 +1095,7 @@ class ApplyBatchTest(unittest.TestCase):
             )
 
         self.assertFalse(result["ok"], result)
-        self.assertEqual(result["status"], "post_save_failed_rolled_back")
+        self.assertEqual(result["status"], "apply_verification_failed_rolled_back")
         self.assertEqual(result["workbookState"], "restored")
         self.assertEqual(result["failure"]["phase"], "live_schema")
         self.assertEqual(result["failure"]["kind"], "returned_failure")
@@ -1168,6 +1168,53 @@ class ApplyBatchTest(unittest.TestCase):
                     self.assertIn("forced restoration", result["restoration"]["error"])
 
                 self.path.write_bytes(before)
+
+    def test_backup_hash_failure_does_not_claim_restore_was_attempted(self):
+        item = op(
+            "update",
+            "stingray_options",
+            {"option_id": "opt_thr_001"},
+            {"price": 777},
+        )
+        original_verify = editor_ops.verify_prepared_workbook
+        original_read_bytes = Path.read_bytes
+        verify_calls = {"count": 0}
+
+        def fail_returned_live_readback(path, prepared):
+            verify_calls["count"] += 1
+            if verify_calls["count"] == 2:
+                return {
+                    "ok": False,
+                    "preparedChecked": 0,
+                    "preparedCount": 1,
+                    "errors": ["forced original readback failure"],
+                }
+            return original_verify(path, prepared)
+
+        def fail_backup_read(path):
+            if path.parent.name == "backups":
+                raise OSError("forced backup read failure")
+            return original_read_bytes(path)
+
+        with (
+            patch.object(
+                editor_ops,
+                "verify_prepared_workbook",
+                side_effect=fail_returned_live_readback,
+            ),
+            patch.object(Path, "read_bytes", autospec=True, side_effect=fail_backup_read),
+            patch.object(editor_ops, "restore_workbook_backup") as restore,
+        ):
+            result = self.run_batch(item, write=True)
+
+        self.assertFalse(result["ok"], result)
+        self.assertEqual(result["status"], "workbook_restore_failed")
+        self.assertEqual(result["workbookState"], "unknown")
+        self.assertFalse(result["restoration"]["attempted"])
+        self.assertFalse(result["restoration"]["verified"])
+        self.assertIsNone(result["restoration"]["backupSha256"])
+        self.assertIn("forced backup read failure", result["restoration"]["error"])
+        restore.assert_not_called()
 
     def test_warning_requires_confirmation(self):
         item = op("update", "zr1_options", {"option_id": "opt_zzz_001"}, {"price": 1})

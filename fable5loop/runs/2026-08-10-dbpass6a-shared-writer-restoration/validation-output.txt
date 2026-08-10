@@ -1,0 +1,95 @@
+Pass 6A validation evidence
+Completed: 2026-08-10T01:08:33-04:00
+Base commit: 7f74b79
+
+1. Initial focused current-tree inventory
+Command:
+  .venv/bin/python -m pytest tests/test_editor_ops_apply.py tests/test_workbook_changeset_service.py -q
+Result:
+  79 passed, 13 subtests passed in 142.26s
+
+2. Detached-parent RED proof
+Tested commit: c8061bc
+Interpreter: /Users/seandm/Projects/27vette/.venv/bin/python
+Command:
+  pytest tests/test_editor_ops_apply.py::ApplyBatchTest::test_thrown_post_save_failures_restore_and_preserve_phase_detail tests/test_editor_ops_apply.py::ApplyBatchTest::test_returned_live_schema_failure_restores_and_preserves_schema_result tests/test_editor_ops_apply.py::ApplyBatchTest::test_unproved_post_save_restoration_preserves_both_failure_records -q
+Result:
+  7 failed, 2 passed in 1.81s
+Expected failures reached the old unsafe behavior: thrown live readback escaped, live package/schema/log faults did not fail safely, returned live schema failure reported success, and restoration evidence was absent.
+The detached worktree was removed and the main worktree remained on db-workflow.
+
+3. Independent verifier cycle 1
+Result: FAIL with two implementation blockers.
+- restoration.attempted could be true before restoration was invoked.
+- verified schema/log/thrown rollbacks introduced post_save_failed_rolled_back, which is outside the owning specification's public receipt outcome mapping.
+Nonblocking observation: partial/flush/close write-log failure after bytes are appended is not separately characterized by the current fault seam.
+
+4. Verifier-repair RED
+Command:
+  .venv/bin/python -m pytest tests/test_editor_ops_apply.py::ApplyBatchTest::test_thrown_post_save_failures_restore_and_preserve_phase_detail tests/test_editor_ops_apply.py::ApplyBatchTest::test_returned_live_schema_failure_restores_and_preserves_schema_result tests/test_editor_ops_apply.py::ApplyBatchTest::test_backup_hash_failure_does_not_claim_restore_was_attempted -q
+Result:
+  6 failed, 1 passed in 1.63s
+Expected failures were the unrecognized restored status and the premature attempted=true evidence.
+
+5. Verifier-repair GREEN
+Same command as step 4.
+Result:
+  3 passed, 4 subtests passed in 1.49s
+
+6. Independent verifier cycle 2
+Result: PASS.
+The verifier confirmed both blockers resolved, criteria 1-8 and 10 retained, and no new blocker.
+
+7. Final complete named manager acceptance inventory
+Command:
+  .venv/bin/python -m pytest tests/test_workbook_manager_catalog.py tests/test_workbook_manager_import_projection.py tests/test_workbook_manager_generated_parity.py tests/test_workbook_manager_api_concurrency.py tests/test_workbook_manager_drafts.py tests/test_workbook_manager_changeset_lifecycle.py tests/test_workbook_manager.py -q
+Result:
+  142 passed, 2 skipped, 17 subtests passed in 966.50s
+Warning:
+  One existing StarletteDeprecationWarning from fastapi.testclient/httpx.
+
+8. Final explicit slow copied-workbook writer inventory
+Command:
+  WBM_SLOW_GATE=1 .venv/bin/python -m pytest tests/test_workbook_manager.py -q
+Result:
+  49 passed in 755.94s
+Warning:
+  One existing StarletteDeprecationWarning from fastapi.testclient/httpx.
+
+9. Final shared writer and service inventory
+Command:
+  .venv/bin/python -m pytest tests/test_editor_ops_apply.py tests/test_workbook_changeset_service.py -q
+Result:
+  80 passed, 13 subtests passed in 145.23s
+
+10. Workbook Manager frontend build
+Command:
+  npm run build --prefix workbook-manager/frontend
+Result:
+  PASS; Vite 5.4.21 transformed 1518 modules and built dist in 646ms.
+
+11. Canonical workbook package gate
+Command:
+  .venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
+Result:
+  status=valid, issue_count=0
+
+12. Canonical workbook schema gate
+Command:
+  .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+Result:
+  status=valid, issue_count=0, error_count=0, warning_count=0
+
+13. Protected-surface and diff checks
+Commands:
+  git status --short -- stingray_master.xlsx form-output form-app requirements.txt workbook-manager/backend/requirements.txt workbook-manager/frontend/package.json workbook-manager/frontend/package-lock.json
+  git diff --check
+Result:
+  PASS; protected-surface status produced no entries and git diff --check produced no output.
+
+14. Relevant gates not run
+- No generation, registry publication, browser runtime, dealer submission, deployment, or live workbook write gate was run because Pass 6A changes only the shared writer's copied-workbook restoration behavior and explicitly preserves those surfaces.
+- No manual browser smoke was run because no manager API route or UI behavior changed and manager apply remains disabled.
+
+15. Loop validator
+The pre-closeout run failed on the incomplete current receipt plus six already-recorded historical missing receipt artifacts. After repairing the current receipt and updating STATE, `scripts/validate_fable5_loop.py` reported only those same six historical missing artifacts: `verifier-report.md`, `validation-output.txt`, and `run.json` in each of `2026-08-08-dbpass5-durable-draft-coalescing` and `2026-08-09-dbpass5-preview-lifecycle`. The Pass 6A receipt itself has no remaining validator finding. `tests/test_fable5_loop_contract.py` was 13 passed / 1 failed solely because its repository-wide clean-contract assertion sees those same historical omissions. They remain out-of-scope historical closeout debt.
