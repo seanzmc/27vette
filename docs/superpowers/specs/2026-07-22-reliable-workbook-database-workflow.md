@@ -2,8 +2,9 @@
 
 Status: implementation in progress; Pass 1 completed 2026-07-22, Pass 2
 completed 2026-07-23, Pass 3 completed 2026-07-30, Pass 4 completed
-2026-08-08, and Pass 5 completed 2026-08-09 on `db-workflow`; the remaining
-implementation is Pass 6A, Pass 6B, and Pass 7, none of which has started.
+2026-08-08, Pass 5 completed 2026-08-09, and Pass 6A completed 2026-08-10 on
+`db-workflow`; the remaining implementation is Pass 6B and Pass 7, neither of
+which has started.
 Revised 2026-08-09 to split shared-writer restoration from durable manager
 apply/recovery and narrow Pass 7 to the minimal exact-artifact client and final
 enablement; revised 2026-07-23 to record the completed workbook-owned Vehicle
@@ -1212,7 +1213,7 @@ inventory `59 passed, 7 subtests passed`; frontend build passed; workbook packag
 and schema checks both returned valid with zero issues; and `git diff --check`
 passed. The canonical workbook, generated artifacts, published registry,
 customer runtime, dealer submission, deployment, and dependencies are unchanged.
-Pass 6A is the exact next action; Pass 5 grants no workbook-write authority.
+Pass 6A followed this checkpoint; Pass 5 itself granted no workbook-write authority.
 
 ### Pass 6A — Harden shared-writer post-save restoration
 
@@ -1242,6 +1243,36 @@ Pass 6A exit gate: returned and thrown failures from live readback,
 package/schema verification, and write-log completion restore and hash-verify
 the backup; a failed restore reports `workbookState=unknown`; and both the
 original and restoration failures remain available as evidence.
+
+#### Pass 6A completion — shared-writer restoration (2026-08-10)
+
+Pass 6A is complete at the shared-writer boundary. After the guarded safe save
+returns its backup, `editor_ops.apply_batch()` now performs live exact-row
+readback, package validation, schema validation, success-result construction,
+and write-log completion inside one narrow restoration boundary. Returned live
+readback/schema failures and thrown readback/package/schema/log exceptions all
+restore through the existing approved backup helper and independently compare
+the restored live SHA-256 with the backup SHA-256. Results distinguish the
+original failure phase/kind/detail from restoration attempted/verified hashes
+and restoration error evidence; only a proved hash match reports
+`workbookState="restored"`, while an unproved restore reports
+`workbookState="unknown"` and `workbook_restore_failed` without losing the
+original cause.
+
+These detailed `failure` and `restoration` fields remain internal shared-writer
+result evidence. Pass 6A does not extend the public
+`workbook-change-receipt-1` schema: the service receipt retains the existing
+status, `workbookState`, errors, backup path, and verification fields, while
+Pass 6B separately owns durable attempt evidence and independently observed
+workbook identity as specified below.
+
+The focused regressions were first observed red because a thrown live readback
+escaped and live package/schema/log checks did not run after save. Final gate
+counts and independent verification are retained in
+`fable5loop/runs/2026-08-10-dbpass6a-shared-writer-restoration/`. No manager
+apply state, API/UI route, public ChangeSet artifact, canonical workbook,
+generated/publication surface, customer runtime, dealer, dependency,
+deployment, commit, or push change was made. Pass 6B is the exact next action.
 
 ### Pass 6B — Add durable manager apply, idempotency, and recovery
 

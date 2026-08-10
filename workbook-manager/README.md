@@ -3,8 +3,9 @@
 Provisional interface for investigating the disposable SQLite projection of
 `stingray_master.xlsx`. Pass 5 adds manager-owned durable update/add/delete
 drafts, immutable ChangeSet emission, and durable shared-service preview and
-approval lifecycles while the browser still exposes only the contained legacy
-staged-edit flow.
+approval lifecycles. Pass 6A independently hardens the shared writer's
+post-save restoration; no manager apply route is enabled, and the browser still
+exposes only the contained legacy staged-edit flow.
 The workbook remains canonical. Live manager-to-workbook writes are disabled
 until the reviewed ChangeSet route is enabled in Pass 7 of the reliability
 specification.
@@ -69,6 +70,11 @@ exact ChangeSet emission, and shared-service preview and approval lifecycles:
   dictionary or exception in immutable durable attempt history. It exposes only
   lifecycle-authorized verbs and never applies, mutates the projection, or
   writes the workbook.
+- The shared writer now rechecks exact rows, package integrity, and schema
+  integrity after a safe save. Any returned or thrown post-save validation/log
+  failure restores and SHA-256-verifies the backup or reports the workbook
+  state unknown. This is shared-service hardening only; no manager apply action
+  calls it yet.
 - Status reports projection, draft, workbook, generated-artifact, and
   publication states separately. Generated artifacts and publication are
   always `unverified` in this provisional manager workflow.

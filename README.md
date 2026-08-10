@@ -135,7 +135,9 @@ An Apply is only the workbook-write step — afterwards regenerate affected mode
 `stingray_master.xlsx`. It is currently **read-only / provisional**: a first
 import into an empty projection is allowed, replacement re-import is contained,
 durable update/add/delete drafts can emit, preview, and approve immutable ChangeSets through
-the shared service, and every `POST /api/sync` request with `write=true` is refused.
+the shared service. The shared writer restores and SHA-256-verifies its backup
+after post-save validation/log failure, but no manager apply route is enabled;
+every `POST /api/sync` request with `write=true` is refused.
 Dry-run sync, browsing, history, and verified-projection disposable comparison
 export remain available; generated-artifact and publication state are not
 inferred. The

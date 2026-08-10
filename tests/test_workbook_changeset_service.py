@@ -381,6 +381,7 @@ def test_failed_restore_reports_workbook_restore_failed(tmp_path, monkeypatch):
     assert receipt["workbookState"] == "unknown"
     assert str(workbook) in receipt["errors"][0]
     assert receipt["backupPath"] in receipt["errors"][0]
+    assert "forced" in receipt["errors"][0]
 
     # No restore occurred: the live save remains applied (price 101).
     wb = load_workbook(workbook, read_only=True, data_only=True)
