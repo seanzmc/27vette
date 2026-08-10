@@ -134,8 +134,8 @@ An Apply is only the workbook-write step — afterwards regenerate affected mode
 `workbook-manager/` is a React (Vite) + FastAPI + SQLite editor for
 `stingray_master.xlsx`. It is currently **read-only / provisional**: a first
 import into an empty projection is allowed, replacement re-import is contained,
-durable update drafts can emit and preview immutable ChangeSets through the
-shared service, and every `POST /api/sync` request with `write=true` is refused.
+durable update/add/delete drafts can emit, preview, and approve immutable ChangeSets through
+the shared service, and every `POST /api/sync` request with `write=true` is refused.
 Dry-run sync, browsing, history, and verified-projection disposable comparison
 export remain available; generated-artifact and publication state are not
 inferred. The
@@ -251,7 +251,7 @@ The remaining `tests/test_*.py` files are not in that gate and are chosen by cha
 | Promotion preflight (slow) | `test_verify_workbook_candidate` |
 | Fable 5 loop | `test_fable5_loop_contract` |
 
-`.venv/bin/python -m pytest tests/ -q` runs everything (589 tests, ~18 min). Three tests in `test_verify_workbook_candidate.py` are ~63s each because each runs the full ten-stage candidate lane over six models; everything outside the slowest ~15 tests is sub-second. Reserve the full run for canonical-workbook writes and publication, per AGENTS.md §10.
+`.venv/bin/python -m pytest tests/ -q` runs everything (678 tests collected as of Pass 5, ~18 min). Three tests in `test_verify_workbook_candidate.py` are ~63s each because each runs the full ten-stage candidate lane over six models; everything outside the slowest ~15 tests is sub-second. Reserve the full run for canonical-workbook writes and publication, per AGENTS.md §10.
 
 Full default validation = schema gate + every default-readiness row of the node matrix + the Python metadata gate. Optional inspection diagnostics run only when their raw-source evidence is relevant. Choose additional gates by changed surface per AGENTS.md §10.
 

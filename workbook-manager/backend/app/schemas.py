@@ -23,7 +23,7 @@ class StageChangeRequest(BaseModel):
     key: dict[str, str] = Field(default_factory=dict)
     record: Optional[dict[str, Any]] = None
     session_id: str = ""
-    confirm_dependencies: bool = False
+
 
 
 class DraftOperationRequest(BaseModel):

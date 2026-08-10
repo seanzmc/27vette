@@ -773,7 +773,6 @@ def stage(
             conn, table=payload.table, model_id=payload.model_id,
             op=payload.op, key=payload.key, record=payload.record,
             session_id=payload.session_id,
-            confirm_dependencies=payload.confirm_dependencies,
             state_conn=state_conn)
     except StagingError as exc:
         raise _staging_error(exc)

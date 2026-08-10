@@ -1,10 +1,9 @@
 # Reliable Workbook–Database Workflow Implementation Specification
 
 Status: implementation in progress; Pass 1 completed 2026-07-22, Pass 2
-completed 2026-07-23, Pass 3 completed 2026-07-30, and Pass 4 completed
-completed 2026-08-08 on `db-workflow`; Pass 5 Checkpoints 1–3 are implemented with
-requirements 7–8 and the full exit gate still open; Passes 6–7 have not
-started. Revised
+completed 2026-07-23, Pass 3 completed 2026-07-30, Pass 4 completed
+2026-08-08, and Pass 5 completed 2026-08-09 on `db-workflow`; Passes 6–7
+have not started. Revised
 2026-07-23 to record the completed workbook-owned Vehicle Setup copy contract;
 the final specification review previously resolved all fourteen findings: primary-
 runtime-only parity, strict publication selection, current baseline, outcome-
@@ -1157,6 +1156,60 @@ The next checkpoint must start with a failing approval-lifecycle regression in
 ChangeSet and formal preview through
 `workbook_domain.service.approve_changeset()` without enabling apply or live
 workbook writes.
+
+#### Pass 5 checkpoint 4 — durable shared-service approval lifecycle (2026-08-09)
+
+Checkpoint 4 completes requirement 7. `POST
+/api/drafts/{draft_id}/approve` accepts only `preview_ready` or
+`approval_confirmation_required` drafts against a current verified projection,
+loads the exact immutable ChangeSet and its latest identity-bound formal
+preview, and invokes only `workbook_domain.service.approve_changeset()`.
+Durable schema 7 stores one immutable attempt envelope per call with the exact
+returned dictionary or exception evidence, bound ChangeSet and preview
+identities, actor and warning IDs, timestamps, resulting Section 4.1 state, and
+exact allowed verbs. Unknown returned outcomes fail closed to
+`approval_rejected`; competing unbound preview rows cannot acquire approval
+authority. No approval path applies a ChangeSet or mutates the projection or
+workbook.
+
+The approval regression was observed failing against detached baseline
+`4338e52` because the approval service and endpoint did not exist. The final
+focused and affected acceptance evidence, protected-surface checks, and
+independent verifier result are recorded in
+`fable5loop/runs/2026-08-09-dbpass5-requirement7-approval-lifecycle/` rather than duplicated
+here.
+
+#### Pass 5 checkpoint 5 — complete final-graph draft lifecycle (2026-08-09)
+
+Checkpoint 5 completes requirement 8 and the Pass 5 exit gate. Durable drafts
+now accept update, add, and delete intent; new-row edits coalesce into the
+original add and add-then-delete collapses to no operation. Add/delete intent
+resolves its source sheet, ownership, key, model context, and typed field pairs
+without attempting per-row relationship approval. Commit emits every operation
+in one immutable ChangeSet, and the existing shared preview service judges the
+complete proposed graph. Coordinated exclusive-group parent plus member adds and
+coordinated parent plus dependent deletes reach `preview_ready`; an incomplete
+dependent delete returns a blocking final-graph warning and maps directly to
+`preview_rejected` with cancel as its only verb, so it cannot reach approval.
+
+The legacy `confirm_dependencies` request/function/UI bypass is removed. Legacy
+database columns remain only as preserved recovery evidence; new staged rows
+always record false and revalidation never treats an old true value as write
+authority. The contained legacy browser now reports the dependents and directs
+the operator to one coordinated draft ChangeSet rather than offering “delete
+anyway.” No apply route or live workbook write was enabled.
+
+The three required final-graph regressions were first observed failing with
+`draft_action_not_implemented`; the new-row coalescing regression was then
+observed failing with `record_not_found`. Final evidence: lifecycle tests `26
+passed, 17 subtests passed`; complete named manager inventory `142 passed, 2
+skipped, 17 subtests passed`; explicit slow copied-workbook manager inventory
+`49 passed`; shared ChangeSet/service inventory `50 passed`; shared writer
+inventory `59 passed, 7 subtests passed`; frontend build passed; workbook package
+and schema checks both returned valid with zero issues; and `git diff --check`
+passed. The canonical workbook, generated artifacts, published registry,
+customer runtime, dealer submission, deployment, and dependencies are unchanged.
+Pass 6 is the exact next action; Pass 5 grants no workbook-write authority.
 
 ### Pass 6 — Harden the shared write boundary and recovery
 

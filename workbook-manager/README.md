@@ -1,10 +1,10 @@
 # Workbook Manager (React + FastAPI + SQLite)
 
 Provisional interface for investigating the disposable SQLite projection of
-`stingray_master.xlsx`. The first three Pass 5 checkpoints add manager-owned
-durable draft updates, immutable update-only ChangeSet emission, and durable
-shared-service preview lifecycle while the browser still exposes only the
-legacy staged-edit flow.
+`stingray_master.xlsx`. Pass 5 adds manager-owned durable update/add/delete
+drafts, immutable ChangeSet emission, and durable shared-service preview and
+approval lifecycles while the browser still exposes only the contained legacy
+staged-edit flow.
 The workbook remains canonical. Live manager-to-workbook writes are disabled
 until the reviewed ChangeSet route is enabled in Pass 7 of the reliability
 specification.
@@ -27,10 +27,9 @@ stingray_master.xlsx (canonical source)
 
 Pass 1 containment remains active. Pass 2 split storage plus the shared backend
 catalog contract, Pass 3 request connections plus promotion coordination, and
-Pass 4 verified candidate promotion are implemented. Pass 5 now has three
-bounded backend checkpoints for durable update intent, exact update-only
-ChangeSet emission, and shared-service preview lifecycle; add/delete operations
-and approval are not implemented yet:
+Pass 4 verified candidate promotion are implemented. Pass 5 is implemented
+through its complete final-graph exit gate: durable update/add/delete intent,
+exact ChangeSet emission, and shared-service preview and approval lifecycles:
 
 - `POST /api/sync` refuses every `write=true` request. The browser has no live
   write control; dry-run remains available for inspection only.
@@ -43,14 +42,17 @@ and approval are not implemented yet:
 - Import is also refused while legacy staged, committed-unsynchronized, or
   failed work exists, or while a nonterminal durable draft exists. An import
   with blocking findings is labeled `unverified`, never verified/current.
-- `POST /api/drafts/{draft_id}/operations` accepts update intent only when the
-  projection is `current`. It resolves workbook lineage and ownership first,
-  coalesces sequential edits to one physical row, records original-to-final
-  changed field pairs in durable state, and never mutates the projection or
-  legacy history. `GET /api/drafts/{draft_id}/operations` returns that intent.
-  These are backend checkpoint routes, not an enabled browser write workflow.
-- `POST /api/drafts/{draft_id}/commit` converts the complete coalesced update
-  draft once through the shared `workbook-changeset-1` contract, stores the exact
+- `POST /api/drafts/{draft_id}/operations` accepts update/add/delete intent only
+  when the projection is `current`. It resolves workbook lineage and ownership,
+  coalesces sequential edits to one physical row, and records typed
+  original-to-final field pairs in durable state. Parent/member additions and
+  dependent deletes remain together for complete final-graph preview; no
+  individual dependency confirmation can bypass that graph. The route never
+  mutates the projection or legacy history. `GET
+  /api/drafts/{draft_id}/operations` returns that intent. These are backend
+  checkpoint routes, not an enabled browser write workflow.
+- `POST /api/drafts/{draft_id}/commit` converts the complete coalesced draft once
+  through the shared `workbook-changeset-1` contract, stores the exact
   typed payload in durable state, and transitions the draft to
   `changeset_emitted`. The stored row has database-enforced update/delete
   refusal. This route does not preview, approve, apply, or write the workbook.
@@ -61,6 +63,12 @@ and approval are not implemented yet:
   history, and maps the result to the specification's preview lifecycle. It
   does not reproduce validation, approve, apply, mutate the projection, or write
   the workbook.
+- `POST /api/drafts/{draft_id}/approve` accepts only an exact identity-bound
+  formal preview from `preview_ready` or `approval_confirmation_required`, calls
+  only `workbook_domain.service.approve_changeset()`, and stores the returned
+  dictionary or exception in immutable durable attempt history. It exposes only
+  lifecycle-authorized verbs and never applies, mutates the projection, or
+  writes the workbook.
 - Status reports projection, draft, workbook, generated-artifact, and
   publication states separately. Generated artifacts and publication are
   always `unverified` in this provisional manager workflow.
@@ -144,27 +152,35 @@ Environment overrides: `WBM_WORKBOOK`, `WBM_DB` (durable state),
 3. **Stage (legacy provisional)** — every add/update/delete is validated (keys, types, enums,
    scoped uniqueness, references) and queued in `pending_changes`. Undo
    discards a staged change without touching data or audit history.
-   Deletes are blocked while dependents exist unless explicitly confirmed.
-4. **Durable draft operations (backend only)** — update requests against a
-   current projection resolve one physical workbook target and persist one
-   coalesced original-to-final operation in `WBM_DB`. Re-import remains blocked
-   until the nonterminal draft has a later lifecycle disposition.
+   Deletes are blocked while dependents exist; the legacy confirmation bypass
+   is removed.
+4. **Durable draft operations (backend only)** — update/add/delete requests
+   against a current projection resolve one physical workbook target and persist
+   one coalesced original-to-final operation in `WBM_DB`. Coordinated
+   parent/member additions and dependent deletes remain in one draft. Re-import
+   remains blocked until the nonterminal draft has a later lifecycle disposition.
 5. **Emit ChangeSet (backend only)** — `POST /api/drafts/{draft_id}/commit`
-   commits a nonempty mutable update draft into one exact immutable
+   commits a nonempty mutable draft into one exact immutable
    `workbook-changeset-1` payload. It does not run the final-graph preview and
    grants no workbook write authority.
 6. **Preview ChangeSet (backend only)** — `POST /api/drafts/{draft_id}/preview`
    runs the exact stored ChangeSet through the shared preview service, records
    immutable result/exception evidence, and exposes only lifecycle-authorized
-   next verbs. A retry reuses the ChangeSet and creates a new attempt.
-7. **Commit (legacy provisional)** — batch revalidation; every
+   next verbs. Blocking final-graph references map to `preview_rejected` with
+   cancel as the only verb; a retry reuses the ChangeSet and creates a new attempt.
+7. **Approve ChangeSet (backend only)** — `POST /api/drafts/{draft_id}/approve`
+   sends the exact stored ChangeSet and identity-bound formal preview through
+   the shared approval service and records immutable result/exception evidence.
+   Confirmation resubmission reuses the same artifacts; re-preview binds a later
+   approval to the new preview. No apply or workbook write is enabled.
+8. **Commit (legacy provisional)** — batch revalidation; every
    change lands in the append-only `change_history` table (timestamp,
    actor, entity, model, op, old/new values, source sheet/row, validation
    result, sync status).
-8. **Sync preview only** — `POST /api/sync` with `write=false` can run the
+9. **Sync preview only** — `POST /api/sync` with `write=false` can run the
    existing dry-run gate. `write=true` is refused by the API regardless of
    confirmation text or mtime.
-9. **Disposable export** — `POST /api/export` can create a comparison workbook
+10. **Disposable export** — `POST /api/export` can create a comparison workbook
    under `var/exports/` only when projection state is `current`. The file is
    labeled disposable and must not replace the workbook or feed generation.
 

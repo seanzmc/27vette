@@ -1,0 +1,84 @@
+# Pass 5 Checkpoint 4 Validation
+
+Date: 2026-08-09
+Implementation commit at start: `1a359af`
+Closeout/hardening changes: uncommitted on `db-workflow`
+
+## TDD evidence
+
+Detached baseline `4338e52` was created as a worktree, the current approval test class was copied into it, and the baseline commit plus interpreter were printed before execution. The baseline command reached production behavior and failed as expected because `approve_draft`, `_map_approval_result`, and the approval endpoint did not exist:
+
+```text
+tested_commit=4338e52
+python=/Users/seandm/Projects/27vette/.venv/bin/python
+11 failed, 1 passed in 0.48s
+```
+
+Independent verifier cycle 1 then identified two uncovered fail-closed cases. New tests were written before the fixes and both failed for the intended behavior:
+
+```text
+unknown approval status:
+actual approval_repreview_required/retry_preview; expected approval_rejected/cancel
+
+competing unbound preview:
+approve_changeset received the later mismatched preview instead of the exact
+ChangeSet-bound formal preview
+
+2 failed, 5 subtests passed in 0.31s
+```
+
+After the minimal allowlist and identity-bound preview query:
+
+```text
+TestDurableApprovalLifecycle:
+8 passed, 5 subtests passed in 0.31s
+```
+
+The endpoint containment regression also now snapshots and rechecks workbook bytes and mtime in addition to the projection row.
+
+## Focused and affected gates
+
+```text
+tests/test_workbook_manager_changeset_lifecycle.py:
+21 passed, 17 subtests passed in 0.46s (before verifier hardening)
+
+final post-receipt focused rerun:
+22 passed, 17 subtests passed in 0.48s
+
+Draft/lifecycle/concurrency/shared ChangeSet and service inventory after hardening:
+109 passed, 17 subtests passed in 5.70s
+one StarletteDeprecationWarning from FastAPI TestClient/httpx
+```
+
+The complete Manager acceptance inventory was started once before verifier hardening and intentionally killed after the tests changed; that mixed-revision run is not counted as evidence. The clean post-hardening inventory passed:
+
+```text
+138 passed, 2 skipped, 1 warning, 17 subtests passed in 932.34s (0:15:32)
+```
+
+The two skips are the explicit `WBM_SLOW_GATE` copied-workbook writer tests. They are not relevant to this read-only approval checkpoint and were proven in Pass 4; no apply or writer code changed here.
+
+## Documentation and protected boundaries
+
+The owning specification, root README, Workbook Manager README, fixed STATE handoff, and this receipt now agree that requirement 7 is complete and requirement 8/full Pass 5 exit-gate work remains open.
+
+`git diff --check` passed before receipt creation. `git status --porcelain -- stingray_master.xlsx form-output form-app` printed nothing: the canonical workbook, generated artifacts, published registry/runtime, and customer application are unchanged. The approval route has no apply call; its endpoint test proves projection data plus workbook bytes/mtime remain unchanged.
+
+No workbook package/schema, generation, registry, browser, dealer, deployment, or live-write gate was run because none of those surfaces changed and Pass 1 write containment remains active.
+
+## Fable contract
+
+The 14-test Fable contract inventory initially reported 13 passed and one repository-contract failure. After all four current receipt files existed, it still reported 13 passed and one repository-contract failure solely because six artifacts are absent from two older incomplete folders:
+
+```text
+fable5loop/runs/2026-08-08-dbpass5-durable-draft-coalescing/:
+  verifier-report.md, validation-output.txt, run.json
+fable5loop/runs/2026-08-09-dbpass5-preview-lifecycle/:
+  verifier-report.md, validation-output.txt, run.json
+```
+
+The direct loop validator reports the same six issues and no current-receipt or STATE-pointer issue. This historical evidence debt is not repaired by inventing retrospective outputs; it remains explicit in the fixed handoff.
+
+## Independent verification
+
+Cycle 1 verdict: FAIL. It found stale spec/README/STATE authority, the incomplete receipt, absent retained RED output, unknown approval outcomes receiving retry-preview authority, no direct workbook byte/mtime assertion in the API containment test, and no adversarial competing-preview binding test. All current-checkpoint findings were addressed. The final verifier verdict is recorded in `verifier-report.md`.

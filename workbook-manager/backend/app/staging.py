@@ -9,8 +9,9 @@ Edits never touch the normalized tables directly:
       -> sync (sync.py turns committed-but-unsynced history into an
          editor_ops batch for the workbook)
 
-Deletes are blocked while dependent records exist unless the change is
-staged with ``confirmed_dependencies``.
+Deletes are blocked while dependent records exist. Coordinated deletes belong
+in one draft ChangeSet whose complete final graph is validated by the shared
+preview service; the legacy staged-row path has no dependency bypass.
 """
 
 from __future__ import annotations
@@ -153,7 +154,7 @@ def _editable_guard(
 
 def stage_change(conn: sqlite3.Connection, *, table: str, model_id: str,
                  op: str, key: dict, record: dict | None,
-                 session_id: str = "", confirm_dependencies: bool = False,
+                 session_id: str = "",
                  state_conn: sqlite3.Connection | None = None,
                  ) -> dict:
     state = state_conn or conn
@@ -188,13 +189,13 @@ def stage_change(conn: sqlite3.Connection, *, table: str, model_id: str,
                                  original_key=key if op == "update" else None)
     if op == "delete":
         dependents = find_dependents(conn, spec, model_id, key)
-        if dependents and not confirm_dependencies:
+        if dependents:
             raise StagingError([{
                 "table": table, "model_id": model_id, "field": "",
                 "entity_key": "/".join(str(key.get(k, "")) for k in spec.key),
                 "message": f"delete blocked: {len(dependents)} dependent "
-                           "record(s) exist; resolve them or stage with "
-                           "confirm_dependencies=true",
+                           "record(s) exist; emit the parent and dependent "
+                           "deletes together through one draft ChangeSet",
                 "dependents": dependents,
             }])
     if errors:
@@ -208,8 +209,7 @@ def stage_change(conn: sqlite3.Connection, *, table: str, model_id: str,
         "confirmed_dependencies) VALUES(?,?,?,?,?,?,?,?,?,?,?)",
         (_now(), session_id, table, model_id or "", json.dumps(key), op,
          old_json, json.dumps(record) if record is not None else None,
-         "staged", json.dumps({"errors": [], "dependents": dependents}),
-         1 if confirm_dependencies else 0),
+         "staged", json.dumps({"errors": [], "dependents": dependents}), 0),
     )
     state.commit()
     return get_change(state, cur.lastrowid)
@@ -298,7 +298,7 @@ def revalidate_staged(
                            "exists (conflict since staging)"}]
             dependents = find_dependents(conn, spec, change["model_id"],
                                          change["entity_key"])
-            if dependents and not change["confirmed_dependencies"]:
+            if dependents:
                 errors.append({"table": spec.table,
                                "model_id": change["model_id"], "field": "",
                                "entity_key": "",

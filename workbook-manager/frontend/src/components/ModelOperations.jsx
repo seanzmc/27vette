@@ -67,21 +67,20 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
     return [...keys, ...rest].slice(0, 7);
   }, [schema]);
 
-  const stageDelete = async (row, confirm = false) => {
+  const stageDelete = async (row) => {
     try {
       await api.stage({
         table,
         model_id: schema.model_scoped ? modelKey : "",
         op: "delete",
         key: Object.fromEntries(schema.key.map((k) => [k, String(row[k] ?? "")])),
-        confirm_dependencies: confirm,
       });
       setDeps(null);
       setNotice({ kind: "ok", text: "Delete staged. Review it in Changes & Sync." });
       onChanged();
     } catch (e) {
       const blocked = e.detail?.errors?.find((x) => x.dependents?.length);
-      if (blocked && !confirm) {
+      if (blocked) {
         setDeps({ row, dependents: blocked.dependents });
       } else {
         setNotice({ kind: "err", text: e.message });
@@ -325,15 +324,10 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
                 ))}
               </tbody>
             </table>
-            <div className="toolbar" style={{ marginTop: 12 }}>
-              <button className="btn danger" onClick={() => stageDelete(deps.row, true)}>
-                <Trash2 size={14} /> Stage delete anyway (I will resolve dependents)
-              </button>
-              <span className="muted">
-                Deleting without resolving these leaves unresolved references
-                that batch validation will flag before commit.
-              </span>
-            </div>
+            <p className="muted" style={{ marginTop: 12 }}>
+              Delete the parent and every listed dependent together through one
+              draft ChangeSet. This legacy staged-row screen cannot bypass final-graph validation.
+            </p>
           </div>
         </div>
       )}

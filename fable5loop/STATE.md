@@ -14,14 +14,14 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 
 - **Updated:** 2026-08-09
 - **Owning specification:** `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md`
-- **Active workflow:** Reliable Workbook–Database Workflow, Pass 5
-- **Branch/commit:** `db-workflow` working tree atop `60fd263`; the handoff-contract changes are not committed.
-- **Last completed:** Replaced the loose progress-pointer rule with an enforced fixed handoff contract: `STATE.md` is now the mandatory centralized resume surface after every substantive task, while the owning specification changes only when requirement-level facts change.
-- **Current status:** The handoff guidance, machine-readable contract, validator, regression coverage, live Pass 5 status, and owning-spec header are reconciled in the working tree. Pass 5 itself remains in progress with requirements 6–8, coordinated add/delete behavior, and the full exit gate open.
-- **Validation:** All 13 independent Fable contract mutation tests passed; `git diff --check` passed. The repository-level loop validator now accepts the handoff and fails only on the three pre-existing missing Checkpoint 1 receipt artifacts.
-- **Next action:** Start with a failing preview-lifecycle regression in `tests/test_workbook_manager_changeset_lifecycle.py`, then route the immutable ChangeSet through `workbook_domain.service.preview_changeset()` without duplicating validation logic.
-- **Blockers or closeout gaps:** No product-decision blocker. Checkpoint 1's receipt folder is incomplete, and Checkpoint 2 has no receipt; do not describe either checkpoint as independently closed.
-- **Latest completed receipt:** `fable5loop/runs/2026-08-08-dbpass4-verified-projection-closeout/`
+- **Active workflow:** Reliable Workbook–Database Workflow, Pass 5 complete; Pass 6 next
+- **Branch/commit:** `db-workflow` working tree atop `1a359af`; Checkpoint 4 closeout/verifier hardening and Checkpoint 5 are uncommitted.
+- **Last completed:** Completed Pass 5 requirement 8 and its exit gate: durable add/delete intent, coordinated parent/member and dependent-delete final-graph preview, cancel-only invalid graphs, and removal of the legacy dependency-confirmation bypass. No apply or workbook write was enabled.
+- **Current status:** Pass 5 requirements 1–8 and the complete exit gate are implemented. Pass 6 has not started.
+- **Validation:** Required RED failures were observed; lifecycle passed 26 plus 17 subtests, named manager inventory 142 with 2 expected skips plus 17 subtests, explicit slow manager inventory 49, shared ChangeSet/service 50, shared writer 59 plus 7 subtests, frontend build, workbook package/schema, and diff checks passed. The Fable validator remains red only on the six already-recorded missing Checkpoint 1/preview receipt artifacts. Protected workbook, generated, publication, runtime, dealer, and deployment surfaces are unchanged.
+- **Next action:** Start Pass 6 with a failing shared-writer regression for a post-save exception, then harden restoration and route manager apply only through the exact bound ChangeSet service artifacts.
+- **Blockers or closeout gaps:** No product-decision blocker. Requirement 8 used the normal repository path and has no Fable receipt; the latest receipt remains Checkpoint 4. Older Checkpoint 1 and preview receipt folders remain incomplete historical closeout debt.
+- **Latest completed receipt:** `fable5loop/runs/2026-08-09-dbpass5-requirement7-approval-lifecycle/`
 - **Protected boundaries:** Live workbook writes, generated artifacts, registry publication, customer runtime, dealer submission, deployment, and push authorization remain separately governed.
 
 ## Verified facts
@@ -179,11 +179,10 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 
 ## Last session
 
-2026-08-09: The latest run directory is
-`fable5loop/runs/2026-08-08-dbpass5-durable-draft-coalescing/`, but its receipt
-is incomplete and does not independently close Checkpoint 1. Checkpoint 2 is
-implemented at `60fd263` without a receipt. Resume from `Current handoff` and
-the owning specification; do not reconstruct current progress from chronology.
+2026-08-09: The latest completed run is
+`fable5loop/runs/2026-08-09-dbpass5-requirement7-approval-lifecycle/`. Resume Pass 5 from the
+fixed `Current handoff` and owning specification: requirement 8 final-graph
+add/delete work is next; apply and live workbook writes remain disabled.
 
 2026-07-30 (database workflow Pass 3 — request connections and promotion coordination): **Pass 3 complete on `db-workflow`; independent verifier passed on cycle 2.** Implemented exactly the five required changes of the owning specification's Pass 3: lifespan bootstrap, request-scoped projection/durable connections with WAL plus a configured busy timeout, durable-only foreign-key enforcement, one process-local lock extended over every mutating route, a bounded fail-closed projection reader gate, single-process-only serving, and the concurrency/reader-drain proofs that must land before Pass 4 promotion may call `os.replace()`. Cycle 1's verifier found four real blockers — a missing receipt/STATE update, a reproducible process wedge from blocking the lock inside a synchronous dependency, a `WEB_CONCURRENCY` bypass of the multi-worker refusal, and a lock-coverage test that could not fail for three routes — all fixed and mutation-proved in cycle 2, which passed. Cycle 3 then closed three of that verifier's non-blocking findings: the missing schema-upgrade path for durable stores Pass 2 created, the untested `_replace_projection` gating, and a redundant unobservable busy-timeout pragma. Gates: new module 31 passed (21 of 25 RED against `fa0eee7`), manager suites 87 passed / 2 skipped in both orders, slow gate 45, shared ChangeSet plus writer 76 plus 7 subtests, loop contract 13, frontend build passed, workbook package/schema valid with zero issues. Workbook, generated artifacts, publication, runtime, and dealer submission unchanged; Pass 1 write containment still active. No commit or push occurred. Receipt: `fable5loop/runs/2026-07-30-dbpass3-request-connections/`. Next action: Pass 4 (build and atomically promote a verified projection) — it must route its replacement through `PROJECTION_GATE`; commit or push only with separate authorization.
 

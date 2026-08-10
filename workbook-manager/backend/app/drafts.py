@@ -25,7 +25,7 @@ from corvette_form_generator.workbook_domain.changeset import (
 from corvette_form_generator.workbook_domain import service as workbook_service
 
 from .catalog import SPEC_BY_TABLE, projection_value
-from .staging import _editable_guard, _fetch_row
+from .staging import _editable_guard, _fetch_row, target_sheet_for
 
 
 class DraftError(ValueError):
@@ -75,6 +75,8 @@ def list_operations(state_conn: sqlite3.Connection, draft_id: str) -> list[dict]
 
 def _changeset_value(family: str, field: str, value: Any) -> Any:
     """Use the shared editor coercion for ChangeSet before/after values."""
+    if value is None:
+        return None
     return editor_ops.coerce_value(family, field, value)
 
 
@@ -101,11 +103,6 @@ def emit_changeset(state_conn: sqlite3.Connection, *, draft_id: str) -> dict:
             raise DraftError(
                 "unknown_table",
                 f"stored draft operation references unknown table {operation['table_name']!r}",
-            )
-        if operation["action"] != "update":
-            raise DraftError(
-                "draft_action_not_implemented",
-                "this Pass 5 checkpoint emits update operations only",
             )
         context = operation.get("model_context") or []
         targets.update(str(model) for model in context if str(model))
@@ -229,6 +226,9 @@ def _map_preview_result(result: dict, identity_state: str) -> tuple[str, list[st
         return "stale", ["cancel"]
     status = result.get("status")
     if status == "validated" and result.get("ok") is True:
+        blocking = (result.get("warningPolicy") or {}).get("blockingIds") or []
+        if blocking:
+            return "preview_rejected", ["cancel"]
         return "preview_ready", ["approve", "cancel"]
     if status in {"locked", "readback_failed"}:
         return "preview_retryable", ["retry_preview", "cancel"]
@@ -256,7 +256,9 @@ def _map_approval_result(result: dict) -> tuple[str, list[str]]:
         return "approved", ["apply", "cancel"]
     if status == "warning_confirmation_mismatch":
         return "approval_confirmation_required", ["approve", "cancel"]
-    return "approval_repreview_required", ["retry_preview", "cancel"]
+    if status in {"preview_not_validated", "binding_mismatch", "warning_blocked"}:
+        return "approval_repreview_required", ["retry_preview", "cancel"]
+    return "approval_rejected", ["cancel"]
 
 
 def _persist_preview_attempt(
@@ -499,9 +501,14 @@ def approve_draft(
         )
     preview_attempt = state_conn.execute(
         "SELECT * FROM draft_preview_attempts WHERE draft_id=? "
+        "AND change_set_id=? AND semantic_fingerprint=? "
         "AND artifact_kind='formal_preview' AND manager_state='preview_ready' "
         "ORDER BY completed_ts DESC, rowid DESC LIMIT 1",
-        (draft_id,),
+        (
+            draft_id,
+            stored_changeset["change_set_id"],
+            stored_changeset["semantic_fingerprint"],
+        ),
     ).fetchone()
     if preview_attempt is None:
         raise DraftError(
@@ -648,8 +655,9 @@ def save_operation(
 ) -> dict | None:
     """Store one coalesced physical-row operation in a mutable draft.
 
-    This first Pass 5 slice implements updates. Adds/deletes remain on the
-    contained legacy UI until complete final-graph ChangeSet handling lands.
+    Individual add/delete operations resolve identity and ownership here, but
+    relational validity is intentionally deferred until the complete immutable
+    ChangeSet reaches the shared final-graph preview service.
     """
     if projection_state != "current":
         raise DraftError(
@@ -659,50 +667,112 @@ def save_operation(
     spec = SPEC_BY_TABLE.get(table)
     if spec is None:
         raise DraftError("unknown_table", f"unknown table {table!r}")
-    if op != "update":
+    if op not in {"add", "update", "delete"}:
         raise DraftError(
-            "draft_action_not_implemented",
-            "this Pass 5 checkpoint accepts update drafts only",
+            "invalid_draft_action",
+            f"unsupported draft action {op!r}",
+        )
+    if set(key) != set(spec.key) or any(not str(key.get(name, "")).strip() for name in spec.key):
+        raise DraftError(
+            "invalid_entity_key",
+            f"draft key must contain exactly nonblank fields: {', '.join(spec.key)}",
         )
     row = _fetch_row(projection_conn, spec, model_id, key)
-    if row is None:
+    source_sheet = str(
+        row["src_sheet"] if row is not None else target_sheet_for(
+            projection_conn, spec, model_id
+        ) or ""
+    ).strip()
+    physical_key = str(
+        row["physical_key"] if row is not None
+        else _json([str(key[name]) for name in spec.key])
+    ).strip()
+    family = spec.editor_family or spec.family
+    prior_row = state_conn.execute(
+        "SELECT * FROM draft_operations WHERE draft_id=? AND source_sheet=? "
+        "AND family=? AND physical_key=?",
+        (draft_id, source_sheet, family, physical_key),
+    ).fetchone()
+    prior_operation = _operation_dict(prior_row) if prior_row is not None else None
+    prior_is_add = prior_operation is not None and prior_operation["action"] == "add"
+    if op in {"update", "delete"} and row is None and not prior_is_add:
         raise DraftError("record_not_found", "projected record was not found")
+    if op == "add" and (row is not None or prior_operation is not None):
+        raise DraftError("duplicate_record", "projected record already exists")
 
-    original = _semantic_row(spec, row)
     supplied = record or {}
-    unknown = sorted(set(supplied) - set(original))
+    column_names = {column.sql_name() for column in spec.columns}
+    unknown = sorted(set(supplied) - column_names)
     if unknown:
         raise DraftError(
             "unknown_fields", f"draft contains unregistered fields: {', '.join(unknown)}"
         )
-    final = dict(original)
-    for name, value in supplied.items():
-        column = spec.column_by_name(name)
-        if column is None:
-            raise DraftError("unknown_fields", f"draft contains unregistered field {name!r}")
-        final[name] = projection_value(column, value)
-    changed_keys = [name for name in spec.key if final.get(name) != original.get(name)]
-    if changed_keys:
-        raise DraftError(
-            "key_change_rejected",
-            f"key fields cannot change on update: {', '.join(changed_keys)}",
-        )
+    original = _semantic_row(spec, row) if row is not None else None
+    if prior_is_add and op == "update":
+        assert prior_operation is not None
+        final = dict(prior_operation["final"] or {})
+        for name, value in supplied.items():
+            column = spec.column_by_name(name)
+            assert column is not None
+            try:
+                final[name] = projection_value(column, value)
+            except ValueError as exc:
+                raise DraftError("invalid_field_value", str(exc)) from exc
+        op = "add"
+    elif op == "add":
+        final = {name: None for name in column_names}
+        for name, value in supplied.items():
+            column = spec.column_by_name(name)
+            assert column is not None
+            try:
+                final[name] = projection_value(column, value)
+            except ValueError as exc:
+                raise DraftError("invalid_field_value", str(exc)) from exc
+        mismatched_keys = [
+            name for name in spec.key
+            if str(final.get(name) or "") != str(key.get(name) or "")
+        ]
+        if mismatched_keys:
+            raise DraftError(
+                "key_mismatch",
+                f"add record key fields must match the entity key: {', '.join(mismatched_keys)}",
+            )
+    elif op == "update":
+        assert original is not None
+        final = dict(original)
+        for name, value in supplied.items():
+            column = spec.column_by_name(name)
+            assert column is not None
+            try:
+                final[name] = projection_value(column, value)
+            except ValueError as exc:
+                raise DraftError("invalid_field_value", str(exc)) from exc
+        changed_keys = [name for name in spec.key if final.get(name) != original.get(name)]
+        if changed_keys:
+            raise DraftError(
+                "key_change_rejected",
+                f"key fields cannot change on update: {', '.join(changed_keys)}",
+            )
+    else:
+        final = None
     ownership_errors = _editable_guard(
-        projection_conn, spec, model_id, op=op, key=key, record=final
+        projection_conn,
+        spec,
+        model_id,
+        op=op,
+        key=key,
+        record=final if final is not None else original,
     )
     if ownership_errors:
         raise DraftError(
             "ownership_rejected", ownership_errors[0]["message"], errors=ownership_errors
         )
 
-    source_sheet = str(row["src_sheet"] or "").strip()
-    physical_key = str(row["physical_key"] or "").strip()
     if not source_sheet or not physical_key:
         raise DraftError(
             "physical_target_unresolved",
             "draft operation requires a resolved source sheet and physical key",
         )
-    family = spec.editor_family or spec.family
     timestamp = _now()
 
     state_conn.execute("BEGIN IMMEDIATE")
@@ -723,21 +793,53 @@ def save_operation(
         ).fetchone()
         if existing is not None:
             prior = _operation_dict(existing)
+            if prior["action"] == "add" and op == "delete":
+                state_conn.execute(
+                    "DELETE FROM draft_operations WHERE id=?", (existing["id"],)
+                )
+                state_conn.commit()
+                return None
+            if prior["action"] == "delete":
+                if op == "delete":
+                    state_conn.commit()
+                    return prior
+                raise DraftError(
+                    "draft_operation_conflict",
+                    "a deleted draft row cannot be edited without recreating the draft",
+                )
             original = prior["original"]
-            final = dict(prior["final"] or original)
-            for name, value in supplied.items():
-                column = spec.column_by_name(name)
-                if column is None:  # guarded above; retain fail-closed locality
-                    raise DraftError(
-                        "unknown_fields", f"draft contains unregistered field {name!r}"
-                    )
-                final[name] = projection_value(column, value)
+            if op == "delete":
+                final = None
+            else:
+                final = dict(prior["final"] or original or {})
+                for name, value in supplied.items():
+                    column = spec.column_by_name(name)
+                    assert column is not None
+                    try:
+                        final[name] = projection_value(column, value)
+                    except ValueError as exc:
+                        raise DraftError("invalid_field_value", str(exc)) from exc
+                if prior["action"] == "add":
+                    op = "add"
 
-        changed_fields = {
-            name: {"before": original.get(name), "after": final.get(name)}
-            for name in original
-            if original.get(name) != final.get(name)
-        }
+        if op == "add":
+            changed_fields = {
+                name: {"before": None, "after": value}
+                for name, value in (final or {}).items()
+                if value is not None
+            }
+        elif op == "delete":
+            changed_fields = {
+                name: {"before": value, "after": None}
+                for name, value in (original or {}).items()
+                if value is not None
+            }
+        else:
+            changed_fields = {
+                name: {"before": original.get(name), "after": final.get(name)}
+                for name in original
+                if original.get(name) != final.get(name)
+            }
         if not changed_fields:
             if existing is not None:
                 state_conn.execute(
@@ -751,14 +853,18 @@ def save_operation(
             family,
             model_id or "",
             source_sheet,
-            row["src_row"],
+            row["src_row"] if row is not None else None,
             physical_key,
             _json(key),
-            "update",
-            _json(original),
-            _json(final),
+            op,
+            _json(original) if original is not None else None,
+            _json(final) if final is not None else None,
             _json(changed_fields),
-            str(row["model_context"] or "[]"),
+            str(
+                row["model_context"] if row is not None
+                else _json([model_id] if model_id else [])
+                or "[]"
+            ),
         )
         if existing is None:
             cursor = state_conn.execute(

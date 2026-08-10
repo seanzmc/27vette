@@ -254,7 +254,7 @@ class TestStagingWorkflow(ImportedWorkbookCase):
                         "rpo": "X", "price": "0", "selectable": "True",
                         "display_order": "1", "active": "True"})
 
-    def test_delete_blocked_by_dependents_then_confirmable(self):
+    def test_delete_with_dependents_cannot_bypass_final_graph_validation(self):
         row = self.conn.execute(
             "SELECT o.option_id FROM options o JOIN option_availability oa "
             "ON oa.model_id=o.model_id AND oa.option_id=o.option_id "
@@ -265,12 +265,11 @@ class TestStagingWorkflow(ImportedWorkbookCase):
                                  model_id="stingray", op="delete",
                                  key={"option_id": option_id}, record=None)
         self.assertIn("dependent", ctx.exception.errors[0]["message"])
-        change = staging.stage_change(
-            self.conn, table="options", model_id="stingray", op="delete",
-            key={"option_id": option_id}, record=None,
-            confirm_dependencies=True)
-        self.assertEqual(change["status"], "staged")
-        staging.discard_change(self.conn, change["id"])
+        with self.assertRaises(TypeError):
+            staging.stage_change(
+                self.conn, table="options", model_id="stingray", op="delete",
+                key={"option_id": option_id}, record=None,
+                confirm_dependencies=True)
 
     def test_undo_before_commit(self):
         change = staging.stage_change(

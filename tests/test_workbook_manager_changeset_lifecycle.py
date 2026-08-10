@@ -19,6 +19,7 @@ for path in (str(BACKEND), str(REPO_ROOT / "scripts")):
 
 from app import db as dbmod, drafts, main  # noqa: E402
 from corvette_form_generator.workbook_domain.changeset import parse_changeset  # noqa: E402
+from test_editor_ops_apply import build_ops_fixture  # noqa: E402
 
 
 class TestImmutableChangeSetEmission(unittest.TestCase):
@@ -193,6 +194,204 @@ class TestImmutableChangeSetEmission(unittest.TestCase):
                     ).fetchone()["payload_json"]
                 )
                 self.assertEqual(emitted, stored)
+            finally:
+                projection.close()
+                state.close()
+
+
+class TestCompleteFinalGraphLifecycle(unittest.TestCase):
+    def _stores(self, root: Path):
+        projection, state = TestImmutableChangeSetEmission()._stores(root)
+        registrations = (
+            ("exclusive_groups_sheet", "exclusive_groups"),
+            ("exclusive_group_members_sheet", "exclusive_group_members"),
+        )
+        for row_number, (role, sheet) in enumerate(registrations, start=3):
+            projection.execute(
+                "INSERT INTO sheet_registry(src_sheet, src_row, src_family, "
+                "physical_key, model_context, model_key, source_role, sheet_name, "
+                "active) VALUES(?,?,?,?,?,?,?,?,?)",
+                ("model_workbook_sources", row_number, "model_workbook_sources",
+                 json.dumps(["stingray", role]), json.dumps(["stingray"]),
+                 "stingray", role, sheet, "True"),
+            )
+        projection.execute(
+            "INSERT INTO exclusive_groups(src_sheet, src_row, src_family, "
+            "physical_key, model_context, model_id, group_id, selection_mode, "
+            "active) VALUES(?,?,?,?,?,?,?,?,?)",
+            ("exclusive_groups", 2, "exclusive_groups", json.dumps(["excl_one"]),
+             json.dumps(["stingray"]), "stingray", "excl_one",
+             "single_within_group", "True"),
+        )
+        for row_number, option_id in enumerate(("opt_one_001", "opt_two_001"), start=2):
+            projection.execute(
+                "INSERT INTO exclusive_group_members(src_sheet, src_row, src_family, "
+                "physical_key, model_context, model_id, group_id, option_id, "
+                "display_order, active) VALUES(?,?,?,?,?,?,?,?,?,?)",
+                ("exclusive_group_members", row_number, "exclusive_members",
+                 json.dumps(["excl_one", option_id]), json.dumps(["stingray"]),
+                 "stingray", "excl_one", option_id, str((row_number - 1) * 10),
+                 "True"),
+            )
+        projection.commit()
+        workbook = root / "fixture.xlsx"
+        build_ops_fixture().save(workbook)
+        return projection, state, workbook
+
+    def _save(
+        self,
+        projection,
+        state,
+        workbook: Path,
+        *,
+        draft_id: str,
+        table: str,
+        op: str,
+        key: dict,
+        record: dict | None,
+    ):
+        return drafts.save_operation(
+            projection,
+            state,
+            projection_state="current",
+            base_workbook_sha256=hashlib.sha256(workbook.read_bytes()).hexdigest(),
+            base_workbook_mtime_ns=str(workbook.stat().st_mtime_ns),
+            draft_id=draft_id,
+            table=table,
+            model_id="stingray",
+            op=op,
+            key=key,
+            record=record,
+        )
+
+    @patch("corvette_form_generator.editor_ops.validate_workbook_schema", return_value=[])
+    def test_parent_and_member_additions_preview_as_one_complete_final_graph(self, _schema):
+        with tempfile.TemporaryDirectory(prefix="wbm-final-graph-add-") as raw:
+            projection, state, workbook = self._stores(Path(raw))
+            try:
+                draft_id = "draft-add-graph"
+                self._save(
+                    projection, state, workbook, draft_id=draft_id,
+                    table="exclusive_groups", op="add", key={"group_id": "excl_new"},
+                    record={"group_id": "excl_new", "selection_mode": "single_within_group",
+                            "active": "True", "notes": None},
+                )
+                for order, option_id in ((10, "opt_one_001"), (20, "opt_two_001")):
+                    self._save(
+                        projection, state, workbook, draft_id=draft_id,
+                        table="exclusive_group_members", op="add",
+                        key={"group_id": "excl_new", "option_id": option_id},
+                        record={"group_id": "excl_new", "option_id": option_id,
+                                "display_order": str(order), "active": "True"},
+                    )
+
+                changeset = drafts.emit_changeset(state, draft_id=draft_id)
+                attempt = drafts.preview_draft(
+                    state, draft_id=draft_id, projection_state="current",
+                    workbook_path=workbook,
+                )
+
+                self.assertEqual([row["action"] for row in changeset["rowChanges"]],
+                                 ["add", "add", "add"])
+                self.assertTrue(attempt["result"]["ok"], attempt)
+                self.assertEqual(attempt["manager_state"], "preview_ready")
+                self.assertEqual(attempt["allowed_verbs"], ["approve", "cancel"])
+            finally:
+                projection.close()
+                state.close()
+
+    @patch("corvette_form_generator.editor_ops.validate_workbook_schema", return_value=[])
+    def test_parent_and_dependent_deletes_preview_as_one_complete_final_graph(self, _schema):
+        with tempfile.TemporaryDirectory(prefix="wbm-final-graph-delete-") as raw:
+            projection, state, workbook = self._stores(Path(raw))
+            try:
+                draft_id = "draft-delete-graph"
+                for option_id in ("opt_one_001", "opt_two_001"):
+                    self._save(
+                        projection, state, workbook, draft_id=draft_id,
+                        table="exclusive_group_members", op="delete",
+                        key={"group_id": "excl_one", "option_id": option_id}, record=None,
+                    )
+                self._save(
+                    projection, state, workbook, draft_id=draft_id,
+                    table="exclusive_groups", op="delete", key={"group_id": "excl_one"},
+                    record=None,
+                )
+
+                changeset = drafts.emit_changeset(state, draft_id=draft_id)
+                attempt = drafts.preview_draft(
+                    state, draft_id=draft_id, projection_state="current",
+                    workbook_path=workbook,
+                )
+
+                self.assertEqual([row["action"] for row in changeset["rowChanges"]],
+                                 ["delete", "delete", "delete"])
+                self.assertTrue(attempt["result"]["ok"], attempt)
+                self.assertEqual(attempt["result"]["warningPolicy"]["blockingIds"], [])
+                self.assertEqual(attempt["manager_state"], "preview_ready")
+            finally:
+                projection.close()
+                state.close()
+
+    @patch("corvette_form_generator.editor_ops.validate_workbook_schema", return_value=[])
+    def test_incomplete_dependent_delete_graph_is_not_approvable(self, _schema):
+        with tempfile.TemporaryDirectory(prefix="wbm-final-graph-invalid-") as raw:
+            projection, state, workbook = self._stores(Path(raw))
+            try:
+                draft_id = "draft-invalid-delete"
+                self._save(
+                    projection, state, workbook, draft_id=draft_id,
+                    table="exclusive_groups", op="delete", key={"group_id": "excl_one"},
+                    record=None,
+                )
+                drafts.emit_changeset(state, draft_id=draft_id)
+
+                attempt = drafts.preview_draft(
+                    state, draft_id=draft_id, projection_state="current",
+                    workbook_path=workbook,
+                )
+
+                self.assertTrue(attempt["result"]["warningPolicy"]["blockingIds"])
+                self.assertEqual(attempt["manager_state"], "preview_rejected")
+                self.assertEqual(attempt["allowed_verbs"], ["cancel"])
+                with self.assertRaises(drafts.DraftError) as ctx:
+                    drafts.approve_draft(
+                        state, draft_id=draft_id, projection_state="current",
+                        actor="Sean", warning_ids=[],
+                    )
+                self.assertEqual(ctx.exception.code, "draft_not_approvable")
+            finally:
+                projection.close()
+                state.close()
+
+    def test_new_row_edits_coalesce_and_add_then_delete_is_a_noop(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-final-graph-coalesce-") as raw:
+            projection, state, workbook = self._stores(Path(raw))
+            try:
+                draft_id = "draft-new-row-coalesce"
+                self._save(
+                    projection, state, workbook, draft_id=draft_id,
+                    table="exclusive_groups", op="add", key={"group_id": "excl_new"},
+                    record={"group_id": "excl_new", "selection_mode": "single_within_group",
+                            "active": "True", "notes": None},
+                )
+                updated = self._save(
+                    projection, state, workbook, draft_id=draft_id,
+                    table="exclusive_groups", op="update", key={"group_id": "excl_new"},
+                    record={"notes": "draft note"},
+                )
+
+                self.assertEqual(updated["action"], "add")
+                self.assertEqual(updated["final"]["notes"], "draft note")
+                self.assertEqual(len(drafts.list_operations(state, draft_id)), 1)
+
+                removed = self._save(
+                    projection, state, workbook, draft_id=draft_id,
+                    table="exclusive_groups", op="delete", key={"group_id": "excl_new"},
+                    record=None,
+                )
+                self.assertIsNone(removed)
+                self.assertEqual(drafts.list_operations(state, draft_id), [])
             finally:
                 projection.close()
                 state.close()
@@ -661,6 +860,10 @@ class TestDurableApprovalLifecycle(unittest.TestCase):
                     drafts._map_approval_result(result),
                     (expected_state, expected_verbs),
                 )
+        self.assertEqual(
+            drafts._map_approval_result({"ok": False, "status": "unexpected"}),
+            ("approval_rejected", ["cancel"]),
+        )
 
     def test_approval_refuses_noncurrent_projection_without_calling_service(self):
         with tempfile.TemporaryDirectory(prefix="wbm-approval-freshness-") as raw:
@@ -826,6 +1029,9 @@ class TestDurableApprovalLifecycle(unittest.TestCase):
     def test_approval_endpoint_returns_attempt_without_apply_or_write(self):
         with tempfile.TemporaryDirectory(prefix="wbm-approval-endpoint-") as raw:
             projection, state, _, _, _ = self._preview_ready(Path(raw))
+            workbook = Path(raw) / "fixture.xlsx"
+            workbook_bytes = workbook.read_bytes()
+            workbook_mtime = workbook.stat().st_mtime_ns
             approval = {
                 "ok": True,
                 "schemaVersion": "workbook-change-approval-1",
@@ -855,6 +1061,65 @@ class TestDurableApprovalLifecycle(unittest.TestCase):
                     ).fetchone()["price"],
                     "100",
                 )
+                self.assertEqual(workbook.read_bytes(), workbook_bytes)
+                self.assertEqual(workbook.stat().st_mtime_ns, workbook_mtime)
+            finally:
+                projection.close()
+                state.close()
+
+    def test_approval_ignores_unbound_competing_preview_attempt(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-approval-binding-") as raw:
+            projection, state, changeset, preview, preview_attempt = (
+                self._preview_ready(Path(raw))
+            )
+            competing_preview = {
+                **preview,
+                "changeSetId": "other-change-set",
+                "semanticFingerprint": "other-semantic-fingerprint",
+                "previewFingerprint": "9" * 64,
+            }
+            approval = {
+                "ok": True,
+                "schemaVersion": "workbook-change-approval-1",
+                "approvalFingerprint": "8" * 64,
+            }
+            try:
+                state.execute(
+                    "INSERT INTO draft_preview_attempts(id, draft_id, change_set_id, "
+                    "semantic_fingerprint, started_ts, completed_ts, artifact_kind, "
+                    "result_json, workbook_identity_state, manager_state, "
+                    "allowed_verbs_json) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    (
+                        "competing-preview",
+                        "draft-approval",
+                        competing_preview["changeSetId"],
+                        competing_preview["semanticFingerprint"],
+                        "zzzz",
+                        "zzzz",
+                        "formal_preview",
+                        json.dumps(competing_preview),
+                        "unchanged",
+                        "preview_ready",
+                        json.dumps(["approve", "cancel"]),
+                    ),
+                )
+                state.commit()
+                with patch.object(
+                    drafts.workbook_service,
+                    "approve_changeset",
+                    return_value=approval,
+                ) as approve_changeset:
+                    attempt = drafts.approve_draft(
+                        state,
+                        draft_id="draft-approval",
+                        projection_state="current",
+                        actor="Sean",
+                        warning_ids=[],
+                    )
+                approve_changeset.assert_called_once_with(
+                    changeset, preview, actor="Sean", warning_ids=[]
+                )
+                self.assertEqual(attempt["preview_attempt_id"], preview_attempt["id"])
             finally:
                 projection.close()
                 state.close()
