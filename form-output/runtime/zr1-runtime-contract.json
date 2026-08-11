@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "zr1_options",
-    "generated_at": "2026-07-28T02:18:59+00:00",
+    "generated_at": "2026-08-11T01:32:03+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -6647,7 +6647,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 150,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VTB.jpg",
+      "image_alt": "Black Rear Fascia/Roof Protector",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lz_r07__opt_vtb_001",
@@ -6668,7 +6675,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 150,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VTB.jpg",
+      "image_alt": "Black Rear Fascia/Roof Protector",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lz_r67__opt_vtb_001",
@@ -6689,7 +6703,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 150,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VTB.jpg",
+      "image_alt": "Black Rear Fascia/Roof Protector",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lz_r67__opt_vtb_001",
@@ -6710,7 +6731,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 150,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VTB.jpg",
+      "image_alt": "Black Rear Fascia/Roof Protector",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lz_r07__opt_pcq_001",
@@ -8159,7 +8187,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 275,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VYW.jpg",
+      "image_alt": "Premium Carpeted Floor Mats",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lz_r07__opt_vyw_001",
@@ -8180,7 +8215,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 275,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VYW.jpg",
+      "image_alt": "Premium Carpeted Floor Mats",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lz_r67__opt_vyw_001",
@@ -8201,7 +8243,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 275,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VYW.jpg",
+      "image_alt": "Premium Carpeted Floor Mats",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lz_r67__opt_vyw_001",
@@ -8222,7 +8271,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 275,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VYW.jpg",
+      "image_alt": "Premium Carpeted Floor Mats",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lz_r07__opt_rwu_001",
@@ -8327,7 +8383,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 125,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/w2d.jpg",
+      "image_alt": "Cargo Net Set",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lz_r07__opt_w2d_001",
@@ -8348,7 +8411,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 125,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/w2d.jpg",
+      "image_alt": "Cargo Net Set",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lz_r67__opt_w2d_001",
@@ -8369,7 +8439,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 125,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/w2d.jpg",
+      "image_alt": "Cargo Net Set",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lz_r67__opt_w2d_001",
@@ -8390,7 +8467,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 125,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/w2d.jpg",
+      "image_alt": "Cargo Net Set",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lz_r07__opt_s2l_001",
@@ -18416,7 +18500,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/wheels/soj.png",
+      "image_alt": "20-Spoke Sterling Silver-Painted Forged Aluminum Wheels",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lz_r07__opt_soj_002",
@@ -18438,7 +18529,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/wheels/soj.png",
+      "image_alt": "20-Spoke Sterling Silver-Painted Forged Aluminum Wheels",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lz_r67__opt_soj_002",
@@ -18460,7 +18558,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/wheels/soj.png",
+      "image_alt": "20-Spoke Sterling Silver-Painted Forged Aluminum Wheels",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lz_r67__opt_soj_002",
@@ -18482,7 +18587,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/wheels/soj.png",
+      "image_alt": "20-Spoke Sterling Silver-Painted Forged Aluminum Wheels",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lz_r07__opt_sog_001",
@@ -18503,7 +18615,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/wheels/sog.png",
+      "image_alt": "20-Spoke Carbon Flash-Painted Forged Aluminum Wheels",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lz_r07__opt_sog_001",
@@ -18524,7 +18643,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/wheels/sog.png",
+      "image_alt": "20-Spoke Carbon Flash-Painted Forged Aluminum Wheels",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lz_r67__opt_sog_001",
@@ -18545,7 +18671,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/wheels/sog.png",
+      "image_alt": "20-Spoke Carbon Flash-Painted Forged Aluminum Wheels",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lz_r67__opt_sog_001",
@@ -18566,7 +18699,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/wheels/sog.png",
+      "image_alt": "20-Spoke Carbon Flash-Painted Forged Aluminum Wheels",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lz_r07__opt_soh_001",
@@ -18587,7 +18727,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/wheels/soh.png",
+      "image_alt": "20-Spoke Bright Machined Forged Aluminum Wheels",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lz_r07__opt_soh_001",
@@ -18608,7 +18755,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/wheels/soh.png",
+      "image_alt": "20-Spoke Bright Machined Forged Aluminum Wheels",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lz_r67__opt_soh_001",
@@ -18629,7 +18783,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/wheels/soh.png",
+      "image_alt": "20-Spoke Bright Machined Forged Aluminum Wheels",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lz_r67__opt_soh_001",
@@ -18650,7 +18811,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/wheels/soh.png",
+      "image_alt": "20-Spoke Bright Machined Forged Aluminum Wheels",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lz_r07__opt_sof_001",
@@ -18671,7 +18839,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1495,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/wheels/sof.png",
+      "image_alt": "20-Spoke Edge Blue-Painted Forged Aluminum Wheels",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lz_r07__opt_sof_001",
@@ -18692,7 +18867,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1495,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/wheels/sof.png",
+      "image_alt": "20-Spoke Edge Blue-Painted Forged Aluminum Wheels",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lz_r67__opt_sof_001",
@@ -18713,7 +18895,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1495,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/wheels/sof.png",
+      "image_alt": "20-Spoke Edge Blue-Painted Forged Aluminum Wheels",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lz_r67__opt_sof_001",
@@ -18734,7 +18923,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1495,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/wheels/sof.png",
+      "image_alt": "20-Spoke Edge Blue-Painted Forged Aluminum Wheels",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lz_r07__opt_su1_001",
@@ -25608,24 +25804,6 @@
       "source_note": ""
     },
     {
-      "rule_id": "zr1_rule_zyc_includes_gba_79270e3f8423",
-      "source_id": "opt_zyc_001",
-      "rule_type": "includes",
-      "target_id": "opt_gba_001",
-      "target_type": "option",
-      "source_type": "option",
-      "source_section": "sec_exte_001",
-      "target_section": "sec_pain_001",
-      "source_selection_mode": "multi_select_opt",
-      "target_selection_mode": "single_select_req",
-      "body_style_scope": "",
-      "disabled_reason": "Included with ZYC Carbon Flash Mirrors and Spoiler.",
-      "auto_add": "True",
-      "active": "True",
-      "runtime_action": "active",
-      "source_note": ""
-    },
-    {
       "rule_id": "zr1_rule_zz3_includes_sl9_92d15a5d1074",
       "source_id": "opt_zz3_001",
       "rule_type": "includes",
@@ -30840,7 +31018,7 @@
       "severity": "pass",
       "entity_type": "rule",
       "entity_id": "",
-      "message": "110 active compatibility rules exported from zr1_rule_mapping."
+      "message": "109 active compatibility rules exported from zr1_rule_mapping."
     },
     {
       "check_id": "interior_contract",

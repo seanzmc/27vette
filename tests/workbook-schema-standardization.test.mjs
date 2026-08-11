@@ -211,6 +211,36 @@ test("no explicit excludes duplicates an active exclusive-group relationship", (
   );
 });
 
+test("active direct rules never both block and require or include the same target", () => {
+  const conflicts = [];
+
+  for (const [modelKey, entry] of Object.entries(liveRegistry().models)) {
+    const typesByEdge = new Map();
+    for (const rule of entry.data.rules.filter((row) => row.active === "True")) {
+      const edge = [
+        rule.source_id,
+        rule.target_type,
+        rule.target_id,
+        rule.body_style_scope || "",
+      ].join("::");
+      if (!typesByEdge.has(edge)) typesByEdge.set(edge, new Set());
+      typesByEdge.get(edge).add(rule.rule_type);
+    }
+
+    for (const [edge, types] of typesByEdge) {
+      if (types.has("excludes") && (types.has("requires") || types.has("includes"))) {
+        conflicts.push(`${modelKey}:${edge}:${[...types].sort().join(",")}`);
+      }
+    }
+  }
+
+  assert.deepEqual(
+    conflicts,
+    [],
+    "a direct rule edge cannot simultaneously block and positively require the same target",
+  );
+});
+
 test("retired lifecycle columns stay absent from every registered sheet", () => {
   // The retired gate checked two named rule sheets. This sweeps all 73
   // registered sheets, so a reintroduction anywhere is caught — including in

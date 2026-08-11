@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "stingray_options",
-    "generated_at": "2026-07-26T20:53:41+00:00",
+    "generated_at": "2026-08-11T01:20:41+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -6356,7 +6356,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 19,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc7-1.png",
+      "image_alt": "Black LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_c07__opt_bc7_001",
@@ -6378,7 +6385,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 19,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc7-1.png",
+      "image_alt": "Black LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_c07__opt_bc7_001",
@@ -6400,7 +6414,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 19,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc7-1.png",
+      "image_alt": "Black LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_c67__opt_bc7_001",
@@ -6421,7 +6442,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 0,
-      "display_order": 19
+      "display_order": 19,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc7-1.png",
+      "image_alt": "Black LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_c67__opt_bc7_001",
@@ -6442,7 +6470,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 0,
-      "display_order": 19
+      "display_order": 19,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc7-1.png",
+      "image_alt": "Black LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_c67__opt_bc7_001",
@@ -6463,7 +6498,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 0,
-      "display_order": 19
+      "display_order": 19,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc7-1.png",
+      "image_alt": "Black LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_c07__opt_bcp_001",
@@ -6484,7 +6526,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 695,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bcp-1.png",
+      "image_alt": "Edge Red LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_c07__opt_bcp_001",
@@ -6505,7 +6554,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 695,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bcp-1.png",
+      "image_alt": "Edge Red LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_c07__opt_bcp_001",
@@ -6526,7 +6582,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 695,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bcp-1.png",
+      "image_alt": "Edge Red LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_c67__opt_bcp_001",
@@ -6547,7 +6610,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 695,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bcp-1.png",
+      "image_alt": "Edge Red LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_c67__opt_bcp_001",
@@ -6568,7 +6638,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 695,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bcp-1.png",
+      "image_alt": "Edge Red LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_c67__opt_bcp_001",
@@ -6589,7 +6666,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 695,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bcp-1.png",
+      "image_alt": "Edge Red LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_c07__opt_bcs_001",
@@ -6610,7 +6694,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 695,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bcs-1.png",
+      "image_alt": "Sterling Silver LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_c07__opt_bcs_001",
@@ -6631,7 +6722,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 695,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bcs-1.png",
+      "image_alt": "Sterling Silver LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_c07__opt_bcs_001",
@@ -6652,7 +6750,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 695,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bcs-1.png",
+      "image_alt": "Sterling Silver LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_c67__opt_bcs_001",
@@ -6673,7 +6778,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 695,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bcs-1.png",
+      "image_alt": "Sterling Silver LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_c67__opt_bcs_001",
@@ -6694,7 +6806,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 695,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bcs-1.png",
+      "image_alt": "Sterling Silver LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_c67__opt_bcs_001",
@@ -6715,7 +6834,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 695,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bcs-1.png",
+      "image_alt": "Sterling Silver LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_c07__opt_bc4_001",
@@ -6736,7 +6862,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 695,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc4-1.png",
+      "image_alt": "Blue LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_c07__opt_bc4_001",
@@ -6757,7 +6890,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 695,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc4-1.png",
+      "image_alt": "Blue LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_c07__opt_bc4_001",
@@ -6778,7 +6918,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 695,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc4-1.png",
+      "image_alt": "Blue LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_c67__opt_bc4_001",
@@ -6799,7 +6946,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 695,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc4-1.png",
+      "image_alt": "Blue LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_c67__opt_bc4_001",
@@ -6820,7 +6974,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 695,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc4-1.png",
+      "image_alt": "Blue LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_c67__opt_bc4_001",
@@ -6841,7 +7002,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 695,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc4-1.png",
+      "image_alt": "Blue LS6 Engine Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_c07__opt_slk_001",
@@ -7283,7 +7451,7 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-nga.jpg",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/c-nga.jpg",
       "image_alt": "Black Exhaust Tips",
       "image_fit": "cover",
       "image_position": "center",
@@ -7311,7 +7479,7 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-nga.jpg",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/c-nga.jpg",
       "image_alt": "Black Exhaust Tips",
       "image_fit": "cover",
       "image_position": "center",
@@ -7339,7 +7507,7 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-nga.jpg",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/c-nga.jpg",
       "image_alt": "Black Exhaust Tips",
       "image_fit": "cover",
       "image_position": "center",
@@ -7367,7 +7535,7 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-nga.jpg",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/c-nga.jpg",
       "image_alt": "Black Exhaust Tips",
       "image_fit": "cover",
       "image_position": "center",
@@ -7395,7 +7563,7 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-nga.jpg",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/c-nga.jpg",
       "image_alt": "Black Exhaust Tips",
       "image_fit": "cover",
       "image_position": "center",
@@ -7423,7 +7591,7 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-nga.jpg",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/c-nga.jpg",
       "image_alt": "Black Exhaust Tips",
       "image_fit": "cover",
       "image_position": "center",
@@ -11366,7 +11534,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 150,
-      "display_order": 80
+      "display_order": 80,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VTB.jpg",
+      "image_alt": "Black Rear Fascia/Roof Protector",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_c07__opt_vtb_001",
@@ -11387,7 +11562,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 150,
-      "display_order": 80
+      "display_order": 80,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VTB.jpg",
+      "image_alt": "Black Rear Fascia/Roof Protector",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_c07__opt_vtb_001",
@@ -11408,7 +11590,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 150,
-      "display_order": 80
+      "display_order": 80,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VTB.jpg",
+      "image_alt": "Black Rear Fascia/Roof Protector",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_c67__opt_vtb_001",
@@ -11429,7 +11618,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 150,
-      "display_order": 80
+      "display_order": 80,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VTB.jpg",
+      "image_alt": "Black Rear Fascia/Roof Protector",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_c67__opt_vtb_001",
@@ -11450,7 +11646,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 150,
-      "display_order": 80
+      "display_order": 80,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VTB.jpg",
+      "image_alt": "Black Rear Fascia/Roof Protector",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_c67__opt_vtb_001",
@@ -11471,7 +11674,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 150,
-      "display_order": 80
+      "display_order": 80,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VTB.jpg",
+      "image_alt": "Black Rear Fascia/Roof Protector",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_c07__opt_sti_001",
@@ -14180,7 +14390,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 275,
-      "display_order": 25
+      "display_order": 25,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VYW.jpg",
+      "image_alt": "Premium Carpeted Floor Mats",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_c07__opt_vyw_001",
@@ -14201,7 +14418,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 275,
-      "display_order": 25
+      "display_order": 25,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VYW.jpg",
+      "image_alt": "Premium Carpeted Floor Mats",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_c07__opt_vyw_001",
@@ -14222,7 +14446,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 275,
-      "display_order": 25
+      "display_order": 25,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VYW.jpg",
+      "image_alt": "Premium Carpeted Floor Mats",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_c67__opt_vyw_001",
@@ -14243,7 +14474,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 275,
-      "display_order": 25
+      "display_order": 25,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VYW.jpg",
+      "image_alt": "Premium Carpeted Floor Mats",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_c67__opt_vyw_001",
@@ -14264,7 +14502,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 275,
-      "display_order": 25
+      "display_order": 25,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VYW.jpg",
+      "image_alt": "Premium Carpeted Floor Mats",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_c67__opt_vyw_001",
@@ -14285,7 +14530,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 275,
-      "display_order": 25
+      "display_order": 25,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/VYW.jpg",
+      "image_alt": "Premium Carpeted Floor Mats",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_c07__opt_rwu_001",
@@ -14432,7 +14684,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 125,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/w2d.jpg",
+      "image_alt": "Cargo Net Set",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_c07__opt_w2d_001",
@@ -14453,7 +14712,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 125,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/w2d.jpg",
+      "image_alt": "Cargo Net Set",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_c07__opt_w2d_001",
@@ -14474,7 +14740,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 125,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/w2d.jpg",
+      "image_alt": "Cargo Net Set",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_c67__opt_w2d_001",
@@ -14495,7 +14768,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 125,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/w2d.jpg",
+      "image_alt": "Cargo Net Set",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_c67__opt_w2d_001",
@@ -14516,7 +14796,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 125,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/w2d.jpg",
+      "image_alt": "Cargo Net Set",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_c67__opt_w2d_001",
@@ -14537,7 +14824,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 125,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/w2d.jpg",
+      "image_alt": "Cargo Net Set",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_c07__opt_s2l_001",
