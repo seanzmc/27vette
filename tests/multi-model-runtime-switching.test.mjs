@@ -1158,6 +1158,82 @@ test("Grand Sport heritage hash marks auto-add Z15 and leave only center stripes
   assert.equal(runtime.state.selected.has("opt_d84_001"), false, "center stripe should not auto-select D84");
 });
 
+test("Grand Sport X heritage hash marks use the Grand Sport one-way Z15 auto-add topology", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grand_sport_x");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const hashOptionIds = [
+    "opt_17a_001",
+    "opt_20a_001",
+    "opt_55a_001",
+    "opt_75a_001",
+    "opt_97a_001",
+    "opt_dx4_001",
+  ];
+  const hashSection = runtime.data.sections.find(
+    (section) => section.section_id === "sec_gsha_001",
+  );
+  assert.ok(hashSection, "Grand Sport X should publish its Heritage Hash Marks section");
+  assert.equal(hashSection.selection_mode, "single_select_opt");
+  assert.equal(hashSection.is_required, "False");
+
+  const firstHash = runtime.activeChoiceRows().find(
+    (choice) => choice.option_id === "opt_17a_001",
+  );
+  assert.ok(firstHash, "17A should be active for Grand Sport X");
+  runtime.handleChoice(firstHash);
+
+  assert.equal(
+    runtime.currentOrder().auto_added_options.some((item) => item.rpo === "Z15"),
+    true,
+    "a Grand Sport X heritage hash selection should auto-add Z15",
+  );
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(runtime.currentOrder().auto_added_options))
+      .map((item) => item.rpo)
+      .filter((rpo) => ["Z15", "SNE", "VPW"].includes(rpo))
+      .sort(),
+    ["Z15"],
+    "Z15 should not auto-add the Jake graphics owned by PDA",
+  );
+  assert.deepEqual(
+    hashOptionIds.filter((optionId) => runtime.state.selected.has(optionId)),
+    ["opt_17a_001"],
+    "Z15 must not auto-add other choices in the optional single-choice hash section",
+  );
+
+  for (const hashOptionId of hashOptionIds) {
+    assert.ok(
+      runtime.data.rules.some(
+        (rule) =>
+          rule.active === "True" &&
+          rule.source_id === hashOptionId &&
+          rule.rule_type === "includes" &&
+          rule.target_id === "opt_z15_001" &&
+          rule.auto_add === "True",
+      ),
+      `${hashOptionId} should auto-add Z15`,
+    );
+  }
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(runtime.data.rules))
+      .filter(
+        (rule) =>
+          rule.active === "True" &&
+          rule.source_id === "opt_z15_001" &&
+          ["includes", "requires"].includes(rule.rule_type),
+      )
+      .map((rule) => `${rule.rule_type}:${rule.target_id}`)
+      .sort(),
+    [],
+    "Z15 must not include or require choices in the reverse direction",
+  );
+});
+
 test("Grand Sport UQT is selectable on 1LT and included on higher trims from workbook overrides", () => {
   const runtime = loadRuntime();
   runtime.activateModel("grandSport");
