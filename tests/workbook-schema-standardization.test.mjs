@@ -241,6 +241,56 @@ test("active direct rules never both block and require or include the same targe
   );
 });
 
+test("active direct rules do not duplicate active grouped relationships", () => {
+  const duplicates = [];
+
+  for (const [modelKey, entry] of Object.entries(liveRegistry().models)) {
+    const groupedEdges = new Map();
+    for (const group of entry.data.ruleGroups.filter((row) => row.active === "True")) {
+      // Direct rules have no trim- or variant-scope fields, so only an
+      // unscoped group (with the same body-style scope) can duplicate one.
+      if (group.trim_level_scope || group.variant_scope) continue;
+
+      const directType = {
+        excludes_any: "excludes",
+        requires_any: "requires",
+      }[group.group_type];
+      if (!directType) continue;
+
+      for (const targetId of group.target_ids) {
+        const edge = [
+          group.source_id,
+          directType,
+          targetId,
+          group.body_style_scope || "",
+        ].join("::");
+        if (!groupedEdges.has(edge)) groupedEdges.set(edge, []);
+        groupedEdges.get(edge).push(group.group_id);
+      }
+    }
+
+    for (const rule of entry.data.rules.filter((row) => row.active === "True")) {
+      const edge = [
+        rule.source_id,
+        rule.rule_type,
+        rule.target_id,
+        rule.body_style_scope || "",
+      ].join("::");
+      if (groupedEdges.has(edge)) {
+        duplicates.push(
+          `${modelKey}:${rule.rule_id}:${groupedEdges.get(edge).sort().join(",")}`,
+        );
+      }
+    }
+  }
+
+  assert.deepEqual(
+    duplicates,
+    [],
+    "a grouped relationship must not retain a competing direct-rule owner",
+  );
+});
+
 test("retired lifecycle columns stay absent from every registered sheet", () => {
   // The retired gate checked two named rule sheets. This sweeps all 73
   // registered sheets, so a reintroduction anywhere is caught — including in

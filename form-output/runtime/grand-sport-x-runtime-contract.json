@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grand_sport_x_options",
-    "generated_at": "2026-08-11T01:32:02+00:00",
+    "generated_at": "2026-08-11T02:14:13+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -43526,24 +43526,6 @@
       "source_note": ""
     },
     {
-      "rule_id": "grand_sport_x_rule_vpo_excludes_pda_33c079f06d87",
-      "source_id": "opt_vpo_001",
-      "rule_type": "excludes",
-      "target_id": "opt_pda_001",
-      "target_type": "option",
-      "source_type": "option",
-      "source_section": "sec_hash_001",
-      "target_section": "sec_jake_001",
-      "source_selection_mode": "single_select_opt",
-      "target_selection_mode": "multi_select_opt",
-      "body_style_scope": "",
-      "disabled_reason": "Blocked by VPO Tech Bronze Jake C8.R Rear Hash Graphic.",
-      "auto_add": "False",
-      "active": "True",
-      "runtime_action": "active",
-      "source_note": ""
-    },
-    {
       "rule_id": "grand_sport_x_rule_vpo_excludes_vpw_35c4b784b7b4",
       "source_id": "opt_vpo_001",
       "rule_type": "excludes",
@@ -43559,42 +43541,6 @@
       "auto_add": "False",
       "active": "False",
       "runtime_action": "omit_redundant_same_section_exclude",
-      "source_note": ""
-    },
-    {
-      "rule_id": "grand_sport_x_rule_vpo_excludes_z15_895a4460e92a",
-      "source_id": "opt_vpo_001",
-      "rule_type": "excludes",
-      "target_id": "opt_z15_001",
-      "target_type": "option",
-      "source_type": "option",
-      "source_section": "sec_hash_001",
-      "target_section": "sec_stri_001",
-      "source_selection_mode": "single_select_opt",
-      "target_selection_mode": "single_select_opt",
-      "body_style_scope": "",
-      "disabled_reason": "Blocked by VPO Tech Bronze Jake C8.R Rear Hash Graphic.",
-      "auto_add": "False",
-      "active": "True",
-      "runtime_action": "active",
-      "source_note": ""
-    },
-    {
-      "rule_id": "grand_sport_x_rule_vpw_excludes_z15_063cc870eca2",
-      "source_id": "opt_vpw_001",
-      "rule_type": "excludes",
-      "target_id": "opt_z15_001",
-      "target_type": "option",
-      "source_type": "option",
-      "source_section": "sec_hash_001",
-      "target_section": "sec_stri_001",
-      "source_selection_mode": "single_select_opt",
-      "target_selection_mode": "single_select_opt",
-      "body_style_scope": "",
-      "disabled_reason": "Blocked by VPW Jake C8.R Rear Hash Graphic.",
-      "auto_add": "False",
-      "active": "True",
-      "runtime_action": "active",
       "source_note": ""
     },
     {
@@ -52385,7 +52331,7 @@
       "severity": "pass",
       "entity_type": "rule",
       "entity_id": "",
-      "message": "176 active compatibility rules exported from grand_sport_x_rule_mapping."
+      "message": "173 active compatibility rules exported from grand_sport_x_rule_mapping."
     },
     {
       "check_id": "interior_contract",
