@@ -1234,6 +1234,73 @@ test("Grand Sport X heritage hash marks use the Grand Sport one-way Z15 auto-add
   );
 });
 
+test("Grand Sport X keeps unavailable R88 out of runtime and applies SFZ canonical conflicts", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grand_sport_x");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  assert.equal(
+    runtime.data.choices.some((choice) => choice.option_id === "opt_r88_001"),
+    false,
+    "inactive R88 should not publish any Grand Sport X runtime choices",
+  );
+
+  const expectedTargets = [
+    "opt_eyk_001",
+    "opt_dpb_001",
+    "opt_dpc_001",
+    "opt_dpg_001",
+    "opt_dpl_001",
+    "opt_dpt_001",
+    "opt_dsy_001",
+    "opt_dsz_001",
+    "opt_dt0_001",
+    "opt_dtc_001",
+    "opt_dth_001",
+    "opt_dub_001",
+    "opt_due_001",
+    "opt_duk_001",
+    "opt_dmu_001",
+    "opt_dmv_001",
+    "opt_dmw_001",
+    "opt_dmx_001",
+    "opt_dmy_001",
+  ];
+  const sfzGroup = runtime.data.ruleGroups.find(
+    (group) => group.group_id === "gsx_group_sfz_excludes_badge_and_stripe_choices",
+  );
+  assert.ok(sfzGroup, "SFZ should publish one grouped canonical exclusion owner");
+  assert.equal(sfzGroup.group_type, "excludes_any");
+  assert.equal(sfzGroup.source_id, "opt_sfz_001");
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(sfzGroup.target_ids)),
+    expectedTargets,
+  );
+  assert.equal(
+    runtime.data.rules.some(
+      (rule) => rule.source_id === "opt_sfz_001" && rule.rule_type === "excludes",
+    ),
+    false,
+    "SFZ exclusions should have one grouped owner instead of partial direct rows",
+  );
+
+  const sfz = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_sfz_001");
+  assert.ok(sfz, "SFZ should remain available for Grand Sport X");
+  runtime.handleChoice(sfz);
+  assert.equal(runtime.state.selected.has("opt_sfz_001"), true);
+
+  for (const optionId of ["opt_eyk_001", "opt_dtc_001", "opt_dmu_001"]) {
+    const choice = runtime.activeChoiceRows().find((candidate) => candidate.option_id === optionId);
+    assert.ok(choice, `${optionId} should exist for the runtime conflict proof`);
+    assert.notEqual(runtime.disableReasonForChoice(choice), "", `${optionId} should be unavailable with SFZ`);
+    runtime.handleChoice(choice);
+    assert.equal(runtime.state.selected.has(optionId), false, `${optionId} should not be selectable with SFZ`);
+  }
+});
+
 test("Grand Sport UQT is selectable on 1LT and included on higher trims from workbook overrides", () => {
   const runtime = loadRuntime();
   runtime.activateModel("grandSport");
