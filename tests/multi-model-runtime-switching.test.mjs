@@ -1301,6 +1301,55 @@ test("Grand Sport X keeps unavailable R88 out of runtime and applies SFZ canonic
   }
 });
 
+test("Grand Sport X does not publish unsupported DT0 or EFR auto-adds", () => {
+  const cases = [
+    {
+      ruleId: "grand_sport_x_rule_dt0_includes_sne_f0099d7e7cb4",
+      sourceId: "opt_dt0_001",
+      targetId: "opt_sne_001",
+      targetRpo: "SNE",
+    },
+    {
+      ruleId: "grand_sport_x_rule_efr_includes_cfv_ea894acb4a76",
+      sourceId: "opt_efr_001",
+      targetId: "opt_cfv_001",
+      targetRpo: "CFV",
+    },
+  ];
+
+  for (const { ruleId, sourceId, targetId, targetRpo } of cases) {
+    const runtime = loadRuntime();
+    runtime.activateModel("grand_sport_x");
+    runtime.state.bodyStyle = "coupe";
+    runtime.state.trimLevel = "1LT";
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+
+    assert.equal(
+      runtime.data.rules.some(
+        (rule) =>
+          rule.rule_id === ruleId &&
+          rule.source_id === sourceId &&
+          rule.rule_type === "includes" &&
+          rule.target_id === targetId &&
+          rule.auto_add === "True",
+      ),
+      false,
+      `${sourceId} should not publish the unsupported ${targetRpo} auto-add`,
+    );
+
+    const source = runtime.activeChoiceRows().find((choice) => choice.option_id === sourceId);
+    assert.ok(source, `${sourceId} should exist for the Grand Sport X runtime proof`);
+    runtime.handleChoice(source);
+    assert.equal(runtime.state.selected.has(sourceId), true, `${sourceId} should remain selectable`);
+    assert.equal(
+      runtime.currentOrder().auto_added_options.some((item) => item.rpo === targetRpo),
+      false,
+      `${sourceId} should not auto-add ${targetRpo}`,
+    );
+  }
+});
+
 test("Grand Sport UQT is selectable on 1LT and included on higher trims from workbook overrides", () => {
   const runtime = loadRuntime();
   runtime.activateModel("grandSport");

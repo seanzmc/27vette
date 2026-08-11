@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grand_sport_x_options",
-    "generated_at": "2026-08-11T04:04:29+00:00",
+    "generated_at": "2026-08-11T14:05:01+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -42508,24 +42508,6 @@
       "source_note": ""
     },
     {
-      "rule_id": "grand_sport_x_rule_dt0_includes_sne_f0099d7e7cb4",
-      "source_id": "opt_dt0_001",
-      "rule_type": "includes",
-      "target_id": "opt_sne_001",
-      "target_type": "option",
-      "source_type": "option",
-      "source_section": "sec_stri_001",
-      "target_section": "sec_stri_001",
-      "source_selection_mode": "single_select_opt",
-      "target_selection_mode": "single_select_opt",
-      "body_style_scope": "",
-      "disabled_reason": "Included with DT0 Competition Yellow Racing Stripes.",
-      "auto_add": "True",
-      "active": "True",
-      "runtime_action": "active",
-      "source_note": ""
-    },
-    {
       "rule_id": "grand_sport_x_rule_dtc_excludes_gtr_84760f32604c",
       "source_id": "opt_dtc_001",
       "rule_type": "excludes",
@@ -42719,24 +42701,6 @@
       "body_style_scope": "",
       "disabled_reason": "Blocked by EDU Body-Color and Carbon Flash Accents.",
       "auto_add": "False",
-      "active": "True",
-      "runtime_action": "active",
-      "source_note": ""
-    },
-    {
-      "rule_id": "grand_sport_x_rule_efr_includes_cfv_ea894acb4a76",
-      "source_id": "opt_efr_001",
-      "rule_type": "includes",
-      "target_id": "opt_cfv_001",
-      "target_type": "option",
-      "source_type": "option",
-      "source_section": "sec_exte_001",
-      "target_section": "sec_perf_ground_001",
-      "source_selection_mode": "multi_select_opt",
-      "target_selection_mode": "single_select_opt",
-      "body_style_scope": "",
-      "disabled_reason": "Included with EFR Carbon Flash Painted Accents.",
-      "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
       "source_note": ""
@@ -51871,7 +51835,7 @@
       "severity": "pass",
       "entity_type": "rule",
       "entity_id": "",
-      "message": "155 active compatibility rules exported from grand_sport_x_rule_mapping."
+      "message": "153 active compatibility rules exported from grand_sport_x_rule_mapping."
     },
     {
       "check_id": "interior_contract",
