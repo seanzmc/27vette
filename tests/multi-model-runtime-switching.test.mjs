@@ -1350,6 +1350,80 @@ test("Grand Sport X does not publish unsupported DT0 or EFR auto-adds", () => {
   }
 });
 
+test("Grand Sport and Grand Sport X publish Jake hood graphics outside the stripe selector with GSX stripe parity", () => {
+  const registry = loadDataWindow().CORVETTE_FORM_DATA;
+  const namedStripeIds = [
+    "opt_dpb_001",
+    "opt_dpc_001",
+    "opt_dpg_001",
+    "opt_dpl_001",
+    "opt_dpt_001",
+    "opt_dsy_001",
+    "opt_dsz_001",
+    "opt_dt0_001",
+    "opt_dtc_001",
+    "opt_dth_001",
+    "opt_dub_001",
+    "opt_due_001",
+    "opt_duk_001",
+    "opt_dzu_001",
+    "opt_dzv_001",
+    "opt_dzx_001",
+  ];
+
+  for (const modelKey of ["grandSport", "grand_sport_x"]) {
+    const data = registry.models[modelKey].data;
+    const byRpo = new Map(data.choices.map((choice) => [choice.rpo, choice]));
+    assert.equal(byRpo.get("PDA")?.section_id, "sec_jake_001", `${modelKey} PDA should remain in Jake Graphics`);
+    assert.equal(byRpo.get("SNE")?.section_id, "sec_jake_001", `${modelKey} SNE should render in Jake Graphics`);
+    assert.equal(byRpo.get("SHT")?.section_id, "sec_jake_001", `${modelKey} SHT should render in Jake Graphics`);
+    assert.equal(byRpo.get("VPW")?.section_id, "sec_hash_001", `${modelKey} VPW should remain in Hash Marks`);
+    assert.equal(byRpo.get("VPO")?.section_id, "sec_hash_001", `${modelKey} VPO should remain in Hash Marks`);
+  }
+
+  const runtime = loadRuntime();
+  runtime.activateModel("grand_sport_x");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.state.selected.clear();
+  runtime.state.userSelected.clear();
+
+  const pda = runtime.activeChoiceRows().find((choice) => choice.rpo === "PDA");
+  assert.ok(pda, "Grand Sport X should expose PDA");
+  runtime.handleChoice(pda);
+  const autoAddedRpos = [...runtime.computeAutoAdded().keys()]
+    .map((optionId) => runtime.data.choices.find((choice) => choice.option_id === optionId)?.rpo)
+    .filter(Boolean)
+    .sort();
+  assert.deepEqual(autoAddedRpos.filter((rpo) => ["SNE", "VPW"].includes(rpo)), ["SNE", "VPW"]);
+
+  const groupTargets = (groupId) => {
+    const group = runtime.data.ruleGroups.find((candidate) => candidate.group_id === groupId);
+    assert.ok(group, `${groupId} should publish from the GSX workbook rule-group owner`);
+    return JSON.parse(JSON.stringify(group.target_ids));
+  };
+  assert.deepEqual(groupTargets("gsx_group_pda_excludes_full_length_stripes"), namedStripeIds);
+  assert.deepEqual(
+    groupTargets("gsx_group_sne_excludes_full_length_stripes_and_jake_conflicts"),
+    [...namedStripeIds, "opt_sht_001", "opt_vpo_001"],
+  );
+  assert.deepEqual(
+    groupTargets("gsx_group_sht_excludes_full_length_stripes_and_jake_conflicts"),
+    [...namedStripeIds, "opt_pda_001", "opt_sne_001", "opt_vpw_001"],
+  );
+  assert.deepEqual(
+    groupTargets("gsx_group_dtc_excludes_jake_hood_graphics"),
+    ["opt_sht_001", "opt_sne_001"],
+  );
+  assert.equal(
+    runtime.data.choices.some((choice) => choice.rpo === "DUW"),
+    false,
+    "Grand Sport X must not invent the unavailable Grand Sport-only DUW stripe",
+  );
+});
+
 test("Grand Sport UQT is selectable on 1LT and included on higher trims from workbook overrides", () => {
   const runtime = loadRuntime();
   runtime.activateModel("grandSport");
