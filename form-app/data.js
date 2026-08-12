@@ -102857,7 +102857,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grand_sport_x_options",
-          "generated_at": "2026-08-12T03:03:13+00:00",
+          "generated_at": "2026-08-12T21:21:13+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -108570,7 +108570,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 10,
+            "display_order": 40,
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc4-1.png",
             "image_alt": "Blue LS6 Engine Cover",
             "image_fit": "cover",
@@ -108598,7 +108598,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 10,
+            "display_order": 40,
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc4-1.png",
             "image_alt": "Blue LS6 Engine Cover",
             "image_fit": "cover",
@@ -108626,7 +108626,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 10,
+            "display_order": 40,
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc4-1.png",
             "image_alt": "Blue LS6 Engine Cover",
             "image_fit": "cover",
@@ -108654,7 +108654,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 10,
+            "display_order": 40,
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc4-1.png",
             "image_alt": "Blue LS6 Engine Cover",
             "image_fit": "cover",
@@ -108682,7 +108682,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 10,
+            "display_order": 40,
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc4-1.png",
             "image_alt": "Blue LS6 Engine Cover",
             "image_fit": "cover",
@@ -108710,7 +108710,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 10,
+            "display_order": 40,
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc4-1.png",
             "image_alt": "Blue LS6 Engine Cover",
             "image_fit": "cover",
@@ -109074,7 +109074,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1895,
-            "display_order": 40
+            "display_order": 1
           },
           {
             "choice_id": "2lt_g07__opt_b6p_001",
@@ -109095,7 +109095,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1895,
-            "display_order": 40
+            "display_order": 1
           },
           {
             "choice_id": "3lt_g07__opt_b6p_001",
@@ -109116,7 +109116,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1895,
-            "display_order": 40
+            "display_order": 1
           },
           {
             "choice_id": "1lt_g67__opt_b6p_001",
@@ -109137,7 +109137,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1895,
-            "display_order": 40
+            "display_order": 1
           },
           {
             "choice_id": "2lt_g67__opt_b6p_001",
@@ -109158,7 +109158,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1895,
-            "display_order": 40
+            "display_order": 1
           },
           {
             "choice_id": "3lt_g67__opt_b6p_001",
@@ -109179,7 +109179,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1895,
-            "display_order": 40
+            "display_order": 1
           },
           {
             "choice_id": "1lt_g07__opt_zz3_001",
@@ -109200,7 +109200,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1195,
-            "display_order": 50
+            "display_order": 5
           },
           {
             "choice_id": "2lt_g07__opt_zz3_001",
@@ -109221,7 +109221,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1195,
-            "display_order": 50
+            "display_order": 5
           },
           {
             "choice_id": "3lt_g07__opt_zz3_001",
@@ -109242,7 +109242,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1195,
-            "display_order": 50
+            "display_order": 5
           },
           {
             "choice_id": "1lt_g67__opt_zz3_001",
@@ -109263,7 +109263,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1195,
-            "display_order": 50
+            "display_order": 5
           },
           {
             "choice_id": "2lt_g67__opt_zz3_001",
@@ -109284,7 +109284,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1195,
-            "display_order": 50
+            "display_order": 5
           },
           {
             "choice_id": "3lt_g67__opt_zz3_001",
@@ -109305,7 +109305,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1195,
-            "display_order": 50
+            "display_order": 5
           },
           {
             "choice_id": "1lt_g07__opt_d3v_001",
@@ -109326,7 +109326,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 195,
-            "display_order": 60
+            "display_order": 10
           },
           {
             "choice_id": "2lt_g07__opt_d3v_001",
@@ -109347,7 +109347,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 195,
-            "display_order": 60
+            "display_order": 10
           },
           {
             "choice_id": "3lt_g07__opt_d3v_001",
@@ -109368,7 +109368,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 195,
-            "display_order": 60
+            "display_order": 10
           },
           {
             "choice_id": "1lt_g67__opt_d3v_001",
@@ -109389,7 +109389,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 195,
-            "display_order": 60
+            "display_order": 10
           },
           {
             "choice_id": "2lt_g67__opt_d3v_001",
@@ -109410,7 +109410,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 195,
-            "display_order": 60
+            "display_order": 10
           },
           {
             "choice_id": "3lt_g67__opt_d3v_001",
@@ -109431,7 +109431,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 195,
-            "display_order": 60
+            "display_order": 10
           },
           {
             "choice_id": "1lt_g07__opt_sl9_001",
@@ -109452,7 +109452,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 125,
-            "display_order": 70
+            "display_order": 11
           },
           {
             "choice_id": "2lt_g07__opt_sl9_001",
@@ -109473,7 +109473,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 125,
-            "display_order": 70
+            "display_order": 11
           },
           {
             "choice_id": "3lt_g07__opt_sl9_001",
@@ -109494,7 +109494,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 125,
-            "display_order": 70
+            "display_order": 11
           },
           {
             "choice_id": "1lt_g67__opt_sl9_001",
@@ -109515,7 +109515,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 125,
-            "display_order": 70
+            "display_order": 11
           },
           {
             "choice_id": "2lt_g67__opt_sl9_001",
@@ -109536,7 +109536,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 125,
-            "display_order": 70
+            "display_order": 11
           },
           {
             "choice_id": "3lt_g67__opt_sl9_001",
@@ -109557,7 +109557,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 125,
-            "display_order": 70
+            "display_order": 11
           },
           {
             "choice_id": "1lt_g07__opt_bc7_001",
@@ -109578,7 +109578,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 0,
-            "display_order": 80,
+            "display_order": 19,
             "display_behavior": "default_selected",
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc7-1.png",
             "image_alt": "Black LS6 Engine Cover",
@@ -109607,7 +109607,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 0,
-            "display_order": 80,
+            "display_order": 19,
             "display_behavior": "default_selected",
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc7-1.png",
             "image_alt": "Black LS6 Engine Cover",
@@ -109636,7 +109636,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 0,
-            "display_order": 80,
+            "display_order": 19,
             "display_behavior": "default_selected",
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc7-1.png",
             "image_alt": "Black LS6 Engine Cover",
@@ -109665,7 +109665,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 0,
-            "display_order": 80,
+            "display_order": 19,
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc7-1.png",
             "image_alt": "Black LS6 Engine Cover",
             "image_fit": "cover",
@@ -109693,7 +109693,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 0,
-            "display_order": 80,
+            "display_order": 19,
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc7-1.png",
             "image_alt": "Black LS6 Engine Cover",
             "image_fit": "cover",
@@ -109721,7 +109721,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 0,
-            "display_order": 80,
+            "display_order": 19,
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/bc7-1.png",
             "image_alt": "Black LS6 Engine Cover",
             "image_fit": "cover",
@@ -109749,7 +109749,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1995,
-            "display_order": 90
+            "display_order": 50
           },
           {
             "choice_id": "2lt_g07__opt_slk_001",
@@ -109770,7 +109770,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1995,
-            "display_order": 90
+            "display_order": 50
           },
           {
             "choice_id": "3lt_g07__opt_slk_001",
@@ -109791,7 +109791,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1995,
-            "display_order": 90
+            "display_order": 50
           },
           {
             "choice_id": "1lt_g67__opt_slk_001",
@@ -109812,7 +109812,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1995,
-            "display_order": 90
+            "display_order": 50
           },
           {
             "choice_id": "2lt_g67__opt_slk_001",
@@ -109833,7 +109833,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1995,
-            "display_order": 90
+            "display_order": 50
           },
           {
             "choice_id": "3lt_g67__opt_slk_001",
@@ -109854,7 +109854,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 1995,
-            "display_order": 90
+            "display_order": 50
           },
           {
             "choice_id": "1lt_g07__opt_sln_001",
@@ -109875,7 +109875,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 2895,
-            "display_order": 100
+            "display_order": 60
           },
           {
             "choice_id": "2lt_g07__opt_sln_001",
@@ -109896,7 +109896,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 2895,
-            "display_order": 100
+            "display_order": 60
           },
           {
             "choice_id": "3lt_g07__opt_sln_001",
@@ -109917,7 +109917,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 2895,
-            "display_order": 100
+            "display_order": 60
           },
           {
             "choice_id": "1lt_g67__opt_sln_001",
@@ -109938,7 +109938,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 2895,
-            "display_order": 100
+            "display_order": 60
           },
           {
             "choice_id": "2lt_g67__opt_sln_001",
@@ -109959,7 +109959,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 2895,
-            "display_order": 100
+            "display_order": 60
           },
           {
             "choice_id": "3lt_g67__opt_sln_001",
@@ -109980,7 +109980,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 2895,
-            "display_order": 100
+            "display_order": 60
           },
           {
             "choice_id": "1lt_g07__opt_vup_001",
@@ -110001,7 +110001,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 575,
-            "display_order": 110
+            "display_order": 70
           },
           {
             "choice_id": "2lt_g07__opt_vup_001",
@@ -110022,7 +110022,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 575,
-            "display_order": 110
+            "display_order": 70
           },
           {
             "choice_id": "3lt_g07__opt_vup_001",
@@ -110043,7 +110043,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 575,
-            "display_order": 110
+            "display_order": 70
           },
           {
             "choice_id": "1lt_g67__opt_vup_001",
@@ -110064,7 +110064,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 575,
-            "display_order": 110
+            "display_order": 70
           },
           {
             "choice_id": "2lt_g67__opt_vup_001",
@@ -110085,7 +110085,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 575,
-            "display_order": 110
+            "display_order": 70
           },
           {
             "choice_id": "3lt_g67__opt_vup_001",
@@ -110106,7 +110106,7 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 575,
-            "display_order": 110
+            "display_order": 70
           },
           {
             "choice_id": "1lt_g07__opt_nga_001",
@@ -137422,7 +137422,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_engi_001",
             "section_name": "Engine Appearance",
             "standard_equipment_group_type": "",
-            "display_order": 80
+            "display_order": 19
           },
           {
             "equipment_id": "std_2lt_g07__opt_bc7_001",
@@ -137436,7 +137436,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_engi_001",
             "section_name": "Engine Appearance",
             "standard_equipment_group_type": "",
-            "display_order": 80
+            "display_order": 19
           },
           {
             "equipment_id": "std_3lt_g07__opt_bc7_001",
@@ -137450,7 +137450,7 @@ window.CORVETTE_FORM_DATA = {
             "section_id": "sec_engi_001",
             "section_name": "Engine Appearance",
             "standard_equipment_group_type": "",
-            "display_order": 80
+            "display_order": 19
           },
           {
             "equipment_id": "std_1lt_g07__opt_nga_001",

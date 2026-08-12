@@ -590,6 +590,25 @@ test("Grand Sport X exterior paint borrows the Grand Sport vehicle render family
   assert.equal(runtime.vehicleAssetFolder(), "e");
 });
 
+test("Grand Sport X engine appearance display order matches Grand Sport", () => {
+  const runtime = loadRuntime();
+  const visibleEngineOrder = (modelKey) => {
+    runtime.activateModel(modelKey);
+    runtime.state.bodyStyle = "coupe";
+    runtime.state.trimLevel = "1LT";
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+    return runtime.activeChoiceRows()
+      .filter((choice) => choice.section_id === "sec_engi_001" && choice.status !== "unavailable")
+      .sort((left, right) => Number(left.display_order) - Number(right.display_order))
+      .map((choice) => choice.rpo);
+  };
+
+  const grandSportOrder = visibleEngineOrder("grandSport");
+  const grandSportXOrder = visibleEngineOrder("grand_sport_x");
+  assert.deepEqual(grandSportXOrder, grandSportOrder);
+});
+
 test("runtime progressively advances vehicle setup panels before exterior paint", () => {
   const runtime = loadRuntime();
   const convertible = runtime.data.contextChoices.find((choice) => choice.context_choice_id === "body_style__convertible");
