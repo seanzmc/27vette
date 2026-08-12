@@ -69,11 +69,11 @@ const nonCenterStripeOptionIds = [
   "opt_sht_001", "opt_vpo_001", "opt_pda_001", "opt_sne_001", "opt_vpw_001",
 ];
 const fullLengthStripeOptionIds = nonCenterStripeOptionIds.slice(0, 16);
-const grandSportJakeOptionIds = ["opt_pda_001", "opt_sne_001", "opt_vpw_001"];
+const grandSportJakeOptionIds = ["opt_pda_001", "opt_sne_001", "opt_sht_001"];
 const jakeGraphicSectionByOptionId = new Map([
   ["opt_pda_001", "sec_jake_001"],
-  ["opt_sne_001", "sec_stri_001"],
-  ["opt_vpw_001", "sec_hash_001"],
+  ["opt_sne_001", "sec_jake_001"],
+  ["opt_sht_001", "sec_jake_001"],
 ]);
 const requiredPackagePriceRules = [
   ["gs_pr_fey_j57_001", "opt_fey_001", "opt_j57_001", "override", 0],
@@ -827,15 +827,21 @@ test("Grand Sport runtime contract standard equipment grouping is workbook-owned
   assert.equal(trimRows.every((item) => ["sec_1lte_001", "sec_2lte_001", "sec_3lte_001"].includes(item.section_id)), true);
 });
 
-test("Grand Sport and Z06 workbook place rear hash graphics outside the stripe radio section", () => {
+test("Grand Sport and Z06 workbook keep rear hash graphics outside the stripe radio section", () => {
   for (const [sheetName, modelLabel] of [["grandSport_options", "Grand Sport"], ["z06_options", "Z06"]]) {
     const rowsByOptionId = new Map(workbookRows(sheetName).map((row) => [row.option_id, row]));
     assert.equal(rowsByOptionId.get("opt_vpo_001")?.section_id, "sec_hash_001", `${modelLabel} VPO should be a rear hash choice`);
     assert.equal(rowsByOptionId.get("opt_vpw_001")?.section_id, "sec_hash_001", `${modelLabel} VPW should be a rear hash choice`);
-    assert.equal(rowsByOptionId.get("opt_sht_001")?.section_id, "sec_stri_001", `${modelLabel} SHT should stay in the stripe section`);
     assert.equal(rowsByOptionId.get("opt_pda_001")?.section_id, "sec_jake_001", `${modelLabel} PDA should live outside stripe/hash radio sections so its includes can auto-add`);
-    assert.equal(rowsByOptionId.get("opt_sne_001")?.section_id, "sec_stri_001", `${modelLabel} SNE should stay in the stripe section`);
   }
+
+  const grandSportRows = new Map(workbookRows("grandSport_options").map((row) => [row.option_id, row]));
+  assert.equal(grandSportRows.get("opt_sht_001")?.section_id, "sec_jake_001", "Grand Sport SHT should live in Jake Graphics");
+  assert.equal(grandSportRows.get("opt_sne_001")?.section_id, "sec_jake_001", "Grand Sport SNE should live in Jake Graphics");
+
+  const z06Rows = new Map(workbookRows("z06_options").map((row) => [row.option_id, row]));
+  assert.equal(z06Rows.get("opt_sht_001")?.section_id, "sec_stri_001", "Z06 SHT should stay in the stripe section");
+  assert.equal(z06Rows.get("opt_sne_001")?.section_id, "sec_stri_001", "Z06 SNE should stay in the stripe section");
 
   for (const [sheetName, ruleIds] of [
     ["grandSport_rule_mapping", ["gs_rule_opt_pda_001_includes_opt_sne_001", "gs_rule_opt_pda_001_includes_opt_vpw_001"]],
@@ -872,7 +878,7 @@ test("Grand Sport wheel choices keep new aluminum wheels in the existing workboo
   ]);
 });
 
-test("Grand Sport Jake graphics are selectable choices with rear hash graphics in the hash section", () => {
+test("Grand Sport Jake graphics and rear hash graphics retain their separate sections", () => {
   for (const optionId of grandSportJakeOptionIds) {
     const choices = draft.choices.filter((choice) => choice.option_id === optionId);
     assert.equal(choices.length, 6, `${optionId} should be emitted for every Grand Sport variant`);

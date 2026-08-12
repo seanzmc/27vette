@@ -328,6 +328,88 @@ def test_reconcile_uses_bare_media_as_shared_fallback_after_model_prefixed_media
     assert status == {}
 
 
+def test_reconcile_uses_model_fallback_chain_before_bare_media() -> None:
+    desired = {
+        ("grand_sport_x", "option", "opt_aaa_001"): {"target_type": "option", "rpo": "aaa", "name": "GSX exact"},
+        ("grand_sport_x", "option", "opt_bbb_001"): {"target_type": "option", "rpo": "bbb", "name": "Grand Sport fallback"},
+        ("grand_sport_x", "option", "opt_ccc_001"): {"target_type": "option", "rpo": "ccc", "name": "Stingray chain fallback"},
+        ("grand_sport", "option", "opt_ddd_001"): {"target_type": "option", "rpo": "ddd", "name": "Stingray fallback"},
+        ("zr1", "option", "opt_eee_001"): {"target_type": "option", "rpo": "eee", "name": "ZR1 exact"},
+        ("zr1x", "option", "opt_fff_001"): {"target_type": "option", "rpo": "fff", "name": "Z06 fallback"},
+        ("z06", "option", "opt_ggg_001"): {"target_type": "option", "rpo": "ggg", "name": "Bare fallback"},
+    }
+    media = asset_map_sync.build_media_inventory(
+        [
+            "https://example.test/27vette/g-aaa.png",
+            "https://example.test/27vette/e-aaa.png",
+            "https://example.test/27vette/aaa.png",
+            "https://example.test/27vette/e-bbb.png",
+            "https://example.test/27vette/c-bbb.png",
+            "https://example.test/27vette/bbb.png",
+            "https://example.test/27vette/c-ccc.png",
+            "https://example.test/27vette/ccc.png",
+            "https://example.test/27vette/c-ddd.png",
+            "https://example.test/27vette/ddd.png",
+            "https://example.test/27vette/r-eee.png",
+            "https://example.test/27vette/h-eee.png",
+            "https://example.test/27vette/eee.png",
+            "https://example.test/27vette/h-fff.png",
+            "https://example.test/27vette/fff.png",
+            "https://example.test/27vette/ggg.png",
+        ]
+    )
+
+    plan = asset_map_sync.reconcile(desired, media, existing_rows={}, alive={}, incremental=False)
+    by_target = {row["target_id"]: row for row in plan.report}
+
+    assert by_target["opt_aaa_001"]["candidate_source"] == "prefixed"
+    assert by_target["opt_aaa_001"]["new_url"].endswith("/g-aaa.png")
+    assert by_target["opt_bbb_001"]["candidate_source"] == "model-fallback:grand_sport"
+    assert by_target["opt_bbb_001"]["new_url"].endswith("/e-bbb.png")
+    assert by_target["opt_ccc_001"]["candidate_source"] == "model-fallback:stingray"
+    assert by_target["opt_ccc_001"]["new_url"].endswith("/c-ccc.png")
+    assert by_target["opt_ddd_001"]["candidate_source"] == "model-fallback:stingray"
+    assert by_target["opt_ddd_001"]["new_url"].endswith("/c-ddd.png")
+    assert by_target["opt_eee_001"]["candidate_source"] == "prefixed"
+    assert by_target["opt_eee_001"]["new_url"].endswith("/r-eee.png")
+    assert by_target["opt_fff_001"]["candidate_source"] == "model-fallback:z06"
+    assert by_target["opt_fff_001"]["new_url"].endswith("/h-fff.png")
+    assert by_target["opt_ggg_001"]["candidate_source"] == "bare-shared"
+    assert by_target["opt_ggg_001"]["new_url"].endswith("/ggg.png")
+
+
+def test_reconcile_flags_ambiguous_highest_priority_model_candidate_without_falling_through() -> None:
+    desired = {
+        ("grand_sport_x", "option", "opt_bbb_001"): {"target_type": "option", "rpo": "bbb", "name": "Ambiguous Grand Sport fallback"},
+        ("grand_sport_x", "option", "opt_ccc_001"): {"target_type": "option", "rpo": "ccc", "name": "Ambiguous GSX exact"},
+    }
+    media = asset_map_sync.build_media_inventory(
+        [
+            "https://example.test/27vette/mech/e-bbb.png",
+            "https://example.test/27vette/exhaust/e-bbb.png",
+            "https://example.test/27vette/mech/c-bbb.png",
+            "https://example.test/27vette/mech/bbb.png",
+            "https://example.test/27vette/mech/g-ccc.png",
+            "https://example.test/27vette/exhaust/g-ccc.png",
+            "https://example.test/27vette/mech/e-ccc.png",
+            "https://example.test/27vette/mech/ccc.png",
+        ]
+    )
+
+    plan = asset_map_sync.reconcile(desired, media, existing_rows={}, alive={}, incremental=False)
+    by_target = {row["target_id"]: row for row in plan.report}
+
+    assert len(plan.report) == 2
+    assert by_target["opt_bbb_001"]["action"] == "flag_ambiguous"
+    assert by_target["opt_bbb_001"]["candidate_source"] == "model-fallback:grand_sport:ambiguous"
+    assert "multiple grand_sport-prefixed files" in by_target["opt_bbb_001"]["note"]
+    assert by_target["opt_ccc_001"]["action"] == "flag_ambiguous"
+    assert by_target["opt_ccc_001"]["candidate_source"] == "prefixed-ambiguous"
+    assert "multiple grand_sport_x-prefixed files" in by_target["opt_ccc_001"]["note"]
+    assert plan.url_writes == {}
+    assert plan.inserts == []
+
+
 def test_reconcile_flags_duplicate_bare_media_for_same_rpo_as_ambiguous() -> None:
     desired = {
         ("stingray", "option", "opt_gba_001"): {"target_type": "option", "rpo": "gba", "name": "Black"},

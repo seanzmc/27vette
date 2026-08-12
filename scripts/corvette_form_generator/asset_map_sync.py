@@ -72,6 +72,15 @@ MODEL_PREFIX = {
     "s": "zr1x",
     "g": "grand_sport_x",
 }
+# Ordered option-media inheritance after an exact model prefix and before a
+# bare shared filename. Chains are flattened deliberately so resolution is
+# deterministic and cannot cycle.
+OPTION_MODEL_FALLBACKS = {
+    "grand_sport": ("stingray",),
+    "grand_sport_x": ("grand_sport", "stingray"),
+    "zr1": ("z06",),
+    "zr1x": ("z06",),
+}
 MODEL_TARGET_STEMS = {
     "stingray": ("stingray", "stingray"),
     "grand-sport": ("grand_sport", "grandSport"),
@@ -568,8 +577,28 @@ def reconcile(
     def resolve_option(model_key: str, rpo: str) -> tuple[dict[str, str], str, str]:
         if not rpo:
             return {}, "no-rpo", "no rpo in option sheet"
-        if (model_key, rpo) in media.option_exact:
-            return {"image_url": media.option_exact[(model_key, rpo)][0]}, "prefixed", ""
+        model_candidates = ((model_key, "prefixed"),) + tuple(
+            (fallback_model, f"model-fallback:{fallback_model}")
+            for fallback_model in OPTION_MODEL_FALLBACKS.get(model_key, ())
+        )
+        for candidate_model, source in model_candidates:
+            candidates = media.option_exact.get((candidate_model, rpo), [])
+            if len(candidates) == 1:
+                note = "" if candidate_model == model_key else (
+                    f"using {candidate_model}-prefixed media as configured fallback for {model_key}"
+                )
+                return {"image_url": candidates[0]}, source, note
+            if len(candidates) > 1:
+                ambiguous_source = (
+                    "prefixed-ambiguous"
+                    if candidate_model == model_key
+                    else f"{source}:ambiguous"
+                )
+                return (
+                    {},
+                    ambiguous_source,
+                    f"multiple {candidate_model}-prefixed files for '{rpo}'; keep one file at this priority",
+                )
         if rpo in media.option_bare:
             if len(media.option_bare[rpo]) == 1:
                 return {"image_url": media.option_bare[rpo][0]}, "bare-shared", ""
