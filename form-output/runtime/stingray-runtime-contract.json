@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "stingray_options",
-    "generated_at": "2026-08-12T21:51:59+00:00",
+    "generated_at": "2026-08-12T23:26:41+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -7618,7 +7618,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/wub.png",
+      "image_alt": "Quad Center Exit Exhaust",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_c07__opt_wub_001",
@@ -7639,7 +7646,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/wub.png",
+      "image_alt": "Quad Center Exit Exhaust",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_c07__opt_wub_001",
@@ -7660,7 +7674,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/wub.png",
+      "image_alt": "Quad Center Exit Exhaust",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_c67__opt_wub_001",
@@ -7681,7 +7702,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/wub.png",
+      "image_alt": "Quad Center Exit Exhaust",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_c67__opt_wub_001",
@@ -7702,7 +7730,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/wub.png",
+      "image_alt": "Quad Center Exit Exhaust",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_c67__opt_wub_001",
@@ -7723,7 +7758,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/wub.png",
+      "image_alt": "Quad Center Exit Exhaust",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_c07__opt_nwi_001",

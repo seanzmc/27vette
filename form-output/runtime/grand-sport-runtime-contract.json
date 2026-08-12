@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-08-12T21:52:00+00:00",
+    "generated_at": "2026-08-12T23:26:42+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -4057,7 +4057,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-eyt.jpg",
+      "image_alt": "Carbon Flash Exterior Badge Package",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_e07__opt_eyt_001",
@@ -4079,7 +4086,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-eyt.jpg",
+      "image_alt": "Carbon Flash Exterior Badge Package",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_e07__opt_eyt_001",
@@ -4101,7 +4115,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-eyt.jpg",
+      "image_alt": "Carbon Flash Exterior Badge Package",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_e67__opt_eyt_001",
@@ -4123,7 +4144,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-eyt.jpg",
+      "image_alt": "Carbon Flash Exterior Badge Package",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_e67__opt_eyt_001",
@@ -4145,7 +4173,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-eyt.jpg",
+      "image_alt": "Carbon Flash Exterior Badge Package",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_e67__opt_eyt_001",
@@ -4167,7 +4202,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-eyt.jpg",
+      "image_alt": "Carbon Flash Exterior Badge Package",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_e07__opt_eyk_001",
@@ -4188,7 +4230,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 395,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-eyk.jpg",
+      "image_alt": "Chrome Exterior Badge Package",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_e07__opt_eyk_001",
@@ -4209,7 +4258,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 395,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-eyk.jpg",
+      "image_alt": "Chrome Exterior Badge Package",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_e07__opt_eyk_001",
@@ -4230,7 +4286,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 395,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-eyk.jpg",
+      "image_alt": "Chrome Exterior Badge Package",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_e67__opt_eyk_001",
@@ -4251,7 +4314,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 395,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-eyk.jpg",
+      "image_alt": "Chrome Exterior Badge Package",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_e67__opt_eyk_001",
@@ -4272,7 +4342,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 395,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-eyk.jpg",
+      "image_alt": "Chrome Exterior Badge Package",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_e67__opt_eyk_001",
@@ -4293,7 +4370,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 395,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-eyk.jpg",
+      "image_alt": "Chrome Exterior Badge Package",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_e07__opt_j6a_001",
@@ -7605,7 +7689,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 575,
-      "display_order": 70
+      "display_order": 70,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-vup.png",
+      "image_alt": "Engine Bay Closeout Graphics",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_e07__opt_vup_001",
@@ -7626,7 +7717,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 575,
-      "display_order": 70
+      "display_order": 70,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-vup.png",
+      "image_alt": "Engine Bay Closeout Graphics",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_e07__opt_vup_001",
@@ -7647,7 +7745,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 575,
-      "display_order": 70
+      "display_order": 70,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-vup.png",
+      "image_alt": "Engine Bay Closeout Graphics",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_e67__opt_vup_001",
@@ -7668,7 +7773,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 575,
-      "display_order": 70
+      "display_order": 70,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-vup.png",
+      "image_alt": "Engine Bay Closeout Graphics",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_e67__opt_vup_001",
@@ -7689,7 +7801,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 575,
-      "display_order": 70
+      "display_order": 70,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-vup.png",
+      "image_alt": "Engine Bay Closeout Graphics",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_e67__opt_vup_001",
@@ -7710,7 +7829,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 575,
-      "display_order": 70
+      "display_order": 70,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/c-vup.png",
+      "image_alt": "Engine Bay Closeout Graphics",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_e07__opt_nga_001",
@@ -7732,7 +7858,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/c-nga.jpg",
+      "image_alt": "Black Exhaust Tips",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_e07__opt_nga_001",
@@ -7754,7 +7887,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/c-nga.jpg",
+      "image_alt": "Black Exhaust Tips",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_e07__opt_nga_001",
@@ -7776,7 +7916,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/c-nga.jpg",
+      "image_alt": "Black Exhaust Tips",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_e67__opt_nga_001",
@@ -7798,7 +7945,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/c-nga.jpg",
+      "image_alt": "Black Exhaust Tips",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_e67__opt_nga_001",
@@ -7820,7 +7974,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/c-nga.jpg",
+      "image_alt": "Black Exhaust Tips",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_e67__opt_nga_001",
@@ -7842,7 +8003,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/c-nga.jpg",
+      "image_alt": "Black Exhaust Tips",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_e07__opt_wub_001",
@@ -7863,7 +8031,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/wub.png",
+      "image_alt": "Quad Center Exit Exhaust",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_e07__opt_wub_001",
@@ -7884,7 +8059,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/wub.png",
+      "image_alt": "Quad Center Exit Exhaust",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_e07__opt_wub_001",
@@ -7905,7 +8087,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/wub.png",
+      "image_alt": "Quad Center Exit Exhaust",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_e67__opt_wub_001",
@@ -7926,7 +8115,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/wub.png",
+      "image_alt": "Quad Center Exit Exhaust",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_e67__opt_wub_001",
@@ -7947,7 +8143,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/wub.png",
+      "image_alt": "Quad Center Exit Exhaust",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_e67__opt_wub_001",
@@ -7968,7 +8171,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/wub.png",
+      "image_alt": "Quad Center Exit Exhaust",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_e07__opt_nwi_001",
