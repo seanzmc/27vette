@@ -1411,6 +1411,97 @@ test("Grand Sport X CF8 blocks only disclosed full-length and center stripes", (
   assert.equal(runtime.state.selected.has("opt_dzu_001"), true);
 });
 
+test("ZR1 and ZR1X SB9 block only disclosed available full-length stripes", () => {
+  const cases = [
+    {
+      modelKey: "zr1",
+      groupId: "zr1_group_sb9_excludes_full_length_stripe_choices",
+      expectedTargets: [
+        "opt_dpb_001",
+        "opt_dpc_001",
+        "opt_dpg_001",
+        "opt_dpl_001",
+        "opt_dpt_001",
+        "opt_dsy_001",
+        "opt_dsz_001",
+        "opt_dt0_001",
+        "opt_dth_001",
+        "opt_dub_001",
+        "opt_due_001",
+        "opt_duk_001",
+        "opt_duw_001",
+      ],
+      behaviorTarget: "opt_dt0_001",
+    },
+    {
+      modelKey: "zr1x",
+      groupId: "zr1x_group_sb9_excludes_full_length_stripe_choices",
+      expectedTargets: [
+        "opt_dpb_001",
+        "opt_dpc_001",
+        "opt_dpg_001",
+        "opt_dpl_001",
+        "opt_dpt_001",
+        "opt_dsy_001",
+        "opt_dsz_001",
+        "opt_dt0_001",
+        "opt_dtb_001",
+        "opt_dth_001",
+        "opt_dub_001",
+        "opt_due_001",
+        "opt_duk_001",
+        "opt_duw_001",
+      ],
+      behaviorTarget: "opt_dtb_001",
+    },
+  ];
+
+  for (const { modelKey, groupId, expectedTargets, behaviorTarget } of cases) {
+    const runtime = loadRuntime();
+    runtime.activateModel(modelKey);
+    runtime.state.bodyStyle = "coupe";
+    runtime.state.trimLevel = "1LZ";
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+
+    const group = runtime.data.ruleGroups.find((candidate) => candidate.group_id === groupId);
+    assert.ok(group, `${modelKey} SB9 should publish one grouped stripe-conflict owner`);
+    assert.equal(group.group_type, "excludes_any");
+    assert.equal(group.source_id, "opt_sb9_001");
+    assert.deepEqual(JSON.parse(JSON.stringify(group.target_ids)), expectedTargets);
+    assert.equal(
+      runtime.data.rules.some(
+        (rule) => rule.source_id === "opt_sb9_001" && rule.rule_type === "excludes",
+      ),
+      false,
+      `${modelKey} SB9 conflicts should not retain partial direct owners`,
+    );
+    assert.equal(group.target_ids.includes("opt_dtc_001"), false, `${modelKey} DTC is not an SB9 conflict`);
+    if (modelKey === "zr1") {
+      assert.equal(group.target_ids.includes("opt_dtb_001"), false, "ZR1 must not invent absent DTB");
+    }
+
+    const sb9 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_sb9_001");
+    assert.ok(sb9, `${modelKey} SB9 should exist for the conflict proof`);
+    runtime.handleChoice(sb9);
+    assert.equal(runtime.state.selected.has("opt_sb9_001"), true);
+
+    const blockedStripe = runtime.activeChoiceRows().find(
+      (choice) => choice.option_id === behaviorTarget,
+    );
+    assert.ok(blockedStripe, `${behaviorTarget} should exist for ${modelKey}`);
+    assert.notEqual(runtime.disableReasonForChoice(blockedStripe), "");
+    runtime.handleChoice(blockedStripe);
+    assert.equal(runtime.state.selected.has(behaviorTarget), false);
+
+    const dtc = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_dtc_001");
+    assert.ok(dtc, `${modelKey} DTC should exist for the compatible-stripe proof`);
+    assert.equal(runtime.disableReasonForChoice(dtc), "");
+    runtime.handleChoice(dtc);
+    assert.equal(runtime.state.selected.has("opt_dtc_001"), true);
+  }
+});
+
 test("Grand Sport X does not publish unsupported DT0 or EFR auto-adds", () => {
   const cases = [
     {

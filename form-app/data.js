@@ -206086,7 +206086,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "zr1_options",
-          "generated_at": "2026-08-11T02:14:13+00:00",
+          "generated_at": "2026-08-12T18:44:38+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -229859,6 +229859,32 @@ window.CORVETTE_FORM_DATA = {
             "disabled_reason": "SFZ blocks conflicting ZR1 badge and stripe choices.",
             "active": "True",
             "notes": "Workbook-owned grouped exclusion metadata."
+          },
+          {
+            "group_id": "zr1_group_sb9_excludes_full_length_stripe_choices",
+            "group_type": "excludes_any",
+            "source_id": "opt_sb9_001",
+            "target_ids": [
+              "opt_dpb_001",
+              "opt_dpc_001",
+              "opt_dpg_001",
+              "opt_dpl_001",
+              "opt_dpt_001",
+              "opt_dsy_001",
+              "opt_dsz_001",
+              "opt_dt0_001",
+              "opt_dth_001",
+              "opt_dub_001",
+              "opt_due_001",
+              "opt_duk_001",
+              "opt_duw_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "SB9 blocks conflicting full-length stripe choices.",
+            "active": "True",
+            "notes": "Workbook-owned canonical SB9 disclosure."
           }
         ],
         "exclusiveGroups": [
@@ -231522,24 +231548,6 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": ""
-          },
-          {
-            "rule_id": "zr1_rule_sb9_excludes_dt0_7d3bc80cde67",
-            "source_id": "opt_sb9_001",
-            "rule_type": "excludes",
-            "target_id": "opt_dt0_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_stri_001",
-            "target_section": "sec_stri_001",
-            "source_selection_mode": "single_select_opt",
-            "target_selection_mode": "single_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by SB9 Hood and Roof Decal Package.",
-            "auto_add": "False",
-            "active": "False",
-            "runtime_action": "omit_redundant_same_section_exclude",
             "source_note": ""
           },
           {
@@ -237009,7 +237017,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "rule",
             "entity_id": "",
-            "message": "104 active compatibility rules exported from zr1_rule_mapping."
+            "message": "103 active compatibility rules exported from zr1_rule_mapping."
           },
           {
             "check_id": "interior_contract",
@@ -237065,7 +237073,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "zr1x_options",
-          "generated_at": "2026-08-11T02:14:13+00:00",
+          "generated_at": "2026-08-12T18:44:39+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -260836,6 +260844,33 @@ window.CORVETTE_FORM_DATA = {
             "disabled_reason": "SFZ blocks conflicting ZR1X badge and stripe choices.",
             "active": "True",
             "notes": "Workbook-owned grouped exclusion metadata."
+          },
+          {
+            "group_id": "zr1x_group_sb9_excludes_full_length_stripe_choices",
+            "group_type": "excludes_any",
+            "source_id": "opt_sb9_001",
+            "target_ids": [
+              "opt_dpb_001",
+              "opt_dpc_001",
+              "opt_dpg_001",
+              "opt_dpl_001",
+              "opt_dpt_001",
+              "opt_dsy_001",
+              "opt_dsz_001",
+              "opt_dt0_001",
+              "opt_dtb_001",
+              "opt_dth_001",
+              "opt_dub_001",
+              "opt_due_001",
+              "opt_duk_001",
+              "opt_duw_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "SB9 blocks conflicting full-length stripe choices.",
+            "active": "True",
+            "notes": "Workbook-owned canonical SB9 disclosure."
           }
         ],
         "exclusiveGroups": [
@@ -262499,24 +262534,6 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": ""
-          },
-          {
-            "rule_id": "zr1x_rule_sb9_excludes_dt0_7d3bc80cde67",
-            "source_id": "opt_sb9_001",
-            "rule_type": "excludes",
-            "target_id": "opt_dt0_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_stri_001",
-            "target_section": "sec_stri_001",
-            "source_selection_mode": "single_select_opt",
-            "target_selection_mode": "single_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by SB9 Hood and Roof Decal Package.",
-            "auto_add": "False",
-            "active": "False",
-            "runtime_action": "omit_redundant_same_section_exclude",
             "source_note": ""
           },
           {
@@ -267957,7 +267974,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "rule",
             "entity_id": "",
-            "message": "103 active compatibility rules exported from zr1x_rule_mapping."
+            "message": "102 active compatibility rules exported from zr1x_rule_mapping."
           },
           {
             "check_id": "interior_contract",
