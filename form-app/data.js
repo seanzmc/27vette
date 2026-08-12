@@ -102857,7 +102857,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grand_sport_x_options",
-          "generated_at": "2026-08-12T02:28:37+00:00",
+          "generated_at": "2026-08-12T03:03:13+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -143597,6 +143597,37 @@ window.CORVETTE_FORM_DATA = {
             "disabled_reason": "DTC Royal Blue Racing Stripes are not available with SNE or SHT Jake hood graphics.",
             "active": "True",
             "notes": "GSX-only reverse stripe owner aligned to the Grand Sport per-stripe Jake-graphic topology."
+          },
+          {
+            "group_id": "gsx_group_cf8_excludes_stripe_choices",
+            "group_type": "excludes_any",
+            "source_id": "opt_cf8_001",
+            "target_ids": [
+              "opt_dmu_001",
+              "opt_dmv_001",
+              "opt_dmw_001",
+              "opt_dmx_001",
+              "opt_dmy_001",
+              "opt_dpb_001",
+              "opt_dpc_001",
+              "opt_dpg_001",
+              "opt_dpl_001",
+              "opt_dpt_001",
+              "opt_dsy_001",
+              "opt_dsz_001",
+              "opt_dt0_001",
+              "opt_dtc_001",
+              "opt_dth_001",
+              "opt_dub_001",
+              "opt_due_001",
+              "opt_duk_001"
+            ],
+            "body_style_scope": "",
+            "trim_level_scope": "",
+            "variant_scope": "",
+            "disabled_reason": "CF8 blocks conflicting Grand Sport stripe choices.",
+            "active": "True",
+            "notes": "GSX CF8 disclosure-backed full-length and Grand Sport center stripe conflicts; includes DTC and omits absent DUW."
           }
         ],
         "exclusiveGroups": [
@@ -145065,24 +145096,6 @@ window.CORVETTE_FORM_DATA = {
             "target_selection_mode": "multi_select_opt",
             "body_style_scope": "",
             "disabled_reason": "Blocked by BV4 Personalized Specification Plaque.",
-            "auto_add": "False",
-            "active": "True",
-            "runtime_action": "active",
-            "source_note": ""
-          },
-          {
-            "rule_id": "grand_sport_x_rule_cf8_excludes_dt0_18baf08efe6c",
-            "source_id": "opt_cf8_001",
-            "rule_type": "excludes",
-            "target_id": "opt_dt0_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_roof_001",
-            "target_section": "sec_stri_001",
-            "source_selection_mode": "single_select_req",
-            "target_selection_mode": "single_select_opt",
-            "body_style_scope": "",
-            "disabled_reason": "Blocked by CF8 Electrochromic Dimming Roof Panel.",
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
@@ -154722,7 +154735,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "rule",
             "entity_id": "",
-            "message": "149 active compatibility rules exported from grand_sport_x_rule_mapping."
+            "message": "148 active compatibility rules exported from grand_sport_x_rule_mapping."
           },
           {
             "check_id": "interior_contract",

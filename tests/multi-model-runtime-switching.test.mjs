@@ -1343,6 +1343,74 @@ test("Grand Sport X requires ZZ3 before BC7 on Convertible", () => {
   );
 });
 
+test("Grand Sport X CF8 blocks only disclosed full-length and center stripes", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grand_sport_x");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "2LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const expectedTargets = [
+    "opt_dmu_001",
+    "opt_dmv_001",
+    "opt_dmw_001",
+    "opt_dmx_001",
+    "opt_dmy_001",
+    "opt_dpb_001",
+    "opt_dpc_001",
+    "opt_dpg_001",
+    "opt_dpl_001",
+    "opt_dpt_001",
+    "opt_dsy_001",
+    "opt_dsz_001",
+    "opt_dt0_001",
+    "opt_dtc_001",
+    "opt_dth_001",
+    "opt_dub_001",
+    "opt_due_001",
+    "opt_duk_001",
+  ];
+  const group = runtime.data.ruleGroups.find(
+    (candidate) => candidate.group_id === "gsx_group_cf8_excludes_stripe_choices",
+  );
+  assert.ok(group, "CF8 should publish one grouped stripe-conflict owner");
+  assert.equal(group.group_type, "excludes_any");
+  assert.equal(group.source_id, "opt_cf8_001");
+  assert.deepEqual(JSON.parse(JSON.stringify(group.target_ids)), expectedTargets);
+  assert.equal(
+    runtime.data.rules.some(
+      (rule) => rule.source_id === "opt_cf8_001" && rule.rule_type === "excludes",
+    ),
+    false,
+    "CF8 conflicts should not retain partial direct owners",
+  );
+  for (const unsupportedTarget of ["opt_duw_001", "opt_dzu_001", "opt_dzv_001", "opt_dzx_001"]) {
+    assert.equal(
+      group.target_ids.includes(unsupportedTarget),
+      false,
+      `${unsupportedTarget} should stay outside the disclosed GSX CF8 conflict set`,
+    );
+  }
+
+  const cf8 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_cf8_001");
+  assert.ok(cf8, "CF8 should be available on Grand Sport X 2LT Coupe");
+  runtime.handleChoice(cf8);
+  assert.equal(runtime.state.selected.has("opt_cf8_001"), true);
+
+  const dtc = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_dtc_001");
+  assert.ok(dtc, "DTC should exist for the full-length stripe behavior proof");
+  assert.notEqual(runtime.disableReasonForChoice(dtc), "");
+  runtime.handleChoice(dtc);
+  assert.equal(runtime.state.selected.has("opt_dtc_001"), false);
+
+  const dzu = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_dzu_001");
+  assert.ok(dzu, "DZU should exist for the compatible Stinger stripe proof");
+  assert.equal(runtime.disableReasonForChoice(dzu), "");
+  runtime.handleChoice(dzu);
+  assert.equal(runtime.state.selected.has("opt_dzu_001"), true);
+});
+
 test("Grand Sport X does not publish unsupported DT0 or EFR auto-adds", () => {
   const cases = [
     {
