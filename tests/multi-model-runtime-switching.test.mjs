@@ -383,6 +383,19 @@ test("generated app data exposes a multi-model registry with Stingray compatibil
   );
 });
 
+test("retired DTB is absent from every published model contract", () => {
+  const registry = loadDataWindow().CORVETTE_FORM_DATA;
+
+  for (const [modelKey, entry] of Object.entries(registry.models)) {
+    const serialized = JSON.stringify(entry.data);
+    assert.equal(
+      /dtb/i.test(serialized),
+      false,
+      `${modelKey} should not publish the retired DTB option, rules, groups, OVS rows, or disclosure copy`,
+    );
+  }
+});
+
 test("active roof option order preserves the established and reviewed model contracts", () => {
   const registry = loadDataWindow().CORVETTE_FORM_DATA;
   const sharedActiveRoofOrder = ["CF7", "C2Z", "CC3", "CM9", "D84", "D86"];
@@ -1445,14 +1458,13 @@ test("ZR1 and ZR1X SB9 block only disclosed available full-length stripes", () =
         "opt_dsy_001",
         "opt_dsz_001",
         "opt_dt0_001",
-        "opt_dtb_001",
         "opt_dth_001",
         "opt_dub_001",
         "opt_due_001",
         "opt_duk_001",
         "opt_duw_001",
       ],
-      behaviorTarget: "opt_dtb_001",
+      behaviorTarget: "opt_dt0_001",
     },
   ];
 
@@ -1477,9 +1489,7 @@ test("ZR1 and ZR1X SB9 block only disclosed available full-length stripes", () =
       `${modelKey} SB9 conflicts should not retain partial direct owners`,
     );
     assert.equal(group.target_ids.includes("opt_dtc_001"), false, `${modelKey} DTC is not an SB9 conflict`);
-    if (modelKey === "zr1") {
-      assert.equal(group.target_ids.includes("opt_dtb_001"), false, "ZR1 must not invent absent DTB");
-    }
+    assert.equal(group.target_ids.includes("opt_dtb_001"), false, `${modelKey} must not publish retired DTB`);
 
     const sb9 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_sb9_001");
     assert.ok(sb9, `${modelKey} SB9 should exist for the conflict proof`);

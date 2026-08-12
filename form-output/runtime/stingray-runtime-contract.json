@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "stingray_options",
-    "generated_at": "2026-08-11T01:20:41+00:00",
+    "generated_at": "2026-08-12T20:15:41+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -41397,7 +41397,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO."
+      "source_note": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO."
     },
     {
       "rule_id": "rule_opt_pcx_001_includes_opt_sht_001",
@@ -41415,7 +41415,7 @@
       "auto_add": "True",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Not available with PDV, SB7 or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCX) Tech Bronze Accent Package, LPO."
+      "source_note": "1. Not available with PDV, SB7 or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCX) Tech Bronze Accent Package, LPO."
     },
     {
       "rule_id": "rule_opt_pcx_001_includes_opt_sng_001",
@@ -41739,7 +41739,7 @@
       "auto_add": "False",
       "active": "True",
       "runtime_action": "active",
-      "source_note": "1. Not available with PDV, SB7 or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCX) Tech Bronze Accent Package, LPO."
+      "source_note": "1. Not available with PDV, SB7 or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCX) Tech Bronze Accent Package, LPO."
     },
     {
       "rule_id": "rule_opt_spy_001_excludes_opt_s47_001",

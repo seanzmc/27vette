@@ -24,7 +24,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "stingray_options",
-          "generated_at": "2026-08-11T01:20:41+00:00",
+          "generated_at": "2026-08-12T20:15:41+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -41416,7 +41416,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO."
+            "source_note": "1. Not available with (EYK) Chrome Exterior Badge Package or any Full Length Dual Racing Stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTH, DUB, DUE, DUK, DUW). Included with (PCX) Tech Bronze Accent Package, LPO."
           },
           {
             "rule_id": "rule_opt_pcx_001_includes_opt_sht_001",
@@ -41434,7 +41434,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "True",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with PDV, SB7 or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCX) Tech Bronze Accent Package, LPO."
+            "source_note": "1. Not available with PDV, SB7 or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCX) Tech Bronze Accent Package, LPO."
           },
           {
             "rule_id": "rule_opt_pcx_001_includes_opt_sng_001",
@@ -41758,7 +41758,7 @@ window.CORVETTE_FORM_DATA = {
             "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
-            "source_note": "1. Not available with PDV, SB7 or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTB, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCX) Tech Bronze Accent Package, LPO."
+            "source_note": "1. Not available with PDV, SB7 or RPO stripes (DPB, DPC, DPG, DPL, DPT, DSY, DSZ, DT0, DTH, DUB, DUE, DUK, DUW, DZU, DZV, DZX). Included with (PCX) Tech Bronze Accent Package, LPO."
           },
           {
             "rule_id": "rule_opt_spy_001_excludes_opt_s47_001",
@@ -50671,7 +50671,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-08-12T01:24:29+00:00",
+          "generated_at": "2026-08-12T20:15:42+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -154791,7 +154791,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-08-11T01:20:43+00:00",
+          "generated_at": "2026-08-12T20:15:43+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -206086,7 +206086,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "zr1_options",
-          "generated_at": "2026-08-12T18:44:38+00:00",
+          "generated_at": "2026-08-12T20:15:44+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -237073,7 +237073,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "zr1x_options",
-          "generated_at": "2026-08-12T18:44:39+00:00",
+          "generated_at": "2026-08-12T20:15:45+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -254011,90 +254011,6 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 130
           },
           {
-            "choice_id": "1lz_s07__opt_dtb_001",
-            "option_id": "opt_dtb_001",
-            "rpo": "DTB",
-            "label": "Electric Blue Full-Length Dual Racing Stripes",
-            "description": "",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
-            "standard_equipment_group_type": "",
-            "auto_added_summary_required": false,
-            "step_key": "aero_exhaust_stripes_accessories",
-            "variant_id": "1lz_s07",
-            "body_style": "coupe",
-            "trim_level": "1LZ",
-            "status": "available",
-            "status_label": "Available",
-            "selectable": "True",
-            "active": "True",
-            "base_price": 1295,
-            "display_order": 140
-          },
-          {
-            "choice_id": "3lz_s07__opt_dtb_001",
-            "option_id": "opt_dtb_001",
-            "rpo": "DTB",
-            "label": "Electric Blue Full-Length Dual Racing Stripes",
-            "description": "",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
-            "standard_equipment_group_type": "",
-            "auto_added_summary_required": false,
-            "step_key": "aero_exhaust_stripes_accessories",
-            "variant_id": "3lz_s07",
-            "body_style": "coupe",
-            "trim_level": "3LZ",
-            "status": "available",
-            "status_label": "Available",
-            "selectable": "True",
-            "active": "True",
-            "base_price": 1295,
-            "display_order": 140
-          },
-          {
-            "choice_id": "1lz_s67__opt_dtb_001",
-            "option_id": "opt_dtb_001",
-            "rpo": "DTB",
-            "label": "Electric Blue Full-Length Dual Racing Stripes",
-            "description": "",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
-            "standard_equipment_group_type": "",
-            "auto_added_summary_required": false,
-            "step_key": "aero_exhaust_stripes_accessories",
-            "variant_id": "1lz_s67",
-            "body_style": "convertible",
-            "trim_level": "1LZ",
-            "status": "available",
-            "status_label": "Available",
-            "selectable": "True",
-            "active": "True",
-            "base_price": 1295,
-            "display_order": 140
-          },
-          {
-            "choice_id": "3lz_s67__opt_dtb_001",
-            "option_id": "opt_dtb_001",
-            "rpo": "DTB",
-            "label": "Electric Blue Full-Length Dual Racing Stripes",
-            "description": "",
-            "section_id": "sec_stri_001",
-            "section_name": "Stripes",
-            "standard_equipment_group_type": "",
-            "auto_added_summary_required": false,
-            "step_key": "aero_exhaust_stripes_accessories",
-            "variant_id": "3lz_s67",
-            "body_style": "convertible",
-            "trim_level": "3LZ",
-            "status": "available",
-            "status_label": "Available",
-            "selectable": "True",
-            "active": "True",
-            "base_price": 1295,
-            "display_order": 140
-          },
-          {
             "choice_id": "1lz_s07__opt_sb9_001",
             "option_id": "opt_sb9_001",
             "rpo": "SB9",
@@ -260858,7 +260774,6 @@ window.CORVETTE_FORM_DATA = {
               "opt_dsy_001",
               "opt_dsz_001",
               "opt_dt0_001",
-              "opt_dtb_001",
               "opt_dth_001",
               "opt_dub_001",
               "opt_due_001",
@@ -267967,7 +267882,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "availability",
             "entity_id": "",
-            "message": "820 draft choice rows exported from the ZR1X variant matrix."
+            "message": "816 draft choice rows exported from the ZR1X variant matrix."
           },
           {
             "check_id": "rules",
