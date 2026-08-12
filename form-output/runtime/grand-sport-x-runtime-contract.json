@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grand_sport_x_options",
-    "generated_at": "2026-08-12T01:32:41+00:00",
+    "generated_at": "2026-08-12T02:28:37+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -43513,6 +43513,24 @@
       "active": "True",
       "runtime_action": "active",
       "source_note": ""
+    },
+    {
+      "rule_id": "gsx_rule_bc7_requires_zz3_convertible",
+      "source_id": "opt_bc7_001",
+      "rule_type": "requires",
+      "target_id": "opt_zz3_001",
+      "target_type": "option",
+      "source_type": "option",
+      "source_section": "sec_engi_001",
+      "target_section": "sec_engi_001",
+      "source_selection_mode": "multi_select_opt",
+      "target_selection_mode": "multi_select_opt",
+      "body_style_scope": "",
+      "disabled_reason": "Requires ZZ3 Convertible Engine Appearance Package.",
+      "auto_add": "False",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "1. Included and only available with (ZZ3) Convertible Engine Appearance Package."
     }
   ],
   "priceRules": [
@@ -51852,7 +51870,7 @@
       "severity": "pass",
       "entity_type": "rule",
       "entity_id": "",
-      "message": "148 active compatibility rules exported from grand_sport_x_rule_mapping."
+      "message": "149 active compatibility rules exported from grand_sport_x_rule_mapping."
     },
     {
       "check_id": "interior_contract",

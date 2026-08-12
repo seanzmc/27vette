@@ -1301,6 +1301,48 @@ test("Grand Sport X keeps unavailable R88 out of runtime and applies SFZ canonic
   }
 });
 
+test("Grand Sport X requires ZZ3 before BC7 on Convertible", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grand_sport_x");
+  runtime.state.bodyStyle = "convertible";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const rule = runtime.data.rules.find(
+    (candidate) =>
+      candidate.active === "True" &&
+      candidate.source_id === "opt_bc7_001" &&
+      candidate.rule_type === "requires" &&
+      candidate.target_id === "opt_zz3_001",
+  );
+  assert.ok(rule, "BC7 should publish its canonical ZZ3 requirement");
+  assert.equal(rule.auto_add, "False");
+
+  const bc7 = runtime.activeChoiceRows().find(
+    (choice) => choice.option_id === "opt_bc7_001",
+  );
+  assert.ok(bc7, "BC7 should be available on Grand Sport X Convertible");
+  assert.equal(
+    runtime.disableReasonForChoice(bc7),
+    "Requires ZZ3 Convertible Engine Appearance Package.",
+  );
+  runtime.handleChoice(bc7);
+  assert.equal(runtime.state.selected.has("opt_bc7_001"), false);
+
+  const zz3 = runtime.activeChoiceRows().find(
+    (choice) => choice.option_id === "opt_zz3_001",
+  );
+  assert.ok(zz3, "ZZ3 should be available on Grand Sport X Convertible");
+  runtime.handleChoice(zz3);
+  assert.equal(runtime.state.selected.has("opt_zz3_001"), true);
+  assert.equal(
+    runtime.currentOrder().auto_added_options.some((item) => item.rpo === "BC7"),
+    true,
+    "ZZ3 should continue to auto-add BC7",
+  );
+});
+
 test("Grand Sport X does not publish unsupported DT0 or EFR auto-adds", () => {
   const cases = [
     {
