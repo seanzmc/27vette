@@ -150,6 +150,7 @@ window.__testApi = {
   handleChoice,
   handleContextChoice: typeof handleContextChoice === "function" ? handleContextChoice : undefined,
   computeAutoAdded,
+  vehicleAssetFolder,
   disableReasonForChoice,
   missingRequirementDetails,
   missingRequired,
@@ -577,6 +578,16 @@ test("generated registry supplies complete workbook-authored vehicle setup copy"
   }
   assert.equal(registry.models.grandSport.vehicleSetup.cardSubtitle, "Purist, rear-wheel-drive performance");
   assert.equal(registry.models.z06.vehicleSetup.cardSubtitle, "Track-born, street-legal supercar");
+});
+
+test("Grand Sport X exterior paint borrows the Grand Sport vehicle render family", () => {
+  const runtime = loadRuntime();
+
+  runtime.activateModel("grandSport");
+  assert.equal(runtime.vehicleAssetFolder(), "e");
+
+  runtime.activateModel("grand_sport_x");
+  assert.equal(runtime.vehicleAssetFolder(), "e");
 });
 
 test("runtime progressively advances vehicle setup panels before exterior paint", () => {

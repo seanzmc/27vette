@@ -212,6 +212,7 @@ function formAssetBase() {
 const VEHICLE_ASSET_FOLDERS = {
   stingray: "c",
   grandSport: "e",
+  grand_sport_x: "e",
   z06: "h",
   zr1: "r",
   zr1x: "s",
