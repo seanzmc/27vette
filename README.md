@@ -1,13 +1,13 @@
 # 27vette
 
-Developer workspace for the 2027 Corvette static order-form app. Live at `order.stingraychevroletcorvette.com`: Stingray, Grand Sport, and Z06 forms with customer build downloads and dealer submissions to Stingray Chevrolet. Agent conduct, source-of-truth boundaries, validation strategy, and handoff rules live in `AGENTS.md`; this file owns the overview, repository map, and commands.
+Developer workspace for the 2027 Corvette static order-form app. The published registry contains Stingray, Grand Sport, Grand Sport X, Z06, ZR1, and ZR1X forms with customer build downloads and dealer submissions to Stingray Chevrolet. The production app is served at `order.stingraychevroletcorvette.com`. Agent conduct, source-of-truth boundaries, validation strategy, and handoff rules live in `AGENTS.md`; this file owns the overview, repository map, and commands.
 
 ## Current State
 
-- Stingray, Grand Sport, and Z06 are live customer-facing forms; no frontend package install or build step.
+- Stingray, Grand Sport, Grand Sport X, Z06, ZR1, and ZR1X are published customer-facing forms; no frontend package install or build step.
 - `form-app/data.js` exposes the multi-model registry at `window.CORVETTE_FORM_DATA` (default model `stingray`; `window.STINGRAY_FORM_DATA` remains a legacy alias for the Stingray dataset). Each model entry carries generated model data plus model-card image metadata from the workbook `asset_map` sheet.
 - Runtime promotion is workbook-owned: `model_master`, `model_registry_promotion`, and `variant_master` decide which models reach the registry; `scripts/promote_model.py` applies promotion rows; registry generation embeds promoted `form-output/runtime/*-runtime-contract.json` verbatim.
-- Grand Sport X, ZR1, and ZR1X are unpromoted future models. Their active workbook registrations and retained runtime contracts remain available for focused rehabilitation, but they are not published in `form-app/data.js` and must not be promoted as part of another model's pass.
+- All six workbook-registered models are promoted into `form-app/data.js`; model publication changes must continue through the workbook-owned promotion path rather than direct registry edits.
 - Dealer submission posts to the WordPress endpoint `https://stingraychevroletcorvette.com/wp-json/corvette-build/v1/submit` with Cloudflare Turnstile — protected boundary, see AGENTS.md §6.
 - Some Grand Sport/Z06 artifact names still carry draft/inspection wording from migration; inspect active registry data and tests before treating that wording as runtime status.
 
