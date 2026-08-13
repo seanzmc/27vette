@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "z06_options",
-    "generated_at": "2026-08-13T16:40:21+00:00",
+    "generated_at": "2026-08-13T18:48:44+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -51936,6 +51936,17 @@
       "variant_scope": "*",
       "priority": 130,
       "notes": "Z default: standard rear spoiler unless another aero/spoiler option is selected or auto-added."
+    },
+    {
+      "rule_id": "z06_default_nga_unless_nwi",
+      "target_option_id": "opt_nga_001",
+      "condition_type": "unless_selected_rpo",
+      "condition_id": "NWI",
+      "body_style_scope": "*",
+      "trim_level_scope": "*",
+      "variant_scope": "*",
+      "priority": 140,
+      "notes": "Default Z06 standard NGA exhaust tips unless NWI bright chrome tips are selected."
     }
   ],
   "validation": [

@@ -158928,7 +158928,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-08-13T16:40:21+00:00",
+          "generated_at": "2026-08-13T18:48:44+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -210859,6 +210859,17 @@ window.CORVETTE_FORM_DATA = {
             "variant_scope": "*",
             "priority": 130,
             "notes": "Z default: standard rear spoiler unless another aero/spoiler option is selected or auto-added."
+          },
+          {
+            "rule_id": "z06_default_nga_unless_nwi",
+            "target_option_id": "opt_nga_001",
+            "condition_type": "unless_selected_rpo",
+            "condition_id": "NWI",
+            "body_style_scope": "*",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "priority": 140,
+            "notes": "Default Z06 standard NGA exhaust tips unless NWI bright chrome tips are selected."
           }
         ],
         "validation": [
@@ -210937,7 +210948,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "zr1_options",
-          "generated_at": "2026-08-13T16:40:22+00:00",
+          "generated_at": "2026-08-13T19:06:59+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -215989,6 +216000,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_order": 10,
+            "display_behavior": "default_selected",
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/h-nga.jpg",
             "image_alt": "Black Exhaust Tips",
             "image_fit": "cover",
@@ -216017,6 +216029,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_order": 10,
+            "display_behavior": "default_selected",
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/h-nga.jpg",
             "image_alt": "Black Exhaust Tips",
             "image_fit": "cover",
@@ -216045,6 +216058,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_order": 10,
+            "display_behavior": "default_selected",
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/h-nga.jpg",
             "image_alt": "Black Exhaust Tips",
             "image_fit": "cover",
@@ -216073,6 +216087,7 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "base_price": 0,
             "display_order": 10,
+            "display_behavior": "default_selected",
             "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/mech/h-nga.jpg",
             "image_alt": "Black Exhaust Tips",
             "image_fit": "cover",
@@ -222011,21 +222026,20 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "J59",
             "label": "10-Piston Front / 6-Piston Rear Carbon Ceramic Brakes",
             "description": "4-wheel antilock disc",
-            "section_id": "sec_stan_001",
-            "section_name": "Standard Equipment",
+            "section_id": "sec_perf_brake_001",
+            "section_name": "Performance Brakes",
             "standard_equipment_group_type": "",
             "auto_added_summary_required": false,
-            "step_key": "standard_equipment",
+            "step_key": "packages_performance",
             "variant_id": "1lz_r07",
             "body_style": "coupe",
             "trim_level": "1LZ",
             "status": "available",
             "status_label": "Available",
-            "selectable": "False",
+            "selectable": "True",
             "active": "True",
             "base_price": 0,
-            "display_order": 500,
-            "display_behavior": "display_only"
+            "display_order": 20
           },
           {
             "choice_id": "3lz_r07__opt_j59_002",
@@ -222033,21 +222047,20 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "J59",
             "label": "10-Piston Front / 6-Piston Rear Carbon Ceramic Brakes",
             "description": "4-wheel antilock disc",
-            "section_id": "sec_stan_001",
-            "section_name": "Standard Equipment",
+            "section_id": "sec_perf_brake_001",
+            "section_name": "Performance Brakes",
             "standard_equipment_group_type": "",
             "auto_added_summary_required": false,
-            "step_key": "standard_equipment",
+            "step_key": "packages_performance",
             "variant_id": "3lz_r07",
             "body_style": "coupe",
             "trim_level": "3LZ",
             "status": "available",
             "status_label": "Available",
-            "selectable": "False",
+            "selectable": "True",
             "active": "True",
             "base_price": 0,
-            "display_order": 500,
-            "display_behavior": "display_only"
+            "display_order": 20
           },
           {
             "choice_id": "1lz_r67__opt_j59_002",
@@ -222055,21 +222068,20 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "J59",
             "label": "10-Piston Front / 6-Piston Rear Carbon Ceramic Brakes",
             "description": "4-wheel antilock disc",
-            "section_id": "sec_stan_001",
-            "section_name": "Standard Equipment",
+            "section_id": "sec_perf_brake_001",
+            "section_name": "Performance Brakes",
             "standard_equipment_group_type": "",
             "auto_added_summary_required": false,
-            "step_key": "standard_equipment",
+            "step_key": "packages_performance",
             "variant_id": "1lz_r67",
             "body_style": "convertible",
             "trim_level": "1LZ",
             "status": "available",
             "status_label": "Available",
-            "selectable": "False",
+            "selectable": "True",
             "active": "True",
             "base_price": 0,
-            "display_order": 500,
-            "display_behavior": "display_only"
+            "display_order": 20
           },
           {
             "choice_id": "3lz_r67__opt_j59_002",
@@ -222077,21 +222089,20 @@ window.CORVETTE_FORM_DATA = {
             "rpo": "J59",
             "label": "10-Piston Front / 6-Piston Rear Carbon Ceramic Brakes",
             "description": "4-wheel antilock disc",
-            "section_id": "sec_stan_001",
-            "section_name": "Standard Equipment",
+            "section_id": "sec_perf_brake_001",
+            "section_name": "Performance Brakes",
             "standard_equipment_group_type": "",
             "auto_added_summary_required": false,
-            "step_key": "standard_equipment",
+            "step_key": "packages_performance",
             "variant_id": "3lz_r67",
             "body_style": "convertible",
             "trim_level": "3LZ",
             "status": "available",
             "status_label": "Available",
-            "selectable": "False",
+            "selectable": "True",
             "active": "True",
             "base_price": 0,
-            "display_order": 500,
-            "display_behavior": "display_only"
+            "display_order": 20
           },
           {
             "choice_id": "1lz_r07__opt_ztk_001",
@@ -236774,9 +236785,9 @@ window.CORVETTE_FORM_DATA = {
             "target_type": "option",
             "source_type": "option",
             "source_section": "sec_perf_z52_001",
-            "target_section": "sec_stan_001",
+            "target_section": "sec_perf_brake_001",
             "source_selection_mode": "single_select_opt",
-            "target_selection_mode": "display_only",
+            "target_selection_mode": "single_select_req",
             "body_style_scope": "",
             "disabled_reason": "Included with ZTK ZTK Track Performance Package.",
             "auto_add": "True",
@@ -236798,24 +236809,6 @@ window.CORVETTE_FORM_DATA = {
             "body_style_scope": "",
             "disabled_reason": "Included with ZTK ZTK Track Performance Package.",
             "auto_add": "True",
-            "active": "True",
-            "runtime_action": "active",
-            "source_note": ""
-          },
-          {
-            "rule_id": "zr1_rule_ztk_requires_tom_5b60f5523451",
-            "source_id": "opt_ztk_001",
-            "rule_type": "requires",
-            "target_id": "opt_tom_001",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_perf_z52_001",
-            "target_section": "sec_perf_aero_001",
-            "source_selection_mode": "single_select_opt",
-            "target_selection_mode": "single_select_req",
-            "body_style_scope": "",
-            "disabled_reason": "Requires TOM Visible Carbon Fiber Aero Package.",
-            "auto_add": "False",
             "active": "True",
             "runtime_action": "active",
             "source_note": ""
@@ -236873,6 +236866,60 @@ window.CORVETTE_FORM_DATA = {
             "active": "True",
             "runtime_action": "active",
             "source_note": ""
+          },
+          {
+            "rule_id": "zr1_rule_ztk_includes_tom_5b60f5523451",
+            "source_id": "opt_ztk_001",
+            "rule_type": "includes",
+            "target_id": "opt_tom_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_perf_z52_001",
+            "target_section": "sec_perf_aero_001",
+            "source_selection_mode": "single_select_opt",
+            "target_selection_mode": "single_select_req",
+            "body_style_scope": "",
+            "disabled_reason": "Included with ZTK ZTK Track Performance Package.",
+            "auto_add": "True",
+            "active": "True",
+            "runtime_action": "active",
+            "source_note": "Selecting ZTK adds the required TOM Visible Carbon Fiber Aero Package."
+          },
+          {
+            "rule_id": "zr1_rule_ztk_excludes_rwj_replace",
+            "source_id": "opt_ztk_001",
+            "rule_type": "excludes",
+            "target_id": "opt_rwj_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_perf_z52_001",
+            "target_section": "sec_lpoe_001",
+            "source_selection_mode": "single_select_opt",
+            "target_selection_mode": "multi_select_opt",
+            "body_style_scope": "",
+            "disabled_reason": "ZTK replaces the incompatible RWJ Gray Premium Outdoor Car Cover.",
+            "auto_add": "False",
+            "active": "True",
+            "runtime_action": "replace",
+            "source_note": "ZTK includes the TOM Visible Carbon Fiber Aero Package and replaces the incompatible RWJ Gray Premium Outdoor Car Cover."
+          },
+          {
+            "rule_id": "zr1_rule_ztk_excludes_wkr_replace",
+            "source_id": "opt_ztk_001",
+            "rule_type": "excludes",
+            "target_id": "opt_wkr_001",
+            "target_type": "option",
+            "source_type": "option",
+            "source_section": "sec_perf_z52_001",
+            "target_section": "sec_lpoe_001",
+            "source_selection_mode": "single_select_opt",
+            "target_selection_mode": "multi_select_opt",
+            "body_style_scope": "",
+            "disabled_reason": "ZTK replaces the incompatible WKR GT3.R Premium Indoor Car Cover.",
+            "auto_add": "False",
+            "active": "True",
+            "runtime_action": "replace",
+            "source_note": "ZTK includes the TOM Visible Carbon Fiber Aero Package and replaces the incompatible WKR GT3.R Premium Indoor Car Cover."
           }
         ],
         "priceRules": [
@@ -242049,6 +242096,17 @@ window.CORVETTE_FORM_DATA = {
             "variant_scope": "*",
             "priority": 240,
             "notes": "Z default: Dark Gray Metallic-painted calipers are standard/default unless another caliper option is selected or auto-added."
+          },
+          {
+            "rule_id": "zr1_default_nga_unless_nwi",
+            "target_option_id": "opt_nga_001",
+            "condition_type": "unless_selected_rpo",
+            "condition_id": "NWI",
+            "body_style_scope": "*",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "priority": 250,
+            "notes": "Default ZR1 standard NGA exhaust tips unless NWI bright chrome tips are selected."
           }
         ],
         "validation": [
@@ -242071,7 +242129,7 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "rule",
             "entity_id": "",
-            "message": "102 active compatibility rules exported from zr1_rule_mapping."
+            "message": "104 active compatibility rules exported from zr1_rule_mapping."
           },
           {
             "check_id": "interior_contract",
@@ -242127,7 +242185,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "zr1x_options",
-          "generated_at": "2026-08-13T16:40:23+00:00",
+          "generated_at": "2026-08-13T18:48:46+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -273551,6 +273609,17 @@ window.CORVETTE_FORM_DATA = {
             "variant_scope": "*",
             "priority": 340,
             "notes": "Z default: Dark Gray Metallic-painted calipers are standard/default unless another caliper option is selected or auto-added."
+          },
+          {
+            "rule_id": "zr1x_default_nga_unless_nwi",
+            "target_option_id": "opt_nga_001",
+            "condition_type": "unless_selected_rpo",
+            "condition_id": "NWI",
+            "body_style_scope": "*",
+            "trim_level_scope": "*",
+            "variant_scope": "*",
+            "priority": 350,
+            "notes": "Default ZR1X standard NGA exhaust tips unless NWI bright chrome tips are selected."
           }
         ],
         "validation": [

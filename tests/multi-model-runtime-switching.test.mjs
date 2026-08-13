@@ -1996,6 +1996,96 @@ test("Grand Sport X defaults NGA and restores it after the NWI path", () => {
   assert.equal(runtime.state.selected.has("opt_nga_001"), true, "removing NWI should restore NGA");
 });
 
+test("Z06, ZR1, and ZR1X share workbook-owned NGA default and restoration behavior", () => {
+  const cases = [
+    ["z06", "z06_default_nga_unless_nwi"],
+    ["zr1", "zr1_default_nga_unless_nwi"],
+    ["zr1x", "zr1x_default_nga_unless_nwi"],
+  ];
+
+  for (const [modelKey, ruleId] of cases) {
+    const runtime = loadRuntime();
+    runtime.activateModel(modelKey);
+    runtime.state.bodyStyle = "coupe";
+    runtime.state.trimLevel = "1LZ";
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+
+    const nga = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_nga_001");
+    const nwi = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_nwi_001");
+    const defaultRule = runtime.data.defaultSelectionRules.find((rule) => rule.rule_id === ruleId);
+    assert.ok(nga && nwi, `${modelKey} should expose both exhaust-tip choices`);
+    assert.equal(nga.display_behavior, "default_selected", `${modelKey} NGA display default should derive from its workbook rule`);
+    assert.deepEqual(
+      defaultRule && {
+        target_option_id: defaultRule.target_option_id,
+        condition_type: defaultRule.condition_type,
+        condition_id: defaultRule.condition_id,
+      },
+      {
+        target_option_id: "opt_nga_001",
+        condition_type: "unless_selected_rpo",
+        condition_id: "NWI",
+      },
+      `${modelKey} should publish the shared NGA-unless-NWI rule shape`,
+    );
+    assert.equal(runtime.state.selected.has("opt_nga_001"), true, `${modelKey} should initially select NGA`);
+
+    runtime.handleChoice(nwi);
+    assert.equal(runtime.state.selected.has("opt_nwi_001"), true, `${modelKey} should select NWI`);
+    assert.equal(runtime.state.selected.has("opt_nga_001"), false, `${modelKey} NWI should replace NGA`);
+
+    runtime.handleChoice(nwi);
+    assert.equal(runtime.state.selected.has("opt_nwi_001"), false, `${modelKey} NWI should be removable`);
+    assert.equal(runtime.state.selected.has("opt_nga_001"), true, `${modelKey} should restore NGA after NWI removal`);
+  }
+});
+
+test("ZR1 exposes J59 as a brake choice and ZTK adds J59 with TOM without a preselection gate", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("zr1");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LZ";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const j58 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j58_002");
+  const j59 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j59_002");
+  const ztk = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_ztk_001");
+  assert.ok(j58 && j59 && ztk, "ZR1 should expose both brake choices and ZTK");
+  assert.equal(j59.section_id, "sec_perf_brake_001", "J59 should render in Performance Brakes");
+  assert.equal(j59.selectable, "True", "J59 should be manually selectable without ZTK");
+  assert.notEqual(j59.display_behavior, "display_only", "J59 should not remain a Standard Equipment display row");
+  assert.equal(runtime.disableReasonForChoice(ztk), "", "ZTK should be selectable before TOM is selected");
+
+  runtime.handleChoice(j59);
+  assert.equal(runtime.state.selected.has("opt_j59_002"), true, "manual J59 selection should stick");
+  assert.equal(runtime.state.selected.has("opt_j58_002"), false, "J59 should replace the standard J58 brake choice");
+  assert.equal(runtime.computeAutoAdded().has("opt_tom_001"), false, "manual J59 should not add TOM by itself");
+
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.handleChoice(ztk);
+  const autoAdded = runtime.computeAutoAdded();
+  assert.equal(runtime.state.selected.has("opt_ztk_001"), true, "ZTK selection should stick without preselecting TOM");
+  assert.equal(autoAdded.has("opt_j59_002"), true, "ZTK should auto-add J59");
+  assert.equal(autoAdded.has("opt_tom_001"), true, "ZTK should auto-add TOM");
+  assert.equal(runtime.state.selected.has("opt_t0e_001"), false, "auto-added TOM should replace the default T0E aero choice");
+
+  for (const coverId of ["opt_rwj_001", "opt_wkr_001"]) {
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+    const cover = runtime.activeChoiceRows().find((choice) => choice.option_id === coverId);
+    assert.ok(cover, `${coverId} should be an active ZR1 car-cover choice`);
+    runtime.handleChoice(cover);
+    assert.equal(runtime.state.selected.has(coverId), true, `${coverId} selection should stick before ZTK`);
+
+    runtime.handleChoice(ztk);
+    assert.equal(runtime.state.selected.has(coverId), false, `ZTK should replace ${coverId} so TOM can be included`);
+    assert.equal(runtime.computeAutoAdded().has("opt_tom_001"), true, `ZTK should still auto-add TOM after replacing ${coverId}`);
+  }
+});
+
 test("Stingray WUB enables NWI without replacing NGA; NWI replaces and restores NGA", () => {
   const runtime = loadRuntime();
   runtime.activateModel("stingray");
