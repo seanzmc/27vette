@@ -163,6 +163,17 @@ Model refresh (from repo root, venv python):
 .venv/bin/python scripts/generate_registry.py
 ```
 
+Asset URL reconciliation and workbook-owned card presentation:
+
+```sh
+.venv/bin/python scripts/sync_asset_map.py --workbook stingray_master.xlsx --report-dir /tmp/asset-map-sync
+.venv/bin/python scripts/set_asset_display.py --rpo <RPO> --fit contain
+```
+
+Both commands preview by default and require an explicit reviewed write flag
+(`--apply` for sync, `--write` for display). Detailed matching, report, and
+presentation semantics: `docs/asset-map-sync.md`.
+
 `<model_key>` must be active and complete in workbook-owned `model_master`, `model_workbook_sources`, and `model_variants` metadata. All models write one strictly validated runtime contract under `form-output/runtime/`. Add `--emit-inspection --inspection-output <dir>` for optional review artifacts. Generator runs never mutate `form-app/data.js` directly; `generate_registry.py` validates every selected retained contract before publishing the promoted registry.
 
 For isolated candidate validation, copy/freeze the workbook first and bind every output to a temporary root:
@@ -248,7 +259,7 @@ The remaining `tests/test_*.py` files are not in that gate and are chosen by cha
 | Workbook Manager | `test_workbook_manager`, `test_workbook_manager_catalog`, `test_workbook_manager_import_projection`, `test_workbook_manager_generated_parity`, `test_workbook_manager_api_concurrency`, `test_workbook_manager_drafts` |
 | Source assembly / runtime metadata | `test_source_assembly_characterization`, `test_runtime_metadata_guards`, `test_corvette_form_generator_contract` |
 | Publication | `test_atomic_registry_write` |
-| Asset map | `test_asset_map_sync` |
+| Asset map | `test_asset_map_sync`, `test_set_asset_display` |
 | Options-sheet quality | `test_options_sheet_quality` |
 | Promotion preflight (slow) | `test_verify_workbook_candidate` |
 | Fable 5 loop | `test_fable5_loop_contract` |

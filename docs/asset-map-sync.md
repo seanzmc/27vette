@@ -90,3 +90,34 @@ After any real workbook apply, run:
 ```
 
 Then regenerate affected active models and the registry only if workbook data changed.
+
+## Card sizing and alignment
+
+Media matching and card presentation are separate workbook concerns. The sync
+updates `image_url`; it intentionally preserves an existing row's
+`image_fit` and `image_position`.
+
+Use the guarded display command to change presentation by RPO. It previews by
+default and resolves shared (`model_key="*"`) rows only once:
+
+```sh
+.venv/bin/python scripts/set_asset_display.py --rpo AQ9 --rpo AH2 --fit contain
+.venv/bin/python scripts/set_asset_display.py --rpo AQ9 --rpo AH2 --fit contain --write
+```
+
+`image_fit` controls sizing: `cover` fills and may crop, while `contain` keeps
+the whole image visible. `image_position` is alignment within that sizing mode,
+so `center` is not the opposite of `contain`. Change alignment independently
+when needed:
+
+```sh
+.venv/bin/python scripts/set_asset_display.py --rpo <RPO> --position top
+```
+
+Repeat `--model <model_key>` to restrict a change; without it, the command
+resolves every promoted active model. The command updates existing active
+asset rows only, routes writes through the guarded editor-operation pipeline,
+and fails closed for unknown RPOs, unpromoted model keys, workbook drift, Excel
+locks, package/schema failures, or duplicate active asset rows. As with sync,
+review the dry-run before adding `--write`, then regenerate affected models and
+the registry.

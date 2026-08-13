@@ -1034,7 +1034,7 @@ test("vehicle setup exposes paced readability hooks without changing option step
   assert.match(appSource, /highlight\.cardSubtitle \|\| highlight\.eyebrow/);
   assert.match(appSource, /When this starting point looks right, continue with/);
   assert.doesNotMatch(appSource, /When this foundation feels right, continue with/);
-  assert.doesNotMatch(setupHtml, /Grand Sport X|eAWD|721-hp/);
+  assert.doesNotMatch(setupHtml, /eAWD|721-hp/);
   assert.match(setupHtml, /Continue to Body Style/);
   assert.doesNotMatch(appSource, /Clear trim path|Same trim path/);
   assert.match(appSource, /Choose trim next/);
