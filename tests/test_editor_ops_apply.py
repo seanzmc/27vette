@@ -144,8 +144,9 @@ class CoerceTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             coerce_value("ovs", "status", "")
 
-    def test_tristate_text_enum_stays_text(self):
-        self.assertEqual(coerce_value("variant_overrides", "selectable", "True"), "True")
+    def test_variant_override_selectable_uses_real_excel_boolean(self):
+        self.assertIs(coerce_value("variant_overrides", "selectable", "True"), True)
+        self.assertIs(coerce_value("variant_overrides", "selectable", False), False)
 
     def test_free_text_stripped(self):
         self.assertEqual(coerce_value("options", "option_name", "  X  "), "X")

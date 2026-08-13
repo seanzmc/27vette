@@ -121,9 +121,8 @@ EDITOR_SHEET_META: dict[str, dict] = {
     },
     "variant_overrides": {
         "key": ("option_id", "variant_id"),
-        "types": {"active": "bool"},
+        "types": {"selectable": "bool", "active": "bool"},
         "enums": {
-            "selectable": ("", "True", "False"),
             "display_behavior": ("", "default_selected", "display_only", "hidden"),
         },
         "refs": {

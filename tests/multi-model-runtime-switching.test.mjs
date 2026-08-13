@@ -609,6 +609,23 @@ test("Grand Sport X engine appearance display order matches Grand Sport", () => 
   assert.deepEqual(grandSportXOrder, grandSportOrder);
 });
 
+test("Grand Sport X seat display order matches Grand Sport", () => {
+  const runtime = loadRuntime();
+  const seatOrder = (modelKey) => {
+    runtime.activateModel(modelKey);
+    runtime.state.bodyStyle = "coupe";
+    runtime.state.trimLevel = "2LT";
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+    return runtime.activeChoiceRows()
+      .filter((choice) => choice.section_id === "sec_seat_002")
+      .sort((left, right) => Number(left.display_order) - Number(right.display_order))
+      .map((choice) => choice.rpo);
+  };
+
+  assert.deepEqual(seatOrder("grand_sport_x"), seatOrder("grandSport"));
+});
+
 test("runtime progressively advances vehicle setup panels before exterior paint", () => {
   const runtime = loadRuntime();
   const convertible = runtime.data.contextChoices.find((choice) => choice.context_choice_id === "body_style__convertible");
@@ -1699,6 +1716,36 @@ test("Grand Sport UQT is selectable on 1LT and included on higher trims from wor
   assert.equal(runtime.data.standardEquipment.some((item) => item.variant_id === "2lt_e07" && item.rpo === "UQT"), true);
 });
 
+test("Grand Sport X UQT matches Grand Sport trim behavior", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grand_sport_x");
+  runtime.state.bodyStyle = "coupe";
+
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  let uqt = runtime.activeChoiceRows().find((choice) => choice.rpo === "UQT");
+  assert.ok(uqt, "Grand Sport X UQT should exist for 1LT");
+  assert.equal(uqt.status, "available");
+  assert.equal(uqt.selectable, "True");
+  assert.equal(uqt.step_key, "interior_trim");
+
+  for (const [trimLevel, variantId] of [["2LT", "2lt_g07"], ["3LT", "3lt_g07"]]) {
+    runtime.state.trimLevel = trimLevel;
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+    uqt = runtime.activeChoiceRows().find((choice) => choice.rpo === "UQT");
+    assert.ok(uqt, `Grand Sport X UQT should exist for ${trimLevel}`);
+    assert.equal(uqt.status, "standard");
+    assert.equal(uqt.selectable, "False");
+    assert.equal(uqt.step_key, "standard_equipment");
+    assert.equal(
+      runtime.data.standardEquipment.some((item) => item.variant_id === variantId && item.rpo === "UQT"),
+      true,
+    );
+  }
+});
+
 test("Grand Sport seat prices are workbook-scoped by trim", () => {
   const runtime = loadRuntime();
   runtime.activateModel("grandSport");
@@ -1924,6 +1971,29 @@ test("Grand Sport WUB enables NWI without replacing NGA; NWI replaces and restor
   assert.equal(runtime.state.selected.has("opt_wub_001"), false, "WUB should be removable");
   assert.equal(runtime.state.selected.has("opt_nwi_001"), false, "removing WUB should remove invalid NWI");
   assert.equal(runtime.state.selected.has("opt_nga_001"), true, "removing WUB from the NWI path should restore NGA");
+});
+
+test("Grand Sport X defaults NGA and restores it after the NWI path", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grand_sport_x");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const wub = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_wub_001");
+  const nwi = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_nwi_001");
+  assert.ok(wub && nwi, "WUB and NWI should be active Grand Sport X exhaust choices");
+  assert.equal(runtime.state.selected.has("opt_nga_001"), true, "NGA should seed as the Grand Sport X default exhaust tip");
+
+  runtime.handleChoice(wub);
+  runtime.handleChoice(nwi);
+  assert.equal(runtime.state.selected.has("opt_nwi_001"), true);
+  assert.equal(runtime.state.selected.has("opt_nga_001"), false, "NWI should replace NGA");
+
+  runtime.handleChoice(nwi);
+  assert.equal(runtime.state.selected.has("opt_nwi_001"), false);
+  assert.equal(runtime.state.selected.has("opt_nga_001"), true, "removing NWI should restore NGA");
 });
 
 test("Stingray WUB enables NWI without replacing NGA; NWI replaces and restores NGA", () => {

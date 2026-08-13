@@ -284,8 +284,8 @@ def _lint_group_integrity(extract, maps):
 
 def _lint_boolean_text(extract, maps):
     """Text 'TRUE'/'FALSE' (Excel boolean-as-text drift) anywhere in the
-    workbook. Case-sensitive uppercase only: lifecycle enums legitimately
-    store the strings 'True'/'False' (e.g. variant_overrides.selectable)."""
+    workbook. Case-sensitive uppercase only so unrelated title-case text is
+    not mistaken for an Excel boolean."""
     _registry, sheet_family, _models_by_sheet, _bmf = maps
     out = []
     for sheet, data in extract["sheets"].items():
