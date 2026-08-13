@@ -194,6 +194,8 @@ def test_open_json_sends_browser_like_user_agent(monkeypatch: pytest.MonkeyPatch
 
     def fake_urlopen(request, timeout):
         captured["accept"] = request.get_header("Accept")
+        captured["cache_control"] = request.get_header("Cache-control")
+        captured["pragma"] = request.get_header("Pragma")
         captured["user_agent"] = request.get_header("User-agent")
         return FakeJsonResponse(b"[]", {"X-WP-TotalPages": "1"})
 
@@ -204,6 +206,8 @@ def test_open_json_sends_browser_like_user_agent(monkeypatch: pytest.MonkeyPatch
     assert payload == []
     assert headers == {"x-wp-totalpages": "1"}
     assert captured["accept"] == "application/json"
+    assert captured["cache_control"] == "no-cache, no-store, max-age=0"
+    assert captured["pragma"] == "no-cache"
     assert captured["user_agent"]
     assert "Mozilla/5.0" in captured["user_agent"]
 
@@ -243,6 +247,53 @@ def test_fetch_media_403_mentions_media_url_list_fallback(monkeypatch: pytest.Mo
     message = str(excinfo.value)
     assert "HTTP 403" in message
     assert "--media-url-list" in message
+
+
+def test_stable_media_fetch_requires_two_identical_uncached_snapshots(monkeypatch: pytest.MonkeyPatch) -> None:
+    snapshots = iter(
+        [
+            asset_map_sync.MediaSnapshot(["https://example.test/27vette/a.png"], {"https://example.test/27vette/a.png": "1"}),
+            asset_map_sync.MediaSnapshot(["https://example.test/27vette/a.png", "https://example.test/27vette/b.png"], {"https://example.test/27vette/a.png": "1", "https://example.test/27vette/b.png": "2"}),
+            asset_map_sync.MediaSnapshot(["https://example.test/27vette/b.png", "https://example.test/27vette/a.png"], {"https://example.test/27vette/a.png": "1", "https://example.test/27vette/b.png": "2"}),
+        ]
+    )
+    tokens: list[str | None] = []
+
+    def fake_fetch(timeout, modified_after=None, *, cache_token=None):
+        tokens.append(cache_token)
+        return next(snapshots)
+
+    monkeypatch.setattr(asset_map_sync, "fetch_media_snapshot", fake_fetch)
+    monkeypatch.setattr(asset_map_sync.time, "sleep", lambda _seconds: None)
+
+    snapshot = asset_map_sync.fetch_media_stable(timeout=1, attempts=4)
+
+    assert len(snapshot.urls) == 2
+    assert len(tokens) == 3
+    assert all(tokens)
+    assert len(set(tokens)) == 3
+
+
+def test_revision_tokens_only_change_after_a_known_modified_time_changes() -> None:
+    url = "https://example.test/wp-content/uploads/pictures/27vette/brakes/r-j6d.webp"
+    snapshot = asset_map_sync.MediaSnapshot([url], {url: "2026-08-13T12:00:00"})
+
+    baseline_urls, baseline_tokens = asset_map_sync.prepare_revisioned_media_urls(snapshot, {})
+    revised_urls, revised_tokens = asset_map_sync.prepare_revisioned_media_urls(
+        snapshot,
+        {"media_modified": {url: "2026-08-13T11:00:00"}, "revision_tokens": {}},
+    )
+    repeated_urls, repeated_tokens = asset_map_sync.prepare_revisioned_media_urls(
+        snapshot,
+        {"media_modified": {url: "2026-08-13T12:00:00"}, "revision_tokens": revised_tokens},
+    )
+
+    assert baseline_urls == [url]
+    assert baseline_tokens == {}
+    assert revised_urls == [f"{url}?asset_rev=20260813T120000"]
+    assert revised_tokens == {url: "20260813T120000"}
+    assert repeated_urls == revised_urls
+    assert repeated_tokens == revised_tokens
 
 
 def test_parse_media_requires_hyphen_for_model_prefix() -> None:
@@ -793,6 +844,54 @@ def test_reconcile_wildcard_url_conflict_is_review_action_with_no_writes() -> No
     assert inserts == []
 
 
+def test_complete_reconcile_updates_one_wildcard_row_for_unique_bare_media() -> None:
+    desired = {
+        ("stingray", "option", "opt_eri_001"): {"target_type": "option", "rpo": "eri", "name": "Battery Protection"},
+        ("zr1", "option", "opt_eri_001"): {"target_type": "option", "rpo": "eri", "name": "Battery Protection"},
+    }
+    new_url = "https://example.test/27vette/lpo/eri-cmp.webp"
+    media = asset_map_sync.build_media_inventory([new_url])
+    existing_rows = {
+        ("*", "option", "opt_eri_001"): {"row": 2, "target_type": "option", "url": "https://example.test/27vette/ext/eri.jpg"},
+    }
+
+    report, url_writes, inserts, _status, _used = asset_map_sync.reconcile(
+        desired,
+        media,
+        existing_rows=existing_rows,
+        alive={},
+        incremental=False,
+        update_safe_wildcards=True,
+    )
+
+    assert url_writes == {(2, "image_url"): new_url}
+    assert inserts == []
+    assert {row["action"] for row in report} == {"replace_shared_canonical"}
+
+
+def test_complete_reconcile_does_not_write_model_specific_candidate_to_wildcard() -> None:
+    desired = {
+        ("stingray", "option", "opt_gba_001"): {"target_type": "option", "rpo": "gba", "name": "Black"},
+    }
+    media = asset_map_sync.build_media_inventory(["https://example.test/27vette/paint/c-gba-new.png"])
+    existing_rows = {
+        ("*", "option", "opt_gba_001"): {"row": 2, "target_type": "option", "url": "https://example.test/27vette/paint/gba-old.png"},
+    }
+
+    report, url_writes, inserts, _status, _used = asset_map_sync.reconcile(
+        desired,
+        media,
+        existing_rows=existing_rows,
+        alive={},
+        incremental=False,
+        update_safe_wildcards=True,
+    )
+
+    assert report[0]["action"] == "wildcard_conflict"
+    assert url_writes == {}
+    assert inserts == []
+
+
 def test_reconcile_exact_row_takes_precedence_over_wildcard_row() -> None:
     desired = {
         ("z06", "option", "opt_j6d_001"): {"target_type": "option", "rpo": "j6d", "name": "Calipers"},
@@ -900,6 +999,42 @@ def test_apply_uses_injected_safe_save_and_inserts_confident_candidate(tmp_path:
     )
     assert (report_dir / "asset_map_sync_report.csv").exists()
     assert (report_dir / "asset_map_unmatched_media.csv").exists()
+
+
+def test_apply_with_no_unambiguous_changes_does_not_rewrite_workbook(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "sync.xlsx"
+    make_apply_workbook(workbook_path)
+    report_dir = tmp_path / "reports"
+    calls: list[Path] = []
+
+    def fake_safe_save(wb, path, *, loaded_mtime_ns=None):
+        calls.append(Path(path))
+        raise AssertionError("save must not run without workbook changes")
+
+    result = asset_map_sync.run_sync(
+        workbook_path=workbook_path,
+        report_dir=report_dir,
+        media_urls=[],
+        apply=True,
+        verify_existing=False,
+        save_fn=fake_safe_save,
+    )
+
+    assert result.url_write_count == 0
+    assert result.insert_count == 0
+    assert result.backup_path is None
+    assert calls == []
+
+
+def test_data_cache_version_bump_is_targeted_and_repeatable(tmp_path: Path) -> None:
+    index_path = tmp_path / "index.html"
+    index_path.write_text('<script src="./data.js?v=26"></script>\n<script src="./app.js?v=27"></script>\n', encoding="utf-8")
+
+    asset_map_sync._bump_data_cache_version(index_path)
+
+    assert index_path.read_text(encoding="utf-8") == (
+        '<script src="./data.js?v=27"></script>\n<script src="./app.js?v=27"></script>\n'
+    )
 
 
 def test_report_manifest_records_source_inventory_and_counts(tmp_path: Path) -> None:
@@ -1114,6 +1249,7 @@ def test_cli_help_works_without_requests_dependency() -> None:
     assert completed.returncode == 0, completed.stdout
     assert "--media-url-list" in completed.stdout
     assert "--apply" in completed.stdout
+    assert "--complete" in completed.stdout
     assert "--status-col" not in completed.stdout
     assert "--deactivate-stale" not in completed.stdout
     assert "--seed-blank-missing" not in completed.stdout

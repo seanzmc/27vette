@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grand_sport_x_options",
-    "generated_at": "2026-08-13T13:50:40+00:00",
+    "generated_at": "2026-08-13T16:12:42+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -18076,7 +18076,7 @@
       "active": "True",
       "base_price": 100,
       "display_order": 10,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/eri.jpg",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/eri-cmp.webp",
       "image_alt": "Battery Protection Package",
       "image_fit": "contain",
       "image_position": "center",
@@ -18104,7 +18104,7 @@
       "active": "True",
       "base_price": 100,
       "display_order": 10,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/eri.jpg",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/eri-cmp.webp",
       "image_alt": "Battery Protection Package",
       "image_fit": "contain",
       "image_position": "center",
@@ -18132,7 +18132,7 @@
       "active": "True",
       "base_price": 100,
       "display_order": 10,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/eri.jpg",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/eri-cmp.webp",
       "image_alt": "Battery Protection Package",
       "image_fit": "contain",
       "image_position": "center",
@@ -18160,7 +18160,7 @@
       "active": "True",
       "base_price": 100,
       "display_order": 10,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/eri.jpg",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/eri-cmp.webp",
       "image_alt": "Battery Protection Package",
       "image_fit": "contain",
       "image_position": "center",
@@ -18188,7 +18188,7 @@
       "active": "True",
       "base_price": 100,
       "display_order": 10,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/eri.jpg",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/eri-cmp.webp",
       "image_alt": "Battery Protection Package",
       "image_fit": "contain",
       "image_position": "center",
@@ -18216,7 +18216,7 @@
       "active": "True",
       "base_price": 100,
       "display_order": 10,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/eri.jpg",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/eri-cmp.webp",
       "image_alt": "Battery Protection Package",
       "image_fit": "contain",
       "image_position": "center",
@@ -18412,7 +18412,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/t0e.jpg",
+      "image_alt": "Low Rear Spoiler",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_t0e_001",
@@ -18434,7 +18441,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/t0e.jpg",
+      "image_alt": "Low Rear Spoiler",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_t0e_001",
@@ -18456,7 +18470,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/t0e.jpg",
+      "image_alt": "Low Rear Spoiler",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_t0e_001",
@@ -18478,7 +18499,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/t0e.jpg",
+      "image_alt": "Low Rear Spoiler",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_t0e_001",
@@ -18500,7 +18528,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/t0e.jpg",
+      "image_alt": "Low Rear Spoiler",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_t0e_001",
@@ -18522,7 +18557,14 @@
       "active": "True",
       "base_price": 0,
       "display_order": 10,
-      "display_behavior": "default_selected"
+      "display_behavior": "default_selected",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/t0e.jpg",
+      "image_alt": "Low Rear Spoiler",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_5zv_001",
@@ -31671,7 +31713,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 320,
-      "display_order": 10
+      "display_order": 10,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/spy-cmp.webp",
+      "image_alt": "Black Lug Nuts",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_spy_001",
@@ -31692,7 +31741,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 320,
-      "display_order": 10
+      "display_order": 10,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/spy-cmp.webp",
+      "image_alt": "Black Lug Nuts",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_spy_001",
@@ -31713,7 +31769,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 320,
-      "display_order": 10
+      "display_order": 10,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/spy-cmp.webp",
+      "image_alt": "Black Lug Nuts",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_spy_001",
@@ -31734,7 +31797,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 320,
-      "display_order": 10
+      "display_order": 10,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/spy-cmp.webp",
+      "image_alt": "Black Lug Nuts",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_spy_001",
@@ -31755,7 +31825,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 320,
-      "display_order": 10
+      "display_order": 10,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/spy-cmp.webp",
+      "image_alt": "Black Lug Nuts",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_spy_001",
@@ -31776,7 +31853,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 320,
-      "display_order": 10
+      "display_order": 10,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/spy-cmp.webp",
+      "image_alt": "Black Lug Nuts",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_spz_001",
@@ -31797,7 +31881,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 105,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/spz-cmp.webp",
+      "image_alt": "Black Wheel Locks",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_spz_001",
@@ -31818,7 +31909,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 105,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/spz-cmp.webp",
+      "image_alt": "Black Wheel Locks",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_spz_001",
@@ -31839,7 +31937,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 105,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/spz-cmp.webp",
+      "image_alt": "Black Wheel Locks",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_spz_001",
@@ -31860,7 +31965,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 105,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/spz-cmp.webp",
+      "image_alt": "Black Wheel Locks",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_spz_001",
@@ -31881,7 +31993,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 105,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/spz-cmp.webp",
+      "image_alt": "Black Wheel Locks",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_spz_001",
@@ -31902,7 +32021,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 105,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/spz-cmp.webp",
+      "image_alt": "Black Wheel Locks",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_s47_001",
@@ -31923,7 +32049,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 275,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/s47-cmp.webp",
+      "image_alt": "Chrome Lug Nuts",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_s47_001",
@@ -31944,7 +32077,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 275,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/s47-cmp.webp",
+      "image_alt": "Chrome Lug Nuts",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_s47_001",
@@ -31965,7 +32105,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 275,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/s47-cmp.webp",
+      "image_alt": "Chrome Lug Nuts",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_s47_001",
@@ -31986,7 +32133,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 275,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/s47-cmp.webp",
+      "image_alt": "Chrome Lug Nuts",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_s47_001",
@@ -32007,7 +32161,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 275,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/s47-cmp.webp",
+      "image_alt": "Chrome Lug Nuts",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_s47_001",
@@ -32028,7 +32189,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 275,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/s47-cmp.webp",
+      "image_alt": "Chrome Lug Nuts",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_sfe_001",
@@ -32049,7 +32217,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 125,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/sfe-cmp.webp",
+      "image_alt": "Chrome Wheel Locks",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_sfe_001",
@@ -32070,7 +32245,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 125,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/sfe-cmp.webp",
+      "image_alt": "Chrome Wheel Locks",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_sfe_001",
@@ -32091,7 +32273,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 125,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/sfe-cmp.webp",
+      "image_alt": "Chrome Wheel Locks",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_sfe_001",
@@ -32112,7 +32301,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 125,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/sfe-cmp.webp",
+      "image_alt": "Chrome Wheel Locks",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_sfe_001",
@@ -32133,7 +32329,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 125,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/sfe-cmp.webp",
+      "image_alt": "Chrome Wheel Locks",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_sfe_001",
@@ -32154,7 +32357,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 125,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/sfe-cmp.webp",
+      "image_alt": "Chrome Wheel Locks",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_5zd_001",
@@ -32175,7 +32385,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/5zd-cmp.webp",
+      "image_alt": "Carbon Flash Crossed Flags Wheel Center Caps",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_5zd_001",
@@ -32196,7 +32413,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/5zd-cmp.webp",
+      "image_alt": "Carbon Flash Crossed Flags Wheel Center Caps",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_5zd_001",
@@ -32217,7 +32441,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/5zd-cmp.webp",
+      "image_alt": "Carbon Flash Crossed Flags Wheel Center Caps",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_5zd_001",
@@ -32238,7 +32469,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/5zd-cmp.webp",
+      "image_alt": "Carbon Flash Crossed Flags Wheel Center Caps",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_5zd_001",
@@ -32259,7 +32497,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/5zd-cmp.webp",
+      "image_alt": "Carbon Flash Crossed Flags Wheel Center Caps",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_5zd_001",
@@ -32280,7 +32525,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/5zd-cmp.webp",
+      "image_alt": "Carbon Flash Crossed Flags Wheel Center Caps",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_5zc_001",
@@ -32301,7 +32553,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/5zc-cmp.webp",
+      "image_alt": "Jake Logo Wheel Center Caps",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_5zc_001",
@@ -32322,7 +32581,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/5zc-cmp.webp",
+      "image_alt": "Jake Logo Wheel Center Caps",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_5zc_001",
@@ -32343,7 +32609,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/5zc-cmp.webp",
+      "image_alt": "Jake Logo Wheel Center Caps",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_5zc_001",
@@ -32364,7 +32637,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/5zc-cmp.webp",
+      "image_alt": "Jake Logo Wheel Center Caps",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_5zc_001",
@@ -32385,7 +32665,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/5zc-cmp.webp",
+      "image_alt": "Jake Logo Wheel Center Caps",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_5zc_001",
@@ -32406,7 +32693,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/5zc-cmp.webp",
+      "image_alt": "Jake Logo Wheel Center Caps",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_5zb_001",
@@ -32427,7 +32721,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 70
+      "display_order": 70,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/5zb-cmp.webp",
+      "image_alt": "Grand Sport Logo Wheel Center Caps",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_5zb_001",
@@ -32448,7 +32749,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 70
+      "display_order": 70,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/5zb-cmp.webp",
+      "image_alt": "Grand Sport Logo Wheel Center Caps",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_5zb_001",
@@ -32469,7 +32777,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 70
+      "display_order": 70,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/5zb-cmp.webp",
+      "image_alt": "Grand Sport Logo Wheel Center Caps",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_5zb_001",
@@ -32490,7 +32805,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 70
+      "display_order": 70,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/5zb-cmp.webp",
+      "image_alt": "Grand Sport Logo Wheel Center Caps",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_5zb_001",
@@ -32511,7 +32833,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 70
+      "display_order": 70,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/5zb-cmp.webp",
+      "image_alt": "Grand Sport Logo Wheel Center Caps",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_5zb_001",
@@ -32532,7 +32861,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 70
+      "display_order": 70,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/5zb-cmp.webp",
+      "image_alt": "Grand Sport Logo Wheel Center Caps",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_swm_001",

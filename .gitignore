@@ -5,6 +5,7 @@ __pycache__/
 .pytest_cache/
 .playwright-mcp/
 .superpowers/
+.asset-map-sync/
 .env
 .env.*
 !.env.example

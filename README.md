@@ -166,13 +166,18 @@ Model refresh (from repo root, venv python):
 Asset URL reconciliation and workbook-owned card presentation:
 
 ```sh
-.venv/bin/python scripts/sync_asset_map.py --workbook stingray_master.xlsx --report-dir /tmp/asset-map-sync
+.venv/bin/python scripts/sync_asset_map.py --complete
+.venv/bin/python scripts/sync_asset_map.py
 .venv/bin/python scripts/set_asset_display.py --rpo <RPO> --fit contain
 ```
 
-Both commands preview by default and require an explicit reviewed write flag
-(`--apply` for sync, `--write` for display). Detailed matching, report, and
-presentation semantics: `docs/asset-map-sync.md`.
+`sync_asset_map.py --complete` is the routine operator path: it requires a
+stable uncached live inventory, applies every unambiguous match through guarded
+workbook save, validates, regenerates affected models, republishes the registry,
+and bumps the browser data cache version. Bare `sync_asset_map.py` remains a
+read-only diagnostic report. Card-presentation edits preview by default and
+require `--write`. Detailed matching, exception, report, and presentation
+semantics: `docs/asset-map-sync.md`.
 
 `<model_key>` must be active and complete in workbook-owned `model_master`, `model_workbook_sources`, and `model_variants` metadata. All models write one strictly validated runtime contract under `form-output/runtime/`. Add `--emit-inspection --inspection-output <dir>` for optional review artifacts. Generator runs never mutate `form-app/data.js` directly; `generate_registry.py` validates every selected retained contract before publishing the promoted registry.
 
