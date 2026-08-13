@@ -952,6 +952,42 @@ test("Grand Sport exclusive groups are model-scoped and Stingray groups match wo
   }
 });
 
+test("GSX, ZR1, and ZR1X related-option groups publish customer-facing workbook copy", () => {
+  const registry = loadDataWindow().CORVETTE_FORM_DATA;
+  const expectedNotes = {
+    grand_sport_x: {
+      grand_sport_x_excl_1623e1da9d59: "Engine cover choices are mutually exclusive within the Engine Appearance section.",
+      grand_sport_x_excl_1a2557e86349: "Suede frunk/trunk compartment liner choices are mutually exclusive within the LPO Interior section.",
+      grand_sport_x_excl_4c81a57b1440: "Indoor car cover choices are mutually exclusive within the LPO Exterior section.",
+      grand_sport_x_excl_72b09b9f4530: "Ground effects choices are mutually exclusive within the Ground Effects section.",
+      grand_sport_x_excl_88226d3d71bc: "Rear Corvette script badge color choices are mutually exclusive within the LPO Exterior section.",
+      grand_sport_x_excl_ba636d8cad42: "Seat belt color choices are mutually exclusive within the Seat Belt section.",
+      grand_sport_x_excl_c874eb278e64: "Exterior accent choices are mutually exclusive within the Exterior Accents section.",
+      grand_sport_x_excl_cb34bcaa3d0b: "Exhaust tip choices are mutually exclusive within the Exhaust section.",
+      grand_sport_x_excl_cb3c5e229696: "Wheel center cap choices are mutually exclusive within the Wheel Accessory section.",
+    },
+    zr1: {
+      zr1_excl_46da2c68b0f9: "Exhaust tip choices are mutually exclusive within the Exhaust section.",
+      zr1_excl_ba636d8cad42: "Seat belt color choices are mutually exclusive within the Seat Belt section.",
+      zr1_excl_cdb87e21ebb0: "Carbon fiber interior trim choices are mutually exclusive within the Interior Trim section.",
+    },
+    zr1x: {
+      zr1x_excl_46da2c68b0f9: "Exhaust tip choices are mutually exclusive within the Exhaust section.",
+      zr1x_excl_ba636d8cad42: "Seat belt color choices are mutually exclusive within the Seat Belt section.",
+      zr1x_excl_cdb87e21ebb0: "Carbon fiber interior trim choices are mutually exclusive within the Interior Trim section.",
+    },
+  };
+
+  for (const [modelKey, notesByGroup] of Object.entries(expectedNotes)) {
+    const groups = registry.models[modelKey].data.exclusiveGroups;
+    for (const [groupId, expectedNote] of Object.entries(notesByGroup)) {
+      const group = groups.find((candidate) => candidate.group_id === groupId);
+      assert.ok(group, `${modelKey} should publish ${groupId}`);
+      assert.equal(group.notes, expectedNote);
+    }
+  }
+});
+
 test("Grand Sport exclusive group selections remove peer options without runtime branches", () => {
   for (const expected of expectedGrandSportExclusiveGroups) {
     const runtime = loadRuntime();

@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "zr1x_options",
-    "generated_at": "2026-08-13T21:18:24+00:00",
+    "generated_at": "2026-08-13T21:46:07+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -24415,7 +24415,7 @@
       ],
       "selection_mode": "single_within_group",
       "active": "True",
-      "notes": "Ingest typed comparator proposal confirmation"
+      "notes": "Exhaust tip choices are mutually exclusive within the Exhaust section."
     },
     {
       "group_id": "zr1x_excl_ba636d8cad42",
@@ -24429,7 +24429,7 @@
       ],
       "selection_mode": "single_within_group",
       "active": "True",
-      "notes": "Ingest typed comparator proposal confirmation"
+      "notes": "Seat belt color choices are mutually exclusive within the Seat Belt section."
     },
     {
       "group_id": "zr1x_excl_cdb87e21ebb0",
@@ -24439,7 +24439,7 @@
       ],
       "selection_mode": "single_within_group",
       "active": "True",
-      "notes": "Ingest typed comparator proposal confirmation"
+      "notes": "Carbon fiber interior trim choices are mutually exclusive within the Interior Trim section."
     },
     {
       "group_id": "zr1x_excl_aero_packages",

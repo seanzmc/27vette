@@ -105335,7 +105335,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grand_sport_x_options",
-          "generated_at": "2026-08-13T17:17:33+00:00",
+          "generated_at": "2026-08-13T21:46:05+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -147767,7 +147767,7 @@ window.CORVETTE_FORM_DATA = {
             ],
             "selection_mode": "single_within_group",
             "active": "True",
-            "notes": "Ingest typed comparator proposal confirmation"
+            "notes": "Engine cover choices are mutually exclusive within the Engine Appearance section."
           },
           {
             "group_id": "grand_sport_x_excl_1a2557e86349",
@@ -147778,7 +147778,7 @@ window.CORVETTE_FORM_DATA = {
             ],
             "selection_mode": "single_within_group",
             "active": "True",
-            "notes": "Ingest typed comparator proposal confirmation"
+            "notes": "Suede frunk/trunk compartment liner choices are mutually exclusive within the LPO Interior section."
           },
           {
             "group_id": "grand_sport_x_excl_4c81a57b1440",
@@ -147788,7 +147788,7 @@ window.CORVETTE_FORM_DATA = {
             ],
             "selection_mode": "single_within_group",
             "active": "True",
-            "notes": "Ingest typed comparator proposal confirmation"
+            "notes": "Indoor car cover choices are mutually exclusive within the LPO Exterior section."
           },
           {
             "group_id": "grand_sport_x_excl_72b09b9f4530",
@@ -147799,7 +147799,7 @@ window.CORVETTE_FORM_DATA = {
             ],
             "selection_mode": "single_within_group",
             "active": "True",
-            "notes": "Ingest typed comparator proposal confirmation"
+            "notes": "Ground effects choices are mutually exclusive within the Ground Effects section."
           },
           {
             "group_id": "grand_sport_x_excl_88226d3d71bc",
@@ -147810,7 +147810,7 @@ window.CORVETTE_FORM_DATA = {
             ],
             "selection_mode": "single_within_group",
             "active": "True",
-            "notes": "Ingest typed comparator proposal confirmation"
+            "notes": "Rear Corvette script badge color choices are mutually exclusive within the LPO Exterior section."
           },
           {
             "group_id": "grand_sport_x_excl_ba636d8cad42",
@@ -147824,7 +147824,7 @@ window.CORVETTE_FORM_DATA = {
             ],
             "selection_mode": "single_within_group",
             "active": "True",
-            "notes": "Ingest typed comparator proposal confirmation"
+            "notes": "Seat belt color choices are mutually exclusive within the Seat Belt section."
           },
           {
             "group_id": "grand_sport_x_excl_c874eb278e64",
@@ -147834,7 +147834,7 @@ window.CORVETTE_FORM_DATA = {
             ],
             "selection_mode": "required_single_within_group",
             "active": "True",
-            "notes": "Ingest typed comparator proposal confirmation"
+            "notes": "Exterior accent choices are mutually exclusive within the Exterior Accents section."
           },
           {
             "group_id": "grand_sport_x_excl_cb34bcaa3d0b",
@@ -147844,7 +147844,7 @@ window.CORVETTE_FORM_DATA = {
             ],
             "selection_mode": "required_single_within_group",
             "active": "True",
-            "notes": "Ingest typed comparator proposal confirmation"
+            "notes": "Exhaust tip choices are mutually exclusive within the Exhaust section."
           },
           {
             "group_id": "grand_sport_x_excl_cb3c5e229696",
@@ -147855,7 +147855,7 @@ window.CORVETTE_FORM_DATA = {
             ],
             "selection_mode": "single_within_group",
             "active": "True",
-            "notes": "Ingest typed comparator proposal confirmation"
+            "notes": "Wheel center cap choices are mutually exclusive within the Wheel Accessory section."
           }
         ],
         "rules": [
@@ -210948,7 +210948,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "zr1_options",
-          "generated_at": "2026-08-13T21:18:23+00:00",
+          "generated_at": "2026-08-13T21:46:06+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -235049,7 +235049,7 @@ window.CORVETTE_FORM_DATA = {
             ],
             "selection_mode": "single_within_group",
             "active": "True",
-            "notes": "Ingest typed comparator proposal confirmation"
+            "notes": "Exhaust tip choices are mutually exclusive within the Exhaust section."
           },
           {
             "group_id": "zr1_excl_ba636d8cad42",
@@ -235063,7 +235063,7 @@ window.CORVETTE_FORM_DATA = {
             ],
             "selection_mode": "single_within_group",
             "active": "True",
-            "notes": "Ingest typed comparator proposal confirmation"
+            "notes": "Seat belt color choices are mutually exclusive within the Seat Belt section."
           },
           {
             "group_id": "zr1_excl_cdb87e21ebb0",
@@ -235073,7 +235073,7 @@ window.CORVETTE_FORM_DATA = {
             ],
             "selection_mode": "single_within_group",
             "active": "True",
-            "notes": "Ingest typed comparator proposal confirmation"
+            "notes": "Carbon fiber interior trim choices are mutually exclusive within the Interior Trim section."
           },
           {
             "group_id": "zr1_excl_performance_brakes",
@@ -242233,7 +242233,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "zr1x_options",
-          "generated_at": "2026-08-13T21:18:24+00:00",
+          "generated_at": "2026-08-13T21:46:07+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -266643,7 +266643,7 @@ window.CORVETTE_FORM_DATA = {
             ],
             "selection_mode": "single_within_group",
             "active": "True",
-            "notes": "Ingest typed comparator proposal confirmation"
+            "notes": "Exhaust tip choices are mutually exclusive within the Exhaust section."
           },
           {
             "group_id": "zr1x_excl_ba636d8cad42",
@@ -266657,7 +266657,7 @@ window.CORVETTE_FORM_DATA = {
             ],
             "selection_mode": "single_within_group",
             "active": "True",
-            "notes": "Ingest typed comparator proposal confirmation"
+            "notes": "Seat belt color choices are mutually exclusive within the Seat Belt section."
           },
           {
             "group_id": "zr1x_excl_cdb87e21ebb0",
@@ -266667,7 +266667,7 @@ window.CORVETTE_FORM_DATA = {
             ],
             "selection_mode": "single_within_group",
             "active": "True",
-            "notes": "Ingest typed comparator proposal confirmation"
+            "notes": "Carbon fiber interior trim choices are mutually exclusive within the Interior Trim section."
           },
           {
             "group_id": "zr1x_excl_aero_packages",
