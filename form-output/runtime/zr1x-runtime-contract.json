@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "zr1x_options",
-    "generated_at": "2026-08-13T19:40:31+00:00",
+    "generated_at": "2026-08-13T21:18:24+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -24348,6 +24348,20 @@
       "disabled_reason": "SB9 blocks conflicting full-length stripe choices.",
       "active": "True",
       "notes": "Workbook-owned canonical SB9 disclosure."
+    },
+    {
+      "group_id": "zr1x_group_ztk_excludes_non_ztk_aero",
+      "group_type": "excludes_any",
+      "source_id": "opt_ztk_001",
+      "target_ids": [
+        "opt_t0e_001"
+      ],
+      "body_style_scope": "*",
+      "trim_level_scope": "*",
+      "variant_scope": "*",
+      "disabled_reason": "T0E is not available while ZTK is selected; ZTK includes the TOM aero package.",
+      "active": "True",
+      "notes": "ZTK always includes TOM; T0E must not be selectable or restorable while ZTK remains selected."
     }
   ],
   "exclusiveGroups": [
@@ -24426,6 +24440,16 @@
       "selection_mode": "single_within_group",
       "active": "True",
       "notes": "Ingest typed comparator proposal confirmation"
+    },
+    {
+      "group_id": "zr1x_excl_aero_packages",
+      "option_ids": [
+        "opt_t0e_001",
+        "opt_tom_002"
+      ],
+      "selection_mode": "single_within_group",
+      "active": "True",
+      "notes": "ZR1X aero choices are radio-like peers; T0E is standard and TOM replaces it when selected or included by ZTK."
     }
   ],
   "rules": [

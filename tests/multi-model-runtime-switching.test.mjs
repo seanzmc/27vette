@@ -2072,10 +2072,14 @@ test("ZR1 exposes J59 as a brake choice and ZTK adds J59 with TOM without a pres
   assert.equal(autoAdded.has("opt_j59_002"), true, "ZTK should auto-add J59");
   assert.equal(autoAdded.has("opt_tom_001"), true, "ZTK should auto-add TOM");
   assert.equal(runtime.state.selected.has("opt_t0e_001"), false, "auto-added TOM should replace the default T0E aero choice");
-  runtime.handleChoice(j59);
-  runtime.handleChoice(tom);
-  assert.equal(runtime.computeAutoAdded().has("opt_j59_002"), true, "J59 cannot be deselected while ZTK includes it");
-  assert.equal(runtime.computeAutoAdded().has("opt_tom_001"), true, "TOM cannot be deselected while ZTK includes it");
+  assert.match(runtime.disableReasonForChoice(j58), /ZTK|J59/i, "J58 should be unavailable while ZTK owns the brake choice");
+  assert.match(runtime.disableReasonForChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_t0e_001")), /ZTK|TOM/i, "T0E should be unavailable while ZTK owns the aero choice");
+  runtime.handleChoice(j58);
+  runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_t0e_001"));
+  assert.equal(runtime.state.selected.has("opt_j58_002"), false, "J58 cannot replace ZTK-included J59");
+  assert.equal(runtime.state.selected.has("opt_t0e_001"), false, "T0E cannot replace ZTK-included TOM");
+  assert.equal(runtime.computeAutoAdded().has("opt_j59_002"), true, "J59 remains included after the blocked J58 click");
+  assert.equal(runtime.computeAutoAdded().has("opt_tom_001"), true, "TOM remains included after the blocked T0E click");
 
   for (const coverId of ["opt_rwj_001", "opt_wkr_001"]) {
     runtime.resetDefaults();
@@ -2101,8 +2105,9 @@ test("ZR1X ZTK is immediately selectable and locks its included J59 and TOM choi
 
   const j59 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j59_002");
   const tom = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_tom_002");
+  const t0e = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_t0e_001");
   const ztk = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_ztk_001");
-  assert.ok(j59 && tom && ztk, "ZR1X should expose J59, TOM, and ZTK in its active contract");
+  assert.ok(j59 && tom && t0e && ztk, "ZR1X should expose J59, TOM, T0E, and ZTK in its active contract");
   assert.equal(runtime.disableReasonForChoice(ztk), "", "ZR1X ZTK should be selectable before TOM is selected");
 
   runtime.handleChoice(ztk);
@@ -2111,10 +2116,11 @@ test("ZR1X ZTK is immediately selectable and locks its included J59 and TOM choi
   assert.equal(runtime.computeAutoAdded().has("opt_tom_002"), true, "ZR1X ZTK should auto-add TOM");
   assert.equal(runtime.state.selected.has("opt_t0e_001"), false, "ZR1X TOM should replace the default T0E aero choice");
 
-  runtime.handleChoice(j59);
-  runtime.handleChoice(tom);
-  assert.equal(runtime.computeAutoAdded().has("opt_j59_002"), true, "ZR1X J59 cannot be deselected while ZTK includes it");
-  assert.equal(runtime.computeAutoAdded().has("opt_tom_002"), true, "ZR1X TOM cannot be deselected while ZTK includes it");
+  assert.match(runtime.disableReasonForChoice(t0e), /ZTK|TOM/i, "ZR1X T0E should be unavailable while ZTK owns the aero choice");
+  runtime.handleChoice(t0e);
+  assert.equal(runtime.state.selected.has("opt_t0e_001"), false, "ZR1X T0E cannot replace ZTK-included TOM");
+  assert.equal(runtime.computeAutoAdded().has("opt_j59_002"), true, "ZR1X J59 remains included with ZTK");
+  assert.equal(runtime.computeAutoAdded().has("opt_tom_002"), true, "ZR1X TOM remains included after the blocked T0E click");
 
   for (const coverId of ["opt_rwj_001", "opt_wkr_001"]) {
     runtime.resetDefaults();
