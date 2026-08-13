@@ -24,7 +24,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "stingray_options",
-          "generated_at": "2026-08-13T16:12:43+00:00",
+          "generated_at": "2026-08-13T16:40:20+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -10209,7 +10209,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 30
+            "display_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "2lt_c07__opt_baz_001",
@@ -10230,7 +10237,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 30
+            "display_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "3lt_c07__opt_baz_001",
@@ -10251,7 +10265,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 30
+            "display_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "1lt_c67__opt_baz_001",
@@ -10272,7 +10293,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 30
+            "display_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "2lt_c67__opt_baz_001",
@@ -10293,7 +10321,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 30
+            "display_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "3lt_c67__opt_baz_001",
@@ -10314,7 +10349,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 30
+            "display_order": 30,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "1lt_c07__opt_fa5_001",
@@ -51763,7 +51805,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-08-13T16:12:41+00:00",
+          "generated_at": "2026-08-13T16:40:18+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -63537,7 +63579,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "2lt_e07__opt_baz_001",
@@ -63558,7 +63607,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "3lt_e07__opt_baz_001",
@@ -63579,7 +63635,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "1lt_e67__opt_baz_001",
@@ -63600,7 +63663,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "2lt_e67__opt_baz_001",
@@ -63621,7 +63691,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "3lt_e67__opt_baz_001",
@@ -63642,7 +63719,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "1lt_e07__opt_fa5_001",
@@ -105251,7 +105335,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grand_sport_x_options",
-          "generated_at": "2026-08-13T16:12:42+00:00",
+          "generated_at": "2026-08-13T16:40:19+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -116727,7 +116811,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "2lt_g07__opt_baz_001",
@@ -116748,7 +116839,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "3lt_g07__opt_baz_001",
@@ -116769,7 +116867,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "1lt_g67__opt_baz_001",
@@ -116790,7 +116895,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "2lt_g67__opt_baz_001",
@@ -116811,7 +116923,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "3lt_g67__opt_baz_001",
@@ -116832,7 +116951,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "1lt_g07__opt_fa5_001",
@@ -158781,7 +158907,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-08-13T16:12:44+00:00",
+          "generated_at": "2026-08-13T16:40:21+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -168418,7 +168544,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "2lz_h07__opt_baz_001",
@@ -168439,7 +168572,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "3lz_h07__opt_baz_001",
@@ -168460,7 +168600,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "1lz_h67__opt_baz_001",
@@ -168481,7 +168628,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "2lz_h67__opt_baz_001",
@@ -168502,7 +168656,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "3lz_h67__opt_baz_001",
@@ -168523,7 +168684,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "1lz_h07__opt_dy0_002",
@@ -210748,7 +210916,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "zr1_options",
-          "generated_at": "2026-08-13T16:12:45+00:00",
+          "generated_at": "2026-08-13T16:40:22+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -216843,7 +217011,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "3lz_r07__opt_baz_001",
@@ -216864,7 +217039,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "1lz_r67__opt_baz_001",
@@ -216885,7 +217067,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "3lz_r67__opt_baz_001",
@@ -216906,7 +217095,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "1lz_r07__opt_fa5_001",
@@ -241910,7 +242106,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "zr1x_options",
-          "generated_at": "2026-08-13T16:12:45+00:00",
+          "generated_at": "2026-08-13T16:40:23+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -247992,7 +248188,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "3lz_s07__opt_baz_001",
@@ -248013,7 +248216,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "1lz_s67__opt_baz_001",
@@ -248034,7 +248244,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "3lz_s67__opt_baz_001",
@@ -248055,7 +248272,14 @@ window.CORVETTE_FORM_DATA = {
             "selectable": "True",
             "active": "True",
             "base_price": 695,
-            "display_order": 20
+            "display_order": 20,
+            "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/baz.jpg",
+            "image_alt": "Stealth Interior",
+            "image_fit": "cover",
+            "image_position": "center",
+            "hover_image_url": "",
+            "hover_image_alt": "",
+            "hover_image_position": ""
           },
           {
             "choice_id": "1lz_s07__opt_fa5_001",

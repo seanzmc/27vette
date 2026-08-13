@@ -320,6 +320,38 @@ def test_parse_shared_option_media_accepts_any_valid_multi_model_prefix_and_suff
     ) == ("h-h", "j6d", False)
 
 
+def test_duplicate_wordpress_records_for_same_url_are_one_media_candidate() -> None:
+    url = "https://example.test/wp-content/uploads/pictures/27vette/baz.jpg"
+
+    inventory = asset_map_sync.build_media_inventory([url, url])
+
+    assert inventory.option_bare == {"baz": [url]}
+    assert inventory.unparseable == []
+
+
+def test_fetch_media_snapshot_collapses_duplicate_attachment_records(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    url = "https://example.test/wp-content/uploads/pictures/27vette/baz.jpg"
+
+    monkeypatch.setattr(
+        asset_map_sync,
+        "_open_json",
+        lambda *_args, **_kwargs: (
+            [
+                {"source_url": url, "modified": "2026-08-12T10:00:00"},
+                {"source_url": url, "modified": "2026-08-13T11:00:00"},
+            ],
+            {"x-wp-totalpages": "1"},
+        ),
+    )
+
+    snapshot = asset_map_sync.fetch_media_snapshot(timeout=1)
+
+    assert snapshot.urls == [url]
+    assert snapshot.modified_by_url == {url: "2026-08-13T11:00:00"}
+
+
 def test_parse_model_and_bodystyle_media_names() -> None:
     assert asset_map_sync.parse_model_media("https://example.test/27vette/grandsport.png") == ("grand_sport", "grandSport")
     assert asset_map_sync.parse_bodystyle_media("https://example.test/27vette/c07-1.png") == (

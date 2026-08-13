@@ -35,6 +35,8 @@ The supported command:
   selectively applying hand-picked URLs;
 - sends cache-bypass headers and requires two identical full WordPress snapshots
   before a complete write;
+- collapses duplicate WordPress attachment records that expose the same physical
+  URL, so one media file cannot become a false ambiguity;
 - resolves default scope from promoted runtime models in `model_registry_promotion`;
 - resolves each model's option sheet through `model_workbook_sources`;
 - accepts media anywhere under `/wp-content/uploads/pictures/27vette/`, including

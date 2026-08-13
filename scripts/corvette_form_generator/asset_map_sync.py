@@ -223,7 +223,7 @@ def build_media_index(media_urls: Iterable[str]) -> tuple[dict[tuple[str, str], 
     exact: dict[tuple[str, str], list[str]] = defaultdict(list)
     bare: dict[str, list[str]] = defaultdict(list)
     unparseable: list[str] = []
-    for url in media_urls:
+    for url in dict.fromkeys(media_urls):
         model, rpo, ok = parse_media(url)
         if not ok:
             unparseable.append(url)
@@ -241,7 +241,10 @@ def build_media_inventory(media_urls: Iterable[str]) -> MediaInventory:
     model_media: dict[tuple[str, str], list[str]] = defaultdict(list)
     bodystyle_media: dict[tuple[str, str, str], list[str]] = defaultdict(list)
     unparseable: list[str] = []
-    for url in media_urls:
+    # WordPress can expose multiple attachment records for the same physical
+    # source URL. Matching is URL-based, so duplicate records are one candidate,
+    # not an ambiguity.
+    for url in dict.fromkeys(media_urls):
         parsed_any = False
         model_key, target_id = parse_model_media(url)
         if model_key and target_id:
@@ -346,12 +349,16 @@ def fetch_media_snapshot(
             url = clean(item.get("source_url"))
             if PATH_FILTER in url:
                 urls.append(url)
-                modified_by_url[url] = clean(item.get("modified"))
+                modified = clean(item.get("modified"))
+                if modified > modified_by_url.get(url, ""):
+                    modified_by_url[url] = modified
         total_pages = int(headers.get("x-wp-totalpages", page))
         if page >= total_pages:
             break
         page += 1
-    return MediaSnapshot(urls=urls, modified_by_url=modified_by_url)
+    # Multiple WordPress attachment rows may resolve to the same physical URL.
+    # Preserve first-seen API order while collapsing those duplicate records.
+    return MediaSnapshot(urls=list(dict.fromkeys(urls)), modified_by_url=modified_by_url)
 
 
 def fetch_media(timeout: float, modified_after: str | None = None) -> list[str]:
