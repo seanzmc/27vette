@@ -25,14 +25,20 @@ The supported command:
   category subfolders such as `/paint/` or `/int/`;
 - treats model-prefixed filenames as model-specific winners (`c-` Stingray,
   `e-` Grand Sport, `h-` Z06, `r-` ZR1, `s-` ZR1X, `g-` Grand Sport X);
-- after an exact model prefix is absent, resolves configured model fallbacks
+- accepts any multi-model prefix made from two or more distinct model codes,
+  such as `e-g-j6d.webp` or `h-s-r-j6d.webp`; the file is shared by every
+  named model, and the narrowest matching group wins when multiple groups
+  contain the same model and RPO;
+- after exact and shared-model prefixes are absent, resolves configured model fallbacks
   before considering a bare shared filename: Grand Sport → Stingray, Grand
   Sport X → Grand Sport → Stingray, and ZR1 / ZR1X → Z06;
 - treats a single bare RPO filename as a shared fallback for every promoted
   active model with a matching active/selectable option row when that model has
   no exact or configured fallback-model candidate for the RPO;
-- flags duplicate files at the highest available priority as ambiguous instead
-  of silently falling through or choosing one by folder or API order;
+- resolves option media in exact single-model → narrowest shared group →
+  configured model fallback → bare generic order, and flags duplicate files
+  at the highest available priority as ambiguous instead of silently falling
+  through or choosing one by folder or API order;
 - uses stdlib HTTP with an explicit browser-like User-Agent, with optional `WP_USER` / `WP_APP_PASSWORD` only when the public media endpoint requires auth;
 - supports deterministic validation with `--media-url-list tests/fixtures/asset-map-sync-media-urls.txt`;
 - writes review reports plus `asset_map_sync_manifest.json` to `--report-dir`;

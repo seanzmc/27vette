@@ -254,6 +254,21 @@ def test_parse_media_requires_hyphen_for_model_prefix() -> None:
     assert asset_map_sync.parse_media("https://example.test/27vette/paint/c-gba.png") == ("stingray", "gba", True)
 
 
+def test_parse_shared_option_media_accepts_any_valid_multi_model_prefix_and_suffix() -> None:
+    assert asset_map_sync.parse_shared_option_media(
+        "https://example.test/27vette/brakes/e-g-j6d-o-cmp.webp"
+    ) == ("e-g", "j6d", True)
+    assert asset_map_sync.parse_shared_option_media(
+        "https://example.test/27vette/brakes/h-s-r-j6d-o-cmp.webp"
+    ) == ("h-s-r", "j6d", True)
+    assert asset_map_sync.parse_shared_option_media(
+        "https://example.test/27vette/brakes/e-j6d.webp"
+    ) == (None, "", False)
+    assert asset_map_sync.parse_shared_option_media(
+        "https://example.test/27vette/brakes/h-h-j6d.webp"
+    ) == ("h-h", "j6d", False)
+
+
 def test_parse_model_and_bodystyle_media_names() -> None:
     assert asset_map_sync.parse_model_media("https://example.test/27vette/grandsport.png") == ("grand_sport", "grandSport")
     assert asset_map_sync.parse_bodystyle_media("https://example.test/27vette/c07-1.png") == (
@@ -376,6 +391,107 @@ def test_reconcile_uses_model_fallback_chain_before_bare_media() -> None:
     assert by_target["opt_fff_001"]["new_url"].endswith("/h-fff.png")
     assert by_target["opt_ggg_001"]["candidate_source"] == "bare-shared"
     assert by_target["opt_ggg_001"]["new_url"].endswith("/ggg.png")
+
+
+def test_reconcile_uses_exact_then_shared_prefix_then_model_fallback_then_bare() -> None:
+    desired = {
+        ("grand_sport", "option", "opt_aaa_001"): {"target_type": "option", "rpo": "aaa", "name": "GS exact"},
+        ("grand_sport", "option", "opt_bbb_001"): {"target_type": "option", "rpo": "bbb", "name": "GS shared"},
+        ("grand_sport_x", "option", "opt_aaa_001"): {"target_type": "option", "rpo": "aaa", "name": "GSX exact"},
+        ("grand_sport_x", "option", "opt_bbb_001"): {"target_type": "option", "rpo": "bbb", "name": "GSX shared"},
+    }
+    media = asset_map_sync.build_media_inventory(
+        [
+            "https://example.test/27vette/e-aaa.png",
+            "https://example.test/27vette/g-aaa.png",
+            "https://example.test/27vette/e-g-aaa-o-cmp.webp",
+            "https://example.test/27vette/e-g-bbb-o-cmp.webp",
+            "https://example.test/27vette/c-bbb.png",
+            "https://example.test/27vette/bbb.png",
+        ]
+    )
+
+    plan = asset_map_sync.reconcile(desired, media, existing_rows={}, alive={}, incremental=False)
+    by_key = {(row["model_key"], row["target_id"]): row for row in plan.report}
+
+    assert by_key[("grand_sport", "opt_aaa_001")]["candidate_source"] == "prefixed"
+    assert by_key[("grand_sport", "opt_aaa_001")]["new_url"].endswith("/e-aaa.png")
+    assert by_key[("grand_sport_x", "opt_aaa_001")]["candidate_source"] == "prefixed"
+    assert by_key[("grand_sport_x", "opt_aaa_001")]["new_url"].endswith("/g-aaa.png")
+    assert by_key[("grand_sport", "opt_bbb_001")]["candidate_source"] == "shared-prefix:e-g"
+    assert by_key[("grand_sport", "opt_bbb_001")]["new_url"].endswith("/e-g-bbb-o-cmp.webp")
+    assert by_key[("grand_sport_x", "opt_bbb_001")]["candidate_source"] == "shared-prefix:e-g"
+    assert by_key[("grand_sport_x", "opt_bbb_001")]["new_url"].endswith("/e-g-bbb-o-cmp.webp")
+
+
+def test_reconcile_resolves_arbitrary_shared_group_for_every_named_model() -> None:
+    desired = {
+        (model_key, "option", "opt_j6d_001"): {
+            "target_type": "option",
+            "rpo": "j6d",
+            "name": "Calipers",
+        }
+        for model_key in ("z06", "zr1", "zr1x")
+    }
+    media = asset_map_sync.build_media_inventory(
+        ["https://example.test/27vette/brakes/h-s-r-j6d-o-cmp.webp"]
+    )
+
+    plan = asset_map_sync.reconcile(desired, media, existing_rows={}, alive={}, incremental=False)
+
+    assert {row["model_key"] for row in plan.report} == {"z06", "zr1", "zr1x"}
+    assert {row["candidate_source"] for row in plan.report} == {"shared-prefix:h-s-r"}
+    assert {row["new_url"] for row in plan.report} == {
+        "https://example.test/27vette/brakes/h-s-r-j6d-o-cmp.webp"
+    }
+
+
+def test_reconcile_prefers_narrower_shared_group_over_broader_shared_group() -> None:
+    desired = {
+        ("zr1", "option", "opt_j6d_001"): {
+            "target_type": "option",
+            "rpo": "j6d",
+            "name": "Calipers",
+        },
+    }
+    media = asset_map_sync.build_media_inventory(
+        [
+            "https://example.test/27vette/brakes/h-r-j6d.webp",
+            "https://example.test/27vette/brakes/h-s-r-j6d.webp",
+        ]
+    )
+
+    plan = asset_map_sync.reconcile(desired, media, existing_rows={}, alive={}, incremental=False)
+
+    assert plan.report[0]["candidate_source"] == "shared-prefix:h-r"
+    assert plan.report[0]["new_url"].endswith("/h-r-j6d.webp")
+
+
+def test_reconcile_flags_duplicate_shared_prefix_media_without_falling_through() -> None:
+    desired = {
+        ("grand_sport_x", "option", "opt_j6d_001"): {
+            "target_type": "option",
+            "rpo": "j6d",
+            "name": "Calipers",
+        },
+    }
+    media = asset_map_sync.build_media_inventory(
+        [
+            "https://example.test/27vette/brakes/e-g-j6d-o-cmp.webp",
+            "https://example.test/27vette/alternate/e-g-j6d-o-cmp.webp",
+            "https://example.test/27vette/brakes/e-j6d.png",
+            "https://example.test/27vette/brakes/j6d.png",
+        ]
+    )
+
+    plan = asset_map_sync.reconcile(desired, media, existing_rows={}, alive={}, incremental=False)
+
+    assert len(plan.report) == 1
+    assert plan.report[0]["action"] == "flag_ambiguous"
+    assert plan.report[0]["candidate_source"] == "shared-prefix:e-g:ambiguous"
+    assert "multiple e-g shared-prefix files" in plan.report[0]["note"]
+    assert plan.url_writes == {}
+    assert plan.inserts == []
 
 
 def test_reconcile_flags_ambiguous_highest_priority_model_candidate_without_falling_through() -> None:

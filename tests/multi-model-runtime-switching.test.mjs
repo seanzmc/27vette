@@ -1808,6 +1808,54 @@ test("Grand Sport workbook default_selected rows seed and reconcile defaults gen
   assert.equal(redCaliperOrder.auto_added_options.some((item) => item.rpo === "J6D"), false, "Grey calipers should not override a user-selected caliper");
 });
 
+test("ZR1 and ZR1X keep fixed included equipment out of customer choice cards", () => {
+  const registry = loadDataWindow().CORVETTE_FORM_DATA;
+  const expectedDefaults = {
+    zr1: ["EFR", "J58"],
+    zr1x: ["AQ9", "AH2", "EFR", "EYT", "SOJ"],
+  };
+
+  for (const [modelKey, defaultRpos] of Object.entries(expectedDefaults)) {
+    const data = registry.models[modelKey].data;
+    const sectionsById = new Map(data.sections.map((section) => [section.section_id, section]));
+    const brokenStandardChoices = data.choices.filter((choice) => {
+      const section = sectionsById.get(choice.section_id);
+      return (
+        choice.active === "True" &&
+        choice.status !== "unavailable" &&
+        choice.selectable !== "True" &&
+        choice.display_behavior !== "hidden" &&
+        section?.selection_mode !== "display_only"
+      );
+    });
+
+    assert.equal(
+      brokenStandardChoices.length,
+      0,
+      `${modelKey} should not render fixed included equipment as unavailable customer choices: ${brokenStandardChoices
+        .map((choice) => `${choice.variant_id}:${choice.rpo}`)
+        .join(", ")}`,
+    );
+
+    for (const rpo of defaultRpos) {
+      const choices = data.choices.filter(
+        (choice) => choice.rpo === rpo && choice.status === "standard" && choice.active === "True",
+      );
+      assert.ok(choices.length > 0, `${modelKey} should retain standard ${rpo} choice rows`);
+      assert.equal(choices.every((choice) => choice.selectable === "True"), true, `${modelKey} ${rpo} should be selectable`);
+      assert.equal(
+        choices.every((choice) => choice.display_behavior === "default_selected"),
+        true,
+        `${modelKey} ${rpo} should be selected by default`,
+      );
+    }
+
+    for (const item of data.standardEquipment) {
+      assert.notEqual(item.status, "unavailable", `${modelKey} standard-equipment export should contain only included rows`);
+    }
+  }
+});
+
 test("Grand Sport engine covers are radio peers without an open Engine Appearance requirement", () => {
   const runtime = loadRuntime();
   runtime.activateModel("grandSport");

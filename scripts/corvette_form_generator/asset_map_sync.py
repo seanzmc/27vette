@@ -60,6 +60,7 @@ COVERAGE_RULESET = (
 
 IMGI_RE = re.compile(r"^imgi_\d+_(.+)$")
 PREFIX_RE = re.compile(r"^([cehrsg])-(.+)$")
+SHARED_PREFIX_RE = re.compile(r"^([cehrsg](?:-[cehrsg])+)-(.+)$")
 MODEL_BODY_STYLE_RE = re.compile(r"^([cehrsg])(07|67)-([12])$")
 SPLIT_RE = re.compile(r"[-_]")
 RPO_RE = re.compile(r"^[0-9a-z]{3}$")
@@ -141,6 +142,7 @@ class MediaInventory:
     model: dict[tuple[str, str], list[str]]
     bodystyle: dict[tuple[str, str, str], list[str]]
     unparseable: list[str]
+    option_shared: dict[tuple[str, str], list[str]] = field(default_factory=dict)
 
 
 def filename_stem(url: str) -> str:
@@ -162,6 +164,23 @@ def parse_media(url: str) -> tuple[str | None, str, bool]:
         stem = match.group(2)
     rpo = SPLIT_RE.split(stem)[0]
     return model, rpo, bool(RPO_RE.match(rpo))
+
+
+def parse_shared_option_media(url: str) -> tuple[str | None, str, bool]:
+    """Return ``(prefix_group, rpo, is_valid)`` for multi-model option media."""
+
+    stem = filename_stem(url)
+    match = IMGI_RE.match(stem)
+    if match:
+        stem = match.group(1)
+    match = SHARED_PREFIX_RE.match(stem)
+    if not match:
+        return None, "", False
+    prefix_group = match.group(1)
+    prefix_codes = prefix_group.split("-")
+    rpo = SPLIT_RE.split(match.group(2))[0]
+    valid = len(set(prefix_codes)) == len(prefix_codes) and bool(RPO_RE.match(rpo))
+    return prefix_group, rpo, valid
 
 
 def parse_model_media(url: str) -> tuple[str | None, str | None]:
@@ -199,6 +218,7 @@ def build_media_index(media_urls: Iterable[str]) -> tuple[dict[tuple[str, str], 
 
 def build_media_inventory(media_urls: Iterable[str]) -> MediaInventory:
     option_exact: dict[tuple[str, str], list[str]] = defaultdict(list)
+    option_shared: dict[tuple[str, str], list[str]] = defaultdict(list)
     option_bare: dict[str, list[str]] = defaultdict(list)
     model_media: dict[tuple[str, str], list[str]] = defaultdict(list)
     bodystyle_media: dict[tuple[str, str, str], list[str]] = defaultdict(list)
@@ -213,13 +233,18 @@ def build_media_inventory(media_urls: Iterable[str]) -> MediaInventory:
         if body_model and body_target and image_field:
             bodystyle_media[(body_model, body_target, image_field)].append(url)
             parsed_any = True
-        option_model, rpo, ok = parse_media(url)
-        if ok and not parsed_any:
+        shared_prefix, rpo, shared_ok = parse_shared_option_media(url)
+        if shared_ok and not parsed_any:
             parsed_any = True
-            if option_model:
-                option_exact[(option_model, rpo)].append(url)
-            else:
-                option_bare[rpo].append(url)
+            option_shared[(shared_prefix, rpo)].append(url)
+        if not shared_ok:
+            option_model, rpo, ok = parse_media(url)
+            if ok and not parsed_any:
+                parsed_any = True
+                if option_model:
+                    option_exact[(option_model, rpo)].append(url)
+                else:
+                    option_bare[rpo].append(url)
         if not parsed_any:
             unparseable.append(url)
     return MediaInventory(
@@ -228,6 +253,7 @@ def build_media_inventory(media_urls: Iterable[str]) -> MediaInventory:
         model=dict(model_media),
         bodystyle=dict(bodystyle_media),
         unparseable=unparseable,
+        option_shared=dict(option_shared),
     )
 
 
@@ -577,26 +603,64 @@ def reconcile(
     def resolve_option(model_key: str, rpo: str) -> tuple[dict[str, str], str, str]:
         if not rpo:
             return {}, "no-rpo", "no rpo in option sheet"
-        model_candidates = ((model_key, "prefixed"),) + tuple(
-            (fallback_model, f"model-fallback:{fallback_model}")
-            for fallback_model in OPTION_MODEL_FALLBACKS.get(model_key, ())
-        )
-        for candidate_model, source in model_candidates:
+
+        candidates = media.option_exact.get((model_key, rpo), [])
+        if len(candidates) == 1:
+            return {"image_url": candidates[0]}, "prefixed", ""
+        if len(candidates) > 1:
+            return (
+                {},
+                "prefixed-ambiguous",
+                f"multiple {model_key}-prefixed files for '{rpo}'; keep one file at this priority",
+            )
+
+        eligible_groups: list[tuple[int, str, list[str]]] = []
+        for (prefix_group, candidate_rpo), group_candidates in media.option_shared.items():
+            if candidate_rpo != rpo:
+                continue
+            group_models = tuple(MODEL_PREFIX[code] for code in prefix_group.split("-"))
+            if model_key in group_models:
+                eligible_groups.append((len(group_models), prefix_group, group_candidates))
+        if eligible_groups:
+            winning_size = min(size for size, _prefix, _candidates in eligible_groups)
+            winning_groups = [
+                (prefix, group_candidates)
+                for size, prefix, group_candidates in eligible_groups
+                if size == winning_size
+            ]
+            winning_candidates = [
+                (prefix, url)
+                for prefix, group_candidates in winning_groups
+                for url in group_candidates
+            ]
+            if len(winning_candidates) == 1:
+                prefix_group, url = winning_candidates[0]
+                return (
+                    {"image_url": url},
+                    f"shared-prefix:{prefix_group}",
+                    f"using {prefix_group}-prefixed media shared with {model_key}",
+                )
+            prefix_labels = ", ".join(sorted(prefix for prefix, _candidates in winning_groups))
+            source_label = winning_groups[0][0] if len(winning_groups) == 1 else prefix_labels
+            return (
+                {},
+                f"shared-prefix:{source_label}:ambiguous",
+                f"multiple {prefix_labels} shared-prefix files for '{rpo}' at the winning specificity",
+            )
+
+        for candidate_model in OPTION_MODEL_FALLBACKS.get(model_key, ()):
+            source = f"model-fallback:{candidate_model}"
             candidates = media.option_exact.get((candidate_model, rpo), [])
             if len(candidates) == 1:
-                note = "" if candidate_model == model_key else (
-                    f"using {candidate_model}-prefixed media as configured fallback for {model_key}"
+                return (
+                    {"image_url": candidates[0]},
+                    source,
+                    f"using {candidate_model}-prefixed media as configured fallback for {model_key}",
                 )
-                return {"image_url": candidates[0]}, source, note
             if len(candidates) > 1:
-                ambiguous_source = (
-                    "prefixed-ambiguous"
-                    if candidate_model == model_key
-                    else f"{source}:ambiguous"
-                )
                 return (
                     {},
-                    ambiguous_source,
+                    f"{source}:ambiguous",
                     f"multiple {candidate_model}-prefixed files for '{rpo}'; keep one file at this priority",
                 )
         if rpo in media.option_bare:
@@ -895,8 +959,12 @@ def _write_reports(
         writer = csv.writer(handle)
         writer.writerow(["source_url", "parsed_model", "parsed_rpo", "reason"])
         for url in unmatched:
-            model_key, rpo, _ = parse_media(url)
-            writer.writerow([url, model_key or "", rpo, reason])
+            shared_prefix, rpo, shared_ok = parse_shared_option_media(url)
+            if shared_ok:
+                writer.writerow([url, shared_prefix, rpo, reason])
+            else:
+                model_key, rpo, _ = parse_media(url)
+                writer.writerow([url, model_key or "", rpo, reason])
         for url in unparseable:
             writer.writerow([url, "", "", "filename did not yield a 3-char RPO"])
     return report_path, missing_path, unmatched_path, len(missing_rows), len(broad_missing_rows)

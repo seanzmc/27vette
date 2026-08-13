@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grand_sport_x_options",
-    "generated_at": "2026-08-12T23:26:43+00:00",
+    "generated_at": "2026-08-13T01:55:20+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -4400,7 +4400,7 @@
       "base_price": 0,
       "display_order": 10,
       "display_behavior": "default_selected",
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6d.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6d-o-cmp.webp",
       "image_alt": "Dark Gray Metallic-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4429,7 +4429,7 @@
       "base_price": 0,
       "display_order": 10,
       "display_behavior": "default_selected",
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6d.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6d-o-cmp.webp",
       "image_alt": "Dark Gray Metallic-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4458,7 +4458,7 @@
       "base_price": 0,
       "display_order": 10,
       "display_behavior": "default_selected",
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6d.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6d-o-cmp.webp",
       "image_alt": "Dark Gray Metallic-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4487,7 +4487,7 @@
       "base_price": 0,
       "display_order": 10,
       "display_behavior": "default_selected",
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6d.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6d-o-cmp.webp",
       "image_alt": "Dark Gray Metallic-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4516,7 +4516,7 @@
       "base_price": 0,
       "display_order": 10,
       "display_behavior": "default_selected",
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6d.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6d-o-cmp.webp",
       "image_alt": "Dark Gray Metallic-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4545,7 +4545,7 @@
       "base_price": 0,
       "display_order": 10,
       "display_behavior": "default_selected",
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6d.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6d-o-cmp.webp",
       "image_alt": "Dark Gray Metallic-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4573,7 +4573,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 20,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6f.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6f-o-cmp.webp",
       "image_alt": "Bright Red-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4601,7 +4601,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 20,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6f.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6f-o-cmp.webp",
       "image_alt": "Bright Red-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4629,7 +4629,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 20,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6f.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6f-o-cmp.webp",
       "image_alt": "Bright Red-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4657,7 +4657,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 20,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6f.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6f-o-cmp.webp",
       "image_alt": "Bright Red-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4685,7 +4685,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 20,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6f.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6f-o-cmp.webp",
       "image_alt": "Bright Red-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4713,7 +4713,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 20,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6f.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6f-o-cmp.webp",
       "image_alt": "Bright Red-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4741,7 +4741,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 30,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6e.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6e-o-cmp.webp",
       "image_alt": "Velocity Yellow-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4769,7 +4769,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 30,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6e.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6e-o-cmp.webp",
       "image_alt": "Velocity Yellow-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4797,7 +4797,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 30,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6e.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6e-o-cmp.webp",
       "image_alt": "Velocity Yellow-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4825,7 +4825,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 30,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6e.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6e-o-cmp.webp",
       "image_alt": "Velocity Yellow-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4853,7 +4853,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 30,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6e.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6e-o-cmp.webp",
       "image_alt": "Velocity Yellow-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4881,7 +4881,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 30,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6e.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6e-o-cmp.webp",
       "image_alt": "Velocity Yellow-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4909,7 +4909,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 40,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6n.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6n-o-cmp.webp",
       "image_alt": "Edge Red-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4937,7 +4937,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 40,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6n.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6n-o-cmp.webp",
       "image_alt": "Edge Red-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4965,7 +4965,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 40,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6n.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6n-o-cmp.webp",
       "image_alt": "Edge Red-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -4993,7 +4993,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 40,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6n.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6n-o-cmp.webp",
       "image_alt": "Edge Red-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -5021,7 +5021,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 40,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6n.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6n-o-cmp.webp",
       "image_alt": "Edge Red-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -5049,7 +5049,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 40,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6n.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6n-o-cmp.webp",
       "image_alt": "Edge Red-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -5077,7 +5077,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 50,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6b.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6b-o-cmp.webp",
       "image_alt": "Blue-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -5105,7 +5105,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 50,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6b.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6b-o-cmp.webp",
       "image_alt": "Blue-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -5133,7 +5133,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 50,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6b.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6b-o-cmp.webp",
       "image_alt": "Blue-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -5161,7 +5161,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 50,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6b.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6b-o-cmp.webp",
       "image_alt": "Blue-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -5189,7 +5189,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 50,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6b.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6b-o-cmp.webp",
       "image_alt": "Blue-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -5217,7 +5217,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 50,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6b.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6b-o-cmp.webp",
       "image_alt": "Blue-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -5245,7 +5245,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 60,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6l.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6l-o-cmp.webp",
       "image_alt": "Orange-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -5273,7 +5273,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 60,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6l.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6l-o-cmp.webp",
       "image_alt": "Orange-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -5301,7 +5301,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 60,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6l.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6l-o-cmp.webp",
       "image_alt": "Orange-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -5329,7 +5329,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 60,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6l.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6l-o-cmp.webp",
       "image_alt": "Orange-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -5357,7 +5357,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 60,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6l.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6l-o-cmp.webp",
       "image_alt": "Orange-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -5385,7 +5385,7 @@
       "active": "True",
       "base_price": 795,
       "display_order": 60,
-      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6l.png",
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6l-o-cmp.webp",
       "image_alt": "Orange-Painted Calipers",
       "image_fit": "cover",
       "image_position": "center",
@@ -7275,7 +7275,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/slk.jpg",
+      "image_alt": "Edge Red Rear Hatch Strut Bracket",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_slk_001",
@@ -7296,7 +7303,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/slk.jpg",
+      "image_alt": "Edge Red Rear Hatch Strut Bracket",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_slk_001",
@@ -7317,7 +7331,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/slk.jpg",
+      "image_alt": "Edge Red Rear Hatch Strut Bracket",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_slk_001",
@@ -7338,7 +7359,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/slk.jpg",
+      "image_alt": "Edge Red Rear Hatch Strut Bracket",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_slk_001",
@@ -7359,7 +7387,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/slk.jpg",
+      "image_alt": "Edge Red Rear Hatch Strut Bracket",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_slk_001",
@@ -7380,7 +7415,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1995,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/slk.jpg",
+      "image_alt": "Edge Red Rear Hatch Strut Bracket",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_sln_001",
@@ -7401,7 +7443,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 2895,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-sln.jpg",
+      "image_alt": "Visible Carbon Fiber Engine Cross Brace",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_sln_001",
@@ -7422,7 +7471,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 2895,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-sln.jpg",
+      "image_alt": "Visible Carbon Fiber Engine Cross Brace",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_sln_001",
@@ -7443,7 +7499,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 2895,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-sln.jpg",
+      "image_alt": "Visible Carbon Fiber Engine Cross Brace",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_sln_001",
@@ -7464,7 +7527,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 2895,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-sln.jpg",
+      "image_alt": "Visible Carbon Fiber Engine Cross Brace",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_sln_001",
@@ -7485,7 +7555,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 2895,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-sln.jpg",
+      "image_alt": "Visible Carbon Fiber Engine Cross Brace",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_sln_001",
@@ -7506,7 +7583,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 2895,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/ext/c-sln.jpg",
+      "image_alt": "Visible Carbon Fiber Engine Cross Brace",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_vup_001",
@@ -8625,7 +8709,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 10
+      "display_order": 10,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmu-z15-1.png",
+      "image_alt": "Carbon Flash Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_dmu_001",
@@ -8646,7 +8737,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 10
+      "display_order": 10,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmu-z15-1.png",
+      "image_alt": "Carbon Flash Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_dmu_001",
@@ -8667,7 +8765,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 10
+      "display_order": 10,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmu-z15-1.png",
+      "image_alt": "Carbon Flash Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_dmu_001",
@@ -8688,7 +8793,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 10
+      "display_order": 10,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmu-z15-1.png",
+      "image_alt": "Carbon Flash Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_dmu_001",
@@ -8709,7 +8821,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 10
+      "display_order": 10,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmu-z15-1.png",
+      "image_alt": "Carbon Flash Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_dmu_001",
@@ -8730,7 +8849,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 10
+      "display_order": 10,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmu-z15-1.png",
+      "image_alt": "Carbon Flash Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_dmv_001",
@@ -8751,7 +8877,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmv-z15-5.png",
+      "image_alt": "Blade Silver Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_dmv_001",
@@ -8772,7 +8905,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmv-z15-5.png",
+      "image_alt": "Blade Silver Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_dmv_001",
@@ -8793,7 +8933,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmv-z15-5.png",
+      "image_alt": "Blade Silver Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_dmv_001",
@@ -8814,7 +8961,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmv-z15-5.png",
+      "image_alt": "Blade Silver Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_dmv_001",
@@ -8835,7 +8989,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmv-z15-5.png",
+      "image_alt": "Blade Silver Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_dmv_001",
@@ -8856,7 +9017,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmv-z15-5.png",
+      "image_alt": "Blade Silver Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_dmw_001",
@@ -8877,7 +9045,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmw-z15-2.png",
+      "image_alt": "Arctic White Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_dmw_001",
@@ -8898,7 +9073,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmw-z15-2.png",
+      "image_alt": "Arctic White Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_dmw_001",
@@ -8919,7 +9101,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmw-z15-2.png",
+      "image_alt": "Arctic White Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_dmw_001",
@@ -8940,7 +9129,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmw-z15-2.png",
+      "image_alt": "Arctic White Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_dmw_001",
@@ -8961,7 +9157,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmw-z15-2.png",
+      "image_alt": "Arctic White Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_dmw_001",
@@ -8982,7 +9185,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmw-z15-2.png",
+      "image_alt": "Arctic White Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_dmx_001",
@@ -9003,7 +9213,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmx-z15-3.png",
+      "image_alt": "Admiral Blue Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_dmx_001",
@@ -9024,7 +9241,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmx-z15-3.png",
+      "image_alt": "Admiral Blue Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_dmx_001",
@@ -9045,7 +9269,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmx-z15-3.png",
+      "image_alt": "Admiral Blue Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_dmx_001",
@@ -9066,7 +9297,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmx-z15-3.png",
+      "image_alt": "Admiral Blue Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_dmx_001",
@@ -9087,7 +9325,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmx-z15-3.png",
+      "image_alt": "Admiral Blue Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_dmx_001",
@@ -9108,7 +9353,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmx-z15-3.png",
+      "image_alt": "Admiral Blue Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_dmy_001",
@@ -9129,7 +9381,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmy-z15-4.png",
+      "image_alt": "Red Mist Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_dmy_001",
@@ -9150,7 +9409,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmy-z15-4.png",
+      "image_alt": "Red Mist Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_dmy_001",
@@ -9171,7 +9437,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmy-z15-4.png",
+      "image_alt": "Red Mist Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_dmy_001",
@@ -9192,7 +9465,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmy-z15-4.png",
+      "image_alt": "Red Mist Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_dmy_001",
@@ -9213,7 +9493,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmy-z15-4.png",
+      "image_alt": "Red Mist Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_dmy_001",
@@ -9234,7 +9521,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1295,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/e-g-dmy-z15-4.png",
+      "image_alt": "Red Mist Center Stripe",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_17a_001",
@@ -11733,7 +12027,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 150,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/SDA.jpg",
+      "image_alt": "Black Recovery Hook",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_sda_001",
@@ -11754,7 +12055,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 150,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/SDA.jpg",
+      "image_alt": "Black Recovery Hook",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_sda_001",
@@ -11775,7 +12083,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 150,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/SDA.jpg",
+      "image_alt": "Black Recovery Hook",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_sda_001",
@@ -11796,7 +12111,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 150,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/SDA.jpg",
+      "image_alt": "Black Recovery Hook",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_sda_001",
@@ -11817,7 +12139,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 150,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/SDA.jpg",
+      "image_alt": "Black Recovery Hook",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_sda_001",
@@ -11838,7 +12167,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 150,
-      "display_order": 20
+      "display_order": 20,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/SDA.jpg",
+      "image_alt": "Black Recovery Hook",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_sfz_001",
@@ -11859,7 +12195,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/sfz.jpg",
+      "image_alt": "Dark Stealth Crossed Flags Emblems",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_sfz_001",
@@ -11880,7 +12223,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/sfz.jpg",
+      "image_alt": "Dark Stealth Crossed Flags Emblems",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_sfz_001",
@@ -11901,7 +12251,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/sfz.jpg",
+      "image_alt": "Dark Stealth Crossed Flags Emblems",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_sfz_001",
@@ -11922,7 +12279,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/sfz.jpg",
+      "image_alt": "Dark Stealth Crossed Flags Emblems",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_sfz_001",
@@ -11943,7 +12307,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/sfz.jpg",
+      "image_alt": "Dark Stealth Crossed Flags Emblems",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_sfz_001",
@@ -11964,7 +12335,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 250,
-      "display_order": 30
+      "display_order": 30,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/sfz.jpg",
+      "image_alt": "Dark Stealth Crossed Flags Emblems",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_sbt_001",
@@ -12531,7 +12909,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 950,
-      "display_order": 90
+      "display_order": 90,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/c-vwe.jpg",
+      "image_alt": "Front Radiator Grille Screens",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_vwe_001",
@@ -12552,7 +12937,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 950,
-      "display_order": 90
+      "display_order": 90,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/c-vwe.jpg",
+      "image_alt": "Front Radiator Grille Screens",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_vwe_001",
@@ -12573,7 +12965,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 950,
-      "display_order": 90
+      "display_order": 90,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/c-vwe.jpg",
+      "image_alt": "Front Radiator Grille Screens",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_vwe_001",
@@ -12594,7 +12993,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 950,
-      "display_order": 90
+      "display_order": 90,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/c-vwe.jpg",
+      "image_alt": "Front Radiator Grille Screens",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_vwe_001",
@@ -12615,7 +13021,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 950,
-      "display_order": 90
+      "display_order": 90,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/c-vwe.jpg",
+      "image_alt": "Front Radiator Grille Screens",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_vwe_001",
@@ -12636,7 +13049,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 950,
-      "display_order": 90
+      "display_order": 90,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/c-vwe.jpg",
+      "image_alt": "Front Radiator Grille Screens",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_vwt_001",
@@ -13161,7 +13581,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 495,
-      "display_order": 150
+      "display_order": 150,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/RWJ.jpg",
+      "image_alt": "Gray Premium Outdoor Car Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_rwj_001",
@@ -13182,7 +13609,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 495,
-      "display_order": 150
+      "display_order": 150,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/RWJ.jpg",
+      "image_alt": "Gray Premium Outdoor Car Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_rwj_001",
@@ -13203,7 +13637,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 495,
-      "display_order": 150
+      "display_order": 150,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/RWJ.jpg",
+      "image_alt": "Gray Premium Outdoor Car Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_rwj_001",
@@ -13224,7 +13665,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 495,
-      "display_order": 150
+      "display_order": 150,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/RWJ.jpg",
+      "image_alt": "Gray Premium Outdoor Car Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_rwj_001",
@@ -13245,7 +13693,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 495,
-      "display_order": 150
+      "display_order": 150,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/RWJ.jpg",
+      "image_alt": "Gray Premium Outdoor Car Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_rwj_001",
@@ -13266,7 +13721,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 495,
-      "display_order": 150
+      "display_order": 150,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/RWJ.jpg",
+      "image_alt": "Gray Premium Outdoor Car Cover",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_rin_001",
@@ -13287,7 +13749,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 440,
-      "display_order": 160
+      "display_order": 160,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/rin.png",
+      "image_alt": "Arctic White Rear Corvette Script Badge",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_rin_001",
@@ -13308,7 +13777,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 440,
-      "display_order": 160
+      "display_order": 160,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/rin.png",
+      "image_alt": "Arctic White Rear Corvette Script Badge",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_rin_001",
@@ -13329,7 +13805,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 440,
-      "display_order": 160
+      "display_order": 160,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/rin.png",
+      "image_alt": "Arctic White Rear Corvette Script Badge",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_rin_001",
@@ -13350,7 +13833,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 440,
-      "display_order": 160
+      "display_order": 160,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/rin.png",
+      "image_alt": "Arctic White Rear Corvette Script Badge",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_rin_001",
@@ -13371,7 +13861,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 440,
-      "display_order": 160
+      "display_order": 160,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/rin.png",
+      "image_alt": "Arctic White Rear Corvette Script Badge",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_rin_001",
@@ -13392,7 +13889,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 440,
-      "display_order": 160
+      "display_order": 160,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/rin.png",
+      "image_alt": "Arctic White Rear Corvette Script Badge",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_sl8_001",
@@ -13413,7 +13917,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 495,
-      "display_order": 170
+      "display_order": 170,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/c-sl8.jpg",
+      "image_alt": "Edge Red Rear Corvette Script Badge",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_sl8_001",
@@ -13434,7 +13945,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 495,
-      "display_order": 170
+      "display_order": 170,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/c-sl8.jpg",
+      "image_alt": "Edge Red Rear Corvette Script Badge",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_sl8_001",
@@ -13455,7 +13973,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 495,
-      "display_order": 170
+      "display_order": 170,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/c-sl8.jpg",
+      "image_alt": "Edge Red Rear Corvette Script Badge",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_sl8_001",
@@ -13476,7 +14001,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 495,
-      "display_order": 170
+      "display_order": 170,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/c-sl8.jpg",
+      "image_alt": "Edge Red Rear Corvette Script Badge",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_sl8_001",
@@ -13497,7 +14029,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 495,
-      "display_order": 170
+      "display_order": 170,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/c-sl8.jpg",
+      "image_alt": "Edge Red Rear Corvette Script Badge",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_sl8_001",
@@ -13518,7 +14057,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 495,
-      "display_order": 170
+      "display_order": 170,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/c-sl8.jpg",
+      "image_alt": "Edge Red Rear Corvette Script Badge",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_rik_001",
@@ -13539,7 +14085,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 395,
-      "display_order": 180
+      "display_order": 180,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/rik.png",
+      "image_alt": "Torch Red Rear Corvette Script Badge",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_rik_001",
@@ -13560,7 +14113,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 395,
-      "display_order": 180
+      "display_order": 180,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/rik.png",
+      "image_alt": "Torch Red Rear Corvette Script Badge",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_rik_001",
@@ -13581,7 +14141,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 395,
-      "display_order": 180
+      "display_order": 180,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/rik.png",
+      "image_alt": "Torch Red Rear Corvette Script Badge",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_rik_001",
@@ -13602,7 +14169,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 395,
-      "display_order": 180
+      "display_order": 180,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/rik.png",
+      "image_alt": "Torch Red Rear Corvette Script Badge",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_rik_001",
@@ -13623,7 +14197,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 395,
-      "display_order": 180
+      "display_order": 180,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/rik.png",
+      "image_alt": "Torch Red Rear Corvette Script Badge",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_rik_001",
@@ -13644,7 +14225,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 395,
-      "display_order": 180
+      "display_order": 180,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/rik.png",
+      "image_alt": "Torch Red Rear Corvette Script Badge",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_sig_001",
@@ -14169,7 +14757,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 475,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/PEF.jpg",
+      "image_alt": "Contoured Liner Protection Package",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_pef_001",
@@ -14190,7 +14785,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 475,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/PEF.jpg",
+      "image_alt": "Contoured Liner Protection Package",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_pef_001",
@@ -14211,7 +14813,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 475,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/PEF.jpg",
+      "image_alt": "Contoured Liner Protection Package",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_pef_001",
@@ -14232,7 +14841,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 475,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/PEF.jpg",
+      "image_alt": "Contoured Liner Protection Package",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_pef_001",
@@ -14253,7 +14869,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 475,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/PEF.jpg",
+      "image_alt": "Contoured Liner Protection Package",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_pef_001",
@@ -14274,7 +14897,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 475,
-      "display_order": 40
+      "display_order": 40,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/PEF.jpg",
+      "image_alt": "Contoured Liner Protection Package",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_ria_001",
@@ -14295,7 +14925,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 265,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/RIA-2.jpg",
+      "image_alt": "All-Weather Floor Liners",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_ria_001",
@@ -14316,7 +14953,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 265,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/RIA-2.jpg",
+      "image_alt": "All-Weather Floor Liners",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_ria_001",
@@ -14337,7 +14981,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 265,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/RIA-2.jpg",
+      "image_alt": "All-Weather Floor Liners",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_ria_001",
@@ -14358,7 +15009,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 265,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/RIA-2.jpg",
+      "image_alt": "All-Weather Floor Liners",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_ria_001",
@@ -14379,7 +15037,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 265,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/RIA-2.jpg",
+      "image_alt": "All-Weather Floor Liners",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_ria_001",
@@ -14400,7 +15065,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 265,
-      "display_order": 50
+      "display_order": 50,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/RIA-2.jpg",
+      "image_alt": "All-Weather Floor Liners",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_cav_001",
@@ -14421,7 +15093,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 230,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/cav.jpg",
+      "image_alt": "Contoured Cargo Area Liners",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_cav_001",
@@ -14442,7 +15121,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 230,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/cav.jpg",
+      "image_alt": "Contoured Cargo Area Liners",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_cav_001",
@@ -14463,7 +15149,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 230,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/cav.jpg",
+      "image_alt": "Contoured Cargo Area Liners",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_cav_001",
@@ -14484,7 +15177,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 230,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/cav.jpg",
+      "image_alt": "Contoured Cargo Area Liners",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_cav_001",
@@ -14505,7 +15205,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 230,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/cav.jpg",
+      "image_alt": "Contoured Cargo Area Liners",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_cav_001",
@@ -14526,7 +15233,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 230,
-      "display_order": 60
+      "display_order": 60,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/cav.jpg",
+      "image_alt": "Contoured Cargo Area Liners",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_vyw_001",
@@ -15009,7 +15723,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1695,
-      "display_order": 100
+      "display_order": 100,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/s2l.png",
+      "image_alt": "Premium Leather Weekend/Travel Bag Set",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g07__opt_s2l_001",
@@ -15030,7 +15751,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1695,
-      "display_order": 100
+      "display_order": 100,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/s2l.png",
+      "image_alt": "Premium Leather Weekend/Travel Bag Set",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g07__opt_s2l_001",
@@ -15051,7 +15779,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1695,
-      "display_order": 100
+      "display_order": 100,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/s2l.png",
+      "image_alt": "Premium Leather Weekend/Travel Bag Set",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g67__opt_s2l_001",
@@ -15072,7 +15807,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1695,
-      "display_order": 100
+      "display_order": 100,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/s2l.png",
+      "image_alt": "Premium Leather Weekend/Travel Bag Set",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "2lt_g67__opt_s2l_001",
@@ -15093,7 +15835,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1695,
-      "display_order": 100
+      "display_order": 100,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/s2l.png",
+      "image_alt": "Premium Leather Weekend/Travel Bag Set",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "3lt_g67__opt_s2l_001",
@@ -15114,7 +15863,14 @@
       "selectable": "True",
       "active": "True",
       "base_price": 1695,
-      "display_order": 100
+      "display_order": 100,
+      "image_url": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/lpo/s2l.png",
+      "image_alt": "Premium Leather Weekend/Travel Bag Set",
+      "image_fit": "cover",
+      "image_position": "center",
+      "hover_image_url": "",
+      "hover_image_alt": "",
+      "hover_image_position": ""
     },
     {
       "choice_id": "1lt_g07__opt_sxb_001",
