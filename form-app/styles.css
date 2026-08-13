@@ -1205,6 +1205,7 @@ textarea {
 
 .interior-group-heading {
   display: grid;
+  flex: 1 1 0;
   gap: 4px;
   min-width: 0;
 }

@@ -703,6 +703,7 @@ test("interior color groups render as collapsed disclosure containers without th
   assert.match(html, /<details class="interior-group"/);
   assert.match(html, /<summary class="interior-group-header">/);
   assert.doesNotMatch(html, /<details class="interior-group"[^>]*\sopen(?:\s|>)/, "groups should be collapsed by default without a selection");
+  assert.match(stylesSource, /\.interior-group-heading\s*\{[\s\S]*?flex:\s*1 1 0;/, "interior headings should fill the row so short descriptions stay aligned");
   assert.doesNotMatch(stylesSource, /\.interior-color-section\s*\{[\s\S]*background:\s*linear-gradient/);
   assert.doesNotMatch(stylesSource, /\.interior-group\s*\{[\s\S]*background:\s*#fbfaf7/);
 });
