@@ -13,16 +13,16 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 ## Current handoff
 
 - **Updated:** 2026-08-13
-- **Owning specification:** The paused database workflow remains owned by `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md`; this separately requested GitHub release-gate slice has no new owning specification.
-- **Active workflow:** Required GitHub release-candidate check; database Pass 6B remains paused and unstarted.
-- **Branch/commit:** `codex/release-candidate-ci` starts from production merge commit `66667f1` on `origin/main`; `db-workflow` remains the continuing Workbook Manager branch.
-- **Last completed:** Added one pull-request workflow around `scripts/verify_workbook_candidate.py`. It checks every PR to `main` with Python 3.12 and Node 22, cancels superseded runs, limits execution to 15 minutes, grants read-only repository permission, and uploads the candidate JSON report even when the gate fails.
-- **Current status:** The workflow, README operator guidance, and this reconciled handoff are ready for a focused CI PR. No workbook, form artifact, runtime, styling, deployment, or dealer surface changed.
-- **Validation:** Workflow YAML parsed successfully. The exact composed candidate command passed locally from a clean `origin/main` worktree across all ten stages and all six models with zero semantic drift, unexpected drift, or boundary violations. GitHub-hosted execution on Python 3.12 and Node 22 remains the PR acceptance proof.
-- **Next action:** Push the CI branch, open its focused PR, require the `release-candidate` status context on `main` after its first successful GitHub run, then merge the CI-only PR.
-- **Blockers or closeout gaps:** No implementation blocker. Branch protection cannot reliably require a new status context until GitHub has observed that check at least once; the PR run is therefore the next gate.
+- **Owning specification:** The paused database workflow remains owned by `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md`; this separately requested live-form correction has no new owning specification.
+- **Active workflow:** Focused GSX/ZR1/ZR1X release hotfix; database Pass 6B remains paused and unstarted.
+- **Branch/commit:** `codex/gsx-ah2-c2z-standard` starts from required-CI production commit `ca81d70` on `origin/main`; `db-workflow` remains the continuing Workbook Manager branch.
+- **Last completed:** Corrected workbook-owned GSX 3LT AH2 pricing to `$0` while retaining the 2LT `$1,695` charge, activated ZR1/ZR1X C2Z as non-selectable Standard Equipment with coupe-only `standard` OVS ownership and convertible `unavailable` ownership, regenerated the three affected contracts and published registry, advanced the data-bundle cache token from 31 to 32, and added focused runtime regression coverage.
+- **Current status:** Implementation and local validation are complete and the hotfix branch is ready to commit and open as a focused PR. Workbook backups `backups/stingray_master-20260813-225503.xlsx` and `backups/stingray_master-20260813-230155.xlsx` exist locally and remain ignored recovery artifacts.
+- **Validation:** Both guarded workbook batches passed dry-run, schema, Boolean-hygiene, prepared-operation readback, backup, reopen, and atomic-save checks. Workbook package/schema are valid with zero issues. `tests/multi-model-runtime-switching.test.mjs` passes 67/67. The composed candidate lane passes all ten stages across all six models with zero semantic drift, unexpected drift, or boundary violations. Local browser proof shows GSX Coupe 3LT AH2 at `$0` with total MSRP unchanged and shows Visible Carbon Fiber Roof Panel inside the expanded Standard Equipment list for ZR1 and ZR1X; browser console has zero warnings/errors.
+- **Next action:** Commit and push `codex/gsx-ah2-c2z-standard`, open the focused PR to `main`, require the hosted `release-candidate` check to pass, then merge and verify the three corrected production flows.
+- **Blockers or closeout gaps:** No implementation blocker. GitHub-hosted required-check proof, merge, deployment, and production verification remain pending.
 - **Latest completed receipt:** `fable5loop/runs/2026-08-10-workbook-manager-validation-efficiency/`
-- **Protected boundaries:** Workbook data, generated artifacts, registry, runtime JavaScript, styling, pricing, schemas, dependencies, asset sync, dealer submission, deployment, and the live form remain unchanged. This slice adds only GitHub CI configuration plus its owned README and operational handoff guidance.
+- **Protected boundaries:** Runtime JavaScript logic, styling, schemas, dependencies, asset sync, dealer submission endpoint/payload/security/UX, and deployment configuration remain unchanged. Only the authorized workbook rows, affected generated contracts/registry, the data-bundle cache token in `form-app/index.html`, focused test, edit log, and operational handoff changed.
 
 ## Verified facts
 
