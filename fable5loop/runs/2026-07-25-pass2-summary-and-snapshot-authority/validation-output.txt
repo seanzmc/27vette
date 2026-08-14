@@ -1,0 +1,123 @@
+# Pass 2 receipt A — validation output
+# commit base: ed3692a
+# workbook SHA-256: 8858cff40ea7eaeda6b7921714f3697a6ee9d1bbc99c84e564d7b118e45b2166
+
+$ .venv/bin/python -m py_compile <pass 2 module list>
+OK (exit 0)
+
+$ PYTHONPATH=scripts .venv/bin/python -m pytest <pass 2 gate set> -q
+tests/test_source_assembly_characterization.py:51: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_source_assembly_characterization.py::test_shared_assembler_preserves_stingray_runtime_drift_surfaces
+1 failed, 59 passed, 8 subtests passed in 12.98s
+
+$ .venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
+  "issue_count": 0,
+  "issues": []
+}
+exit=0
+
+$ .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+  "status": "valid",
+  "issue_count": 0,
+  "error_count": 0,
+  "warning_count": 0,
+  "issues": []
+}
+
+$ node --test <every browser/runtime gate>   (pass/fail)
+stingray-generator-stability: 15/0
+stingray-form-regression: 90/0
+multi-model-runtime-switching: 48/0
+z06-runtime-promotion: 5/0
+z06-performance-package-interactions: 21/0
+z06-runtime-rule-corrections: 15/0
+z06-interior-accessory-cleanup: 7/0
+z06-contract-preview: 3/0
+z06-form-data-draft: 24/0
+nonruntime-option-source-purge: 6/0
+unpublished-runtime-contracts: 2/0
+workbook-schema-standardization: 8/1        (pre-existing, unchanged)
+workbook-visual-copy-standardization: 8/0
+seat-canonicalization-diff: 2/0
+grand-sport-contract-preview: 5/1           (pre-existing, Pass 4A)
+grand-sport-draft-data: 18/1                (pre-existing, Pass 4A)
+
+$ PYTHONPATH=scripts .venv/bin/python -m pytest tests/ -q
+6 failed, 460 passed, 2 skipped, 15 subtests passed
+  test_editor_lints.py::RealWorkbookLintTest::test_d1_rwj_wks_collision                 pre-existing
+  test_editor_lints.py::RealWorkbookLintTest::test_negative_no_duplicate_keys_or_orphan_refs  pre-existing
+  test_editor_lints.py::RealWorkbookCompareTest::test_c2_cj2_stingray_name_deviator     pre-existing
+  test_editor_lints.py::RealWorkbookCompareTest::test_r3_drz_pending_review             pre-existing
+  test_source_assembly_characterization.py::...preserves_stingray_runtime_drift_surfaces  pre-existing
+  test_fable5_loop_contract.py::test_repository_fable5_loop_contract_passes             receipt incomplete at time of run
+
+# Workbook opens per isolated generation, traced at the openpyxl.load_workbook call site
+
+before (commit ed3692a)                     after
+  stingray      2  production:165, interiors:121      stingray      2  production:164, interiors:121
+  grand_sport   4  inspection:427/647/976/1091        grand_sport   2  inspection:647/976
+  z06           4  inspection:427/647/976/1091        z06           2  inspection:647/976
+  z06 --emit-inspection  4                            z06 --emit-inspection  3
+
+  z06 normal generation wall clock: 0.67-0.71s -> 0.54-0.62s
+
+# Artifact identity across all six discoverable models
+
+44 generated artifacts (6 runtime contracts, 30 review files = 5 models x
+inspection/preview/draft JSON+MD,
+6 derived-swap manifests, stingray-form-data.json/csv) generated into an isolated
+--output-root before and after the change, compared with generated_at scrubbed:
+
+  artifacts compared: 44
+  differs: []
+
+The only intended difference is the generate_form.py stdout summary shape.
+
+# Tracked-surface proof
+
+git status --porcelain after the full gate run shows only:
+  scripts/corvette_form_generator/{inspection,model_generation,production,runtime_contract,source_assembly}.py
+  scripts/corvette_form_generator/validation.py (deleted)
+  tests/test_model_generation_route.py
+  fable5loop/runs/2026-07-25-pass2-summary-and-snapshot-authority/
+
+The two pre-existing grand-sport tests invoke generate_form.py without --output-root and
+rewrote form-app/data.js and two runtime contracts. `git diff` on those three files showed
+generated_at as the ONLY changed line in each; they were restored with `git checkout --`.
+That churn independently re-confirms byte reproducibility from the unchanged workbook.
+
+# ── Post-verifier corrections re-validated ────────────────────────────────────
+
+After the independent verifier returned PASS with four defects, the following landed and every
+gate above was re-run:
+
+  - inspect_model_sources() and build_contract_preview() wrapped in try/finally (they leaked their
+    workbook handle on every call at ed3692a, success and failure alike)
+  - dead _runtime_contract_json() removed; the now-unreachable REQUIRED_RESULT_KEYS runtime guard
+    removed and asserted in the test instead
+  - two new tests: every builder loads once, and every builder closes on an injected RuntimeError
+
+$ PYTHONPATH=scripts .venv/bin/python -m pytest <pass 2 gate set> -q
+1 failed, 60 passed, 8 subtests passed        (same single pre-existing failure; 55 -> 60 passing)
+
+$ six-model isolated regeneration vs the ed3692a before-state
+artifacts compared: 44 | differs: []
+
+$ node --test (generation-touching gates, re-run)
+stingray-generator-stability 15/0   stingray-form-regression 90/0   multi-model-runtime-switching 48/0
+z06-contract-preview 3/0   z06-form-data-draft 24/0   z06-interior-accessory-cleanup 7/0
+grand-sport-contract-preview 5/1   grand-sport-draft-data 18/1      (both pre-existing, Pass 4A)
+
+$ .venv/bin/python -m py_compile <pass 2 module list>
+OK (exit 0)
+
+$ git status --porcelain
+ M scripts/corvette_form_generator/inspection.py
+ M scripts/corvette_form_generator/model_generation.py
+ M scripts/corvette_form_generator/production.py
+ M scripts/corvette_form_generator/runtime_contract.py
+ M scripts/corvette_form_generator/source_assembly.py
+D  scripts/corvette_form_generator/validation.py
+ M tests/test_model_generation_route.py
+?? fable5loop/runs/2026-07-25-pass2-summary-and-snapshot-authority/

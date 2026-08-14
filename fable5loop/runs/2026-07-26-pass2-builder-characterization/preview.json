@@ -1,0 +1,56 @@
+{
+  "boolHygieneResult": {
+    "after_bool_like_count": 7110,
+    "after_workbook": "/var/folders/4_/jywtrzb95073s2nk3fk35fkc0000gn/T/com.apple.shortcuts.mac-helper/tmpiss374k5/stingray_master.xlsx",
+    "before_bool_like_count": 7110,
+    "before_workbook": "/Users/seandm/Projects/27vette/stingray_master.xlsx",
+    "error_count": 0,
+    "issue_count": 0,
+    "issues": [],
+    "status": "valid"
+  },
+  "changeSetId": "57b8836bdf5ef56442df1073",
+  "createdAt": "2026-07-26T22:20:47+00:00",
+  "errors": [],
+  "gateReminders": [
+    ".venv/bin/python scripts/generate_form.py --model z06",
+    ".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx",
+    "node --test tests/z06-contract-preview.test.mjs",
+    "node --test tests/z06-form-data-draft.test.mjs"
+  ],
+  "ok": true,
+  "operationCoverage": {
+    "preparedCount": 22,
+    "rawCount": 22,
+    "rawCovered": 22
+  },
+  "previewFingerprint": "9eb30619a2e1224f8e136919268d1810dd5834dcaf493de2a8e8076fb44e3712",
+  "schemaResult": {
+    "error_count": 0,
+    "issue_count": 0,
+    "issues": [],
+    "status": "valid",
+    "warning_count": 0,
+    "workbook": "/var/folders/4_/jywtrzb95073s2nk3fk35fkc0000gn/T/com.apple.shortcuts.mac-helper/tmpiss374k5/stingray_master.xlsx"
+  },
+  "schemaVersion": "workbook-change-preview-1",
+  "semanticFingerprint": "57b8836bdf5ef56442df10733e5f1a32c50b88506a34dba4332ed683a8383139",
+  "status": "validated",
+  "verification": {
+    "errors": [],
+    "ok": true,
+    "preparedChecked": 22,
+    "preparedCount": 22
+  },
+  "warningPolicy": {
+    "blockingIds": [],
+    "confirmableIds": [],
+    "fingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "unknownIds": []
+  },
+  "warnings": [],
+  "workbook": {
+    "mtimeNs": "1784922924189292254",
+    "sha256": "8858cff40ea7eaeda6b7921714f3697a6ee9d1bbc99c84e564d7b118e45b2166"
+  }
+}

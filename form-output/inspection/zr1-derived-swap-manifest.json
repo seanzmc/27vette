@@ -1,0 +1,37 @@
+{
+  "model_key": "zr1",
+  "candidate_count": 2,
+  "emitted_count": 0,
+  "shadowed_count": 2,
+  "not_emitted_count": 0,
+  "entries": [
+    {
+      "disposition": "shadowed_by_authored",
+      "source_id": "opt_ztk_001",
+      "target_id": "opt_rwj_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_ztk_001",
+          "opt_tom_001"
+        ],
+        "primitive_rule_id": "zr1_rule_rwj_excludes_tom_98fe17eb4e5f",
+        "conflict_id": "opt_tom_001"
+      },
+      "allowlisted": false
+    },
+    {
+      "disposition": "shadowed_by_authored",
+      "source_id": "opt_ztk_001",
+      "target_id": "opt_wkr_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_ztk_001",
+          "opt_tom_001"
+        ],
+        "primitive_rule_id": "zr1_rule_wkr_excludes_tom_18fe08c0a78e",
+        "conflict_id": "opt_tom_001"
+      },
+      "allowlisted": false
+    }
+  ]
+}

@@ -88,11 +88,25 @@
   ],
   "stateRequiredSections": [
     "Memory entry contract",
+    "Current handoff",
     "Verified facts",
     "General rules",
     "Open failures",
     "Lessons learned",
     "Last session"
+  ],
+  "currentHandoffRequiredFields": [
+    "Updated",
+    "Owning specification",
+    "Active workflow",
+    "Branch/commit",
+    "Last completed",
+    "Current status",
+    "Validation",
+    "Next action",
+    "Blockers or closeout gaps",
+    "Latest completed receipt",
+    "Protected boundaries"
   ],
   "skillRequiredSections": [
     "Start-of-run checklist",
@@ -109,7 +123,7 @@
     "Run relevant 27vette validation gates.",
     "Use an independent verifier for non-trivial work.",
     "Write a run receipt with outcome, verifier report, validation output, and run metadata.",
-    "Update STATE.md before ending the run.",
+    "Update every Current handoff field in STATE.md before ending the run.",
     "Distill durable procedural lessons into the skill.",
     "Record the skill-update decision in run.json.",
     "Report validation, gates not run, residual risks, and boundaries preserved."

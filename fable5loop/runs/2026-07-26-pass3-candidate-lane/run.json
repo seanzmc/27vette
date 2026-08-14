@@ -1,0 +1,41 @@
+{
+  "id": "2026-07-26-pass3-candidate-lane",
+  "started_at": "2026-07-26T21:40:00-04:00",
+  "completed_at": "2026-07-27T01:15:00-04:00",
+  "objective": "Pass 3 stage 1 (requirements 1-6, 10-12): build the composed candidate lane (scripts/verify_workbook_candidate.py) per spec §3.7 and §3.7.1, gate promotion preflight on it, give the browser harness a candidate-registry data path, and prove requirement 12's five properties. Requirements 7, 8, and 9 are deliberately deferred to a later stage.",
+  "changed_surface": "new candidate-lane script and its test; promotion preflight wiring; one node harness data-path override; no workbook write, no artifact published",
+  "outcome_rubric": "fable5loop/runs/2026-07-26-pass3-candidate-lane/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-26-pass3-candidate-lane/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-26-pass3-candidate-lane/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-26-pass3-candidate-lane/validation-output.txt"
+    },
+    {
+      "section": "Open failures",
+      "evidence": "fable5loop/runs/2026-07-26-pass3-candidate-lane/validation-output.txt"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-26-pass3-candidate-lane/outcome.md"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-26-pass3-candidate-lane/verifier-report.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 1
+  },
+  "boundaries_preserved": [
+    "workbook",
+    "generated artifacts",
+    "runtime app",
+    "dealer submission"
+  ]
+}

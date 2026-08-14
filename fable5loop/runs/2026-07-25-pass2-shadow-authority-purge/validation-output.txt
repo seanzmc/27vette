@@ -1,0 +1,288 @@
+# Pass 2 receipt B — validation output
+# base commit: bdf6690  |  workbook SHA-256: 8858cff40ea7eaeda6b7921714f3697a6ee9d1bbc99c84e564d7b118e45b2166
+
+## Reachability sweep — instrumented against the canonical workbook, all six active/generatable models
+
+  hits    candidate                                                    disposition
+  ----    ---------                                                    -----------
+     0    inspection.cleanup_display_text (all 5 transforms)           DELETED  (0 of 2,248 calls)
+     0    model_configs.SECTION_STEP_OVERRIDES (24 entries)            DELETED  (10,206 step_for_section calls, ALL from section_master.step_key)
+     0    model_configs.STANDARD_SECTIONS (8 entries)                  DELETED
+     0    mapping.step_for_section name-substring heuristic            DELETED
+     0    inspection.STATUS_ALIASES "not available" -> "unavailable"   DELETED  (0 of 7,452 ovs status rows)
+     0    mapping.selection_mode_label title-case fallback             DELETED  (now raises)
+  1434    mapping.status_to_label                                      LIVE, see below -- receipt originally mis-classified this
+     0    runtime_metadata load_runtime_steps fallback rows            DELETED  (now raises)
+     0    runtime_metadata load_context_sections fallback rows         DELETED  (now raises)
+     0    runtime_metadata._LEGACY_RULE_PHRASE_FALLBACKS + loader      DELETED  (zero production callers; rule_phrase_map sheet already authors all 6 rows)
+     0    production `or set(STANDARD_SECTIONS)`                       DELETED  (7-8 authored buckets per model)
+     0    interiors z25_interior_ids rule-derived set                  DELETED  (adds nothing over model_interior_scope.requires_option_id)
+     0    interiors `or trim.replace("_R6X", "")`                      DELETED  (0 blank workbook trim_level)
+     0    model_configs.STEP_ORDER / STEP_LABELS as fallback           DELETED
+
+  LIVE — reported as workbook-shape gaps, NOT fixed in Python:
+    48    STEP_LABELS["standard_equipment"] -> sections[].step_label   pinned to one key; needs 6 runtime_steps rows (8 sections x 6 models)
+   all    SELECTION_MODE_LABELS (4 customer-visible strings)           needs a workbook column; renders at app.js:2009
+   all    BODY_STYLE_DISPLAY_ORDER (coupe=1, convertible=2)            needs a workbook column
+    15    interiors requires_r6x derived by string match on Trim       needs a model_interior_scope column
+
+$ .venv/bin/python -m py_compile <changed generator modules>
+OK (exit 0)
+
+$ .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+  "status": "valid",
+  "issue_count": 0,
+  "error_count": 0,
+  "warning_count": 0,
+  "issues": []
+}
+
+$ .venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
+  "issue_count": 0,
+  "issues": []
+}
+
+$ PYTHONPATH=scripts .venv/bin/python -m pytest tests/ -q
+6 failed, 464 passed, 2 skipped, 45 subtests passed        (baseline at bdf6690: 5 failed, 462 passed, 15 subtests)
+  test_editor_lints.py x4                                   pre-existing
+  test_source_assembly_characterization.py x1               pre-existing (Pass 2 receipt C owns it)
+  test_fable5_loop_contract.py                              self-referential: fails only on this receipt's own
+                                                            missing run.json / verifier-report.md mid-run
+  Real delta is 5 -> 5 code failures. An earlier draft of this file reported a 6/459 baseline;
+  the independent verifier measured 5 failed / 462 passed at bdf6690 and was right.
+
+$ node --test <all 16 browser/runtime gates>   (pass/fail)
+stingray-generator-stability 15/0     stingray-form-regression 90/0     multi-model-runtime-switching 48/0
+z06-runtime-promotion 5/0             z06-performance-package-interactions 21/0
+z06-runtime-rule-corrections 15/0     z06-interior-accessory-cleanup 7/0
+z06-contract-preview 3/0              z06-form-data-draft 24/0          nonruntime-option-source-purge 6/0
+unpublished-runtime-contracts 2/0     workbook-schema-standardization 8/1   (pre-existing)
+workbook-visual-copy-standardization 8/0   seat-canonicalization-diff 2/0
+grand-sport-contract-preview 5/1      grand-sport-draft-data 18/1       (both pre-existing, Pass 4A)
+
+# Artifact identity — the proof that every deletion was inert
+
+44 generated artifacts across all six discoverable models, generated into an isolated
+--output-root before and after, compared with generated_at scrubbed:
+
+  artifacts compared: 44
+  differs: []
+
+# Net effect
+
+ 9 files changed, 225 insertions(+), 446 deletions(-)   — net -221 lines of generator code
+
+# Tracked-surface proof
+
+The two pre-existing grand-sport tests again rewrote form-app/data.js and two runtime contracts
+(generated_at only); restored with `git checkout --`. Final `git status --porcelain` lists only the
+9 changed files (7 generator modules, 2 test modules) and the receipt directory.
+
+# ── Post-verifier corrections ─────────────────────────────────────────────────
+
+The independent verifier returned FAIL on three criteria. All are addressed.
+
+## BLOCKING: the step-completeness check was weaker than what it replaced
+
+The verifier reproduced a real regression. The old check compared workbook `runtime_steps`
+against the Python `STEP_ORDER` tuple, for promoted models only: 14/14 promoted, 0/14 unpromoted.
+The first version of the replacement read `section_presentation` + `context_section_master` — but
+`section_presentation` authors **zero** `step_key` values across all six models, so it saw only
+2 of 14 keys. Dropping z06's `summary` or `base_interior` row generated silently.
+
+`_referenced_step_keys()` now unions three model-scoped workbook sources plus a cross-model
+consistency rule, and never a Python list:
+
+  - `section_presentation`, `context_section_master`, `step_order_summary_map`   -> 13 of 14
+  - `_steps_every_other_active_model_authors()`                                  -> the 14th
+    (a step every OTHER active model authors is not optional here; if a model legitimately
+     diverges the intersection shrinks and the rule relaxes)
+  - minus the single recorded bucket-step gap, which has no runtime_steps row by design
+
+Verified by dropping every step in turn, for a promoted and an unpromoted model:
+
+  z06 (promoted)    14 of 14 dropped steps now fail   (baseline 14/14, first fix 12/14)
+  zr1 (unpromoted)  14 of 14 dropped steps now fail   (baseline  0/14, first fix 12/14)
+
+Locked by `test_dropping_any_single_runtime_step_fails_generation` (30 subtests).
+
+## Live shadows the sweep MISSED — found by the verifier, now inventoried
+
+  hits   candidate                                          status
+  ----   ---------                                          ------
+  1434   mapping.status_to_label 3 display strings          LIVE, CUSTOMER-VISIBLE. "Available" /
+         (per model; z06 = 789/488/157)                     "Standard" / "Not Available" are
+                                                            Python-authored and render through
+                                                            app.js:1983. Same class the receipt
+                                                            flagged for SELECTION_MODE_LABELS but
+                                                            wrongly dismissed as "all authored" --
+                                                            the KEYS are authored, the DISPLAY
+                                                            STRINGS are not. Needs a workbook column.
+   734   production.py disabled_reason composition          LIVE, CUSTOMER-VISIBLE. 734 of 790
+         f"Blocked by {..}." / f"Requires {..}." /           workbook rule rows leave disabled_reason
+         f"Included with {..}." / f"{..} removes {..}."      blank and get a Python-composed string;
+                                                            only 56 are authored. All 795 shipped
+                                                            rules carry one. Renders as tooltips and
+                                                            toasts at app.js:853, 870, 1011, 1089,
+                                                            1103-1104, 1139, 1620. THE WORKBOOK
+                                                            ALREADY HAS THE COLUMN -- this is the
+                                                            highest-value remaining item.
+    62   presentation_bool(.., default=False)               LIVE, not fail-closed. 11 of 57
+                                                            section_presentation rows leave
+                                                            standard_equipment_bucket blank and 51
+                                                            leave auto_added_bucket blank; a Python
+                                                            default decides bucket membership and
+                                                            auto_added_summary_required.
+   all   inspection.SPECIAL_REVIEW_RPOS {EL9,Z25,FEY,Z15}   LIVE. config.special_rule_review_rpos is
+                                                            () for all six models, so the fallback
+                                                            fires every run. Inspection-artifact
+                                                            scope only, so lower severity.
+
+## Candidates the receipt left undisposed (criterion 1 violation, now stated)
+
+  production.py standard_equipment_preference `sec_stan_002`   LIVE. A hardcoded section id ranks
+                                                               which duplicate standard-equipment row
+                                                               wins. It is generation LOGIC, not a
+                                                               shadowed value, and is one of the six
+                                                               behavioral differences requirement 3
+                                                               must characterize. Deliberately kept.
+  interiors.py `opt_z25_001` in requires_z25                   LIVE but half-migrated: the comparison
+                                                               value comes from
+                                                               model_interior_scope.requires_option_id;
+                                                               only the constant and the field NAME
+                                                               are Python. Renaming the field is a
+                                                               runtime-contract shape change that
+                                                               touches app.js. Deliberately kept.
+
+## Re-validated after the fix
+
+  six-model isolated regeneration vs bdf6690:  44 artifacts compared, 0 differ
+  PYTHONPATH=scripts pytest tests/ -q:         6 failed, 464 passed, 2 skipped, 45 subtests
+  all 16 node gates:                           counts unchanged from baseline
+  validate_workbook_schema.py:                 valid, 0 issues
+  git status:                                  9 changed files + receipt dir; no tracked artifact change
+
+# ── Cycle-2 verifier corrections ──────────────────────────────────────────────
+
+Cycle 2 confirmed the single-drop repair (84/84 across all six models) but returned FAIL on five
+further points. All five are fixed. Attacks re-run against the fixed code:
+
+  [A] drop `summary` from z06 AND zr1        -> both FAIL      (was SILENT-OK)
+  [D] deactivate zr1x `summary`, drop z06's  -> FAILS          (was SILENT-OK; one `active=False`
+                                                                cell used to disable the guard)
+  [C] add a label entry for `paint`          -> no longer exempts it from the completeness guard
+  [E] blank a `step_label` cell              -> FAILS          (was shipping the raw snake_case key
+                                                                as a customer-visible label)
+  [B] drop `summary` from ALL SIX models     -> SILENT-OK      <-- DISCLOSED LIMIT, see below
+
+## Fix 1 — cross-model rule is a UNION, not an intersection
+
+An intersection was defeated by two ordinary authoring actions: dropping the same step from two
+models, or deactivating a single peer row. A union survives both, because every remaining peer still
+demands the step.
+
+**Disclosed limit, weaker than bdf6690 for promoted models in exactly one case:** dropping a step
+from EVERY active model passes, because nothing is left to compare against. The old Python
+`STEP_ORDER` tuple caught that for promoted models. `summary` is the only step with no model-scoped
+workbook reference — `step_order_summary_map` covers the other 13 — so `summary` is the only key
+exposed. Closing this needs a model-scoped workbook reference to the summary step; until then it is
+recorded here rather than framed as intended behavior.
+
+## Fix 2 — the test no longer passes on the intersection source alone
+
+`test_dropping_any_single_runtime_step_fails_generation` now covers all six models (84 subtests) and
+asserts on the completeness message with `assertRaisesRegex`, not a bare `ValueError`. Two cases
+added: `test_dropping_one_step_from_two_models_still_fails` (pins the union), and
+`test_workbook_scoped_sources_catch_a_step_no_peer_authors`, which strips `paint` from every model
+so only `step_order_summary_map` can catch it — pinning the workbook-scoped sheets independently of
+the cross-model rule. Without it, narrowing the check back to peer comparison alone would pass every
+other case in the class.
+
+## Fix 3 — split the conflated set
+
+`UNAUTHORED_BUCKET_STEP_LABELS` served two purposes: supplying a label AND exempting a key from the
+completeness guard. Cycle 2 demonstrated the hole — adding `{"paint": "Paint"}` made a dropped
+`paint` row generate silently. Now `BUCKET_STEP_KEYS` (exemption) and `UNAUTHORED_BUCKET_STEP_LABELS`
+(label) are separate.
+
+## Fix 4 — blank step_label raises
+
+`load_runtime_steps` did `clean(row.get("step_label")) or step_key`, so a blank cell shipped the raw
+snake_case key as a customer-visible label (`steps[].step_label` renders at app.js:1965, 2612, 2677).
+It now raises, matching the module docstring and `workbook_step_label`.
+
+## Fix 5 — figures corrected again
+
+  post-fix suite:  5 failed, 467 passed, 2 skipped, 103 subtests
+                   (the receipt previously said 6 failed / 464 passed; the 6th was the
+                    self-referential loop-contract failure, which passes now that this
+                    receipt is complete. Baseline at bdf6690: 5 failed, 462 passed.)
+  status_to_label: 1434 is the z06 figure. Per model: stingray 1416, grand_sport 1428,
+                   grand_sport_x 1422, z06 1434, zr1 820, zr1x 820.
+
+## Re-validated after the cycle-2 fixes
+
+  six-model isolated regeneration vs bdf6690:   44 artifacts compared, 0 differ
+  drop-one-step matrix, all six models:         84 of 84 rejected
+  PYTHONPATH=scripts pytest tests/ -q:          5 failed, 467 passed, 2 skipped, 103 subtests
+                                                (same 5 pre-existing code failures as baseline)
+  all 16 node gates:                            counts unchanged from baseline
+  validate_workbook_schema.py:                  valid, 0 issues
+  git status:                                   9 changed files + receipt dir; no tracked artifact change
+
+# ── Post-run measurement corrections and dispositions (2026-07-25) ────────────
+
+Two figures reported to the user were wrong and are corrected here.
+
+## status_to_label renders 867 times, not 1434
+
+`choice.status_label` is read at ONE site, `app.js:1983`, and only as a fallback when the choice has
+no `description`. `descriptiveTooltipText` (`app.js:331`) then discards `"available"` outright.
+
+  suppressed by descriptiveTooltipText  447
+  RENDERS: Standard                     720
+  RENDERS: Not Available                147
+                                        ---
+  actually rendered                     867     (across stingray, grand-sport, z06)
+
+The 1,434 figure was the count of choices carrying a `status_label` field on z06, not the count that
+reaches a screen. Deferred: adding a sheet to own three cells is the wrong shape, and the 867
+affected choices have no `description` at all — a content question, not a schema one.
+
+## disabled_reason: 298 composed across the 3 published models, and it is not ambient copy
+
+The earlier "734 of 790" was workbook rows across all six models' rule sheets. Across the three
+PUBLISHED models the shipped figure is:
+
+  rule_type   authored   composed
+  excludes          10        131
+  includes          44        125
+  requires           2         42
+
+It renders only when a rule fires against the customer's current selections — the "Unavailable" pill
+at `app.js:1999`, the eviction toast at `:1620`, and auto-add/requirement copy at `:853`/`:870`.
+Unselected, nothing shows. Disposition: an optional authoring pass over the 131 composed excludes,
+at the user's discretion. No obligation — the generic sentence is accurate.
+
+## The 21 raw-id strings are a code defect, not a missing workbook value
+
+`contract.label_for()` (`contract.py:257`):
+
+    if entity_id in options:        return f"{option.get('rpo')} {option.get('label')}"      # correct
+    if entity_id in interiors_by_id: return f"{interior['interior_id']} {interior['interior_name']}"
+
+The interior branch leaks the internal key: "Included with 3LT_AE4_HUF_N26 Natural Dipped Suede."
+All 21 occurrences are `includes` rules; zero are excludes.
+
+`form-app/app.js:832 getInteriorCustomerLabel()` already prefers `interior_leaf_label ||
+interior_name` — the browser gets it right. But the browser reads `rule.disabled_reason ||
+<compose>`, so the baked Python string OVERRIDES the correct label. The same sentence is composed in
+two places, Python at generation and JS at render.
+
+**Disposition: folded into Pass 2 receipt C at the user's direction.** Receipt C must reconcile both
+composers, and the 21 changed strings need review before publication.
+
+## Decision recorded
+
+No canonical workbook write was authorized in this session. All workbook-column items above remain
+deferred.

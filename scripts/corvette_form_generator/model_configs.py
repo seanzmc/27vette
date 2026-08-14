@@ -25,95 +25,6 @@ WORKBOOK_PATH = ROOT / "stingray_master.xlsx"
 OUTPUT_DIR = ROOT / "form-output"
 APP_DIR = ROOT / "form-app"
 
-STEP_ORDER = (
-    "body_style",
-    "trim_level",
-    "paint",
-    "exterior_appearance",
-    "wheels",
-    "packages_performance",
-    "aero_exhaust_stripes_accessories",
-    "seat",
-    "base_interior",
-    "seat_belt",
-    "interior_trim",
-    "accessories",
-    "delivery",
-    "summary",
-)
-
-STEP_LABELS = {
-    "body_style": "Body Style",
-    "trim_level": "Trim Level",
-    "paint": "Exterior Paint",
-    "exterior_appearance": "Exterior Appearance",
-    "wheels": "Wheels & Brake Calipers",
-    "packages_performance": "Performance & Aero",
-    "aero_exhaust_stripes_accessories": "Stripes",
-    "seat": "Seats",
-    "base_interior": "Interior Color",
-    "seat_belt": "Seat Belt",
-    "interior_trim": "Interior Trim",
-    "accessories": "Accessories",
-    "delivery": "Custom Delivery",
-    "summary": "Summary",
-    "standard_equipment": "Standard Equipment",
-}
-
-CONTEXT_SECTIONS = (
-    {
-        "section_id": "sec_context_body_style",
-        "section_name": "Body Style",
-        "selection_mode": "single_select_req",
-        "selection_mode_label": "Required single choice",
-        "choice_mode": "single",
-        "is_required": "True",
-        "standard_behavior": "user_selected",
-        "section_display_order": 1,
-        "step_key": "body_style",
-        "step_label": "Body Style",
-    },
-    {
-        "section_id": "sec_context_trim_level",
-        "section_name": "Trim Level",
-        "selection_mode": "single_select_req",
-        "selection_mode_label": "Required single choice",
-        "choice_mode": "single",
-        "is_required": "True",
-        "standard_behavior": "user_selected",
-        "section_display_order": 2,
-        "step_key": "trim_level",
-        "step_label": "Trim Level",
-    },
-)
-
-SECTION_STEP_OVERRIDES = {
-    "sec_pain_001": "paint",
-    "sec_whee_002": "wheels",
-    "sec_cali_001": "wheels",
-    "sec_roof_001": "exterior_appearance",
-    "sec_exte_001": "exterior_appearance",
-    "sec_badg_001": "exterior_appearance",
-    "sec_engi_001": "exterior_appearance",
-    "sec_perf_001": "packages_performance",
-    "sec_susp_001": "packages_performance",
-    "sec_seat_002": "seat",
-    "sec_intc_001": "base_interior",
-    "sec_intc_002": "base_interior",
-    "sec_intc_003": "base_interior",
-    "sec_seat_001": "seat_belt",
-    "sec_inte_001": "interior_trim",
-    "sec_lpoi_001": "interior_trim",
-    "sec_whee_001": "wheels",
-    "sec_gsce_001": "exterior_appearance",
-    "sec_gsha_001": "exterior_appearance",
-    "sec_colo_001": "interior_trim",
-    "sec_onst_001": "interior_trim",
-    "sec_cust_002": "interior_trim",
-    "sec_spec_001": "packages_performance",
-    "sec_cust_001": "delivery",
-}
-
 BODY_STYLE_DISPLAY_ORDER = {
     "coupe": 1,
     "convertible": 2,
@@ -124,27 +35,6 @@ SELECTION_MODE_LABELS = {
     "single_select_opt": "Optional single choice",
     "multi_select_opt": "Optional multiple choice",
     "display_only": "Display only",
-}
-
-STANDARD_SECTIONS = frozenset(
-    {
-        "sec_1lte_001",
-        "sec_2lte_001",
-        "sec_3lte_001",
-        "sec_incl_001",
-        "sec_stan_001",
-        "sec_stan_002",
-        "sec_safe_001",
-        "sec_tech_001",
-    }
-)
-
-DEFAULT_TEXT_CLEANUP = {
-    "enabled": True,
-    "normalize_new_prefix": True,
-    "collapse_whitespace": True,
-    "collapse_repeated_punctuation": True,
-    "remove_adjacent_duplicate_phrases": True,
 }
 
 _MODEL_NOTES = {
@@ -206,16 +96,10 @@ def base_model_config(model_key: str) -> ModelConfig:
         workbook_path=WORKBOOK_PATH,
         output_dir=OUTPUT_DIR,
         app_dir=APP_DIR,
-        step_order=STEP_ORDER,
-        step_labels=STEP_LABELS,
-        context_sections=CONTEXT_SECTIONS,
         body_style_display_order=BODY_STYLE_DISPLAY_ORDER,
         selection_mode_labels=SELECTION_MODE_LABELS,
-        standard_sections=STANDARD_SECTIONS,
-        section_step_overrides=SECTION_STEP_OVERRIDES,
         preview_artifact_prefix=f"{slug}-contract-preview",
         draft_artifact_prefix=f"{slug}-form-data-draft",
-        text_cleanup=dict(DEFAULT_TEXT_CLEANUP),
         notes=_MODEL_NOTES.get(model_key, ()),
     )
 
@@ -297,7 +181,13 @@ def _require_generation_variants(wb, model_key: str, model_row: dict[str, str]) 
         )
 
 
-def discover_generation_model_configs(workbook_path: Path = WORKBOOK_PATH) -> dict[str, ModelConfig]:
+def discover_generation_model_configs(
+    workbook_path: Path = WORKBOOK_PATH,
+    *,
+    root: Path = ROOT,
+    output_dir: Path | None = None,
+    app_dir: Path | None = None,
+) -> dict[str, ModelConfig]:
     """Return workbook-discovered configs for active/generatable models.
 
     Discovery is stricter than runtime compatibility fallback metadata: a model
@@ -313,7 +203,13 @@ def discover_generation_model_configs(workbook_path: Path = WORKBOOK_PATH) -> di
             model_key = clean(model_row.get("model_key")).lower()
             _require_generation_sources(wb, model_key)
             _require_generation_variants(wb, model_key, model_row)
-            configs[model_key] = load_model_config_overrides(wb, base_model_config(model_key))
+            base_config = base_model_config(model_key).with_overrides(
+                root=root,
+                workbook_path=workbook_path,
+                output_dir=output_dir or root / "form-output",
+                app_dir=app_dir or root / "form-app",
+            )
+            configs[model_key] = load_model_config_overrides(wb, base_config)
         return configs
     finally:
         wb.close()

@@ -1,0 +1,71 @@
+PASS 4 STAGE C IMPLEMENTATION VALIDATION
+Date: 2026-07-29
+Source commit: 3515f72d0b81008a516c5bb1eac9ca2c38aab2aa
+Authority: fable5loop/runs/2026-07-29-pass4c-preflight/preflight-report.md
+
+IMPLEMENTED MANIFEST
+- Plan moves: 19/19 exact approved sources moved to collision-free docs/archive/completed-specs destinations.
+- Close-then-archive notes: 9/9 exact plans carry one dated top-level completion note before archival; historical bodies retained.
+- Historical-document moves: 4/4 exact approved sources moved to archive destinations.
+- Deletions: 3/3 exact approved review/log files absent.
+- Raw-log evidence: one append-only 2026-07-29 retirement note added to the retained July 5 verifier report before log deletion.
+- Active plans: exactly 9 = 6 KEEP_OPEN + 2 KEEP_HISTORICAL_INPUT + 1 NEEDS_DECISION.
+- Current pointer updates: reliable-workflow audit/Vehicle Setup pointers, retained Z06 Pass 2 pointer, and moved July 16 current-owner/design pointers updated.
+- STATE: compact Current authority header added below the memory-entry contract; chronology retained.
+- Owning specification: Stage C approval boundary, final manifest, current counts, final plan partition, and completion record updated; final status waits on implementation verifier.
+
+MECHANICAL VERIFIER
+Command: .venv/bin/python fable5loop/runs/2026-07-29-pass4c-stagec-implementation/verify_manifest.py
+Result: PASS
+- active_plans: 9
+- plan_moves: 19
+- document_moves: 4
+- deletions: 3
+- closure_notes: 9
+- protected_files: 167 byte-identical
+- preexisting_archive_files: 155 byte-identical
+- prior_receipt_files_checked: 201 byte-identical
+- ignored metadata: exact basename .DS_Store only
+- combined HEAD diff: exactly 23 renames and 3 approved deletions
+- current non-historical old-path hits: 0
+- errors: []
+
+ACTIVE REFERENCE CHECK
+- Scanned the current root excluding docs/archive, Fable run receipts/STATE chronology, and nested auxiliary worktrees for all 24 moved/deleted old source paths.
+- Zero current pointer hits remain.
+- One intentional evidence hit remains in the owning specification: docs/claude_output-workbookEditor.md is named only in the final deleted-manifest record.
+- The two retained Grand Sport plan paths remain current intentionally because canonical workbook/generated/published provenance embeds them.
+
+CURRENT INVENTORY COUNTS
+- 42 tracked scripts/**/*.py|*.mjs entries.
+- 47 test entrypoints: 31 tests/test_*.py plus 16 tests/*.test.mjs; three helper/fixture modules excluded.
+- Six retained form-output/inspection/*-derived-swap-manifest.json files.
+
+PROTECTED BOUNDARY
+- stingray_master.xlsx: byte-identical to source snapshot.
+- scripts/, tests/, form-output/, form-app/: 167 protected tracked files byte-identical.
+- AGENTS.md, README.md, docs/route-map.md: byte-identical.
+- 155 pre-existing archive payloads: byte-identical.
+- 201 unapproved prior-receipt payloads: byte-identical.
+- Allowed prior-receipt changes are exactly the July 5 verifier append and two approved raw-log deletions.
+- No workbook write, generation/publication, runtime/dealer, schema, dependency, deployment, commit, or push action occurred.
+
+WHITESPACE / STATUS
+- git diff --check on authored/current files: PASS.
+- git diff --cached --check: PASS.
+- git diff --check HEAD across the complete combined implementation: PASS.
+- Git summary reports exactly 23 renames and three deletions, plus approved pointer/spec/STATE/receipt edits.
+
+PROCESS DEVIATIONS
+1. The first exact git-mv sequence stopped after the nineteenth plan move and db-audit move because docs/archive/completed-specs/workbook-manager did not yet exist. No unintended move occurred. The directory was created and only the exact remaining three historical moves and three deletions were executed.
+2. The first protected-receipt comparison reported only fable5loop/runs/.DS_Store, recreated by Finder after the source snapshot. The verifier now excludes only exact basename .DS_Store, matching the established Stage A policy; arbitrary metadata or content drift remains detectable.
+3. The first final Fable validator and contract run failed only because the same-day `pass4c-preflight` slug sorted after `pass4c-implementation`, so the contract treated preflight as the latest run. The implementation receipt was renamed to `2026-07-29-pass4c-stagec-implementation`, every current pointer was updated, and the rerun passed.
+
+FINAL CLOSEOUT
+- Independent verifier `deleg_82348cd1`: PASS I1–I7, no blockers, no verifier edits.
+- Final `verifier-report.md` and `run.json`: present and valid.
+- `.venv/bin/python scripts/validate_fable5_loop.py`: PASS.
+- `.venv/bin/python -m pytest tests/test_fable5_loop_contract.py -q`: 13 passed in 0.88s.
+- Final manifest verifier after receipt closeout: PASS, errors `[]`.
+- Final `git diff --check HEAD`: PASS.
+- Owning specification status: COMPLETED; `STATE.md` current authority, verified fact, and Last session point to this receipt.

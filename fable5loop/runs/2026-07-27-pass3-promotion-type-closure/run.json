@@ -1,0 +1,19 @@
+{
+  "id": "2026-07-27-pass3-promotion-type-closure",
+  "started_at": "2026-07-27T08:00:00-04:00",
+  "completed_at": "2026-07-27T13:30:00-04:00",
+  "objective": "Pass 3 requirements 7 and 8: record the consumer closure, then restrict promotion artifact metadata to runtime_contract, remove the current_generation and draft_artifact acceptance/production consumers, and delete build_registry_from_promotions() and the artifact-resolution fallbacks. Completes Pass 3.",
+  "changed_surface": "promotion vocabulary, promotion parsing, schema validation, and three test modules; no workbook write, nothing published",
+  "outcome_rubric": "fable5loop/runs/2026-07-27-pass3-promotion-type-closure/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-27-pass3-promotion-type-closure/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-27-pass3-promotion-type-closure/validation-output.txt",
+  "state_updates": [
+    {"section": "Verified facts", "evidence": "fable5loop/runs/2026-07-27-pass3-promotion-type-closure/validation-output.txt"},
+    {"section": "Open failures", "evidence": "fable5loop/runs/2026-07-27-pass3-promotion-type-closure/validation-output.txt"},
+    {"section": "Lessons learned", "evidence": "fable5loop/runs/2026-07-27-pass3-promotion-type-closure/verifier-report.md"},
+    {"section": "Last session", "evidence": "fable5loop/runs/2026-07-27-pass3-promotion-type-closure/outcome.md"}
+  ],
+  "skill_update": {"decision": "updated", "evidence": "fable5loop/runs/2026-07-27-pass3-promotion-type-closure/verifier-report.md"},
+  "verifier": {"required": true, "independent_context": true, "verdict": "pass", "accepted_by_human": false, "cycles": 1},
+  "boundaries_preserved": ["workbook", "generated artifacts", "runtime app", "dealer submission"]
+}

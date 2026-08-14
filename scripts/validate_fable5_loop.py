@@ -113,6 +113,21 @@ def _validate_state(root: Path, contract: dict[str, Any], issues: list[str]) -> 
         if not _has_heading(state_text, section):
             issues.append(f"STATE.md missing section: {section}")
 
+    handoff_bullets = _bullet_texts(state_text, "Current handoff")
+    for field in contract.get("currentHandoffRequiredFields", []):
+        prefix = f"**{field}:**"
+        matches = [bullet for bullet in handoff_bullets if bullet.startswith(prefix)]
+        if len(matches) != 1:
+            issues.append(f"STATE.md Current handoff must contain exactly one field: {field}")
+            continue
+        if not matches[0][len(prefix) :].strip():
+            issues.append(f"STATE.md Current handoff field is empty: {field}")
+
+    updated_prefix = "**Updated:**"
+    updated = next((bullet for bullet in handoff_bullets if bullet.startswith(updated_prefix)), "")
+    if updated and not DATE_RE.search(updated[len(updated_prefix) :]):
+        issues.append("STATE.md Current handoff Updated field missing ISO date")
+
     for section in contract.get("memoryEvidenceRequiredSections", []):
         for bullet in _bullet_texts(state_text, section):
             if not DATE_RE.search(bullet):

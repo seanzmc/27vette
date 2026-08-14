@@ -5,7 +5,10 @@ This directory is the repo-local operating system for Fable 5 runs on 27vette. I
 ## Start here for every Fable 5 run
 
 1. Read this file.
-2. Read `STATE.md` to resume from verified facts, general rules, open failures, lessons learned, and the last-session pointer.
+2. Read the fixed `Current handoff` block in `STATE.md` first. It records the
+   latest completed work, actual validation state, exact next action, blockers
+   or closeout gaps, owning specification, and latest completed receipt. Follow
+   its owning-spec link for requirement-level progress.
 3. Read `skills/27vette-fable5-compounding.md` for the procedural loop.
 4. Read `outcomes/27vette-loop-outcomes.md` and choose or write the task-specific outcome rubric before editing.
 5. Check `fable5-loop-contract.json` so the run knows the three tiers, four compound-stack layers, and required artifacts.
@@ -67,13 +70,34 @@ Before declaring done:
    - `validation-output.txt`,
    - `run.json`.
 4. Update `STATE.md`:
-   - verified facts with evidence,
+   - every field in the fixed `Current handoff` block, even when no new receipt
+     was produced,
+   - verified cross-task facts with evidence only when reusable,
    - general rules only when they are reusable,
    - unresolved failures with reproduction steps,
    - last-session resume pointer.
 5. Update `skills/27vette-fable5-compounding.md` only for durable procedural lessons; otherwise record a `not_applicable` or `deferred` decision in `run.json`.
 6. Report what changed, what did not change, validation results, gates not run, and residual risk.
 
+## Live progress ownership
+
+Keep at most two live progress surfaces for a workflow:
+
+1. The owning specification is the sole detailed tracker for requirements,
+   acceptance evidence, blockers, and pass-level decisions. Update it only
+   when those facts change.
+2. `STATE.md` is the centralized operational handoff. Its fixed top block is
+   overwritten after every substantive repository task, including work that
+   did not use Fable, so the next agent can resume without reconstructing chat
+   or chronology.
+
+Run receipts remain required evidence, but they are not working progress files.
+Do not copy detailed pass narratives or test inventories between the
+specification, `STATE.md`, and receipts. The handoff summarizes what landed and
+what happens next; the specification owns the requirement detail; a receipt
+records what a finished Fable run proved. README files change only when their
+owned commands, architecture, or operator guidance change.
+
 ## Protected 27vette boundaries
 
-The loop does not override `AGENTS.md`. Workbook writes, generated artifacts, runtime behavior, styling, dealer submission, and ingest passes keep their normal spec/approval/validation requirements.
+The loop does not override `AGENTS.md`. Workbook writes, generated artifacts, runtime behavior, styling, and dealer submission keep their normal spec/approval/validation requirements. The retired ingest workflow cannot be restored through a Fable run without a new approved design.

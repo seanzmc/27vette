@@ -125,13 +125,32 @@ def test_validator_rejects_state_fact_without_timestamped_evidence(tmp_path: Pat
     assert any("STATE.md Verified facts bullet missing Evidence:" in issue for issue in issues)
 
 
+def test_validator_rejects_incomplete_current_handoff(tmp_path: Path) -> None:
+    copy_scaffold(tmp_path)
+    state = tmp_path / "fable5loop" / "STATE.md"
+    state.write_text(
+        state.read_text(encoding="utf-8").replace(
+            "- **Next action:**",
+            "- **Missing next action:**",
+            1,
+        ),
+        encoding="utf-8",
+    )
+
+    issues = validate(tmp_path)
+    assert any(
+        "STATE.md Current handoff must contain exactly one field: Next action" in issue
+        for issue in issues
+    )
+
+
 def test_validator_rejects_stale_last_session_pointer(tmp_path: Path) -> None:
     copy_scaffold(tmp_path)
     state = tmp_path / "fable5loop" / "STATE.md"
     latest_run = sorted(
         path
         for path in (tmp_path / "fable5loop" / "runs").iterdir()
-        if path.is_dir() and (path / "run.json").is_file()
+        if path.is_dir() and VALIDATOR.RUN_DIR_RE.match(path.name)
     )[-1]
     latest_relative = latest_run.relative_to(tmp_path).as_posix()
     state.write_text(

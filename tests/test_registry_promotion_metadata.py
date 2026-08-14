@@ -16,10 +16,13 @@ SCRIPTS_DIR = ROOT / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
+from corvette_form_generator.workbook_domain.registry import (  # noqa: E402
+    DEFAULT_REGISTRY_PROMOTION_ARTIFACT_TYPE,
+    REGISTRY_PROMOTION_ARTIFACT_TYPES,
+)
 from corvette_form_generator.registry_promotion import (  # noqa: E402
     MODEL_REGISTRY_PROMOTION_HEADERS,
     build_registry_from_artifacts,
-    build_registry_from_promotions,
     live_contract_data,
     load_registry_promotions,
 )
@@ -30,6 +33,60 @@ def append_sheet(wb: Workbook, name: str, headers: list[str], rows: list[dict[st
     ws.append(headers)
     for row in rows or []:
         ws.append([row.get(header, None) for header in headers])
+
+
+SETUP_COPY = {
+    "setup_card_subtitle": "Workbook-authored card subtitle",
+    "setup_eyebrow": "WORKBOOK-AUTHORED EYEBROW",
+    "setup_title": "Workbook-authored title",
+    "setup_description": "Workbook-authored description.",
+    "setup_fact_1": "Fact one",
+    "setup_fact_2": "Fact two",
+    "setup_fact_3": "Fact three",
+}
+
+
+def runtime_contract_data(
+    model_label: str,
+    source_sheet: str,
+    *,
+    choices: list[dict[str, object]] | None = None,
+    rules: list[dict[str, object]] | None = None,
+) -> dict[str, object]:
+    data: dict[str, object] = {
+        "dataset": {
+            "name": f"2027 Corvette {model_label} operational form",
+            "model": model_label,
+            "model_year": "2027",
+            "source_sheet": source_sheet,
+            "status": "runtime_active",
+        },
+        "orderSummary": {},
+    }
+    for field in (
+        "variants",
+        "steps",
+        "sections",
+        "contextChoices",
+        "choices",
+        "standardEquipment",
+        "ruleGroups",
+        "exclusiveGroups",
+        "rules",
+        "priceRules",
+        "interiors",
+        "colorOverrides",
+        "defaultSelectionRules",
+        "validation",
+    ):
+        data[field] = []
+    data["variants"] = [{"variant_id": "test-variant"}]
+    data["steps"] = [{"step_key": "test-step"}]
+    data["sections"] = [{"section_id": "test-section"}]
+    data["contextChoices"] = [{"context_choice_id": "test-context"}]
+    data["choices"] = choices or [{"choice_id": "test-choice"}]
+    data["rules"] = rules or []
+    return data
 
 
 def workbook_with_promotions(promotion_rows: list[dict[str, object]] | None = None) -> Workbook:
@@ -48,6 +105,13 @@ def workbook_with_promotions(promotion_rows: list[dict[str, object]] | None = No
             "expected_variant_count",
             "default_model",
             "active",
+            "setup_card_subtitle",
+            "setup_eyebrow",
+            "setup_title",
+            "setup_description",
+            "setup_fact_1",
+            "setup_fact_2",
+            "setup_fact_3",
             "notes",
         ],
         [
@@ -57,6 +121,7 @@ def workbook_with_promotions(promotion_rows: list[dict[str, object]] | None = No
                 "model_label": "Stingray",
                 "export_slug": "stingray",
                 "active": True,
+                **SETUP_COPY,
             },
             {
                 "model_key": "grand_sport",
@@ -64,6 +129,7 @@ def workbook_with_promotions(promotion_rows: list[dict[str, object]] | None = No
                 "model_label": "Grand Sport",
                 "export_slug": "grand-sport",
                 "active": True,
+                **SETUP_COPY,
             },
             {
                 "model_key": "z06",
@@ -71,6 +137,7 @@ def workbook_with_promotions(promotion_rows: list[dict[str, object]] | None = No
                 "model_label": "Z06",
                 "export_slug": "z06",
                 "active": False,
+                **SETUP_COPY,
             },
         ],
     )
@@ -84,12 +151,12 @@ def promoted_stingray_row(**overrides: object) -> dict[str, object]:
         "registry_key": "stingray",
         "promoted_to_runtime": True,
         "default_model": True,
-        "artifact_path": "",
-        "artifact_type": "current_generation",
+        "artifact_path": "form-output/runtime/stingray-runtime-contract.json",
+        "artifact_type": "runtime_contract",
         "legacy_alias": "STINGRAY_FORM_DATA",
         "active": True,
         "display_order": 1,
-        "notes": "Current generated Stingray data.",
+        "notes": "Stingray runtime contract.",
     }
     row.update(overrides)
     return row
@@ -113,19 +180,19 @@ def promoted_grand_sport_row(**overrides: object) -> dict[str, object]:
 
 
 class RegistryPromotionMetadataTests(unittest.TestCase):
-    def test_header_only_promotion_sheet_returns_no_promotions_for_legacy_fallback(self) -> None:
+    def test_header_only_promotion_sheet_refuses_to_build_a_registry(self) -> None:
+        """Breaks if an empty promotion sheet is ever allowed to publish something.
+
+        `build_registry_from_promotions` used to answer None here and let the
+        caller decide. It is gone (Pass 3 requirement 8); the surviving builder
+        refuses outright rather than guessing.
+        """
+
         wb = workbook_with_promotions([])
 
         self.assertEqual(load_registry_promotions(wb), [])
-        self.assertIsNone(
-            build_registry_from_promotions(
-                wb,
-                current_model_key="stingray",
-                current_data={"dataset": {"name": "current"}},
-                model_assets={},
-                root=ROOT,
-            )
-        )
+        with self.assertRaisesRegex(RuntimeError, "no promoted rows"):
+            build_registry_from_artifacts(wb, model_assets={}, root=ROOT)
 
     def test_promoted_rows_build_ordered_registry_and_aliases_from_workbook_metadata(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -134,17 +201,15 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
             artifact_path.parent.mkdir(parents=True)
             artifact_path.write_text(
                 json.dumps(
-                    {
-                        "dataset": {
-                            "source_sheet": "grandSport_options",
-                            "status": "runtime_active",
-                        },
-                        "choices": [
+                    runtime_contract_data(
+                        "Grand Sport",
+                        "grandSport_options",
+                        choices=[
                             {
                                 "choice_id": "gs-choice",
                             }
                         ],
-                        "rules": [
+                        rules=[
                             {
                                 "rule_id": "rule-1",
                                 "source_id": "opt_sht_001",
@@ -152,9 +217,13 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
                                 "source_note": "runtime rule note",
                             }
                         ],
-                    }
+                    )
                 ),
                 encoding="utf-8",
+            )
+            stingray_path = root / "form-output" / "runtime" / "stingray-runtime-contract.json"
+            stingray_path.write_text(
+                json.dumps(runtime_contract_data("Stingray", "stingray_options")), encoding="utf-8"
             )
             wb = workbook_with_promotions(
                 [
@@ -171,10 +240,8 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
                 ]
             )
 
-            registry = build_registry_from_promotions(
+            registry = build_registry_from_artifacts(
                 wb,
-                current_model_key="stingray",
-                current_data={"dataset": {"source_sheet": "stingray_options"}, "choices": []},
                 model_assets={"stingray": {"image_url": "stingray.png"}, "grandSport": {"image_url": "gs.png"}},
                 root=root,
             )
@@ -187,6 +254,16 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
         self.assertEqual(registry["models"]["stingray"]["image_url"], "stingray.png")
         self.assertEqual(registry["models"]["grandSport"]["label"], "Grand Sport")
         self.assertEqual(registry["models"]["grandSport"]["exportSlug"], "grand-sport")
+        self.assertEqual(
+            registry["models"]["grandSport"]["vehicleSetup"],
+            {
+                "cardSubtitle": "Workbook-authored card subtitle",
+                "eyebrow": "WORKBOOK-AUTHORED EYEBROW",
+                "title": "Workbook-authored title",
+                "description": "Workbook-authored description.",
+                "facts": ["Fact one", "Fact two", "Fact three"],
+            },
+        )
         self.assertEqual(registry["models"]["grandSport"]["data"]["dataset"]["source_sheet"], "grandSport_options")
         choice = registry["models"]["grandSport"]["data"]["choices"][0]
         self.assertEqual(choice["choice_id"], "gs-choice")
@@ -226,28 +303,30 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
         self.assertEqual(cleaned["choices"], [{"choice_id": "choice-1"}])
         self.assertEqual(cleaned["standardEquipment"], [{"equipment_id": "std-1"}])
 
-    def test_file_backed_registry_loads_current_generation_and_runtime_contract_artifacts(self) -> None:
+    def test_every_promoted_row_is_loaded_from_its_named_runtime_contract(self) -> None:
+        """Breaks if a promoted row can ever publish anything but the file it names.
+
+        Was `..._loads_current_generation_and_runtime_contract_artifacts`: one of
+        the two rows used to resolve to whatever sat at a generator output path
+        instead of naming its artifact. Both rows now name one.
+        """
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
             stingray_path = root / "form-output" / "runtime" / "stingray-runtime-contract.json"
             gs_path = root / "form-output" / "runtime" / "grand-sport-runtime-contract.json"
             gs_path.parent.mkdir(parents=True)
             stingray_path.write_text(
-                json.dumps({"dataset": {"source_sheet": "stingray_options", "status": "runtime_active"}, "choices": []}),
+                json.dumps(runtime_contract_data("Stingray", "stingray_options")),
                 encoding="utf-8",
             )
             gs_path.write_text(
-                json.dumps({"dataset": {"source_sheet": "grandSport_options", "status": "runtime_active"}, "choices": []}),
+                json.dumps(runtime_contract_data("Grand Sport", "grandSport_options")),
                 encoding="utf-8",
             )
             wb = workbook_with_promotions(
                 [
                     promoted_grand_sport_row(display_order=2),
-                    promoted_stingray_row(
-                        display_order=1,
-                        artifact_path="form-output/runtime/stingray-runtime-contract.json",
-                        artifact_type="runtime_contract",
-                    ),
+                    promoted_stingray_row(display_order=1),
                 ]
             )
 
@@ -261,7 +340,17 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
         self.assertEqual(list(registry["models"].keys()), ["stingray", "grandSport"])
         self.assertEqual(registry["models"]["stingray"]["data"]["dataset"]["source_sheet"], "stingray_options")
         self.assertEqual(registry["models"]["grandSport"]["data"]["dataset"]["status"], "runtime_active")
+        self.assertEqual(registry["models"]["stingray"]["vehicleSetup"]["facts"], ["Fact one", "Fact two", "Fact three"])
         self.assertEqual(registry["legacyAliases"], {"STINGRAY_FORM_DATA": "stingray"})
+
+    def test_promoted_model_requires_complete_vehicle_setup_copy(self) -> None:
+        wb = workbook_with_promotions([promoted_stingray_row()])
+        headers = [cell.value for cell in wb["model_master"][1]]
+        title_col = headers.index("setup_title") + 1
+        wb["model_master"].cell(row=2, column=title_col).value = None
+
+        with self.assertRaisesRegex(ValueError, "setup_title"):
+            load_registry_promotions(wb)
 
     def test_promoted_artifact_with_draft_fields_fails_fast(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -278,17 +367,15 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
                 ),
                 encoding="utf-8",
             )
+            stingray_path = root / "form-output" / "runtime" / "stingray-runtime-contract.json"
+            stingray_path.write_text(
+                json.dumps(runtime_contract_data("Stingray", "stingray_options")), encoding="utf-8"
+            )
             wb = workbook_with_promotions(
                 [promoted_grand_sport_row(display_order=2), promoted_stingray_row(display_order=1)]
             )
-            with self.assertRaisesRegex(ValueError, "not a clean runtime contract"):
-                build_registry_from_promotions(
-                    wb,
-                    current_model_key="stingray",
-                    current_data={"dataset": {"source_sheet": "stingray_options"}, "choices": []},
-                    model_assets={},
-                    root=root,
-                )
+            with self.assertRaisesRegex(ValueError, "not publishable"):
+                build_registry_from_artifacts(wb, model_assets={}, root=root)
 
     def test_promotions_require_exactly_one_default_model(self) -> None:
         wb = workbook_with_promotions([promoted_stingray_row(default_model=False), promoted_grand_sport_row()])
@@ -307,11 +394,54 @@ class RegistryPromotionMetadataTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Duplicate promoted registry_key"):
             load_registry_promotions(wb)
 
-    def test_non_current_promoted_rows_require_artifact_path(self) -> None:
-        wb = workbook_with_promotions([promoted_stingray_row(), promoted_grand_sport_row(artifact_path="")])
+    def test_every_promoted_row_requires_an_artifact_path(self) -> None:
+        """Breaks if a promoted row can ever publish without naming its artifact.
+
+        Scope, stated precisely: this does NOT catch the old
+        `!= "current_generation"` exemption coming back, because the vocabulary
+        check above raises first and makes that branch unreachable here. The
+        schema layer accumulates rather than raising, so the exemption is live
+        there — `test_a_retired_type_with_a_blank_path_reports_both_defects` in
+        `tests/test_schema_validation_metadata.py` is what covers it.
+        """
+
+        wb = workbook_with_promotions([promoted_stingray_row(artifact_path=""), promoted_grand_sport_row()])
 
         with self.assertRaisesRegex(ValueError, "artifact_path"):
             load_registry_promotions(wb)
+
+    def test_a_retired_artifact_type_is_rejected_by_name(self) -> None:
+        """Breaks if `current_generation` or `draft_artifact` is ever accepted again.
+
+        Both used to publish something other than a strictly validated runtime
+        contract. The check is on the shared vocabulary, so narrowing it in one
+        module and not another would also fail here.
+        """
+
+        for retired in ("current_generation", "draft_artifact"):
+            with self.subTest(artifact_type=retired):
+                wb = workbook_with_promotions([promoted_stingray_row(artifact_type=retired)])
+                with self.assertRaisesRegex(ValueError, "Unsupported model_registry_promotion artifact_type"):
+                    load_registry_promotions(wb)
+
+    def test_runtime_contract_is_the_only_promotable_artifact_type(self) -> None:
+        """Breaks if the vocabulary widens anywhere; this is the single authority."""
+
+        self.assertEqual(REGISTRY_PROMOTION_ARTIFACT_TYPES, ("runtime_contract",))
+        self.assertEqual(DEFAULT_REGISTRY_PROMOTION_ARTIFACT_TYPE, "runtime_contract")
+
+    def test_a_blank_artifact_type_defaults_to_runtime_contract(self) -> None:
+        """Breaks if a blank cell ever silently means a retired type again.
+
+        It used to mean `draft_artifact` — a review artifact promoted to
+        production by omission.
+        """
+
+        wb = workbook_with_promotions([promoted_stingray_row(artifact_type=None)])
+
+        promotions = load_registry_promotions(wb)
+
+        self.assertEqual([p.artifact_type for p in promotions], ["runtime_contract"])
 
     def test_promoted_registry_keys_must_match_model_master(self) -> None:
         wb = workbook_with_promotions([promoted_stingray_row(registry_key="wrong")])

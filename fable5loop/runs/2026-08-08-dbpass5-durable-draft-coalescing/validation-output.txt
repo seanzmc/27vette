@@ -1,0 +1,34 @@
+Pass 5 Checkpoint 1 retrospective validation reconstruction
+Reconstructed: 2026-08-11T09:01:29-04:00
+
+Evidence boundary
+- The original 2026-08-08 terminal transcript and raw test output were not present in the receipt folder and were not recovered.
+- The historical outcome rubric and owning specification remain the contemporaneous record of the original RED/GREEN sequence.
+- The results below are fresh 2026-08-11 reruns against immutable detached commit 94e059ecebd760bec75bbd163b3f6615163f8296, whose parent is 06030a800972ae6fd95e160defe5d97e42ecd5ae.
+- No output below is represented as original 2026-08-08 output.
+
+Fresh detached-commit validation
+
+Command:
+env -u PYTHONPATH /Users/seandm/Projects/27vette/.venv/bin/python -m pytest tests/test_workbook_manager_drafts.py tests/test_workbook_manager_catalog.py tests/test_workbook_manager_api_concurrency.py -q
+
+Result:
+40 passed, 1 warning in 2.96s
+
+Command:
+env -u PYTHONPATH /Users/seandm/Projects/27vette/.venv/bin/python -m pytest tests/test_workbook_manager.py::TestApi::test_pass5_draft_api_roots_durable_update_without_projection_mutation -q
+
+Result:
+1 passed, 1 warning in 68.30s
+
+Static historical checks
+- git diff --check 06030a8 94e059e: passed.
+- The implementation diff contains no stingray_master.xlsx, form-output/, or form-app/ change.
+- The implementation diff adds the focused durable-draft owner and tests and changes only the documented backend/API/guidance surfaces.
+
+Fable structural validator
+- `.venv/bin/python scripts/validate_fable5_loop.py`: passed on 2026-08-11 after both retrospective receipt sets were completed.
+- Result: `Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.`
+
+Known evidence limitation
+- A fresh GREEN rerun proves the landed final state, but it cannot recreate the original temporal observation of RED before implementation. The contemporaneous outcome/spec record that sequence; this reconstruction does not invent a missing raw log.

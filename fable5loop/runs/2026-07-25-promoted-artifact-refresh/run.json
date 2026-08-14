@@ -1,0 +1,35 @@
+{
+  "id": "2026-07-25-promoted-artifact-refresh",
+  "started_at": "2026-07-25T12:00:00-04:00",
+  "completed_at": "2026-07-25T13:30:00-04:00",
+  "objective": "Clear the Pass 3 blocking prerequisite: regenerate the three promoted runtime contracts through the strict generation path and republish form-app/data.js, after reviewing the bounded workbook-authored drift.",
+  "changed_surface": "generated artifacts and published registry",
+  "outcome_rubric": "fable5loop/runs/2026-07-25-promoted-artifact-refresh/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-25-promoted-artifact-refresh/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-25-promoted-artifact-refresh/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-25-promoted-artifact-refresh/verifier-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-25-promoted-artifact-refresh/validation-output.txt"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-25-promoted-artifact-refresh/outcome.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false
+  },
+  "boundaries_preserved": [
+    "workbook",
+    "runtime app",
+    "dealer submission"
+  ]
+}

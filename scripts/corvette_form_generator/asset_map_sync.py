@@ -18,16 +18,25 @@ import json
 import os
 from pathlib import Path
 import re
+import subprocess
 import sys
+import time
 from typing import Any, Callable, Iterable
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode, urlparse, unquote
+from urllib.parse import parse_qsl, urlencode, urlparse, unquote, urlunparse
 from urllib.request import Request, urlopen
 
 from openpyxl import load_workbook
 
 from corvette_form_generator.contract import WILDCARD_MODEL_KEY
-from corvette_form_generator.workbook import clean, rows_from_sheet, save_workbook_safely, workbook_truthy
+from corvette_form_generator.output import write_text_atomic
+from corvette_form_generator.workbook import (
+    clean,
+    restore_workbook_backup,
+    rows_from_sheet,
+    save_workbook_safely,
+    workbook_truthy,
+)
 
 SITE = "stingraychevroletcorvette.com"
 MEDIA_ENDPOINT = f"https://{SITE}/wp-json/wp/v2/media"
@@ -37,6 +46,9 @@ WORDPRESS_USER_AGENT = (
     "AppleWebKit/537.36 Chrome/125 Safari/537.36 27vette-asset-map-sync/1.0"
 )
 ASSET_SHEET = "asset_map"
+ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_WORKBOOK = ROOT / "stingray_master.xlsx"
+DEFAULT_REPORT_DIR = ROOT / ".asset-map-sync"
 TARGET_TYPE_OPTION = "option"
 TARGET_TYPE_MODEL = "model"
 TARGET_TYPE_CONTEXT_CHOICE = "context_choice"
@@ -60,6 +72,7 @@ COVERAGE_RULESET = (
 
 IMGI_RE = re.compile(r"^imgi_\d+_(.+)$")
 PREFIX_RE = re.compile(r"^([cehrsg])-(.+)$")
+SHARED_PREFIX_RE = re.compile(r"^([cehrsg](?:-[cehrsg])+)-(.+)$")
 MODEL_BODY_STYLE_RE = re.compile(r"^([cehrsg])(07|67)-([12])$")
 SPLIT_RE = re.compile(r"[-_]")
 RPO_RE = re.compile(r"^[0-9a-z]{3}$")
@@ -71,6 +84,15 @@ MODEL_PREFIX = {
     "r": "zr1",
     "s": "zr1x",
     "g": "grand_sport_x",
+}
+# Ordered option-media inheritance after an exact model prefix and before a
+# bare shared filename. Chains are flattened deliberately so resolution is
+# deterministic and cannot cycle.
+OPTION_MODEL_FALLBACKS = {
+    "grand_sport": ("stingray",),
+    "grand_sport_x": ("grand_sport", "stingray"),
+    "zr1": ("z06",),
+    "zr1x": ("z06",),
 }
 MODEL_TARGET_STEMS = {
     "stingray": ("stingray", "stingray"),
@@ -132,6 +154,13 @@ class MediaInventory:
     model: dict[tuple[str, str], list[str]]
     bodystyle: dict[tuple[str, str, str], list[str]]
     unparseable: list[str]
+    option_shared: dict[tuple[str, str], list[str]] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class MediaSnapshot:
+    urls: list[str]
+    modified_by_url: dict[str, str]
 
 
 def filename_stem(url: str) -> str:
@@ -153,6 +182,23 @@ def parse_media(url: str) -> tuple[str | None, str, bool]:
         stem = match.group(2)
     rpo = SPLIT_RE.split(stem)[0]
     return model, rpo, bool(RPO_RE.match(rpo))
+
+
+def parse_shared_option_media(url: str) -> tuple[str | None, str, bool]:
+    """Return ``(prefix_group, rpo, is_valid)`` for multi-model option media."""
+
+    stem = filename_stem(url)
+    match = IMGI_RE.match(stem)
+    if match:
+        stem = match.group(1)
+    match = SHARED_PREFIX_RE.match(stem)
+    if not match:
+        return None, "", False
+    prefix_group = match.group(1)
+    prefix_codes = prefix_group.split("-")
+    rpo = SPLIT_RE.split(match.group(2))[0]
+    valid = len(set(prefix_codes)) == len(prefix_codes) and bool(RPO_RE.match(rpo))
+    return prefix_group, rpo, valid
 
 
 def parse_model_media(url: str) -> tuple[str | None, str | None]:
@@ -177,7 +223,7 @@ def build_media_index(media_urls: Iterable[str]) -> tuple[dict[tuple[str, str], 
     exact: dict[tuple[str, str], list[str]] = defaultdict(list)
     bare: dict[str, list[str]] = defaultdict(list)
     unparseable: list[str] = []
-    for url in media_urls:
+    for url in dict.fromkeys(media_urls):
         model, rpo, ok = parse_media(url)
         if not ok:
             unparseable.append(url)
@@ -190,11 +236,15 @@ def build_media_index(media_urls: Iterable[str]) -> tuple[dict[tuple[str, str], 
 
 def build_media_inventory(media_urls: Iterable[str]) -> MediaInventory:
     option_exact: dict[tuple[str, str], list[str]] = defaultdict(list)
+    option_shared: dict[tuple[str, str], list[str]] = defaultdict(list)
     option_bare: dict[str, list[str]] = defaultdict(list)
     model_media: dict[tuple[str, str], list[str]] = defaultdict(list)
     bodystyle_media: dict[tuple[str, str, str], list[str]] = defaultdict(list)
     unparseable: list[str] = []
-    for url in media_urls:
+    # WordPress can expose multiple attachment records for the same physical
+    # source URL. Matching is URL-based, so duplicate records are one candidate,
+    # not an ambiguity.
+    for url in dict.fromkeys(media_urls):
         parsed_any = False
         model_key, target_id = parse_model_media(url)
         if model_key and target_id:
@@ -204,13 +254,18 @@ def build_media_inventory(media_urls: Iterable[str]) -> MediaInventory:
         if body_model and body_target and image_field:
             bodystyle_media[(body_model, body_target, image_field)].append(url)
             parsed_any = True
-        option_model, rpo, ok = parse_media(url)
-        if ok and not parsed_any:
+        shared_prefix, rpo, shared_ok = parse_shared_option_media(url)
+        if shared_ok and not parsed_any:
             parsed_any = True
-            if option_model:
-                option_exact[(option_model, rpo)].append(url)
-            else:
-                option_bare[rpo].append(url)
+            option_shared[(shared_prefix, rpo)].append(url)
+        if not shared_ok:
+            option_model, rpo, ok = parse_media(url)
+            if ok and not parsed_any:
+                parsed_any = True
+                if option_model:
+                    option_exact[(option_model, rpo)].append(url)
+                else:
+                    option_bare[rpo].append(url)
         if not parsed_any:
             unparseable.append(url)
     return MediaInventory(
@@ -219,6 +274,7 @@ def build_media_inventory(media_urls: Iterable[str]) -> MediaInventory:
         model=dict(model_media),
         bodystyle=dict(bodystyle_media),
         unparseable=unparseable,
+        option_shared=dict(option_shared),
     )
 
 
@@ -232,7 +288,12 @@ def _auth_header_from_env() -> str | None:
 
 
 def _open_json(url: str, *, auth_header: str | None, timeout: float) -> tuple[list[dict[str, Any]], dict[str, str]]:
-    headers = {"Accept": "application/json", "User-Agent": WORDPRESS_USER_AGENT}
+    headers = {
+        "Accept": "application/json",
+        "Cache-Control": "no-cache, no-store, max-age=0",
+        "Pragma": "no-cache",
+        "User-Agent": WORDPRESS_USER_AGENT,
+    }
     if auth_header:
         headers["Authorization"] = auth_header
     request = Request(url, headers=headers)
@@ -250,19 +311,27 @@ def _media_fetch_error(exc: HTTPError, api_url: str) -> WordPressMediaFetchError
     )
 
 
-def fetch_media(timeout: float, modified_after: str | None = None) -> list[str]:
-    """Fetch WordPress media URLs using stdlib HTTP and optional Basic auth."""
+def fetch_media_snapshot(
+    timeout: float,
+    modified_after: str | None = None,
+    *,
+    cache_token: str | None = None,
+) -> MediaSnapshot:
+    """Fetch one uncached WordPress media inventory snapshot."""
 
     auth_header = _auth_header_from_env()
     urls: list[str] = []
+    modified_by_url: dict[str, str] = {}
     page = 1
     while True:
         params: dict[str, Any] = {
             "per_page": 100,
             "page": page,
-            "_fields": "source_url",
+            "_fields": "source_url,modified",
             "media_type": "image",
         }
+        if cache_token:
+            params["asset_sync_cache_bust"] = cache_token
         if modified_after:
             params.update({"modified_after": modified_after, "orderby": "modified", "order": "desc"})
         api_url = f"{MEDIA_ENDPOINT}?{urlencode(params)}"
@@ -280,11 +349,50 @@ def fetch_media(timeout: float, modified_after: str | None = None) -> list[str]:
             url = clean(item.get("source_url"))
             if PATH_FILTER in url:
                 urls.append(url)
+                modified = clean(item.get("modified"))
+                if modified > modified_by_url.get(url, ""):
+                    modified_by_url[url] = modified
         total_pages = int(headers.get("x-wp-totalpages", page))
         if page >= total_pages:
             break
         page += 1
-    return urls
+    # Multiple WordPress attachment rows may resolve to the same physical URL.
+    # Preserve first-seen API order while collapsing those duplicate records.
+    return MediaSnapshot(urls=list(dict.fromkeys(urls)), modified_by_url=modified_by_url)
+
+
+def fetch_media(timeout: float, modified_after: str | None = None) -> list[str]:
+    """Compatibility wrapper returning URLs from one media snapshot."""
+
+    return fetch_media_snapshot(timeout, modified_after).urls
+
+
+def fetch_media_stable(
+    timeout: float,
+    modified_after: str | None = None,
+    *,
+    attempts: int = 4,
+) -> MediaSnapshot:
+    """Require two identical uncached snapshots before a complete apply."""
+
+    previous: MediaSnapshot | None = None
+    for attempt in range(max(2, attempts)):
+        snapshot = fetch_media_snapshot(
+            timeout,
+            modified_after,
+            cache_token=f"{time.time_ns()}-{attempt}",
+        )
+        if previous is not None and (
+            sorted(previous.urls) == sorted(snapshot.urls)
+            and previous.modified_by_url == snapshot.modified_by_url
+        ):
+            return snapshot
+        previous = snapshot
+        time.sleep(0.25)
+    raise RuntimeError(
+        "WordPress media inventory did not stabilize after "
+        f"{max(2, attempts)} uncached snapshots; no workbook write was attempted."
+    )
 
 
 def read_media_url_list(path: Path | str) -> list[str]:
@@ -301,22 +409,78 @@ def state_path(report_dir: Path) -> Path:
     return report_dir / ".asset_map_sync_state.json"
 
 
-def read_since_auto(report_dir: Path, cushion_hours: int = 6) -> tuple[str | None, bool]:
+def read_state(report_dir: Path) -> tuple[dict[str, Any], bool]:
     path = state_path(report_dir)
     if not path.exists():
+        return {}, False
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        return (payload if isinstance(payload, dict) else {}), True
+    except (OSError, TypeError, json.JSONDecodeError):
+        return {}, True
+
+
+def read_since_auto(report_dir: Path, cushion_hours: int = 6) -> tuple[str | None, bool]:
+    payload, exists = read_state(report_dir)
+    if not exists:
         return None, False
     try:
-        timestamp = json.loads(path.read_text(encoding="utf-8")).get("last_run_utc")
+        timestamp = payload.get("last_run_utc")
         if not timestamp:
             return None, True
         return (datetime.fromisoformat(timestamp) - timedelta(hours=cushion_hours)).strftime("%Y-%m-%dT%H:%M:%S"), True
-    except (OSError, ValueError, TypeError, json.JSONDecodeError):
+    except (ValueError, TypeError):
         return None, True
 
 
-def write_state(report_dir: Path) -> None:
-    payload = {"last_run_utc": datetime.now(timezone.utc).replace(tzinfo=None).isoformat(timespec="seconds")}
-    state_path(report_dir).write_text(json.dumps(payload), encoding="utf-8")
+def _with_asset_revision(url: str, token: str) -> str:
+    parsed = urlparse(url)
+    query = dict(parse_qsl(parsed.query, keep_blank_values=True))
+    query["asset_rev"] = token
+    return urlunparse(parsed._replace(query=urlencode(query)))
+
+
+def prepare_revisioned_media_urls(
+    snapshot: MediaSnapshot,
+    prior_state: dict[str, Any],
+) -> tuple[list[str], dict[str, str]]:
+    """Version only URLs whose attachment modified time changed after a known baseline."""
+
+    prior_modified = prior_state.get("media_modified", {})
+    if not isinstance(prior_modified, dict):
+        prior_modified = {}
+    prior_tokens = prior_state.get("revision_tokens", {})
+    if not isinstance(prior_tokens, dict):
+        prior_tokens = {}
+    tokens: dict[str, str] = {}
+    urls: list[str] = []
+    for url in snapshot.urls:
+        modified = snapshot.modified_by_url.get(url, "")
+        token = clean(prior_tokens.get(url))
+        if url in prior_modified and modified and clean(prior_modified.get(url)) != modified:
+            token = re.sub(r"[^0-9A-Za-z]", "", modified)
+        if token:
+            tokens[url] = token
+            urls.append(_with_asset_revision(url, token))
+        else:
+            urls.append(url)
+    return urls, tokens
+
+
+def write_state(
+    report_dir: Path,
+    *,
+    media_modified: dict[str, str] | None = None,
+    revision_tokens: dict[str, str] | None = None,
+) -> None:
+    payload, _exists = read_state(report_dir)
+    payload["last_run_utc"] = datetime.now(timezone.utc).replace(tzinfo=None).isoformat(timespec="seconds")
+    if media_modified is not None:
+        payload["media_modified"] = media_modified
+    if revision_tokens is not None:
+        payload["revision_tokens"] = revision_tokens
+    report_dir.mkdir(parents=True, exist_ok=True)
+    state_path(report_dir).write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
 def url_alive(url: str, timeout: float) -> bool:
@@ -543,6 +707,7 @@ def reconcile(
     alive: dict[str, bool] | None = None,
     incremental: bool = False,
     classify_coverage: Callable[[str, str, str], tuple[str, str]] | None = None,
+    update_safe_wildcards: bool = False,
 ) -> SyncPlan:
     """Pure reconciliation of desired asset targets vs current hosted media inventory."""
 
@@ -568,8 +733,66 @@ def reconcile(
     def resolve_option(model_key: str, rpo: str) -> tuple[dict[str, str], str, str]:
         if not rpo:
             return {}, "no-rpo", "no rpo in option sheet"
-        if (model_key, rpo) in media.option_exact:
-            return {"image_url": media.option_exact[(model_key, rpo)][0]}, "prefixed", ""
+
+        candidates = media.option_exact.get((model_key, rpo), [])
+        if len(candidates) == 1:
+            return {"image_url": candidates[0]}, "prefixed", ""
+        if len(candidates) > 1:
+            return (
+                {},
+                "prefixed-ambiguous",
+                f"multiple {model_key}-prefixed files for '{rpo}'; keep one file at this priority",
+            )
+
+        eligible_groups: list[tuple[int, str, list[str]]] = []
+        for (prefix_group, candidate_rpo), group_candidates in media.option_shared.items():
+            if candidate_rpo != rpo:
+                continue
+            group_models = tuple(MODEL_PREFIX[code] for code in prefix_group.split("-"))
+            if model_key in group_models:
+                eligible_groups.append((len(group_models), prefix_group, group_candidates))
+        if eligible_groups:
+            winning_size = min(size for size, _prefix, _candidates in eligible_groups)
+            winning_groups = [
+                (prefix, group_candidates)
+                for size, prefix, group_candidates in eligible_groups
+                if size == winning_size
+            ]
+            winning_candidates = [
+                (prefix, url)
+                for prefix, group_candidates in winning_groups
+                for url in group_candidates
+            ]
+            if len(winning_candidates) == 1:
+                prefix_group, url = winning_candidates[0]
+                return (
+                    {"image_url": url},
+                    f"shared-prefix:{prefix_group}",
+                    f"using {prefix_group}-prefixed media shared with {model_key}",
+                )
+            prefix_labels = ", ".join(sorted(prefix for prefix, _candidates in winning_groups))
+            source_label = winning_groups[0][0] if len(winning_groups) == 1 else prefix_labels
+            return (
+                {},
+                f"shared-prefix:{source_label}:ambiguous",
+                f"multiple {prefix_labels} shared-prefix files for '{rpo}' at the winning specificity",
+            )
+
+        for candidate_model in OPTION_MODEL_FALLBACKS.get(model_key, ()):
+            source = f"model-fallback:{candidate_model}"
+            candidates = media.option_exact.get((candidate_model, rpo), [])
+            if len(candidates) == 1:
+                return (
+                    {"image_url": candidates[0]},
+                    source,
+                    f"using {candidate_model}-prefixed media as configured fallback for {model_key}",
+                )
+            if len(candidates) > 1:
+                return (
+                    {},
+                    f"{source}:ambiguous",
+                    f"multiple {candidate_model}-prefixed files for '{rpo}'; keep one file at this priority",
+                )
         if rpo in media.option_bare:
             if len(media.option_bare[rpo]) == 1:
                 return {"image_url": media.option_bare[rpo][0]}, "bare-shared", ""
@@ -602,6 +825,26 @@ def reconcile(
                 return fields, "bodystyle-filename", ""
             return {}, "none", ""
         return {}, "unsupported-target-type", f"unsupported target_type '{target_type}'"
+
+    safe_wildcard_candidates: dict[tuple[str, str], str] = {}
+    if update_safe_wildcards:
+        for target_type, target_id in wildcard_rows:
+            if target_type != TARGET_TYPE_OPTION:
+                continue
+            resolutions = [
+                resolve_fields(model_key, target_id, info)
+                for (model_key, desired_type, desired_id), info in desired.items()
+                if desired_type == target_type and desired_id == target_id
+            ]
+            candidate_urls = {
+                fields.get("image_url", "")
+                for fields, source, _note in resolutions
+                if fields and source == "bare-shared"
+            }
+            if resolutions and len(candidate_urls) == 1 and all(
+                fields and source == "bare-shared" for fields, source, _note in resolutions
+            ):
+                safe_wildcard_candidates[(target_type, target_id)] = candidate_urls.pop()
 
     report: list[dict[str, str]] = []
     url_writes: dict[tuple[int, str], str] = {}
@@ -706,7 +949,26 @@ def reconcile(
         if wildcard is not None:
             wildcard_url = clean(wildcard.get("url"))
             candidate_url = fields.get("image_url", "") if fields else ""
-            if candidate_url and candidate_url != wildcard_url:
+            safe_candidate = safe_wildcard_candidates.get((target_type, target_id), "")
+            if safe_candidate and safe_candidate != wildcard_url:
+                row_number = int(wildcard["row"])
+                url_writes[(row_number, "image_url")] = safe_candidate
+                status[row_number] = "ok"
+                add_report(
+                    "existing",
+                    model_key,
+                    source_sheet,
+                    target_type,
+                    target_id,
+                    rpo,
+                    "replace_shared_canonical",
+                    "bare-shared",
+                    wildcard_url,
+                    safe_candidate,
+                    "ok",
+                    "unique bare media safely replaces the shared wildcard row",
+                )
+            elif candidate_url and candidate_url != wildcard_url:
                 add_report(
                     "existing",
                     model_key,
@@ -719,7 +981,8 @@ def reconcile(
                     wildcard_url,
                     candidate_url,
                     "ok",
-                    "canonical media differs from shared wildcard row; resolve manually (sync never edits wildcard rows)",
+                    "canonical media differs from shared wildcard row; routine sync never edits wildcard rows, "
+                    "and complete sync edits only a unique bare shared candidate",
                 )
             else:
                 add_report(
@@ -866,8 +1129,12 @@ def _write_reports(
         writer = csv.writer(handle)
         writer.writerow(["source_url", "parsed_model", "parsed_rpo", "reason"])
         for url in unmatched:
-            model_key, rpo, _ = parse_media(url)
-            writer.writerow([url, model_key or "", rpo, reason])
+            shared_prefix, rpo, shared_ok = parse_shared_option_media(url)
+            if shared_ok:
+                writer.writerow([url, shared_prefix, rpo, reason])
+            else:
+                model_key, rpo, _ = parse_media(url)
+                writer.writerow([url, model_key or "", rpo, reason])
         for url in unparseable:
             writer.writerow([url, "", "", "filename did not yield a 3-char RPO"])
     return report_path, missing_path, unmatched_path, len(missing_rows), len(broad_missing_rows)
@@ -1020,6 +1287,7 @@ def build_sync_plan(
     timeout: float,
     workers: int,
     incremental: bool,
+    update_safe_wildcards: bool = False,
 ) -> tuple[SyncPlan, dict[str, str], list[str], list[str]]:
     if asset_sheet not in wb.sheetnames:
         raise ValueError(f"Sheet {asset_sheet!r} not found.")
@@ -1047,6 +1315,7 @@ def build_sync_plan(
         alive=alive,
         incremental=incremental,
         classify_coverage=classify_coverage,
+        update_safe_wildcards=update_safe_wildcards,
     )
     plan = replace(plan, section_coverage=build_section_coverage_stats(desired, existing_rows))
     unmatched = sorted(set(media_urls) - plan.used - set(media.unparseable))
@@ -1104,6 +1373,10 @@ def run_sync(
     since_argument: str | None = None,
     resolved_modified_after: str | None = None,
     state_read: bool = False,
+    state_media_modified: dict[str, str] | None = None,
+    state_revision_tokens: dict[str, str] | None = None,
+    update_safe_wildcards: bool = False,
+    write_apply_state: bool = True,
     save_fn: Callable[..., Path] = save_workbook_safely,
 ) -> SyncResult:
     workbook_path = Path(workbook_path)
@@ -1123,6 +1396,7 @@ def run_sync(
             timeout=timeout,
             workers=workers,
             incremental=incremental,
+            update_safe_wildcards=update_safe_wildcards,
         )
     finally:
         plan_wb.close()
@@ -1138,7 +1412,8 @@ def run_sync(
     coverage_summary = build_coverage_summary(plan.report)
     coverage_summary["section_coverage"] = plan.section_coverage
 
-    if apply:
+    has_workbook_changes = bool(plan.url_writes or plan.inserts)
+    if apply and has_workbook_changes:
         apply_wb = load_workbook(workbook_path)
         try:
             apply_sync_plan(apply_wb, asset_sheet=asset_sheet, plan=plan)
@@ -1147,9 +1422,13 @@ def run_sync(
             apply_wb.close()
         check_wb = load_workbook(workbook_path, read_only=True, data_only=True)
         check_wb.close()
-        if since_argument == "auto":
-            write_state(report_dir)
-            state_written = True
+    if apply and since_argument == "auto" and write_apply_state:
+        write_state(
+            report_dir,
+            media_modified=state_media_modified,
+            revision_tokens=state_revision_tokens,
+        )
+        state_written = True
 
     manifest_path = _write_manifest(
         report_dir=report_dir,
@@ -1192,13 +1471,110 @@ def run_sync(
     )
 
 
+def _affected_models_from_report(report_path: Path) -> list[str]:
+    write_actions = {"fill", "insert_filled", "replace_canonical", "replace_shared_canonical"}
+    with report_path.open(encoding="utf-8") as handle:
+        return sorted(
+            {
+                clean(row.get("model_key")).lower()
+                for row in csv.DictReader(handle)
+                if row.get("action") in write_actions and clean(row.get("model_key")) not in {"", WILDCARD_MODEL_KEY}
+            }
+        )
+
+
+def _snapshot_files(paths: Iterable[Path]) -> dict[Path, bytes | None]:
+    return {path: path.read_bytes() if path.exists() else None for path in paths}
+
+
+def _restore_files(snapshot: dict[Path, bytes | None]) -> None:
+    for path, content in snapshot.items():
+        if content is None:
+            path.unlink(missing_ok=True)
+        else:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(content)
+
+
+def _bump_data_cache_version(index_path: Path) -> None:
+    text = index_path.read_text(encoding="utf-8")
+    pattern = re.compile(r'(src="\./data\.js\?v=)(\d+)(")')
+    match = pattern.search(text)
+    if not match:
+        raise RuntimeError(f"Could not find data.js cache version in {index_path}")
+    replacement = f"{match.group(1)}{int(match.group(2)) + 1}{match.group(3)}"
+    write_text_atomic(index_path, text[: match.start()] + replacement + text[match.end() :])
+
+
+def _mark_manifest_state_written(manifest_path: Path) -> None:
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    payload["state_written"] = True
+    manifest_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def run_complete_pipeline(result: SyncResult, *, workbook_path: Path) -> list[str]:
+    """Validate, regenerate, publish, and cache-bust one complete sync atomically enough to roll back."""
+
+    affected_models = _affected_models_from_report(result.report_path)
+    if not affected_models or not (result.url_write_count or result.insert_count):
+        return []
+    tracked_paths = [
+        *(ROOT / "form-output" / "runtime" / f"{model.replace('_', '-')}-runtime-contract.json" for model in affected_models),
+        *(ROOT / "form-output" / "inspection" / f"{model.replace('_', '-')}-derived-swap-manifest.json" for model in affected_models),
+        ROOT / "form-app" / "data.js",
+        ROOT / "form-app" / "index.html",
+    ]
+    snapshot = _snapshot_files(tracked_paths)
+    commands = [
+        ("workbook package", [sys.executable, "scripts/validate_workbook_package.py", str(workbook_path)]),
+        ("workbook schema", [sys.executable, "scripts/validate_workbook_schema.py", str(workbook_path)]),
+        *(
+            (
+                f"generate {model}",
+                [sys.executable, "scripts/generate_form.py", "--model", model, "--workbook", str(workbook_path)],
+            )
+            for model in affected_models
+        ),
+        ("publish registry", [sys.executable, "scripts/generate_registry.py", "--workbook", str(workbook_path)]),
+    ]
+    try:
+        for label, command in commands:
+            print(f"  {label} ...", end="", flush=True)
+            completed = subprocess.run(  # noqa: S603 - fixed project commands
+                command,
+                cwd=ROOT,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                check=False,
+            )
+            if completed.returncode:
+                print(" failed", flush=True)
+                if completed.stdout:
+                    print(completed.stdout, file=sys.stderr, flush=True)
+                raise RuntimeError(f"Complete asset sync failed during {label}")
+            print(" ok", flush=True)
+        _bump_data_cache_version(ROOT / "form-app" / "index.html")
+    except Exception:
+        if result.backup_path is not None:
+            restore_workbook_backup(workbook_path, result.backup_path)
+        _restore_files(snapshot)
+        raise
+    return affected_models
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Report or safely apply asset_map image URL sync from current hosted media inventory.")
-    parser.add_argument("--workbook", required=True, type=Path)
+    parser.add_argument("--workbook", default=DEFAULT_WORKBOOK, type=Path)
     parser.add_argument("--asset-sheet", default=ASSET_SHEET)
-    parser.add_argument("--report-dir", required=True, type=Path)
+    parser.add_argument("--report-dir", default=DEFAULT_REPORT_DIR, type=Path)
     parser.add_argument("--media-url-list", type=Path, help="Deterministic newline-delimited media URL fixture/list")
     parser.add_argument("--apply", action="store_true", help="Write workbook changes through save_workbook_safely()")
+    parser.add_argument(
+        "--complete",
+        action="store_true",
+        help="Stable full live pull, apply every unambiguous change, validate, regenerate, and publish",
+    )
     parser.add_argument("--timeout", type=float, default=10.0)
     parser.add_argument("--workers", type=int, default=16)
     parser.add_argument("--verify-existing-network", dest="verify_existing", action="store_true", help="Optionally probe existing workbook URLs for dead-link reporting")
@@ -1211,8 +1587,21 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
+    if args.complete and args.media_url_list:
+        parser.error("--complete uses the live stable inventory and cannot be combined with --media-url-list")
+    if args.complete and args.since:
+        parser.error("--complete always uses a full stable inventory and cannot be combined with --since")
+    if args.complete and args.workbook.resolve() != DEFAULT_WORKBOOK.resolve():
+        parser.error("--complete is restricted to the canonical stingray_master.xlsx workflow")
+
+    prior_state, prior_state_exists = read_state(args.report_dir)
     state_read = False
-    if args.since == "auto":
+    media_modified: dict[str, str] | None = None
+    revision_tokens: dict[str, str] | None = None
+    if args.complete:
+        modified_after = None
+        state_read = prior_state_exists
+    elif args.since == "auto":
         modified_after, state_read = read_since_auto(args.report_dir)
     else:
         modified_after = args.since
@@ -1222,29 +1611,38 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Loaded {len(media_urls)} media URLs from {args.media_url_list}")
     else:
         media_source = "live"
-        label = f"incremental after {modified_after}" if modified_after else "full"
-        print(f"Pulling media [{label}] ...")
+        label = "stable full" if args.complete else (f"incremental after {modified_after}" if modified_after else "full")
+        print(f"Pulling media [{label}] ...", flush=True)
         try:
-            media_urls = fetch_media(args.timeout, modified_after)
+            if args.complete:
+                snapshot = fetch_media_stable(args.timeout)
+                media_urls, revision_tokens = prepare_revisioned_media_urls(snapshot, prior_state)
+                media_modified = snapshot.modified_by_url
+            else:
+                media_urls = fetch_media(args.timeout, modified_after)
         except WordPressMediaFetchError as exc:
             print(str(exc), file=sys.stderr)
             return 1
-        print(f"  {len(media_urls)} images under {PATH_FILTER}")
+        print(f"  {len(media_urls)} images under {PATH_FILTER}", flush=True)
 
     result = run_sync(
         workbook_path=args.workbook,
         report_dir=args.report_dir,
         media_urls=media_urls,
-        apply=args.apply,
+        apply=args.apply or args.complete,
         asset_sheet=args.asset_sheet,
         verify_existing=args.verify_existing,
         timeout=args.timeout,
         workers=args.workers,
         incremental=modified_after is not None,
         media_source=media_source,
-        since_argument=args.since,
+        since_argument="auto" if args.complete else args.since,
         resolved_modified_after=modified_after,
         state_read=state_read,
+        state_media_modified=media_modified,
+        state_revision_tokens=revision_tokens,
+        update_safe_wildcards=args.complete,
+        write_apply_state=not args.complete,
     )
 
     print("\n=== Summary ===")
@@ -1259,10 +1657,25 @@ def main(argv: list[str] | None = None) -> int:
         f"Manifest: {result.manifest_path}"
     )
 
-    if args.apply:
-        print(f"\nAPPLIED: {result.url_write_count} url change(s), {result.insert_count} row insert(s).")
+    if args.apply or args.complete:
+        print(
+            f"\nAPPLIED: {result.url_write_count} url change(s), {result.insert_count} row insert(s).",
+            flush=True,
+        )
         if result.backup_path:
             print(f"Backup -> {result.backup_path}")
+        if args.complete:
+            affected_models = run_complete_pipeline(result, workbook_path=args.workbook)
+            write_state(
+                args.report_dir,
+                media_modified=media_modified,
+                revision_tokens=revision_tokens,
+            )
+            _mark_manifest_state_written(result.manifest_path)
+            if affected_models:
+                print("COMPLETE: validated, regenerated, and published " + ", ".join(affected_models))
+            else:
+                print("COMPLETE: no unambiguous workbook changes were needed.")
     else:
         print(f"\nDRY RUN -- would write {result.url_write_count} url change(s) and {result.insert_count} new row(s).")
     return 0

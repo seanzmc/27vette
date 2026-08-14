@@ -1,0 +1,51 @@
+{
+  "id": "2026-07-29-pass4a-macos-boundary-hardening",
+  "started_at": "2026-07-29T09:35:16-04:00",
+  "completed_at": "2026-07-29T10:32:47-04:00",
+  "objective": "Verify Pass 4 Stage A against current execution; repair the macOS Finder-metadata false boundary failure found by the fresh candidate-lane gate; stop before Stage B per the user's conditional instruction.",
+  "changed_surface": "Candidate-lane protected-surface hashing, one focused regression test, one stale source comment, explicit historical/superseded execution notices on ten plans, repo-local Fable failure-mode guidance, owning-spec/STATE closeout, and this receipt. No workbook, generated contract, registry, runtime application, dealer submission, or Stage B deletion.",
+  "outcome_rubric": "fable5loop/runs/2026-07-29-pass4a-macos-boundary-hardening/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-29-pass4a-macos-boundary-hardening/verifier-report.md",
+  "late_verifier_report": "fable5loop/runs/2026-07-29-pass4a-macos-boundary-hardening/verifier-report-c9.md",
+  "validation_output": "fable5loop/runs/2026-07-29-pass4a-macos-boundary-hardening/validation-output.txt",
+  "process_deviations": [
+    "The task-specific rubric was written after the source edit because the defect surfaced during final verification; TDD order was preserved for the repair, with a focused RED observed before production code changed.",
+    "The first full fresh verification proved every unaffected Stage A gate green but stopped before loop closeout because the candidate lane correctly made the bundle nonzero; the repaired full candidate suite and closeout gates were then run separately.",
+    "An ignored form-output/.DS_Store file was removed once as a diagnostic, but macOS recreated it during the rerun; the implementation was fixed instead of depending on workspace cleanup.",
+    "The first independent verifier completed after the initial closeout and found a separate C9 failure in a stale source comment and unclassified historical plan commands. The run was reopened, corrected, and independently reverified before final completion."
+  ],
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-29-pass4a-macos-boundary-hardening/validation-output.txt"
+    },
+    {
+      "section": "Lessons learned",
+      "evidence": "fable5loop/runs/2026-07-29-pass4a-macos-boundary-hardening/verifier-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-29-pass4a-macos-boundary-hardening/outcome.md"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/skills/27vette-fable5-compounding.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false,
+    "cycles": 3,
+    "delegation_id": "deleg_47ba823f"
+  },
+  "boundaries_preserved": [
+    "canonical workbook",
+    "generated runtime contracts",
+    "published registry",
+    "runtime application",
+    "dealer submission",
+    "exact six-file Stage B deletion boundary"
+  ]
+}

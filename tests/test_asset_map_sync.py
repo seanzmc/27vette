@@ -194,6 +194,8 @@ def test_open_json_sends_browser_like_user_agent(monkeypatch: pytest.MonkeyPatch
 
     def fake_urlopen(request, timeout):
         captured["accept"] = request.get_header("Accept")
+        captured["cache_control"] = request.get_header("Cache-control")
+        captured["pragma"] = request.get_header("Pragma")
         captured["user_agent"] = request.get_header("User-agent")
         return FakeJsonResponse(b"[]", {"X-WP-TotalPages": "1"})
 
@@ -204,6 +206,8 @@ def test_open_json_sends_browser_like_user_agent(monkeypatch: pytest.MonkeyPatch
     assert payload == []
     assert headers == {"x-wp-totalpages": "1"}
     assert captured["accept"] == "application/json"
+    assert captured["cache_control"] == "no-cache, no-store, max-age=0"
+    assert captured["pragma"] == "no-cache"
     assert captured["user_agent"]
     assert "Mozilla/5.0" in captured["user_agent"]
 
@@ -245,6 +249,53 @@ def test_fetch_media_403_mentions_media_url_list_fallback(monkeypatch: pytest.Mo
     assert "--media-url-list" in message
 
 
+def test_stable_media_fetch_requires_two_identical_uncached_snapshots(monkeypatch: pytest.MonkeyPatch) -> None:
+    snapshots = iter(
+        [
+            asset_map_sync.MediaSnapshot(["https://example.test/27vette/a.png"], {"https://example.test/27vette/a.png": "1"}),
+            asset_map_sync.MediaSnapshot(["https://example.test/27vette/a.png", "https://example.test/27vette/b.png"], {"https://example.test/27vette/a.png": "1", "https://example.test/27vette/b.png": "2"}),
+            asset_map_sync.MediaSnapshot(["https://example.test/27vette/b.png", "https://example.test/27vette/a.png"], {"https://example.test/27vette/a.png": "1", "https://example.test/27vette/b.png": "2"}),
+        ]
+    )
+    tokens: list[str | None] = []
+
+    def fake_fetch(timeout, modified_after=None, *, cache_token=None):
+        tokens.append(cache_token)
+        return next(snapshots)
+
+    monkeypatch.setattr(asset_map_sync, "fetch_media_snapshot", fake_fetch)
+    monkeypatch.setattr(asset_map_sync.time, "sleep", lambda _seconds: None)
+
+    snapshot = asset_map_sync.fetch_media_stable(timeout=1, attempts=4)
+
+    assert len(snapshot.urls) == 2
+    assert len(tokens) == 3
+    assert all(tokens)
+    assert len(set(tokens)) == 3
+
+
+def test_revision_tokens_only_change_after_a_known_modified_time_changes() -> None:
+    url = "https://example.test/wp-content/uploads/pictures/27vette/brakes/r-j6d.webp"
+    snapshot = asset_map_sync.MediaSnapshot([url], {url: "2026-08-13T12:00:00"})
+
+    baseline_urls, baseline_tokens = asset_map_sync.prepare_revisioned_media_urls(snapshot, {})
+    revised_urls, revised_tokens = asset_map_sync.prepare_revisioned_media_urls(
+        snapshot,
+        {"media_modified": {url: "2026-08-13T11:00:00"}, "revision_tokens": {}},
+    )
+    repeated_urls, repeated_tokens = asset_map_sync.prepare_revisioned_media_urls(
+        snapshot,
+        {"media_modified": {url: "2026-08-13T12:00:00"}, "revision_tokens": revised_tokens},
+    )
+
+    assert baseline_urls == [url]
+    assert baseline_tokens == {}
+    assert revised_urls == [f"{url}?asset_rev=20260813T120000"]
+    assert revised_tokens == {url: "20260813T120000"}
+    assert repeated_urls == revised_urls
+    assert repeated_tokens == revised_tokens
+
+
 def test_parse_media_requires_hyphen_for_model_prefix() -> None:
     assert asset_map_sync.parse_media("https://example.test/imgi_47_379.png") == (None, "379", True)
     assert asset_map_sync.parse_media("https://example.test/h-stx.png") == ("z06", "stx", True)
@@ -252,6 +303,53 @@ def test_parse_media_requires_hyphen_for_model_prefix() -> None:
     assert asset_map_sync.parse_media("https://example.test/c-qe6_v1.png") == ("stingray", "qe6", True)
     assert asset_map_sync.parse_media("https://example.test/27vette/paint/gba.png") == (None, "gba", True)
     assert asset_map_sync.parse_media("https://example.test/27vette/paint/c-gba.png") == ("stingray", "gba", True)
+
+
+def test_parse_shared_option_media_accepts_any_valid_multi_model_prefix_and_suffix() -> None:
+    assert asset_map_sync.parse_shared_option_media(
+        "https://example.test/27vette/brakes/e-g-j6d-o-cmp.webp"
+    ) == ("e-g", "j6d", True)
+    assert asset_map_sync.parse_shared_option_media(
+        "https://example.test/27vette/brakes/h-s-r-j6d-o-cmp.webp"
+    ) == ("h-s-r", "j6d", True)
+    assert asset_map_sync.parse_shared_option_media(
+        "https://example.test/27vette/brakes/e-j6d.webp"
+    ) == (None, "", False)
+    assert asset_map_sync.parse_shared_option_media(
+        "https://example.test/27vette/brakes/h-h-j6d.webp"
+    ) == ("h-h", "j6d", False)
+
+
+def test_duplicate_wordpress_records_for_same_url_are_one_media_candidate() -> None:
+    url = "https://example.test/wp-content/uploads/pictures/27vette/baz.jpg"
+
+    inventory = asset_map_sync.build_media_inventory([url, url])
+
+    assert inventory.option_bare == {"baz": [url]}
+    assert inventory.unparseable == []
+
+
+def test_fetch_media_snapshot_collapses_duplicate_attachment_records(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    url = "https://example.test/wp-content/uploads/pictures/27vette/baz.jpg"
+
+    monkeypatch.setattr(
+        asset_map_sync,
+        "_open_json",
+        lambda *_args, **_kwargs: (
+            [
+                {"source_url": url, "modified": "2026-08-12T10:00:00"},
+                {"source_url": url, "modified": "2026-08-13T11:00:00"},
+            ],
+            {"x-wp-totalpages": "1"},
+        ),
+    )
+
+    snapshot = asset_map_sync.fetch_media_snapshot(timeout=1)
+
+    assert snapshot.urls == [url]
+    assert snapshot.modified_by_url == {url: "2026-08-13T11:00:00"}
 
 
 def test_parse_model_and_bodystyle_media_names() -> None:
@@ -326,6 +424,189 @@ def test_reconcile_uses_bare_media_as_shared_fallback_after_model_prefixed_media
     ]
     assert url_writes == {}
     assert status == {}
+
+
+def test_reconcile_uses_model_fallback_chain_before_bare_media() -> None:
+    desired = {
+        ("grand_sport_x", "option", "opt_aaa_001"): {"target_type": "option", "rpo": "aaa", "name": "GSX exact"},
+        ("grand_sport_x", "option", "opt_bbb_001"): {"target_type": "option", "rpo": "bbb", "name": "Grand Sport fallback"},
+        ("grand_sport_x", "option", "opt_ccc_001"): {"target_type": "option", "rpo": "ccc", "name": "Stingray chain fallback"},
+        ("grand_sport", "option", "opt_ddd_001"): {"target_type": "option", "rpo": "ddd", "name": "Stingray fallback"},
+        ("zr1", "option", "opt_eee_001"): {"target_type": "option", "rpo": "eee", "name": "ZR1 exact"},
+        ("zr1x", "option", "opt_fff_001"): {"target_type": "option", "rpo": "fff", "name": "Z06 fallback"},
+        ("z06", "option", "opt_ggg_001"): {"target_type": "option", "rpo": "ggg", "name": "Bare fallback"},
+    }
+    media = asset_map_sync.build_media_inventory(
+        [
+            "https://example.test/27vette/g-aaa.png",
+            "https://example.test/27vette/e-aaa.png",
+            "https://example.test/27vette/aaa.png",
+            "https://example.test/27vette/e-bbb.png",
+            "https://example.test/27vette/c-bbb.png",
+            "https://example.test/27vette/bbb.png",
+            "https://example.test/27vette/c-ccc.png",
+            "https://example.test/27vette/ccc.png",
+            "https://example.test/27vette/c-ddd.png",
+            "https://example.test/27vette/ddd.png",
+            "https://example.test/27vette/r-eee.png",
+            "https://example.test/27vette/h-eee.png",
+            "https://example.test/27vette/eee.png",
+            "https://example.test/27vette/h-fff.png",
+            "https://example.test/27vette/fff.png",
+            "https://example.test/27vette/ggg.png",
+        ]
+    )
+
+    plan = asset_map_sync.reconcile(desired, media, existing_rows={}, alive={}, incremental=False)
+    by_target = {row["target_id"]: row for row in plan.report}
+
+    assert by_target["opt_aaa_001"]["candidate_source"] == "prefixed"
+    assert by_target["opt_aaa_001"]["new_url"].endswith("/g-aaa.png")
+    assert by_target["opt_bbb_001"]["candidate_source"] == "model-fallback:grand_sport"
+    assert by_target["opt_bbb_001"]["new_url"].endswith("/e-bbb.png")
+    assert by_target["opt_ccc_001"]["candidate_source"] == "model-fallback:stingray"
+    assert by_target["opt_ccc_001"]["new_url"].endswith("/c-ccc.png")
+    assert by_target["opt_ddd_001"]["candidate_source"] == "model-fallback:stingray"
+    assert by_target["opt_ddd_001"]["new_url"].endswith("/c-ddd.png")
+    assert by_target["opt_eee_001"]["candidate_source"] == "prefixed"
+    assert by_target["opt_eee_001"]["new_url"].endswith("/r-eee.png")
+    assert by_target["opt_fff_001"]["candidate_source"] == "model-fallback:z06"
+    assert by_target["opt_fff_001"]["new_url"].endswith("/h-fff.png")
+    assert by_target["opt_ggg_001"]["candidate_source"] == "bare-shared"
+    assert by_target["opt_ggg_001"]["new_url"].endswith("/ggg.png")
+
+
+def test_reconcile_uses_exact_then_shared_prefix_then_model_fallback_then_bare() -> None:
+    desired = {
+        ("grand_sport", "option", "opt_aaa_001"): {"target_type": "option", "rpo": "aaa", "name": "GS exact"},
+        ("grand_sport", "option", "opt_bbb_001"): {"target_type": "option", "rpo": "bbb", "name": "GS shared"},
+        ("grand_sport_x", "option", "opt_aaa_001"): {"target_type": "option", "rpo": "aaa", "name": "GSX exact"},
+        ("grand_sport_x", "option", "opt_bbb_001"): {"target_type": "option", "rpo": "bbb", "name": "GSX shared"},
+    }
+    media = asset_map_sync.build_media_inventory(
+        [
+            "https://example.test/27vette/e-aaa.png",
+            "https://example.test/27vette/g-aaa.png",
+            "https://example.test/27vette/e-g-aaa-o-cmp.webp",
+            "https://example.test/27vette/e-g-bbb-o-cmp.webp",
+            "https://example.test/27vette/c-bbb.png",
+            "https://example.test/27vette/bbb.png",
+        ]
+    )
+
+    plan = asset_map_sync.reconcile(desired, media, existing_rows={}, alive={}, incremental=False)
+    by_key = {(row["model_key"], row["target_id"]): row for row in plan.report}
+
+    assert by_key[("grand_sport", "opt_aaa_001")]["candidate_source"] == "prefixed"
+    assert by_key[("grand_sport", "opt_aaa_001")]["new_url"].endswith("/e-aaa.png")
+    assert by_key[("grand_sport_x", "opt_aaa_001")]["candidate_source"] == "prefixed"
+    assert by_key[("grand_sport_x", "opt_aaa_001")]["new_url"].endswith("/g-aaa.png")
+    assert by_key[("grand_sport", "opt_bbb_001")]["candidate_source"] == "shared-prefix:e-g"
+    assert by_key[("grand_sport", "opt_bbb_001")]["new_url"].endswith("/e-g-bbb-o-cmp.webp")
+    assert by_key[("grand_sport_x", "opt_bbb_001")]["candidate_source"] == "shared-prefix:e-g"
+    assert by_key[("grand_sport_x", "opt_bbb_001")]["new_url"].endswith("/e-g-bbb-o-cmp.webp")
+
+
+def test_reconcile_resolves_arbitrary_shared_group_for_every_named_model() -> None:
+    desired = {
+        (model_key, "option", "opt_j6d_001"): {
+            "target_type": "option",
+            "rpo": "j6d",
+            "name": "Calipers",
+        }
+        for model_key in ("z06", "zr1", "zr1x")
+    }
+    media = asset_map_sync.build_media_inventory(
+        ["https://example.test/27vette/brakes/h-s-r-j6d-o-cmp.webp"]
+    )
+
+    plan = asset_map_sync.reconcile(desired, media, existing_rows={}, alive={}, incremental=False)
+
+    assert {row["model_key"] for row in plan.report} == {"z06", "zr1", "zr1x"}
+    assert {row["candidate_source"] for row in plan.report} == {"shared-prefix:h-s-r"}
+    assert {row["new_url"] for row in plan.report} == {
+        "https://example.test/27vette/brakes/h-s-r-j6d-o-cmp.webp"
+    }
+
+
+def test_reconcile_prefers_narrower_shared_group_over_broader_shared_group() -> None:
+    desired = {
+        ("zr1", "option", "opt_j6d_001"): {
+            "target_type": "option",
+            "rpo": "j6d",
+            "name": "Calipers",
+        },
+    }
+    media = asset_map_sync.build_media_inventory(
+        [
+            "https://example.test/27vette/brakes/h-r-j6d.webp",
+            "https://example.test/27vette/brakes/h-s-r-j6d.webp",
+        ]
+    )
+
+    plan = asset_map_sync.reconcile(desired, media, existing_rows={}, alive={}, incremental=False)
+
+    assert plan.report[0]["candidate_source"] == "shared-prefix:h-r"
+    assert plan.report[0]["new_url"].endswith("/h-r-j6d.webp")
+
+
+def test_reconcile_flags_duplicate_shared_prefix_media_without_falling_through() -> None:
+    desired = {
+        ("grand_sport_x", "option", "opt_j6d_001"): {
+            "target_type": "option",
+            "rpo": "j6d",
+            "name": "Calipers",
+        },
+    }
+    media = asset_map_sync.build_media_inventory(
+        [
+            "https://example.test/27vette/brakes/e-g-j6d-o-cmp.webp",
+            "https://example.test/27vette/alternate/e-g-j6d-o-cmp.webp",
+            "https://example.test/27vette/brakes/e-j6d.png",
+            "https://example.test/27vette/brakes/j6d.png",
+        ]
+    )
+
+    plan = asset_map_sync.reconcile(desired, media, existing_rows={}, alive={}, incremental=False)
+
+    assert len(plan.report) == 1
+    assert plan.report[0]["action"] == "flag_ambiguous"
+    assert plan.report[0]["candidate_source"] == "shared-prefix:e-g:ambiguous"
+    assert "multiple e-g shared-prefix files" in plan.report[0]["note"]
+    assert plan.url_writes == {}
+    assert plan.inserts == []
+
+
+def test_reconcile_flags_ambiguous_highest_priority_model_candidate_without_falling_through() -> None:
+    desired = {
+        ("grand_sport_x", "option", "opt_bbb_001"): {"target_type": "option", "rpo": "bbb", "name": "Ambiguous Grand Sport fallback"},
+        ("grand_sport_x", "option", "opt_ccc_001"): {"target_type": "option", "rpo": "ccc", "name": "Ambiguous GSX exact"},
+    }
+    media = asset_map_sync.build_media_inventory(
+        [
+            "https://example.test/27vette/mech/e-bbb.png",
+            "https://example.test/27vette/exhaust/e-bbb.png",
+            "https://example.test/27vette/mech/c-bbb.png",
+            "https://example.test/27vette/mech/bbb.png",
+            "https://example.test/27vette/mech/g-ccc.png",
+            "https://example.test/27vette/exhaust/g-ccc.png",
+            "https://example.test/27vette/mech/e-ccc.png",
+            "https://example.test/27vette/mech/ccc.png",
+        ]
+    )
+
+    plan = asset_map_sync.reconcile(desired, media, existing_rows={}, alive={}, incremental=False)
+    by_target = {row["target_id"]: row for row in plan.report}
+
+    assert len(plan.report) == 2
+    assert by_target["opt_bbb_001"]["action"] == "flag_ambiguous"
+    assert by_target["opt_bbb_001"]["candidate_source"] == "model-fallback:grand_sport:ambiguous"
+    assert "multiple grand_sport-prefixed files" in by_target["opt_bbb_001"]["note"]
+    assert by_target["opt_ccc_001"]["action"] == "flag_ambiguous"
+    assert by_target["opt_ccc_001"]["candidate_source"] == "prefixed-ambiguous"
+    assert "multiple grand_sport_x-prefixed files" in by_target["opt_ccc_001"]["note"]
+    assert plan.url_writes == {}
+    assert plan.inserts == []
 
 
 def test_reconcile_flags_duplicate_bare_media_for_same_rpo_as_ambiguous() -> None:
@@ -595,6 +876,54 @@ def test_reconcile_wildcard_url_conflict_is_review_action_with_no_writes() -> No
     assert inserts == []
 
 
+def test_complete_reconcile_updates_one_wildcard_row_for_unique_bare_media() -> None:
+    desired = {
+        ("stingray", "option", "opt_eri_001"): {"target_type": "option", "rpo": "eri", "name": "Battery Protection"},
+        ("zr1", "option", "opt_eri_001"): {"target_type": "option", "rpo": "eri", "name": "Battery Protection"},
+    }
+    new_url = "https://example.test/27vette/lpo/eri-cmp.webp"
+    media = asset_map_sync.build_media_inventory([new_url])
+    existing_rows = {
+        ("*", "option", "opt_eri_001"): {"row": 2, "target_type": "option", "url": "https://example.test/27vette/ext/eri.jpg"},
+    }
+
+    report, url_writes, inserts, _status, _used = asset_map_sync.reconcile(
+        desired,
+        media,
+        existing_rows=existing_rows,
+        alive={},
+        incremental=False,
+        update_safe_wildcards=True,
+    )
+
+    assert url_writes == {(2, "image_url"): new_url}
+    assert inserts == []
+    assert {row["action"] for row in report} == {"replace_shared_canonical"}
+
+
+def test_complete_reconcile_does_not_write_model_specific_candidate_to_wildcard() -> None:
+    desired = {
+        ("stingray", "option", "opt_gba_001"): {"target_type": "option", "rpo": "gba", "name": "Black"},
+    }
+    media = asset_map_sync.build_media_inventory(["https://example.test/27vette/paint/c-gba-new.png"])
+    existing_rows = {
+        ("*", "option", "opt_gba_001"): {"row": 2, "target_type": "option", "url": "https://example.test/27vette/paint/gba-old.png"},
+    }
+
+    report, url_writes, inserts, _status, _used = asset_map_sync.reconcile(
+        desired,
+        media,
+        existing_rows=existing_rows,
+        alive={},
+        incremental=False,
+        update_safe_wildcards=True,
+    )
+
+    assert report[0]["action"] == "wildcard_conflict"
+    assert url_writes == {}
+    assert inserts == []
+
+
 def test_reconcile_exact_row_takes_precedence_over_wildcard_row() -> None:
     desired = {
         ("z06", "option", "opt_j6d_001"): {"target_type": "option", "rpo": "j6d", "name": "Calipers"},
@@ -702,6 +1031,42 @@ def test_apply_uses_injected_safe_save_and_inserts_confident_candidate(tmp_path:
     )
     assert (report_dir / "asset_map_sync_report.csv").exists()
     assert (report_dir / "asset_map_unmatched_media.csv").exists()
+
+
+def test_apply_with_no_unambiguous_changes_does_not_rewrite_workbook(tmp_path: Path) -> None:
+    workbook_path = tmp_path / "sync.xlsx"
+    make_apply_workbook(workbook_path)
+    report_dir = tmp_path / "reports"
+    calls: list[Path] = []
+
+    def fake_safe_save(wb, path, *, loaded_mtime_ns=None):
+        calls.append(Path(path))
+        raise AssertionError("save must not run without workbook changes")
+
+    result = asset_map_sync.run_sync(
+        workbook_path=workbook_path,
+        report_dir=report_dir,
+        media_urls=[],
+        apply=True,
+        verify_existing=False,
+        save_fn=fake_safe_save,
+    )
+
+    assert result.url_write_count == 0
+    assert result.insert_count == 0
+    assert result.backup_path is None
+    assert calls == []
+
+
+def test_data_cache_version_bump_is_targeted_and_repeatable(tmp_path: Path) -> None:
+    index_path = tmp_path / "index.html"
+    index_path.write_text('<script src="./data.js?v=26"></script>\n<script src="./app.js?v=27"></script>\n', encoding="utf-8")
+
+    asset_map_sync._bump_data_cache_version(index_path)
+
+    assert index_path.read_text(encoding="utf-8") == (
+        '<script src="./data.js?v=27"></script>\n<script src="./app.js?v=27"></script>\n'
+    )
 
 
 def test_report_manifest_records_source_inventory_and_counts(tmp_path: Path) -> None:
@@ -916,6 +1281,7 @@ def test_cli_help_works_without_requests_dependency() -> None:
     assert completed.returncode == 0, completed.stdout
     assert "--media-url-list" in completed.stdout
     assert "--apply" in completed.stdout
+    assert "--complete" in completed.stdout
     assert "--status-col" not in completed.stdout
     assert "--deactivate-stale" not in completed.stdout
     assert "--seed-blank-missing" not in completed.stdout

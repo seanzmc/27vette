@@ -1,13 +1,33 @@
 # Reliable Workbook–Database Workflow Implementation Specification
 
-Status: implementation-ready revision; not started. Revised 2026-07-22 after
-final specification review. All fourteen review findings are resolved: primary-
+Status: implementation in progress; Pass 1 completed 2026-07-22, Pass 2
+completed 2026-07-23, Pass 3 completed 2026-07-30, Pass 4 completed
+2026-08-08, Pass 5 completed 2026-08-09, and Pass 6A completed 2026-08-10 on
+`db-workflow`; the remaining implementation is Pass 6B and Pass 7, neither of
+which has started.
+Revised 2026-08-09 to split shared-writer restoration from durable manager
+apply/recovery and narrow Pass 7 to the minimal exact-artifact client and final
+enablement; revised 2026-07-23 to record the completed workbook-owned Vehicle
+Setup copy contract;
+the final specification review previously resolved all fourteen findings: primary-
 runtime-only parity, strict publication selection, current baseline, outcome-
 specific lifecycle states, interrupted-apply recovery, exception evidence,
 acceptance-only generated parity, single readback authority, complete writable-
 column ownership, non-circular write enablement, crash-safe two-store migration,
 distinct restored outcomes, stale-projection permissions, and deferred UI work.
-Recommended implementation reasoning: high.
+Recommended implementation reasoning: medium. Escalate only for a specific
+unresolved data-integrity, crash-recovery, or concurrency judgment.
+
+## Working progress authority
+
+This specification is the sole detailed progress file for this workflow. It
+owns pass status, completed requirements, current blockers, validation state,
+and the next implementation step. Update it in place as Passes 6A–7 proceed.
+
+`fable5loop/STATE.md` may carry only a short program-level pointer to this file,
+the current pass/blocker state, and the latest evidence receipt. Fable run
+receipts are immutable closeout evidence, not parallel progress trackers; they
+must not introduce a competing current status or next-step narrative.
 
 ## 1. Goal and authority boundary
 
@@ -33,7 +53,7 @@ Workbook Manager implementation direction.
 
 ## 2. Current evidence and baseline
 
-The audit in `docs/db_audit-7-22.md` proved these defects against disposable
+The audit in `docs/archive/old-reports/db_audit-7-22.md` proved these defects against disposable
 workbooks and databases:
 
 1. Import clears and commits the active projection before the new source is
@@ -123,7 +143,10 @@ The current `WBM_DB` can contain both imported projection tables and durable
 before any storage consumer changes.
 
 - Keep `WBM_DB` as the durable-state path and add `WBM_PROJECTION_DB` for the
-  projection path. New installations initialize both at schema version 1.
+  projection path. New installations initialize both at the current
+  `SCHEMA_VERSION` (1 as written in Pass 2; 2 since Pass 3 added the durable
+  `change_history.pending_change_id` foreign key, with an in-place upgrade for
+  stores built at 1).
 - At startup, under a Pass 2 process-local startup/migration lock and before
   any storage consumer runs,
   checkpoint and close the legacy database, hash it, and copy it to a unique
@@ -252,6 +275,22 @@ header is a separate schema-authoring operation outside this pass. Opaque
 columns are preserved by copy-plus-overlay but never appear in manager draft,
 update, or ChangeSet payloads.
 
+Vehicle Setup presentation copy is an explicit compatibility requirement of
+this workflow. The completed migration owned by
+`docs/archive/completed-specs/vehicle-setup-copy-workbook-ownership-spec.md` added these seven
+manager-writable free-text columns to `model_master`:
+`setup_card_subtitle`, `setup_eyebrow`, `setup_title`, `setup_description`,
+`setup_fact_1`, `setup_fact_2`, and `setup_fact_3`. Pass 2 includes them in the
+shared registry/catalog and imports them for every active model. They remain
+optional for an unpromoted model definition, while the existing shared schema
+and registry-promotion validation require all seven for a promoted model. Pass
+4 must preserve them through candidate import, semantic readback, and
+copy-plus-overlay reconstruction. Pass 5 preview must surface the shared
+validation failure if a ChangeSet would clear required promoted-model setup
+copy. Pass 7 must round-trip the seven fields through schema metadata, API,
+browser form, draft, ChangeSet, and immutable history without changing their
+workbook ownership or moving them into SQLite-only state.
+
 SQLite enforces primary/composite uniqueness only. Do not add a parallel SQL
 foreign-key model. Ordinary, union, conditional, `option_rpos`, section/variant,
 and model-scoped references all remain shared projected-final-state semantic
@@ -342,7 +381,7 @@ canonical workbook
 For this manager pass, generation is isolated acceptance or an external
 post-write gate. Registry publication remains outside the manager. No
 compatibility JSON/CSV writer, current-generation/draft promotion input, legacy
-fallback/alias behavior, ingest deployment proof, publication, or deployment is
+fallback/alias behavior, retired ingest deployment proof, publication, or deployment is
 part of manager execution.
 
 Add `workbook-manager/backend/app/contract_parity.py` with one public helper:
@@ -357,9 +396,18 @@ requested discovered config, and uses `ModelConfig.with_overrides()` to set
 `output_dir=output_root/form-output`, and `app_dir=output_root/form-app`. It then
 calls `source_assembly.assemble_model_source(config)`, takes only
 `assembly.runtime_contract`, validates that contract with
-`registry_promotion.assert_runtime_contract()`, and writes only
+`runtime_contract.assert_runtime_contract()`, and writes only
 `runtime_contract_artifact_path(output_root, model_key)` through the repository
 JSON writer.
+
+Corrected 2026-07-24: `runtime_contract.py` is the strict-validation owner after
+Pass G1 of `docs/superpowers/specs/2026-07-23-validation-single-lane-active-surface-cleanup.md`.
+The older `registry_promotion.assert_runtime_contract()` spelling still resolves
+through a re-export but omits the identity binding, so it validates more weakly
+than intended without failing. Pass the discovered `config` and the workbook
+promotion label as `expected_model_label` so dataset identity is checked against
+the candidate snapshot. Any future change to this validator's owner or signature
+must update both specifications in the same pass.
 
 Do not call `generate_model_artifacts()`,
 `write_stingray_compatibility_artifacts()`, any inspection/preview/draft writer,
@@ -687,6 +735,42 @@ Required changes:
 Pass 1 exit gate: no API or browser path can mutate `stingray_master.xlsx` or
 destructively replace an existing projection database.
 
+Pass 1 result — completed 2026-07-22:
+
+- Added seven disposable containment regressions and observed all seven fail
+  against the pre-pass implementation before production edits. They now pass.
+- `POST /api/sync` returns `409 read_only_provisional` for every `write=true`
+  payload, including a fully populated legacy confirmation payload. The browser
+  write control was removed; only `write=false` dry-run remains callable.
+- Initial import into an empty projection remains available. Replacement import
+  returns `409` before importer invocation whenever a projection is active or
+  unresolved staged, committed-unsynchronized, or failed legacy work exists.
+  The existing projection row/import-run counts remain unchanged on refusal.
+- `/api/status` now reports `projection`, `draft`, `workbook`,
+  `generated_artifacts`, and `publication` separately. The current canonical
+  first import has 34 blocking findings and is therefore labeled `unverified`,
+  not verified/current. Comparison export is refused in that state; direct
+  current-projection exports are labeled `DISPOSABLE-comparison-*.xlsx` and
+  remain under the configured untracked export directory.
+- The built browser was smoked against a copied workbook and temporary database.
+  It showed the persistent `Read-only / provisional` banner, separate state
+  labels, disabled replacement-import/export controls, `WRITE DISABLED`, and no
+  live write control. Browser console: zero errors. Direct copied-workbook API
+  probes returned 409 for write and re-import; copied-workbook SHA-256 remained
+  `5d133540769ea5c2e744a1402ef9d4d49e8bd110a9772ff50a6031ed0fc89850`.
+- Gates: focused containment `7 passed`; shared ChangeSet/writer
+  `75 passed, 7 subtests passed`; frontend build passed; Python compile passed;
+  workbook package and schema validation both passed with zero issues. The
+  normal manager suite remained at its assigned baseline (`2 failed, 32 passed,
+  2 skipped`); the slow scratch-copy run remained at the same two assigned
+  failures (`2 failed, 34 passed`). No new failure was introduced.
+- Canonical workbook and `form-app/data.js` hashes remained respectively
+  `5d133540769ea5c2e744a1402ef9d4d49e8bd110a9772ff50a6031ed0fc89850` and
+  `a34d1fdc80b04fe48f7ef2e77e37f67da038017bcaaca21ff1425767a4381a59`.
+  Tracked generated/runtime artifacts, publication, deployment, customer form,
+  and dealer submission were unchanged. Pass 1 temporary test-log churn was
+  restored before closeout.
+
 ### Pass 2 — Split storage and adopt the shared backend contract
 
 Required changes:
@@ -725,6 +809,62 @@ key/type/enum/reference/requiredness definition, every sheet and managed column
 has one catalog disposition, shared preview rejects blank required fields, and
 unknown or unowned models cannot create drafts.
 
+Pass 2 result — completed 2026-07-23:
+
+- Split storage now keeps `WBM_DB` as durable workflow/recovery state and uses
+  `WBM_PROJECTION_DB` for the disposable workbook projection. Startup runs the
+  locked bootstrap before either connection accessor can serve a consumer.
+- First-start migration checkpoints and hashes the legacy database, verifies a
+  same-directory hash-derived archive, builds both stores under
+  `BEGIN IMMEDIATE`, records matching schema/migration/source markers plus
+  per-table row-count/fingerprint evidence, replaces the disposable projection
+  first and durable state last, and fsyncs files/directories. Restart probes
+  cover partial and ambiguous archive temporaries and interruption before,
+  between, and after replacements. Exact legacy pending/history payloads remain
+  read-only recovery records; unresolved records continue to block import.
+- The shared workbook-domain registry now owns complete writable columns,
+  keys, scalar types, finite domains, ordinary/union/conditional/derived
+  references, optional columns, and both requiredness sets. The manager-only
+  `catalog.py` adapter owns SQL routing, labels, collection placement, and
+  display prefixes. Optional blanks project to SQL `NULL`; required blanks are
+  blocking findings and shared preview errors.
+- Every live sheet and managed column receives one catalog disposition. Shared
+  physical interiors/color rows are projected once per physical key with all
+  registered model contexts. Preserved-known and preserved-unknown sheets stay
+  workbook-owned; their cells are not copied into SQLite.
+- Projection reads and imports now use the projection connection; staged/
+  committed legacy workflow state, blockers, sync evidence, and backups use the
+  durable connection. Model context is retained for physically scoped and
+  `model_key`-keyed families.
+- Staging enforces workbook-derived known/active/generatable/source-ownership
+  predicates, fixed-sheet topology exceptions, publication preflight, and the
+  sole writable `asset_map` wildcard. Runtime publication does not grant edit
+  ownership. The stale scaffold rejection test was replaced by matrix-derived
+  active, inactive, fixed, source-backed, publication, wildcard, and unknown-model
+  coverage.
+- All production/test consumers moved from duplicate `app/specs.py` metadata to
+  the catalog; the no-consumer search passed and `specs.py` was deleted. The
+  backend schema payload now reports model context, requiredness, optionality,
+  finite/free-text kind, and ordinary/union/conditional/derived references.
+- Gates: focused manager/catalog/migration `56 passed, 2 skipped`; slow copied-
+  workbook manager `45 passed`; shared writer `83 passed, 7 subtests passed`;
+  shared ChangeSet `50 passed`; Python compile and `git diff --check` passed;
+  frontend build passed; workbook package and schema validation both passed
+  with zero issues. The only warning was the existing FastAPI/Starlette
+  `httpx` deprecation warning.
+- Disposable browser smoke imported a copied workbook into temporary split
+  stores, retained the persistent read-only/provisional and unverified state,
+  loaded Stingray and ZR1 model-specific options plus shared collections, and
+  produced zero browser console errors. No canonical workbook write occurred.
+- Protected-path diff was empty for `stingray_master.xlsx`, `form-output/`, and
+  `form-app/data.js`. Current hashes are respectively
+  `c5f986f6793205e00124db5640248e9e8c57ebb930679a92c2b3e8c56fb62154` and
+  `802afa1fea4e9e802f7d82635556c5569d3c73b2f4ae59267f64dd8157f9bceb` for the
+  workbook and runtime registry. Product data, generated contracts,
+  publication, deployment, customer form behavior, and dealer submission were
+  unchanged. Pass 1 write containment remains active; Pass 3 connection/
+  promotion coordination is still not started.
+
 ### Pass 3 — Establish request connections and promotion coordination
 
 Required changes:
@@ -749,6 +889,91 @@ Required changes:
 Pass 3 exit gate: concurrent first-load/status requests use independent
 connections without lock errors, promotion can quiesce readers deterministically,
 and subsequent requests open the promoted projection manifest.
+
+Pass 3 result — completed 2026-07-30:
+
+- Storage bootstrap/migration now runs in the FastAPI `lifespan` and records its
+  result on `app.state.storage_bootstrap`. Entering the app lifespan with no
+  request builds both stores with matching manifests; no request path bootstraps
+  lazily. `TestClient` must therefore be entered as a context manager.
+- The global `_conn`/`_state_conn`/`_storage_bootstrapped` accessors are gone.
+  `projection_connection()` and `state_connection()` are request-scoped
+  generator dependencies that open one connection each and close it when the
+  request ends; `open_projection_connection()`/`open_state_connection()` are the
+  non-request helpers. Every connection sets WAL plus an explicit
+  `busy_timeout` (`WBM_BUSY_TIMEOUT_MS`, default 5000 ms).
+- SQLite foreign keys are enforced only on durable manager-state connections,
+  where `change_history.pending_change_id` now declares
+  `REFERENCES pending_changes(id)`. Projection connections keep enforcement off,
+  so an unresolved workbook reference still imports and is reported as a finding
+  rather than rejected by SQL. Both directions are asserted. Because that DDL
+  change is invisible to a durable store Pass 2 already created, `SCHEMA_VERSION`
+  is now 2 and bootstrap upgrades a version-1 durable store in place — rebuilding
+  only `change_history` with the foreign key, preserving every row under
+  `BEGIN IMMEDIATE`, refusing on any row-count change, and recording the new
+  version in the manifest. The upgrade is idempotent across restarts and is
+  reported as `schema_upgraded` in the bootstrap result.
+- `STATE_LOCK` is the one process-local lock and now covers bootstrap plus every
+  durable-state mutating route (`/api/import`, stage, discard, validate, commit,
+  `/api/sync`, `/api/backup`) and, by contract, candidate promotion and workbook
+  apply. Two concurrency defects were found and fixed while proving it, both
+  worth recording because they are invisible to ordinary request-path reasoning:
+  - An `RLock` held across a *synchronous* generator dependency's `yield` cannot
+    be released, because FastAPI runs that dependency's enter and exit on
+    different threadpool threads. The lock is now a plain `Lock` (releasable
+    from any thread) and is therefore non-reentrant.
+  - Blocking on that lock from a threadpool worker parks an anyio thread token,
+    and once every token is parked the lock holder can never obtain a thread to
+    finish and release — a permanent, unrecoverable process wedge, reproduced
+    deterministically with the thread limiter shrunk to four tokens. The lock is
+    now taken in an `async` dependency that polls a non-blocking acquire on the
+    event loop under a bounded deadline (`WBM_STATE_LOCK_WAIT_SECONDS`, default
+    30 s), so contention degrades to `503` instead of hanging. Lock *ordering*
+    (lock-then-reader) was never the risk; thread starvation was.
+- `PROJECTION_GATE` blocks new readers, drains open request-scoped projection
+  connections, and only then permits replacement. Both waits are bounded and
+  fail closed (`ProjectionBusyError`; `WBM_READER_WAIT_SECONDS` and
+  `WBM_READER_DRAIN_SECONDS`, default 10 s each). A request arriving during a
+  promotion returns `503`; a promotion whose readers do not drain replaces
+  nothing and re-admits readers. Lock ordering is lock-then-reader — mutating
+  endpoints declare the lock dependency first — so promotion (lock, then
+  quiesce) cannot deadlock against an in-flight request. No second durable
+  projection-generation state machine was added: `/api/status` now reports the
+  opened projection's own `storage_manifest` identity. The bootstrap projection
+  swap itself now runs through the gate, so Pass 4 inherits a gated replacement
+  path rather than an ungated `os.replace` to copy.
+- Requests to an app whose lifespan never ran fail closed with
+  `503 storage_not_bootstrapped` naming the lifespan requirement, instead of an
+  opaque `no such table` error plus stray empty database files.
+- `run.sh` refuses `--workers` **and** a `WEB_CONCURRENCY` other than `1`:
+  uvicorn reads the worker count from the environment when the flag is absent, so
+  refusing only argv would have left multi-worker serving reachable. No
+  distributed locking was added. `workbook-manager/README.md` and the root README
+  record the Pass 3 behavior, the new environment overrides, and the new test
+  module.
+- No promotion code calls `os.replace()` yet; Pass 4 owns that. The gate and its
+  reader-drain proofs land first, as required.
+- Gates: new `tests/test_workbook_manager_api_concurrency.py` `31 passed`. Its
+  final form fails `21` of `25` against pre-implementation `fa0eee7` in a
+  throwaway worktree (the first 16-criterion draft failed 16 there), and each
+  later test was observed failing against the intermediate build it fixes:
+  thread starvation, full lock coverage, the `WEB_CONCURRENCY` bypass, the
+  lifespan guard, the gated projection swap, and the durable schema upgrade. The
+  busy-timeout test is the exception and is recorded as such: it cannot fail
+  against the intermediate build, because the explicit pragma there set the same
+  value the driver already sets — which is why that line was deleted rather than
+  defended. The four manager suites together `87 passed, 2 skipped`
+  in documented and reverse order; `WBM_SLOW_GATE=1 tests/test_workbook_manager.py`
+  `45 passed`; shared ChangeSet plus shared writer `76 passed, 7 subtests passed`;
+  frontend build passed; workbook package and schema validation both valid with
+  zero issues.
+- Protected-path `git status` was empty for `stingray_master.xlsx`,
+  `form-output/`, and `form-app/data.js`; current hashes are
+  `16415b913935b6d644fd1fbdcb5f6818d119e62cb6ef1fd077cff0f4b8d870e1` and
+  `7d97dba5294d09de4a622ec410810bad4c1d1955c043d5c69e6105896258b91c`. Product
+  data, generated contracts, publication, deployment, customer form behavior, and
+  dealer submission were unchanged. Pass 1 write containment remains active;
+  `write=true` sync is still refused. Pass 4 candidate promotion is not started.
 
 ### Pass 4 — Build and atomically promote a verified projection
 
@@ -804,6 +1029,27 @@ byte-for-byte unchanged; only a reconciled, semantically read-back,
 package/schema-valid candidate becomes current. The slow primary-runtime-only
 source/reconstruction acceptance regression is also green.
 
+Pass 4 result (completed 2026-08-08): commit `e02dd0a` implemented candidate
+row/sheet dispositions, fail-closed package/schema/reference/reconciliation
+checks, identity-copy-plus-overlay reconstruction, semantic readback, source
+identity recheck, WAL-safe candidate closure, reader-gated atomic promotion and
+rollback, comparison export, generated-contract parity acceptance, and the
+re-import UI/status changes. The canonical workbook delta in that commit was
+separately reviewed and authorized on 2026-08-08: it removes only two already
+inactive, unresolved `asset_map` rows for `c-07-1.png` and `c-07-2.png`. The
+ten-stage candidate verifier was rerun without declaring any model changed;
+all six models reported empty `semantic_drift_vs_retained` arrays and there
+were zero boundary violations. No tracked generated artifact or published
+registry changed. The complete 111-test manager acceptance inventory
+was covered in two serial invocations (the first was interrupted after 98
+passed / 2 expected skips; the remaining `TestApi` class then passed 11/11), the
+two explicit slow scratch-copy writer gates passed, shared ChangeSet/writer
+tests passed, the frontend built, and workbook package/schema validation was
+clean. A copied-workbook browser smoke then confirmed honest current/unverified
+status, model navigation, write containment, and a byte-identical disposable
+comparison export. Evidence:
+`fable5loop/runs/2026-08-08-dbpass4-verified-projection-closeout/`.
+
 ### Pass 5 — Replace staged full rows with draft-to-ChangeSet emission
 
 Required changes:
@@ -834,67 +1080,351 @@ Pass 5 exit gate: sequential same-row edits emit one operation; valid
 parent/member additions and coordinated deletes preview together; invalid final
 graphs cannot produce an approvable preview.
 
-### Pass 6 — Harden the shared write boundary and recovery
+#### Pass 5 checkpoint 1 — durable update intent (2026-08-08)
+
+Checkpoint 1 is complete at implementation commit `94e059e`, with closeout
+evidence under
+`fable5loop/runs/2026-08-08-dbpass5-durable-draft-coalescing/`. It delivers only
+requirements 1–4 for update operations: the durable store owns draft intent;
+authoring requires a current projection; lineage and ownership resolve before
+persistence; repeated edits to one physical row coalesce from the first
+projected value to the final changed field pairs; and a full reversion removes
+the operation. The disposable projection and legacy staged/history rows remain
+unchanged, and active drafts participate in re-import containment.
+
+Requirements 5–8 and the full Pass 5 exit gate remain open: exact immutable
+`workbook-changeset-1` emission, complete final-graph preview through the shared
+service, exact approval persistence/mapping, coordinated add/delete behavior,
+and removal of the dependency-confirmation bypass. The next checkpoint must
+start with a failing regression in
+`tests/test_workbook_manager_changeset_lifecycle.py`; it must not extend the
+legacy full-row writer or enable live workbook writes.
+
+#### Pass 5 checkpoint 2 — immutable update ChangeSet emission (2026-08-09)
+
+Checkpoint 2 is implemented at commit `60fd263`. It completes
+requirement 5 for the update-only draft surface: one nonempty mutable draft
+commit emits one exact `workbook-changeset-1`, converts typed field pairs through
+the shared editor coercion, validates the payload through the shared parser,
+persists the exact canonical payload in the durable store, and transitions the
+batch to `changeset_emitted`. Database triggers refuse artifact update or
+deletion. `POST /api/drafts/{draft_id}/commit` exposes only this emission step;
+it does not preview, approve, apply, mutate the projection, or write the
+workbook.
+
+The schema-5 migration regression was observed failing against detached
+baseline `bef0cbb` because a version-4 durable store was not upgraded, then
+passed against this implementation while preserving a draft-operation sentinel
+and verified version-3 projection across first and second restart. The new
+lifecycle file passes 4 tests; the focused draft/concurrency/shared-ChangeSet
+inventory passes 91 tests and the complete API class passes 12 tests, each with
+one third-party deprecation warning. Two broader manager inventory attempts
+exceeded the 600-second foreground limit after printing progress and therefore
+are not counted as green.
+
+Requirements 6–8 and the full Pass 5 exit gate remain open: complete
+final-graph preview and exact attempt persistence/mapping, exact approval
+persistence/mapping, coordinated add/delete behavior, and removal of the legacy
+dependency-confirmation bypass. The next checkpoint must start with a failing
+preview lifecycle regression in
+`tests/test_workbook_manager_changeset_lifecycle.py` and route the immutable
+ChangeSet through `workbook_domain.service.preview_changeset()` without
+reproducing its validation logic.
+
+#### Pass 5 checkpoint 3 — durable shared-service preview lifecycle (2026-08-09)
+
+Checkpoint 3 completes requirement 6. `POST
+/api/drafts/{draft_id}/preview` accepts only an emitted or retryable immutable
+ChangeSet against a current verified projection and invokes only
+`workbook_domain.service.preview_changeset()`. Durable schema 6 stores one
+immutable attempt envelope per call with the exact returned dictionary or the
+exception class/message, independently observed workbook identity, ChangeSet
+identity, timestamps, resulting Section 4.1 manager state, and exact allowed
+verbs. Formal previews, early refusals, freshness refusals, retryable transient
+exceptions, rejected exceptions, identity loss, and distinct retry attempts are
+covered without mutating the projection or workbook.
+
+The focused lifecycle file passes 13 tests plus 12 mapping/exception subtests;
+the draft/lifecycle/concurrency inventory passes 50 tests plus 12 subtests, and
+the shared ChangeSet/service inventory passes 50 tests. The remaining manager
+acceptance inventory and independent verifier result are recorded in
+`fable5loop/runs/2026-08-09-dbpass5-preview-lifecycle/` rather than duplicated
+here.
+
+Requirements 7–8 and the full Pass 5 exit gate remain open: exact approval
+persistence/mapping, coordinated add/delete behavior, removal of the legacy
+dependency-confirmation bypass, valid parent/member and coordinated-delete
+final-graph proof, and proof that invalid final graphs cannot become approvable.
+The next checkpoint must start with a failing approval-lifecycle regression in
+`tests/test_workbook_manager_changeset_lifecycle.py` and route the exact stored
+ChangeSet and formal preview through
+`workbook_domain.service.approve_changeset()` without enabling apply or live
+workbook writes.
+
+#### Pass 5 checkpoint 4 — durable shared-service approval lifecycle (2026-08-09)
+
+Checkpoint 4 completes requirement 7. `POST
+/api/drafts/{draft_id}/approve` accepts only `preview_ready` or
+`approval_confirmation_required` drafts against a current verified projection,
+loads the exact immutable ChangeSet and its latest identity-bound formal
+preview, and invokes only `workbook_domain.service.approve_changeset()`.
+Durable schema 7 stores one immutable attempt envelope per call with the exact
+returned dictionary or exception evidence, bound ChangeSet and preview
+identities, actor and warning IDs, timestamps, resulting Section 4.1 state, and
+exact allowed verbs. Unknown returned outcomes fail closed to
+`approval_rejected`; competing unbound preview rows cannot acquire approval
+authority. No approval path applies a ChangeSet or mutates the projection or
+workbook.
+
+The approval regression was observed failing against detached baseline
+`4338e52` because the approval service and endpoint did not exist. The final
+focused and affected acceptance evidence, protected-surface checks, and
+independent verifier result are recorded in
+`fable5loop/runs/2026-08-09-dbpass5-requirement7-approval-lifecycle/` rather than duplicated
+here.
+
+#### Pass 5 checkpoint 5 — complete final-graph draft lifecycle (2026-08-09)
+
+Checkpoint 5 completes requirement 8 and the Pass 5 exit gate. Durable drafts
+now accept update, add, and delete intent; new-row edits coalesce into the
+original add and add-then-delete collapses to no operation. Add/delete intent
+resolves its source sheet, ownership, key, model context, and typed field pairs
+without attempting per-row relationship approval. Commit emits every operation
+in one immutable ChangeSet, and the existing shared preview service judges the
+complete proposed graph. Coordinated exclusive-group parent plus member adds and
+coordinated parent plus dependent deletes reach `preview_ready`; an incomplete
+dependent delete returns a blocking final-graph warning and maps directly to
+`preview_rejected` with cancel as its only verb, so it cannot reach approval.
+
+The legacy `confirm_dependencies` request/function/UI bypass is removed. Legacy
+database columns remain only as preserved recovery evidence; new staged rows
+always record false and revalidation never treats an old true value as write
+authority. The contained legacy browser now reports the dependents and directs
+the operator to one coordinated draft ChangeSet rather than offering “delete
+anyway.” No apply route or live workbook write was enabled.
+
+The three required final-graph regressions were first observed failing with
+`draft_action_not_implemented`; the new-row coalescing regression was then
+observed failing with `record_not_found`. Final evidence: lifecycle tests `26
+passed, 17 subtests passed`; complete named manager inventory `142 passed, 2
+skipped, 17 subtests passed`; explicit slow copied-workbook manager inventory
+`49 passed`; shared ChangeSet/service inventory `50 passed`; shared writer
+inventory `59 passed, 7 subtests passed`; frontend build passed; workbook package
+and schema checks both returned valid with zero issues; and `git diff --check`
+passed. The canonical workbook, generated artifacts, published registry,
+customer runtime, dealer submission, deployment, and dependencies are unchanged.
+Pass 6A followed this checkpoint; Pass 5 itself granted no workbook-write authority.
+
+### Pass 6A — Harden shared-writer post-save restoration
+
+Keep this checkpoint inside the shared writer. Do not add manager apply state,
+an API route, or a generalized transaction framework here.
 
 Required changes:
 
 1. Fix post-save exception restoration in
    `scripts/corvette_form_generator/editor_ops.py`, because the shared writer—not
    a manager wrapper—owns physical workbook recovery.
-2. Enclose save, live readback, schema/package verification, and write-log
-   completion in one restoration boundary.
+2. Enclose save, live exact-row readback, live package/schema verification,
+   write-log completion, and success-result construction in one restoration
+   boundary once a backup exists.
 3. After any post-save returned failure or exception, restore the backup and
-   hash-verify it before returning `workbookState=restored`. Return
-   `workbookState=unknown` when restoration cannot be proven.
-4. Preserve the original failure and any restoration failure in the result.
-5. Drive manager apply only through `workbook_domain.service.apply_changeset()`
-   with the exact ChangeSet, preview, and approval artifacts.
-6. Persist every early refusal, formal artifact, attempt envelope, and receipt unchanged.
-   Map service outcomes and expose retry/cancel verbs exactly as Section 4.1
-   defines; do not mark individual operations applied after an atomic batch
-   failure.
-7. Persist `applying` plus its unique active-attempt identity atomically before
-   the writer call; enforce durable idempotency and startup orphan handling from
-   Section 4.
-8. Mark terminal `applied` only from a formally bound
+   hash-verify the restored workbook against that backup before returning
+   `workbookState=restored`. Return `workbookState=unknown` when restoration
+   cannot be proven.
+4. Preserve the original failure phase/detail and any restoration failure in
+   the returned result. Never replace the original cause with a generic restore
+   message.
+5. Keep the implementation local and narrow. A small shared restoration helper
+   is permitted; a manager wrapper, new public artifact, transaction framework,
+   or second write engine is not.
+
+Pass 6A exit gate: returned and thrown failures from live readback,
+package/schema verification, and write-log completion restore and hash-verify
+the backup; a failed restore reports `workbookState=unknown`; and both the
+original and restoration failures remain available as evidence.
+
+#### Pass 6A completion — shared-writer restoration (2026-08-10)
+
+Pass 6A is complete at the shared-writer boundary. After the guarded safe save
+returns its backup, `editor_ops.apply_batch()` now performs live exact-row
+readback, package validation, schema validation, success-result construction,
+and write-log completion inside one narrow restoration boundary. Returned live
+readback/schema failures and thrown readback/package/schema/log exceptions all
+restore through the existing approved backup helper and independently compare
+the restored live SHA-256 with the backup SHA-256. Results distinguish the
+original failure phase/kind/detail from restoration attempted/verified hashes
+and restoration error evidence; only a proved hash match reports
+`workbookState="restored"`, while an unproved restore reports
+`workbookState="unknown"` and `workbook_restore_failed` without losing the
+original cause.
+
+The first independent verification cycle found two contract defects in that
+implementation: backup-hash failure could claim restoration was attempted before
+the restore helper ran, and some verified rollbacks introduced an unrecognized
+public receipt status. The final implementation leaves `attempted=false` until
+backup hashing succeeds and restoration is about to run, and every verified
+post-save rollback reuses the existing
+`apply_verification_failed_rolled_back` status from Section 4.1. Both repairs
+were observed RED before implementation and the independent re-verifier passed
+criteria 1–8 and 10 with no new blocker.
+
+These detailed `failure` and `restoration` fields remain internal shared-writer
+result evidence. Pass 6A does not extend the public
+`workbook-change-receipt-1` schema: the service receipt retains the existing
+status, `workbookState`, errors, backup path, and verification fields, while
+Pass 6B separately owns durable attempt evidence and independently observed
+workbook identity as specified below.
+
+The detached-parent regressions produced seven intended failures before the
+implementation. The verifier-repair regressions then produced six intended
+failures before their narrow repair. Final evidence: complete named manager
+inventory `142 passed, 2 skipped, 17 subtests passed`; explicit slow copied-
+workbook inventory `49 passed`; shared writer/service inventory `80 passed, 13
+subtests passed`; frontend build passed; workbook package and schema checks both
+returned valid with zero issues; protected-surface status and `git diff --check`
+were clean; and the independent re-verifier returned PASS. Detailed output is
+retained in `fable5loop/runs/2026-08-10-dbpass6a-shared-writer-restoration/`.
+No manager apply state, API/UI route, public ChangeSet artifact, canonical
+workbook, generated/publication surface, customer runtime, dealer, dependency,
+deployment, commit, or push change was made. Pass 6B is the exact next action.
+
+#### Validation-efficiency checkpoint between Pass 6A and Pass 6B (2026-08-10)
+
+This bounded test-only checkpoint is complete; Pass 6B remains unstarted. The
+historical pre-Pass-6A timing audit was 932.51 seconds at `138 passed, 2 skipped,
+17 subtests passed`; it is context only, not the optimization baseline. The
+same-version Pass 6A receipt records the actual pre-optimization inventory as
+`142 passed, 2 skipped, 17 subtests passed` in 966.50 seconds.
+
+The manager behavior tests now import the canonical workbook once into an
+immutable SQLite base, clone that base per behavior class, and assert both the
+base projection and canonical workbook SHA-256 remain unchanged. One complete
+unchanged comparison export owns disposable labeling, byte identity, unmanaged
+sheet preservation, managed row counts, Vehicle Setup copy round-trip, and the
+explicit absence of generated-parity authority. One complete successful
+projection promotion owns package/schema validation, semantic readback,
+manifest reopening, row-disposition reconciliation, and durable-state-store
+isolation. No unique assertion was removed.
+
+Distinct complete acceptance owners remain for changed-overlay reconstruction,
+comparison source drift, projection atomic-replace failure, projection source
+drift, API lifespan import/re-import/export, and generated-contract parity. The
+generated-parity gate still reconstructs from a real imported projection and
+compares source/reconstruction contracts for all three promoted models. Focused
+blocking-import and low-level atomic replacement cases remain separate; no
+production validator or claimed behavior is mocked or bypassed.
+
+The documented seven-module inventory ran exactly once after the slice with
+`--durations=30`: `139 passed, 2 skipped, 17 subtests passed` in 791.25 seconds.
+That is 175.25 seconds and 18.13% below the same-version 966.50-second Pass 6A
+baseline. The 25% target time is 724.88 seconds; this result remains 66.37 seconds
+above it. The checkpoint stops here rather than broadening scope or weakening a
+distinct proof. The slowest retained owners were changed-overlay export 213.42
+seconds, generated parity 74.87 seconds, API setup/import 71.45 seconds, API
+re-import 69.69 seconds, unchanged export 69.47 seconds, API export 68.78
+seconds, promotion success 68.44 seconds, promotion source drift 67.92 seconds,
+and atomic-replace failure 67.86 seconds.
+
+Focused editing evidence passed (`6 passed` in 348.78 seconds), and the isolated
+post-review unchanged-export owner passed in 70.74 seconds. Protected-surface
+and final diff evidence is retained in
+`fable5loop/runs/2026-08-10-workbook-manager-validation-efficiency/`. Remaining
+risk is runtime only: the complete checkpoint still takes about 13 minutes, but
+further reduction requires a separately bounded design over retained acceptance
+owners. Pass 6B is still the exact next implementation action.
+
+### Pass 6B — Add durable manager apply, idempotency, and recovery
+
+Build on the proven Pass 6A writer and the immutable preview/approval attempt
+pattern already established in Pass 5. Do not make the apply path browser- or
+live-route reachable in this checkpoint; Pass 7 owns final enablement.
+
+Required changes:
+
+1. Drive manager apply only through
+   `workbook_domain.service.apply_changeset()` with the exact stored ChangeSet,
+   identity-bound formal preview, and identity-bound formal approval artifacts.
+2. Add one durable immutable apply-attempt owner containing the unique attempt
+   ID, exact ChangeSet/preview/approval identities, timestamps, returned
+   dictionary or exception evidence, independently observed workbook identity,
+   resulting manager state, and exact allowed verbs. Do not redesign or merge
+   the existing preview and approval tables merely for symmetry.
+3. Persist `applying` plus its unique active-attempt identity atomically before
+   invoking the shared service. Enforce at most one active apply attempt per
+   ChangeSet and return an existing terminal result or reject an active attempt
+   before any replay can reach the writer.
+4. Persist every early refusal, formal receipt, and attempt envelope unchanged.
+   Map service outcomes through one explicit fail-closed allowlist matching
+   Section 4.1; unknown or malformed outcomes grant no retry or write authority.
+   Do not mark individual operations applied after an atomic batch failure.
+5. Permit exact-artifact retry only from `apply_retryable` or
+   `apply_restored_retryable`, under the identity proofs in Section 4. Support
+   lifecycle cancellation without deleting history.
+6. During startup, convert any orphaned `applying` attempt to
+   `workbook_state_unknown`; never retry it automatically. Add the minimum
+   manager-owned manual-resolution record/operation required by Section 4 to
+   prove restored, prove applied, or preserve an abandoned unknown outcome.
+7. Mark terminal `applied` only from a formally bound
    `workbook-change-receipt-1` with `status="applied"`,
    `workbookState="saved"`, passing receipt verification, and exact ChangeSet,
    preview, and approval identities. Do not implement a second manager readback;
-   the shared writer/service receipt owns exact affected-row verification. Mark
-   the projection stale after success.
+   the shared writer/service receipt owns exact affected-row verification.
+8. Do not add a second stored projection-staleness flag. A successful workbook
+   write changes the live SHA-256/mtime, so the existing workbook/projection
+   identity comparison must naturally report the projection stale until a
+   verified re-import succeeds.
 
-Pass 6 exit gate: injected failures after physical save restore and hash-verify
-the backup; every failure remains visible with exactly the recovery verb allowed
-by Section 4.1; an orphaned `applying` attempt becomes unknown on restart; and
-repeated requests cannot duplicate a workbook mutation.
+Pass 6B exit gate: every service outcome exposes only its Section 4.1 recovery
+verbs; an orphaned `applying` attempt becomes unknown on restart; cancellation
+and manual resolution preserve immutable history; exact request replay cannot
+duplicate a workbook mutation; and a successful receipt makes the existing
+status calculation report the projection stale without a second readback or
+parallel freshness state.
 
 ### Pass 7 — Make the API and UI a thin client
 
 Required changes:
 
-1. Resolve API resources only from the allowlisted catalog; never accept a raw
-   SQL table name outside it.
+1. Preserve and characterize the existing catalog allowlist on schema, record,
+   and dependency endpoints; never accept a raw SQL table name outside it. This
+   is a regression proof, not a new resource-routing layer.
 2. Fix Form Structure section-to-step fallback using the workbook master
    section metadata already imported by the manager.
-3. Carry model context through schema response, form payload, draft, ChangeSet,
-   preview, history, and receipt for every model-owned family.
-4. Show projected values, source row lineage, blocking findings, exact
-   ChangeSet/preview identity, warnings,
-   failure detail, retry/cancel controls, and separate workflow statuses.
-   Render finite controls from the final Pass 2 metadata and free text only for
-   registry-declared free-text fields.
-5. Do not report generated artifacts or runtime publication current after a
-   workbook write. This pass does not run or publish generators; report those
-   states as stale/unverified until separately proven outside the manager.
-6. Keep the route disabled while implementing Pass 7 and run every non-write
-   Pass 7 gate first. As the final code change, enable only the action bound to
-   the exact approved artifacts, not a typed `SYNC` string plus mtime. Then run
-   the disposable end-to-end copied-workbook write proof and close Pass 7 only
-   after that proof passes.
+3. Preserve model context through the schema response, form payload, durable
+   draft operation, and manager-owned lifecycle/history view for every
+   model-owned family. Do not extend or rewrite the immutable shared ChangeSet,
+   preview, approval, or receipt schemas merely to add manager presentation
+   fields: expose their exact stored artifacts alongside manager-owned source
+   row, physical identity, and model-context metadata.
+4. Replace the active legacy staged-row browser workflow with one minimal
+   durable-draft lifecycle workspace. It must show projected values, source row
+   lineage, model context, blocking findings, exact ChangeSet/preview/approval
+   identities, warnings, failure detail, allowed retry/cancel/manual-recovery
+   controls, and separate workflow statuses. It must support operation capture,
+   commit, preview, approval, and the exact bound apply action without creating
+   a parallel workflow engine.
+5. Render finite controls from the final Pass 2 `field_kind`/`finite_values`
+   metadata and free text only for registry-declared free-text fields. Preserve
+   optional blank/SQL `NULL` and reference meaning through unchanged-row and
+   edited-row round trips, including the seven workbook-owned Vehicle Setup
+   copy fields.
+6. Preserve the existing separate status behavior: after a workbook write the
+   workbook/projection identity is stale, while generated artifacts and runtime
+   publication remain stale/unverified until separately proven outside the
+   manager. This pass does not run or publish generators.
+7. Keep legacy `POST /api/sync` permanently read-only: every `write=true`
+   request remains refused. While implementing Pass 7, keep the dedicated bound
+   apply action unreachable and run every non-write gate first. As the final
+   code change, enable only that dedicated action over the exact approved
+   artifacts. Then run the disposable end-to-end copied-workbook write proof and
+   close Pass 7 only after it passes.
 
 Pass 7 exit gate: a real unchanged model-owned row round-trips through the
-API/browser payload without losing model context or blank/reference meaning;
-only the bound ChangeSet service can reach a live write.
+API/browser payload without losing model context, source lineage, or
+blank/reference meaning; the legacy staged/sync browser workflow grants no
+write authority; `POST /api/sync write=true` remains refused; and only the
+dedicated exact-artifact action can reach the bound ChangeSet service write.
 
 A manager `applied` receipt means only that the workbook write and exact
 readback were proven. It is not repository or customer-runtime completion. The
@@ -910,6 +1440,7 @@ Expected existing owners:
 
 - `workbook-manager/backend/app/config.py`
 - `workbook-manager/backend/app/db.py`
+- `workbook-manager/backend/app/drafts.py`
 - `workbook-manager/backend/app/importer.py`
 - `workbook-manager/backend/app/validation.py`
 - `workbook-manager/backend/app/staging.py`
@@ -950,7 +1481,7 @@ Implementation is complete only when these named owners prove:
 
 | Audit risk | Required proof | Owning test module |
 |---|---|---|
-| Unsafe legacy path | live sync and destructive re-import remain refused until final enablement | `tests/test_workbook_manager.py` |
+| Unsafe legacy path | legacy live sync remains permanently refused; destructive re-import remains fail-closed | `tests/test_workbook_manager.py` |
 | Registry drift | every writable family matches shared key/type/enum/reference/requiredness metadata | `tests/test_workbook_manager_catalog.py` |
 | Blank/NULL drift | optional SQL `NULL` and required-blank behavior follow Section 3.6 | `tests/test_workbook_manager_catalog.py` |
 | Reference mismatch | ordinary/union/conditional/derived references all validate through the shared semantic contract | `tests/test_workbook_manager_catalog.py` |
@@ -967,10 +1498,11 @@ Implementation is complete only when these named owners prove:
 | Per-row validation | parent/member adds and coordinated deletes pass as one valid final graph | `tests/test_workbook_manager_changeset_lifecycle.py` |
 | Sequential edits | one physical row appears once with original-to-final field pairs | `tests/test_workbook_manager_changeset_lifecycle.py` |
 | Service mapping | every Section 4.1 returned outcome and a thrown approval exception maps to one state and exact allowed verbs; its attempt envelope persists and reopens unchanged | `tests/test_workbook_manager_changeset_lifecycle.py` |
-| Failed/interrupted sync | failures expose only state-authorized verbs; one active attempt is durable; orphaned applying becomes unknown; retry/request replay is idempotent | `tests/test_workbook_manager_changeset_lifecycle.py` |
+| Failed/interrupted apply | failures expose only state-authorized verbs; one active attempt is durable; orphaned applying becomes unknown; retry/request replay is idempotent | `tests/test_workbook_manager_changeset_lifecycle.py` |
 | Weak write binding | tampered ChangeSet, preview, approval, SHA, or mtime is rejected by the shared service | `tests/test_workbook_changeset_service.py` |
-| Readback/log exception | every post-save exception restores and hash-verifies backup or reports unknown | `tests/test_editor_ops_apply.py` |
-| UI context loss | unchanged real model-key rows round-trip with correct model/reference/source-lineage metadata | `tests/test_workbook_manager.py` plus disposable browser smoke |
+| Post-save exception | live readback, package/schema, and log failures restore and hash-verify the backup or report unknown while preserving original and restoration evidence | `tests/test_editor_ops_apply.py` |
+| UI context loss | unchanged real model-key rows round-trip through the manager lifecycle view with correct model/reference/source-lineage metadata while shared artifacts remain unchanged | `tests/test_workbook_manager.py` plus disposable browser smoke |
+| Vehicle Setup copy loss | all seven workbook-owned `model_master` setup-copy fields survive import/reconstruction and API/browser/ChangeSet round-trip; clearing one for a promoted model fails shared preview validation | `tests/test_workbook_manager.py`, `tests/test_workbook_manager_import_projection.py`, and `tests/test_workbook_manager_changeset_lifecycle.py` |
 | False readiness | workbook save leaves projection/generated/publication status stale or unverified | `tests/test_workbook_manager_changeset_lifecycle.py` |
 | Stale projection authority | stale ChangeSet permits cancel only; after cancellation, stale projection permits labeled browse/history and verified re-import but blocks export/draft/preview/approval/apply until that import succeeds | `tests/test_workbook_manager_changeset_lifecycle.py` |
 
@@ -983,7 +1515,10 @@ For every pass:
 3. Make the smallest change through the owners above.
 4. Run the focused test, then the current manager suite.
 5. Recheck `git status` and prove the canonical workbook, tracked generated
-   artifacts, runtime registry, deployment, and dealer code did not change.
+   artifacts, runtime registry, deployment, and dealer code did not change. If
+   a separately authorized workbook cleanup shares the implementation commit,
+   enumerate that exact delta and run its normal workbook/runtime gates instead
+   of calling the workbook unchanged.
 6. Record the pass result in this specification before moving to the next pass.
 
 The README owns exact commands. Add any new focused modules from Section 8 to its
@@ -991,6 +1526,17 @@ Workbook Manager validation table, then run the current documented manager,
 shared ChangeSet service, shared writer, slow copied-workbook, frontend build,
 workbook package/schema, and diff checks. The named modules in Section 8 own the
 acceptance proofs; do not substitute an unnamed smoke test for them.
+
+Use those checks in tiers rather than rerunning every real-workbook acceptance
+case after every edit. During implementation, run the exact affected test or
+class; at a pass checkpoint, run the complete named acceptance inventory once.
+The end-to-end promotion, comparison export, scratch-copy write, and generated-
+parity cases remain required because they prove distinct protected boundaries.
+Passes 6A–7 may reduce runtime by cloning a verified imported-projection fixture
+and using compact workbooks for negative cases, provided at least one real-
+workbook success and one real-workbook fail-closed case continue to exercise
+each complete boundary. Runtime reduction must not replace package/schema,
+semantic-readback, atomic-rollback, or generated-contract acceptance.
 
 Generated-contract acceptance runs only through the primary-runtime-only helper
 against temporary workbooks/output roots; it is not part of production import.
@@ -1000,7 +1546,8 @@ output.
 Browser-smoke the built manager against a copied workbook and temporary state/
 projection databases. Cover model navigation, structure mapping, an unchanged
 real-row edit, coordinated batch validation, stale workbook display, preview
-binding, forced failure, retry/cancel, and post-write stale status. No live
+binding, forced failure, retry/cancel/manual-recovery display, and post-write
+stale status. No live
 dealer submission and no write to the canonical workbook are validation steps.
 
 ## 10. Scope control and stop conditions
@@ -1032,7 +1579,7 @@ validation, editing workbook rows, or hiding unsafe actions only in the UI.
 - Per-model physical SQL table families.
 - A new workbook compiler framework, ORM, API version, frontend framework, or
   dependency.
-- Rewriting the fallback workbook editor or ingest workflow.
+- Rewriting the fallback workbook editor or restoring the retired ingest workflow.
 - Changing canonical option availability, pricing, defaults, relationships,
   copy, ordering, lifecycle, or publication decisions as implementation data.
   The manager may support already-authorized future edits through the matrix;
@@ -1045,7 +1592,10 @@ validation, editing workbook rows, or hiding unsafe actions only in the UI.
 
 Companion disposition:
 
-- Workbook source data: unchanged; hash/status proof required.
+- Workbook source data: no Pass 4 behavior depends on a product-data change.
+  Commit `e02dd0a` also removed two inactive unresolved `asset_map` rows; that
+  exact cleanup was separately reviewed, authorized, and proven runtime-neutral
+  during the 2026-08-08 closeout.
 - Generated artifacts and `form-app/data.js`: inspected-no-change; temporary
   parity outputs only.
 - Customer form and dealer submission: unchanged.
@@ -1057,6 +1607,18 @@ Companion disposition:
 - Model generation: implementation and output contracts unchanged. Acceptance
   calls canonical source assembly and writes only a temporary canonical runtime
   contract; no compatibility writer or publication path is changed or exercised.
+- Post-export gate: once Pass 3 of the single-lane specification lands
+  `scripts/verify_workbook_candidate.py`, this workflow calls that one command
+  after an approved workbook write and consumes its JSON readiness report. It
+  does not reimplement the package/schema/quality/generation/registry stage
+  sequence, and it does not use touched-model information to narrow what is
+  generated or validated — see §3.7.1 of that specification.
+- Legacy staging/sync: Pass 5 replaced their write authority with durable
+  draft-to-ChangeSet emission. Keep `staging.py` and
+  `sync_workbook(write=True)` characterization-only during Passes 6A–6B; Pass 7
+  removes the legacy staged-row browser workflow and keeps
+  `POST /api/sync write=true` permanently refused. Do not harden or re-enable
+  that superseded write lane.
 - Workbook Manager docs and root README pointer: updated to match actual safety
   state and commands.
 - Superseded relational design/plan: retained as historical, not edited back
@@ -1071,5 +1633,6 @@ Follow `AGENTS.md` handoff requirements. Also report:
 - post-save restoration hash proof;
 - concurrent API result;
 - browser-smoke result;
-- proof that the canonical workbook and tracked generated/runtime surfaces were
+- proof that the canonical workbook was unchanged or carries only an exact
+  separately authorized delta, and that tracked generated/runtime surfaces were
   unchanged.

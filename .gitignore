@@ -5,6 +5,7 @@ __pycache__/
 .pytest_cache/
 .playwright-mcp/
 .superpowers/
+.asset-map-sync/
 .env
 .env.*
 !.env.example
@@ -20,3 +21,5 @@ export-page/
 # transient ingest run artifacts (never source, never checked in)
 form-output/ingest/
 form-output/ingest-wizard/
+
+graphify-out/

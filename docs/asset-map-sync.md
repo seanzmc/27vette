@@ -3,10 +3,22 @@
 The old `asset_map-Sync/asset_map_sync.py` entry point was retired and removed
 because it wrote `stingray_master.xlsx` directly.
 
-Use the safe project command instead:
+For routine media maintenance, use the complete guarded workflow:
 
 ```sh
-.venv/bin/python scripts/sync_asset_map.py --workbook stingray_master.xlsx --report-dir /tmp/asset-map-sync
+.venv/bin/python scripts/sync_asset_map.py --complete
+```
+
+That one command pulls a stable uncached live inventory, applies every
+unambiguous URL replacement and filled insert together, validates the workbook,
+regenerates every affected promoted model, republishes `form-app/data.js`, and
+increments the `data.js` cache version in `form-app/index.html`. Reports and the
+media-revision baseline live in ignored `.asset-map-sync/`.
+
+For a read-only live diagnostic, omit `--complete`:
+
+```sh
+.venv/bin/python scripts/sync_asset_map.py
 ```
 
 For deterministic review/test runs, avoid live WordPress state and use the
@@ -19,22 +31,43 @@ checked-in fixture list:
 The supported command:
 
 - defaults to dry-run/report mode;
+- provides `--complete` as the routine canonical-workbook operation instead of
+  selectively applying hand-picked URLs;
+- sends cache-bypass headers and requires two identical full WordPress snapshots
+  before a complete write;
+- collapses duplicate WordPress attachment records that expose the same physical
+  URL, so one media file cannot become a false ambiguity;
 - resolves default scope from promoted runtime models in `model_registry_promotion`;
 - resolves each model's option sheet through `model_workbook_sources`;
 - accepts media anywhere under `/wp-content/uploads/pictures/27vette/`, including
   category subfolders such as `/paint/` or `/int/`;
 - treats model-prefixed filenames as model-specific winners (`c-` Stingray,
   `e-` Grand Sport, `h-` Z06, `r-` ZR1, `s-` ZR1X, `g-` Grand Sport X);
+- accepts any multi-model prefix made from two or more distinct model codes,
+  such as `e-g-j6d.webp` or `h-s-r-j6d.webp`; the file is shared by every
+  named model, and the narrowest matching group wins when multiple groups
+  contain the same model and RPO;
+- after exact and shared-model prefixes are absent, resolves configured model fallbacks
+  before considering a bare shared filename: Grand Sport → Stingray, Grand
+  Sport X → Grand Sport → Stingray, and ZR1 / ZR1X → Z06;
 - treats a single bare RPO filename as a shared fallback for every promoted
   active model with a matching active/selectable option row when that model has
-  no model-prefixed candidate for the RPO;
-- flags duplicate bare RPO filenames as ambiguous instead of choosing one by
-  folder or API order;
+  no exact or configured fallback-model candidate for the RPO;
+- resolves option media in exact single-model → narrowest shared group →
+  configured model fallback → bare generic order, and flags duplicate files
+  at the highest available priority as ambiguous instead of silently falling
+  through or choosing one by folder or API order;
 - uses stdlib HTTP with an explicit browser-like User-Agent, with optional `WP_USER` / `WP_APP_PASSWORD` only when the public media endpoint requires auth;
 - supports deterministic validation with `--media-url-list tests/fixtures/asset-map-sync-media-urls.txt`;
 - writes review reports plus `asset_map_sync_manifest.json` to `--report-dir`;
 - keeps dry-run/report mode read-only with respect to workbook rows and state files;
-- saves workbook changes only when `--apply` is passed, through `save_workbook_safely()`.
+- saves workbook changes only when `--apply` or `--complete` is passed, through
+  `save_workbook_safely()`;
+- records WordPress attachment modification times after a successful complete
+  run. If a later run sees the same URL with a new modification time, it adds a
+  stable `asset_rev` query token so browsers/CDNs fetch the revised image;
+- stops ambiguous candidates at the report boundary while continuing to apply
+  every independent unambiguous match.
 
 Report outputs:
 
@@ -57,9 +90,11 @@ Wildcard (shared) asset_map rows:
   target: such targets report `keep` (never `insert_filled`), and section
   coverage stats count them as covered. This is the anti-undo contract — a
   sync run must not re-insert per-model rows for wildcard-covered targets.
-- Sync never writes, edits, or inserts wildcard rows. If the canonical media
-  inventory differs from a wildcard row's URL, the row reports the
-  `wildcard_conflict` review action for manual resolution.
+- Dry-run and low-level `--apply` never write, edit, or insert wildcard rows.
+  Complete mode may update one existing wildcard URL only when every promoted
+  model resolves the same single bare generic candidate. Model-prefixed or
+  otherwise divergent candidates remain `wildcard_conflict`; complete mode
+  never creates wildcard rows.
 - A wildcard row is reported `stale_target` only when NO promoted model
   desires the target.
 - Wildcard authoring (including migrating repeated identical per-model rows to
@@ -69,15 +104,49 @@ Blank-row seeding, stale-row deactivation, and workbook schema/status-column
 changes are not routine asset-map maintenance. They need a separate approved
 workbook-data spec before being reintroduced or applied to `stingray_master.xlsx`.
 
-Do not use `--apply` on the canonical workbook from a fresh live media pull. A
-real apply requires a reviewed manifest/report and separate approval for the
-specific workbook row changes.
+Use `--complete` for canonical live maintenance. Low-level `--apply` remains for
+deterministic fixtures or an explicitly reviewed diagnostic report; it does not
+perform stable discovery, safe wildcard replacement, generation, publication,
+or cache-version updates.
 
-After any real workbook apply, run:
+After a low-level `--apply`, run:
 
 ```sh
 .venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
 .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
 ```
 
-Then regenerate affected active models and the registry only if workbook data changed.
+Then regenerate affected active models and the registry only if workbook data
+changed. Complete mode performs those steps automatically and rolls the workbook
+plus generated/publication files back if its post-save pipeline fails.
+
+## Card sizing and alignment
+
+Media matching and card presentation are separate workbook concerns. The sync
+updates `image_url`; it intentionally preserves an existing row's
+`image_fit` and `image_position`.
+
+Use the guarded display command to change presentation by RPO. It previews by
+default and resolves shared (`model_key="*"`) rows only once:
+
+```sh
+.venv/bin/python scripts/set_asset_display.py --rpo AQ9 --rpo AH2 --fit contain
+.venv/bin/python scripts/set_asset_display.py --rpo AQ9 --rpo AH2 --fit contain --write
+```
+
+`image_fit` controls sizing: `cover` fills and may crop, while `contain` keeps
+the whole image visible. `image_position` is alignment within that sizing mode,
+so `center` is not the opposite of `contain`. Change alignment independently
+when needed:
+
+```sh
+.venv/bin/python scripts/set_asset_display.py --rpo <RPO> --position top
+```
+
+Repeat `--model <model_key>` to restrict a change; without it, the command
+resolves every promoted active model. The command updates existing active
+asset rows only, routes writes through the guarded editor-operation pipeline,
+and fails closed for unknown RPOs, unpromoted model keys, workbook drift, Excel
+locks, package/schema failures, or duplicate active asset rows. As with sync,
+review the dry-run before adding `--write`, then regenerate affected models and
+the registry.

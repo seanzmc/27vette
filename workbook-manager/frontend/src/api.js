@@ -13,6 +13,7 @@ async function request(path, options = {}) {
   if (!resp.ok) {
     const err = new Error(
       body?.detail?.errors?.map((e) => e.message).join("; ") ||
+        body?.detail?.message ||
         (typeof body?.detail === "string" ? body.detail : resp.statusText)
     );
     err.status = resp.status;

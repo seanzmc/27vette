@@ -1,0 +1,82 @@
+=== baseline (pre-refresh) commit and hashes ===
+commit: 2a0b1d1a7c6521267be10cccdc979ee0fdcbcc0f
+802afa1fea4e9e802f7d82635556c5569d3c73b2f4ae59267f64dd8157f9bceb  form-app/data.js
+72ea5004a6d7489b3355d8f15197fdf1ed8d1bcc829d338069943999aacaa160  form-output/runtime/grand-sport-runtime-contract.json
+d5bec07a19770eb9c064a748a2c10fc8cd6a84d484066dce41307c8261bcbbb7  form-output/runtime/grand-sport-x-runtime-contract.json
+f4cbc7a5f2f01b9473ec55f273a617e889eeee6e5ad63a0e32ff455e8e3105af  form-output/runtime/stingray-runtime-contract.json
+061625f2f697fdec3474fc299b1979c2c72e98238fa0f24a3483be5884340f7b  form-output/runtime/z06-runtime-contract.json
+b36e1a8e9297e5cf5de09ed3993b2d3c53b674427e6a7e391d6e2065f8092881  form-output/runtime/zr1-runtime-contract.json
+c77ccf1cadd7c10e8a94ac240130bcd37c49fc728e2589da05c9ffece03c4a3c  form-output/runtime/zr1x-runtime-contract.json
+
+=== after refresh ===
+393f08924674748185ce71407ea826d0c8c4639f5942bf68f0eeb1a9f2dd87f7  form-app/data.js
+6fe5018a7f2796d14c6756c24d7c91649184e2a6f3593b6c1d5e13eb5c7e67be  form-output/runtime/stingray-runtime-contract.json
+3a54ec6c0436c4c5a22682f711ce390f6c2cc8fe3b2d27c10d37bd97f368380f  form-output/runtime/grand-sport-runtime-contract.json
+88bc506c3e666e76bcc327ac1d77b97d49442d04c9f0ffda310596fcfde5fee0  form-output/runtime/z06-runtime-contract.json
+
+=== canonical workbook UNCHANGED ===
+(no lines = unchanged)
+8858cff40ea7eaeda6b7921714f3697a6ee9d1bbc99c84e564d7b118e45b2166  stingray_master.xlsx
+
+=== validate_workbook_package.py ===
+{
+  "workbook": "stingray_master.xlsx",
+  "status": "valid",
+  "issue_count": 0,
+  "issues": []
+}
+
+=== validate_workbook_schema.py (FULL, includes live contract) ===
+BEFORE this pass: 1 error, app_registry_freshness_check_failed on the retained Stingray contract.
+{
+  "workbook": "stingray_master.xlsx",
+  "status": "valid",
+  "issue_count": 0,
+  "error_count": 0,
+  "warning_count": 0,
+  "issues": []
+}
+
+=== node gates ===
+multi-model-runtime-switching              ℹ pass 48 ℹ fail 0 
+stingray-form-regression                   ℹ pass 90 ℹ fail 0 
+z06-runtime-promotion                      ℹ pass 5 ℹ fail 0 
+z06-performance-package-interactions       ℹ pass 21 ℹ fail 0 
+z06-runtime-rule-corrections               ℹ pass 15 ℹ fail 0 
+z06-interior-accessory-cleanup             ℹ pass 7 ℹ fail 0 
+nonruntime-option-source-purge             ℹ pass 6 ℹ fail 0 
+unpublished-runtime-contracts              ℹ pass 2 ℹ fail 0 
+stingray-generator-stability               ℹ pass 15 ℹ fail 0 
+workbook-visual-copy-standardization       ℹ pass 8 ℹ fail 0 
+workbook-schema-standardization            ℹ pass 8 ℹ fail 1 
+
+NOTE: workbook-schema-standardization was 7 pass / 2 fail before this pass.
+The schema-CLI failure is now resolved. Its remaining failure is the pre-existing
+grandSport redundant-excludes workbook-data assertion, unrelated to this refresh.
+
+=== full Python suite ===
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_editor_lints.py::RealWorkbookLintTest::test_d1_rwj_wks_collision
+FAILED tests/test_editor_lints.py::RealWorkbookLintTest::test_negative_no_duplicate_keys_or_orphan_refs
+FAILED tests/test_editor_lints.py::RealWorkbookCompareTest::test_c2_cj2_stingray_name_deviator
+FAILED tests/test_editor_lints.py::RealWorkbookCompareTest::test_r3_drz_pending_review
+FAILED tests/test_fable5_loop_contract.py::test_repository_fable5_loop_contract_passes
+FAILED tests/test_source_assembly_characterization.py::test_shared_assembler_preserves_stingray_runtime_drift_surfaces
+6 failed, 456 passed, 2 skipped, 1 warning, 15 subtests passed in 259.42s (0:04:19)
+
+BEFORE this pass the suite had 6 failures. test_shared_assembler_preserves_grand_sport_runtime_drift_surfaces
+is now green because its retained baseline is fresh. The remaining Stingray characterization failure is the
+separate pre-existing UQT display_behavior issue recorded in STATE Open failures (2026-07-13).
+
+=== git status after everything ===
+ M form-app/data.js
+ M form-output/inspection/grand-sport-derived-swap-manifest.json
+ M form-output/inspection/stingray-derived-swap-manifest.json
+ M form-output/inspection/z06-derived-swap-manifest.json
+ M form-output/runtime/grand-sport-runtime-contract.json
+ M form-output/runtime/stingray-runtime-contract.json
+ M form-output/runtime/z06-runtime-contract.json
+ M form-output/stingray-form-data.csv
+ M form-output/stingray-form-data.json
+?? fable5loop/runs/2026-07-25-promoted-artifact-refresh/

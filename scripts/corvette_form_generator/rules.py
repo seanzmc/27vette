@@ -8,7 +8,7 @@ from typing import Any
 
 from corvette_form_generator.contract import label_for
 from corvette_form_generator.model_config import ModelConfig
-from corvette_form_generator.rule_derivation import derive_swap_rules, write_derivation_manifest
+from corvette_form_generator.rule_derivation import derive_swap_rules
 from corvette_form_generator.workbook import clean, intish, rows_from_optional_sheet
 
 
@@ -140,6 +140,7 @@ def build_draft_rules(
     interiors: list[dict[str, Any]],
     grouped_requires: set[tuple[str, str]],
     grouped_excludes: set[tuple[str, str]],
+    derivation_manifest_sink: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
     interiors_by_id = {row["interior_id"]: row for row in interiors if row.get("interior_id")}
     valid_ids = set(option_rows) | set(interiors_by_id)
@@ -202,7 +203,9 @@ def build_draft_rules(
                 "source_note": truncate_reason(rule.get("original_detail_raw", ""), 500),
             }
         )
-    extend_with_derived_swap_rules(config, raw_rules, option_rows, interiors_by_id, sections_by_id)
+    manifest = extend_with_derived_swap_rules(config, raw_rules, option_rows, interiors_by_id, sections_by_id)
+    if derivation_manifest_sink is not None:
+        derivation_manifest_sink.append(manifest)
     return raw_rules
 
 
@@ -213,10 +216,10 @@ def extend_with_derived_swap_rules(
     interiors_by_id: dict[str, dict[str, Any]],
     sections_by_id: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
-    """Append allowlist-approved derived swap rules and write the manifest.
+    """Append allowlist-approved derived swap rules and return the manifest.
 
-    Shared by both rule-assembly routes (draft models via ``build_draft_rules``,
-    Stingray via ``production.py``) so derivation behavior cannot diverge.
+    Called through ``build_draft_rules`` for every model so derivation behavior
+    cannot diverge by model.
     Returns the derivation manifest.
     """
 
@@ -242,5 +245,4 @@ def extend_with_derived_swap_rules(
         meta,
     )
     raw_rules.extend(emitted)
-    write_derivation_manifest(config.output_dir, config.model_key, manifest)
     return manifest

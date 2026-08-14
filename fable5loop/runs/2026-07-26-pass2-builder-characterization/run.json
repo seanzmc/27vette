@@ -1,0 +1,41 @@
+{
+  "id": "2026-07-26-pass2-builder-characterization",
+  "started_at": "2026-07-26T09:00:00-04:00",
+  "completed_at": "2026-07-26T16:00:00-04:00",
+  "objective": "Pass 2 receipt C: characterize every difference between the two source builders (stage 1, read-only), then collapse them into one workbook-driven builder for all six models and fix contract.label_for()'s interior-id leak (stage 2). Publication deliberately deferred until after verification.",
+  "changed_surface": "generator source and tests only; no artifact published",
+  "outcome_rubric": "fable5loop/runs/2026-07-26-pass2-builder-characterization/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-26-pass2-builder-characterization/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-26-pass2-builder-characterization/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-26-pass2-builder-characterization/verifier-report.md"
+    },
+    {
+      "section": "Open failures",
+      "evidence": "fable5loop/runs/2026-07-26-pass2-builder-characterization/outcome.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-26-pass2-builder-characterization/outcome.md"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-26-pass2-builder-characterization/verifier-report.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "fail",
+    "accepted_by_human": false,
+    "cycles": 1
+  },
+  "boundaries_preserved": [
+    "workbook",
+    "generated artifacts",
+    "runtime app",
+    "dealer submission"
+  ]
+}

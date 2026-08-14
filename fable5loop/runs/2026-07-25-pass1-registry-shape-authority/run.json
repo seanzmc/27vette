@@ -1,0 +1,36 @@
+{
+  "id": "2026-07-25-pass1-registry-shape-authority",
+  "started_at": "2026-07-25T09:00:00-04:00",
+  "completed_at": "2026-07-25T11:20:00-04:00",
+  "objective": "Pass 1: make workbook_domain.registry the only workbook-shape authority and turn post-export schema validation into a real gate for the database-backed editor.",
+  "changed_surface": "generator/tooling and validation/tests",
+  "outcome_rubric": "fable5loop/runs/2026-07-25-pass1-registry-shape-authority/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-25-pass1-registry-shape-authority/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-25-pass1-registry-shape-authority/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Verified facts",
+      "evidence": "fable5loop/runs/2026-07-25-pass1-registry-shape-authority/verifier-report.md"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-07-25-pass1-registry-shape-authority/validation-output.txt"
+    }
+  ],
+  "skill_update": {
+    "decision": "updated",
+    "evidence": "fable5loop/runs/2026-07-25-pass1-registry-shape-authority/verifier-report.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false
+  },
+  "boundaries_preserved": [
+    "workbook",
+    "generated artifacts",
+    "runtime app",
+    "dealer submission"
+  ]
+}

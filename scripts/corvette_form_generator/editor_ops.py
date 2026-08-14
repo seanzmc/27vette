@@ -712,6 +712,16 @@ def _prepare_batch(extract, batch):
         if unknown:
             errors.append(f"{ctx}: unknown column(s) {unknown}")
             continue
+        # A physical Excel column is not writable authority. The shared registry
+        # owns the writable set, so a rogue column that exists only in the sheet
+        # is rejected even though it passes the header check above.
+        unregistered = sorted(c for c in row if c not in EDITOR_SHEET_META[family]["columns"])
+        if unregistered:
+            errors.append(
+                f"{ctx}: column(s) {unregistered} are not owned by family {family!r} "
+                "in the shared workbook registry"
+            )
+            continue
         if action == "update" and any(c in row for c in keycols):
             errors.append(f"{ctx}: key columns are immutable on update")
             continue
@@ -731,6 +741,19 @@ def _prepare_batch(extract, batch):
         effective_row = dict(key_indexes[sheet].get(kt, {}))
         effective_row.update(key)
         effective_row.update(coerced)
+        required_columns = set(meta.get("required_on_add", ())) if action == "add" else set()
+        effective_is_active = "active" not in meta.get("columns", ()) or workbook_truthy(
+            effective_row.get("active")
+        )
+        if effective_is_active:
+            required_columns.update(meta.get("required_on_effective_active_row", ()))
+        for required_column in sorted(required_columns):
+            value = effective_row.get(required_column)
+            if value is None or not str(value).strip():
+                errors.append(f"{ctx}: required field {required_column} is blank")
+                bad = True
+        if bad:
+            continue
         for col, refkind in _meta_ref_items(meta):
             if action == "delete":
                 continue
@@ -977,21 +1000,6 @@ def _operation_coverage(batch: dict, prepared: list[dict]) -> tuple[dict, list[s
 # Apply pipeline
 # ─────────────────────────────────────────────────────────────
 
-GATE_COMMANDS = {
-    "stingray": [".venv/bin/python scripts/generate_form.py --model stingray",
-                 ".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx",
-                 "node --test tests/stingray-form-regression.test.mjs",
-                 "node --test tests/stingray-generator-stability.test.mjs"],
-    "grand_sport": [".venv/bin/python scripts/generate_form.py --model grand_sport",
-                    ".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx",
-                    "node --test tests/grand-sport-contract-preview.test.mjs",
-                    "node --test tests/grand-sport-draft-data.test.mjs"],
-    "z06": [".venv/bin/python scripts/generate_form.py --model z06",
-            ".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx",
-            "node --test tests/z06-contract-preview.test.mjs",
-            "node --test tests/z06-form-data-draft.test.mjs"],
-}
-
 CONFIRMABLE_WARNING_KINDS = {"scaffold"}
 
 
@@ -1029,13 +1037,28 @@ def classify_warnings(warnings) -> dict:
 
 
 def gate_reminders(models: set[str]) -> list[str]:
-    commands: list[str] = []
-    for model in sorted(models):
-        commands.extend(GATE_COMMANDS.get(model, [
-            f".venv/bin/python scripts/generate_form.py --model {model}",
-            ".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx"]))
-    seen = set()
-    return [c for c in commands if not (c in seen or seen.add(c))]
+    """Return the current post-write route; README owns the full gate matrix.
+
+    Preview/draft tests are optional diagnostics, not readiness authority. The
+    composed candidate lane is the one current command that performs complete
+    fresh generation, strict validation, registry construction, and browser
+    proof without writing tracked artifacts.
+    """
+
+    model_keys = sorted(models)
+    changed_models = " ".join(f"--changed-model {model}" for model in model_keys)
+    commands = [
+        ".venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx",
+        ".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx",
+    ]
+    if changed_models:
+        commands.append(
+            ".venv/bin/python scripts/verify_workbook_candidate.py --workbook stingray_master.xlsx "
+            f"{changed_models} --report /tmp/27vette-workbook-candidate.json"
+        )
+    commands.extend(f".venv/bin/python scripts/generate_form.py --model {model}" for model in model_keys)
+    commands.append(".venv/bin/python scripts/generate_registry.py")
+    return commands
 
 
 def apply_ops_to_workbook(wb, prepared_ops, sheet_family) -> set[str]:
@@ -1233,6 +1256,69 @@ def _workbook_identity_matches(path: Path, expected_mtime_ns, expected_sha256) -
     return True
 
 
+def _append_edit_log(log_file: Path, entry: dict) -> None:
+    """Append one completed write entry through a fault-injectable seam."""
+    log_file.parent.mkdir(parents=True, exist_ok=True)
+    with log_file.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(entry) + "\n")
+
+
+def _post_save_failure_result(
+    path: Path,
+    backup_path: Path,
+    *,
+    failure: dict,
+    errors: list[str],
+    restored_status: str,
+    base: dict,
+    extra: dict | None = None,
+) -> dict:
+    """Restore and hash-verify a backup while retaining original failure evidence."""
+    restoration = {
+        "attempted": False,
+        "verified": False,
+        "backupSha256": None,
+        "workbookSha256": None,
+        "error": None,
+    }
+    restore_error = None
+    try:
+        restoration["backupSha256"] = hashlib.sha256(backup_path.read_bytes()).hexdigest()
+        restoration["attempted"] = True
+        restore_workbook_backup(path, backup_path)
+        restoration["workbookSha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+        restoration["verified"] = (
+            restoration["workbookSha256"] == restoration["backupSha256"]
+        )
+        if not restoration["verified"]:
+            restore_error = "restored workbook SHA-256 does not match backup"
+    except Exception as exc:  # never claim the workbook is safe
+        restore_error = f"{type(exc).__name__}: {exc}"
+    restoration["error"] = restore_error
+
+    result = dict(base)
+    result.update(extra or {})
+    result.update({
+        "ok": False,
+        "status": restored_status if restoration["verified"] else "workbook_restore_failed",
+        "workbookState": "restored" if restoration["verified"] else "unknown",
+        "backupPath": str(backup_path),
+        "workbookPath": str(path),
+        "failure": failure,
+        "restoration": restoration,
+    })
+    if restoration["verified"]:
+        result["errors"] = list(errors)
+    else:
+        original_detail = "; ".join(errors) or str(failure.get("detail") or "unknown")
+        result["errors"] = [
+            f"{failure['phase']} failed ({original_detail}) and backup restoration "
+            f"could not be verified; workbook path: {path}; backup path: {backup_path}"
+            + (f"; restore error: {restore_error}" if restore_error else "")
+        ]
+    return result
+
+
 def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli",
                 log_path=None, allow_stale=False, run_schema_validation=True) -> dict:
     path = Path(path)
@@ -1420,52 +1506,90 @@ def apply_batch(path, batch, *, write=False, confirmed_warnings=(), source="cli"
         loaded_mtime_ns=int(expected_mtime) if not allow_stale else loaded_mtime,
         approved_bool_type_migrations=approved_bool_type_migrations,
     )
-    live_verification = verify_prepared_workbook(path, prepared)
-    if not live_verification["ok"]:
-        restore_error = None
-        try:
-            restore_workbook_backup(path, backup_path)
-            restored_ok = (
-                hashlib.sha256(path.read_bytes()).hexdigest()
-                == hashlib.sha256(backup_path.read_bytes()).hexdigest()
-            )
-        except Exception as exc:  # never claim the workbook is safe
-            restored_ok = False
-            restore_error = str(exc)
-        if not restored_ok:
-            return {
-                "ok": False,
-                "status": "workbook_restore_failed",
-                "workbookState": "unknown",
-                "errors": [
-                    "live readback failed and backup restoration could not be "
-                    f"verified; workbook path: {path}; backup path: {backup_path}"
-                    + (f"; restore error: {restore_error}" if restore_error else ""),
-                ],
-                "backupPath": str(backup_path),
-                "workbookPath": str(path),
-                **base,
-                "verification": live_verification,
+    phase = "live_readback"
+    try:
+        live_verification = verify_prepared_workbook(path, prepared)
+        if not live_verification["ok"]:
+            failure = {
+                "phase": phase,
+                "kind": "returned_failure",
+                "detail": "; ".join(live_verification["errors"]),
             }
-        return {
-            "ok": False,
-            "status": "apply_verification_failed_rolled_back",
-            "workbookState": "restored",
-            "errors": live_verification["errors"],
+            return _post_save_failure_result(
+                path,
+                backup_path,
+                failure=failure,
+                errors=live_verification["errors"],
+                restored_status="apply_verification_failed_rolled_back",
+                base=base,
+                extra={"verification": live_verification},
+            )
+
+        phase = "live_package"
+        assert_valid_workbook_package(path)
+
+        phase = "live_schema"
+        live_schema_result = schema_result
+        if run_schema_validation:
+            live_schema_issues = validate_workbook_schema(str(path), check_live_contract=False)
+            live_schema_result = result_payload(str(path), live_schema_issues)
+            if live_schema_result["error_count"]:
+                failure = {
+                    "phase": phase,
+                    "kind": "returned_failure",
+                    "detail": (
+                        "live schema validation returned "
+                        f"{live_schema_result['error_count']} error(s)"
+                    ),
+                }
+                return _post_save_failure_result(
+                    path,
+                    backup_path,
+                    failure=failure,
+                    errors=[failure["detail"]],
+                    restored_status="apply_verification_failed_rolled_back",
+                    base=base,
+                    extra={
+                        "verification": live_verification,
+                        "schemaResult": live_schema_result,
+                    },
+                )
+
+        log_file = Path(log_path) if log_path else DEFAULT_LOG_PATH
+        entry = {"ts": datetime.now().isoformat(timespec="seconds"), "source": source,
+                 "workbook": str(path), "opCount": len(prepared),
+                 "composites": sorted({o["_composite"] for o in prepared if o.get("_composite")}),
+                 "sheets": sorted(touched), "backupPath": str(backup_path),
+                 "schemaErrors": None if live_schema_result is None else live_schema_result["error_count"],
+                 "warningsConfirmed": sorted(confirmed)}
+        phase = "success_result"
+        success_result = {
+            "ok": True,
+            "status": "applied",
+            "errors": [],
+            "applied": len(prepared),
             "backupPath": str(backup_path),
+            "logPath": str(log_file),
             **base,
+            "schemaResult": live_schema_result,
             "verification": live_verification,
         }
-    log_file = Path(log_path) if log_path else DEFAULT_LOG_PATH
-    log_file.parent.mkdir(parents=True, exist_ok=True)
-    entry = {"ts": datetime.now().isoformat(timespec="seconds"), "source": source,
-             "workbook": str(path), "opCount": len(prepared),
-             "composites": sorted({o["_composite"] for o in prepared if o.get("_composite")}),
-             "sheets": sorted(touched), "backupPath": str(backup_path),
-             "schemaErrors": None if schema_result is None else schema_result["error_count"],
-             "warningsConfirmed": sorted(confirmed)}
-    with log_file.open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps(entry) + "\n")
-    return {"ok": True, "status": "applied", "errors": [], "applied": len(prepared),
-            "backupPath": str(backup_path), "logPath": str(log_file), **base,
-            "verification": live_verification}
+
+        phase = "write_log"
+        _append_edit_log(log_file, entry)
+        return success_result
+    except Exception as exc:
+        detail = f"{type(exc).__name__}: {exc}"
+        failure = {"phase": phase, "kind": "exception", "detail": detail}
+        return _post_save_failure_result(
+            path,
+            backup_path,
+            failure=failure,
+            errors=[detail],
+            restored_status="apply_verification_failed_rolled_back",
+            base=base,
+            extra={
+                "verification": locals().get("live_verification"),
+                "schemaResult": locals().get("live_schema_result", schema_result),
+            },
+        )

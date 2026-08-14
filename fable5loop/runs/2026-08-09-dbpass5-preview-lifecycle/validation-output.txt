@@ -1,0 +1,34 @@
+Pass 5 Checkpoint 3 retrospective validation reconstruction
+Reconstructed: 2026-08-11T09:01:29-04:00
+
+Evidence boundary
+- The original 2026-08-09 terminal transcript and raw test output were not present in the receipt folder and were not recovered.
+- The historical outcome rubric and owning specification remain the contemporaneous record of the original RED/GREEN sequence and acceptance counts.
+- The results below are fresh 2026-08-11 reruns against immutable detached commit 4338e528135a2f98fb0ab7ea60b0e886164afc0a, whose parent is 584b3cbfd604959391194fb35bfbd7b6fb181bb8.
+- No output below is represented as original 2026-08-09 output.
+
+Fresh detached-commit validation
+
+Command:
+env -u PYTHONPATH /Users/seandm/Projects/27vette/.venv/bin/python -m pytest tests/test_workbook_manager_changeset_lifecycle.py tests/test_workbook_manager_drafts.py tests/test_workbook_manager_api_concurrency.py -q
+
+Result:
+50 passed, 1 warning, 12 subtests passed in 2.84s
+
+Command:
+env -u PYTHONPATH /Users/seandm/Projects/27vette/.venv/bin/python -m pytest tests/test_workbook_changeset.py tests/test_workbook_changeset_service.py -q
+
+Result:
+50 passed in 3.37s
+
+Static historical checks
+- git diff --check 584b3cb 4338e52: passed.
+- The implementation diff contains no stingray_master.xlsx, form-output/, or form-app/ change.
+- The implementation diff is limited to the documented manager backend, focused lifecycle tests, and workflow/guidance surfaces.
+
+Fable structural validator
+- `.venv/bin/python scripts/validate_fable5_loop.py`: passed on 2026-08-11 after both retrospective receipt sets were completed.
+- Result: `Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.`
+
+Known evidence limitation
+- Fresh GREEN reruns prove the landed final state, but they cannot recreate the original temporal observation of RED before implementation. The contemporaneous outcome/spec record that sequence; this reconstruction does not invent a missing raw log.

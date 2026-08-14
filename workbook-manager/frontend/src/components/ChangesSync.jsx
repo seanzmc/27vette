@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  CheckCheck, CloudUpload, DatabaseBackup, FileDown, FileUp,
+  CheckCheck, DatabaseBackup, FileDown, FileUp,
   RefreshCcw, ShieldCheck, Undo2,
 } from "lucide-react";
 import { api } from "../api.js";
@@ -10,8 +10,6 @@ export default function ChangesSync({ status, onChanged }) {
   const [validation, setValidation] = useState(null);
   const [commitResult, setCommitResult] = useState(null);
   const [dryRun, setDryRun] = useState(null);
-  const [writeResult, setWriteResult] = useState(null);
-  const [confirmText, setConfirmText] = useState("");
   const [importReport, setImportReport] = useState(null);
   const [notice, setNotice] = useState(null);
   const [busy, setBusy] = useState("");
@@ -127,7 +125,7 @@ export default function ChangesSync({ status, onChanged }) {
         )}
       </div>
 
-      <div className="section-heading">Workbook Synchronization ({unsynced} committed change(s) pending)</div>
+      <div className="section-heading">Workbook Sync Preview ({unsynced} committed change(s) pending; write disabled)</div>
       <div className="panel">
         <div className="panel-body">
           <div className="toolbar">
@@ -135,7 +133,6 @@ export default function ChangesSync({ status, onChanged }) {
               className="btn"
               disabled={!unsynced || !!busy}
               onClick={() => run("dryrun", async () => {
-                setWriteResult(null);
                 setDryRun(await api.sync({ write: false }));
               })}
             >
@@ -173,48 +170,6 @@ export default function ChangesSync({ status, onChanged }) {
             </div>
           )}
 
-          {dryRun?.status === "validated" && (
-            <div className="toolbar" style={{ marginTop: 12 }}>
-              <input
-                className="text"
-                style={{ width: 160 }}
-                placeholder={'Type "SYNC" to enable'}
-                value={confirmText}
-                onChange={(e) => setConfirmText(e.target.value)}
-              />
-              <button
-                className="btn danger"
-                disabled={confirmText !== "SYNC" || !!busy}
-                onClick={() => run("write", async () => {
-                  const r = await api.sync({
-                    write: true,
-                    confirm: "SYNC",
-                    expected_mtime_ns: dryRun.workbookMtimeNs,
-                    confirmed_warnings: (dryRun.warnings || []).map((w) => w.id),
-                  });
-                  setWriteResult(r);
-                  setDryRun(null);
-                  setConfirmText("");
-                  onChanged();
-                })}
-              >
-                <CloudUpload size={15} />
-                {busy === "write" ? "Writing…" : "Write to stingray_master.xlsx"}
-              </button>
-              <span className="muted">
-                A timestamped backup is created automatically before the write;
-                afterwards regenerate artifacts per README gates.
-              </span>
-            </div>
-          )}
-
-          {writeResult && (
-            <div className={`notice ${writeResult.ok ? "ok" : "err"}`}>
-              {writeResult.ok
-                ? "Workbook written through save_workbook_safely(). Backup created; run the regeneration gates before publishing."
-                : `Write refused: ${writeResult.status} — ${(writeResult.errors || []).join("; ")}`}
-            </div>
-          )}
         </div>
       </div>
 
@@ -223,7 +178,10 @@ export default function ChangesSync({ status, onChanged }) {
         <div className="panel-body toolbar">
           <button
             className="btn"
-            disabled={!!busy}
+            disabled={!!busy || !status?.projection?.reimport_allowed}
+            title={status?.projection?.reimport_allowed
+              ? "Build, verify, and atomically promote a candidate projection."
+              : "Import is blocked until the projection or unresolved workflow state is recoverable."}
             onClick={() => run("import", async () => {
               const r = await api.runImport();
               setImportReport(r);
@@ -234,13 +192,16 @@ export default function ChangesSync({ status, onChanged }) {
           </button>
           <button
             className="btn"
-            disabled={!!busy}
+            disabled={!!busy || status?.projection?.state !== "current"}
+            title={status?.projection?.state !== "current"
+              ? "Export requires a current verified projection."
+              : "Create a disposable comparison workbook."}
             onClick={() => run("export", async () => {
               const r = await api.exportWorkbook();
-              setNotice({ kind: "ok", text: `Comparison workbook exported: ${r.path}` });
+              setNotice({ kind: "ok", text: `Disposable comparison workbook exported: ${r.path}` });
             })}
           >
-            <FileDown size={15} /> Export Comparison Workbook
+            <FileDown size={15} /> Export Disposable Comparison
           </button>
           <button
             className="btn"

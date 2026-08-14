@@ -1,13 +1,13 @@
 # 27vette
 
-Developer workspace for the 2027 Corvette static order-form app. Live at `order.stingraychevroletcorvette.com`: Stingray, Grand Sport, and Z06 forms with customer build downloads and dealer submissions to Stingray Chevrolet. Agent conduct, source-of-truth boundaries, validation strategy, and handoff rules live in `AGENTS.md`; this file owns the overview, repository map, and commands.
+Developer workspace for the 2027 Corvette static order-form app. The published registry contains Stingray, Grand Sport, Grand Sport X, Z06, ZR1, and ZR1X forms with customer build downloads and dealer submissions to Stingray Chevrolet. The production app is served at `order.stingraychevroletcorvette.com`. Agent conduct, source-of-truth boundaries, validation strategy, and handoff rules live in `AGENTS.md`; this file owns the overview, repository map, and commands.
 
 ## Current State
 
-- Stingray, Grand Sport, and Z06 are live customer-facing forms; no frontend package install or build step.
+- Stingray, Grand Sport, Grand Sport X, Z06, ZR1, and ZR1X are published customer-facing forms; no frontend package install or build step.
 - `form-app/data.js` exposes the multi-model registry at `window.CORVETTE_FORM_DATA` (default model `stingray`; `window.STINGRAY_FORM_DATA` remains a legacy alias for the Stingray dataset). Each model entry carries generated model data plus model-card image metadata from the workbook `asset_map` sheet.
 - Runtime promotion is workbook-owned: `model_master`, `model_registry_promotion`, and `variant_master` decide which models reach the registry; `scripts/promote_model.py` applies promotion rows; registry generation embeds promoted `form-output/runtime/*-runtime-contract.json` verbatim.
-- Grand Sport X, ZR1, and ZR1X are unpromoted future models. Their active workbook registrations and retained runtime contracts remain available for focused rehabilitation, but they are not published in `form-app/data.js` and must not be promoted as part of another model's pass.
+- All six workbook-registered models are promoted into `form-app/data.js`; model publication changes must continue through the workbook-owned promotion path rather than direct registry edits.
 - Dealer submission posts to the WordPress endpoint `https://stingraychevroletcorvette.com/wp-json/corvette-build/v1/submit` with Cloudflare Turnstile — protected boundary, see AGENTS.md §6.
 - Some Grand Sport/Z06 artifact names still carry draft/inspection wording from migration; inspect active registry data and tests before treating that wording as runtime status.
 
@@ -33,7 +33,6 @@ scripts/
   apply_workbook_changeset.py shared ChangeSet preview/approval/write CLI
   apply_workbook_ops.py       gated workbook writes from exported ops batches
   workbook_editor_server.py   localhost workbook review/edit UI
-  ingest_wizard_server.py     localhost ingest wizard UI (raw order-guide intake)
 workbook-manager/             React + FastAPI + SQLite workbook editor
                               (staged edits, SQL audit, gated sync; see its README)
   compare-generated-contracts.mjs  contract diff ignoring timestamps
@@ -44,11 +43,17 @@ form-output/                  generated artifacts (never hand-edit);
                               inspection/ = opt-in review
 form-app/                     index.html, styles.css, app.js + generated data.js
 tests/                        node --test *.mjs + pytest gates
-docs/, .hermes/plans/         active specs, reviews, ingest docs
-Order-Guide_IngestPrompt.md   raw ingest workflow prompt
+docs/, .hermes/plans/         active specs, reviews, and plans
 ```
 
-Other dirs (`product/`, `dist_updates/`, `archive/`, `backups/`, `visualizer/`) are reference/archive/visualizer surfaces — inspect only when a task names them. `visualizer/workbook-editor/intentional-differences.json` is the committed allowlist of intentional cross-model option differences (`status: intentional` suppresses; `pending-review` annotates); editing it is a normal file change, not a workbook write.
+Other dirs (`product/`, `dist_updates/`, `archive/`, `backups/`) are reference/archive surfaces — inspect only when a task names them.
+
+## Planned / In-Progress Modules
+
+Not yet part of the live customer path; inspect before assuming either is production-ready.
+
+- **Workbook Manager (SQL-based editor)** — `workbook-manager/`: React + FastAPI + SQLite editor for `stingray_master.xlsx`, currently **read-only / provisional** (write path not yet enabled). See Workbook Manager Workflow below for details, setup, and tests.
+- **Visualizer** — `visualizer/`: prototype build-and-price visual configurator (stacked exterior/interior image layers driven by selected options) plus its companion `workbook-editor/` review UI. `visualizer/workbook-editor/intentional-differences.json` is the committed allowlist of intentional cross-model option differences (`status: intentional` suppresses; `pending-review` annotates); editing it is a normal file change, not a workbook write. Full visualizer integration into the order form is tracked in `docs/roadmap_wishes.md` and is not yet wired into `form-app/`.
 
 ## Workbook Source Surfaces
 
@@ -64,12 +69,12 @@ Model-scoped sheets (`grandSport_*`, `z06_*` active; `zr1_*`/`zr1x_*` inactive s
 
 ## Generated Data Contract
 
-Each model dataset: `dataset`, `variants`, `steps`, `sections`, `contextChoices`, `choices`, `standardEquipment`, `ruleGroups`, `exclusiveGroups`, `rules`, `priceRules`, `interiors`, `colorOverrides`, `defaultSelectionRules`, `validation`. Stingray additionally carries `runtimeRuleExceptions`. All promoted models carry workbook-owned `orderSummary` metadata (`sections`, `stepMap`) that the runtime reads instead of hardcoded grouping. Registry shape:
+Each model dataset: `dataset`, `variants`, `steps`, `sections`, `contextChoices`, `choices`, `standardEquipment`, `ruleGroups`, `exclusiveGroups`, `rules`, `priceRules`, `interiors`, `colorOverrides`, `defaultSelectionRules`, `validation`. Stingray additionally carries `runtimeRuleExceptions`. All promoted models carry workbook-owned `orderSummary` metadata (`sections`, `stepMap`) in `data` and workbook-owned Vehicle Setup presentation copy in the registry-level `vehicleSetup` object. Registry shape:
 
 ```js
 window.CORVETTE_FORM_DATA = {
   defaultModelKey: "stingray",
-  models: { stingray: { key, label, modelName, exportSlug, image_url, image_alt, image_fit, image_position, data }, grandSport: {...}, z06: {...} }
+  models: { stingray: { key, label, modelName, exportSlug, image_url, image_alt, image_fit, image_position, vehicleSetup: { cardSubtitle, eyebrow, title, description, facts }, data }, grandSport: {...}, z06: {...} }
 };
 ```
 
@@ -96,19 +101,13 @@ python -m pip install -r requirements.txt
 
 Do not commit `.venv/`. Always run Python tooling with `.venv/bin/python` or the activated venv.
 
-## Ingest Wizard Workflow
+## Raw Order-Guide Ingest (retired)
 
-`scripts/ingest_wizard_server.py` serves the localhost-only five-function path for raw order-guide intake: intake/profile, target selection, canonical compilation, typed exception resolution, and immutable `workbook-changeset-1` emission. Saved current runs resume at their current stage. Historical broad-review and plan artifacts are GET-only evidence; their mutation routes return HTTP 410. The browser cannot approve or apply a ChangeSet and cannot run generation, publication, promotion, deployment, or dealer work. Run artifacts stay under `form-output/ingest-wizard/<run-id>/`; detail lives in `docs/ingest/`.
-
-```sh
-.venv/bin/python scripts/ingest_wizard_server.py [--port 8040]
-```
-
-The completed 2026-07-20 compounded recovery remains documented as historical evidence in `docs/ingest/7-20_compounded-repair-spec.md`; its one-use projection and ChangeSet commands are retired.
+Retired 2026-07-23; no supported ingest command exists. See AGENTS.md §8 for boundaries and `docs/archive/retired-ingest/2026-07-23/` for historical evidence only.
 
 ## Workbook Editor Workflow
 
-`scripts/workbook_editor_server.py` serves the fallback localhost-only UI for routine review/editing of `stingray_master.xlsx`; it derives models, sheet registries, schemas, and reference domains from the live workbook. Its obsolete embedded Ingest Review workflow is retired; raw ingest uses the separate wizard above.
+`scripts/workbook_editor_server.py` serves the fallback localhost-only UI for routine review/editing of `stingray_master.xlsx`; it derives models, sheet registries, schemas, and reference domains from the live workbook. Its obsolete embedded Ingest Review workflow remains retired.
 
 ```sh
 .venv/bin/python scripts/workbook_editor_server.py [--port 8030] [--workbook <path>]
@@ -118,7 +117,7 @@ Open `http://127.0.0.1:8027/`. Review tab: `/api/lints` (informational structura
 
 Apply behavior: edits queue client-side as typed operations; only sheet families registered in `model_workbook_sources` are editable; adding an option requires OVS coverage for every active variant; Apply runs the full gate internally (batch validation, dry-run on temp copy, package + schema validation, `save_workbook_safely()` lock/mtime checks, backup, atomic replace, table-ref maintenance, `form-output/workbook-edit-log.jsonl` entry); warnings block until confirmed.
 
-Shared ChangeSet operator path (preview is the default; approval never writes; write requires the exact bound preview and approval):
+Shared ChangeSet operator path (preview is the default; approval never writes; write requires the exact bound preview and approval). This is the approved target write contract for Workbook Manager; there is no current non-ingest producer until the Manager implements its later passes:
 
 ```sh
 .venv/bin/python scripts/apply_workbook_changeset.py change-set.json --workbook stingray_master.xlsx --preview-out preview.json
@@ -126,32 +125,71 @@ Shared ChangeSet operator path (preview is the default; approval never writes; w
 .venv/bin/python scripts/apply_workbook_changeset.py change-set.json --workbook stingray_master.xlsx --write --preview preview.json --approval approval.json --receipt-out receipt.json
 ```
 
-The fallback editor still uses its existing typed-operation Apply path until Workbook Manager parity is proven in Phase 3; `scripts/apply_workbook_ops.py` remains only for that transition and is not an ingest continuation.
+The fallback editor still uses its existing typed-operation Apply path until Workbook Manager parity is proven in Phase 3; `scripts/apply_workbook_ops.py` remains only for that transition.
 
 An Apply is only the workbook-write step — afterwards regenerate affected model artifacts, run the relevant gates below, and review diffs.
 
 ## Workbook Manager Workflow
 
 `workbook-manager/` is a React (Vite) + FastAPI + SQLite editor for
-`stingray_master.xlsx`: import into a normalized database with full
-duplicate/unresolved-reference reporting, staged form-based edits with
-batch validation and an append-only SQL audit trail, and workbook
-synchronization exclusively through the existing
-`editor_ops.apply_batch` → `save_workbook_safely()` gate (dry-run first,
-explicit confirmation, automatic backup). Setup, run, and test commands:
-`workbook-manager/README.md`. Tests: `tests/test_workbook_manager.py`
-(add `WBM_SLOW_GATE=1` for the full dry-run/live-write gate tests).
+`stingray_master.xlsx`. It is currently **read-only / provisional**: a first
+import into an empty projection is allowed, replacement re-import is contained,
+durable update/add/delete drafts can emit, preview, and approve immutable ChangeSets through
+the shared service. The shared writer restores and SHA-256-verifies its backup
+after post-save validation/log failure, but no manager apply route is enabled;
+every `POST /api/sync` request with `write=true` is refused.
+Dry-run sync, browsing, history, and verified-projection disposable comparison
+export remain available; generated-artifact and publication state are not
+inferred. The
+workbook remains canonical. Storage bootstrap runs in the FastAPI lifespan,
+every request opens and closes its own projection and durable-state connection,
+and one process-local lock plus a projection reader gate serialize durable
+mutations and any future candidate promotion — so supported serving is
+**single-process only** and `run.sh` refuses `--workers`. Setup, current
+containment behavior, and test commands: `workbook-manager/README.md`. Focused
+tests: `tests/test_workbook_manager_catalog.py`,
+`tests/test_workbook_manager_import_projection.py`,
+`tests/test_workbook_manager_api_concurrency.py`,
+`tests/test_workbook_manager_drafts.py`,
+`tests/test_workbook_manager_changeset_lifecycle.py`, and
+`tests/test_workbook_manager.py`.
 
 ## Workbook And Generator Workflows
 
 Model refresh (from repo root, venv python):
 
 ```sh
-.venv/bin/python scripts/generate_form.py --model <stingray|grand_sport|z06>
+.venv/bin/python scripts/generate_form.py --model <model_key>
 .venv/bin/python scripts/generate_registry.py
 ```
 
-The Stingray run also writes compatibility outputs (`form-output/stingray-form-data.json/.csv`); all models write clean runtime contracts under `form-output/runtime/`. Add `--emit-inspection --inspection-output <dir>` for optional review artifacts. Generator runs never mutate `form-app/data.js` directly; `generate_registry.py` publishes the promoted registry.
+Asset URL reconciliation and workbook-owned card presentation:
+
+```sh
+.venv/bin/python scripts/sync_asset_map.py --complete
+.venv/bin/python scripts/sync_asset_map.py
+.venv/bin/python scripts/set_asset_display.py --rpo <RPO> --fit contain
+```
+
+`sync_asset_map.py --complete` is the routine operator path: it requires a
+stable uncached live inventory, applies every unambiguous match through guarded
+workbook save, validates, regenerates affected models, republishes the registry,
+and bumps the browser data cache version. Bare `sync_asset_map.py` remains a
+read-only diagnostic report. Card-presentation edits preview by default and
+require `--write`. Detailed matching, exception, report, and presentation
+semantics: `docs/asset-map-sync.md`.
+
+`<model_key>` must be active and complete in workbook-owned `model_master`, `model_workbook_sources`, and `model_variants` metadata. All models write one strictly validated runtime contract under `form-output/runtime/`. Add `--emit-inspection --inspection-output <dir>` for optional review artifacts. Generator runs never mutate `form-app/data.js` directly; `generate_registry.py` validates every selected retained contract before publishing the promoted registry.
+
+For isolated candidate validation, copy/freeze the workbook first and bind every output to a temporary root:
+
+```sh
+.venv/bin/python scripts/generate_form.py --model <model_key> \
+  --workbook /tmp/stingray_master.snapshot.xlsx \
+  --output-root /tmp/27vette-candidate
+```
+
+This command exits nonzero and writes no model artifacts when source assembly or strict runtime-contract validation fails. A successful single-model run is not registry or browser release-readiness proof.
 
 Promotion verify/reapply (workbook-owned; repeat `--model` to validate and write one atomic multi-model batch):
 
@@ -195,23 +233,45 @@ Workbook package integrity / repair (also run if Excel reports recovery):
 .venv/bin/python scripts/repair_workbook_tables.py stingray_master.xlsx
 ```
 
-Test-to-surface map (run each with `node --test tests/<name>.test.mjs`):
+Node gate matrix (run each with `node --test tests/<name>.test.mjs`):
+
+| Authority / purpose | Default readiness gates |
+|---|---|
+| Workbook source and schema | `workbook-schema-standardization`, `workbook-visual-copy-standardization`, `nonruntime-option-source-purge` |
+| Fresh generation and strict runtime contracts | `stingray-runtime-contract`, `grand-sport-runtime-contract`, `z06-runtime-contract`, `z06-interior-accessory-cleanup` |
+| Published registry and browser runtime | `stingray-form-regression`, `z06-published-runtime`, `multi-model-runtime-switching`, `z06-performance-package-interactions`, `z06-runtime-rule-corrections` |
+| Isolated registry publication | `z06-registry-publication` |
+| Generated-artifact boundary helper | `tracked-artifacts-guard` |
+
+Optional inspection diagnostics (not readiness gates): `grand-sport-contract-preview`, `z06-contract-preview`. They retain raw-source/provenance evidence for investigations; customer/runtime assertions belong in the strict runtime-contract gates above.
+
+Those tables are the complete set of `tests/*.test.mjs`; a new node gate must be added here and assigned one authority. Default gates are read-only or write only below a temporary root. Publication verification is explicit and isolated from the published `form-app/data.js` path.
+
+Six node files invoke `scripts/generate_form.py` — the three strict model runtime-contract gates, the two optional preview diagnostics, and `z06-interior-accessory-cleanup`. Each generates into a temporary `--output-root` and asserts every file under `form-output/` and `form-app/` is byte-identical afterwards. That check reads both roots whole, so run those files serially — a concurrent process writing a protected artifact is reported as a boundary violation.
+
+Python metadata gate — the default for generation/contract/promotion changes:
+
+```sh
+.venv/bin/python -m pytest tests/test_generation_safety.py tests/test_generate_form_model_discovery_cli.py tests/test_runtime_contract_builder.py tests/test_model_config_metadata.py tests/test_promote_model.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py tests/test_rule_derivation.py tests/test_model_generation_route.py tests/test_all_model_runtime_generation.py -q
+```
+
+The remaining `tests/test_*.py` files are not in that gate and are chosen by changed surface:
 
 | Surface | Tests |
 |---|---|
-| Stingray | `stingray-form-regression`, `stingray-generator-stability` |
-| Grand Sport | `grand-sport-contract-preview`, `grand-sport-draft-data` |
-| Z06 | `z06-contract-preview`, `z06-form-data-draft`, `z06-interior-accessory-cleanup`, `z06-performance-package-interactions`, `z06-runtime-rule-corrections` |
-| Promotion / switching | `z06-runtime-promotion`, `multi-model-runtime-switching` |
-| Workbook standardization | `workbook-schema-standardization`, `workbook-visual-copy-standardization` |
+| Workbook write path / editor | `test_editor_ops_apply`, `test_editor_ops_meta`, `test_editor_ops_global_families`, `test_editor_lints`, `test_editor_server_payload`, `test_editor_server_write_api` |
+| Workbook domain / ChangeSet | `test_workbook_domain_registry`, `test_workbook_changeset`, `test_workbook_changeset_service`, `test_workbook_bool_hygiene` |
+| Workbook Manager | `test_workbook_manager`, `test_workbook_manager_catalog`, `test_workbook_manager_import_projection`, `test_workbook_manager_generated_parity`, `test_workbook_manager_api_concurrency`, `test_workbook_manager_drafts` |
+| Source assembly / runtime metadata | `test_source_assembly_characterization`, `test_runtime_metadata_guards`, `test_corvette_form_generator_contract` |
+| Publication | `test_atomic_registry_write` |
+| Asset map | `test_asset_map_sync`, `test_set_asset_display` |
+| Options-sheet quality | `test_options_sheet_quality` |
+| Promotion preflight (slow) | `test_verify_workbook_candidate` |
+| Fable 5 loop | `test_fable5_loop_contract` |
 
-Python metadata gates:
+`.venv/bin/python -m pytest tests/ -q` runs everything (678 tests collected as of Pass 5, ~18 min). Three tests in `test_verify_workbook_candidate.py` are ~63s each because each runs the full ten-stage candidate lane over six models; everything outside the slowest ~15 tests is sub-second. Reserve the full run for canonical-workbook writes and publication, per AGENTS.md §10.
 
-```sh
-.venv/bin/python -m pytest tests/test_model_config_metadata.py tests/test_promote_model.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py tests/test_rule_derivation.py -q
-```
-
-Full default validation = schema gate + all rows of the table + the pytest gate. Choose gates by changed surface per AGENTS.md §10.
+Full default validation = schema gate + every default-readiness row of the node matrix + the Python metadata gate. Optional inspection diagnostics run only when their raw-source evidence is relevant. Choose additional gates by changed surface per AGENTS.md §10.
 
 ## Workbook Safety
 
@@ -220,3 +280,9 @@ Close Excel before any script that writes `stingray_master.xlsx`; treat `~$sting
 ## Roadmap
 
 Keep moving model rules/defaults/pricing/presentation into workbook-authored tables; keep the three live models structurally consistent source-to-contract; complete ZR1/ZR1X source review before any promotion; retire draft/inspection naming once the promotion path is proven; manage image assets via workbook asset maps; simplify customer UX without losing ordering accuracy or dealer detail; strengthen promotion gates; reduce monolithic runtime logic as rules become fully data-owned.
+
+Larger candidate initiatives (not yet scoped/approved, see `docs/roadmap_wishes.md`):
+
+- Site restyle to the new homepage design system, replacing Elementor while keeping Formidable Forms and wpDataTables.
+- Visualizer integration into the order form (see Planned/In-Progress Modules above) — grouped exterior/interior option presentation feeding a real-time build-and-price view, no change to rule/pricing/submission behavior.
+- Workbook Manager write-path enablement (Pass 7+ of its reliability spec) to move it from read-only projection to an approved SQL-based workbook-write surface.

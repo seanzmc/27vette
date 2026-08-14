@@ -30,6 +30,7 @@ from corvette_form_generator.editor_ops import (  # noqa: E402
     gate_reminders,
     validate_batch,
 )
+from corvette_form_generator.schema_validation import SchemaIssue  # noqa: E402
 
 REAL_WORKBOOK = ROOT / "stingray_master.xlsx"
 
@@ -143,8 +144,9 @@ class CoerceTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             coerce_value("ovs", "status", "")
 
-    def test_tristate_text_enum_stays_text(self):
-        self.assertEqual(coerce_value("variant_overrides", "selectable", "True"), "True")
+    def test_variant_override_selectable_uses_real_excel_boolean(self):
+        self.assertIs(coerce_value("variant_overrides", "selectable", "True"), True)
+        self.assertIs(coerce_value("variant_overrides", "selectable", False), False)
 
     def test_free_text_stripped(self):
         self.assertEqual(coerce_value("options", "option_name", "  X  "), "X")
@@ -152,22 +154,35 @@ class CoerceTest(unittest.TestCase):
 
 
 class GateRemindersTest(unittest.TestCase):
-    def test_grand_sport_default_reminders_exclude_optional_audit_gate(self):
+    def test_grand_sport_reminders_use_the_current_candidate_lane(self):
         reminders = gate_reminders({"grand_sport"})
 
         self.assertIn(".venv/bin/python scripts/generate_form.py --model grand_sport", reminders)
+        self.assertIn(".venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx", reminders)
         self.assertIn(".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx", reminders)
-        self.assertIn("node --test tests/grand-sport-contract-preview.test.mjs", reminders)
-        self.assertIn("node --test tests/grand-sport-draft-data.test.mjs", reminders)
-        self.assertFalse(any("rule-audit" in command for command in reminders), reminders)
+        self.assertIn(
+            ".venv/bin/python scripts/verify_workbook_candidate.py --workbook stingray_master.xlsx "
+            "--changed-model grand_sport --report /tmp/27vette-workbook-candidate.json",
+            reminders,
+        )
+        candidate_index = next(index for index, command in enumerate(reminders) if "verify_workbook_candidate.py" in command)
+        generation_index = reminders.index(".venv/bin/python scripts/generate_form.py --model grand_sport")
+        publication_index = reminders.index(".venv/bin/python scripts/generate_registry.py")
+        self.assertLess(candidate_index, generation_index)
+        self.assertLess(generation_index, publication_index)
+        self.assertFalse(any("preview" in command or "draft" in command or "rule-audit" in command for command in reminders), reminders)
 
-    def test_multi_model_reminders_dedupe_schema_validation(self):
+    def test_multi_model_reminders_dedupe_shared_validation_and_scope_candidate_report(self):
         reminders = gate_reminders({"stingray", "grand_sport"})
 
         self.assertEqual(
             reminders.count(".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx"),
             1,
         )
+        candidate = [command for command in reminders if "verify_workbook_candidate.py" in command]
+        self.assertEqual(len(candidate), 1)
+        self.assertIn("--changed-model grand_sport", candidate[0])
+        self.assertIn("--changed-model stingray", candidate[0])
 
 
 # ─────────────────────────────────────────────────────────────
@@ -379,6 +394,19 @@ class ValidateBatchTest(OpsFixtureBase):
         self.assertTrue(self.errors_of(op("update", "readonly_generated_fixture", {"step_key": "paint"}, {"step_key": "x"})))
         self.assertTrue(self.errors_of(op("update", "section_master", {"section_id": "sec_a"}, {"section_name": "X"})))
         self.assertTrue(self.errors_of(op("update", "nope", {"option_id": "a"}, {})))
+
+    def test_rogue_physical_column_outside_the_registry_is_rejected(self):
+        """A column that exists in Excel but not in the shared registry is not writable."""
+
+        drifted = copy.deepcopy(self.extract)
+        drifted["sheets"]["stingray_options"]["headers"].append("rogue_column")
+
+        errors = validate_batch(
+            drifted,
+            batch(op("update", "stingray_options", {"option_id": "opt_one_001"}, {"rogue_column": "x"})),
+        )["errors"]
+
+        self.assertTrue(any("rogue_column" in error for error in errors), errors)
 
     def test_unknown_column_and_immutable_key(self):
         self.assertTrue(self.errors_of(op("update", "stingray_options", {"option_id": "opt_one_001"}, {"bogus": 1})))
@@ -960,8 +988,234 @@ class ApplyBatchTest(unittest.TestCase):
         self.assertEqual(result["workbookState"], "restored")
         self.assertTrue(Path(result["backupPath"]).exists())
         self.assertTrue(any("price" in error for error in result["errors"]), result)
+        self.assertEqual(result["failure"]["kind"], "returned_failure")
+        self.assertEqual(result["failure"]["phase"], "live_readback")
+        self.assertTrue(result["restoration"]["verified"])
+        self.assertEqual(
+            result["restoration"]["workbookSha256"],
+            result["restoration"]["backupSha256"],
+        )
         self.assertFalse(self.log.exists())
         self.assertEqual(self.path.read_bytes(), before)
+
+    def test_thrown_post_save_failures_restore_and_preserve_phase_detail(self):
+        item = op(
+            "update",
+            "stingray_options",
+            {"option_id": "opt_thr_001"},
+            {"price": 777},
+        )
+        original_verify = editor_ops.verify_prepared_workbook
+        original_package = editor_ops.assert_valid_workbook_package
+
+        def run_fault(phase):
+            before = self.path.read_bytes()
+            verify_calls = {"count": 0}
+            package_calls = {"count": 0}
+            schema_calls = {"count": 0}
+
+            def verify(path, prepared):
+                verify_calls["count"] += 1
+                if phase == "live_readback" and verify_calls["count"] == 2:
+                    raise RuntimeError("forced live readback exception")
+                return original_verify(path, prepared)
+
+            def package(path):
+                package_calls["count"] += 1
+                if phase == "live_package" and package_calls["count"] == 2:
+                    raise RuntimeError("forced live package exception")
+                return original_package(path)
+
+            def schema(*args, **kwargs):
+                schema_calls["count"] += 1
+                if phase == "live_schema" and schema_calls["count"] == 2:
+                    raise RuntimeError("forced live schema exception")
+                return []
+
+            def append_log(*args, **kwargs):
+                if phase == "write_log":
+                    raise OSError("forced write log exception")
+
+            batch_payload = batch(item, mtime=self.path.stat().st_mtime_ns)
+            with (
+                patch.object(editor_ops, "verify_prepared_workbook", side_effect=verify),
+                patch.object(editor_ops, "assert_valid_workbook_package", side_effect=package),
+                patch.object(editor_ops, "validate_workbook_schema", side_effect=schema),
+                patch.object(editor_ops, "_append_edit_log", side_effect=append_log, create=True),
+            ):
+                result = apply_batch(
+                    self.path,
+                    batch_payload,
+                    write=True,
+                    log_path=self.log,
+                    run_schema_validation=True,
+                )
+
+            self.assertFalse(result["ok"], result)
+            self.assertEqual(result["status"], "apply_verification_failed_rolled_back")
+            self.assertEqual(result["workbookState"], "restored")
+            self.assertEqual(result["failure"]["phase"], phase)
+            self.assertEqual(result["failure"]["kind"], "exception")
+            self.assertIn("forced", result["failure"]["detail"])
+            self.assertTrue(result["restoration"]["verified"])
+            self.assertIsNone(result["restoration"]["error"])
+            self.assertEqual(
+                result["restoration"]["workbookSha256"],
+                result["restoration"]["backupSha256"],
+            )
+            self.assertEqual(self.path.read_bytes(), before)
+            self.assertFalse(self.log.exists())
+
+        for phase in ("live_readback", "live_package", "live_schema", "write_log"):
+            with self.subTest(phase=phase):
+                run_fault(phase)
+
+    def test_returned_live_schema_failure_restores_and_preserves_schema_result(self):
+        item = op(
+            "update",
+            "stingray_options",
+            {"option_id": "opt_thr_001"},
+            {"price": 777},
+        )
+        before = self.path.read_bytes()
+        schema_calls = {"count": 0}
+
+        def schema(*args, **kwargs):
+            schema_calls["count"] += 1
+            if schema_calls["count"] == 2:
+                return [SchemaIssue("error", "forced_live_schema", message="forced returned failure")]
+            return []
+
+        with patch.object(editor_ops, "validate_workbook_schema", side_effect=schema):
+            result = apply_batch(
+                self.path,
+                batch(item, mtime=self.path.stat().st_mtime_ns),
+                write=True,
+                log_path=self.log,
+                run_schema_validation=True,
+            )
+
+        self.assertFalse(result["ok"], result)
+        self.assertEqual(result["status"], "apply_verification_failed_rolled_back")
+        self.assertEqual(result["workbookState"], "restored")
+        self.assertEqual(result["failure"]["phase"], "live_schema")
+        self.assertEqual(result["failure"]["kind"], "returned_failure")
+        self.assertEqual(result["schemaResult"]["error_count"], 1)
+        self.assertTrue(result["restoration"]["verified"])
+        self.assertEqual(
+            result["restoration"]["workbookSha256"],
+            result["restoration"]["backupSha256"],
+        )
+        self.assertEqual(self.path.read_bytes(), before)
+        self.assertFalse(self.log.exists())
+
+    def test_unproved_post_save_restoration_preserves_both_failure_records(self):
+        item = op(
+            "update",
+            "stingray_options",
+            {"option_id": "opt_thr_001"},
+            {"price": 777},
+        )
+        original_verify = editor_ops.verify_prepared_workbook
+        original_restore = editor_ops.restore_workbook_backup
+
+        for restoration_mode in ("hash_mismatch", "exception"):
+            with self.subTest(restoration_mode=restoration_mode):
+                before = self.path.read_bytes()
+                verify_calls = {"count": 0}
+
+                def fail_returned_live_readback(path, prepared):
+                    verify_calls["count"] += 1
+                    if verify_calls["count"] == 2:
+                        return {
+                            "ok": False,
+                            "preparedChecked": 0,
+                            "preparedCount": 1,
+                            "errors": ["forced original readback failure"],
+                        }
+                    return original_verify(path, prepared)
+
+                def fail_restore(path, backup_path):
+                    if restoration_mode == "exception":
+                        raise RuntimeError("forced restoration exception")
+                    original_restore(path, backup_path)
+                    path.write_bytes(path.read_bytes() + b"forced-hash-mismatch")
+
+                with (
+                    patch.object(
+                        editor_ops,
+                        "verify_prepared_workbook",
+                        side_effect=fail_returned_live_readback,
+                    ),
+                    patch.object(editor_ops, "restore_workbook_backup", side_effect=fail_restore),
+                ):
+                    result = self.run_batch(item, write=True)
+
+                self.assertFalse(result["ok"], result)
+                self.assertEqual(result["status"], "workbook_restore_failed")
+                self.assertEqual(result["workbookState"], "unknown")
+                self.assertEqual(result["failure"]["phase"], "live_readback")
+                self.assertEqual(result["failure"]["kind"], "returned_failure")
+                self.assertIn("forced original", result["failure"]["detail"])
+                self.assertFalse(result["restoration"]["verified"])
+                self.assertTrue(result["restoration"]["backupSha256"])
+                self.assertTrue(result["restoration"]["error"])
+                self.assertIn("forced original", result["errors"][0])
+                if restoration_mode == "hash_mismatch":
+                    self.assertTrue(result["restoration"]["workbookSha256"])
+                    self.assertIn("does not match", result["restoration"]["error"])
+                else:
+                    self.assertIsNone(result["restoration"]["workbookSha256"])
+                    self.assertIn("forced restoration", result["restoration"]["error"])
+
+                self.path.write_bytes(before)
+
+    def test_backup_hash_failure_does_not_claim_restore_was_attempted(self):
+        item = op(
+            "update",
+            "stingray_options",
+            {"option_id": "opt_thr_001"},
+            {"price": 777},
+        )
+        original_verify = editor_ops.verify_prepared_workbook
+        original_read_bytes = Path.read_bytes
+        verify_calls = {"count": 0}
+
+        def fail_returned_live_readback(path, prepared):
+            verify_calls["count"] += 1
+            if verify_calls["count"] == 2:
+                return {
+                    "ok": False,
+                    "preparedChecked": 0,
+                    "preparedCount": 1,
+                    "errors": ["forced original readback failure"],
+                }
+            return original_verify(path, prepared)
+
+        def fail_backup_read(path):
+            if path.parent.name == "backups":
+                raise OSError("forced backup read failure")
+            return original_read_bytes(path)
+
+        with (
+            patch.object(
+                editor_ops,
+                "verify_prepared_workbook",
+                side_effect=fail_returned_live_readback,
+            ),
+            patch.object(Path, "read_bytes", autospec=True, side_effect=fail_backup_read),
+            patch.object(editor_ops, "restore_workbook_backup") as restore,
+        ):
+            result = self.run_batch(item, write=True)
+
+        self.assertFalse(result["ok"], result)
+        self.assertEqual(result["status"], "workbook_restore_failed")
+        self.assertEqual(result["workbookState"], "unknown")
+        self.assertFalse(result["restoration"]["attempted"])
+        self.assertFalse(result["restoration"]["verified"])
+        self.assertIsNone(result["restoration"]["backupSha256"])
+        self.assertIn("forced backup read failure", result["restoration"]["error"])
+        restore.assert_not_called()
 
     def test_warning_requires_confirmation(self):
         item = op("update", "zr1_options", {"option_id": "opt_zzz_001"}, {"price": 1})

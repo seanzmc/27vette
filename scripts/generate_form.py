@@ -22,6 +22,8 @@ from pathlib import Path
 from corvette_form_generator.model_generation import GenerationOptions, generate_model_artifacts
 from corvette_form_generator.model_configs import discover_generation_model_configs
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -29,6 +31,18 @@ def main() -> None:
         "--model",
         required=True,
         help="model key to generate",
+    )
+    parser.add_argument(
+        "--workbook",
+        type=Path,
+        default=PROJECT_ROOT / "stingray_master.xlsx",
+        help="exact workbook snapshot to read",
+    )
+    parser.add_argument(
+        "--output-root",
+        type=Path,
+        default=PROJECT_ROOT,
+        help="root containing candidate form-output/ and form-app/ directories",
     )
     parser.add_argument(
         "--emit-inspection",
@@ -45,7 +59,10 @@ def main() -> None:
     if args.inspection_output is not None and not args.emit_inspection:
         parser.error("--inspection-output requires --emit-inspection")
 
-    configs = discover_generation_model_configs()
+    configs = discover_generation_model_configs(
+        args.workbook,
+        root=args.output_root,
+    )
     if args.model not in configs:
         active_models = ", ".join(sorted(configs)) or "none"
         parser.error(f"Unsupported or inactive model {args.model!r}. Active generatable models: {active_models}")

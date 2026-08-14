@@ -3,9 +3,9 @@
 
 This module owns the workbook-changeset-1 contract: canonical
 normalization, strict parsing, semantic fingerprinting, and conversion
-to editor apply batches. The changeset is the single interchange
-between change producers (editor UI, ingest wizard) and the workbook
-editor apply path; payloads are validated and fingerprinted here so
+to editor apply batches. The changeset is the approved interchange for
+Workbook Manager and other registry-bound editor producers to reach the
+workbook apply path; payloads are validated and fingerprinted here so
 consumers never re-interpret raw JSON.
 """
 

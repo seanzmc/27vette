@@ -1,0 +1,152 @@
+Pass 4 Stage A gate-authority closeout validation
+Date: 2026-07-28
+
+BOUNDARIES
+- Canonical workbook not edited by this slice.
+- No tracked generated/published artifact changed during the complete serial Node run.
+- form-app/index.html favicon change is concurrent/unrelated and excluded.
+
+NODE GATES — serial, every tests/*.test.mjs file
+Command shape:
+  for file in $(find tests -maxdepth 1 -name '*.test.mjs' -print | sort); do node --test "$file"; done
+Result: 18 files passed, 0 failed.
+Per-file counts:
+- grand-sport-contract-preview: 5 passed
+- grand-sport-runtime-contract: 18 passed
+- multi-model-runtime-switching: 48 passed
+- nonruntime-option-source-purge: 6 passed
+- seat-canonicalization-diff: 2 passed
+- stingray-form-regression: 91 passed
+- stingray-runtime-contract: 12 passed
+- tracked-artifacts-guard: 7 passed
+- unpublished-runtime-contracts: 2 passed
+- workbook-schema-standardization: 11 passed
+- workbook-visual-copy-standardization: 8 passed
+- z06-contract-preview: 2 passed
+- z06-interior-accessory-cleanup: 7 passed
+- z06-performance-package-interactions: 21 passed
+- z06-published-runtime: 4 passed
+- z06-registry-publication: 2 passed
+- z06-runtime-contract: 24 passed
+- z06-runtime-rule-corrections: 15 passed
+Evidence captured during run: /tmp/27vette-stage-a-node-validation.txt
+
+PROTECTED ARTIFACT IDENTITY
+Command shape:
+  git ls-files -z form-output form-app | xargs -0 shasum -a 256
+  (before and after all 18 serial Node files)
+Result: cmp exit 0; tracked form-output/form-app hashes identical.
+Evidence: /tmp/27vette-stage-a-artifacts-before.sha256 and /tmp/27vette-stage-a-artifacts-after.sha256
+
+WORKBOOK GATES
+- .venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx
+  Result: status valid, issue_count 0.
+- .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+  Result: status valid, issue_count 0, error_count 0, warning_count 0.
+
+PYTHON METADATA / ROUTE / ALL-MODEL GENERATION
+Command:
+  .venv/bin/python -m pytest tests/test_generation_safety.py tests/test_generate_form_model_discovery_cli.py tests/test_runtime_contract_builder.py tests/test_model_config_metadata.py tests/test_promote_model.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py tests/test_rule_derivation.py tests/test_model_generation_route.py tests/test_all_model_runtime_generation.py -q
+Result: 188 passed, 111 subtests passed in 169.29s.
+
+EDITOR APPLY / REMINDER ROUTE
+Command:
+  PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_editor_ops_apply.py -q
+Result: 59 passed, 7 subtests passed in 82.33s.
+Post-ordering focused rerun:
+  PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_editor_ops_apply.py::GateRemindersTest -q
+Result: 2 passed in 0.11s.
+
+README INVENTORY
+Compared all tests/*.test.mjs basenames with backticked gate names in README matrix.
+Result: actual_count 18, listed_count 18, missing [], extra [].
+
+PROMOTION PATH RESOLUTION
+Executed load_registry_promotions() and artifact_path_for_promotion() against the canonical workbook.
+Result:
+- stingray -> runtime_contract -> form-output/runtime/stingray-runtime-contract.json
+- grand_sport -> runtime_contract -> form-output/runtime/grand-sport-runtime-contract.json
+- z06 -> runtime_contract -> form-output/runtime/z06-runtime-contract.json
+No compatibility JSON/CSV path resolved.
+
+STALE ACTIVE COMMAND SCAN
+Searched README.md, docs/route-map.md, scripts/, and tests/ for:
+  stingray-generator-stability | grand-sport-draft-data | z06-form-data-draft | z06-runtime-promotion
+Result: zero matches. Historical/superseded specs and plans, receipts, STATE chronology, and Stage C .hermes plan-classification surfaces intentionally retain historical names.
+
+CANDIDATE-LANE TESTS
+- Initial foreground run reached 14 passing tests but was killed at the 600-second tool limit; partial output is not counted as success.
+- Complete background rerun:
+  .venv/bin/python -m pytest tests/test_verify_workbook_candidate.py -q
+  Result: 15 passed in 652.49s (10:52), exit 0.
+
+DIFF HYGIENE
+- git diff --check: pass after final edits.
+- Stage A diff excludes concurrent form-app/index.html favicon edit.
+
+FINAL ACCEPTANCE SENTINEL
+Recorded after the final source/test edit and focused reruns:
+- Full tracked Stage A `git diff HEAD` fingerprint excluding form-app/index.html: 1c30621a9d44ef3b2b7200fc9cdad6605376fbb28b5f83a680c815b7328e66f9
+- Earlier fingerprints were superseded first because worktree-only `git diff` omitted four staged rename records, then because Stage A completed the owning spec/STATE closeout, migrated the retained-unpublished assertions, and removed the compatibility producer/current consumers required by the zero-consumer exit criterion.
+- editor_ops.py: 0642cf8a8d853bd3eb1446b5e7b485cab67ad7863b0b89920360d76f4ed85fac
+- test_editor_ops_apply.py: 9f22f0385945638bfee339593c304ef09d9f3542b9ea963d4c4b7613c8976d9e
+- stingray-runtime-contract: 0ae64b1b8f121c5c7e3dea7aed8d3e545cc25a217fea281d4a650e81c8d37129
+- grand-sport-runtime-contract: 5e9f91fa2fb2ebddcdb8bbe999a1f1cf2a495b6911b39de217b83ef7a300a793
+- grand-sport-contract-preview: 126dae6110587170b72341541a867504bf79ae2c17ef8984c2afb48bff43124d
+- z06-runtime-contract: 5dac3176327b9daf66d19ea58e77e9365120aa405a6f1f4caa3defba4a9d4f00
+- z06-contract-preview: 24482985e78ec406d95e7f205b686c1025583a8b9c7c0e3b254a7625b2ebc26f
+- z06-interior-accessory-cleanup: ae53d339f70a3bf5ad3156024c4d45b8058e196653f39865866c6eb4308739ea
+- z06-published-runtime: a646c1d97ec1c04b26466bbb6660a9b2f6a0f843834ac70a66aa3cfaa4a1b663
+- z06-registry-publication: 3a2988835d8b2ed97720c241dd7d40829bf3ab7d3d2efe205f797ee72922f6d6
+- README.md: 0119a65c8abc8e617f0b00b18114c0243fb1672b08fdd6f6e1f5313674cac801
+- docs/route-map.md: 32742c784b17b61b34dbd9a166a2153f274d757dd0841c440dcedd7292942954
+- model_generation.py: bb8c7fcbcb4d11c7180c8427ecde023f41b50a3918996be67da2cb693b1e3dc2
+- source_assembly.py: e272f2d38836b201a9c3555eefc16879ffa89bc34ac45d5f44acd7c0fe226875
+- test_generation_safety.py: 01e562557d23e5ec330f55e2914eb5c196e9ffeee959135369b2a893d5df809c
+- test_generate_form_model_discovery_cli.py: c5cc2b7c9d03f094ea8ac34487ef5e8f4e35edcdd501de8886abde9170c912f8
+- test_all_model_runtime_generation.py: 15f0e57d7cfc865809dd54721043b17f972af99331dc6e4404cd262b0b92248b
+Focused post-freeze reruns:
+- GateRemindersTest: 2 passed.
+- z06-interior-accessory-cleanup: 7 passed.
+- test_all_model_runtime_generation.py after retained-artifact assertion migration: 30 passed in 5.68s.
+- unpublished-runtime-contracts pre-deletion parity check: 2 passed.
+
+STAGE B INVENTORY CORRECTION
+- The initial five-file list omitted `tests/unpublished-runtime-contracts.test.mjs`, despite the owning spec classifying it `RETIRE_STALE`.
+- Its two unique guarantees were migrated to fresh isolated generation in `tests/test_all_model_runtime_generation.py` and passed there.
+- Correct exact unexecuted `git rm` list (all six verified tracked):
+  form-output/stingray-form-data.json
+  form-output/stingray-form-data.csv
+  scripts/corvette_form_generator/production.py
+  scripts/seat-canonicalization-diff.mjs
+  tests/seat-canonicalization-diff.test.mjs
+  tests/unpublished-runtime-contracts.test.mjs
+
+FINAL ZERO-CONSUMER MIGRATION
+- Removed `write_stingray_compatibility_artifacts` import/call, `compatibility_artifacts` result key, and `compatibility_source` marker from the active generation path.
+- Removed all active Python test imports, calls, and result-shape assertions for the compatibility exporter.
+- AST import/call scan over active `scripts/**/*.py` and `tests/**/*.py`, excluding the deletion-candidate `production.py`: `active_import_or_call_hits: []`.
+- Active text scan under scripts/tests: compatibility names remain only inside deletion-candidate `production.py`; tests have zero matches.
+- `production.py` contains only the dead compatibility JSON/CSV writer; no unrelated reusable behavior was found.
+- `seat-canonicalization-diff.mjs` has no scripts caller; its only test-tree caller is the paired Stage B candidate `seat-canonicalization-diff.test.mjs`.
+- Final Python metadata/route/all-model authority command: 189 passed, 111 subtests passed in 161.17s.
+- Final all-Node serial run: 18 files passed; protected `form-output/` and `form-app/` hashes identical.
+- Real composed candidate command with all six `--changed-model` values: `ok: true`, all ten stages run, no stages skipped, no boundary violations, no validation findings, no unexpected drift.
+- Final README inventory: 18 actual, 18 listed, missing [], extra [].
+
+INDEPENDENT VERIFIER
+- `deleg_8dac534d`: C1-C9 PASS; C10 FAIL pending receipt completion and loop validation.
+- Sole required fix: complete the receipt, run the canonical loop validator, and obtain a bounded follow-up verdict against that completed receipt.
+- `deleg_93463833`: final exact-current PASS for C1-C10 and every Stage A exit criterion at fingerprint `1c30621a9d44ef3b2b7200fc9cdad6605376fbb28b5f83a680c815b7328e66f9`.
+- Final verifier reruns: loop validator passed; `git diff --check HEAD` passed; migrated all-model gate 30 passed in 6.01s; active text and Python AST consumer scans returned no hits.
+- Required fixes before pass: none. Stage B still requires Sean's separate approval.
+- Report: fable5loop/runs/2026-07-28-pass4a-gate-authority-closeout/verifier-report.md
+
+LOOP VALIDATOR
+- Command: .venv/bin/python scripts/validate_fable5_loop.py
+- Result: exit 0.
+- Output: Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude setup, memory, skill, routine, outcomes, and eval rubric are present.
+- Contract tests: `.venv/bin/python -m pytest tests/test_fable5_loop_contract.py -q` -> 13 passed in 0.78s.
+- Final post-verdict rerun: loop validator passed; Fable contract tests 13 passed in 0.69s; `git diff --check` passed.
+- Final post-verdict tracked-patch fingerprint excluding unrelated `form-app/index.html`: `6d857f44d92cfb51c6e7a65eab3f72977cb37738d8598a988ed984b5059eadf6`.
+- The accepted verifier fingerprint `1c30621...` is the exact implementation/spec snapshot inspected independently; the final tracked hash differs only because `STATE.md` was updated post-verdict from pending re-verification to PASS and gained the verifier's durable retirement lesson. Receipt files are untracked and do not affect either hash.

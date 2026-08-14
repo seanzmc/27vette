@@ -1,0 +1,41 @@
+{
+  "id": "2026-08-10-dbpass6a-shared-writer-restoration",
+  "started_at": "2026-08-09T23:45:00-04:00",
+  "completed_at": "2026-08-10T01:08:33-04:00",
+  "objective": "Complete Pass 6A by making every post-save shared-writer failure restore and SHA-256-verify its backup or report unknown without losing failure evidence.",
+  "changed_surface": "shared workbook writer, focused restoration regressions, workflow documentation, and Fable closeout artifacts",
+  "outcome_rubric": "fable5loop/runs/2026-08-10-dbpass6a-shared-writer-restoration/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-08-10-dbpass6a-shared-writer-restoration/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-08-10-dbpass6a-shared-writer-restoration/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Current handoff",
+      "evidence": "fable5loop/runs/2026-08-10-dbpass6a-shared-writer-restoration/validation-output.txt"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-08-10-dbpass6a-shared-writer-restoration/verifier-report.md"
+    }
+  ],
+  "skill_update": {
+    "decision": "not_applicable",
+    "evidence": "fable5loop/runs/2026-08-10-dbpass6a-shared-writer-restoration/verifier-report.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false
+  },
+  "boundaries_preserved": [
+    "canonical workbook",
+    "manager apply API and UI",
+    "public ChangeSet artifact schemas",
+    "generated artifacts",
+    "registry publication",
+    "customer runtime",
+    "dealer submission",
+    "deployment",
+    "dependencies"
+  ]
+}

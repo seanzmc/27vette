@@ -1,0 +1,293 @@
+Run: 2026-07-26-pass3-candidate-lane
+Scope: spec Pass 3 stage 1 — requirements 1-6 (behavior), 10, 11, 12
+Workbook SHA-256 at start and end: d11674e3213a8858b13f5e4283b82868046ed34335c96419a8fe909034760bfd
+(unchanged; no workbook write, nothing published)
+
+
+================================================================
+WHAT WAS BUILT
+================================================================
+
+  scripts/verify_workbook_candidate.py      NEW  — the composed lane (§3.7)
+  tests/test_verify_workbook_candidate.py   NEW  — requirement 12's proofs
+  scripts/promote_model.py                  MOD  — preflight now calls the lane
+  tests/multi-model-runtime-switching.test.mjs  MOD — data.js path override
+  tests/test_promote_model.py               MOD  — lane-gating test; one fixture
+                                                   test opts out of the lane
+
+  tests/z06-runtime-promotion.test.mjs          MOD  — requirement 6 split
+  tests/z06-registry-publication.test.mjs      NEW  — the writing assertion
+
+Explicitly NOT in this stage, and still open:
+  requirement 7  restrict promotion artifact metadata; remove current_generation
+                 and draft_artifact consumers
+  requirement 8  remove build_registry_from_promotions() and the fallbacks
+  requirement 9  make generate_registry.py's write atomic
+These are deletions gated on a consumer-closure record and get their own stage.
+
+
+================================================================
+THE LANE, RUN FOR REAL
+================================================================
+
+  $ .venv/bin/python scripts/verify_workbook_candidate.py \
+      --changed-model grand_sport_x --changed-model zr1 --changed-model zr1x \
+      --report <path>
+  exit 0
+
+  stagesRun: copy_candidate, workbook_package, workbook_schema,
+             options_sheet_quality, discover_models, generate_models,
+             validate_contracts, candidate_registry, browser_harness,
+             semantic_drift
+  partition: changed=[grand_sport_x, zr1, zr1x]
+             unchanged=[grand_sport, stingray, z06]
+             unexpected_drift=[]
+  boundaryViolations: []
+
+Same workbook, declaring nothing changed:
+
+  exit 1, failedStage=semantic_drift
+  unexpected_drift=[grand_sport_x, zr1, zr1x]
+
+That is not a synthetic failure. It is the open staleness recorded in STATE.md on
+2026-07-25: the three unpromoted models' retained contracts still reference
+`sec_perf_support_001`, a section the workbook no longer defines, and **no gate
+flagged them** because they are unpublished. The candidate lane flags them on its
+first real run. This is the §3.7 rationale — generate the complete promoted plus
+generatable set, not only published models — demonstrated rather than argued.
+
+
+================================================================
+PROMOTION PREFLIGHT (requirements 1-5), RUN FOR REAL
+================================================================
+
+  $ .venv/bin/python scripts/promote_model.py --model z06
+  exit 1
+
+  status: candidate_lane_failed          (change_count 2)
+  candidate_readiness.ok: False
+  candidate_readiness.failedStage: semantic_drift
+  partition: changed=[z06] unchanged=[grand_sport, stingray]
+             unexpected_drift=[grand_sport_x, zr1, zr1x]
+  stagesRun: all ten, in order
+
+Before this change the same command reported `validated` without generating or
+runtime-testing anything — spec §2.1 item 2's second confirmed false-confidence
+path. It now generates all six models from the post-promotion scratch workbook,
+strictly validates each contract, builds a complete candidate registry, runs the
+browser harness against that registry, and refuses. The canonical workbook is
+untouched on that path; `git status` for `stingray_master.xlsx`, `form-output/`,
+and `form-app/data.js` is clean after the run.
+
+The promoted models are declared changed automatically (the lane receives
+`normalized_keys`), so a promotion's own expected drift does not fail it while
+drift anywhere else does.
+
+
+================================================================
+DESIGN POINTS WORTH RECORDING
+================================================================
+
+Drift is keyed on entity identity, not array position (`ENTITY_KEYS`). Keying on
+position would report a section reorder as drift for every downstream row — the
+wrong-key artifact-diff failure mode already recorded in the skill. Collections
+without a known identity column are compared as order-insensitive multisets.
+Only `generated_at` / `sourceGeneratedAt` / `generatedAt` are ignored.
+
+Stage 3 runs `validate_workbook_schema(..., check_live_contract=False)`. The live
+check compares against the *published* tree, which a candidate has no business
+being measured against; the candidate's registry is proven at stages 8 and 9
+instead.
+
+The harness override is a single named fact shared by both sides
+(`CORVETTE_FORM_DATA_JS`), and the harness has **no fallback** when it is set:
+silently reading the published `form-app/data.js` would let stage 9 pass while
+proving nothing about the candidate. Two tests pin this — one asserts the harness
+fails against a deliberately empty candidate registry, one asserts the env var
+name matches on both sides.
+
+`execute_promotion(..., run_candidate_lane=False)` exists for the promotion
+bookkeeping tests, whose fixture workbook is a minimal scaffold and not
+generatable. The CLI never passes it.
+
+
+================================================================
+TESTS
+================================================================
+
+  $ PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_verify_workbook_candidate.py -q
+  12 passed in 375.69s
+
+  Requirement 12's five required proofs, plus five more:
+    all stages run in order against a candidate copy
+    a workbook defect fails at the earliest applicable stage (a deleted
+      `section_master` fails at workbook_schema; generate_models is in
+      stagesNotRun, and models is empty — not merely unreported)
+    undeclared semantic drift is reported as unexpected_drift and fails
+    declaring a changed model does not reduce the generated set (both runs
+      generate all six and report identical per-model drift)
+    protected surfaces byte-identical after a passing AND a failing run
+    declaring drift moves it out of unexpected and passes
+    the '*' marker declares every model (§3.7.1.1)
+    an unknown --changed-model fails instead of silently declaring nothing
+    the report round-trips to disk with the §3.7.1.4 field set and schemaVersion
+    drift ignores order but not content
+    the browser stage reads the candidate registry, not the published one
+    the override env var name matches on both sides
+
+  $ PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_promote_model.py -q
+  10 passed
+
+  One is new: `test_candidate_lane_gates_promotion` proves a failing lane blocks
+  the canonical write (workbook bytes unchanged, no backup_path), and that the
+  lane is handed the scratch workbook — not the canonical one — with the promoted
+  models declared.
+
+
+================================================================
+FULL GATE PARITY
+================================================================
+
+Python full suite:
+  1 failed, 542 passed, 2 skipped, 103 subtests passed in 775.79s
+
+  Baseline before this run was 523 passed. The +19 is exactly this run's new
+  coverage: 12 in tests/test_verify_workbook_candidate.py, 1 in
+  tests/test_promote_model.py, and 6 from the per-model
+  test_dataset_binds_to_the_candidate_snapshot added while closing Pass 2.
+  The single failure is tests/test_fable5_loop_contract.py, reporting that this
+  run's own folder lacks run.json and is not referenced from STATE.md. It clears
+  at closeout.
+
+Node gates (per file, pass/fail):
+  grand-sport-contract-preview            5 / 1   pre-existing (Pass 4A)
+  grand-sport-draft-data                 18 / 1   pre-existing (Pass 4A)
+  multi-model-runtime-switching          48 / 0   <- the file this run modified
+  nonruntime-option-source-purge          6 / 0
+  seat-canonicalization-diff              2 / 0
+  stingray-form-regression               91 / 0
+  stingray-generator-stability           15 / 0
+  unpublished-runtime-contracts           2 / 0
+  workbook-schema-standardization         8 / 1   pre-existing (active explicit excludes)
+  workbook-visual-copy-standardization    8 / 0
+  z06-contract-preview                    3 / 0
+  z06-form-data-draft                    24 / 0
+  z06-interior-accessory-cleanup          7 / 0
+  z06-performance-package-interactions   21 / 0
+  z06-runtime-promotion                   5 / 0
+  z06-runtime-rule-corrections           15 / 0
+
+  Identical to the tallies recorded for the preceding run, including the three
+  known failures. `multi-model-runtime-switching` is unchanged at 48/0 with the
+  override unset, which is the compatibility claim that matters: the harness
+  behaves exactly as before for every existing caller.
+
+  Running the node gates again dirtied form-app/data.js and two runtime contracts
+  by `generated_at` only (Pass 4A). Reverted with `git checkout --`; final
+  `git status` for the protected paths is clean.
+
+
+================================================================
+BOUNDARIES
+================================================================
+
+  stingray_master.xlsx     unchanged
+  form-output/             unchanged
+  form-app/data.js         unchanged
+  No model promoted. Nothing published. The lane asserts this itself, on every
+  code path including failure paths, and reports `boundaryViolations` rather
+  than leaving it to the caller.
+
+
+================================================================
+INDEPENDENT VERIFIER (separate context) — cycle 1 verdict: FAIL
+================================================================
+
+The verifier confirmed the load-bearing claims under adversarial testing —
+scoping never narrows any stage, the harness has no fallback and stage 9
+provably reads the candidate registry, promotion is genuinely gated including on
+exception paths, and the drift failure is the real 2026-07-25 staleness, not a
+synthetic one. It also reproduced that `HEAD`'s `promote_model.py` reports
+`validated` where this one exits 1. It failed the run on four counts. All six
+findings (four graded, two notes) are fixed and re-proved below.
+
+V1 (blocking) — **Requirement 6 was inside the claimed scope, undelivered, and
+   unmentioned.** The rubric said "requirements 1-6 and 10-12" and deferred only
+   7/8/9, but `tests/z06-runtime-promotion.test.mjs` still ran
+   `scripts/generate_registry.py` against the tracked app at line 161. Worse, the
+   receipt attributed the resulting `data.js` churn to Pass 4A — it is exactly
+   the defect requirement 6 owns.
+   FIXED by delivering it: the writing assertion moved to
+   `tests/z06-registry-publication.test.mjs`, and the promotion file is now
+   read-only.
+     $ node --test tests/z06-runtime-promotion.test.mjs   -> pass 4, fail 0
+     $ git status --porcelain -- form-app form-output     -> empty
+   Before the split, that same run rewrote `form-app/data.js`.
+
+V2 (should-fix) — **"Stages after a failure do not run" was false for stage 10.**
+   The drift block sat outside the `try/except StageFailure`, so an injected
+   stage-7 failure produced a report with two failed stages and `semantic_drift`
+   in `stagesRun`.
+   FIXED: drift runs only when no stage failed. Re-proved by the same injection:
+     failedStage: validate_contracts | semantic_drift ran: False
+     failed stages reported: ['validate_contracts']
+   Also fixed the secondary point: `stagesNotRun` could not distinguish
+   "unreached" from "skipped by the caller". The report now carries
+   `stagesSkippedByCaller` alongside it.
+
+V3 (should-fix) — **The byte-identity assertion did not cover every code path.**
+   Only `StageFailure` was caught, so an arbitrary exception or a Ctrl-C
+   mid-stage escaped before the check. The verifier confirmed no path actually
+   *wrote* a tracked file, but the receipt's claim was about the assertion.
+   FIXED: a `BaseException` handler re-checks the protected surfaces, raises a
+   boundary error if they moved, and otherwise re-raises the original untouched.
+     F3 probe: crash injected into run_stage_schema -> re-raised cleanly,
+     protected paths clean.
+
+V4 (blocking) — **Two of requirement 12's proofs caught nothing.** The verifier
+   built a weakened lane and shadowed the module: hardcoding
+   `boundary_violations = []` and disabling stage 9 were invisible to the entire
+   test file, because every assertion checked `boundaryViolations == []` (which a
+   lane that never computes it satisfies) and every test passed
+   `run_harness=False`.
+   FIXED with two tests that fail against exactly those weakenings:
+     test_the_lane_detects_and_reports_a_protected_path_write — makes a stage
+       write a tracked file and requires the lane to name it, then restores the
+       bytes; asserts `boundaryViolations == ['form-output/runtime/z06-runtime-contract.json']`.
+     test_the_lane_runs_the_browser_stage_against_a_temporary_registry — the one
+       full `run_harness=True` run; asserts `stagesRun == list(STAGES)` and that
+       the tested `data.js` is outside the repo root and no longer exists.
+
+V5 (should-fix) — **Drift missed a real change and reported a false one.**
+   Identity keying collapsed duplicate rows, so appending a byte-identical
+   duplicate `choices` row produced zero drift; and `contract_entity_index`
+   walked only top-level lists, so `orderSummary.sections` was still compared
+   positionally.
+   FIXED: identity keying is used only when the key is actually unique
+   (otherwise it falls back to the content-sensitive multiset), and indexing
+   recurses into nested dicts.
+     duplicated row       -> ['choices']   (was [])
+     orderSummary reorder -> []            (was ['orderSummary'])
+     real content change  -> ['choices']
+
+V6 (note) — Stage 7 largely re-runs the assertion `build_model_runtime_contract`
+   already performed before writing. Kept deliberately: it adds the
+   serialization round-trip and is the spec's required gate-side check. Recorded
+   so a green stage 7 is read for what it is.
+
+V7 (note) — **Dead duplicate acceptance check.** The lane re-checked
+   "exactly one default model", which `load_registry_promotions()` already
+   raises on, so it could never fire — a second acceptance check in form if not
+   in effect (§3.8).
+   FIXED: removed, with a comment recording why.
+
+Post-fix:
+  $ PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_verify_workbook_candidate.py -q
+  14 passed in 504.94s
+  $ node --test tests/z06-runtime-promotion.test.mjs   -> pass 4, fail 0
+  Protected paths clean after every run.
+
+Verifier items not independently checked by it, and why: the full Python suite
+and 15 of 16 node gate tallies (budget spent on nine full lane invocations). The
+maker ran both; the numbers are in FULL GATE PARITY above. The verifier did run
+the one node gate this change modified.

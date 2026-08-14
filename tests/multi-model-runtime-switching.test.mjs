@@ -34,9 +34,15 @@ function makeElement() {
   };
 }
 
+// Pass 3 §3.7 stage 9: the candidate lane points this harness at a temporary
+// registry. No fallback if the override is set but unreadable — silently
+// reading the published data.js would make the candidate stage pass while
+// proving nothing about the candidate.
+const DATA_JS_PATH = process.env.CORVETTE_FORM_DATA_JS || "form-app/data.js";
+
 function loadDataWindow() {
   const context = { window: {} };
-  vm.runInNewContext(fs.readFileSync("form-app/data.js", "utf8"), context);
+  vm.runInNewContext(fs.readFileSync(DATA_JS_PATH, "utf8"), context);
   return context.window;
 }
 
@@ -144,6 +150,7 @@ window.__testApi = {
   handleChoice,
   handleContextChoice: typeof handleContextChoice === "function" ? handleContextChoice : undefined,
   computeAutoAdded,
+  vehicleAssetFolder,
   disableReasonForChoice,
   missingRequirementDetails,
   missingRequired,
@@ -332,8 +339,11 @@ test("generated app data exposes a multi-model registry with Stingray compatibil
   assert.equal(registry.defaultModelKey, "stingray");
   assert.deepEqual(Object.keys(registry.models).sort(), [
     "grandSport",
+    "grand_sport_x",
     "stingray",
     "z06",
+    "zr1",
+    "zr1x",
   ]);
   assert.equal(registry.models.stingray.label, "Stingray");
   assert.equal(registry.models.stingray.modelName, "Corvette Stingray");
@@ -374,6 +384,19 @@ test("generated app data exposes a multi-model registry with Stingray compatibil
   );
 });
 
+test("retired DTB is absent from every published model contract", () => {
+  const registry = loadDataWindow().CORVETTE_FORM_DATA;
+
+  for (const [modelKey, entry] of Object.entries(registry.models)) {
+    const serialized = JSON.stringify(entry.data);
+    assert.equal(
+      /dtb/i.test(serialized),
+      false,
+      `${modelKey} should not publish the retired DTB option, rules, groups, OVS rows, or disclosure copy`,
+    );
+  }
+});
+
 test("active roof option order preserves the established and reviewed model contracts", () => {
   const registry = loadDataWindow().CORVETTE_FORM_DATA;
   const sharedActiveRoofOrder = ["CF7", "C2Z", "CC3", "CM9", "D84", "D86"];
@@ -394,8 +417,8 @@ test("active roof option order preserves the established and reviewed model cont
     Object.entries(roofOrders)
       .filter(([, order]) => order.includes("CF8"))
       .map(([modelKey]) => modelKey),
-    ["grandSport"],
-    "CF8 should remain active in the published Grand Sport contract"
+    ["grandSport", "grand_sport_x"],
+    "CF8 should remain active in the published Grand Sport and Grand Sport X contracts"
   );
 });
 
@@ -407,7 +430,7 @@ test("active registry models carry generated order-summary metadata without brow
   assert.doesNotMatch(appSource, /orderSectionDefinitions\.map/);
 
   const registry = loadDataWindow().CORVETTE_FORM_DATA;
-  const requiredChargesModels = new Set(["z06"]);
+  const requiredChargesModels = new Set(["z06", "zr1", "zr1x"]);
   for (const [modelKey, entry] of Object.entries(registry.models)) {
     const expectsRequiredCharges = requiredChargesModels.has(modelKey);
     const expectedOrderSummarySections = expectsRequiredCharges ? 12 : 11;
@@ -541,6 +564,66 @@ test("runtime renders vehicle setup as one paced visible foundation step", () =>
   assert.doesNotMatch(setupHtml, /data-context-choice="trim_level__/);
   assert.match(setupHtml, /Continue to Body Style/);
   assert.doesNotMatch(setupHtml, /Continue to Exterior Paint/);
+});
+
+test("generated registry supplies complete workbook-authored vehicle setup copy", () => {
+  const registry = loadDataWindow().CORVETTE_FORM_DATA;
+  for (const model of Object.values(registry.models)) {
+    assert.equal(typeof model.vehicleSetup.cardSubtitle, "string");
+    assert.equal(typeof model.vehicleSetup.eyebrow, "string");
+    assert.equal(typeof model.vehicleSetup.title, "string");
+    assert.equal(typeof model.vehicleSetup.description, "string");
+    assert.equal(model.vehicleSetup.facts.length, 3);
+    assert.equal(model.vehicleSetup.facts.every(Boolean), true);
+  }
+  assert.equal(registry.models.grandSport.vehicleSetup.cardSubtitle, "Purist, rear-wheel-drive performance");
+  assert.equal(registry.models.z06.vehicleSetup.cardSubtitle, "Track-born, street-legal supercar");
+});
+
+test("Grand Sport X exterior paint borrows the Grand Sport vehicle render family", () => {
+  const runtime = loadRuntime();
+
+  runtime.activateModel("grandSport");
+  assert.equal(runtime.vehicleAssetFolder(), "e");
+
+  runtime.activateModel("grand_sport_x");
+  assert.equal(runtime.vehicleAssetFolder(), "e");
+});
+
+test("Grand Sport X engine appearance display order matches Grand Sport", () => {
+  const runtime = loadRuntime();
+  const visibleEngineOrder = (modelKey) => {
+    runtime.activateModel(modelKey);
+    runtime.state.bodyStyle = "coupe";
+    runtime.state.trimLevel = "1LT";
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+    return runtime.activeChoiceRows()
+      .filter((choice) => choice.section_id === "sec_engi_001" && choice.status !== "unavailable")
+      .sort((left, right) => Number(left.display_order) - Number(right.display_order))
+      .map((choice) => choice.rpo);
+  };
+
+  const grandSportOrder = visibleEngineOrder("grandSport");
+  const grandSportXOrder = visibleEngineOrder("grand_sport_x");
+  assert.deepEqual(grandSportXOrder, grandSportOrder);
+});
+
+test("Grand Sport X seat display order matches Grand Sport", () => {
+  const runtime = loadRuntime();
+  const seatOrder = (modelKey) => {
+    runtime.activateModel(modelKey);
+    runtime.state.bodyStyle = "coupe";
+    runtime.state.trimLevel = "2LT";
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+    return runtime.activeChoiceRows()
+      .filter((choice) => choice.section_id === "sec_seat_002")
+      .sort((left, right) => Number(left.display_order) - Number(right.display_order))
+      .map((choice) => choice.rpo);
+  };
+
+  assert.deepEqual(seatOrder("grand_sport_x"), seatOrder("grandSport"));
 });
 
 test("runtime progressively advances vehicle setup panels before exterior paint", () => {
@@ -869,6 +952,42 @@ test("Grand Sport exclusive groups are model-scoped and Stingray groups match wo
   }
 });
 
+test("GSX, ZR1, and ZR1X related-option groups publish customer-facing workbook copy", () => {
+  const registry = loadDataWindow().CORVETTE_FORM_DATA;
+  const expectedNotes = {
+    grand_sport_x: {
+      grand_sport_x_excl_1623e1da9d59: "Engine cover choices are mutually exclusive within the Engine Appearance section.",
+      grand_sport_x_excl_1a2557e86349: "Suede frunk/trunk compartment liner choices are mutually exclusive within the LPO Interior section.",
+      grand_sport_x_excl_4c81a57b1440: "Indoor car cover choices are mutually exclusive within the LPO Exterior section.",
+      grand_sport_x_excl_72b09b9f4530: "Ground effects choices are mutually exclusive within the Ground Effects section.",
+      grand_sport_x_excl_88226d3d71bc: "Rear Corvette script badge color choices are mutually exclusive within the LPO Exterior section.",
+      grand_sport_x_excl_ba636d8cad42: "Seat belt color choices are mutually exclusive within the Seat Belt section.",
+      grand_sport_x_excl_c874eb278e64: "Exterior accent choices are mutually exclusive within the Exterior Accents section.",
+      grand_sport_x_excl_cb34bcaa3d0b: "Exhaust tip choices are mutually exclusive within the Exhaust section.",
+      grand_sport_x_excl_cb3c5e229696: "Wheel center cap choices are mutually exclusive within the Wheel Accessory section.",
+    },
+    zr1: {
+      zr1_excl_46da2c68b0f9: "Exhaust tip choices are mutually exclusive within the Exhaust section.",
+      zr1_excl_ba636d8cad42: "Seat belt color choices are mutually exclusive within the Seat Belt section.",
+      zr1_excl_cdb87e21ebb0: "Carbon fiber interior trim choices are mutually exclusive within the Interior Trim section.",
+    },
+    zr1x: {
+      zr1x_excl_46da2c68b0f9: "Exhaust tip choices are mutually exclusive within the Exhaust section.",
+      zr1x_excl_ba636d8cad42: "Seat belt color choices are mutually exclusive within the Seat Belt section.",
+      zr1x_excl_cdb87e21ebb0: "Carbon fiber interior trim choices are mutually exclusive within the Interior Trim section.",
+    },
+  };
+
+  for (const [modelKey, notesByGroup] of Object.entries(expectedNotes)) {
+    const groups = registry.models[modelKey].data.exclusiveGroups;
+    for (const [groupId, expectedNote] of Object.entries(notesByGroup)) {
+      const group = groups.find((candidate) => candidate.group_id === groupId);
+      assert.ok(group, `${modelKey} should publish ${groupId}`);
+      assert.equal(group.notes, expectedNote);
+    }
+  }
+});
+
 test("Grand Sport exclusive group selections remove peer options without runtime branches", () => {
   for (const expected of expectedGrandSportExclusiveGroups) {
     const runtime = loadRuntime();
@@ -1135,6 +1254,470 @@ test("Grand Sport heritage hash marks auto-add Z15 and leave only center stripes
   assert.equal(runtime.state.selected.has("opt_d84_001"), false, "center stripe should not auto-select D84");
 });
 
+test("Grand Sport X heritage hash marks use the Grand Sport one-way Z15 auto-add topology", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grand_sport_x");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const hashOptionIds = [
+    "opt_17a_001",
+    "opt_20a_001",
+    "opt_55a_001",
+    "opt_75a_001",
+    "opt_97a_001",
+    "opt_dx4_001",
+  ];
+  const hashSection = runtime.data.sections.find(
+    (section) => section.section_id === "sec_gsha_001",
+  );
+  assert.ok(hashSection, "Grand Sport X should publish its Heritage Hash Marks section");
+  assert.equal(hashSection.selection_mode, "single_select_opt");
+  assert.equal(hashSection.is_required, "False");
+
+  const firstHash = runtime.activeChoiceRows().find(
+    (choice) => choice.option_id === "opt_17a_001",
+  );
+  assert.ok(firstHash, "17A should be active for Grand Sport X");
+  runtime.handleChoice(firstHash);
+
+  assert.equal(
+    runtime.currentOrder().auto_added_options.some((item) => item.rpo === "Z15"),
+    true,
+    "a Grand Sport X heritage hash selection should auto-add Z15",
+  );
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(runtime.currentOrder().auto_added_options))
+      .map((item) => item.rpo)
+      .filter((rpo) => ["Z15", "SNE", "VPW"].includes(rpo))
+      .sort(),
+    ["Z15"],
+    "Z15 should not auto-add the Jake graphics owned by PDA",
+  );
+  assert.deepEqual(
+    hashOptionIds.filter((optionId) => runtime.state.selected.has(optionId)),
+    ["opt_17a_001"],
+    "Z15 must not auto-add other choices in the optional single-choice hash section",
+  );
+
+  for (const hashOptionId of hashOptionIds) {
+    assert.ok(
+      runtime.data.rules.some(
+        (rule) =>
+          rule.active === "True" &&
+          rule.source_id === hashOptionId &&
+          rule.rule_type === "includes" &&
+          rule.target_id === "opt_z15_001" &&
+          rule.auto_add === "True",
+      ),
+      `${hashOptionId} should auto-add Z15`,
+    );
+  }
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(runtime.data.rules))
+      .filter(
+        (rule) =>
+          rule.active === "True" &&
+          rule.source_id === "opt_z15_001" &&
+          ["includes", "requires"].includes(rule.rule_type),
+      )
+      .map((rule) => `${rule.rule_type}:${rule.target_id}`)
+      .sort(),
+    [],
+    "Z15 must not include or require choices in the reverse direction",
+  );
+});
+
+test("Grand Sport X keeps unavailable R88 out of runtime and applies SFZ canonical conflicts", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grand_sport_x");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  assert.equal(
+    runtime.data.choices.some((choice) => choice.option_id === "opt_r88_001"),
+    false,
+    "inactive R88 should not publish any Grand Sport X runtime choices",
+  );
+
+  const expectedTargets = [
+    "opt_eyk_001",
+    "opt_dpb_001",
+    "opt_dpc_001",
+    "opt_dpg_001",
+    "opt_dpl_001",
+    "opt_dpt_001",
+    "opt_dsy_001",
+    "opt_dsz_001",
+    "opt_dt0_001",
+    "opt_dtc_001",
+    "opt_dth_001",
+    "opt_dub_001",
+    "opt_due_001",
+    "opt_duk_001",
+    "opt_dmu_001",
+    "opt_dmv_001",
+    "opt_dmw_001",
+    "opt_dmx_001",
+    "opt_dmy_001",
+  ];
+  const sfzGroup = runtime.data.ruleGroups.find(
+    (group) => group.group_id === "gsx_group_sfz_excludes_badge_and_stripe_choices",
+  );
+  assert.ok(sfzGroup, "SFZ should publish one grouped canonical exclusion owner");
+  assert.equal(sfzGroup.group_type, "excludes_any");
+  assert.equal(sfzGroup.source_id, "opt_sfz_001");
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(sfzGroup.target_ids)),
+    expectedTargets,
+  );
+  assert.equal(
+    runtime.data.rules.some(
+      (rule) => rule.source_id === "opt_sfz_001" && rule.rule_type === "excludes",
+    ),
+    false,
+    "SFZ exclusions should have one grouped owner instead of partial direct rows",
+  );
+
+  const sfz = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_sfz_001");
+  assert.ok(sfz, "SFZ should remain available for Grand Sport X");
+  runtime.handleChoice(sfz);
+  assert.equal(runtime.state.selected.has("opt_sfz_001"), true);
+
+  for (const optionId of ["opt_eyk_001", "opt_dtc_001", "opt_dmu_001"]) {
+    const choice = runtime.activeChoiceRows().find((candidate) => candidate.option_id === optionId);
+    assert.ok(choice, `${optionId} should exist for the runtime conflict proof`);
+    assert.notEqual(runtime.disableReasonForChoice(choice), "", `${optionId} should be unavailable with SFZ`);
+    runtime.handleChoice(choice);
+    assert.equal(runtime.state.selected.has(optionId), false, `${optionId} should not be selectable with SFZ`);
+  }
+});
+
+test("Grand Sport X requires ZZ3 before BC7 on Convertible", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grand_sport_x");
+  runtime.state.bodyStyle = "convertible";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const rule = runtime.data.rules.find(
+    (candidate) =>
+      candidate.active === "True" &&
+      candidate.source_id === "opt_bc7_001" &&
+      candidate.rule_type === "requires" &&
+      candidate.target_id === "opt_zz3_001",
+  );
+  assert.ok(rule, "BC7 should publish its canonical ZZ3 requirement");
+  assert.equal(rule.auto_add, "False");
+
+  const bc7 = runtime.activeChoiceRows().find(
+    (choice) => choice.option_id === "opt_bc7_001",
+  );
+  assert.ok(bc7, "BC7 should be available on Grand Sport X Convertible");
+  assert.equal(
+    runtime.disableReasonForChoice(bc7),
+    "Requires ZZ3 Convertible Engine Appearance Package.",
+  );
+  runtime.handleChoice(bc7);
+  assert.equal(runtime.state.selected.has("opt_bc7_001"), false);
+
+  const zz3 = runtime.activeChoiceRows().find(
+    (choice) => choice.option_id === "opt_zz3_001",
+  );
+  assert.ok(zz3, "ZZ3 should be available on Grand Sport X Convertible");
+  runtime.handleChoice(zz3);
+  assert.equal(runtime.state.selected.has("opt_zz3_001"), true);
+  assert.equal(
+    runtime.currentOrder().auto_added_options.some((item) => item.rpo === "BC7"),
+    true,
+    "ZZ3 should continue to auto-add BC7",
+  );
+});
+
+test("Grand Sport X CF8 blocks only disclosed full-length and center stripes", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grand_sport_x");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "2LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const expectedTargets = [
+    "opt_dmu_001",
+    "opt_dmv_001",
+    "opt_dmw_001",
+    "opt_dmx_001",
+    "opt_dmy_001",
+    "opt_dpb_001",
+    "opt_dpc_001",
+    "opt_dpg_001",
+    "opt_dpl_001",
+    "opt_dpt_001",
+    "opt_dsy_001",
+    "opt_dsz_001",
+    "opt_dt0_001",
+    "opt_dtc_001",
+    "opt_dth_001",
+    "opt_dub_001",
+    "opt_due_001",
+    "opt_duk_001",
+  ];
+  const group = runtime.data.ruleGroups.find(
+    (candidate) => candidate.group_id === "gsx_group_cf8_excludes_stripe_choices",
+  );
+  assert.ok(group, "CF8 should publish one grouped stripe-conflict owner");
+  assert.equal(group.group_type, "excludes_any");
+  assert.equal(group.source_id, "opt_cf8_001");
+  assert.deepEqual(JSON.parse(JSON.stringify(group.target_ids)), expectedTargets);
+  assert.equal(
+    runtime.data.rules.some(
+      (rule) => rule.source_id === "opt_cf8_001" && rule.rule_type === "excludes",
+    ),
+    false,
+    "CF8 conflicts should not retain partial direct owners",
+  );
+  for (const unsupportedTarget of ["opt_duw_001", "opt_dzu_001", "opt_dzv_001", "opt_dzx_001"]) {
+    assert.equal(
+      group.target_ids.includes(unsupportedTarget),
+      false,
+      `${unsupportedTarget} should stay outside the disclosed GSX CF8 conflict set`,
+    );
+  }
+
+  const cf8 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_cf8_001");
+  assert.ok(cf8, "CF8 should be available on Grand Sport X 2LT Coupe");
+  runtime.handleChoice(cf8);
+  assert.equal(runtime.state.selected.has("opt_cf8_001"), true);
+
+  const dtc = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_dtc_001");
+  assert.ok(dtc, "DTC should exist for the full-length stripe behavior proof");
+  assert.notEqual(runtime.disableReasonForChoice(dtc), "");
+  runtime.handleChoice(dtc);
+  assert.equal(runtime.state.selected.has("opt_dtc_001"), false);
+
+  const dzu = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_dzu_001");
+  assert.ok(dzu, "DZU should exist for the compatible Stinger stripe proof");
+  assert.equal(runtime.disableReasonForChoice(dzu), "");
+  runtime.handleChoice(dzu);
+  assert.equal(runtime.state.selected.has("opt_dzu_001"), true);
+});
+
+test("ZR1 and ZR1X SB9 block only disclosed available full-length stripes", () => {
+  const cases = [
+    {
+      modelKey: "zr1",
+      groupId: "zr1_group_sb9_excludes_full_length_stripe_choices",
+      expectedTargets: [
+        "opt_dpb_001",
+        "opt_dpc_001",
+        "opt_dpg_001",
+        "opt_dpl_001",
+        "opt_dpt_001",
+        "opt_dsy_001",
+        "opt_dsz_001",
+        "opt_dt0_001",
+        "opt_dth_001",
+        "opt_dub_001",
+        "opt_due_001",
+        "opt_duk_001",
+        "opt_duw_001",
+      ],
+      behaviorTarget: "opt_dt0_001",
+    },
+    {
+      modelKey: "zr1x",
+      groupId: "zr1x_group_sb9_excludes_full_length_stripe_choices",
+      expectedTargets: [
+        "opt_dpb_001",
+        "opt_dpc_001",
+        "opt_dpg_001",
+        "opt_dpl_001",
+        "opt_dpt_001",
+        "opt_dsy_001",
+        "opt_dsz_001",
+        "opt_dt0_001",
+        "opt_dth_001",
+        "opt_dub_001",
+        "opt_due_001",
+        "opt_duk_001",
+        "opt_duw_001",
+      ],
+      behaviorTarget: "opt_dt0_001",
+    },
+  ];
+
+  for (const { modelKey, groupId, expectedTargets, behaviorTarget } of cases) {
+    const runtime = loadRuntime();
+    runtime.activateModel(modelKey);
+    runtime.state.bodyStyle = "coupe";
+    runtime.state.trimLevel = "1LZ";
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+
+    const group = runtime.data.ruleGroups.find((candidate) => candidate.group_id === groupId);
+    assert.ok(group, `${modelKey} SB9 should publish one grouped stripe-conflict owner`);
+    assert.equal(group.group_type, "excludes_any");
+    assert.equal(group.source_id, "opt_sb9_001");
+    assert.deepEqual(JSON.parse(JSON.stringify(group.target_ids)), expectedTargets);
+    assert.equal(
+      runtime.data.rules.some(
+        (rule) => rule.source_id === "opt_sb9_001" && rule.rule_type === "excludes",
+      ),
+      false,
+      `${modelKey} SB9 conflicts should not retain partial direct owners`,
+    );
+    assert.equal(group.target_ids.includes("opt_dtc_001"), false, `${modelKey} DTC is not an SB9 conflict`);
+    assert.equal(group.target_ids.includes("opt_dtb_001"), false, `${modelKey} must not publish retired DTB`);
+
+    const sb9 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_sb9_001");
+    assert.ok(sb9, `${modelKey} SB9 should exist for the conflict proof`);
+    runtime.handleChoice(sb9);
+    assert.equal(runtime.state.selected.has("opt_sb9_001"), true);
+
+    const blockedStripe = runtime.activeChoiceRows().find(
+      (choice) => choice.option_id === behaviorTarget,
+    );
+    assert.ok(blockedStripe, `${behaviorTarget} should exist for ${modelKey}`);
+    assert.notEqual(runtime.disableReasonForChoice(blockedStripe), "");
+    runtime.handleChoice(blockedStripe);
+    assert.equal(runtime.state.selected.has(behaviorTarget), false);
+
+    const dtc = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_dtc_001");
+    assert.ok(dtc, `${modelKey} DTC should exist for the compatible-stripe proof`);
+    assert.equal(runtime.disableReasonForChoice(dtc), "");
+    runtime.handleChoice(dtc);
+    assert.equal(runtime.state.selected.has("opt_dtc_001"), true);
+  }
+});
+
+test("Grand Sport X does not publish unsupported DT0 or EFR auto-adds", () => {
+  const cases = [
+    {
+      ruleId: "grand_sport_x_rule_dt0_includes_sne_f0099d7e7cb4",
+      sourceId: "opt_dt0_001",
+      targetId: "opt_sne_001",
+      targetRpo: "SNE",
+    },
+    {
+      ruleId: "grand_sport_x_rule_efr_includes_cfv_ea894acb4a76",
+      sourceId: "opt_efr_001",
+      targetId: "opt_cfv_001",
+      targetRpo: "CFV",
+    },
+  ];
+
+  for (const { ruleId, sourceId, targetId, targetRpo } of cases) {
+    const runtime = loadRuntime();
+    runtime.activateModel("grand_sport_x");
+    runtime.state.bodyStyle = "coupe";
+    runtime.state.trimLevel = "1LT";
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+
+    assert.equal(
+      runtime.data.rules.some(
+        (rule) =>
+          rule.rule_id === ruleId &&
+          rule.source_id === sourceId &&
+          rule.rule_type === "includes" &&
+          rule.target_id === targetId &&
+          rule.auto_add === "True",
+      ),
+      false,
+      `${sourceId} should not publish the unsupported ${targetRpo} auto-add`,
+    );
+
+    const source = runtime.activeChoiceRows().find((choice) => choice.option_id === sourceId);
+    assert.ok(source, `${sourceId} should exist for the Grand Sport X runtime proof`);
+    runtime.handleChoice(source);
+    assert.equal(runtime.state.selected.has(sourceId), true, `${sourceId} should remain selectable`);
+    assert.equal(
+      runtime.currentOrder().auto_added_options.some((item) => item.rpo === targetRpo),
+      false,
+      `${sourceId} should not auto-add ${targetRpo}`,
+    );
+  }
+});
+
+test("Grand Sport and Grand Sport X publish Jake hood graphics outside the stripe selector with GSX stripe parity", () => {
+  const registry = loadDataWindow().CORVETTE_FORM_DATA;
+  const namedStripeIds = [
+    "opt_dpb_001",
+    "opt_dpc_001",
+    "opt_dpg_001",
+    "opt_dpl_001",
+    "opt_dpt_001",
+    "opt_dsy_001",
+    "opt_dsz_001",
+    "opt_dt0_001",
+    "opt_dtc_001",
+    "opt_dth_001",
+    "opt_dub_001",
+    "opt_due_001",
+    "opt_duk_001",
+    "opt_dzu_001",
+    "opt_dzv_001",
+    "opt_dzx_001",
+  ];
+
+  for (const modelKey of ["grandSport", "grand_sport_x"]) {
+    const data = registry.models[modelKey].data;
+    const byRpo = new Map(data.choices.map((choice) => [choice.rpo, choice]));
+    assert.equal(byRpo.get("PDA")?.section_id, "sec_jake_001", `${modelKey} PDA should remain in Jake Graphics`);
+    assert.equal(byRpo.get("SNE")?.section_id, "sec_jake_001", `${modelKey} SNE should render in Jake Graphics`);
+    assert.equal(byRpo.get("SHT")?.section_id, "sec_jake_001", `${modelKey} SHT should render in Jake Graphics`);
+    assert.equal(byRpo.get("VPW")?.section_id, "sec_hash_001", `${modelKey} VPW should remain in Hash Marks`);
+    assert.equal(byRpo.get("VPO")?.section_id, "sec_hash_001", `${modelKey} VPO should remain in Hash Marks`);
+  }
+
+  const runtime = loadRuntime();
+  runtime.activateModel("grand_sport_x");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.state.selected.clear();
+  runtime.state.userSelected.clear();
+
+  const pda = runtime.activeChoiceRows().find((choice) => choice.rpo === "PDA");
+  assert.ok(pda, "Grand Sport X should expose PDA");
+  runtime.handleChoice(pda);
+  const autoAddedRpos = [...runtime.computeAutoAdded().keys()]
+    .map((optionId) => runtime.data.choices.find((choice) => choice.option_id === optionId)?.rpo)
+    .filter(Boolean)
+    .sort();
+  assert.deepEqual(autoAddedRpos.filter((rpo) => ["SNE", "VPW"].includes(rpo)), ["SNE", "VPW"]);
+
+  const groupTargets = (groupId) => {
+    const group = runtime.data.ruleGroups.find((candidate) => candidate.group_id === groupId);
+    assert.ok(group, `${groupId} should publish from the GSX workbook rule-group owner`);
+    return JSON.parse(JSON.stringify(group.target_ids));
+  };
+  assert.deepEqual(groupTargets("gsx_group_pda_excludes_full_length_stripes"), namedStripeIds);
+  assert.deepEqual(
+    groupTargets("gsx_group_sne_excludes_full_length_stripes_and_jake_conflicts"),
+    [...namedStripeIds, "opt_sht_001", "opt_vpo_001"],
+  );
+  assert.deepEqual(
+    groupTargets("gsx_group_sht_excludes_full_length_stripes_and_jake_conflicts"),
+    [...namedStripeIds, "opt_pda_001", "opt_sne_001", "opt_vpw_001"],
+  );
+  assert.deepEqual(
+    groupTargets("gsx_group_dtc_excludes_jake_hood_graphics"),
+    ["opt_sht_001", "opt_sne_001"],
+  );
+  assert.equal(
+    runtime.data.choices.some((choice) => choice.rpo === "DUW"),
+    false,
+    "Grand Sport X must not invent the unavailable Grand Sport-only DUW stripe",
+  );
+});
+
 test("Grand Sport UQT is selectable on 1LT and included on higher trims from workbook overrides", () => {
   const runtime = loadRuntime();
   runtime.activateModel("grandSport");
@@ -1167,6 +1750,36 @@ test("Grand Sport UQT is selectable on 1LT and included on higher trims from wor
   order = runtime.currentOrder();
   assert.equal(order.selected_options.some((item) => item.rpo === "UQT"), false);
   assert.equal(runtime.data.standardEquipment.some((item) => item.variant_id === "2lt_e07" && item.rpo === "UQT"), true);
+});
+
+test("Grand Sport X UQT matches Grand Sport trim behavior", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grand_sport_x");
+  runtime.state.bodyStyle = "coupe";
+
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  let uqt = runtime.activeChoiceRows().find((choice) => choice.rpo === "UQT");
+  assert.ok(uqt, "Grand Sport X UQT should exist for 1LT");
+  assert.equal(uqt.status, "available");
+  assert.equal(uqt.selectable, "True");
+  assert.equal(uqt.step_key, "interior_trim");
+
+  for (const [trimLevel, variantId] of [["2LT", "2lt_g07"], ["3LT", "3lt_g07"]]) {
+    runtime.state.trimLevel = trimLevel;
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+    uqt = runtime.activeChoiceRows().find((choice) => choice.rpo === "UQT");
+    assert.ok(uqt, `Grand Sport X UQT should exist for ${trimLevel}`);
+    assert.equal(uqt.status, "standard");
+    assert.equal(uqt.selectable, "False");
+    assert.equal(uqt.step_key, "standard_equipment");
+    assert.equal(
+      runtime.data.standardEquipment.some((item) => item.variant_id === variantId && item.rpo === "UQT"),
+      true,
+    );
+  }
 });
 
 test("Grand Sport seat prices are workbook-scoped by trim", () => {
@@ -1278,6 +1891,54 @@ test("Grand Sport workbook default_selected rows seed and reconcile defaults gen
   assert.equal(redCaliperOrder.auto_added_options.some((item) => item.rpo === "J6D"), false, "Grey calipers should not override a user-selected caliper");
 });
 
+test("ZR1 and ZR1X keep fixed included equipment out of customer choice cards", () => {
+  const registry = loadDataWindow().CORVETTE_FORM_DATA;
+  const expectedDefaults = {
+    zr1: ["EFR", "J58"],
+    zr1x: ["AQ9", "AH2", "EFR", "EYT", "SOJ"],
+  };
+
+  for (const [modelKey, defaultRpos] of Object.entries(expectedDefaults)) {
+    const data = registry.models[modelKey].data;
+    const sectionsById = new Map(data.sections.map((section) => [section.section_id, section]));
+    const brokenStandardChoices = data.choices.filter((choice) => {
+      const section = sectionsById.get(choice.section_id);
+      return (
+        choice.active === "True" &&
+        choice.status !== "unavailable" &&
+        choice.selectable !== "True" &&
+        choice.display_behavior !== "hidden" &&
+        section?.selection_mode !== "display_only"
+      );
+    });
+
+    assert.equal(
+      brokenStandardChoices.length,
+      0,
+      `${modelKey} should not render fixed included equipment as unavailable customer choices: ${brokenStandardChoices
+        .map((choice) => `${choice.variant_id}:${choice.rpo}`)
+        .join(", ")}`,
+    );
+
+    for (const rpo of defaultRpos) {
+      const choices = data.choices.filter(
+        (choice) => choice.rpo === rpo && choice.status === "standard" && choice.active === "True",
+      );
+      assert.ok(choices.length > 0, `${modelKey} should retain standard ${rpo} choice rows`);
+      assert.equal(choices.every((choice) => choice.selectable === "True"), true, `${modelKey} ${rpo} should be selectable`);
+      assert.equal(
+        choices.every((choice) => choice.display_behavior === "default_selected"),
+        true,
+        `${modelKey} ${rpo} should be selected by default`,
+      );
+    }
+
+    for (const item of data.standardEquipment) {
+      assert.notEqual(item.status, "unavailable", `${modelKey} standard-equipment export should contain only included rows`);
+    }
+  }
+});
+
 test("Grand Sport engine covers are radio peers without an open Engine Appearance requirement", () => {
   const runtime = loadRuntime();
   runtime.activateModel("grandSport");
@@ -1346,6 +2007,169 @@ test("Grand Sport WUB enables NWI without replacing NGA; NWI replaces and restor
   assert.equal(runtime.state.selected.has("opt_wub_001"), false, "WUB should be removable");
   assert.equal(runtime.state.selected.has("opt_nwi_001"), false, "removing WUB should remove invalid NWI");
   assert.equal(runtime.state.selected.has("opt_nga_001"), true, "removing WUB from the NWI path should restore NGA");
+});
+
+test("Grand Sport X defaults NGA and restores it after the NWI path", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grand_sport_x");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const wub = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_wub_001");
+  const nwi = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_nwi_001");
+  assert.ok(wub && nwi, "WUB and NWI should be active Grand Sport X exhaust choices");
+  assert.equal(runtime.state.selected.has("opt_nga_001"), true, "NGA should seed as the Grand Sport X default exhaust tip");
+
+  runtime.handleChoice(wub);
+  runtime.handleChoice(nwi);
+  assert.equal(runtime.state.selected.has("opt_nwi_001"), true);
+  assert.equal(runtime.state.selected.has("opt_nga_001"), false, "NWI should replace NGA");
+
+  runtime.handleChoice(nwi);
+  assert.equal(runtime.state.selected.has("opt_nwi_001"), false);
+  assert.equal(runtime.state.selected.has("opt_nga_001"), true, "removing NWI should restore NGA");
+});
+
+test("Z06, ZR1, and ZR1X share workbook-owned NGA default and restoration behavior", () => {
+  const cases = [
+    ["z06", "z06_default_nga_unless_nwi"],
+    ["zr1", "zr1_default_nga_unless_nwi"],
+    ["zr1x", "zr1x_default_nga_unless_nwi"],
+  ];
+
+  for (const [modelKey, ruleId] of cases) {
+    const runtime = loadRuntime();
+    runtime.activateModel(modelKey);
+    runtime.state.bodyStyle = "coupe";
+    runtime.state.trimLevel = "1LZ";
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+
+    const nga = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_nga_001");
+    const nwi = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_nwi_001");
+    const defaultRule = runtime.data.defaultSelectionRules.find((rule) => rule.rule_id === ruleId);
+    assert.ok(nga && nwi, `${modelKey} should expose both exhaust-tip choices`);
+    assert.equal(nga.display_behavior, "default_selected", `${modelKey} NGA display default should derive from its workbook rule`);
+    assert.deepEqual(
+      defaultRule && {
+        target_option_id: defaultRule.target_option_id,
+        condition_type: defaultRule.condition_type,
+        condition_id: defaultRule.condition_id,
+      },
+      {
+        target_option_id: "opt_nga_001",
+        condition_type: "unless_selected_rpo",
+        condition_id: "NWI",
+      },
+      `${modelKey} should publish the shared NGA-unless-NWI rule shape`,
+    );
+    assert.equal(runtime.state.selected.has("opt_nga_001"), true, `${modelKey} should initially select NGA`);
+
+    runtime.handleChoice(nwi);
+    assert.equal(runtime.state.selected.has("opt_nwi_001"), true, `${modelKey} should select NWI`);
+    assert.equal(runtime.state.selected.has("opt_nga_001"), false, `${modelKey} NWI should replace NGA`);
+
+    runtime.handleChoice(nwi);
+    assert.equal(runtime.state.selected.has("opt_nwi_001"), false, `${modelKey} NWI should be removable`);
+    assert.equal(runtime.state.selected.has("opt_nga_001"), true, `${modelKey} should restore NGA after NWI removal`);
+  }
+});
+
+test("ZR1 exposes J59 as a brake choice and ZTK adds J59 with TOM without a preselection gate", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("zr1");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LZ";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const j58 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j58_002");
+  const j59 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j59_002");
+  const tom = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_tom_001");
+  const ztk = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_ztk_001");
+  assert.ok(j58 && j59 && tom && ztk, "ZR1 should expose both brake choices, TOM, and ZTK");
+  assert.equal(j59.section_id, "sec_perf_brake_001", "J59 should render in Performance Brakes");
+  assert.equal(j59.selectable, "True", "J59 should be manually selectable without ZTK");
+  assert.notEqual(j59.display_behavior, "display_only", "J59 should not remain a Standard Equipment display row");
+  assert.equal(runtime.disableReasonForChoice(ztk), "", "ZTK should be selectable before TOM is selected");
+
+  runtime.handleChoice(j59);
+  assert.equal(runtime.state.selected.has("opt_j59_002"), true, "manual J59 selection should stick");
+  assert.equal(runtime.state.selected.has("opt_j58_002"), false, "J59 should replace the standard J58 brake choice");
+  assert.equal(runtime.computeAutoAdded().has("opt_tom_001"), false, "manual J59 should not add TOM by itself");
+
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  runtime.handleChoice(ztk);
+  const autoAdded = runtime.computeAutoAdded();
+  assert.equal(runtime.state.selected.has("opt_ztk_001"), true, "ZTK selection should stick without preselecting TOM");
+  assert.equal(autoAdded.has("opt_j59_002"), true, "ZTK should auto-add J59");
+  assert.equal(autoAdded.has("opt_tom_001"), true, "ZTK should auto-add TOM");
+  assert.equal(runtime.state.selected.has("opt_t0e_001"), false, "auto-added TOM should replace the default T0E aero choice");
+  assert.match(runtime.disableReasonForChoice(j58), /ZTK|J59/i, "J58 should be unavailable while ZTK owns the brake choice");
+  assert.match(runtime.disableReasonForChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_t0e_001")), /ZTK|TOM/i, "T0E should be unavailable while ZTK owns the aero choice");
+  runtime.handleChoice(j58);
+  runtime.handleChoice(runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_t0e_001"));
+  assert.equal(runtime.state.selected.has("opt_j58_002"), false, "J58 cannot replace ZTK-included J59");
+  assert.equal(runtime.state.selected.has("opt_t0e_001"), false, "T0E cannot replace ZTK-included TOM");
+  assert.equal(runtime.computeAutoAdded().has("opt_j59_002"), true, "J59 remains included after the blocked J58 click");
+  assert.equal(runtime.computeAutoAdded().has("opt_tom_001"), true, "TOM remains included after the blocked T0E click");
+
+  for (const coverId of ["opt_rwj_001", "opt_wkr_001"]) {
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+    const cover = runtime.activeChoiceRows().find((choice) => choice.option_id === coverId);
+    assert.ok(cover, `${coverId} should be an active ZR1 car-cover choice`);
+    runtime.handleChoice(cover);
+    assert.equal(runtime.state.selected.has(coverId), true, `${coverId} selection should stick before ZTK`);
+
+    runtime.handleChoice(ztk);
+    assert.equal(runtime.state.selected.has(coverId), false, `ZTK should replace ${coverId} so TOM can be included`);
+    assert.equal(runtime.computeAutoAdded().has("opt_tom_001"), true, `ZTK should still auto-add TOM after replacing ${coverId}`);
+  }
+});
+
+test("ZR1X ZTK is immediately selectable and locks its included J59 and TOM choices", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("zr1x");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LZ";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  const j59 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j59_002");
+  const tom = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_tom_002");
+  const t0e = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_t0e_001");
+  const ztk = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_ztk_001");
+  assert.ok(j59 && tom && t0e && ztk, "ZR1X should expose J59, TOM, T0E, and ZTK in its active contract");
+  assert.equal(runtime.disableReasonForChoice(ztk), "", "ZR1X ZTK should be selectable before TOM is selected");
+
+  runtime.handleChoice(ztk);
+  assert.equal(runtime.state.selected.has("opt_ztk_001"), true, "ZR1X ZTK selection should stick immediately");
+  assert.equal(runtime.computeAutoAdded().has("opt_j59_002"), true, "ZR1X ZTK should auto-add J59");
+  assert.equal(runtime.computeAutoAdded().has("opt_tom_002"), true, "ZR1X ZTK should auto-add TOM");
+  assert.equal(runtime.state.selected.has("opt_t0e_001"), false, "ZR1X TOM should replace the default T0E aero choice");
+
+  assert.match(runtime.disableReasonForChoice(t0e), /ZTK|TOM/i, "ZR1X T0E should be unavailable while ZTK owns the aero choice");
+  runtime.handleChoice(t0e);
+  assert.equal(runtime.state.selected.has("opt_t0e_001"), false, "ZR1X T0E cannot replace ZTK-included TOM");
+  assert.equal(runtime.computeAutoAdded().has("opt_j59_002"), true, "ZR1X J59 remains included with ZTK");
+  assert.equal(runtime.computeAutoAdded().has("opt_tom_002"), true, "ZR1X TOM remains included after the blocked T0E click");
+
+  for (const coverId of ["opt_rwj_001", "opt_wkr_001"]) {
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+    const cover = runtime.activeChoiceRows().find((choice) => choice.option_id === coverId);
+    assert.ok(cover, `${coverId} should be an active ZR1X car-cover choice`);
+    runtime.handleChoice(cover);
+    assert.equal(runtime.state.selected.has(coverId), true, `${coverId} selection should stick before ZTK`);
+
+    runtime.handleChoice(ztk);
+    assert.equal(runtime.state.selected.has(coverId), false, `ZR1X ZTK should replace ${coverId} so TOM can be included`);
+    assert.equal(runtime.computeAutoAdded().has("opt_tom_002"), true, `ZR1X ZTK should still include TOM after replacing ${coverId}`);
+  }
 });
 
 test("Stingray WUB enables NWI without replacing NGA; NWI replaces and restores NGA", () => {

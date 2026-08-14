@@ -85,7 +85,6 @@ def _valid_row(**overrides: object) -> list[object]:
             "description_equals_detail_raw",
         ),
         ({"option_name": "Line one\nLine two"}, "option_name_multiline"),
-        ({"option_name": "X" * 61}, "option_name_too_long"),
         ({"option_name": "LPO"}, "bare_lpo_option_name"),
         ({"option_id": "opt_std_0123456789abcdef"}, "hash_derived_option_id"),
         ({"display_order": None}, "active_option_missing_display_order"),
@@ -162,6 +161,19 @@ def test_display_only_included_row_may_use_explicit_zero_price() -> None:
     ) == []
 
 
+def test_customer_facing_option_names_have_no_arbitrary_length_limit() -> None:
+    from corvette_form_generator.options_sheet_quality import evaluate_options_sheet_quality
+
+    row = dict(zip(OPTION_HEADERS, _valid_row(option_name="X" * 200)))
+
+    assert evaluate_options_sheet_quality(
+        "zr1",
+        "zr1_options",
+        [row],
+        {"sec_std_001": "display_only"},
+    ) == []
+
+
 def test_pure_quality_evaluator_reports_each_active_section_order_collision() -> None:
     from corvette_form_generator.options_sheet_quality import evaluate_options_sheet_quality
 
@@ -184,8 +196,7 @@ def test_pure_quality_evaluator_reports_each_active_section_order_collision() ->
 def test_quality_allowlist_requires_exact_value_and_reason(tmp_path: Path) -> None:
     from corvette_form_generator.options_sheet_quality import lint_options_sheet_quality
 
-    long_name = "A" * 61
-    workbook = _quality_workbook(tmp_path, [_valid_row(option_name=long_name)])
+    workbook = _quality_workbook(tmp_path, [_valid_row(price=995)])
     allowlist = tmp_path / "allowlist.json"
     allowlist.write_text(
         json.dumps(
@@ -196,8 +207,8 @@ def test_quality_allowlist_requires_exact_value_and_reason(tmp_path: Path) -> No
                         "model": "zr1",
                         "sheet": "zr1_options",
                         "optionId": "opt_001",
-                        "checkId": "option_name_too_long",
-                        "value": long_name,
+                        "checkId": "standard_option_nonzero_price",
+                        "value": 995,
                         "reason": "Reviewed reference exception.",
                     }
                 ],
@@ -207,16 +218,16 @@ def test_quality_allowlist_requires_exact_value_and_reason(tmp_path: Path) -> No
     )
 
     assert not any(
-        issue.check_id == "option_name_too_long"
+        issue.check_id == "standard_option_nonzero_price"
         for issue in lint_options_sheet_quality(workbook, allowlist_path=allowlist)
     )
 
     wb = load_workbook(workbook)
-    wb["zr1_options"]["D2"] = "B" * 61
+    wb["zr1_options"]["C2"] = 1495
     wb.save(workbook)
     wb.close()
     assert any(
-        issue.check_id == "option_name_too_long"
+        issue.check_id == "standard_option_nonzero_price"
         for issue in lint_options_sheet_quality(workbook, allowlist_path=allowlist)
     )
 

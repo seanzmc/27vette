@@ -1,0 +1,58 @@
+Workbook Manager validation-efficiency checkpoint evidence
+Date: 2026-08-10
+Base: db-workflow / df79bb380703
+
+PRE-FLIGHT
+- git status --short --branch: clean on db-workflow tracking origin/db-workflow.
+- HEAD and origin/db-workflow: df79bb380703bff90a3edf2d9e829e7424c6b918.
+- Fable validator before edits: exit 1 with only six historical missing Pass 5 receipt artifacts (three under 2026-08-08-dbpass5-durable-draft-coalescing and three under 2026-08-09-dbpass5-preview-lifecycle).
+
+BASELINE
+- Historical pre-Pass-6A live read-only timing audit: 932.51 seconds; 138 passed, 2 skipped, 17 subtests. This is context only, not the optimization baseline.
+- Same-version pre-optimization baseline from the completed Pass 6A receipt: 966.50 seconds; 142 passed, 2 skipped, 17 subtests.
+
+FOCUSED AFFECTED RUN
+Command:
+.venv/bin/python -m pytest tests/test_workbook_manager.py::TestImportFidelity::test_import_reports_are_queryable tests/test_workbook_manager.py::TestStagingWorkflow::test_stage_validate_commit_add_option tests/test_workbook_manager.py::TestComparisonExport tests/test_workbook_manager_import_projection.py::TestAtomicProjectionPromotion::test_real_workbook_acceptance_promotes_verified_projection_once -q --durations=10
+Result: 6 passed in 348.78s.
+Slowest: changed-overlay export 208.14s; promotion success 71.01s; unchanged-export setup 67.45s.
+
+POST-REVIEW FOCUSED RUN
+Command:
+.venv/bin/python -m pytest tests/test_workbook_manager.py::TestComparisonExport::test_acceptance_export_is_disposable_and_preserves_unchanged_workbook -q --durations=5
+Result: 1 passed in 70.74s.
+Slowest: unchanged-export setup 70.37s.
+
+FINAL DOCUMENTED INVENTORY — RUN EXACTLY ONCE AFTER THE SLICE
+Command:
+.venv/bin/python -m pytest tests/test_workbook_manager_catalog.py tests/test_workbook_manager_import_projection.py tests/test_workbook_manager_generated_parity.py tests/test_workbook_manager_api_concurrency.py tests/test_workbook_manager_drafts.py tests/test_workbook_manager_changeset_lifecycle.py tests/test_workbook_manager.py -q --durations=30
+Result: 139 passed, 2 skipped, 1 warning, 17 subtests passed in 791.25s (0:13:11).
+Warning: existing StarletteDeprecationWarning from fastapi.testclient/httpx.
+
+Slowest retained cases:
+- 213.42s changed-overlay comparison export
+- 74.87s generated-contract parity
+- 71.45s API class setup / initial promoted projection
+- 69.69s API active-projection re-import
+- 69.47s unchanged comparison-export setup
+- 68.78s API comparison export
+- 68.44s projection-promotion success
+- 67.92s projection source-drift fail-closed
+- 67.86s projection atomic-replace fail-closed
+- 2.80s incomplete asset import blocker
+- 2.78s malformed workbook blocker
+- 2.77s blocking-import no-replace proof
+- 2.76s unresolved-reference disposition proof
+
+TIMING COMPARISON
+- Saved from the same-version Pass 6A baseline: 175.25 seconds.
+- Reduction: 18.13%.
+- 25% target wall time: 724.88 seconds.
+- Final remains 66.37 seconds above that target; scope stopped without weakening coverage.
+
+FINAL CLOSEOUT CHECKS
+- git diff --check: PASS.
+- Canonical live SHA-256 equals HEAD: 624f1fa15c89e0a288f4ba0d74eb7eb32bfdedce2e1ec7a168ce3f0fe18292ec.
+- `git diff --quiet HEAD` passed for `stingray_master.xlsx`, `form-output/`, all of `form-app/` (generated registry plus runtime/dealer surfaces), dependency manifests, and `.github` deployment files.
+- Tracked changes are limited to the owning specification, STATE, two test modules, and `workbook-manager/README.md`; the only untracked path is this four-file receipt.
+- The first closeout loop-validator run found the same six historical Pass 5 receipt omissions plus five formatting/independent-mechanical-verifier declaration issues in this new receipt. Those issues were corrected; the next rerun caught one remaining heading-capitalization mismatch, which was also corrected. No historical receipt was changed.

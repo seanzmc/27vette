@@ -1,0 +1,75 @@
+PASS 4 STAGE C PREFLIGHT VALIDATION
+Date: 2026-07-29
+Source commit: 3515f72d0b81008a516c5bb1eac9ca2c38aab2aa
+
+SCOPE
+- Read-only audit of the current Stage C plan/doc/review candidates.
+- Receipt, owning-spec status paragraph, and dated STATE closeout only.
+- No plan/doc move or deletion.
+- No workbook, code/test, generation, publication, runtime, browser, or dealer action.
+
+INVENTORY AND PARTITION
+- Exact command: git ls-files '.hermes/plans/*.md'
+- Tracked plans: 28
+- Classified unique plans: 28
+- PROPOSE_ARCHIVE_ALREADY_CLOSED: 10
+- PROPOSE_CLOSE_THEN_ARCHIVE: 9
+- KEEP_OPEN: 6
+- KEEP_HISTORICAL_INPUT: 2
+- NEEDS_DECISION: 1
+- Missing: []
+- Extra: []
+- Duplicate classifications: []
+- Result: PREFLIGHT_PARTITION_AND_BOUNDARY_OK
+
+DESTINATION AND CANDIDATE CHECKS
+- Nineteen completed-plan archive destinations checked on disk and in Git index: zero collisions.
+- Four historical-document sources present/tracked; four destinations free.
+- Three conditional-deletion sources present/tracked.
+- No move or deletion executed.
+
+CURRENT-CONSUMER STOP
+- Read-only openpyxl inspection found 21 canonical workbook cells carrying one of the two Grand Sport reverse-exclusion plan paths.
+- Range: grandSport_rule_groups!I30 through grandSport_rule_groups!I50.
+- Those paths are also emitted into the retained Grand Sport runtime contract and published registry.
+- Result: both plans classified KEEP_HISTORICAL_INPUT at their current paths; no workbook/regeneration/publication expansion.
+
+HISTORICAL EVIDENCE
+- Four July 5 cross-model receipt files retain objective, gate matrix, classifications, verifier judgment, and provenance.
+- The two raw logs are conditional deletion candidates only after an append-only dated note preserves the verifier's original inspection fact and points to distilled evidence.
+- docs/claude_output-workbookEditor.md has no unique evidence beyond the July 15 receipt and current Workbook Manager README.
+- Prior historical receipts and STATE chronology are not rewritten merely to modernize original paths.
+
+CURRENT POINTERS
+- Exact current updates required during implementation are listed in preflight-report.md:
+  - reliable workbook/database workflow: db audit and vehicle-setup plan pointers;
+  - open Z06 interior plan: archived Pass 1 runtime-rule plan pointer;
+  - moved July 16 plan/design: archive navigation pointers only;
+  - July 5 verifier report: append-only raw-log retirement note;
+  - owning cleanup specification: current Stage C manifest/counts/status.
+
+STATE NAVIGATION
+- STATE.md measured at 229 physical lines / 117,367 bytes before this preflight closeout.
+- Preflight recommendation: add a compact current-authority header during approved implementation; do not rewrite chronology.
+
+DURABLE LESSON
+- `active-surface-viability-audits` reference `guidance-and-retirement-audit.md` now requires canonical data/workbook and generated/published path scans before moving completed plans.
+- STATE Lessons learned records the same dated, evidenced source-of-truth provenance rule.
+
+PROTECTED BOUNDARY
+- Workbook SHA-256 at preflight: 16415b913935b6d644fd1fbdcb5f6818d119e62cb6ef1fd077cff0f4b8d870e1.
+- git diff --exit-code 3515f72 over stingray_master.xlsx, scripts/, tests/, form-output/, form-app/, AGENTS.md, README.md, and docs/route-map.md: clean.
+- git diff --check: clean.
+- Only owning spec, STATE, and the new preflight receipt differ from 3515f72.
+- The owning spec's current approval section now treats Pass 0A/0B and Passes 2–3 as historical/completed and binds Stage C to this preflight manifest rather than stale Pass 5 language.
+
+INDEPENDENT VERIFICATION
+- Cycle 1 (`deleg_cbf25bb5`): FAIL C2/C7/C8. The initial 19-plan archive class mixed ten top-level-closed plans with nine landed plans that still retained approval prompts or lacked top-level closure. The report/rubric/spec/STATE now split those nine into `PROPOSE_CLOSE_THEN_ARCHIVE`, with an exact pre-move closure action. The verifier also required distinguishing unchanged standing guidance owners from the intentionally updated owning specification; corrected.
+- Final independent verification (`deleg_cb040293`): PASS C1-C7 with no blockers. Exact 10 / 9 / 6 / 2 / 1 partition, evidence ancestry, no-collision maps, conditional log boundary, pointer inventory, STATE-header recommendation, protected surfaces, and pre-move closure gate re-verified; verifier made no edits.
+
+FINAL FABLE GATES
+- First closeout attempt correctly failed because final `verifier-report.md`/`run.json` did not yet exist. After creating them, the next attempt found the verifier-report section contract and repo-local `skill_update.evidence` path incomplete; corrected without changing the audit manifest.
+- `.venv/bin/python scripts/validate_fable5_loop.py`: PASS.
+- `.venv/bin/python -m pytest tests/test_fable5_loop_contract.py -q`: 13 passed in 0.80s.
+- `git diff --check`: PASS.
+- Protected-source diff from `3515f72`: empty for workbook, scripts, tests, generated/published artifacts, app/runtime, standing guidance, route map, and existing archives.

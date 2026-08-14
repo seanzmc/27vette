@@ -4,30 +4,6 @@
     {
       "model": "stingray",
       "sheet": "stingray_options",
-      "optionId": "opt_q9o_001",
-      "checkId": "option_name_too_long",
-      "value": "Satin Graphite 5-Split-Spoke Forged Aluminum Wheels with Machined Edge",
-      "reason": "Existing promoted-model reference name; exact legacy copy retained."
-    },
-    {
-      "model": "stingray",
-      "sheet": "stingray_options",
-      "optionId": "opt_q9a_001",
-      "checkId": "option_name_too_long",
-      "value": "Midnight Gray 20-Spoke Forged Aluminum Wheels with Red Stripe",
-      "reason": "Existing promoted-model reference name; exact legacy copy retained."
-    },
-    {
-      "model": "grand_sport",
-      "sheet": "grandSport_options",
-      "optionId": "opt_swp_001",
-      "checkId": "option_name_too_long",
-      "value": "Carbon Flash Bright Polished-Face 10-Spoke Forged Aluminum Wheels",
-      "reason": "Existing promoted-model reference name; exact legacy copy retained."
-    },
-    {
-      "model": "stingray",
-      "sheet": "stingray_options",
       "optionId": "opt_d30_001",
       "checkId": "standard_option_nonzero_price",
       "value": 1495,

@@ -4,9 +4,11 @@ import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
-const reviewDir = "/tmp/27vette-z06-interior-accessory-draft-test";
-const draftPath = `${reviewDir}/z06-form-data-draft.json`;
-let cachedDraft;
+import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
+
+const testRoot = "/tmp/27vette-z06-interior-accessory-runtime-test";
+const runtimePath = `${testRoot}/form-output/runtime/z06-runtime-contract.json`;
+let cachedContract;
 
 function makeElement() {
   return {
@@ -134,25 +136,39 @@ function autoAddedRpos(runtime) {
   return [...runtime.computeAutoAdded().keys()].map((id) => choices.find((choice) => choice.option_id === id)?.rpo || id).sort();
 }
 
-function draftData() {
-  if (cachedDraft) return cachedDraft;
-  fs.rmSync(reviewDir, { recursive: true, force: true });
+function runtimeContract() {
+  if (cachedContract) return cachedContract;
+  fs.rmSync(testRoot, { recursive: true, force: true });
+  fs.mkdirSync(testRoot, { recursive: true });
+  const before = readTrackedArtifacts();
   execFileSync(
     ".venv/bin/python",
-    ["scripts/generate_form.py", "--model", "z06", "--emit-inspection", "--inspection-output", reviewDir],
+    [
+      "scripts/generate_form.py",
+      "--model",
+      "z06",
+      "--output-root",
+      testRoot,
+    ],
     {
       encoding: "utf8",
       stdio: "pipe",
     }
   );
-  cachedDraft = JSON.parse(fs.readFileSync(draftPath, "utf8"));
-  return cachedDraft;
+  assertTrackedArtifactsUnchanged(before);
+  assert.ok(
+    fs.existsSync(runtimePath),
+    "--output-root must receive the strict runtime contract this gate consumes"
+  );
+  cachedContract = JSON.parse(fs.readFileSync(runtimePath, "utf8"));
+  assert.equal(cachedContract.dataset.status, "runtime_active");
+  return cachedContract;
 }
 
 test("Z06 UQT follows LZ trim-scoped selectable and standard-equipment contract", () => {
-  const draft = draftData();
+  const contract = runtimeContract();
   for (const variantId of ["1lz_h07", "1lz_h67"]) {
-    const uqt = draft.choices.find((choice) => choice.choice_id === `${variantId}__opt_uqt_001`);
+    const uqt = contract.choices.find((choice) => choice.choice_id === `${variantId}__opt_uqt_001`);
     assert.ok(uqt, `${variantId} should emit UQT`);
     assert.equal(uqt.status, "available");
     assert.equal(uqt.selectable, "True");
@@ -165,7 +181,7 @@ test("Z06 UQT follows LZ trim-scoped selectable and standard-equipment contract"
     ["3lz_h07", "sec_3lte_001"],
     ["3lz_h67", "sec_3lte_001"],
   ]) {
-    const uqt = draft.choices.find((choice) => choice.choice_id === `${variantId}__opt_uqt_001`);
+    const uqt = contract.choices.find((choice) => choice.choice_id === `${variantId}__opt_uqt_001`);
     assert.ok(uqt, `${variantId} should emit UQT`);
     assert.equal(uqt.status, "standard");
     assert.equal(uqt.selectable, "False");
@@ -191,8 +207,8 @@ test("Z06 runtime does not expose standard UQT or N3W as selectable front-end op
 });
 
 test("Z06 3LZ seat pricing is trim-scoped in generated data and runtime", () => {
-  const draft = draftData();
-  const priceRules = new Map(draft.priceRules.map((rule) => [rule.price_rule_id, rule]));
+  const contract = runtimeContract();
+  const priceRules = new Map(contract.priceRules.map((rule) => [rule.price_rule_id, rule]));
   for (const [ruleId, targetOptionId, priceValue] of [
     ["z06_pr_3lz_ah2_seat_001", "opt_ah2_001", 0],
     ["z06_pr_3lz_ae4_seat_001", "opt_ae4_002", 595],

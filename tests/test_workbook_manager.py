@@ -15,7 +15,9 @@ import sqlite3
 import sys
 import tempfile
 import unittest
+from copy import deepcopy
 from pathlib import Path
+from unittest import mock
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BACKEND = REPO_ROOT / "workbook-manager" / "backend"
@@ -25,11 +27,21 @@ for p in (str(BACKEND), str(REPO_ROOT / "scripts")):
 
 from app import db as dbmod                     # noqa: E402
 from app import importer, naming, staging, sync as syncmod  # noqa: E402
-from app.specs import SPEC_BY_TABLE, TABLE_SPECS  # noqa: E402
+from app.catalog import (  # noqa: E402
+    SPEC_BY_TABLE,
+    TABLE_SPECS,
+    classify_workbook_sheets,
+)
 from app.staging import StagingError            # noqa: E402
 from app.validation import find_dependents      # noqa: E402
 
 WORKBOOK = REPO_ROOT / "stingray_master.xlsx"
+
+_IMMUTABLE_FIXTURE_ROOT: Path | None = None
+_IMMUTABLE_PROJECTION: Path | None = None
+_IMMUTABLE_PROJECTION_SHA256 = ""
+_IMMUTABLE_WORKBOOK_SHA256 = ""
+_IMMUTABLE_IMPORT_REPORT: dict | None = None
 
 try:
     import fastapi  # noqa: F401
@@ -44,8 +56,51 @@ def fresh_db(tmpdir: Path) -> sqlite3.Connection:
     return conn
 
 
+def _sha256(path: Path) -> str:
+    import hashlib
+
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def setUpModule() -> None:
+    """Build the real-workbook imported projection once; tests clone it only."""
+    global _IMMUTABLE_FIXTURE_ROOT
+    global _IMMUTABLE_PROJECTION
+    global _IMMUTABLE_PROJECTION_SHA256
+    global _IMMUTABLE_WORKBOOK_SHA256
+    global _IMMUTABLE_IMPORT_REPORT
+
+    _IMMUTABLE_FIXTURE_ROOT = Path(tempfile.mkdtemp(prefix="wbm-import-base-"))
+    connection = fresh_db(_IMMUTABLE_FIXTURE_ROOT)
+    try:
+        import_report = importer.import_workbook(connection, WORKBOOK)
+        _IMMUTABLE_IMPORT_REPORT = import_report
+        errors = [
+            issue
+            for issue in import_report["issues"]
+            if issue["severity"] == "error"
+        ]
+        if errors:
+            raise AssertionError(f"immutable imported fixture has errors: {errors}")
+        connection.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+    finally:
+        connection.close()
+    _IMMUTABLE_PROJECTION = _IMMUTABLE_FIXTURE_ROOT / "test.sqlite3"
+    _IMMUTABLE_PROJECTION_SHA256 = _sha256(_IMMUTABLE_PROJECTION)
+    _IMMUTABLE_WORKBOOK_SHA256 = _sha256(WORKBOOK)
+
+
+def tearDownModule() -> None:
+    """Prove sharing did not mutate either reusable source."""
+    assert _IMMUTABLE_PROJECTION is not None
+    assert _IMMUTABLE_FIXTURE_ROOT is not None
+    assert _sha256(_IMMUTABLE_PROJECTION) == _IMMUTABLE_PROJECTION_SHA256
+    assert _sha256(WORKBOOK) == _IMMUTABLE_WORKBOOK_SHA256
+    shutil.rmtree(_IMMUTABLE_FIXTURE_ROOT, ignore_errors=True)
+
+
 class ImportedWorkbookCase(unittest.TestCase):
-    """Shared imported-database fixture (imported once per class)."""
+    """Focused behavior fixture cloned from one immutable real import."""
 
     tmpdir: Path
     conn: sqlite3.Connection
@@ -53,14 +108,21 @@ class ImportedWorkbookCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        assert _IMMUTABLE_PROJECTION is not None
+        assert _IMMUTABLE_IMPORT_REPORT is not None
         cls.tmpdir = Path(tempfile.mkdtemp(prefix="wbm-test-"))
-        cls.conn = fresh_db(cls.tmpdir)
-        cls.report = importer.import_workbook(cls.conn, WORKBOOK)
+        projection = cls.tmpdir / "test.sqlite3"
+        shutil.copy2(_IMMUTABLE_PROJECTION, projection)
+        cls.conn = dbmod.connect(projection)
+        cls.report = deepcopy(_IMMUTABLE_IMPORT_REPORT)
 
     @classmethod
     def tearDownClass(cls):
+        assert _IMMUTABLE_PROJECTION is not None
         cls.conn.close()
         shutil.rmtree(cls.tmpdir, ignore_errors=True)
+        assert _sha256(_IMMUTABLE_PROJECTION) == _IMMUTABLE_PROJECTION_SHA256
+        assert _sha256(WORKBOOK) == _IMMUTABLE_WORKBOOK_SHA256
 
 
 class TestImportFidelity(ImportedWorkbookCase):
@@ -96,24 +158,17 @@ class TestImportFidelity(ImportedWorkbookCase):
                              self._workbook_row_count(sheet),
                              f"row loss in {sheet}")
 
-    def test_every_sheet_is_handled_or_preserved(self):
+    def test_every_sheet_is_classified_without_a_second_preserved_cell_store(self):
         from openpyxl import load_workbook
         wb = load_workbook(WORKBOOK, read_only=True)
         names = set(wb.sheetnames)
+        classifications = classify_workbook_sheets(wb)
         wb.close()
-        managed: set[str] = set()
-        for spec in TABLE_SPECS:
-            rows = self.conn.execute(
-                f"SELECT DISTINCT src_sheet s FROM {spec.table}").fetchall()
-            managed |= {r["s"] for r in rows if r["s"]}
-        raw = {r["s"] for r in self.conn.execute(
-            "SELECT DISTINCT sheet s FROM raw_sheet_rows")}
-        missing = names - managed - raw
-        # Sheets that are entirely empty of data rows may appear nowhere.
-        for sheet in missing:
-            self.assertEqual(
-                self._workbook_row_count(sheet), 0,
-                f"sheet {sheet!r} lost during import")
+        self.assertEqual(
+            self.conn.execute("SELECT COUNT(*) c FROM raw_sheet_rows").fetchone()["c"],
+            0,
+        )
+        self.assertEqual(names, set(classifications))
 
     def test_model_scoped_option_uniqueness_enforced(self):
         dup = self.conn.execute(
@@ -128,6 +183,27 @@ class TestImportFidelity(ImportedWorkbookCase):
             "HAVING COUNT(DISTINCT model_id) > 1)").fetchone()
         self.assertGreater(row["c"], 1,
                            "expected shared option_ids across models")
+
+    def test_model_setup_copy_columns_are_managed_and_imported(self):
+        expected = {
+            "setup_card_subtitle", "setup_eyebrow", "setup_title", "setup_description",
+            "setup_fact_1", "setup_fact_2", "setup_fact_3",
+        }
+        model_spec = SPEC_BY_TABLE["models"]
+        self.assertTrue(expected.issubset({column.header for column in model_spec.columns}))
+        rows = self.conn.execute(
+            "SELECT * FROM models WHERE active IN ('True', '1', 'TRUE', 'true') "
+            "ORDER BY model_key"
+        ).fetchall()
+        self.assertEqual(
+            [row["model_key"] for row in rows],
+            ["grand_sport", "grand_sport_x", "stingray", "z06", "zr1", "zr1x"],
+        )
+        for row in rows:
+            self.assertTrue(
+                all(row[column] for column in expected),
+                f"active model {row['model_key']} must have complete setup copy",
+            )
 
     def test_import_reports_are_queryable(self):
         self.assertIn(self.report["run"]["status"],
@@ -148,6 +224,18 @@ class TestImportFidelity(ImportedWorkbookCase):
             (self.report["run"]["id"],)).fetchone()["c"]
         self.assertEqual(orphans, reported,
                          "unresolved OVS references must all be reported")
+
+    def test_shared_physical_source_rows_import_once_with_all_model_contexts(self):
+        rows = self.conn.execute(
+            "SELECT src_sheet, physical_key, model_context FROM interiors"
+        ).fetchall()
+        identities = {(row["src_sheet"], row["physical_key"]) for row in rows}
+        self.assertEqual(len(rows), len(identities))
+        shared = self.conn.execute(
+            "SELECT model_context FROM interiors "
+            "WHERE src_sheet='lt_interiors' LIMIT 1"
+        ).fetchone()
+        self.assertGreater(len(json.loads(shared["model_context"])), 1)
 
 
 class TestNaming(unittest.TestCase):
@@ -223,7 +311,7 @@ class TestStagingWorkflow(ImportedWorkbookCase):
                         "rpo": "X", "price": "0", "selectable": "True",
                         "display_order": "1", "active": "True"})
 
-    def test_delete_blocked_by_dependents_then_confirmable(self):
+    def test_delete_with_dependents_cannot_bypass_final_graph_validation(self):
         row = self.conn.execute(
             "SELECT o.option_id FROM options o JOIN option_availability oa "
             "ON oa.model_id=o.model_id AND oa.option_id=o.option_id "
@@ -234,12 +322,11 @@ class TestStagingWorkflow(ImportedWorkbookCase):
                                  model_id="stingray", op="delete",
                                  key={"option_id": option_id}, record=None)
         self.assertIn("dependent", ctx.exception.errors[0]["message"])
-        change = staging.stage_change(
-            self.conn, table="options", model_id="stingray", op="delete",
-            key={"option_id": option_id}, record=None,
-            confirm_dependencies=True)
-        self.assertEqual(change["status"], "staged")
-        staging.discard_change(self.conn, change["id"])
+        with self.assertRaises(TypeError):
+            staging.stage_change(
+                self.conn, table="options", model_id="stingray", op="delete",
+                key={"option_id": option_id}, record=None,
+                confirm_dependencies=True)
 
     def test_undo_before_commit(self):
         change = staging.stage_change(
@@ -300,13 +387,198 @@ class TestStagingWorkflow(ImportedWorkbookCase):
         for c in staging.list_changes(self.conn, "staged"):
             staging.discard_change(self.conn, c["id"])
 
-    def test_scaffold_model_rejected(self):
+    def test_unknown_model_content_rejected(self):
         with self.assertRaises(StagingError) as ctx:
             staging.stage_change(
-                self.conn, table="options", model_id="zr1", op="add",
+                self.conn, table="options", model_id="not_a_model", op="add",
                 key={"option_id": "opt_test_910"},
                 record={"option_id": "opt_test_910"})
-        self.assertIn("inactive scaffold", ctx.exception.errors[0]["message"])
+        self.assertIn("unknown model", ctx.exception.errors[0]["message"])
+
+    def test_active_source_backed_unpublished_model_is_editable(self):
+        source = self.conn.execute(
+            "SELECT * FROM options WHERE model_id='zr1' LIMIT 1"
+        ).fetchone()
+        record = {
+            column.sql_name(): source[column.sql_name()]
+            for column in SPEC_BY_TABLE["options"].columns
+        }
+        record["option_id"] = "opt_test_911"
+        change = staging.stage_change(
+            self.conn,
+            table="options",
+            model_id="zr1",
+            op="add",
+            key={"option_id": record["option_id"]},
+            record=record,
+        )
+        self.assertEqual(change["status"], "staged")
+        staging.discard_change(self.conn, change["id"])
+
+    def test_runtime_promotion_requires_canonical_model_generatability(self):
+        model = "zr1"
+        source = self.conn.execute(
+            "SELECT * FROM model_registry_promotion WHERE model_key=?", (model,)
+        ).fetchone()
+        record = {
+            column.sql_name(): source[column.sql_name()]
+            for column in SPEC_BY_TABLE["model_registry_promotion"].columns
+        }
+        record["active"] = "True"
+        record["promoted_to_runtime"] = "True"
+        with mock.patch.object(
+            staging, "discover_generation_model_configs", return_value={}
+        ):
+            with self.assertRaises(StagingError) as ctx:
+                staging.stage_change(
+                    self.conn,
+                    table="model_registry_promotion",
+                    model_id=model,
+                    op="update",
+                    key={"model_key": model},
+                    record=record,
+                )
+        self.assertIn("not generatable", ctx.exception.errors[0]["message"])
+
+    def test_inactive_model_content_rejected_but_topology_editable(self):
+        model = "grand_sport_x"
+        original_active = self.conn.execute(
+            "SELECT active FROM models WHERE model_key=?", (model,)
+        ).fetchone()["active"]
+        self.conn.execute("UPDATE models SET active='False' WHERE model_key=?", (model,))
+        self.conn.commit()
+        try:
+            source = self.conn.execute(
+                "SELECT * FROM options WHERE model_id=? LIMIT 1", (model,)
+            ).fetchone()
+            record = {
+                column.sql_name(): source[column.sql_name()]
+                for column in SPEC_BY_TABLE["options"].columns
+            }
+            record["option_id"] = "opt_test_912"
+            with self.assertRaises(StagingError) as ctx:
+                staging.stage_change(
+                    self.conn,
+                    table="options",
+                    model_id=model,
+                    op="add",
+                    key={"option_id": record["option_id"]},
+                    record=record,
+                )
+            self.assertIn("inactive model", ctx.exception.errors[0]["message"])
+
+            topology = self.conn.execute(
+                "SELECT * FROM model_variants WHERE model_key=? LIMIT 1", (model,)
+            ).fetchone()
+            topology_record = {
+                column.sql_name(): topology[column.sql_name()]
+                for column in SPEC_BY_TABLE["model_variants"].columns
+            }
+            change = staging.stage_change(
+                self.conn,
+                table="model_variants",
+                model_id=model,
+                op="update",
+                key={
+                    "model_key": topology["model_key"],
+                    "variant_id": topology["variant_id"],
+                },
+                record=topology_record,
+            )
+            staging.discard_change(self.conn, change["id"])
+        finally:
+            self.conn.execute(
+                "UPDATE models SET active=? WHERE model_key=?", (original_active, model)
+            )
+            self.conn.commit()
+
+    def test_asset_wildcard_is_the_only_writable_wildcard_model_scope(self):
+        change = staging.stage_change(
+            self.conn,
+            table="assets",
+            model_id="*",
+            op="add",
+            key={"model_key": "*", "target_type": "option", "target_id": "opt_test_asset"},
+            record={
+                "model_key": "*",
+                "target_type": "option",
+                "target_id": "opt_test_asset",
+                "image_url": "https://example.invalid/test.png",
+                "image_alt": "Test",
+                "image_fit": "contain",
+                "image_position": "center",
+                "hover_image_url": "",
+                "hover_image_alt": "",
+                "hover_image_position": "",
+                "active": "True",
+                "notes": "test",
+            },
+        )
+        staging.discard_change(self.conn, change["id"])
+        with self.assertRaises(StagingError):
+            staging.stage_change(
+                self.conn,
+                table="default_selection_rules",
+                model_id="*",
+                op="add",
+                key={"model_key": "*", "rule_id": "default_test"},
+                record={"model_key": "*", "rule_id": "default_test"},
+            )
+
+    def test_inactive_source_role_rejected_while_fixed_model_content_is_editable(self):
+        model = "zr1"
+        role = "source_option_sheet"
+        original = self.conn.execute(
+            "SELECT active FROM sheet_registry WHERE model_key=? AND source_role=?",
+            (model, role),
+        ).fetchone()["active"]
+        self.conn.execute(
+            "UPDATE sheet_registry SET active='False' WHERE model_key=? AND source_role=?",
+            (model, role),
+        )
+        self.conn.commit()
+        try:
+            source = self.conn.execute(
+                "SELECT * FROM options WHERE model_id=? LIMIT 1", (model,)
+            ).fetchone()
+            record = {
+                column.sql_name(): source[column.sql_name()]
+                for column in SPEC_BY_TABLE["options"].columns
+            }
+            record["option_id"] = "opt_test_913"
+            with self.assertRaises(StagingError) as ctx:
+                staging.stage_change(
+                    self.conn,
+                    table="options",
+                    model_id=model,
+                    op="add",
+                    key={"option_id": record["option_id"]},
+                    record=record,
+                )
+            self.assertIn("inactive source role", ctx.exception.errors[0]["message"])
+
+            fixed = self.conn.execute(
+                "SELECT * FROM form_steps WHERE model_key=? LIMIT 1", (model,)
+            ).fetchone()
+            fixed_record = {
+                column.sql_name(): fixed[column.sql_name()]
+                for column in SPEC_BY_TABLE["form_steps"].columns
+            }
+            change = staging.stage_change(
+                self.conn,
+                table="form_steps",
+                model_id=model,
+                op="update",
+                key={"model_key": model, "step_key": fixed["step_key"]},
+                record=fixed_record,
+            )
+            staging.discard_change(self.conn, change["id"])
+        finally:
+            self.conn.execute(
+                "UPDATE sheet_registry SET active=? WHERE model_key=? AND source_role=?",
+                (original, model, role),
+            )
+            self.conn.commit()
 
 
 class TestSyncBatch(ImportedWorkbookCase):
@@ -329,6 +601,20 @@ class TestSyncBatch(ImportedWorkbookCase):
         self.assertTrue(result["ok"], result)
         return row, record
 
+    def _commit_model_setup_edit(self):
+        row = self.conn.execute(
+            "SELECT * FROM models WHERE model_key='stingray'"
+        ).fetchone()
+        record = {c.sql_name(): row[c.sql_name()]
+                  for c in SPEC_BY_TABLE["models"].columns}
+        record["setup_title"] = f"{record['setup_title']} (reviewed)"
+        staging.stage_change(
+            self.conn, table="models", model_id="", op="update",
+            key={"model_key": row["model_key"]}, record=record)
+        result = staging.commit_staged(self.conn, actor="test")
+        self.assertTrue(result["ok"], result)
+        return row, record
+
     def test_batch_targets_registered_sheet_with_header_names(self):
         row, record = self._commit_price_edit()
         batch = syncmod.build_batch(self.conn, WORKBOOK)
@@ -338,6 +624,16 @@ class TestSyncBatch(ImportedWorkbookCase):
         self.assertEqual(op["action"], "update")
         self.assertEqual(op["key"], {"option_id": row["option_id"]})
         self.assertEqual(op["row"]["price"], record["price"])
+
+    def test_model_setup_edit_builds_model_master_editor_op(self):
+        row, record = self._commit_model_setup_edit()
+        batch = syncmod.build_batch(self.conn, WORKBOOK)
+        self.assertEqual(len(batch["items"]), 1)
+        op = batch["items"][0]
+        self.assertEqual(op["sheet"], "model_master")
+        self.assertEqual(op["action"], "update")
+        self.assertEqual(op["key"], {"model_key": row["model_key"]})
+        self.assertEqual(op["row"]["setup_title"], record["setup_title"])
 
     def test_dry_run_batch_passes_editor_ops_validation(self):
         """Fast slice of the gate: batch preparation + validation only."""
@@ -369,12 +665,19 @@ class TestSyncBatch(ImportedWorkbookCase):
     @unittest.skipUnless(os.environ.get("WBM_SLOW_GATE") == "1",
                          "full live-write gate is slow; set WBM_SLOW_GATE=1")
     def test_live_write_on_scratch_copy_creates_backup_and_marks_synced(self):
+        from app import config
+
         wb_copy = Path(self.tmpdir) / "scratch3.xlsx"
         shutil.copy2(WORKBOOK, wb_copy)
         self._commit_price_edit()
-        result = syncmod.sync_workbook(
-            self.conn, wb_copy, write=True,
-            expected_mtime_ns=str(wb_copy.stat().st_mtime_ns))
+        original_log_path = config.EDIT_LOG_PATH
+        config.EDIT_LOG_PATH = Path(self.tmpdir) / "workbook-edit-log.jsonl"
+        try:
+            result = syncmod.sync_workbook(
+                self.conn, wb_copy, write=True,
+                expected_mtime_ns=str(wb_copy.stat().st_mtime_ns))
+        finally:
+            config.EDIT_LOG_PATH = original_log_path
         self.assertEqual(result.get("status"), "applied",
                          f"live write failed: {result}")
         self.assertTrue(result.get("backupPath"))
@@ -393,30 +696,132 @@ class TestSyncBatch(ImportedWorkbookCase):
 
 
 class TestComparisonExport(ImportedWorkbookCase):
-    def test_export_preserves_unmanaged_and_row_counts(self):
-        import os
-        os.environ.setdefault("WBM_VAR_DIR", str(self.tmpdir / "var"))
+    """Real acceptance exports; the unchanged success is executed exactly once."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        from app import config  # type: ignore[import-not-found]
+
+        cls.workbook = cls.tmpdir / "valid-source.xlsx"
+        shutil.copy2(WORKBOOK, cls.workbook)
+        cls._previous_config = (
+            config.VAR_DIR,
+            config.EXPORT_DIR,
+            config.DB_BACKUP_DIR,
+        )
+        config.VAR_DIR = cls.tmpdir / "var"
+        cls.unchanged_export_dir = config.VAR_DIR / "unchanged-export"
+        config.EXPORT_DIR = cls.unchanged_export_dir
+        config.DB_BACKUP_DIR = config.VAR_DIR / "db-backups"
+        cls.unchanged_export = syncmod.export_comparison_workbook(
+            cls.conn, cls.workbook
+        )
+        config.EXPORT_DIR = config.VAR_DIR / "per-test-exports"
+
+    @classmethod
+    def tearDownClass(cls):
+        from app import config  # type: ignore[import-not-found]
+
+        config.VAR_DIR, config.EXPORT_DIR, config.DB_BACKUP_DIR = cls._previous_config
+        super().tearDownClass()
+
+    def test_acceptance_export_is_disposable_and_preserves_unchanged_workbook(self):
+        """Own the complete real-workbook unchanged comparison-export proof."""
+        result = self.unchanged_export
+        self.assertTrue(result["ok"], result)
+        self.assertTrue(result["disposable"])
+        self.assertIn("DISPOSABLE-comparison-", Path(result["path"]).name)
+        self.assertTrue(
+            Path(result["path"]).is_relative_to(self.unchanged_export_dir)
+        )
+        self.assertFalse(result["generated_contract_parity_verified"])
+        self.assertTrue(result["byte_identical"])
+        self.assertEqual(Path(result["path"]).read_bytes(), self.workbook.read_bytes())
+        from openpyxl import load_workbook
+        orig = load_workbook(self.workbook, read_only=True)
+        regen = load_workbook(result["path"], read_only=True)
+        try:
+            self.assertEqual(set(orig.sheetnames), set(regen.sheetnames),
+                             "regenerated workbook must keep every sheet")
+            # unmanaged sheet content preserved verbatim (PriceRef)
+            def rows(wb, sheet):
+                return [tuple(str(c) if c is not None else "" for c in r)
+                        for r in wb[sheet].iter_rows(values_only=True)]
+            self.assertEqual(rows(orig, "PriceRef"), rows(regen, "PriceRef"))
+            # managed sheet keeps its row count
+            self.assertEqual(len(rows(orig, "stingray_options")),
+                             len(rows(regen, "stingray_options")))
+            self.assertEqual(
+                rows(orig, "model_master"),
+                rows(regen, "model_master"),
+                "managed model_master setup copy must round-trip without drift",
+            )
+        finally:
+            orig.close()
+            regen.close()
+
+    def test_export_overlays_registry_owned_projection_fields(self):
+        """Own the complete real-workbook changed-overlay acceptance proof."""
         from app import config
+        from openpyxl import load_workbook
+
         config.VAR_DIR = self.tmpdir / "var"
         config.EXPORT_DIR = config.VAR_DIR / "exports"
         config.DB_BACKUP_DIR = config.VAR_DIR / "db-backups"
-        result = syncmod.export_comparison_workbook(self.conn, WORKBOOK)
-        self.assertTrue(result["ok"])
-        from openpyxl import load_workbook
-        orig = load_workbook(WORKBOOK, read_only=True)
-        regen = load_workbook(result["path"], read_only=True)
-        self.assertEqual(set(orig.sheetnames), set(regen.sheetnames),
-                         "regenerated workbook must keep every sheet")
-        # unmanaged sheet content preserved verbatim (PriceRef)
-        def rows(wb, sheet):
-            return [tuple(str(c) if c is not None else "" for c in r)
-                    for r in wb[sheet].iter_rows(values_only=True)]
-        self.assertEqual(rows(orig, "PriceRef"), rows(regen, "PriceRef"))
-        # managed sheet keeps its row count
-        self.assertEqual(len(rows(orig, "stingray_options")),
-                         len(rows(regen, "stingray_options")))
-        orig.close()
-        regen.close()
+        row = self.conn.execute(
+            "SELECT id, src_sheet, src_row FROM sheet_registry "
+            "ORDER BY id LIMIT 1"
+        ).fetchone()
+        self.assertIsNotNone(row)
+        value = "pass4-overlay-proof"
+        self.conn.execute(
+            "UPDATE sheet_registry SET notes=? WHERE id=?",
+            (value, row["id"]),
+        )
+        self.conn.commit()
+
+        result = syncmod.export_comparison_workbook(self.conn, self.workbook)
+
+        self.assertTrue(result["ok"], result)
+        self.assertFalse(result["byte_identical"])
+        self.assertEqual(result["rewritten"], {"registry_owned_fields": "overlaid"})
+        exported = load_workbook(result["path"], read_only=True, data_only=False)
+        try:
+            sheet = exported[row["src_sheet"]]
+            headers = [cell.value for cell in sheet[1]]
+            column = headers.index("notes") + 1
+            self.assertEqual(sheet.cell(row["src_row"], column).value, value)
+        finally:
+            exported.close()
+
+    def test_export_refuses_source_drift_during_copy(self):
+        """Own the real-workbook comparison-export source-drift refusal."""
+        import os
+        from unittest import mock
+        from app import config
+
+        config.VAR_DIR = self.tmpdir / "var"
+        config.EXPORT_DIR = config.VAR_DIR / "exports"
+        original = self.workbook.read_bytes()
+        mtime_ns = self.workbook.stat().st_mtime_ns
+        real_copy = shutil.copy2
+
+        def copy_then_drift(source, destination):
+            result = real_copy(source, destination)
+            self.workbook.write_bytes(original + b"drift")
+            os.utime(self.workbook, ns=(mtime_ns, mtime_ns))
+            return result
+
+        try:
+            with mock.patch.object(syncmod.shutil, "copy2", side_effect=copy_then_drift):
+                result = syncmod.export_comparison_workbook(self.conn, self.workbook)
+            self.assertFalse(result["ok"])
+            self.assertEqual(result["status"], "stale")
+            self.assertFalse(list(config.EXPORT_DIR.glob("*.candidate.xlsx")))
+        finally:
+            self.workbook.write_bytes(original)
+            os.utime(self.workbook, ns=(mtime_ns, mtime_ns))
 
 
 class TestDependencyInspection(ImportedWorkbookCase):
@@ -434,6 +839,17 @@ class TestDependencyInspection(ImportedWorkbookCase):
             self.assertTrue(d["src_sheet"])
 
 
+class TestPass1BrowserContainment(unittest.TestCase):
+    def test_browser_has_persistent_provisional_banner_and_no_write_control(self):
+        app_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                      "App.jsx").read_text()
+        sync_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                       "components" / "ChangesSync.jsx").read_text()
+        self.assertIn("Read-only / provisional", app_source)
+        self.assertNotIn("write: true", sync_source)
+        self.assertNotIn("Write to stingray_master.xlsx", sync_source)
+
+
 @unittest.skipUnless(HAVE_FASTAPI, "fastapi not installed; install "
                      "workbook-manager/backend/requirements.txt")
 class TestApi(unittest.TestCase):
@@ -441,8 +857,12 @@ class TestApi(unittest.TestCase):
     def setUpClass(cls):
         import os
         cls.tmpdir = Path(tempfile.mkdtemp(prefix="wbm-api-"))
+        cls.workbook = cls.tmpdir / "source.xlsx"
+        shutil.copy2(WORKBOOK, cls.workbook)
+        cls.previous_workbook_env = os.environ.get("WBM_WORKBOOK")
         os.environ["WBM_DB"] = str(cls.tmpdir / "api.sqlite3")
         os.environ["WBM_VAR_DIR"] = str(cls.tmpdir / "var")
+        os.environ["WBM_WORKBOOK"] = str(cls.workbook)
         # Force a FULL re-import of the app package so config re-reads the
         # env vars above. The bare "app" entry must be deleted too: leaving
         # the package object in sys.modules makes `from . import staging`
@@ -454,12 +874,23 @@ class TestApi(unittest.TestCase):
             if mod == "app" or mod.startswith("app."):
                 del sys.modules[mod]
         from fastapi.testclient import TestClient
-        from app.main import app as fastapi_app
-        cls.client = TestClient(fastapi_app)
+        from app import main as mainmod
+        cls.mainmod = mainmod
+        # The client must be entered as a context manager: storage bootstrap
+        # runs in the FastAPI lifespan, not lazily inside a request.
+        cls.client = TestClient(mainmod.app)
+        cls.client.__enter__()
         cls.client.post("/api/import")
 
     @classmethod
     def tearDownClass(cls):
+        import os
+
+        cls.client.__exit__(None, None, None)
+        if cls.previous_workbook_env is None:
+            os.environ.pop("WBM_WORKBOOK", None)
+        else:
+            os.environ["WBM_WORKBOOK"] = cls.previous_workbook_env
         shutil.rmtree(cls.tmpdir, ignore_errors=True)
 
     def test_status_and_models(self):
@@ -468,6 +899,35 @@ class TestApi(unittest.TestCase):
         models = self.client.get("/api/models").json()["models"]
         keys = {m["model_key"] for m in models}
         self.assertLessEqual({"stingray", "grand_sport", "z06"}, keys)
+
+    def test_status_reports_provisional_surfaces_separately(self):
+        status = self.client.get("/api/status").json()
+        self.assertEqual(status["mode"], "read_only_provisional")
+        self.assertEqual(status["projection"]["state"], "current")
+        self.assertTrue(status["projection"]["active"])
+        self.assertTrue(status["projection"]["reimport_allowed"])
+        self.assertEqual(status["draft"]["state"], "clear")
+        self.assertIn("state", status["workbook"])
+        self.assertEqual(status["generated_artifacts"]["state"], "unverified")
+        self.assertEqual(status["publication"]["state"], "unverified")
+
+    def test_same_mtime_hash_drift_is_stale_and_allows_verified_reimport(self):
+        import os
+
+        original = self.workbook.read_bytes()
+        mtime_ns = self.workbook.stat().st_mtime_ns
+        try:
+            mutated = bytearray(original)
+            mutated[-1] ^= 1
+            self.workbook.write_bytes(mutated)
+            os.utime(self.workbook, ns=(mtime_ns, mtime_ns))
+            status = self.client.get("/api/status").json()
+            self.assertEqual(status["workbook"]["state"], "stale")
+            self.assertEqual(status["projection"]["state"], "stale")
+            self.assertTrue(status["projection"]["reimport_allowed"])
+        finally:
+            self.workbook.write_bytes(original)
+            os.utime(self.workbook, ns=(mtime_ns, mtime_ns))
 
     def test_structure_and_collections(self):
         structure = self.client.get("/api/structure/stingray").json()
@@ -494,9 +954,150 @@ class TestApi(unittest.TestCase):
                                             "search": "Z51"}).json()
         self.assertGreater(resp["total"], 0)
 
-    def test_live_sync_requires_confirmation(self):
-        resp = self.client.post("/api/sync", json={"write": True})
-        self.assertEqual(resp.status_code, 400)
+    def test_schema_exposes_final_shared_field_and_model_context_metadata(self):
+        defaults = self.client.get(
+            "/api/records/default_selection_rules/schema",
+            params={"model": "stingray"},
+        ).json()
+        self.assertTrue(defaults["model_context"]["required"])
+        by_name = {column["name"]: column for column in defaults["columns"]}
+        self.assertEqual(by_name["condition_type"]["field_kind"], "finite")
+        condition_ref = by_name["condition_id"]["reference"]
+        self.assertEqual(condition_ref["kind"], "conditional")
+        self.assertTrue(
+            any(target["derived"] for target in condition_ref["targets"])
+        )
+        self.assertTrue(by_name["condition_id"]["optional"])
+        self.assertEqual(by_name["notes"]["field_kind"], "free_text")
+
+        mappings = self.client.get(
+            "/api/records/rule_mappings/schema", params={"model": "stingray"}
+        ).json()
+        mapping_fields = {column["name"]: column for column in mappings["columns"]}
+        self.assertEqual(mapping_fields["source_id"]["reference"]["kind"], "union")
+
+    def test_live_sync_is_provisionally_read_only_even_when_fully_confirmed(self):
+        current_mtime = str(WORKBOOK.stat().st_mtime_ns)
+        resp = self.client.post("/api/sync", json={
+            "write": True,
+            "confirm": "SYNC",
+            "expected_mtime_ns": current_mtime,
+        })
+        self.assertEqual(resp.status_code, 409)
+        detail = resp.json()["detail"]
+        self.assertEqual(detail["status"], "read_only_provisional")
+        self.assertIn("Pass 7", detail["message"])
+
+    def test_pass5_draft_api_roots_durable_update_without_projection_mutation(self):
+        projected = self.client.get(
+            "/api/records/options", params={"model": "stingray", "limit": 1}
+        ).json()["records"][0]
+        option_id = projected["option_id"]
+        original_name = projected["option_name"]
+        draft_id = "api-draft-test"
+        response = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "options",
+                "model_id": "stingray",
+                "op": "update",
+                "key": {"option_id": option_id},
+                "record": {"option_name": f"{original_name} changed"},
+                "session_id": "api-test",
+                "actor": "test",
+            },
+        )
+        try:
+            self.assertEqual(response.status_code, 200, response.text)
+            operation = response.json()
+            self.assertEqual(operation["draft_id"], draft_id)
+            self.assertEqual(operation["source_sheet"], "stingray_options")
+            self.assertEqual(
+                operation["changed_fields"],
+                {
+                    "option_name": {
+                        "before": original_name,
+                        "after": f"{original_name} changed",
+                    }
+                },
+            )
+            listed = self.client.get(f"/api/drafts/{draft_id}/operations")
+            self.assertEqual(listed.status_code, 200, listed.text)
+            self.assertEqual(len(listed.json()["operations"]), 1)
+            status = self.client.get("/api/status").json()
+            self.assertEqual(status["draft"]["active"], 1)
+            self.assertEqual(status["draft"]["state"], "blocked")
+            self.assertFalse(status["projection"]["reimport_allowed"])
+            unchanged = self.client.get(
+                "/api/records/options",
+                params={"model": "stingray", "search": option_id, "limit": 1},
+            ).json()["records"][0]
+            self.assertEqual(unchanged["option_name"], original_name)
+        finally:
+            conn = self.mainmod.open_state_connection()
+            try:
+                conn.execute("DELETE FROM draft_operations WHERE draft_id=?", (draft_id,))
+                conn.execute("DELETE FROM workflow_drafts WHERE id=?", (draft_id,))
+                conn.commit()
+            finally:
+                conn.close()
+
+    def test_reimport_atomically_replaces_an_active_projection(self):
+        conn = self.mainmod.open_projection_connection()
+        before_manifest = self.mainmod._projection_manifest(conn)
+        before_options = conn.execute("SELECT COUNT(*) c FROM options").fetchone()["c"]
+        conn.close()
+        resp = self.client.post("/api/import")
+        self.assertEqual(resp.status_code, 200, resp.text)
+        self.assertTrue(resp.json()["promoted"])
+        conn = self.mainmod.open_projection_connection()
+        self.addCleanup(conn.close)
+        self.assertNotEqual(self.mainmod._projection_manifest(conn), before_manifest)
+        self.assertEqual(
+            conn.execute("SELECT COUNT(*) c FROM options").fetchone()["c"], before_options
+        )
+
+    def test_current_projection_allows_verified_comparison_export(self):
+        status = self.client.get("/api/status").json()
+        self.assertEqual(status["projection"]["state"], "current")
+        resp = self.client.post("/api/export")
+        self.assertEqual(resp.status_code, 200, resp.text)
+        self.assertTrue(resp.json()["byte_identical"])
+        self.assertTrue(resp.json()["semantic_readback_verified"])
+
+    def test_import_reports_all_unresolved_legacy_workflow_blockers(self):
+        conn = self.mainmod.open_state_connection()
+        self.addCleanup(conn.close)
+        pending_id = conn.execute(
+            "INSERT INTO pending_changes(ts, table_name, entity_key_json, op, "
+            "status) VALUES('test', 'options', '{}', 'update', 'staged')"
+        ).lastrowid
+        pending_history_id = conn.execute(
+            "INSERT INTO change_history(ts, entity_type, entity_id, op, status, "
+            "sync_status) VALUES('test', 'options', 'one', 'update', "
+            "'committed', 'pending')"
+        ).lastrowid
+        failed_history_id = conn.execute(
+            "INSERT INTO change_history(ts, entity_type, entity_id, op, status, "
+            "sync_status) VALUES('test', 'options', 'two', 'update', "
+            "'committed', 'sync_failed')"
+        ).lastrowid
+        conn.commit()
+        try:
+            resp = self.client.post("/api/import")
+            self.assertEqual(resp.status_code, 409)
+            blockers = resp.json()["detail"]["import_blockers"]
+            self.assertEqual(blockers["staged"], 1)
+            self.assertEqual(blockers["committed_unsynchronized"], 1)
+            self.assertEqual(blockers["failed"], 1)
+            self.assertEqual(blockers["unresolved_total"], 3)
+        finally:
+            conn.execute("DELETE FROM pending_changes WHERE id=?", (pending_id,))
+            conn.execute(
+                "DELETE FROM change_history WHERE id IN (?, ?)",
+                (pending_history_id, failed_history_id),
+            )
+            conn.commit()
 
 
 if __name__ == "__main__":

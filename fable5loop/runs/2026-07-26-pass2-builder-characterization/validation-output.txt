@@ -1,0 +1,273 @@
+# Pass 2 receipt C stage 1 — characterization output (read-only)
+# base commit: 38f340b  |  workbook SHA-256: 8858cff40ea7eaeda6b7921714f3697a6ee9d1bbc99c84e564d7b118e45b2166
+
+==============================================================================
+STINGRAY: production builder (current release) vs workbook builder (target)
+==============================================================================
+
+--- top-level fields ---
+  choices                  production=    1416  workbook=    1416
+  colorOverrides           production=     245  workbook=     237   <-- DIFFERS
+  contextChoices           production=       8  workbook=       8
+  defaultSelectionRules    production=       4  workbook=       4
+  draftMetadata            workbook-only (dict)
+  exclusiveGroups          production=      10  workbook=      10
+  interiors                production=     130  workbook=     130
+  priceRules               production=      49  workbook=      49
+  ruleGroups               production=      27  workbook=      27
+  rules                    production=     145  workbook=     114   <-- DIFFERS
+  runtimeRuleExceptions    production=       0  workbook=  ABSENT   <-- DIFFERS
+  sections                 production=      50  workbook=      32   <-- DIFFERS
+  standardEquipment        production=     467  workbook=     467
+  steps                    production=      14  workbook=      14
+  validation               production=       3  workbook=       7   <-- DIFFERS
+  variants                 production=       6  workbook=       6
+
+--- variants (key=variant_id) ---
+  production-only: 0   workbook-only: 0   field-changed: 6
+    changed columns: {'preview_included': 6, 'model': 6, 'source_active': 6}
+    e.g. 1lt_c07: {"preview_included": [null, true], "model": [null, "Stingray"], "source_active": [null, "True"]}
+    e.g. 1lt_c67: {"preview_included": [null, true], "model": [null, "Stingray"], "source_active": [null, "True"]}
+    e.g. 2lt_c07: {"preview_included": [null, true], "model": [null, "Stingray"], "source_active": [null, "True"]}
+
+--- steps (key=step_key) ---
+  production-only: 0   workbook-only: 0   field-changed: 5
+    changed columns: {'section_ids': 5}
+    e.g. aero_exhaust_stripes_accessories: {"section_ids": ["sec_gsce_001|sec_gsha_001|sec_hash_001|sec_jake_001|sec_stri_001", "sec_hash_001|sec_stri_001"]}
+    e.g. base_interior: {"section_ids": ["sec_intc_001|sec_intc_002|sec_intc_003|sec_lzint_001|sec_lzint_002|sec_lzint_003", ""]}
+    e.g. interior_trim: {"section_ids": ["sec_colo_001|sec_cust_002|sec_inte_001|sec_onst_001", "sec_colo_001|sec_inte_001"]}
+
+--- sections (key=section_id) ---
+  production-only: 18   workbook-only: 0   field-changed: 30
+    only in production: sec_cust_002
+    only in production: sec_gsce_001
+    only in production: sec_gsha_001
+    only in production: sec_intc_001
+    only in production: sec_intc_002
+    only in production: sec_intc_003
+    only in production: sec_jake_001
+    only in production: sec_lzint_001
+    only in production: sec_lzint_002
+    only in production: sec_lzint_003
+    only in production: sec_onst_001
+    only in production: sec_perf_aero_001
+    ... and 6 more
+    changed columns: {'source_section_name': 30}
+    e.g. sec_1lte_001: {"source_section_name": [null, "1LT Equipment"]}
+    e.g. sec_2lte_001: {"source_section_name": [null, "2LT Equipment"]}
+    e.g. sec_3lte_001: {"source_section_name": [null, "3LT Equipment"]}
+
+--- choices (key=choice_id) ---
+  production-only: 0   workbook-only: 0   field-changed: 1416
+    changed columns: {'source_description': 1416, 'source_option_name': 1416, 'text_cleanup_notes': 1416, 'display_behavior': 1385, 'standard_equipment_group_type': 62}
+    e.g. 1lt_c07__opt_001: {"standard_equipment_group_type": ["trim_equipment", ""], "source_description": [null, "Features leather-wrapped upper instrument panel, door trim panels and console"], "display_behavior": [null, ""], "source_option_name": [null, "Custom Le
+    e.g. 1lt_c07__opt_002: {"source_description": [null, "Includes 2 remote transmitters that enable automatic door unlock and open by touching door switch"], "display_behavior": [null, ""], "source_option_name": [null, "Keyless Open and Start"], "text_cleanup_notes"
+    e.g. 1lt_c07__opt_003: {"source_description": [null, ""], "display_behavior": [null, ""], "source_option_name": [null, "All-Speed Traction Control"], "text_cleanup_notes": [null, []]}
+
+--- rules (key=rule_id) ---
+  production-only: 31   workbook-only: 0   field-changed: 19
+    only in production: rule_opt_5v7_001_excludes_opt_5vm_001
+    only in production: rule_opt_5v7_001_excludes_opt_5w8_001
+    only in production: rule_opt_5vm_001_excludes_opt_5v7_001
+    only in production: rule_opt_5vm_001_excludes_opt_5w8_001
+    only in production: rule_opt_5vm_001_excludes_opt_sti_001
+    only in production: rule_opt_5vm_001_excludes_opt_tvs_001
+    only in production: rule_opt_5vm_001_excludes_opt_zf1_001
+    only in production: rule_opt_5vm_001_requires_opt_5zu_001
+    only in production: rule_opt_5vm_001_requires_opt_5zw_001
+    only in production: rule_opt_5vm_001_requires_opt_5zz_001
+    only in production: rule_opt_5vm_001_requires_opt_z51_001
+    only in production: rule_opt_5w8_001_excludes_opt_5v7_001
+    ... and 19 more
+    changed columns: {'source_selection_mode': 19}
+    e.g. rule_3lt_ae4_ejh_includes_opt_3n9_001: {"source_selection_mode": ["single_select_req", ""]}
+    e.g. rule_3lt_ae4_epx_n26_includes_opt_3n9_001: {"source_selection_mode": ["single_select_req", ""]}
+    e.g. rule_3lt_ae4_h8t_includes_opt_3a9_001: {"source_selection_mode": ["single_select_req", ""]}
+
+--- interiors (key=interior_id) ---
+  production-only: 0   workbook-only: 0   field-changed: 130
+    changed columns: {'requires_z25': 130}
+    e.g. 1LT_AE4_HTJ_N26: {"requires_z25": [null, "False"]}
+    e.g. 1LT_AQ9_HTA: {"requires_z25": [null, "False"]}
+    e.g. 1LT_AQ9_HUP: {"requires_z25": [null, "False"]}
+
+--- colorOverrides (key=override_id) ---
+  production-only: 8   workbook-only: 0   field-changed: 207
+    only in production: co_238
+    only in production: co_239
+    only in production: co_240
+    only in production: co_241
+    only in production: co_242
+    only in production: co_243
+    only in production: co_244
+    only in production: co_245
+    changed columns: {'interior_id': 203, 'option_id': 102}
+    e.g. co_031: {"interior_id": ["3LT_AE4_EL9", "3LT_AE4_EPX_N26"], "option_id": ["opt_g26_001", "opt_g4z_001"]}
+    e.g. co_032: {"interior_id": ["3LT_AE4_EL9", "3LT_AE4_EPX_N26"], "option_id": ["opt_g4z_001", "opt_gkz_001"]}
+    e.g. co_033: {"interior_id": ["3LT_AE4_EL9", "3LT_AE4_H8T"], "option_id": ["opt_gbk_001", "opt_g26_001"]}
+
+--- validation rows ---
+  production:
+    [pass   ] active_variants: 6 active Stingray variants exported.
+    [pass   ] availability_rows: 1416 choice rows exported ({'standard': 467, 'unavailable': 140, 'available': 809}).
+    [pass   ] rules: 145 active compatibility rules exported from 145 source rules.
+  workbook:
+    [warning] stingray_draft_status: Stingray form data is a draft inspection artifact and is not runtime active.
+    [pass   ] active_variants: 6 configured Stingray variants included by model config; workbook active flags are unchanged.
+    [pass   ] availability_rows: 1416 draft choice rows exported from the Stingray variant matrix.
+    [pass   ] rules: 114 active compatibility rules exported from rule_mapping.
+    [pass   ] interior_contract: 130 model-scoped Stingray LT interiors exported.
+    [pass   ] price_rules: 49 active price rules exported from price_rules.
+    [pass   ] color_overrides: 237 color override rows exported from color_overrides.
+
+=== scope checks ===
+18 production-only sections — does any Stingray row live in them?
+   sec_cust_002           choices=False  standardEquipment=False
+   sec_gsce_001           choices=False  standardEquipment=False
+   sec_gsha_001           choices=False  standardEquipment=False
+   sec_intc_001           choices=False  standardEquipment=False
+   sec_intc_002           choices=False  standardEquipment=False
+   sec_intc_003           choices=False  standardEquipment=False
+   sec_jake_001           choices=False  standardEquipment=False
+   sec_lzint_001          choices=False  standardEquipment=False
+   sec_lzint_002          choices=False  standardEquipment=False
+   sec_lzint_003          choices=False  standardEquipment=False
+   sec_onst_001           choices=False  standardEquipment=False
+   sec_perf_aero_001      choices=False  standardEquipment=False
+   sec_perf_brake_001     choices=False  standardEquipment=False
+   sec_perf_ground_001    choices=False  standardEquipment=False
+   sec_perf_z52_001       choices=False  standardEquipment=False
+   sec_spec_001           choices=False  standardEquipment=False
+   sec_z06_cf_whee_001    choices=False  standardEquipment=False
+   sec_z06_pkg_001        choices=False  standardEquipment=False
+
+8 production-only colorOverrides:
+   interior=3LT_AE4_EL9      option=opt_g26_001    option_active=True  interior_in_stingray_scope=False scope_active=None
+   interior=3LT_AE4_EL9      option=opt_g4z_001    option_active=True  interior_in_stingray_scope=False scope_active=None
+   interior=3LT_AE4_EL9      option=opt_gbk_001    option_active=True  interior_in_stingray_scope=False scope_active=None
+   interior=3LT_AE4_EL9      option=opt_gph_001    option_active=True  interior_in_stingray_scope=False scope_active=None
+   interior=3LT_AH2_EL9      option=opt_g26_001    option_active=True  interior_in_stingray_scope=False scope_active=None
+   interior=3LT_AH2_EL9      option=opt_g4z_001    option_active=True  interior_in_stingray_scope=False scope_active=None
+   interior=3LT_AH2_EL9      option=opt_gbk_001    option_active=True  interior_in_stingray_scope=False scope_active=None
+   interior=3LT_AH2_EL9      option=opt_gph_001    option_active=True  interior_in_stingray_scope=False scope_active=None
+
+=== tracked surface ===
+$ git status --porcelain
+?? fable5loop/runs/2026-07-26-pass2-builder-characterization/
+
+# ══ STAGE 2 — convergence ══════════════════════════════════════════════════
+# base commit: 8c005a8  |  workbook SHA-256: 8858cff40ea7eaeda6b7921714f3697a6ee9d1bbc99c84e564d7b118e45b2166
+
+## Workbook opens, six-model run in one process
+  before pass 2:  23   (1 discovery + 22 generation)
+  after receipt B: 13   (1 discovery + 12 generation)
+  after receipt C:  7   (1 discovery +  6 generation)  -- one frozen snapshot per assembly
+
+## Module sizes
+  production.py: 731 lines ->       62 lines (Stingray compatibility export only)
+
+$ .venv/bin/python -m py_compile <changed generator modules>
+OK (exit 0)
+
+$ PYTHONPATH=scripts .venv/bin/python -m pytest tests/ -q
+5 failed, 495 passed, 2 skipped, 103 subtests passed
+  test_editor_lints.py x4        pre-existing; all four diagnosed in the receipt
+  test_fable5_loop_contract.py   self-referential: this receipt incomplete at run time
+  (baseline at HEAD: 5 failed, 467 passed)
+
+$ node --test <all 16 browser/runtime gates>
+  stingray-generator-stability: ℹ pass 15 ℹ fail 0 
+  stingray-form-regression: ℹ pass 90 ℹ fail 0 
+  multi-model-runtime-switching: ℹ pass 48 ℹ fail 0 
+  z06-runtime-promotion: ℹ pass 5 ℹ fail 0 
+  z06-performance-package-interactions: ℹ pass 21 ℹ fail 0 
+  z06-runtime-rule-corrections: ℹ pass 15 ℹ fail 0 
+  z06-interior-accessory-cleanup: ℹ pass 7 ℹ fail 0 
+  z06-contract-preview: ℹ pass 3 ℹ fail 0 
+  z06-form-data-draft: ℹ pass 24 ℹ fail 0 
+  nonruntime-option-source-purge: ℹ pass 6 ℹ fail 0 
+  unpublished-runtime-contracts: ℹ pass 2 ℹ fail 0 
+  workbook-schema-standardization: ℹ pass 7 ℹ fail 2 
+  workbook-visual-copy-standardization: ℹ pass 8 ℹ fail 0 
+  seat-canonicalization-diff: ℹ pass 2 ℹ fail 0 
+  grand-sport-contract-preview: ℹ pass 5 ℹ fail 1 
+  grand-sport-draft-data: ℹ pass 18 ℹ fail 1 
+
+  Node gate notes:
+    workbook-schema-standardization 7/2 -- one is the pre-existing `active explicit excludes`
+      failure (confirmed by `git stash` + re-run: it fails at HEAD too); the other is the
+      live-app-contract check, stale because form-app/data.js is NOT republished. Publication
+      is deliberately deferred until after verification.
+    grand-sport-contract-preview 5/1 and grand-sport-draft-data 18/1 -- both pre-existing,
+      owned by Pass 4A.
+
+## Validation checks the retired Stingray builder had
+
+Ported: `missing_r6x_included_option_{interior_id}` -> `interiors._require_r6x_included_options`,
+raised as a hard failure rather than an error-severity row (assert_runtime_contract rejects those
+anyway). Latent-live: 15 interiors carry requires_r6x, 0 violate today.
+
+NOT ported, recorded as open:
+  - redundant_{rule_id}                same-section single-select excludes
+  - active_variant_count / availability_row_count   count-mismatch guards
+  - missing_{key}_{rule_id}            rule referencing an unknown entity; the new builder
+                                       FILTERS dangling rules instead of flagging them, so this
+                                       is a change in reporting, not only in payload
+  - heuristic_section_step_key_{id}    now structurally impossible: step_for_section raises
+
+## Published-artifact delta (generated to an isolated root, not published)
+
+  stingray       sections     50 ->  32   (-18, all carrying zero Stingray rows)
+  stingray       rules       145 -> 114   (-31, all referencing active=False options)
+  stingray       colorOverrides 245 -> 237 (-8, interiors outside Stingray's model_interior_scope)
+  stingray       rules        19 reasons corrected by the label_for interior fix
+  grand_sport / grand_sport_x / zr1 / zr1x   2 / 18 / 16 / 16 reasons corrected
+  z06            0 corrected -- its 22 leaks are workbook-authored, not composed
+  all six        display_behavior key dropped where blank (1340-1355 choices each)
+
+  Zero rows added or removed anywhere except Stingray's three approved collections.
+  Stingray choices lose `standard_equipment_group_type` on 62 rows; app.js reads that field from
+  data.standardEquipment (unchanged), never from choices, so it is inert.
+
+## Tracked surface
+
+  git status --porcelain shows only source, tests, and this receipt. No workbook write, no
+  artifact publication, no registry change.
+
+# ══ WORKBOOK WRITE — clear 22 z06 disabled_reason cells ═══════════════════════
+
+Approved by Sean 2026-07-26. First canonical workbook write through the guarded
+ChangeSet path, which is the same boundary the planned SQL-backed editor will use.
+
+  changeSetId          57b8836bdf5ef56442df1073
+  workbook SHA before  8858cff40ea7eaeda6b7921714f3697a6ee9d1bbc99c84e564d7b118e45b2166
+  workbook SHA after   d11674e3213a8858b13f5e4283b82868046ed34335c96419a8fe909034760bfd
+  artifacts retained   z06-clear-reasons.changeset.json, preview.json, approval.json
+  journal              form-output/workbook-edit-log.jsonl
+
+Preview (never touches the workbook): status=validated, ok=true, operationCoverage
+22/22 prepared and covered, verification 22/22 checked, schemaResult valid with 0
+issues on the simulated workbook, 0 warnings, 0 errors. Workbook SHA unchanged after
+both preview and approve.
+
+Semantic diff of the applied write, whole-workbook cell comparison against HEAD:
+
+  cells removed: 22   added: 0   value-changed: 0
+  sheets touched: ['z06_rule_mapping']
+
+Why clear rather than rewrite: a blank `disabled_reason` makes the generator compose
+the sentence from the interior's customer label, which is what the other five models
+already do and what stays correct if an interior is renamed. Rewriting the prose would
+have re-pinned the copy to a snapshot of today's interior names.
+
+Result in the published registry, read from the running form:
+
+  stingray    rawIdTooltips 0   e.g. "Included with Santorini Blue."
+  grandSport  rawIdTooltips 0
+  z06         rawIdTooltips 0   (was 22)
+
+Gates after the write: validate_workbook_schema valid / 0 issues; z06 regenerated with
+validation_errors 0; registry republished; Python 501 passed / 0 failed; every node gate
+at baseline (the lone `workbook-schema-standardization` failure is the pre-existing
+`active explicit excludes` one, and the two grand-sport gates remain the pre-existing
+Pass 4A failures).

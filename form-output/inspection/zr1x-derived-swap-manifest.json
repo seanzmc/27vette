@@ -1,0 +1,51 @@
+{
+  "model_key": "zr1x",
+  "candidate_count": 3,
+  "emitted_count": 0,
+  "shadowed_count": 2,
+  "not_emitted_count": 1,
+  "entries": [
+    {
+      "disposition": "candidate_not_emitted",
+      "source_id": "opt_cfc_002",
+      "target_id": "opt_zyc_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_cfc_002",
+          "opt_gba_001"
+        ],
+        "primitive_rule_id": "zr1x_rule_zyc_excludes_gba_a0a0e7ea8243",
+        "conflict_id": "opt_gba_001"
+      },
+      "allowlisted": false
+    },
+    {
+      "disposition": "shadowed_by_authored",
+      "source_id": "opt_ztk_001",
+      "target_id": "opt_rwj_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_ztk_001",
+          "opt_tom_002"
+        ],
+        "primitive_rule_id": "zr1x_rule_rwj_excludes_tom_98fe17eb4e5f",
+        "conflict_id": "opt_tom_002"
+      },
+      "allowlisted": false
+    },
+    {
+      "disposition": "shadowed_by_authored",
+      "source_id": "opt_ztk_001",
+      "target_id": "opt_wkr_001",
+      "derived_via": {
+        "includes_path": [
+          "opt_ztk_001",
+          "opt_tom_002"
+        ],
+        "primitive_rule_id": "zr1x_rule_wkr_excludes_tom_18fe08c0a78e",
+        "conflict_id": "opt_tom_002"
+      },
+      "allowlisted": false
+    }
+  ]
+}

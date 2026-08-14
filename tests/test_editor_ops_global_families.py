@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pass C editor_ops extensions: global sheet families + create_sheet ops.
+"""Editor operations for global sheet families and create-sheet batches.
 
 Fixture workbooks only. Write tests keep schema validation enabled while
 mocking a successful schema issue scan for the compact workbook; the live
@@ -23,7 +23,7 @@ for entry in (ROOT / "scripts", ROOT / "tests"):
 
 import corvette_form_generator.editor_ops as editor_ops  # noqa: E402
 from corvette_form_generator.editor_ops import apply_batch  # noqa: E402
-from ingest_wizard_fixtures import build_master_workbook  # noqa: E402
+from workbook_domain_fixtures import build_master_workbook  # noqa: E402
 
 
 def batch(path: Path, items: list[dict]) -> dict:
@@ -125,6 +125,7 @@ class GlobalFamilyOpsTest(unittest.TestCase):
                         "model_key": "grand_sport_x",
                         "registry_key": "grandSportX",
                         "model_label": "Grand Sport X",
+                        "model_year": 2027,
                         "expected_variant_count": 6,
                         "default_model": False,
                         "active": False,
@@ -146,7 +147,13 @@ class GlobalFamilyOpsTest(unittest.TestCase):
                     "action": "add",
                     "sheet": "runtime_steps",
                     "key": {"model_key": "zr1", "step_key": "paint"},
-                    "row": {"model_key": "zr1", "step_key": "paint", "step_label": "Paint", "runtime_order": 1},
+                    "row": {
+                        "model_key": "zr1",
+                        "step_key": "paint",
+                        "step_label": "Paint",
+                        "runtime_order": 1,
+                        "active": True,
+                    },
                 }
             ],
             write=True,
@@ -253,6 +260,7 @@ class GlobalFamilyOpsTest(unittest.TestCase):
                         "rpo": "ZZZ",
                         "option_name": "Test Option",
                         "section_id": "sec_whee_001",
+                        "selectable": True,
                         "active": True,
                     },
                 },

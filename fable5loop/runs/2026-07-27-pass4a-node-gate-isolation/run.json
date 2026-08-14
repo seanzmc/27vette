@@ -1,0 +1,19 @@
+{
+  "id": "2026-07-27-pass4a-node-gate-isolation",
+  "started_at": "2026-07-27T14:40:00-04:00",
+  "completed_at": "2026-07-27T16:40:00-04:00",
+  "objective": "Pass 4 Stage A, first slice: isolate the five node gates that invoked scripts/generate_form.py without --output-root and therefore rewrote tracked runtime contracts, assert the generated-artifact boundary from inside those gates, and retarget the stale section expectations two of them carried. Stage A remains open.",
+  "changed_surface": "five node test files, one new shared test helper, one new guard test, README gate-matrix note; no workbook write, nothing published, no generator or runtime change",
+  "outcome_rubric": "fable5loop/runs/2026-07-27-pass4a-node-gate-isolation/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-07-27-pass4a-node-gate-isolation/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-07-27-pass4a-node-gate-isolation/validation-output.txt",
+  "state_updates": [
+    {"section": "Verified facts", "evidence": "fable5loop/runs/2026-07-27-pass4a-node-gate-isolation/validation-output.txt"},
+    {"section": "Open failures", "evidence": "fable5loop/runs/2026-07-27-pass4a-node-gate-isolation/validation-output.txt"},
+    {"section": "Lessons learned", "evidence": "fable5loop/runs/2026-07-27-pass4a-node-gate-isolation/verifier-report.md"},
+    {"section": "Last session", "evidence": "fable5loop/runs/2026-07-27-pass4a-node-gate-isolation/outcome.md"}
+  ],
+  "skill_update": {"decision": "updated", "evidence": "fable5loop/runs/2026-07-27-pass4a-node-gate-isolation/verifier-report.md"},
+  "verifier": {"required": true, "independent_context": true, "verdict": "pass", "accepted_by_human": false, "cycles": 1},
+  "boundaries_preserved": ["workbook", "generated artifacts", "runtime app", "dealer submission"]
+}

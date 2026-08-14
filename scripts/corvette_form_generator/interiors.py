@@ -14,7 +14,6 @@ from corvette_form_generator.pricing import (
     price_ref_component_prices,
     price_ref_prices,
 )
-from corvette_form_generator.rules import runtime_authored_rule
 from corvette_form_generator.runtime_metadata import (
     load_interior_components,
     load_model_interior_scope_map,
@@ -115,21 +114,39 @@ def active_interior_flags(config: ModelConfig) -> dict[str, bool]:
     return flags
 
 
+def _require_r6x_included_options(config: ModelConfig, interior_rows: list[dict[str, Any]]) -> None:
+    """An R6X-requiring interior must name the option it pulls in.
+
+    Ported from the retired Stingray-only builder in Pass 2 receipt C. It trips
+    zero rows today, but 15 interiors carry ``requires_r6x``, so it is a live
+    guard over data the workbook owns -- not dead code to drop with the fork.
+    """
+
+    def flag(row: dict[str, Any], field: str) -> bool:
+        return str(row.get(field, "")).strip() == "True"
+
+    missing = [
+        clean(row.get("interior_id", ""))
+        for row in interior_rows
+        if flag(row, "active_for_stingray")
+        and flag(row, "requires_r6x")
+        and not clean(row.get("included_option_id", ""))
+    ]
+    if missing:
+        raise ValueError(
+            f"{config.model_label}: R6X interiors require included_option_id in "
+            f"{config.interior_source_sheet}; missing for {', '.join(sorted(missing))}."
+        )
+
+
 def build_model_interiors(config: ModelConfig, wb: Any | None = None) -> list[dict[str, Any]]:
     close_workbook = wb is None
     if wb is None:
         wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
     try:
         interior_rows = rows_from_sheet(wb, config.interior_source_sheet)
+        _require_r6x_included_options(config, interior_rows)
         price_ref_rows = rows_from_sheet(wb, "PriceRef")
-        rule_rows = rows_from_sheet(wb, config.rule_mapping_sheet)
-        z25_interior_ids = {
-            row.get("source_id", "")
-            for row in rule_rows
-            if row.get("rule_type", "").lower() == "includes"
-            and row.get("target_id", "") == "opt_z25_001"
-            and runtime_authored_rule(row)
-        }
         interior_price_ref = price_ref_prices(price_ref_rows)
         interior_component_price_ref = price_ref_component_prices(price_ref_rows)
         workbook_components_by_interior_id = load_interior_components(wb, config.model_key)
@@ -158,8 +175,8 @@ def build_model_interiors(config: ModelConfig, wb: Any | None = None) -> list[di
             "interior_id": interior_id,
             "source_sheet": config.interior_source_sheet,
             **active_flags,
-            "requires_z25": "True" if requires_option_id == "opt_z25_001" or interior_id in z25_interior_ids else "False",
-            "trim_level": clean(scope_row.get("trim_level")) or trim.replace("_R6X", ""),
+            "requires_z25": "True" if requires_option_id == "opt_z25_001" else "False",
+            "trim_level": clean(scope_row.get("trim_level")),
             "requires_r6x": "True" if "_R6X" in trim or interior_id.endswith("_R6X") else "False",
             "seat_code": clean(row.get("Seat", "")),
             "interior_code": clean(row.get("Interior Code", "")),

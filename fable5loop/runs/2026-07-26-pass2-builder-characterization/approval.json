@@ -1,0 +1,15 @@
+{
+  "acceptedWarningIds": [],
+  "actor": "Seanzmc",
+  "approvalFingerprint": "054f9b77153e88da462a0cbc14b79d39d89d1f89910ebdf7bcf8018d8ed2345b",
+  "changeSetId": "57b8836bdf5ef56442df1073",
+  "createdAt": "2026-07-26T22:21:20+00:00",
+  "ok": true,
+  "previewFingerprint": "9eb30619a2e1224f8e136919268d1810dd5834dcaf493de2a8e8076fb44e3712",
+  "schemaVersion": "workbook-change-approval-1",
+  "semanticFingerprint": "57b8836bdf5ef56442df10733e5f1a32c50b88506a34dba4332ed683a8383139",
+  "workbook": {
+    "mtimeNs": "1784922924189292254",
+    "sha256": "8858cff40ea7eaeda6b7921714f3697a6ee9d1bbc99c84e564d7b118e45b2166"
+  }
+}

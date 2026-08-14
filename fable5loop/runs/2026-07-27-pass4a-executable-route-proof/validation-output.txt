@@ -1,0 +1,124 @@
+Run: 2026-07-27-pass4a-executable-route-proof
+Base commit: ed75b54 (the Stage A node-gate isolation slice)
+Workbook: stingray_master.xlsx  sha256 d11674e3213a8858b13f5e4283b82868046ed34335c96419a8fe909034760bfd, unchanged
+Changed: tests/test_model_generation_route.py, tests/test_runtime_contract_builder.py. Tests only.
+
+PROCESS DEVIATION: the outcome rubric was written after the edits, not before.
+Recorded in outcome.md and weighed by the verifier, which judged the rubric
+spec-derived rather than shaped to the result — C5's second clause and C2 both
+failed the first submission.
+
+================================================================================
+What was replaced
+================================================================================
+Deleted from test_model_generation_route.py:
+  test_generate_form_delegates_to_shared_model_generation_module      (9 source-text assertions)
+  test_model_generation_uses_shared_source_assembly_without_temporary_route_split (14)
+Deleted from test_runtime_contract_builder.py:
+  test_builder_preserves_existing_live_contract_cleanup_behavior — its expected
+    value was `live_contract_data(draft)`, the same helper build_model_runtime_contract
+    calls, so the two sides moved together and the assertion could not fail.
+  test_exactly_one_module_finalizes_the_runtime_contract — text greps.
+
+Test counts: test_model_generation_route.py 7 -> 22, test_runtime_contract_builder.py
+2 -> 14 (+11 subtests).
+
+================================================================================
+Mutation matrix — every claim, and the input that defeats it
+================================================================================
+Each mutation applied to the real module, suite run, then `git checkout -- scripts/`.
+
+  (a) generate_form.py ignores --output-root, uses PROJECT_ROOT
+      -> CAUGHT: test_the_cli_delegates_generation_to_the_shared_entry_point
+         "the CLI must honour --output-root"
+  (b) provenance stripper narrowed to the choices[]/standardEquipment[] row paths
+      -> CAUGHT: test_draft_only_provenance_is_stripped_wherever_it_is_nested
+  (b2) stripper AND find_draft_only_fields narrowed together, defeating the
+       validator backstop
+      -> CAUGHT: same test, on the assertion rather than the raise
+  (c) zr1x given a private assembly path around assemble_model_source
+      -> CAUGHT: both parametrized route tests, naming [zr1x]
+  (d) build_model_runtime_contract setdefault()s dataset identity instead of
+      overwriting it
+      -> CAUGHT: test_config_owns_the_dataset_identity_even_when_the_draft_disagrees
+         (the main expectation test does NOT catch this — the two are doing
+         different work, which is why both exist)
+  (e) copy_from_model_key and raw_source_sheets dropped from
+      DRAFT_ONLY_PROVENANCE_FIELDS
+      -> was UNCAUGHT BY THE ENTIRE 567-TEST PYTHON SUITE at first submission.
+         Now CAUGHT: test_builder_output_matches_the_expected_contract_exactly,
+         after both fields were added to draft_payload().
+         Re-measured: 1 failed, 12 passed.
+  (f) generate_form.py regrows a stingray-only PRODUCTION_MODEL_KEYS branch
+      -> was uncaught by these two files (only test_all_model_runtime_generation.py
+         saw it). Now CAUGHT: test_the_cli_delegates_generation_to_the_shared_entry_point[stingray],
+         after that test was parametrized over discovery.
+         Re-measured: 1 failed, 22 passed.
+  (g) production.py re-adds `from ...registry_promotion import live_contract_data`
+      -> was uncaught. Now CAUGHT: test_the_generation_lane_does_not_depend_on_registry_promotion.
+  (i) production.py adds a second build_model_runtime_contract caller
+      -> was uncaught. Now CAUGHT: test_only_the_finalizer_and_the_assembly_call_the_finalizer.
+         (g) and (i) applied together: 2 failed, 11 passed.
+  (h) summary counts rebuilt from assembly.report
+      -> CAUGHT: test_generation_summary_is_derived_from_the_validated_runtime_contract
+
+================================================================================
+The retired guard was passing for the wrong reason
+================================================================================
+The deleted one-caller check asserted the caller set of
+build_model_runtime_contract was {"runtime_contract.py", "source_assembly.py"}.
+It searched file text, so it matched the `def` line and the docstring inside the
+defining module. Parsed as an AST, runtime_contract.py never calls its own
+finalizer: the real caller set is {"source_assembly.py"}. The replacement asserts
+that, and the AST walk counts only ast.Call nodes, so a mention in a comment,
+docstring, or string literal — including this receipt's own prose — cannot
+satisfy or trip it.
+
+================================================================================
+C8 — the "already delivered" claims, checked rather than assumed
+================================================================================
+tests/test_generate_form_model_discovery_cli.py: no inactive-ZR1 assertion and no
+six-model literal. Pass 2 rewrote it. No work needed. Verified by read.
+
+Retired artifact types: tests/test_registry_promotion_metadata.py:414-421 and
+tests/test_schema_validation_metadata.py:1413-1421,1446-1454 are deliberate
+negative tests ("breaks if current_generation or draft_artifact is re-accepted"),
+delivered by Pass 3. No work needed.
+
+Disclosed deviation the maker's first summary left implied: a permanent
+six-model literal DOES exist, at tests/test_all_model_runtime_generation.py:44
+(EXPECTED_MODEL_KEYS). The spec bullet forbade one in the discovery CLI test; it
+was added deliberately in Pass 2 on a verifier finding, because a set derived
+from the same sheet the code reads cannot detect a change to that sheet. That is
+a defensible deviation, and it is stated here rather than left unsaid.
+
+================================================================================
+Gates
+================================================================================
+Two rewritten files:
+  PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_runtime_contract_builder.py tests/test_model_generation_route.py -q
+  36 passed, 11 subtests passed in 18.45s
+
+README Python metadata gate set plus the two rewritten files and the six-model gate:
+  test_generation_safety, test_generate_form_model_discovery_cli,
+  test_runtime_contract_builder, test_model_config_metadata, test_promote_model,
+  test_registry_promotion_metadata, test_schema_validation_metadata,
+  test_rule_derivation, test_model_generation_route, test_all_model_runtime_generation
+  188 passed, 111 subtests passed in 185.85s
+
+Full Python suite, run by the verifier against the pre-fix state of this chunk:
+  567 passed, 2 skipped
+
+Boundaries:
+  git status --porcelain -- form-output form-app  empty after every run.
+  No production code change: scripts/ is byte-identical to ed75b54 (every
+  mutation restored with `git checkout -- scripts/`, verified clean).
+  No workbook write. Nothing published. No promotion.
+
+Known pre-existing baseline failure, untouched by this run:
+  tests/workbook-schema-standardization.test.mjs
+  "active explicit excludes do not duplicate active exclusive-group peers"
+
+Loop validator, after receipt completion:
+  Fable 5 loop validation passed: 3 tiers, 4 layers, required artifacts, Claude
+  setup, memory, skill, routine, outcomes, and eval rubric are present.

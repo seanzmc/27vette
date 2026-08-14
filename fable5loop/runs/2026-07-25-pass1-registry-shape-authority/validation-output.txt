@@ -1,0 +1,159 @@
+=== commit / protected surfaces ===
+d5db8bb7744097078fb0ef84b8df772fbc2e1f6f
+8858cff40ea7eaeda6b7921714f3697a6ee9d1bbc99c84e564d7b118e45b2166  stingray_master.xlsx
+802afa1fea4e9e802f7d82635556c5569d3c73b2f4ae59267f64dd8157f9bceb  form-app/data.js
+git status --porcelain -- stingray_master.xlsx form-output form-app:
+(no lines above = clean)
+
+=== validate_workbook_package.py stingray_master.xlsx ===
+{
+  "workbook": "stingray_master.xlsx",
+  "status": "valid",
+  "issue_count": 0,
+  "issues": []
+}
+
+=== validate_workbook_schema.py stingray_master.xlsx --skip-live-contract ===
+{
+  "workbook": "stingray_master.xlsx",
+  "status": "valid",
+  "issue_count": 0,
+  "error_count": 0,
+  "warning_count": 0,
+  "issues": []
+}
+
+=== git diff --check ===
+clean
+
+=== validate_workbook_schema.py stingray_master.xlsx (full, includes live contract) ===
+{
+  "workbook": "stingray_master.xlsx",
+  "status": "invalid",
+  "issue_count": 1,
+  "error_count": 1,
+  "warning_count": 0,
+  "issues": [
+    {
+      "severity": "error",
+      "check_id": "app_registry_freshness_check_failed",
+      "sheet": "form-app/data.js",
+      "row": null,
+      "column": "",
+      "value": null,
+      "message": "Could not validate app registry freshness: Runtime contract /Users/seandm/Projects/27vette/form-output/runtime/stingray-runtime-contract.json is not publishable (dataset.model must be a non-empty string; dataset.model_year must be a non-empty string; dataset.status is None, expected 'runtime_active'; dataset.model is None, expected 'Stingray'). Correct the workbook/source generation error and regenerate it."
+    }
+  ]
+}
+
+NOTE: the single error above is the retained Stingray runtime contract failing strict
+validation. It is the Pass 3 prerequisite recorded in the spec, not a Pass 1 regression.
+
+=== Pass 1 focused gate (spec section 4, Pass 1 gates) ===
+tests/test_workbook_manager.py::TestApi::test_import_reports_all_unresolved_legacy_workflow_blockers
+  /Users/seandm/Projects/27vette/.venv/lib/python3.14/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+209 passed, 2 skipped, 1 warning, 7 subtests passed in 93.66s (0:01:33)
+
+=== full Python suite ===
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_editor_lints.py::RealWorkbookLintTest::test_d1_rwj_wks_collision
+FAILED tests/test_editor_lints.py::RealWorkbookLintTest::test_negative_no_duplicate_keys_or_orphan_refs
+FAILED tests/test_editor_lints.py::RealWorkbookCompareTest::test_c2_cj2_stingray_name_deviator
+FAILED tests/test_editor_lints.py::RealWorkbookCompareTest::test_r3_drz_pending_review
+FAILED tests/test_fable5_loop_contract.py::test_repository_fable5_loop_contract_passes
+FAILED tests/test_source_assembly_characterization.py::test_shared_assembler_preserves_stingray_runtime_drift_surfaces
+FAILED tests/test_source_assembly_characterization.py::test_shared_assembler_preserves_grand_sport_runtime_drift_surfaces
+7 failed, 452 passed, 2 skipped, 1 warning, 15 subtests passed in 259.10s (0:04:19)
+
+=== node --test tests/workbook-schema-standardization.test.mjs ===
+✖ schema validation CLI accepts the standardized workbook and live app contract (61232.978667ms)
+✖ active explicit excludes do not duplicate active exclusive-group peers (180.401958ms)
+ℹ pass 7
+ℹ fail 2
+✖ failing tests:
+✖ schema validation CLI accepts the standardized workbook and live app contract (61232.978667ms)
+✖ active explicit excludes do not duplicate active exclusive-group peers (180.401958ms)
+(both node failures reproduce identically at HEAD with Pass 1 changes stashed)
+
+=== POST-VERIFIER FIX CYCLE ===
+Verifier finding F1 (models_for_write_targets narrowed) fixed; two follow-ups closed.
+
+--- focused re-run ---
+........................................................................ [ 59%]
+.................................................                        [100%]
+121 passed in 4.46s
+
+--- validate_workbook_schema.py --skip-live-contract ---
+{
+  "workbook": "stingray_master.xlsx",
+  "status": "valid",
+  "issue_count": 0,
+  "error_count": 0,
+  "warning_count": 0,
+  "issues": []
+}
+
+--- full Python suite after fixes ---
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_editor_lints.py::RealWorkbookLintTest::test_d1_rwj_wks_collision
+FAILED tests/test_editor_lints.py::RealWorkbookLintTest::test_negative_no_duplicate_keys_or_orphan_refs
+FAILED tests/test_editor_lints.py::RealWorkbookCompareTest::test_c2_cj2_stingray_name_deviator
+FAILED tests/test_editor_lints.py::RealWorkbookCompareTest::test_r3_drz_pending_review
+FAILED tests/test_fable5_loop_contract.py::test_repository_fable5_loop_contract_passes
+FAILED tests/test_source_assembly_characterization.py::test_shared_assembler_preserves_stingray_runtime_drift_surfaces
+FAILED tests/test_source_assembly_characterization.py::test_shared_assembler_preserves_grand_sport_runtime_drift_surfaces
+7 failed, 454 passed, 2 skipped, 1 warning, 15 subtests passed in 258.70s (0:04:18)
+
+--- protected surfaces ---
+(no lines = clean)
+8858cff40ea7eaeda6b7921714f3697a6ee9d1bbc99c84e564d7b118e45b2166  stingray_master.xlsx
+
+=== POST-VERIFIER-CYCLE-2 (O1-residual closure) ===
+Membership check for artifact_type moved out of the promoted-only loop; the duplicate
+promoted-loop copy removed. Now every active promotion row is domain-checked.
+
+--- validate_workbook_package.py ---
+{
+  "workbook": "stingray_master.xlsx",
+  "status": "valid",
+  "issue_count": 0,
+  "issues": []
+}
+--- validate_workbook_schema.py --skip-live-contract ---
+{
+  "workbook": "stingray_master.xlsx",
+  "status": "valid",
+  "issue_count": 0,
+  "error_count": 0,
+  "warning_count": 0,
+  "issues": []
+}
+
+--- Pass 1 focused gate (final source) ---
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+212 passed, 2 skipped, 1 warning, 7 subtests passed in 93.80s (0:01:33)
+
+--- full Python suite (final source) ---
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_editor_lints.py::RealWorkbookLintTest::test_d1_rwj_wks_collision
+FAILED tests/test_editor_lints.py::RealWorkbookLintTest::test_negative_no_duplicate_keys_or_orphan_refs
+FAILED tests/test_editor_lints.py::RealWorkbookCompareTest::test_c2_cj2_stingray_name_deviator
+FAILED tests/test_editor_lints.py::RealWorkbookCompareTest::test_r3_drz_pending_review
+FAILED tests/test_fable5_loop_contract.py::test_repository_fable5_loop_contract_passes
+FAILED tests/test_source_assembly_characterization.py::test_shared_assembler_preserves_stingray_runtime_drift_surfaces
+FAILED tests/test_source_assembly_characterization.py::test_shared_assembler_preserves_grand_sport_runtime_drift_surfaces
+7 failed, 455 passed, 2 skipped, 1 warning, 15 subtests passed in 267.38s (0:04:27)
+
+--- protected surfaces / diff check ---
+(no lines = clean)
+8858cff40ea7eaeda6b7921714f3697a6ee9d1bbc99c84e564d7b118e45b2166  stingray_master.xlsx
+diff --check clean

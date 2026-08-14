@@ -1,0 +1,322 @@
+Run: 2026-07-26-pass2-compat-scope-and-six-model-gate
+Scope: spec Pass 2 requirements 8 and 10
+Workbook SHA-256 at start and end: d11674e3213a8858b13f5e4283b82868046ed34335c96419a8fe909034760bfd
+(unchanged; this run performs no workbook write)
+
+
+================================================================
+REQUIREMENT 8 — Stingray compatibility export disposition
+================================================================
+
+--- R8.1  Consumer scan -----------------------------------------
+
+Scope: active tree only. `archive/`, `docs/archive/`, and `.claude/worktrees/`
+excluded — a historical spec naming the artifact is not a consumer.
+
+Text search for the artifact filenames:
+
+  form-output/stingray-form-data.json
+    tests/stingray-generator-stability.test.mjs:25        READER  (real consumer)
+    tests/test_schema_validation_metadata.py:1184         READER  (fixture; see below)
+    tests/test_schema_validation_metadata.py:1254         READER  (fixture; see below)
+    tests/test_generation_safety.py:109,148               writer-side path assertion
+    scripts/corvette_form_generator/production.py:52      writer
+    README.md:148, docs/route-map.md:15                   documentation
+
+  form-output/stingray-form-data.csv
+    tests/test_generation_safety.py:149                   writer-side path assertion
+    scripts/corvette_form_generator/production.py:55      writer
+    README.md:148, docs/route-map.md:15                   documentation
+    -> no code branch consumes CSV content anywhere in the active tree.
+       (The two isolated-root gates do byte-hash every file under form-output/,
+        the CSV included, to prove they wrote nothing. That is not consumption.)
+
+CORRECTION — the text search above is not sufficient on its own.
+
+  First conclusion (wrong): the two `test_schema_validation_metadata.py` lines
+  write a file nothing reads, because grep finds no read of that filename in
+  `scripts/`. Removing both lines was expected to be a no-op.
+
+  Actual result of removing them:
+    tests/test_schema_validation_metadata.py::SchemaValidationMetadataTests::
+      test_live_app_registry_must_match_promoted_artifacts   FAILED
+    (1 failed, 43 passed)
+
+  Root cause: the path is never spelled literally in source. It is constructed:
+
+    scripts/corvette_form_generator/registry_promotion.py:162-165
+      def current_generation_artifact_path(root, promotion):
+          if promotion.artifact_path:
+              return resolve_artifact_path(root, promotion.artifact_path)
+          return resolve_artifact_path(
+              root, Path("form-output") / f"{export_slug(promotion.model_key)}-form-data.json")
+
+  Both lines were restored (`git checkout --`). They are a legitimate fixture
+  for a reachable code path, not dead setup.
+
+
+--- R8.2  Reachability from publication --------------------------
+
+Corrected claim. The compatibility JSON is NOT unconditionally a leaf output;
+it is the fallback artifact for `artifact_type == "current_generation"`
+promotion rows, and that path feeds registry publication:
+
+  scripts/generate_registry.py:49    -> artifact_path_for_promotion(...)
+  registry_promotion.py:172-175      -> current_generation_artifact_path(...) when
+                                        artifact_type == "current_generation"
+
+Whether that matters for the canonical workbook is a data question, resolved by
+running the real resolver over the real promotion rows rather than by reading:
+
+  stingray      runtime_contract -> form-output/runtime/stingray-runtime-contract.json
+  grand_sport   runtime_contract -> form-output/runtime/grand-sport-runtime-contract.json
+  z06           runtime_contract -> form-output/runtime/z06-runtime-contract.json
+
+All six `model_registry_promotion` rows declare `artifact_type=runtime_contract`.
+No promotion resolves to `stingray-form-data.json`. For the canonical workbook the
+compatibility export is therefore a leaf: registry publication never reads it.
+
+Within generation, the writer runs strictly downstream of validation and feeds
+nothing back — `model_generation.py:155-185`: `assert_runtime_contract(...)` on
+line 158, then `write_stingray_compatibility_artifacts(...)` on line 168 taking
+the already-validated contract, returning only paths into the summary's artifact
+dict. `_summary_from_runtime_contract()` derives from the contract, not from
+these artifacts.
+
+Related finding, recorded not fixed (Pass 3 requirement 7 owns it):
+
+  registry_promotion.promotion_requires_runtime_contract_assertion()  (line 178)
+  returns False for `current_generation`, i.e. it is a switch that skips the
+  strict assertion — the second acceptance check §3.8's standing rule forbids.
+  Caller scan: ZERO callers in scripts/ or tests/. It is unreachable dead code
+  today. Deletion candidate.
+
+
+--- R8.3  Parity proof vs the collapsed builder -------------------
+
+Stingray regenerated from the unchanged canonical workbook into an isolated
+--output-root. The snapshot keeps the canonical filename, because
+`dataset.source_workbook` records it (a renamed snapshot produced exactly one
+spurious difference on the first attempt, which is how this was caught).
+
+  $ node scripts/compare-generated-contracts.mjs \
+      form-output/stingray-form-data.json <candidate>/form-output/stingray-form-data.json
+  contracts match: ...                                        exit 0
+
+  $ cmp <candidate>/form-output/stingray-form-data.csv form-output/stingray-form-data.csv
+  CSV IDENTICAL                                               exit 0
+
+Zero non-timestamp differences. No allowlist used.
+
+
+--- R8.4  Disposition ---------------------------------------------
+
+  stingray-form-data.json  RETAINED.
+    One real consumer (`stingray-generator-stability.test.mjs`) plus one dormant
+    but reachable registry-publication fallback. Deletion is blocked until Pass 3
+    requirement 7 removes `current_generation` as an accepted artifact_type.
+
+  stingray-form-data.csv   RETAINED FOR NOW, zero consumers.
+    No reader, no constructed path, no code branch. Recorded as an explicit
+    Pass 4 Stage B deletion candidate. Not deleted here: Stage B owns approved
+    deletion, and this run's boundary is "add a gate, delete nothing".
+
+
+================================================================
+REQUIREMENT 10 — six-model executable harness
+================================================================
+
+Created: tests/test_all_model_runtime_generation.py
+
+  R10.1  Model set read from `model_master` directly (workbook_active_models())
+         and compared to discover_generation_model_configs().
+         CORRECTED after verification: this comparison is weaker than the rubric
+         assumed. Discovery *raises* on an incomplete model rather than dropping
+         it, so for a well-formed workbook both sides are equal by construction
+         and the comparison only catches a discovery-code regression. The
+         workbook direction is covered instead by the named-membership assertion
+         in R10.5. Both the test docstring and the module docstring now say this.
+  R10.2  Every model generated via `scripts/generate_form.py` as a subprocess
+         into one isolated --output-root.
+  R10.3  Each contract re-read from disk and passed through
+         runtime_contract.assert_runtime_contract(config=...). Same validator
+         generation uses; no second weaker check.
+  R10.4  Variant count and uniqueness checked against
+         model_master.expected_variant_count.
+  R10.5  Membership, not only count: the workbook's active set and discovery's
+         set must each equal the six named keys, and the per-model parametrized
+         tests are pinned to those names so coverage cannot shrink silently.
+  R10.6  SHA-256 of stingray_master.xlsx, form-app/data.js, and every file under
+         form-output/ hashed before and after; asserted equal.
+  R10.7  Negative proof present —
+         test_strict_validation_rejects_what_a_status_and_error_scan_would_accept
+         builds a payload with runtime_active status and zero error-severity
+         rows (which the previous CLI gate's check accepted) but empty `steps`
+         and no `orderSummary`, and asserts the strict validator raises with
+         both reasons named.
+
+Convergence (spec requirement 10: "the same executable test harness"):
+tests/test_generate_form_model_discovery_cli.py previously ran its own full
+six-model generation loop with a hardcoded EXPECTED_MODELS set. That duplicate
+loop is removed; the file now covers CLI-argument behavior only (--output-root
+confinement, unknown model, --inspection-output guard). The six-model set is still
+generated once per suite run, now by the harness that requirement 10 names,
+rather than by a CLI-argument test that had grown a second gate inside it. The stdout key-shape assertion it
+owned moved into the new harness, parametrized per model.
+
+  $ PYTHONPATH=scripts .venv/bin/python -m pytest \
+      tests/test_all_model_runtime_generation.py \
+      tests/test_generate_form_model_discovery_cli.py -q
+  25 passed
+
+
+--- R10.8  Pass 2 gate block, run exactly as written in the spec ---
+
+  $ .venv/bin/python -m py_compile scripts/generate_form.py \
+      scripts/corvette_form_generator/{model_generation,source_assembly,runtime_contract,production,inspection}.py
+  py_compile OK
+
+  $ PYTHONPATH=scripts .venv/bin/python -m pytest \
+      tests/test_generate_form_model_discovery_cli.py tests/test_model_config_metadata.py \
+      tests/test_model_generation_route.py tests/test_source_assembly_characterization.py \
+      tests/test_runtime_contract_builder.py tests/test_rule_derivation.py \
+      tests/test_all_model_runtime_generation.py -q
+  104 passed, 88 subtests passed in 164.66s
+
+The block is green as written for the first time; `tests/test_all_model_runtime_generation.py`
+did not exist before this run, so the block previously failed at collection.
+
+
+================================================================
+FULL GATE PARITY (X2)
+================================================================
+
+Python — full suite:
+  1 failed, 523 passed, 2 skipped, 103 subtests passed in 435.55s
+
+  The single failure is tests/test_fable5_loop_contract.py, reporting that this
+  run's own folder lacks run.json and is not referenced from STATE.md. It is
+  produced by this run's incompleteness at the time of the run, and clears at
+  closeout. Baseline before this run was 501 passed / 0 failed.
+
+Node gates (per file, pass/fail):
+  grand-sport-contract-preview            5 / 1   pre-existing (Pass 4A)
+  grand-sport-draft-data                 18 / 1   pre-existing (Pass 4A)
+  multi-model-runtime-switching          48 / 0
+  nonruntime-option-source-purge          6 / 0
+  seat-canonicalization-diff              2 / 0
+  stingray-form-regression               91 / 0
+  stingray-generator-stability           15 / 0
+  unpublished-runtime-contracts           2 / 0
+  workbook-schema-standardization         8 / 1   pre-existing (active explicit excludes)
+  workbook-visual-copy-standardization    8 / 0
+  z06-contract-preview                    3 / 0
+  z06-form-data-draft                    24 / 0
+  z06-interior-accessory-cleanup          7 / 0
+  z06-performance-package-interactions   21 / 0
+  z06-runtime-rule-corrections           15 / 0
+  z06-runtime-promotion                   5 / 0
+
+  The three failures are the two Pass 4A grand-sport tests and the
+  workbook-schema-standardization "active explicit excludes" case, all recorded
+  as open before this run. Evidence that they predate it: this run changed no
+  .mjs file and no generator source — the diff is two Python test files plus
+  loop receipt files.
+
+Artifact side-effects during gate runs:
+  Running the node gates dirtied form-app/data.js and two runtime contracts by
+  `generated_at` only (the known Pass 4A defect: those tests invoke generators
+  and generate_registry.py against tracked paths). Diff inspected — timestamps
+  only, 4 changed lines total — then reverted with `git checkout --`.
+  Final `git status --porcelain` shows only:
+    M  tests/test_generate_form_model_discovery_cli.py
+    ?? tests/test_all_model_runtime_generation.py
+    ?? fable5loop/runs/2026-07-26-pass2-compat-scope-and-six-model-gate/
+
+  This is itself further evidence for Pass 4A: a read-only gate run should not
+  be able to modify a published artifact.
+
+
+================================================================
+BOUNDARIES
+================================================================
+
+  stingray_master.xlsx     unchanged (SHA-256 identical, start and end)
+  form-output/             unchanged
+  form-app/data.js         unchanged
+  No model promoted. No product or business rule changed. Nothing published.
+
+
+================================================================
+INDEPENDENT VERIFIER (separate context, no maker reasoning)
+================================================================
+
+Verdict: PASS with should-fix findings. Every hard number in this receipt was
+reproduced independently: gate block 104 passed / 88 subtests, full suite
+1 failed / 523 passed / 2 skipped, all 16 node-gate tallies, both parity
+comparisons, the workbook SHA-256, and the R8.1 fixture-removal failure verbatim.
+No claim was found false. Four were imprecise; all four are fixed above and
+below.
+
+Findings accepted and fixed in this run:
+
+  V1 (should-fix)  `test_discovery_matches_the_workbooks_own_active_model_set`
+      could not fail on any workbook change, contradicting its own docstring.
+      Proved by mutation: deactivating `zr1x` in a workbook copy left that test
+      passing (only the count assertion failed), and deactivating a required
+      source sheet made all 22 tests error in fixture setup rather than reach
+      the assertion.
+      Fixed: docstring corrected to state what it actually catches; the workbook
+      direction is now covered by named membership.
+
+  V2 (should-fix)  Undisclosed coverage removal. The old CLI test asserted
+      `set(configs) == {six named keys}`; the first version of this run replaced
+      it with a count-only check, so a workbook edit renaming a model key while
+      leaving six rows active would have passed the entire Pass 2 gate. The
+      verifier's assertion-by-assertion diff found this was the only old
+      assertion not carried over; the other ten were.
+      Fixed: `EXPECTED_MODEL_KEYS` membership is asserted, and the three
+      per-model parametrized tests are pinned to those names so the parametrized
+      count cannot shrink with the workbook (it silently went 22 -> 19 under the
+      verifier's mutation).
+
+  V3 (note)  "zero readers" for the CSV was literally false: this run's own two
+      gates byte-hash every file under form-output/, the CSV included.
+      Fixed: wording above.
+
+  V4 (note)  "generates the set once instead of twice" described a counterfactual
+      as if it were the prior state. Before this run the set was generated once,
+      by the CLI test.
+      Fixed: wording above.
+
+Findings recorded, not fixed (they are other passes' work):
+
+  V5  `assert_runtime_contract` does not enforce the spec's variant rejection
+      rules or the workbook binding. The verifier probed the real validator with
+      the real config: dropping a variant, duplicating a variant, renaming a
+      variant_id, dropping a choice, and a wrong `source_workbook` were all
+      ACCEPTED; empty steps, missing orderSummary, draft status, empty choices,
+      blank dataset.name, and an error-severity row were rejected.
+      Consequence: `test_variant_count_matches_the_workbooks_declared_count` is
+      load-bearing rather than redundant, and this run adds
+      `test_dataset_binds_to_the_candidate_snapshot` to cover the binding gap at
+      the gate until the validator owns it. The validator gap itself belongs to
+      the pass that owns the rejection matrix, and is recorded as open.
+
+  V6  The negative proof discriminates only at the "collection empty / key
+      missing" level, which follows directly from V5.
+
+  V7  Running the node gates writes tracked artifacts (`form-app/data.js` and two
+      runtime contracts, `generated_at` only). Independently reproduced, including
+      which files. Pass 4A owns it.
+
+Not independently verified by the verifier:
+  - The 501-passed pre-run baseline was not re-run at HEAD. It is arithmetically
+    consistent with 523 (+22 new file, +1 net in the CLI file, -1 loop-contract
+    test currently failing) but was not executed.
+
+Post-fix re-run of the two changed files:
+  $ PYTHONPATH=scripts .venv/bin/python -m pytest \
+      tests/test_all_model_runtime_generation.py \
+      tests/test_generate_form_model_discovery_cli.py -q
+  31 passed

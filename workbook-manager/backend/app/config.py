@@ -21,6 +21,9 @@ DEFAULT_WORKBOOK = Path(
     os.environ.get("WBM_WORKBOOK", REPO_ROOT / "stingray_master.xlsx")
 )
 DEFAULT_DB = Path(os.environ.get("WBM_DB", VAR_DIR / "workbook_manager.sqlite3"))
+DEFAULT_PROJECTION_DB = Path(
+    os.environ.get("WBM_PROJECTION_DB", VAR_DIR / "workbook_projection.sqlite3")
+)
 
 FRONTEND_DIST = MODULE_ROOT / "frontend" / "dist"
 

@@ -26,6 +26,17 @@ body {
 
 #root { min-height: 100vh; }
 
+.provisional-banner {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px 16px; padding: 8px 22px;
+  border-bottom: 1px solid rgba(245,185,66,.55);
+  background: #2a220f; color: var(--accent); font-size: 12px;
+}
+.provisional-banner > div:first-child { display: flex; gap: 8px; flex-wrap: wrap; }
+.status-surfaces { display: flex; gap: 5px; flex-wrap: wrap; }
+.status-surfaces .chip { color: var(--text); border-color: rgba(245,185,66,.35); }
+
 .app-header {
   display: flex; align-items: center; justify-content: space-between;
   flex-wrap: wrap; gap: 12px;

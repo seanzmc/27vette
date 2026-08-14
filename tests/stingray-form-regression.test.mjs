@@ -4,13 +4,14 @@ import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
-function loadData() {
+function loadRegistry() {
   const context = { window: {} };
   vm.runInNewContext(fs.readFileSync("form-app/data.js", "utf8"), context);
-  return context.window.STINGRAY_FORM_DATA;
+  return context.window.CORVETTE_FORM_DATA;
 }
 
-const data = loadData();
+const registry = loadRegistry();
+const data = registry.models.stingray.data;
 const appSource = fs.readFileSync("form-app/app.js", "utf8");
 const htmlSource = fs.readFileSync("form-app/index.html", "utf8");
 const stylesSource = fs.readFileSync("form-app/styles.css", "utf8");
@@ -134,7 +135,7 @@ function makeElement() {
   };
 }
 
-function loadRuntime({ fetchImpl, turnstileAvailable = true } = {}) {
+function loadRuntime({ fetchImpl, turnstileAvailable = true, formDataRegistry } = {}) {
   const downloads = [];
   const elements = new Map();
   const docListeners = {};
@@ -157,6 +158,7 @@ function loadRuntime({ fetchImpl, turnstileAvailable = true } = {}) {
   };
   const context = {
     window: {
+      CORVETTE_FORM_DATA: formDataRegistry,
       STINGRAY_FORM_DATA: data,
       __downloads: downloads,
       __lastBlobContent: "",
@@ -701,6 +703,7 @@ test("interior color groups render as collapsed disclosure containers without th
   assert.match(html, /<details class="interior-group"/);
   assert.match(html, /<summary class="interior-group-header">/);
   assert.doesNotMatch(html, /<details class="interior-group"[^>]*\sopen(?:\s|>)/, "groups should be collapsed by default without a selection");
+  assert.match(stylesSource, /\.interior-group-heading\s*\{[\s\S]*?flex:\s*1 1 0;/, "interior headings should fill the row so short descriptions stay aligned");
   assert.doesNotMatch(stylesSource, /\.interior-color-section\s*\{[\s\S]*background:\s*linear-gradient/);
   assert.doesNotMatch(stylesSource, /\.interior-group\s*\{[\s\S]*background:\s*#fbfaf7/);
 });
@@ -1003,7 +1006,7 @@ test("step rail checkmarks only appear for satisfied previous steps", () => {
 });
 
 test("vehicle setup exposes paced readability hooks without changing option step content", () => {
-  const runtime = loadRuntime();
+  const runtime = loadRuntime({ formDataRegistry: registry });
   runtime.render();
 
   const setupHtml = runtime.elements.get("#stepContent").innerHTML;
@@ -1026,19 +1029,13 @@ test("vehicle setup exposes paced readability hooks without changing option step
   assert.match(setupHtml, /Next-generation LS6 power for the everyday supercar/);
   assert.match(setupHtml, /LS6 6\.7L V8/);
   assert.match(setupHtml, /535 hp \/ 520 lb-ft/);
-  assert.match(appSource, /cardSubtitle: "Purist, rear-wheel-drive performance"/);
-  assert.match(appSource, /eyebrow: "PURIST, REAR-WHEEL-DRIVE PERFORMANCE"/);
-  assert.match(appSource, /The reborn legend, tuned for a pure rear-drive sweet spot/);
-  assert.match(appSource, /Available quad center exhaust/);
-  assert.match(appSource, /cardSubtitle: "Track-born, street-legal supercar"/);
-  assert.match(appSource, /eyebrow: "TRACK-BORN, STREET-LEGAL SUPERCAR"/);
-  assert.match(appSource, /The most powerful naturally aspirated V8 ever built/);
-  assert.match(appSource, /LT6 5\.5L V8/);
-  assert.match(appSource, /670 hp \/ 8,600 rpm/);
+  assert.doesNotMatch(appSource, /vehicleSetupHighlights/);
+  assert.match(appSource, /model\?\.vehicleSetup/);
+  assert.equal(registry.models.stingray.vehicleSetup.title, "Next-generation LS6 power for the everyday supercar");
   assert.match(appSource, /highlight\.cardSubtitle \|\| highlight\.eyebrow/);
   assert.match(appSource, /When this starting point looks right, continue with/);
   assert.doesNotMatch(appSource, /When this foundation feels right, continue with/);
-  assert.doesNotMatch(setupHtml, /Grand Sport X|eAWD|721-hp/);
+  assert.doesNotMatch(setupHtml, /eAWD|721-hp/);
   assert.match(setupHtml, /Continue to Body Style/);
   assert.doesNotMatch(appSource, /Clear trim path|Same trim path/);
   assert.match(appSource, /Choose trim next/);
@@ -1118,6 +1115,22 @@ test("vehicle setup exposes paced readability hooks without changing option step
   runtime.render();
   assert.equal(runtime.elements.get("#stepContent").dataset.activeStep, "paint");
   assert.equal(runtime.elements.get("#stepContent").dataset.stepKind, "option");
+});
+
+test("vehicle setup uses generic defaults for partially malformed registry metadata", () => {
+  const malformedRegistry = structuredClone(registry);
+  malformedRegistry.models.stingray.vehicleSetup = {
+    cardSubtitle: "",
+    eyebrow: "Legacy partial metadata",
+    facts: "not-an-array",
+  };
+  const runtime = loadRuntime({ formDataRegistry: malformedRegistry });
+  runtime.render();
+  const setupHtml = runtime.elements.get("#stepContent").innerHTML;
+  assert.match(setupHtml, /Corvette performance/);
+  assert.match(setupHtml, /Legacy partial metadata/);
+  assert.match(setupHtml, /Stingray sets the starting personality/);
+  assert.match(setupHtml, /Corvette Stingray/);
 });
 
 test("card media support is optional and data-driven", () => {
@@ -2016,18 +2029,21 @@ test("runtime defaults and RPO exceptions are workbook-generated metadata", () =
     JSON.parse(JSON.stringify(data.defaultSelectionRules.map((rule) => rule.rule_id).sort())),
     ["default_719", "default_bc7", "default_fe1", "default_nga"]
   );
+  // Receipt C: the key is omitted entirely when a model owns no exceptions,
+  // rather than shipped as an empty list. app.js guards with Array.isArray.
+  const runtimeRuleExceptions = data.runtimeRuleExceptions || [];
   assert.deepEqual(
-    JSON.parse(JSON.stringify(data.runtimeRuleExceptions.map((exception) => exception.exception_id).sort())),
+    JSON.parse(JSON.stringify(runtimeRuleExceptions.map((exception) => exception.exception_id).sort())),
     []
   );
-  assert.equal(data.runtimeRuleExceptions.length, 0, "Stingray runtime-rule exception sheet should no longer own active behavior");
+  assert.equal(runtimeRuleExceptions.length, 0, "Stingray runtime-rule exception sheet should no longer own active behavior");
   assert.equal(
-    data.runtimeRuleExceptions.some((exception) => exception.exception_id === "ex_gba_zyc"),
+    runtimeRuleExceptions.some((exception) => exception.exception_id === "ex_gba_zyc"),
     false,
     "Stingray GBA/ZYC conflict should be owned by grouped exclusion metadata"
   );
   assert.equal(
-    data.runtimeRuleExceptions.some((exception) => exception.exception_id === "ex_nwi_nga"),
+    runtimeRuleExceptions.some((exception) => exception.exception_id === "ex_nwi_nga"),
     false,
     "Stingray NGA/NWI replacement should be owned by the exhaust exclusive group plus NGA default metadata"
   );
@@ -2181,7 +2197,7 @@ test("FE3 disabled tile explains that Z51 includes it without duplicating the RP
 });
 
 test("ZF1 requires Z51, replaces T0A, and is auto-added by high wing spoilers only with Z51", () => {
-  for (const sourceId of ["opt_5zz_001", "opt_5zu_001", "opt_5zw_001"]) {
+  for (const sourceId of ["opt_5zz_001", "opt_5zu_001"]) {
     const rule = data.rules.find((item) => item.source_id === sourceId && item.target_id === "opt_zf1_001");
     assert.ok(rule, `${sourceId} should include ZF1`);
     assert.equal(rule.rule_type, "includes");
@@ -2456,10 +2472,10 @@ test("stripe sections use the requested order", () => {
     .sort((a, b) => Number(a.section_display_order) - Number(b.section_display_order))
     .map((section) => section.section_name);
 
-  assert.deepEqual(
-    JSON.parse(JSON.stringify(sectionNames)),
-    ["Stripes", "Jake Graphics Package", "Hash Marks", "GS Hash Marks", "GS Center Stripes"]
-  );
+  // Receipt C: sections carrying zero Stingray rows are no longer shipped. The
+  // three that dropped (Jake Graphics Package, GS Hash Marks, GS Center Stripes)
+  // rendered nothing -- renderStepContent builds sections from choices.
+  assert.deepEqual(JSON.parse(JSON.stringify(sectionNames)), ["Stripes", "Hash Marks"]);
   assert.match(appSource, /section_display_order/);
 });
 
@@ -2567,7 +2583,7 @@ test("spoiler replacement ownership preserves ZYC and keeps T0A replacement beha
     const rule = data.rules.find((item) => item.source_id === sourceId && item.target_id === "opt_t0a_001");
     assert.equal(rule, undefined, `${sourceId} should use grp_spoiler_high_wing instead of a direct T0A replace row`);
   }
-  for (const sourceId of ["opt_5zw_001", "opt_zf1_001"]) {
+  for (const sourceId of ["opt_zf1_001"]) {
     const rule = data.rules.find((item) => item.source_id === sourceId && item.target_id === "opt_t0a_001");
     assert.ok(rule, `${sourceId} should preserve direct T0A replacement`);
     assert.equal(rule.runtime_action, "replace");
@@ -2889,4 +2905,20 @@ test("standard equipment grouping is data-driven by workbook metadata", () => {
   assert.equal(trimRows.every((item) => ["sec_1lte_001", "sec_2lte_001", "sec_3lte_001"].includes(item.section_id)), true);
   assert.doesNotMatch(appSource, /LT Equipment\$\.test/);
   assert.match(appSource, /standard_equipment_group_type === "trim_equipment"/);
+});
+
+test("options deactivated in the workbook ship neither choices nor rules", () => {
+  // Receipt C: setting active=False in stingray_options now removes the option AND
+  // every rule that references it. Before, Stingray kept 31 such rules as dead payload.
+  const optionIds = new Set(data.choices.map((choice) => choice.option_id));
+  const interiorIds = new Set(data.interiors.map((interior) => interior.interior_id));
+  for (const deactivated of ["opt_5vm_001", "opt_5w8_001", "opt_5zw_001", "opt_ryq_001"]) {
+    assert.equal(optionIds.has(deactivated), false, `${deactivated} should not ship as a choice`);
+  }
+  const dangling = data.rules.filter(
+    (rule) =>
+      (!optionIds.has(rule.source_id) && !interiorIds.has(rule.source_id)) ||
+      (!optionIds.has(rule.target_id) && !interiorIds.has(rule.target_id))
+  );
+  assert.deepEqual(JSON.parse(JSON.stringify(dangling.map((rule) => rule.rule_id))), []);
 });

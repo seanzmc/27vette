@@ -29,7 +29,6 @@ from corvette_form_generator.rules import (
     load_exclusive_groups,
     load_rule_groups,
 )
-from corvette_form_generator.runtime_contract import build_model_runtime_contract
 from corvette_form_generator.runtime_metadata import (
     derived_default_selected_display_behavior,
     load_context_sections,
@@ -37,6 +36,9 @@ from corvette_form_generator.runtime_metadata import (
     load_default_selection_rules,
     load_order_summary_metadata,
     load_runtime_steps,
+    UNAUTHORED_BUCKET_STEP_LABELS,
+    step_label_lookup,
+    workbook_step_label,
     load_section_presentation,
     load_variant_option_overrides,
     presentation_bool,
@@ -45,12 +47,6 @@ from corvette_form_generator.workbook import clean, intish, money, rows_from_opt
 
 
 ALLOWED_STATUSES = {"available", "standard", "unavailable"}
-STATUS_ALIASES = {
-    "available": "available",
-    "standard": "standard",
-    "not available": "unavailable",
-    "unavailable": "unavailable",
-}
 RULE_HOT_SPOT_PATTERNS = {
     "requires": re.compile(r"\brequires?\b", re.IGNORECASE),
     "not_available": re.compile(r"\bnot available\b", re.IGNORECASE),
@@ -65,8 +61,9 @@ SPECIAL_REVIEW_RPOS = {"EL9", "Z25", "FEY", "Z15"}
 
 
 def normalize_status(value: Any) -> str:
-    text = clean(value).lower()
-    return STATUS_ALIASES.get(text, text)
+    """Workbook status values ship as authored; only case is normalized."""
+
+    return clean(value).lower()
 
 
 def normalize_selectable(value: Any) -> str:
@@ -122,47 +119,6 @@ def apply_status_lookup(rows: list[dict[str, Any]], status_lookup: dict[tuple[st
         }
 
 
-def cleanup_display_text(value: str, config: ModelConfig) -> tuple[str, list[str]]:
-    notes: list[str] = []
-    original = clean(value)
-    text = original
-    if not text or not config.text_cleanup.get("enabled"):
-        return text, notes
-
-    collapsed = re.sub(r"\s+", " ", text).strip()
-    if collapsed != text:
-        notes.append("collapsed_whitespace")
-        text = collapsed
-
-    punctuation = re.sub(r"([!?.,])\1+", r"\1", text)
-    punctuation = re.sub(r"\s+([,.;:!?])", r"\1", punctuation)
-    if punctuation != text:
-        notes.append("collapsed_repeated_punctuation")
-        text = punctuation
-
-    if config.text_cleanup.get("normalize_new_prefix"):
-        normalized_new = re.sub(r"^NEW!\s*", "New ", text, flags=re.IGNORECASE)
-        if normalized_new != text:
-            notes.append("normalized_new_prefix")
-            text = normalized_new
-
-    exact_replacements = {
-        "New Ground effects": "New Ground Effects",
-    }
-    replacement = exact_replacements.get(text)
-    if replacement:
-        notes.append("normalized_capitalization")
-        text = replacement
-
-    if config.text_cleanup.get("remove_adjacent_duplicate_phrases"):
-        deduped = re.sub(r"\b(\w+)(\s+\1\b)+", r"\1", text, flags=re.IGNORECASE)
-        if deduped != text:
-            notes.append("removed_adjacent_duplicate_word")
-            text = deduped
-
-    return text, notes
-
-
 def resolved_step_key(
     section_id: str,
     sections: dict[str, dict[str, str]],
@@ -172,18 +128,7 @@ def resolved_step_key(
     section = sections.get(section_id, {})
     presentation = (section_presentation or {}).get(section_id, {})
     presentation_step_key = clean(presentation.get("step_key"))
-    standard_sections = {
-        key
-        for key, row in (section_presentation or {}).items()
-        if presentation_bool(row, "standard_equipment_bucket", default=False)
-    } or config.standard_sections
-    return step_for_section(
-        section_id,
-        clean(presentation.get("display_label")) or section.get("section_name", ""),
-        section_step_key=presentation_step_key or clean(section.get("step_key", "")),
-        standard_sections=standard_sections,
-        section_step_overrides=config.section_step_overrides,
-    )
+    return step_for_section(section_id, presentation_step_key or clean(section.get("step_key", "")))
 
 
 def section_display_label(
@@ -211,17 +156,15 @@ def section_step_resolution_source(
     section = sections.get(section_id, {})
     if clean(section.get("step_key", "")):
         return "section_master"
-    if section_id in config.section_step_overrides:
-        return "model_config"
     if presentation_bool(presentation, "standard_equipment_bucket", default=False):
         return "section_presentation_standard_bucket"
-    if section_id in config.standard_sections:
-        return "standard_sections"
-    return "heuristic"
+    return "unresolved"
 
 
-def valid_step_keys(config: ModelConfig) -> set[str]:
-    return set(config.step_order) | {"standard_equipment"}
+def valid_step_keys(runtime_steps: list[dict[str, Any]]) -> set[str]:
+    """Valid steps are the workbook's own runtime_steps rows, plus the bucket step."""
+
+    return {row["step_key"] for row in runtime_steps} | set(UNAUTHORED_BUCKET_STEP_LABELS)
 
 
 def classify_rule_hot_spots(
@@ -423,8 +366,19 @@ def build_draft_price_rules(
     return price_rules, validation_rows, len(raw_rows)
 
 
-def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
-    wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
+def inspect_model_sources(config: ModelConfig, *, wb: Any | None = None) -> dict[str, Any]:
+    """Report on one model's source rows from a single frozen workbook snapshot."""
+
+    if wb is not None:
+        return _inspect_model_sources(config, wb)
+    snapshot = load_workbook(config.workbook_path, data_only=True, read_only=True)
+    try:
+        return _inspect_model_sources(config, snapshot)
+    finally:
+        snapshot.close()
+
+
+def _inspect_model_sources(config: ModelConfig, wb: Any) -> dict[str, Any]:
     raw_rows = rows_from_sheet(wb, config.source_option_sheet)
     variants_raw = rows_from_sheet(wb, "variant_master")
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
@@ -643,14 +597,26 @@ def inspect_model_sources(config: ModelConfig) -> dict[str, Any]:
     }
 
 
-def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
-    wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
+def build_contract_preview(config: ModelConfig, *, wb: Any | None = None) -> dict[str, Any]:
+    """Build one model's contract preview from a single frozen workbook snapshot."""
+
+    if wb is not None:
+        return _build_contract_preview(config, wb)
+    snapshot = load_workbook(config.workbook_path, data_only=True, read_only=True)
+    try:
+        return _build_contract_preview(config, snapshot)
+    finally:
+        snapshot.close()
+
+
+def _build_contract_preview(config: ModelConfig, wb: Any) -> dict[str, Any]:
     raw_rows = rows_from_sheet(wb, config.source_option_sheet)
     variants_raw = rows_from_sheet(wb, "variant_master")
     sections = {row["section_id"]: row for row in rows_from_sheet(wb, "section_master")}
     section_presentation_rows = load_section_presentation(wb, config.model_key)
     section_presentation = {row["section_id"]: row for row in section_presentation_rows}
-    runtime_steps = load_runtime_steps(wb, config.model_key, config.step_order, config.step_labels)
+    runtime_steps = load_runtime_steps(wb, config.model_key)
+    step_labels = step_label_lookup(runtime_steps)
     order_summary_metadata = load_order_summary_metadata(wb, config.model_key)
     default_selection_rules = load_default_selection_rules(wb, config.model_key)
     default_selection_display_rules = load_default_selection_display_rules(wb, config.model_key)
@@ -660,7 +626,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
             **row,
             "selection_mode_label": selection_mode_label(row.get("selection_mode", ""), config.selection_mode_labels),
         }
-        for row in load_context_sections(wb, config.model_key, config.context_sections)
+        for row in load_context_sections(wb, config.model_key)
     ]
     rows = [normalized_option_row(row, config) for row in raw_rows]
     apply_status_lookup(rows, status_lookup_from_sheet(wb, config), config)
@@ -701,9 +667,8 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
     candidate_standard_equipment: list[dict[str, Any]] = []
     unresolved_issues: list[dict[str, Any]] = []
     validation_rows: list[dict[str, Any]] = []
-    text_cleanup_counter: Counter[str] = Counter()
     section_ids_with_choices: set[str] = set()
-    known_step_keys = valid_step_keys(config)
+    known_step_keys = valid_step_keys(runtime_steps)
     for section_id, section in sections.items():
         step_key = clean(section.get("step_key", ""))
         if step_key and step_key not in known_step_keys:
@@ -773,11 +738,10 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
             unresolved_issues.append(issue)
             validation_rows.append({**issue, "severity": "error"})
             continue
-        label, label_notes = cleanup_display_text(row["option_name"], config)
-        description, description_notes = cleanup_display_text(row["description"], config)
-        text_cleanup_notes = [f"label:{note}" for note in label_notes] + [f"description:{note}" for note in description_notes]
-        for note in text_cleanup_notes:
-            text_cleanup_counter[note] += 1
+        # Display copy ships exactly as the workbook authors it. There is no
+        # generator-side rewrite; a copy defect is fixed in the workbook.
+        label = clean(row["option_name"])
+        description = clean(row["description"])
 
         option_base = {
             "option_id": row["option_id"],
@@ -791,7 +755,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
             "active": row["active"],
             "base_price": row["price"],
             "display_order": row["display_order"],
-            "text_cleanup_notes": text_cleanup_notes,
+            "text_cleanup_notes": [],
         }
 
         for variant_id, status in row["statuses"].items():
@@ -837,6 +801,10 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
                 choice, config.model_key, default_selection_display_rules, exclusive_groups
             ):
                 choice["display_behavior"] = "default_selected"
+            if not str(choice["display_behavior"]).strip():
+                # Carry the key only when it has a value; a blank one says nothing
+                # and the browser treats absent and empty identically.
+                del choice["display_behavior"]
             choices.append(choice)
             section_ids_with_choices.add(choice_section_id)
             if status == "standard":
@@ -866,7 +834,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
             unresolved_issues.append(issue)
             validation_rows.append({**issue, "severity": "error"})
 
-    step_order_index = {step_key: index for index, step_key in enumerate(config.step_order)}
+    step_order_index = {row["step_key"]: index for index, row in enumerate(runtime_steps)}
 
     def section_sort_key(section_id: str) -> tuple[int, int, str]:
         section = sections.get(section_id, {})
@@ -896,7 +864,7 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
                 "standard_behavior": section.get("standard_behavior", ""),
                 "section_display_order": intish(presentation.get("section_display_order"), intish(section.get("display_order"))),
                 "step_key": step_key,
-                "step_label": config.step_labels.get(step_key, step_key.replace("_", " ").title()),
+                "step_label": workbook_step_label(step_labels, step_key),
             }
         )
 
@@ -928,8 +896,9 @@ def build_contract_preview(config: ModelConfig) -> dict[str, Any]:
         special_review_rpos=special_review_rpos,
     )
     text_cleanup_summary = {
-        "changed_fields": sum(text_cleanup_counter.values()),
-        "notes": dict(sorted(text_cleanup_counter.items())),
+        # Retained at zero: the generator performs no display-text rewrites.
+        "changed_fields": 0,
+        "notes": {},
     }
 
     return {
@@ -968,20 +937,31 @@ def write_contract_preview_artifacts(preview: dict[str, Any], output_dir: Path, 
     return {"json": str(json_path), "markdown": str(md_path)}
 
 
-def build_form_data_draft(config: ModelConfig, *, preview: dict[str, Any] | None = None) -> dict[str, Any]:
-    if preview is None:
-        preview = build_contract_preview(config)
+def build_form_data_draft(
+    config: ModelConfig,
+    *,
+    preview: dict[str, Any] | None = None,
+    wb: Any | None = None,
+) -> dict[str, Any]:
+    """Build one model's draft payload from a single frozen workbook snapshot."""
+
+    if wb is not None:
+        return _build_form_data_draft(config, preview or build_contract_preview(config, wb=wb), wb)
+    snapshot = load_workbook(config.workbook_path, data_only=True, read_only=True)
+    try:
+        return _build_form_data_draft(config, preview or build_contract_preview(config, wb=snapshot), snapshot)
+    finally:
+        snapshot.close()
+
+
+def _build_form_data_draft(config: ModelConfig, preview: dict[str, Any], wb: Any) -> dict[str, Any]:
     variants_by_id = {row["variant_id"]: row for row in preview["variants"]}
     sections_by_id = {row["section_id"]: row for row in preview["sections"]}
-    wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
-    try:
-        interiors = build_model_interiors(config, wb=wb)
-        asset_map = load_asset_map(wb, config.model_key)
-        rule_groups = load_rule_groups(wb, config)
-        exclusive_groups = load_exclusive_groups(wb, config)
-        default_selection_rules = load_default_selection_rules(wb, config.model_key)
-    finally:
-        wb.close()
+    interiors = build_model_interiors(config, wb=wb)
+    asset_map = load_asset_map(wb, config.model_key)
+    rule_groups = load_rule_groups(wb, config)
+    exclusive_groups = load_exclusive_groups(wb, config)
+    default_selection_rules = load_default_selection_rules(wb, config.model_key)
     option_rows: dict[str, dict[str, Any]] = {}
     statuses_by_option: defaultdict[str, dict[str, str]] = defaultdict(dict)
     order_by_option: dict[str, int] = {}
@@ -1058,13 +1038,17 @@ def build_form_data_draft(config: ModelConfig, *, preview: dict[str, Any] | None
                 "selection_mode": section.get("selection_mode", ""),
                 "selection_mode_label": section.get("selection_mode_label", ""),
                 "base_price": option["base_price"],
-                "display_behavior": choice_source.get("display_behavior", ""),
                 "display_order": option.get("display_order") or order_by_option[option_id],
                 "source_detail_raw": option["source_detail_raw"],
                 "source_option_name": option["source_option_name"],
                 "source_description": option["source_description"],
                 "text_cleanup_notes": option["text_cleanup_notes"],
             }
+            display_behavior = str(choice_source.get("display_behavior", "") or "").strip()
+            if display_behavior:
+                # Carry the key only when it has a value; the browser treats
+                # absent and empty identically, so a blank one is dead payload.
+                draft_choice["display_behavior"] = display_behavior
             merge_option_asset_fields(draft_choice, option_rows, only_if_image_present=True)
             draft_choices.append(draft_choice)
 
@@ -1088,26 +1072,24 @@ def build_form_data_draft(config: ModelConfig, *, preview: dict[str, Any] | None
         if choice["status"] == "standard"
     ]
 
-    wb = load_workbook(config.workbook_path, data_only=True, read_only=True)
-    try:
-        color_overrides = build_color_overrides(wb, config, interiors, option_rows)
-        rules = build_draft_rules(
-            wb,
-            config,
-            option_rows,
-            sections_by_id,
-            interiors,
-            grouped_requirement_pairs(rule_groups),
-            grouped_exclusion_pairs(rule_groups) | exclusive_group_pairs(exclusive_groups),
-        )
-        price_rules, price_rule_validation, price_rule_source_rows = build_draft_price_rules(
-            wb,
-            config,
-            option_rows,
-            interiors,
-        )
-    finally:
-        wb.close()
+    derivation_manifests: list[dict[str, Any]] = []
+    color_overrides = build_color_overrides(wb, config, interiors, option_rows)
+    rules = build_draft_rules(
+        wb,
+        config,
+        option_rows,
+        sections_by_id,
+        interiors,
+        grouped_requirement_pairs(rule_groups),
+        grouped_exclusion_pairs(rule_groups) | exclusive_group_pairs(exclusive_groups),
+        derivation_manifests,
+    )
+    price_rules, price_rule_validation, price_rule_source_rows = build_draft_price_rules(
+        wb,
+        config,
+        option_rows,
+        interiors,
+    )
 
     validation = [
         {
@@ -1203,6 +1185,7 @@ def build_form_data_draft(config: ModelConfig, *, preview: dict[str, Any] | None
         "colorOverrides": color_overrides,
         "defaultSelectionRules": default_selection_rules,
         "validation": validation,
+        "_derivationManifest": derivation_manifests[0],
         "draftMetadata": {
             "sourcePreviewStatus": preview["dataset"]["status"],
             "candidateAvailableOrStandardChoices": len(preview["choices"]),
@@ -1222,24 +1205,6 @@ def write_form_data_draft_artifacts(draft: dict[str, Any], output_dir: Path, art
     json_path.write_text(json.dumps(draft, indent=2), encoding="utf-8")
     md_path.write_text(render_form_data_draft_markdown(draft), encoding="utf-8")
     return {"json": str(json_path), "markdown": str(md_path)}
-
-
-def write_runtime_contract_artifact(
-    config: ModelConfig,
-    draft: dict[str, Any],
-    output_dir: Path,
-    artifact_prefix: str,
-) -> dict[str, str]:
-    """Emit the clean runtime contract that registry promotion embeds verbatim.
-
-    Draft-only decoration (draftMetadata, source_* provenance, cleanup notes,
-    draft status wording) lives only in the draft artifacts; this contract is
-    what ``model_registry_promotion`` rows should reference via artifact_path.
-    """
-    output_dir.mkdir(parents=True, exist_ok=True)
-    json_path = output_dir / f"{artifact_prefix}.json"
-    json_path.write_text(json.dumps(build_model_runtime_contract(config, draft), indent=2), encoding="utf-8")
-    return {"json": str(json_path)}
 
 
 def write_inspection_artifacts(report: dict[str, Any], output_dir: Path, artifact_prefix: str) -> dict[str, str]:

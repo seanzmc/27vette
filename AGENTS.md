@@ -2,7 +2,7 @@
 
 Durable operating guide for AI agents in this repo: source-of-truth boundaries, workflow expectations, validation strategy, and handoff requirements. `README.md` owns the project overview, repository map, and all exact commands. If this guide and the live repo disagree, inspect code/workbook/tests/docs first, then flag the discrepancy.
 
-No-redundancy rule: every instruction fact has one owning file (this file = agent conduct/boundaries/validation/handoff; README = overview/map/commands; `Order-Guide_IngestPrompt.md` + `docs/ingest/` = ingest detail). When updating guidance, edit the owner and fix pointers; never duplicate prose across these files.
+No-redundancy rule: every instruction fact has one owning file (this file = agent conduct/boundaries/validation/handoff; README = overview/map/commands; archived ingest material = historical evidence only). When updating guidance, edit the owner and fix pointers; never duplicate prose across these files.
 
 ## 1. First Principles and Context Gathering
 
@@ -31,6 +31,8 @@ Runtime JavaScript — consumes generated data; renders, manages interaction, ge
 CSS — presentation only. Styling changes must preserve data contracts, runtime state, validation semantics, payloads, and behavior; never use styling to hide broken data or logic.
 
 Asset/media maintenance — `asset_map` remains workbook-authored source data. The safe sync entry is `scripts/sync_asset_map.py`, with exact usage and report contracts owned by `docs/asset-map-sync.md` and README. Treat sync runs as dry-run/report-first review surfaces unless `--apply` is explicitly approved for specific reviewed row changes; wildcard authoring, blank-row seeding, stale-row deactivation, or schema/status-column changes are separate workbook-data work, not routine media maintenance.
+
+Workbook shape authority — `scripts/corvette_form_generator/workbook_domain/registry.py` owns registered sheet families, writable columns, and shared workbook-domain enums such as `model_registry_promotion.artifact_type`. Schema validation, promotion parsing, editor operations, and Workbook Manager projections must derive from that registry instead of adding parallel header, writeability, or artifact-type lists.
 
 ## 4. Autonomy and Approval Gates
 
@@ -106,6 +108,8 @@ Do not recreate or hand-edit generated workbook sheets. Change source rows or ge
 
 Workbook editor surfaces (`scripts/workbook_editor_server.py`, `scripts/apply_workbook_ops.py`, and `workbook-manager/`) are interfaces around the same workbook-write safety contract, not separate authorities. The workbook remains canonical unless a separately approved stage changes that. Any editor or manager write path must route through `editor_ops.apply_batch`/approved tooling and `save_workbook_safely()`, then regenerate and validate affected artifacts through the normal gates.
 
+Workbook Manager remains read-only/provisional for live workbook writes: its SQLite projection is disposable/rebuildable, durable manager state records recovery/audit state and bounded backend-only draft update intent, and comparison exports are explicitly `DISPOSABLE-*` review artifacts, never workbook replacements or generation inputs. Durable draft operation routes do not imply browser write workflow, ChangeSet emission, preview, approval, apply, or workbook mutation; nonterminal drafts keep replacement import contained. Serve it only through the single-process lifespan path documented in `workbook-manager/README.md`/`workbook-manager/run.sh`; do not use multiple uvicorn workers or bypass lifespan in tests. Package/schema validation and semantic readback prove projection reconstruction, not primary runtime-contract parity unless the separate generated-parity gate has actually run.
+
 ## 6. Dealer Submission (protected boundary)
 
 Do not change the dealer endpoint, payload shape, model scoping, security/Turnstile behavior, or submission UX without explicit approval. Near submission code: inspect runtime and tests first; validate modal behavior, required fields, payload construction, error handling, and safe failure states. No live dealer submissions as routine validation. In passes that don't touch it, report dealer behavior as preserved/untouched.
@@ -114,19 +118,23 @@ Do not change the dealer endpoint, payload shape, model scoping, security/Turnst
 
 Classify the change: styling-only, behavior-only, data-only, or mixed. For behavior work, inspect generated data fields and runtime consumers before editing JS. Preserve stable identifiers and generated keys unless a scoped migration is approved. Verify affected customer workflows (model switching, body/trim/variant selection, required steps, option select/deselect, include/require/exclude, summaries, totals, download, dealer modal/payload scoping) as relevant — not just visual appearance. Check mobile/responsive behavior for customer-facing changes. Prefer customer-friendly, mobile-first, visually clear UI. Avoid depending on exact selectors/internals unless they are stable conventions.
 
-## 8. Raw Order-Guide Ingest (summary)
+## 8. Raw Order-Guide Ingest (retired)
 
-Edge workflow for new-model intake or broad source refresh — never routine maintenance. Preflight is read-only evidence gathering: preserve raw evidence and provenance, invent nothing, keep candidate artifacts transient, and never mutate the workbook, generated artifacts, or `form-app/data.js`. Applying reviewed output later is a separate approved workbook pass with full §5 safety, regeneration, and gates. Detail: `Order-Guide_IngestPrompt.md` and `docs/ingest/`.
+The raw order-guide ingest wizard, compiler/exception queue, ChangeSet emitter, deployment proof, browser UI, and helper libraries were retired on 2026-07-23 because their imported data was not trustworthy enough to remain an executable workspace workflow. There is no supported raw-ingest command or active ingest code path.
 
-Current ingest direction is browser-first for source intake, then compiler/exception driven for production continuation. The current entry path is `scripts/ingest_wizard_server.py`; the production direction is the canonical-row compiler plus typed exception queue in `docs/ingest/canonical-row-compiler-exception-queue-design.md`, with the approved consolidation destination in `docs/ingest/ingest-separation-model-integration-editor-consolidation-spec.md`: ingest owns raw intake, profiling/target selection, canonical compilation, typed exception resolution, and shared ChangeSet emission only. Historical Pass B broad review lanes and Pass C/D.2 decision-to-plan artifacts remain evidence/debug surfaces, not production write authority.
+Historical specifications, reports, and prompts live under `docs/archive/retired-ingest/2026-07-23/`; Fable receipts remain chronological evidence. They are not current architecture, test authority, or instructions to resume the retired implementation. Preserve raw source files and ignored local run artifacts as evidence unless a separately approved cleanup names them.
 
-The shared ChangeSet/workbook-service direction does not itself authorize live workbook writes, generated-artifact refresh, registry publication, runtime promotion, deployment, or dealer changes. Those remain separate approved steps with §5 workbook safety and normal regeneration/validation gates. During transition, do not let ingest, the workbook editor, or Workbook Manager keep parallel schemas, validators, writer authority, or canonical row stores when the shared workbook registry/service should own the contract.
+Any future raw-source intake requires a new evidence-first specification and explicit approval. It must not restore archived behavior merely because code or tests once existed. Workbook writes, generation, publication, promotion, deployment, and dealer changes remain separately governed by §§5–7 and §10.
 
-Current ingest stops after immutable `workbook-changeset-1` emission. Historical `pass-c-*` plans and approvals are GET-only evidence and never production write authority; `scripts/ingest_wizard_apply.py` is retired. Preview, approval, and any separately authorized workbook write use the shared service through `scripts/apply_workbook_changeset.py`, with exact ChangeSet/preview/approval/workbook binding, §5 workbook safety, and verified rollback. This path does not authorize generation, publication, promotion, deployment, or dealer changes.
+The generic `workbook-changeset-1` parser/service remains the approved target contract for reliable Workbook Manager writes. That contract is independent of ingest and does not imply a current non-ingest producer until the Manager's owning specification implements one.
 
 ## 9. Fable 5 Loop Workflows
 
-Fable 5 loop artifacts under `fable5loop/` are orchestration/memory infrastructure for large, multi-stage work; they do not override this guide's spec, workbook, generated-artifact, runtime, styling, dealer, or ingest boundaries. For any Fable 5 run, start from `fable5loop/README.md`, preserve run receipts/state updates, and run the loop validator when loop artifacts change. Use `docs/fable-ex-tasks.md` as routing guidance for when the loop is appropriate; keep routine model/workbook/runtime edits on the normal repo path unless a task explicitly needs the loop.
+Fable 5 loop artifacts under `fable5loop/` are orchestration/memory infrastructure for large, multi-stage work; they do not override this guide's spec, workbook, generated-artifact, runtime, styling, or dealer boundaries. For any Fable 5 run, start from `fable5loop/README.md`, preserve run receipts/state updates, and run the loop validator when loop artifacts change. Use `docs/fable-ex-tasks.md` as routing guidance for when the loop is appropriate; keep routine model/workbook/runtime edits on the normal repo path unless a task explicitly needs the loop.
+
+Keep workflow progress in at most two live files: the owning specification is the sole detailed tracker for requirements, acceptance evidence, blockers, and pass-level decisions; `fable5loop/STATE.md` is the centralized operational handoff. Run receipts are immutable evidence, not parallel progress trackers. After every substantive repository task, update the fixed `Current handoff` block in `STATE.md` before declaring the task complete, even when the task did not use Fable and produced no receipt. That block must say what was just completed, where it landed, what validation is actually complete, the exact next action, blockers or closeout gaps, the owning specification when one exists, and the latest completed receipt. Update the owning specification only when the task changes its requirement status, acceptance evidence, blockers, or planned checkpoint; do not copy a session narrative into it. README files change only when their owned commands, architecture, or operator guidance change.
+
+For any bounded run with a turn, tool-call, time, or context ceiling, reserve the final three available turns—or begin at the first ceiling warning when the remaining allowance is not visible—for checkpoint closeout. Stop starting implementation work at that point. Use the reserved capacity to run the smallest decisive affected-path test and `git diff --check`; update the owning specification with exact completed/open requirements, validation, blockers, and next step when those facts changed; rewrite the fixed `fable5loop/STATE.md` handoff; finish the current run receipt sufficiently for recovery when the task used Fable, including checks not run; and inspect `git status` plus the final diff for unrelated or temporary files. Leave the slice commit-ready. Commit and push only when the user requested it or the active workflow already authorizes it. If even the reserved closeout cannot finish, prioritize truthful spec/status recovery over broader tests or additional implementation, and never describe that checkpoint as pass-complete.
 
 Claude Code project files under `.claude/` are thin launch/wrapper surfaces for this repo. They may point agents into `AGENTS.md` and `fable5loop/`, but durable workflow procedure belongs in the repo-owned guides and Fable loop files, not duplicated in `.claude/` wrappers.
 
@@ -140,8 +148,11 @@ Choose gates by changed surface and risk — don't run irrelevant gates from old
 - Generator changes: representative generation + tests covering the changed contract behavior.
 - Registry/publication: verify published bundle and model switching.
 - Runtime JS: relevant automated tests + manual verification of affected workflows.
+- Workbook Manager import/projection/draft/export: use the focused manager gates in `workbook-manager/README.md`; include the generated-parity acceptance test before claiming reconstructed workbooks preserve primary runtime contracts.
 - Styling: inspect affected UI at relevant viewports; confirm behavior preserved.
 - Dealer submission: targeted tests/manual checks in a safe context; report untested live behavior.
+
+For generation validation, do not cite `generate_form.py` stdout `validation_errors: 0` as independent proof of a clean artifact; strict runtime-contract errors abort before that summary can print. Use the workbook schema gate, relevant targeted tests, regenerated artifact diffs, and isolated byte comparisons where parity is the success condition.
 
 Report every check run with its result, and every relevant gate not run with the reason. Never claim validation passed without real tool output.
 

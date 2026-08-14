@@ -1,0 +1,94 @@
+Pass 4 Stage A macOS boundary hardening validation
+Date: 2026-07-29
+
+INITIAL FRESH STAGE A VERIFICATION
+Command bundle: package validation; schema validation; Python metadata/route/all-model gate; editor apply route; every tests/*.test.mjs file serially with protected tracked-artifact hashes before/after; full candidate-lane tests; loop validator and Fable tests.
+
+Results before candidate-lane failure:
+- Workbook package: valid, issue_count 0.
+- Workbook schema: valid, issue_count 0, error_count 0, warning_count 0.
+- Python metadata/route/all-model: 189 passed, 111 subtests passed in 178.24s.
+- Editor apply/reminder route: 59 passed, 7 subtests passed in 84.71s.
+- All 18 Node files passed serially.
+- Protected tracked form-output/form-app hashes: identical before/after the Node run.
+
+Candidate-lane result before repair:
+- 13 passed, 2 failed in 672.33s.
+- Failures:
+  - test_the_lane_detects_and_reports_a_protected_path_write
+  - test_the_lane_runs_the_browser_stage_against_a_temporary_registry
+- Both failures reported `form-output/.DS_Store` in boundaryViolations.
+- `git check-ignore -v form-output/.DS_Store` identified `.gitignore:2:.DS_Store`.
+- Removing the file before a rerun did not resolve the failure: macOS recreated it during the 11-minute test run. Its observed mtime was 2026-07-29 10:04:37 EDT, inside the rerun window.
+- Root cause: `protected_surface_hashes()` recursively hashed every file under `form-output/`, including ignored Finder metadata. The candidate lane therefore classified an external OS metadata rewrite as generated-output drift.
+
+TDD RED
+Command:
+  .venv/bin/python -m pytest tests/test_verify_workbook_candidate.py::test_protected_surface_hashes_ignore_macos_finder_metadata -q
+Result:
+  1 failed in 0.13s.
+Expected failure:
+  `form-output/.DS_Store` was present in `protected_surface_hashes(tmp_path)`.
+
+IMPLEMENTATION
+- `scripts/verify_workbook_candidate.py`: exclude only files whose basename is exactly `.DS_Store` from the recursive `form-output/` protected hash set.
+- Existing arbitrary untracked-file detection remains unchanged. The full candidate suite retains the injected tracked-write boundary test; the fresh Node run retained the seven shared tracked-artifact helper tests, including a real arbitrary untracked file under a protected root.
+
+TDD GREEN
+Command:
+  .venv/bin/python -m pytest tests/test_verify_workbook_candidate.py::test_protected_surface_hashes_ignore_macos_finder_metadata -q
+Result:
+  1 passed in 0.09s.
+
+SELECTIVITY PROBE
+- In a temporary root containing both `form-output/.DS_Store` and `form-output/stray.json`, `protected_surface_hashes()` returned only `form-output/stray.json` with its SHA-256.
+- This proves the exact Finder metadata exemption does not become a general ignored/untracked-file exemption.
+
+FINAL FOCUSED STAGE A GATE
+Command:
+  .venv/bin/python -m pytest tests/test_verify_workbook_candidate.py -q
+Result:
+  16 passed in 670.24s.
+- Finder metadata was recreated again during this successful post-fix run: `form-output/.DS_Store` mtime 2026-07-29 10:17:14 EDT. The pass therefore exercises the repaired path rather than succeeding because the file happened to stay absent.
+
+Post-fix companion gates:
+- `.venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx`: valid, issue_count 0.
+- `.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx`: valid, issue_count 0, error_count 0, warning_count 0.
+- `git diff --check`: pass.
+
+BOUNDARIES
+- No canonical workbook change.
+- No tracked runtime-contract or registry publication change.
+- No runtime application or dealer-submission change.
+- No Stage B deletion started.
+- Only candidate-lane hashing, its focused test, and Fable closeout artifacts are in the repair scope.
+
+POST-CLOSEOUT GATES
+- `.venv/bin/python scripts/validate_fable5_loop.py`: passed.
+- `.venv/bin/python -m pytest tests/test_fable5_loop_contract.py -q`: 13 passed in 0.82s.
+- Focused `.DS_Store` regression rerun: 1 passed in 0.10s.
+- `git diff --check`: passed.
+- Canonical workbook, tracked `form-output/`, published `form-app/data.js`, runtime `app.js`, and `styles.css`: no diff from HEAD.
+- All six exact Stage B candidate files: still tracked and present.
+
+LATE C9 ZERO-REFERENCE CORRECTION
+- Late verifier `deleg_e1b7eb40` returned FAIL on Stage A C9 after the initial closeout. C1-C8 and C10 passed. It found one stale active source comment in `rules.py` and old executable commands/paths in `.hermes/plans` without explicit superseded status.
+- `rules.py` now states the measured route: `extend_with_derived_swap_rules()` is called through `build_draft_rules` for every model. A usage scan finds one caller from that shared function and no `production.py` reference outside the exact Stage B candidate module.
+- Exactly ten `.hermes/plans` files contain retiring path/name references; exactly ten now carry top-of-file `Execution status (2026-07-29): SUPERSEDED` or `SUPERSEDED FOR COMMANDS` notices. Historical prose remains intact for Stage C.
+- Current `scripts/` scan finds retiring names only in the exact candidate `production.py` and `seat-canonicalization-diff.mjs` files.
+- Current `tests/` scan finds retiring names only in the exact candidate `seat-canonicalization-diff.test.mjs` file.
+- Historical archived prose remains unchanged, as required.
+
+Late-correction gates:
+- `PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_rule_derivation.py tests/test_model_generation_route.py -q`: 38 passed in 13.21s.
+- `python -m py_compile scripts/corvette_form_generator/rules.py`: passed.
+- Loop validator: passed.
+- Fable contract: 13 passed in 0.82s.
+- `git diff --check`: passed.
+- Workbook, tracked generated artifacts, published registry, runtime JS/CSS: unchanged from HEAD.
+- All six exact Stage B candidates: still tracked and present.
+- Final post-verdict closeout rerun after receipt/STATE updates: loop validator passed; Fable contract 13 passed in 0.74s; rule/model route 38 passed in 12.80s; `py_compile` and `git diff --check` passed; mechanical count 10/10 plan notices and 6/6 Stage B candidates present.
+
+Source transcripts:
+- `/tmp/27vette-pass4a-fresh-verification.txt`
+- `/tmp/27vette-pass4a-macos-boundary-validation.txt`

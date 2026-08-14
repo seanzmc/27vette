@@ -4,7 +4,16 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
 from pathlib import Path
+import re
 from typing import Any, Mapping
+
+
+def validate_model_key(model_key: str) -> str:
+    """Return a path-safe model key or fail before any artifact I/O."""
+
+    if re.fullmatch(r"[a-z][a-z0-9_]*", model_key) is None:
+        raise ValueError(f"Invalid model_key {model_key!r}; expected lowercase letters, digits, and underscores")
+    return model_key
 
 
 @dataclass(frozen=True)
@@ -21,13 +30,12 @@ class ModelConfig:
     workbook_path: Path
     output_dir: Path
     app_dir: Path
-    step_order: tuple[str, ...]
-    step_labels: Mapping[str, str]
-    context_sections: tuple[Mapping[str, Any], ...]
+    # Both remain Python-authored because the workbook has no column for them
+    # yet. Measured live, unlike the shadow fields deleted in this pass:
+    # selection_mode_labels ships customer-visible copy through
+    # sections[].selection_mode_label. Recorded as a workbook-shape gap.
     body_style_display_order: Mapping[str, int]
     selection_mode_labels: Mapping[str, str]
-    standard_sections: frozenset[str]
-    section_step_overrides: Mapping[str, str]
     interior_source_sheet: str = "lt_interiors"
     blank_section_overrides: Mapping[str, str] = field(default_factory=dict)
     preview_artifact_prefix: str = ""
@@ -41,7 +49,6 @@ class ModelConfig:
     color_overrides_sheet: str = "color_overrides"
     variant_option_overrides_sheet: str = ""
     exclusive_groups: tuple[Mapping[str, Any], ...] = ()
-    text_cleanup: Mapping[str, Any] = field(default_factory=dict)
     special_rule_review_rpos: tuple[str, ...] = ()
     notes: tuple[str, ...] = ()
 
