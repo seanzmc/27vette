@@ -27,7 +27,9 @@ export default function RecordForm({
       }
       await stageFn({
         table: schema.table,
-        model_id: schema.model_scoped ? modelKey : "",
+        model_id: schema.model_context?.required
+          ? (schema.model_context.value || modelKey)
+          : "",
         op: mode === "edit" ? "update" : "add",
         key,
         record: draft,

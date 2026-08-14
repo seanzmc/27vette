@@ -193,7 +193,7 @@ export default function FormStructure({ models, modelKey, setModelKey, onChanged
             mode={editing.mode}
             initial={editing.initial}
             modelKey={modelKey}
-            stageFn={(p) => api.stage({ ...p, model_id: "" })}
+            stageFn={api.stage}
             onStaged={staged}
             onCancel={() => setEditing(null)}
           />

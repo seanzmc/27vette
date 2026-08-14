@@ -4,8 +4,10 @@ Provisional interface for investigating the disposable SQLite projection of
 `stingray_master.xlsx`. Pass 5 adds manager-owned durable update/add/delete
 drafts, immutable ChangeSet emission, and durable shared-service preview and
 approval lifecycles. Pass 6A independently hardens the shared writer's
-post-save restoration; no manager apply route is enabled, and the browser still
-exposes only the contained legacy staged-edit flow.
+post-save restoration. Pass 7 checkpoint 1 adds the read-only durable lifecycle
+view and preserves schema-declared model context through record/form/draft
+payloads; no manager apply route is enabled, and the browser still exposes only
+the contained legacy staged-edit flow.
 The workbook remains canonical. Live manager-to-workbook writes are disabled
 until the reviewed ChangeSet route is enabled in Pass 7 of the reliability
 specification.
@@ -70,6 +72,13 @@ exact ChangeSet emission, and shared-service preview and approval lifecycles:
   dictionary or exception in immutable durable attempt history. It exposes only
   lifecycle-authorized verbs and never applies, mutates the projection, or
   writes the workbook.
+- `GET /api/drafts/{draft_id}` returns the manager-owned lifecycle view: draft
+  status, parsed operations, aggregated model and physical-row context, exact
+  stored ChangeSet/preview/approval/apply evidence, cancellation state, and
+  manual-resolution history. It does not mutate durable state or reshape the
+  immutable shared artifacts. Record responses expose `model_context` as a JSON
+  list, and browser form payloads follow schema-declared context for physically
+  scoped, model-key, and source-routed families.
 - The shared writer now rechecks exact rows, package integrity, and schema
   integrity after a safe save. Any returned or thrown post-save validation/log
   failure restores and SHA-256-verifies the backup or reports the workbook

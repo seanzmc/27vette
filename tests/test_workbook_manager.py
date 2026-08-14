@@ -849,6 +849,17 @@ class TestPass1BrowserContainment(unittest.TestCase):
         self.assertNotIn("write: true", sync_source)
         self.assertNotIn("Write to stingray_master.xlsx", sync_source)
 
+    def test_form_payload_uses_schema_model_context_for_model_key_families(self):
+        record_form = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                       "components" / "RecordForm.jsx").read_text()
+        structure = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                     "components" / "FormStructure.jsx").read_text()
+        self.assertIn("schema.model_context?.required", record_form)
+        self.assertIn("schema.model_context.value || modelKey", record_form)
+        self.assertNotIn("model_id: schema.model_scoped ? modelKey", record_form)
+        self.assertIn("stageFn={api.stage}", structure)
+        self.assertNotIn('model_id: ""', structure)
+
 
 @unittest.skipUnless(HAVE_FASTAPI, "fastapi not installed; install "
                      "workbook-manager/backend/requirements.txt")
@@ -1009,6 +1020,97 @@ class TestApi(unittest.TestCase):
         ).json()
         mapping_fields = {column["name"]: column for column in mappings["columns"]}
         self.assertEqual(mapping_fields["source_id"]["reference"]["kind"], "union")
+
+    def test_real_model_row_round_trips_context_lineage_null_and_reference(self):
+        conn = self.mainmod.open_projection_connection()
+        try:
+            row = conn.execute(
+                "SELECT * FROM rule_mappings WHERE model_id='stingray' "
+                "AND runtime_action IS NULL AND source_id IS NOT NULL "
+                "AND original_detail_raw IS NOT NULL LIMIT 1"
+            ).fetchone()
+            self.assertIsNotNone(row)
+            source = dict(row)
+        finally:
+            conn.close()
+
+        schema = self.client.get(
+            "/api/records/rule_mappings/schema", params={"model": "stingray"}
+        ).json()
+        fields = {column["name"]: column for column in schema["columns"]}
+        self.assertEqual(schema["model_context"]["value"], "stingray")
+        self.assertEqual(fields["source_id"]["reference"]["kind"], "union")
+        self.assertTrue(fields["runtime_action"]["optional"])
+
+        projected = self.client.get(
+            "/api/records/rule_mappings",
+            params={"model": "stingray", "search": source["rule_id"]},
+        ).json()["records"]
+        record = next(item for item in projected if item["id"] == source["id"])
+        self.assertEqual(record["model_context"], ["stingray"])
+        self.assertEqual(record["src_sheet"], source["src_sheet"])
+        self.assertEqual(record["src_row"], source["src_row"])
+        self.assertEqual(record["physical_key"], source["physical_key"])
+        self.assertIsNone(record["runtime_action"])
+        self.assertEqual(record["source_id"], source["source_id"])
+
+        draft_id = "api-context-round-trip"
+        response = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "rule_mappings",
+                "model_id": "stingray",
+                "op": "update",
+                "key": {"rule_id": source["rule_id"]},
+                "record": {
+                    "original_detail_raw": source["original_detail_raw"] + " context proof"
+                },
+                "session_id": "api-context-test",
+                "actor": "test",
+            },
+        )
+        try:
+            self.assertEqual(response.status_code, 200, response.text)
+            operation = response.json()
+            self.assertEqual(operation["model_context"], ["stingray"])
+            self.assertEqual(operation["source_sheet"], source["src_sheet"])
+            self.assertEqual(operation["source_row"], source["src_row"])
+            self.assertEqual(operation["physical_key"], source["physical_key"])
+            self.assertIsNone(operation["original"]["runtime_action"])
+            self.assertEqual(operation["original"]["source_id"], source["source_id"])
+            self.assertIsNone(operation["final"]["runtime_action"])
+            self.assertEqual(operation["final"]["source_id"], source["source_id"])
+
+            lifecycle = self.client.get(f"/api/drafts/{draft_id}")
+            self.assertEqual(lifecycle.status_code, 200, lifecycle.text)
+            body = lifecycle.json()
+            self.assertEqual(body["context"]["model_keys"], ["stingray"])
+            self.assertEqual(body["operations"], [operation])
+            self.assertEqual(
+                body["context"]["physical_targets"][0]["physical_key"],
+                source["physical_key"],
+            )
+
+            emitted = self.client.post(f"/api/drafts/{draft_id}/commit")
+            self.assertEqual(emitted.status_code, 200, emitted.text)
+            committed = self.client.get(f"/api/drafts/{draft_id}").json()
+            self.assertEqual(
+                committed["artifacts"]["changeset"]["artifact"], emitted.json()
+            )
+            self.assertEqual(
+                committed["artifacts"]["changeset"]["change_set_id"],
+                emitted.json()["changeSetId"],
+            )
+        finally:
+            state = self.mainmod.open_state_connection()
+            try:
+                status = state.execute(
+                    "SELECT status FROM workflow_drafts WHERE id=?", (draft_id,)
+                ).fetchone()
+                if status is not None and status["status"] != "cancelled":
+                    self.mainmod.drafts.cancel_draft(state, draft_id=draft_id)
+            finally:
+                state.close()
 
     def test_live_sync_is_provisionally_read_only_even_when_fully_confirmed(self):
         current_mtime = str(WORKBOOK.stat().st_mtime_ns)

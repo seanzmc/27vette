@@ -1265,6 +1265,73 @@ class TestDurableApplyLifecycle(unittest.TestCase):
                 projection.close()
                 state.close()
 
+    def test_lifecycle_view_exposes_exact_artifacts_and_physical_context(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-lifecycle-view-") as raw:
+            root = Path(raw)
+            projection, state, workbook, changeset, preview, _, approval, _ = (
+                self._approved(root)
+            )
+            retryable = {
+                "ok": False,
+                "status": "locked",
+                "workbookState": "untouched",
+            }
+            try:
+                with patch.object(
+                    drafts.workbook_service,
+                    "apply_changeset",
+                    return_value=retryable,
+                ):
+                    apply_attempt = drafts.apply_draft(
+                        state,
+                        draft_id="draft-approval",
+                        workbook_path=workbook,
+                    )
+
+                view = drafts.lifecycle_view(state, "draft-approval")
+                self.assertEqual(view["context"]["model_keys"], ["stingray"])
+                self.assertEqual(
+                    view["context"]["physical_targets"],
+                    [{
+                        "operation_id": view["operations"][0]["id"],
+                        "table": "options",
+                        "family": "options",
+                        "source_sheet": "stingray_options",
+                        "source_row": 10,
+                        "physical_key": '["opt_test"]',
+                        "entity_key": {"option_id": "opt_test"},
+                        "model_context": ["stingray"],
+                    }],
+                )
+                self.assertEqual(
+                    view["artifacts"]["changeset"]["artifact"], changeset
+                )
+                self.assertEqual(
+                    view["artifacts"]["preview_attempts"][0]["result"], preview
+                )
+                self.assertEqual(
+                    view["artifacts"]["approval_attempts"][0]["result"], approval
+                )
+                self.assertEqual(
+                    view["artifacts"]["apply_attempts"][0], apply_attempt
+                )
+                self.assertIsNone(view["artifacts"]["cancellation"])
+                self.assertEqual(view["artifacts"]["manual_resolutions"], [])
+
+                drafts.cancel_draft(state, draft_id="draft-approval")
+                cancelled = drafts.lifecycle_view(state, "draft-approval")
+                self.assertEqual(
+                    cancelled["artifacts"]["cancellation"]["status"],
+                    "cancelled",
+                )
+                self.assertEqual(
+                    cancelled["artifacts"]["apply_attempts"],
+                    view["artifacts"]["apply_attempts"],
+                )
+            finally:
+                projection.close()
+                state.close()
+
     def test_apply_uses_real_shared_writer_on_disposable_workbook(self):
         with tempfile.TemporaryDirectory(prefix="wbm-real-apply-") as raw:
             root = Path(raw)
@@ -1633,6 +1700,10 @@ class TestDurableApplyLifecycle(unittest.TestCase):
             )
             self.assertEqual(resolution["manager_state"], "manually_resolved_restored")
             self.assertEqual(resolution["observed_workbook_sha256"], changeset["workbook"]["sha256"])
+            lifecycle = drafts.lifecycle_view(state, "draft-approval")
+            self.assertEqual(
+                lifecycle["artifacts"]["manual_resolutions"], [resolution]
+            )
             with self.assertRaisesRegex(
                 sqlite3.IntegrityError, "manual resolution artifacts are immutable"
             ):

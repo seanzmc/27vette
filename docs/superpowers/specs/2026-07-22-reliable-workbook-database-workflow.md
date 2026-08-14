@@ -4,7 +4,7 @@ Status: implementation in progress; Pass 1 completed 2026-07-22, Pass 2
 completed 2026-07-23, Pass 3 completed 2026-07-30, Pass 4 completed
 2026-08-08, Pass 5 completed 2026-08-09, Pass 6A completed 2026-08-10, and
 Pass 6B completed 2026-08-14 on `db-workflow`; Pass 7 is in progress at its
-first API characterization/fallback checkpoint.
+durable editing and review UI checkpoint after completing lifecycle-context API.
 Revised 2026-08-14 to expand the remaining Pass 7 work into five explicit
 checkpoints: lifecycle context, durable editing UI, integrated asset management,
 one shared draft/apply lane, and final Apply-and-Rebuild orchestration. Revised
@@ -1426,10 +1426,10 @@ the released six-model promotion set on 2026-08-14, and its owner passes `4`.
 
 Completed foundation: preserve the catalog allowlist on schema, record, and
 dependency endpoints, and resolve blank Form Structure section-to-step values
-from imported workbook master metadata. The five remaining checkpoints are the
-only active Pass 7 implementation sequence.
+from imported workbook master metadata. The five-checkpoint Pass 7 sequence is
+pinned below; checkpoint 1 is complete and four checkpoints remain.
 
-#### Remaining checkpoint 1 — lifecycle context API
+#### Checkpoint 1 — lifecycle context API (completed 2026-08-14)
 
 Preserve model context through the schema response, form payload, durable draft
 operation, and manager-owned lifecycle/history view for every model-owned
@@ -1441,6 +1441,22 @@ shared artifact schemas merely to add presentation fields.
 Exit gate: an unchanged real model-owned row round-trips through the API view
 without losing model context, source lineage, physical identity, blank/`NULL`
 meaning, or reference meaning.
+
+Completion: `GET /api/drafts/{draft_id}` now provides one manager-owned view of
+the draft, parsed operations, aggregated model/physical targets, exact stored
+ChangeSet, preview, approval, and apply artifacts, cancellation state, and
+manual-resolution evidence. Record responses expose `model_context` as a list,
+and form payloads use schema-declared context rather than the narrower legacy
+`model_scoped` flag, preserving model-key and source-routed families without
+changing shared artifact schemas. A real Stingray rule-mapping row retained its
+source sheet/row, physical key, union-reference value, and optional SQL `NULL`
+through record, durable operation, lifecycle view, and exact ChangeSet emission.
+
+Evidence: complete Manager owner `50 passed, 2 skipped`; lifecycle owner `35
+passed` plus `36 subtests`; frontend build passed with 1,518 modules. The only
+warning was the existing Starlette/httpx deprecation. Apply remains route- and
+browser-unreachable, and protected workbook/generated/publication surfaces did
+not change.
 
 #### Remaining checkpoint 2 — durable editing and review UI
 
@@ -1540,10 +1556,10 @@ sections under runtime steps, preserving explicit presentation values.
 The complete API owner passes `14 passed`; the separately corrected six-model
 generated-parity owner passes `4 passed`. The latter replaces the stale former
 three-model expectation with the exact released six-model promotion set and
-retains protected workbook/generated-artifact hash proof. No durable lifecycle
-workspace, browser thin client, Asset Manager, apply route, or write enablement
-has started. The five remaining checkpoints and the Pass 7 exit gate remain
-open.
+retains protected workbook/generated-artifact hash proof. That foundation
+preceded the lifecycle-context completion recorded above. The durable editing
+UI, Asset Manager, unified ordinary/asset lane, final Apply and Rebuild, and the
+Pass 7 exit gate remain open.
 
 A manager `applied` receipt still proves only the workbook write and exact
 readback. Apply and Rebuild owns the subsequent local generation, comparison,

@@ -641,6 +641,9 @@ def records(table: str, model: str = "", search: str = "",
     out = []
     for r in rows:
         d = dict(r)
+        raw_context = d.get("model_context")
+        if isinstance(raw_context, str):
+            d["model_context"] = json.loads(raw_context) if raw_context else []
         d["_display_id"] = display_id(str(d.get(spec.key[0], "")),
                                       spec.id_prefixes)
         out.append(d)
@@ -661,6 +664,13 @@ def dependencies_post(
 
 
 # ── staged changes ───────────────────────────────────────────────────
+
+@app.get("/api/drafts/{draft_id}")
+def draft_lifecycle(draft_id: str, state_conn=Depends(state_connection)):
+    try:
+        return drafts.lifecycle_view(state_conn, draft_id)
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
 
 @app.post("/api/drafts/{draft_id}/operations")
 def save_draft_operation(

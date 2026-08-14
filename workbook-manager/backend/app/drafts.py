@@ -75,6 +75,104 @@ def list_operations(state_conn: sqlite3.Connection, draft_id: str) -> list[dict]
     return [_operation_dict(row) for row in rows]
 
 
+def lifecycle_view(state_conn: sqlite3.Connection, draft_id: str) -> dict:
+    """Return one manager-owned view over exact stored lifecycle evidence."""
+    draft_row = state_conn.execute(
+        "SELECT * FROM workflow_drafts WHERE id=?", (draft_id,)
+    ).fetchone()
+    if draft_row is None:
+        raise DraftError("draft_not_found", f"draft {draft_id!r} was not found")
+
+    operations = list_operations(state_conn, draft_id)
+    model_keys = {
+        str(model_key)
+        for operation in operations
+        for model_key in (
+            [operation.get("model_id")] + (operation.get("model_context") or [])
+        )
+        if str(model_key or "")
+    }
+    physical_targets = [
+        {
+            "operation_id": operation["id"],
+            "table": operation["table_name"],
+            "family": operation["family"],
+            "source_sheet": operation["source_sheet"],
+            "source_row": operation["source_row"],
+            "physical_key": operation["physical_key"],
+            "entity_key": operation["entity_key"],
+            "model_context": operation.get("model_context") or [],
+        }
+        for operation in operations
+    ]
+
+    changeset_row = state_conn.execute(
+        "SELECT * FROM draft_changesets WHERE draft_id=?", (draft_id,)
+    ).fetchone()
+    changeset = None
+    if changeset_row is not None:
+        changeset = dict(changeset_row)
+        changeset["artifact"] = json.loads(changeset.pop("payload_json"))
+
+    preview_attempts = [
+        _preview_attempt_dict(row)
+        for row in state_conn.execute(
+            "SELECT * FROM draft_preview_attempts WHERE draft_id=? "
+            "ORDER BY started_ts, rowid",
+            (draft_id,),
+        ).fetchall()
+    ]
+    approval_attempts = [
+        _approval_attempt_dict(row)
+        for row in state_conn.execute(
+            "SELECT * FROM draft_approval_attempts WHERE draft_id=? "
+            "ORDER BY started_ts, rowid",
+            (draft_id,),
+        ).fetchall()
+    ]
+    apply_attempts = [
+        _apply_attempt_dict(row)
+        for row in state_conn.execute(
+            "SELECT * FROM draft_apply_attempts WHERE draft_id=? "
+            "ORDER BY started_ts, rowid",
+            (draft_id,),
+        ).fetchall()
+    ]
+    manual_resolutions = [
+        _manual_resolution_dict(row)
+        for row in state_conn.execute(
+            "SELECT * FROM draft_manual_resolutions WHERE draft_id=? "
+            "ORDER BY created_ts, rowid",
+            (draft_id,),
+        ).fetchall()
+    ]
+    draft = dict(draft_row)
+    cancellation = (
+        {
+            "status": draft["status"],
+            "updated_ts": draft["updated_ts"],
+        }
+        if draft["status"] == "cancelled"
+        else None
+    )
+    return {
+        "draft": draft,
+        "context": {
+            "model_keys": sorted(model_keys),
+            "physical_targets": physical_targets,
+        },
+        "operations": operations,
+        "artifacts": {
+            "changeset": changeset,
+            "preview_attempts": preview_attempts,
+            "approval_attempts": approval_attempts,
+            "apply_attempts": apply_attempts,
+            "cancellation": cancellation,
+            "manual_resolutions": manual_resolutions,
+        },
+    }
+
+
 def _changeset_value(family: str, field: str, value: Any) -> Any:
     """Use the shared editor coercion for ChangeSet before/after values."""
     if value is None:

@@ -41,6 +41,12 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ model_id: modelId, key }),
     }),
+  draftLifecycle: (draftId) => request(`/api/drafts/${draftId}`),
+  saveDraftOperation: (draftId, payload) =>
+    request(`/api/drafts/${draftId}/operations`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
   stage: (payload) =>
     request("/api/changes", { method: "POST", body: JSON.stringify(payload) }),
   changes: (status = "staged") => request(`/api/changes?status=${status}`),
