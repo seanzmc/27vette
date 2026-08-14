@@ -5,10 +5,11 @@ completed 2026-07-23, Pass 3 completed 2026-07-30, Pass 4 completed
 2026-08-08, Pass 5 completed 2026-08-09, Pass 6A completed 2026-08-10, and
 Pass 6B completed 2026-08-14 on `db-workflow`; Pass 7 is in progress at its
 first API characterization/fallback checkpoint.
-Revised 2026-08-09 to split shared-writer restoration from durable manager
-apply/recovery and narrow Pass 7 to the minimal exact-artifact client and final
-enablement; revised 2026-07-23 to record the completed workbook-owned Vehicle
-Setup copy contract;
+Revised 2026-08-14 to expand the remaining Pass 7 work into five explicit
+checkpoints: lifecycle context, durable editing UI, integrated asset management,
+one shared draft/apply lane, and final Apply-and-Rebuild orchestration. Revised
+2026-08-09 to split shared-writer restoration from durable manager apply/recovery;
+revised 2026-07-23 to record the completed workbook-owned Vehicle Setup copy contract;
 the final specification review previously resolved all fourteen findings: primary-
 runtime-only parity, strict publication selection, current baseline, outcome-
 specific lifecycle states, interrupted-apply recovery, exception evidence,
@@ -1418,52 +1419,114 @@ not a Pass 6B regression. Evidence lives in
 No canonical workbook, projection data, generated/publication/runtime/dealer
 surface, dependency, or deployment changed. No apply, cancel, or manual
 resolution route was added to FastAPI or the browser; Pass 7 still owns final
-thin-client reachability. Before calling the full manager checkpoint green,
-correct the stale six-model generated-parity expectation and rerun that owner.
+thin-client reachability. The separately scoped expectation was corrected to
+the released six-model promotion set on 2026-08-14, and its owner passes `4`.
 
 ### Pass 7 — Make the API and UI a thin client
 
-Required changes:
+Completed foundation: preserve the catalog allowlist on schema, record, and
+dependency endpoints, and resolve blank Form Structure section-to-step values
+from imported workbook master metadata. The five remaining checkpoints are the
+only active Pass 7 implementation sequence.
 
-1. Preserve and characterize the existing catalog allowlist on schema, record,
-   and dependency endpoints; never accept a raw SQL table name outside it. This
-   is a regression proof, not a new resource-routing layer.
-2. Fix Form Structure section-to-step fallback using the workbook master
-   section metadata already imported by the manager.
-3. Preserve model context through the schema response, form payload, durable
-   draft operation, and manager-owned lifecycle/history view for every
-   model-owned family. Do not extend or rewrite the immutable shared ChangeSet,
-   preview, approval, or receipt schemas merely to add manager presentation
-   fields: expose their exact stored artifacts alongside manager-owned source
-   row, physical identity, and model-context metadata.
-4. Replace the active legacy staged-row browser workflow with one minimal
-   durable-draft lifecycle workspace. It must show projected values, source row
-   lineage, model context, blocking findings, exact ChangeSet/preview/approval
-   identities, warnings, failure detail, allowed retry/cancel/manual-recovery
-   controls, and separate workflow statuses. It must support operation capture,
-   commit, preview, approval, and the exact bound apply action without creating
-   a parallel workflow engine.
-5. Render finite controls from the final Pass 2 `field_kind`/`finite_values`
-   metadata and free text only for registry-declared free-text fields. Preserve
-   optional blank/SQL `NULL` and reference meaning through unchanged-row and
-   edited-row round trips, including the seven workbook-owned Vehicle Setup
-   copy fields.
-6. Preserve the existing separate status behavior: after a workbook write the
-   workbook/projection identity is stale, while generated artifacts and runtime
-   publication remain stale/unverified until separately proven outside the
-   manager. This pass does not run or publish generators.
-7. Keep legacy `POST /api/sync` permanently read-only: every `write=true`
-   request remains refused. While implementing Pass 7, keep the dedicated bound
-   apply action unreachable and run every non-write gate first. As the final
-   code change, enable only that dedicated action over the exact approved
-   artifacts. Then run the disposable end-to-end copied-workbook write proof and
-   close Pass 7 only after it passes.
+#### Remaining checkpoint 1 — lifecycle context API
 
-Pass 7 exit gate: a real unchanged model-owned row round-trips through the
-API/browser payload without losing model context, source lineage, or
-blank/reference meaning; the legacy staged/sync browser workflow grants no
-write authority; `POST /api/sync write=true` remains refused; and only the
-dedicated exact-artifact action can reach the bound ChangeSet service write.
+Preserve model context through the schema response, form payload, durable draft
+operation, and manager-owned lifecycle/history view for every model-owned
+family. Expose exact stored ChangeSet, preview, approval, apply, cancellation,
+and manual-resolution artifacts beside manager-owned source sheet/row, physical
+identity, and model-context metadata. Do not extend or rewrite the immutable
+shared artifact schemas merely to add presentation fields.
+
+Exit gate: an unchanged real model-owned row round-trips through the API view
+without losing model context, source lineage, physical identity, blank/`NULL`
+meaning, or reference meaning.
+
+#### Remaining checkpoint 2 — durable editing and review UI
+
+Replace the active legacy staged-row browser workflow with one minimal durable-
+draft workspace. It shows projected values, lineage, model context, blocking
+findings, exact lifecycle identities, warnings, failure detail, and only the
+verbs allowed by current durable state. It supports operation capture, commit,
+preview, approval, retry, cancel, and manual-recovery presentation without a
+parallel workflow engine. Render finite controls from `field_kind` /
+`finite_values`, references from registry metadata, and free text only for
+registry-declared free-text fields. Preserve optional blank/SQL `NULL` and all
+seven workbook-owned Vehicle Setup copy fields.
+
+Exit gate: the built browser completes unchanged-row and edited-row draft,
+commit, preview, and approval flows against a copied workbook; no browser or API
+apply action is reachable yet, and legacy `POST /api/sync write=true` remains
+refused.
+
+#### Remaining checkpoint 3 — integrated Asset Manager workspace
+
+Add an Asset Manager workspace inside the same React/FastAPI application. Reuse
+the existing `scripts/sync_asset_map.py` reconciliation rules and report
+contracts rather than duplicating filename, fallback-model, wildcard, coverage,
+or ambiguity logic. The workspace selects one model or all promoted models,
+reads a stable WordPress media inventory, and presents coverage by model/section
+plus missing, unmatched, ambiguous, stale, and proposed matches. It permits
+review of `image_url`, `image_fit`, `image_position`, and active state while
+keeping workbook `asset_map` rows canonical.
+
+This checkpoint is review/draft only. It does not upload media to WordPress,
+write the workbook, generate contracts, publish `form-app/data.js`, change cache
+versions, or invent rows for unresolved/ambiguous matches.
+
+Exit gate: deterministic fixture-backed and copied-workbook browser tests prove
+the Manager reports the same reconciliation decisions and coverage contract as
+the existing asset sync owner, and ambiguous/unmatched items cannot silently
+become draft writes.
+
+#### Remaining checkpoint 4 — one draft/apply lane for ordinary and asset edits
+
+Route approved Asset Manager edits into the same durable operation, ChangeSet,
+preview, and approval lifecycle as ordinary workbook edits. Ordinary and asset
+operations may coexist in one draft and must retain exact workbook ownership,
+model scope, before/final values, and dependency evidence. Do not add a second
+asset writer, a second ChangeSet dialect, or a subprocess path that bypasses the
+shared writer and `save_workbook_safely()` contract.
+
+Exit gate: a mixed copied-workbook draft reaches exact bound approval with one
+immutable artifact chain; cancellation and retry remain idempotent; the
+dedicated apply route is still unreachable; canonical and generated files are
+byte-identical before and after all validation.
+
+#### Remaining checkpoint 5 — final Apply and Rebuild
+
+As the final code change, enable one dedicated **Apply and Rebuild** action over
+the exact approved artifacts. It must:
+
+1. create and verify the recoverable workbook/output rollback set;
+2. apply only through the existing durable exact-artifact lifecycle and shared
+   safe writer;
+3. run workbook package/schema validation and exact saved-row readback;
+4. derive every affected model from operation ownership/model context rather
+   than trusting the currently selected UI card;
+5. regenerate and compare every affected promoted model through the canonical
+   generator path;
+6. rebuild `form-app/data.js` from registry promotion and increment its cache
+   version only when the published bundle changes; and
+7. report workbook, projection, generated-contract, and publication status as
+   separate evidence-backed states.
+
+Any downstream failure must leave the workflow visibly failed and restore and
+hash-verify the complete rollback set; if restoration cannot be proven, report
+the workbook/output state unknown and expose only manual-resolution actions.
+No deployment or dealer submission occurs. Legacy `POST /api/sync write=true`
+remains permanently refused.
+
+Exit gate: a disposable end-to-end browser/API run edits one ordinary row and
+one asset row in a copied workbook, reviews and approves one exact artifact
+chain, applies once, regenerates the derived affected-model set, verifies the
+registry/cache result, proves replay cannot write twice, and exercises one
+forced post-apply failure with complete restoration proof.
+
+Pass 7 exit gate: all five remaining checkpoint exit gates pass; the generic
+durable editor and Asset Manager share one workbook-owned draft/apply lane;
+only Apply and Rebuild can reach the bound writer and post-write pipeline; and
+no failed or partially restored workflow is presented as current.
 
 #### Pass 7 checkpoint 1 — catalog containment and section fallback (2026-08-14)
 
@@ -1478,17 +1541,15 @@ The complete API owner passes `14 passed`; the separately corrected six-model
 generated-parity owner passes `4 passed`. The latter replaces the stale former
 three-model expectation with the exact released six-model promotion set and
 retains protected workbook/generated-artifact hash proof. No durable lifecycle
-workspace, browser thin client, apply/cancel/manual-resolution endpoint, or
-write enablement has started. Requirements 3–7 and the Pass 7 exit gate remain
+workspace, browser thin client, Asset Manager, apply route, or write enablement
+has started. The five remaining checkpoints and the Pass 7 exit gate remain
 open.
 
-A manager `applied` receipt means only that the workbook write and exact
-readback were proven. It is not repository or customer-runtime completion. The
-enclosing operational workflow must then run the affected package/schema,
-generation, generated-contract comparison, and registry-verification gates from
-the README before reporting the overall workflow current. That post-write work
-remains outside automatic manager execution and must not publish or deploy
-without the normal repository authority.
+A manager `applied` receipt still proves only the workbook write and exact
+readback. Apply and Rebuild owns the subsequent local generation, comparison,
+registry publication, and cache-version evidence required to call affected
+repository outputs current. It never implies deployment, production cache
+purge, or dealer-submission verification.
 
 ## 7. Expected implementation surfaces
 
@@ -1508,7 +1569,10 @@ Expected existing owners:
 - `workbook-manager/frontend/src/components/RecordForm.jsx`
 - `workbook-manager/frontend/src/components/ChangesSync.jsx`
 - `workbook-manager/frontend/src/components/FormStructure.jsx`
+- `scripts/sync_asset_map.py`
+- `docs/asset-map-sync.md`
 - `tests/test_workbook_manager.py`
+- `tests/test_asset_map_sync.py`
 - `tests/test_workbook_changeset_service.py`
 - `tests/test_editor_ops_apply.py`
 - `scripts/corvette_form_generator/workbook_domain/registry.py`
@@ -1519,6 +1583,7 @@ Expected existing owners:
 
 Expected new owner:
 
+- `workbook-manager/frontend/src/components/AssetManager.jsx`
 - `workbook-manager/backend/app/catalog.py`
 - `workbook-manager/backend/app/contract_parity.py`
 - `tests/test_workbook_manager_catalog.py`
@@ -1526,6 +1591,8 @@ Expected new owner:
 - `tests/test_workbook_manager_generated_parity.py`
 - `tests/test_workbook_manager_changeset_lifecycle.py`
 - `tests/test_workbook_manager_api_concurrency.py`
+- `tests/test_workbook_manager_asset_manager.py`
+- `tests/test_workbook_manager_apply_rebuild.py`
 
 State/import helpers may be added only when required to implement these pinned
 owners. Do not create the broad module tree from the superseded plan, move all
@@ -1559,7 +1626,10 @@ Implementation is complete only when these named owners prove:
 | Post-save exception | live readback, package/schema, and log failures restore and hash-verify the backup or report unknown while preserving original and restoration evidence | `tests/test_editor_ops_apply.py` |
 | UI context loss | unchanged real model-key rows round-trip through the manager lifecycle view with correct model/reference/source-lineage metadata while shared artifacts remain unchanged | `tests/test_workbook_manager.py` plus disposable browser smoke |
 | Vehicle Setup copy loss | all seven workbook-owned `model_master` setup-copy fields survive import/reconstruction and API/browser/ChangeSet round-trip; clearing one for a promoted model fails shared preview validation | `tests/test_workbook_manager.py`, `tests/test_workbook_manager_import_projection.py`, and `tests/test_workbook_manager_changeset_lifecycle.py` |
-| False readiness | workbook save leaves projection/generated/publication status stale or unverified | `tests/test_workbook_manager_changeset_lifecycle.py` |
+| Asset reconciliation drift | fixture-backed Manager results match the existing asset sync report/coverage contract; ambiguous and unmatched candidates remain review-only | `tests/test_asset_map_sync.py`, `tests/test_workbook_manager_asset_manager.py`, and disposable browser smoke |
+| Parallel asset writer | mixed ordinary/asset edits emit one exact immutable artifact chain and reach only the shared writer | `tests/test_workbook_manager_changeset_lifecycle.py` plus disposable browser smoke |
+| False readiness | workbook apply alone cannot report generated/publication current; successful Apply and Rebuild proves each state independently; failed rebuild restores the full rollback set or reports unknown | `tests/test_workbook_manager_changeset_lifecycle.py`, generated-parity acceptance, and disposable browser smoke |
+| Partial Apply and Rebuild | affected-model derivation includes shared-row impact, registry/cache output changes only on success, replay cannot write twice, and forced downstream failure restores verified workbook/output hashes | `tests/test_workbook_manager_apply_rebuild.py` plus disposable browser smoke |
 | Stale projection authority | stale ChangeSet permits cancel only; after cancellation, stale projection permits labeled browse/history and verified re-import but blocks export/draft/preview/approval/apply until that import succeeds | `tests/test_workbook_manager_changeset_lifecycle.py` |
 
 ## 9. Validation and execution rules
@@ -1571,10 +1641,11 @@ For every pass:
 3. Make the smallest change through the owners above.
 4. Run the focused test, then the current manager suite.
 5. Recheck `git status` and prove the canonical workbook, tracked generated
-   artifacts, runtime registry, deployment, and dealer code did not change. If
-   a separately authorized workbook cleanup shares the implementation commit,
-   enumerate that exact delta and run its normal workbook/runtime gates instead
-   of calling the workbook unchanged.
+   artifacts, runtime registry, deployment, and dealer code did not change
+   during checkpoints 1–4. Checkpoint 5 validation stays on copied workbooks and
+   temporary output roots; enumerate and hash-check its exact disposable
+   workbook/generated/registry/cache delta and rollback result instead of
+   touching canonical files.
 6. Record the pass result in this specification before moving to the next pass.
 
 The README owns exact commands. Add any new focused modules from Section 8 to its
@@ -1602,9 +1673,11 @@ output.
 Browser-smoke the built manager against a copied workbook and temporary state/
 projection databases. Cover model navigation, structure mapping, an unchanged
 real-row edit, coordinated batch validation, stale workbook display, preview
-binding, forced failure, retry/cancel/manual-recovery display, and post-write
-stale status. No live
-dealer submission and no write to the canonical workbook are validation steps.
+binding, deterministic asset reconciliation/review, a mixed ordinary/asset
+draft, forced failure, retry/cancel/manual-recovery display, Apply and Rebuild,
+and post-write generated/publication status. No live dealer submission, live
+deployment, WordPress upload, or write to the canonical workbook is a
+validation step.
 
 ## 10. Scope control and stop conditions
 
@@ -1617,8 +1690,9 @@ Stop and request direction only if implementation would require:
 - choosing or changing workbook product/business behavior;
 - changing a shared public ChangeSet contract rather than using it as written;
 - adding a dependency or supporting multi-process/distributed manager writes;
-- changing generated/runtime contracts, publication, deployment, or dealer
-  submission;
+- changing generated/runtime contract semantics, deployment, production cache,
+  WordPress media, or dealer submission; local regeneration, registry rebuild,
+  and cache-version maintenance are authorized only inside checkpoint 5;
 - discarding or guessing how to convert real legacy staged/unsynced work;
 - accepting a candidate despite a blocking reconciliation finding, or reporting
   the slow acceptance parity test successful when it failed;
@@ -1640,9 +1714,9 @@ validation, editing workbook rows, or hiding unsafe actions only in the UI.
   copy, ordering, lifecycle, or publication decisions as implementation data.
   The manager may support already-authorized future edits through the matrix;
   this reliability implementation does not make those business decisions.
-- Automatic generation, registry publication, deployment, or dealer submission
-  inside the manager. The enclosing approved workbook workflow still performs
-  the required post-write generation and verification before overall completion.
+- Deployment, production cache purge, dealer submission, or WordPress media
+  upload inside the manager. Apply and Rebuild performs only the local guarded
+  workbook/generation/registry/cache-version workflow defined in checkpoint 5.
 
 ## 12. Companion impact and completion handoff
 
@@ -1652,23 +1726,28 @@ Companion disposition:
   Commit `e02dd0a` also removed two inactive unresolved `asset_map` rows; that
   exact cleanup was separately reviewed, authorized, and proven runtime-neutral
   during the 2026-08-08 closeout.
-- Generated artifacts and `form-app/data.js`: inspected-no-change; temporary
-  parity outputs only.
+- Generated artifacts and `form-app/data.js`: unchanged through checkpoints
+  1–4; checkpoint 5 may update only outputs derived from the approved workbook
+  change through canonical generation/registry owners and its rollback envelope.
 - Customer form and dealer submission: unchanged.
 - Shared registry: reused; only generic metadata needed by existing writable
   families may be added.
 - Shared ChangeSet contract/service: reused; no parallel contract.
 - Shared writer: consumes registry-requiredness and is hardened for post-save
   restoration correctness.
-- Model generation: implementation and output contracts unchanged. Acceptance
-  calls canonical source assembly and writes only a temporary canonical runtime
-  contract; no compatibility writer or publication path is changed or exercised.
-- Post-export gate: once Pass 3 of the single-lane specification lands
-  `scripts/verify_workbook_candidate.py`, this workflow calls that one command
-  after an approved workbook write and consumes its JSON readiness report. It
-  does not reimplement the package/schema/quality/generation/registry stage
-  sequence, and it does not use touched-model information to narrow what is
-  generated or validated — see §3.7.1 of that specification.
+- Model generation: generator implementation and output contracts remain
+  unchanged. Checkpoint 5 invokes the canonical generation and registry paths
+  for the affected-model set derived from draft ownership; it does not add a
+  second generator or model-specific business logic.
+- Post-write gate: Apply and Rebuild must reuse the authoritative candidate and
+  generation/registry owners rather than reproduce their validation rules.
+  Draft ownership determines the affected-model set presented to the operator;
+  shared rows may expand that set, and no selected UI model may narrow required
+  validation.
+- Asset maintenance: `asset_map` remains workbook-owned. The Manager reuses the
+  existing sync reconciliation/report contract, but all approved row changes
+  join the same durable draft/shared-writer lane; it does not retain a parallel
+  direct-write asset path.
 - Legacy staging/sync: Pass 5 replaced their write authority with durable
   draft-to-ChangeSet emission. Keep `staging.py` and
   `sync_workbook(write=True)` characterization-only during Passes 6A–6B; Pass 7
