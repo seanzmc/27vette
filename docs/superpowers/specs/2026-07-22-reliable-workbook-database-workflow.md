@@ -1382,6 +1382,45 @@ duplicate a workbook mutation; and a successful receipt makes the existing
 status calculation report the projection stale without a second readback or
 parallel freshness state.
 
+#### Pass 6B completion — durable manager apply and recovery (2026-08-14)
+
+Pass 6B is complete at the backend lifecycle boundary. Durable schema 8 adds
+one active-attempt uniqueness owner, a finalizable-then-immutable apply
+envelope, and immutable manual-resolution evidence without changing projection
+schema. The manager loads the exact stored ChangeSet, formal preview, and
+formal approval, commits `applying` before invoking only
+`workbook_domain.service.apply_changeset()`, returns an existing terminal result
+on replay, and refuses an already-active attempt before the writer. Exact retry
+authority is limited to proven untouched or complete exactly bound restored
+receipts; malformed, incomplete, unbound, and unknown outcomes fail closed.
+
+Startup converts an interrupted active attempt to `workbook_state_unknown`
+without replay. Manual restored resolution requires the exact original
+SHA-256/mtime; manual applied resolution independently reopens the workbook and
+verifies every final ChangeSet row/sheet effect; abandoned unknown preserves
+the unresolved evidence. A formally bound applied receipt additionally requires
+positive internally consistent coverage/readback counts, clean schema and
+Boolean-hygiene results, and exact ChangeSet/preview/approval identities. The
+resulting workbook identity naturally makes the existing projection status
+stale; no second freshness flag or success readback was added.
+
+Final evidence: Pass 6B class `7 passed` plus `19 subtests`; focused manager and
+shared lifecycle `88 passed` plus `36 subtests`; shared writer/editor `80 passed`
+plus `13 subtests`; compilation and `git diff --check` passed; independent
+verifier passed after two fail-closed repair checkpoints. The complete manager
+inventory returned `144 passed, 2 skipped, 25 subtests` plus one unrelated
+generated-parity failure. That exact failure reproduces at unchanged detached
+`HEAD`: the test still expects the former three promoted models while the
+released workbook promotes six. It is a separately scoped baseline correction,
+not a Pass 6B regression. Evidence lives in
+`fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`.
+
+No canonical workbook, projection data, generated/publication/runtime/dealer
+surface, dependency, or deployment changed. No apply, cancel, or manual
+resolution route was added to FastAPI or the browser; Pass 7 still owns final
+thin-client reachability. Before calling the full manager checkpoint green,
+correct the stale six-model generated-parity expectation and rerun that owner.
+
 ### Pass 7 — Make the API and UI a thin client
 
 Required changes:

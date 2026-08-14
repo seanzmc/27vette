@@ -73,8 +73,9 @@ exact ChangeSet emission, and shared-service preview and approval lifecycles:
 - The shared writer now rechecks exact rows, package integrity, and schema
   integrity after a safe save. Any returned or thrown post-save validation/log
   failure restores and SHA-256-verifies the backup or reports the workbook
-  state unknown. This is shared-service hardening only; no manager apply action
-  calls it yet.
+  state unknown. The backend-only durable apply lifecycle can call it with the
+  exact stored ChangeSet/preview/approval artifacts; no API or browser action
+  can reach that lifecycle until Pass 7.
 - Status reports projection, draft, workbook, generated-artifact, and
   publication states separately. Generated artifacts and publication are
   always `unverified` in this provisional manager workflow.
@@ -178,15 +179,22 @@ Environment overrides: `WBM_WORKBOOK`, `WBM_DB` (durable state),
    sends the exact stored ChangeSet and identity-bound formal preview through
    the shared approval service and records immutable result/exception evidence.
    Confirmation resubmission reuses the same artifacts; re-preview binds a later
-   approval to the new preview. No apply or workbook write is enabled.
-8. **Commit (legacy provisional)** — batch revalidation; every
+   approval to the new preview.
+8. **Apply ChangeSet (backend service only, not route-reachable)** — Pass 6B
+   routes the exact stored ChangeSet, preview, and approval only through
+   `workbook_domain.service.apply_changeset()`. One active durable attempt is
+   recorded before the writer runs; exact replay is idempotent, interrupted
+   attempts become unknown on startup, and cancellation/manual resolution keep
+   immutable history. There is intentionally no FastAPI or browser apply action;
+   Pass 7 owns that final enablement.
+9. **Commit (legacy provisional)** — batch revalidation; every
    change lands in the append-only `change_history` table (timestamp,
    actor, entity, model, op, old/new values, source sheet/row, validation
    result, sync status).
-9. **Sync preview only** — `POST /api/sync` with `write=false` can run the
+10. **Sync preview only** — `POST /api/sync` with `write=false` can run the
    existing dry-run gate. `write=true` is refused by the API regardless of
    confirmation text or mtime.
-10. **Disposable export** — `POST /api/export` can create a comparison workbook
+11. **Disposable export** — `POST /api/export` can create a comparison workbook
    under `var/exports/` only when projection state is `current`. The file is
    labeled disposable and must not replace the workbook or feed generation.
 
