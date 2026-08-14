@@ -938,6 +938,40 @@ class TestApi(unittest.TestCase):
         self.assertIn("options", tables)
         self.assertIn("pricing", tables)
 
+    def test_structure_falls_back_to_master_section_step(self):
+        structure = self.client.get("/api/structure/stingray").json()
+        presentation = {
+            section["section_id"]: section
+            for section in structure["section_presentation"]
+        }
+        stripes = next(
+            step for step in structure["steps"]
+            if step["step_key"] == "aero_exhaust_stripes_accessories"
+        )
+
+        self.assertEqual(
+            presentation["sec_1lte_001"]["step_key"],
+            "standard_equipment",
+        )
+        self.assertIn(
+            "sec_stri_001",
+            {section["section_id"] for section in stripes["sections"]},
+        )
+
+    def test_catalog_routes_refuse_non_allowlisted_table_names(self):
+        attempts = (
+            self.client.get("/api/records/sqlite_master/schema"),
+            self.client.get("/api/records/sqlite_master"),
+            self.client.post(
+                "/api/records/sqlite_master/dependencies",
+                json={"model_id": "", "key": {}},
+            ),
+        )
+
+        for response in attempts:
+            self.assertEqual(response.status_code, 404, response.text)
+            self.assertIn("unknown table", response.json()["detail"])
+
     def test_stage_endpoint_validation_error_shape(self):
         resp = self.client.post("/api/changes", json={
             "table": "options", "model_id": "stingray", "op": "add",

@@ -2,9 +2,9 @@
 
 Status: implementation in progress; Pass 1 completed 2026-07-22, Pass 2
 completed 2026-07-23, Pass 3 completed 2026-07-30, Pass 4 completed
-2026-08-08, Pass 5 completed 2026-08-09, and Pass 6A completed 2026-08-10 on
-`db-workflow`; the remaining implementation is Pass 6B and Pass 7, neither of
-which has started.
+2026-08-08, Pass 5 completed 2026-08-09, Pass 6A completed 2026-08-10, and
+Pass 6B completed 2026-08-14 on `db-workflow`; Pass 7 is in progress at its
+first API characterization/fallback checkpoint.
 Revised 2026-08-09 to split shared-writer restoration from durable manager
 apply/recovery and narrow Pass 7 to the minimal exact-artifact client and final
 enablement; revised 2026-07-23 to record the completed workbook-owned Vehicle
@@ -1464,6 +1464,23 @@ API/browser payload without losing model context, source lineage, or
 blank/reference meaning; the legacy staged/sync browser workflow grants no
 write authority; `POST /api/sync write=true` remains refused; and only the
 dedicated exact-artifact action can reach the bound ChangeSet service write.
+
+#### Pass 7 checkpoint 1 — catalog containment and section fallback (2026-08-14)
+
+Pass 7 has started with the first two non-write requirements. The existing
+`SPEC_BY_TABLE` catalog remains the only accepted table-name authority for the
+schema, records, and dependency endpoints; a regression now proves all three
+reject a non-catalog SQLite table name. Form Structure now fills a blank
+presentation `step_key` from the imported `section_master` row before grouping
+sections under runtime steps, preserving explicit presentation values.
+
+The complete API owner passes `14 passed`; the separately corrected six-model
+generated-parity owner passes `4 passed`. The latter replaces the stale former
+three-model expectation with the exact released six-model promotion set and
+retains protected workbook/generated-artifact hash proof. No durable lifecycle
+workspace, browser thin client, apply/cancel/manual-resolution endpoint, or
+write enablement has started. Requirements 3–7 and the Pass 7 exit gate remain
+open.
 
 A manager `applied` receipt means only that the workbook write and exact
 readback were proven. It is not repository or customer-runtime completion. The

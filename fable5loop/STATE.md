@@ -14,13 +14,13 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 
 - **Updated:** 2026-08-14
 - **Owning specification:** `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md` remains the detailed database-workflow tracker.
-- **Active workflow:** Database Pass 6B is complete at the backend-only lifecycle boundary; Pass 7 remains unstarted.
-- **Branch/commit:** `db-workflow` at `75452bb`; the Pass 6B working tree is verified but uncommitted and unpushed.
-- **Last completed:** Added durable exact-artifact manager apply attempts, idempotent replay containment, fail-closed receipt/outcome mapping, startup interruption recovery, immutable cancellation/manual-resolution history, and schema-8 upgrade coverage without route reachability.
-- **Current status:** The backend can call the shared writer only from the exact stored ChangeSet/preview/approval lifecycle. No FastAPI or browser apply action exists. Pass 6B independent verification passed after two narrow fail-closed repair checkpoints.
-- **Validation:** Pass 6B class `7 passed` plus `19 subtests`; focused manager/shared lifecycle `88 passed` plus `36 subtests`; shared writer/editor `80 passed` plus `13 subtests`; compilation and `git diff --check` passed. The broad manager inventory returned `144 passed, 2 skipped, 25 subtests` and one stale six-model parity expectation reproduced identically at unchanged detached HEAD.
-- **Next action:** Correct the separately scoped generated-parity test's former three-model expectation for the released six-model registry and rerun that owner; then begin Pass 7 thin-client API/UI reachability when requested.
-- **Blockers or closeout gaps:** No Pass 6B implementation blocker. The broad manager checkpoint cannot be called fully green until the pre-existing generated-parity expectation is corrected. No commit or push was requested.
+- **Active workflow:** Database Pass 6B is complete; Pass 7 is in progress at the first non-write API characterization/fallback checkpoint.
+- **Branch/commit:** `db-workflow` at `604def3`; the parity correction and first Pass 7 slice are verified but uncommitted and unpushed.
+- **Last completed:** Corrected the generated-parity owner's released registry expectation from three to six models, proved catalog allowlist containment on all three record endpoints, and made Form Structure fall back from blank presentation step metadata to the imported section master before grouping.
+- **Current status:** Pass 7 requirements 1 and 2 are implemented. The backend lifecycle remains exact-artifact bound, but no apply/cancel/manual-resolution FastAPI route or durable-draft browser workspace exists; the legacy staged/sync browser remains contained and `write=true` stays refused.
+- **Validation:** Six-model generated-parity owner `4 passed`; complete Workbook Manager API owner `14 passed` with one existing Starlette/httpx deprecation warning; `git diff --check` passed. The earlier broad manager inventory was not rerun because the corrected failing owner and the affected API owner both passed.
+- **Next action:** Implement Pass 7 requirement 3: preserve manager-owned model context, physical/source-row identity, and exact stored lifecycle artifacts through the API view without changing shared ChangeSet/preview/approval/receipt schemas.
+- **Blockers or closeout gaps:** Pass 7 requirements 3–7, the durable-draft browser workspace, final dedicated bound-apply enablement, and disposable copied-workbook end-to-end proof remain open. No commit or push was requested.
 - **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`
 - **Protected boundaries:** No canonical workbook, projection data, generated artifact, publication, runtime JavaScript, styling, pricing, dealer submission, dependency, deployment, or public shared-artifact schema changed. All real writes used disposable fixture workbooks.
 

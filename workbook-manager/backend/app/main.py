@@ -443,6 +443,7 @@ def structure(model_key: str, conn=Depends(projection_connection)):
         "SELECT * FROM form_sections")}
     for p in presentation:
         master = sections.get(p["section_id"], {})
+        p["step_key"] = p.get("step_key") or master.get("step_key")
         p["section_name"] = master.get("section_name", "")
         p["display_name"] = p.get("display_label") or master.get(
             "section_name") or display_id(p["section_id"], ("sec_",))
