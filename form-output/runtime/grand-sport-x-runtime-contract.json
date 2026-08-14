@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grand_sport_x_options",
-    "generated_at": "2026-08-13T21:46:05+00:00",
+    "generated_at": "2026-08-14T02:56:28+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -45469,6 +45469,17 @@
       "trim_level_scope": "",
       "variant_scope": "",
       "notes": "Ingest target-authored comparator price confirmation"
+    },
+    {
+      "price_rule_id": "gsx_pr_3lt_ah2_seat_001",
+      "condition_option_id": "opt_ah2_001",
+      "target_option_id": "opt_ah2_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "*",
+      "trim_level_scope": "3LT",
+      "variant_scope": "",
+      "notes": "3LT standard AH2 GT2 seats should not add a charge."
     }
   ],
   "interiors": [
@@ -53556,7 +53567,7 @@
       "severity": "pass",
       "entity_type": "price_rule",
       "entity_id": "",
-      "message": "25 active price rules exported from grand_sport_x_price_rules."
+      "message": "26 active price rules exported from grand_sport_x_price_rules."
     },
     {
       "check_id": "color_overrides",

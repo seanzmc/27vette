@@ -1819,6 +1819,31 @@ test("Grand Sport seat prices are workbook-scoped by trim", () => {
   assert.equal(runtime.optionPrice("opt_aup_001"), 350);
 });
 
+test("Grand Sport X AH2 pricing is workbook-scoped by trim", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("grand_sport_x");
+  runtime.state.bodyStyle = "coupe";
+
+  runtime.state.trimLevel = "2LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  let ah2 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_ah2_001");
+  assert.ok(ah2, "Grand Sport X 2LT AH2 seat should exist");
+  assert.equal(runtime.choiceDisplayPrice(ah2), 1695, "Grand Sport X 2LT AH2 should retain its charge");
+  runtime.handleChoice(ah2);
+  assert.equal(runtime.optionPrice("opt_ah2_001"), 1695);
+
+  runtime.state.trimLevel = "3LT";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+  ah2 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_ah2_001");
+  assert.ok(ah2, "Grand Sport X 3LT AH2 seat should exist");
+  assert.equal(ah2.status, "standard");
+  assert.equal(runtime.choiceDisplayPrice(ah2), 0, "Grand Sport X 3LT standard AH2 should show no charge");
+  runtime.handleChoice(ah2);
+  assert.equal(runtime.optionPrice("opt_ah2_001"), 0);
+});
+
 test("Grand Sport workbook default_selected rows seed and reconcile defaults generically", () => {
   const runtime = loadRuntime();
   runtime.activateModel("grandSport");
@@ -1897,6 +1922,10 @@ test("ZR1 and ZR1X keep fixed included equipment out of customer choice cards", 
     zr1: ["EFR", "J58"],
     zr1x: ["AQ9", "AH2", "EFR", "EYT", "SOJ"],
   };
+  const expectedC2zStandardVariants = {
+    zr1: ["1lz_r07", "3lz_r07"],
+    zr1x: ["1lz_s07", "3lz_s07"],
+  };
 
   for (const [modelKey, defaultRpos] of Object.entries(expectedDefaults)) {
     const data = registry.models[modelKey].data;
@@ -1936,6 +1965,23 @@ test("ZR1 and ZR1X keep fixed included equipment out of customer choice cards", 
     for (const item of data.standardEquipment) {
       assert.notEqual(item.status, "unavailable", `${modelKey} standard-equipment export should contain only included rows`);
     }
+
+    assert.equal(
+      data.standardEquipment
+        .filter((item) => item.rpo === "C2Z")
+        .map((item) => item.variant_id)
+        .sort()
+        .join(","),
+      expectedC2zStandardVariants[modelKey].join(","),
+      `${modelKey} should list standard C2Z only for its coupe variants`,
+    );
+    const c2zChoices = data.choices.filter((choice) => choice.rpo === "C2Z");
+    assert.equal(c2zChoices.filter((choice) => choice.body_style === "coupe").every(
+      (choice) => choice.status === "standard" && choice.selectable === "False" && choice.step_key === "standard_equipment",
+    ), true, `${modelKey} coupe C2Z should be fixed standard equipment`);
+    assert.equal(c2zChoices.filter((choice) => choice.body_style === "convertible").every(
+      (choice) => choice.status === "unavailable",
+    ), true, `${modelKey} convertible C2Z should remain unavailable`);
   }
 });
 
