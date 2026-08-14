@@ -135,14 +135,17 @@ init();
   return context.window.__testApi;
 }
 
-test("generated app registry promotes Z06 without changing default model", () => {
+test("generated app registry publishes all six models without changing the Stingray default", () => {
   const registry = loadDataWindow().CORVETTE_FORM_DATA;
 
   assert.equal(registry.defaultModelKey, "stingray");
   assert.deepEqual(Object.keys(registry.models).sort(), [
     "grandSport",
+    "grand_sport_x",
     "stingray",
     "z06",
+    "zr1",
+    "zr1x",
   ]);
   assert.equal(registry.models.z06.key, "z06");
   assert.equal(registry.models.z06.label, "Z06");
