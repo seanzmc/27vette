@@ -174,6 +174,37 @@ class TestDurableDraftEditing(unittest.TestCase):
                 )
                 self.assertIsNone(reverted)
                 self.assertEqual(drafts.list_operations(state, "draft-1"), [])
+                self.assertEqual(
+                    state.execute(
+                        "SELECT COUNT(*) c FROM workflow_drafts WHERE id='draft-1'"
+                    ).fetchone()["c"],
+                    0,
+                )
+            finally:
+                projection.close()
+                state.close()
+
+    def test_unchanged_update_does_not_leave_an_empty_draft(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-draft-unchanged-") as raw:
+            projection, state = self._stores(Path(raw))
+            try:
+                unchanged = drafts.save_operation(
+                    projection, state, projection_state="current",
+                    base_workbook_sha256="sha", base_workbook_mtime_ns="1",
+                    draft_id="draft-unchanged", table="options",
+                    model_id="stingray", op="update",
+                    key={"option_id": "opt_test"},
+                    record={"option_name": "Original", "price": "100"},
+                )
+                self.assertIsNone(unchanged)
+                self.assertEqual(drafts.list_operations(state, "draft-unchanged"), [])
+                self.assertEqual(
+                    state.execute(
+                        "SELECT COUNT(*) c FROM workflow_drafts "
+                        "WHERE id='draft-unchanged'"
+                    ).fetchone()["c"],
+                    0,
+                )
             finally:
                 projection.close()
                 state.close()

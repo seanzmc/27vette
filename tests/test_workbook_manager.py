@@ -840,12 +840,26 @@ class TestDependencyInspection(ImportedWorkbookCase):
 
 
 class TestPass1BrowserContainment(unittest.TestCase):
-    def test_browser_has_persistent_provisional_banner_and_no_write_control(self):
+    def test_browser_uses_durable_draft_workspace_and_has_no_write_control(self):
         app_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
                       "App.jsx").read_text()
         sync_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
                        "components" / "ChangesSync.jsx").read_text()
-        self.assertIn("Read-only / provisional", app_source)
+        operations_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                             "components" / "ModelOperations.jsx").read_text()
+        structure_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                            "components" / "FormStructure.jsx").read_text()
+        self.assertIn("Durable draft mode", app_source)
+        self.assertIn("Freeze ChangeSet", sync_source)
+        self.assertIn("Approve Exact Preview", sync_source)
+        self.assertIn("Apply remains intentionally unavailable", sync_source)
+        self.assertIn("api.saveDraftOperation", operations_source)
+        self.assertIn("api.saveDraftOperation", structure_source)
+        self.assertNotIn("api.stage", operations_source)
+        self.assertNotIn("api.stage", structure_source)
+        self.assertNotIn("api.changes", sync_source)
+        self.assertNotIn("api.commit(", sync_source)
+        self.assertNotIn("api.sync", sync_source)
         self.assertNotIn("write: true", sync_source)
         self.assertNotIn("Write to stingray_master.xlsx", sync_source)
 
@@ -857,8 +871,20 @@ class TestPass1BrowserContainment(unittest.TestCase):
         self.assertIn("schema.model_context?.required", record_form)
         self.assertIn("schema.model_context.value || modelKey", record_form)
         self.assertNotIn("model_id: schema.model_scoped ? modelKey", record_form)
-        self.assertIn("stageFn={api.stage}", structure)
+        self.assertIn("saveFn={saveDraft}", structure)
         self.assertNotIn('model_id: ""', structure)
+
+    def test_form_controls_follow_registry_field_kinds_and_keep_setup_copy(self):
+        record_form = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                       "components" / "RecordForm.jsx").read_text()
+        structure = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                     "components" / "FormStructure.jsx").read_text()
+        self.assertIn('col.field_kind === "finite"', record_form)
+        self.assertIn('col.field_kind === "reference"', record_form)
+        self.assertIn("col.finite_values", record_form)
+        self.assertIn("blank / SQL NULL", record_form)
+        self.assertIn('col.name === "setup_description"', record_form)
+        self.assertIn("Edit model metadata &amp; Vehicle Setup copy", structure)
 
 
 @unittest.skipUnless(HAVE_FASTAPI, "fastapi not installed; install "
@@ -1020,6 +1046,89 @@ class TestApi(unittest.TestCase):
         ).json()
         mapping_fields = {column["name"]: column for column in mappings["columns"]}
         self.assertEqual(mapping_fields["source_id"]["reference"]["kind"], "union")
+
+    def test_durable_draft_discovery_and_cancel_routes_preserve_history(self):
+        row = self.client.get(
+            "/api/records/options",
+            params={"model": "stingray", "limit": 1},
+        ).json()["records"][0]
+        draft_id = "api-ui-draft-cancel"
+        saved = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "options",
+                "model_id": "stingray",
+                "op": "update",
+                "key": {"option_id": row["option_id"]},
+                "record": {"option_name": f'{row["option_name"]} UI review'},
+                "actor": "browser-test",
+            },
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+
+        listed = self.client.get("/api/drafts", params={"limit": 200}).json()
+        summary = next(item for item in listed["drafts"] if item["id"] == draft_id)
+        self.assertEqual(summary["status"], "draft")
+        self.assertEqual(summary["operation_count"], 1)
+
+        cancelled = self.client.post(f"/api/drafts/{draft_id}/cancel")
+        self.assertEqual(cancelled.status_code, 200, cancelled.text)
+        self.assertEqual(cancelled.json()["status"], "cancelled")
+        lifecycle = self.client.get(f"/api/drafts/{draft_id}").json()
+        self.assertEqual(lifecycle["draft"]["status"], "cancelled")
+        self.assertEqual(len(lifecycle["operations"]), 1)
+        self.assertEqual(
+            lifecycle["artifacts"]["cancellation"]["status"], "cancelled"
+        )
+
+    def test_vehicle_setup_copy_round_trips_through_browser_schema_and_draft(self):
+        setup_fields = [
+            "setup_card_subtitle", "setup_eyebrow", "setup_title",
+            "setup_description", "setup_fact_1", "setup_fact_2", "setup_fact_3",
+        ]
+        schema = self.client.get(
+            "/api/records/models/schema", params={"model": "stingray"}
+        ).json()
+        columns = {column["name"]: column for column in schema["columns"]}
+        self.assertTrue(set(setup_fields) <= columns.keys())
+        self.assertTrue(all(columns[name]["field_kind"] == "free_text"
+                            for name in setup_fields))
+
+        records = self.client.get(
+            "/api/records/models",
+            params={"model": "stingray", "search": "stingray"},
+        ).json()["records"]
+        model = next(row for row in records if row["model_key"] == "stingray")
+        final_copy = {name: model[name] for name in setup_fields}
+        final_copy["setup_title"] = f'{final_copy["setup_title"]} UI proof'
+        draft_id = "api-setup-copy-ui"
+        saved = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "models",
+                "model_id": "stingray",
+                "op": "update",
+                "key": {"model_key": "stingray"},
+                "record": final_copy,
+                "actor": "browser-test",
+            },
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+        operation = saved.json()
+        self.assertEqual(
+            {name: operation["final"][name] for name in setup_fields}, final_copy
+        )
+
+        committed = self.client.post(f"/api/drafts/{draft_id}/commit")
+        self.assertEqual(committed.status_code, 200, committed.text)
+        change = committed.json()["rowChanges"][0]
+        self.assertEqual(set(change["fields"]), {"setup_title"})
+        self.assertEqual(
+            change["fields"]["setup_title"]["after"], final_copy["setup_title"]
+        )
+        self.assertEqual(
+            self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200
+        )
 
     def test_real_model_row_round_trips_context_lineage_null_and_reference(self):
         conn = self.mainmod.open_projection_connection()

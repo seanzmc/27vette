@@ -14,15 +14,15 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 
 - **Updated:** 2026-08-14
 - **Owning specification:** `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md` remains the detailed database-workflow tracker.
-- **Active workflow:** Database Pass 6B and Pass 7 lifecycle-context checkpoint 1 are complete; checkpoint 2 durable editing/review UI is next.
-- **Branch/commit:** `db-workflow` at `496f619`; checkpoint 1 implementation/docs are verified but uncommitted and unpushed.
-- **Last completed:** Added one read-only durable lifecycle API view over exact stored artifacts and manager-owned physical/model context, normalized record context, and corrected form payload scoping for model-key and source-routed families without enabling apply.
-- **Current status:** A real model-owned rule row now retains source sheet/row, physical key, union-reference value, optional `NULL`, model context, durable operation, and exact ChangeSet through the API. Four checkpoints remain: durable UI, Asset Manager, unified ordinary/asset lane, and Apply and Rebuild.
-- **Validation:** Complete Manager owner `50 passed, 2 skipped`; lifecycle owner `35 passed` plus `36 subtests`; focused browser-containment/form-payload `2 passed`; frontend build passed with 1,518 modules; Python compilation and `git diff --check` passed. The only warning was the existing Starlette/httpx deprecation.
-- **Next action:** Implement checkpoint 2: replace the legacy staged-row browser workflow with the durable draft/commit/preview/approval/retry/cancel/recovery workspace while keeping apply unreachable.
-- **Blockers or closeout gaps:** Checkpoints 2–5 and disposable browser proof remain open. WordPress media upload, deployment, production cache purge, and dealer submission remain outside Manager scope. No commit or push was requested.
+- **Active workflow:** Database Pass 6B and Pass 7 checkpoints 1–2 are complete; checkpoint 3 integrated Asset Manager is next.
+- **Branch/commit:** `db-workflow` at `31374bd`; checkpoint 2 implementation/docs are verified but uncommitted and unpushed.
+- **Last completed:** Replaced the active legacy staged-row browser path with the durable draft editor/review workspace, schema-driven finite/reference/free-text controls, durable discovery/cancellation, and exact lifecycle evidence without enabling apply.
+- **Current status:** The copied-workbook browser completes no-op and edited operation, ChangeSet, preview, approval, and cancellation flows; empty no-op drafts no longer block import. Three checkpoints remain: integrated Asset Manager, unified ordinary/asset lane, and Apply and Rebuild.
+- **Validation:** Complete Manager owner `53 passed, 2 skipped`; lifecycle/draft owner `41 passed` plus `36 subtests`; frontend build passed with 1,518 modules; headed copied-workbook browser completed the checkpoint exit flow and the final clean load had zero console messages. Exact artifact identities are recorded in the owning specification. The only automated warning was the existing Starlette/httpx deprecation.
+- **Next action:** Implement checkpoint 3: add the review/draft-only Asset Manager workspace by reusing `scripts/sync_asset_map.py` reconciliation/report owners; do not add a parallel writer or enable apply.
+- **Blockers or closeout gaps:** Checkpoints 3–5 remain open. WordPress media upload, deployment, production cache purge, and dealer submission remain outside Manager scope. No commit or push was requested.
 - **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`
-- **Protected boundaries:** No canonical workbook, projection data, generated artifact, publication, runtime JavaScript, styling, pricing, dealer submission, dependency, deployment, or public shared-artifact schema changed. All real writes used disposable fixture workbooks.
+- **Protected boundaries:** No canonical workbook, generated artifact, publication, customer runtime, pricing, dealer submission, dependency, deployment, or public shared-artifact schema changed. Browser validation used a disposable workbook copy and temporary stores; apply remains route-unreachable.
 
 ## Verified facts
 

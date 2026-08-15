@@ -4,13 +4,13 @@ Provisional interface for investigating the disposable SQLite projection of
 `stingray_master.xlsx`. Pass 5 adds manager-owned durable update/add/delete
 drafts, immutable ChangeSet emission, and durable shared-service preview and
 approval lifecycles. Pass 6A independently hardens the shared writer's
-post-save restoration. Pass 7 checkpoint 1 adds the read-only durable lifecycle
-view and preserves schema-declared model context through record/form/draft
-payloads; no manager apply route is enabled, and the browser still exposes only
-the contained legacy staged-edit flow.
+post-save restoration. Pass 7 checkpoints 1–2 add the read-only durable
+lifecycle view and the schema-driven durable editing/review workspace. The
+browser now captures operations, freezes one ChangeSet, previews, approves,
+retries, cancels, and presents recovery evidence through the durable lifecycle.
+No manager apply route is enabled.
 The workbook remains canonical. Live manager-to-workbook writes are disabled
-until the reviewed ChangeSet route is enabled in Pass 7 of the reliability
-specification.
+until the final Apply and Rebuild checkpoint enables one reviewed route.
 
 ```text
 React interface (frontend/, Vite build served by FastAPI)
@@ -26,7 +26,7 @@ openpyxl import/export adapter (backend/app/importer.py, sync.py)
 stingray_master.xlsx (canonical source)
 ```
 
-## Current safety status: read-only / provisional
+## Current safety status: durable drafts; workbook apply disabled
 
 Pass 1 containment remains active. Pass 2 split storage plus the shared backend
 catalog contract, Pass 3 request connections plus promotion coordination, and
@@ -52,8 +52,9 @@ exact ChangeSet emission, and shared-service preview and approval lifecycles:
   dependent deletes remain together for complete final-graph preview; no
   individual dependency confirmation can bypass that graph. The route never
   mutates the projection or legacy history. `GET
-  /api/drafts/{draft_id}/operations` returns that intent. These are backend
-  checkpoint routes, not an enabled browser write workflow.
+  /api/drafts/{draft_id}/operations` returns that intent. The active browser
+  editors now use these durable routes; they still cannot apply or write the
+  workbook.
 - `POST /api/drafts/{draft_id}/commit` converts the complete coalesced draft once
   through the shared `workbook-changeset-1` contract, stores the exact
   typed payload in durable state, and transitions the draft to
@@ -79,6 +80,15 @@ exact ChangeSet emission, and shared-service preview and approval lifecycles:
   immutable shared artifacts. Record responses expose `model_context` as a JSON
   list, and browser form payloads follow schema-declared context for physically
   scoped, model-key, and source-routed families.
+- `GET /api/drafts` lets the single-user browser recover the latest nonterminal
+  durable draft, and `POST /api/drafts/{draft_id}/cancel` records a terminal
+  cancellation without deleting operation or artifact history.
+- The active Form Structure and Model Operations editors write only durable
+  operations. Draft Review shows projected before/final values, physical
+  sheet/row lineage, model context, exact ChangeSet/preview/approval identities,
+  warnings, failures, and immutable attempts. Controls derive from registry
+  `field_kind`, finite values, and reference metadata; optional blanks remain
+  SQL `NULL`. Apply is intentionally absent.
 - The shared writer now rechecks exact rows, package integrity, and schema
   integrity after a safe save. Any returned or thrown post-save validation/log
   failure restores and SHA-256-verifies the backup or reports the workbook
@@ -159,51 +169,42 @@ Environment overrides: `WBM_WORKBOOK`, `WBM_DB` (durable state),
    Every duplicate identifier, missing sheet/column, and unresolved
    relationship is reported with sheet/row/entity detail. Blocking findings
    block candidate promotion and leave the current projection untouched.
-2. **Edit (legacy browser)** — Form Structure workspace (models, runtime steps, section
+2. **Edit durable draft** — Form Structure workspace (models, runtime steps, section
    presentation/order, context sections, variants) and Model Operations
    workspace (options, OVS, exclusive groups + members, rule mapping, rule
    groups + members, pricing, variant overrides, assets, interior scope,
    components; shared interiors/color overrides). Collections come from the
    workbook's own `model_workbook_sources` registry, not a hardcoded list.
-3. **Stage (legacy provisional)** — every add/update/delete is validated (keys, types, enums,
-   scoped uniqueness, references) and queued in `pending_changes`. Undo
-   discards a staged change without touching data or audit history.
-   Deletes are blocked while dependents exist; the legacy confirmation bypass
-   is removed.
-4. **Durable draft operations (backend only)** — update/add/delete requests
+3. **Durable draft operations** — update/add/delete requests
    against a current projection resolve one physical workbook target and persist
    one coalesced original-to-final operation in `WBM_DB`. Coordinated
    parent/member additions and dependent deletes remain in one draft. Re-import
    remains blocked until the nonterminal draft has a later lifecycle disposition.
-5. **Emit ChangeSet (backend only)** — `POST /api/drafts/{draft_id}/commit`
+4. **Emit ChangeSet** — `POST /api/drafts/{draft_id}/commit`
    commits a nonempty mutable draft into one exact immutable
    `workbook-changeset-1` payload. It does not run the final-graph preview and
    grants no workbook write authority.
-6. **Preview ChangeSet (backend only)** — `POST /api/drafts/{draft_id}/preview`
+5. **Preview ChangeSet** — `POST /api/drafts/{draft_id}/preview`
    runs the exact stored ChangeSet through the shared preview service, records
    immutable result/exception evidence, and exposes only lifecycle-authorized
    next verbs. Blocking final-graph references map to `preview_rejected` with
    cancel as the only verb; a retry reuses the ChangeSet and creates a new attempt.
-7. **Approve ChangeSet (backend only)** — `POST /api/drafts/{draft_id}/approve`
+6. **Approve ChangeSet** — `POST /api/drafts/{draft_id}/approve`
    sends the exact stored ChangeSet and identity-bound formal preview through
    the shared approval service and records immutable result/exception evidence.
    Confirmation resubmission reuses the same artifacts; re-preview binds a later
    approval to the new preview.
-8. **Apply ChangeSet (backend service only, not route-reachable)** — Pass 6B
+7. **Apply ChangeSet (backend service only, not route-reachable)** — Pass 6B
    routes the exact stored ChangeSet, preview, and approval only through
    `workbook_domain.service.apply_changeset()`. One active durable attempt is
    recorded before the writer runs; exact replay is idempotent, interrupted
    attempts become unknown on startup, and cancellation/manual resolution keep
    immutable history. There is intentionally no FastAPI or browser apply action;
    Pass 7 owns that final enablement.
-9. **Commit (legacy provisional)** — batch revalidation; every
-   change lands in the append-only `change_history` table (timestamp,
-   actor, entity, model, op, old/new values, source sheet/row, validation
-   result, sync status).
-10. **Sync preview only** — `POST /api/sync` with `write=false` can run the
-   existing dry-run gate. `write=true` is refused by the API regardless of
-   confirmation text or mtime.
-11. **Disposable export** — `POST /api/export` can create a comparison workbook
+8. **Legacy containment** — historical staged/history rows remain recovery
+   evidence only. The browser has no staged-row or sync workflow, and
+   `POST /api/sync` still refuses `write=true` regardless of payload.
+9. **Disposable export** — `POST /api/export` can create a comparison workbook
    under `var/exports/` only when projection state is `current`. The file is
    labeled disposable and must not replace the workbook or feed generation.
 

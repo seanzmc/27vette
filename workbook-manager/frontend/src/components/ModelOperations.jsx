@@ -6,7 +6,9 @@ import { api } from "../api.js";
 import { displayId } from "../naming.js";
 import RecordForm from "./RecordForm.jsx";
 
-export default function ModelOperations({ models, modelKey, setModelKey, onChanged }) {
+export default function ModelOperations({
+  models, modelKey, setModelKey, draftId, draftMutable, onChanged,
+}) {
   const [collections, setCollections] = useState([]);
   const [table, setTable] = useState("options");
   const [schema, setSchema] = useState(null);
@@ -67,24 +69,45 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
     return [...keys, ...rest].slice(0, 7);
   }, [schema]);
 
-  const stageDelete = async (row) => {
+  const saveDraft = (payload) => api.saveDraftOperation(draftId, {
+    ...payload,
+    actor: "workbook-manager-ui",
+    session_id: "browser",
+  });
+
+  const saveDelete = async (row) => {
     try {
-      await api.stage({
+      await saveDraft({
         table,
-        model_id: schema.model_scoped ? modelKey : "",
+        model_id: schema.model_context?.required
+          ? (schema.model_context.value || modelKey)
+          : "",
         op: "delete",
         key: Object.fromEntries(schema.key.map((k) => [k, String(row[k] ?? "")])),
       });
       setDeps(null);
-      setNotice({ kind: "ok", text: "Delete staged. Review it in Changes & Sync." });
+      setNotice({ kind: "ok", text: "Delete saved to the durable draft. Review the complete graph in Draft Review." });
       onChanged();
     } catch (e) {
-      const blocked = e.detail?.errors?.find((x) => x.dependents?.length);
-      if (blocked) {
-        setDeps({ row, dependents: blocked.dependents });
+      setNotice({ kind: "err", text: e.message });
+    }
+  };
+
+  const inspectDelete = async (row) => {
+    const key = Object.fromEntries(schema.key.map((name) => [name, String(row[name] ?? "")]));
+    try {
+      const result = await api.dependencies(
+        table,
+        schema.model_context?.required ? (schema.model_context.value || modelKey) : "",
+        key,
+      );
+      if (result.dependents.length) {
+        setDeps({ row, dependents: result.dependents });
       } else {
-        setNotice({ kind: "err", text: e.message });
+        await saveDelete(row);
       }
+    } catch (e) {
+      setNotice({ kind: "err", text: e.message });
     }
   };
 
@@ -95,11 +118,16 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
       return [...cur.slice(-1), row]; // keep at most two
     });
 
-  const staged = async () => {
+  const saved = async (operation) => {
     setEditing(null);
-    setNotice({ kind: "ok", text: "Change staged. Review it in Changes & Sync." });
+    setNotice({
+      kind: "ok",
+      text: operation
+        ? "Change saved to the durable draft. Review it in Draft Review."
+        : "No values changed; no draft operation was created.",
+    });
     await loadRows();
-    onChanged();
+    onChanged({ draft: Boolean(operation) });
   };
 
   return (
@@ -162,7 +190,7 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
             </div>
             <button
               className="btn green small"
-              disabled={!activeCollection?.editable}
+              disabled={!activeCollection?.editable || !draftMutable}
               onClick={() => setEditing({ mode: "add", initial: null })}
             >
               <PlusCircle size={14} /> Add
@@ -210,16 +238,16 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
                       <button
                         className="icon-btn"
                         title="Edit"
-                        disabled={!activeCollection?.editable}
+                        disabled={!activeCollection?.editable || !draftMutable}
                         onClick={() => setEditing({ mode: "edit", initial: r })}
                       >
                         <Pencil size={14} />
                       </button>
                       <button
                         className="icon-btn danger"
-                        title="Stage delete"
-                        disabled={!activeCollection?.editable}
-                        onClick={() => stageDelete(r)}
+                        title="Save delete to draft"
+                        disabled={!activeCollection?.editable || !draftMutable}
+                        onClick={() => inspectDelete(r)}
                       >
                         <Trash2 size={14} />
                       </button>
@@ -293,8 +321,8 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
             mode={editing.mode}
             initial={editing.initial}
             modelKey={modelKey}
-            stageFn={api.stage}
-            onStaged={staged}
+            saveFn={saveDraft}
+            onSaved={saved}
             onCancel={() => setEditing(null)}
           />
         </div>
@@ -326,8 +354,11 @@ export default function ModelOperations({ models, modelKey, setModelKey, onChang
             </table>
             <p className="muted" style={{ marginTop: 12 }}>
               Delete the parent and every listed dependent together through one
-              draft ChangeSet. This legacy staged-row screen cannot bypass final-graph validation.
+              draft ChangeSet. Final-graph preview refuses an incomplete delete.
             </p>
+            <button className="btn danger small" onClick={() => saveDelete(deps.row)}>
+              <Trash2 size={14} /> Save parent delete to draft
+            </button>
           </div>
         </div>
       )}

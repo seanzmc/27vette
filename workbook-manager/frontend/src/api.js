@@ -41,28 +41,28 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ model_id: modelId, key }),
     }),
+  drafts: (limit = 50) => request(`/api/drafts?limit=${limit}`),
   draftLifecycle: (draftId) => request(`/api/drafts/${draftId}`),
   saveDraftOperation: (draftId, payload) =>
     request(`/api/drafts/${draftId}/operations`, {
       method: "POST",
       body: JSON.stringify(payload),
     }),
-  stage: (payload) =>
-    request("/api/changes", { method: "POST", body: JSON.stringify(payload) }),
-  changes: (status = "staged") => request(`/api/changes?status=${status}`),
-  discard: (id) => request(`/api/changes/${id}`, { method: "DELETE" }),
-  validateChanges: () => request("/api/changes/validate", { method: "POST" }),
-  commit: (actor = "") =>
-    request("/api/changes/commit", {
+  commitDraft: (draftId) =>
+    request(`/api/drafts/${draftId}/commit`, { method: "POST" }),
+  previewDraft: (draftId) =>
+    request(`/api/drafts/${draftId}/preview`, { method: "POST" }),
+  approveDraft: (draftId, payload) =>
+    request(`/api/drafts/${draftId}/approve`, {
       method: "POST",
-      body: JSON.stringify({ actor }),
+      body: JSON.stringify(payload),
     }),
+  cancelDraft: (draftId) =>
+    request(`/api/drafts/${draftId}/cancel`, { method: "POST" }),
   history: (params = {}) => {
     const q = new URLSearchParams(params).toString();
     return request(`/api/history?${q}`);
   },
-  sync: (payload) =>
-    request("/api/sync", { method: "POST", body: JSON.stringify(payload) }),
   exportWorkbook: () => request("/api/export", { method: "POST" }),
   backup: () => request("/api/backup", { method: "POST" }),
 };

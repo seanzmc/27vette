@@ -1,244 +1,331 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
-  CheckCheck, DatabaseBackup, FileDown, FileUp,
-  RefreshCcw, ShieldCheck, Undo2,
+  CheckCheck, DatabaseBackup, FileDown, FileUp, RefreshCcw,
+  RotateCcw, ShieldCheck, StopCircle,
 } from "lucide-react";
 import { api } from "../api.js";
 
-export default function ChangesSync({ status, onChanged }) {
-  const [staged, setStaged] = useState([]);
-  const [validation, setValidation] = useState(null);
-  const [commitResult, setCommitResult] = useState(null);
-  const [dryRun, setDryRun] = useState(null);
-  const [importReport, setImportReport] = useState(null);
-  const [notice, setNotice] = useState(null);
+const TERMINAL = new Set([
+  "applied", "cancelled", "manually_resolved_restored",
+  "manually_resolved_applied", "abandoned_unknown",
+]);
+
+function compact(value, length = 16) {
+  if (!value) return "—";
+  return value.length > length ? `${value.slice(0, length)}…` : value;
+}
+
+function latest(items = []) {
+  return items[items.length - 1] || null;
+}
+
+function messages(attempt) {
+  if (!attempt) return [];
+  const result = attempt.result || {};
+  const errors = (result.errors || []).map((item) =>
+    typeof item === "string" ? item : (item.message || JSON.stringify(item))
+  );
+  if (attempt.exception_message) errors.unshift(
+    `${attempt.exception_class || "Error"}: ${attempt.exception_message}`
+  );
+  return errors;
+}
+
+export default function ChangesSync({
+  status, draftId, lifecycle, onChanged, onStartNew,
+}) {
   const [busy, setBusy] = useState("");
+  const [notice, setNotice] = useState(null);
+  const [actor, setActor] = useState("Workbook Manager operator");
+  const [acceptedWarnings, setAcceptedWarnings] = useState([]);
+  const [importReport, setImportReport] = useState(null);
 
-  const refresh = async () => {
-    const c = await api.changes("staged");
-    setStaged(c.changes);
-    onChanged();
-  };
+  const artifacts = lifecycle?.artifacts || {};
+  const previewAttempt = latest(artifacts.preview_attempts);
+  const approvalAttempt = latest(artifacts.approval_attempts);
+  const applyAttempt = latest(artifacts.apply_attempts);
+  const preview = previewAttempt?.result || null;
+  const approval = approvalAttempt?.result || null;
+  const changeSet = artifacts.changeset?.artifact || null;
+  const draftState = lifecycle?.draft?.status || "new";
+  const operations = lifecycle?.operations || [];
+  const confirmableWarnings = preview?.warningPolicy?.confirmableIds || [];
+  const visibleWarnings = preview?.warnings || [];
 
-  useEffect(() => { refresh(); }, []); // eslint-disable-line
+  useEffect(() => {
+    setAcceptedWarnings((current) => current.filter(
+      (warningId) => confirmableWarnings.includes(warningId)
+    ));
+  }, [preview?.previewFingerprint]); // eslint-disable-line
 
-  const run = async (label, fn) => {
+  const identityRows = useMemo(() => [
+    ["Draft", lifecycle?.draft?.id || draftId],
+    ["ChangeSet", changeSet?.changeSetId],
+    ["Semantic fingerprint", changeSet?.semanticFingerprint],
+    ["Preview fingerprint", preview?.previewFingerprint],
+    ["Approval fingerprint", approval?.approvalFingerprint],
+  ], [lifecycle, draftId, changeSet, preview, approval]);
+
+  const run = async (label, action) => {
     setBusy(label);
     setNotice(null);
     try {
-      return await fn();
+      await action();
+      await onChanged();
     } catch (e) {
       setNotice({ kind: "err", text: e.message });
-      return null;
     } finally {
       setBusy("");
     }
   };
 
-  const unsynced = status?.unsynced_committed_changes ?? 0;
+  const canCancel = lifecycle && !TERMINAL.has(draftState)
+    && !["applying", "workbook_state_unknown"].includes(draftState);
+  const canPreview = [
+    "changeset_emitted", "preview_retryable", "approval_repreview_required",
+  ].includes(draftState);
+  const canApprove = ["preview_ready", "approval_confirmation_required"].includes(draftState);
 
   return (
     <div>
-      <div className="section-heading">Staged Changes ({staged.length})</div>
-      <div className="panel">
-        <div className="panel-head">
-          <span className="muted">
-            Staged changes live outside the database tables until committed;
-            undo removes them without a trace in the audit history.
-          </span>
-          <div className="toolbar">
-            <button
-              className="btn small"
-              disabled={!staged.length || !!busy}
-              onClick={() => run("validate", async () => setValidation(await api.validateChanges()))}
-            >
-              <ShieldCheck size={14} /> Validate All
-            </button>
-            <button
-              className="btn primary small"
-              disabled={!staged.length || !!busy}
-              onClick={() => run("commit", async () => {
-                const r = await api.commit("workbook-manager-ui");
-                setCommitResult(r);
-                setValidation(r.validation ?? null);
-                await refresh();
-              })}
-            >
-              <CheckCheck size={14} /> Validate &amp; Commit
-            </button>
-          </div>
+      <div className="draft-hero">
+        <div>
+          <div className="eyebrow">Durable workbook draft</div>
+          <h2>Review the exact change before it can ever reach the workbook.</h2>
+          <p>
+            Edits are durable manager intent. Commit freezes one ChangeSet;
+            preview runs the shared workbook gate; approval binds that exact preview.
+          </p>
         </div>
-        {staged.length === 0 ? (
-          <div className="empty">Nothing staged. Edits from both workspaces queue here.</div>
-        ) : (
-          staged.map((c) => {
-            const errs = validation?.results?.find((r) => r.change_id === c.id)?.errors || [];
-            return (
-              <div className="change-row" key={c.id}>
-                <span className={`op-tag ${c.op}`}>{c.op.toUpperCase()}</span>
-                <span className="mono">{c.table_name}</span>
-                {c.model_id && <span className="chip blue">{c.model_id}</span>}
-                <span className="mono faint">
-                  {Object.entries(c.entity_key || {}).map(([k, v]) => `${k}=${v}`).join(", ")}
-                </span>
-                {errs.length > 0 && (
-                  <span className="chip err">{errs.length} validation error(s)</span>
-                )}
-                <span className="spacer" />
-                <span className="faint mono">{c.ts}</span>
-                <button
-                  className="icon-btn danger"
-                  title="Undo (discard staged change)"
-                  onClick={() => run("undo", async () => { await api.discard(c.id); await refresh(); })}
-                >
-                  <Undo2 size={14} />
-                </button>
-              </div>
-            );
-          })
-        )}
-        {validation && !validation.ok && (
-          <div className="panel-body">
-            <div className="notice err">
-              Batch validation failed — fix or undo the flagged changes before commit.
-            </div>
-            <ul className="error-list">
-              {validation.results.flatMap((r) =>
-                r.errors.map((e, i) => (
-                  <li key={`${r.change_id}-${i}`}>
-                    #{r.change_id} · {e.table}{e.model_id ? ` (${e.model_id})` : ""}
-                    {e.field ? ` · ${e.field}` : ""} — {e.message}
-                  </li>
-                ))
-              )}
-            </ul>
-          </div>
-        )}
-        {commitResult && (
-          <div className="panel-body">
-            <div className={`notice ${commitResult.ok ? "ok" : "err"}`}>
-              {commitResult.ok
-                ? `Committed ${commitResult.committed} change(s) to the database. Audit rows written; workbook not yet touched.`
-                : `Commit blocked: ${commitResult.status}`}
-            </div>
-          </div>
-        )}
+        <div className="draft-state-card">
+          <span className="muted">Current state</span>
+          <strong>{draftState.replaceAll("_", " ")}</strong>
+          <span className="mono faint" title={draftId}>{compact(draftId, 24)}</span>
+        </div>
       </div>
 
-      <div className="section-heading">Workbook Sync Preview ({unsynced} committed change(s) pending; write disabled)</div>
+      {notice && <div className={`notice ${notice.kind}`}>{notice.text}</div>}
+      {status?.projection?.blocking_findings > 0 && (
+        <div className="notice err">
+          Projection has {status.projection.blocking_findings} blocking finding(s).
+          Draft authoring and lifecycle advancement remain fail-closed.
+        </div>
+      )}
+
+      <div className="section-heading">Draft operations ({operations.length})</div>
+      <div className="panel">
+        {operations.length === 0 ? (
+          <div className="empty">
+            No operations yet. Edit a projected record in Form Structure or Model Operations.
+          </div>
+        ) : operations.map((operation) => (
+          <div className="draft-operation" key={operation.id}>
+            <div className="operation-heading">
+              <span className={`op-tag ${operation.action}`}>{operation.action.toUpperCase()}</span>
+              <strong>{operation.table_name}</strong>
+              <span className="mono faint">
+                {Object.entries(operation.entity_key || {}).map(([key, value]) => `${key}=${value}`).join(", ")}
+              </span>
+              <span className="spacer" />
+              {(operation.model_context || []).map((model) => (
+                <span className="chip blue" key={model}>{model}</span>
+              ))}
+            </div>
+            <div className="lineage-row">
+              <span>sheet <strong>{operation.source_sheet}</strong></span>
+              <span>row <strong>{operation.source_row ?? "new"}</strong></span>
+              <span>family <strong>{operation.family}</strong></span>
+              <span className="mono" title={operation.physical_key}>
+                physical {compact(operation.physical_key, 28)}
+              </span>
+            </div>
+            <div className="field-diff">
+              {Object.entries(operation.changed_fields || {}).map(([field, pair]) => (
+                <React.Fragment key={field}>
+                  <div className="field-name">{field}</div>
+                  <div className="before-value">{pair.before === null ? <em>SQL NULL</em> : String(pair.before)}</div>
+                  <div className="after-value">{pair.after === null ? <em>SQL NULL</em> : String(pair.after)}</div>
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="section-heading">Lifecycle actions</div>
       <div className="panel">
         <div className="panel-body">
-          <div className="toolbar">
-            <button
-              className="btn"
-              disabled={!unsynced || !!busy}
-              onClick={() => run("dryrun", async () => {
-                setDryRun(await api.sync({ write: false }));
-              })}
-            >
-              <ShieldCheck size={15} /> {busy === "dryrun" ? "Running gate…" : "Dry-Run Sync"}
-            </button>
-            <span className="muted">
-              Dry-run pushes pending changes through the repo's gated pipeline
-              (lock check, batch validation, temp-copy apply, package + schema
-              validation) without writing. Slow is normal.
-            </span>
+          <div className="toolbar lifecycle-actions">
+            {draftState === "draft" && (
+              <button
+                className="btn primary"
+                disabled={!operations.length || !!busy}
+                onClick={() => run("commit", () => api.commitDraft(draftId))}
+              >
+                <CheckCheck size={15} /> Freeze ChangeSet
+              </button>
+            )}
+            {canPreview && (
+              <button
+                className="btn primary"
+                disabled={!!busy}
+                onClick={() => run("preview", () => api.previewDraft(draftId))}
+              >
+                {draftState === "changeset_emitted"
+                  ? <ShieldCheck size={15} />
+                  : <RotateCcw size={15} />}
+                {draftState === "changeset_emitted" ? "Run Workbook Preview" : "Retry Preview"}
+              </button>
+            )}
+            {canApprove && (
+              <button
+                className="btn primary"
+                disabled={!!busy || !actor.trim()}
+                onClick={() => run("approve", () => api.approveDraft(draftId, {
+                  actor: actor.trim(), warning_ids: acceptedWarnings,
+                }))}
+              >
+                <CheckCheck size={15} /> Approve Exact Preview
+              </button>
+            )}
+            {canCancel && (
+              <button
+                className="btn danger"
+                disabled={!!busy}
+                onClick={() => run("cancel", () => api.cancelDraft(draftId))}
+              >
+                <StopCircle size={15} /> Cancel Draft
+              </button>
+            )}
+            {TERMINAL.has(draftState) && (
+              <button className="btn" disabled={!!busy} onClick={onStartNew}>
+                Start New Draft
+              </button>
+            )}
+            {busy && <span className="muted">{busy.replaceAll("_", " ")}…</span>}
           </div>
-
-          {dryRun && (
-            <div className={`notice ${dryRun.status === "validated" ? "ok" : "err"}`}>
-              Dry-run: <strong>{dryRun.status}</strong> · {dryRun.opCount ?? 0} op(s)
-              {dryRun.errors?.length > 0 && (
-                <ul className="error-list">
-                  {dryRun.errors.map((e, i) => <li key={i}>{String(e)}</li>)}
-                </ul>
-              )}
-              {dryRun.warnings?.length > 0 && (
-                <ul className="error-list">
-                  {dryRun.warnings.map((w, i) => (
-                    <li key={i} style={{ color: "var(--accent)", borderColor: "rgba(245,185,66,.4)", background: "rgba(245,185,66,.07)" }}>
-                      ⚠ {w.id}: {w.message}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {dryRun.skipped?.length > 0 && (
-                <div className="muted" style={{ marginTop: 6 }}>
-                  {dryRun.skipped.length} change(s) skipped (no workbook write path).
-                </div>
-              )}
+          {canApprove && (
+            <div className="approval-box">
+              <label>
+                Operator
+                <input className="text" value={actor} onChange={(event) => setActor(event.target.value)} />
+              </label>
+              {confirmableWarnings.map((warningId) => (
+                <label className="warning-check" key={warningId}>
+                  <input
+                    type="checkbox"
+                    checked={acceptedWarnings.includes(warningId)}
+                    onChange={(event) => setAcceptedWarnings((current) => event.target.checked
+                      ? [...new Set([...current, warningId])]
+                      : current.filter((item) => item !== warningId))}
+                  />
+                  Accept confirmable warning <span className="mono">{warningId}</span>
+                </label>
+              ))}
             </div>
           )}
-
+          {draftState === "approved" && (
+            <div className="notice ok">
+              Exact preview approved. Apply remains intentionally unavailable until the final Apply and Rebuild checkpoint.
+            </div>
+          )}
+          {draftState === "workbook_state_unknown" && (
+            <div className="notice err">
+              Manual recovery required. No retry or cancellation is safe. Inspect the last apply evidence below and resolve the workbook state through the guarded recovery procedure.
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="section-heading">Workbook &amp; Database Tools</div>
+      <div className="section-heading">Exact lifecycle evidence</div>
+      <div className="evidence-grid">
+        <div className="panel panel-body">
+          <strong>Bound identities</strong>
+          <dl className="identity-list">
+            {identityRows.map(([label, value]) => (
+              <React.Fragment key={label}>
+                <dt>{label}</dt>
+                <dd className="mono" title={value || ""}>{compact(value, 28)}</dd>
+              </React.Fragment>
+            ))}
+          </dl>
+        </div>
+        <div className="panel panel-body">
+          <strong>Warnings &amp; failures</strong>
+          {!visibleWarnings.length && !messages(previewAttempt).length && !messages(approvalAttempt).length
+            ? <p className="muted">No recorded warnings or failures.</p>
+            : (
+              <ul className="error-list compact-list">
+                {visibleWarnings.map((warning, index) => (
+                  <li className="warning" key={`warning-${index}`}>
+                    {warning.id ? `${warning.id}: ` : ""}{warning.message || String(warning)}
+                  </li>
+                ))}
+                {[...messages(previewAttempt), ...messages(approvalAttempt), ...messages(applyAttempt)]
+                  .map((message, index) => <li key={`error-${index}`}>{message}</li>)}
+              </ul>
+            )}
+        </div>
+      </div>
+
+      {(previewAttempt || approvalAttempt || applyAttempt || artifacts.manual_resolutions?.length > 0) && (
+        <div className="panel artifact-history">
+          <div className="panel-head"><strong>Immutable attempt history</strong></div>
+          {[...(artifacts.preview_attempts || []).map((item) => ["Preview", item]),
+            ...(artifacts.approval_attempts || []).map((item) => ["Approval", item]),
+            ...(artifacts.apply_attempts || []).map((item) => ["Apply", item])]
+            .map(([kind, item]) => (
+              <details key={`${kind}-${item.id}`}>
+                <summary>
+                  {kind} · {item.manager_state} · <span className="mono">{compact(item.id)}</span>
+                </summary>
+                <pre>{JSON.stringify(item, null, 2)}</pre>
+              </details>
+            ))}
+          {(artifacts.manual_resolutions || []).map((item) => (
+            <details key={item.id} open>
+              <summary>Manual resolution · {item.manager_state}</summary>
+              <pre>{JSON.stringify(item, null, 2)}</pre>
+            </details>
+          ))}
+        </div>
+      )}
+
+      <div className="section-heading">Projection tools</div>
       <div className="panel">
         <div className="panel-body toolbar">
           <button
             className="btn"
             disabled={!!busy || !status?.projection?.reimport_allowed}
-            title={status?.projection?.reimport_allowed
-              ? "Build, verify, and atomically promote a candidate projection."
-              : "Import is blocked until the projection or unresolved workflow state is recoverable."}
-            onClick={() => run("import", async () => {
-              const r = await api.runImport();
-              setImportReport(r);
-              await refresh();
-            })}
+            onClick={() => run("import", async () => setImportReport(await api.runImport()))}
           >
             <FileUp size={15} /> Re-Import Workbook
           </button>
           <button
             className="btn"
             disabled={!!busy || status?.projection?.state !== "current"}
-            title={status?.projection?.state !== "current"
-              ? "Export requires a current verified projection."
-              : "Create a disposable comparison workbook."}
             onClick={() => run("export", async () => {
-              const r = await api.exportWorkbook();
-              setNotice({ kind: "ok", text: `Disposable comparison workbook exported: ${r.path}` });
+              const result = await api.exportWorkbook();
+              setNotice({ kind: "ok", text: `Disposable comparison exported: ${result.path}` });
             })}
           >
             <FileDown size={15} /> Export Disposable Comparison
           </button>
-          <button
-            className="btn"
-            disabled={!!busy}
-            onClick={() => run("backup", async () => {
-              const r = await api.backup();
-              setNotice({ kind: "ok", text: `Database backup: ${r.path}` });
-            })}
-          >
-            <DatabaseBackup size={15} /> Backup Database
+          <button className="btn" disabled={!!busy} onClick={() => run("backup", async () => {
+            const result = await api.backup();
+            setNotice({ kind: "ok", text: `Database backup: ${result.path}` });
+          })}>
+            <DatabaseBackup size={15} /> Backup Manager State
           </button>
-          <button className="btn" disabled={!!busy} onClick={() => run("refresh", refresh)}>
+          <button className="btn" disabled={!!busy} onClick={() => run("refresh", async () => {})}>
             <RefreshCcw size={15} /> Refresh
           </button>
         </div>
-        {notice && <div className="panel-body"><div className={`notice ${notice.kind}`}>{notice.text}</div></div>}
         {importReport && (
           <div className="panel-body">
-            <div className={`notice ${importReport.run.status === "imported" ? "ok" : "warn"}`}>
-              Import {importReport.run.status} · {importReport.issues.length} issue(s)
+            <div className={`notice ${importReport.run?.status === "imported" ? "ok" : "err"}`}>
+              Import {importReport.run?.status || importReport.status} · {importReport.issues?.length || 0} issue(s)
             </div>
-            {importReport.issues.length > 0 && (
-              <ul className="error-list">
-                {importReport.issues.slice(0, 50).map((i) => (
-                  <li
-                    key={i.id}
-                    style={i.severity === "warning"
-                      ? { color: "var(--accent)", borderColor: "rgba(245,185,66,.4)", background: "rgba(245,185,66,.07)" }
-                      : undefined}
-                  >
-                    [{i.severity}] {i.category} · {i.sheet}
-                    {i.src_row ? `:${i.src_row}` : ""}
-                    {i.entity_key ? ` · ${i.entity_key}` : ""} — {i.message}
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
         )}
       </div>

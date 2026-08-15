@@ -4,7 +4,9 @@ import { api } from "../api.js";
 import { humanize } from "../naming.js";
 import RecordForm from "./RecordForm.jsx";
 
-export default function FormStructure({ models, modelKey, setModelKey, onChanged }) {
+export default function FormStructure({
+  models, modelKey, setModelKey, draftId, draftMutable, onChanged,
+}) {
   const [structure, setStructure] = useState(null);
   const [editing, setEditing] = useState(null); // {table, mode, initial, schema}
   const [error, setError] = useState("");
@@ -25,11 +27,17 @@ export default function FormStructure({ models, modelKey, setModelKey, onChanged
     setEditing({ table, mode: initial ? "edit" : "add", initial, schema });
   };
 
-  const staged = async () => {
+  const saved = async (operation) => {
     setEditing(null);
     await load(modelKey);
-    onChanged();
+    onChanged({ draft: Boolean(operation) });
   };
+
+  const saveDraft = (payload) => api.saveDraftOperation(draftId, {
+    ...payload,
+    actor: "workbook-manager-ui",
+    session_id: "browser",
+  });
 
   return (
     <div>
@@ -54,6 +62,22 @@ export default function FormStructure({ models, modelKey, setModelKey, onChanged
             </div>
           </button>
         ))}
+      </div>
+
+      <div className="toolbar" style={{ marginBottom: 14 }}>
+        <button
+          className="btn small"
+          disabled={!draftMutable || !models.find((model) => model.model_key === modelKey)}
+          onClick={async () => {
+            const model = models.find((item) => item.model_key === modelKey);
+            if (model) await startEdit("models", model);
+          }}
+        >
+          <Pencil size={14} /> Edit model metadata &amp; Vehicle Setup copy
+        </button>
+        {!draftMutable && (
+          <span className="muted">This draft is locked; start a new draft to edit.</span>
+        )}
       </div>
 
       {error && <div className="notice err">{error}</div>}
@@ -102,6 +126,7 @@ export default function FormStructure({ models, modelKey, setModelKey, onChanged
                 <button
                   className="icon-btn"
                   title="Edit step"
+                  disabled={!draftMutable}
                   onClick={() => startEdit("form_steps", s)}
                 >
                   <Pencil size={14} />
@@ -117,7 +142,7 @@ export default function FormStructure({ models, modelKey, setModelKey, onChanged
                 Workbook-owned display order, labels, and conditional
                 visibility (display_behavior) per section.
               </span>
-              <button className="btn small" onClick={() => startEdit("section_presentation", null)}>
+              <button className="btn small" disabled={!draftMutable} onClick={() => startEdit("section_presentation", null)}>
                 Add Section Presentation
               </button>
             </div>
@@ -143,7 +168,7 @@ export default function FormStructure({ models, modelKey, setModelKey, onChanged
                     </td>
                     <td>
                       <div className="row-actions">
-                        <button className="icon-btn" onClick={() => startEdit("section_presentation", p)}>
+                        <button className="icon-btn" disabled={!draftMutable} onClick={() => startEdit("section_presentation", p)}>
                           <Pencil size={14} />
                         </button>
                       </div>
@@ -193,8 +218,8 @@ export default function FormStructure({ models, modelKey, setModelKey, onChanged
             mode={editing.mode}
             initial={editing.initial}
             modelKey={modelKey}
-            stageFn={api.stage}
-            onStaged={staged}
+            saveFn={saveDraft}
+            onSaved={saved}
             onCancel={() => setEditing(null)}
           />
         </div>

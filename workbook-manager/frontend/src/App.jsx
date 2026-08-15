@@ -8,12 +8,24 @@ import ModelOperations from "./components/ModelOperations.jsx";
 import ChangesSync from "./components/ChangesSync.jsx";
 import HistoryView from "./components/HistoryView.jsx";
 
+const DRAFT_STORAGE_KEY = "27vette-workbook-manager-draft";
+const TERMINAL_DRAFT_STATES = new Set([
+  "applied", "cancelled", "manually_resolved_restored",
+  "manually_resolved_applied", "abandoned_unknown",
+]);
+
+function newDraftId() {
+  return `manager-${crypto.randomUUID()}`;
+}
+
 export default function App() {
   const [tab, setTab] = useState("structure");
   const [status, setStatus] = useState(null);
   const [models, setModels] = useState([]);
   const [modelKey, setModelKey] = useState("stingray");
   const [fatal, setFatal] = useState("");
+  const [draftId, setDraftId] = useState("");
+  const [draftLifecycle, setDraftLifecycle] = useState(null);
 
   const refreshStatus = useCallback(async () => {
     try {
@@ -37,19 +49,71 @@ export default function App() {
     }
   }, [modelKey]);
 
-  useEffect(() => { refreshStatus(); }, []); // eslint-disable-line
+  const refreshDraft = useCallback(async (id = draftId) => {
+    if (!id) return null;
+    try {
+      const lifecycle = await api.draftLifecycle(id);
+      setDraftLifecycle(lifecycle);
+      return lifecycle;
+    } catch (e) {
+      if (e.status === 404) {
+        setDraftLifecycle(null);
+        return null;
+      }
+      throw e;
+    }
+  }, [draftId]);
 
-  const staged = status?.staged_changes ?? 0;
-  const unsynced = status?.unsynced_committed_changes ?? 0;
+  const selectDraft = useCallback((id) => {
+    localStorage.setItem(DRAFT_STORAGE_KEY, id);
+    setDraftId(id);
+    setDraftLifecycle(null);
+  }, []);
+
+  const startNewDraft = useCallback(() => {
+    selectDraft(newDraftId());
+    setTab("operations");
+  }, [selectDraft]);
+
+  const refreshManager = useCallback(async ({ draft = true } = {}) => {
+    await Promise.all([
+      refreshStatus(),
+      draft ? refreshDraft() : Promise.resolve(null),
+    ]);
+  }, [refreshStatus, refreshDraft]);
+
+  useEffect(() => {
+    refreshStatus();
+    (async () => {
+      try {
+        const listed = await api.drafts();
+        const saved = localStorage.getItem(DRAFT_STORAGE_KEY);
+        const savedRow = listed.drafts.find((draft) => draft.id === saved);
+        const resumable = listed.drafts.find(
+          (draft) => !TERMINAL_DRAFT_STATES.has(draft.status)
+        );
+        const recoveredId = savedRow && !TERMINAL_DRAFT_STATES.has(savedRow.status)
+          ? savedRow.id
+          : resumable?.id;
+        selectDraft(recoveredId || newDraftId());
+        if (recoveredId) await refreshDraft(recoveredId);
+      } catch (e) {
+        setFatal(`Draft recovery failed: ${e.message}`);
+      }
+    })();
+  }, []); // eslint-disable-line
+
+  const operationCount = draftLifecycle?.operations?.length ?? 0;
+  const draftMutable = !draftLifecycle || draftLifecycle.draft.status === "draft";
 
   const tabs = [
     { id: "structure", label: "Form Structure", icon: ListOrdered },
     { id: "operations", label: "Model Operations", icon: Settings2 },
     {
       id: "changes",
-      label: "Changes & Sync",
+      label: "Draft Review",
       icon: GitBranch,
-      badge: staged + unsynced || null,
+      badge: operationCount || null,
     },
     { id: "history", label: "History", icon: History },
   ];
@@ -58,8 +122,8 @@ export default function App() {
     <div>
       <div className="provisional-banner" role="status">
         <div>
-          <strong>Read-only / provisional</strong>
-          <span>Live workbook writes and replacement re-imports are disabled.</span>
+          <strong>Durable draft mode</strong>
+          <span>Workbook apply is unavailable; edits remain in reviewed manager state.</span>
         </div>
         <div className="status-surfaces" aria-label="Workbook Manager states">
           <span className="chip">projection: {status?.projection?.state || "loading"}</span>
@@ -109,7 +173,9 @@ export default function App() {
             models={models}
             modelKey={modelKey}
             setModelKey={setModelKey}
-            onChanged={refreshStatus}
+            draftId={draftId}
+            draftMutable={draftMutable}
+            onChanged={refreshManager}
           />
         )}
         {tab === "operations" && (
@@ -117,11 +183,19 @@ export default function App() {
             models={models}
             modelKey={modelKey}
             setModelKey={setModelKey}
-            onChanged={refreshStatus}
+            draftId={draftId}
+            draftMutable={draftMutable}
+            onChanged={refreshManager}
           />
         )}
         {tab === "changes" && (
-          <ChangesSync status={status} onChanged={refreshStatus} />
+          <ChangesSync
+            status={status}
+            draftId={draftId}
+            lifecycle={draftLifecycle}
+            onChanged={refreshManager}
+            onStartNew={startNewDraft}
+          />
         )}
         {tab === "history" && <HistoryView models={models} />}
       </main>

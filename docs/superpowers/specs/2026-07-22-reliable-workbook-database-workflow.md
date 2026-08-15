@@ -3,8 +3,9 @@
 Status: implementation in progress; Pass 1 completed 2026-07-22, Pass 2
 completed 2026-07-23, Pass 3 completed 2026-07-30, Pass 4 completed
 2026-08-08, Pass 5 completed 2026-08-09, Pass 6A completed 2026-08-10, and
-Pass 6B completed 2026-08-14 on `db-workflow`; Pass 7 is in progress at its
-durable editing and review UI checkpoint after completing lifecycle-context API.
+Pass 6B completed 2026-08-14 on `db-workflow`; Pass 7 lifecycle-context and
+durable editing/review UI checkpoints are complete, and integrated Asset
+Manager checkpoint 3 is next.
 Revised 2026-08-14 to expand the remaining Pass 7 work into five explicit
 checkpoints: lifecycle context, durable editing UI, integrated asset management,
 one shared draft/apply lane, and final Apply-and-Rebuild orchestration. Revised
@@ -1458,7 +1459,7 @@ warning was the existing Starlette/httpx deprecation. Apply remains route- and
 browser-unreachable, and protected workbook/generated/publication surfaces did
 not change.
 
-#### Remaining checkpoint 2 — durable editing and review UI
+#### Checkpoint 2 — durable editing and review UI (completed 2026-08-14)
 
 Replace the active legacy staged-row browser workflow with one minimal durable-
 draft workspace. It shows projected values, lineage, model context, blocking
@@ -1474,6 +1475,30 @@ Exit gate: the built browser completes unchanged-row and edited-row draft,
 commit, preview, and approval flows against a copied workbook; no browser or API
 apply action is reachable yet, and legacy `POST /api/sync write=true` remains
 refused.
+
+Completion: the active Form Structure and Model Operations workspaces now write
+only coalesced durable operations. Draft Review presents projected before/final
+values, source sheet/row, physical identity, model context, exact lifecycle
+identities, warnings, failure detail, immutable attempts, cancellation, and
+manual-recovery evidence. It derives finite and reference controls from schema
+metadata, preserves optional blank as SQL `NULL`, exposes all seven Vehicle
+Setup copy fields through the model editor, and filters the browser to the
+verbs allowed by the durable state. Draft discovery resumes the newest
+nonterminal lifecycle; an unchanged edit or full reversion removes its empty
+mutable identity instead of blocking import. Apply remains absent from the API
+and browser.
+
+Evidence: complete Manager owner `53 passed, 2 skipped`; lifecycle/draft owner
+`41 passed` plus `36 subtests`; frontend build passed with 1,518 modules. A
+headed browser against a copied real workbook completed unchanged-row and
+edited-row operation, ChangeSet, preview, approval, and cancellation flows with
+zero final console messages. The edited proof bound draft
+`manager-99365004-9c3a-492b-8a61-58aba545a3e2`, ChangeSet
+`ef2b694b7a4c6cfeccc9785c`, preview fingerprint
+`4844232bf9767f715c8c2ce71212a1751d53966837f8bc267404b273926dfaa0`,
+and approval fingerprint
+`1acc23ba80bfcc7ca7640d0f81561b767d51ad740f834fc2375484a033dbe04e`.
+The only automated warning was the existing Starlette/httpx deprecation.
 
 #### Remaining checkpoint 3 — integrated Asset Manager workspace
 

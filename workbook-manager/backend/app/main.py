@@ -167,9 +167,14 @@ def _staging_error(exc: StagingError):
 
 
 def _draft_error(exc: drafts.DraftError):
-    status_code = 409 if exc.code in {
+    if exc.code == "draft_not_found":
+        status_code = 404
+    elif exc.code in {
         "projection_not_current", "draft_not_mutable", "draft_binding_mismatch"
-    } else 422
+    }:
+        status_code = 409
+    else:
+        status_code = 422
     return HTTPException(status_code=status_code, detail={
         "status": exc.code,
         "message": str(exc),
@@ -665,6 +670,14 @@ def dependencies_post(
 
 # ── staged changes ───────────────────────────────────────────────────
 
+@app.get("/api/drafts")
+def durable_drafts(
+    limit: int = Query(50, ge=1, le=200),
+    state_conn=Depends(state_connection),
+):
+    return {"drafts": drafts.list_drafts(state_conn, limit=limit)}
+
+
 @app.get("/api/drafts/{draft_id}")
 def draft_lifecycle(draft_id: str, state_conn=Depends(state_connection)):
     try:
@@ -768,6 +781,18 @@ def approve_draft_changeset(
             actor=payload.actor,
             warning_ids=payload.warning_ids,
         )
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
+
+
+@app.post("/api/drafts/{draft_id}/cancel")
+def cancel_draft(
+    draft_id: str,
+    _lock=Depends(durable_write_lock),
+    state_conn=Depends(state_connection),
+):
+    try:
+        return drafts.cancel_draft(state_conn, draft_id=draft_id)
     except drafts.DraftError as exc:
         raise _draft_error(exc)
 

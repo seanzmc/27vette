@@ -75,6 +75,17 @@ def list_operations(state_conn: sqlite3.Connection, draft_id: str) -> list[dict]
     return [_operation_dict(row) for row in rows]
 
 
+def list_drafts(state_conn: sqlite3.Connection, *, limit: int = 50) -> list[dict]:
+    """Return durable draft identities for browser recovery and selection."""
+    rows = state_conn.execute(
+        "SELECT d.*, COUNT(o.id) AS operation_count "
+        "FROM workflow_drafts d LEFT JOIN draft_operations o ON o.draft_id=d.id "
+        "GROUP BY d.id ORDER BY d.updated_ts DESC, d.id DESC LIMIT ?",
+        (limit,),
+    ).fetchall()
+    return [dict(row) for row in rows]
+
+
 def lifecycle_view(state_conn: sqlite3.Connection, draft_id: str) -> dict:
     """Return one manager-owned view over exact stored lifecycle evidence."""
     draft_row = state_conn.execute(
@@ -1535,6 +1546,15 @@ def save_operation(
             if existing is not None:
                 state_conn.execute(
                     "DELETE FROM draft_operations WHERE id=?", (existing["id"],)
+                )
+            remaining = state_conn.execute(
+                "SELECT COUNT(*) AS c FROM draft_operations WHERE draft_id=?",
+                (draft_id,),
+            ).fetchone()["c"]
+            if remaining == 0:
+                state_conn.execute(
+                    "DELETE FROM workflow_drafts WHERE id=? AND status='draft'",
+                    (draft_id,),
                 )
             state_conn.commit()
             return None
