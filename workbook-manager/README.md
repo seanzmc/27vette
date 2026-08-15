@@ -1,5 +1,10 @@
 # Workbook Manager (React + FastAPI + SQLite)
 
+**Using the Manager for the first time?** Start with the plain-language
+[Workbook Manager User Guide](USER-GUIDE.md). It explains how to open the
+Manager, make ordinary and image-related changes, review a draft, safely use
+Apply and Rebuild, and recover from common warnings.
+
 Guarded editor for the disposable SQLite projection of
 `stingray_master.xlsx`. Pass 5 adds manager-owned durable update/add/delete
 drafts, immutable ChangeSet emission, and durable shared-service preview and

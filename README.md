@@ -48,11 +48,11 @@ docs/, .hermes/plans/         active specs, reviews, and plans
 
 Other dirs (`product/`, `dist_updates/`, `archive/`, `backups/`) are reference/archive surfaces — inspect only when a task names them.
 
-## Planned / In-Progress Modules
+## Local Tools and In-Progress Modules
 
 Not yet part of the live customer path; inspect before assuming either is production-ready.
 
-- **Workbook Manager (SQL-based editor)** — `workbook-manager/`: React + FastAPI + SQLite editor for `stingray_master.xlsx`. Draft saves remain provisional; one exact approved **Apply and Rebuild** action owns guarded workbook write, affected-model regeneration, and local registry/cache publication. See Workbook Manager Workflow below for details, setup, and tests.
+- **Workbook Manager (local workbook editor)** — `workbook-manager/`: completed local tool for reviewing and applying guarded changes to `stingray_master.xlsx`. Saving adds changes to a draft; only the reviewed **Apply and Rebuild** action changes the workbook and refreshes the affected local order-form files. For everyday use, start with the plain-language [Workbook Manager User Guide](workbook-manager/USER-GUIDE.md). See Workbook Manager Workflow below for technical details, setup, and tests.
 - **Visualizer** — `visualizer/`: prototype build-and-price visual configurator (stacked exterior/interior image layers driven by selected options) plus its companion `workbook-editor/` review UI. `visualizer/workbook-editor/intentional-differences.json` is the committed allowlist of intentional cross-model option differences (`status: intentional` suppresses; `pending-review` annotates); editing it is a normal file change, not a workbook write. Full visualizer integration into the order form is tracked in `docs/roadmap_wishes.md` and is not yet wired into `form-app/`.
 
 ## Workbook Source Surfaces
@@ -130,6 +130,9 @@ The fallback editor retains its existing typed-operation Apply path; Workbook Ma
 An Apply is only the workbook-write step — afterwards regenerate affected model artifacts, run the relevant gates below, and review diffs.
 
 ## Workbook Manager Workflow
+
+For everyday use, start with the plain-language
+[Workbook Manager User Guide](workbook-manager/USER-GUIDE.md).
 
 `workbook-manager/` is a React (Vite) + FastAPI + SQLite editor for
 `stingray_master.xlsx`. Draft editing is provisional: a first
