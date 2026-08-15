@@ -855,6 +855,10 @@ class TestPass1BrowserContainment(unittest.TestCase):
         self.assertIn("Apply remains intentionally unavailable", sync_source)
         self.assertIn("api.saveDraftOperation", operations_source)
         self.assertIn("api.saveDraftOperation", structure_source)
+        self.assertIn("await loadRows();\n    onChanged();", operations_source)
+        self.assertIn("await load(modelKey);\n    onChanged();", structure_source)
+        self.assertNotIn("onChanged({ draft: Boolean(operation) })", operations_source)
+        self.assertNotIn("onChanged({ draft: Boolean(operation) })", structure_source)
         self.assertNotIn("api.stage", operations_source)
         self.assertNotIn("api.stage", structure_source)
         self.assertNotIn("api.changes", sync_source)
@@ -863,7 +867,7 @@ class TestPass1BrowserContainment(unittest.TestCase):
         self.assertNotIn("write: true", sync_source)
         self.assertNotIn("Write to stingray_master.xlsx", sync_source)
 
-    def test_asset_workspace_is_lazy_bounded_preview_without_draft_operations(self):
+    def test_asset_workspace_is_lazy_bounded_and_uses_shared_draft_only(self):
         app_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
                       "App.jsx").read_text()
         asset_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
@@ -871,13 +875,20 @@ class TestPass1BrowserContainment(unittest.TestCase):
         self.assertIn('label: "Asset Manager"', app_source)
         self.assertIn("PAGE_SIZE = 24", asset_source)
         self.assertIn('loading="lazy"', asset_source)
-        self.assertIn('["cover", "contain", "swatch"]', asset_source)
+        self.assertIn("data.controls?.image_fit", asset_source)
+        self.assertIn("fitValues.map", asset_source)
         self.assertIn('/^[\\w\\s.%/-]+$/.test(position)', asset_source)
         self.assertIn("Show body-style hover media", asset_source)
         self.assertIn("not regenerated runtime proof", asset_source)
-        self.assertIn("Nothing here creates a draft operation", asset_source)
-        self.assertNotIn("saveDraftOperation", asset_source)
-        self.assertNotIn("/api/drafts", asset_source)
+        self.assertIn("Add all safe matches to draft", asset_source)
+        self.assertIn("Use explicitly selected candidate", asset_source)
+        self.assertIn("Advanced: use manual URL", asset_source)
+        self.assertIn("Assign to selected target", asset_source)
+        self.assertIn("Ignore this exact media identity", asset_source)
+        self.assertIn("Save presentation edits to draft", asset_source)
+        self.assertIn("api.saveAssetResolution", asset_source)
+        self.assertNotIn("api.apply", asset_source)
+        self.assertNotIn("write: true", asset_source)
 
     def test_form_payload_uses_schema_model_context_for_model_key_families(self):
         record_form = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
@@ -1004,6 +1015,7 @@ class TestApi(unittest.TestCase):
         self.assertEqual(actual["coverage"], expected["coverage"])
         self.assertEqual(actual["status_counts"], expected["status_counts"])
         self.assertEqual(actual["queue"], expected["queue"])
+        self.assertEqual(actual["controls"]["image_fit"], ["cover", "contain", "swatch"])
         draft_write.assert_not_called()
         self.assertEqual(_sha256(self.workbook), workbook_before)
         self.assertEqual(
@@ -1014,6 +1026,391 @@ class TestApi(unittest.TestCase):
             {path: _sha256(path) for path in protected_paths},
             protected_before,
         )
+
+    def test_safe_asset_resolution_uses_existing_draft_and_binds_evidence(self):
+        draft_id = "asset-safe-api"
+        protected = [
+            self.workbook,
+            REPO_ROOT / "form-app" / "data.js",
+            *(REPO_ROOT / "form-output" / "runtime").glob("*-runtime-contract.json"),
+        ]
+        before = {path: _sha256(path) for path in protected}
+        view = self.client.get(
+            "/api/assets/reconciliation",
+            params={"status": "safe_proposal", "draft_id": draft_id},
+        ).json()
+        self.assertEqual(view["status_counts"]["safe_proposal"], 1)
+        item = view["queue"]["items"][0]
+        response = self.client.post(
+            f"/api/drafts/{draft_id}/asset-resolutions",
+            json={
+                "item_id": item["id"],
+                "resolution_kind": "accept_safe",
+                "fingerprints": view["fingerprints"],
+                "values": {"image_fit": "contain", "image_position": "25% 40%"},
+                "actor": "asset-test",
+            },
+        )
+        self.assertEqual(response.status_code, 200, response.text)
+        operation = response.json()
+        self.assertEqual(operation["table_name"], "assets")
+        self.assertEqual(operation["changed_fields"]["image_fit"]["after"], "contain")
+        lifecycle = self.client.get(f"/api/drafts/{draft_id}").json()
+        self.assertEqual(len(lifecycle["operations"]), 1)
+        evidence = lifecycle["artifacts"]["asset_resolutions"]
+        self.assertEqual(len(evidence), 1)
+        self.assertEqual(evidence[0]["resolution_kind"], "accept_safe")
+        self.assertEqual(evidence[0]["reconciliation_sha256"], view["fingerprints"]["reconciliation_sha256"])
+        self.assertEqual(lifecycle["operations"][0]["asset_resolutions"][0]["id"], evidence[0]["id"])
+        self.assertEqual({path: _sha256(path) for path in protected}, before)
+        self.assertEqual(self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200)
+
+    def test_operational_ignore_invalidates_when_inventory_fingerprint_changes(self):
+        draft_id = "asset-ignore-api"
+        fixture = self.tmpdir / "ignore-media.txt"
+        fixture.write_text("https://example.test/readme.txt\n", encoding="utf-8")
+        original_fixture = os.environ["WBM_ASSET_MEDIA_URL_LIST"]
+        try:
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = str(fixture)
+            self.mainmod.asset_workspace.clear_cache()
+            view = self.client.get(
+                "/api/assets/reconciliation",
+                params={"status": "unparseable", "draft_id": draft_id, "refresh": True},
+            ).json()
+            item = view["queue"]["items"][0]
+            response = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": item["id"],
+                    "resolution_kind": "ignore",
+                    "fingerprints": view["fingerprints"],
+                },
+            )
+            self.assertEqual(response.status_code, 200, response.text)
+            ignored = self.client.get(
+                "/api/assets/reconciliation",
+                params={"status": "ignored", "draft_id": draft_id},
+            ).json()
+            self.assertEqual(ignored["status_counts"]["ignored"], 1)
+
+            fixture.write_text(
+                "https://example.test/readme.txt\nhttps://example.test/another.txt\n",
+                encoding="utf-8",
+            )
+            refreshed = self.client.get(
+                "/api/assets/reconciliation",
+                params={"status": "unparseable", "draft_id": draft_id, "refresh": True},
+            ).json()
+            self.assertEqual(refreshed["status_counts"]["ignored"], 0)
+            self.assertGreaterEqual(refreshed["status_counts"]["unparseable"], 1)
+            self.assertEqual(refreshed["draft_asset_resolutions"]["stale_count"], 1)
+        finally:
+            self.client.post(f"/api/drafts/{draft_id}/cancel")
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = original_fixture
+            self.mainmod.asset_workspace.clear_cache()
+
+    def test_bulk_asset_acceptance_adds_only_server_classified_safe_matches(self):
+        draft_id = "asset-safe-bulk-api"
+        view = self.client.get(
+            "/api/assets/reconciliation",
+            params={"draft_id": draft_id, "refresh": True},
+        ).json()
+        response = self.client.post(
+            f"/api/drafts/{draft_id}/asset-resolutions/safe",
+            json={"fingerprints": view["fingerprints"], "actor": "bulk-test"},
+        )
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual(response.json()["accepted"], view["status_counts"]["safe_proposal"])
+        lifecycle = self.client.get(f"/api/drafts/{draft_id}").json()
+        evidence = lifecycle["artifacts"]["asset_resolutions"]
+        self.assertTrue(evidence)
+        self.assertEqual({item["resolution_kind"] for item in evidence}, {"accept_safe"})
+        self.assertFalse({
+            item["evidence"]["source_status"] for item in evidence
+        } & {"ambiguous", "stale_target", "wildcard_conflict", "unmatched", "unparseable"})
+        self.assertEqual(self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200)
+
+    def test_asset_fingerprint_drift_blocks_changeset_freeze(self):
+        draft_id = "asset-stale-freeze-api"
+        fixture = self.tmpdir / "stale-freeze-media.txt"
+        fixture.write_text("https://example.test/h-stx.png\n", encoding="utf-8")
+        original_fixture = os.environ["WBM_ASSET_MEDIA_URL_LIST"]
+        try:
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = str(fixture)
+            self.mainmod.asset_workspace.clear_cache()
+            view = self.client.get(
+                "/api/assets/reconciliation",
+                params={"status": "safe_proposal", "draft_id": draft_id, "refresh": True},
+            ).json()
+            item = view["queue"]["items"][0]
+            saved = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": item["id"],
+                    "resolution_kind": "accept_safe",
+                    "fingerprints": view["fingerprints"],
+                },
+            )
+            self.assertEqual(saved.status_code, 200, saved.text)
+            fixture.write_text(
+                "https://example.test/h-stx.png\nhttps://example.test/readme.txt\n",
+                encoding="utf-8",
+            )
+            committed = self.client.post(f"/api/drafts/{draft_id}/commit")
+            self.assertEqual(committed.status_code, 422, committed.text)
+            self.assertEqual(
+                committed.json()["detail"]["status"], "asset_reconciliation_stale"
+            )
+            lifecycle = self.client.get(f"/api/drafts/{draft_id}").json()
+            self.assertEqual(lifecycle["draft"]["status"], "draft")
+            self.assertIsNone(lifecycle["artifacts"]["changeset"])
+        finally:
+            self.client.post(f"/api/drafts/{draft_id}/cancel")
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = original_fixture
+            self.mainmod.asset_workspace.clear_cache()
+
+    def test_ambiguous_asset_requires_explicit_equal_priority_candidate(self):
+        draft_id = "asset-ambiguous-api"
+        fixture = self.tmpdir / "ambiguous-media.txt"
+        fixture.write_text(
+            "\n".join([
+                "https://example.test/a/h-stx.png",
+                "https://example.test/b/h-stx.png",
+            ]) + "\n",
+            encoding="utf-8",
+        )
+        original_fixture = os.environ["WBM_ASSET_MEDIA_URL_LIST"]
+        try:
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = str(fixture)
+            self.mainmod.asset_workspace.clear_cache()
+            view = self.client.get(
+                "/api/assets/reconciliation",
+                params={"model": "z06", "status": "ambiguous", "draft_id": draft_id, "refresh": True},
+            ).json()
+            item = view["queue"]["items"][0]
+            alternatives = item["candidate"]["alternatives"]
+            self.assertEqual(len(alternatives), 2)
+            rejected = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": item["id"],
+                    "resolution_kind": "select_candidate",
+                    "fingerprints": view["fingerprints"],
+                    "selected_url": "https://example.test/not-a-candidate.png",
+                },
+            )
+            self.assertEqual(rejected.status_code, 422)
+            accepted = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": item["id"],
+                    "resolution_kind": "select_candidate",
+                    "fingerprints": view["fingerprints"],
+                    "selected_url": alternatives[1]["url"],
+                    "values": {"image_fit": "contain", "image_position": "right center"},
+                },
+            )
+            self.assertEqual(accepted.status_code, 200, accepted.text)
+            lifecycle = self.client.get(f"/api/drafts/{draft_id}").json()
+            evidence = lifecycle["artifacts"]["asset_resolutions"][0]
+            self.assertEqual(evidence["resolution_kind"], "select_candidate")
+            self.assertEqual(evidence["media_url"], alternatives[1]["url"])
+        finally:
+            self.client.post(f"/api/drafts/{draft_id}/cancel")
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = original_fixture
+            self.mainmod.asset_workspace.clear_cache()
+
+    def test_unmatched_media_can_only_assign_to_a_valid_snapshot_target(self):
+        draft_id = "asset-assignment-api"
+        fixture = self.tmpdir / "assignment-media.txt"
+        media_url = "https://example.test/c-xyz.png"
+        fixture.write_text(media_url + "\n", encoding="utf-8")
+        original_fixture = os.environ["WBM_ASSET_MEDIA_URL_LIST"]
+        try:
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = str(fixture)
+            self.mainmod.asset_workspace.clear_cache()
+            view = self.client.get(
+                "/api/assets/reconciliation",
+                params={"status": "unmatched", "draft_id": draft_id, "refresh": True},
+            ).json()
+            source = view["queue"]["items"][0]
+            target = next(
+                item for item in view["assignment_targets"]
+                if item["model_key"] == "stingray" and item["target_type"] == "option"
+            )
+            rejected = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": source["id"],
+                    "resolution_kind": "assign_media",
+                    "fingerprints": view["fingerprints"],
+                    "target_item_id": "not-a-target",
+                },
+            )
+            self.assertEqual(rejected.status_code, 422)
+            accepted = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": source["id"],
+                    "resolution_kind": "assign_media",
+                    "fingerprints": view["fingerprints"],
+                    "target_item_id": target["item_id"],
+                    "values": {"image_fit": "cover", "image_position": "center"},
+                },
+            )
+            self.assertEqual(accepted.status_code, 200, accepted.text)
+            operation = accepted.json()
+            self.assertEqual(operation["table_name"], "assets")
+            self.assertEqual(operation["final"]["image_url"], media_url)
+            evidence = self.client.get(f"/api/drafts/{draft_id}").json()["artifacts"]["asset_resolutions"][0]
+            self.assertEqual(evidence["resolution_kind"], "assign_media")
+            self.assertEqual(evidence["evidence"]["target_item_id"], target["item_id"])
+            other_target = next(
+                item for item in view["assignment_targets"]
+                if item["model_key"] == "z06"
+                and (
+                    item["target_type"], item["target_id"]
+                ) != (target["target_type"], target["target_id"])
+            )
+            retargeted = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": source["id"],
+                    "resolution_kind": "assign_media",
+                    "fingerprints": view["fingerprints"],
+                    "target_item_id": other_target["item_id"],
+                },
+            )
+            self.assertEqual(retargeted.status_code, 422)
+            self.assertEqual(
+                retargeted.json()["detail"]["status"],
+                "asset_resolution_retarget_rejected",
+            )
+        finally:
+            self.client.post(f"/api/drafts/{draft_id}/cancel")
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = original_fixture
+            self.mainmod.asset_workspace.clear_cache()
+
+    def test_mixed_ordinary_and_asset_draft_reaches_one_approval_chain(self):
+        draft_id = "asset-mixed-approval-api"
+        fixture = self.tmpdir / "mixed-media.txt"
+        fixture.write_text(
+            "\n".join([
+                "https://example.test/h-stx.png",
+                "https://example.test/a/h-j6a.png",
+                "https://example.test/b/h-j6a.png",
+                "https://example.test/c-gba.png",
+            ]) + "\n",
+            encoding="utf-8",
+        )
+        original_fixture = os.environ["WBM_ASSET_MEDIA_URL_LIST"]
+        protected = [
+            self.workbook,
+            REPO_ROOT / "form-app" / "data.js",
+            REPO_ROOT / "form-app" / "index.html",
+            *(REPO_ROOT / "form-output" / "runtime").glob("*-runtime-contract.json"),
+        ]
+        before = {path: _sha256(path) for path in protected}
+        try:
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = str(fixture)
+            self.mainmod.asset_workspace.clear_cache()
+            ordinary = self.client.get(
+                "/api/records/options", params={"model": "stingray", "limit": 1}
+            ).json()["records"][0]
+            saved_ordinary = self.client.post(
+                f"/api/drafts/{draft_id}/operations",
+                json={
+                    "table": "options",
+                    "model_id": "stingray",
+                    "op": "update",
+                    "key": {"option_id": ordinary["option_id"]},
+                    "record": {"option_name": ordinary["option_name"] + " mixed proof"},
+                },
+            )
+            self.assertEqual(saved_ordinary.status_code, 200, saved_ordinary.text)
+
+            view = self.client.get(
+                "/api/assets/reconciliation",
+                params={"draft_id": draft_id, "refresh": True},
+            ).json()
+            safe = next(item for item in view["queue"]["items"] if item["status"] == "safe_proposal")
+            saved_safe = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": safe["id"],
+                    "resolution_kind": "accept_safe",
+                    "fingerprints": view["fingerprints"],
+                },
+            )
+            self.assertEqual(saved_safe.status_code, 200, saved_safe.text)
+
+            ambiguous_view = self.client.get(
+                "/api/assets/reconciliation",
+                params={"model": "z06", "status": "ambiguous", "draft_id": draft_id},
+            ).json()
+            ambiguous = ambiguous_view["queue"]["items"][0]
+            selected = ambiguous["candidate"]["alternatives"][0]["url"]
+            saved_ambiguous = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": ambiguous["id"],
+                    "resolution_kind": "select_candidate",
+                    "fingerprints": ambiguous_view["fingerprints"],
+                    "selected_url": selected,
+                    "values": {"image_fit": "contain", "image_position": "right center"},
+                },
+            )
+            self.assertEqual(saved_ambiguous.status_code, 200, saved_ambiguous.text)
+
+            presentation_view = self.client.get(
+                "/api/assets/reconciliation",
+                params={"model": "stingray", "status": "missing", "draft_id": draft_id, "limit": 100},
+            ).json()
+            presentation = next(
+                item for item in presentation_view["queue"]["items"]
+                if item["coverage"]["kind"] == "exact"
+                and item["current_values"]["image_url"]
+            )
+            current_fit = presentation["current_values"]["image_fit"]
+            edited_fit = "contain" if current_fit != "contain" else "cover"
+            saved_presentation = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": presentation["id"],
+                    "resolution_kind": "manual_url",
+                    "fingerprints": presentation_view["fingerprints"],
+                    "selected_url": presentation["current_values"]["image_url"],
+                    "values": {"image_fit": edited_fit, "image_position": "left center"},
+                },
+            )
+            self.assertEqual(saved_presentation.status_code, 200, saved_presentation.text)
+
+            lifecycle = self.client.get(f"/api/drafts/{draft_id}").json()
+            self.assertEqual(len(lifecycle["artifacts"]["asset_resolutions"]), 3)
+            self.assertTrue(any(op["table_name"] == "options" for op in lifecycle["operations"]))
+            self.assertTrue(any(op["table_name"] == "assets" for op in lifecycle["operations"]))
+
+            committed = self.client.post(f"/api/drafts/{draft_id}/commit")
+            self.assertEqual(committed.status_code, 200, committed.text)
+            preview = self.client.post(f"/api/drafts/{draft_id}/preview")
+            self.assertEqual(preview.status_code, 200, preview.text)
+            self.assertEqual(preview.json()["manager_state"], "preview_ready")
+            confirmable = preview.json()["result"]["warningPolicy"]["confirmableIds"]
+            approved = self.client.post(
+                f"/api/drafts/{draft_id}/approve",
+                json={"actor": "mixed-proof", "warning_ids": confirmable},
+            )
+            self.assertEqual(approved.status_code, 200, approved.text)
+            self.assertEqual(approved.json()["manager_state"], "approved")
+            final = self.client.get(f"/api/drafts/{draft_id}").json()
+            self.assertIsNotNone(final["artifacts"]["changeset"])
+            self.assertEqual(len(final["artifacts"]["preview_attempts"]), 1)
+            self.assertEqual(len(final["artifacts"]["approval_attempts"]), 1)
+            self.assertEqual({path: _sha256(path) for path in protected}, before)
+        finally:
+            self.client.post(f"/api/drafts/{draft_id}/cancel")
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = original_fixture
+            self.mainmod.asset_workspace.clear_cache()
 
     def test_status_reports_provisional_surfaces_separately(self):
         status = self.client.get("/api/status").json()
@@ -1124,6 +1521,16 @@ class TestApi(unittest.TestCase):
         ).json()
         mapping_fields = {column["name"]: column for column in mappings["columns"]}
         self.assertEqual(mapping_fields["source_id"]["reference"]["kind"], "union")
+
+        assets = self.client.get(
+            "/api/records/assets/schema", params={"model": "stingray"}
+        ).json()
+        asset_fields = {column["name"]: column for column in assets["columns"]}
+        self.assertEqual(asset_fields["image_fit"]["field_kind"], "finite")
+        self.assertEqual(
+            asset_fields["image_fit"]["finite_values"],
+            ["cover", "contain", "swatch"],
+        )
 
     def test_durable_draft_discovery_and_cancel_routes_preserve_history(self):
         row = self.client.get(

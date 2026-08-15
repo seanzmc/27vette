@@ -215,7 +215,7 @@ EDITOR_SHEET_META: dict[str, dict] = {
     "asset_map": {
         "key": ("model_key", "target_type", "target_id"),
         "types": {"active": "bool"},
-        "enums": {},
+        "enums": {"image_fit": ("cover", "contain", "swatch")},
         "refs": {},
         "conditional_ref": {"discriminator": "target_type", "column": "target_id"},
         "conditional_refs": {"option": "options"},

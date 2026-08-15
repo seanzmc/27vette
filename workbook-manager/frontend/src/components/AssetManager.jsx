@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  AlertTriangle, CheckCircle2, ExternalLink, Image, Images,
-  RefreshCw, SearchX,
+  AlertTriangle, Ban, CheckCircle2, ExternalLink, Image, Images,
+  Link, RefreshCw, Save, SearchX,
 } from "lucide-react";
 import { api } from "../api.js";
 
@@ -16,15 +16,21 @@ const STATUS_LABELS = {
   dead_url: "Dead URLs",
   stale_target: "Stale targets",
   wildcard_conflict: "Wildcard conflicts",
+  ignored: "Ignored media",
 };
 const POSITION_CHOICES = [
   ["left top", "↖"], ["center top", "↑"], ["right top", "↗"],
   ["left center", "←"], ["center", "•"], ["right center", "→"],
   ["left bottom", "↙"], ["center bottom", "↓"], ["right bottom", "↘"],
 ];
+const FIT_DESCRIPTIONS = {
+  cover: "fill and crop",
+  contain: "show full image",
+  swatch: "3:1 color strip",
+};
 
-function safeFit(value) {
-  return ["cover", "contain", "swatch"].includes(value) ? value : "cover";
+function safeFit(value, choices) {
+  return choices.includes(value) ? value : choices[0] || String(value || "");
 }
 
 function safePosition(value) {
@@ -36,11 +42,11 @@ function shortHash(value) {
   return value ? `${value.slice(0, 10)}…${value.slice(-6)}` : "—";
 }
 
-function ImagePane({ label, values, fallbackAlt = "", lazy = false }) {
+function ImagePane({ label, values, fitValues, fallbackAlt = "", lazy = false }) {
   const url = values?.image_url || "";
   const [state, setState] = useState(url ? "loading" : "empty");
   useEffect(() => setState(url ? "loading" : "empty"), [url]);
-  const fit = safeFit(values?.image_fit);
+  const fit = safeFit(values?.image_fit, fitValues);
   const position = safePosition(values?.image_position);
   return (
     <div className="asset-image-pane">
@@ -102,7 +108,9 @@ function QueueThumbnail({ item }) {
   );
 }
 
-export default function AssetManager({ models, modelKey, setModelKey }) {
+export default function AssetManager({
+  models, modelKey, setModelKey, draftId, draftMutable, draftLifecycle, onChanged,
+}) {
   const [filters, setFilters] = useState({
     model: modelKey || "", section: "", target_type: "",
     coverage_intent: "", status: "",
@@ -112,13 +120,15 @@ export default function AssetManager({ models, modelKey, setModelKey }) {
   const [selectedId, setSelectedId] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState(null);
+  const [actionBusy, setActionBusy] = useState("");
 
   const load = useCallback(async (refresh = false) => {
     setLoading(true);
     setError("");
     try {
       const result = await api.assetReconciliation({
-        ...filters, offset, limit: PAGE_SIZE, refresh,
+        ...filters, offset, limit: PAGE_SIZE, refresh, draft_id: draftId,
       });
       setData(result);
       setSelectedId((current) => (
@@ -130,7 +140,7 @@ export default function AssetManager({ models, modelKey, setModelKey }) {
     } finally {
       setLoading(false);
     }
-  }, [filters, offset]);
+  }, [filters, offset, draftId]);
 
   useEffect(() => { load(false); }, [load]);
 
@@ -148,6 +158,35 @@ export default function AssetManager({ models, modelKey, setModelKey }) {
   const activeModelCoverage = data?.coverage.models.find(
     (model) => model.model_key === filters.model
   );
+  const runResolution = async (label, payload, { bulk = false } = {}) => {
+    setActionBusy(label);
+    setNotice(null);
+    try {
+      const result = bulk
+        ? await api.saveAllSafeAssetResolutions(draftId, payload)
+        : await api.saveAssetResolution(draftId, payload);
+      setNotice({
+        kind: "ok",
+        text: bulk
+          ? `${result.accepted} safe asset resolution(s) added to Draft Review.`
+          : "Asset resolution added to the shared durable draft.",
+      });
+      await onChanged();
+      await load(false);
+      return result;
+    } catch (e) {
+      setNotice({ kind: "err", text: e.message });
+      return null;
+    } finally {
+      setActionBusy("");
+    }
+  };
+  const boundPayload = (payload = {}) => ({
+    fingerprints: data.fingerprints,
+    session_id: "asset-manager",
+    actor: "Workbook Manager operator",
+    ...payload,
+  });
 
   return (
     <div className="asset-workspace">
@@ -162,9 +201,10 @@ export default function AssetManager({ models, modelKey, setModelKey }) {
         </button>
       </div>
       <div className="notice warn asset-readonly-notice">
-        Preview only. Nothing here creates a draft operation, changes the workbook, or modifies WordPress media.
+        Resolutions enter the same durable draft and Draft Review as ordinary edits. Nothing here writes the workbook or modifies WordPress media.
       </div>
 
+      {notice && <div className={`notice ${notice.kind}`}>{notice.text}</div>}
       {error && <div className="notice err">Asset reconciliation failed: {error}</div>}
       {!data && loading && <div className="empty">Loading the shared reconciliation view…</div>}
       {data && (
@@ -203,6 +243,30 @@ export default function AssetManager({ models, modelKey, setModelKey }) {
                 <strong>{data.status_counts[key] || 0}</strong><span>{label}</span>
               </button>
             ))}
+          </div>
+
+          <div className="asset-draft-toolbar panel panel-body">
+            <div>
+              <strong>Shared draft basket</strong>
+              <span className="muted">
+                {draftLifecycle?.operations?.length || 0} workbook operation(s) · {data.draft_asset_resolutions?.count || 0} asset evidence record(s)
+              </span>
+              {data.draft_asset_resolutions?.stale_count > 0 && (
+                <span className="chip warn">{data.draft_asset_resolutions.stale_count} stale asset resolution(s)</span>
+              )}
+            </div>
+            <button
+              className="btn primary"
+              type="button"
+              disabled={!draftMutable || !data.status_counts.safe_proposal || !!actionBusy}
+              onClick={() => runResolution(
+                "accept safe proposals",
+                boundPayload(),
+                { bulk: true },
+              )}
+            >
+              <CheckCircle2 size={14} /> Add all safe matches to draft
+            </button>
           </div>
 
           <div className="section-heading"><Images size={14} /> Resolution inbox</div>
@@ -265,30 +329,88 @@ export default function AssetManager({ models, modelKey, setModelKey }) {
             </div>
           </div>
 
-          {selected && <AssetInspector item={selected} />}
+          {selected && (
+            <AssetInspector
+              item={selected}
+              assignmentTargets={data.assignment_targets || []}
+              fitValues={data.controls?.image_fit || []}
+              draftMutable={draftMutable}
+              drafted={(data.draft_asset_resolutions?.item_ids || []).includes(selected.id)}
+              busy={actionBusy}
+              onResolve={(payload) => runResolution(
+                payload.resolution_kind.replaceAll("_", " "),
+                boundPayload({ item_id: selected.id, ...payload }),
+              )}
+            />
+          )}
         </>
       )}
     </div>
   );
 }
 
-function AssetInspector({ item }) {
+function AssetInspector({
+  item, assignmentTargets, fitValues, draftMutable, drafted, busy, onResolve,
+}) {
   const initial = useMemo(() => ({
     ...item.proposed_values,
     image_url: item.proposed_values?.image_url || item.candidate?.alternatives?.[0]?.url || "",
-    image_fit: safeFit(item.proposed_values?.image_fit),
+    image_fit: safeFit(item.proposed_values?.image_fit, fitValues),
     image_position: safePosition(item.proposed_values?.image_position),
     hover_image_position: safePosition(item.proposed_values?.hover_image_position || item.proposed_values?.image_position),
-  }), [item]);
+  }), [item, fitValues]);
   const [preview, setPreview] = useState(initial);
   const [showHover, setShowHover] = useState(false);
   const [previewBroken, setPreviewBroken] = useState(false);
-  useEffect(() => { setPreview(initial); setShowHover(false); }, [initial]);
+  const [selectedCandidate, setSelectedCandidate] = useState("");
+  const [targetItemId, setTargetItemId] = useState("");
+  const [inventoryQuery, setInventoryQuery] = useState("");
+  const [inventory, setInventory] = useState([]);
+  const [inventoryUrl, setInventoryUrl] = useState("");
+  const [searching, setSearching] = useState(false);
+  useEffect(() => {
+    setPreview(initial);
+    setShowHover(false);
+    setSelectedCandidate("");
+    setTargetItemId("");
+    setInventory([]);
+    setInventoryUrl("");
+  }, [initial]);
   const displayed = showHover && preview.hover_image_url
     ? { ...preview, image_url: preview.hover_image_url, image_alt: preview.hover_image_alt, image_position: preview.hover_image_position }
     : preview;
   const positionField = showHover ? "hover_image_position" : "image_position";
   useEffect(() => setPreviewBroken(false), [displayed.image_url]);
+  const resolutionValues = {
+    image_url: preview.image_url || "",
+    image_alt: preview.image_alt || "",
+    image_fit: safeFit(preview.image_fit, fitValues),
+    image_position: safePosition(preview.image_position),
+    hover_image_url: preview.hover_image_url || "",
+    hover_image_alt: preview.hover_image_alt || "",
+    hover_image_position: preview.hover_image_position || "",
+    active: preview.active === false || preview.active === "False" ? false : true,
+    notes: preview.notes || "",
+  };
+  const presentationOnly = { ...resolutionValues };
+  delete presentationOnly.image_url;
+  delete presentationOnly.hover_image_url;
+  const searchInventory = async () => {
+    setSearching(true);
+    try {
+      const result = await api.assetMediaOptions(inventoryQuery, 50);
+      setInventory(result.items || []);
+    } finally {
+      setSearching(false);
+    }
+  };
+  const resolve = (resolution_kind, extra = {}) => onResolve({
+    resolution_kind,
+    values: resolutionValues,
+    selected_url: "",
+    target_item_id: "",
+    ...extra,
+  });
   return (
     <div className="asset-inspector panel">
       <div className="panel-head">
@@ -313,7 +435,11 @@ function AssetInspector({ item }) {
               <button
                 type="button"
                 key={`${candidate.field}:${candidate.url}`}
-                onClick={() => setPreview((current) => ({ ...current, [candidate.field]: candidate.url }))}
+                className={selectedCandidate === candidate.url ? "selected" : ""}
+                onClick={() => {
+                  setSelectedCandidate(candidate.url);
+                  setPreview((current) => ({ ...current, [candidate.field]: candidate.url }));
+                }}
               >
                 <span>{candidate.field} · {candidate.source} · priority {candidate.priority ?? "n/a"}</span>
                 <span className="mono">{candidate.url}</span>
@@ -323,18 +449,24 @@ function AssetInspector({ item }) {
         )}
 
         <div className="asset-compare-grid">
-          <ImagePane label="Current workbook image" values={item.current_values} fallbackAlt={item.label} />
-          <ImagePane label="Selected candidate" values={item.proposed_values} fallbackAlt={item.label} />
+          <ImagePane label="Current workbook image" values={item.current_values} fitValues={fitValues} fallbackAlt={item.label} />
+          <ImagePane label="Selected candidate" values={preview} fitValues={fitValues} fallbackAlt={item.label} />
         </div>
 
         <div className="asset-preview-layout">
           <div className="asset-preview-controls">
             <div className="eyebrow">Temporary browser controls</div>
+            <label>Image URL
+              <input className="text" value={preview.image_url || ""} onChange={(e) => setPreview({ ...preview, image_url: e.target.value })} />
+            </label>
+            <label>Image alt text
+              <input className="text" value={preview.image_alt || ""} onChange={(e) => setPreview({ ...preview, image_alt: e.target.value })} />
+            </label>
             <label>Fit
-              <select className="select" value={safeFit(preview.image_fit)} onChange={(e) => setPreview({ ...preview, image_fit: e.target.value })}>
-                <option value="cover">cover · fill and crop</option>
-                <option value="contain">contain · show full image</option>
-                <option value="swatch">swatch · 3:1 color strip</option>
+              <select className="select" value={safeFit(preview.image_fit, fitValues)} onChange={(e) => setPreview({ ...preview, image_fit: e.target.value })}>
+                {fitValues.map((fit) => (
+                  <option value={fit} key={fit}>{fit} · {FIT_DESCRIPTIONS[fit] || fit}</option>
+                ))}
               </select>
             </label>
             <label>{showHover ? "Hover position picker" : "Position picker"}</label>
@@ -353,10 +485,31 @@ function AssetInspector({ item }) {
                 Show body-style hover media
               </label>
             )}
+            {item.supports_hover && (
+              <>
+                <label>Hover image URL
+                  <input className="text" value={preview.hover_image_url || ""} onChange={(e) => setPreview({ ...preview, hover_image_url: e.target.value })} />
+                </label>
+                <label>Hover alt text
+                  <input className="text" value={preview.hover_image_alt || ""} onChange={(e) => setPreview({ ...preview, hover_image_alt: e.target.value })} />
+                </label>
+              </>
+            )}
+            <label className="hover-toggle">
+              <input
+                type="checkbox"
+                checked={resolutionValues.active}
+                onChange={(e) => setPreview({ ...preview, active: e.target.checked })}
+              />
+              Asset row active
+            </label>
+            <label>Notes
+              <textarea className="text" rows="3" value={preview.notes || ""} onChange={(e) => setPreview({ ...preview, notes: e.target.value })} />
+            </label>
           </div>
           <div className="asset-card-preview">
             <div className="eyebrow">Card presentation preview · not regenerated runtime proof</div>
-            <div className={`runtime-card-media fit-${safeFit(preview.image_fit)} ${showHover ? "show-hover" : ""}`}>
+            <div className={`runtime-card-media fit-${safeFit(preview.image_fit, fitValues)} ${showHover ? "show-hover" : ""}`}>
               {displayed.image_url && !previewBroken ? (
                 <img
                   src={displayed.image_url}
@@ -372,6 +525,121 @@ function AssetInspector({ item }) {
             <strong>{item.label}</strong>
             <span className="muted">{item.rpo?.toUpperCase() || item.target_type}</span>
           </div>
+        </div>
+
+        <div className="asset-resolution-actions">
+          <div>
+            <div className="eyebrow">Durable resolution action</div>
+            <p className="muted">
+              This records exact reconciliation evidence beside the ordinary asset_map draft operation. Draft Review remains the approval basket.
+            </p>
+          </div>
+          {drafted && (
+            <div className="notice ok">This item already has evidence in Draft Review. Saving again may refine the same physical-row operation, but cannot silently retarget it.</div>
+          )}
+          {!draftMutable && (
+            <div className="notice warn">This draft is no longer mutable. Start a new draft to resolve another asset.</div>
+          )}
+          {item.status === "safe_proposal" && (
+            <button className="btn primary" disabled={!draftMutable || !!busy} onClick={() => resolve("accept_safe")}>
+              <CheckCircle2 size={14} /> Add safe proposal to draft
+            </button>
+          )}
+          {item.status === "ambiguous" && (
+            <button
+              className="btn primary"
+              disabled={!draftMutable || !!busy || !selectedCandidate}
+              onClick={() => resolve("select_candidate", {
+                selected_url: selectedCandidate,
+                values: presentationOnly,
+              })}
+            >
+              <Link size={14} /> Use explicitly selected candidate
+            </button>
+          )}
+          {item.status === "missing" && (
+            <div className="asset-resolution-stack">
+              <label>Search stable media inventory
+                <span className="toolbar compact-toolbar">
+                  <input className="text" value={inventoryQuery} onChange={(e) => setInventoryQuery(e.target.value)} placeholder="RPO or filename" />
+                  <button className="btn small" type="button" disabled={searching} onClick={searchInventory}>Search</button>
+                </span>
+              </label>
+              {inventory.length > 0 && (
+                <select className="select" value={inventoryUrl} onChange={(e) => {
+                  setInventoryUrl(e.target.value);
+                  if (e.target.value) setPreview({ ...preview, image_url: e.target.value });
+                }}>
+                  <option value="">Select an inventory image</option>
+                  {inventory.map((option) => <option key={option.url} value={option.url}>{option.label} · {option.url}</option>)}
+                </select>
+              )}
+              <span className="toolbar">
+                <button
+                  className="btn primary"
+                  disabled={!draftMutable || !!busy || !inventoryUrl}
+                  onClick={() => resolve("inventory_match", {
+                    selected_url: inventoryUrl,
+                    values: presentationOnly,
+                  })}
+                >Use selected inventory image</button>
+                <button
+                  className="btn"
+                  disabled={!draftMutable || !!busy || !preview.image_url}
+                  onClick={() => resolve("manual_url", {
+                    selected_url: preview.image_url,
+                    values: presentationOnly,
+                  })}
+                >Advanced: use manual URL</button>
+              </span>
+            </div>
+          )}
+          {["unmatched", "unparseable"].includes(item.status) && (
+            <div className="asset-resolution-stack">
+              <label>Assign media to an existing promoted target
+                <select className="select" value={targetItemId} onChange={(e) => setTargetItemId(e.target.value)}>
+                  <option value="">Select workbook target</option>
+                  {assignmentTargets.map((target) => (
+                    <option key={target.item_id} value={target.item_id}>
+                      {target.model_key} · {target.rpo || target.target_id} · {target.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <span className="toolbar">
+                <button
+                  className="btn primary"
+                  disabled={!draftMutable || !!busy || !targetItemId}
+                  onClick={() => resolve("assign_media", {
+                    target_item_id: targetItemId,
+                    values: presentationOnly,
+                  })}
+                ><Link size={14} /> Assign to selected target</button>
+                <button
+                  className="btn"
+                  disabled={!draftMutable || !!busy}
+                  onClick={() => resolve("ignore", { values: {} })}
+                ><Ban size={14} /> Ignore this exact media identity</button>
+              </span>
+            </div>
+          )}
+          {item.status === "stale_target" && (
+            <button
+              className="btn danger"
+              disabled={!draftMutable || !!busy}
+              onClick={() => resolve("deactivate", {
+                values: { ...resolutionValues, active: false },
+              })}
+            ><Ban size={14} /> Add explicit stale-row deactivation</button>
+          )}
+          {["covered", "wildcard_conflict"].includes(item.status) && (
+            <button className="btn primary" disabled={!draftMutable || !!busy} onClick={() => resolve("edit")}>
+              <Save size={14} /> Save presentation edits to draft
+            </button>
+          )}
+          {item.status === "ignored" && (
+            <div className="notice ok">This exact media identity is ignored by durable manager evidence. Any inventory fingerprint change returns it to review.</div>
+          )}
         </div>
       </div>
     </div>

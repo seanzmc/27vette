@@ -55,19 +55,12 @@ def clear_cache() -> None:
         _CACHE.clear()
 
 
-def get_asset_manager_view(
+def get_asset_manager_snapshot(
     workbook_path: Path,
     *,
     refresh: bool = False,
-    model_key: str = "",
-    section_id: str = "",
-    target_type: str = "",
-    coverage_intent: str = "",
-    status: str = "",
-    offset: int = 0,
-    limit: int = 24,
-) -> dict[str, Any]:
-    """Return one filtered page without reproducing reconciliation rules here."""
+) -> asset_map_sync.AssetManagerSnapshot:
+    """Return the shared snapshot, rebuilding only when its source identity moves."""
 
     configured = os.environ.get("WBM_ASSET_MEDIA_URL_LIST", "").strip()
     fixture_path = Path(configured).expanduser().resolve() if configured else None
@@ -94,6 +87,43 @@ def get_asset_manager_view(
         with _CACHE_LOCK:
             _CACHE.clear()
             _CACHE[cache_key] = snapshot
+    return snapshot
+
+
+def get_cached_asset_manager_snapshot(
+    workbook_path: Path, fingerprints: dict[str, str]
+) -> asset_map_sync.AssetManagerSnapshot | None:
+    """Find the already-reviewed snapshot without doing network work under a write lock."""
+
+    configured = os.environ.get("WBM_ASSET_MEDIA_URL_LIST", "").strip()
+    fixture_path = Path(configured).expanduser().resolve() if configured else None
+    source_identity = _fixture_identity(fixture_path)
+    verify_existing = _truthy_env("WBM_ASSET_VERIFY_EXISTING")
+    workbook_sha256 = _workbook_sha256(workbook_path)
+    cache_key = f"{workbook_path.resolve()}:{workbook_sha256}:{source_identity}:{verify_existing}"
+    with _CACHE_LOCK:
+        snapshot = _CACHE.get(cache_key)
+    if snapshot is None or snapshot.fingerprints != fingerprints:
+        return None
+    return snapshot
+
+
+def get_asset_manager_view(
+    workbook_path: Path,
+    *,
+    refresh: bool = False,
+    model_key: str = "",
+    section_id: str = "",
+    target_type: str = "",
+    coverage_intent: str = "",
+    status: str = "",
+    offset: int = 0,
+    limit: int = 24,
+    ignored_item_ids: set[str] | None = None,
+) -> dict[str, Any]:
+    """Return one filtered page without reproducing reconciliation rules here."""
+
+    snapshot = get_asset_manager_snapshot(workbook_path, refresh=refresh)
 
     return asset_map_sync.filter_asset_manager_snapshot(
         snapshot,
@@ -104,4 +134,12 @@ def get_asset_manager_view(
         status=status,
         offset=offset,
         limit=limit,
+        ignored_item_ids=ignored_item_ids,
     )
+
+
+def search_media_options(
+    workbook_path: Path, query: str, *, limit: int = 50
+) -> dict[str, Any]:
+    snapshot = get_asset_manager_snapshot(workbook_path)
+    return asset_map_sync.search_asset_manager_media(snapshot, query, limit=limit)

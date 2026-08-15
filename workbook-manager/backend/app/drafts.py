@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any
 
 from corvette_form_generator import editor_ops
+from corvette_form_generator.contract import WILDCARD_MODEL_KEY
 from corvette_form_generator.workbook_domain.changeset import (
     SCHEMA_VERSION as CHANGESET_SCHEMA_VERSION,
     changeset_fingerprint,
@@ -75,6 +76,113 @@ def list_operations(state_conn: sqlite3.Connection, draft_id: str) -> list[dict]
     return [_operation_dict(row) for row in rows]
 
 
+def _asset_resolution_dict(row) -> dict:
+    result = dict(row)
+    result["evidence"] = json.loads(result.pop("evidence_json"))
+    return result
+
+
+def list_asset_resolutions(
+    state_conn: sqlite3.Connection, draft_id: str
+) -> list[dict]:
+    rows = state_conn.execute(
+        "SELECT * FROM draft_asset_resolutions WHERE draft_id=? ORDER BY id",
+        (draft_id,),
+    ).fetchall()
+    return [_asset_resolution_dict(row) for row in rows]
+
+
+def active_asset_ignores(
+    state_conn: sqlite3.Connection,
+    *,
+    fingerprints: dict[str, str],
+) -> set[str]:
+    """Return ignore identities that still bind the current media snapshot."""
+
+    rows = state_conn.execute(
+        "SELECT r.* FROM draft_asset_resolutions r "
+        "JOIN workflow_drafts d ON d.id=r.draft_id "
+        "WHERE r.resolution_kind='ignore' AND d.status!='cancelled'"
+    ).fetchall()
+    return {
+        row["item_id"]
+        for row in rows
+        if row["reconciliation_sha256"] == fingerprints.get("reconciliation_sha256")
+        and row["media_inventory_sha256"] == fingerprints.get("media_inventory_sha256")
+        and row["workbook_sha256"] == fingerprints.get("workbook_sha256")
+    }
+
+
+def assert_asset_resolutions_current(
+    state_conn: sqlite3.Connection,
+    *,
+    draft_id: str,
+    snapshot,
+) -> None:
+    """Fail closed when reviewed asset evidence no longer matches draft or inventory."""
+
+    evidence_rows = list_asset_resolutions(state_conn, draft_id)
+    if not evidence_rows:
+        return
+    current_items = {item["id"]: item for item in snapshot.items}
+    current_fingerprints = snapshot.fingerprints
+    errors: list[dict] = []
+    for row in evidence_rows:
+        evidence = row["evidence"]
+        if any(
+            row[field] != current_fingerprints.get(field)
+            for field in (
+                "reconciliation_sha256",
+                "media_inventory_sha256",
+                "workbook_sha256",
+            )
+        ):
+            errors.append({
+                "item_id": row["item_id"],
+                "message": "asset reconciliation evidence is stale; refresh and resolve again",
+            })
+            continue
+        item = current_items.get(row["item_id"])
+        if item is None:
+            errors.append({
+                "item_id": row["item_id"],
+                "message": "asset reconciliation item no longer exists",
+            })
+            continue
+        if row["resolution_kind"] == "ignore":
+            if row["media_url"] not in snapshot.media_urls:
+                errors.append({
+                    "item_id": row["item_id"],
+                    "message": "ignored media identity no longer exists in this inventory",
+                })
+            continue
+        operation = state_conn.execute(
+            "SELECT * FROM draft_operations WHERE id=? AND draft_id=?",
+            (row["operation_id"], draft_id),
+        ).fetchone()
+        if operation is None:
+            errors.append({
+                "item_id": row["item_id"],
+                "message": "asset evidence no longer has its bound draft operation",
+            })
+            continue
+        final = json.loads(operation["final_json"]) if operation["final_json"] else None
+        expected_final = evidence.get("final_values")
+        if expected_final is not None and any(
+            (final or {}).get(field) != value for field, value in expected_final.items()
+        ):
+            errors.append({
+                "item_id": row["item_id"],
+                "message": "asset draft values changed after the reviewed resolution",
+            })
+    if errors:
+        raise DraftError(
+            "asset_reconciliation_stale",
+            "asset evidence is stale; return to Asset Manager before freezing the ChangeSet",
+            errors=errors,
+        )
+
+
 def list_drafts(state_conn: sqlite3.Connection, *, limit: int = 50) -> list[dict]:
     """Return durable draft identities for browser recovery and selection."""
     rows = state_conn.execute(
@@ -95,6 +203,13 @@ def lifecycle_view(state_conn: sqlite3.Connection, draft_id: str) -> dict:
         raise DraftError("draft_not_found", f"draft {draft_id!r} was not found")
 
     operations = list_operations(state_conn, draft_id)
+    asset_resolutions = list_asset_resolutions(state_conn, draft_id)
+    by_operation: dict[int, list[dict]] = {}
+    for resolution in asset_resolutions:
+        if resolution.get("operation_id") is not None:
+            by_operation.setdefault(int(resolution["operation_id"]), []).append(resolution)
+    for operation in operations:
+        operation["asset_resolutions"] = by_operation.get(int(operation["id"]), [])
     model_keys = {
         str(model_key)
         for operation in operations
@@ -180,6 +295,7 @@ def lifecycle_view(state_conn: sqlite3.Connection, draft_id: str) -> dict:
             "apply_attempts": apply_attempts,
             "cancellation": cancellation,
             "manual_resolutions": manual_resolutions,
+            "asset_resolutions": asset_resolutions,
         },
     }
 
@@ -217,7 +333,7 @@ def emit_changeset(state_conn: sqlite3.Connection, *, draft_id: str) -> dict:
             )
         context = operation.get("model_context") or []
         targets.update(str(model) for model in context if str(model))
-        if operation.get("model_id"):
+        if operation.get("model_id") and operation["model_id"] != WILDCARD_MODEL_KEY:
             targets.add(str(operation["model_id"]))
 
         key = {}
@@ -1339,6 +1455,101 @@ def _ensure_mutable_draft(
     )
 
 
+def _upsert_asset_resolution(
+    state_conn: sqlite3.Connection,
+    *,
+    draft_id: str,
+    operation_id: int | None,
+    evidence: dict[str, Any],
+    timestamp: str,
+) -> None:
+    required = {
+        "item_id", "resolution_kind", "reconciliation_sha256",
+        "media_inventory_sha256", "workbook_sha256",
+    }
+    missing = sorted(required - set(evidence))
+    if missing:
+        raise DraftError(
+            "asset_evidence_incomplete",
+            f"asset resolution evidence is missing: {', '.join(missing)}",
+        )
+    state_conn.execute(
+        "INSERT INTO draft_asset_resolutions(draft_id, operation_id, created_ts, "
+        "updated_ts, item_id, resolution_kind, reconciliation_sha256, "
+        "media_inventory_sha256, workbook_sha256, media_url, candidate_source, "
+        "candidate_reason, evidence_json) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?) "
+        "ON CONFLICT(draft_id, item_id) DO UPDATE SET "
+        "operation_id=excluded.operation_id, updated_ts=excluded.updated_ts, "
+        "resolution_kind=excluded.resolution_kind, "
+        "reconciliation_sha256=excluded.reconciliation_sha256, "
+        "media_inventory_sha256=excluded.media_inventory_sha256, "
+        "workbook_sha256=excluded.workbook_sha256, media_url=excluded.media_url, "
+        "candidate_source=excluded.candidate_source, "
+        "candidate_reason=excluded.candidate_reason, evidence_json=excluded.evidence_json",
+        (
+            draft_id,
+            operation_id,
+            timestamp,
+            timestamp,
+            evidence["item_id"],
+            evidence["resolution_kind"],
+            evidence["reconciliation_sha256"],
+            evidence["media_inventory_sha256"],
+            evidence["workbook_sha256"],
+            evidence.get("media_url", ""),
+            evidence.get("candidate_source", ""),
+            evidence.get("candidate_reason", ""),
+            _json(evidence),
+        ),
+    )
+
+
+def save_asset_ignore(
+    state_conn: sqlite3.Connection,
+    *,
+    draft_id: str,
+    session_id: str,
+    actor: str,
+    base_workbook_sha256: str,
+    base_workbook_mtime_ns: str,
+    evidence: dict[str, Any],
+    manage_transaction: bool = True,
+) -> dict:
+    """Store a no-workbook operational disposition beside the mutable draft."""
+
+    timestamp = _now()
+    if manage_transaction:
+        state_conn.execute("BEGIN IMMEDIATE")
+    try:
+        _ensure_mutable_draft(
+            state_conn,
+            draft_id=draft_id,
+            session_id=session_id,
+            actor=actor,
+            base_workbook_sha256=base_workbook_sha256,
+            base_workbook_mtime_ns=base_workbook_mtime_ns,
+            timestamp=timestamp,
+        )
+        _upsert_asset_resolution(
+            state_conn,
+            draft_id=draft_id,
+            operation_id=None,
+            evidence=evidence,
+            timestamp=timestamp,
+        )
+        if manage_transaction:
+            state_conn.commit()
+    except Exception:
+        if manage_transaction:
+            state_conn.rollback()
+        raise
+    row = state_conn.execute(
+        "SELECT * FROM draft_asset_resolutions WHERE draft_id=? AND item_id=?",
+        (draft_id, evidence["item_id"]),
+    ).fetchone()
+    return _asset_resolution_dict(row)
+
+
 def save_operation(
     projection_conn: sqlite3.Connection,
     state_conn: sqlite3.Connection,
@@ -1354,6 +1565,8 @@ def save_operation(
     record: dict[str, Any] | None,
     session_id: str = "",
     actor: str = "",
+    asset_evidence: dict[str, Any] | None = None,
+    manage_transaction: bool = True,
 ) -> dict | None:
     """Store one coalesced physical-row operation in a mutable draft.
 
@@ -1477,7 +1690,8 @@ def save_operation(
         )
     timestamp = _now()
 
-    state_conn.execute("BEGIN IMMEDIATE")
+    if manage_transaction:
+        state_conn.execute("BEGIN IMMEDIATE")
     try:
         _ensure_mutable_draft(
             state_conn,
@@ -1499,11 +1713,13 @@ def save_operation(
                 state_conn.execute(
                     "DELETE FROM draft_operations WHERE id=?", (existing["id"],)
                 )
-                state_conn.commit()
+                if manage_transaction:
+                    state_conn.commit()
                 return None
             if prior["action"] == "delete":
                 if op == "delete":
-                    state_conn.commit()
+                    if manage_transaction:
+                        state_conn.commit()
                     return prior
                 raise DraftError(
                     "draft_operation_conflict",
@@ -1556,7 +1772,8 @@ def save_operation(
                     "DELETE FROM workflow_drafts WHERE id=? AND status='draft'",
                     (draft_id,),
                 )
-            state_conn.commit()
+            if manage_transaction:
+                state_conn.commit()
             return None
         values = (
             timestamp,
@@ -1596,12 +1813,30 @@ def save_operation(
                 (*values, existing["id"]),
             )
             operation_id = existing["id"]
-        state_conn.commit()
+        if asset_evidence is not None:
+            _upsert_asset_resolution(
+                state_conn,
+                draft_id=draft_id,
+                operation_id=int(operation_id),
+                evidence=asset_evidence,
+                timestamp=timestamp,
+            )
+        if manage_transaction:
+            state_conn.commit()
     except Exception:
-        state_conn.rollback()
+        if manage_transaction:
+            state_conn.rollback()
         raise
 
     stored = state_conn.execute(
         "SELECT * FROM draft_operations WHERE id=?", (operation_id,)
     ).fetchone()
-    return _operation_dict(stored)
+    result = _operation_dict(stored)
+    result["asset_resolutions"] = [
+        _asset_resolution_dict(row)
+        for row in state_conn.execute(
+            "SELECT * FROM draft_asset_resolutions WHERE operation_id=? ORDER BY id",
+            (operation_id,),
+        ).fetchall()
+    ]
+    return result

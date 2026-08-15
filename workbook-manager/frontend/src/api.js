@@ -37,6 +37,8 @@ export const api = {
     });
     return request(`/api/assets/reconciliation?${q.toString()}`);
   },
+  assetMediaOptions: (query = "", limit = 50) =>
+    request(`/api/assets/media-options?query=${encodeURIComponent(query)}&limit=${limit}`),
   schema: (table, model = "") =>
     request(`/api/records/${table}/schema?model=${encodeURIComponent(model)}`),
   records: (table, { model = "", search = "", limit = 200, offset = 0 } = {}) =>
@@ -52,6 +54,16 @@ export const api = {
   draftLifecycle: (draftId) => request(`/api/drafts/${draftId}`),
   saveDraftOperation: (draftId, payload) =>
     request(`/api/drafts/${draftId}/operations`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  saveAssetResolution: (draftId, payload) =>
+    request(`/api/drafts/${draftId}/asset-resolutions`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  saveAllSafeAssetResolutions: (draftId, payload) =>
+    request(`/api/drafts/${draftId}/asset-resolutions/safe`, {
       method: "POST",
       body: JSON.stringify(payload),
     }),

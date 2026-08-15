@@ -123,6 +123,14 @@ Then regenerate affected active models and the registry only if workbook data
 changed. Complete mode performs those steps automatically and rolls the workbook
 plus generated/publication files back if its post-save pipeline fails.
 
+Workbook Manager uses this same reconciliation owner for its Asset Manager. It
+can place reviewed safe, explicit ambiguous, inventory/manual, assignment,
+deactivation, and presentation decisions into the Manager's ordinary durable
+draft lane, with reconciliation/media fingerprints retained beside the shared
+ChangeSet. Operational ignore is Manager state only. These controls do not call
+this CLI's apply mode, mutate WordPress media, or write the workbook; the
+Manager's final Apply and Rebuild checkpoint separately owns write reachability.
+
 ## Card sizing and alignment
 
 Media matching and card presentation are separate workbook concerns. The sync

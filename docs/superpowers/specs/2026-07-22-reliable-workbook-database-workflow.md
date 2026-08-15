@@ -1432,7 +1432,7 @@ the released six-model promotion set on 2026-08-14, and its owner passes `4`.
 Completed foundation: preserve the catalog allowlist on schema, record, and
 dependency endpoints, and resolve blank Form Structure section-to-step values
 from imported workbook master metadata. The five-checkpoint Pass 7 sequence is
-pinned below; checkpoint 1 is complete and four checkpoints remain.
+pinned below; checkpoints 1–4 are complete and only checkpoint 5 remains.
 
 #### Checkpoint 1 — lifecycle context API (completed 2026-08-14)
 
@@ -1503,6 +1503,14 @@ zero final console messages. The edited proof bound draft
 and approval fingerprint
 `1acc23ba80bfcc7ca7640d0f81561b767d51ad740f834fc2375484a033dbe04e`.
 The only automated warning was the existing Starlette/httpx deprecation.
+
+Post-completion correction (2026-08-15): both ordinary editor surfaces now
+refresh the manager-owned lifecycle after every successful save, including the
+`null` response produced when a full reversion removes the final coalesced
+operation and its empty mutable draft. Draft Review and its operation badge now
+clear immediately instead of retaining stale client state. Focused browser-
+containment plus backend full-reversion coverage passed `5 passed`; the frontend
+production build passed with 1,519 modules.
 
 #### Checkpoint 3 — Asset Resolution Workspace foundation (completed 2026-08-14)
 
@@ -1599,7 +1607,7 @@ zero. The only browser console error was the
 intentional unreachable fixture image used to prove the broken-image state;
 the only automated warning was the existing Starlette/httpx deprecation.
 
-#### Remaining checkpoint 4 — actionable resolutions in the one durable draft lane
+#### Checkpoint 4 — actionable resolutions in the one durable draft lane (completed 2026-08-15)
 
 Make the Asset Resolution Workspace useful for resolving what can safely be
 resolved, without adding another workflow engine. Route accepted asset changes
@@ -1652,6 +1660,36 @@ fingerprint changes; cancellation and retry remain idempotent; the dedicated
 apply route is still unreachable; canonical workbook and generated/publication
 files are byte-identical before and after all validation.
 
+Completion: durable schema 9 stores mutable, draft-bound asset resolution
+evidence beside the existing coalesced operation and supports manager-only
+operational ignores without changing `workbook-changeset-1`. The shared
+reconciliation snapshot now exposes stable inventory selection and promoted
+assignment targets. The server validates every action against its current
+status and exact workbook/media/reconciliation fingerprints; safe bulk is
+derived server-side, ambiguous selection is restricted to equal-priority
+candidates, assignment is restricted to snapshot targets, and an item cannot
+silently retarget an existing operation. Shared wildcard rows keep their
+physical workbook identity while ChangeSet targets derive from their real model
+context and never contain `*`. Commit refreshes the reconciliation and fails
+closed on drift. Asset Manager provides the bounded action controls and Draft
+Review shows asset provenance beside ordinary before/final operations and
+operational ignores. No apply route or workbook/media writer was added.
+
+Evidence: asset reconciliation owner `50 passed`; registry/schema metadata
+owners `55 passed, 2 subtests passed`; durable lifecycle/concurrency owners `68
+passed, 36 subtests passed`; complete Manager owner `62 passed, 2 skipped` after
+one response-shape parity repair. Focused mixed-draft proof reached one
+identity-bound approval chain with an ordinary edit, safe proposal, explicit
+ambiguous resolution, manual fit/position change, and three retained asset
+evidence rows. Workbook package and schema validation reported zero issues, and
+the frontend production build passed with 1,519 modules. A headed copied-workbook
+browser run added safe and explicit ambiguous resolutions, displayed both in
+Draft Review at desktop and 390px widths, proved no horizontal overflow after a
+mobile tab-layout correction, and found no unexpected console errors; the only
+allowed console error was the deliberately unreachable fixture image. The
+canonical and copied workbook stayed SHA-256-identical, tracked generated and
+publication files were unchanged, and the dedicated apply route remained absent.
+
 #### Remaining checkpoint 5 — final Apply and Rebuild
 
 As the final code change, enable one dedicated **Apply and Rebuild** action over
@@ -1682,7 +1720,7 @@ chain, applies once, regenerates the derived affected-model set, verifies the
 registry/cache result, proves replay cannot write twice, and exercises one
 forced post-apply failure with complete restoration proof.
 
-Pass 7 exit gate: all five remaining checkpoint exit gates pass; the generic
+Pass 7 exit gate: all five checkpoint exit gates pass; the generic
 durable editor and Asset Manager share one workbook-owned draft/apply lane;
 only Apply and Rebuild can reach the bound writer and post-write pipeline; and
 no failed or partially restored workflow is presented as current.

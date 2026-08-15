@@ -124,10 +124,10 @@ export default function ModelOperations({
       kind: "ok",
       text: operation
         ? "Change saved to the durable draft. Review it in Draft Review."
-        : "No values changed; no draft operation was created.",
+        : "No effective draft changes remain.",
     });
     await loadRows();
-    onChanged({ draft: Boolean(operation) });
+    onChanged();
   };
 
   return (

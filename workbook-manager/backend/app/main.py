@@ -23,6 +23,7 @@ from fastapi.staticfiles import StaticFiles
 
 from . import (
     config,
+    asset_resolutions,
     asset_workspace,
     db as dbmod,
     drafts,
@@ -33,6 +34,8 @@ from . import (
 from .naming import display_id, humanize, sheet_display_name
 from .schemas import (
     ApprovalRequest,
+    AssetResolutionRequest,
+    AssetSafeBulkRequest,
     ChangeOut,
     CommitRequest,
     DraftOperationRequest,
@@ -544,7 +547,9 @@ def asset_reconciliation(
     status: str = Query("", max_length=80),
     offset: int = Query(0, ge=0),
     limit: int = Query(24, ge=1, le=100),
+    draft_id: str = Query("", max_length=120),
     conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
 ):
     """Typed, read-only view over the shared asset reconciliation result."""
 
@@ -555,9 +560,14 @@ def asset_reconciliation(
             "message": "Asset Manager requires a verified current projection of the workbook.",
         })
     try:
-        return asset_workspace.get_asset_manager_view(
-            config.DEFAULT_WORKBOOK,
-            refresh=refresh,
+        snapshot = asset_workspace.get_asset_manager_snapshot(
+            config.DEFAULT_WORKBOOK, refresh=refresh
+        )
+        ignored = drafts.active_asset_ignores(
+            state_conn, fingerprints=snapshot.fingerprints
+        )
+        view = asset_workspace.asset_map_sync.filter_asset_manager_snapshot(
+            snapshot,
             model_key=model,
             section_id=section,
             target_type=target_type,
@@ -565,12 +575,57 @@ def asset_reconciliation(
             status=status,
             offset=offset,
             limit=limit,
+            ignored_item_ids=ignored,
         )
+        image_fit = SPEC_BY_TABLE["assets"].column_by_name("image_fit")
+        view["controls"] = {
+            "image_fit": list(image_fit.enum if image_fit is not None else ()),
+        }
+        evidence = drafts.list_asset_resolutions(state_conn, draft_id) if draft_id else []
+        view["draft_asset_resolutions"] = {
+            "count": len(evidence),
+            "item_ids": [row["item_id"] for row in evidence],
+            "stale_count": sum(
+                1 for row in evidence
+                if any(
+                    row[field] != snapshot.fingerprints.get(field)
+                    for field in (
+                        "reconciliation_sha256",
+                        "media_inventory_sha256",
+                        "workbook_sha256",
+                    )
+                )
+            ),
+        }
+        return view
     except asset_workspace.asset_map_sync.WordPressMediaFetchError as exc:
         raise HTTPException(502, detail={
             "status": "asset_media_inventory_unavailable",
             "message": str(exc),
         }) from exc
+    except (OSError, ValueError) as exc:
+        raise HTTPException(422, detail={
+            "status": "asset_reconciliation_failed",
+            "message": str(exc),
+        }) from exc
+
+
+@app.get("/api/assets/media-options")
+def asset_media_options(
+    query: str = Query("", max_length=200),
+    limit: int = Query(50, ge=1, le=100),
+    conn=Depends(projection_connection),
+):
+    workbook = _workbook_state(conn)
+    if workbook["state"] != "current":
+        raise HTTPException(409, detail={
+            "status": "asset_reconciliation_workbook_not_current",
+            "message": "Asset Manager requires a verified current projection of the workbook.",
+        })
+    try:
+        return asset_workspace.search_media_options(
+            config.DEFAULT_WORKBOOK, query, limit=limit
+        )
     except (OSError, ValueError) as exc:
         raise HTTPException(422, detail={
             "status": "asset_reconciliation_failed",
@@ -777,16 +832,116 @@ def draft_operations(draft_id: str, state_conn=Depends(state_connection)):
     )}
 
 
+def _asset_draft_context(conn):
+    workbook = _workbook_state(conn)
+    run = conn.execute(
+        "SELECT * FROM import_runs ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    return workbook, _projection_state(conn, run, workbook)
+
+
+@app.post("/api/drafts/{draft_id}/asset-resolutions")
+def save_asset_resolution(
+    draft_id: str,
+    payload: AssetResolutionRequest,
+    _lock=Depends(durable_write_lock),
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
+    workbook, projection = _asset_draft_context(conn)
+    snapshot = asset_workspace.get_cached_asset_manager_snapshot(
+        config.DEFAULT_WORKBOOK, payload.fingerprints
+    )
+    if snapshot is None:
+        raise HTTPException(409, detail={
+            "status": "asset_reconciliation_stale",
+            "message": "The reviewed asset snapshot is no longer cached/current; refresh Asset Manager.",
+        })
+    try:
+        return asset_resolutions.save_resolution(
+            conn,
+            state_conn,
+            snapshot=snapshot,
+            projection_state=projection["state"],
+            base_workbook_sha256=workbook["imported_sha256"],
+            base_workbook_mtime_ns=workbook["imported_mtime_ns"],
+            draft_id=draft_id,
+            item_id=payload.item_id,
+            resolution_kind=payload.resolution_kind,
+            fingerprints=payload.fingerprints,
+            selected_url=payload.selected_url,
+            target_item_id=payload.target_item_id,
+            values=payload.values,
+            session_id=payload.session_id,
+            actor=payload.actor,
+        )
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
+
+
+@app.post("/api/drafts/{draft_id}/asset-resolutions/safe")
+def save_all_safe_asset_resolutions(
+    draft_id: str,
+    payload: AssetSafeBulkRequest,
+    _lock=Depends(durable_write_lock),
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
+    workbook, projection = _asset_draft_context(conn)
+    snapshot = asset_workspace.get_cached_asset_manager_snapshot(
+        config.DEFAULT_WORKBOOK, payload.fingerprints
+    )
+    if snapshot is None:
+        raise HTTPException(409, detail={
+            "status": "asset_reconciliation_stale",
+            "message": "The reviewed asset snapshot is no longer cached/current; refresh Asset Manager.",
+        })
+    try:
+        results = asset_resolutions.save_all_safe(
+            conn,
+            state_conn,
+            snapshot=snapshot,
+            fingerprints=payload.fingerprints,
+            projection_state=projection["state"],
+            base_workbook_sha256=workbook["imported_sha256"],
+            base_workbook_mtime_ns=workbook["imported_mtime_ns"],
+            draft_id=draft_id,
+            session_id=payload.session_id,
+            actor=payload.actor,
+        )
+        return {"draft_id": draft_id, "accepted": len(results), "operations": results}
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
+
+
 @app.post("/api/drafts/{draft_id}/commit")
 def commit_draft(
     draft_id: str,
     _lock=Depends(durable_write_lock),
+    conn=Depends(projection_connection),
     state_conn=Depends(state_connection),
 ):
     try:
+        if drafts.list_asset_resolutions(state_conn, draft_id):
+            snapshot = asset_workspace.get_asset_manager_snapshot(
+                config.DEFAULT_WORKBOOK, refresh=True
+            )
+            drafts.assert_asset_resolutions_current(
+                state_conn, draft_id=draft_id, snapshot=snapshot
+            )
         return drafts.emit_changeset(state_conn, draft_id=draft_id)
     except drafts.DraftError as exc:
         raise _draft_error(exc)
+    except asset_workspace.asset_map_sync.WordPressMediaFetchError as exc:
+        raise HTTPException(502, detail={
+            "status": "asset_media_inventory_unavailable",
+            "message": str(exc),
+        }) from exc
+    except (OSError, ValueError) as exc:
+        raise HTTPException(422, detail={
+            "status": "asset_reconciliation_failed",
+            "message": str(exc),
+        }) from exc
 
 
 @app.post("/api/drafts/{draft_id}/preview")

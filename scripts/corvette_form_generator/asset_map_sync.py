@@ -198,6 +198,7 @@ class AssetManagerSnapshot:
     coverage_ruleset: dict[str, Any]
     items: tuple[dict[str, Any], ...]
     action_counts: dict[str, int]
+    media_urls: tuple[str, ...]
 
 
 def filename_stem(url: str) -> str:
@@ -1430,6 +1431,7 @@ ASSET_MANAGER_STATUSES = (
     "dead_url",
     "stale_target",
     "wildcard_conflict",
+    "ignored",
 )
 SAFE_PROPOSAL_ACTIONS = {
     "fill", "replace_canonical", "insert_filled", "replace_shared_canonical",
@@ -1690,6 +1692,7 @@ def build_asset_manager_snapshot(
         },
         items=tuple(items),
         action_counts=dict(Counter(item["action"] for item in items)),
+        media_urls=tuple(normalized_urls),
     )
 
 
@@ -1703,6 +1706,7 @@ def filter_asset_manager_snapshot(
     status: str = "",
     offset: int = 0,
     limit: int = 24,
+    ignored_item_ids: set[str] | None = None,
 ) -> dict[str, Any]:
     """Filter/paginate while keeping every count and percentage domain-owned."""
 
@@ -1715,7 +1719,12 @@ def filter_asset_manager_snapshot(
             and (not include_status or not status or item.get("status") == status)
         )
 
-    scoped = [item for item in snapshot.items if matches(item, include_status=False)]
+    ignored_item_ids = ignored_item_ids or set()
+    effective_items = [
+        {**item, "status": "ignored"} if item["id"] in ignored_item_ids else item
+        for item in snapshot.items
+    ]
+    scoped = [item for item in effective_items if matches(item, include_status=False)]
     filtered = [item for item in scoped if not status or item.get("status") == status]
     target_items = [item for item in scoped if item.get("kind") == "target"]
 
@@ -1741,7 +1750,7 @@ def filter_asset_manager_snapshot(
     status_counter = Counter(item.get("status", "") for item in scoped)
     status_counts = {name: status_counter.get(name, 0) for name in ASSET_MANAGER_STATUSES}
     facets = {
-        "models": sorted({item.get("model_key", "") for item in snapshot.items if item.get("model_key")}),
+        "models": sorted({item.get("model_key", "") for item in effective_items if item.get("model_key")}),
         "sections": sorted({item.get("section_id", "") for item in scoped if item.get("section_id")}),
         "target_types": sorted({item.get("target_type", "") for item in scoped if item.get("target_type")}),
         "coverage_intents": sorted({item.get("coverage_intent", "") for item in scoped if item.get("coverage_intent")}),
@@ -1769,6 +1778,36 @@ def filter_asset_manager_snapshot(
             "limit": limit,
             "items": filtered[offset:offset + limit],
         },
+        "assignment_targets": [
+            {
+                "item_id": item["id"],
+                "model_key": item.get("model_key", ""),
+                "section_id": item.get("section_id", ""),
+                "target_type": item.get("target_type", ""),
+                "target_id": item.get("target_id", ""),
+                "rpo": item.get("rpo", ""),
+                "label": item.get("label", ""),
+            }
+            for item in snapshot.items
+            if item.get("kind") == "target" and item.get("model_key") != WILDCARD_MODEL_KEY
+        ],
+    }
+
+
+def search_asset_manager_media(
+    snapshot: AssetManagerSnapshot, query: str = "", *, limit: int = 50
+) -> dict[str, Any]:
+    """Return a bounded inventory selector bound to the snapshot fingerprints."""
+
+    needle = query.strip().lower()
+    matches = [
+        url for url in snapshot.media_urls
+        if not needle or needle in url.lower() or needle in filename_stem(url)
+    ][:max(1, min(limit, 100))]
+    return {
+        "fingerprints": snapshot.fingerprints,
+        "query": query,
+        "items": [{"url": url, "label": filename_stem(url)} for url in matches],
     }
 
 

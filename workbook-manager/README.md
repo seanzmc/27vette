@@ -4,9 +4,9 @@ Provisional interface for investigating the disposable SQLite projection of
 `stingray_master.xlsx`. Pass 5 adds manager-owned durable update/add/delete
 drafts, immutable ChangeSet emission, and durable shared-service preview and
 approval lifecycles. Pass 6A independently hardens the shared writer's
-post-save restoration. Pass 7 checkpoints 1–3 add the read-only durable
-lifecycle view, schema-driven durable editing/review workspace, and read-only
-Asset Resolution Workspace. The
+post-save restoration. Pass 7 checkpoints 1–4 add the read-only durable
+lifecycle view, schema-driven durable editing/review workspace, Asset Resolution
+Workspace, and fingerprint-bound asset decisions in the shared draft lane. The
 browser now captures operations, freezes one ChangeSet, previews, approves,
 retries, cancels, and presents recovery evidence through the durable lifecycle.
 No manager apply route is enabled.
@@ -15,11 +15,11 @@ until the final Apply and Rebuild checkpoint enables one reviewed route.
 
 The remaining Pass 7 plan is owned by
 `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md`.
-Checkpoint 3 extends this UI with a read-only Asset Resolution Workspace for
-coverage, resolution queues, image inspection, and card presentation preview;
-it is complete. Checkpoint 4 sends explicit asset decisions into the same durable draft and
-Draft Review used by ordinary edits. Neither checkpoint introduces another
-writer, changes the completed Manager navigation/workflow, or enables apply.
+Checkpoint 4 is complete: explicit safe, ambiguous, inventory, manual,
+assignment, deactivation, ignore, and presentation decisions use the same
+durable draft and Draft Review as ordinary edits. The final checkpoint owns the
+only future Apply and Rebuild route. No separate asset writer or ChangeSet
+dialect exists.
 
 ```text
 React interface (frontend/, Vite build served by FastAPI)
@@ -85,8 +85,9 @@ exact ChangeSet emission, and shared-service preview and approval lifecycles:
 - `GET /api/drafts/{draft_id}` returns the manager-owned lifecycle view: draft
   status, parsed operations, aggregated model and physical-row context, exact
   stored ChangeSet/preview/approval/apply evidence, cancellation state, and
-  manual-resolution history. It does not mutate durable state or reshape the
-  immutable shared artifacts. Record responses expose `model_context` as a JSON
+  manual-resolution history, and manager-owned asset resolution evidence. It
+  does not mutate durable state or reshape the immutable shared artifacts.
+  Record responses expose `model_context` as a JSON
   list, and browser form payloads follow schema-declared context for physically
   scoped, model-key, and source-routed families.
 - `GET /api/drafts` lets the single-user browser recover the latest nonterminal
@@ -99,12 +100,16 @@ exact ChangeSet emission, and shared-service preview and approval lifecycles:
   `field_kind`, finite values, and reference metadata; optional blanks remain
   SQL `NULL`. Apply is intentionally absent.
 - `GET /api/assets/reconciliation` exposes the shared asset-sync reconciliation
-  result as a fingerprint-bound, server-filtered, bounded read-only queue. The
+  result as a fingerprint-bound, server-filtered, bounded queue. The
   Asset Manager tab presents overall/model/section coverage, distinct status
   queues, lazy thumbnails, current/candidate lineage, broken-image states, and
-  a temporary runtime-pinned fit/position/body-style-hover preview. It does not
-  call a durable operation route or persist a decision. A refresh only replaces
-  the process-local reconciliation cache.
+  a runtime-pinned fit/position/body-style-hover preview. `GET
+  /api/assets/media-options` provides bounded inventory selection. Individual
+  decisions and server-classified safe bulk proposals go through `POST
+  /api/drafts/{draft_id}/asset-resolutions` and `/asset-resolutions/safe`; they
+  create ordinary `assets` draft operations plus manager-owned provenance, or a
+  no-workbook operational ignore. Refresh/inventory drift visibly stales that
+  evidence and blocks ChangeSet emission until it is resolved again.
 - The shared writer now rechecks exact rows, package integrity, and schema
   integrity after a safe save. Any returned or thrown post-save validation/log
   failure restores and SHA-256-verifies the backup or reports the workbook
@@ -189,11 +194,14 @@ newline-delimited URL list instead; `WBM_ASSET_MEDIA_TIMEOUT` (default 10),
    Every duplicate identifier, missing sheet/column, and unresolved
    relationship is reported with sheet/row/entity detail. Blocking findings
    block candidate promotion and leave the current projection untouched.
-2. **Inspect assets** — Asset Manager consumes the same pure reconciliation
+2. **Inspect and resolve assets** — Asset Manager consumes the same pure reconciliation
    owner as `scripts/sync_asset_map.py`, then returns fingerprinted,
-   server-filtered coverage and resolution pages. Fit, position, hover, and
-   candidate selection are temporary presentation exploration only in this
-   checkpoint; no draft operation or workbook/media write is reachable.
+   server-filtered coverage and resolution pages. Safe proposals, explicit
+   ambiguous choices, stable-inventory/manual assignments, stale deactivation,
+   operational ignores, and fit/position/hover edits enter the active durable
+   draft. Bulk acceptance is server-derived and excludes ambiguous, stale,
+   wildcard-conflict, unmatched, and unparseable items. No workbook or media
+   write is reachable.
 3. **Edit durable draft** — Form Structure workspace (models, runtime steps, section
    presentation/order, context sections, variants) and Model Operations
    workspace (options, OVS, exclusive groups + members, rule mapping, rule
@@ -207,8 +215,9 @@ newline-delimited URL list instead; `WBM_ASSET_MEDIA_TIMEOUT` (default 10),
    remains blocked until the nonterminal draft has a later lifecycle disposition.
 5. **Emit ChangeSet** — `POST /api/drafts/{draft_id}/commit`
    commits a nonempty mutable draft into one exact immutable
-   `workbook-changeset-1` payload. It does not run the final-graph preview and
-   grants no workbook write authority.
+   `workbook-changeset-1` payload. Asset evidence is re-reconciled first and
+   stale workbook/media identities fail closed. It does not run the final-graph
+   preview and grants no workbook write authority.
 6. **Preview ChangeSet** — `POST /api/drafts/{draft_id}/preview`
    runs the exact stored ChangeSet through the shared preview service, records
    immutable result/exception evidence, and exposes only lifecycle-authorized

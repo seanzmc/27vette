@@ -54,10 +54,12 @@ from .catalog import TABLE_SPECS, TableSpec
 # drafts and their coalesced physical-row operations. 5 (Pass 5): immutable
 # emitted ChangeSet payloads. 6 (Pass 5): immutable preview-attempt evidence.
 # 7 (Pass 5): immutable approval-attempt evidence. 8 (Pass 6B): durable apply
-# attempts and manual-resolution evidence. Versions 4–8 did not change
+# attempts and manual-resolution evidence. 9 (Pass 7 checkpoint 4): mutable
+# asset-resolution evidence beside coalesced draft operations and operational
+# ignores. Versions 4–9 did not change
 # projection shape, so a verified version-3
 # projection remains compatible while its durable store upgrades independently.
-SCHEMA_VERSION = 8
+SCHEMA_VERSION = 9
 PROJECTION_SCHEMA_VERSION = 3
 # One process-local lock for bootstrap, durable-state mutation, candidate
 # promotion, and workbook apply.
@@ -347,6 +349,23 @@ DURABLE_SUPPORT_DDL = SUPPORT_DDL[3:5] + [
       model_context_json TEXT NOT NULL DEFAULT '[]',
       UNIQUE(draft_id, source_sheet, family, physical_key)
     )""",
+    """CREATE TABLE IF NOT EXISTS draft_asset_resolutions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      draft_id TEXT NOT NULL REFERENCES workflow_drafts(id),
+      operation_id INTEGER REFERENCES draft_operations(id) ON DELETE CASCADE,
+      created_ts TEXT NOT NULL,
+      updated_ts TEXT NOT NULL,
+      item_id TEXT NOT NULL,
+      resolution_kind TEXT NOT NULL,
+      reconciliation_sha256 TEXT NOT NULL,
+      media_inventory_sha256 TEXT NOT NULL,
+      workbook_sha256 TEXT NOT NULL,
+      media_url TEXT NOT NULL DEFAULT '',
+      candidate_source TEXT NOT NULL DEFAULT '',
+      candidate_reason TEXT NOT NULL DEFAULT '',
+      evidence_json TEXT NOT NULL,
+      UNIQUE(draft_id, item_id)
+    )""",
     """CREATE TABLE IF NOT EXISTS draft_changesets (
       draft_id TEXT PRIMARY KEY REFERENCES workflow_drafts(id),
       created_ts TEXT NOT NULL,
@@ -583,6 +602,10 @@ def init_durable_schema(conn: sqlite3.Connection) -> None:
     conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_draft_operations_draft "
         "ON draft_operations(draft_id, id)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_draft_asset_resolutions_draft "
+        "ON draft_asset_resolutions(draft_id, id)"
     )
     conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_draft_preview_attempts_draft "
@@ -1039,7 +1062,8 @@ def _upgrade_durable_store(state_path: Path, manifest: dict) -> bool:
     emitted ChangeSet artifacts; schema 6 adds immutable preview-attempt
     evidence; schema 7 adds immutable approval-attempt evidence; schema 8 adds
     finalizable-then-immutable apply attempts plus immutable manual-resolution
-    evidence. Rebuild the history table only when its foreign key is absent,
+    evidence; schema 9 adds mutable draft-bound asset resolution evidence and
+    operational ignores. Rebuild the history table only when its foreign key is absent,
     preserve every row, and create all missing durable objects idempotently.
     Returns True when an upgrade applied.
     """
@@ -1058,6 +1082,10 @@ def _upgrade_durable_store(state_path: Path, manifest: dict) -> bool:
             conn.execute(
                 "CREATE INDEX IF NOT EXISTS idx_draft_operations_draft "
                 "ON draft_operations(draft_id, id)"
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_draft_asset_resolutions_draft "
+                "ON draft_asset_resolutions(draft_id, id)"
             )
             conn.execute(
                 "CREATE INDEX IF NOT EXISTS idx_draft_preview_attempts_draft "
@@ -1111,6 +1139,10 @@ def _upgrade_durable_store(state_path: Path, manifest: dict) -> bool:
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_draft_operations_draft "
             "ON draft_operations(draft_id, id)"
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_draft_asset_resolutions_draft "
+            "ON draft_asset_resolutions(draft_id, id)"
         )
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_draft_preview_attempts_draft "

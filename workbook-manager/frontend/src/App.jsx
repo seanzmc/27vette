@@ -195,6 +195,10 @@ export default function App() {
             models={models}
             modelKey={modelKey}
             setModelKey={setModelKey}
+            draftId={draftId}
+            draftMutable={draftMutable}
+            draftLifecycle={draftLifecycle}
+            onChanged={refreshManager}
           />
         )}
         {tab === "changes" && (

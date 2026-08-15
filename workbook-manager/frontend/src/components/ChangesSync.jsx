@@ -49,6 +49,8 @@ export default function ChangesSync({
   const changeSet = artifacts.changeset?.artifact || null;
   const draftState = lifecycle?.draft?.status || "new";
   const operations = lifecycle?.operations || [];
+  const assetResolutions = artifacts.asset_resolutions || [];
+  const assetIgnores = assetResolutions.filter((item) => item.resolution_kind === "ignore");
   const confirmableWarnings = preview?.warningPolicy?.confirmableIds || [];
   const visibleWarnings = preview?.warnings || [];
 
@@ -148,9 +150,46 @@ export default function ChangesSync({
                 </React.Fragment>
               ))}
             </div>
+            {(operation.asset_resolutions || []).map((resolution) => (
+              <div className="asset-evidence-summary" key={resolution.id}>
+                <div>
+                  <span className="chip blue">asset {resolution.resolution_kind.replaceAll("_", " ")}</span>
+                  <strong>{resolution.evidence?.source_status || "asset resolution"}</strong>
+                  <span>{resolution.candidate_source || "manual authority"}</span>
+                </div>
+                <p>{resolution.candidate_reason || "Explicit operator-authored presentation change."}</p>
+                <div className="lineage-row">
+                  <span>item <strong className="mono">{compact(resolution.item_id, 20)}</strong></span>
+                  <span>reconciliation <strong className="mono">{compact(resolution.reconciliation_sha256, 20)}</strong></span>
+                  <span>inventory <strong className="mono">{compact(resolution.media_inventory_sha256, 20)}</strong></span>
+                  <span>coverage <strong>{resolution.evidence?.coverage?.kind || "n/a"}</strong></span>
+                </div>
+              </div>
+            ))}
           </div>
         ))}
       </div>
+
+      {assetIgnores.length > 0 && (
+        <>
+          <div className="section-heading">Operational asset dispositions ({assetIgnores.length})</div>
+          <div className="panel">
+            {assetIgnores.map((resolution) => (
+              <div className="draft-operation" key={resolution.id}>
+                <div className="operation-heading">
+                  <span className="op-tag update">IGNORE</span>
+                  <strong>{resolution.evidence?.media_url || resolution.media_url}</strong>
+                </div>
+                <div className="lineage-row">
+                  <span>item <strong className="mono">{compact(resolution.item_id, 20)}</strong></span>
+                  <span>inventory <strong className="mono">{compact(resolution.media_inventory_sha256, 20)}</strong></span>
+                  <span>changed inventory returns this item to review</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       <div className="section-heading">Lifecycle actions</div>
       <div className="panel">

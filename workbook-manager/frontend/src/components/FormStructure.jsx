@@ -30,7 +30,7 @@ export default function FormStructure({
   const saved = async (operation) => {
     setEditing(null);
     await load(modelKey);
-    onChanged({ draft: Boolean(operation) });
+    onChanged();
   };
 
   const saveDraft = (payload) => api.saveDraftOperation(draftId, {

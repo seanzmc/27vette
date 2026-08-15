@@ -146,6 +146,47 @@ class TestImmutableChangeSetEmission(unittest.TestCase):
                 projection.close()
                 state.close()
 
+    def test_shared_asset_uses_real_model_context_not_wildcard_target(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-shared-asset-targets-") as raw:
+            projection, state = self._stores(Path(raw))
+            projection.execute(
+                "INSERT INTO assets(src_sheet, src_row, src_family, physical_key, "
+                "model_context, model_key, target_type, target_id, image_url, "
+                "image_alt, image_fit, image_position, active) "
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                (
+                    "asset_map", 2, "asset_map", '["*","option","opt_test"]',
+                    '["stingray","z06"]', "*", "option", "opt_test",
+                    "https://example.test/original.png", "Shared", "cover", "center",
+                    "True",
+                ),
+            )
+            projection.commit()
+            try:
+                drafts.save_operation(
+                    projection,
+                    state,
+                    projection_state="current",
+                    base_workbook_sha256="a" * 64,
+                    base_workbook_mtime_ns="123",
+                    draft_id="shared-asset",
+                    table="assets",
+                    model_id="*",
+                    op="update",
+                    key={
+                        "model_key": "*",
+                        "target_type": "option",
+                        "target_id": "opt_test",
+                    },
+                    record={"image_fit": "contain"},
+                )
+                emitted = drafts.emit_changeset(state, draft_id="shared-asset")
+                self.assertEqual(emitted["targets"], ["stingray", "z06"])
+                self.assertNotIn("*", emitted["targets"])
+            finally:
+                projection.close()
+                state.close()
+
     def test_empty_draft_cannot_emit_a_changeset(self):
         with tempfile.TemporaryDirectory(prefix="wbm-empty-changeset-") as raw:
             _, state = self._stores(Path(raw))
@@ -1886,7 +1927,13 @@ class TestDurableSchemaMigrations(unittest.TestCase):
                         "AND name='draft_manual_resolutions'"
                     ).fetchone()
                 )
-                self.assertEqual(dbmod.storage_manifest(state)["schema_version"], 8)
+                self.assertIsNotNone(
+                    state.execute(
+                        "SELECT name FROM sqlite_master WHERE type='table' "
+                        "AND name='draft_asset_resolutions'"
+                    ).fetchone()
+                )
+                self.assertEqual(dbmod.storage_manifest(state)["schema_version"], 9)
             finally:
                 state.close()
 
@@ -1955,7 +2002,13 @@ class TestDurableSchemaMigrations(unittest.TestCase):
                         "AND name='draft_apply_attempts'"
                     ).fetchone()
                 )
-                self.assertEqual(dbmod.storage_manifest(state)["schema_version"], 8)
+                self.assertIsNotNone(
+                    state.execute(
+                        "SELECT name FROM sqlite_master WHERE type='table' "
+                        "AND name='draft_asset_resolutions'"
+                    ).fetchone()
+                )
+                self.assertEqual(dbmod.storage_manifest(state)["schema_version"], 9)
             finally:
                 state.close()
 
@@ -1965,6 +2018,7 @@ class TestDurableSchemaMigrations(unittest.TestCase):
             state = dbmod.connect(state_path)
             try:
                 dbmod.init_durable_schema(state)
+                state.execute("DROP TABLE draft_asset_resolutions")
                 state.execute("DROP TABLE draft_manual_resolutions")
                 state.execute("DROP TABLE draft_apply_attempts")
                 state.execute(
@@ -2034,7 +2088,13 @@ class TestDurableSchemaMigrations(unittest.TestCase):
                         "AND name='draft_manual_resolutions'"
                     ).fetchone()
                 )
-                self.assertEqual(dbmod.storage_manifest(state)["schema_version"], 8)
+                self.assertIsNotNone(
+                    state.execute(
+                        "SELECT name FROM sqlite_master WHERE type='table' "
+                        "AND name='draft_asset_resolutions'"
+                    ).fetchone()
+                )
+                self.assertEqual(dbmod.storage_manifest(state)["schema_version"], 9)
             finally:
                 state.close()
 

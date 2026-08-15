@@ -41,6 +41,25 @@ class ApprovalRequest(BaseModel):
     warning_ids: list[str] = Field(default_factory=list)
 
 
+class AssetResolutionRequest(BaseModel):
+    item_id: str
+    resolution_kind: str = Field(
+        pattern="^(accept_safe|select_candidate|inventory_match|manual_url|assign_media|edit|deactivate|ignore)$"
+    )
+    fingerprints: dict[str, str]
+    selected_url: str = ""
+    target_item_id: str = ""
+    values: dict[str, Any] = Field(default_factory=dict)
+    session_id: str = ""
+    actor: str = ""
+
+
+class AssetSafeBulkRequest(BaseModel):
+    fingerprints: dict[str, str]
+    session_id: str = ""
+    actor: str = ""
+
+
 class ChangeOut(BaseModel):
     id: int
     ts: str
