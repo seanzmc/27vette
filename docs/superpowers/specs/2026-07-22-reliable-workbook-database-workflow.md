@@ -4,11 +4,14 @@ Status: implementation in progress; Pass 1 completed 2026-07-22, Pass 2
 completed 2026-07-23, Pass 3 completed 2026-07-30, Pass 4 completed
 2026-08-08, Pass 5 completed 2026-08-09, Pass 6A completed 2026-08-10, and
 Pass 6B completed 2026-08-14 on `db-workflow`; Pass 7 lifecycle-context and
-durable editing/review UI checkpoints are complete, and integrated Asset
-Manager checkpoint 3 is next.
+durable editing/review UI checkpoints are complete, and the Asset Resolution
+Workspace foundation is checkpoint 3 next.
 Revised 2026-08-14 to expand the remaining Pass 7 work into five explicit
 checkpoints: lifecycle context, durable editing UI, integrated asset management,
 one shared draft/apply lane, and final Apply-and-Rebuild orchestration. Revised
+again 2026-08-14 to define the remaining asset work as a useful Asset Resolution
+Workspace with coverage, resolution queues, image inspection, card presentation
+preview, and explicit decisions feeding the existing durable draft UI. Revised
 2026-08-09 to split shared-writer restoration from durable manager apply/recovery;
 revised 2026-07-23 to record the completed workbook-owned Vehicle Setup copy contract;
 the final specification review previously resolved all fourteen findings: primary-
@@ -1500,39 +1503,119 @@ and approval fingerprint
 `1acc23ba80bfcc7ca7640d0f81561b767d51ad740f834fc2375484a033dbe04e`.
 The only automated warning was the existing Starlette/httpx deprecation.
 
-#### Remaining checkpoint 3 — integrated Asset Manager workspace
+#### Remaining checkpoint 3 — Asset Resolution Workspace foundation
 
-Add an Asset Manager workspace inside the same React/FastAPI application. Reuse
-the existing `scripts/sync_asset_map.py` reconciliation rules and report
-contracts rather than duplicating filename, fallback-model, wildcard, coverage,
-or ambiguity logic. The workspace selects one model or all promoted models,
-reads a stable WordPress media inventory, and presents coverage by model/section
-plus missing, unmatched, ambiguous, stale, and proposed matches. It permits
-review of `image_url`, `image_fit`, `image_position`, and active state while
-keeping workbook `asset_map` rows canonical.
+Extend, but do not redesign or replace, the completed durable Manager UI. Add an
+Asset Manager tab inside the same React/FastAPI application while preserving
+Form Structure, Model Operations, Draft Review, their navigation/state model,
+and their established responsive styling. This checkpoint owns the read-only
+asset intelligence and visual-inspection foundation; checkpoint 4 owns actions
+that enter the existing durable draft.
 
-This checkpoint is review/draft only. It does not upload media to WordPress,
-write the workbook, generate contracts, publish `form-app/data.js`, change cache
-versions, or invent rows for unresolved/ambiguous matches.
+The Manager must call the same Python reconciliation owner used by
+`scripts/sync_asset_map.py`. Refactor the pure asset-sync domain result only as
+needed to expose one typed manager-facing JSON view with selected candidates,
+equal-priority alternatives, candidate source/reason, current asset values,
+coverage classification, section statistics, unmatched/unparseable media, and
+the workbook/media-inventory fingerprints that produced the result. The CLI
+reports and Manager API must consume that shared result. Do not shell out to the
+CLI, parse CSV reports as an application API, or reproduce filename, model
+prefix, shared-prefix, fallback-model, wildcard, coverage, ambiguity, stale, or
+existing-URL logic in FastAPI or React.
 
-Exit gate: deterministic fixture-backed and copied-workbook browser tests prove
-the Manager reports the same reconciliation decisions and coverage contract as
-the existing asset sync owner, and ambiguous/unmatched items cannot silently
-become draft writes.
+The Asset Manager workspace has three coordinated surfaces:
 
-#### Remaining checkpoint 4 — one draft/apply lane for ordinary and asset edits
+1. **Coverage dashboard.** Select one model or all promoted models; show overall,
+   per-model, and per-section total/covered/missing/coverage percentages plus
+   counts for safe proposals, missing, ambiguous, unmatched, unparseable, dead
+   URL, stale target, and wildcard conflict. Model, section, target-type,
+   expected/not-expected, and reconciliation-status filters open the matching
+   work queue. Counts and percentages remain reconciliation outputs, never UI
+   recomputations.
+2. **Resolution inbox.** Use a bounded/paginated or virtualized list with lazy
+   thumbnails. Each item shows model, section, RPO, option/target label,
+   workbook target and physical lineage, exact/shared coverage, current and
+   candidate URLs, candidate priority/source, and the reason the engine did or
+   did not choose a match. Separate safe proposals, missing targets, ambiguous
+   candidates, unmatched/unparseable media, stale rows, dead URLs, and wildcard
+   conflicts instead of flattening them into one undifferentiated table.
+3. **Image inspector and card preview.** Show current and proposed images side by
+   side with loading, broken-image, alt-text, and open-original states. Preview
+   the runtime card's 16:9 media frame, 3:1 swatch mode, `cover`, `contain`, and
+   `swatch` fit behavior, sanitized `image_position`, and body-style base/hover
+   media where supported. Provide a visual position picker plus an advanced
+   position value. Label this as a card presentation preview, not proof of a
+   regenerated runtime contract. Pin its accepted fit/position behavior to the
+   existing runtime and guarded display-owner tests so it cannot silently drift.
 
-Route approved Asset Manager edits into the same durable operation, ChangeSet,
-preview, and approval lifecycle as ordinary workbook edits. Ordinary and asset
-operations may coexist in one draft and must retain exact workbook ownership,
-model scope, before/final values, and dependency evidence. Do not add a second
-asset writer, a second ChangeSet dialect, or a subprocess path that bypasses the
-shared writer and `save_workbook_safely()` contract.
+This checkpoint may let the operator explore candidate selection and
+presentation controls in temporary browser state, but it cannot create a draft
+operation. It does not upload, rename, or delete WordPress media; persist a
+resolution/ignore decision; write the workbook; generate contracts; publish
+`form-app/data.js`; change cache versions; deactivate stale rows; author
+wildcards; or choose a candidate for an ambiguous/unmatched item.
 
-Exit gate: a mixed copied-workbook draft reaches exact bound approval with one
-immutable artifact chain; cancellation and retry remain idempotent; the
-dedicated apply route is still unreachable; canonical and generated files are
-byte-identical before and after all validation.
+Exit gate: deterministic fixture-backed API tests prove exact parity with the
+shared reconciliation result for actions, candidate alternatives, coverage,
+wildcards, unmatched/unparseable media, and fingerprints. A copied-workbook
+browser test exercises model/section/status filtering, bounded lazy image
+loading, current/candidate and fit/position/hover previews, broken-image states,
+and a reconciliation refresh. No Asset Manager control can call the durable
+operation route; canonical workbook, projection, durable drafts, generated
+artifacts, and publication remain byte-identical.
+
+#### Remaining checkpoint 4 — actionable resolutions in the one durable draft lane
+
+Make the Asset Resolution Workspace useful for resolving what can safely be
+resolved, without adding another workflow engine. Route accepted asset changes
+through the same durable operation, ChangeSet, preview, and approval lifecycle
+already used by Form Structure and Model Operations. Draft Review remains the
+single basket and must present ordinary and asset operations together; the
+completed checkpoint-2 UI is extended only where required to display asset
+provenance and preview evidence.
+
+The available action must follow the reconciliation status:
+
+- unambiguous fill/insert/canonical-replacement proposals may be added
+  individually or through one reviewed **Add all safe matches to draft** action;
+- ambiguous items must show every equal-priority candidate and require an
+  explicit human selection before one asset operation is created;
+- missing targets may be assigned only to an explicitly selected item from the
+  stable inventory, or changed through a clearly labeled advanced manual URL edit
+  that carries no automatic-match authority;
+- unmatched/unparseable media may be explicitly assigned to an existing valid
+  promoted target, or receive a manager-owned operational ignore disposition
+  bound to the media identity/modification fingerprint so a changed file returns
+  to review; an ignore never changes workbook coverage policy;
+- stale rows and wildcard conflicts require individual decisions and are never
+  included in bulk acceptance; stale deactivation is an explicit `active`
+  change, and wildcard authoring remains outside routine sync maintenance; and
+- existing rows may edit workbook-owned `image_url`, `image_alt`, `image_fit`,
+  `image_position`, supported hover fields, `active`, and notes. Fit is a finite
+  registry-backed control; position uses the same sanitized semantics proven by
+  the runtime/display owner. Optional fields preserve blank/SQL `NULL` meaning.
+
+Every asset operation must retain exact workbook ownership, model/wildcard
+coverage, before/final values, the reconciliation and media-inventory
+fingerprints, candidate source/reason, and any explicit human resolution in
+manager-owned evidence. Do not extend the immutable shared ChangeSet schemas
+merely for UI provenance; bind presentation evidence beside them in the Manager
+lifecycle. Reconciliation refresh or workbook/media drift must visibly stale an
+uncommitted proposal rather than silently retarget it.
+
+Do not add a second asset writer, a second ChangeSet dialect, a CSV/subprocess
+apply path, or a route that bypasses the shared writer and
+`save_workbook_safely()` contract. WordPress upload/delete/rename remains out of
+scope. Apply remains unreachable until checkpoint 5.
+
+Exit gate: a mixed copied-workbook draft contains an ordinary edit, a safe asset
+proposal, one explicit ambiguous/manual resolution, and a fit/position edit;
+Draft Review exposes their exact evidence and reaches one identity-bound
+approval artifact chain. Bulk acceptance excludes ambiguous, stale, wildcard
+conflict, and unmatched items; operational ignore invalidates when its media
+fingerprint changes; cancellation and retry remain idempotent; the dedicated
+apply route is still unreachable; canonical workbook and generated/publication
+files are byte-identical before and after all validation.
 
 #### Remaining checkpoint 5 — final Apply and Rebuild
 
@@ -1582,9 +1665,9 @@ The complete API owner passes `14 passed`; the separately corrected six-model
 generated-parity owner passes `4 passed`. The latter replaces the stale former
 three-model expectation with the exact released six-model promotion set and
 retains protected workbook/generated-artifact hash proof. That foundation
-preceded the lifecycle-context completion recorded above. The durable editing
-UI, Asset Manager, unified ordinary/asset lane, final Apply and Rebuild, and the
-Pass 7 exit gate remain open.
+preceded the lifecycle-context and durable editing/review completions recorded
+above. The Asset Resolution Workspace, actionable ordinary/asset draft lane,
+final Apply and Rebuild, and the Pass 7 exit gate remain open.
 
 A manager `applied` receipt still proves only the workbook write and exact
 readback. Apply and Rebuild owns the subsequent local generation, comparison,
@@ -1611,6 +1694,8 @@ Expected existing owners:
 - `workbook-manager/frontend/src/components/ChangesSync.jsx`
 - `workbook-manager/frontend/src/components/FormStructure.jsx`
 - `scripts/sync_asset_map.py`
+- `scripts/corvette_form_generator/asset_map_sync.py`
+- `scripts/set_asset_display.py`
 - `docs/asset-map-sync.md`
 - `tests/test_workbook_manager.py`
 - `tests/test_asset_map_sync.py`
@@ -1667,8 +1752,10 @@ Implementation is complete only when these named owners prove:
 | Post-save exception | live readback, package/schema, and log failures restore and hash-verify the backup or report unknown while preserving original and restoration evidence | `tests/test_editor_ops_apply.py` |
 | UI context loss | unchanged real model-key rows round-trip through the manager lifecycle view with correct model/reference/source-lineage metadata while shared artifacts remain unchanged | `tests/test_workbook_manager.py` plus disposable browser smoke |
 | Vehicle Setup copy loss | all seven workbook-owned `model_master` setup-copy fields survive import/reconstruction and API/browser/ChangeSet round-trip; clearing one for a promoted model fails shared preview validation | `tests/test_workbook_manager.py`, `tests/test_workbook_manager_import_projection.py`, and `tests/test_workbook_manager_changeset_lifecycle.py` |
-| Asset reconciliation drift | fixture-backed Manager results match the existing asset sync report/coverage contract; ambiguous and unmatched candidates remain review-only | `tests/test_asset_map_sync.py`, `tests/test_workbook_manager_asset_manager.py`, and disposable browser smoke |
-| Parallel asset writer | mixed ordinary/asset edits emit one exact immutable artifact chain and reach only the shared writer | `tests/test_workbook_manager_changeset_lifecycle.py` plus disposable browser smoke |
+| Asset reconciliation drift | fixture-backed typed Manager results match the shared sync owner for actions, selected and equal-priority candidates, sources/reasons, coverage, wildcard behavior, unmatched/unparseable media, and workbook/media fingerprints; no CSV or duplicated UI/API matcher is accepted | `tests/test_asset_map_sync.py`, `tests/test_workbook_manager_asset_manager.py`, and disposable browser smoke |
+| Asset preview drift | current/candidate, 16:9, swatch, fit, sanitized position, supported hover, broken-image, and lazy-loading behavior stays pinned to the runtime/display owners without claiming generated-runtime proof | `tests/test_workbook_manager_asset_manager.py`, retained runtime media tests, and disposable browser smoke |
+| Unsafe asset resolution | bulk acceptance includes only unambiguous safe proposals; ambiguous/manual/stale/wildcard decisions require explicit evidence; operational ignore is fingerprint-bound and cannot alter workbook coverage policy | `tests/test_workbook_manager_asset_manager.py` and disposable browser smoke |
+| Parallel asset writer | mixed ordinary/asset edits emit one exact immutable artifact chain, preserve reconciliation evidence beside it, and reach only the shared writer | `tests/test_workbook_manager_changeset_lifecycle.py` plus disposable browser smoke |
 | False readiness | workbook apply alone cannot report generated/publication current; successful Apply and Rebuild proves each state independently; failed rebuild restores the full rollback set or reports unknown | `tests/test_workbook_manager_changeset_lifecycle.py`, generated-parity acceptance, and disposable browser smoke |
 | Partial Apply and Rebuild | affected-model derivation includes shared-row impact, registry/cache output changes only on success, replay cannot write twice, and forced downstream failure restores verified workbook/output hashes | `tests/test_workbook_manager_apply_rebuild.py` plus disposable browser smoke |
 | Stale projection authority | stale ChangeSet permits cancel only; after cancellation, stale projection permits labeled browse/history and verified re-import but blocks export/draft/preview/approval/apply until that import succeeds | `tests/test_workbook_manager_changeset_lifecycle.py` |

@@ -12,6 +12,14 @@ No manager apply route is enabled.
 The workbook remains canonical. Live manager-to-workbook writes are disabled
 until the final Apply and Rebuild checkpoint enables one reviewed route.
 
+The remaining Pass 7 plan is owned by
+`docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md`.
+Checkpoint 3 extends this UI with a read-only Asset Resolution Workspace for
+coverage, resolution queues, image inspection, and card presentation preview;
+checkpoint 4 sends explicit asset decisions into the same durable draft and
+Draft Review used by ordinary edits. Neither checkpoint introduces another
+writer, changes the completed Manager navigation/workflow, or enables apply.
+
 ```text
 React interface (frontend/, Vite build served by FastAPI)
     ↓
@@ -94,7 +102,7 @@ exact ChangeSet emission, and shared-service preview and approval lifecycles:
   failure restores and SHA-256-verifies the backup or reports the workbook
   state unknown. The backend-only durable apply lifecycle can call it with the
   exact stored ChangeSet/preview/approval artifacts; no API or browser action
-  can reach that lifecycle until Pass 7.
+  can reach that lifecycle until the final Apply and Rebuild checkpoint.
 - Status reports projection, draft, workbook, generated-artifact, and
   publication states separately. Generated artifacts and publication are
   always `unverified` in this provisional manager workflow.
@@ -200,7 +208,7 @@ Environment overrides: `WBM_WORKBOOK`, `WBM_DB` (durable state),
    recorded before the writer runs; exact replay is idempotent, interrupted
    attempts become unknown on startup, and cancellation/manual resolution keep
    immutable history. There is intentionally no FastAPI or browser apply action;
-   Pass 7 owns that final enablement.
+   the final Apply and Rebuild checkpoint owns that enablement.
 8. **Legacy containment** — historical staged/history rows remain recovery
    evidence only. The browser has no staged-row or sync workflow, and
    `POST /api/sync` still refuses `write=true` regardless of payload.
