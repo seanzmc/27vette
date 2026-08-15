@@ -208,6 +208,17 @@ The first command is the no-write preflight/proposal. Run `--write` only after t
 
 ## Validation
 
+Pull requests targeting `main` run the required `release-candidate` GitHub check from `.github/workflows/release-candidate.yml`. That check invokes the single composed six-model lane and uploads its JSON report:
+
+```sh
+python scripts/verify_workbook_candidate.py \
+  --workbook stingray_master.xlsx \
+  --changed-model '*' \
+  --report candidate-report.json
+```
+
+This PR gate intentionally does not duplicate the complete test inventory, access the live asset library, or submit a dealer build. Choose any additional local gates by changed surface as described below.
+
 Fable 5 compounding loop scaffold:
 
 ```sh
