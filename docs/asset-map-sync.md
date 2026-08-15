@@ -73,7 +73,10 @@ Report outputs:
 
 - `asset_map_sync_report.csv`: full reconciliation report. Every row carries `coverage_intent` (`expected` / `not_expected`) and `coverage_intent_reason`. Policy is universal-expected: every active+selectable option card should eventually carry a visual element, so `not_expected` derives only from structural presentation metadata (`section_master.selection_mode=display_only`, active `section_presentation.standard_equipment_bucket`) — never from media or asset_map coverage state.
 - `asset_map_missing_images.csv`: the actionable review queue — missing/ambiguous/dead-no-candidate targets classified `expected`, sorted model → section → target for form-consistency triage. Structurally `not_expected` missing rows are excluded here but remain visible in the broad report CSV with their intent columns populated. This file is for triage; it does not imply blank-row seeding or automatic workbook edits.
-- `asset_map_unmatched_media.csv`: uploaded media that did not map to a desired active option target, plus unparseable filenames.
+- `asset_map_unmatched_media.csv`: uploaded media that did not map to a desired
+  active option target, plus unparseable filenames. Equal-priority ambiguous
+  candidates are considered by reconciliation and remain attached to their
+  ambiguous target; they are not duplicated into this unmatched queue.
 - `asset_map_sync_manifest.json`: run contract with workbook path/sheet, included promoted model option sheets, media source mode, `--since` state handling, existing URL verification mode, action counts, planned URL writes/inserts, actionable missing-image count/path plus `broad_missing_images_count`, a `coverage` block (classifier ruleset version + rules, intent counts, actionable count, per-model/per-section intent breakdown, and `section_coverage` stats: per model × section `total_targets` / `covered` / `missing` / `coverage_pct` over ALL desired option targets — the form-consistency view that converges to 100% as images land), unmatched media count/path, unparseable filename count, and report paths.
 
 Coverage-intent classification is report-only: it never adds or applies workbook rows. The universal-expected policy is product policy encoded as the classifier default; the only workbook-derived classifications are structural presentation facts that self-correct when `section_master` / `section_presentation` change.
@@ -119,6 +122,14 @@ After a low-level `--apply`, run:
 Then regenerate affected active models and the registry only if workbook data
 changed. Complete mode performs those steps automatically and rolls the workbook
 plus generated/publication files back if its post-save pipeline fails.
+
+Workbook Manager uses this same reconciliation owner for its Asset Manager. It
+can place reviewed safe, explicit ambiguous, inventory/manual, assignment,
+deactivation, and presentation decisions into the Manager's ordinary durable
+draft lane, with reconciliation/media fingerprints retained beside the shared
+ChangeSet. Operational ignore is Manager state only. These controls do not call
+this CLI's apply mode, mutate WordPress media, or write the workbook; the
+Manager's final Apply and Rebuild checkpoint separately owns write reachability.
 
 ## Card sizing and alignment
 

@@ -840,14 +840,80 @@ class TestDependencyInspection(ImportedWorkbookCase):
 
 
 class TestPass1BrowserContainment(unittest.TestCase):
-    def test_browser_has_persistent_provisional_banner_and_no_write_control(self):
+    def test_browser_uses_one_guarded_durable_apply_rebuild_control(self):
         app_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
                       "App.jsx").read_text()
         sync_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
                        "components" / "ChangesSync.jsx").read_text()
-        self.assertIn("Read-only / provisional", app_source)
+        operations_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                             "components" / "ModelOperations.jsx").read_text()
+        structure_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                            "components" / "FormStructure.jsx").read_text()
+        self.assertIn("Guarded workbook workflow", app_source)
+        self.assertIn("Freeze ChangeSet", sync_source)
+        self.assertIn("Approve Exact Preview", sync_source)
+        self.assertIn("Apply and Rebuild", sync_source)
+        self.assertIn("api.applyRebuildDraft", sync_source)
+        self.assertIn("APPLY AND REBUILD", sync_source)
+        self.assertIn("api.saveDraftOperation", operations_source)
+        self.assertIn("api.saveDraftOperation", structure_source)
+        self.assertIn("await loadRows();\n    onChanged();", operations_source)
+        self.assertIn("await load(modelKey);\n    onChanged();", structure_source)
+        self.assertNotIn("onChanged({ draft: Boolean(operation) })", operations_source)
+        self.assertNotIn("onChanged({ draft: Boolean(operation) })", structure_source)
+        self.assertNotIn("api.stage", operations_source)
+        self.assertNotIn("api.stage", structure_source)
+        self.assertNotIn("api.changes", sync_source)
+        self.assertNotIn("api.commit(", sync_source)
+        self.assertNotIn("api.sync", sync_source)
         self.assertNotIn("write: true", sync_source)
         self.assertNotIn("Write to stingray_master.xlsx", sync_source)
+
+    def test_asset_workspace_is_lazy_bounded_and_uses_shared_draft_only(self):
+        app_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                      "App.jsx").read_text()
+        asset_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                        "components" / "AssetManager.jsx").read_text()
+        self.assertIn('label: "Asset Manager"', app_source)
+        self.assertIn("PAGE_SIZE = 24", asset_source)
+        self.assertIn('loading="lazy"', asset_source)
+        self.assertIn("data.controls?.image_fit", asset_source)
+        self.assertIn("fitValues.map", asset_source)
+        self.assertIn('/^[\\w\\s.%/-]+$/.test(position)', asset_source)
+        self.assertIn("Show body-style hover media", asset_source)
+        self.assertIn("not regenerated runtime proof", asset_source)
+        self.assertIn("Add all safe matches to draft", asset_source)
+        self.assertIn("Use explicitly selected candidate", asset_source)
+        self.assertIn("Advanced: use manual URL", asset_source)
+        self.assertIn("Assign to selected target", asset_source)
+        self.assertIn("Ignore this exact media identity", asset_source)
+        self.assertIn("Save presentation edits to draft", asset_source)
+        self.assertIn("api.saveAssetResolution", asset_source)
+        self.assertNotIn("api.apply", asset_source)
+        self.assertNotIn("write: true", asset_source)
+
+    def test_form_payload_uses_schema_model_context_for_model_key_families(self):
+        record_form = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                       "components" / "RecordForm.jsx").read_text()
+        structure = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                     "components" / "FormStructure.jsx").read_text()
+        self.assertIn("schema.model_context?.required", record_form)
+        self.assertIn("schema.model_context.value || modelKey", record_form)
+        self.assertNotIn("model_id: schema.model_scoped ? modelKey", record_form)
+        self.assertIn("saveFn={saveDraft}", structure)
+        self.assertNotIn('model_id: ""', structure)
+
+    def test_form_controls_follow_registry_field_kinds_and_keep_setup_copy(self):
+        record_form = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                       "components" / "RecordForm.jsx").read_text()
+        structure = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                     "components" / "FormStructure.jsx").read_text()
+        self.assertIn('col.field_kind === "finite"', record_form)
+        self.assertIn('col.field_kind === "reference"', record_form)
+        self.assertIn("col.finite_values", record_form)
+        self.assertIn("blank / SQL NULL", record_form)
+        self.assertIn('col.name === "setup_description"', record_form)
+        self.assertIn("Edit model metadata &amp; Vehicle Setup copy", structure)
 
 
 @unittest.skipUnless(HAVE_FASTAPI, "fastapi not installed; install "
@@ -860,9 +926,23 @@ class TestApi(unittest.TestCase):
         cls.workbook = cls.tmpdir / "source.xlsx"
         shutil.copy2(WORKBOOK, cls.workbook)
         cls.previous_workbook_env = os.environ.get("WBM_WORKBOOK")
+        cls.previous_asset_media_env = os.environ.get("WBM_ASSET_MEDIA_URL_LIST")
+        cls.previous_apply_output_env = os.environ.get("WBM_APPLY_OUTPUT_ROOT")
+        cls.apply_output_root = cls.tmpdir / "apply-output"
+        shutil.copytree(REPO_ROOT / "form-output", cls.apply_output_root / "form-output")
+        (cls.apply_output_root / "form-app").mkdir(parents=True)
+        for name in ("data.js", "index.html"):
+            shutil.copy2(
+                REPO_ROOT / "form-app" / name,
+                cls.apply_output_root / "form-app" / name,
+            )
         os.environ["WBM_DB"] = str(cls.tmpdir / "api.sqlite3")
         os.environ["WBM_VAR_DIR"] = str(cls.tmpdir / "var")
         os.environ["WBM_WORKBOOK"] = str(cls.workbook)
+        os.environ["WBM_APPLY_OUTPUT_ROOT"] = str(cls.apply_output_root)
+        os.environ["WBM_ASSET_MEDIA_URL_LIST"] = str(
+            REPO_ROOT / "tests" / "fixtures" / "asset-map-sync-media-urls.txt"
+        )
         # Force a FULL re-import of the app package so config re-reads the
         # env vars above. The bare "app" entry must be deleted too: leaving
         # the package object in sys.modules makes `from . import staging`
@@ -891,6 +971,14 @@ class TestApi(unittest.TestCase):
             os.environ.pop("WBM_WORKBOOK", None)
         else:
             os.environ["WBM_WORKBOOK"] = cls.previous_workbook_env
+        if cls.previous_asset_media_env is None:
+            os.environ.pop("WBM_ASSET_MEDIA_URL_LIST", None)
+        else:
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = cls.previous_asset_media_env
+        if cls.previous_apply_output_env is None:
+            os.environ.pop("WBM_APPLY_OUTPUT_ROOT", None)
+        else:
+            os.environ["WBM_APPLY_OUTPUT_ROOT"] = cls.previous_apply_output_env
         shutil.rmtree(cls.tmpdir, ignore_errors=True)
 
     def test_status_and_models(self):
@@ -900,9 +988,449 @@ class TestApi(unittest.TestCase):
         keys = {m["model_key"] for m in models}
         self.assertLessEqual({"stingray", "grand_sport", "z06"}, keys)
 
-    def test_status_reports_provisional_surfaces_separately(self):
+    def test_asset_reconciliation_api_is_exact_shared_read_only_view(self):
+        from corvette_form_generator import asset_map_sync
+
+        fixture = REPO_ROOT / "tests" / "fixtures" / "asset-map-sync-media-urls.txt"
+        snapshot = asset_map_sync.build_asset_manager_snapshot(
+            self.workbook,
+            asset_map_sync.read_media_url_list(fixture),
+            media_source=f"media-url-list:{fixture.name}",
+        )
+        expected = asset_map_sync.filter_asset_manager_snapshot(
+            snapshot,
+            model_key="stingray",
+            status="safe_proposal",
+            offset=0,
+            limit=24,
+        )
+        workbook_before = _sha256(self.workbook)
+        drafts_before = self.client.get("/api/drafts", params={"limit": 200}).json()
+        protected_paths = [
+            self.mainmod.config.DEFAULT_PROJECTION_DB,
+            self.mainmod.config.DEFAULT_DB,
+            REPO_ROOT / "form-app" / "data.js",
+            REPO_ROOT / "form-app" / "index.html",
+            *(REPO_ROOT / "form-output" / "runtime").glob("*-runtime-contract.json"),
+        ]
+        protected_before = {path: _sha256(path) for path in protected_paths}
+        with mock.patch.object(self.mainmod.drafts, "save_operation") as draft_write:
+            response = self.client.get(
+                "/api/assets/reconciliation",
+                params={
+                    "model": "stingray",
+                    "status": "safe_proposal",
+                    "limit": 24,
+                    "refresh": "true",
+                },
+            )
+        self.assertEqual(response.status_code, 200, response.text)
+        actual = response.json()
+        self.assertEqual(actual["fingerprints"], expected["fingerprints"])
+        self.assertEqual(actual["media"], expected["media"])
+        self.assertEqual(actual["coverage"], expected["coverage"])
+        self.assertEqual(actual["status_counts"], expected["status_counts"])
+        self.assertEqual(actual["queue"], expected["queue"])
+        self.assertEqual(actual["controls"]["image_fit"], ["cover", "contain", "swatch"])
+        draft_write.assert_not_called()
+        self.assertEqual(_sha256(self.workbook), workbook_before)
+        self.assertEqual(
+            self.client.get("/api/drafts", params={"limit": 200}).json(),
+            drafts_before,
+        )
+        self.assertEqual(
+            {path: _sha256(path) for path in protected_paths},
+            protected_before,
+        )
+
+    def test_safe_asset_resolution_uses_existing_draft_and_binds_evidence(self):
+        draft_id = "asset-safe-api"
+        protected = [
+            self.workbook,
+            REPO_ROOT / "form-app" / "data.js",
+            *(REPO_ROOT / "form-output" / "runtime").glob("*-runtime-contract.json"),
+        ]
+        before = {path: _sha256(path) for path in protected}
+        view = self.client.get(
+            "/api/assets/reconciliation",
+            params={"status": "safe_proposal", "draft_id": draft_id},
+        ).json()
+        self.assertEqual(view["status_counts"]["safe_proposal"], 1)
+        item = view["queue"]["items"][0]
+        response = self.client.post(
+            f"/api/drafts/{draft_id}/asset-resolutions",
+            json={
+                "item_id": item["id"],
+                "resolution_kind": "accept_safe",
+                "fingerprints": view["fingerprints"],
+                "values": {"image_fit": "contain", "image_position": "25% 40%"},
+                "actor": "asset-test",
+            },
+        )
+        self.assertEqual(response.status_code, 200, response.text)
+        operation = response.json()
+        self.assertEqual(operation["table_name"], "assets")
+        self.assertEqual(operation["changed_fields"]["image_fit"]["after"], "contain")
+        lifecycle = self.client.get(f"/api/drafts/{draft_id}").json()
+        self.assertEqual(len(lifecycle["operations"]), 1)
+        evidence = lifecycle["artifacts"]["asset_resolutions"]
+        self.assertEqual(len(evidence), 1)
+        self.assertEqual(evidence[0]["resolution_kind"], "accept_safe")
+        self.assertEqual(evidence[0]["reconciliation_sha256"], view["fingerprints"]["reconciliation_sha256"])
+        self.assertEqual(lifecycle["operations"][0]["asset_resolutions"][0]["id"], evidence[0]["id"])
+        self.assertEqual({path: _sha256(path) for path in protected}, before)
+        self.assertEqual(self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200)
+
+    def test_operational_ignore_invalidates_when_inventory_fingerprint_changes(self):
+        draft_id = "asset-ignore-api"
+        fixture = self.tmpdir / "ignore-media.txt"
+        fixture.write_text("https://example.test/readme.txt\n", encoding="utf-8")
+        original_fixture = os.environ["WBM_ASSET_MEDIA_URL_LIST"]
+        try:
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = str(fixture)
+            self.mainmod.asset_workspace.clear_cache()
+            view = self.client.get(
+                "/api/assets/reconciliation",
+                params={"status": "unparseable", "draft_id": draft_id, "refresh": True},
+            ).json()
+            item = view["queue"]["items"][0]
+            response = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": item["id"],
+                    "resolution_kind": "ignore",
+                    "fingerprints": view["fingerprints"],
+                },
+            )
+            self.assertEqual(response.status_code, 200, response.text)
+            ignored = self.client.get(
+                "/api/assets/reconciliation",
+                params={"status": "ignored", "draft_id": draft_id},
+            ).json()
+            self.assertEqual(ignored["status_counts"]["ignored"], 1)
+
+            fixture.write_text(
+                "https://example.test/readme.txt\nhttps://example.test/another.txt\n",
+                encoding="utf-8",
+            )
+            refreshed = self.client.get(
+                "/api/assets/reconciliation",
+                params={"status": "unparseable", "draft_id": draft_id, "refresh": True},
+            ).json()
+            self.assertEqual(refreshed["status_counts"]["ignored"], 0)
+            self.assertGreaterEqual(refreshed["status_counts"]["unparseable"], 1)
+            self.assertEqual(refreshed["draft_asset_resolutions"]["stale_count"], 1)
+        finally:
+            self.client.post(f"/api/drafts/{draft_id}/cancel")
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = original_fixture
+            self.mainmod.asset_workspace.clear_cache()
+
+    def test_bulk_asset_acceptance_adds_only_server_classified_safe_matches(self):
+        draft_id = "asset-safe-bulk-api"
+        view = self.client.get(
+            "/api/assets/reconciliation",
+            params={"draft_id": draft_id, "refresh": True},
+        ).json()
+        response = self.client.post(
+            f"/api/drafts/{draft_id}/asset-resolutions/safe",
+            json={"fingerprints": view["fingerprints"], "actor": "bulk-test"},
+        )
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual(response.json()["accepted"], view["status_counts"]["safe_proposal"])
+        lifecycle = self.client.get(f"/api/drafts/{draft_id}").json()
+        evidence = lifecycle["artifacts"]["asset_resolutions"]
+        self.assertTrue(evidence)
+        self.assertEqual({item["resolution_kind"] for item in evidence}, {"accept_safe"})
+        self.assertFalse({
+            item["evidence"]["source_status"] for item in evidence
+        } & {"ambiguous", "stale_target", "wildcard_conflict", "unmatched", "unparseable"})
+        self.assertEqual(self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200)
+
+    def test_asset_fingerprint_drift_blocks_changeset_freeze(self):
+        draft_id = "asset-stale-freeze-api"
+        fixture = self.tmpdir / "stale-freeze-media.txt"
+        fixture.write_text("https://example.test/h-stx.png\n", encoding="utf-8")
+        original_fixture = os.environ["WBM_ASSET_MEDIA_URL_LIST"]
+        try:
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = str(fixture)
+            self.mainmod.asset_workspace.clear_cache()
+            view = self.client.get(
+                "/api/assets/reconciliation",
+                params={"status": "safe_proposal", "draft_id": draft_id, "refresh": True},
+            ).json()
+            item = view["queue"]["items"][0]
+            saved = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": item["id"],
+                    "resolution_kind": "accept_safe",
+                    "fingerprints": view["fingerprints"],
+                },
+            )
+            self.assertEqual(saved.status_code, 200, saved.text)
+            fixture.write_text(
+                "https://example.test/h-stx.png\nhttps://example.test/readme.txt\n",
+                encoding="utf-8",
+            )
+            committed = self.client.post(f"/api/drafts/{draft_id}/commit")
+            self.assertEqual(committed.status_code, 422, committed.text)
+            self.assertEqual(
+                committed.json()["detail"]["status"], "asset_reconciliation_stale"
+            )
+            lifecycle = self.client.get(f"/api/drafts/{draft_id}").json()
+            self.assertEqual(lifecycle["draft"]["status"], "draft")
+            self.assertIsNone(lifecycle["artifacts"]["changeset"])
+        finally:
+            self.client.post(f"/api/drafts/{draft_id}/cancel")
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = original_fixture
+            self.mainmod.asset_workspace.clear_cache()
+
+    def test_ambiguous_asset_requires_explicit_equal_priority_candidate(self):
+        draft_id = "asset-ambiguous-api"
+        fixture = self.tmpdir / "ambiguous-media.txt"
+        fixture.write_text(
+            "\n".join([
+                "https://example.test/a/h-stx.png",
+                "https://example.test/b/h-stx.png",
+            ]) + "\n",
+            encoding="utf-8",
+        )
+        original_fixture = os.environ["WBM_ASSET_MEDIA_URL_LIST"]
+        try:
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = str(fixture)
+            self.mainmod.asset_workspace.clear_cache()
+            view = self.client.get(
+                "/api/assets/reconciliation",
+                params={"model": "z06", "status": "ambiguous", "draft_id": draft_id, "refresh": True},
+            ).json()
+            item = view["queue"]["items"][0]
+            alternatives = item["candidate"]["alternatives"]
+            self.assertEqual(len(alternatives), 2)
+            rejected = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": item["id"],
+                    "resolution_kind": "select_candidate",
+                    "fingerprints": view["fingerprints"],
+                    "selected_url": "https://example.test/not-a-candidate.png",
+                },
+            )
+            self.assertEqual(rejected.status_code, 422)
+            accepted = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": item["id"],
+                    "resolution_kind": "select_candidate",
+                    "fingerprints": view["fingerprints"],
+                    "selected_url": alternatives[1]["url"],
+                    "values": {"image_fit": "contain", "image_position": "right center"},
+                },
+            )
+            self.assertEqual(accepted.status_code, 200, accepted.text)
+            lifecycle = self.client.get(f"/api/drafts/{draft_id}").json()
+            evidence = lifecycle["artifacts"]["asset_resolutions"][0]
+            self.assertEqual(evidence["resolution_kind"], "select_candidate")
+            self.assertEqual(evidence["media_url"], alternatives[1]["url"])
+        finally:
+            self.client.post(f"/api/drafts/{draft_id}/cancel")
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = original_fixture
+            self.mainmod.asset_workspace.clear_cache()
+
+    def test_unmatched_media_can_only_assign_to_a_valid_snapshot_target(self):
+        draft_id = "asset-assignment-api"
+        fixture = self.tmpdir / "assignment-media.txt"
+        media_url = "https://example.test/c-xyz.png"
+        fixture.write_text(media_url + "\n", encoding="utf-8")
+        original_fixture = os.environ["WBM_ASSET_MEDIA_URL_LIST"]
+        try:
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = str(fixture)
+            self.mainmod.asset_workspace.clear_cache()
+            view = self.client.get(
+                "/api/assets/reconciliation",
+                params={"status": "unmatched", "draft_id": draft_id, "refresh": True},
+            ).json()
+            source = view["queue"]["items"][0]
+            target = next(
+                item for item in view["assignment_targets"]
+                if item["model_key"] == "stingray" and item["target_type"] == "option"
+            )
+            rejected = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": source["id"],
+                    "resolution_kind": "assign_media",
+                    "fingerprints": view["fingerprints"],
+                    "target_item_id": "not-a-target",
+                },
+            )
+            self.assertEqual(rejected.status_code, 422)
+            accepted = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": source["id"],
+                    "resolution_kind": "assign_media",
+                    "fingerprints": view["fingerprints"],
+                    "target_item_id": target["item_id"],
+                    "values": {"image_fit": "cover", "image_position": "center"},
+                },
+            )
+            self.assertEqual(accepted.status_code, 200, accepted.text)
+            operation = accepted.json()
+            self.assertEqual(operation["table_name"], "assets")
+            self.assertEqual(operation["final"]["image_url"], media_url)
+            evidence = self.client.get(f"/api/drafts/{draft_id}").json()["artifacts"]["asset_resolutions"][0]
+            self.assertEqual(evidence["resolution_kind"], "assign_media")
+            self.assertEqual(evidence["evidence"]["target_item_id"], target["item_id"])
+            other_target = next(
+                item for item in view["assignment_targets"]
+                if item["model_key"] == "z06"
+                and (
+                    item["target_type"], item["target_id"]
+                ) != (target["target_type"], target["target_id"])
+            )
+            retargeted = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": source["id"],
+                    "resolution_kind": "assign_media",
+                    "fingerprints": view["fingerprints"],
+                    "target_item_id": other_target["item_id"],
+                },
+            )
+            self.assertEqual(retargeted.status_code, 422)
+            self.assertEqual(
+                retargeted.json()["detail"]["status"],
+                "asset_resolution_retarget_rejected",
+            )
+        finally:
+            self.client.post(f"/api/drafts/{draft_id}/cancel")
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = original_fixture
+            self.mainmod.asset_workspace.clear_cache()
+
+    def test_mixed_ordinary_and_asset_draft_reaches_one_approval_chain(self):
+        draft_id = "asset-mixed-approval-api"
+        fixture = self.tmpdir / "mixed-media.txt"
+        fixture.write_text(
+            "\n".join([
+                "https://example.test/h-stx.png",
+                "https://example.test/a/h-j6a.png",
+                "https://example.test/b/h-j6a.png",
+                "https://example.test/c-gba.png",
+            ]) + "\n",
+            encoding="utf-8",
+        )
+        original_fixture = os.environ["WBM_ASSET_MEDIA_URL_LIST"]
+        protected = [
+            self.workbook,
+            REPO_ROOT / "form-app" / "data.js",
+            REPO_ROOT / "form-app" / "index.html",
+            *(REPO_ROOT / "form-output" / "runtime").glob("*-runtime-contract.json"),
+        ]
+        before = {path: _sha256(path) for path in protected}
+        try:
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = str(fixture)
+            self.mainmod.asset_workspace.clear_cache()
+            ordinary = self.client.get(
+                "/api/records/options", params={"model": "stingray", "limit": 1}
+            ).json()["records"][0]
+            saved_ordinary = self.client.post(
+                f"/api/drafts/{draft_id}/operations",
+                json={
+                    "table": "options",
+                    "model_id": "stingray",
+                    "op": "update",
+                    "key": {"option_id": ordinary["option_id"]},
+                    "record": {"option_name": ordinary["option_name"] + " mixed proof"},
+                },
+            )
+            self.assertEqual(saved_ordinary.status_code, 200, saved_ordinary.text)
+
+            view = self.client.get(
+                "/api/assets/reconciliation",
+                params={"draft_id": draft_id, "refresh": True},
+            ).json()
+            safe = next(item for item in view["queue"]["items"] if item["status"] == "safe_proposal")
+            saved_safe = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": safe["id"],
+                    "resolution_kind": "accept_safe",
+                    "fingerprints": view["fingerprints"],
+                },
+            )
+            self.assertEqual(saved_safe.status_code, 200, saved_safe.text)
+
+            ambiguous_view = self.client.get(
+                "/api/assets/reconciliation",
+                params={"model": "z06", "status": "ambiguous", "draft_id": draft_id},
+            ).json()
+            ambiguous = ambiguous_view["queue"]["items"][0]
+            selected = ambiguous["candidate"]["alternatives"][0]["url"]
+            saved_ambiguous = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": ambiguous["id"],
+                    "resolution_kind": "select_candidate",
+                    "fingerprints": ambiguous_view["fingerprints"],
+                    "selected_url": selected,
+                    "values": {"image_fit": "contain", "image_position": "right center"},
+                },
+            )
+            self.assertEqual(saved_ambiguous.status_code, 200, saved_ambiguous.text)
+
+            presentation_view = self.client.get(
+                "/api/assets/reconciliation",
+                params={"model": "stingray", "status": "missing", "draft_id": draft_id, "limit": 100},
+            ).json()
+            presentation = next(
+                item for item in presentation_view["queue"]["items"]
+                if item["coverage"]["kind"] == "exact"
+                and item["current_values"]["image_url"]
+            )
+            current_fit = presentation["current_values"]["image_fit"]
+            edited_fit = "contain" if current_fit != "contain" else "cover"
+            saved_presentation = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions",
+                json={
+                    "item_id": presentation["id"],
+                    "resolution_kind": "manual_url",
+                    "fingerprints": presentation_view["fingerprints"],
+                    "selected_url": presentation["current_values"]["image_url"],
+                    "values": {"image_fit": edited_fit, "image_position": "left center"},
+                },
+            )
+            self.assertEqual(saved_presentation.status_code, 200, saved_presentation.text)
+
+            lifecycle = self.client.get(f"/api/drafts/{draft_id}").json()
+            self.assertEqual(len(lifecycle["artifacts"]["asset_resolutions"]), 3)
+            self.assertTrue(any(op["table_name"] == "options" for op in lifecycle["operations"]))
+            self.assertTrue(any(op["table_name"] == "assets" for op in lifecycle["operations"]))
+
+            committed = self.client.post(f"/api/drafts/{draft_id}/commit")
+            self.assertEqual(committed.status_code, 200, committed.text)
+            preview = self.client.post(f"/api/drafts/{draft_id}/preview")
+            self.assertEqual(preview.status_code, 200, preview.text)
+            self.assertEqual(preview.json()["manager_state"], "preview_ready")
+            confirmable = preview.json()["result"]["warningPolicy"]["confirmableIds"]
+            approved = self.client.post(
+                f"/api/drafts/{draft_id}/approve",
+                json={"actor": "mixed-proof", "warning_ids": confirmable},
+            )
+            self.assertEqual(approved.status_code, 200, approved.text)
+            self.assertEqual(approved.json()["manager_state"], "approved")
+            final = self.client.get(f"/api/drafts/{draft_id}").json()
+            self.assertIsNotNone(final["artifacts"]["changeset"])
+            self.assertEqual(len(final["artifacts"]["preview_attempts"]), 1)
+            self.assertEqual(len(final["artifacts"]["approval_attempts"]), 1)
+            self.assertEqual({path: _sha256(path) for path in protected}, before)
+        finally:
+            self.client.post(f"/api/drafts/{draft_id}/cancel")
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = original_fixture
+            self.mainmod.asset_workspace.clear_cache()
+
+    def test_status_reports_guarded_surfaces_separately(self):
         status = self.client.get("/api/status").json()
-        self.assertEqual(status["mode"], "read_only_provisional")
+        self.assertEqual(status["mode"], "durable_apply_rebuild")
         self.assertEqual(status["projection"]["state"], "current")
         self.assertTrue(status["projection"]["active"])
         self.assertTrue(status["projection"]["reimport_allowed"])
@@ -937,6 +1465,40 @@ class TestApi(unittest.TestCase):
         tables = {c["table"] for c in cols}
         self.assertIn("options", tables)
         self.assertIn("pricing", tables)
+
+    def test_structure_falls_back_to_master_section_step(self):
+        structure = self.client.get("/api/structure/stingray").json()
+        presentation = {
+            section["section_id"]: section
+            for section in structure["section_presentation"]
+        }
+        stripes = next(
+            step for step in structure["steps"]
+            if step["step_key"] == "aero_exhaust_stripes_accessories"
+        )
+
+        self.assertEqual(
+            presentation["sec_1lte_001"]["step_key"],
+            "standard_equipment",
+        )
+        self.assertIn(
+            "sec_stri_001",
+            {section["section_id"] for section in stripes["sections"]},
+        )
+
+    def test_catalog_routes_refuse_non_allowlisted_table_names(self):
+        attempts = (
+            self.client.get("/api/records/sqlite_master/schema"),
+            self.client.get("/api/records/sqlite_master"),
+            self.client.post(
+                "/api/records/sqlite_master/dependencies",
+                json={"model_id": "", "key": {}},
+            ),
+        )
+
+        for response in attempts:
+            self.assertEqual(response.status_code, 404, response.text)
+            self.assertIn("unknown table", response.json()["detail"])
 
     def test_stage_endpoint_validation_error_shape(self):
         resp = self.client.post("/api/changes", json={
@@ -976,6 +1538,190 @@ class TestApi(unittest.TestCase):
         mapping_fields = {column["name"]: column for column in mappings["columns"]}
         self.assertEqual(mapping_fields["source_id"]["reference"]["kind"], "union")
 
+        assets = self.client.get(
+            "/api/records/assets/schema", params={"model": "stingray"}
+        ).json()
+        asset_fields = {column["name"]: column for column in assets["columns"]}
+        self.assertEqual(asset_fields["image_fit"]["field_kind"], "finite")
+        self.assertEqual(
+            asset_fields["image_fit"]["finite_values"],
+            ["cover", "contain", "swatch"],
+        )
+
+    def test_durable_draft_discovery_and_cancel_routes_preserve_history(self):
+        row = self.client.get(
+            "/api/records/options",
+            params={"model": "stingray", "limit": 1},
+        ).json()["records"][0]
+        draft_id = "api-ui-draft-cancel"
+        saved = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "options",
+                "model_id": "stingray",
+                "op": "update",
+                "key": {"option_id": row["option_id"]},
+                "record": {"option_name": f'{row["option_name"]} UI review'},
+                "actor": "browser-test",
+            },
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+
+        listed = self.client.get("/api/drafts", params={"limit": 200}).json()
+        summary = next(item for item in listed["drafts"] if item["id"] == draft_id)
+        self.assertEqual(summary["status"], "draft")
+        self.assertEqual(summary["operation_count"], 1)
+
+        cancelled = self.client.post(f"/api/drafts/{draft_id}/cancel")
+        self.assertEqual(cancelled.status_code, 200, cancelled.text)
+        self.assertEqual(cancelled.json()["status"], "cancelled")
+        lifecycle = self.client.get(f"/api/drafts/{draft_id}").json()
+        self.assertEqual(lifecycle["draft"]["status"], "cancelled")
+        self.assertEqual(len(lifecycle["operations"]), 1)
+        self.assertEqual(
+            lifecycle["artifacts"]["cancellation"]["status"], "cancelled"
+        )
+
+    def test_vehicle_setup_copy_round_trips_through_browser_schema_and_draft(self):
+        setup_fields = [
+            "setup_card_subtitle", "setup_eyebrow", "setup_title",
+            "setup_description", "setup_fact_1", "setup_fact_2", "setup_fact_3",
+        ]
+        schema = self.client.get(
+            "/api/records/models/schema", params={"model": "stingray"}
+        ).json()
+        columns = {column["name"]: column for column in schema["columns"]}
+        self.assertTrue(set(setup_fields) <= columns.keys())
+        self.assertTrue(all(columns[name]["field_kind"] == "free_text"
+                            for name in setup_fields))
+
+        records = self.client.get(
+            "/api/records/models",
+            params={"model": "stingray", "search": "stingray"},
+        ).json()["records"]
+        model = next(row for row in records if row["model_key"] == "stingray")
+        final_copy = {name: model[name] for name in setup_fields}
+        final_copy["setup_title"] = f'{final_copy["setup_title"]} UI proof'
+        draft_id = "api-setup-copy-ui"
+        saved = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "models",
+                "model_id": "stingray",
+                "op": "update",
+                "key": {"model_key": "stingray"},
+                "record": final_copy,
+                "actor": "browser-test",
+            },
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+        operation = saved.json()
+        self.assertEqual(
+            {name: operation["final"][name] for name in setup_fields}, final_copy
+        )
+
+        committed = self.client.post(f"/api/drafts/{draft_id}/commit")
+        self.assertEqual(committed.status_code, 200, committed.text)
+        change = committed.json()["rowChanges"][0]
+        self.assertEqual(set(change["fields"]), {"setup_title"})
+        self.assertEqual(
+            change["fields"]["setup_title"]["after"], final_copy["setup_title"]
+        )
+        self.assertEqual(
+            self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200
+        )
+
+    def test_real_model_row_round_trips_context_lineage_null_and_reference(self):
+        conn = self.mainmod.open_projection_connection()
+        try:
+            row = conn.execute(
+                "SELECT * FROM rule_mappings WHERE model_id='stingray' "
+                "AND runtime_action IS NULL AND source_id IS NOT NULL "
+                "AND original_detail_raw IS NOT NULL LIMIT 1"
+            ).fetchone()
+            self.assertIsNotNone(row)
+            source = dict(row)
+        finally:
+            conn.close()
+
+        schema = self.client.get(
+            "/api/records/rule_mappings/schema", params={"model": "stingray"}
+        ).json()
+        fields = {column["name"]: column for column in schema["columns"]}
+        self.assertEqual(schema["model_context"]["value"], "stingray")
+        self.assertEqual(fields["source_id"]["reference"]["kind"], "union")
+        self.assertTrue(fields["runtime_action"]["optional"])
+
+        projected = self.client.get(
+            "/api/records/rule_mappings",
+            params={"model": "stingray", "search": source["rule_id"]},
+        ).json()["records"]
+        record = next(item for item in projected if item["id"] == source["id"])
+        self.assertEqual(record["model_context"], ["stingray"])
+        self.assertEqual(record["src_sheet"], source["src_sheet"])
+        self.assertEqual(record["src_row"], source["src_row"])
+        self.assertEqual(record["physical_key"], source["physical_key"])
+        self.assertIsNone(record["runtime_action"])
+        self.assertEqual(record["source_id"], source["source_id"])
+
+        draft_id = "api-context-round-trip"
+        response = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "rule_mappings",
+                "model_id": "stingray",
+                "op": "update",
+                "key": {"rule_id": source["rule_id"]},
+                "record": {
+                    "original_detail_raw": source["original_detail_raw"] + " context proof"
+                },
+                "session_id": "api-context-test",
+                "actor": "test",
+            },
+        )
+        try:
+            self.assertEqual(response.status_code, 200, response.text)
+            operation = response.json()
+            self.assertEqual(operation["model_context"], ["stingray"])
+            self.assertEqual(operation["source_sheet"], source["src_sheet"])
+            self.assertEqual(operation["source_row"], source["src_row"])
+            self.assertEqual(operation["physical_key"], source["physical_key"])
+            self.assertIsNone(operation["original"]["runtime_action"])
+            self.assertEqual(operation["original"]["source_id"], source["source_id"])
+            self.assertIsNone(operation["final"]["runtime_action"])
+            self.assertEqual(operation["final"]["source_id"], source["source_id"])
+
+            lifecycle = self.client.get(f"/api/drafts/{draft_id}")
+            self.assertEqual(lifecycle.status_code, 200, lifecycle.text)
+            body = lifecycle.json()
+            self.assertEqual(body["context"]["model_keys"], ["stingray"])
+            self.assertEqual(body["operations"], [operation])
+            self.assertEqual(
+                body["context"]["physical_targets"][0]["physical_key"],
+                source["physical_key"],
+            )
+
+            emitted = self.client.post(f"/api/drafts/{draft_id}/commit")
+            self.assertEqual(emitted.status_code, 200, emitted.text)
+            committed = self.client.get(f"/api/drafts/{draft_id}").json()
+            self.assertEqual(
+                committed["artifacts"]["changeset"]["artifact"], emitted.json()
+            )
+            self.assertEqual(
+                committed["artifacts"]["changeset"]["change_set_id"],
+                emitted.json()["changeSetId"],
+            )
+        finally:
+            state = self.mainmod.open_state_connection()
+            try:
+                status = state.execute(
+                    "SELECT status FROM workflow_drafts WHERE id=?", (draft_id,)
+                ).fetchone()
+                if status is not None and status["status"] != "cancelled":
+                    self.mainmod.drafts.cancel_draft(state, draft_id=draft_id)
+            finally:
+                state.close()
+
     def test_live_sync_is_provisionally_read_only_even_when_fully_confirmed(self):
         current_mtime = str(WORKBOOK.stat().st_mtime_ns)
         resp = self.client.post("/api/sync", json={
@@ -986,7 +1732,7 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp.status_code, 409)
         detail = resp.json()["detail"]
         self.assertEqual(detail["status"], "read_only_provisional")
-        self.assertIn("Pass 7", detail["message"])
+        self.assertIn("Apply and Rebuild", detail["message"])
 
     def test_pass5_draft_api_roots_durable_update_without_projection_mutation(self):
         projected = self.client.get(
@@ -1098,6 +1844,87 @@ class TestApi(unittest.TestCase):
                 (pending_history_id, failed_history_id),
             )
             conn.commit()
+
+    def test_zz_apply_rebuild_copied_workbook_mixed_draft_and_replay(self):
+        draft_id = "api-apply-rebuild-mixed"
+        canonical_paths = [
+            WORKBOOK,
+            REPO_ROOT / "form-app" / "data.js",
+            REPO_ROOT / "form-app" / "index.html",
+            *(REPO_ROOT / "form-output" / "runtime").glob("*-runtime-contract.json"),
+        ]
+        canonical_before = {path: _sha256(path) for path in canonical_paths}
+        workbook_before = _sha256(self.workbook)
+        ordinary = self.client.get(
+            "/api/records/options", params={"model": "stingray", "limit": 1}
+        ).json()["records"][0]
+        saved = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "options",
+                "model_id": "stingray",
+                "op": "update",
+                "key": {"option_id": ordinary["option_id"]},
+                "record": {"option_name": ordinary["option_name"] + " apply proof"},
+            },
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+
+        asset_view = self.client.get(
+            "/api/assets/reconciliation",
+            params={"model": "stingray", "status": "covered", "draft_id": draft_id, "refresh": True},
+        ).json()
+        asset = asset_view["queue"]["items"][0]
+        saved_asset = self.client.post(
+            f"/api/drafts/{draft_id}/asset-resolutions",
+            json={
+                "item_id": asset["id"],
+                "resolution_kind": "edit",
+                "fingerprints": asset_view["fingerprints"],
+                "values": {
+                    "image_alt": asset["current_values"]["image_alt"] + " apply proof",
+                },
+            },
+        )
+        self.assertEqual(saved_asset.status_code, 200, saved_asset.text)
+
+        committed = self.client.post(f"/api/drafts/{draft_id}/commit")
+        self.assertEqual(committed.status_code, 200, committed.text)
+        preview = self.client.post(f"/api/drafts/{draft_id}/preview")
+        self.assertEqual(preview.status_code, 200, preview.text)
+        confirmable = preview.json()["result"]["warningPolicy"]["confirmableIds"]
+        approved = self.client.post(
+            f"/api/drafts/{draft_id}/approve",
+            json={"actor": "apply-proof", "warning_ids": confirmable},
+        )
+        self.assertEqual(approved.status_code, 200, approved.text)
+
+        applied = self.client.post(
+            f"/api/drafts/{draft_id}/apply-rebuild",
+            json={"actor": "apply-proof", "confirm": "APPLY AND REBUILD"},
+        )
+        self.assertEqual(applied.status_code, 200, applied.text)
+        attempt = applied.json()
+        self.assertEqual(attempt["manager_state"], "applied")
+        evidence = attempt["result"]["applyRebuild"]
+        self.assertEqual(evidence["status"], "current")
+        self.assertEqual(evidence["affected_models"], ["stingray"])
+        self.assertEqual(evidence["workbook"]["state"], "applied")
+        self.assertEqual(evidence["generated_contracts"]["state"], "current")
+        self.assertEqual(evidence["publication"]["state"], "current")
+        self.assertNotEqual(_sha256(self.workbook), workbook_before)
+
+        replay = self.client.post(
+            f"/api/drafts/{draft_id}/apply-rebuild",
+            json={"actor": "apply-proof", "confirm": "APPLY AND REBUILD"},
+        )
+        self.assertEqual(replay.status_code, 200, replay.text)
+        self.assertEqual(replay.json()["id"], attempt["id"])
+        state = self.client.get("/api/status").json()
+        self.assertEqual(state["projection"]["state"], "stale")
+        self.assertEqual(state["generated_artifacts"]["state"], "current")
+        self.assertEqual(state["publication"]["state"], "current")
+        self.assertEqual({path: _sha256(path) for path in canonical_paths}, canonical_before)
 
 
 if __name__ == "__main__":

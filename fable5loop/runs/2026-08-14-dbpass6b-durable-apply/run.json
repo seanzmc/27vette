@@ -1,0 +1,45 @@
+{
+  "id": "2026-08-14-dbpass6b-durable-apply",
+  "started_at": "2026-08-14T09:07:10-04:00",
+  "completed_at": "2026-08-14T09:38:28-04:00",
+  "objective": "Complete Pass 6B durable manager apply, idempotency, and recovery without API or browser reachability.",
+  "changed_surface": "Workbook Manager durable schema, backend lifecycle, focused tests, workflow documentation, and receipt evidence",
+  "outcome_rubric": "fable5loop/runs/2026-08-14-dbpass6b-durable-apply/outcome.md",
+  "verifier_report": "fable5loop/runs/2026-08-14-dbpass6b-durable-apply/verifier-report.md",
+  "validation_output": "fable5loop/runs/2026-08-14-dbpass6b-durable-apply/validation-output.txt",
+  "state_updates": [
+    {
+      "section": "Current handoff",
+      "evidence": "fable5loop/runs/2026-08-14-dbpass6b-durable-apply/validation-output.txt"
+    },
+    {
+      "section": "Open failures",
+      "evidence": "fable5loop/runs/2026-08-14-dbpass6b-durable-apply/validation-output.txt"
+    },
+    {
+      "section": "Last session",
+      "evidence": "fable5loop/runs/2026-08-14-dbpass6b-durable-apply/verifier-report.md"
+    }
+  ],
+  "skill_update": {
+    "decision": "not_applicable",
+    "evidence": "fable5loop/runs/2026-08-14-dbpass6b-durable-apply/verifier-report.md"
+  },
+  "verifier": {
+    "required": true,
+    "independent_context": true,
+    "verdict": "pass",
+    "accepted_by_human": false
+  },
+  "boundaries_preserved": [
+    "canonical workbook",
+    "manager apply API and UI",
+    "public ChangeSet preview approval and receipt schemas",
+    "generated artifacts",
+    "registry publication",
+    "customer runtime",
+    "dealer submission",
+    "deployment",
+    "dependencies"
+  ]
+}

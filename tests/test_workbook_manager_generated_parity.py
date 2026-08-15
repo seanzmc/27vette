@@ -140,7 +140,17 @@ class TestWorkbookManagerGeneratedParity(unittest.TestCase):
                 config.EXPORT_DIR = previous_export_dir
                 connection.close()
             models = promoted_runtime_models(source, ROOT)
-            self.assertEqual(models, ("stingray", "grand_sport", "z06"))
+            self.assertEqual(
+                models,
+                (
+                    "stingray",
+                    "grand_sport",
+                    "grand_sport_x",
+                    "z06",
+                    "zr1",
+                    "zr1x",
+                ),
+            )
 
             for model_key in models:
                 source_root = temp / "source-output" / model_key

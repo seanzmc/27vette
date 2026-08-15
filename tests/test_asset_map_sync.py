@@ -1595,3 +1595,80 @@ def test_manifest_section_coverage_stats(tmp_path: Path) -> None:
     # Pure helper agrees with the manifest.
     desired, _, existing = _coverage_inputs(workbook_path)
     assert asset_map_sync.build_section_coverage_stats(desired, existing) == stats
+
+
+def test_asset_manager_snapshot_is_typed_parity_view_with_candidates_and_fingerprints(
+    tmp_path: Path,
+) -> None:
+    workbook_path = tmp_path / "asset-manager.xlsx"
+    make_coverage_workbook(workbook_path)
+    urls = [
+        "https://example.test/27vette/c-dsp.png",
+        "https://example.test/27vette/c-req-a.png",
+        "https://example.test/27vette/c-req-b.png",
+        "https://example.test/27vette/c-abc.png",
+        "https://example.test/27vette/longfilename.png",
+    ]
+
+    wb = load_workbook(workbook_path, read_only=True, data_only=True)
+    try:
+        plan, _sources, unmatched, unparseable = asset_map_sync.build_sync_plan(
+            wb,
+            asset_sheet="asset_map",
+            media_urls=urls,
+            verify_existing=False,
+            timeout=1,
+            workers=1,
+            incremental=False,
+        )
+    finally:
+        wb.close()
+    snapshot = asset_map_sync.build_asset_manager_snapshot(
+        workbook_path, urls, media_source="fixture"
+    )
+    view = asset_map_sync.filter_asset_manager_snapshot(snapshot, limit=100)
+
+    target_items = {
+        (item["model_key"], item["target_type"], item["target_id"]): item
+        for item in snapshot.items if item["kind"] == "target"
+    }
+    assert {
+        key: item["action"] for key, item in target_items.items()
+    } == {
+        (row["model_key"], row["target_type"], row["target_id"]): row["action"]
+        for row in plan.report
+    }
+    ambiguous = target_items[("stingray", "option", "opt_req_001")]
+    assert ambiguous["status"] == "ambiguous"
+    assert ambiguous["candidate"]["priority"] == 1
+    assert [candidate["url"] for candidate in ambiguous["candidate"]["alternatives"]] == [
+        "https://example.test/27vette/c-req-a.png",
+        "https://example.test/27vette/c-req-b.png",
+    ]
+    existing = target_items[("stingray", "option", "opt_exist_001")]
+    assert existing["current_values"]["image_fit"] == "cover"
+    assert existing["lineage"] == {
+        "target_source_sheet": "stingray_options",
+        "asset_source_sheet": "asset_map",
+        "asset_source_row": 2,
+    }
+    assert view["media"]["unmatched_count"] == len(unmatched) == 1
+    assert view["media"]["unparseable_count"] == len(unparseable) == 1
+    assert view["status_counts"]["ambiguous"] == 1
+    assert view["status_counts"]["unmatched"] == 1
+    assert view["status_counts"]["unparseable"] == 1
+    assert view["coverage"]["overall"]["total_targets"] == len(plan.report)
+    assert len(view["fingerprints"]["workbook_sha256"]) == 64
+    assert len(view["fingerprints"]["media_inventory_sha256"]) == 64
+    assert len(view["fingerprints"]["reconciliation_sha256"]) == 64
+
+    repeated = asset_map_sync.build_asset_manager_snapshot(
+        workbook_path, reversed(urls), media_source="fixture"
+    )
+    assert repeated.fingerprints == snapshot.fingerprints
+    changed = asset_map_sync.build_asset_manager_snapshot(
+        workbook_path, [*urls, "https://example.test/27vette/c-npr.png"], media_source="fixture"
+    )
+    assert changed.fingerprints["workbook_sha256"] == snapshot.fingerprints["workbook_sha256"]
+    assert changed.fingerprints["media_inventory_sha256"] != snapshot.fingerprints["media_inventory_sha256"]
+    assert changed.fingerprints["reconciliation_sha256"] != snapshot.fingerprints["reconciliation_sha256"]

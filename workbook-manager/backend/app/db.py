@@ -53,10 +53,13 @@ from .catalog import TABLE_SPECS, TableSpec
 # records sheet and managed-row dispositions. 4 (Pass 5): durable workflow
 # drafts and their coalesced physical-row operations. 5 (Pass 5): immutable
 # emitted ChangeSet payloads. 6 (Pass 5): immutable preview-attempt evidence.
-# 7 (Pass 5): immutable approval-attempt evidence. Versions 4–7 did not change
+# 7 (Pass 5): immutable approval-attempt evidence. 8 (Pass 6B): durable apply
+# attempts and manual-resolution evidence. 9 (Pass 7 checkpoint 4): mutable
+# asset-resolution evidence beside coalesced draft operations and operational
+# ignores. Versions 4–9 did not change
 # projection shape, so a verified version-3
 # projection remains compatible while its durable store upgrades independently.
-SCHEMA_VERSION = 7
+SCHEMA_VERSION = 9
 PROJECTION_SCHEMA_VERSION = 3
 # One process-local lock for bootstrap, durable-state mutation, candidate
 # promotion, and workbook apply.
@@ -346,6 +349,23 @@ DURABLE_SUPPORT_DDL = SUPPORT_DDL[3:5] + [
       model_context_json TEXT NOT NULL DEFAULT '[]',
       UNIQUE(draft_id, source_sheet, family, physical_key)
     )""",
+    """CREATE TABLE IF NOT EXISTS draft_asset_resolutions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      draft_id TEXT NOT NULL REFERENCES workflow_drafts(id),
+      operation_id INTEGER REFERENCES draft_operations(id) ON DELETE CASCADE,
+      created_ts TEXT NOT NULL,
+      updated_ts TEXT NOT NULL,
+      item_id TEXT NOT NULL,
+      resolution_kind TEXT NOT NULL,
+      reconciliation_sha256 TEXT NOT NULL,
+      media_inventory_sha256 TEXT NOT NULL,
+      workbook_sha256 TEXT NOT NULL,
+      media_url TEXT NOT NULL DEFAULT '',
+      candidate_source TEXT NOT NULL DEFAULT '',
+      candidate_reason TEXT NOT NULL DEFAULT '',
+      evidence_json TEXT NOT NULL,
+      UNIQUE(draft_id, item_id)
+    )""",
     """CREATE TABLE IF NOT EXISTS draft_changesets (
       draft_id TEXT PRIMARY KEY REFERENCES workflow_drafts(id),
       created_ts TEXT NOT NULL,
@@ -417,6 +437,73 @@ DURABLE_SUPPORT_DDL = SUPPORT_DDL[3:5] + [
     BEFORE DELETE ON draft_approval_attempts
     BEGIN
       SELECT RAISE(ABORT, 'draft approval attempt artifacts are immutable');
+    END""",
+    """CREATE TABLE IF NOT EXISTS draft_apply_attempts (
+      id TEXT PRIMARY KEY,
+      draft_id TEXT NOT NULL REFERENCES workflow_drafts(id),
+      preview_attempt_id TEXT NOT NULL REFERENCES draft_preview_attempts(id),
+      approval_attempt_id TEXT NOT NULL REFERENCES draft_approval_attempts(id),
+      change_set_id TEXT NOT NULL,
+      semantic_fingerprint TEXT NOT NULL,
+      preview_fingerprint TEXT NOT NULL,
+      approval_fingerprint TEXT NOT NULL,
+      started_ts TEXT NOT NULL,
+      completed_ts TEXT NOT NULL DEFAULT '',
+      artifact_kind TEXT NOT NULL DEFAULT 'pending',
+      result_json TEXT,
+      exception_class TEXT NOT NULL DEFAULT '',
+      exception_message TEXT NOT NULL DEFAULT '',
+      workbook_identity_state TEXT NOT NULL DEFAULT '',
+      observed_workbook_sha256 TEXT NOT NULL DEFAULT '',
+      observed_workbook_mtime_ns TEXT NOT NULL DEFAULT '',
+      manager_state TEXT NOT NULL,
+      allowed_verbs_json TEXT NOT NULL,
+      active INTEGER NOT NULL DEFAULT 1 CHECK(active IN (0, 1))
+    )""",
+    """CREATE UNIQUE INDEX IF NOT EXISTS idx_draft_apply_attempt_active
+    ON draft_apply_attempts(draft_id) WHERE active=1""",
+    """CREATE TRIGGER IF NOT EXISTS draft_apply_attempts_finalize_once
+    BEFORE UPDATE ON draft_apply_attempts
+    WHEN OLD.completed_ts != ''
+      OR OLD.active != 1 OR NEW.active != 0 OR NEW.completed_ts = ''
+      OR NEW.id != OLD.id OR NEW.draft_id != OLD.draft_id
+      OR NEW.preview_attempt_id != OLD.preview_attempt_id
+      OR NEW.approval_attempt_id != OLD.approval_attempt_id
+      OR NEW.change_set_id != OLD.change_set_id
+      OR NEW.semantic_fingerprint != OLD.semantic_fingerprint
+      OR NEW.preview_fingerprint != OLD.preview_fingerprint
+      OR NEW.approval_fingerprint != OLD.approval_fingerprint
+      OR NEW.started_ts != OLD.started_ts
+    BEGIN
+      SELECT RAISE(ABORT, 'draft apply attempt artifacts are immutable');
+    END""",
+    """CREATE TRIGGER IF NOT EXISTS draft_apply_attempts_immutable_delete
+    BEFORE DELETE ON draft_apply_attempts
+    BEGIN
+      SELECT RAISE(ABORT, 'draft apply attempt artifacts are immutable');
+    END""",
+    """CREATE TABLE IF NOT EXISTS draft_manual_resolutions (
+      id TEXT PRIMARY KEY,
+      draft_id TEXT NOT NULL REFERENCES workflow_drafts(id),
+      apply_attempt_id TEXT NOT NULL REFERENCES draft_apply_attempts(id),
+      created_ts TEXT NOT NULL,
+      actor TEXT NOT NULL DEFAULT '',
+      resolution TEXT NOT NULL,
+      evidence_json TEXT NOT NULL,
+      observed_workbook_sha256 TEXT NOT NULL DEFAULT '',
+      observed_workbook_mtime_ns TEXT NOT NULL DEFAULT '',
+      manager_state TEXT NOT NULL,
+      UNIQUE(draft_id)
+    )""",
+    """CREATE TRIGGER IF NOT EXISTS draft_manual_resolutions_immutable_update
+    BEFORE UPDATE ON draft_manual_resolutions
+    BEGIN
+      SELECT RAISE(ABORT, 'draft manual resolution artifacts are immutable');
+    END""",
+    """CREATE TRIGGER IF NOT EXISTS draft_manual_resolutions_immutable_delete
+    BEFORE DELETE ON draft_manual_resolutions
+    BEGIN
+      SELECT RAISE(ABORT, 'draft manual resolution artifacts are immutable');
     END""",
     """CREATE TABLE IF NOT EXISTS legacy_recovery_records (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -517,12 +604,20 @@ def init_durable_schema(conn: sqlite3.Connection) -> None:
         "ON draft_operations(draft_id, id)"
     )
     conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_draft_asset_resolutions_draft "
+        "ON draft_asset_resolutions(draft_id, id)"
+    )
+    conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_draft_preview_attempts_draft "
         "ON draft_preview_attempts(draft_id, started_ts)"
     )
     conn.execute(
         "CREATE INDEX IF NOT EXISTS idx_draft_approval_attempts_draft "
         "ON draft_approval_attempts(draft_id, started_ts)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_draft_apply_attempts_draft "
+        "ON draft_apply_attempts(draft_id, started_ts)"
     )
     conn.commit()
 
@@ -965,8 +1060,10 @@ def _upgrade_durable_store(state_path: Path, manifest: dict) -> bool:
     ``pending_changes.id`` foreign key. Schema 3 changes only the disposable
     projection. Schema 4 adds durable draft tables; schema 5 adds immutable
     emitted ChangeSet artifacts; schema 6 adds immutable preview-attempt
-    evidence; schema 7 adds immutable approval-attempt evidence. Rebuild the
-    history table only when its foreign key is absent,
+    evidence; schema 7 adds immutable approval-attempt evidence; schema 8 adds
+    finalizable-then-immutable apply attempts plus immutable manual-resolution
+    evidence; schema 9 adds mutable draft-bound asset resolution evidence and
+    operational ignores. Rebuild the history table only when its foreign key is absent,
     preserve every row, and create all missing durable objects idempotently.
     Returns True when an upgrade applied.
     """
@@ -987,12 +1084,20 @@ def _upgrade_durable_store(state_path: Path, manifest: dict) -> bool:
                 "ON draft_operations(draft_id, id)"
             )
             conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_draft_asset_resolutions_draft "
+                "ON draft_asset_resolutions(draft_id, id)"
+            )
+            conn.execute(
                 "CREATE INDEX IF NOT EXISTS idx_draft_preview_attempts_draft "
                 "ON draft_preview_attempts(draft_id, started_ts)"
             )
             conn.execute(
                 "CREATE INDEX IF NOT EXISTS idx_draft_approval_attempts_draft "
                 "ON draft_approval_attempts(draft_id, started_ts)"
+            )
+            conn.execute(
+                "CREATE INDEX IF NOT EXISTS idx_draft_apply_attempts_draft "
+                "ON draft_apply_attempts(draft_id, started_ts)"
             )
             conn.execute(
                 "UPDATE storage_manifest SET schema_version=?", (SCHEMA_VERSION,)
@@ -1036,12 +1141,20 @@ def _upgrade_durable_store(state_path: Path, manifest: dict) -> bool:
             "ON draft_operations(draft_id, id)"
         )
         conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_draft_asset_resolutions_draft "
+            "ON draft_asset_resolutions(draft_id, id)"
+        )
+        conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_draft_preview_attempts_draft "
             "ON draft_preview_attempts(draft_id, started_ts)"
         )
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_draft_approval_attempts_draft "
             "ON draft_approval_attempts(draft_id, started_ts)"
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_draft_apply_attempts_draft "
+            "ON draft_apply_attempts(draft_id, started_ts)"
         )
         conn.execute(
             "UPDATE storage_manifest SET schema_version=?", (SCHEMA_VERSION,)
@@ -1075,6 +1188,44 @@ def durable_orphan_history_rows(state_path: Path) -> int:
         conn.close()
 
 
+def recover_orphaned_apply_attempts(conn: sqlite3.Connection) -> int:
+    """Fail closed any apply attempt left active by an interrupted process."""
+    exists = conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' "
+        "AND name='draft_apply_attempts'"
+    ).fetchone()
+    if not exists:
+        return 0
+    rows = conn.execute(
+        "SELECT id, draft_id FROM draft_apply_attempts "
+        "WHERE active=1 OR manager_state='applying' ORDER BY started_ts, rowid"
+    ).fetchall()
+    if not rows:
+        return 0
+    completed = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    conn.execute("BEGIN IMMEDIATE")
+    try:
+        for row in rows:
+            conn.execute(
+                "UPDATE draft_apply_attempts SET completed_ts=?, "
+                "artifact_kind='interrupted', exception_class='ProcessInterrupted', "
+                "exception_message='apply attempt was active during startup recovery', "
+                "workbook_identity_state='unknown', manager_state='workbook_state_unknown', "
+                "allowed_verbs_json='[\"resolve_manually\"]', active=0 WHERE id=?",
+                (completed, row["id"]),
+            )
+            conn.execute(
+                "UPDATE workflow_drafts SET status='workbook_state_unknown', "
+                "updated_ts=? WHERE id=?",
+                (completed, row["draft_id"]),
+            )
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    return len(rows)
+
+
 def bootstrap_storage(state_path: Path, projection_path: Path) -> dict:
     """Initialize or split the legacy combined database before consumers run."""
     state_path = Path(state_path)
@@ -1090,6 +1241,11 @@ def bootstrap_storage(state_path: Path, projection_path: Path) -> dict:
             upgraded = _upgrade_durable_store(state_path, state_manifest)
             if upgraded:
                 state_manifest = _read_manifest_path(state_path) or state_manifest
+            state_conn = connect(state_path, foreign_keys=True)
+            try:
+                recovered_apply_attempts = recover_orphaned_apply_attempts(state_conn)
+            finally:
+                state_conn.close()
             projection_manifest = _read_manifest_path(projection_path)
             verified_import = (
                 projection_manifest
@@ -1116,6 +1272,7 @@ def bootstrap_storage(state_path: Path, projection_path: Path) -> dict:
                 return {
                     "status": "ready",
                     "schema_upgraded": upgraded,
+                    "recovered_apply_attempts": recovered_apply_attempts,
                     "orphan_history_rows": (
                         durable_orphan_history_rows(state_path) if upgraded else 0
                     ),
@@ -1135,6 +1292,7 @@ def bootstrap_storage(state_path: Path, projection_path: Path) -> dict:
             return {
                 "status": "projection_rebuilt",
                 "schema_upgraded": upgraded,
+                "recovered_apply_attempts": recovered_apply_attempts,
                 "orphan_history_rows": (
                     durable_orphan_history_rows(state_path) if upgraded else 0
                 ),

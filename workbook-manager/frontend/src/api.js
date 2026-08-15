@@ -30,6 +30,15 @@ export const api = {
   models: () => request("/api/models"),
   structure: (model) => request(`/api/structure/${model}`),
   collections: (model) => request(`/api/models/${model}/collections`),
+  assetReconciliation: (params = {}) => {
+    const q = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== "" && value !== false && value != null) q.set(key, value);
+    });
+    return request(`/api/assets/reconciliation?${q.toString()}`);
+  },
+  assetMediaOptions: (query = "", limit = 50) =>
+    request(`/api/assets/media-options?query=${encodeURIComponent(query)}&limit=${limit}`),
   schema: (table, model = "") =>
     request(`/api/records/${table}/schema?model=${encodeURIComponent(model)}`),
   records: (table, { model = "", search = "", limit = 200, offset = 0 } = {}) =>
@@ -41,22 +50,48 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ model_id: modelId, key }),
     }),
-  stage: (payload) =>
-    request("/api/changes", { method: "POST", body: JSON.stringify(payload) }),
-  changes: (status = "staged") => request(`/api/changes?status=${status}`),
-  discard: (id) => request(`/api/changes/${id}`, { method: "DELETE" }),
-  validateChanges: () => request("/api/changes/validate", { method: "POST" }),
-  commit: (actor = "") =>
-    request("/api/changes/commit", {
+  drafts: (limit = 50) => request(`/api/drafts?limit=${limit}`),
+  draftLifecycle: (draftId) => request(`/api/drafts/${draftId}`),
+  saveDraftOperation: (draftId, payload) =>
+    request(`/api/drafts/${draftId}/operations`, {
       method: "POST",
-      body: JSON.stringify({ actor }),
+      body: JSON.stringify(payload),
+    }),
+  saveAssetResolution: (draftId, payload) =>
+    request(`/api/drafts/${draftId}/asset-resolutions`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  saveAllSafeAssetResolutions: (draftId, payload) =>
+    request(`/api/drafts/${draftId}/asset-resolutions/safe`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  commitDraft: (draftId) =>
+    request(`/api/drafts/${draftId}/commit`, { method: "POST" }),
+  previewDraft: (draftId) =>
+    request(`/api/drafts/${draftId}/preview`, { method: "POST" }),
+  approveDraft: (draftId, payload) =>
+    request(`/api/drafts/${draftId}/approve`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  applyRebuildDraft: (draftId, payload) =>
+    request(`/api/drafts/${draftId}/apply-rebuild`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  cancelDraft: (draftId) =>
+    request(`/api/drafts/${draftId}/cancel`, { method: "POST" }),
+  resolveUnknownDraft: (draftId, payload) =>
+    request(`/api/drafts/${draftId}/resolve-unknown`, {
+      method: "POST",
+      body: JSON.stringify(payload),
     }),
   history: (params = {}) => {
     const q = new URLSearchParams(params).toString();
     return request(`/api/history?${q}`);
   },
-  sync: (payload) =>
-    request("/api/sync", { method: "POST", body: JSON.stringify(payload) }),
   exportWorkbook: () => request("/api/export", { method: "POST" }),
   backup: () => request("/api/backup", { method: "POST" }),
 };

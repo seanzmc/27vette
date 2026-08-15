@@ -21,13 +21,27 @@ from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import config, db as dbmod, drafts, importer, staging, sync as syncmod
+from . import (
+    config,
+    apply_rebuild,
+    asset_resolutions,
+    asset_workspace,
+    db as dbmod,
+    drafts,
+    importer,
+    staging,
+    sync as syncmod,
+)
 from .naming import display_id, humanize, sheet_display_name
 from .schemas import (
     ApprovalRequest,
+    ApplyRebuildRequest,
+    AssetResolutionRequest,
+    AssetSafeBulkRequest,
     ChangeOut,
     CommitRequest,
     DraftOperationRequest,
+    ManualResolutionRequest,
     StageChangeRequest,
     SyncRequest,
     TableSchemaOut,
@@ -43,7 +57,8 @@ from .catalog import (
 from .staging import StagingError
 from .validation import find_dependents
 
-PROVISIONAL_MODE = "read_only_provisional"
+WORKFLOW_MODE = "durable_apply_rebuild"
+PROVISIONAL_MODE = "read_only_provisional"  # permanent legacy sync refusal token
 IMPORT_TERMINAL_ALLOWLIST = (
     "applied",
     "cancelled",
@@ -167,9 +182,14 @@ def _staging_error(exc: StagingError):
 
 
 def _draft_error(exc: drafts.DraftError):
-    status_code = 409 if exc.code in {
+    if exc.code == "draft_not_found":
+        status_code = 404
+    elif exc.code in {
         "projection_not_current", "draft_not_mutable", "draft_binding_mismatch"
-    } else 422
+    }:
+        status_code = 409
+    else:
+        status_code = 422
     return HTTPException(status_code=status_code, detail={
         "status": exc.code,
         "message": str(exc),
@@ -330,7 +350,7 @@ def status(
         and blockers["unresolved_total"] == 0
     )
     return {
-        "mode": PROVISIONAL_MODE,
+        "mode": WORKFLOW_MODE,
         "projection": projection,
         "draft": {
             "state": "blocked" if blockers["unresolved_total"] else "clear",
@@ -338,14 +358,11 @@ def status(
             "terminal_import_allowlist": list(IMPORT_TERMINAL_ALLOWLIST),
         },
         "workbook": workbook,
-        "generated_artifacts": {
-            "state": "unverified",
-            "reason": "generation is outside the provisional manager workflow",
-        },
-        "publication": {
-            "state": "unverified",
-            "reason": "runtime publication is outside the manager workflow",
-        },
+        **apply_rebuild.output_status(
+            state_conn,
+            workbook_path=config.DEFAULT_WORKBOOK,
+            repository_root=config.APPLY_OUTPUT_ROOT,
+        ),
         "tables": counts,
         "staged_changes": staged,
         "unsynced_committed_changes": unsynced,
@@ -443,6 +460,7 @@ def structure(model_key: str, conn=Depends(projection_connection)):
         "SELECT * FROM form_sections")}
     for p in presentation:
         master = sections.get(p["section_id"], {})
+        p["step_key"] = p.get("step_key") or master.get("step_key")
         p["section_name"] = master.get("section_name", "")
         p["display_name"] = p.get("display_label") or master.get(
             "section_name") or display_id(p["section_id"], ("sec_",))
@@ -518,6 +536,102 @@ def collections(model_key: str, conn=Depends(projection_connection)):
             "scaffold": False,
         })
     return {"model_key": model_key, "collections": out}
+
+
+@app.get("/api/assets/reconciliation")
+def asset_reconciliation(
+    refresh: bool = False,
+    model: str = Query("", max_length=80),
+    section: str = Query("", max_length=160),
+    target_type: str = Query("", max_length=80),
+    coverage_intent: str = Query("", max_length=80),
+    status: str = Query("", max_length=80),
+    offset: int = Query(0, ge=0),
+    limit: int = Query(24, ge=1, le=100),
+    draft_id: str = Query("", max_length=120),
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
+    """Typed, read-only view over the shared asset reconciliation result."""
+
+    workbook = _workbook_state(conn)
+    if workbook["state"] != "current":
+        raise HTTPException(409, detail={
+            "status": "asset_reconciliation_workbook_not_current",
+            "message": "Asset Manager requires a verified current projection of the workbook.",
+        })
+    try:
+        snapshot = asset_workspace.get_asset_manager_snapshot(
+            config.DEFAULT_WORKBOOK, refresh=refresh
+        )
+        ignored = drafts.active_asset_ignores(
+            state_conn, fingerprints=snapshot.fingerprints
+        )
+        view = asset_workspace.asset_map_sync.filter_asset_manager_snapshot(
+            snapshot,
+            model_key=model,
+            section_id=section,
+            target_type=target_type,
+            coverage_intent=coverage_intent,
+            status=status,
+            offset=offset,
+            limit=limit,
+            ignored_item_ids=ignored,
+        )
+        image_fit = SPEC_BY_TABLE["assets"].column_by_name("image_fit")
+        view["controls"] = {
+            "image_fit": list(image_fit.enum if image_fit is not None else ()),
+        }
+        evidence = drafts.list_asset_resolutions(state_conn, draft_id) if draft_id else []
+        view["draft_asset_resolutions"] = {
+            "count": len(evidence),
+            "item_ids": [row["item_id"] for row in evidence],
+            "stale_count": sum(
+                1 for row in evidence
+                if any(
+                    row[field] != snapshot.fingerprints.get(field)
+                    for field in (
+                        "reconciliation_sha256",
+                        "media_inventory_sha256",
+                        "workbook_sha256",
+                    )
+                )
+            ),
+        }
+        return view
+    except asset_workspace.asset_map_sync.WordPressMediaFetchError as exc:
+        raise HTTPException(502, detail={
+            "status": "asset_media_inventory_unavailable",
+            "message": str(exc),
+        }) from exc
+    except (OSError, ValueError) as exc:
+        raise HTTPException(422, detail={
+            "status": "asset_reconciliation_failed",
+            "message": str(exc),
+        }) from exc
+
+
+@app.get("/api/assets/media-options")
+def asset_media_options(
+    query: str = Query("", max_length=200),
+    limit: int = Query(50, ge=1, le=100),
+    conn=Depends(projection_connection),
+):
+    workbook = _workbook_state(conn)
+    if workbook["state"] != "current":
+        raise HTTPException(409, detail={
+            "status": "asset_reconciliation_workbook_not_current",
+            "message": "Asset Manager requires a verified current projection of the workbook.",
+        })
+    try:
+        return asset_workspace.search_media_options(
+            config.DEFAULT_WORKBOOK, query, limit=limit
+        )
+    except (OSError, ValueError) as exc:
+        raise HTTPException(422, detail={
+            "status": "asset_reconciliation_failed",
+            "message": str(exc),
+        }) from exc
 
 
 @app.get("/api/tables")
@@ -640,6 +754,9 @@ def records(table: str, model: str = "", search: str = "",
     out = []
     for r in rows:
         d = dict(r)
+        raw_context = d.get("model_context")
+        if isinstance(raw_context, str):
+            d["model_context"] = json.loads(raw_context) if raw_context else []
         d["_display_id"] = display_id(str(d.get(spec.key[0], "")),
                                       spec.id_prefixes)
         out.append(d)
@@ -660,6 +777,21 @@ def dependencies_post(
 
 
 # ── staged changes ───────────────────────────────────────────────────
+
+@app.get("/api/drafts")
+def durable_drafts(
+    limit: int = Query(50, ge=1, le=200),
+    state_conn=Depends(state_connection),
+):
+    return {"drafts": drafts.list_drafts(state_conn, limit=limit)}
+
+
+@app.get("/api/drafts/{draft_id}")
+def draft_lifecycle(draft_id: str, state_conn=Depends(state_connection)):
+    try:
+        return drafts.lifecycle_view(state_conn, draft_id)
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
 
 @app.post("/api/drafts/{draft_id}/operations")
 def save_draft_operation(
@@ -701,16 +833,116 @@ def draft_operations(draft_id: str, state_conn=Depends(state_connection)):
     )}
 
 
+def _asset_draft_context(conn):
+    workbook = _workbook_state(conn)
+    run = conn.execute(
+        "SELECT * FROM import_runs ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    return workbook, _projection_state(conn, run, workbook)
+
+
+@app.post("/api/drafts/{draft_id}/asset-resolutions")
+def save_asset_resolution(
+    draft_id: str,
+    payload: AssetResolutionRequest,
+    _lock=Depends(durable_write_lock),
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
+    workbook, projection = _asset_draft_context(conn)
+    snapshot = asset_workspace.get_cached_asset_manager_snapshot(
+        config.DEFAULT_WORKBOOK, payload.fingerprints
+    )
+    if snapshot is None:
+        raise HTTPException(409, detail={
+            "status": "asset_reconciliation_stale",
+            "message": "The reviewed asset snapshot is no longer cached/current; refresh Asset Manager.",
+        })
+    try:
+        return asset_resolutions.save_resolution(
+            conn,
+            state_conn,
+            snapshot=snapshot,
+            projection_state=projection["state"],
+            base_workbook_sha256=workbook["imported_sha256"],
+            base_workbook_mtime_ns=workbook["imported_mtime_ns"],
+            draft_id=draft_id,
+            item_id=payload.item_id,
+            resolution_kind=payload.resolution_kind,
+            fingerprints=payload.fingerprints,
+            selected_url=payload.selected_url,
+            target_item_id=payload.target_item_id,
+            values=payload.values,
+            session_id=payload.session_id,
+            actor=payload.actor,
+        )
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
+
+
+@app.post("/api/drafts/{draft_id}/asset-resolutions/safe")
+def save_all_safe_asset_resolutions(
+    draft_id: str,
+    payload: AssetSafeBulkRequest,
+    _lock=Depends(durable_write_lock),
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
+    workbook, projection = _asset_draft_context(conn)
+    snapshot = asset_workspace.get_cached_asset_manager_snapshot(
+        config.DEFAULT_WORKBOOK, payload.fingerprints
+    )
+    if snapshot is None:
+        raise HTTPException(409, detail={
+            "status": "asset_reconciliation_stale",
+            "message": "The reviewed asset snapshot is no longer cached/current; refresh Asset Manager.",
+        })
+    try:
+        results = asset_resolutions.save_all_safe(
+            conn,
+            state_conn,
+            snapshot=snapshot,
+            fingerprints=payload.fingerprints,
+            projection_state=projection["state"],
+            base_workbook_sha256=workbook["imported_sha256"],
+            base_workbook_mtime_ns=workbook["imported_mtime_ns"],
+            draft_id=draft_id,
+            session_id=payload.session_id,
+            actor=payload.actor,
+        )
+        return {"draft_id": draft_id, "accepted": len(results), "operations": results}
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
+
+
 @app.post("/api/drafts/{draft_id}/commit")
 def commit_draft(
     draft_id: str,
     _lock=Depends(durable_write_lock),
+    conn=Depends(projection_connection),
     state_conn=Depends(state_connection),
 ):
     try:
+        if drafts.list_asset_resolutions(state_conn, draft_id):
+            snapshot = asset_workspace.get_asset_manager_snapshot(
+                config.DEFAULT_WORKBOOK, refresh=True
+            )
+            drafts.assert_asset_resolutions_current(
+                state_conn, draft_id=draft_id, snapshot=snapshot
+            )
         return drafts.emit_changeset(state_conn, draft_id=draft_id)
     except drafts.DraftError as exc:
         raise _draft_error(exc)
+    except asset_workspace.asset_map_sync.WordPressMediaFetchError as exc:
+        raise HTTPException(502, detail={
+            "status": "asset_media_inventory_unavailable",
+            "message": str(exc),
+        }) from exc
+    except (OSError, ValueError) as exc:
+        raise HTTPException(422, detail={
+            "status": "asset_reconciliation_failed",
+            "message": str(exc),
+        }) from exc
 
 
 @app.post("/api/drafts/{draft_id}/preview")
@@ -756,6 +988,119 @@ def approve_draft_changeset(
             projection_state=projection["state"],
             actor=payload.actor,
             warning_ids=payload.warning_ids,
+        )
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
+
+
+@app.post("/api/drafts/{draft_id}/apply-rebuild")
+def apply_and_rebuild_draft(
+    draft_id: str,
+    payload: ApplyRebuildRequest,
+    _lock=Depends(durable_write_lock),
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
+    """Reach the writer only through one exact approved Apply and Rebuild action."""
+
+    if payload.confirm != "APPLY AND REBUILD":
+        raise HTTPException(422, detail={
+            "status": "apply_rebuild_confirmation_required",
+            "message": "type APPLY AND REBUILD to run the exact approved pipeline",
+        })
+    draft_row = state_conn.execute(
+        "SELECT status FROM workflow_drafts WHERE id=?", (draft_id,)
+    ).fetchone()
+    if draft_row is not None and draft_row["status"] == "applied":
+        try:
+            return drafts.apply_draft(
+                state_conn,
+                draft_id=draft_id,
+                workbook_path=config.DEFAULT_WORKBOOK,
+                log_path=config.EDIT_LOG_PATH,
+            )
+        except drafts.DraftError as exc:
+            raise _draft_error(exc)
+    workbook = _workbook_state(conn)
+    run = conn.execute(
+        "SELECT * FROM import_runs ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    projection = _projection_state(conn, run, workbook)
+    if projection["state"] != "current":
+        raise HTTPException(409, detail={
+            "status": "projection_not_current",
+            "message": "Apply and Rebuild requires the exact current imported projection",
+            "projection": projection,
+        })
+    operations = drafts.list_operations(state_conn, draft_id)
+    candidate_models = sorted({
+        str(model)
+        for operation in operations
+        for model in (
+            [operation.get("model_id")] + (operation.get("model_context") or [])
+        )
+        if str(model or "") not in {"", "*"}
+    })
+
+    def prepare():
+        return apply_rebuild.prepare_rollback_set(
+            draft_id=draft_id,
+            workbook_path=config.DEFAULT_WORKBOOK,
+            repository_root=config.APPLY_OUTPUT_ROOT,
+            rollback_root=config.APPLY_ROLLBACK_DIR,
+            candidate_models=candidate_models,
+            requested_by=payload.actor,
+        )
+
+    def complete(receipt, rollback):
+        return apply_rebuild.complete_apply_rebuild(
+            receipt,
+            rollback=rollback,
+            operations=operations,
+            workbook_path=config.DEFAULT_WORKBOOK,
+            repository_root=config.APPLY_OUTPUT_ROOT,
+        )
+
+    try:
+        return drafts.apply_draft(
+            state_conn,
+            draft_id=draft_id,
+            workbook_path=config.DEFAULT_WORKBOOK,
+            log_path=config.EDIT_LOG_PATH,
+            prepare_apply=prepare,
+            complete_apply=complete,
+        )
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
+
+
+@app.post("/api/drafts/{draft_id}/cancel")
+def cancel_draft(
+    draft_id: str,
+    _lock=Depends(durable_write_lock),
+    state_conn=Depends(state_connection),
+):
+    try:
+        return drafts.cancel_draft(state_conn, draft_id=draft_id)
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
+
+
+@app.post("/api/drafts/{draft_id}/resolve-unknown")
+def resolve_unknown_draft(
+    draft_id: str,
+    payload: ManualResolutionRequest,
+    _lock=Depends(durable_write_lock),
+    state_conn=Depends(state_connection),
+):
+    try:
+        return drafts.resolve_unknown_draft(
+            state_conn,
+            draft_id=draft_id,
+            resolution=payload.resolution,
+            workbook_path=config.DEFAULT_WORKBOOK,
+            actor=payload.actor,
+            evidence=payload.evidence,
         )
     except drafts.DraftError as exc:
         raise _draft_error(exc)
@@ -856,9 +1201,8 @@ def sync_endpoint(
     if payload.write:
         raise HTTPException(409, detail={
             "status": PROVISIONAL_MODE,
-            "message": "live workbook writes are disabled during the "
-                       "read-only provisional workflow; only the exact bound "
-                       "ChangeSet service may be enabled in Pass 7",
+            "message": "legacy live sync writes are permanently disabled; use "
+                       "the exact approved Apply and Rebuild action",
         })
     return syncmod.sync_workbook(
         conn, config.DEFAULT_WORKBOOK, write=payload.write,

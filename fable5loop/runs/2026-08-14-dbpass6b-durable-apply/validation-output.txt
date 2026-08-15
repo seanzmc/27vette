@@ -1,0 +1,40 @@
+# Pass 6B Validation Output
+
+## Baseline and RED
+
+- Pre-edit Fable loop validation: PASS.
+- Focused RED command: `env -u PYTHONPATH .venv/bin/python -m pytest tests/test_workbook_manager_changeset_lifecycle.py -q -k 'DurableApplyLifecycle'`.
+- Observed before implementation: `11 failed, 1 passed, 26 deselected`; failures were the absent apply mapper, durable apply operation/owner, and startup recovery operation. This is the retained contemporaneous summary of real terminal output; the original full terminal stream was not saved separately.
+
+## Final focused validation
+
+- Python compilation of `db.py`, `drafts.py`, and the lifecycle test: PASS.
+- Final Pass 6B class: `7 passed, 27 deselected, 19 subtests passed in 0.68s`.
+- Lifecycle/drafts/concurrency/shared-service inventory: `88 passed, 36 subtests passed in 6.31s`; one existing Starlette/httpx deprecation warning.
+- Shared writer/editor inventory: `80 passed, 13 subtests passed in 151.68s`.
+- `git diff --check`: PASS.
+
+## Broad Workbook Manager checkpoint
+
+- Documented seven-module inventory: `144 passed, 2 skipped, 25 subtests passed`, one failure, in `782.49s`.
+- The only failure was `TestWorkbookManagerGeneratedParity.test_source_and_identity_reconstruction_runtime_contracts_match`: the test hardcodes the former promoted tuple `stingray, grand_sport, z06`, while the released workbook now returns all six promoted models (`stingray, grand_sport, grand_sport_x, z06, zr1, zr1x`).
+- Exact failure attribution was reproduced from unchanged detached `HEAD` `75452bb`: the same test failed with the same six-versus-three tuple at line 143 in `70.30s`. The detached worktree was removed after proof. This failure predates and is not attributable to Pass 6B; it remains a separately scoped baseline test correction.
+- The complete 13-minute inventory was not repeated after the narrow fail-closed mapper repair. Every changed execution branch is covered by the final 88-test focused inventory; no unrelated slow acceptance owner changed.
+
+## Independent verification
+
+- Cycle 1: FAIL. Found unchanged non-transient exceptions mapped too broadly, restored retry accepted an unbound result, applied accepted a minimal receipt, representative-only mapping tests, and one stale README sentence.
+- Cycle 2: FAIL, narrow. The first repair allowed missing nested counters to compare equal as `None == None` and classified any schema-claiming dictionary as a formal receipt.
+- Cycle 3: PASS. Positive integer counts, internal coverage/readback equality, the empty-proof near-miss, and exact artifact classification were independently inspected. The verifier edited no files and did not rerun long inventories.
+
+## Protected boundaries
+
+- `stingray_master.xlsx`, `form-output/`, and `form-app/`: no tracked changes.
+- No FastAPI/browser apply, cancel, or manual-resolution route exists; the only apply entry is the backend lifecycle function in `drafts.py`.
+- No generated artifact, registry publication, runtime JavaScript, styling, pricing, dealer submission, deployment, dependency, or public shared-artifact schema changed.
+- Real write validation used only disposable temporary fixture workbooks; the canonical workbook was never written.
+
+## Gates not run
+
+- Canonical workbook package/schema validation and frontend build were not rerun because neither the workbook nor frontend changed.
+- Live dealer submission was intentionally not exercised.
