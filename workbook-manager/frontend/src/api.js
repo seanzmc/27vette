@@ -30,6 +30,13 @@ export const api = {
   models: () => request("/api/models"),
   structure: (model) => request(`/api/structure/${model}`),
   collections: (model) => request(`/api/models/${model}/collections`),
+  assetReconciliation: (params = {}) => {
+    const q = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== "" && value !== false && value != null) q.set(key, value);
+    });
+    return request(`/api/assets/reconciliation?${q.toString()}`);
+  },
   schema: (table, model = "") =>
     request(`/api/records/${table}/schema?model=${encodeURIComponent(model)}`),
   records: (table, { model = "", search = "", limit = 200, offset = 0 } = {}) =>

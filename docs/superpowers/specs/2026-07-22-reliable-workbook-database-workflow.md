@@ -3,9 +3,10 @@
 Status: implementation in progress; Pass 1 completed 2026-07-22, Pass 2
 completed 2026-07-23, Pass 3 completed 2026-07-30, Pass 4 completed
 2026-08-08, Pass 5 completed 2026-08-09, Pass 6A completed 2026-08-10, and
-Pass 6B completed 2026-08-14 on `db-workflow`; Pass 7 lifecycle-context and
-durable editing/review UI checkpoints are complete, and the Asset Resolution
-Workspace foundation is checkpoint 3 next.
+Pass 6B completed 2026-08-14 on `db-workflow`; Pass 7 checkpoints 1–3 are
+complete through the read-only Asset Resolution Workspace foundation, and
+actionable asset resolutions through the shared durable draft are checkpoint 4
+next.
 Revised 2026-08-14 to expand the remaining Pass 7 work into five explicit
 checkpoints: lifecycle context, durable editing UI, integrated asset management,
 one shared draft/apply lane, and final Apply-and-Rebuild orchestration. Revised
@@ -1503,7 +1504,7 @@ and approval fingerprint
 `1acc23ba80bfcc7ca7640d0f81561b767d51ad740f834fc2375484a033dbe04e`.
 The only automated warning was the existing Starlette/httpx deprecation.
 
-#### Remaining checkpoint 3 — Asset Resolution Workspace foundation
+#### Checkpoint 3 — Asset Resolution Workspace foundation (completed 2026-08-14)
 
 Extend, but do not redesign or replace, the completed durable Manager UI. Add an
 Asset Manager tab inside the same React/FastAPI application while preserving
@@ -1563,6 +1564,40 @@ loading, current/candidate and fit/position/hover previews, broken-image states,
 and a reconciliation refresh. No Asset Manager control can call the durable
 operation route; canonical workbook, projection, durable drafts, generated
 artifacts, and publication remain byte-identical.
+
+Completion: `asset_map_sync.py` now owns a typed candidate resolution and
+immutable Manager snapshot built by the same `build_sync_plan()` path as the
+CLI. It exposes selected fields, equal-priority alternatives, precedence and
+reason, registry-owned current presentation values, exact/shared physical
+lineage, coverage intent, status/action counts, unmatched/unparseable media,
+and workbook/media/reconciliation fingerprints. Ambiguous files count as
+considered alternatives instead of also leaking into the unmatched queue. The
+FastAPI adapter only supplies stable live or deterministic fixture inventory,
+caches the snapshot in process, and delegates filtering, percentages, status
+counts, and bounded pagination back to the shared domain owner.
+
+The preserved React shell now includes an Asset Manager tab with overall,
+per-model, and per-section coverage; distinct status queues; model/section/
+target-type/coverage-intent filters; a 24-item lazy inbox; current/candidate
+inspection with alt/open-original/loading/broken states; and a runtime-pinned
+16:9 or 3:1 `cover`/`contain`/`swatch`, sanitized base/hover position preview.
+All controls are explicitly temporary and the component contains no durable
+operation or draft route.
+
+Evidence: deterministic asset-sync/shared-view owner `50 passed`; Manager
+connection/route owner `32 passed`; frontend production build passed with 1,519
+modules; complete Manager owner `55 passed, 2 skipped`, including the focused
+API immutability proof rerun after final assertions. A headed copied-workbook
+browser run exercised all-model and scoped coverage, section and target-type
+filtering, bounded queues, lazy images,
+current/candidate comparison, an intentional broken candidate, body-style
+hover, swatch/position/invalid-position behavior, and inventory refresh. The
+copied workbook remained SHA-256-identical to canonical, while the projection,
+durable stores, generated runtime contracts, published registry, and shell HTML
+remained byte-identical; durable drafts, operations, and apply attempts remained
+zero. The only browser console error was the
+intentional unreachable fixture image used to prove the broken-image state;
+the only automated warning was the existing Starlette/httpx deprecation.
 
 #### Remaining checkpoint 4 — actionable resolutions in the one durable draft lane
 
@@ -1709,6 +1744,7 @@ Expected existing owners:
 
 Expected new owner:
 
+- `workbook-manager/backend/app/asset_workspace.py`
 - `workbook-manager/frontend/src/components/AssetManager.jsx`
 - `workbook-manager/backend/app/catalog.py`
 - `workbook-manager/backend/app/contract_parity.py`
@@ -1717,7 +1753,6 @@ Expected new owner:
 - `tests/test_workbook_manager_generated_parity.py`
 - `tests/test_workbook_manager_changeset_lifecycle.py`
 - `tests/test_workbook_manager_api_concurrency.py`
-- `tests/test_workbook_manager_asset_manager.py`
 - `tests/test_workbook_manager_apply_rebuild.py`
 
 State/import helpers may be added only when required to implement these pinned

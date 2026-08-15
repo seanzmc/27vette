@@ -14,6 +14,7 @@ from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field, replace
 from datetime import datetime, timedelta, timezone
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -30,6 +31,7 @@ from openpyxl import load_workbook
 
 from corvette_form_generator.contract import WILDCARD_MODEL_KEY
 from corvette_form_generator.output import write_text_atomic
+from corvette_form_generator.workbook_domain.registry import WRITABLE_COLUMNS
 from corvette_form_generator.workbook import (
     clean,
     restore_workbook_backup,
@@ -136,6 +138,9 @@ class SyncPlan:
     status: dict[int, str]
     used: set[str]
     section_coverage: dict[str, Any] = field(default_factory=dict)
+    resolutions: dict[tuple[str, str, str], "CandidateResolution"] = field(default_factory=dict)
+    desired_targets: dict[tuple[str, str, str], dict[str, str]] = field(default_factory=dict)
+    current_rows: dict[tuple[str, str, str], dict[str, Any]] = field(default_factory=dict)
 
     def __iter__(self):
         """Preserve the older tuple-unpack test/helper contract."""
@@ -161,6 +166,38 @@ class MediaInventory:
 class MediaSnapshot:
     urls: list[str]
     modified_by_url: dict[str, str]
+
+
+@dataclass(frozen=True)
+class CandidateAlternative:
+    """One equal-priority media candidate surfaced for human inspection."""
+
+    field: str
+    url: str
+    source: str
+    priority: int
+
+
+@dataclass(frozen=True)
+class CandidateResolution:
+    """Typed output of the shared candidate resolver used by sync and Manager."""
+
+    fields: dict[str, str]
+    source: str
+    reason: str
+    priority: int | None
+    alternatives: tuple[CandidateAlternative, ...] = ()
+
+
+@dataclass(frozen=True)
+class AssetManagerSnapshot:
+    """Immutable shared reconciliation view consumed by API filtering and tests."""
+
+    fingerprints: dict[str, str]
+    media: dict[str, Any]
+    coverage_ruleset: dict[str, Any]
+    items: tuple[dict[str, Any], ...]
+    action_counts: dict[str, int]
 
 
 def filename_stem(url: str) -> str:
@@ -688,15 +725,154 @@ def existing_asset_rows(ws, header_index: dict[str, int]) -> dict[tuple[str, str
         target_id_key = target_id.lower() if target_type == TARGET_TYPE_OPTION else target_id
         if not model_key or not target_id_key:
             continue
-        values = {
+        values: dict[str, Any] = {
             "row": row_number,
+            "source_sheet": ws.title,
+            "source_row": row_number,
             "target_type": target_type,
             "url": clean(row[header_index["image_url"]]),
         }
-        if "hover_image_url" in header_index:
-            values["hover_image_url"] = clean(row[header_index["hover_image_url"]])
+        for column in WRITABLE_COLUMNS["asset_map"]:
+            if column in header_index:
+                values[column] = clean(row[header_index[column]])
         rows[(model_key, target_type, target_id_key)] = values
     return rows
+
+
+def resolve_candidate(
+    media: MediaInventory,
+    model_key: str,
+    target_id: str,
+    info: dict[str, str],
+) -> CandidateResolution:
+    """Resolve one target using the sync owner's exact fail-closed precedence."""
+
+    target_type = info.get("target_type", TARGET_TYPE_OPTION)
+    if target_type == TARGET_TYPE_OPTION:
+        rpo = info.get("rpo", "")
+        if not rpo:
+            return CandidateResolution({}, "no-rpo", "no rpo in option sheet", None)
+
+        candidates = media.option_exact.get((model_key, rpo), [])
+        if len(candidates) == 1:
+            return CandidateResolution({"image_url": candidates[0]}, "prefixed", "", 1)
+        if len(candidates) > 1:
+            source = "prefixed-ambiguous"
+            return CandidateResolution(
+                {}, source,
+                f"multiple {model_key}-prefixed files for '{rpo}'; keep one file at this priority",
+                1,
+                tuple(CandidateAlternative("image_url", url, source, 1) for url in candidates),
+            )
+
+        eligible_groups: list[tuple[int, str, list[str]]] = []
+        for (prefix_group, candidate_rpo), group_candidates in media.option_shared.items():
+            if candidate_rpo != rpo:
+                continue
+            group_models = tuple(MODEL_PREFIX[code] for code in prefix_group.split("-"))
+            if model_key in group_models:
+                eligible_groups.append((len(group_models), prefix_group, group_candidates))
+        if eligible_groups:
+            winning_size = min(size for size, _prefix, _candidates in eligible_groups)
+            winning_groups = [
+                (prefix, group_candidates)
+                for size, prefix, group_candidates in eligible_groups
+                if size == winning_size
+            ]
+            winning_candidates = [
+                (prefix, url)
+                for prefix, group_candidates in winning_groups
+                for url in group_candidates
+            ]
+            if len(winning_candidates) == 1:
+                prefix_group, url = winning_candidates[0]
+                source = f"shared-prefix:{prefix_group}"
+                return CandidateResolution(
+                    {"image_url": url}, source,
+                    f"using {prefix_group}-prefixed media shared with {model_key}", 2,
+                )
+            prefix_labels = ", ".join(sorted(prefix for prefix, _candidates in winning_groups))
+            source_label = winning_groups[0][0] if len(winning_groups) == 1 else prefix_labels
+            source = f"shared-prefix:{source_label}:ambiguous"
+            return CandidateResolution(
+                {}, source,
+                f"multiple {prefix_labels} shared-prefix files for '{rpo}' at the winning specificity",
+                2,
+                tuple(
+                    CandidateAlternative("image_url", url, f"shared-prefix:{prefix}", 2)
+                    for prefix, url in winning_candidates
+                ),
+            )
+
+        for candidate_model in OPTION_MODEL_FALLBACKS.get(model_key, ()):
+            source = f"model-fallback:{candidate_model}"
+            candidates = media.option_exact.get((candidate_model, rpo), [])
+            if len(candidates) == 1:
+                return CandidateResolution(
+                    {"image_url": candidates[0]}, source,
+                    f"using {candidate_model}-prefixed media as configured fallback for {model_key}", 3,
+                )
+            if len(candidates) > 1:
+                ambiguous_source = f"{source}:ambiguous"
+                return CandidateResolution(
+                    {}, ambiguous_source,
+                    f"multiple {candidate_model}-prefixed files for '{rpo}'; keep one file at this priority",
+                    3,
+                    tuple(
+                        CandidateAlternative("image_url", url, source, 3)
+                        for url in candidates
+                    ),
+                )
+        candidates = media.option_bare.get(rpo, [])
+        if len(candidates) == 1:
+            return CandidateResolution({"image_url": candidates[0]}, "bare-shared", "", 4)
+        if len(candidates) > 1:
+            return CandidateResolution(
+                {}, "bare-ambiguous",
+                f"multiple bare files for '{rpo}'; keep one shared file or add c/e/h/r/s/g prefixes",
+                4,
+                tuple(CandidateAlternative("image_url", url, "bare-shared", 4) for url in candidates),
+            )
+        return CandidateResolution({}, "none", "", None)
+
+    if target_type == TARGET_TYPE_MODEL:
+        candidates = media.model.get((model_key, target_id), [])
+        if len(candidates) == 1:
+            return CandidateResolution({"image_url": candidates[0]}, "model-filename", "", 1)
+        if len(candidates) > 1:
+            return CandidateResolution(
+                {}, "model-ambiguous", f"multiple model files for '{target_id}'", 1,
+                tuple(CandidateAlternative("image_url", url, "model-filename", 1) for url in candidates),
+            )
+        return CandidateResolution({}, "none", "", None)
+
+    if target_type == TARGET_TYPE_CONTEXT_CHOICE:
+        fields: dict[str, str] = {}
+        alternatives: list[CandidateAlternative] = []
+        ambiguous: list[str] = []
+        for candidate_field in ("image_url", "hover_image_url"):
+            candidates = media.bodystyle.get((model_key, target_id, candidate_field), [])
+            if len(candidates) == 1:
+                fields[candidate_field] = candidates[0]
+            elif len(candidates) > 1:
+                ambiguous.append(candidate_field)
+                alternatives.extend(
+                    CandidateAlternative(candidate_field, url, "bodystyle-filename", 1)
+                    for url in candidates
+                )
+        if ambiguous:
+            return CandidateResolution(
+                {}, "bodystyle-ambiguous",
+                f"multiple body-style files for {', '.join(ambiguous)}", 1,
+                tuple(alternatives),
+            )
+        if fields:
+            return CandidateResolution(fields, "bodystyle-filename", "", 1)
+        return CandidateResolution({}, "none", "", None)
+
+    return CandidateResolution(
+        {}, "unsupported-target-type", f"unsupported target_type '{target_type}'", None
+    )
 
 
 def reconcile(
@@ -730,119 +906,24 @@ def reconcile(
         if model_key == WILDCARD_MODEL_KEY
     }
 
-    def resolve_option(model_key: str, rpo: str) -> tuple[dict[str, str], str, str]:
-        if not rpo:
-            return {}, "no-rpo", "no rpo in option sheet"
-
-        candidates = media.option_exact.get((model_key, rpo), [])
-        if len(candidates) == 1:
-            return {"image_url": candidates[0]}, "prefixed", ""
-        if len(candidates) > 1:
-            return (
-                {},
-                "prefixed-ambiguous",
-                f"multiple {model_key}-prefixed files for '{rpo}'; keep one file at this priority",
-            )
-
-        eligible_groups: list[tuple[int, str, list[str]]] = []
-        for (prefix_group, candidate_rpo), group_candidates in media.option_shared.items():
-            if candidate_rpo != rpo:
-                continue
-            group_models = tuple(MODEL_PREFIX[code] for code in prefix_group.split("-"))
-            if model_key in group_models:
-                eligible_groups.append((len(group_models), prefix_group, group_candidates))
-        if eligible_groups:
-            winning_size = min(size for size, _prefix, _candidates in eligible_groups)
-            winning_groups = [
-                (prefix, group_candidates)
-                for size, prefix, group_candidates in eligible_groups
-                if size == winning_size
-            ]
-            winning_candidates = [
-                (prefix, url)
-                for prefix, group_candidates in winning_groups
-                for url in group_candidates
-            ]
-            if len(winning_candidates) == 1:
-                prefix_group, url = winning_candidates[0]
-                return (
-                    {"image_url": url},
-                    f"shared-prefix:{prefix_group}",
-                    f"using {prefix_group}-prefixed media shared with {model_key}",
-                )
-            prefix_labels = ", ".join(sorted(prefix for prefix, _candidates in winning_groups))
-            source_label = winning_groups[0][0] if len(winning_groups) == 1 else prefix_labels
-            return (
-                {},
-                f"shared-prefix:{source_label}:ambiguous",
-                f"multiple {prefix_labels} shared-prefix files for '{rpo}' at the winning specificity",
-            )
-
-        for candidate_model in OPTION_MODEL_FALLBACKS.get(model_key, ()):
-            source = f"model-fallback:{candidate_model}"
-            candidates = media.option_exact.get((candidate_model, rpo), [])
-            if len(candidates) == 1:
-                return (
-                    {"image_url": candidates[0]},
-                    source,
-                    f"using {candidate_model}-prefixed media as configured fallback for {model_key}",
-                )
-            if len(candidates) > 1:
-                return (
-                    {},
-                    f"{source}:ambiguous",
-                    f"multiple {candidate_model}-prefixed files for '{rpo}'; keep one file at this priority",
-                )
-        if rpo in media.option_bare:
-            if len(media.option_bare[rpo]) == 1:
-                return {"image_url": media.option_bare[rpo][0]}, "bare-shared", ""
-            return {}, "bare-ambiguous", f"multiple bare files for '{rpo}'; keep one shared file or add c/e/h/r/s/g prefixes"
-        return {}, "none", ""
-
-    def resolve_fields(model_key: str, target_id: str, info: dict[str, str]) -> tuple[dict[str, str], str, str]:
-        target_type = info.get("target_type", TARGET_TYPE_OPTION)
-        if target_type == TARGET_TYPE_OPTION:
-            return resolve_option(model_key, info.get("rpo", ""))
-        if target_type == TARGET_TYPE_MODEL:
-            candidates = media.model.get((model_key, target_id), [])
-            if len(candidates) == 1:
-                return {"image_url": candidates[0]}, "model-filename", ""
-            if len(candidates) > 1:
-                return {}, "model-ambiguous", f"multiple model files for '{target_id}'"
-            return {}, "none", ""
-        if target_type == TARGET_TYPE_CONTEXT_CHOICE:
-            fields: dict[str, str] = {}
-            ambiguous: list[str] = []
-            for field in ("image_url", "hover_image_url"):
-                candidates = media.bodystyle.get((model_key, target_id, field), [])
-                if len(candidates) == 1:
-                    fields[field] = candidates[0]
-                elif len(candidates) > 1:
-                    ambiguous.append(field)
-            if ambiguous:
-                return {}, "bodystyle-ambiguous", f"multiple body-style files for {', '.join(ambiguous)}"
-            if fields:
-                return fields, "bodystyle-filename", ""
-            return {}, "none", ""
-        return {}, "unsupported-target-type", f"unsupported target_type '{target_type}'"
-
     safe_wildcard_candidates: dict[tuple[str, str], str] = {}
     if update_safe_wildcards:
         for target_type, target_id in wildcard_rows:
             if target_type != TARGET_TYPE_OPTION:
                 continue
             resolutions = [
-                resolve_fields(model_key, target_id, info)
+                resolve_candidate(media, model_key, target_id, info)
                 for (model_key, desired_type, desired_id), info in desired.items()
                 if desired_type == target_type and desired_id == target_id
             ]
             candidate_urls = {
-                fields.get("image_url", "")
-                for fields, source, _note in resolutions
-                if fields and source == "bare-shared"
+                resolution.fields.get("image_url", "")
+                for resolution in resolutions
+                if resolution.fields and resolution.source == "bare-shared"
             }
             if resolutions and len(candidate_urls) == 1 and all(
-                fields and source == "bare-shared" for fields, source, _note in resolutions
+                resolution.fields and resolution.source == "bare-shared"
+                for resolution in resolutions
             ):
                 safe_wildcard_candidates[(target_type, target_id)] = candidate_urls.pop()
 
@@ -851,6 +932,7 @@ def reconcile(
     inserts: list[dict[str, Any]] = []
     status: dict[int, str] = {}
     used: set[str] = set()
+    resolutions: dict[tuple[str, str, str], CandidateResolution] = {}
 
     def add_report(
         scope: str,
@@ -895,9 +977,13 @@ def reconcile(
     for (model_key, target_type, target_id), info in desired.items():
         rpo = info.get("rpo", "")
         source_sheet = info.get("source_sheet", "")
-        fields, source, note = resolve_fields(model_key, target_id, info)
+        resolution = resolve_candidate(media, model_key, target_id, info)
+        resolutions[(model_key, target_type, target_id)] = resolution
+        fields, source, note = resolution.fields, resolution.source, resolution.reason
         for url in fields.values():
             used.add(url)
+        for alternative in resolution.alternatives:
+            used.add(alternative.url)
 
         existing = existing_rows.get((model_key, target_type, target_id))
         if existing:
@@ -1050,7 +1136,14 @@ def reconcile(
             "asset target no longer desired by current promoted model inventory",
         )
 
-    return SyncPlan(report=report, url_writes=url_writes, inserts=inserts, status=status, used=used)
+    return SyncPlan(
+        report=report,
+        url_writes=url_writes,
+        inserts=inserts,
+        status=status,
+        used=used,
+        resolutions=resolutions,
+    )
 
 
 def _ensure_asset_headers(headers: list[str]) -> dict[str, int]:
@@ -1317,9 +1410,366 @@ def build_sync_plan(
         classify_coverage=classify_coverage,
         update_safe_wildcards=update_safe_wildcards,
     )
-    plan = replace(plan, section_coverage=build_section_coverage_stats(desired, existing_rows))
+    plan = replace(
+        plan,
+        section_coverage=build_section_coverage_stats(desired, existing_rows),
+        desired_targets=desired,
+        current_rows=existing_rows,
+    )
     unmatched = sorted(set(media_urls) - plan.used - set(media.unparseable))
     return plan, sources, unmatched, media.unparseable
+
+
+ASSET_MANAGER_STATUSES = (
+    "safe_proposal",
+    "covered",
+    "missing",
+    "ambiguous",
+    "unmatched",
+    "unparseable",
+    "dead_url",
+    "stale_target",
+    "wildcard_conflict",
+)
+SAFE_PROPOSAL_ACTIONS = {
+    "fill", "replace_canonical", "insert_filled", "replace_shared_canonical",
+}
+
+
+def _manager_status(action: str) -> str:
+    if action in SAFE_PROPOSAL_ACTIONS:
+        return "safe_proposal"
+    if action == "keep":
+        return "covered"
+    if action in {"flag_missing", "skip_no_candidate_incremental"}:
+        return "missing"
+    if action == "flag_ambiguous":
+        return "ambiguous"
+    if action in {"flag_dead_no_match", "dead_no_match_incremental"}:
+        return "dead_url"
+    if action == "stale_target":
+        return "stale_target"
+    if action == "wildcard_conflict":
+        return "wildcard_conflict"
+    return action or "missing"
+
+
+def _sha256_path(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _stable_item_id(*parts: str) -> str:
+    return hashlib.sha256("\x1f".join(parts).encode("utf-8")).hexdigest()[:20]
+
+
+def _current_asset_for_target(
+    current_rows: dict[tuple[str, str, str], dict[str, Any]],
+    model_key: str,
+    target_type: str,
+    target_id: str,
+) -> tuple[dict[str, Any], str]:
+    exact = current_rows.get((model_key, target_type, target_id))
+    if exact is not None:
+        return exact, "exact"
+    if target_type == TARGET_TYPE_OPTION:
+        shared = current_rows.get((WILDCARD_MODEL_KEY, target_type, target_id))
+        if shared is not None:
+            return shared, "shared"
+    return {}, "missing"
+
+
+def build_asset_manager_snapshot(
+    workbook_path: Path | str,
+    media_urls: Iterable[str],
+    *,
+    media_source: str = "live",
+    verify_existing: bool = False,
+    timeout: float = 10.0,
+    workers: int = 16,
+) -> AssetManagerSnapshot:
+    """Build the read-only Manager view from the exact CLI reconciliation owner."""
+
+    workbook_path = Path(workbook_path)
+    normalized_urls = sorted(set(media_urls))
+    wb = load_workbook(workbook_path, read_only=True, data_only=True)
+    try:
+        plan, sources, unmatched, unparseable = build_sync_plan(
+            wb,
+            asset_sheet=ASSET_SHEET,
+            media_urls=normalized_urls,
+            verify_existing=verify_existing,
+            timeout=timeout,
+            workers=workers,
+            incremental=False,
+        )
+    finally:
+        wb.close()
+
+    items: list[dict[str, Any]] = []
+    for row in plan.report:
+        model_key = row.get("model_key", "")
+        target_type = row.get("target_type", "")
+        target_id = row.get("target_id", "")
+        resolution = plan.resolutions.get(
+            (model_key, target_type, target_id),
+            CandidateResolution({}, row.get("candidate_source", ""), row.get("note", ""), None),
+        )
+        current, coverage_kind = _current_asset_for_target(
+            plan.current_rows, model_key, target_type, target_id
+        )
+        current_values = {
+            column: clean(current.get(column, ""))
+            for column in WRITABLE_COLUMNS["asset_map"]
+        }
+        proposed_values = dict(current_values)
+        proposed_values.update(resolution.fields)
+        if resolution.fields and not current:
+            proposed_values.update({
+                "model_key": model_key,
+                "target_type": target_type,
+                "target_id": target_id,
+                "image_alt": row.get("option_name", ""),
+                "image_fit": NEW_ROW_FIT,
+                "image_position": NEW_ROW_POSITION,
+                "active": "True",
+                "notes": NEW_ROW_NOTE,
+            })
+            if resolution.fields.get("hover_image_url"):
+                proposed_values["hover_image_alt"] = row.get("option_name", "")
+                proposed_values["hover_image_position"] = NEW_ROW_POSITION
+        status = _manager_status(row.get("action", ""))
+        items.append({
+            "id": _stable_item_id("target", model_key, target_type, target_id),
+            "kind": "target",
+            "status": status,
+            "action": row.get("action", ""),
+            "model_key": model_key,
+            "section_id": row.get("section_id", "") or "(none)",
+            "target_type": target_type,
+            "target_id": target_id,
+            "rpo": row.get("rpo", ""),
+            "label": row.get("option_name", "") or target_id,
+            "expected": row.get("coverage_intent", "") != COVERAGE_NOT_EXPECTED,
+            "coverage_intent": row.get("coverage_intent", "") or "unclassified",
+            "coverage_intent_reason": row.get("coverage_intent_reason", ""),
+            "coverage": {
+                "kind": coverage_kind,
+                "covered": bool(current_values.get("image_url")),
+                "asset_model_key": current_values.get("model_key", ""),
+            },
+            "workbook_target": {
+                "model_key": model_key,
+                "target_type": target_type,
+                "target_id": target_id,
+            },
+            "lineage": {
+                "target_source_sheet": row.get("source_sheet", ""),
+                "asset_source_sheet": current.get("source_sheet", ""),
+                "asset_source_row": current.get("source_row"),
+            },
+            "current_values": current_values,
+            "proposed_values": proposed_values,
+            "candidate": {
+                "selected": [
+                    {"field": candidate_field, "url": url}
+                    for candidate_field, url in sorted(resolution.fields.items())
+                ],
+                "source": resolution.source,
+                "priority": resolution.priority,
+                "reason": resolution.reason or row.get("note", ""),
+                "alternatives": [
+                    {
+                        "field": alternative.field,
+                        "url": alternative.url,
+                        "source": alternative.source,
+                        "priority": alternative.priority,
+                    }
+                    for alternative in resolution.alternatives
+                ],
+            },
+            "supports_hover": (
+                target_type == TARGET_TYPE_CONTEXT_CHOICE
+                and target_id.startswith("body_style__")
+            ),
+        })
+
+    for url in unmatched:
+        shared_prefix, rpo, shared_ok = parse_shared_option_media(url)
+        if shared_ok:
+            parsed_model = shared_prefix or ""
+        else:
+            parsed_model, rpo, _ = parse_media(url)
+        items.append({
+            "id": _stable_item_id("unmatched", url),
+            "kind": "media",
+            "status": "unmatched",
+            "action": "unmatched_media",
+            "model_key": parsed_model or "",
+            "section_id": "(media inventory)",
+            "target_type": "media",
+            "target_id": "",
+            "rpo": rpo,
+            "label": filename_stem(url),
+            "expected": False,
+            "coverage_intent": "unclassified",
+            "coverage_intent_reason": "media has no desired workbook target",
+            "coverage": {"kind": "unmatched", "covered": False, "asset_model_key": ""},
+            "workbook_target": {},
+            "lineage": {"target_source_sheet": "", "asset_source_sheet": "", "asset_source_row": None},
+            "current_values": {},
+            "proposed_values": {"image_url": url},
+            "candidate": {
+                "selected": [], "source": "unmatched-media", "priority": None,
+                "reason": "media filename parsed but did not match a desired workbook target",
+                "alternatives": [{"field": "image_url", "url": url, "source": "inventory", "priority": None}],
+            },
+            "supports_hover": False,
+        })
+    for url in unparseable:
+        items.append({
+            "id": _stable_item_id("unparseable", url),
+            "kind": "media",
+            "status": "unparseable",
+            "action": "unparseable_media",
+            "model_key": "",
+            "section_id": "(media inventory)",
+            "target_type": "media",
+            "target_id": "",
+            "rpo": "",
+            "label": filename_stem(url),
+            "expected": False,
+            "coverage_intent": "unclassified",
+            "coverage_intent_reason": "filename did not yield a supported target identity",
+            "coverage": {"kind": "unparseable", "covered": False, "asset_model_key": ""},
+            "workbook_target": {},
+            "lineage": {"target_source_sheet": "", "asset_source_sheet": "", "asset_source_row": None},
+            "current_values": {},
+            "proposed_values": {"image_url": url},
+            "candidate": {
+                "selected": [], "source": "unparseable-media", "priority": None,
+                "reason": "filename did not yield a supported model, RPO, model card, or body-style identity",
+                "alternatives": [{"field": "image_url", "url": url, "source": "inventory", "priority": None}],
+            },
+            "supports_hover": False,
+        })
+
+    items.sort(key=lambda item: (
+        ASSET_MANAGER_STATUSES.index(item["status"])
+        if item["status"] in ASSET_MANAGER_STATUSES else len(ASSET_MANAGER_STATUSES),
+        item.get("model_key", ""), item.get("section_id", ""),
+        item.get("rpo", ""), item.get("target_id", ""), item["id"],
+    ))
+    workbook_sha256 = _sha256_path(workbook_path)
+    media_sha256 = hashlib.sha256(
+        json.dumps(normalized_urls, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    ).hexdigest()
+    reconciliation_sha256 = hashlib.sha256(
+        f"{workbook_sha256}:{media_sha256}:{COVERAGE_RULESET_VERSION}".encode("utf-8")
+    ).hexdigest()
+    return AssetManagerSnapshot(
+        fingerprints={
+            "workbook_sha256": workbook_sha256,
+            "workbook_mtime_ns": str(workbook_path.stat().st_mtime_ns),
+            "media_inventory_sha256": media_sha256,
+            "reconciliation_sha256": reconciliation_sha256,
+        },
+        media={
+            "source": media_source,
+            "url_count": len(normalized_urls),
+            "unmatched_count": len(unmatched),
+            "unparseable_count": len(unparseable),
+            "existing_url_verification": "enabled" if verify_existing else "not_run",
+        },
+        coverage_ruleset={
+            "version": COVERAGE_RULESET_VERSION,
+            "rules": list(COVERAGE_RULESET),
+        },
+        items=tuple(items),
+        action_counts=dict(Counter(item["action"] for item in items)),
+    )
+
+
+def filter_asset_manager_snapshot(
+    snapshot: AssetManagerSnapshot,
+    *,
+    model_key: str = "",
+    section_id: str = "",
+    target_type: str = "",
+    coverage_intent: str = "",
+    status: str = "",
+    offset: int = 0,
+    limit: int = 24,
+) -> dict[str, Any]:
+    """Filter/paginate while keeping every count and percentage domain-owned."""
+
+    def matches(item: dict[str, Any], *, include_status: bool = True) -> bool:
+        return (
+            (not model_key or item.get("model_key") == model_key)
+            and (not section_id or item.get("section_id") == section_id)
+            and (not target_type or item.get("target_type") == target_type)
+            and (not coverage_intent or item.get("coverage_intent") == coverage_intent)
+            and (not include_status or not status or item.get("status") == status)
+        )
+
+    scoped = [item for item in snapshot.items if matches(item, include_status=False)]
+    filtered = [item for item in scoped if not status or item.get("status") == status]
+    target_items = [item for item in scoped if item.get("kind") == "target"]
+
+    def coverage_bucket(rows: list[dict[str, Any]]) -> dict[str, Any]:
+        total = len(rows)
+        covered = sum(1 for item in rows if item.get("coverage", {}).get("covered"))
+        return {
+            "total_targets": total,
+            "covered": covered,
+            "missing": total - covered,
+            "coverage_pct": round(100.0 * covered / total, 1) if total else 0.0,
+        }
+
+    models: list[dict[str, Any]] = []
+    for current_model in sorted({item.get("model_key", "") for item in target_items if item.get("model_key")}):
+        model_items = [item for item in target_items if item.get("model_key") == current_model]
+        sections = []
+        for current_section in sorted({item.get("section_id", "") for item in model_items}):
+            section_items = [item for item in model_items if item.get("section_id") == current_section]
+            sections.append({"section_id": current_section, **coverage_bucket(section_items)})
+        models.append({"model_key": current_model, **coverage_bucket(model_items), "sections": sections})
+
+    status_counter = Counter(item.get("status", "") for item in scoped)
+    status_counts = {name: status_counter.get(name, 0) for name in ASSET_MANAGER_STATUSES}
+    facets = {
+        "models": sorted({item.get("model_key", "") for item in snapshot.items if item.get("model_key")}),
+        "sections": sorted({item.get("section_id", "") for item in scoped if item.get("section_id")}),
+        "target_types": sorted({item.get("target_type", "") for item in scoped if item.get("target_type")}),
+        "coverage_intents": sorted({item.get("coverage_intent", "") for item in scoped if item.get("coverage_intent")}),
+        "statuses": list(ASSET_MANAGER_STATUSES),
+    }
+    return {
+        "mode": "read_only_asset_resolution",
+        "fingerprints": snapshot.fingerprints,
+        "media": snapshot.media,
+        "coverage_ruleset": snapshot.coverage_ruleset,
+        "coverage": {"overall": coverage_bucket(target_items), "models": models},
+        "status_counts": status_counts,
+        "action_counts": snapshot.action_counts,
+        "facets": facets,
+        "filters": {
+            "model_key": model_key,
+            "section_id": section_id,
+            "target_type": target_type,
+            "coverage_intent": coverage_intent,
+            "status": status,
+        },
+        "queue": {
+            "total": len(filtered),
+            "offset": offset,
+            "limit": limit,
+            "items": filtered[offset:offset + limit],
+        },
+    }
 
 
 def apply_sync_plan(wb, *, asset_sheet: str, plan: SyncPlan) -> None:

@@ -863,6 +863,22 @@ class TestPass1BrowserContainment(unittest.TestCase):
         self.assertNotIn("write: true", sync_source)
         self.assertNotIn("Write to stingray_master.xlsx", sync_source)
 
+    def test_asset_workspace_is_lazy_bounded_preview_without_draft_operations(self):
+        app_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                      "App.jsx").read_text()
+        asset_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                        "components" / "AssetManager.jsx").read_text()
+        self.assertIn('label: "Asset Manager"', app_source)
+        self.assertIn("PAGE_SIZE = 24", asset_source)
+        self.assertIn('loading="lazy"', asset_source)
+        self.assertIn('["cover", "contain", "swatch"]', asset_source)
+        self.assertIn('/^[\\w\\s.%/-]+$/.test(position)', asset_source)
+        self.assertIn("Show body-style hover media", asset_source)
+        self.assertIn("not regenerated runtime proof", asset_source)
+        self.assertIn("Nothing here creates a draft operation", asset_source)
+        self.assertNotIn("saveDraftOperation", asset_source)
+        self.assertNotIn("/api/drafts", asset_source)
+
     def test_form_payload_uses_schema_model_context_for_model_key_families(self):
         record_form = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
                        "components" / "RecordForm.jsx").read_text()
@@ -897,9 +913,13 @@ class TestApi(unittest.TestCase):
         cls.workbook = cls.tmpdir / "source.xlsx"
         shutil.copy2(WORKBOOK, cls.workbook)
         cls.previous_workbook_env = os.environ.get("WBM_WORKBOOK")
+        cls.previous_asset_media_env = os.environ.get("WBM_ASSET_MEDIA_URL_LIST")
         os.environ["WBM_DB"] = str(cls.tmpdir / "api.sqlite3")
         os.environ["WBM_VAR_DIR"] = str(cls.tmpdir / "var")
         os.environ["WBM_WORKBOOK"] = str(cls.workbook)
+        os.environ["WBM_ASSET_MEDIA_URL_LIST"] = str(
+            REPO_ROOT / "tests" / "fixtures" / "asset-map-sync-media-urls.txt"
+        )
         # Force a FULL re-import of the app package so config re-reads the
         # env vars above. The bare "app" entry must be deleted too: leaving
         # the package object in sys.modules makes `from . import staging`
@@ -928,6 +948,10 @@ class TestApi(unittest.TestCase):
             os.environ.pop("WBM_WORKBOOK", None)
         else:
             os.environ["WBM_WORKBOOK"] = cls.previous_workbook_env
+        if cls.previous_asset_media_env is None:
+            os.environ.pop("WBM_ASSET_MEDIA_URL_LIST", None)
+        else:
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = cls.previous_asset_media_env
         shutil.rmtree(cls.tmpdir, ignore_errors=True)
 
     def test_status_and_models(self):
@@ -936,6 +960,60 @@ class TestApi(unittest.TestCase):
         models = self.client.get("/api/models").json()["models"]
         keys = {m["model_key"] for m in models}
         self.assertLessEqual({"stingray", "grand_sport", "z06"}, keys)
+
+    def test_asset_reconciliation_api_is_exact_shared_read_only_view(self):
+        from corvette_form_generator import asset_map_sync
+
+        fixture = REPO_ROOT / "tests" / "fixtures" / "asset-map-sync-media-urls.txt"
+        snapshot = asset_map_sync.build_asset_manager_snapshot(
+            self.workbook,
+            asset_map_sync.read_media_url_list(fixture),
+            media_source=f"media-url-list:{fixture.name}",
+        )
+        expected = asset_map_sync.filter_asset_manager_snapshot(
+            snapshot,
+            model_key="stingray",
+            status="safe_proposal",
+            offset=0,
+            limit=24,
+        )
+        workbook_before = _sha256(self.workbook)
+        drafts_before = self.client.get("/api/drafts", params={"limit": 200}).json()
+        protected_paths = [
+            self.mainmod.config.DEFAULT_PROJECTION_DB,
+            self.mainmod.config.DEFAULT_DB,
+            REPO_ROOT / "form-app" / "data.js",
+            REPO_ROOT / "form-app" / "index.html",
+            *(REPO_ROOT / "form-output" / "runtime").glob("*-runtime-contract.json"),
+        ]
+        protected_before = {path: _sha256(path) for path in protected_paths}
+        with mock.patch.object(self.mainmod.drafts, "save_operation") as draft_write:
+            response = self.client.get(
+                "/api/assets/reconciliation",
+                params={
+                    "model": "stingray",
+                    "status": "safe_proposal",
+                    "limit": 24,
+                    "refresh": "true",
+                },
+            )
+        self.assertEqual(response.status_code, 200, response.text)
+        actual = response.json()
+        self.assertEqual(actual["fingerprints"], expected["fingerprints"])
+        self.assertEqual(actual["media"], expected["media"])
+        self.assertEqual(actual["coverage"], expected["coverage"])
+        self.assertEqual(actual["status_counts"], expected["status_counts"])
+        self.assertEqual(actual["queue"], expected["queue"])
+        draft_write.assert_not_called()
+        self.assertEqual(_sha256(self.workbook), workbook_before)
+        self.assertEqual(
+            self.client.get("/api/drafts", params={"limit": 200}).json(),
+            drafts_before,
+        )
+        self.assertEqual(
+            {path: _sha256(path) for path in protected_paths},
+            protected_before,
+        )
 
     def test_status_reports_provisional_surfaces_separately(self):
         status = self.client.get("/api/status").json()

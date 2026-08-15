@@ -21,7 +21,15 @@ from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import config, db as dbmod, drafts, importer, staging, sync as syncmod
+from . import (
+    config,
+    asset_workspace,
+    db as dbmod,
+    drafts,
+    importer,
+    staging,
+    sync as syncmod,
+)
 from .naming import display_id, humanize, sheet_display_name
 from .schemas import (
     ApprovalRequest,
@@ -524,6 +532,50 @@ def collections(model_key: str, conn=Depends(projection_connection)):
             "scaffold": False,
         })
     return {"model_key": model_key, "collections": out}
+
+
+@app.get("/api/assets/reconciliation")
+def asset_reconciliation(
+    refresh: bool = False,
+    model: str = Query("", max_length=80),
+    section: str = Query("", max_length=160),
+    target_type: str = Query("", max_length=80),
+    coverage_intent: str = Query("", max_length=80),
+    status: str = Query("", max_length=80),
+    offset: int = Query(0, ge=0),
+    limit: int = Query(24, ge=1, le=100),
+    conn=Depends(projection_connection),
+):
+    """Typed, read-only view over the shared asset reconciliation result."""
+
+    workbook = _workbook_state(conn)
+    if workbook["state"] != "current":
+        raise HTTPException(409, detail={
+            "status": "asset_reconciliation_workbook_not_current",
+            "message": "Asset Manager requires a verified current projection of the workbook.",
+        })
+    try:
+        return asset_workspace.get_asset_manager_view(
+            config.DEFAULT_WORKBOOK,
+            refresh=refresh,
+            model_key=model,
+            section_id=section,
+            target_type=target_type,
+            coverage_intent=coverage_intent,
+            status=status,
+            offset=offset,
+            limit=limit,
+        )
+    except asset_workspace.asset_map_sync.WordPressMediaFetchError as exc:
+        raise HTTPException(502, detail={
+            "status": "asset_media_inventory_unavailable",
+            "message": str(exc),
+        }) from exc
+    except (OSError, ValueError) as exc:
+        raise HTTPException(422, detail={
+            "status": "asset_reconciliation_failed",
+            "message": str(exc),
+        }) from exc
 
 
 @app.get("/api/tables")

@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  Database, History, ListOrdered, Settings2, GitBranch,
+  Database, History, Images, ListOrdered, Settings2, GitBranch,
 } from "lucide-react";
 import { api } from "./api.js";
 import FormStructure from "./components/FormStructure.jsx";
 import ModelOperations from "./components/ModelOperations.jsx";
+import AssetManager from "./components/AssetManager.jsx";
 import ChangesSync from "./components/ChangesSync.jsx";
 import HistoryView from "./components/HistoryView.jsx";
 
@@ -109,6 +110,7 @@ export default function App() {
   const tabs = [
     { id: "structure", label: "Form Structure", icon: ListOrdered },
     { id: "operations", label: "Model Operations", icon: Settings2 },
+    { id: "assets", label: "Asset Manager", icon: Images },
     {
       id: "changes",
       label: "Draft Review",
@@ -186,6 +188,13 @@ export default function App() {
             draftId={draftId}
             draftMutable={draftMutable}
             onChanged={refreshManager}
+          />
+        )}
+        {tab === "assets" && (
+          <AssetManager
+            models={models}
+            modelKey={modelKey}
+            setModelKey={setModelKey}
           />
         )}
         {tab === "changes" && (
