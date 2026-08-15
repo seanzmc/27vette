@@ -1,12 +1,10 @@
 # Reliable Workbook–Database Workflow Implementation Specification
 
-Status: implementation in progress; Pass 1 completed 2026-07-22, Pass 2
+Status: implementation complete; Pass 1 completed 2026-07-22, Pass 2
 completed 2026-07-23, Pass 3 completed 2026-07-30, Pass 4 completed
 2026-08-08, Pass 5 completed 2026-08-09, Pass 6A completed 2026-08-10, and
-Pass 6B completed 2026-08-14 on `db-workflow`; Pass 7 checkpoints 1–3 are
-complete through the read-only Asset Resolution Workspace foundation, and
-actionable asset resolutions through the shared durable draft are checkpoint 4
-next.
+Pass 6B completed 2026-08-14 on `db-workflow`; all five Pass 7 checkpoints and
+the final Apply and Rebuild exit gate completed 2026-08-15.
 Revised 2026-08-14 to expand the remaining Pass 7 work into five explicit
 checkpoints: lifecycle context, durable editing UI, integrated asset management,
 one shared draft/apply lane, and final Apply-and-Rebuild orchestration. Revised
@@ -1432,7 +1430,7 @@ the released six-model promotion set on 2026-08-14, and its owner passes `4`.
 Completed foundation: preserve the catalog allowlist on schema, record, and
 dependency endpoints, and resolve blank Form Structure section-to-step values
 from imported workbook master metadata. The five-checkpoint Pass 7 sequence is
-pinned below; checkpoints 1–4 are complete and only checkpoint 5 remains.
+pinned below; all five checkpoints are complete.
 
 #### Checkpoint 1 — lifecycle context API (completed 2026-08-14)
 
@@ -1690,7 +1688,7 @@ allowed console error was the deliberately unreachable fixture image. The
 canonical and copied workbook stayed SHA-256-identical, tracked generated and
 publication files were unchanged, and the dedicated apply route remained absent.
 
-#### Remaining checkpoint 5 — final Apply and Rebuild
+#### Checkpoint 5 — final Apply and Rebuild (completed 2026-08-15)
 
 As the final code change, enable one dedicated **Apply and Rebuild** action over
 the exact approved artifacts. It must:
@@ -1724,6 +1722,50 @@ Pass 7 exit gate: all five checkpoint exit gates pass; the generic
 durable editor and Asset Manager share one workbook-owned draft/apply lane;
 only Apply and Rebuild can reach the bound writer and post-write pipeline; and
 no failed or partially restored workflow is presented as current.
+
+Completion: `POST /api/drafts/{draft_id}/apply-rebuild` is the sole Manager
+route that can reach the existing exact-artifact apply lifecycle. It requires
+the typed phrase `APPLY AND REBUILD`; durable applying state is committed before
+the writer runs; a verified rollback set containing the workbook, every
+ownership-derived possible affected output, `form-app/data.js`, and
+`form-app/index.html` is created first. The existing shared service remains the
+only workbook writer and retains exact ChangeSet/preview/approval binding plus
+saved-row, package, schema, and bool-hygiene proof.
+
+After a valid saved receipt, checkpoint 5 derives the affected promoted set
+from stored `model_id`/`model_context`, copies existing runtime inputs into an
+isolated candidate root, invokes the canonical model generator for each
+affected model, and invokes the canonical registry publisher. Only verified
+candidate hashes are atomically published. `index.html` increments the
+`data.js` cache version only when the registry bytes change. The immutable apply
+receipt records workbook, projection, generated-contract, publication, and
+rollback states separately; status re-hashes that evidence and reports later
+drift as stale. Exact replay returns the original attempt without another
+rollback set, workbook write, generation, or publication.
+
+Any downstream exception restores the full pre-apply set and independently
+hash-verifies each path. A proven restoration maps to
+`apply_restored_retryable`; an unproven restoration maps to
+`workbook_state_unknown`, where the browser/API exposes only the existing
+independently verified manual-resolution actions. Legacy
+`POST /api/sync write=true` remains permanently refused. Deployment, production
+cache purge, WordPress media mutation, and dealer submission remain outside the
+Manager.
+
+Evidence: focused Apply and Rebuild owner passed `7 passed`; lifecycle owner
+passed `36 passed, 36 subtests passed`; frontend production
+build passed with 1,519 modules. A real copied-workbook API acceptance edited
+one ordinary Stingray row and one fingerprint-bound covered asset row, approved
+one artifact chain, applied once, regenerated Stingray, rebuilt the registry,
+reported generated/publication current while the projection was stale, and
+returned the same immutable attempt on replay (`1 passed` in 296.32 seconds).
+Forced downstream failure restored and hash-verified workbook, generated
+contract, registry, and cache HTML bytes. A headed copied-workbook browser run
+typed the confirmation, executed the real action, displayed workbook applied /
+projection stale / generated current / publication current plus cache `31 →
+32`, had no horizontal overflow at 1,200px or 390px, and produced zero console
+warnings/errors. Canonical workbook and tracked generated/publication hashes
+remained unchanged throughout copied validation.
 
 #### Pass 7 checkpoint 1 — catalog containment and section fallback (2026-08-14)
 

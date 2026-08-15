@@ -15,7 +15,7 @@ import sqlite3
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from corvette_form_generator import editor_ops
 from corvette_form_generator.contract import WILDCARD_MODEL_KEY
@@ -839,7 +839,10 @@ def _map_apply_result(
         return "workbook_state_unknown", ["resolve_manually"]
     if workbook_state == "restored":
         if (
-            status == "apply_verification_failed_rolled_back"
+            status in {
+                "apply_verification_failed_rolled_back",
+                "apply_rebuild_failed_rolled_back",
+            }
             and identity_state == "unchanged"
             and exact_formal_receipt
         ):
@@ -1104,6 +1107,8 @@ def apply_draft(
     draft_id: str,
     workbook_path: Path,
     log_path: Path | None = None,
+    prepare_apply: Callable[[], Any] | None = None,
+    complete_apply: Callable[[dict, Any], dict] | None = None,
 ) -> dict:
     """Apply exact stored artifacts once through the shared workbook service."""
     draft = state_conn.execute(
@@ -1148,9 +1153,15 @@ def apply_draft(
     )
     path = Path(workbook_path)
     try:
+        prepared_apply = prepare_apply() if prepare_apply is not None else None
         result = workbook_service.apply_changeset(
             path, changeset, preview, approval, log_path=log_path
         )
+        if (
+            complete_apply is not None
+            and _is_exact_applied_receipt(result, changeset, preview, approval)
+        ):
+            result = complete_apply(result, prepared_apply)
     except Exception as exc:
         identity = _workbook_identity(path, changeset["workbook"])
         if isinstance(exc, TRANSIENT_APPLY_EXCEPTIONS) and identity["state"] == "unchanged":

@@ -840,7 +840,7 @@ class TestDependencyInspection(ImportedWorkbookCase):
 
 
 class TestPass1BrowserContainment(unittest.TestCase):
-    def test_browser_uses_durable_draft_workspace_and_has_no_write_control(self):
+    def test_browser_uses_one_guarded_durable_apply_rebuild_control(self):
         app_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
                       "App.jsx").read_text()
         sync_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
@@ -849,10 +849,12 @@ class TestPass1BrowserContainment(unittest.TestCase):
                              "components" / "ModelOperations.jsx").read_text()
         structure_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
                             "components" / "FormStructure.jsx").read_text()
-        self.assertIn("Durable draft mode", app_source)
+        self.assertIn("Guarded workbook workflow", app_source)
         self.assertIn("Freeze ChangeSet", sync_source)
         self.assertIn("Approve Exact Preview", sync_source)
-        self.assertIn("Apply remains intentionally unavailable", sync_source)
+        self.assertIn("Apply and Rebuild", sync_source)
+        self.assertIn("api.applyRebuildDraft", sync_source)
+        self.assertIn("APPLY AND REBUILD", sync_source)
         self.assertIn("api.saveDraftOperation", operations_source)
         self.assertIn("api.saveDraftOperation", structure_source)
         self.assertIn("await loadRows();\n    onChanged();", operations_source)
@@ -925,9 +927,19 @@ class TestApi(unittest.TestCase):
         shutil.copy2(WORKBOOK, cls.workbook)
         cls.previous_workbook_env = os.environ.get("WBM_WORKBOOK")
         cls.previous_asset_media_env = os.environ.get("WBM_ASSET_MEDIA_URL_LIST")
+        cls.previous_apply_output_env = os.environ.get("WBM_APPLY_OUTPUT_ROOT")
+        cls.apply_output_root = cls.tmpdir / "apply-output"
+        shutil.copytree(REPO_ROOT / "form-output", cls.apply_output_root / "form-output")
+        (cls.apply_output_root / "form-app").mkdir(parents=True)
+        for name in ("data.js", "index.html"):
+            shutil.copy2(
+                REPO_ROOT / "form-app" / name,
+                cls.apply_output_root / "form-app" / name,
+            )
         os.environ["WBM_DB"] = str(cls.tmpdir / "api.sqlite3")
         os.environ["WBM_VAR_DIR"] = str(cls.tmpdir / "var")
         os.environ["WBM_WORKBOOK"] = str(cls.workbook)
+        os.environ["WBM_APPLY_OUTPUT_ROOT"] = str(cls.apply_output_root)
         os.environ["WBM_ASSET_MEDIA_URL_LIST"] = str(
             REPO_ROOT / "tests" / "fixtures" / "asset-map-sync-media-urls.txt"
         )
@@ -963,6 +975,10 @@ class TestApi(unittest.TestCase):
             os.environ.pop("WBM_ASSET_MEDIA_URL_LIST", None)
         else:
             os.environ["WBM_ASSET_MEDIA_URL_LIST"] = cls.previous_asset_media_env
+        if cls.previous_apply_output_env is None:
+            os.environ.pop("WBM_APPLY_OUTPUT_ROOT", None)
+        else:
+            os.environ["WBM_APPLY_OUTPUT_ROOT"] = cls.previous_apply_output_env
         shutil.rmtree(cls.tmpdir, ignore_errors=True)
 
     def test_status_and_models(self):
@@ -1412,9 +1428,9 @@ class TestApi(unittest.TestCase):
             os.environ["WBM_ASSET_MEDIA_URL_LIST"] = original_fixture
             self.mainmod.asset_workspace.clear_cache()
 
-    def test_status_reports_provisional_surfaces_separately(self):
+    def test_status_reports_guarded_surfaces_separately(self):
         status = self.client.get("/api/status").json()
-        self.assertEqual(status["mode"], "read_only_provisional")
+        self.assertEqual(status["mode"], "durable_apply_rebuild")
         self.assertEqual(status["projection"]["state"], "current")
         self.assertTrue(status["projection"]["active"])
         self.assertTrue(status["projection"]["reimport_allowed"])
@@ -1716,7 +1732,7 @@ class TestApi(unittest.TestCase):
         self.assertEqual(resp.status_code, 409)
         detail = resp.json()["detail"]
         self.assertEqual(detail["status"], "read_only_provisional")
-        self.assertIn("Pass 7", detail["message"])
+        self.assertIn("Apply and Rebuild", detail["message"])
 
     def test_pass5_draft_api_roots_durable_update_without_projection_mutation(self):
         projected = self.client.get(
@@ -1828,6 +1844,87 @@ class TestApi(unittest.TestCase):
                 (pending_history_id, failed_history_id),
             )
             conn.commit()
+
+    def test_zz_apply_rebuild_copied_workbook_mixed_draft_and_replay(self):
+        draft_id = "api-apply-rebuild-mixed"
+        canonical_paths = [
+            WORKBOOK,
+            REPO_ROOT / "form-app" / "data.js",
+            REPO_ROOT / "form-app" / "index.html",
+            *(REPO_ROOT / "form-output" / "runtime").glob("*-runtime-contract.json"),
+        ]
+        canonical_before = {path: _sha256(path) for path in canonical_paths}
+        workbook_before = _sha256(self.workbook)
+        ordinary = self.client.get(
+            "/api/records/options", params={"model": "stingray", "limit": 1}
+        ).json()["records"][0]
+        saved = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "options",
+                "model_id": "stingray",
+                "op": "update",
+                "key": {"option_id": ordinary["option_id"]},
+                "record": {"option_name": ordinary["option_name"] + " apply proof"},
+            },
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+
+        asset_view = self.client.get(
+            "/api/assets/reconciliation",
+            params={"model": "stingray", "status": "covered", "draft_id": draft_id, "refresh": True},
+        ).json()
+        asset = asset_view["queue"]["items"][0]
+        saved_asset = self.client.post(
+            f"/api/drafts/{draft_id}/asset-resolutions",
+            json={
+                "item_id": asset["id"],
+                "resolution_kind": "edit",
+                "fingerprints": asset_view["fingerprints"],
+                "values": {
+                    "image_alt": asset["current_values"]["image_alt"] + " apply proof",
+                },
+            },
+        )
+        self.assertEqual(saved_asset.status_code, 200, saved_asset.text)
+
+        committed = self.client.post(f"/api/drafts/{draft_id}/commit")
+        self.assertEqual(committed.status_code, 200, committed.text)
+        preview = self.client.post(f"/api/drafts/{draft_id}/preview")
+        self.assertEqual(preview.status_code, 200, preview.text)
+        confirmable = preview.json()["result"]["warningPolicy"]["confirmableIds"]
+        approved = self.client.post(
+            f"/api/drafts/{draft_id}/approve",
+            json={"actor": "apply-proof", "warning_ids": confirmable},
+        )
+        self.assertEqual(approved.status_code, 200, approved.text)
+
+        applied = self.client.post(
+            f"/api/drafts/{draft_id}/apply-rebuild",
+            json={"actor": "apply-proof", "confirm": "APPLY AND REBUILD"},
+        )
+        self.assertEqual(applied.status_code, 200, applied.text)
+        attempt = applied.json()
+        self.assertEqual(attempt["manager_state"], "applied")
+        evidence = attempt["result"]["applyRebuild"]
+        self.assertEqual(evidence["status"], "current")
+        self.assertEqual(evidence["affected_models"], ["stingray"])
+        self.assertEqual(evidence["workbook"]["state"], "applied")
+        self.assertEqual(evidence["generated_contracts"]["state"], "current")
+        self.assertEqual(evidence["publication"]["state"], "current")
+        self.assertNotEqual(_sha256(self.workbook), workbook_before)
+
+        replay = self.client.post(
+            f"/api/drafts/{draft_id}/apply-rebuild",
+            json={"actor": "apply-proof", "confirm": "APPLY AND REBUILD"},
+        )
+        self.assertEqual(replay.status_code, 200, replay.text)
+        self.assertEqual(replay.json()["id"], attempt["id"])
+        state = self.client.get("/api/status").json()
+        self.assertEqual(state["projection"]["state"], "stale")
+        self.assertEqual(state["generated_artifacts"]["state"], "current")
+        self.assertEqual(state["publication"]["state"], "current")
+        self.assertEqual({path: _sha256(path) for path in canonical_paths}, canonical_before)
 
 
 if __name__ == "__main__":

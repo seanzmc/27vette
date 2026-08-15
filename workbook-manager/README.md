@@ -1,25 +1,25 @@
 # Workbook Manager (React + FastAPI + SQLite)
 
-Provisional interface for investigating the disposable SQLite projection of
+Guarded editor for the disposable SQLite projection of
 `stingray_master.xlsx`. Pass 5 adds manager-owned durable update/add/delete
 drafts, immutable ChangeSet emission, and durable shared-service preview and
 approval lifecycles. Pass 6A independently hardens the shared writer's
-post-save restoration. Pass 7 checkpoints 1–4 add the read-only durable
+post-save restoration. Pass 7 checkpoints 1–5 add the durable
 lifecycle view, schema-driven durable editing/review workspace, Asset Resolution
 Workspace, and fingerprint-bound asset decisions in the shared draft lane. The
 browser now captures operations, freezes one ChangeSet, previews, approves,
 retries, cancels, and presents recovery evidence through the durable lifecycle.
-No manager apply route is enabled.
-The workbook remains canonical. Live manager-to-workbook writes are disabled
-until the final Apply and Rebuild checkpoint enables one reviewed route.
+The workbook remains canonical. Pass 7 checkpoint 5 enables exactly one
+reviewed Apply and Rebuild route over the bound artifact chain; ordinary draft
+saves never write or regenerate.
 
-The remaining Pass 7 plan is owned by
+The completed Pass 7 plan is owned by
 `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md`.
-Checkpoint 4 is complete: explicit safe, ambiguous, inventory, manual,
+Checkpoints 1–5 are complete: explicit safe, ambiguous, inventory, manual,
 assignment, deactivation, ignore, and presentation decisions use the same
-durable draft and Draft Review as ordinary edits. The final checkpoint owns the
-only future Apply and Rebuild route. No separate asset writer or ChangeSet
-dialect exists.
+durable draft and Draft Review as ordinary edits. One Apply and Rebuild route
+owns the guarded workbook write plus local generation/publication. No separate
+asset writer or ChangeSet dialect exists.
 
 ```text
 React interface (frontend/, Vite build served by FastAPI)
@@ -35,7 +35,7 @@ openpyxl import/export adapter (backend/app/importer.py, sync.py)
 stingray_master.xlsx (canonical source)
 ```
 
-## Current safety status: durable drafts; workbook apply disabled
+## Current safety status: durable drafts; one guarded Apply and Rebuild route
 
 Pass 1 containment remains active. Pass 2 split storage plus the shared backend
 catalog contract, Pass 3 request connections plus promotion coordination, and
@@ -43,8 +43,9 @@ Pass 4 verified candidate promotion are implemented. Pass 5 is implemented
 through its complete final-graph exit gate: durable update/add/delete intent,
 exact ChangeSet emission, and shared-service preview and approval lifecycles:
 
-- `POST /api/sync` refuses every `write=true` request. The browser has no live
-  write control; dry-run remains available for inspection only.
+- `POST /api/sync` permanently refuses every `write=true` request. The only
+  browser write control is the typed-confirmation Apply and Rebuild action over
+  an exact approved draft.
 - `POST /api/import` builds a same-filesystem candidate, validates package and
   schema integrity, proves semantic readback, rechecks source SHA-256 plus mtime,
   and atomically replaces the active projection only after every production gate
@@ -98,7 +99,7 @@ exact ChangeSet emission, and shared-service preview and approval lifecycles:
   sheet/row lineage, model context, exact ChangeSet/preview/approval identities,
   warnings, failures, and immutable attempts. Controls derive from registry
   `field_kind`, finite values, and reference metadata; optional blanks remain
-  SQL `NULL`. Apply is intentionally absent.
+  SQL `NULL`.
 - `GET /api/assets/reconciliation` exposes the shared asset-sync reconciliation
   result as a fingerprint-bound, server-filtered, bounded queue. The
   Asset Manager tab presents overall/model/section coverage, distinct status
@@ -113,12 +114,22 @@ exact ChangeSet emission, and shared-service preview and approval lifecycles:
 - The shared writer now rechecks exact rows, package integrity, and schema
   integrity after a safe save. Any returned or thrown post-save validation/log
   failure restores and SHA-256-verifies the backup or reports the workbook
-  state unknown. The backend-only durable apply lifecycle can call it with the
-  exact stored ChangeSet/preview/approval artifacts; no API or browser action
-  can reach that lifecycle until the final Apply and Rebuild checkpoint.
+  state unknown. `POST /api/drafts/{draft_id}/apply-rebuild` calls that lifecycle
+  with the exact stored ChangeSet/preview/approval artifacts, after creating a
+  durable hash-verified rollback set. It derives affected promoted models from
+  stored operation ownership, generates in an isolated candidate root, publishes
+  only complete candidate hashes, and bumps the `data.js` cache version only
+  when the published registry changes. Replay returns the same immutable attempt.
+- A downstream generation/publication failure restores and hash-verifies the
+  workbook, affected generated outputs, registry, and cache-bearing HTML. A
+  proven restoration permits retry/cancel; an unproven restoration exposes only
+  the manual recovery route. No action deploys, purges production cache, changes
+  WordPress media, or submits to a dealer.
 - Status reports projection, draft, workbook, generated-artifact, and
-  publication states separately. Generated artifacts and publication are
-  always `unverified` in this provisional manager workflow.
+  publication states separately. Successful Apply and Rebuild evidence is
+  re-hashed on status reads; later workbook/output drift reports stale rather
+  than current. The projection is intentionally stale after a successful write
+  until verified re-import.
 - Comparison export is available only from a `current` verified projection.
   Outputs are explicitly named `DISPOSABLE-comparison-*.xlsx` under
   `workbook-manager/var/exports/`; they are never write or publication inputs.
@@ -181,7 +192,8 @@ serving is unsupported and no distributed locking exists.
 Environment overrides: `WBM_WORKBOOK`, `WBM_DB` (durable state),
 `WBM_PROJECTION_DB` (disposable projection), `WBM_VAR_DIR`, `WBM_PORT`,
 `WBM_BUSY_TIMEOUT_MS`, `WBM_READER_WAIT_SECONDS`, `WBM_READER_DRAIN_SECONDS`,
-`WBM_STATE_LOCK_WAIT_SECONDS`. Asset Manager uses a stable full WordPress media
+`WBM_STATE_LOCK_WAIT_SECONDS`, `WBM_APPLY_OUTPUT_ROOT` (isolated validation only;
+defaults to the repository). Asset Manager uses a stable full WordPress media
 inventory by default. `WBM_ASSET_MEDIA_URL_LIST` selects a deterministic
 newline-delimited URL list instead; `WBM_ASSET_MEDIA_TIMEOUT` (default 10),
 `WBM_ASSET_MEDIA_WORKERS` (default 16), and
@@ -201,7 +213,7 @@ newline-delimited URL list instead; `WBM_ASSET_MEDIA_TIMEOUT` (default 10),
    operational ignores, and fit/position/hover edits enter the active durable
    draft. Bulk acceptance is server-derived and excludes ambiguous, stale,
    wildcard-conflict, unmatched, and unparseable items. No workbook or media
-   write is reachable.
+   write is reachable until the exact approved Apply and Rebuild action.
 3. **Edit durable draft** — Form Structure workspace (models, runtime steps, section
    presentation/order, context sections, variants) and Model Operations
    workspace (options, OVS, exclusive groups + members, rule mapping, rule
@@ -228,13 +240,16 @@ newline-delimited URL list instead; `WBM_ASSET_MEDIA_TIMEOUT` (default 10),
    the shared approval service and records immutable result/exception evidence.
    Confirmation resubmission reuses the same artifacts; re-preview binds a later
    approval to the new preview.
-8. **Apply ChangeSet (backend service only, not route-reachable)** — Pass 6B
-   routes the exact stored ChangeSet, preview, and approval only through
-   `workbook_domain.service.apply_changeset()`. One active durable attempt is
-   recorded before the writer runs; exact replay is idempotent, interrupted
-   attempts become unknown on startup, and cancellation/manual resolution keep
-   immutable history. There is intentionally no FastAPI or browser apply action;
-   the final Apply and Rebuild checkpoint owns that enablement.
+8. **Apply and Rebuild** — `POST /api/drafts/{draft_id}/apply-rebuild` requires
+   the typed phrase `APPLY AND REBUILD`, records one active durable attempt,
+   prepares the rollback set, and routes the exact stored ChangeSet, preview,
+   and approval only through `workbook_domain.service.apply_changeset()`.
+   After saved-row/package/schema proof, it regenerates the ownership-derived
+   affected promoted models in isolation, rebuilds `form-app/data.js`, bumps its
+   HTML cache version only on a changed bundle, and reports workbook, projection,
+   generated-contract, and publication state independently. Exact replay is
+   idempotent; interrupted attempts become unknown on startup; proven downstream
+   rollback permits retry/cancel; manual resolution remains immutable.
 9. **Legacy containment** — historical staged/history rows remain recovery
    evidence only. The browser has no staged-row or sync workflow, and
    `POST /api/sync` still refuses `write=true` regardless of payload.
@@ -278,8 +293,9 @@ overlay write and reconstruction-validation path.
   tests/test_workbook_manager_api_concurrency.py \
   tests/test_workbook_manager_drafts.py \
   tests/test_workbook_manager_changeset_lifecycle.py \
+  tests/test_workbook_manager_apply_rebuild.py \
   tests/test_workbook_manager.py -q
-# optional direct shared-writer scratch-copy tests (not an enabled API route):
+# optional slow copied-workbook acceptance:
 WBM_SLOW_GATE=1 .venv/bin/python -m pytest tests/test_workbook_manager.py -q
 ```
 

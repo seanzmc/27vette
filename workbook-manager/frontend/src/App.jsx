@@ -124,8 +124,8 @@ export default function App() {
     <div>
       <div className="provisional-banner" role="status">
         <div>
-          <strong>Durable draft mode</strong>
-          <span>Workbook apply is unavailable; edits remain in reviewed manager state.</span>
+          <strong>Guarded workbook workflow</strong>
+          <span>Draft saves stay provisional. Only an exact approved Apply and Rebuild updates the workbook and local runtime outputs.</span>
         </div>
         <div className="status-surfaces" aria-label="Workbook Manager states">
           <span className="chip">projection: {status?.projection?.state || "loading"}</span>

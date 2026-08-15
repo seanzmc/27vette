@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  CheckCheck, DatabaseBackup, FileDown, FileUp, RefreshCcw,
-  RotateCcw, ShieldCheck, StopCircle,
+  CheckCheck, DatabaseBackup, FileDown, FileUp, PlayCircle, RefreshCcw,
+  RotateCcw, ShieldCheck, StopCircle, TriangleAlert,
 } from "lucide-react";
 import { api } from "../api.js";
 
@@ -39,6 +39,7 @@ export default function ChangesSync({
   const [actor, setActor] = useState("Workbook Manager operator");
   const [acceptedWarnings, setAcceptedWarnings] = useState([]);
   const [importReport, setImportReport] = useState(null);
+  const [applyConfirmation, setApplyConfirmation] = useState("");
 
   const artifacts = lifecycle?.artifacts || {};
   const previewAttempt = latest(artifacts.preview_attempts);
@@ -53,6 +54,7 @@ export default function ChangesSync({
   const assetIgnores = assetResolutions.filter((item) => item.resolution_kind === "ignore");
   const confirmableWarnings = preview?.warningPolicy?.confirmableIds || [];
   const visibleWarnings = preview?.warnings || [];
+  const rebuild = applyAttempt?.result?.applyRebuild || null;
 
   useEffect(() => {
     setAcceptedWarnings((current) => current.filter(
@@ -87,6 +89,7 @@ export default function ChangesSync({
     "changeset_emitted", "preview_retryable", "approval_repreview_required",
   ].includes(draftState);
   const canApprove = ["preview_ready", "approval_confirmation_required"].includes(draftState);
+  const canApply = ["approved", "apply_retryable", "apply_restored_retryable"].includes(draftState);
 
   return (
     <div>
@@ -227,6 +230,25 @@ export default function ChangesSync({
                 <CheckCheck size={15} /> Approve Exact Preview
               </button>
             )}
+            {canApply && (
+              <button
+                className="btn primary"
+                disabled={!!busy || !actor.trim() || applyConfirmation !== "APPLY AND REBUILD"}
+                onClick={() => run("apply_rebuild", async () => {
+                  const attempt = await api.applyRebuildDraft(draftId, {
+                    actor: actor.trim(), confirm: applyConfirmation,
+                  });
+                  const state = attempt.result?.applyRebuild?.status || attempt.manager_state;
+                  setNotice({
+                    kind: attempt.manager_state === "applied" ? "ok" : "err",
+                    text: `Apply and Rebuild finished: ${state.replaceAll("_", " ")}.`,
+                  });
+                })}
+              >
+                {draftState === "approved" ? <PlayCircle size={15} /> : <RotateCcw size={15} />}
+                {draftState === "approved" ? "Apply and Rebuild" : "Retry Apply and Rebuild"}
+              </button>
+            )}
             {canCancel && (
               <button
                 className="btn danger"
@@ -263,18 +285,73 @@ export default function ChangesSync({
               ))}
             </div>
           )}
-          {draftState === "approved" && (
-            <div className="notice ok">
-              Exact preview approved. Apply remains intentionally unavailable until the final Apply and Rebuild checkpoint.
+          {canApply && (
+            <div className="apply-confirmation">
+              <div className="notice warn">
+                <TriangleAlert size={16} /> This action writes the exact approved ChangeSet, then regenerates and publishes the derived local model outputs. It does not deploy or submit to a dealer.
+              </div>
+              <label>
+                <span>Type <span className="mono">APPLY AND REBUILD</span> to continue</span>
+                <input
+                  className="text mono"
+                  value={applyConfirmation}
+                  onChange={(event) => setApplyConfirmation(event.target.value)}
+                  placeholder="APPLY AND REBUILD"
+                />
+              </label>
             </div>
           )}
           {draftState === "workbook_state_unknown" && (
-            <div className="notice err">
-              Manual recovery required. No retry or cancellation is safe. Inspect the last apply evidence below and resolve the workbook state through the guarded recovery procedure.
+            <div className="manual-recovery notice err">
+              <strong>Manual recovery required.</strong>
+              <span>No retry or cancellation is safe. Inspect the immutable evidence, then record only what you have independently verified.</span>
+              <div className="toolbar">
+                {["restored", "applied", "abandoned_unknown"].map((resolution) => (
+                  <button
+                    className="btn danger"
+                    disabled={!!busy || !actor.trim()}
+                    key={resolution}
+                    onClick={() => {
+                      if (!window.confirm(`Record manual resolution: ${resolution.replaceAll("_", " ")}?`)) return;
+                      run("manual_resolution", () => api.resolveUnknownDraft(draftId, {
+                        actor: actor.trim(), resolution,
+                        evidence: { note: "Recorded from Workbook Manager recovery controls." },
+                      }));
+                    }}
+                  >
+                    {resolution.replaceAll("_", " ")}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>
       </div>
+
+      {rebuild && (
+        <>
+          <div className="section-heading">Apply and Rebuild result</div>
+          <div className="apply-state-grid">
+            {[
+              ["Workbook", rebuild.workbook],
+              ["Projection", rebuild.projection],
+              ["Generated contracts", rebuild.generated_contracts],
+              ["Publication", rebuild.publication],
+            ].map(([label, evidence]) => (
+              <div className="panel panel-body" key={label}>
+                <span className="muted">{label}</span>
+                <strong>{evidence?.state || "unknown"}</strong>
+                {label === "Generated contracts" && (
+                  <span>{rebuild.affected_models?.join(", ") || "no models"}</span>
+                )}
+                {label === "Publication" && evidence?.changed && (
+                  <span>data.js cache {evidence.cache_version_before} → {evidence.cache_version_after}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       <div className="section-heading">Exact lifecycle evidence</div>
       <div className="evidence-grid">

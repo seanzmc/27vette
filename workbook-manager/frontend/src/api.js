@@ -76,8 +76,18 @@ export const api = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
+  applyRebuildDraft: (draftId, payload) =>
+    request(`/api/drafts/${draftId}/apply-rebuild`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
   cancelDraft: (draftId) =>
     request(`/api/drafts/${draftId}/cancel`, { method: "POST" }),
+  resolveUnknownDraft: (draftId, payload) =>
+    request(`/api/drafts/${draftId}/resolve-unknown`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
   history: (params = {}) => {
     const q = new URLSearchParams(params).toString();
     return request(`/api/history?${q}`);

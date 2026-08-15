@@ -23,6 +23,7 @@ from fastapi.staticfiles import StaticFiles
 
 from . import (
     config,
+    apply_rebuild,
     asset_resolutions,
     asset_workspace,
     db as dbmod,
@@ -34,11 +35,13 @@ from . import (
 from .naming import display_id, humanize, sheet_display_name
 from .schemas import (
     ApprovalRequest,
+    ApplyRebuildRequest,
     AssetResolutionRequest,
     AssetSafeBulkRequest,
     ChangeOut,
     CommitRequest,
     DraftOperationRequest,
+    ManualResolutionRequest,
     StageChangeRequest,
     SyncRequest,
     TableSchemaOut,
@@ -54,7 +57,8 @@ from .catalog import (
 from .staging import StagingError
 from .validation import find_dependents
 
-PROVISIONAL_MODE = "read_only_provisional"
+WORKFLOW_MODE = "durable_apply_rebuild"
+PROVISIONAL_MODE = "read_only_provisional"  # permanent legacy sync refusal token
 IMPORT_TERMINAL_ALLOWLIST = (
     "applied",
     "cancelled",
@@ -346,7 +350,7 @@ def status(
         and blockers["unresolved_total"] == 0
     )
     return {
-        "mode": PROVISIONAL_MODE,
+        "mode": WORKFLOW_MODE,
         "projection": projection,
         "draft": {
             "state": "blocked" if blockers["unresolved_total"] else "clear",
@@ -354,14 +358,11 @@ def status(
             "terminal_import_allowlist": list(IMPORT_TERMINAL_ALLOWLIST),
         },
         "workbook": workbook,
-        "generated_artifacts": {
-            "state": "unverified",
-            "reason": "generation is outside the provisional manager workflow",
-        },
-        "publication": {
-            "state": "unverified",
-            "reason": "runtime publication is outside the manager workflow",
-        },
+        **apply_rebuild.output_status(
+            state_conn,
+            workbook_path=config.DEFAULT_WORKBOOK,
+            repository_root=config.APPLY_OUTPUT_ROOT,
+        ),
         "tables": counts,
         "staged_changes": staged,
         "unsynced_committed_changes": unsynced,
@@ -992,6 +993,87 @@ def approve_draft_changeset(
         raise _draft_error(exc)
 
 
+@app.post("/api/drafts/{draft_id}/apply-rebuild")
+def apply_and_rebuild_draft(
+    draft_id: str,
+    payload: ApplyRebuildRequest,
+    _lock=Depends(durable_write_lock),
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
+    """Reach the writer only through one exact approved Apply and Rebuild action."""
+
+    if payload.confirm != "APPLY AND REBUILD":
+        raise HTTPException(422, detail={
+            "status": "apply_rebuild_confirmation_required",
+            "message": "type APPLY AND REBUILD to run the exact approved pipeline",
+        })
+    draft_row = state_conn.execute(
+        "SELECT status FROM workflow_drafts WHERE id=?", (draft_id,)
+    ).fetchone()
+    if draft_row is not None and draft_row["status"] == "applied":
+        try:
+            return drafts.apply_draft(
+                state_conn,
+                draft_id=draft_id,
+                workbook_path=config.DEFAULT_WORKBOOK,
+                log_path=config.EDIT_LOG_PATH,
+            )
+        except drafts.DraftError as exc:
+            raise _draft_error(exc)
+    workbook = _workbook_state(conn)
+    run = conn.execute(
+        "SELECT * FROM import_runs ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    projection = _projection_state(conn, run, workbook)
+    if projection["state"] != "current":
+        raise HTTPException(409, detail={
+            "status": "projection_not_current",
+            "message": "Apply and Rebuild requires the exact current imported projection",
+            "projection": projection,
+        })
+    operations = drafts.list_operations(state_conn, draft_id)
+    candidate_models = sorted({
+        str(model)
+        for operation in operations
+        for model in (
+            [operation.get("model_id")] + (operation.get("model_context") or [])
+        )
+        if str(model or "") not in {"", "*"}
+    })
+
+    def prepare():
+        return apply_rebuild.prepare_rollback_set(
+            draft_id=draft_id,
+            workbook_path=config.DEFAULT_WORKBOOK,
+            repository_root=config.APPLY_OUTPUT_ROOT,
+            rollback_root=config.APPLY_ROLLBACK_DIR,
+            candidate_models=candidate_models,
+            requested_by=payload.actor,
+        )
+
+    def complete(receipt, rollback):
+        return apply_rebuild.complete_apply_rebuild(
+            receipt,
+            rollback=rollback,
+            operations=operations,
+            workbook_path=config.DEFAULT_WORKBOOK,
+            repository_root=config.APPLY_OUTPUT_ROOT,
+        )
+
+    try:
+        return drafts.apply_draft(
+            state_conn,
+            draft_id=draft_id,
+            workbook_path=config.DEFAULT_WORKBOOK,
+            log_path=config.EDIT_LOG_PATH,
+            prepare_apply=prepare,
+            complete_apply=complete,
+        )
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
+
+
 @app.post("/api/drafts/{draft_id}/cancel")
 def cancel_draft(
     draft_id: str,
@@ -1000,6 +1082,26 @@ def cancel_draft(
 ):
     try:
         return drafts.cancel_draft(state_conn, draft_id=draft_id)
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
+
+
+@app.post("/api/drafts/{draft_id}/resolve-unknown")
+def resolve_unknown_draft(
+    draft_id: str,
+    payload: ManualResolutionRequest,
+    _lock=Depends(durable_write_lock),
+    state_conn=Depends(state_connection),
+):
+    try:
+        return drafts.resolve_unknown_draft(
+            state_conn,
+            draft_id=draft_id,
+            resolution=payload.resolution,
+            workbook_path=config.DEFAULT_WORKBOOK,
+            actor=payload.actor,
+            evidence=payload.evidence,
+        )
     except drafts.DraftError as exc:
         raise _draft_error(exc)
 
@@ -1099,9 +1201,8 @@ def sync_endpoint(
     if payload.write:
         raise HTTPException(409, detail={
             "status": PROVISIONAL_MODE,
-            "message": "live workbook writes are disabled during the "
-                       "read-only provisional workflow; only the exact bound "
-                       "ChangeSet service may be enabled in Pass 7",
+            "message": "legacy live sync writes are permanently disabled; use "
+                       "the exact approved Apply and Rebuild action",
         })
     return syncmod.sync_workbook(
         conn, config.DEFAULT_WORKBOOK, write=payload.write,

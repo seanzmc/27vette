@@ -52,7 +52,7 @@ Other dirs (`product/`, `dist_updates/`, `archive/`, `backups/`) are reference/a
 
 Not yet part of the live customer path; inspect before assuming either is production-ready.
 
-- **Workbook Manager (SQL-based editor)** — `workbook-manager/`: React + FastAPI + SQLite editor for `stingray_master.xlsx`, currently **read-only / provisional** (write path not yet enabled). See Workbook Manager Workflow below for details, setup, and tests.
+- **Workbook Manager (SQL-based editor)** — `workbook-manager/`: React + FastAPI + SQLite editor for `stingray_master.xlsx`. Draft saves remain provisional; one exact approved **Apply and Rebuild** action owns guarded workbook write, affected-model regeneration, and local registry/cache publication. See Workbook Manager Workflow below for details, setup, and tests.
 - **Visualizer** — `visualizer/`: prototype build-and-price visual configurator (stacked exterior/interior image layers driven by selected options) plus its companion `workbook-editor/` review UI. `visualizer/workbook-editor/intentional-differences.json` is the committed allowlist of intentional cross-model option differences (`status: intentional` suppresses; `pending-review` annotates); editing it is a normal file change, not a workbook write. Full visualizer integration into the order form is tracked in `docs/roadmap_wishes.md` and is not yet wired into `form-app/`.
 
 ## Workbook Source Surfaces
@@ -117,7 +117,7 @@ Open `http://127.0.0.1:8027/`. Review tab: `/api/lints` (informational structura
 
 Apply behavior: edits queue client-side as typed operations; only sheet families registered in `model_workbook_sources` are editable; adding an option requires OVS coverage for every active variant; Apply runs the full gate internally (batch validation, dry-run on temp copy, package + schema validation, `save_workbook_safely()` lock/mtime checks, backup, atomic replace, table-ref maintenance, `form-output/workbook-edit-log.jsonl` entry); warnings block until confirmed.
 
-Shared ChangeSet operator path (preview is the default; approval never writes; write requires the exact bound preview and approval). This is the approved target write contract for Workbook Manager; there is no current non-ingest producer until the Manager implements its later passes:
+Shared ChangeSet operator path (preview is the default; approval never writes; write requires the exact bound preview and approval). Workbook Manager is the current producer through its single Apply and Rebuild route:
 
 ```sh
 .venv/bin/python scripts/apply_workbook_changeset.py change-set.json --workbook stingray_master.xlsx --preview-out preview.json
@@ -125,22 +125,27 @@ Shared ChangeSet operator path (preview is the default; approval never writes; w
 .venv/bin/python scripts/apply_workbook_changeset.py change-set.json --workbook stingray_master.xlsx --write --preview preview.json --approval approval.json --receipt-out receipt.json
 ```
 
-The fallback editor still uses its existing typed-operation Apply path until Workbook Manager parity is proven in Phase 3; `scripts/apply_workbook_ops.py` remains only for that transition.
+The fallback editor retains its existing typed-operation Apply path; Workbook Manager uses the same shared writer through its separately bound durable lifecycle.
 
 An Apply is only the workbook-write step — afterwards regenerate affected model artifacts, run the relevant gates below, and review diffs.
 
 ## Workbook Manager Workflow
 
 `workbook-manager/` is a React (Vite) + FastAPI + SQLite editor for
-`stingray_master.xlsx`. It is currently **read-only / provisional**: a first
+`stingray_master.xlsx`. Draft editing is provisional: a first
 import into an empty projection is allowed, replacement re-import is contained,
-durable update/add/delete drafts can emit, preview, and approve immutable ChangeSets through
-the shared service. The shared writer restores and SHA-256-verifies its backup
-after post-save validation/log failure, but no manager apply route is enabled;
-every `POST /api/sync` request with `write=true` is refused.
-Dry-run sync, browsing, history, and verified-projection disposable comparison
-export remain available; generated-artifact and publication state are not
-inferred. The
+and durable update/add/delete plus Asset Manager decisions emit, preview, and
+approve one immutable ChangeSet through the shared service. The shared writer
+restores and SHA-256-verifies its backup after post-save validation/log failure.
+Only the typed-confirmation `POST /api/drafts/{draft_id}/apply-rebuild` route may
+write: it binds the exact approved artifacts, prepares a verified rollback set,
+regenerates ownership-derived affected models in an isolated root, publishes a
+complete local registry candidate, and restores/hash-verifies workbook and
+outputs on downstream failure. Every legacy `POST /api/sync` request with
+`write=true` remains refused. Draft Save does not write or regenerate.
+Browsing, history, and verified-projection disposable comparison export remain
+available; generated-artifact and publication status is reported current only
+while its successful Apply and Rebuild hashes still match. The
 workbook remains canonical. Storage bootstrap runs in the FastAPI lifespan,
 every request opens and closes its own projection and durable-state connection,
 and one process-local lock plus a projection reader gate serialize durable
@@ -151,7 +156,8 @@ tests: `tests/test_workbook_manager_catalog.py`,
 `tests/test_workbook_manager_import_projection.py`,
 `tests/test_workbook_manager_api_concurrency.py`,
 `tests/test_workbook_manager_drafts.py`,
-`tests/test_workbook_manager_changeset_lifecycle.py`, and
+`tests/test_workbook_manager_changeset_lifecycle.py`,
+`tests/test_workbook_manager_apply_rebuild.py`, and
 `tests/test_workbook_manager.py`.
 
 ## Workbook And Generator Workflows
@@ -261,7 +267,7 @@ The remaining `tests/test_*.py` files are not in that gate and are chosen by cha
 |---|---|
 | Workbook write path / editor | `test_editor_ops_apply`, `test_editor_ops_meta`, `test_editor_ops_global_families`, `test_editor_lints`, `test_editor_server_payload`, `test_editor_server_write_api` |
 | Workbook domain / ChangeSet | `test_workbook_domain_registry`, `test_workbook_changeset`, `test_workbook_changeset_service`, `test_workbook_bool_hygiene` |
-| Workbook Manager | `test_workbook_manager`, `test_workbook_manager_catalog`, `test_workbook_manager_import_projection`, `test_workbook_manager_generated_parity`, `test_workbook_manager_api_concurrency`, `test_workbook_manager_drafts` |
+| Workbook Manager | `test_workbook_manager`, `test_workbook_manager_catalog`, `test_workbook_manager_import_projection`, `test_workbook_manager_generated_parity`, `test_workbook_manager_api_concurrency`, `test_workbook_manager_drafts`, `test_workbook_manager_changeset_lifecycle`, `test_workbook_manager_apply_rebuild` |
 | Source assembly / runtime metadata | `test_source_assembly_characterization`, `test_runtime_metadata_guards`, `test_corvette_form_generator_contract` |
 | Publication | `test_atomic_registry_write` |
 | Asset map | `test_asset_map_sync`, `test_set_asset_display` |
@@ -285,4 +291,3 @@ Larger candidate initiatives (not yet scoped/approved, see `docs/roadmap_wishes.
 
 - Site restyle to the new homepage design system, replacing Elementor while keeping Formidable Forms and wpDataTables.
 - Visualizer integration into the order form (see Planned/In-Progress Modules above) — grouped exterior/interior option presentation feeding a real-time build-and-price view, no change to rule/pricing/submission behavior.
-- Workbook Manager write-path enablement (Pass 7+ of its reliability spec) to move it from read-only projection to an approved SQL-based workbook-write surface.

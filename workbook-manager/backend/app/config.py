@@ -16,6 +16,7 @@ MODULE_ROOT = REPO_ROOT / "workbook-manager"
 VAR_DIR = Path(os.environ.get("WBM_VAR_DIR", MODULE_ROOT / "var"))
 EXPORT_DIR = VAR_DIR / "exports"
 DB_BACKUP_DIR = VAR_DIR / "db-backups"
+APPLY_ROLLBACK_DIR = VAR_DIR / "apply-rebuild-rollbacks"
 
 DEFAULT_WORKBOOK = Path(
     os.environ.get("WBM_WORKBOOK", REPO_ROOT / "stingray_master.xlsx")
@@ -24,14 +25,15 @@ DEFAULT_DB = Path(os.environ.get("WBM_DB", VAR_DIR / "workbook_manager.sqlite3")
 DEFAULT_PROJECTION_DB = Path(
     os.environ.get("WBM_PROJECTION_DB", VAR_DIR / "workbook_projection.sqlite3")
 )
+APPLY_OUTPUT_ROOT = Path(os.environ.get("WBM_APPLY_OUTPUT_ROOT", REPO_ROOT))
 
 FRONTEND_DIST = MODULE_ROOT / "frontend" / "dist"
 
 # Written by editor_ops.apply_batch on live writes (same log the workbook
 # editor uses), keeping one shared audit trail for workbook mutations.
-EDIT_LOG_PATH = REPO_ROOT / "form-output" / "workbook-edit-log.jsonl"
+EDIT_LOG_PATH = APPLY_OUTPUT_ROOT / "form-output" / "workbook-edit-log.jsonl"
 
 
 def ensure_dirs() -> None:
-    for d in (VAR_DIR, EXPORT_DIR, DB_BACKUP_DIR):
+    for d in (VAR_DIR, EXPORT_DIR, DB_BACKUP_DIR, APPLY_ROLLBACK_DIR):
         d.mkdir(parents=True, exist_ok=True)

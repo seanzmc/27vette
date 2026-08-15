@@ -41,6 +41,17 @@ class ApprovalRequest(BaseModel):
     warning_ids: list[str] = Field(default_factory=list)
 
 
+class ApplyRebuildRequest(BaseModel):
+    actor: str = ""
+    confirm: str
+
+
+class ManualResolutionRequest(BaseModel):
+    actor: str
+    resolution: str = Field(pattern="^(restored|applied|abandoned_unknown)$")
+    evidence: dict[str, Any] = Field(default_factory=dict)
+
+
 class AssetResolutionRequest(BaseModel):
     item_id: str
     resolution_kind: str = Field(
