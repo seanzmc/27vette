@@ -332,9 +332,9 @@ def build_ops_fixture() -> Workbook:
     append_sheet(
         wb,
         "asset_map",
-        ["model_key", "target_type", "target_id", "image_url", "active", "notes"],
+        ["model_key", "target_type", "target_id", "image_url", "image_fit", "active", "notes"],
         [{"model_key": "stingray", "target_type": "option", "target_id": "opt_thr_001",
-          "image_url": "https://example.test/thr.png", "active": True}],
+          "image_url": "https://example.test/thr.png", "image_fit": "cover", "active": True}],
     )
     append_sheet(
         wb,
@@ -509,7 +509,7 @@ class ValidateBatchTest(OpsFixtureBase):
                 "asset_map",
                 {"model_key": "stingray", "target_type": "context_choice", "target_id": "body_style__coupe"},
                 {"model_key": "stingray", "target_type": "context_choice", "target_id": "body_style__coupe",
-                 "image_url": "https://example.test/coupe.png", "active": True},
+                 "image_url": "https://example.test/coupe.png", "image_fit": "cover", "active": True},
             ),
         ]
         self.assertEqual(self.errors_of(*valid_items), [])
@@ -546,7 +546,7 @@ class ValidateBatchTest(OpsFixtureBase):
                 "asset_map",
                 {"model_key": "stingray", "target_type": "option", "target_id": "opt_missing"},
                 {"model_key": "stingray", "target_type": "option", "target_id": "opt_missing",
-                 "image_url": "https://example.test/missing.png", "active": True},
+                 "image_url": "https://example.test/missing.png", "image_fit": "cover", "active": True},
             ),
         ]
         for item in invalid_items:

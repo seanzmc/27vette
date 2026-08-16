@@ -250,8 +250,15 @@ def test_fresh_unpublished_contracts_preserve_workbook_owned_roof_order(generate
         "D84",
         "D86",
     ]
-    assert section_rpo_order(contract_for(generated, "zr1"), "sec_roof_001") == ["C2Z", "CFC"]
-    assert section_rpo_order(contract_for(generated, "zr1x"), "sec_roof_001") == ["C2Z"]
+    zr1_contract = contract_for(generated, "zr1")
+    assert section_rpo_order(zr1_contract, "sec_roof_001") == []
+    assert section_rpo_order(zr1_contract, "sec_stan_001").count("C2Z") >= 1
+    assert all(choice["rpo"] != "CFC" for choice in zr1_contract["choices"])
+    zr1x_contract = contract_for(generated, "zr1x")
+    assert section_rpo_order(zr1x_contract, "sec_roof_001") == []
+    zr1x_standard_rpos = section_rpo_order(zr1x_contract, "sec_stan_001")
+    assert zr1x_standard_rpos.count("C2Z") >= 1
+    assert zr1x_standard_rpos.count("CFC") >= 1
 
 
 def test_fresh_unpublished_contracts_preserve_generated_order_summary_metadata(generated) -> None:

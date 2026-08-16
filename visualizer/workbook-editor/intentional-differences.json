@@ -4,9 +4,9 @@
     {
       "option_id": "opt_zz3_001",
       "field": "description",
-      "models": ["z06"],
+      "models": ["z06", "zr1", "zr1x"],
       "status": "intentional",
-      "reason": "ZZ3 includes-list drops '(BC7) Black LS6 engine cover' on Z06 — BC7 does not exist on Z06 (different engine). Review §5."
+      "reason": "ZZ3 includes-list drops '(BC7) Black LS6 engine cover' on Z06, ZR1, and ZR1X — BC7 does not exist on those models' different engines. Review §5."
     },
     {
       "option_id": "opt_wub_001",

@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "zr1x_options",
-    "generated_at": "2026-08-14T03:03:08+00:00",
+    "generated_at": "2026-08-15T22:51:09+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -330,7 +330,7 @@
     },
     {
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "source_section_name": "2LT Equipment",
       "selection_mode": "display_only",
       "selection_mode_label": "Display only",
@@ -1163,7 +1163,7 @@
       "label": "Bose Performance Series Audio System",
       "description": "Includes 14 speakers",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1184,8 +1184,8 @@
       "label": "Bose Performance Series Audio System",
       "description": "Includes 14 speakers",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s07",
@@ -1205,7 +1205,7 @@
       "label": "Bose Performance Series Audio System",
       "description": "Includes 14 speakers",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1226,8 +1226,8 @@
       "label": "Bose Performance Series Audio System",
       "description": "Includes 14 speakers",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s67",
@@ -1247,7 +1247,7 @@
       "label": "HD Front and Rear Vision Cameras",
       "description": "Front camera is curb view",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1268,8 +1268,8 @@
       "label": "HD Front and Rear Vision Cameras",
       "description": "Front camera is curb view",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s07",
@@ -1289,7 +1289,7 @@
       "label": "HD Front and Rear Vision Cameras",
       "description": "Front camera is curb view",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1310,8 +1310,8 @@
       "label": "HD Front and Rear Vision Cameras",
       "description": "Front camera is curb view",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s67",
@@ -1331,7 +1331,7 @@
       "label": "Rear Cross Traffic Alert",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1352,8 +1352,8 @@
       "label": "Rear Cross Traffic Alert",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s07",
@@ -1373,7 +1373,7 @@
       "label": "Rear Cross Traffic Alert",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1394,8 +1394,8 @@
       "label": "Rear Cross Traffic Alert",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s67",
@@ -1415,7 +1415,7 @@
       "label": "Dual Wireless Phone Charging Pads",
       "description": "Center Console and Seatback",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1436,8 +1436,8 @@
       "label": "Dual Wireless Phone Charging Pads",
       "description": "Center Console and Seatback",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s07",
@@ -1457,7 +1457,7 @@
       "label": "Dual Wireless Phone Charging Pads",
       "description": "Center Console and Seatback",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1478,8 +1478,8 @@
       "label": "Dual Wireless Phone Charging Pads",
       "description": "Center Console and Seatback",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s67",
@@ -1499,7 +1499,7 @@
       "label": "Three-Channel Programmable Universal Home Remote",
       "description": "Located on driver visor",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1520,8 +1520,8 @@
       "label": "Three-Channel Programmable Universal Home Remote",
       "description": "Located on driver visor",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s07",
@@ -1541,7 +1541,7 @@
       "label": "Three-Channel Programmable Universal Home Remote",
       "description": "Located on driver visor",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1562,8 +1562,8 @@
       "label": "Three-Channel Programmable Universal Home Remote",
       "description": "Located on driver visor",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s67",
@@ -1583,7 +1583,7 @@
       "label": "Heated Steering Wheel",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1604,8 +1604,8 @@
       "label": "Heated Steering Wheel",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s07",
@@ -1625,7 +1625,7 @@
       "label": "Heated Steering Wheel",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1646,8 +1646,8 @@
       "label": "Heated Steering Wheel",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s67",
@@ -1667,7 +1667,7 @@
       "label": "Heated and Vented Seats",
       "description": "Driver and Passenger",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1688,8 +1688,8 @@
       "label": "Heated and Vented Seats",
       "description": "Driver and Passenger",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s07",
@@ -1709,7 +1709,7 @@
       "label": "Heated and Vented Seats",
       "description": "Driver and Passenger",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1730,8 +1730,8 @@
       "label": "Heated and Vented Seats",
       "description": "Driver and Passenger",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s67",
@@ -1751,7 +1751,7 @@
       "label": "Driver Power Lumbar Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1772,8 +1772,8 @@
       "label": "Driver Power Lumbar Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s07",
@@ -1793,7 +1793,7 @@
       "label": "Driver Power Lumbar Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1814,8 +1814,8 @@
       "label": "Driver Power Lumbar Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s67",
@@ -1835,7 +1835,7 @@
       "label": "Passenger Power Lumbar Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1856,8 +1856,8 @@
       "label": "Passenger Power Lumbar Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s07",
@@ -1877,7 +1877,7 @@
       "label": "Passenger Power Lumbar Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1898,8 +1898,8 @@
       "label": "Passenger Power Lumbar Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s67",
@@ -1919,7 +1919,7 @@
       "label": "Driver Power Bolster Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1940,8 +1940,8 @@
       "label": "Driver Power Bolster Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s07",
@@ -1961,7 +1961,7 @@
       "label": "Driver Power Bolster Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -1982,8 +1982,8 @@
       "label": "Driver Power Bolster Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s67",
@@ -2003,7 +2003,7 @@
       "label": "Passenger Power Bolster Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -2024,8 +2024,8 @@
       "label": "Passenger Power Bolster Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s07",
@@ -2045,7 +2045,7 @@
       "label": "Passenger Power Bolster Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -2066,8 +2066,8 @@
       "label": "Passenger Power Bolster Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s67",
@@ -2087,7 +2087,7 @@
       "label": "Memory Driver and Passenger Convenience Package",
       "description": "Includes steering wheel and outside mirrors plus seat memory for both driver and passenger; key fob or door button activated",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -2108,8 +2108,8 @@
       "label": "Memory Driver and Passenger Convenience Package",
       "description": "Includes steering wheel and outside mirrors plus seat memory for both driver and passenger; key fob or door button activated",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s07",
@@ -2129,7 +2129,7 @@
       "label": "Memory Driver and Passenger Convenience Package",
       "description": "Includes steering wheel and outside mirrors plus seat memory for both driver and passenger; key fob or door button activated",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -2150,8 +2150,8 @@
       "label": "Memory Driver and Passenger Convenience Package",
       "description": "Includes steering wheel and outside mirrors plus seat memory for both driver and passenger; key fob or door button activated",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s67",
@@ -2171,7 +2171,7 @@
       "label": "Two Cargo Nets",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -2192,8 +2192,8 @@
       "label": "Two Cargo Nets",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s07",
@@ -2213,7 +2213,7 @@
       "label": "Two Cargo Nets",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -2234,8 +2234,8 @@
       "label": "Two Cargo Nets",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s67",
@@ -2255,7 +2255,7 @@
       "label": "Heated Power-Folding Outside Mirrors",
       "description": "Driver-side auto-dimming with turn signal indicators",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -2276,8 +2276,8 @@
       "label": "Heated Power-Folding Outside Mirrors",
       "description": "Driver-side auto-dimming with turn signal indicators",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s07",
@@ -2297,7 +2297,7 @@
       "label": "Heated Power-Folding Outside Mirrors",
       "description": "Driver-side auto-dimming with turn signal indicators",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -2318,8 +2318,8 @@
       "label": "Heated Power-Folding Outside Mirrors",
       "description": "Driver-side auto-dimming with turn signal indicators",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s67",
@@ -2339,7 +2339,7 @@
       "label": "Side Blind Zone Alert",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -2360,8 +2360,8 @@
       "label": "Side Blind Zone Alert",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s07",
@@ -2381,7 +2381,7 @@
       "label": "Side Blind Zone Alert",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -2402,8 +2402,8 @@
       "label": "Side Blind Zone Alert",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s67",
@@ -2423,7 +2423,7 @@
       "label": "Electrical Theft-Deterrent System",
       "description": "Unauthorized entry activates the horn",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -2444,8 +2444,8 @@
       "label": "Electrical Theft-Deterrent System",
       "description": "Unauthorized entry activates the horn",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s07",
@@ -2465,7 +2465,7 @@
       "label": "Electrical Theft-Deterrent System",
       "description": "Unauthorized entry activates the horn",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -2486,8 +2486,8 @@
       "label": "Electrical Theft-Deterrent System",
       "description": "Unauthorized entry activates the horn",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s67",
@@ -2507,7 +2507,7 @@
       "label": "Vehicle Interior Movement Theft Sensor",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -2528,8 +2528,8 @@
       "label": "Vehicle Interior Movement Theft Sensor",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s07",
@@ -2549,7 +2549,7 @@
       "label": "Vehicle Interior Movement Theft Sensor",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -2570,8 +2570,8 @@
       "label": "Vehicle Interior Movement Theft Sensor",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s67",
@@ -2591,7 +2591,7 @@
       "label": "Vehicle Inclination Theft Sensor",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -2612,8 +2612,8 @@
       "label": "Vehicle Inclination Theft Sensor",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s07",
@@ -2633,7 +2633,7 @@
       "label": "Vehicle Inclination Theft Sensor",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
+      "section_name": "2LZ Equipment",
       "standard_equipment_group_type": "",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
@@ -2654,8 +2654,8 @@
       "label": "Vehicle Inclination Theft Sensor",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "auto_added_summary_required": false,
       "step_key": "standard_equipment",
       "variant_id": "3lz_s67",
@@ -5496,7 +5496,7 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
+      "selectable": "True",
       "active": "True",
       "base_price": 2600,
       "display_order": 5
@@ -5517,7 +5517,7 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
+      "selectable": "True",
       "active": "True",
       "base_price": 2600,
       "display_order": 5
@@ -5538,7 +5538,7 @@
       "trim_level": "1LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
+      "selectable": "True",
       "active": "True",
       "base_price": 2600,
       "display_order": 5
@@ -5559,7 +5559,7 @@
       "trim_level": "3LZ",
       "status": "standard",
       "status_label": "Standard",
-      "selectable": "False",
+      "selectable": "True",
       "active": "True",
       "base_price": 2600,
       "display_order": 5
@@ -19852,8 +19852,8 @@
       "label": "Bose Performance Series Audio System",
       "description": "Includes 14 speakers",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 30
     },
     {
@@ -19866,8 +19866,8 @@
       "label": "Bose Performance Series Audio System",
       "description": "Includes 14 speakers",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 30
     },
     {
@@ -19880,8 +19880,8 @@
       "label": "HD Front and Rear Vision Cameras",
       "description": "Front camera is curb view",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 40
     },
     {
@@ -19894,8 +19894,8 @@
       "label": "HD Front and Rear Vision Cameras",
       "description": "Front camera is curb view",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 40
     },
     {
@@ -19908,8 +19908,8 @@
       "label": "Rear Cross Traffic Alert",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 50
     },
     {
@@ -19922,8 +19922,8 @@
       "label": "Rear Cross Traffic Alert",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 50
     },
     {
@@ -19936,8 +19936,8 @@
       "label": "Dual Wireless Phone Charging Pads",
       "description": "Center Console and Seatback",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 60
     },
     {
@@ -19950,8 +19950,8 @@
       "label": "Dual Wireless Phone Charging Pads",
       "description": "Center Console and Seatback",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 60
     },
     {
@@ -19964,8 +19964,8 @@
       "label": "Three-Channel Programmable Universal Home Remote",
       "description": "Located on driver visor",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 70
     },
     {
@@ -19978,8 +19978,8 @@
       "label": "Three-Channel Programmable Universal Home Remote",
       "description": "Located on driver visor",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 70
     },
     {
@@ -19992,8 +19992,8 @@
       "label": "Heated Steering Wheel",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 80
     },
     {
@@ -20006,8 +20006,8 @@
       "label": "Heated Steering Wheel",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 80
     },
     {
@@ -20020,8 +20020,8 @@
       "label": "Heated and Vented Seats",
       "description": "Driver and Passenger",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 100
     },
     {
@@ -20034,8 +20034,8 @@
       "label": "Heated and Vented Seats",
       "description": "Driver and Passenger",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 100
     },
     {
@@ -20048,8 +20048,8 @@
       "label": "Driver Power Lumbar Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 110
     },
     {
@@ -20062,8 +20062,8 @@
       "label": "Driver Power Lumbar Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 110
     },
     {
@@ -20076,8 +20076,8 @@
       "label": "Passenger Power Lumbar Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 120
     },
     {
@@ -20090,8 +20090,8 @@
       "label": "Passenger Power Lumbar Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 120
     },
     {
@@ -20104,8 +20104,8 @@
       "label": "Driver Power Bolster Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 130
     },
     {
@@ -20118,8 +20118,8 @@
       "label": "Driver Power Bolster Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 130
     },
     {
@@ -20132,8 +20132,8 @@
       "label": "Passenger Power Bolster Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 140
     },
     {
@@ -20146,8 +20146,8 @@
       "label": "Passenger Power Bolster Seat Adjuster",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 140
     },
     {
@@ -20160,8 +20160,8 @@
       "label": "Memory Driver and Passenger Convenience Package",
       "description": "Includes steering wheel and outside mirrors plus seat memory for both driver and passenger; key fob or door button activated",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 150
     },
     {
@@ -20174,8 +20174,8 @@
       "label": "Memory Driver and Passenger Convenience Package",
       "description": "Includes steering wheel and outside mirrors plus seat memory for both driver and passenger; key fob or door button activated",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 150
     },
     {
@@ -20188,8 +20188,8 @@
       "label": "Two Cargo Nets",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 160
     },
     {
@@ -20202,8 +20202,8 @@
       "label": "Two Cargo Nets",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 160
     },
     {
@@ -20216,8 +20216,8 @@
       "label": "Heated Power-Folding Outside Mirrors",
       "description": "Driver-side auto-dimming with turn signal indicators",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 170
     },
     {
@@ -20230,8 +20230,8 @@
       "label": "Heated Power-Folding Outside Mirrors",
       "description": "Driver-side auto-dimming with turn signal indicators",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 170
     },
     {
@@ -20244,8 +20244,8 @@
       "label": "Side Blind Zone Alert",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 180
     },
     {
@@ -20258,8 +20258,8 @@
       "label": "Side Blind Zone Alert",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 180
     },
     {
@@ -20272,8 +20272,8 @@
       "label": "Electrical Theft-Deterrent System",
       "description": "Unauthorized entry activates the horn",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 190
     },
     {
@@ -20286,8 +20286,8 @@
       "label": "Electrical Theft-Deterrent System",
       "description": "Unauthorized entry activates the horn",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 190
     },
     {
@@ -20300,8 +20300,8 @@
       "label": "Vehicle Interior Movement Theft Sensor",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 200
     },
     {
@@ -20314,8 +20314,8 @@
       "label": "Vehicle Interior Movement Theft Sensor",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 200
     },
     {
@@ -20328,8 +20328,8 @@
       "label": "Vehicle Inclination Theft Sensor",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 210
     },
     {
@@ -20342,8 +20342,8 @@
       "label": "Vehicle Inclination Theft Sensor",
       "description": "",
       "section_id": "sec_2lte_001",
-      "section_name": "2LT Equipment",
-      "standard_equipment_group_type": "",
+      "section_name": "2LZ Equipment",
+      "standard_equipment_group_type": "trim_equipment",
       "display_order": 210
     },
     {
@@ -24474,6 +24474,246 @@
       "disabled_reason": "T0E is not available while ZTK is selected; ZTK includes the TOM aero package.",
       "active": "True",
       "notes": "ZTK always includes TOM; T0E must not be selectable or restorable while ZTK remains selected."
+    },
+    {
+      "group_id": "zr1x_seatbelt_3lz_ae4_ejh_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AE4_EJH",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "zr1x_seatbelt_3lz_ae4_epx_n2z_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AE4_EPX_N2Z",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "zr1x_seatbelt_3lz_ae4_h8t_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AE4_H8T",
+      "target_ids": [
+        "opt_3a9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "zr1x_seatbelt_3lz_ae4_hnk_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AE4_HNK",
+      "target_ids": [
+        "opt_3f9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "zr1x_seatbelt_3lz_ae4_huf_n2z_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AE4_HUF_N2Z",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "zr1x_seatbelt_3lz_ae4_huw_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AE4_HUW",
+      "target_ids": [
+        "opt_379_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "zr1x_seatbelt_3lz_ae4_hux_n2z_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AE4_HUX_N2Z",
+      "target_ids": [
+        "opt_379_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "zr1x_seatbelt_3lz_ae4_hzn_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AE4_HZN",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "zr1x_seatbelt_3lz_ah2_ejh_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AH2_EJH",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "zr1x_seatbelt_3lz_ah2_epx_n2z_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AH2_EPX_N2Z",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "zr1x_seatbelt_3lz_ah2_h8t_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AH2_H8T",
+      "target_ids": [
+        "opt_3a9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "zr1x_seatbelt_3lz_ah2_hnk_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AH2_HNK",
+      "target_ids": [
+        "opt_3f9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "zr1x_seatbelt_3lz_ah2_huf_n2z_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AH2_HUF_N2Z",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "zr1x_seatbelt_3lz_ah2_huw_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AH2_HUW",
+      "target_ids": [
+        "opt_379_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "zr1x_seatbelt_3lz_ah2_hux_n2z_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AH2_HUX_N2Z",
+      "target_ids": [
+        "opt_379_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "zr1x_seatbelt_3lz_ah2_hzn_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AH2_HZN",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
     }
   ],
   "exclusiveGroups": [
@@ -24998,24 +25238,6 @@
       "source_note": ""
     },
     {
-      "rule_id": "zr1x_rule_3lz_ae4_hag_includes_3n9_c61381987c99",
-      "source_id": "3LZ_AE4_HAG",
-      "rule_type": "includes",
-      "target_id": "opt_3n9_001",
-      "target_type": "option",
-      "source_type": "interior",
-      "source_section": "sec_lzint_003",
-      "target_section": "sec_seat_001",
-      "source_selection_mode": "",
-      "target_selection_mode": "single_select_req",
-      "body_style_scope": "",
-      "disabled_reason": "Included with Asymmetrical Santorini Blue / Jet Black.",
-      "auto_add": "True",
-      "active": "True",
-      "runtime_action": "active",
-      "source_note": ""
-    },
-    {
       "rule_id": "zr1x_rule_3lz_ae4_hnk_includes_3f9_9bf82fedad08",
       "source_id": "3LZ_AE4_HNK",
       "rule_type": "includes",
@@ -25038,24 +25260,6 @@
       "source_id": "3LZ_AE4_HVZ",
       "rule_type": "includes",
       "target_id": "opt_3f9_001",
-      "target_type": "option",
-      "source_type": "interior",
-      "source_section": "sec_lzint_003",
-      "target_section": "sec_seat_001",
-      "source_selection_mode": "",
-      "target_selection_mode": "single_select_req",
-      "body_style_scope": "",
-      "disabled_reason": "Included with Asymmetrical Adrenaline Red / Jet Black.",
-      "auto_add": "True",
-      "active": "True",
-      "runtime_action": "active",
-      "source_note": ""
-    },
-    {
-      "rule_id": "zr1x_rule_3lz_ae4_hvz_includes_3n9_74703fb79f90",
-      "source_id": "3LZ_AE4_HVZ",
-      "rule_type": "includes",
-      "target_id": "opt_3n9_001",
       "target_type": "option",
       "source_type": "interior",
       "source_section": "sec_lzint_003",
@@ -25106,24 +25310,6 @@
       "source_note": ""
     },
     {
-      "rule_id": "zr1x_rule_3lz_ah2_hag_includes_3n9_b12f578ab58d",
-      "source_id": "3LZ_AH2_HAG",
-      "rule_type": "includes",
-      "target_id": "opt_3n9_001",
-      "target_type": "option",
-      "source_type": "interior",
-      "source_section": "sec_lzint_003",
-      "target_section": "sec_seat_001",
-      "source_selection_mode": "",
-      "target_selection_mode": "single_select_req",
-      "body_style_scope": "",
-      "disabled_reason": "Included with Asymmetrical Santorini Blue / Jet Black.",
-      "auto_add": "True",
-      "active": "True",
-      "runtime_action": "active",
-      "source_note": ""
-    },
-    {
       "rule_id": "zr1x_rule_3lz_ah2_hnk_includes_3f9_51584a0141bb",
       "source_id": "3LZ_AH2_HNK",
       "rule_type": "includes",
@@ -25160,24 +25346,6 @@
       "source_note": ""
     },
     {
-      "rule_id": "zr1x_rule_3lz_ah2_hvz_includes_3n9_b96861565c39",
-      "source_id": "3LZ_AH2_HVZ",
-      "rule_type": "includes",
-      "target_id": "opt_3n9_001",
-      "target_type": "option",
-      "source_type": "interior",
-      "source_section": "sec_lzint_003",
-      "target_section": "sec_seat_001",
-      "source_selection_mode": "",
-      "target_selection_mode": "single_select_req",
-      "body_style_scope": "",
-      "disabled_reason": "Included with Asymmetrical Adrenaline Red / Jet Black.",
-      "auto_add": "True",
-      "active": "True",
-      "runtime_action": "active",
-      "source_note": ""
-    },
-    {
       "rule_id": "zr1x_rule_3lz_aup_hag_includes_3a9_bd1929b75541",
       "source_id": "3LZ_AUP_HAG",
       "rule_type": "includes",
@@ -25196,46 +25364,10 @@
       "source_note": ""
     },
     {
-      "rule_id": "zr1x_rule_3lz_aup_hag_includes_3n9_22a3551a8409",
-      "source_id": "3LZ_AUP_HAG",
-      "rule_type": "includes",
-      "target_id": "opt_3n9_001",
-      "target_type": "option",
-      "source_type": "interior",
-      "source_section": "sec_lzint_003",
-      "target_section": "sec_seat_001",
-      "source_selection_mode": "",
-      "target_selection_mode": "single_select_req",
-      "body_style_scope": "",
-      "disabled_reason": "Included with Asymmetrical Santorini Blue / Jet Black.",
-      "auto_add": "True",
-      "active": "True",
-      "runtime_action": "active",
-      "source_note": ""
-    },
-    {
       "rule_id": "zr1x_rule_3lz_aup_hvz_includes_3f9_8f21c0b3378c",
       "source_id": "3LZ_AUP_HVZ",
       "rule_type": "includes",
       "target_id": "opt_3f9_001",
-      "target_type": "option",
-      "source_type": "interior",
-      "source_section": "sec_lzint_003",
-      "target_section": "sec_seat_001",
-      "source_selection_mode": "",
-      "target_selection_mode": "single_select_req",
-      "body_style_scope": "",
-      "disabled_reason": "Included with Asymmetrical Adrenaline Red / Jet Black.",
-      "auto_add": "True",
-      "active": "True",
-      "runtime_action": "active",
-      "source_note": ""
-    },
-    {
-      "rule_id": "zr1x_rule_3lz_aup_hvz_includes_3n9_0b705baadbe8",
-      "source_id": "3LZ_AUP_HVZ",
-      "rule_type": "includes",
-      "target_id": "opt_3n9_001",
       "target_type": "option",
       "source_type": "interior",
       "source_section": "sec_lzint_003",
@@ -26436,6 +26568,222 @@
       "active": "True",
       "runtime_action": "replace",
       "source_note": "ZTK includes the TOM Visible Carbon Fiber Aero Package and replaces the incompatible WKR GT3.R Premium Indoor Car Cover."
+    },
+    {
+      "rule_id": "zr1x_seatbelt_3lz_ae4_ejh_includes_3n9",
+      "source_id": "3LZ_AE4_EJH",
+      "rule_type": "includes",
+      "target_id": "opt_3n9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_lzint_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with selected interior.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "Included with selected interior."
+    },
+    {
+      "rule_id": "zr1x_seatbelt_3lz_ae4_epx_n2z_includes_3n9",
+      "source_id": "3LZ_AE4_EPX_N2Z",
+      "rule_type": "includes",
+      "target_id": "opt_3n9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_lzint_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with selected interior.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "Included with selected interior."
+    },
+    {
+      "rule_id": "zr1x_seatbelt_3lz_ae4_huf_n2z_includes_3n9",
+      "source_id": "3LZ_AE4_HUF_N2Z",
+      "rule_type": "includes",
+      "target_id": "opt_3n9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_lzint_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with selected interior.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "Included with selected interior."
+    },
+    {
+      "rule_id": "zr1x_seatbelt_3lz_ae4_huw_includes_379",
+      "source_id": "3LZ_AE4_HUW",
+      "rule_type": "includes",
+      "target_id": "opt_379_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_lzint_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with selected interior.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "Included with selected interior."
+    },
+    {
+      "rule_id": "zr1x_seatbelt_3lz_ae4_hux_n2z_includes_379",
+      "source_id": "3LZ_AE4_HUX_N2Z",
+      "rule_type": "includes",
+      "target_id": "opt_379_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_lzint_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with selected interior.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "Included with selected interior."
+    },
+    {
+      "rule_id": "zr1x_seatbelt_3lz_ae4_hzn_includes_3n9",
+      "source_id": "3LZ_AE4_HZN",
+      "rule_type": "includes",
+      "target_id": "opt_3n9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_lzint_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with selected interior.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "Included with selected interior."
+    },
+    {
+      "rule_id": "zr1x_seatbelt_3lz_ah2_ejh_includes_3n9",
+      "source_id": "3LZ_AH2_EJH",
+      "rule_type": "includes",
+      "target_id": "opt_3n9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_lzint_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with selected interior.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "Included with selected interior."
+    },
+    {
+      "rule_id": "zr1x_seatbelt_3lz_ah2_epx_n2z_includes_3n9",
+      "source_id": "3LZ_AH2_EPX_N2Z",
+      "rule_type": "includes",
+      "target_id": "opt_3n9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_lzint_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with selected interior.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "Included with selected interior."
+    },
+    {
+      "rule_id": "zr1x_seatbelt_3lz_ah2_huf_n2z_includes_3n9",
+      "source_id": "3LZ_AH2_HUF_N2Z",
+      "rule_type": "includes",
+      "target_id": "opt_3n9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_lzint_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with selected interior.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "Included with selected interior."
+    },
+    {
+      "rule_id": "zr1x_seatbelt_3lz_ah2_huw_includes_379",
+      "source_id": "3LZ_AH2_HUW",
+      "rule_type": "includes",
+      "target_id": "opt_379_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_lzint_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with selected interior.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "Included with selected interior."
+    },
+    {
+      "rule_id": "zr1x_seatbelt_3lz_ah2_hux_n2z_includes_379",
+      "source_id": "3LZ_AH2_HUX_N2Z",
+      "rule_type": "includes",
+      "target_id": "opt_379_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_lzint_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with selected interior.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "Included with selected interior."
+    },
+    {
+      "rule_id": "zr1x_seatbelt_3lz_ah2_hzn_includes_3n9",
+      "source_id": "3LZ_AH2_HZN",
+      "rule_type": "includes",
+      "target_id": "opt_3n9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_lzint_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with selected interior.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "Included with selected interior."
     }
   ],
   "priceRules": [
@@ -26559,6 +26907,248 @@
       "trim_level_scope": "",
       "variant_scope": "",
       "notes": "Ingest target-authored comparator price confirmation"
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ae4_ejh_3n9_zero",
+      "condition_option_id": "3LZ_AE4_EJH",
+      "target_option_id": "opt_3n9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ae4_epx_n2z_3n9_zero",
+      "condition_option_id": "3LZ_AE4_EPX_N2Z",
+      "target_option_id": "opt_3n9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ae4_h8t_3a9_zero",
+      "condition_option_id": "3LZ_AE4_H8T",
+      "target_option_id": "opt_3a9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ae4_hag_3a9_zero",
+      "condition_option_id": "3LZ_AE4_HAG",
+      "target_option_id": "opt_3a9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ae4_hnk_3f9_zero",
+      "condition_option_id": "3LZ_AE4_HNK",
+      "target_option_id": "opt_3f9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ae4_huf_n2z_3n9_zero",
+      "condition_option_id": "3LZ_AE4_HUF_N2Z",
+      "target_option_id": "opt_3n9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ae4_huw_379_zero",
+      "condition_option_id": "3LZ_AE4_HUW",
+      "target_option_id": "opt_379_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ae4_hux_n2z_379_zero",
+      "condition_option_id": "3LZ_AE4_HUX_N2Z",
+      "target_option_id": "opt_379_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ae4_hvz_3f9_zero",
+      "condition_option_id": "3LZ_AE4_HVZ",
+      "target_option_id": "opt_3f9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ae4_hzn_3n9_zero",
+      "condition_option_id": "3LZ_AE4_HZN",
+      "target_option_id": "opt_3n9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ah2_ejh_3n9_zero",
+      "condition_option_id": "3LZ_AH2_EJH",
+      "target_option_id": "opt_3n9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ah2_epx_n2z_3n9_zero",
+      "condition_option_id": "3LZ_AH2_EPX_N2Z",
+      "target_option_id": "opt_3n9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ah2_h8t_3a9_zero",
+      "condition_option_id": "3LZ_AH2_H8T",
+      "target_option_id": "opt_3a9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ah2_hag_3a9_zero",
+      "condition_option_id": "3LZ_AH2_HAG",
+      "target_option_id": "opt_3a9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ah2_hnk_3f9_zero",
+      "condition_option_id": "3LZ_AH2_HNK",
+      "target_option_id": "opt_3f9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ah2_huf_n2z_3n9_zero",
+      "condition_option_id": "3LZ_AH2_HUF_N2Z",
+      "target_option_id": "opt_3n9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ah2_huw_379_zero",
+      "condition_option_id": "3LZ_AH2_HUW",
+      "target_option_id": "opt_379_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ah2_hux_n2z_379_zero",
+      "condition_option_id": "3LZ_AH2_HUX_N2Z",
+      "target_option_id": "opt_379_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ah2_hvz_3f9_zero",
+      "condition_option_id": "3LZ_AH2_HVZ",
+      "target_option_id": "opt_3f9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_ah2_hzn_3n9_zero",
+      "condition_option_id": "3LZ_AH2_HZN",
+      "target_option_id": "opt_3n9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_aup_hag_3a9_zero",
+      "condition_option_id": "3LZ_AUP_HAG",
+      "target_option_id": "opt_3a9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "zr1x_seatbelt_3lz_aup_hvz_3f9_zero",
+      "condition_option_id": "3LZ_AUP_HVZ",
+      "target_option_id": "opt_3f9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
     }
   ],
   "interiors": [
@@ -31544,6 +32134,742 @@
       "rule_type": "requires",
       "adds_rpo": "opt_d30_001",
       "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_114",
+      "interior_id": "1LZ_AQ9_HUQ",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_115",
+      "interior_id": "3LZ_AE4_EJH",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_116",
+      "interior_id": "3LZ_AE4_EPX_N2Z",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_117",
+      "interior_id": "3LZ_AE4_H8T",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_118",
+      "interior_id": "3LZ_AE4_HAG",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_119",
+      "interior_id": "3LZ_AE4_HNK",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_120",
+      "interior_id": "3LZ_AE4_HU2",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_121",
+      "interior_id": "3LZ_AE4_HUA_N2Z",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_122",
+      "interior_id": "3LZ_AE4_HVZ",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_123",
+      "interior_id": "3LZ_AH2_EJH",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_124",
+      "interior_id": "3LZ_AH2_EPX_N2Z",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_125",
+      "interior_id": "3LZ_AH2_H8T",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_126",
+      "interior_id": "3LZ_AH2_HAG",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_127",
+      "interior_id": "3LZ_AH2_HNK",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_128",
+      "interior_id": "3LZ_AH2_HU2",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_129",
+      "interior_id": "3LZ_AH2_HU2_TU7",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_130",
+      "interior_id": "3LZ_AH2_HUA_N2Z_TU7",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_131",
+      "interior_id": "3LZ_AH2_HVZ",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_132",
+      "interior_id": "3LZ_AUP_HAG",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_133",
+      "interior_id": "3LZ_AUP_HVZ",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_134",
+      "interior_id": "3LZ_R6X_AE4_HUU",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_135",
+      "interior_id": "3LZ_R6X_AE4_HZP_N2Z",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_136",
+      "interior_id": "3LZ_R6X_AH2_HUU",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_137",
+      "interior_id": "3LZ_R6X_AH2_HZP_N2Z",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_138",
+      "interior_id": "1LZ_AQ9_HUQ",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_139",
+      "interior_id": "3LZ_AE4_EJH",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_140",
+      "interior_id": "3LZ_AE4_EPX_N2Z",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_141",
+      "interior_id": "3LZ_AE4_HNK",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_142",
+      "interior_id": "3LZ_AE4_HU2",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_143",
+      "interior_id": "3LZ_AE4_HUA_N2Z",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_144",
+      "interior_id": "3LZ_AE4_HUW",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_145",
+      "interior_id": "3LZ_AE4_HUX_N2Z",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_146",
+      "interior_id": "3LZ_AE4_HVZ",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_147",
+      "interior_id": "3LZ_AH2_EJH",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_148",
+      "interior_id": "3LZ_AH2_EPX_N2Z",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_149",
+      "interior_id": "3LZ_AH2_HNK",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_150",
+      "interior_id": "3LZ_AH2_HU2",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_151",
+      "interior_id": "3LZ_AH2_HU2_TU7",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_152",
+      "interior_id": "3LZ_AH2_HUA_N2Z_TU7",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_153",
+      "interior_id": "3LZ_AH2_HUW",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_154",
+      "interior_id": "3LZ_AH2_HUX_N2Z",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_155",
+      "interior_id": "3LZ_AH2_HVZ",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_156",
+      "interior_id": "3LZ_AUP_HVZ",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_157",
+      "interior_id": "3LZ_R6X_AE4_HUU",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_158",
+      "interior_id": "3LZ_R6X_AE4_HZP_N2Z",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_159",
+      "interior_id": "3LZ_R6X_AH2_HUU",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_160",
+      "interior_id": "3LZ_R6X_AH2_HZP_N2Z",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_161",
+      "interior_id": "3LZ_AE4_EJH",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_162",
+      "interior_id": "3LZ_AE4_EPX_N2Z",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_163",
+      "interior_id": "3LZ_AE4_H8T",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_164",
+      "interior_id": "3LZ_AE4_HAG",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_165",
+      "interior_id": "3LZ_AE4_HUW",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_166",
+      "interior_id": "3LZ_AE4_HUX_N2Z",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_167",
+      "interior_id": "3LZ_AH2_EJH",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_168",
+      "interior_id": "3LZ_AH2_EPX_N2Z",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_169",
+      "interior_id": "3LZ_AH2_H8T",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_170",
+      "interior_id": "3LZ_AH2_HAG",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_171",
+      "interior_id": "3LZ_AH2_HUW",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_172",
+      "interior_id": "3LZ_AH2_HUX_N2Z",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_173",
+      "interior_id": "3LZ_AUP_HAG",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_174",
+      "interior_id": "1LZ_AQ9_HUQ",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_175",
+      "interior_id": "3LZ_AE4_EJH",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_176",
+      "interior_id": "3LZ_AE4_EPX_N2Z",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_177",
+      "interior_id": "3LZ_AE4_H8T",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_178",
+      "interior_id": "3LZ_AE4_HAG",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_179",
+      "interior_id": "3LZ_AE4_HNK",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_180",
+      "interior_id": "3LZ_AE4_HU2",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_181",
+      "interior_id": "3LZ_AE4_HUA_N2Z",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_182",
+      "interior_id": "3LZ_AE4_HUF_N2Z",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_183",
+      "interior_id": "3LZ_AE4_HUW",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_184",
+      "interior_id": "3LZ_AE4_HUX_N2Z",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_185",
+      "interior_id": "3LZ_AE4_HVZ",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_186",
+      "interior_id": "3LZ_AE4_HZN",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_187",
+      "interior_id": "3LZ_AH2_EJH",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_188",
+      "interior_id": "3LZ_AH2_EPX_N2Z",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_189",
+      "interior_id": "3LZ_AH2_H8T",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_190",
+      "interior_id": "3LZ_AH2_HAG",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_191",
+      "interior_id": "3LZ_AH2_HNK",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_192",
+      "interior_id": "3LZ_AH2_HU2",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_193",
+      "interior_id": "3LZ_AH2_HU2_TU7",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_194",
+      "interior_id": "3LZ_AH2_HUA_N2Z_TU7",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_195",
+      "interior_id": "3LZ_AH2_HUF_N2Z",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_196",
+      "interior_id": "3LZ_AH2_HUW",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_197",
+      "interior_id": "3LZ_AH2_HUX_N2Z",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_198",
+      "interior_id": "3LZ_AH2_HVZ",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_199",
+      "interior_id": "3LZ_AH2_HZN",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_200",
+      "interior_id": "3LZ_AUP_HAG",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_201",
+      "interior_id": "3LZ_AUP_HVZ",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_202",
+      "interior_id": "3LZ_R6X_AE4_HUU",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_203",
+      "interior_id": "3LZ_R6X_AE4_HZP_N2Z",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_204",
+      "interior_id": "3LZ_R6X_AH2_HUU",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_205",
+      "interior_id": "3LZ_R6X_AH2_HZP_N2Z",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
     }
   ],
   "defaultSelectionRules": [
@@ -31634,7 +32960,7 @@
       "severity": "pass",
       "entity_type": "rule",
       "entity_id": "",
-      "message": "104 active compatibility rules exported from zr1x_rule_mapping."
+      "message": "110 active compatibility rules exported from zr1x_rule_mapping."
     },
     {
       "check_id": "interior_contract",
@@ -31648,14 +32974,14 @@
       "severity": "pass",
       "entity_type": "price_rule",
       "entity_id": "",
-      "message": "11 active price rules exported from zr1x_price_rules."
+      "message": "33 active price rules exported from zr1x_price_rules."
     },
     {
       "check_id": "color_overrides",
       "severity": "pass",
       "entity_type": "color_override",
       "entity_id": "",
-      "message": "113 color override rows exported from color_overrides."
+      "message": "205 color override rows exported from color_overrides."
     }
   ]
 }

@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "z06_options",
-    "generated_at": "2026-08-13T18:48:44+00:00",
+    "generated_at": "2026-08-15T22:51:07+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -42337,6 +42337,246 @@
       "disabled_reason": "DZX blocks Z06 Jake hood graphics.",
       "active": "True",
       "notes": "Stripe cleanup: selected dual racing stripes conflict with SHT and SNE hood graphics."
+    },
+    {
+      "group_id": "z06_seatbelt_3lz_ae4_ejh_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AE4_EJH",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "z06_seatbelt_3lz_ae4_epx_n2z_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AE4_EPX_N2Z",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "z06_seatbelt_3lz_ae4_h8t_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AE4_H8T",
+      "target_ids": [
+        "opt_3a9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "z06_seatbelt_3lz_ae4_hnk_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AE4_HNK",
+      "target_ids": [
+        "opt_3f9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "z06_seatbelt_3lz_ae4_huf_n2z_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AE4_HUF_N2Z",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "z06_seatbelt_3lz_ae4_huw_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AE4_HUW",
+      "target_ids": [
+        "opt_379_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "z06_seatbelt_3lz_ae4_hux_n2z_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AE4_HUX_N2Z",
+      "target_ids": [
+        "opt_379_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "z06_seatbelt_3lz_ae4_hzn_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AE4_HZN",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "z06_seatbelt_3lz_ah2_ejh_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AH2_EJH",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "z06_seatbelt_3lz_ah2_epx_n2z_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AH2_EPX_N2Z",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "z06_seatbelt_3lz_ah2_h8t_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AH2_H8T",
+      "target_ids": [
+        "opt_3a9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "z06_seatbelt_3lz_ah2_hnk_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AH2_HNK",
+      "target_ids": [
+        "opt_3f9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "z06_seatbelt_3lz_ah2_huf_n2z_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AH2_HUF_N2Z",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "z06_seatbelt_3lz_ah2_huw_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AH2_HUW",
+      "target_ids": [
+        "opt_379_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "z06_seatbelt_3lz_ah2_hux_n2z_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AH2_HUX_N2Z",
+      "target_ids": [
+        "opt_379_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "z06_seatbelt_3lz_ah2_hzn_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LZ_AH2_HZN",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
     }
   ],
   "exclusiveGroups": [
@@ -51890,6 +52130,886 @@
       "rule_type": "requires",
       "adds_rpo": "opt_d30_001",
       "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_138",
+      "interior_id": "1LZ_AQ9_HUQ",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_139",
+      "interior_id": "2LZ_AE4_HU7_N26",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_140",
+      "interior_id": "2LZ_AE4_HUL",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_141",
+      "interior_id": "2LZ_AH2_HU7_N26_TU7",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_142",
+      "interior_id": "2LZ_AH2_HUL",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_143",
+      "interior_id": "2LZ_AH2_HUL_TU7",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_144",
+      "interior_id": "2LZ_AQ9_HUR",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_145",
+      "interior_id": "3LZ_AE4_EJH",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_146",
+      "interior_id": "3LZ_AE4_EPX_N2Z",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_147",
+      "interior_id": "3LZ_AE4_H8T",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_148",
+      "interior_id": "3LZ_AE4_HAG",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_149",
+      "interior_id": "3LZ_AE4_HNK",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_150",
+      "interior_id": "3LZ_AE4_HU2",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_151",
+      "interior_id": "3LZ_AE4_HUA_N2Z",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_152",
+      "interior_id": "3LZ_AE4_HVZ",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_153",
+      "interior_id": "3LZ_AH2_EJH",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_154",
+      "interior_id": "3LZ_AH2_EPX_N2Z",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_155",
+      "interior_id": "3LZ_AH2_H8T",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_156",
+      "interior_id": "3LZ_AH2_HAG",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_157",
+      "interior_id": "3LZ_AH2_HNK",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_158",
+      "interior_id": "3LZ_AH2_HU2",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_159",
+      "interior_id": "3LZ_AH2_HU2_TU7",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_160",
+      "interior_id": "3LZ_AH2_HUA_N2Z_TU7",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_161",
+      "interior_id": "3LZ_AH2_HVZ",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_162",
+      "interior_id": "3LZ_AUP_HAG",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_163",
+      "interior_id": "3LZ_AUP_HVZ",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_164",
+      "interior_id": "3LZ_R6X_AE4_HUU",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_165",
+      "interior_id": "3LZ_R6X_AE4_HZP_N2Z",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_166",
+      "interior_id": "3LZ_R6X_AH2_HUU",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_167",
+      "interior_id": "3LZ_R6X_AH2_HZP_N2Z",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_168",
+      "interior_id": "1LZ_AQ9_HUQ",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_169",
+      "interior_id": "2LZ_AE4_HU7_N26",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_170",
+      "interior_id": "2LZ_AE4_HUL",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_171",
+      "interior_id": "2LZ_AH2_HU7_N26_TU7",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_172",
+      "interior_id": "2LZ_AH2_HUL",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_173",
+      "interior_id": "2LZ_AH2_HUL_TU7",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_174",
+      "interior_id": "2LZ_AQ9_HUR",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_175",
+      "interior_id": "3LZ_AE4_EJH",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_176",
+      "interior_id": "3LZ_AE4_EPX_N2Z",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_177",
+      "interior_id": "3LZ_AE4_HNK",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_178",
+      "interior_id": "3LZ_AE4_HU2",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_179",
+      "interior_id": "3LZ_AE4_HUA_N2Z",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_180",
+      "interior_id": "3LZ_AE4_HUW",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_181",
+      "interior_id": "3LZ_AE4_HUX_N2Z",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_182",
+      "interior_id": "3LZ_AE4_HVZ",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_183",
+      "interior_id": "3LZ_AH2_EJH",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_184",
+      "interior_id": "3LZ_AH2_EPX_N2Z",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_185",
+      "interior_id": "3LZ_AH2_HNK",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_186",
+      "interior_id": "3LZ_AH2_HU2",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_187",
+      "interior_id": "3LZ_AH2_HU2_TU7",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_188",
+      "interior_id": "3LZ_AH2_HUA_N2Z_TU7",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_189",
+      "interior_id": "3LZ_AH2_HUW",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_190",
+      "interior_id": "3LZ_AH2_HUX_N2Z",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_191",
+      "interior_id": "3LZ_AH2_HVZ",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_192",
+      "interior_id": "3LZ_AUP_HVZ",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_193",
+      "interior_id": "3LZ_R6X_AE4_HUU",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_194",
+      "interior_id": "3LZ_R6X_AE4_HZP_N2Z",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_195",
+      "interior_id": "3LZ_R6X_AH2_HUU",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_196",
+      "interior_id": "3LZ_R6X_AH2_HZP_N2Z",
+      "option_id": "opt_3a9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_197",
+      "interior_id": "3LZ_AE4_EJH",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_198",
+      "interior_id": "3LZ_AE4_EPX_N2Z",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_199",
+      "interior_id": "3LZ_AE4_H8T",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_200",
+      "interior_id": "3LZ_AE4_HAG",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_201",
+      "interior_id": "3LZ_AE4_HUW",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_202",
+      "interior_id": "3LZ_AE4_HUX_N2Z",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_203",
+      "interior_id": "3LZ_AH2_EJH",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_204",
+      "interior_id": "3LZ_AH2_EPX_N2Z",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_205",
+      "interior_id": "3LZ_AH2_H8T",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_206",
+      "interior_id": "3LZ_AH2_HAG",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_207",
+      "interior_id": "3LZ_AH2_HUW",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_208",
+      "interior_id": "3LZ_AH2_HUX_N2Z",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_209",
+      "interior_id": "3LZ_AUP_HAG",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_210",
+      "interior_id": "1LZ_AQ9_HUQ",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_211",
+      "interior_id": "2LZ_AE4_HU7_N26",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_212",
+      "interior_id": "2LZ_AE4_HUL",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_213",
+      "interior_id": "2LZ_AH2_HU7_N26_TU7",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_214",
+      "interior_id": "2LZ_AH2_HUL",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_215",
+      "interior_id": "2LZ_AH2_HUL_TU7",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_216",
+      "interior_id": "2LZ_AQ9_HUR",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_217",
+      "interior_id": "3LZ_AE4_EJH",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_218",
+      "interior_id": "3LZ_AE4_EPX_N2Z",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_219",
+      "interior_id": "3LZ_AE4_H8T",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_220",
+      "interior_id": "3LZ_AE4_HAG",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_221",
+      "interior_id": "3LZ_AE4_HNK",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_222",
+      "interior_id": "3LZ_AE4_HU2",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_223",
+      "interior_id": "3LZ_AE4_HUA_N2Z",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_224",
+      "interior_id": "3LZ_AE4_HUF_N2Z",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_225",
+      "interior_id": "3LZ_AE4_HUW",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_226",
+      "interior_id": "3LZ_AE4_HUX_N2Z",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_227",
+      "interior_id": "3LZ_AE4_HVZ",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_228",
+      "interior_id": "3LZ_AE4_HZN",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_229",
+      "interior_id": "3LZ_AH2_EJH",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_230",
+      "interior_id": "3LZ_AH2_EPX_N2Z",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_231",
+      "interior_id": "3LZ_AH2_H8T",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_232",
+      "interior_id": "3LZ_AH2_HAG",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_233",
+      "interior_id": "3LZ_AH2_HNK",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_234",
+      "interior_id": "3LZ_AH2_HU2",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_235",
+      "interior_id": "3LZ_AH2_HU2_TU7",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_236",
+      "interior_id": "3LZ_AH2_HUA_N2Z_TU7",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_237",
+      "interior_id": "3LZ_AH2_HUF_N2Z",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_238",
+      "interior_id": "3LZ_AH2_HUW",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_239",
+      "interior_id": "3LZ_AH2_HUX_N2Z",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_240",
+      "interior_id": "3LZ_AH2_HVZ",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_241",
+      "interior_id": "3LZ_AH2_HZN",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_242",
+      "interior_id": "3LZ_AUP_HAG",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_243",
+      "interior_id": "3LZ_AUP_HVZ",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_244",
+      "interior_id": "3LZ_R6X_AE4_HUU",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_245",
+      "interior_id": "3LZ_R6X_AE4_HZP_N2Z",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_246",
+      "interior_id": "3LZ_R6X_AH2_HUU",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_247",
+      "interior_id": "3LZ_R6X_AH2_HZP_N2Z",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
     }
   ],
   "defaultSelectionRules": [
@@ -51990,7 +53110,7 @@
       "severity": "pass",
       "entity_type": "color_override",
       "entity_id": "",
-      "message": "137 color override rows exported from color_overrides."
+      "message": "247 color override rows exported from color_overrides."
     }
   ]
 }

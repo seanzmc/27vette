@@ -258,12 +258,21 @@ test("Z06 gas guzzler tax drafts as standard-equipment default charge with T0F/T
   }
 });
 
-test("Z06 3LZ interiors include locked zero-price seatbelt colors", () => {
+test("Z06 3LZ interiors include zero-price seatbelt colors with authored Black alternatives", () => {
   const ruleKeys = new Set(draft.rules.map((rule) => `${rule.source_id}::${rule.rule_type}::${rule.target_id}`));
   const priceKeys = new Set(draft.priceRules.map((rule) => `${rule.condition_option_id}::${rule.target_option_id}::${rule.price_rule_type}::${rule.price_value}`));
   for (const [interiorId, seatbeltOptionId] of z06InteriorSeatbeltIncludes) {
     assert.ok(ruleKeys.has(`${interiorId}::includes::${seatbeltOptionId}`), `${interiorId} should include ${seatbeltOptionId}`);
     assert.ok(priceKeys.has(`${interiorId}::${seatbeltOptionId}::override::0`), `${interiorId} should zero-price ${seatbeltOptionId}`);
+    const replacementGroup = draft.ruleGroups.find(
+      (group) => group.source_id === interiorId && group.group_type === "requires_any",
+    );
+    if (/_(HAG|HVZ)$/.test(interiorId)) {
+      assert.equal(replacementGroup, undefined, `${interiorId} should lock its asymmetrical included color`);
+    } else {
+      assert.ok(replacementGroup, `${interiorId} should allow the included color or Black`);
+      assert.deepEqual([...replacementGroup.target_ids].sort(), [seatbeltOptionId, "opt_719_001"].sort());
+    }
   }
 });
 

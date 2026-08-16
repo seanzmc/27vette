@@ -2836,7 +2836,7 @@ test("single interior and included seatbelt defaults are handled in runtime", ()
   assert.equal(seatbeltDefault?.condition_id, "sec_seat_001");
 });
 
-test("Stingray 3LT interiors lock included color seatbelts against other seatbelt choices", () => {
+test("Stingray 3LT interiors allow Black for included colors except asymmetrical interiors", () => {
   const group = data.exclusiveGroups.find((item) => item.group_id === "excl_seat_belts");
   assert.ok(group, "Stingray seatbelt exclusive group should be generated");
   assert.equal(group.selection_mode, "single_within_group");
@@ -2858,6 +2858,12 @@ test("Stingray 3LT interiors lock included color seatbelts against other seatbel
   runtime.reconcileSelections();
   assert.equal(runtime.state.selected.has("opt_3f9_001"), false, "D30 should not unlock a 3LT included seatbelt peer");
 
+  const blackReplacement = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_719_001");
+  runtime.handleChoice(blackReplacement);
+  runtime.reconcileSelections();
+  assert.equal(runtime.state.selected.has("opt_719_001"), true, "H8T should allow Black at no charge");
+  assert.equal(runtime.computeAutoAdded().has("opt_3a9_001"), false, "Black should replace the H8T included color");
+
   for (const interiorId of ["3LT_AE4_EJH", "3LT_AE4_EPX_N26", "3LT_AH2_EJH", "3LT_AH2_EPX_N26"]) {
     const seatRpo = interiorId.includes("_AE4_") ? "AE4" : "AH2";
     const vdaRuntime = configureInteriorOrder({ trimLevel: "3LT", seatRpo, interiorId });
@@ -2865,8 +2871,18 @@ test("Stingray 3LT interiors lock included color seatbelts against other seatbel
     assert.equal(vdaRuntime.computeAutoAdded().has("opt_3n9_001"), true, `${interiorId} should auto-add 3N9`);
     assert.equal(vdaRuntime.optionPrice("opt_3n9_001"), 0, `${interiorId} should zero-price 3N9`);
 
+    const blackSeatbelt = vdaRuntime.activeChoiceRows().find((choice) => choice.option_id === "opt_719_001");
+    vdaRuntime.handleChoice(blackSeatbelt);
+    vdaRuntime.reconcileSelections();
+    assert.equal(vdaRuntime.state.selected.has("opt_719_001"), true, `${interiorId} should allow Black at no charge`);
+    assert.equal(vdaRuntime.computeAutoAdded().has("opt_3n9_001"), false, `${interiorId} Black should replace 3N9`);
+
     const otherSeatbelt = vdaRuntime.activeChoiceRows().find(
-      (choice) => choice.section_id === "sec_seat_001" && choice.option_id !== "opt_3n9_001" && choice.selectable === "True"
+      (choice) =>
+        choice.section_id === "sec_seat_001" &&
+        choice.option_id !== "opt_3n9_001" &&
+        choice.option_id !== "opt_719_001" &&
+        choice.selectable === "True"
     );
     assert.ok(otherSeatbelt, "expected another selectable seatbelt for VDA lock test");
     vdaRuntime.handleChoice(otherSeatbelt);
@@ -2886,11 +2902,20 @@ test("Stingray 3LT interiors lock included color seatbelts against other seatbel
   dippedRuntime.state.activeStep = "seat_belt";
   const blackSeatbelt = dippedRuntime.activeChoiceRows().find((choice) => choice.option_id === "opt_719_001");
   const blackSeatbeltHtml = dippedRuntime.renderChoiceCard(blackSeatbelt, autoAdded);
-  assert.match(
-    blackSeatbeltHtml,
-    /Torch Red Seat Belt Color is included with Adrenaline Red Dipped, so other seat belt colors are unavailable\./
-  );
+  assert.doesNotMatch(blackSeatbeltHtml, /unavailable/i);
   assert.doesNotMatch(blackSeatbeltHtml, /3LT_AH2_HNK|3lt_ah2_hnk/);
+  dippedRuntime.handleChoice(blackSeatbelt);
+  dippedRuntime.reconcileSelections();
+  assert.equal(dippedRuntime.state.selected.has("opt_719_001"), true, "HNK should allow Black at no charge");
+  assert.equal(dippedRuntime.computeAutoAdded().has("opt_3f9_001"), false, "Black should replace the HNK included color");
+
+  const asymRuntime = configureInteriorOrder({ trimLevel: "3LT", seatRpo: "AH2", interiorId: "3LT_AH2_HVZ" });
+  asymRuntime.reconcileSelections();
+  assert.equal(asymRuntime.computeAutoAdded().has("opt_3f9_001"), true, "HVZ should auto-add 3F9");
+  assert.equal(asymRuntime.optionPrice("opt_3f9_001"), 0, "HVZ included 3F9 should price at zero");
+  asymRuntime.handleChoice(asymRuntime.activeChoiceRows().find((choice) => choice.option_id === "opt_719_001"));
+  asymRuntime.reconcileSelections();
+  assert.equal(asymRuntime.state.selected.has("opt_719_001"), false, "HVZ should lock 3F9 with no Black alternative");
 });
 
 test("sidebar keeps one Standard & Included surface inside Selected RPOs", () => {
