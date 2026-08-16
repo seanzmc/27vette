@@ -82,6 +82,7 @@ class GlobalFamilyOpsTest(unittest.TestCase):
                         "target_type": "option",
                         "target_id": "opt_pdb_001",
                         "image_url": "https://example.test/pdb.png",
+                        "image_fit": "cover",
                         "active": True,
                     },
                 },

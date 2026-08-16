@@ -364,7 +364,10 @@ class RealWorkbookCompareTest(unittest.TestCase):
             self.assertTrue(entry.get("reason"))
 
     def test_compared_models_exclude_scaffolds(self):
-        self.assertEqual(self.result["models"], ["grand_sport", "stingray", "z06"])
+        self.assertEqual(
+            self.result["models"],
+            ["grand_sport", "grand_sport_x", "stingray", "z06", "zr1", "zr1x"],
+        )
 
     def test_c1_eyt_description_flagged(self):
         diffs = {d["field"]: d for d in self.by_key["opt_eyt_001"]["diffs"]}

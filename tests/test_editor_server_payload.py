@@ -363,7 +363,10 @@ class ReviewEndpointsTest(unittest.TestCase):
         for key in ("models", "sharedCount", "rows", "modelOnly",
                     "staleAllowlist", "workbook", "allowlist"):
             self.assertIn(key, body)
-        self.assertEqual(body["models"], ["grand_sport", "stingray", "z06"])
+        self.assertEqual(
+            body["models"],
+            ["grand_sport", "grand_sport_x", "stingray", "z06", "zr1", "zr1x"],
+        )
         for row in body["rows"][:25]:
             for key in ("joinKey", "joinedVia", "rpo", "optionIds", "models", "diffs"):
                 self.assertIn(key, row)
