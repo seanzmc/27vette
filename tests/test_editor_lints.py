@@ -216,6 +216,48 @@ class LintFixtureTest(unittest.TestCase):
         self.assertEqual(sum(summary.values()), len(self.lints))
 
 
+class ReferenceUnionLintTest(unittest.TestCase):
+    def test_rule_group_source_accepts_interior_but_rejects_missing_reference(self):
+        extract = make_extract({
+            "model_master": [
+                {"model_key": "m1", "model_label": "M1", "active": True},
+            ],
+            "model_workbook_sources": [
+                {"model_key": "m1", "source_role": "source_option_sheet",
+                 "sheet_name": "m1_options", "active": True},
+                {"model_key": "m1", "source_role": "interior_source_sheet",
+                 "sheet_name": "m1_interiors", "active": True},
+                {"model_key": "m1", "source_role": "rule_groups_sheet",
+                 "sheet_name": "m1_rule_groups", "active": True},
+                {"model_key": "m1", "source_role": "rule_group_members_sheet",
+                 "sheet_name": "m1_rule_group_members", "active": True},
+            ],
+            "m1_options": [
+                {"option_id": "opt_member", "rpo": "MEM", "active": True},
+            ],
+            "m1_interiors": [
+                {"interior_id": "int_valid", "Interior Name": "Valid Interior"},
+            ],
+            "m1_rule_groups": [
+                {"group_id": "rg_valid", "group_type": "requires_any",
+                 "source_id": "int_valid", "active": True},
+                {"group_id": "rg_missing", "group_type": "requires_any",
+                 "source_id": "int_missing", "active": True},
+            ],
+            "m1_rule_group_members": [
+                {"group_id": "rg_valid", "target_id": "opt_member",
+                 "display_order": 1, "active": True},
+                {"group_id": "rg_missing", "target_id": "opt_member",
+                 "display_order": 1, "active": True},
+            ],
+        })
+
+        orphans = lints_by_id(run_lints(extract)).get("orphan_ref", [])
+
+        self.assertEqual([lint["key"] for lint in orphans], ["rg_missing"])
+        self.assertIn("options or interiors", orphans[0]["message"])
+
+
 class CompareFixtureTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

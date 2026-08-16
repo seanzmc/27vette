@@ -347,7 +347,7 @@ test("Grand Sport runtime contract emits color overrides and workbook-backed pac
     assert.equal(rule.price_rule_type, "override", `${rule.price_rule_id} should use supported override type`);
     assert.equal(typeof rule.price_value, "number", `${rule.price_rule_id} should emit numeric price_value`);
   }
-  assert.equal(draft.colorOverrides.length, 245);
+  assert.equal(draft.colorOverrides.length, 263);
   assert.ok(
     draft.colorOverrides.some(
       (override) =>

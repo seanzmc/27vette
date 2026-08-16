@@ -19,7 +19,9 @@ from pathlib import Path
 
 from corvette_form_generator.editor_ops import (
     _DORDER_GROUP_COL,
+    _meta_ref_items,
     _ref_domain,
+    _ref_label,
     _registry_maps,
     EDITOR_SHEET_META,
     rows_of,
@@ -115,42 +117,23 @@ def _lint_duplicate_keys(extract, maps):
     return out
 
 
-# Columns whose existing-row domain is wider than the editor's pick-list:
-# the generator accepts interior_ids as rule/price-rule conditions
-# (inspection.py: valid_condition_ids = option_rows | interiors), e.g. the
-# trim/seat/color combo rows like 3LT_AE4_H8T. Keyed by (family, column).
-_REF_DOMAIN_UNIONS = {
-    ("rule_mapping", "source_id"): ("interiors",),
-    # A rule may TARGET an interior as well as be sourced from one -- e.g. the
-    # z06/zr1/zr1x "<interior> includes <seat belt colour>" rows. The generator
-    # resolves both endpoints against options | interiors, so linting target_id
-    # against options alone reported 129 valid rows as orphans.
-    ("rule_mapping", "target_id"): ("interiors",),
-    ("price_rules", "condition_option_id"): ("interiors",),
-}
-
-
 def _lint_orphan_refs(extract, maps):
     out = []
     domains: dict[tuple, set] = {}
     for sheet, family, label, _models in _registered_sheets(maps):
         meta = EDITOR_SHEET_META[family]
         keycols = list(meta["key"])
-        for col, refkind in meta.get("refs", {}).items():
-            extra_kinds = _REF_DOMAIN_UNIONS.get((family, col), ())
-            dkey = (sheet, refkind, extra_kinds)
+        for col, refkind in _meta_ref_items(meta):
+            dkey = (sheet, refkind)
             if dkey not in domains:
-                domain = set(_ref_domain(extract, maps, {}, sheet, refkind))
-                for extra in extra_kinds:
-                    domain |= _ref_domain(extract, maps, {}, sheet, extra)
-                domains[dkey] = domain
+                domains[dkey] = set(_ref_domain(extract, maps, {}, sheet, refkind))
             domain = domains[dkey]
             for row in rows_of(extract, sheet):
                 value = _norm(row.get(col))
                 if value and value not in domain:
                     out.append(_lint(
                         "orphan_ref", sheet, label, _key_of(row, keycols),
-                        f"{col}={value!r} not found in {refkind}", [col]))
+                        f"{col}={value!r} not found in {_ref_label(refkind)}", [col]))
     return out
 
 

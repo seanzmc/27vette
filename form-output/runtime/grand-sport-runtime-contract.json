@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grandSport_options",
-    "generated_at": "2026-08-13T16:40:18+00:00",
+    "generated_at": "2026-08-15T22:51:06+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -42482,6 +42482,246 @@
       "disabled_reason": "VPW blocks Grand Sport Heritage Graphics and Heritage Hash Marks.",
       "active": "True",
       "notes": "Jake-graphics/heritage-hash reverse exclusion gap (see .hermes/plans/grand-sport-jake-heritage-hash-reverse-exclusions-spec.md)."
+    },
+    {
+      "group_id": "grand_sport_seatbelt_3lt_ae4_ejh_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LT_AE4_EJH",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "grand_sport_seatbelt_3lt_ae4_epx_n26_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LT_AE4_EPX_N26",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "grand_sport_seatbelt_3lt_ae4_h8t_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LT_AE4_H8T",
+      "target_ids": [
+        "opt_3a9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "grand_sport_seatbelt_3lt_ae4_hnk_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LT_AE4_HNK",
+      "target_ids": [
+        "opt_3f9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "grand_sport_seatbelt_3lt_ae4_huf_n26_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LT_AE4_HUF_N26",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "grand_sport_seatbelt_3lt_ae4_huw_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LT_AE4_HUW",
+      "target_ids": [
+        "opt_379_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "grand_sport_seatbelt_3lt_ae4_hux_n26_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LT_AE4_HUX_N26",
+      "target_ids": [
+        "opt_379_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "grand_sport_seatbelt_3lt_ae4_hzn_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LT_AE4_HZN",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "grand_sport_seatbelt_3lt_ah2_ejh_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LT_AH2_EJH",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "grand_sport_seatbelt_3lt_ah2_epx_n26_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LT_AH2_EPX_N26",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "grand_sport_seatbelt_3lt_ah2_h8t_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LT_AH2_H8T",
+      "target_ids": [
+        "opt_3a9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "grand_sport_seatbelt_3lt_ah2_hnk_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LT_AH2_HNK",
+      "target_ids": [
+        "opt_3f9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "grand_sport_seatbelt_3lt_ah2_huf_n26_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LT_AH2_HUF_N26",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "grand_sport_seatbelt_3lt_ah2_huw_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LT_AH2_HUW",
+      "target_ids": [
+        "opt_379_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "grand_sport_seatbelt_3lt_ah2_hux_n26_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LT_AH2_HUX_N26",
+      "target_ids": [
+        "opt_379_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
+    },
+    {
+      "group_id": "grand_sport_seatbelt_3lt_ah2_hzn_included_or_black",
+      "group_type": "requires_any",
+      "source_id": "3LT_AH2_HZN",
+      "target_ids": [
+        "opt_3n9_001",
+        "opt_719_001"
+      ],
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "disabled_reason": "",
+      "active": "True",
+      "notes": "Choose the included seatbelt color or Black (719) at no charge."
     }
   ],
   "exclusiveGroups": [
@@ -44832,6 +45072,60 @@
       "active": "True",
       "runtime_action": "active",
       "source_note": "(EJH, EPX) Very Dark Atmosphere interiors comes with (3N9) Natural seat belt color."
+    },
+    {
+      "rule_id": "grand_sport_seatbelt_3lt_ae4_hvz_includes_3f9",
+      "source_id": "3LT_AE4_HVZ",
+      "rule_type": "includes",
+      "target_id": "opt_3f9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_intc_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with selected interior.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "Included with selected interior."
+    },
+    {
+      "rule_id": "grand_sport_seatbelt_3lt_ah2_hvz_includes_3f9",
+      "source_id": "3LT_AH2_HVZ",
+      "rule_type": "includes",
+      "target_id": "opt_3f9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_intc_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with selected interior.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "Included with selected interior."
+    },
+    {
+      "rule_id": "grand_sport_seatbelt_3lt_aup_hvz_includes_3f9",
+      "source_id": "3LT_AUP_HVZ",
+      "rule_type": "includes",
+      "target_id": "opt_3f9_001",
+      "target_type": "option",
+      "source_type": "interior",
+      "source_section": "sec_intc_003",
+      "target_section": "sec_seat_001",
+      "source_selection_mode": "",
+      "target_selection_mode": "single_select_req",
+      "body_style_scope": "",
+      "disabled_reason": "Included with selected interior.",
+      "auto_add": "True",
+      "active": "True",
+      "runtime_action": "active",
+      "source_note": "Included with selected interior."
     }
   ],
   "priceRules": [
@@ -45395,6 +45689,39 @@
       "trim_level_scope": "",
       "variant_scope": "",
       "notes": "EJH/EPX Very Dark Atmosphere interior includes Natural seat belt color."
+    },
+    {
+      "price_rule_id": "grand_sport_seatbelt_3lt_ae4_hvz_3f9_zero",
+      "condition_option_id": "3LT_AE4_HVZ",
+      "target_option_id": "opt_3f9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "grand_sport_seatbelt_3lt_ah2_hvz_3f9_zero",
+      "condition_option_id": "3LT_AH2_HVZ",
+      "target_option_id": "opt_3f9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
+    },
+    {
+      "price_rule_id": "grand_sport_seatbelt_3lt_aup_hvz_3f9_zero",
+      "condition_option_id": "3LT_AUP_HVZ",
+      "target_option_id": "opt_3f9_001",
+      "price_rule_type": "override",
+      "price_value": 0,
+      "body_style_scope": "",
+      "trim_level_scope": "",
+      "variant_scope": "",
+      "notes": "Included seatbelt has no additional charge."
     }
   ],
   "interiors": [
@@ -53411,6 +53738,150 @@
       "rule_type": "requires",
       "adds_rpo": "opt_d30_001",
       "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_246",
+      "interior_id": "3LT_AE4_EL9",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_247",
+      "interior_id": "3LT_AE4_H8T",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_248",
+      "interior_id": "3LT_AH2_EL9",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_249",
+      "interior_id": "3LT_AH2_H8T",
+      "option_id": "opt_379_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_250",
+      "interior_id": "3LT_AE4_H8T",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_251",
+      "interior_id": "3LT_AE4_HAG",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_252",
+      "interior_id": "3LT_AH2_H8T",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_253",
+      "interior_id": "3LT_AH2_HAG",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_254",
+      "interior_id": "3LT_AUP_HAG",
+      "option_id": "opt_3f9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_255",
+      "interior_id": "3LT_AE4_EL9",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_256",
+      "interior_id": "3LT_AE4_HAG",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_257",
+      "interior_id": "3LT_AE4_HUF_N26",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_258",
+      "interior_id": "3LT_AE4_HZN",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_259",
+      "interior_id": "3LT_AH2_EL9",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_260",
+      "interior_id": "3LT_AH2_HAG",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_261",
+      "interior_id": "3LT_AH2_HUF_N26",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_262",
+      "interior_id": "3LT_AH2_HZN",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
+    },
+    {
+      "override_id": "co_263",
+      "interior_id": "3LT_AUP_HAG",
+      "option_id": "opt_3m9_001",
+      "rule_type": "requires",
+      "adds_rpo": "opt_d30_001",
+      "notes": "Exterior/interior pairing requires the listed override RPO."
     }
   ],
   "defaultSelectionRules": [
@@ -53479,7 +53950,7 @@
       "severity": "pass",
       "entity_type": "rule",
       "entity_id": "",
-      "message": "123 active compatibility rules exported from grandSport_rule_mapping."
+      "message": "126 active compatibility rules exported from grandSport_rule_mapping."
     },
     {
       "check_id": "interior_contract",
@@ -53493,14 +53964,14 @@
       "severity": "pass",
       "entity_type": "price_rule",
       "entity_id": "",
-      "message": "51 active price rules exported from grandSport_price_rules."
+      "message": "54 active price rules exported from grandSport_price_rules."
     },
     {
       "check_id": "color_overrides",
       "severity": "pass",
       "entity_type": "color_override",
       "entity_id": "",
-      "message": "245 color override rows exported from color_overrides."
+      "message": "263 color override rows exported from color_overrides."
     }
   ]
 }

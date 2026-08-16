@@ -83,6 +83,7 @@ EDITOR_SHEET_META: dict[str, dict] = {
         "types": {"active": "bool"},
         "enums": {"group_type": ("requires_any", "excludes_any")},
         "refs": {"source_id": "options"},
+        "ref_unions": {"source_id": ("options", "interiors")},
     },
     "rule_group_members": {
         "key": ("group_id", "target_id"),

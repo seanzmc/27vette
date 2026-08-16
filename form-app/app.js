@@ -1551,10 +1551,12 @@ function relationshipBadgesForChoice(choice, { disabled = false } = {}) {
   const badges = [];
   const includeRules = includeRulesForChoice(choice);
   if (includeRules.length) {
+    const includedItems = includeRules.map((rule) => getOptionLabel(rule.target_id));
     badges.push({
       type: "includes",
       className: `includes${disabled ? " disabled" : ""}`,
       label: `Includes ${includeRules.length} item${includeRules.length === 1 ? "" : "s"}`,
+      tooltip: `Includes ${includedItems.join("; ")}.`,
     });
   }
   return badges;
@@ -1564,7 +1566,11 @@ function renderRelationshipBadge(badge) {
   if (badge.type === "includes") {
     return `
       <span class="choice-relationship-badge ${badge.className}">
-        <span>${escapeHtml(badge.label)}</span>
+        ${renderInfoTooltip(badge.tooltip, `${badge.label} details`, {
+          focusable: false,
+          icon: false,
+          triggerText: badge.label,
+        })}
       </span>
     `;
   }

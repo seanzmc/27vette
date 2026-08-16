@@ -196,7 +196,7 @@ test("Z06 gas guzzler tax defaults into every build and prices up with T0F/T0G",
   }
 });
 
-test("Z06 3LZ interiors include locked zero-price seatbelt colors", () => {
+test("Z06 3LZ interiors include zero-price seatbelt colors and allow Black except for asymmetrical interiors", () => {
   for (const [interiorId, seatbeltOptionId, seatbeltRpo] of z06InteriorSeatbeltIncludes) {
     const runtime = z06Runtime({ trimLevel: "3LZ" });
     const seatRpo = interiorId.includes("_AE4_") ? "AE4" : interiorId.includes("_AUP_") ? "AUP" : "AH2";
@@ -206,8 +206,26 @@ test("Z06 3LZ interiors include locked zero-price seatbelt colors", () => {
     assert.equal(autoAddedRpos(runtime).includes(seatbeltRpo), true, `${interiorId} should auto-add ${seatbeltRpo}`);
     assert.equal(runtime.optionPrice(seatbeltOptionId), 0, `${interiorId} ${seatbeltRpo} should price at zero`);
 
+    const asymmetrical = /_(HAG|HVZ)$/.test(interiorId);
+    const blackSeatbelt = runtime.activeChoiceRows().find((item) => item.option_id === "opt_719_001");
+    runtime.handleChoice(blackSeatbelt);
+    runtime.reconcileSelections();
+    assert.equal(
+      runtime.state.selected.has("opt_719_001"),
+      !asymmetrical,
+      `${interiorId} should ${asymmetrical ? "lock its included color" : "allow Black at no charge"}`,
+    );
+    assert.equal(runtime.optionPrice("opt_719_001"), 0, "Black replacement should remain $0");
+    if (!asymmetrical) {
+      assert.equal(runtime.computeAutoAdded().has(seatbeltOptionId), false, `${interiorId} Black should replace the included color`);
+    }
+
     const otherSeatbelt = runtime.activeChoiceRows().find(
-      (item) => item.section_id === "sec_seat_001" && item.option_id !== seatbeltOptionId && item.selectable === "True"
+      (item) =>
+        item.section_id === "sec_seat_001" &&
+        item.option_id !== seatbeltOptionId &&
+        item.option_id !== "opt_719_001" &&
+        item.selectable === "True"
     );
     assert.ok(otherSeatbelt, "expected another selectable seatbelt for lock test");
     runtime.handleChoice(otherSeatbelt);

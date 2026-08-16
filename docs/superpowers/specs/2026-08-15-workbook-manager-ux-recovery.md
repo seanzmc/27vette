@@ -266,6 +266,40 @@ viewports. It must:
 - return focus to the initiating control after close;
 - show the saved change immediately in a persistent draft tray.
 
+### 6.4 Connected navigation and discovery
+
+Every normal entry point must resolve a workbook entity to the same stable
+connected workspace. Opening an option from Form Overview, a section, search
+results, a group member list, a rule relationship, or Images must open the same
+model-scoped Option Explorer detail rather than a separate table-specific copy.
+Opening a group from an option or search result must likewise open the same
+Group workspace. Back navigation preserves the originating model, workspace,
+entity, and expanded context so relationship exploration does not become a new
+scavenger hunt.
+
+The normal operator shell must provide one model-scoped cross-entity search.
+Results are typed and visually distinguishable as Option, Group, Section, or
+Rule results while leading with human labels and RPOs. Exact RPO, approved human
+label, and canonical-ID matches rank ahead of descriptive-text matches.
+Selecting a result opens that entity's connected workspace; search must not
+create a second read model or send users to raw collection tables.
+
+The Manager must also expose named, read-only relationship queries and
+diagnostic filters for recurring questions that the projection can answer
+deterministically. The initial contract includes:
+
+- options without required image coverage;
+- options belonging to more than one exclusive group;
+- where an option or group is used in the selected model;
+- every incoming and outgoing conflict, requirement, inclusion, or replacement
+  affecting an option;
+- options whose availability differs across the selected model's variants.
+
+These are connected projection queries, not AI-authored business judgments.
+Each result links to the same canonical option, group, section, or rule detail,
+states its model scope and filter definition, and remains read-only until an
+operator deliberately opens an authorized contextual editor.
+
 ## 7. Group Manager and workbook-owned labels
 
 ### 7.1 Human group label contract
@@ -666,6 +700,10 @@ automatically.
   machine.
 - Add the model-scoped read-only Option Explorer and read-only Group Explorer.
 - Add backend connected read models for option and group details.
+- Add model-scoped cross-entity search across options, groups, sections, and
+  rules, with every result resolving to the same connected entity workspace.
+- Add the initial named relationship diagnostics from §6.4 as read-only
+  projection queries with explicit model scope and definitions.
 - Move current raw table navigation and maintenance controls under Advanced &
   Recovery without deleting them.
 - Remove the unlabeled row-comparison checkboxes and arbitrary two-record diff;
@@ -677,8 +715,11 @@ automatically.
 Exit gate: a copied-workbook browser session can search for an option, see all
 connected group/OVS/rule/pricing/asset relationships, open a group by human
 description/status, inspect named members, and recover from stale/first-run
-state with no unexplained console errors. Workbook/generated/publication bytes
-remain unchanged.
+state with no unexplained console errors. Cross-entity search distinguishes and
+opens option, group, section, and rule results; opening the same entity from
+search or a relationship returns the same stable detail workspace; and the
+initial named diagnostics return traceable, model-scoped results. Workbook,
+generated, and publication bytes remain unchanged.
 
 ### Checkpoint 2 — group display-label contract and reviewed migration
 
@@ -766,6 +807,11 @@ Use focused tests while editing and one broader affected-surface suite at each
 checkpoint. Required coverage includes:
 
 - connected option/group API response contracts and query bounds;
+- stable entity identity and preserved navigation context across search and
+  relationship entry points;
+- typed cross-entity search ranking, model scoping, and destination coverage;
+- deterministic named-diagnostic definitions, query bounds, and traceable
+  results for every §6.4 query;
 - exact projection/workbook identity and read-only behavior;
 - option/group relationship completeness;
 - form-graph parity with freshly generated runtime metadata;
