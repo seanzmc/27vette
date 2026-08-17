@@ -2189,7 +2189,7 @@ test("ZR1 shows package-owned J59 and ZTK adds it with TOM without a preselectio
   }
 });
 
-test("ZR1X defaults J58, lets ZTK replace it with J59, and restores J58 when ZTK is removed", () => {
+test("ZR1X keeps standard J59 with or without ZTK and never publishes J58", () => {
   const runtime = loadRuntime();
   runtime.activateModel("zr1x");
   runtime.state.bodyStyle = "coupe";
@@ -2202,38 +2202,46 @@ test("ZR1X defaults J58, lets ZTK replace it with J59, and restores J58 when ZTK
   const tom = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_tom_002");
   const t0e = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_t0e_001");
   const ztk = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_ztk_001");
-  assert.ok(j58 && j59 && tom && t0e && ztk, "ZR1X should expose J58, J59, TOM, T0E, and ZTK in its active contract");
-  assert.equal(j58.selectable, "True", "ZR1X J58 should be the selectable standard brake");
-  assert.equal(j58.display_behavior, "default_selected", "ZR1X J58 should be selected by default");
-  assert.equal(runtime.state.selected.has("opt_j58_002"), true, "ZR1X should satisfy its brake requirement with J58 before ZTK");
+  assert.equal(j58, undefined, "ZR1X must not publish ZR1-only J58 brakes");
+  assert.ok(j59 && tom && t0e && ztk, "ZR1X should expose standard J59, TOM, T0E, and ZTK");
+  assert.equal(j59.section_id, "sec_perf_brake_001", "ZR1X J59 should render in Performance Brakes");
+  assert.equal(j59.selectable, "True", "ZR1X standard J59 should remain selectable");
+  assert.equal(j59.display_behavior, "default_selected", "ZR1X standard J59 should be selected by default");
+  assert.equal(
+    runtime.data.choices.filter((choice) => choice.option_id === "opt_j59_002").every((choice) => choice.status === "standard"),
+    true,
+    "ZR1X J59 should be standard in every active variant",
+  );
+  assert.equal(
+    runtime.data.rules.some((rule) => rule.source_id === "opt_ztk_001" && rule.rule_type === "includes" && rule.target_id === "opt_j59_002"),
+    false,
+    "ZR1X ZTK must not claim to add the already-standard J59 brakes",
+  );
+  assert.equal(runtime.state.selected.has("opt_j59_002"), true, "ZR1X should satisfy its brake requirement with standard J59 before ZTK");
   assert.equal(
     runtime.missingRequirementDetails().some((item) => item.label === "Performance Brakes"),
     false,
     "ZR1X should not require ZTK to satisfy Performance Brakes",
   );
-  assert.equal(j59.section_id, "sec_perf_brake_001", "ZR1X J59 should render in Performance Brakes");
-  assert.equal(j59.selectable, "False", "ZR1X J59 should remain package-owned");
-  assert.equal(j59.display_behavior, "display_only", "ZR1X J59 should remain visible");
-  assert.match(runtime.disableReasonForChoice(j59), /Included with ZTK/i);
   assert.equal(runtime.disableReasonForChoice(ztk), "", "ZR1X ZTK should be selectable before TOM is selected");
 
   runtime.handleChoice(ztk);
   assert.equal(runtime.state.selected.has("opt_ztk_001"), true, "ZR1X ZTK selection should stick immediately");
-  assert.equal(runtime.computeAutoAdded().has("opt_j59_002"), true, "ZR1X ZTK should auto-add J59");
-  assert.equal(runtime.state.selected.has("opt_j58_002"), false, "ZR1X ZTK should replace standard J58");
+  assert.equal(runtime.state.selected.has("opt_j59_002"), true, "ZR1X standard J59 should remain selected with ZTK");
+  assert.equal(runtime.computeAutoAdded().has("opt_j59_002"), false, "ZR1X must not classify standard J59 as package-added");
   assert.equal(runtime.computeAutoAdded().has("opt_tom_002"), true, "ZR1X ZTK should auto-add TOM");
   assert.equal(runtime.state.selected.has("opt_t0e_001"), false, "ZR1X TOM should replace the default T0E aero choice");
 
   assert.match(runtime.disableReasonForChoice(t0e), /ZTK|TOM/i, "ZR1X T0E should be unavailable while ZTK owns the aero choice");
   runtime.handleChoice(t0e);
   assert.equal(runtime.state.selected.has("opt_t0e_001"), false, "ZR1X T0E cannot replace ZTK-included TOM");
-  assert.equal(runtime.computeAutoAdded().has("opt_j59_002"), true, "ZR1X J59 remains included with ZTK");
+  assert.equal(runtime.state.selected.has("opt_j59_002"), true, "ZR1X standard J59 remains selected with ZTK");
   assert.equal(runtime.computeAutoAdded().has("opt_tom_002"), true, "ZR1X TOM remains included after the blocked T0E click");
 
   runtime.handleChoice(ztk);
   assert.equal(runtime.state.selected.has("opt_ztk_001"), false, "ZR1X ZTK should be removable");
-  assert.equal(runtime.computeAutoAdded().has("opt_j59_002"), false, "ZR1X should remove package-owned J59 with ZTK");
-  assert.equal(runtime.state.selected.has("opt_j58_002"), true, "ZR1X should restore standard J58 after ZTK is removed");
+  assert.equal(runtime.state.selected.has("opt_j59_002"), true, "ZR1X standard J59 should remain after ZTK is removed");
+  assert.equal(runtime.computeAutoAdded().has("opt_j59_002"), false, "ZR1X standard J59 should never be package-added");
   assert.equal(
     runtime.missingRequirementDetails().some((item) => item.label === "Performance Brakes"),
     false,
@@ -2828,8 +2836,9 @@ test("ZR1-family gas-guzzler charges, trim disclosures, EFR hiding, and ZTK deta
   runtime.reconcileSelections();
   const ztk = runtime.activeChoiceRows().find((choice) => choice.rpo === "ZTK");
   const ztkHtml = runtime.renderChoiceCard(ztk, new Map());
-  assert.match(ztkHtml, /Includes 4 items/);
-  for (const rpo of ["FEZ", "J59", "XFS", "TOM"]) assert.match(ztkHtml, new RegExp(rpo));
+  assert.match(ztkHtml, /Includes 3 items/);
+  for (const rpo of ["FEZ", "XFS", "TOM"]) assert.match(ztkHtml, new RegExp(rpo));
+  assert.doesNotMatch(ztkHtml, /J59/, "ZR1X ZTK must not claim to include the standard J59 brakes");
 });
 
 test("ZR1 exterior appearance is optional after its EFR card removal and completes in the step rail", () => {

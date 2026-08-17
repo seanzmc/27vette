@@ -246972,7 +246972,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "zr1x_options",
-          "generated_at": "2026-08-17T04:39:46+00:00",
+          "generated_at": "2026-08-17T04:53:08+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -263158,13 +263158,13 @@ window.CORVETTE_FORM_DATA = {
             "variant_id": "1lz_s07",
             "body_style": "coupe",
             "trim_level": "1LZ",
-            "status": "available",
-            "status_label": "Available",
-            "selectable": "False",
+            "status": "standard",
+            "status_label": "Standard",
+            "selectable": "True",
             "active": "True",
             "base_price": 0,
             "display_order": 20,
-            "display_behavior": "display_only"
+            "display_behavior": "default_selected"
           },
           {
             "choice_id": "3lz_s07__opt_j59_002",
@@ -263180,13 +263180,13 @@ window.CORVETTE_FORM_DATA = {
             "variant_id": "3lz_s07",
             "body_style": "coupe",
             "trim_level": "3LZ",
-            "status": "available",
-            "status_label": "Available",
-            "selectable": "False",
+            "status": "standard",
+            "status_label": "Standard",
+            "selectable": "True",
             "active": "True",
             "base_price": 0,
             "display_order": 20,
-            "display_behavior": "display_only"
+            "display_behavior": "default_selected"
           },
           {
             "choice_id": "1lz_s67__opt_j59_002",
@@ -263202,13 +263202,13 @@ window.CORVETTE_FORM_DATA = {
             "variant_id": "1lz_s67",
             "body_style": "convertible",
             "trim_level": "1LZ",
-            "status": "available",
-            "status_label": "Available",
-            "selectable": "False",
+            "status": "standard",
+            "status_label": "Standard",
+            "selectable": "True",
             "active": "True",
             "base_price": 0,
             "display_order": 20,
-            "display_behavior": "display_only"
+            "display_behavior": "default_selected"
           },
           {
             "choice_id": "3lz_s67__opt_j59_002",
@@ -263224,13 +263224,13 @@ window.CORVETTE_FORM_DATA = {
             "variant_id": "3lz_s67",
             "body_style": "convertible",
             "trim_level": "3LZ",
-            "status": "available",
-            "status_label": "Available",
-            "selectable": "False",
+            "status": "standard",
+            "status_label": "Standard",
+            "selectable": "True",
             "active": "True",
             "base_price": 0,
             "display_order": 20,
-            "display_behavior": "display_only"
+            "display_behavior": "default_selected"
           },
           {
             "choice_id": "1lz_s07__opt_lt7_002",
@@ -266655,94 +266655,6 @@ window.CORVETTE_FORM_DATA = {
             "hover_image_url": "",
             "hover_image_alt": "",
             "hover_image_position": ""
-          },
-          {
-            "choice_id": "1lz_s07__opt_j58_002",
-            "option_id": "opt_j58_002",
-            "rpo": "J58",
-            "label": "ZR1-Specific Carbon Ceramic Brakes",
-            "description": "4-wheel antilock disc",
-            "section_id": "sec_perf_brake_001",
-            "section_name": "Performance Brakes",
-            "standard_equipment_group_type": "",
-            "auto_added_summary_required": false,
-            "step_key": "packages_performance",
-            "variant_id": "1lz_s07",
-            "body_style": "coupe",
-            "trim_level": "1LZ",
-            "status": "standard",
-            "status_label": "Standard",
-            "selectable": "True",
-            "active": "True",
-            "base_price": 0,
-            "display_order": 10,
-            "display_behavior": "default_selected"
-          },
-          {
-            "choice_id": "3lz_s07__opt_j58_002",
-            "option_id": "opt_j58_002",
-            "rpo": "J58",
-            "label": "ZR1-Specific Carbon Ceramic Brakes",
-            "description": "4-wheel antilock disc",
-            "section_id": "sec_perf_brake_001",
-            "section_name": "Performance Brakes",
-            "standard_equipment_group_type": "",
-            "auto_added_summary_required": false,
-            "step_key": "packages_performance",
-            "variant_id": "3lz_s07",
-            "body_style": "coupe",
-            "trim_level": "3LZ",
-            "status": "standard",
-            "status_label": "Standard",
-            "selectable": "True",
-            "active": "True",
-            "base_price": 0,
-            "display_order": 10,
-            "display_behavior": "default_selected"
-          },
-          {
-            "choice_id": "1lz_s67__opt_j58_002",
-            "option_id": "opt_j58_002",
-            "rpo": "J58",
-            "label": "ZR1-Specific Carbon Ceramic Brakes",
-            "description": "4-wheel antilock disc",
-            "section_id": "sec_perf_brake_001",
-            "section_name": "Performance Brakes",
-            "standard_equipment_group_type": "",
-            "auto_added_summary_required": false,
-            "step_key": "packages_performance",
-            "variant_id": "1lz_s67",
-            "body_style": "convertible",
-            "trim_level": "1LZ",
-            "status": "standard",
-            "status_label": "Standard",
-            "selectable": "True",
-            "active": "True",
-            "base_price": 0,
-            "display_order": 10,
-            "display_behavior": "default_selected"
-          },
-          {
-            "choice_id": "3lz_s67__opt_j58_002",
-            "option_id": "opt_j58_002",
-            "rpo": "J58",
-            "label": "ZR1-Specific Carbon Ceramic Brakes",
-            "description": "4-wheel antilock disc",
-            "section_id": "sec_perf_brake_001",
-            "section_name": "Performance Brakes",
-            "standard_equipment_group_type": "",
-            "auto_added_summary_required": false,
-            "step_key": "packages_performance",
-            "variant_id": "3lz_s67",
-            "body_style": "convertible",
-            "trim_level": "3LZ",
-            "status": "standard",
-            "status_label": "Standard",
-            "selectable": "True",
-            "active": "True",
-            "base_price": 0,
-            "display_order": 10,
-            "display_behavior": "default_selected"
           }
         ],
         "standardEquipment": [
@@ -270807,6 +270719,62 @@ window.CORVETTE_FORM_DATA = {
             "display_order": 410
           },
           {
+            "equipment_id": "std_1lz_s07__opt_j59_002",
+            "variant_id": "1lz_s07",
+            "body_style": "coupe",
+            "trim_level": "1LZ",
+            "option_id": "opt_j59_002",
+            "rpo": "J59",
+            "label": "10-Piston Front / 6-Piston Rear Carbon Ceramic Brakes",
+            "description": "4-wheel antilock disc",
+            "section_id": "sec_perf_brake_001",
+            "section_name": "Performance Brakes",
+            "standard_equipment_group_type": "",
+            "display_order": 20
+          },
+          {
+            "equipment_id": "std_3lz_s07__opt_j59_002",
+            "variant_id": "3lz_s07",
+            "body_style": "coupe",
+            "trim_level": "3LZ",
+            "option_id": "opt_j59_002",
+            "rpo": "J59",
+            "label": "10-Piston Front / 6-Piston Rear Carbon Ceramic Brakes",
+            "description": "4-wheel antilock disc",
+            "section_id": "sec_perf_brake_001",
+            "section_name": "Performance Brakes",
+            "standard_equipment_group_type": "",
+            "display_order": 20
+          },
+          {
+            "equipment_id": "std_1lz_s67__opt_j59_002",
+            "variant_id": "1lz_s67",
+            "body_style": "convertible",
+            "trim_level": "1LZ",
+            "option_id": "opt_j59_002",
+            "rpo": "J59",
+            "label": "10-Piston Front / 6-Piston Rear Carbon Ceramic Brakes",
+            "description": "4-wheel antilock disc",
+            "section_id": "sec_perf_brake_001",
+            "section_name": "Performance Brakes",
+            "standard_equipment_group_type": "",
+            "display_order": 20
+          },
+          {
+            "equipment_id": "std_3lz_s67__opt_j59_002",
+            "variant_id": "3lz_s67",
+            "body_style": "convertible",
+            "trim_level": "3LZ",
+            "option_id": "opt_j59_002",
+            "rpo": "J59",
+            "label": "10-Piston Front / 6-Piston Rear Carbon Ceramic Brakes",
+            "description": "4-wheel antilock disc",
+            "section_id": "sec_perf_brake_001",
+            "section_name": "Performance Brakes",
+            "standard_equipment_group_type": "",
+            "display_order": 20
+          },
+          {
             "equipment_id": "std_1lz_s07__opt_lt7_002",
             "variant_id": "1lz_s07",
             "body_style": "coupe",
@@ -271393,62 +271361,6 @@ window.CORVETTE_FORM_DATA = {
             "section_name": "Wheels",
             "standard_equipment_group_type": "",
             "display_order": 10
-          },
-          {
-            "equipment_id": "std_1lz_s07__opt_j58_002",
-            "variant_id": "1lz_s07",
-            "body_style": "coupe",
-            "trim_level": "1LZ",
-            "option_id": "opt_j58_002",
-            "rpo": "J58",
-            "label": "ZR1-Specific Carbon Ceramic Brakes",
-            "description": "4-wheel antilock disc",
-            "section_id": "sec_perf_brake_001",
-            "section_name": "Performance Brakes",
-            "standard_equipment_group_type": "",
-            "display_order": 10
-          },
-          {
-            "equipment_id": "std_3lz_s07__opt_j58_002",
-            "variant_id": "3lz_s07",
-            "body_style": "coupe",
-            "trim_level": "3LZ",
-            "option_id": "opt_j58_002",
-            "rpo": "J58",
-            "label": "ZR1-Specific Carbon Ceramic Brakes",
-            "description": "4-wheel antilock disc",
-            "section_id": "sec_perf_brake_001",
-            "section_name": "Performance Brakes",
-            "standard_equipment_group_type": "",
-            "display_order": 10
-          },
-          {
-            "equipment_id": "std_1lz_s67__opt_j58_002",
-            "variant_id": "1lz_s67",
-            "body_style": "convertible",
-            "trim_level": "1LZ",
-            "option_id": "opt_j58_002",
-            "rpo": "J58",
-            "label": "ZR1-Specific Carbon Ceramic Brakes",
-            "description": "4-wheel antilock disc",
-            "section_id": "sec_perf_brake_001",
-            "section_name": "Performance Brakes",
-            "standard_equipment_group_type": "",
-            "display_order": 10
-          },
-          {
-            "equipment_id": "std_3lz_s67__opt_j58_002",
-            "variant_id": "3lz_s67",
-            "body_style": "convertible",
-            "trim_level": "3LZ",
-            "option_id": "opt_j58_002",
-            "rpo": "J58",
-            "label": "ZR1-Specific Carbon Ceramic Brakes",
-            "description": "4-wheel antilock disc",
-            "section_id": "sec_perf_brake_001",
-            "section_name": "Performance Brakes",
-            "standard_equipment_group_type": "",
-            "display_order": 10
           }
         ],
         "ruleGroups": [
@@ -271546,20 +271458,6 @@ window.CORVETTE_FORM_DATA = {
             "disabled_reason": "T0E is not available while ZTK is selected; ZTK includes the TOM aero package.",
             "active": "True",
             "notes": "ZTK always includes TOM; T0E must not be selectable or restorable while ZTK remains selected."
-          },
-          {
-            "group_id": "zr1x_group_ztk_excludes_j58_brakes",
-            "group_type": "excludes_any",
-            "source_id": "opt_ztk_001",
-            "target_ids": [
-              "opt_j58_002"
-            ],
-            "body_style_scope": "*",
-            "trim_level_scope": "*",
-            "variant_scope": "*",
-            "disabled_reason": "J58 brakes are not available while ZTK is selected; ZTK includes J59 brakes.",
-            "active": "True",
-            "notes": "ZTK always includes J59; J58 must not be selectable or restorable while ZTK remains selected."
           }
         ],
         "exclusiveGroups": [
@@ -271648,16 +271546,6 @@ window.CORVETTE_FORM_DATA = {
             "selection_mode": "single_within_group",
             "active": "True",
             "notes": "ZR1X aero choices are radio-like peers; T0E is standard and TOM replaces it when selected or included by ZTK."
-          },
-          {
-            "group_id": "zr1x_excl_performance_brakes",
-            "option_ids": [
-              "opt_j58_002",
-              "opt_j59_002"
-            ],
-            "selection_mode": "required_single_within_group",
-            "active": "True",
-            "notes": "ZR1X brake choices require one active brake selection; J58 is standard and J59 replaces it when included by ZTK."
           }
         ],
         "rules": [
@@ -272320,24 +272208,6 @@ window.CORVETTE_FORM_DATA = {
             "target_section": "sec_stan_001",
             "source_selection_mode": "single_select_opt",
             "target_selection_mode": "display_only",
-            "body_style_scope": "",
-            "disabled_reason": "Included with ZTK ZTK Track Performance Package.",
-            "auto_add": "True",
-            "active": "True",
-            "runtime_action": "active",
-            "source_note": ""
-          },
-          {
-            "rule_id": "zr1x_rule_ztk_includes_j59_c53c618e6bcb",
-            "source_id": "opt_ztk_001",
-            "rule_type": "includes",
-            "target_id": "opt_j59_002",
-            "target_type": "option",
-            "source_type": "option",
-            "source_section": "sec_perf_z52_001",
-            "target_section": "sec_perf_brake_001",
-            "source_selection_mode": "single_select_opt",
-            "target_selection_mode": "single_select_req",
             "body_style_scope": "",
             "disabled_reason": "Included with ZTK ZTK Track Performance Package.",
             "auto_add": "True",
@@ -279647,14 +279517,14 @@ window.CORVETTE_FORM_DATA = {
             "severity": "pass",
             "entity_type": "availability",
             "entity_id": "",
-            "message": "816 draft choice rows exported from the ZR1X variant matrix."
+            "message": "812 draft choice rows exported from the ZR1X variant matrix."
           },
           {
             "check_id": "rules",
             "severity": "pass",
             "entity_type": "rule",
             "entity_id": "",
-            "message": "97 active compatibility rules exported from zr1x_rule_mapping."
+            "message": "96 active compatibility rules exported from zr1x_rule_mapping."
           },
           {
             "check_id": "interior_contract",
