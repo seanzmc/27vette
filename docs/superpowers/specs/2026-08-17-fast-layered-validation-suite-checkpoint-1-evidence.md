@@ -10,39 +10,55 @@ baseline, so the two are comparable.
 
 ## 1. Node lane, all 16 files, after the rewrite
 
+One serial run, recorded whole so the per-gate seconds sum to the lane totals.
+`tests/validation_catalog.json` carries the same numbers from the same run.
+
 ```text
-GATE tests/grand-sport-contract-preview.test.mjs exit=1 seconds=1.36 | tests 5 pass 4 fail 1
+GATE tests/grand-sport-contract-preview.test.mjs exit=1 seconds=1.46 | tests 5 pass 4 fail 1
   AssertionError: rule/detail hot spot buckets are preserved for later phases (22 vs 25)
   -- Layer 4 diagnostic. stale.grand_sport_preview_requires_hotspot_count, Checkpoint 2.
-GATE tests/grand-sport-runtime-contract.test.mjs exit=0 seconds=3.20 | tests 19 pass 19 fail 0
-GATE tests/multi-model-runtime-switching.test.mjs exit=0 seconds=4.43 | tests 70 pass 70 fail 0
-GATE tests/nonruntime-option-source-purge.test.mjs exit=0 seconds=1.65 | tests 6 pass 6 fail 0
-GATE tests/stingray-form-regression.test.mjs exit=0 seconds=3.86 | tests 91 pass 91 fail 0
-GATE tests/stingray-runtime-contract.test.mjs exit=0 seconds=17.49 | tests 12 pass 12 fail 0
-GATE tests/tracked-artifacts-guard.test.mjs exit=0 seconds=1.04 | tests 7 pass 7 fail 0
-GATE tests/workbook-schema-standardization.test.mjs exit=0 seconds=0.84 | tests 12 pass 12 fail 0
-GATE tests/workbook-visual-copy-standardization.test.mjs exit=0 seconds=0.65 | tests 8 pass 8 fail 0
-GATE tests/z06-contract-preview.test.mjs exit=0 seconds=1.32 | tests 2 pass 2 fail 0
-GATE tests/z06-interior-accessory-cleanup.test.mjs exit=0 seconds=1.76 | tests 7 pass 7 fail 0
-GATE tests/z06-performance-package-interactions.test.mjs exit=0 seconds=6.48 | tests 21 pass 21 fail 0
-GATE tests/z06-published-runtime.test.mjs exit=0 seconds=0.46 | tests 4 pass 4 fail 0
-GATE tests/z06-registry-publication.test.mjs exit=0 seconds=1.41 | tests 2 pass 2 fail 0
-GATE tests/z06-runtime-contract.test.mjs exit=0 seconds=1.74 | tests 24 pass 24 fail 0
-GATE tests/z06-runtime-rule-corrections.test.mjs exit=0 seconds=5.44 | tests 15 pass 15 fail 0
-TOTAL 53.27
+GATE tests/grand-sport-runtime-contract.test.mjs exit=0 seconds=3.25 | tests 19 pass 19 fail 0
+GATE tests/multi-model-runtime-switching.test.mjs exit=0 seconds=4.52 | tests 70 pass 70 fail 0
+GATE tests/nonruntime-option-source-purge.test.mjs exit=0 seconds=1.67 | tests 6 pass 6 fail 0
+GATE tests/stingray-form-regression.test.mjs exit=0 seconds=4.58 | tests 91 pass 91 fail 0
+GATE tests/stingray-runtime-contract.test.mjs exit=0 seconds=17.71 | tests 12 pass 12 fail 0
+GATE tests/tracked-artifacts-guard.test.mjs exit=0 seconds=1.11 | tests 7 pass 7 fail 0
+GATE tests/workbook-schema-standardization.test.mjs exit=0 seconds=0.91 | tests 12 pass 12 fail 0
+GATE tests/workbook-visual-copy-standardization.test.mjs exit=0 seconds=0.68 | tests 8 pass 8 fail 0
+GATE tests/z06-contract-preview.test.mjs exit=0 seconds=1.35 | tests 2 pass 2 fail 0
+GATE tests/z06-interior-accessory-cleanup.test.mjs exit=0 seconds=1.81 | tests 7 pass 7 fail 0
+GATE tests/z06-performance-package-interactions.test.mjs exit=0 seconds=6.64 | tests 21 pass 21 fail 0
+GATE tests/z06-published-runtime.test.mjs exit=0 seconds=0.48 | tests 4 pass 4 fail 0
+GATE tests/z06-registry-publication.test.mjs exit=0 seconds=1.44 | tests 2 pass 2 fail 0
+GATE tests/z06-runtime-contract.test.mjs exit=0 seconds=1.82 | tests 24 pass 24 fail 0
+GATE tests/z06-runtime-rule-corrections.test.mjs exit=0 seconds=6.01 | tests 15 pass 15 fail 0
+TOTAL 55.44
 ```
 
-Against Checkpoint 0: all 16 files 111.75 s → 53.27 s; the fourteen documented
-readiness gates 109.27 s → 50.59 s, and their 6 failures across 5 files → 0.
+Against Checkpoint 0: all 16 files 111.75 s -> 55.44 s; the fourteen documented
+readiness gates 109.27 s -> 52.63 s, and their 6 failures across 5 files -> 0.
+
+**Collected tests: 305 across all 16 files, 298 across the 14 readiness gates —
+unchanged in total from Checkpoint 0.** `grand-sport-runtime-contract` went
+18 -> 19 (one stale test split into two parity tests) and
+`workbook-schema-standardization` 13 -> 12 (duplicate schema invocation
+removed); those cancel. An earlier draft of this file and of the catalog stated
+"309 tests over the 14", which no set of per-gate counts could produce; PR review
+caught it. The catalog contract test does not sum `collected_tests` against prose,
+so nothing failed — the arithmetic is stated here so it can be rechecked.
+
+Wall times are approximate, not budgets: three serial runs of the full set
+measured 53.27 s, 54.56 s and the 55.44 s recorded above. A hard timing budget
+needs three stable baseline runs (spec §5, Layer 1).
 
 Per-file movement worth naming:
 
 | Gate | Checkpoint 0 | Checkpoint 1 | Why |
 |---|---|---|---|
-| `workbook-schema-standardization` | 64.97 s, 13 tests | 0.84 s, 12 tests | duplicate schema invocation removed |
-| `z06-runtime-rule-corrections` | 3.91 s, 15 tests | 5.44 s, 15 tests | the sweep now exercises every peer of every case, not one |
-| `stingray-form-regression` | 2.54 s, 91 tests | 3.86 s, 91 tests | same reason |
-| `grand-sport-runtime-contract` | 3.07 s, 18 tests, 2 fail | 3.20 s, 19 tests | one stale test split into two parity tests |
+| `workbook-schema-standardization` | 64.97 s, 13 tests | 0.91 s, 12 tests | duplicate schema invocation removed |
+| `z06-runtime-rule-corrections` | 3.91 s, 15 tests | 6.01 s, 15 tests | the sweep exercises every peer of every case, and reads the workbook for its expected side |
+| `stingray-form-regression` | 2.54 s, 91 tests | 4.58 s, 91 tests | same reason |
+| `grand-sport-runtime-contract` | 3.07 s, 18 tests, 2 fail | 3.25 s, 19 tests | one stale test split into two parity tests |
 
 ## 2. Python owners this checkpoint touched
 
@@ -73,8 +89,11 @@ and fails at that stage, while the declared run passes with the same non-empty
 drift set. Run alone first, the drift pair measured `4 passed, 12 deselected in
 209.00s`.
 
-The two drift canaries were also run alone before the full file: `4 passed,
-12 deselected in 209.00s` for `-k drift`.
+Re-run after the PR-review fixes: `test_runtime_metadata_guards.py` and
+`test_validation_catalog.py` together, `30 passed in 0.24s`; the three
+standalone files again `15`, `32`, `18` passed with `PYTHONPATH` unset.
+`test_verify_workbook_candidate.py` was not re-run after those fixes — none of
+them touch it.
 
 ## 3. Mutation canaries
 
@@ -157,6 +176,34 @@ app.js disableReasonForChoice returns "" for seat-belt choices
 
 load_default_selection_display_rules drops its first row per model
   -> tests/test_runtime_metadata_guards.py 3 failed, 8 passed
+```
+
+### Omission canaries added after PR review
+
+Review found the first version of the Stingray sweep deriving its cases, blocked
+peers, and added RPOs from the payload it was exercising: a generator that
+dropped one relationship removed the case and its expectation together, and the
+non-empty guard only fired if *every* case disappeared. Both sweeps now read
+their expected relationships from the model's registered rule-mapping and
+colour-override sheets and assert registry-vs-workbook parity before driving the
+runtime. These two canaries are the proof that the omission is now visible —
+neither was run before, and neither would have failed the earlier version.
+
+Both were run in a second throwaway worktree, regenerating stingray and z06 and
+republishing the registry inside it.
+
+```text
+rules.py drops one interior-targeted excludes row
+  -> stingray-form-regression 90/91
+     "published interior exclude rules drifted from the workbook rule-mapping sheet"
+  -> z06-runtime-rule-corrections 14/15
+     same assertion
+
+build_color_overrides drops one resolvable row
+  -> z06-runtime-rule-corrections 14/15
+     "published colour overrides drifted from the workbook colour-override sheet"
+  -> stingray-form-regression 88/91
+     its own override-parity assertion plus two pre-existing D30-context tests
 ```
 
 ## 4. What this checkpoint did not measure

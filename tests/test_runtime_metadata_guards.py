@@ -328,7 +328,7 @@ class RuntimeMetadataGuardTests(unittest.TestCase):
                 for row in _raw_sheet_rows(wb, "model_master")
                 if str(row.get("active", "")).strip().lower() in {"true", "yes", "1", "y"}
             )
-            expected = sorted(
+            authored = [
                 (
                     str(row["model_key"]).strip(),
                     str(row["rule_id"]).strip(),
@@ -338,7 +338,7 @@ class RuntimeMetadataGuardTests(unittest.TestCase):
                 if str(row.get("active", "")).strip().lower() in {"true", "yes", "1", "y"}
                 and str(row.get("display_behavior", "")).strip() == "default_selected"
                 and str(row.get("rule_id", "")).strip()
-            )
+            ]
             actual = sorted(
                 (model_key, row["rule_id"], row["display_behavior"])
                 for model_key in model_keys
@@ -347,10 +347,19 @@ class RuntimeMetadataGuardTests(unittest.TestCase):
         finally:
             wb.close()
 
+        # A row naming a model that is not workbook-active is never swept, so
+        # comparing it against the loader would fail for something that is not a
+        # loader defect. Scope the comparison and report the orphan separately,
+        # so each failure names its own cause.
+        active = set(model_keys)
+        orphans = sorted(row for row in authored if row[0] not in active)
+        expected = sorted(row for row in authored if row[0] in active)
+
         # Guard the sweep: an empty expected side would make the comparison
         # vacuous, and every model must be swept, not a named subset.
         self.assertGreaterEqual(len(model_keys), 2)
         self.assertTrue(expected, "no active default_selected row in default_selection_rules")
+        self.assertEqual(orphans, [], "default_selection_rules rows name inactive models")
         self.assertEqual(actual, expected)
 
 

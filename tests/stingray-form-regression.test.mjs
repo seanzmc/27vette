@@ -4,6 +4,8 @@ import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
+import { relationshipPairs, workbookInteriorRelationships } from "./lib/interior-relationships.mjs";
+
 function loadRegistry() {
   const context = { window: {} };
   vm.runInNewContext(fs.readFileSync("form-app/data.js", "utf8"), context);
@@ -2843,32 +2845,83 @@ test("single interior and included seatbelt defaults are handled in runtime", ()
 // which PR #19 superseded: a peer the workbook does not mark unavailable is
 // selectable and adds D30 exactly where a colour-override row says so.
 //
-// Every case, peer, and expectation is now discovered from the published
-// registry rows, so authoring a new interior/seatbelt relationship extends this
-// sweep instead of leaving it asserting a stale subset (spec §4.3).
+// The expected relationships come from the model's registered rule-mapping and
+// colour-override sheets, NOT from the published payload being exercised. PR
+// review caught the first version doing the latter: cases, blocked peers, and
+// added RPOs were all filtered out of `data`, so a generator that dropped a row
+// removed the case and its expectation together and the sweep stayed green over
+// shrinking coverage. The workbook is the oracle; the runtime is the subject.
 test("every interior-included Stingray option obeys its workbook include, exclude, and override rows", () => {
   const groupForOption = new Map();
   for (const group of data.exclusiveGroups) {
     for (const optionId of group.option_ids) groupForOption.set(optionId, group);
   }
   const interiorsById = new Map(data.interiors.map((interior) => [interior.interior_id, interior]));
+  const optionIds = new Set(data.choices.map((choice) => choice.option_id));
 
-  const cases = data.rules
-    .filter(
-      (rule) =>
-        rule.rule_type === "includes" &&
-        rule.active === "True" &&
-        interiorsById.has(rule.source_id) &&
-        groupForOption.has(rule.target_id),
+  const workbook = workbookInteriorRelationships({
+    modelKey: "stingray",
+    interiorIds: new Set(interiorsById.keys()),
+    optionIds,
+  });
+
+  // Parity first: the published registry must carry exactly the resolvable
+  // relationships the workbook authors. This is the assertion a dropped row
+  // fails — the runtime loop below cannot see an omission on its own.
+  const registryIncludes = new Map();
+  const registryExcludes = new Map();
+  for (const rule of data.rules) {
+    if (rule.active !== "True") continue;
+    if (rule.rule_type === "includes" && interiorsById.has(rule.source_id) && optionIds.has(rule.target_id)) {
+      if (!registryIncludes.has(rule.source_id)) registryIncludes.set(rule.source_id, new Set());
+      registryIncludes.get(rule.source_id).add(rule.target_id);
+    }
+    if (rule.rule_type === "excludes" && optionIds.has(rule.source_id) && interiorsById.has(rule.target_id)) {
+      if (!registryExcludes.has(rule.target_id)) registryExcludes.set(rule.target_id, new Set());
+      registryExcludes.get(rule.target_id).add(rule.source_id);
+    }
+  }
+  const registryOverrides = new Map();
+  for (const override of data.colorOverrides) {
+    if (!interiorsById.has(override.interior_id) || !optionIds.has(override.option_id)) continue;
+    if (!registryOverrides.has(override.interior_id)) registryOverrides.set(override.interior_id, new Map());
+    registryOverrides.get(override.interior_id).set(override.option_id, override.adds_rpo);
+  }
+
+  assert.ok(relationshipPairs(workbook.includes).length > 0, "no interior include row resolves for stingray");
+  assert.ok(relationshipPairs(workbook.excludes).length > 0, "no interior exclude row resolves for stingray");
+  assert.ok(relationshipPairs(workbook.overrides).length > 0, "no colour-override row resolves for stingray");
+  assert.deepEqual(
+    relationshipPairs(registryIncludes),
+    relationshipPairs(workbook.includes),
+    "published interior include rules drifted from the workbook rule-mapping sheet",
+  );
+  assert.deepEqual(
+    relationshipPairs(registryExcludes),
+    relationshipPairs(workbook.excludes),
+    "published interior exclude rules drifted from the workbook rule-mapping sheet",
+  );
+  assert.deepEqual(
+    relationshipPairs(registryOverrides),
+    relationshipPairs(workbook.overrides),
+    "published colour overrides drifted from the workbook colour-override sheet",
+  );
+
+  const cases = [...workbook.includes]
+    .flatMap(([interiorId, includedOptionIds]) =>
+      [...includedOptionIds].map((includedOptionId) => ({ interiorId, includedOptionId })),
     )
-    .map((rule) => ({
-      interior: interiorsById.get(rule.source_id),
-      includedOptionId: rule.target_id,
-      group: groupForOption.get(rule.target_id),
-      rule,
+    .filter(({ includedOptionId }) => groupForOption.has(includedOptionId))
+    .map(({ interiorId, includedOptionId }) => ({
+      interior: interiorsById.get(interiorId),
+      includedOptionId,
+      group: groupForOption.get(includedOptionId),
+      rule: data.rules.find(
+        (row) => row.rule_type === "includes" && row.source_id === interiorId && row.target_id === includedOptionId,
+      ),
     }));
 
-  assert.ok(cases.length > 0, "no interior-included option reaches the published Stingray registry");
+  assert.ok(cases.length > 0, "no workbook-authored interior include resolves into an exclusive group");
 
   for (const { interior, includedOptionId, group, rule } of cases) {
     const interiorId = interior.interior_id;
@@ -2887,24 +2940,11 @@ test("every interior-included Stingray option obeys its workbook include, exclud
     const includedReason = String(autoAdded.get(includedOptionId) || "");
     assert.ok(includedReason, `${interiorId} auto-added ${includedOptionId} with no reason copy`);
     assert.doesNotMatch(includedReason, new RegExp(interiorId, "i"));
-    assert.ok(rule.disabled_reason, `${rule.rule_id} should carry authored customer copy`);
+    assert.ok(rule?.disabled_reason, `${interiorId} include of ${includedOptionId} lost its authored copy`);
 
-    const blockedPeers = new Set(
-      data.rules
-        .filter(
-          (row) =>
-            row.rule_type === "excludes" &&
-            row.active === "True" &&
-            row.target_id === interiorId &&
-            group.option_ids.includes(row.source_id),
-        )
-        .map((row) => row.source_id),
-    );
-    const addsByPeer = new Map(
-      data.colorOverrides
-        .filter((override) => override.interior_id === interiorId && group.option_ids.includes(override.option_id))
-        .map((override) => [override.option_id, override.adds_rpo]),
-    );
+    // Both expectations are the workbook's, not the payload's.
+    const blockedPeers = workbook.excludes.get(interiorId) || new Set();
+    const addsByPeer = workbook.overrides.get(interiorId) || new Map();
 
     runtime.state.activeStep = "seat_belt";
     for (const peerId of group.option_ids) {

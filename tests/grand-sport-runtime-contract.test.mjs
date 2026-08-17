@@ -760,15 +760,27 @@ test("every Grand Sport option asset equals its applicable active asset_map row"
   // Expected side: raw asset_map rows. Wildcard ("*") rows apply to option
   // targets in every model; an exact model row wins over a wildcard for the
   // same target. Blank model_key is not shared media and does not apply.
+  //
+  // Cross-model precedence is the one rule reimplemented here, so the case it
+  // cannot adjudicate is rejected rather than silently resolved: two active
+  // rows sharing a model_key AND a target are a workbook defect, and letting
+  // one overwrite the other could make this test and the generator wrong in the
+  // same direction.
   const expectedByOptionId = new Map();
   for (const pass of ["*", MODEL_KEY]) {
+    const seenThisPass = new Set();
     for (const row of workbookRows("asset_map")) {
       if (!workbookTruthy(row.active)) continue;
       if (cell(row.model_key) !== pass) continue;
       if (cell(row.target_type) !== "option") continue;
       const targetId = cell(row.target_id);
       if (!targetId || !cell(row.image_url)) continue;
-      if (pass === "*" && expectedByOptionId.has(targetId)) continue;
+      assert.equal(
+        seenThisPass.has(targetId),
+        false,
+        `asset_map has two active option rows for model_key ${pass} and target ${targetId}`,
+      );
+      seenThisPass.add(targetId);
       expectedByOptionId.set(
         targetId,
         Object.fromEntries(IMAGE_FIELDS.map((field) => [field, cell(row[field])])),

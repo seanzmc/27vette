@@ -595,9 +595,9 @@ was replaced by its current value.
 |---|---|
 | `grand-sport-runtime-contract` `colorOverrides.length === 263` | identity-set comparison against the resolvable rows of the model's registered `color_overrides` sheet, plus `override_id` uniqueness |
 | `grand-sport-runtime-contract` J6F PNG URL | sweep comparing every option's seven image fields against its applicable active `asset_map` row, wildcard/exact precedence resolved on the expected side |
-| `stingray-form-regression` included-seatbelt lock (2 assertions) | runtime sweep discovered from the registry rows: include rules supply the cases, the owning exclusive group the peers, `excludes` rows the blocked set, colour-override rows the added RPO |
+| `stingray-form-regression` included-seatbelt lock (2 assertions) | runtime sweep whose cases, blocked peers, and added RPOs are read from the model's registered rule-mapping and colour-override sheets, with registry-vs-workbook parity asserted before the runtime is driven |
 | `z06-runtime-contract` "included colour or Black" | parity between emitted interior-sourced `includes` / interior-conditioned price rules and the model's registered rule-mapping and price-rule sheets |
-| `z06-runtime-rule-corrections` included-seatbelt block (2 assertions) | the same data-derived runtime sweep |
+| `z06-runtime-rule-corrections` included-seatbelt block (2 assertions) | the same sweep, over the same workbook-read expected sets |
 | `z06-registry-publication` three model keys | comparison against the active promoted rows of `model_registry_promotion`, ordered by `display_order` |
 | `test_runtime_metadata_guards.py:303` three-row/three-model literal | loader output for every workbook-active model against a direct openpyxl read of the same sheet |
 | dead `semantic_drift` canaries | probe selected from the retained ZR1 contract itself; raises if no option reaches both collections |
@@ -608,17 +608,20 @@ JavaScript — were deleted with the assertions that read them.
 Also delivered:
 
 - The duplicate schema invocation is gone from the Node readiness path.
-  `workbook-schema-standardization` measures **0.84 s against 64.97 s**, and the
-  fourteen-gate readiness lane **50.59 s against 109.27 s**. `cmd.workbook_schema`
-  is the single schema authority, named as such in README; no structural sweep
-  was dropped.
+  `workbook-schema-standardization` measures **0.91 s against 64.97 s**, and the
+  fourteen-gate readiness lane **52.63 s against 109.27 s**. `cmd.workbook_schema`
+  is the single schema authority, named as such in README and reachable from the
+  Node matrix section; no structural sweep was dropped.
 - `tests/conftest.py` owns the `scripts/` path insertion for the whole test
   directory. With `PYTHONPATH` unset and run alone: `test_rule_derivation` 15
   passed, `test_source_assembly_characterization` 32 passed,
   `test_options_sheet_quality` 18 passed. Layer 0 can now select them.
 - `tests/lib/workbook-rows.mjs` — the independent §4.2 expected side for Node
   parity gates: openpyxl only, no generator import, memoized per sheet.
-  Checkpoint 2 replaces it with the persistent workbook-truth snapshot.
+  `tests/lib/interior-relationships.mjs` builds the interior/option include,
+  exclude, and colour-override sets on top of it, so the two runtime sweeps state
+  what must be true independently of the payload they exercise. Checkpoint 2
+  replaces both with the persistent workbook-truth snapshot.
 - Both restatements of `default_model_is_stingray` are removed;
   `multi-model-runtime-switching` is its single asserting owner.
 
@@ -626,8 +629,8 @@ Acceptance evidence (local Node 26.7.0 / Python 3.14.7, serial):
 
 | Lane | Result |
 |---|---|
-| 14 documented Node readiness gates | all pass, 50.59 s |
-| All 16 Node files | 53.27 s; only `grand-sport-contract-preview` fails, on the Checkpoint 2 hot-spot literal it already owned |
+| 14 documented Node readiness gates | all pass — 298 collected tests, 52.63 s |
+| All 16 Node files | 305 collected tests, 55.44 s; only `grand-sport-contract-preview` fails, on the Checkpoint 2 hot-spot literal it already owned |
 | `test_runtime_metadata_guards.py` | 11 passed, 0.25 s |
 | `test_verify_workbook_candidate.py` | see the Checkpoint 1 evidence file |
 | `test_validation_catalog.py` | 19 passed |
@@ -651,8 +654,14 @@ canonical workbook and the working tree were never mutated:
 5. Forced failure of the new runtime sweeps (suppressing the seat-belt disable
    reason in `app.js`) and of the rewritten metadata guard (loader drops one row
    per model) → both fail as intended.
+6. Omission canaries added after PR review → dropping one interior-targeted
+   `excludes` row, and dropping one resolvable colour-override row, each fail the
+   registry-vs-workbook parity assertion in both runtime sweeps. Neither would
+   have failed the first version of those sweeps, which derived their expected
+   relationships from the payload they exercised; that is the defect review
+   caught and these two canaries are the proof it is closed.
 
-Canaries 4, 6, 7 and 8 belong to later checkpoints and were not run.
+Canaries 4, 6 and 8 belong to later checkpoints and were not run.
 
 Carried forward, unchanged by this checkpoint:
 

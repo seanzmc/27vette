@@ -201,7 +201,15 @@ test("promoted Z06 runtime data strips draft-only provenance and protects source
 test("runtime can switch to Z06 and build a model-scoped order", () => {
   const runtime = loadRuntime();
 
-  assert.equal(runtime.activeModelKey, "stingray");
+  // The subject is the switch, not which model the app opens on — that is the
+  // default_model_is_stingray lock, owned by multi-model-runtime-switching. The
+  // pre-switch state is compared against the workbook's flagged default row so
+  // this gate does not restate the decision (spec §4.4).
+  const defaultRow = workbookRows("model_registry_promotion").find(
+    (row) => workbookTruthy(row.active) && workbookTruthy(row.default_model)
+  );
+  assert.ok(defaultRow, "model_registry_promotion declares no active default model");
+  assert.equal(runtime.activeModelKey, cell(defaultRow.registry_key));
   runtime.activateModel("z06");
 
   assert.equal(runtime.activeModelKey, "z06");

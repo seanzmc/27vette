@@ -75,13 +75,15 @@
     "checkpoint_1": {
       "captured": "2026-08-17",
       "method": "same method as the Checkpoint 0 baseline: each gate run once, serially, one process per file, wall time measured around the process. Same machine and runtimes.",
-      "node_serial_total_seconds": 53.27,
-      "node_serial_total_note": "All 16 node files, against 111.75 s at Checkpoint 0. The fourteen documented readiness gates are 50.59 s against 109.27 s; removing the duplicate schema invocation accounts for 64.1 s of the 58.7 s reduction, partly offset by the broader data-derived seatbelt sweeps.",
+      "node_serial_total_seconds": 55.44,
+      "node_serial_total_note": "All 16 node files at 55.44 s, against 111.75 s at Checkpoint 0; the fourteen documented readiness gates at 52.63 s against 109.27 s. Every approximate_seconds above comes from this one serial run, so the per-gate values sum to these totals. Removing the duplicate schema invocation accounts for 64.06 s of the reduction; the data-derived seatbelt sweeps, which now read the workbook for their expected side, give back about 5 s. Three runs of the full set measured 53.27 s, 54.56 s and this one — wall times, not budgets. A hard timing budget needs three stable baselines (spec §5, Layer 1).",
       "node_collected_tests": 305,
-      "node_result": "All 14 readiness gates pass (309 tests over the 14). Of all 16 files, only node.grand-sport-contract-preview fails, on the Checkpoint 2 hot-spot count literal it already owned; it is a Layer 4 diagnostic and not a readiness gate.",
-      "node_readiness_seconds": 50.59,
+      "node_result": "All 14 readiness gates pass: 298 collected tests over the 14, matching the sum of their per-gate collected_tests. Of all 16 files (305 tests), only node.grand-sport-contract-preview fails, on the Checkpoint 2 hot-spot count literal it already owned; it is a Layer 4 diagnostic and not a readiness gate.",
+      "node_readiness_seconds": 52.63,
       "python_touched": "py.test_runtime_metadata_guards 0.25 s / 11 passed; py.test_verify_workbook_candidate 684.74 s / 16 passed (694.43 s with 2 failures at Checkpoint 0); py.test_rule_derivation, py.test_source_assembly_characterization and py.test_options_sheet_quality now pass run alone with no PYTHONPATH (15, 32, 18) via tests/conftest.py; py.test_validation_catalog 19 passed.",
-      "ci_reference_status": "STILL OPEN. Node 22 / Python 3.12 remain uninstalled on the reference machine; every number here is local Node 26.7.0 / Python 3.14.7 evidence, not the CI baseline."
+      "ci_reference_status": "STILL OPEN. Node 22 / Python 3.12 remain uninstalled on the reference machine; every number here is local Node 26.7.0 / Python 3.14.7 evidence, not the CI baseline.",
+      "node_readiness_collected_tests": 298,
+      "counts_note": "Collected tests are unchanged in total: 305 across all 16 files, 298 across the 14 readiness gates. grand-sport-runtime-contract went 18 -> 19 (one stale test split into two parity tests) and workbook-schema-standardization 13 -> 12 (duplicate schema invocation removed); those cancel."
     }
   },
   "acceptance_locks": [
@@ -331,16 +333,16 @@
       "serial_group": null,
       "ci_policy": "not_run_now",
       "checkpoint_policy": "default_readiness",
-      "approximate_seconds": 0.84,
+      "approximate_seconds": 0.91,
       "acceptance_locks": [],
       "disposition": "rewrite",
-      "disposition_reason": "Slowest gate in the inventory and the single largest duplicated cost: it invokes scripts/validate_workbook_schema.py, which full default validation already runs directly (spec §3.2). Checkpoint 1 removes the duplicate invocation while keeping this file's registry-derived structural sweeps and their named pinned expectations.",
+      "disposition_reason": "Was the slowest gate in the inventory and the single largest duplicated cost: it invoked scripts/validate_workbook_schema.py, which full default validation already runs directly (spec §3.2). Checkpoint 1 removed that invocation; the file now owns only its registry-derived structural sweeps and their named pinned expectations, and cmd.workbook_schema is the single schema authority.",
       "readme_reference": "workbook-schema-standardization",
       "notes": "Holds KNOWN_TYPE_DRIFT — nine registry-declared typed columns holding text. That is a recorded workbook non-conformance, not a stale test literal.",
       "collected_tests": 12,
       "baseline_result": "pass",
       "readme_publishes_command": false,
-      "checkpoint_1_result": "DONE. The duplicate `scripts/validate_workbook_schema.py` invocation is removed; cmd.workbook_schema is the single schema authority. 64.97 s -> 0.84 s, 13 -> 12 tests. Every structural sweep and its named pinned expectation is unchanged."
+      "checkpoint_1_result": "DONE. The duplicate `scripts/validate_workbook_schema.py` invocation is removed; cmd.workbook_schema is the single schema authority, and README's node matrix section now points operators at it so a node-only run does not silently skip schema validation. 64.97 s -> 0.91 s, 13 -> 12 tests. Every structural sweep and its named pinned expectation is unchanged."
     },
     {
       "id": "node.workbook-visual-copy-standardization",
@@ -364,7 +366,7 @@
       "serial_group": null,
       "ci_policy": "not_run_now",
       "checkpoint_policy": "default_readiness",
-      "approximate_seconds": 0.62,
+      "approximate_seconds": 0.68,
       "acceptance_locks": [],
       "disposition": "rewrite",
       "disposition_reason": "Cheap and green, but OPTION_SHEETS is a hardcoded three-model list (stingray, grandSport, z06) while six models are workbook-active. Its copy rules are model-neutral, so Checkpoint 2 derives the sheet list from model_sheet_registry() and pairs it with a named expected set.",
@@ -395,7 +397,7 @@
       "serial_group": null,
       "ci_policy": "not_run_now",
       "checkpoint_policy": "default_readiness",
-      "approximate_seconds": 1.56,
+      "approximate_seconds": 1.67,
       "acceptance_locks": [],
       "disposition": "rewrite",
       "disposition_reason": "Carries an approvedDeletes literal inventory of purged option/OVS rows per model. §4.4 says product-specific literals belong in a named acceptance lock; a purge list is a historical decision, not a live customer behavior. Checkpoint 2 decides between an absence-parity check against the active sheets and a single named lock.",
@@ -432,7 +434,7 @@
       "serial_group": "protected_artifacts",
       "ci_policy": "not_run_now",
       "checkpoint_policy": "default_readiness",
-      "approximate_seconds": 16.46,
+      "approximate_seconds": 17.71,
       "acceptance_locks": [],
       "disposition": "retire_after_parity",
       "disposition_reason": "Second-slowest gate. It regenerates one model that the candidate lane and test_all_model_runtime_generation.py already generate and strictly validate (spec §3.2). Its unique value is the per-collection contract assertions; Checkpoint 4 removes model-specific regeneration once candidate parity proves equivalent or stronger failure detection. No assertion is removed before that proof.",
@@ -470,7 +472,7 @@
       "serial_group": "protected_artifacts",
       "ci_policy": "not_run_now",
       "checkpoint_policy": "default_readiness",
-      "approximate_seconds": 3.2,
+      "approximate_seconds": 3.25,
       "acceptance_locks": [],
       "disposition": "rewrite",
       "disposition_reason": "Owns two of the six stale assertions (colorOverrides count literal, J6F asset URL literal). Checkpoint 1 rewrites both as workbook-to-output parity against active source rows and the active asset_map row, without substituting new literals. The rest of the file follows stingray-runtime-contract's retire_after_parity path in Checkpoint 4.",
@@ -508,7 +510,7 @@
       "serial_group": "protected_artifacts",
       "ci_policy": "not_run_now",
       "checkpoint_policy": "default_readiness",
-      "approximate_seconds": 1.74,
+      "approximate_seconds": 1.82,
       "acceptance_locks": [],
       "disposition": "rewrite",
       "disposition_reason": "Owns one of the three superseded included-seatbelt assertions. Checkpoint 1 rewrites it as parity against the active seatbelt OVS/rule rows. Also carries expectedVariantIds and a standardSections literal set; Checkpoint 2 routes those to parity against workbook-declared variant and section rows.",
@@ -547,7 +549,7 @@
       "serial_group": "protected_artifacts",
       "ci_policy": "not_run_now",
       "checkpoint_policy": "default_readiness",
-      "approximate_seconds": 1.71,
+      "approximate_seconds": 1.81,
       "acceptance_locks": [],
       "disposition": "rewrite",
       "disposition_reason": "Generic interior/accessory reconciliation behavior expressed as one model's example. Checkpoint 3 folds it into the generated runtime state matrix (§4.3 items 5, 6, 9) and drops the private regeneration.",
@@ -585,7 +587,7 @@
       "serial_group": null,
       "ci_policy": "not_run_now",
       "checkpoint_policy": "default_readiness",
-      "approximate_seconds": 3.86,
+      "approximate_seconds": 4.58,
       "acceptance_locks": [
         "dealer_payload_and_security_contract"
       ],
@@ -596,7 +598,7 @@
       "collected_tests": 91,
       "baseline_result": "pass",
       "readme_publishes_command": false,
-      "checkpoint_1_result": "DONE. Same data-derived sweep as z06-runtime-rule-corrections, including the card-render checks (no interior id leak, no 'unavailable' copy without a blocking row). The superseded 'D30 should not unlock a 3LT included seatbelt peer' assertion is gone. The dealer payload/security lock is untouched."
+      "checkpoint_1_result": "DONE. Same data-derived sweep as z06-runtime-rule-corrections, including the card-render checks (no interior id leak, no 'unavailable' copy without a blocking row). The superseded 'D30 should not unlock a 3LT included seatbelt peer' assertion is gone. PR review caught the first version deriving its cases, blocked peers, and added RPOs from the payload under test; the expected relationships now come from the model's registered rule-mapping and colour-override sheets via tests/lib/interior-relationships.mjs, and the sweep asserts registry-vs-workbook parity before driving the runtime. The dealer payload/security lock is untouched."
     },
     {
       "id": "node.z06-published-runtime",
@@ -621,7 +623,7 @@
       "serial_group": null,
       "ci_policy": "not_run_now",
       "checkpoint_policy": "default_readiness",
-      "approximate_seconds": 0.46,
+      "approximate_seconds": 0.48,
       "acceptance_locks": [],
       "disposition": "rewrite",
       "disposition_reason": "Read-only published-registry checks for one model, plus a restatement of the default-model lock. Checkpoint 3 replaces the per-model assertions with matrix coverage over every promoted model; Checkpoint 1/2 removes the defaultModelKey restatement.",
@@ -657,7 +659,7 @@
       "serial_group": null,
       "ci_policy": "not_run_now",
       "checkpoint_policy": "default_readiness",
-      "approximate_seconds": 4.43,
+      "approximate_seconds": 4.52,
       "acceptance_locks": [
         "default_model_is_stingray",
         "zr1x_standard_j59_no_j58"
@@ -694,7 +696,7 @@
       "serial_group": null,
       "ci_policy": "not_run_now",
       "checkpoint_policy": "default_readiness",
-      "approximate_seconds": 6.41,
+      "approximate_seconds": 6.64,
       "acceptance_locks": [],
       "disposition": "rewrite",
       "disposition_reason": "Package include/require/exclude/replace behavior expressed as one model's examples. Checkpoint 3 covers it generically (§4.3 item 9) over every promoted model; keep whatever remains genuinely Z06-specific as named cases.",
@@ -728,7 +730,7 @@
       "serial_group": null,
       "ci_policy": "not_run_now",
       "checkpoint_policy": "default_readiness",
-      "approximate_seconds": 5.44,
+      "approximate_seconds": 6.01,
       "acceptance_locks": [],
       "disposition": "rewrite",
       "disposition_reason": "Owns one of the three superseded included-seatbelt assertions (Checkpoint 1 rewrite as parity). The remaining rule-correction cases are generic exclusive-group and auto-add invariants that Checkpoint 3 covers in the matrix.",
@@ -737,7 +739,7 @@
       "collected_tests": 15,
       "baseline_result": "pass",
       "readme_publishes_command": false,
-      "checkpoint_1_result": "DONE. The 22-row table and the superseded 'included colour blocks every peer' behaviour are replaced by a data-derived sweep: cases come from the registry's own interior include rules, peers from the owning exclusive group, blocking from the excludes rows, and D30-style additions from the colour-override rows. Slower than the stale version (3.91 s -> 5.44 s) because it now exercises every peer of every case instead of one. Mutation-proved: suppressing the seat-belt disable reason in app.js fails it."
+      "checkpoint_1_result": "DONE. The 22-row table and the superseded 'included colour blocks every peer' behaviour are replaced by a sweep whose cases, blocked peers, and added RPOs are read from the model's registered rule-mapping and colour-override sheets, with registry-vs-workbook parity asserted first. Slower than the stale version (3.91 s -> 5.44 s) because it exercises every peer of every case instead of one. Mutation-proved three ways: suppressing the seat-belt disable reason in app.js, dropping one interior-targeted excludes row, and dropping one resolvable colour-override row each fail it."
     },
     {
       "id": "node.z06-registry-publication",
@@ -764,7 +766,7 @@
       "serial_group": "protected_artifacts",
       "ci_policy": "not_run_now",
       "checkpoint_policy": "default_readiness",
-      "approximate_seconds": 1.41,
+      "approximate_seconds": 1.44,
       "acceptance_locks": [],
       "disposition": "rewrite",
       "disposition_reason": "Owns the stale three-model-key literal. Checkpoint 1 rewrites it as parity against active model_registry_promotion rows, or — with approval — promotes it to the named promoted_model_membership lock. Also restates the default-model lock, which is removed. The isolated-publication and atomic-boundary assertions are structural and stay.",
@@ -798,7 +800,7 @@
       "serial_group": "protected_artifacts",
       "ci_policy": "not_run_now",
       "checkpoint_policy": "default_readiness",
-      "approximate_seconds": 1.06,
+      "approximate_seconds": 1.11,
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Proves the shared boundary helper is not vacuous. Spec §8 canary 8 (forced tracked-output write from an isolated generating gate) belongs here. Keep and extend.",
@@ -834,7 +836,7 @@
       "serial_group": "protected_artifacts",
       "ci_policy": "not_run_now",
       "checkpoint_policy": "diagnostic",
-      "approximate_seconds": 1.25,
+      "approximate_seconds": 1.46,
       "acceptance_locks": [],
       "disposition": "diagnostic_only",
       "disposition_reason": "README already classifies it as an optional inspection diagnostic, not a readiness gate. It is currently FAILING on a stale rule-hot-spot count literal that the documented fourteen-gate audit never saw, which is exactly the drift Layer 4 exists to surface. Keep as diagnostic; give the count a source-derived expectation in Checkpoint 2.",
@@ -870,7 +872,7 @@
       "serial_group": "protected_artifacts",
       "ci_policy": "not_run_now",
       "checkpoint_policy": "diagnostic",
-      "approximate_seconds": 1.23,
+      "approximate_seconds": 1.35,
       "acceptance_locks": [],
       "disposition": "diagnostic_only",
       "disposition_reason": "Optional inspection diagnostic per README. Green at this baseline.",
@@ -1111,7 +1113,7 @@
     },
     {
       "id": "py.test_rule_derivation",
-      "command": "PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_rule_derivation.py -q",
+      "command": ".venv/bin/python -m pytest tests/test_rule_derivation.py -q",
       "test_files": [
         "tests/test_rule_derivation.py"
       ],
@@ -1135,9 +1137,9 @@
       "disposition": "keep",
       "disposition_reason": "Pure-function unit tests over includes-closure swap derivation. Ideal Layer 0 content.",
       "readme_reference": "test_rule_derivation",
-      "notes": "Requires PYTHONPATH=scripts when selected alone; see finding.import_order_dependence.",
+      "notes": "Checkpoint 0 recorded this file as runnable only with PYTHONPATH=scripts. Checkpoint 1's tests/conftest.py owns that path insertion for the whole directory, so it now runs alone with PYTHONPATH unset; see finding.import_order_dependence.",
       "collected_tests": 15,
-      "baseline_result": "pass_only_with_pythonpath_scripts",
+      "baseline_result": "pass",
       "readme_publishes_command": false,
       "checkpoint_1_result": "DONE. Runs alone with no PYTHONPATH (15 passed) via the new tests/conftest.py."
     },
@@ -1250,7 +1252,7 @@
     },
     {
       "id": "py.test_options_sheet_quality",
-      "command": "PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_options_sheet_quality.py -q",
+      "command": ".venv/bin/python -m pytest tests/test_options_sheet_quality.py -q",
       "test_files": [
         "tests/test_options_sheet_quality.py"
       ],
@@ -1278,9 +1280,9 @@
       "disposition": "keep",
       "disposition_reason": "Owns the source-quality module the candidate lane's stage 4 calls. Honors OPTIONS_SHEET_QUALITY_WORKBOOK for reviewed pre-write repair.",
       "readme_reference": "test_options_sheet_quality",
-      "notes": "Requires PYTHONPATH=scripts when selected alone; see finding.import_order_dependence.",
+      "notes": "Checkpoint 0 recorded this file as runnable only with PYTHONPATH=scripts. Checkpoint 1's tests/conftest.py owns that path insertion for the whole directory, so it now runs alone with PYTHONPATH unset; see finding.import_order_dependence.",
       "collected_tests": 18,
-      "baseline_result": "pass_only_with_pythonpath_scripts",
+      "baseline_result": "pass",
       "readme_publishes_command": false,
       "checkpoint_1_result": "DONE. Runs alone with no PYTHONPATH (18 passed) via the new tests/conftest.py."
     },
@@ -1319,7 +1321,7 @@
     },
     {
       "id": "py.test_source_assembly_characterization",
-      "command": "PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_source_assembly_characterization.py -q",
+      "command": ".venv/bin/python -m pytest tests/test_source_assembly_characterization.py -q",
       "test_files": [
         "tests/test_source_assembly_characterization.py"
       ],
@@ -1343,9 +1345,9 @@
       "disposition": "keep",
       "disposition_reason": "Model-neutral contract invariants that must hold for all six models under one builder — already the shape §4.1 asks for.",
       "readme_reference": "test_source_assembly_characterization",
-      "notes": "Requires PYTHONPATH=scripts when selected alone; see finding.import_order_dependence.",
+      "notes": "Checkpoint 0 recorded this file as runnable only with PYTHONPATH=scripts. Checkpoint 1's tests/conftest.py owns that path insertion for the whole directory, so it now runs alone with PYTHONPATH unset; see finding.import_order_dependence.",
       "collected_tests": 32,
-      "baseline_result": "pass_only_with_pythonpath_scripts",
+      "baseline_result": "pass",
       "readme_publishes_command": false,
       "checkpoint_1_result": "DONE. Runs alone with no PYTHONPATH (32 passed) via the new tests/conftest.py."
     },
@@ -2175,7 +2177,7 @@
         "node.tracked-artifacts-guard"
       ],
       "serial_required": true,
-      "measured_seconds": 109.27,
+      "measured_seconds": 52.63,
       "measured_note": "Sum of the fourteen readiness files at this baseline. The 2026-08-17 documented audit measured 106.38s for 298 tests under the same runtime.",
       "readme_publishes_command": false
     },
@@ -2189,7 +2191,7 @@
         "node.z06-contract-preview"
       ],
       "serial_required": true,
-      "measured_seconds": 2.48,
+      "measured_seconds": 2.81,
       "measured_note": "",
       "readme_publishes_command": false
     },
@@ -2516,7 +2518,7 @@
       "share_of_measured_node_lane": "59.5% of the 109.27s fourteen-gate readiness total",
       "disposition": "Checkpoint 1 — remove the duplicate invocation from the node path; keep cmd.workbook_schema as the single schema authority.",
       "status": "resolved_checkpoint_1",
-      "checkpoint_1_result": "Removed. node.workbook-schema-standardization measures 0.84 s against 64.97 s, and the fourteen-gate readiness lane 50.59 s against 109.27 s. cmd.workbook_schema remains the single schema authority; no structural sweep was dropped."
+      "checkpoint_1_result": "Removed. node.workbook-schema-standardization measures 0.91 s against 64.97 s, and the fourteen-gate readiness lane 52.63 s against 109.27 s. cmd.workbook_schema remains the single schema authority and README's node matrix section names it; no structural sweep was dropped."
     },
     {
       "id": "cost.model_specific_regeneration",
@@ -2860,7 +2862,7 @@
   "mutation_canaries": {
     "captured": "2026-08-17",
     "method": "A throwaway `git worktree` at HEAD with the Checkpoint 1 test files copied in. Each canary mutates a COPY of the workbook (or injects a defect into a copy of the generator/runtime) inside that worktree; the canonical workbook and the working tree are never touched. The worktree is removed afterwards.",
-    "scope_note": "Spec §8 lists eight canaries. Checkpoint 1's acceptance names three (asset URL, override count, registry membership); those three plus four forced-failure proofs of the new assertions were run here. Canaries 4, 6 and 8 belong to later checkpoints and were NOT run.",
+    "scope_note": "Spec §8 lists eight canaries. Checkpoint 1's acceptance names three (asset URL, override count, registry membership); those three plus seven forced-failure proofs of the new assertions were run here. The last two were added after PR review, which caught the Stingray sweep deriving its expectations from the payload under test — an omission no canary had been run against. Canaries 4, 6 and 8 belong to later checkpoints and were NOT run.",
     "results": [
       {
         "canary": "§8.1 valid active asset URL change",
@@ -2909,6 +2911,18 @@
         "input": "load_default_selection_display_rules drops its first row per model",
         "expected": "the default-selection parity test fails",
         "measured": "FAILS AS INTENDED — 3 failed, 8 passed in test_runtime_metadata_guards.py"
+      },
+      {
+        "canary": "injected generator defect (interior excludes)",
+        "input": "rules.py drops one interior-targeted excludes row, then stingray/z06 regenerate and the registry republishes",
+        "expected": "both runtime sweeps fail on registry-vs-workbook exclude parity",
+        "measured": "FAILS AS INTENDED — stingray-form-regression 90/91 and z06-runtime-rule-corrections 14/15, both on 'published interior exclude rules drifted from the workbook rule-mapping sheet'"
+      },
+      {
+        "canary": "injected generator defect (colour overrides, runtime side)",
+        "input": "build_color_overrides drops one resolvable row, then stingray/z06 regenerate and the registry republishes",
+        "expected": "both runtime sweeps fail on registry-vs-workbook override parity",
+        "measured": "FAILS AS INTENDED — z06-runtime-rule-corrections 14/15 on 'published colour overrides drifted from the workbook colour-override sheet'; stingray-form-regression 88/91, its own parity assertion plus two pre-existing D30-context tests"
       }
     ]
   }

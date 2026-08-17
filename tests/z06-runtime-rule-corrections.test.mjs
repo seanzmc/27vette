@@ -3,6 +3,8 @@ import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
+import { relationshipPairs, workbookInteriorRelationships } from "./lib/interior-relationships.mjs";
+
 function makeElement() {
   return {
     textContent: "",
@@ -179,37 +181,71 @@ test("Z06 gas guzzler tax defaults into every build and prices up with T0F/T0G",
 // authority: a peer the workbook does not mark unavailable IS selectable, adds
 // D30 where a colour-override row says so, and replaces the included colour.
 //
-// Nothing here names an interior, a seatbelt, or D30. Every case, peer set, and
-// expectation is discovered from the published registry's own rows, so a
+// Nothing here names an interior, a seatbelt, or D30. Cases, peers, and
+// expectations are read from the model's registered workbook sheets, so a
 // workbook change to any seatbelt relationship moves the coverage with it
-// instead of failing a stale literal (spec §4.3).
+// instead of failing a stale literal — and an omission in the generated payload
+// fails the parity assertions rather than silently shrinking the sweep (§4.3).
 test("every interior-included option obeys its workbook include, exclude, and override rows", () => {
   const probe = z06Runtime({ trimLevel: "3LZ" });
   const data = probe.data;
   const interiorsById = new Map(data.interiors.map((interior) => [interior.interior_id, interior]));
 
-  // Discover the cases: an interior that includes an option through an active
-  // auto-add rule, and the exclusive group that option belongs to.
   const groupForOption = new Map();
   for (const group of data.exclusiveGroups) {
     for (const optionId of group.option_ids) groupForOption.set(optionId, group);
   }
+  const optionIds = new Set(data.choices.map((row) => row.option_id));
 
-  const cases = data.rules
-    .filter(
-      (rule) =>
-        rule.rule_type === "includes" &&
-        rule.active === "True" &&
-        interiorsById.has(rule.source_id) &&
-        groupForOption.has(rule.target_id),
-    )
-    .map((rule) => ({
-      interior: interiorsById.get(rule.source_id),
-      includedOptionId: rule.target_id,
-      group: groupForOption.get(rule.target_id),
+  // The expected relationships are read from the model's registered sheets, not
+  // from the payload under test. `z06-runtime-contract` already owns include
+  // parity; excludes and colour overrides had no independent owner until PR
+  // review pointed it out, so a dropped row of either kind removed the case and
+  // its expectation at once.
+  const workbook = workbookInteriorRelationships({
+    modelKey: "z06",
+    interiorIds: new Set(interiorsById.keys()),
+    optionIds,
+  });
+
+  const registryExcludes = new Map();
+  for (const rule of data.rules) {
+    if (rule.rule_type !== "excludes" || rule.active !== "True") continue;
+    if (!optionIds.has(rule.source_id) || !interiorsById.has(rule.target_id)) continue;
+    if (!registryExcludes.has(rule.target_id)) registryExcludes.set(rule.target_id, new Set());
+    registryExcludes.get(rule.target_id).add(rule.source_id);
+  }
+  const registryOverrides = new Map();
+  for (const override of data.colorOverrides) {
+    if (!interiorsById.has(override.interior_id) || !optionIds.has(override.option_id)) continue;
+    if (!registryOverrides.has(override.interior_id)) registryOverrides.set(override.interior_id, new Map());
+    registryOverrides.get(override.interior_id).set(override.option_id, override.adds_rpo);
+  }
+
+  assert.ok(relationshipPairs(workbook.includes).length > 0, "no interior include row resolves for z06");
+  assert.ok(relationshipPairs(workbook.excludes).length > 0, "no interior exclude row resolves for z06");
+  assert.ok(relationshipPairs(workbook.overrides).length > 0, "no colour-override row resolves for z06");
+  assert.deepEqual(
+    relationshipPairs(registryExcludes),
+    relationshipPairs(workbook.excludes),
+    "published interior exclude rules drifted from the workbook rule-mapping sheet",
+  );
+  assert.deepEqual(
+    relationshipPairs(registryOverrides),
+    relationshipPairs(workbook.overrides),
+    "published colour overrides drifted from the workbook colour-override sheet",
+  );
+
+  const cases = [...workbook.includes]
+    .flatMap(([interiorId, included]) => [...included].map((includedOptionId) => ({ interiorId, includedOptionId })))
+    .filter(({ includedOptionId }) => groupForOption.has(includedOptionId))
+    .map(({ interiorId, includedOptionId }) => ({
+      interior: interiorsById.get(interiorId),
+      includedOptionId,
+      group: groupForOption.get(includedOptionId),
     }));
 
-  assert.ok(cases.length > 0, "no interior-included option reaches the published Z06 registry");
+  assert.ok(cases.length > 0, "no workbook-authored interior include resolves into an exclusive group");
 
   for (const { interior, includedOptionId, group } of cases) {
     const interiorId = interior.interior_id;
