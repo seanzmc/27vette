@@ -842,6 +842,9 @@ test("runtime renders include relationship badges with rule-derived item details
   assert.doesNotMatch(html, /choice-relationship-badge includes[\s\S]*info-icon/);
   assert.match(html, /choice-relationship-badge includes[\s\S]*tooltip-panel/);
   assert.match(html, /choice-name[\s\S]*info-tooltip/);
+  const styles = fs.readFileSync("form-app/styles.css", "utf8");
+  assert.match(styles, /\.choice-relationship-badge \.info-tooltip\s*\{[^}]*width:\s*auto;/s);
+  assert.match(styles, /\.choice-relationship-badge \.tooltip-trigger-text\s*\{[^}]*white-space:\s*nowrap;/s);
 
   const disabledIncludesChoice = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_fe4_001");
   html = runtime.renderChoiceCard(disabledIncludesChoice, new Map());
@@ -1915,7 +1918,7 @@ test("Grand Sport workbook default_selected rows seed and reconcile defaults gen
   assert.equal(redCaliperOrder.auto_added_options.some((item) => item.rpo === "J6D"), false, "Grey calipers should not override a user-selected caliper");
 });
 
-test("ZR1 and ZR1X keep fixed included equipment out of customer choice cards", () => {
+test("ZR1 and ZR1X hide fixed included equipment unless it is intentionally display-only", () => {
   const registry = loadDataWindow().CORVETTE_FORM_DATA;
   const expectedDefaults = {
     zr1: ["J58"],
@@ -1936,6 +1939,7 @@ test("ZR1 and ZR1X keep fixed included equipment out of customer choice cards", 
         choice.status !== "unavailable" &&
         choice.selectable !== "True" &&
         choice.display_behavior !== "hidden" &&
+        choice.display_behavior !== "display_only" &&
         section?.selection_mode !== "display_only"
       );
     });
@@ -2127,7 +2131,7 @@ test("Z06, ZR1, and ZR1X share workbook-owned NGA default and restoration behavi
   }
 });
 
-test("ZR1 keeps J59 auto-only and ZTK adds J59 with TOM without a preselection gate", () => {
+test("ZR1 shows package-owned J59 and ZTK adds it with TOM without a preselection gate", () => {
   const runtime = loadRuntime();
   runtime.activateModel("zr1");
   runtime.state.bodyStyle = "coupe";
@@ -2139,10 +2143,14 @@ test("ZR1 keeps J59 auto-only and ZTK adds J59 with TOM without a preselection g
   const j59 = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_j59_002");
   const tom = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_tom_001");
   const ztk = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_ztk_001");
-  assert.ok(j58 && j59 && tom && ztk, "ZR1 should retain J58, auto-only J59, TOM, and ZTK");
+  assert.ok(j58 && j59 && tom && ztk, "ZR1 should retain J58, package-owned J59, TOM, and ZTK");
   assert.equal(j59.section_id, "sec_perf_brake_001", "J59 should render in Performance Brakes");
   assert.equal(j59.selectable, "False", "J59 should not be manually selectable without ZTK");
-  assert.equal(j59.display_behavior, "auto_only", "J59 should be retained only as a valid include target");
+  assert.equal(j59.display_behavior, "display_only", "J59 should remain visible as a package-owned brake");
+  assert.match(runtime.disableReasonForChoice(j59), /Included with ZTK/i);
+  runtime.state.activeStep = "packages_performance";
+  runtime.render();
+  assert.match(runtime.elements.get("#stepContent").innerHTML, /data-option="opt_j59_002"/);
   assert.equal(runtime.disableReasonForChoice(ztk), "", "ZTK should be selectable before TOM is selected");
 
   runtime.handleChoice(j59);
@@ -2194,6 +2202,10 @@ test("ZR1X ZTK is immediately selectable and locks its included J59 and TOM choi
   const t0e = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_t0e_001");
   const ztk = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_ztk_001");
   assert.ok(j59 && tom && t0e && ztk, "ZR1X should expose J59, TOM, T0E, and ZTK in its active contract");
+  assert.equal(j59.section_id, "sec_perf_brake_001", "ZR1X J59 should render in Performance Brakes");
+  assert.equal(j59.selectable, "False", "ZR1X J59 should remain package-owned");
+  assert.equal(j59.display_behavior, "display_only", "ZR1X J59 should remain visible");
+  assert.match(runtime.disableReasonForChoice(j59), /Included with ZTK/i);
   assert.equal(runtime.disableReasonForChoice(ztk), "", "ZR1X ZTK should be selectable before TOM is selected");
 
   runtime.handleChoice(ztk);
@@ -2605,130 +2617,150 @@ test("Grand Sport interiors are model-scoped and export selected interior identi
   assert.match(runtime.plainTextOrderSummary(compact), /EL9 Santorini Blue Dipped with Torch Red accents/);
 });
 
-test("Grand Sport 3LT interiors auto-add included color seatbelts from workbook rules", () => {
-  const runtime = loadRuntime();
-  runtime.activateModel("grandSport");
-  runtime.state.bodyStyle = "coupe";
-  runtime.state.trimLevel = "3LT";
-  runtime.resetDefaults();
-  runtime.reconcileSelections();
+const seatbeltIdsByRpo = {
+  379: "opt_379_001",
+  "3N9": "opt_3n9_001",
+  "3A9": "opt_3a9_001",
+  "3F9": "opt_3f9_001",
+  "3M9": "opt_3m9_001",
+  719: "opt_719_001",
+};
+const seatbeltIds = new Set(Object.values(seatbeltIdsByRpo));
+const lowTrimRedInteriors = new Set(["HUQ", "HU7", "HUL", "HUR"]);
+const highTrimRedInteriors = new Set(["HU2", "HUA", "HUU", "HZP"]);
 
-  const ah2Seat = runtime.activeChoiceRows().find((choice) => choice.rpo === "AH2" && choice.step_key === "seat");
-  runtime.handleChoice(ah2Seat);
+function includedSeatbeltRpo(trim, code) {
+  if (!trim.startsWith("3")) return "";
+  if (["HUW", "HUX"].includes(code)) return "379";
+  if (["HUF", "HZN", "EJH", "EPX"].includes(code)) return "3N9";
+  if (["H8T", "HAG"].includes(code)) return "3A9";
+  if (["HNK", "HVZ", "EL9"].includes(code)) return "3F9";
+  return "";
+}
 
-  for (const [interiorId, rpo, optionId] of [
-    ["3LT_AH2_EJH", "3N9", "opt_3n9_001"],
-    ["3LT_AH2_EPX_N26", "3N9", "opt_3n9_001"],
-    ["3LT_AH2_HZN", "3N9", "opt_3n9_001"],
-    ["3LT_AH2_HNK", "3F9", "opt_3f9_001"],
-    ["3LT_AH2_H8T", "3A9", "opt_3a9_001"],
-    ["3LT_AH2_HUW", "379", "opt_379_001"],
-    ["3LT_AH2_HVZ", "3F9", "opt_3f9_001"],
-  ]) {
-    runtime.state.selectedInterior = interiorId;
-    runtime.reconcileSelections();
-    const order = runtime.currentOrder();
-    assert.equal(runtime.state.selected.has("opt_719_001"), false, `${interiorId} should replace default 719`);
-    assert.equal(order.auto_added_options.some((item) => item.rpo === rpo && item.price === 0), true, `${interiorId} should auto-add ${rpo} at no charge`);
-
-    const asymmetrical = /_(HAG|HVZ)$/.test(interiorId);
-    const blackSeatbelt = runtime.activeChoiceRows().find((item) => item.option_id === "opt_719_001");
-    runtime.handleChoice(blackSeatbelt);
-    runtime.reconcileSelections();
-    assert.equal(
-      runtime.state.selected.has("opt_719_001"),
-      !asymmetrical,
-      `${interiorId} should ${asymmetrical ? "lock its included color" : "allow Black at no charge"}`,
-    );
-    assert.equal(runtime.optionPrice("opt_719_001"), 0, "Black replacement should remain $0");
-    if (!asymmetrical) {
-      assert.equal(runtime.computeAutoAdded().has(optionId), false, `${interiorId} Black should replace the included color`);
-    }
-
-    const otherSeatbelt = runtime.activeChoiceRows().find(
-      (item) =>
-        item.section_id === "sec_seat_001" &&
-        item.option_id !== optionId &&
-        item.option_id !== "opt_719_001" &&
-        item.selectable === "True"
-    );
-    assert.ok(otherSeatbelt, "expected another selectable seatbelt for lock test");
-    runtime.handleChoice(otherSeatbelt);
-    runtime.reconcileSelections();
-    assert.equal(runtime.state.selected.has(otherSeatbelt.option_id), false, `${interiorId} should block other seatbelts`);
-
-    runtime.state.selected.add("opt_d30_001");
-    runtime.handleChoice(otherSeatbelt);
-    runtime.reconcileSelections();
-    assert.equal(runtime.state.selected.has(otherSeatbelt.option_id), false, `${interiorId} should block other seatbelts even with D30`);
-    runtime.state.selected.delete("opt_d30_001");
-  }
-
-  runtime.state.selectedInterior = "3LT_AH2_HTE";
-  runtime.reconcileSelections();
-  assert.equal(runtime.state.selected.has("opt_719_001"), true, "3LT interior without included color seatbelt should keep 719 default");
-  assert.equal(runtime.currentOrder().auto_added_options.some((item) => ["3N9", "3F9", "3A9", "379"].includes(item.rpo)), false);
-});
-
-test("GSX, ZR1, and ZR1X publish complete zero-price seatbelt rules with Black alternatives", () => {
-  const registry = loadDataWindow().CORVETTE_FORM_DATA;
-  const expectedByCode = {
-    HUW: "opt_379_001",
-    HUX: "opt_379_001",
-    EJH: "opt_3n9_001",
-    EPX: "opt_3n9_001",
-    HZN: "opt_3n9_001",
-    HUF: "opt_3n9_001",
-    HNK: "opt_3f9_001",
-    HVZ: "opt_3f9_001",
-    H8T: "opt_3a9_001",
-    HAG: "opt_3a9_001",
+function seatbeltUnavailable(trim, code, rpo) {
+  if (!trim.startsWith("3")) return false;
+  const codesByRpo = {
+    379: ["HVZ", "HAG"],
+    "3N9": ["HVZ", "HAG"],
+    "3A9": ["HVZ"],
+    "3F9": ["HAG"],
+    "3M9": ["HVZ", "HAG"],
+    719: ["HVZ", "HAG"],
   };
-  const asymmetricalCodes = new Set(["HAG", "HVZ"]);
+  return codesByRpo[rpo].includes(code);
+}
 
-  for (const modelKey of ["grand_sport_x", "zr1", "zr1x"]) {
-    const data = registry.models[modelKey].data;
-    const relevantInteriors = data.interiors.filter((interior) => expectedByCode[interior.interior_code]);
-    assert.ok(relevantInteriors.length >= 20, `${modelKey} should publish every documented 3LT/3LZ interior variant`);
+function seatbeltAddsD30(trim, code, rpo) {
+  if (seatbeltUnavailable(trim, code, rpo) || includedSeatbeltRpo(trim, code) === rpo) return false;
+  const level = trim[0];
+  if (rpo === "379") return level === "3" ? new Set([...highTrimRedInteriors, "HNK", "EJH", "EPX", "H8T"]).has(code) : lowTrimRedInteriors.has(code);
+  if (rpo === "3N9") {
+    if (level === "1") return !new Set(["HTA", "HTJ"]).has(code);
+    if (level === "2") return !new Set(["H1Y", "HTM", "HTP", "HTN", "HTQ", "HUV"]).has(code);
+    return level === "3" && !new Set(["HMO", "HTE", "HTT", "HU0", "HVV", "HXO", "HUB", "HUC", "HTG", "HUE"]).has(code);
+  }
+  if (rpo === "3A9") return level === "3" ? new Set([...highTrimRedInteriors, "HNK", "HUW", "HUX", "EJH", "EPX"]).has(code) : lowTrimRedInteriors.has(code);
+  if (rpo === "3F9") return level === "3" && new Set(["HUW", "HUX", "EJH", "EPX", "H8T"]).has(code);
+  if (rpo === "3M9") return level === "3" ? new Set([...highTrimRedInteriors, "HNK", "HUF", "HZN", "HUW", "HUX", "EJH", "EPX", "H8T", "EL9"]).has(code) : lowTrimRedInteriors.has(code);
+  return false;
+}
 
-    for (const interior of relevantInteriors) {
-      const expectedTarget = expectedByCode[interior.interior_code];
-      const seatbeltIncludes = data.rules.filter(
-        (rule) =>
-          rule.source_id === interior.interior_id &&
-          rule.rule_type === "includes" &&
-          ["opt_379_001", "opt_3a9_001", "opt_3f9_001", "opt_3n9_001"].includes(rule.target_id),
+test("all six promoted models publish the complete Seatbelt_Rules matrix", () => {
+  const registry = loadDataWindow().CORVETTE_FORM_DATA;
+  const models = [
+    ["stingray", "stingray"],
+    ["grand_sport", "grandSport"],
+    ["grand_sport_x", "grand_sport_x"],
+    ["z06", "z06"],
+    ["zr1", "zr1"],
+    ["zr1x", "zr1x"],
+  ];
+
+  for (const [modelKey, registryKey] of models) {
+    const data = registry.models[registryKey].data;
+    assert.equal(
+      data.ruleGroups.some((group) => group.group_id.includes("seatbelt_") && group.group_id.includes("included_or_black")),
+      false,
+      `${modelKey} must not restrict included seatbelts to an invented included-or-black group`,
+    );
+
+    for (const interior of data.interiors) {
+      const expectedIncludedRpo = includedSeatbeltRpo(interior.trim_level, interior.interior_code);
+      const expectedIncludedId = expectedIncludedRpo ? seatbeltIdsByRpo[expectedIncludedRpo] : "";
+      const includes = data.rules.filter(
+        (rule) => rule.source_id === interior.interior_id && rule.rule_type === "includes" && seatbeltIds.has(rule.target_id),
       );
-      assert.equal(
-        seatbeltIncludes.map((rule) => rule.target_id).join(","),
-        expectedTarget,
-        `${modelKey} ${interior.interior_id} should include exactly its documented seatbelt`,
+      assert.deepEqual(
+        Array.from(includes, (rule) => rule.target_id),
+        expectedIncludedId ? [expectedIncludedId] : [],
+        `${modelKey} ${interior.interior_id} included seatbelt`,
       );
       assert.equal(
         data.priceRules.some(
-          (rule) =>
-            rule.condition_option_id === interior.interior_id &&
-            rule.target_option_id === expectedTarget &&
-            rule.price_value === 0,
+          (rule) => rule.condition_option_id === interior.interior_id && rule.target_option_id === expectedIncludedId && Number(rule.price_value) === 0,
         ),
-        true,
-        `${modelKey} ${interior.interior_id} should zero-price ${expectedTarget}`,
+        Boolean(expectedIncludedId),
+        `${modelKey} ${interior.interior_id} included seatbelt price`,
       );
 
-      const replacementGroup = data.ruleGroups.find(
-        (group) => group.source_id === interior.interior_id && group.group_type === "requires_any",
-      );
-      if (asymmetricalCodes.has(interior.interior_code)) {
-        assert.equal(replacementGroup, undefined, `${modelKey} ${interior.interior_code} should not allow a Black alternative`);
-      } else {
-        assert.ok(replacementGroup, `${modelKey} ${interior.interior_id} should publish its Black alternative`);
+      for (const [rpo, optionId] of Object.entries(seatbeltIdsByRpo)) {
         assert.equal(
-          [...replacementGroup.target_ids].sort().join(","),
-          [expectedTarget, "opt_719_001"].sort().join(","),
-          `${modelKey} ${interior.interior_id} should allow only its included color or Black`,
+          data.rules.some(
+            (rule) => rule.source_id === optionId && rule.rule_type === "excludes" && rule.target_id === interior.interior_id,
+          ),
+          seatbeltUnavailable(interior.trim_level, interior.interior_code, rpo),
+          `${modelKey} ${interior.interior_id} ${rpo} availability`,
+        );
+        assert.equal(
+          data.colorOverrides.some(
+            (row) => row.interior_id === interior.interior_id && row.option_id === optionId && row.adds_rpo === "opt_d30_001",
+          ),
+          seatbeltAddsD30(interior.trim_level, interior.interior_code, rpo),
+          `${modelKey} ${interior.interior_id} ${rpo} D30 behavior`,
         );
       }
     }
+
+    const hasZ25 = data.choices.some((choice) => choice.option_id === "opt_z25_001");
+    assert.equal(
+      data.rules.some((rule) => rule.source_id === "opt_z25_001" && rule.rule_type === "includes" && rule.target_id === "opt_3f9_001"),
+      hasZ25,
+      `${modelKey} Z25 should include 3F9 only where Z25 exists`,
+    );
+    assert.equal(
+      data.priceRules.some((rule) => rule.condition_option_id === "opt_z25_001" && rule.target_option_id === "opt_3f9_001" && Number(rule.price_value) === 0),
+      hasZ25,
+      `${modelKey} Z25 should zero-price 3F9 only where Z25 exists`,
+    );
+  }
+});
+
+test("included seatbelts are soft defaults and paid D30 alternatives work in all six models", () => {
+  for (const modelKey of ["stingray", "grandSport", "grand_sport_x", "z06", "zr1", "zr1x"]) {
+    const runtime = loadRuntime();
+    runtime.activateModel(modelKey);
+    const interior = runtime.data.interiors.find((item) => item.trim_level.startsWith("3") && item.interior_code === "HUW");
+    assert.ok(interior, `${modelKey} should expose a 3LT/3LZ HUW interior`);
+    runtime.state.bodyStyle = "coupe";
+    runtime.state.trimLevel = interior.trim_level;
+    runtime.resetDefaults();
+    runtime.reconcileSelections();
+    const seat = runtime.activeChoiceRows().find((choice) => choice.rpo === interior.seat_code && choice.step_key === "seat");
+    if (seat && !runtime.state.selected.has(seat.option_id)) runtime.handleChoice(seat);
+    runtime.state.selectedInterior = interior.interior_id;
+    runtime.reconcileSelections();
+    assert.equal(runtime.computeAutoAdded().has("opt_379_001"), true, `${modelKey} HUW should include 379`);
+    assert.equal(runtime.optionPrice("opt_379_001"), 0, `${modelKey} included 379 should be $0`);
+
+    const yellow = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_3m9_001");
+    assert.equal(runtime.disableReasonForChoice(yellow), "", `${modelKey} HUW should permit a paid Yellow alternative`);
+    runtime.handleChoice(yellow);
+    runtime.reconcileSelections();
+    assert.equal(runtime.state.selected.has("opt_3m9_001"), true, `${modelKey} should select Yellow`);
+    assert.equal(runtime.computeAutoAdded().has("opt_379_001"), false, `${modelKey} Yellow should replace included Orange`);
+    assert.equal(runtime.computeAutoAdded().has("opt_d30_001"), true, `${modelKey} HUW with Yellow should add D30`);
+    assert.equal(runtime.optionPrice("opt_3m9_001"), 595, `${modelKey} paid Yellow alternative should remain $595`);
   }
 });
 
@@ -2780,29 +2812,20 @@ test("ZR1-family gas-guzzler charges, trim disclosures, EFR hiding, and ZTK deta
   for (const rpo of ["FEZ", "J59", "XFS", "TOM"]) assert.match(ztkHtml, new RegExp(rpo));
 });
 
-test("documented seatbelt/interior conflicts auto-add D30 across promoted models", () => {
-  const registry = loadDataWindow().CORVETTE_FORM_DATA;
-  const casesByModel = {
-    stingray: [["3LT_AH2_H8T", "opt_379_001"], ["3LT_AH2_HAG", "opt_3f9_001"]],
-    grand_sport: [["3LT_AH2_EL9", "opt_379_001"], ["3LT_AH2_EL9", "opt_3m9_001"]],
-    grand_sport_x: [["3LT_AH2_H8T", "opt_3f9_001"], ["3LT_AH2_HAG", "opt_3m9_001"]],
-    z06: [["3LZ_AH2_H8T", "opt_379_001"], ["3LZ_AH2_HAG", "opt_3f9_001"]],
-    zr1: [["3LZ_AH2_HUF_N2Z", "opt_3m9_001"], ["3LZ_AH2_HAG", "opt_3f9_001"]],
-    zr1x: [["3LZ_AH2_HZN", "opt_3m9_001"], ["3LZ_AH2_H8T", "opt_379_001"]],
-  };
-  for (const [modelKey, cases] of Object.entries(casesByModel)) {
-    const registryKey = modelKey === "grand_sport" ? "grandSport" : modelKey;
-    const overrides = registry.models[registryKey].data.colorOverrides;
-    for (const [interiorId, optionId] of cases) {
-      assert.equal(
-        overrides.some(
-          (row) => row.interior_id === interiorId && row.option_id === optionId && row.adds_rpo === "opt_d30_001",
-        ),
-        true,
-        `${modelKey} ${interiorId} + ${optionId} should add D30`,
-      );
-    }
-  }
+test("ZR1 exterior appearance is optional after its EFR card removal and completes in the step rail", () => {
+  const runtime = loadRuntime();
+  runtime.activateModel("zr1");
+  runtime.state.bodyStyle = "coupe";
+  runtime.state.trimLevel = "1LZ";
+  runtime.resetDefaults();
+  runtime.reconcileSelections();
+
+  assert.equal(runtime.missingRequired().includes("Exterior Accents"), false);
+  runtime.state.activeStep = "wheels";
+  runtime.state.farthestStepIndex = 4;
+  runtime.render();
+  const railHtml = runtime.elements.get("#stepRail").innerHTML;
+  assert.match(railHtml, /class="step-link[^"]*complete" data-step="exterior_appearance"/);
 });
 
 test("Grand Sport and Z06 stripe runtime allows rear hash graphics with dual stripes and PDA auto-adds package graphics", () => {
