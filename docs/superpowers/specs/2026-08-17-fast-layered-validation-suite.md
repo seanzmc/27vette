@@ -1,0 +1,778 @@
+# Fast Layered Validation Suite Specification
+
+Status: IN IMPLEMENTATION — Checkpoint 0 complete 2026-08-17; Checkpoint 1 is
+the next authorized slice.
+Date: 2026-08-17
+Branch: `claude/fast-layered-validation-suite-4c31f6` (spec authored on `main`)
+Recommended implementation reasoning: medium. Escalate only for a specific
+data-integrity, concurrency, protected-output, or dealer-boundary judgment.
+
+## 1. Decision and authority
+
+This specification owns the replacement of the current overlapping validation
+inventory with one fast layered suite. It extends, but does not reopen, the
+completed single-lane architecture in
+`docs/superpowers/specs/2026-07-23-validation-single-lane-active-surface-cleanup.md`.
+That completed specification remains authoritative for the canonical path:
+
+```text
+stingray_master.xlsx
+  -> package, schema, and source-quality validation
+  -> workbook-discovered six-model generation in an isolated candidate root
+  -> strict runtime-contract validation
+  -> complete candidate registry
+  -> browser/runtime harness
+  -> explicit publication only after approval
+```
+
+This specification changes how that path is tested, selected, timed, and
+reported. It does not create a second generation, publication, workbook-write,
+or runtime path.
+
+The workbook remains the only source of product and business data. Test code
+may contain a deliberately small, reviewed acceptance-lock inventory for
+protected decisions, but must not become a parallel database of model rows,
+prices, counts, URLs, relationships, or variant matrices.
+
+`docs/superpowers/specs/2026-08-15-workbook-manager-ux-recovery.md` continues to
+own the paused Manager product recovery. This suite must support that work, but
+does not implement its UI checkpoints.
+
+## 2. Goal
+
+Build a validation system that is fast enough to use continuously and strong
+enough to protect the customer runtime without turning ordinary workbook data
+changes into widespread stale-test maintenance.
+
+The finished suite must:
+
+1. Separate structural invariants, workbook-to-output parity, runtime state
+   invariants, and intentional product acceptance locks.
+2. Pay each expensive canonical-workbook setup cost once per validation layer,
+   then share immutable results safely.
+3. Discover models, variants, promoted artifacts, source rows, and assets from
+   their authoritative workbook/registry owners instead of repeating literals
+   in test files.
+4. Exercise every promoted model and declared variant through a generic runtime
+   state matrix.
+5. Keep a small named set of customer-critical behavior locks whose failure
+   truly requires product review.
+6. Make changed-surface selection mechanical and visible.
+7. Produce a stage-timed machine-readable report and a concise human summary.
+8. Preserve the canonical workbook, generated artifacts, published registry,
+   dealer boundary, and live systems during every normal validation run.
+
+## 3. Current diagnosis and evidence
+
+### 3.1 Node readiness audit — 2026-08-17
+
+The documented fourteen-gate Node readiness matrix was run serially against
+`main` at `3a7fc52` under local Node `26.7.0`:
+
+| Result | Evidence |
+|---|---|
+| Total | 298 tests in 106.38 seconds |
+| Passed | 292 |
+| Failed | 6 assertions across 5 files |
+| Slowest gate | `workbook-schema-standardization`, 62.91 seconds |
+| Next slowest | `stingray-runtime-contract`, 16.09 seconds |
+| Protected tracked diff | none |
+
+The six failures are stale expectations, not demonstrated runtime defects:
+
+- three assertions retain the superseded included-seatbelt lock/Black-only
+  behavior while the current six-model authority proves workbook-approved paid
+  alternatives;
+- Grand Sport pins `colorOverrides.length === 263` while the current valid
+  workbook produces 281 rows;
+- Grand Sport pins an obsolete J6F image URL instead of comparing with the
+  active `asset_map` row;
+- isolated registry publication pins three model keys although six models are
+  promoted.
+
+One intentional product change therefore produces failures across multiple
+test authorities. Updating the literals again would restore green temporarily
+while preserving the underlying scalability defect.
+
+### 3.2 Duplicate and expensive work
+
+- Full default validation runs the schema command directly and again from
+  `workbook-schema-standardization.test.mjs`; the repeated invocation accounts
+  for roughly one minute of the Node lane.
+- Three model-specific Node contract files generate models independently even
+  though `test_all_model_runtime_generation.py` and
+  `verify_workbook_candidate.py` already generate and validate every discovered
+  model.
+- Candidate-verifier tests repeatedly build complete six-model candidates for
+  cases whose actual subject is a stage mapping or failure response. The
+  2026-08-09 audit measured 648.04 seconds for 16 tests, with repeated complete
+  candidates costing about 61–67 seconds each.
+- The default Python metadata lane was 166.55 seconds; one repeated workbook
+  mutation/generation owner consumed 126.43 seconds.
+- The 2026-08-10 Workbook Manager checkpoint inventory was 791.25 seconds.
+  Earlier profiling showed real-workbook promotion/import/export owners near
+  66–75 seconds each and changed-overlay comparison export materially slower.
+- Current collection is 734 Python tests, while README still states 678. A
+  manually maintained collection count is already stale.
+
+### 3.3 Missing systematic matrices
+
+- No single gate enumerates every promoted model x body style x trim/variant
+  through runtime reconciliation and completion invariants.
+- GSX, ZR1, and ZR1X depend on the composed six-model candidate lane and
+  scattered targeted assertions rather than a uniform model-neutral behavior
+  contract.
+- Dealer-payload model scoping has explicit examples for Stingray, Grand Sport,
+  and Z06 only. Generic model/variant identity propagation is not swept over
+  every promoted model; live submission must remain untested.
+- The current six-model seatbelt test statically sweeps many combinations, but
+  still reproduces much of the product matrix in JavaScript and runs only one
+  coupe/HUW behavior example per model.
+
+## 4. Test authority classes
+
+Every default or checkpoint gate must declare exactly one primary authority
+class. A gate may supply secondary evidence, but it cannot be counted twice in
+the coverage ledger.
+
+### 4.1 Structural invariant
+
+Structural tests do not care which particular products or values are present.
+They prove rules such as:
+
+- registered sheets and fields have valid types;
+- canonical IDs and physical keys are unique;
+- every reference resolves;
+- model membership and variant topology are internally consistent;
+- active choices resolve to valid variants, sections, and steps;
+- rule and group members resolve and do not contradict their owning structure;
+- exclusive groups and required selections are satisfiable;
+- runtime contracts contain the required shapes and no error-severity findings;
+- generation and publication respect isolated output roots and atomic
+  boundaries.
+
+Structural tests derive schema vocabulary from
+`workbook_domain/registry.py`, runtime shape from `runtime_contract.py`, and
+model discovery from `model_configs.py`. They must not copy workbook headers,
+model-specific row counts, media URLs, or complete RPO lists.
+
+### 4.2 Workbook-to-output parity
+
+Parity tests compare two independent paths:
+
+```text
+expected: direct, simple read of authoritative workbook rows
+actual:   generator -> runtime contract -> candidate registry/runtime
+```
+
+The expected side must not call the generator transformation under test. A
+shared generator function cannot be both implementation and oracle.
+
+Examples:
+
+- generated model keys equal active promotion rows;
+- generated variants equal workbook-declared active variant facts;
+- a generated image equals the applicable active `asset_map` row;
+- emitted option/rule/group/price/override identity sets equal active source
+  rows after only contractually documented normalization;
+- a Workbook Manager reconstruction generates the same primary runtime
+  contracts as its bound source workbook.
+
+Parity tests may compare exact values because the workbook supplies those
+values at run time. They must not duplicate them as test literals.
+
+### 4.3 Runtime state invariant
+
+Runtime state tests exercise generic behavior over the candidate registry.
+They discover cases from data, perform state transitions, and check invariants
+rather than asserting one copied product matrix.
+
+For every promoted model and declared active variant, the matrix must prove as
+applicable:
+
+1. model activation selects only that model's registry data;
+2. body style and trim resolve to the intended variant;
+3. reset plus reconciliation reaches a stable fixed point;
+4. a second reconciliation is idempotent;
+5. every selected/default/auto-added option exists and is valid in context;
+6. no selected option remains disabled unless its contract explicitly marks a
+   locked included/display-only state;
+7. at most one peer is selected in a single-selection exclusive group;
+8. required selections are either satisfied or reported by the owning section;
+9. include, require, exclude, replace, default, and price rules preserve their
+   generic contract after representative transitions;
+10. totals equal the independently recomputed base, option, component,
+    override, and charge lines exposed by the order contract;
+11. model switching clears incompatible prior-model state;
+12. download and stubbed dealer payload identity match the active model and
+    variant.
+
+The matrix must not make live dealer requests. Turnstile, endpoint failures,
+retry behavior, and payload-shape protection remain focused, stubbed acceptance
+tests under the dealer protected boundary.
+
+### 4.4 Intentional product acceptance lock
+
+An acceptance lock names a stable, reviewed customer or safety decision whose
+change must stop validation for human review. Examples include the default
+model, ZR1X standard J59/no J58, and the dealer payload/security contract.
+
+Acceptance locks are the only normal location for product-specific literals.
+Each lock must record:
+
+- the decision it protects;
+- the authoritative workbook rows or protected runtime interface;
+- why generic structure/parity would not detect an unintended but valid data
+  change;
+- its owning test;
+- the approval required to change or retire it.
+
+One decision has one lock owner. Other tests may exercise the resulting generic
+behavior but must not restate its product facts.
+
+## 5. Validation layers
+
+### Layer 0 — fast developer loop
+
+Purpose: deterministic feedback after ordinary code edits.
+
+Contract:
+
+- pure functions, compact fixtures, schema-registry unit tests, runtime state
+  helpers, and targeted UI logic only;
+- no canonical-workbook generation;
+- no real-workbook import/export;
+- no tracked output writes;
+- no network or browser dependency;
+- target wall time: 30 seconds or less on the reference development machine.
+
+Layer 0 is selected by changed surface. It is not a miniature full suite.
+
+### Layer 1 — composed workbook-to-browser candidate
+
+Purpose: one authoritative readiness proof for workbook, generator, generated
+contract, registry, and browser runtime changes.
+
+The existing `verify_workbook_candidate.py` remains the spine and must perform
+each expensive stage once:
+
+1. copy the selected workbook to an isolated root;
+2. package validation;
+3. schema validation;
+4. option-sheet quality;
+5. model discovery;
+6. generate every discovered model once;
+7. strictly validate every written contract;
+8. build the complete candidate registry;
+9. build the independent temporary workbook-truth snapshot;
+10. run parity assertions and the generated runtime state matrix against the
+    candidate registry;
+11. report semantic drift and protected-surface hashes.
+
+The report must include stage durations, artifact identities, discovered and
+promoted model/variant sets, skipped stages, failures, and protected-boundary
+results. Initial target wall time is 5 minutes or less in CI and on the
+reference machine. Timing is reported before it becomes a hard gate; a hard
+budget requires at least three stable baseline runs.
+
+### Layer 2 — changed-surface acceptance
+
+Purpose: run focused acceptance owners only when their surface changes.
+
+The machine-readable validation catalog maps repository surfaces to commands,
+including:
+
+- workbook write/editor and ChangeSet;
+- asset/media synchronization;
+- runtime JavaScript and customer interactions;
+- dealer modal/payload/security;
+- publication/atomic write;
+- Workbook Manager projection, draft, Apply/Rebuild, recovery, and frontend;
+- Fable 5 loop infrastructure;
+- docs-only consistency.
+
+Each entry declares authority class, expected inputs, side effects, isolation,
+serialization requirement, approximate duration, and whether it is required in
+CI, at a pass checkpoint, after a canonical workbook write, or only for its
+changed surface.
+
+### Layer 3 — checkpoint and protected-boundary acceptance
+
+Purpose: retain expensive proof where fixture substitution would weaken a real
+boundary.
+
+This layer includes exactly one real-workbook success proof for each distinct
+protected behavior, plus necessary failure-path owners:
+
+- canonical workbook package/schema and guarded-save proof;
+- complete candidate generation/publication parity;
+- Workbook Manager real import/promotion, unchanged and changed comparison
+  exports, generated parity, Apply/Rebuild rollback, source drift, atomic
+  replacement, and scratch-copy writer proof;
+- browser checks for affected customer flows and responsive layout;
+- dealer submission only through stubbed/local harnesses, never a live post.
+
+Layer 3 runs after canonical workbook writes, at implementation checkpoints,
+and before release when the affected protected boundary requires it. It is not
+the default inner loop.
+
+### Layer 4 — full inventory diagnostic
+
+Purpose: scheduled/manual detection of forgotten classification, cross-surface
+interference, and baseline drift.
+
+The full pytest and Node inventories remain available, but are diagnostic until
+every owner is classified and green. A full-inventory failure is reported with
+its layer and authority classification; it must not silently redefine the
+release gate.
+
+## 6. Shared fixtures and isolation
+
+### 6.1 Candidate result
+
+Layer 1 owns one immutable candidate result per workbook hash, code revision,
+and runtime/tool version tuple. Within one process/run, generation, contract
+validation, registry construction, parity, and runtime matrix all consume that
+result instead of regenerating it.
+
+Cross-run caching is out of scope initially. If later added, it must be
+content-addressed, disposable, and rejected when any identity component moves.
+
+### 6.2 Independent workbook-truth snapshot
+
+Implement a temporary, untracked JSON snapshot built from a read-only workbook
+handle and shared registry metadata. It contains only the raw/normalized fields
+needed by parity checks, including:
+
+- active model and variant facts;
+- promotion rows and default selection;
+- registered source rows keyed by physical identity;
+- option/OVS, rule/group/member, price, override, section, interior component,
+  and asset identities and values needed by current runtime contracts.
+
+The snapshot builder may normalize Boolean/cell representation and shared
+physical ownership according to existing workbook-domain contracts. It may not
+reimplement generation, rule derivation, runtime cleanup, or business fallback
+logic.
+
+Node receives the snapshot and candidate registry through explicit temporary
+paths. No snapshot is committed or published.
+
+### 6.3 Candidate-verifier tests
+
+Candidate-verifier unit tests use compact fixtures and stage injection for
+error mapping, unknown input, skipped-stage, and report-schema behavior. Retain
+only a small named set of complete six-model end-to-end tests:
+
+- successful full candidate;
+- failure before generation;
+- generation/contract failure with later stages skipped;
+- protected-surface mutation detection;
+- semantic drift partitioning;
+- candidate browser/runtime matrix failure.
+
+Complete candidates are module/session scoped where isolation permits. Each
+test that mutates a result clones its immutable fixture first.
+
+### 6.4 Workbook Manager fixtures
+
+Build one verified immutable real-workbook projection/candidate fixture per
+checkpoint run, then clone it into test-local directories. Compact workbooks
+and SQLite fixtures own negative validation/migration cases. Preserve one real
+workbook owner for every distinct acceptance boundary listed in Layer 3; fixture
+sharing must not collapse those proofs into equality checks against themselves.
+
+## 7. Validation catalog and coverage ledger
+
+Add one machine-readable catalog under `tests/` that records every default and
+checkpoint gate. The implementation may choose JSON or a Python data module,
+but it must be consumable without adding a dependency.
+
+Minimum fields:
+
+```text
+id
+command
+layer
+primary_authority
+changed_surfaces
+reads
+writes
+isolation
+serial_group
+ci_policy
+checkpoint_policy
+approximate_seconds
+acceptance_locks
+```
+
+A catalog contract test must fail when:
+
+- a default/checkpoint test file has no catalog entry;
+- two entries claim primary ownership of the same named acceptance lock;
+- a generating gate lacks an isolated output declaration;
+- a protected-output gate is assigned unsafe parallel execution;
+- README's published commands or layer names disagree with the catalog.
+
+The catalog owns collection descriptions and measured counts. README may show
+commands and approximate timing, but must not hand-maintain a precise pytest
+collection count.
+
+## 8. Mutation canaries
+
+The migration is not complete merely because the rewritten tests pass the
+current workbook. Temporary-copy canaries must prove that each authority class
+fails and adapts for the right reasons.
+
+Required canaries:
+
+1. Change a valid active asset URL in a copied workbook. Structural and parity
+   layers remain green when generated output follows it; no literal URL test
+   fails.
+2. Add one valid color-override row in a compact/copied workbook. Coverage
+   expands without changing a hardcoded aggregate count.
+3. Add or remove a valid promoted-model fixture row. Dynamic registry/parity
+   coverage follows it; a separately declared model-membership acceptance lock
+   may fail deliberately if that decision is protected.
+4. Introduce an unresolved reference. Structural validation fails before
+   generation/runtime proof.
+5. Inject a generator defect so emitted data differs from the independent
+   workbook-truth snapshot. Parity fails, proving the oracle is not circular.
+6. Change a valid, non-locked product relationship in a copied workbook. Generic
+   runtime cases follow the new authored relationship without stale literals.
+7. Change a named acceptance-lock decision. Exactly its owning lock fails; no
+   unrelated structural test restates the same product fact.
+8. Force a tracked-output write from an isolated generating gate. The boundary
+   guard fails and reports the exact path.
+
+## 9. Migration checkpoints
+
+### Checkpoint 0 — freeze and classify the live inventory
+
+- Record Node 22 and Python 3.12 reference timings for current documented
+  gates; keep the 2026-08-17 Node 26 audit as local evidence, not the CI
+  baseline.
+- Inventory every default/checkpoint Python and Node owner in the validation
+  catalog.
+- Classify each gate and each product-specific assertion under §4.
+- Build a coverage ledger mapping behavior/invariant to its single primary
+  owner and secondary evidence.
+- Mark each gate keep, rewrite, merge, move-to-checkpoint, diagnostic-only, or
+  retire-after-parity.
+- Make no assertion deletion in this checkpoint.
+
+Acceptance: every current default/checkpoint gate is classified; the six stale
+assertions and all known expensive repeated setups have explicit dispositions.
+
+#### Checkpoint 0 result — 2026-08-17 (COMPLETE)
+
+Delivered:
+
+- `tests/validation_catalog.json` — the machine-readable catalog. 59 gates (16
+  Node files, 38 Python files, 5 script commands), 6 suites, 5 acceptance-lock
+  records, 33 coverage-ledger entries, 7 stale assertions, 7 findings, and 8
+  expensive repeated setups. Every gate carries all §7 fields plus its §4
+  authority class, its §9 disposition with a stated reason, measured seconds,
+  collected test count, and its baseline result.
+- `tests/test_validation_catalog.py` — the §7 contract test. All five failure
+  conditions are implemented and each is proved by a forced mutation, so none of
+  them can be green for the wrong reason. 17 tests, 0.03 s.
+- `README.md` — one ownership correction. The hand-maintained pytest collection
+  count (678, measured 734) is removed and the catalog is named as the owner;
+  the contract test fails if a count returns.
+
+Measured baseline (local Node 26.7.0 / Python 3.14.7 on darwin arm64, serial;
+one process per file except where noted). Raw output:
+`docs/superpowers/specs/2026-08-17-fast-layered-validation-suite-checkpoint-0-baseline.md`.
+
+| Lane | Wall time | Tests | Result |
+|---|---|---|---|
+| 14 documented Node readiness gates | 109.27 s | 298 | 292 pass, 6 fail in 5 files |
+| All 16 Node files | 111.75 s | 305 | 298 pass, 7 fail in 6 files |
+| Python metadata gate, as README publishes it | 176.60 s | 189 + 111 subtests | green |
+| Workbook Manager checkpoint (9 files) | 1,123.47 s | — | green (2 skips) |
+| Full Python inventory (37 files) | 2,381.46 s | 734 collected | 3 files fail alone |
+
+The 14-gate lane reproduces §3.1 exactly: 298 tests, 292 passed, 6 failed across
+5 files, slowest gate `workbook-schema-standardization`, next
+`stingray-runtime-contract`.
+
+Reference-timing gap (OPEN): Node 22 and Python 3.12 — the CI versions in
+`.github/workflows/release-candidate.yml` — are not installed on the reference
+machine (available: Node 23/24/25/26, Python 3.13/3.14). Every number above is
+local evidence and is explicitly not the CI baseline this checkpoint asked for.
+Closing it needs a CI run or an approved toolchain install; the catalog records
+the gap in `baseline.ci_reference_status`.
+
+Cost concentration measured:
+
+- `workbook-schema-standardization` is 64.97 s, 59.5% of the Node readiness
+  lane, and it re-invokes the schema command full validation already runs.
+- `test_workbook_manager` (810.34 s), `test_verify_workbook_candidate`
+  (694.43 s) and `test_workbook_manager_import_projection` (222.91 s) are 74.5%
+  of the full Python inventory.
+- The §3.2 "repeated workbook mutation/generation owner" is identified:
+  `tests/test_model_config_metadata.py`, 150.33 s, 83.9% of the metadata lane.
+- Two owners the specification's evidence never named:
+  `test_editor_server_write_api.py` at 220.06 s for 4 tests, and
+  `test_editor_ops_apply.py` at 147.75 s.
+
+Findings beyond the documented six stale assertions — four new defects and
+three stale open-failure entries proved resolved. The catalog records all seven
+in `new_findings`:
+
+1. `grand-sport-contract-preview.test.mjs:94` — stale hot-spot count (22 vs 25)
+   in an optional diagnostic the fourteen-gate audit never ran.
+2. `test_runtime_metadata_guards.py:303` — a hardcoded three-row
+   default-selection list over a hardcoded three-model tuple; the workbook now
+   has a fourth valid row. Same defect class as the documented six, on the
+   Python side the audit did not cover.
+3. **The candidate lane's `semantic_drift` stage has no live positive proof.**
+   Its two forcing tests perturb the ZR1 `EFR` option name and expect drift in
+   `choices` and `standardEquipment`; both measured empty. `zr1_options`
+   `opt_efr_001` is `active=True, selectable=False`, yet appears in neither of
+   the 800 choices nor the 318 standardEquipment rows of the retained ZR1
+   contract, so the mutation cannot drift anything. Why an active option row
+   emits nothing is a workbook/generator question this checkpoint is not
+   authorized to answer (§12); it is classified, not decided.
+4. `test_rule_derivation.py`, `test_source_assembly_characterization.py` and
+   `test_options_sheet_quality.py` only pass with `PYTHONPATH=scripts` or beside
+   their siblings. Layer 0 selects gates individually, so this must be fixed
+   before those files can be selected alone.
+5. Three failures `STATE.md` still carries as open are resolved:
+   `test_editor_lints.py` (27 passed, 0 failed, against four recorded on
+   2026-07-26), `test_workbook_manager_generated_parity.py` (4 passed, against
+   the hardcoded three-model tuple recorded on 2026-08-14), and the
+   `sec_perf_support_001` pins plus tracked-artifact churn recorded against
+   `grand-sport-contract-preview.test.mjs` on 2026-07-25.
+
+Also confirmed from the catalog, not new but now measured: the fourteen-gate
+Node lane spends 59.5% of its time re-running a schema command that full default
+validation already runs.
+
+No assertion was deleted, no expectation was refreshed to match current output,
+and no acceptance lock was created. The catalog records
+`promoted_model_membership` as **proposed**: turning it into a lock would freeze
+a business decision and needs §12 approval first.
+
+Also recorded: three files assert `defaultModelKey === "stingray"`, which
+violates the §4.4 one-decision-one-owner rule. The catalog names
+`multi-model-runtime-switching` as the owner and the other two as restatements
+to remove in Checkpoint 1/2.
+
+### Checkpoint 1 — restore truth without refreshing literals
+
+- Rewrite the six current stale assertions as structural, source-parity, or one
+  intentional acceptance lock.
+- Do not replace old counts, URLs, or model lists with new literals.
+- Remove the duplicate schema invocation from the Node readiness path while
+  retaining one schema authority.
+- Update the catalog and README ownership descriptions.
+
+Acceptance: the current default Node inventory is green, the mutation canaries
+for asset URL, override count, and registry membership pass, and protected
+tracked artifacts remain byte-identical.
+
+### Checkpoint 2 — build independent truth and composed parity
+
+- Implement the temporary workbook-truth snapshot.
+- Add source-to-contract and source-to-registry parity owners.
+- Route existing model-specific literal assertions to the parity owner or the
+  explicit acceptance-lock inventory.
+- Prove oracle independence with injected mismatch tests.
+
+Acceptance: every runtime collection with a workbook source has a documented
+parity disposition; no default structural/parity gate embeds complete business
+rows or mutable asset URLs.
+
+### Checkpoint 3 — generate the runtime state matrix
+
+- Parameterize candidate runtime checks over every promoted model and declared
+  variant.
+- Implement the §4.3 invariants and bounded representative transitions.
+- Keep focused dealer security/error tests; add generic model/variant payload
+  identity coverage without live submission.
+- Replace duplicated model-specific generic behavior tests only after the
+  matrix demonstrates equivalent or stronger failure detection.
+
+Acceptance: all promoted models and active variants appear in the report; each
+state invariant has a forced-failure test; model switching and payload identity
+are covered uniformly.
+
+### Checkpoint 4 — consolidate the candidate and Python lanes
+
+- Make the composed candidate the single expensive workbook-to-browser lane.
+- Share one generated candidate within the run.
+- Convert candidate report/stage tests to compact fixtures where end-to-end
+  generation is not their subject.
+- Refactor the metadata mutation hotspot to use compact workbooks or a shared
+  base while retaining representative real-workbook mutation proof.
+- Remove model-specific regeneration from default Node gates once equivalent
+  candidate coverage is proven.
+
+Acceptance: no default layer pays the same schema, model generation, or
+candidate-registry cost twice; retained end-to-end owners still fail when their
+protected stage is broken.
+
+### Checkpoint 5 — optimize Workbook Manager checkpoint fixtures
+
+- Implement the immutable verified projection/candidate fixture and safe clones.
+- Move negative cases to compact fixtures.
+- Retain the distinct real-workbook acceptance boundaries from §5 Layer 3.
+- Measure isolated, combined, and order-sensitive runs to prevent shared-module
+  or mutable-fixture contamination.
+
+Acceptance: Manager fast tests are suitable for Layer 0/2 selection; checkpoint
+runtime materially improves from the 791.25-second baseline without removing a
+distinct protected-boundary proof.
+
+### Checkpoint 6 — CI, documentation, and retirement
+
+- Wire CI to the cataloged layers: Layer 0 plus Layer 1 on every PR, affected
+  Layer 2 gates by changed surface or explicit conservative fallback, and Layer
+  3 when a protected boundary requires it.
+- Run all generating/protected-output gates serially unless their roots are
+  proven disjoint.
+- Upload the stage-timed report.
+- Update README and Workbook Manager guidance from the catalog.
+- Retire obsolete test files/helpers only after the coverage ledger shows their
+  primary protections moved and mutation canaries prove the replacement.
+- Run the full inventory as the final diagnostic and classify every remaining
+  failure.
+
+Acceptance: required CI proves the documented release path; local and CI
+commands agree; no stale gate remains silently outside the catalog; all retired
+owners have explicit replacement evidence.
+
+## 10. Files and surfaces expected to change during implementation
+
+Expected owners, subject to Checkpoint 0 confirmation:
+
+- `scripts/verify_workbook_candidate.py` — stage timing, shared candidate,
+  temporary truth path, and composed report.
+- `scripts/corvette_form_generator/runtime_contract.py` and
+  `workbook_domain/registry.py` — consumed as authorities; changed only if a
+  missing generic invariant is proven to belong there.
+- `tests/test_verify_workbook_candidate.py` — compact stage tests plus bounded
+  full-candidate acceptance.
+- `tests/test_all_model_runtime_generation.py` — merge/retire overlap only after
+  candidate parity.
+- `tests/multi-model-runtime-switching.test.mjs` — generated state matrix and
+  explicit candidate/truth inputs.
+- current model-specific Node contract/regression/publication files — rewrite,
+  narrow, move to acceptance, or retire according to the coverage ledger.
+- `tests/lib/` — independent workbook-truth and runtime-matrix helpers.
+- a new dependency-free validation catalog under `tests/`.
+- Workbook Manager test fixtures and the focused files named in its README.
+- `.github/workflows/release-candidate.yml` — layered commands/report upload only
+  after local acceptance.
+- `README.md`, `workbook-manager/README.md`, and `fable5loop/STATE.md` — owned
+  operator guidance and handoff.
+
+The implementation must not assume every listed file requires edits. Each
+checkpoint uses the smallest confirmed manifest.
+
+## 11. Preserved boundaries
+
+- `stingray_master.xlsx` remains canonical and is not changed merely to make a
+  test easier.
+- No new workbook sheet, column, taxonomy, or business-rule store is introduced
+  by this specification.
+- Generated artifacts remain outputs and are never hand-edited as fixes.
+- Runtime behavior, pricing, defaults, product availability, model promotion,
+  and customer copy do not change unless a separately approved defect is found.
+- Dealer endpoint, payload shape, model scoping, Turnstile/security behavior,
+  modal UX, and live submission remain protected.
+- No test performs a live dealer submission, deployment, WordPress upload,
+  production cache purge, or production verification.
+- No new dependency or build-system assumption is authorized.
+- Workbook Manager draft/apply/recovery semantics remain unchanged.
+- Raw ingest remains retired.
+
+## 12. Failure handling and approval gates
+
+During implementation:
+
+- A stale literal may be rewritten without product approval when the workbook
+  and current approved runtime agree and the replacement preserves or improves
+  coverage.
+- If workbook, retained contract, candidate output, and runtime behavior
+  disagree, stop and classify the defect; do not choose product truth in test
+  code.
+- If a proposed acceptance lock would invent or freeze a new business decision,
+  request approval.
+- If removing a test would reduce a protected boundary or customer behavior
+  proof, stop until an equivalent replacement is demonstrated by a forced
+  failure/mutation canary.
+- Any new dependency, workbook schema, public interface, CI/build assumption,
+  dealer change, or deployment change requires explicit approval.
+- Performance improvements must not depend on unsafe shared mutable workbooks,
+  databases, temporary roots, module reload state, or parallel protected-output
+  checks.
+
+After two repeated no-progress attempts on one fixture/isolation problem, stop
+at a clean checkpoint and report the evidence rather than weakening the gate.
+
+## 13. Validation of this documentation checkpoint
+
+This spec-writing task is complete when:
+
+- this file exists as the owning fast-suite specification;
+- the current baseline, authority classes, layers, state matrix, mutation
+  canaries, checkpoints, approval gates, and preserved boundaries are explicit;
+- the handoff points to Checkpoint 0 and says implementation has not started;
+- README is inspected but unchanged because no operator command has changed;
+- `scripts/validate_fable5_loop.py` and `git diff --check` pass;
+- final status shows only this specification, the required handoff update, and
+  pre-existing user-owned files.
+
+## 14. Definition of done for the implemented suite
+
+The implementation is complete only when all of the following are true:
+
+1. Every default/checkpoint gate is cataloged and has one primary authority.
+2. The canonical workbook passes package, schema, and source-quality validation.
+3. Every workbook-discovered model generates once into an isolated candidate
+   and passes strict contract validation.
+4. Candidate registry and independent workbook-truth parity pass.
+5. Every promoted model and active variant passes the runtime state matrix.
+6. Acceptance locks are few, named, singly owned, and approval-bound.
+7. All §8 mutation canaries prove the layers fail or adapt for the intended
+   reason.
+8. Layer 0 and Layer 1 meet their measured budgets or document an approved,
+   evidence-backed exception.
+9. Workbook Manager checkpoint time materially improves without losing any
+   distinct Layer 3 boundary.
+10. Required CI, local commands, catalog, and README agree.
+11. Full Python and Node inventories are green or contain only explicitly
+    documented environment skips; no baseline failure is hidden behind the
+    layered release result.
+12. Canonical workbook, tracked generated artifacts, dealer boundary, and
+    deployment surfaces remain unchanged by validation itself.
+13. The owning specification records final timings, coverage disposition,
+    retired owners, residual risks, and closeout date before it is marked
+    complete.
+
+## 15. Next action
+
+Checkpoint 0 is complete (see its result block in §9). The catalog, coverage
+ledger, contract test, measured local baseline, and per-gate dispositions are in
+place; no assertion was deleted.
+
+The next authorized implementation slice is Checkpoint 1: rewrite the six
+documented stale assertions — plus the two new stale owners this baseline found
+(`test_runtime_metadata_guards.py:303` and the dead `semantic_drift` canaries) —
+as structural, source-parity, or one intentional acceptance lock, without
+replacing old counts, URLs, or model lists with new literals; remove the
+duplicate schema invocation from the Node readiness path; and fix the three
+files that only pass with `PYTHONPATH=scripts` so Layer 0 can select them alone.
+
+Two items carry approval gates into Checkpoint 1:
+
+- promoting `promoted_model_membership` from a proposed record to a real
+  acceptance lock freezes a business decision and needs approval (§12);
+- deciding why `zr1_options` `opt_efr_001` is active in the workbook yet absent
+  from the generated ZR1 contract is a workbook/generator question, not a test
+  question. Classify the defect; do not choose product truth in test code.
+
+Still open from Checkpoint 0: the Node 22 / Python 3.12 CI reference timings.

@@ -288,8 +288,11 @@ The remaining `tests/test_*.py` files are not in that gate and are chosen by cha
 | Options-sheet quality | `test_options_sheet_quality` |
 | Promotion preflight (slow) | `test_verify_workbook_candidate` |
 | Fable 5 loop | `test_fable5_loop_contract` |
+| Validation catalog | `test_validation_catalog` |
 
-`.venv/bin/python -m pytest tests/ -q` runs everything (678 tests collected as of Pass 5, ~18 min). Three tests in `test_verify_workbook_candidate.py` are ~63s each because each runs the full ten-stage candidate lane over six models; everything outside the slowest ~15 tests is sub-second. Reserve the full run for canonical-workbook writes and publication, per AGENTS.md §10.
+`tests/validation_catalog.json` is the machine-readable inventory of every gate above: its layer, authority class, isolation, serialization requirement, measured duration, and collection counts. `test_validation_catalog` enforces it and fails when a test file is missing from the catalog, when two gates claim one named acceptance lock, when a generating gate lacks an isolated output declaration, when a protected-output gate is not serialized, or when this README disagrees with the catalog. Read counts and timings from the catalog rather than adding them here.
+
+`.venv/bin/python -m pytest tests/ -q` runs everything (~18 min). Three tests in `test_verify_workbook_candidate.py` are ~63s each because each runs the full ten-stage candidate lane over six models; everything outside the slowest ~15 tests is sub-second. Reserve the full run for canonical-workbook writes and publication, per AGENTS.md §10.
 
 Full default validation = schema gate + every default-readiness row of the node matrix + the Python metadata gate. Optional inspection diagnostics run only when their raw-source evidence is relevant. Choose additional gates by changed surface per AGENTS.md §10.
 
