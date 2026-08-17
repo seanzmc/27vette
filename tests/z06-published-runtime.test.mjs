@@ -3,7 +3,7 @@ import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
-import { cell, workbookRows, workbookTruthy } from "./lib/workbook-rows.mjs";
+import { cell, workbookRows, workbookTruthy } from "./lib/workbook-truth.mjs";
 
 const expectedZ06VariantIds = ["1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67", "3lz_h67"];
 const standardSections = new Set([

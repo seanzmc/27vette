@@ -4,22 +4,28 @@ import fs from "node:fs";
 import test from "node:test";
 
 import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
-import { cell, modelSourceSheet, workbookRows } from "./lib/workbook-rows.mjs";
+import { cell, modelSourceSheet, workbookRows, workbookTruth } from "./lib/workbook-truth.mjs";
 
 const MODEL_KEY = "z06";
 const outputRoot = "/tmp/27vette-z06-runtime-contract-test";
 const runtimePath = `${outputRoot}/form-output/runtime/z06-runtime-contract.json`;
-const expectedVariantIds = ["1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67", "3lz_h67"];
-const standardSections = new Set([
-  "sec_stan_001",
-  "sec_1lte_001",
-  "sec_2lte_001",
-  "sec_3lte_001",
-  "sec_incl_001",
-  "sec_safe_001",
-  "sec_stan_002",
-  "sec_tech_001",
-]);
+
+// Checkpoint 2 of the fast layered validation suite (spec §9) replaced two
+// literals that opened this file. Both restated workbook rows: the six variant
+// ids, and the eight sections that hold standard equipment. Neither is a
+// decision this gate owns — `model_variants` owns the first and
+// `section_presentation.standard_equipment_bucket` owns the second — so both
+// now read through the §6.2 workbook-truth snapshot and follow a valid
+// workbook change instead of failing on it.
+const truth = workbookTruth();
+const expectedVariantIds = truth.models[MODEL_KEY].variants.map((variant) => variant.variant_id);
+
+const modelPresentationRows = workbookRows("section_presentation").filter(
+  (row) => row.model_key === MODEL_KEY && row.active === "True",
+);
+const standardSections = new Set(
+  modelPresentationRows.filter((row) => row.standard_equipment_bucket).map((row) => row.section_id),
+);
 const fullLengthStripeOptionIds = [
   "opt_dpb_001", "opt_dpc_001", "opt_dpg_001", "opt_dpl_001", "opt_dpt_001", "opt_dsy_001", "opt_dsz_001", "opt_dt0_001",
   "opt_dth_001", "opt_dub_001", "opt_due_001", "opt_duk_001", "opt_duw_001", "opt_dzu_001", "opt_dzv_001", "opt_dzx_001",
@@ -75,15 +81,31 @@ test("Z06 fresh runtime contract preserves the required top-level contract", () 
     assert.ok(Object.hasOwn(draft, key), `draft is missing ${key}`);
   }
   assert.equal(draft.dataset.status, "runtime_active");
-  assert.equal(draft.dataset.model, "Z06");
-  assert.equal(draft.dataset.source_sheet, "z06_options");
+  assert.equal(draft.dataset.model, truth.models[MODEL_KEY].model_label);
+  assert.equal(draft.dataset.source_sheet, modelSourceSheet(MODEL_KEY, "source_option_sheet"));
   assert.deepEqual(
-    draft.variants.map((variant) => variant.variant_id),
-    expectedVariantIds
+    draft.variants.map((variant) => variant.variant_id).sort(),
+    [...expectedVariantIds].sort()
   );
   assert.equal(draft.steps.every((step) => step.source !== "fallback_config"), true);
-  assert.equal(draft.orderSummary.sections.length, 12);
-  assert.equal(Object.keys(draft.orderSummary.stepMap).length, 14);
+  assert.deepEqual(
+    draft.orderSummary.sections.map((section) => section.section_key).sort(),
+    workbookRows("order_summary_sections")
+      .filter((row) => row.model_key === MODEL_KEY && row.active === "True")
+      .map((row) => row.section_key)
+      .sort()
+  );
+  assert.deepEqual(
+    Object.keys(draft.orderSummary.stepMap).sort(),
+    [
+      ...new Set(
+        workbookRows("step_order_summary_map")
+          .filter((row) => row.model_key === MODEL_KEY && row.active === "True")
+          .map((row) => row.step_key)
+      ),
+    ].sort()
+  );
+  assert.ok(standardSections.size > 0, "the workbook marks no Z06 section as a standard-equipment bucket");
   assert.equal(draft.orderSummary.stepMap.packages_performance, "performance_mechanical");
   assert.equal(draft.orderSummary.stepMap.standard_equipment, "required_charges");
   assert.ok(draft.choices.length > 0, "Z06 runtime contract should include choices");

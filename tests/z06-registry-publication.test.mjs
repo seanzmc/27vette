@@ -7,7 +7,7 @@ import path from "node:path";
 import test from "node:test";
 import vm from "node:vm";
 
-import { cell, workbookRows, workbookTruthy } from "./lib/workbook-rows.mjs";
+import { cell, workbookRows, workbookTruthy } from "./lib/workbook-truth.mjs";
 
 // Spec Pass 3 requirements 6 and 9. Split out of the published-runtime gate
 // so the read-only promotion assertions never invoke the publisher, then given an

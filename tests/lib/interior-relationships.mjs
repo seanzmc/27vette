@@ -20,7 +20,7 @@
 // Note on `active`: none of `rule_mapping`, `price_rules`, or `color_overrides`
 // carries an `active` column — a row's presence is its activation. There is no
 // activation filter to mirror here, and inventing one would silently drop rows.
-import { cell, modelSourceSheet, workbookRows } from "./workbook-rows.mjs";
+import { cell, modelSourceSheet, workbookRows } from "./workbook-truth.mjs";
 
 /**
  * Workbook-authored relationships between interiors and options for one model.

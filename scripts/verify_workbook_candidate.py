@@ -66,6 +66,12 @@ STAGES = (
     "generate_models",
     "validate_contracts",
     "candidate_registry",
+    # Checkpoint 2 of the fast layered validation suite added these two. The
+    # snapshot is the independent expected side (§6.2); the parity stage is the
+    # only place the lane compares source rows against what it just generated,
+    # rather than against the retained artifact it is trying to replace.
+    "workbook_truth",
+    "source_parity",
     "browser_harness",
     "semantic_drift",
 )
@@ -74,10 +80,21 @@ STAGES = (
 # Only generation timestamps — anything else is a real difference.
 GENERATED_AT_KEYS = frozenset({"generated_at", "sourceGeneratedAt", "generatedAt"})
 
-# The harness stage 9 runs against the candidate registry. Kept as one name so
-# the override is a single fact, not a convention repeated in several places.
+# The harness and parity stages run against the candidate registry. Kept as
+# names so each override is a single fact, not a convention repeated in several
+# places.
 HARNESS_DATA_JS_ENV = "CORVETTE_FORM_DATA_JS"
+WORKBOOK_TRUTH_ENV = "CORVETTE_WORKBOOK_TRUTH"
+CONTRACT_ROOT_ENV = "CORVETTE_CONTRACT_ROOT"
 DEFAULT_HARNESS = Path("tests/multi-model-runtime-switching.test.mjs")
+
+# The §4.2 parity owners. They read the candidate's contracts and registry
+# through the environment above, so the same files serve Layer 1 here and Layer
+# 0 standalone against the tracked artifacts.
+PARITY_GATES = (
+    Path("tests/source-to-contract-parity.test.mjs"),
+    Path("tests/source-to-registry-parity.test.mjs"),
+)
 
 # §3.7.1.1: a row in a global family marks every model touched, because a
 # global-family edit can move a model nobody named.
@@ -247,17 +264,20 @@ def retained_contract_for(model_key: str) -> dict[str, Any] | None:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def run_browser_harness(data_js: Path, harness: Path) -> StageResult:
+def run_node_gates(stage: str, gates: tuple[Path, ...] | list[Path], env_overrides: dict[str, str]) -> StageResult:
+    """Run node test files against the candidate, in one process."""
+
     import os
     import subprocess
 
-    if not harness.exists():
-        return StageResult("browser_harness", ok=False, findings=[{"message": f"harness not found: {harness}"}])
+    missing = [str(gate) for gate in gates if not gate.exists()]
+    if missing:
+        return StageResult(stage, ok=False, findings=[{"message": f"gate not found: {missing}"}])
 
     env = dict(os.environ)
-    env[HARNESS_DATA_JS_ENV] = str(data_js)
+    env.update(env_overrides)
     completed = subprocess.run(
-        ["node", "--test", str(harness)],
+        ["node", "--test", *[str(gate) for gate in gates]],
         cwd=ROOT,
         text=True,
         capture_output=True,
@@ -266,11 +286,63 @@ def run_browser_harness(data_js: Path, harness: Path) -> StageResult:
     )
     ok = completed.returncode == 0
     return StageResult(
-        "browser_harness",
+        stage,
         ok=ok,
         findings=[] if ok else [{"message": completed.stdout[-4000:] or completed.stderr[-4000:]}],
-        detail={"harness": str(harness), "data_js": str(data_js), "returncode": completed.returncode},
+        detail={
+            "gates": [str(gate) for gate in gates],
+            "returncode": completed.returncode,
+            **env_overrides,
+        },
     )
+
+
+def run_workbook_truth(candidate: Path, out_path: Path) -> StageResult:
+    """Build the §6.2 snapshot from the candidate workbook, not the tracked one.
+
+    Built here rather than inside each gate so Layer 1 pays it once and every
+    parity assertion underneath compares against the same immutable document.
+    """
+
+    import subprocess
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPTS_DIR / "build_workbook_truth.py"),
+            "--workbook",
+            str(candidate),
+            "--out",
+            str(out_path),
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if completed.returncode != 0:
+        return StageResult(
+            "workbook_truth",
+            ok=False,
+            findings=[{"message": completed.stderr[-4000:] or completed.stdout[-4000:]}],
+        )
+    snapshot = json.loads(out_path.read_text(encoding="utf-8"))
+    return StageResult(
+        "workbook_truth",
+        ok=True,
+        detail={
+            "snapshot": str(out_path),
+            "schemaVersion": snapshot["schemaVersion"],
+            "workbook_sha256": snapshot["workbook"]["sha256"],
+            "sheets": len(snapshot["sheets"]),
+            "models": sorted(snapshot["models"]),
+            "promoted_models": snapshot["promotions"]["promoted_model_keys"],
+        },
+    )
+
+
+def run_browser_harness(data_js: Path, harness: Path) -> StageResult:
+    return run_node_gates("browser_harness", [harness], {HARNESS_DATA_JS_ENV: str(data_js)})
 
 
 def verify_candidate(
@@ -420,7 +492,33 @@ def verify_candidate(
               if not result.ok:
                   raise StageFailure(result)
 
-              # Stage 9: the browser harness, against the candidate registry.
+              # Stage 9: the independent workbook-truth snapshot (§6.2), built
+              # from the CANDIDATE workbook. Building it from the tracked one
+              # would have the parity stage below check fresh output against a
+              # different workbook's rows.
+              truth_path = tmp / "workbook-truth.json"
+              result = run_workbook_truth(candidate, truth_path)
+              stages.append(result)
+              if not result.ok:
+                  raise StageFailure(result)
+
+              # Stage 10: parity between those source rows and what stages 6-8
+              # just produced. Every path is inside the temporary root, so this
+              # proves the candidate rather than the retained artifacts.
+              result = run_node_gates(
+                  "source_parity",
+                  PARITY_GATES,
+                  {
+                      WORKBOOK_TRUTH_ENV: str(truth_path),
+                      CONTRACT_ROOT_ENV: str(candidate_root),
+                      HARNESS_DATA_JS_ENV: str(candidate_data_js),
+                  },
+              )
+              stages.append(result)
+              if not result.ok:
+                  raise StageFailure(result)
+
+              # Stage 11: the browser harness, against the candidate registry.
               if run_harness:
                   result = run_browser_harness(candidate_data_js, harness)
                   stages.append(result)
