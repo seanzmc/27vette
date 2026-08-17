@@ -1523,28 +1523,34 @@ textarea {
   color: var(--dim);
 }
 
-.choice-relationship-badge.info-tooltip {
+.choice-relationship-badge .info-tooltip {
   display: inline-flex;
   width: auto;
   height: auto;
   color: var(--ok);
+  line-height: 1.2;
 }
 
-.choice-relationship-badge.info-tooltip:hover,
-.choice-relationship-badge.info-tooltip:focus-visible,
-.choice-relationship-badge.info-tooltip.is-open {
+.choice-relationship-badge .tooltip-trigger-text {
+  white-space: nowrap;
+}
+
+.choice-relationship-badge .info-tooltip:hover,
+.choice-relationship-badge .info-tooltip:focus-visible,
+.choice-relationship-badge .info-tooltip.is-open {
+  border-radius: 999px;
   background: currentColor;
 }
 
-.choice-relationship-badge.info-tooltip:hover .tooltip-trigger-text,
-.choice-relationship-badge.info-tooltip:focus-visible .tooltip-trigger-text,
-.choice-relationship-badge.info-tooltip.is-open .tooltip-trigger-text {
+.choice-relationship-badge .info-tooltip:hover .tooltip-trigger-text,
+.choice-relationship-badge .info-tooltip:focus-visible .tooltip-trigger-text,
+.choice-relationship-badge .info-tooltip.is-open .tooltip-trigger-text {
   color: #0c0e0f;
 }
 
-.choice-relationship-badge.includes.disabled.info-tooltip:hover,
-.choice-relationship-badge.includes.disabled.info-tooltip:focus-visible,
-.choice-relationship-badge.includes.disabled.info-tooltip.is-open {
+.choice-relationship-badge.includes.disabled .info-tooltip:hover,
+.choice-relationship-badge.includes.disabled .info-tooltip:focus-visible,
+.choice-relationship-badge.includes.disabled .info-tooltip.is-open {
   color: var(--dim);
 }
 

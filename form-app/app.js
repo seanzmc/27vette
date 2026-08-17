@@ -918,11 +918,12 @@ function userSelectedExclusiveGroupPeer(optionId, selectedIds) {
 }
 
 function includedRuleLocksExclusivePeer(rule) {
+  if (interiorsById.has(rule.source_id)) return false;
   const sourceGroup = optionExclusiveGroup(rule.source_id);
   const targetGroup = optionExclusiveGroup(rule.target_id);
   if (targetGroup?.selection_mode !== "single_within_group") return false;
   if (exclusiveGroupAllowsSingleSelection(sourceGroup)) return true;
-  return Boolean(data.interiors?.some((interior) => interior.interior_id === rule.source_id));
+  return false;
 }
 
 function includedRuleAllowedReplacementPeers(rule) {
@@ -1122,7 +1123,7 @@ function disableReasonForChoice(choice, { includeSelectedRequirements = true } =
     }
     if (rule.rule_type === "excludes" && selectedIds.has(rule.target_id)) {
       if (rule.runtime_action === "replace") continue;
-      return `Conflicts with ${getEntityLabel(rule.target_id)}.`;
+      return rule.disabled_reason || `Conflicts with ${getEntityLabel(rule.target_id)}.`;
     }
   }
 
@@ -1350,7 +1351,7 @@ function missingRequirementDetails() {
   const autoAdded = computeAutoAdded();
   for (const choice of rows) {
     const section = sectionsById.get(choice.section_id);
-    if (!section || !(section.selection_mode === "single_select_req" || truthyValue(section.is_required))) continue;
+    if (!section || section.selection_mode !== "single_select_req") continue;
     if (choice.step_key === "base_interior") continue;
     if (shouldHideChoice(choice)) continue;
     if (!sections.has(choice.section_id)) sections.set(choice.section_id, { section, choices: [] });
@@ -2017,7 +2018,7 @@ function renderModeLabel(section) {
 }
 
 function sectionRequiresSelection(section, choices = []) {
-  if (section?.selection_mode === "single_select_req" || truthyValue(section?.is_required)) return true;
+  if (section?.selection_mode === "single_select_req") return true;
   return choices.some((choice) => {
     const group = optionExclusiveGroup(choice.option_id);
     return exclusiveGroupRequiresSelection(group);
