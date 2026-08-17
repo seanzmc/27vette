@@ -1,0 +1,39 @@
+Seatbelt Rules
+
+Key:
+"Included with"= $0 charge, seatbelt is auto added with listed interiors.
+"Adds D30 with", "+D30"= D30 $1,495 auto-added, plus seatbelt charge ($595)
+"Not available with"= Cannot be selected.
+"Not recommended with"= "Adds D30 with"
+
+379 Orange Seat belt
+1LT, 1LZ, 2LT, 2LZ: Adds D30 with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.
+3LT, 3LZ: Not available with (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior.
+Adds D30 with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior.
+Included with (HUW, HUX) Habanero interiors.
+
+3N9 Natural Seat belt
+1LT, 1LZ: Recommended with (HTA, HTJ) Jet Black interior. +D30 with all other interiors.
+2LT, 2LZ: Recommended with (H1Y, HTM, HTP) Jet Black interior or (HTN, HTQ, HUV) Natural interior. +D30 with all other interiors.
+3LT, 3LZ: Recommended with (HMO, HTE, HTT, HU0, HVV, HXO) Jet Black interiors, (HUB, HUC) Ultimate Suede Jet Black interiors or (HTG, HUE) Natural interiors. Included with (HUF, HZN) Natural Dipped interiors and (EJH, EPX) Very Dark Atmosphere interiors.
+Not available with (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior.
++D30 with all other interiors.
+
+3A9 Santorini Blue Seat belt
+1LT, 1LZ, 2LT, 2LZ: Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.
+3LT, 3LZ: Not available with (HVZ) Asymmetrical Adrenaline Red/Jet Black interior.
+Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUW, HUX) Habanero interiors or (EJH, EPX) Very Dark Atmosphere interiors.
+Included with (H8T) Santorini Blue interior and (HAG) Asymmetrical Santorini Blue/Jet Black interior.
+
+3F9 Torch Red Seat belt
+3LT, 3LZ: Not available with (HAG) Asymmetrical Santorini Blue/Jet Black interior.
+Not recommended with (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors or (H8T) Santorini Blue interior.
+Included with (HNK) Adrenaline Red Dipped interior, (HVZ) Asymmetrical Adrenaline Red/Jet Black interior, (EL9) Santorini Blue Dipped with Red accents interior and (Z25) Grand Sport Launch Edition.
+
+3M9 Yellow Seat belt
+1LT, 1LZ, 2LT, 2LZ: Not recommended with (HUQ, HU7, HUL, HUR) Adrenaline Red interiors.
+3LT, 3LZ: Not available with (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior.
+Not recommended with (HU2, HUA, HUU, HZP) Adrenaline Red interiors, (HNK) Adrenaline Red Dipped interior, (HUF, HZN) Natural Dipped interiors, (HUW, HUX) Habanero interiors, (EJH, EPX) Very Dark Atmosphere interiors, (H8T) Santorini Blue interior or (EL9) Santorini Blue Dipped with Red accents interior.
+
+719 Black Seat belt
+3LT, 3LZ: Not available with (HVZ) Asymmetrical Adrenaline Red/Jet Black interior or (HAG) Asymmetrical Santorini Blue/Jet Black interior.
