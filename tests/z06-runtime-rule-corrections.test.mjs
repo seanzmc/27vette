@@ -3,6 +3,8 @@ import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
+import { relationshipPairs, workbookInteriorRelationships } from "./lib/interior-relationships.mjs";
+
 function makeElement() {
   return {
     textContent: "",
@@ -135,30 +137,6 @@ function autoAddedRpos(runtime) {
   return [...runtime.computeAutoAdded().keys()].map((id) => choices.find((choice) => choice.option_id === id)?.rpo || id).sort();
 }
 
-const z06InteriorSeatbeltIncludes = [
-  ["3LZ_AE4_H8T", "opt_3a9_001", "3A9"],
-  ["3LZ_AE4_HAG", "opt_3a9_001", "3A9"],
-  ["3LZ_AE4_HNK", "opt_3f9_001", "3F9"],
-  ["3LZ_AE4_EJH", "opt_3n9_001", "3N9"],
-  ["3LZ_AE4_EPX_N2Z", "opt_3n9_001", "3N9"],
-  ["3LZ_AE4_HUF_N2Z", "opt_3n9_001", "3N9"],
-  ["3LZ_AE4_HUW", "opt_379_001", "379"],
-  ["3LZ_AE4_HUX_N2Z", "opt_379_001", "379"],
-  ["3LZ_AE4_HZN", "opt_3n9_001", "3N9"],
-  ["3LZ_AH2_H8T", "opt_3a9_001", "3A9"],
-  ["3LZ_AH2_HAG", "opt_3a9_001", "3A9"],
-  ["3LZ_AH2_HNK", "opt_3f9_001", "3F9"],
-  ["3LZ_AH2_EJH", "opt_3n9_001", "3N9"],
-  ["3LZ_AH2_EPX_N2Z", "opt_3n9_001", "3N9"],
-  ["3LZ_AH2_HUF_N2Z", "opt_3n9_001", "3N9"],
-  ["3LZ_AH2_HUW", "opt_379_001", "379"],
-  ["3LZ_AH2_HUX_N2Z", "opt_379_001", "379"],
-  ["3LZ_AH2_HZN", "opt_3n9_001", "3N9"],
-  ["3LZ_AUP_HAG", "opt_3a9_001", "3A9"],
-  ["3LZ_AH2_HVZ", "opt_3f9_001", "3F9"],
-  ["3LZ_AE4_HVZ", "opt_3f9_001", "3F9"],
-  ["3LZ_AUP_HVZ", "opt_3f9_001", "3F9"],
-];
 
 test("Z06 gas guzzler tax defaults into every build and prices up with T0F/T0G", () => {
   const runtime = z06Runtime();
@@ -196,46 +174,170 @@ test("Z06 gas guzzler tax defaults into every build and prices up with T0F/T0G",
   }
 });
 
-test("Z06 3LZ interiors include zero-price seatbelt colors and allow Black except for asymmetrical interiors", () => {
-  for (const [interiorId, seatbeltOptionId, seatbeltRpo] of z06InteriorSeatbeltIncludes) {
-    const runtime = z06Runtime({ trimLevel: "3LZ" });
-    const seatRpo = interiorId.includes("_AE4_") ? "AE4" : interiorId.includes("_AUP_") ? "AUP" : "AH2";
-    runtime.handleChoice(choice(runtime, seatRpo));
+// Checkpoint 1 of the fast layered validation suite (spec §9) rewrote this
+// test. It used to walk a 22-row interior/seatbelt table copied into this file
+// and assert the retired behaviour that an included seatbelt colour locks out
+// every peer and permits only Black. PR #19 landed the Seatbelt_Rules.txt
+// authority: a peer the workbook does not mark unavailable IS selectable, adds
+// D30 where a colour-override row says so, and replaces the included colour.
+//
+// Nothing here names an interior, a seatbelt, or D30. Cases, peers, and
+// expectations are read from the model's registered workbook sheets, so a
+// workbook change to any seatbelt relationship moves the coverage with it
+// instead of failing a stale literal — and an omission in the generated payload
+// fails the parity assertions rather than silently shrinking the sweep (§4.3).
+test("every interior-included option obeys its workbook include, exclude, and override rows", () => {
+  const probe = z06Runtime({ trimLevel: "3LZ" });
+  const data = probe.data;
+  const interiorsById = new Map(data.interiors.map((interior) => [interior.interior_id, interior]));
+
+  const groupForOption = new Map();
+  for (const group of data.exclusiveGroups) {
+    for (const optionId of group.option_ids) groupForOption.set(optionId, group);
+  }
+  const optionIds = new Set(data.choices.map((row) => row.option_id));
+
+  // The expected relationships are read from the model's registered sheets, not
+  // from the payload under test. `z06-runtime-contract` already owns include
+  // parity; excludes and colour overrides had no independent owner until PR
+  // review pointed it out, so a dropped row of either kind removed the case and
+  // its expectation at once.
+  const workbook = workbookInteriorRelationships({
+    modelKey: "z06",
+    interiorIds: new Set(interiorsById.keys()),
+    optionIds,
+  });
+
+  const registryExcludes = new Map();
+  for (const rule of data.rules) {
+    if (rule.rule_type !== "excludes" || rule.active !== "True") continue;
+    if (!optionIds.has(rule.source_id) || !interiorsById.has(rule.target_id)) continue;
+    if (!registryExcludes.has(rule.target_id)) registryExcludes.set(rule.target_id, new Set());
+    registryExcludes.get(rule.target_id).add(rule.source_id);
+  }
+  const registryOverrides = new Map();
+  for (const override of data.colorOverrides) {
+    if (!interiorsById.has(override.interior_id) || !optionIds.has(override.option_id)) continue;
+    if (!registryOverrides.has(override.interior_id)) registryOverrides.set(override.interior_id, new Map());
+    registryOverrides.get(override.interior_id).set(override.option_id, override.adds_rpo);
+  }
+
+  assert.ok(relationshipPairs(workbook.includes).length > 0, "no interior include row resolves for z06");
+  assert.ok(relationshipPairs(workbook.excludes).length > 0, "no interior exclude row resolves for z06");
+  assert.ok(relationshipPairs(workbook.overrides).length > 0, "no colour-override row resolves for z06");
+  assert.deepEqual(
+    relationshipPairs(registryExcludes),
+    relationshipPairs(workbook.excludes),
+    "published interior exclude rules drifted from the workbook rule-mapping sheet",
+  );
+  assert.deepEqual(
+    relationshipPairs(registryOverrides),
+    relationshipPairs(workbook.overrides),
+    "published colour overrides drifted from the workbook colour-override sheet",
+  );
+
+  const cases = [...workbook.includes]
+    .flatMap(([interiorId, included]) => [...included].map((includedOptionId) => ({ interiorId, includedOptionId })))
+    .filter(({ includedOptionId }) => groupForOption.has(includedOptionId))
+    .map(({ interiorId, includedOptionId }) => ({
+      interior: interiorsById.get(interiorId),
+      includedOptionId,
+      group: groupForOption.get(includedOptionId),
+    }));
+
+  assert.ok(cases.length > 0, "no workbook-authored interior include resolves into an exclusive group");
+
+  for (const { interior, includedOptionId, group } of cases) {
+    const interiorId = interior.interior_id;
+    const runtime = z06Runtime({ trimLevel: interior.trim_level });
+
+    // Select the interior through its own seat option, read from the interior
+    // row rather than parsed out of the interior id.
+    runtime.handleChoice(choice(runtime, interior.seat_code));
     runtime.state.selectedInterior = interiorId;
     runtime.reconcileSelections();
-    assert.equal(autoAddedRpos(runtime).includes(seatbeltRpo), true, `${interiorId} should auto-add ${seatbeltRpo}`);
-    assert.equal(runtime.optionPrice(seatbeltOptionId), 0, `${interiorId} ${seatbeltRpo} should price at zero`);
 
-    const asymmetrical = /_(HAG|HVZ)$/.test(interiorId);
-    const blackSeatbelt = runtime.activeChoiceRows().find((item) => item.option_id === "opt_719_001");
-    runtime.handleChoice(blackSeatbelt);
-    runtime.reconcileSelections();
     assert.equal(
-      runtime.state.selected.has("opt_719_001"),
-      !asymmetrical,
-      `${interiorId} should ${asymmetrical ? "lock its included color" : "allow Black at no charge"}`,
+      runtime.computeAutoAdded().has(includedOptionId),
+      true,
+      `${interiorId} should auto-add its included option ${includedOptionId}`,
     );
-    assert.equal(runtime.optionPrice("opt_719_001"), 0, "Black replacement should remain $0");
-    if (!asymmetrical) {
-      assert.equal(runtime.computeAutoAdded().has(seatbeltOptionId), false, `${interiorId} Black should replace the included color`);
+    assert.equal(
+      runtime.optionPrice(includedOptionId),
+      0,
+      `${interiorId} should price its included option at zero`,
+    );
+
+    // Peers the workbook marks unavailable for this interior, and the D30-style
+    // RPO each remaining peer adds, both read from the registry rows.
+    const blockedPeers = new Set(
+      data.rules
+        .filter(
+          (rule) =>
+            rule.rule_type === "excludes" &&
+            rule.active === "True" &&
+            rule.target_id === interiorId &&
+            group.option_ids.includes(rule.source_id),
+        )
+        .map((rule) => rule.source_id),
+    );
+    const addsByPeer = new Map(
+      data.colorOverrides
+        .filter((override) => override.interior_id === interiorId && group.option_ids.includes(override.option_id))
+        .map((override) => [override.option_id, override.adds_rpo]),
+    );
+
+    let selectedPeer = null;
+    for (const peerId of group.option_ids) {
+      if (peerId === includedOptionId) continue;
+      const peer = runtime.activeChoiceRows().find((row) => row.option_id === peerId);
+      assert.ok(peer, `${interiorId} peer ${peerId} should be present in the runtime`);
+
+      const reason = runtime.disableReasonForChoice(peer);
+      runtime.handleChoice(peer);
+      runtime.reconcileSelections();
+
+      if (blockedPeers.has(peerId)) {
+        assert.equal(
+          runtime.state.selected.has(peerId),
+          false,
+          `${interiorId} should refuse ${peerId}, which the workbook marks unavailable`,
+        );
+        assert.notEqual(reason, "", `${interiorId} should explain why ${peerId} is unavailable`);
+        assert.equal(
+          selectedPeer === null || runtime.state.selected.has(selectedPeer),
+          true,
+          `${interiorId} lost its selected peer when a blocked peer was clicked`,
+        );
+        continue;
+      }
+
+      assert.equal(reason, "", `${interiorId} should offer ${peerId}: no workbook row blocks it`);
+      assert.equal(
+        runtime.state.selected.has(peerId),
+        true,
+        `${interiorId} should accept ${peerId}, which no workbook row blocks`,
+      );
+      assert.equal(
+        runtime.computeAutoAdded().has(includedOptionId),
+        false,
+        `${interiorId} should drop its included option once a peer is chosen`,
+      );
+
+      // §4.3 item 7: at most one peer of a single-selection group is selected.
+      assert.equal(group.selection_mode, "single_within_group");
+      // Copied into this realm: `group.option_ids` comes from the vm context,
+      // and a cross-realm array fails a prototype-sensitive deep compare.
+      const selectedPeers = [...group.option_ids].filter((id) => runtime.state.selected.has(id));
+      assert.deepEqual(selectedPeers, [peerId], `${interiorId} holds more than one peer of ${group.group_id}`);
+
+      const addsRpo = addsByPeer.get(peerId);
+      if (addsRpo) {
+        const added = runtime.state.selected.has(addsRpo) || runtime.computeAutoAdded().has(addsRpo);
+        assert.equal(added, true, `${interiorId} ${peerId} should add ${addsRpo} per its colour-override row`);
+      }
+      selectedPeer = peerId;
     }
-
-    const otherSeatbelt = runtime.activeChoiceRows().find(
-      (item) =>
-        item.section_id === "sec_seat_001" &&
-        item.option_id !== seatbeltOptionId &&
-        item.option_id !== "opt_719_001" &&
-        item.selectable === "True"
-    );
-    assert.ok(otherSeatbelt, "expected another selectable seatbelt for lock test");
-    runtime.handleChoice(otherSeatbelt);
-    runtime.reconcileSelections();
-    assert.equal(runtime.state.selected.has(otherSeatbelt.option_id), false, `${interiorId} should block other seatbelts`);
-
-    runtime.state.selected.add("opt_d30_001");
-    runtime.handleChoice(otherSeatbelt);
-    runtime.reconcileSelections();
-    assert.equal(runtime.state.selected.has(otherSeatbelt.option_id), false, `${interiorId} should block other seatbelts even with D30`);
   }
 });
 

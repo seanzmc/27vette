@@ -336,7 +336,17 @@ test("generated app data exposes a multi-model registry with Stingray compatibil
   const registry = dataWindow.CORVETTE_FORM_DATA;
 
   assert.ok(registry, "CORVETTE_FORM_DATA registry should exist");
+
+  // Acceptance lock `default_model_is_stingray` (tests/validation_catalog.json).
+  // This file is its single owner; Checkpoint 1 removed the restatements in
+  // z06-registry-publication and z06-published-runtime.
   assert.equal(registry.defaultModelKey, "stingray");
+
+  // The de-facto membership pin. `promoted_model_membership` is recorded in the
+  // catalog as a PROPOSED lock: turning it into a declared one freezes a
+  // business decision and needs §12 approval, which Checkpoint 1 did not seek.
+  // Until then this literal is the only place a promoted-model change fails
+  // deliberately (spec §8 canary 3); every other gate follows the promotion rows.
   assert.deepEqual(Object.keys(registry.models).sort(), [
     "grandSport",
     "grand_sport_x",

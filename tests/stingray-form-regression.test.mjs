@@ -4,6 +4,8 @@ import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
+import { relationshipPairs, workbookInteriorRelationships } from "./lib/interior-relationships.mjs";
+
 function loadRegistry() {
   const context = { window: {} };
   vm.runInNewContext(fs.readFileSync("form-app/data.js", "utf8"), context);
@@ -2836,86 +2838,159 @@ test("single interior and included seatbelt defaults are handled in runtime", ()
   assert.equal(seatbeltDefault?.condition_id, "sec_seat_001");
 });
 
-test("Stingray 3LT interiors allow Black for included colors except asymmetrical interiors", () => {
-  const group = data.exclusiveGroups.find((item) => item.group_id === "excl_seat_belts");
-  assert.ok(group, "Stingray seatbelt exclusive group should be generated");
-  assert.equal(group.selection_mode, "single_within_group");
-  assert.deepEqual(JSON.parse(JSON.stringify(group.option_ids)), ["opt_719_001", "opt_3n9_001", "opt_379_001", "opt_3a9_001", "opt_3f9_001", "opt_3m9_001"]);
+// Checkpoint 1 of the fast layered validation suite (spec §9) rewrote this
+// test. It used to name eight interiors and five seatbelt option ids and assert
+// the retired behaviour that an included colour blocks every peer and permits
+// only Black — including "D30 should not unlock a 3LT included seatbelt peer",
+// which PR #19 superseded: a peer the workbook does not mark unavailable is
+// selectable and adds D30 exactly where a colour-override row says so.
+//
+// The expected relationships come from the model's registered rule-mapping and
+// colour-override sheets, NOT from the published payload being exercised. PR
+// review caught the first version doing the latter: cases, blocked peers, and
+// added RPOs were all filtered out of `data`, so a generator that dropped a row
+// removed the case and its expectation together and the sweep stayed green over
+// shrinking coverage. The workbook is the oracle; the runtime is the subject.
+test("every interior-included Stingray option obeys its workbook include, exclude, and override rows", () => {
+  const groupForOption = new Map();
+  for (const group of data.exclusiveGroups) {
+    for (const optionId of group.option_ids) groupForOption.set(optionId, group);
+  }
+  const interiorsById = new Map(data.interiors.map((interior) => [interior.interior_id, interior]));
+  const optionIds = new Set(data.choices.map((choice) => choice.option_id));
 
-  const runtime = configureInteriorOrder({ trimLevel: "3LT", seatRpo: "AE4", interiorId: "3LT_AE4_H8T" });
-  runtime.reconcileSelections();
-  assert.equal(runtime.computeAutoAdded().has("opt_3a9_001"), true, "3LT_AE4_H8T should auto-add 3A9");
-  assert.equal(runtime.optionPrice("opt_3a9_001"), 0, "included 3A9 should price at zero");
+  const workbook = workbookInteriorRelationships({
+    modelKey: "stingray",
+    interiorIds: new Set(interiorsById.keys()),
+    optionIds,
+  });
 
-  const redSeatbelt = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_3f9_001");
-  assert.ok(redSeatbelt, "red seatbelt should exist for lock test");
-  runtime.handleChoice(redSeatbelt);
-  runtime.reconcileSelections();
-  assert.equal(runtime.state.selected.has("opt_3f9_001"), false, "included 3A9 should block other seatbelt choices");
-
-  runtime.state.selected.add("opt_d30_001");
-  runtime.handleChoice(redSeatbelt);
-  runtime.reconcileSelections();
-  assert.equal(runtime.state.selected.has("opt_3f9_001"), false, "D30 should not unlock a 3LT included seatbelt peer");
-
-  const blackReplacement = runtime.activeChoiceRows().find((choice) => choice.option_id === "opt_719_001");
-  runtime.handleChoice(blackReplacement);
-  runtime.reconcileSelections();
-  assert.equal(runtime.state.selected.has("opt_719_001"), true, "H8T should allow Black at no charge");
-  assert.equal(runtime.computeAutoAdded().has("opt_3a9_001"), false, "Black should replace the H8T included color");
-
-  for (const interiorId of ["3LT_AE4_EJH", "3LT_AE4_EPX_N26", "3LT_AH2_EJH", "3LT_AH2_EPX_N26"]) {
-    const seatRpo = interiorId.includes("_AE4_") ? "AE4" : "AH2";
-    const vdaRuntime = configureInteriorOrder({ trimLevel: "3LT", seatRpo, interiorId });
-    vdaRuntime.reconcileSelections();
-    assert.equal(vdaRuntime.computeAutoAdded().has("opt_3n9_001"), true, `${interiorId} should auto-add 3N9`);
-    assert.equal(vdaRuntime.optionPrice("opt_3n9_001"), 0, `${interiorId} should zero-price 3N9`);
-
-    const blackSeatbelt = vdaRuntime.activeChoiceRows().find((choice) => choice.option_id === "opt_719_001");
-    vdaRuntime.handleChoice(blackSeatbelt);
-    vdaRuntime.reconcileSelections();
-    assert.equal(vdaRuntime.state.selected.has("opt_719_001"), true, `${interiorId} should allow Black at no charge`);
-    assert.equal(vdaRuntime.computeAutoAdded().has("opt_3n9_001"), false, `${interiorId} Black should replace 3N9`);
-
-    const otherSeatbelt = vdaRuntime.activeChoiceRows().find(
-      (choice) =>
-        choice.section_id === "sec_seat_001" &&
-        choice.option_id !== "opt_3n9_001" &&
-        choice.option_id !== "opt_719_001" &&
-        choice.selectable === "True"
-    );
-    assert.ok(otherSeatbelt, "expected another selectable seatbelt for VDA lock test");
-    vdaRuntime.handleChoice(otherSeatbelt);
-    vdaRuntime.reconcileSelections();
-    assert.equal(vdaRuntime.state.selected.has(otherSeatbelt.option_id), false, `${interiorId} should block other seatbelt colors`);
-
-    vdaRuntime.state.selected.add("opt_d30_001");
-    vdaRuntime.handleChoice(otherSeatbelt);
-    vdaRuntime.reconcileSelections();
-    assert.equal(vdaRuntime.state.selected.has(otherSeatbelt.option_id), false, `${interiorId} should keep other seatbelts blocked even with D30`);
+  // Parity first: the published registry must carry exactly the resolvable
+  // relationships the workbook authors. This is the assertion a dropped row
+  // fails — the runtime loop below cannot see an omission on its own.
+  const registryIncludes = new Map();
+  const registryExcludes = new Map();
+  for (const rule of data.rules) {
+    if (rule.active !== "True") continue;
+    if (rule.rule_type === "includes" && interiorsById.has(rule.source_id) && optionIds.has(rule.target_id)) {
+      if (!registryIncludes.has(rule.source_id)) registryIncludes.set(rule.source_id, new Set());
+      registryIncludes.get(rule.source_id).add(rule.target_id);
+    }
+    if (rule.rule_type === "excludes" && optionIds.has(rule.source_id) && interiorsById.has(rule.target_id)) {
+      if (!registryExcludes.has(rule.target_id)) registryExcludes.set(rule.target_id, new Set());
+      registryExcludes.get(rule.target_id).add(rule.source_id);
+    }
+  }
+  const registryOverrides = new Map();
+  for (const override of data.colorOverrides) {
+    if (!interiorsById.has(override.interior_id) || !optionIds.has(override.option_id)) continue;
+    if (!registryOverrides.has(override.interior_id)) registryOverrides.set(override.interior_id, new Map());
+    registryOverrides.get(override.interior_id).set(override.option_id, override.adds_rpo);
   }
 
-  const dippedRuntime = configureInteriorOrder({ trimLevel: "3LT", seatRpo: "AH2", interiorId: "3LT_AH2_HNK" });
-  dippedRuntime.reconcileSelections();
-  const autoAdded = dippedRuntime.computeAutoAdded();
-  assert.equal(autoAdded.get("opt_3f9_001"), "Included with Adrenaline Red Dipped.");
-  dippedRuntime.state.activeStep = "seat_belt";
-  const blackSeatbelt = dippedRuntime.activeChoiceRows().find((choice) => choice.option_id === "opt_719_001");
-  const blackSeatbeltHtml = dippedRuntime.renderChoiceCard(blackSeatbelt, autoAdded);
-  assert.doesNotMatch(blackSeatbeltHtml, /unavailable/i);
-  assert.doesNotMatch(blackSeatbeltHtml, /3LT_AH2_HNK|3lt_ah2_hnk/);
-  dippedRuntime.handleChoice(blackSeatbelt);
-  dippedRuntime.reconcileSelections();
-  assert.equal(dippedRuntime.state.selected.has("opt_719_001"), true, "HNK should allow Black at no charge");
-  assert.equal(dippedRuntime.computeAutoAdded().has("opt_3f9_001"), false, "Black should replace the HNK included color");
+  assert.ok(relationshipPairs(workbook.includes).length > 0, "no interior include row resolves for stingray");
+  assert.ok(relationshipPairs(workbook.excludes).length > 0, "no interior exclude row resolves for stingray");
+  assert.ok(relationshipPairs(workbook.overrides).length > 0, "no colour-override row resolves for stingray");
+  assert.deepEqual(
+    relationshipPairs(registryIncludes),
+    relationshipPairs(workbook.includes),
+    "published interior include rules drifted from the workbook rule-mapping sheet",
+  );
+  assert.deepEqual(
+    relationshipPairs(registryExcludes),
+    relationshipPairs(workbook.excludes),
+    "published interior exclude rules drifted from the workbook rule-mapping sheet",
+  );
+  assert.deepEqual(
+    relationshipPairs(registryOverrides),
+    relationshipPairs(workbook.overrides),
+    "published colour overrides drifted from the workbook colour-override sheet",
+  );
 
-  const asymRuntime = configureInteriorOrder({ trimLevel: "3LT", seatRpo: "AH2", interiorId: "3LT_AH2_HVZ" });
-  asymRuntime.reconcileSelections();
-  assert.equal(asymRuntime.computeAutoAdded().has("opt_3f9_001"), true, "HVZ should auto-add 3F9");
-  assert.equal(asymRuntime.optionPrice("opt_3f9_001"), 0, "HVZ included 3F9 should price at zero");
-  asymRuntime.handleChoice(asymRuntime.activeChoiceRows().find((choice) => choice.option_id === "opt_719_001"));
-  asymRuntime.reconcileSelections();
-  assert.equal(asymRuntime.state.selected.has("opt_719_001"), false, "HVZ should lock 3F9 with no Black alternative");
+  const cases = [...workbook.includes]
+    .flatMap(([interiorId, includedOptionIds]) =>
+      [...includedOptionIds].map((includedOptionId) => ({ interiorId, includedOptionId })),
+    )
+    .filter(({ includedOptionId }) => groupForOption.has(includedOptionId))
+    .map(({ interiorId, includedOptionId }) => ({
+      interior: interiorsById.get(interiorId),
+      includedOptionId,
+      group: groupForOption.get(includedOptionId),
+      rule: data.rules.find(
+        (row) => row.rule_type === "includes" && row.source_id === interiorId && row.target_id === includedOptionId,
+      ),
+    }));
+
+  assert.ok(cases.length > 0, "no workbook-authored interior include resolves into an exclusive group");
+
+  for (const { interior, includedOptionId, group, rule } of cases) {
+    const interiorId = interior.interior_id;
+    const runtime = configureInteriorOrder({
+      trimLevel: interior.trim_level,
+      seatRpo: interior.seat_code,
+      interiorId,
+    });
+    runtime.reconcileSelections();
+
+    const autoAdded = runtime.computeAutoAdded();
+    assert.equal(autoAdded.has(includedOptionId), true, `${interiorId} should auto-add ${includedOptionId}`);
+    assert.equal(runtime.optionPrice(includedOptionId), 0, `${interiorId} should zero-price ${includedOptionId}`);
+    // The auto-add reason is customer copy: it must exist and must not leak the
+    // internal interior key (STATE 2026-07-25, `contract.label_for`).
+    const includedReason = String(autoAdded.get(includedOptionId) || "");
+    assert.ok(includedReason, `${interiorId} auto-added ${includedOptionId} with no reason copy`);
+    assert.doesNotMatch(includedReason, new RegExp(interiorId, "i"));
+    assert.ok(rule?.disabled_reason, `${interiorId} include of ${includedOptionId} lost its authored copy`);
+
+    // Both expectations are the workbook's, not the payload's.
+    const blockedPeers = workbook.excludes.get(interiorId) || new Set();
+    const addsByPeer = workbook.overrides.get(interiorId) || new Map();
+
+    runtime.state.activeStep = "seat_belt";
+    for (const peerId of group.option_ids) {
+      if (peerId === includedOptionId) continue;
+      const peer = runtime.activeChoiceRows().find((choice) => choice.option_id === peerId);
+      assert.ok(peer, `${interiorId} peer ${peerId} should be present in the runtime`);
+
+      const blocked = blockedPeers.has(peerId);
+      const card = runtime.renderChoiceCard(peer, runtime.computeAutoAdded());
+      assert.doesNotMatch(card, new RegExp(interiorId, "i"), `${peerId} card leaked the interior id`);
+      if (!blocked) {
+        assert.doesNotMatch(card, /unavailable/i, `${peerId} card says unavailable with no blocking row`);
+      }
+
+      runtime.handleChoice(peer);
+      runtime.reconcileSelections();
+
+      if (blocked) {
+        assert.equal(
+          runtime.state.selected.has(peerId),
+          false,
+          `${interiorId} should refuse ${peerId}, which the workbook marks unavailable`,
+        );
+        continue;
+      }
+
+      assert.equal(
+        runtime.state.selected.has(peerId),
+        true,
+        `${interiorId} should accept ${peerId}, which no workbook row blocks`,
+      );
+      assert.equal(
+        runtime.computeAutoAdded().has(includedOptionId),
+        false,
+        `${interiorId} should drop its included option once a peer is chosen`,
+      );
+      const selectedPeers = [...group.option_ids].filter((id) => runtime.state.selected.has(id));
+      assert.deepEqual(selectedPeers, [peerId], `${interiorId} holds more than one peer of ${group.group_id}`);
+
+      const addsRpo = addsByPeer.get(peerId);
+      if (addsRpo) {
+        const added = runtime.state.selected.has(addsRpo) || runtime.computeAutoAdded().has(addsRpo);
+        assert.equal(added, true, `${interiorId} ${peerId} should add ${addsRpo} per its colour-override row`);
+      }
+    }
+  }
 });
 
 test("sidebar keeps one Standard & Included surface inside Selected RPOs", () => {

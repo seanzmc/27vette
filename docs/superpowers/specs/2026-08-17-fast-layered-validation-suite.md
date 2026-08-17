@@ -1,7 +1,7 @@
 # Fast Layered Validation Suite Specification
 
-Status: IN IMPLEMENTATION — Checkpoint 0 complete 2026-08-17; Checkpoint 1 is
-the next authorized slice.
+Status: IN IMPLEMENTATION — Checkpoints 0 and 1 complete 2026-08-17;
+Checkpoint 2 is the next authorized slice.
 Date: 2026-08-17
 Branch: `claude/fast-layered-validation-suite-4c31f6` (spec authored on `main`)
 Recommended implementation reasoning: medium. Escalate only for a specific
@@ -584,6 +584,98 @@ Acceptance: the current default Node inventory is green, the mutation canaries
 for asset URL, override count, and registry membership pass, and protected
 tracked artifacts remain byte-identical.
 
+#### Checkpoint 1 result — 2026-08-17 (COMPLETE)
+
+All six documented stale assertions, both new stale owners from the Checkpoint 0
+baseline, the duplicate schema invocation, and the three import-order-dependent
+files are closed. No literal was refreshed: not one old count, URL, or model list
+was replaced by its current value.
+
+| Stale owner | Replacement |
+|---|---|
+| `grand-sport-runtime-contract` `colorOverrides.length === 263` | identity-set comparison against the resolvable rows of the model's registered `color_overrides` sheet, plus `override_id` uniqueness |
+| `grand-sport-runtime-contract` J6F PNG URL | sweep comparing every option's seven image fields against its applicable active `asset_map` row, wildcard/exact precedence resolved on the expected side |
+| `stingray-form-regression` included-seatbelt lock (2 assertions) | runtime sweep whose cases, blocked peers, and added RPOs are read from the model's registered rule-mapping and colour-override sheets, with registry-vs-workbook parity asserted before the runtime is driven |
+| `z06-runtime-contract` "included colour or Black" | parity between emitted interior-sourced `includes` / interior-conditioned price rules and the model's registered rule-mapping and price-rule sheets |
+| `z06-runtime-rule-corrections` included-seatbelt block (2 assertions) | the same sweep, over the same workbook-read expected sets |
+| `z06-registry-publication` three model keys | comparison against the active promoted rows of `model_registry_promotion`, ordered by `display_order` |
+| `test_runtime_metadata_guards.py:303` three-row/three-model literal | loader output for every workbook-active model against a direct openpyxl read of the same sheet |
+| dead `semantic_drift` canaries | probe selected from the retained ZR1 contract itself; raises if no option reaches both collections |
+
+Two 22-row interior/seatbelt tables — parallel copies of workbook data in
+JavaScript — were deleted with the assertions that read them.
+
+Also delivered:
+
+- The duplicate schema invocation is gone from the Node readiness path.
+  `workbook-schema-standardization` measures **0.91 s against 64.97 s**, and the
+  fourteen-gate readiness lane **52.63 s against 109.27 s**. `cmd.workbook_schema`
+  is the single schema authority, named as such in README and reachable from the
+  Node matrix section; no structural sweep was dropped.
+- `tests/conftest.py` owns the `scripts/` path insertion for the whole test
+  directory. With `PYTHONPATH` unset and run alone: `test_rule_derivation` 15
+  passed, `test_source_assembly_characterization` 32 passed,
+  `test_options_sheet_quality` 18 passed. Layer 0 can now select them.
+- `tests/lib/workbook-rows.mjs` — the independent §4.2 expected side for Node
+  parity gates: openpyxl only, no generator import, memoized per sheet.
+  `tests/lib/interior-relationships.mjs` builds the interior/option include,
+  exclude, and colour-override sets on top of it, so the two runtime sweeps state
+  what must be true independently of the payload they exercise. Checkpoint 2
+  replaces both with the persistent workbook-truth snapshot.
+- Both restatements of `default_model_is_stingray` are removed;
+  `multi-model-runtime-switching` is its single asserting owner.
+
+Acceptance evidence (local Node 26.7.0 / Python 3.14.7, serial):
+
+| Lane | Result |
+|---|---|
+| 14 documented Node readiness gates | all pass — 298 collected tests, 52.63 s |
+| All 16 Node files | 305 collected tests, 55.44 s; only `grand-sport-contract-preview` fails, on the Checkpoint 2 hot-spot literal it already owned |
+| `test_runtime_metadata_guards.py` | 11 passed, 0.25 s |
+| `test_verify_workbook_candidate.py` | see the Checkpoint 1 evidence file |
+| `test_validation_catalog.py` | 19 passed |
+| Protected tracked artifacts | unchanged (`git status -- form-output form-app` clean) |
+
+Mutation canaries, all run in a throwaway `git worktree` against copies — the
+canonical workbook and the working tree were never mutated:
+
+1. §8.1 valid active asset URL change → parity layers green, no literal URL test
+   fails.
+2. §8.2 one valid new colour-override row → emitted overrides 281 → 282, gate
+   green. The retired `=== 263` literal would have failed both before and after.
+3. §8.3 promoted-model membership change → before republication the publication
+   parity test follows the workbook (5 models) while the tracked-registry
+   comparison correctly fails as stale; after republishing, both parity gates
+   follow the change and `multi-model-runtime-switching` fails 8 of 70 on its
+   de-facto membership pin.
+4. §8.5 injected generator defects → dropping `image_alt`, dropping one
+   resolvable override row, and dropping one interior-sourced `includes` row each
+   fail exactly their own new parity assertion.
+5. Forced failure of the new runtime sweeps (suppressing the seat-belt disable
+   reason in `app.js`) and of the rewritten metadata guard (loader drops one row
+   per model) → both fail as intended.
+6. Omission canaries added after PR review → dropping one interior-targeted
+   `excludes` row, and dropping one resolvable colour-override row, each fail the
+   registry-vs-workbook parity assertion in both runtime sweeps. Neither would
+   have failed the first version of those sweeps, which derived their expected
+   relationships from the payload they exercised; that is the defect review
+   caught and these two canaries are the proof it is closed.
+
+Canaries 4, 6 and 8 belong to later checkpoints and were not run.
+
+Carried forward, unchanged by this checkpoint:
+
+- `promoted_model_membership` stays **proposed**. Checkpoint 1 took the parity
+  route, which needs no approval; declaring the lock still freezes a business
+  decision and needs §12 approval.
+- Why active `zr1_options.opt_efr_001` emits nothing is still **unanswered**. The
+  canary no longer depends on it, but the workbook/generator question is a §12
+  classification, not a test decision.
+- Node 22 / Python 3.12 CI reference timings are still **uncaptured**.
+- `grand-sport-contract-preview.test.mjs:94` (hot-spot count 22 vs 25) is still
+  open, per its recorded Checkpoint 2 disposition. It is a Layer 4 diagnostic,
+  not a readiness gate, and is the only failing Node file.
+
 ### Checkpoint 2 — build independent truth and composed parity
 
 - Implement the temporary workbook-truth snapshot.
@@ -766,24 +858,30 @@ The implementation is complete only when all of the following are true:
 
 ## 15. Next action
 
-Checkpoint 0 is complete (see its result block in §9). The catalog, coverage
-ledger, contract test, measured local baseline, and per-gate dispositions are in
-place; no assertion was deleted.
+Checkpoints 0 and 1 are complete (see their result blocks in §9). The catalog,
+coverage ledger, and contract test are in place; the six documented stale
+assertions and both new stale owners are rewritten as parity or data-derived
+runtime sweeps with no refreshed literals; the duplicate schema invocation is
+gone; and every Python test file is independently runnable.
 
-The next authorized implementation slice is Checkpoint 1: rewrite the six
-documented stale assertions — plus the two new stale owners this baseline found
-(`test_runtime_metadata_guards.py:303` and the dead `semantic_drift` canaries) —
-as structural, source-parity, or one intentional acceptance lock, without
-replacing old counts, URLs, or model lists with new literals; remove the
-duplicate schema invocation from the Node readiness path; and fix the three
-files that only pass with `PYTHONPATH=scripts` so Layer 0 can select them alone.
+The next authorized implementation slice is Checkpoint 2: implement the
+temporary workbook-truth snapshot (§6.2), add source-to-contract and
+source-to-registry parity owners, route the remaining model-specific literal
+assertions to the parity owner or the acceptance-lock inventory, and prove oracle
+independence with injected mismatch tests. `tests/lib/workbook-rows.mjs` is the
+interim expected-side reader Checkpoint 1 introduced; the snapshot replaces it.
 
-Two items carry approval gates into Checkpoint 1:
+Three items carry approval or classification gates into Checkpoint 2:
 
 - promoting `promoted_model_membership` from a proposed record to a real
-  acceptance lock freezes a business decision and needs approval (§12);
+  acceptance lock freezes a business decision and needs approval (§12).
+  Checkpoint 1 used the parity route instead, which needs none; the literal in
+  `multi-model-runtime-switching` remains the de-facto pin until approval;
 - deciding why `zr1_options` `opt_efr_001` is active in the workbook yet absent
   from the generated ZR1 contract is a workbook/generator question, not a test
-  question. Classify the defect; do not choose product truth in test code.
+  question. The drift canary no longer depends on it. Classify the defect; do not
+  choose product truth in test code;
+- `grand-sport-contract-preview.test.mjs:94` (hot-spot count 22 vs 25) is the
+  remaining stale aggregate literal, deferred here by its recorded disposition.
 
 Still open from Checkpoint 0: the Node 22 / Python 3.12 CI reference timings.

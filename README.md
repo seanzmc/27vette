@@ -230,7 +230,9 @@ Fable 5 compounding loop scaffold:
 
 The operating entrypoint is `fable5loop/README.md`. Use this gate after any change to the loop scaffold, run receipts, state file, or compounding skill.
 
-Workbook schema gate:
+Workbook schema gate — the single schema authority. No test re-runs it; the
+`workbook-schema-standardization` node gate owns only the structural conformance
+this command does not check:
 
 ```sh
 .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
@@ -263,6 +265,8 @@ Node gate matrix (run each with `node --test tests/<name>.test.mjs`):
 | Isolated registry publication | `z06-registry-publication` |
 | Generated-artifact boundary helper | `tracked-artifacts-guard` |
 
+This matrix does not run the workbook schema gate. It used to, inside `workbook-schema-standardization`, and that one duplicated call was more than half the lane's wall time. Run the schema gate above alongside the node files: full default validation is the schema gate **plus** this matrix **plus** the Python metadata gate, never the matrix alone.
+
 Optional inspection diagnostics (not readiness gates): `grand-sport-contract-preview`, `z06-contract-preview`. They retain raw-source/provenance evidence for investigations; customer/runtime assertions belong in the strict runtime-contract gates above.
 
 Those tables are the complete set of `tests/*.test.mjs`; a new node gate must be added here and assigned one authority. Default gates are read-only or write only below a temporary root. Publication verification is explicit and isolated from the published `form-app/data.js` path.
@@ -289,6 +293,11 @@ The remaining `tests/test_*.py` files are not in that gate and are chosen by cha
 | Promotion preflight (slow) | `test_verify_workbook_candidate` |
 | Fable 5 loop | `test_fable5_loop_contract` |
 | Validation catalog | `test_validation_catalog` |
+
+Every `tests/test_*.py` file runs standalone: `tests/conftest.py` puts `scripts/`
+on `sys.path` for the whole directory, so no pytest command needs
+`PYTHONPATH=scripts`. The options-sheet quality CLI above still does, because it
+is a module invocation rather than a pytest run.
 
 `tests/validation_catalog.json` is the machine-readable inventory of every gate above: its layer, authority class, isolation, serialization requirement, measured duration, and collection counts. `test_validation_catalog` enforces it and fails when a test file is missing from the catalog, when two gates claim one named acceptance lock, when a generating gate lacks an isolated output declaration, when a protected-output gate is not serialized, or when this README disagrees with the catalog. Read counts and timings from the catalog rather than adding them here.
 

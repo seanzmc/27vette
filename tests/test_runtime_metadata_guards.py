@@ -23,6 +23,24 @@ from corvette_form_generator.runtime_metadata import (  # noqa: E402
     load_runtime_steps,
 )
 
+def _raw_sheet_rows(wb: object, sheet_name: str) -> list[dict[str, object]]:
+    """Cells of one sheet, read directly.
+
+    The independent side of a parity assertion (spec §4.2): openpyxl only, no
+    `corvette_form_generator` call, so the expected side cannot be produced by
+    the code under test.
+    """
+
+    ws = wb[sheet_name]
+    headers = [ws.cell(1, col).value for col in range(1, ws.max_column + 1)]
+    rows: list[dict[str, object]] = []
+    for raw in ws.iter_rows(min_row=2, values_only=True):
+        record = {header: value for header, value in zip(headers, raw) if header}
+        if any(value is not None for value in record.values()):
+            rows.append(record)
+    return rows
+
+
 PROMOTION_HEADERS = [
     "model_key",
     "registry_key",
@@ -290,24 +308,59 @@ class RuntimeMetadataGuardTests(unittest.TestCase):
         self.assertNotIn("_DEFAULT_SELECTED_DISPLAY_RULE_IDS_BY_MODEL", source)
 
     def test_live_workbook_default_selection_display_behavior_rows_are_explicit(self) -> None:
+        """Every workbook-authored `default_selected` row reaches the loader, and no other.
+
+        Checkpoint 1 of the fast layered validation suite (spec §9) replaced the
+        hardcoded three-row expectation this test carried over a hardcoded
+        three-model tuple. The workbook has since authored a fourth valid row
+        and promotes six models, so the literal failed for a valid data state
+        while the three-model sweep silently covered half the active models.
+        The expected side is now a direct read of the same sheet's cells — no
+        `runtime_metadata` call — so a valid new row extends the comparison
+        instead of breaking it, and a loader that drops, invents, or misroutes a
+        row still fails.
+        """
+
         wb = load_workbook(ROOT / "stingray_master.xlsx", read_only=True, data_only=True)
         try:
-            rows = [
-                (model_key, row["rule_id"], row["display_behavior"])
-                for model_key in ("stingray", "grand_sport", "z06")
-                for row in load_default_selection_display_rules(wb, model_key)
+            model_keys = sorted(
+                str(row["model_key"]).strip()
+                for row in _raw_sheet_rows(wb, "model_master")
+                if str(row.get("active", "")).strip().lower() in {"true", "yes", "1", "y"}
+            )
+            authored = [
+                (
+                    str(row["model_key"]).strip(),
+                    str(row["rule_id"]).strip(),
+                    str(row["display_behavior"]).strip(),
+                )
+                for row in _raw_sheet_rows(wb, "default_selection_rules")
+                if str(row.get("active", "")).strip().lower() in {"true", "yes", "1", "y"}
+                and str(row.get("display_behavior", "")).strip() == "default_selected"
+                and str(row.get("rule_id", "")).strip()
             ]
+            actual = sorted(
+                (model_key, row["rule_id"], row["display_behavior"])
+                for model_key in model_keys
+                for row in load_default_selection_display_rules(wb, model_key)
+            )
         finally:
             wb.close()
 
-        self.assertEqual(
-            sorted(rows),
-            [
-                ("grand_sport", "gs_default_bc7_coupe", "default_selected"),
-                ("grand_sport", "gs_default_nga_unless_nwi", "default_selected"),
-                ("stingray", "default_bc7", "default_selected"),
-            ],
-        )
+        # A row naming a model that is not workbook-active is never swept, so
+        # comparing it against the loader would fail for something that is not a
+        # loader defect. Scope the comparison and report the orphan separately,
+        # so each failure names its own cause.
+        active = set(model_keys)
+        orphans = sorted(row for row in authored if row[0] not in active)
+        expected = sorted(row for row in authored if row[0] in active)
+
+        # Guard the sweep: an empty expected side would make the comparison
+        # vacuous, and every model must be swept, not a named subset.
+        self.assertGreaterEqual(len(model_keys), 2)
+        self.assertTrue(expected, "no active default_selected row in default_selection_rules")
+        self.assertEqual(orphans, [], "default_selection_rules rows name inactive models")
+        self.assertEqual(actual, expected)
 
 
 if __name__ == "__main__":

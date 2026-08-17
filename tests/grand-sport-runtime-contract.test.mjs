@@ -4,6 +4,7 @@ import fs from "node:fs";
 import test from "node:test";
 
 import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
+import { cell, modelSourceSheet, workbookRows, workbookTruthy } from "./lib/workbook-rows.mjs";
 
 const outputRoot = "/tmp/27vette-grand-sport-runtime-contract-test";
 const runtimePath = `${outputRoot}/form-output/runtime/grand-sport-runtime-contract.json`;
@@ -32,32 +33,6 @@ function generateRuntimeContractWithoutTrackedMutation() {
     "--output-root must receive the strict runtime contract this gate consumes"
   );
   return JSON.parse(fs.readFileSync(runtimePath, "utf8"));
-}
-
-function workbookRows(sheetName) {
-  const output = execFileSync(
-    ".venv/bin/python",
-    [
-      "-c",
-      [
-        "import json",
-        "from openpyxl import load_workbook",
-        "wb = load_workbook('stingray_master.xlsx', read_only=True, data_only=True)",
-        `ws = wb['${sheetName}']`,
-        "headers = [ws.cell(1, col).value for col in range(1, ws.max_column + 1)]",
-        "rows = []",
-        "def legacy_value(value):",
-        "    return 'True' if value is True else 'False' if value is False else value",
-        "for raw in ws.iter_rows(min_row=2, values_only=True):",
-        "    record = {header: legacy_value(value) for header, value in zip(headers, raw) if header and value is not None}",
-        "    if record:",
-        "        rows.append(record)",
-        "print(json.dumps(rows))",
-      ].join("\n"),
-    ],
-    { encoding: "utf8" }
-  );
-  return JSON.parse(output);
 }
 
 const draft = generateRuntimeContractWithoutTrackedMutation();
@@ -347,16 +322,6 @@ test("Grand Sport runtime contract emits color overrides and workbook-backed pac
     assert.equal(rule.price_rule_type, "override", `${rule.price_rule_id} should use supported override type`);
     assert.equal(typeof rule.price_value, "number", `${rule.price_rule_id} should emit numeric price_value`);
   }
-  assert.equal(draft.colorOverrides.length, 263);
-  assert.ok(
-    draft.colorOverrides.some(
-      (override) =>
-        override.interior_id === "3LT_R6X_AH2_HZP_N26" &&
-        override.option_id === "opt_379_001" &&
-        override.adds_rpo === "opt_d30_001"
-    ),
-    "seatbelt color override rows should auto-add D30 like Stingray"
-  );
   const warnings = new Set(draft.validation.filter((row) => row.severity === "warning").map((row) => row.check_id));
   const passes = new Set(draft.validation.filter((row) => row.severity === "pass").map((row) => row.check_id));
   assert.equal(warnings.has("pricing_deferred"), false);
@@ -773,23 +738,137 @@ test("Grand Sport runtime contract keeps normalized display fields and strips ra
   assert.equal(cfl.step_key, "packages_performance");
 });
 
-test("Grand Sport runtime contract applies active option assets from asset_map", () => {
-  const brightRedCaliperChoices = draft.choices.filter((choice) => choice.option_id === "opt_j6f_001");
-  assert.equal(brightRedCaliperChoices.length, 6);
-  for (const choice of brightRedCaliperChoices) {
-    assert.equal(
-      choice.image_url,
-      "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6f.png"
-    );
-    assert.equal(choice.image_alt, "Bright Red-Painted Calipers");
-    assert.equal(choice.image_fit, "cover");
-    assert.equal(choice.image_position, "center");
+// Checkpoint 1 of the fast layered validation suite (spec §9) replaced the
+// literal `.../brakes/e-j6f.png` pinned here. That URL was a mutable workbook
+// value copied into a test file: the workbook moved to a `.webp` render and the
+// gate failed while the generator was correct. The expected side is now a
+// direct read of the `asset_map` rows, so a valid media change follows the
+// workbook (spec §8 canary 1) while a generator that drops, invents, or
+// misroutes an asset still fails.
+test("every Grand Sport option asset equals its applicable active asset_map row", () => {
+  const MODEL_KEY = "grand_sport";
+  const IMAGE_FIELDS = [
+    "image_url",
+    "image_alt",
+    "image_fit",
+    "image_position",
+    "hover_image_url",
+    "hover_image_alt",
+    "hover_image_position",
+  ];
+
+  // Expected side: raw asset_map rows. Wildcard ("*") rows apply to option
+  // targets in every model; an exact model row wins over a wildcard for the
+  // same target. Blank model_key is not shared media and does not apply.
+  //
+  // Cross-model precedence is the one rule reimplemented here, so the case it
+  // cannot adjudicate is rejected rather than silently resolved: two active
+  // rows sharing a model_key AND a target are a workbook defect, and letting
+  // one overwrite the other could make this test and the generator wrong in the
+  // same direction.
+  const expectedByOptionId = new Map();
+  for (const pass of ["*", MODEL_KEY]) {
+    const seenThisPass = new Set();
+    for (const row of workbookRows("asset_map")) {
+      if (!workbookTruthy(row.active)) continue;
+      if (cell(row.model_key) !== pass) continue;
+      if (cell(row.target_type) !== "option") continue;
+      const targetId = cell(row.target_id);
+      if (!targetId || !cell(row.image_url)) continue;
+      assert.equal(
+        seenThisPass.has(targetId),
+        false,
+        `asset_map has two active option rows for model_key ${pass} and target ${targetId}`,
+      );
+      seenThisPass.add(targetId);
+      expectedByOptionId.set(
+        targetId,
+        Object.fromEntries(IMAGE_FIELDS.map((field) => [field, cell(row[field])])),
+      );
+    }
   }
 
-  const unmappedChoice = draft.choices.find((choice) => choice.option_id === "opt_cfl_001");
-  assert.ok(unmappedChoice, "unmapped choice should still be present");
-  assert.equal(Object.hasOwn(unmappedChoice, "image_url"), false);
-  assert.equal(Object.hasOwn(unmappedChoice, "image_alt"), false);
+  const optionIds = new Set(draft.choices.map((choice) => choice.option_id));
+  const mappedOptionIds = [...expectedByOptionId.keys()].filter((id) => optionIds.has(id));
+
+  // Guard the sweep: an empty expected side would make every assertion below
+  // vacuous, which is how the retired literal survived being wrong.
+  assert.ok(
+    mappedOptionIds.length > 0,
+    "asset_map declares no active option asset that reaches the Grand Sport contract",
+  );
+  assert.ok(
+    optionIds.size > mappedOptionIds.length,
+    "expected at least one unmapped option to prove assets are not applied blanket",
+  );
+
+  for (const choice of draft.choices) {
+    const expected = expectedByOptionId.get(choice.option_id);
+    if (expected) {
+      for (const field of IMAGE_FIELDS) {
+        assert.equal(
+          choice[field],
+          expected[field],
+          `${choice.choice_id} ${field} does not match its active asset_map row`,
+        );
+      }
+    } else {
+      for (const field of IMAGE_FIELDS) {
+        assert.equal(
+          Object.hasOwn(choice, field),
+          false,
+          `${choice.choice_id} carries ${field} with no applicable active asset_map row`,
+        );
+      }
+    }
+  }
+});
+
+// Checkpoint 1 replaced `assert.equal(draft.colorOverrides.length, 263)`. A
+// count is not a membership check — 263 rows with one wrong interior passes it,
+// and one valid new workbook row fails it for no defect. The identity set is
+// compared against the shared color_overrides sheet instead (spec §8 canary 2).
+test("emitted Grand Sport colorOverrides equal their resolvable source rows", () => {
+  const sheetName = modelSourceSheet("grand_sport", "color_overrides_sheet");
+  const sourceRows = workbookRows(sheetName);
+
+  const interiorIds = new Set(draft.interiors.map((interior) => interior.interior_id));
+  const optionIds = new Set(draft.choices.map((choice) => choice.option_id));
+
+  const identity = (row) =>
+    [
+      cell(row.interior_id),
+      cell(row.option_id),
+      cell(row.rule_type).toLowerCase(),
+      cell(row.adds_rpo),
+    ].join("::");
+
+  // The one documented normalization: a shared-sheet row whose interior,
+  // option, or added RPO is outside this model's scope is not emitted.
+  const expected = sourceRows
+    .filter(
+      (row) =>
+        interiorIds.has(cell(row.interior_id)) &&
+        optionIds.has(cell(row.option_id)) &&
+        optionIds.has(cell(row.adds_rpo)),
+    )
+    .map(identity)
+    .sort();
+  const actual = draft.colorOverrides.map(identity).sort();
+
+  assert.ok(expected.length > 0, `${sheetName} resolved no rows into the Grand Sport contract`);
+  assert.deepEqual(
+    actual,
+    expected,
+    "emitted colorOverrides drifted from the resolvable rows of " + sheetName,
+  );
+
+  // Structural invariants the identity comparison cannot see.
+  const overrideIds = draft.colorOverrides.map((override) => override.override_id);
+  assert.equal(new Set(overrideIds).size, overrideIds.length, "override_id is not unique");
+  for (const override of draft.colorOverrides) {
+    assert.ok(override.notes, `${override.override_id} lost its notes field`);
+  }
 });
 
 test("Grand Sport runtime contract section placement follows section_master step_key", () => {

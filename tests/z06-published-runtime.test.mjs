@@ -3,6 +3,8 @@ import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
+import { cell, workbookRows, workbookTruthy } from "./lib/workbook-rows.mjs";
+
 const expectedZ06VariantIds = ["1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67", "3lz_h67"];
 const standardSections = new Set([
   "sec_stan_001",
@@ -135,18 +137,22 @@ init();
   return context.window.__testApi;
 }
 
-test("generated app registry publishes all six models without changing the Stingray default", () => {
+test("the published registry carries every promoted model and the full Z06 runtime", () => {
   const registry = loadDataWindow().CORVETTE_FORM_DATA;
 
-  assert.equal(registry.defaultModelKey, "stingray");
-  assert.deepEqual(Object.keys(registry.models).sort(), [
-    "grandSport",
-    "grand_sport_x",
-    "stingray",
-    "z06",
-    "zr1",
-    "zr1x",
-  ]);
+  // Checkpoint 1 of the fast layered validation suite (spec §9) removed two
+  // restatements from this gate: `defaultModelKey === "stingray"`, which is the
+  // default_model_is_stingray acceptance lock owned by
+  // tests/multi-model-runtime-switching.test.mjs, and the six-key membership
+  // literal. §4.4 allows one owner per decision. Membership is compared here
+  // against the workbook's own promotion rows instead.
+  const promotedRegistryKeys = workbookRows("model_registry_promotion")
+    .filter((row) => workbookTruthy(row.active) && workbookTruthy(row.promoted_to_runtime))
+    .map((row) => cell(row.registry_key))
+    .sort();
+  assert.ok(promotedRegistryKeys.length > 0, "model_registry_promotion promotes no model");
+  assert.deepEqual(Object.keys(registry.models).sort(), promotedRegistryKeys);
+
   assert.equal(registry.models.z06.key, "z06");
   assert.equal(registry.models.z06.label, "Z06");
   assert.equal(registry.models.z06.modelName, "Corvette Z06");
@@ -195,7 +201,15 @@ test("promoted Z06 runtime data strips draft-only provenance and protects source
 test("runtime can switch to Z06 and build a model-scoped order", () => {
   const runtime = loadRuntime();
 
-  assert.equal(runtime.activeModelKey, "stingray");
+  // The subject is the switch, not which model the app opens on — that is the
+  // default_model_is_stingray lock, owned by multi-model-runtime-switching. The
+  // pre-switch state is compared against the workbook's flagged default row so
+  // this gate does not restate the decision (spec §4.4).
+  const defaultRow = workbookRows("model_registry_promotion").find(
+    (row) => workbookTruthy(row.active) && workbookTruthy(row.default_model)
+  );
+  assert.ok(defaultRow, "model_registry_promotion declares no active default model");
+  assert.equal(runtime.activeModelKey, cell(defaultRow.registry_key));
   runtime.activateModel("z06");
 
   assert.equal(runtime.activeModelKey, "z06");
