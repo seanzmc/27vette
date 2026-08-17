@@ -131,7 +131,9 @@ def _suite_member_gate_ids(catalog: dict, suite: dict) -> set[str]:
     owners = _gate_test_files(catalog)
     command = suite["command"]
 
-    files = set(re.findall(r"tests/[\w.\-]+\.(?:py|mjs)", command))
+    # `/` is in the path class so an explicit nested path (tests/unit/test_x.py)
+    # is derived rather than silently under-counted.
+    files = set(re.findall(r"tests/[\w./\-]+\.(?:py|mjs)", command))
     if re.search(r"tests/\*\.test\.mjs", command):
         files |= {path for path in owners if path.endswith(".test.mjs")}
     if re.search(r"pytest\s+tests/(?:\s|$)", command):
@@ -165,6 +167,13 @@ def test_every_gate_declares_the_required_fields(catalog):
         assert gate["checkpoint_policy"] in enums["checkpoint_policy"], gate["id"]
         assert gate["disposition"] in enums["disposition"], gate["id"]
         assert gate["disposition_reason"].strip(), f"{gate['id']} has an empty disposition reason"
+        # Typed, not merely present. `null` would satisfy a presence check and
+        # then make conditions 3 and 4 skip the gate on their falsy guard.
+        for flag in ("generates", "hashes_protected_roots"):
+            assert isinstance(gate[flag], bool), (
+                f"{gate['id']} declares {flag}={gate[flag]!r}; it must be a bool, "
+                "because the isolation and serialization checks branch on it"
+            )
 
 
 def test_every_gate_declares_exactly_one_primary_authority(catalog):
@@ -280,9 +289,20 @@ def test_generating_gates_declare_isolated_output(catalog):
         )
         assert gate["isolation"] != "read_only", f"{gate['id']} generates but is declared read_only"
         assert gate["writes"], f"{gate['id']} generates but declares no output location"
+        exceptions = " ".join(gate.get("isolation_exceptions", []))
         for path in gate["writes"]:
             assert not path.startswith(tracked_roots), (
                 f"{gate['id']} declares a write to the tracked generated surface: {path}"
+            )
+            # A write that is not under a temporary root is a real side effect on
+            # the invocation directory. It may be acceptable, but it has to be
+            # declared, or `isolation` reads as "nothing lands outside a temp dir"
+            # to whatever schedules this gate later.
+            if path.startswith("<") or path.startswith("/tmp/"):
+                continue
+            assert path in exceptions, (
+                f"{gate['id']} writes {path!r}, which is not under a temporary root and is not "
+                "listed in isolation_exceptions"
             )
 
 
@@ -308,8 +328,22 @@ def test_suite_gate_ids_match_what_the_command_would_run(catalog):
     """
     for suite in catalog["suites"]:
         expected = _suite_member_gate_ids(catalog, suite)
-        if not expected:
+
+        if not suite.get("membership_derivable", True):
+            # An opt-out has to say why, or it is just the empty list again
+            # wearing a different name.
+            assert suite.get("membership_note", "").strip(), (
+                f"{suite['id']} opts out of command-derived membership without a stated reason"
+            )
             continue
+
+        # An unparseable command must not skip the check: that is the same
+        # "empty value makes the rule vacuous" hole, one level up.
+        assert expected, (
+            f"{suite['id']} declares derivable membership but its command parsed no gates: "
+            f"{suite['command']!r}"
+        )
+
         missing = sorted(expected - set(suite["gate_ids"]))
         extra = sorted(set(suite["gate_ids"]) - expected)
         assert not missing, f"{suite['id']} command runs gates it does not declare: {missing}"
@@ -367,13 +401,18 @@ def test_readme_publishes_every_catalog_command_it_claims(catalog, readme_text):
 
 
 def test_readme_lists_every_node_gate(readme_text):
-    """README states its tables are the complete set of tests/*.test.mjs."""
+    """README states its tables are the complete set of tests/*.test.mjs.
+
+    Discovery is recursive for the same reason the completeness check is: a
+    nested gate that README never lists is the failure this is meant to catch.
+    """
     normalized = _normalize(readme_text)
-    missing = [
-        path.name.removesuffix(".test.mjs")
-        for path in sorted(TESTS_DIR.glob("*.test.mjs"))
-        if path.name.removesuffix(".test.mjs") not in normalized
-    ]
+    missing = sorted(
+        path.rsplit("/", 1)[-1].removesuffix(".test.mjs")
+        for path in _discover_test_files()
+        if path.endswith(".test.mjs")
+        and path.rsplit("/", 1)[-1].removesuffix(".test.mjs") not in normalized
+    )
     assert not missing, f"node gates missing from the README matrix: {missing}"
 
 
@@ -431,6 +470,15 @@ def test_checks_fail_on_a_mutated_catalog(catalog):
     with pytest.raises(AssertionError):
         test_generating_gates_declare_isolated_output(mutated)
 
+    # An undeclared write to the invocation directory is a side effect the
+    # isolation kind does not describe.
+    mutated = copy_catalog()
+    stray = next(g for g in mutated["gates"] if g["generates"])
+    stray["writes"] = list(stray["writes"]) + ["./some-report.json"]
+    stray.pop("isolation_exceptions", None)
+    with pytest.raises(AssertionError):
+        test_generating_gates_declare_isolated_output(mutated)
+
     # condition 4: a protected-output gate loses its serial group
     mutated = copy_catalog()
     protected = next(g for g in mutated["gates"] if g["hashes_protected_roots"])
@@ -461,6 +509,26 @@ def test_checks_fail_on_a_mutated_catalog(catalog):
         test_suites_containing_protected_gates_require_serial_execution(mutated)
     with pytest.raises(AssertionError):
         test_suite_gate_ids_match_what_the_command_would_run(mutated)
+
+    # A command the deriver cannot parse must not skip the membership check —
+    # that would restore the vacuous case one level up.
+    mutated = copy_catalog()
+    blind = mutated["suites"][0]
+    blind["command"] = "./scripts/run-everything.sh"
+    blind["gate_ids"] = []
+    with pytest.raises(AssertionError):
+        test_suite_gate_ids_match_what_the_command_would_run(mutated)
+
+    # Opting out of derivation requires a stated reason.
+    blind["membership_derivable"] = False
+    with pytest.raises(AssertionError):
+        test_suite_gate_ids_match_what_the_command_would_run(mutated)
+
+    # A null flag satisfies presence and then turns conditions 3 and 4 off.
+    mutated = copy_catalog()
+    mutated["gates"][0]["hashes_protected_roots"] = None
+    with pytest.raises(AssertionError):
+        test_every_gate_declares_the_required_fields(mutated)
 
     # condition 5: README disagreement, both directions
     mutated = copy_catalog()
