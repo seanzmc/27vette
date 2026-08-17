@@ -470,13 +470,18 @@ Delivered:
 
 - `tests/validation_catalog.json` — the machine-readable catalog. 59 gates (16
   Node files, 38 Python files, 5 script commands), 6 suites, 5 acceptance-lock
-  records, 33 coverage-ledger entries, 7 stale assertions, 7 findings, and 8
+  records, 33 coverage-ledger entries, 7 stale assertions, 8 findings, and 8
   expensive repeated setups. Every gate carries all §7 fields plus its §4
   authority class, its §9 disposition with a stated reason, measured seconds,
   collected test count, and its baseline result.
 - `tests/test_validation_catalog.py` — the §7 contract test. All five failure
   conditions are implemented and each is proved by a forced mutation, so none of
-  them can be green for the wrong reason. 17 tests, 0.03 s.
+  them can be green for the wrong reason. Condition 4 is enforced at suite level
+  as well as gate level: suite membership is derived from the command rather
+  than trusted from `gate_ids`, so a whole-inventory command cannot be declared
+  parallel-safe by leaving its membership empty. File discovery is recursive,
+  and a generating gate may not declare `read_only` or `in_process` isolation.
+  19 tests, 0.04 s.
 - `README.md` — one ownership correction. The hand-maintained pytest collection
   count (678, measured 734) is removed and the catalog is named as the owner;
   the contract test fails if a count returns.
@@ -517,8 +522,8 @@ Cost concentration measured:
   `test_editor_server_write_api.py` at 220.06 s for 4 tests, and
   `test_editor_ops_apply.py` at 147.75 s.
 
-Findings beyond the documented six stale assertions — four new defects and
-three stale open-failure entries proved resolved. The catalog records all seven
+Findings beyond the documented six stale assertions — five new defects and
+three stale open-failure entries proved resolved. The catalog records all eight
 in `new_findings`:
 
 1. `grand-sport-contract-preview.test.mjs:94` — stale hot-spot count (22 vs 25)
@@ -539,7 +544,13 @@ in `new_findings`:
    `test_options_sheet_quality.py` only pass with `PYTHONPATH=scripts` or beside
    their siblings. Layer 0 selects gates individually, so this must be fixed
    before those files can be selected alone.
-5. Three failures `STATE.md` still carries as open are resolved:
+5. Review of the first implementation found the catalog's own condition 4
+   vacuous at suite level: `suite.full_python_inventory` declared no members and
+   `serial_required: false` while `pytest tests/` collects
+   `test_verify_workbook_candidate`, which hashes the protected roots. Fixed
+   here — the same "a check only observed passing is not a check" failure mode
+   the catalog exists to prevent, found in the catalog's enforcement.
+6. Three failures `STATE.md` still carries as open are resolved:
    `test_editor_lints.py` (27 passed, 0 failed, against four recorded on
    2026-07-26), `test_workbook_manager_generated_parity.py` (4 passed, against
    the hardcoded three-model tuple recorded on 2026-08-14), and the

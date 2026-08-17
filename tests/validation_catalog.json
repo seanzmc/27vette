@@ -160,7 +160,7 @@
       ],
       "writes": [
         "<temp candidate root>/**",
-        "candidate-report.json"
+        "./candidate-report.json"
       ],
       "isolation": "temp_workbook_copy",
       "generates": true,
@@ -175,7 +175,11 @@
       "readme_reference": "python scripts/verify_workbook_candidate.py",
       "notes": "Ten stages: copy_candidate, workbook_package, workbook_schema, options_sheet_quality, discover_models, generate_models, validate_contracts, candidate_registry, browser_harness, semantic_drift.",
       "collected_tests": null,
-      "baseline_result": "not_run_in_this_baseline"
+      "baseline_result": "not_run_in_this_baseline",
+      "isolation_exceptions": [
+        "./candidate-report.json is written to the invocation directory, not a temp root. It is a readiness report, not a generated product artifact, and it is not tracked or gitignored — CI uploads it and discards it. Declared here rather than left implicit by the isolation kind."
+      ],
+      "readme_publishes_command": true
     },
     {
       "id": "cmd.workbook_schema",
@@ -206,7 +210,8 @@
       "readme_reference": ".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx",
       "notes": "Also runs as stage 3 of the candidate lane against the temporary copy.",
       "collected_tests": null,
-      "baseline_result": "not_run_standalone_in_this_baseline"
+      "baseline_result": "not_run_standalone_in_this_baseline",
+      "readme_publishes_command": true
     },
     {
       "id": "cmd.workbook_package",
@@ -234,7 +239,8 @@
       "readme_reference": ".venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx",
       "notes": "",
       "collected_tests": null,
-      "baseline_result": "not_run_standalone_in_this_baseline"
+      "baseline_result": "not_run_standalone_in_this_baseline",
+      "readme_publishes_command": true
     },
     {
       "id": "cmd.options_sheet_quality",
@@ -264,7 +270,8 @@
       "readme_reference": "corvette_form_generator.options_sheet_quality",
       "notes": "",
       "collected_tests": null,
-      "baseline_result": "not_run_standalone_in_this_baseline"
+      "baseline_result": "not_run_standalone_in_this_baseline",
+      "readme_publishes_command": true
     },
     {
       "id": "cmd.fable5_loop_validator",
@@ -292,7 +299,8 @@
       "readme_reference": ".venv/bin/python scripts/validate_fable5_loop.py",
       "notes": "",
       "collected_tests": null,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": true
     },
     {
       "id": "node.workbook-schema-standardization",
@@ -326,7 +334,8 @@
       "readme_reference": "workbook-schema-standardization",
       "notes": "Holds KNOWN_TYPE_DRIFT — nine registry-declared typed columns holding text. That is a recorded workbook non-conformance, not a stale test literal.",
       "collected_tests": 13,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "node.workbook-visual-copy-standardization",
@@ -357,7 +366,8 @@
       "readme_reference": "workbook-visual-copy-standardization",
       "notes": "",
       "collected_tests": 8,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "node.nonruntime-option-source-purge",
@@ -387,7 +397,8 @@
       "readme_reference": "nonruntime-option-source-purge",
       "notes": "",
       "collected_tests": 6,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "node.stingray-runtime-contract",
@@ -423,7 +434,8 @@
       "readme_reference": "stingray-runtime-contract",
       "notes": "",
       "collected_tests": 12,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "node.grand-sport-runtime-contract",
@@ -460,7 +472,8 @@
       "readme_reference": "grand-sport-runtime-contract",
       "notes": "Currently FAILING — see stale_assertions.",
       "collected_tests": 18,
-      "baseline_result": "fail_2"
+      "baseline_result": "fail_2",
+      "readme_publishes_command": false
     },
     {
       "id": "node.z06-runtime-contract",
@@ -496,7 +509,8 @@
       "readme_reference": "z06-runtime-contract",
       "notes": "Currently FAILING — see stale_assertions. Measured wall time is low because the run aborts at the failing assertion before later cases.",
       "collected_tests": 24,
-      "baseline_result": "fail_1"
+      "baseline_result": "fail_1",
+      "readme_publishes_command": false
     },
     {
       "id": "node.z06-interior-accessory-cleanup",
@@ -533,7 +547,8 @@
       "readme_reference": "z06-interior-accessory-cleanup",
       "notes": "",
       "collected_tests": 7,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "node.stingray-form-regression",
@@ -572,7 +587,8 @@
       "readme_reference": "stingray-form-regression",
       "notes": "Currently FAILING — see stale_assertions.",
       "collected_tests": 91,
-      "baseline_result": "fail_1"
+      "baseline_result": "fail_1",
+      "readme_publishes_command": false
     },
     {
       "id": "node.z06-published-runtime",
@@ -604,7 +620,8 @@
       "readme_reference": "z06-published-runtime",
       "notes": "Carries expectedZ06VariantIds and a standardSections literal set duplicated from z06-runtime-contract.",
       "collected_tests": 4,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "node.multi-model-runtime-switching",
@@ -641,7 +658,8 @@
       "readme_reference": "multi-model-runtime-switching",
       "notes": "Also holds the largest static product matrix in JavaScript (13 URLs, six-model seatbelt sweep). Checkpoint 3 replaces the static sweep with data-discovered cases; the two named locks stay.",
       "collected_tests": 70,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "node.z06-performance-package-interactions",
@@ -673,7 +691,8 @@
       "readme_reference": "z06-performance-package-interactions",
       "notes": "",
       "collected_tests": 21,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "node.z06-runtime-rule-corrections",
@@ -706,7 +725,8 @@
       "readme_reference": "z06-runtime-rule-corrections",
       "notes": "Currently FAILING — see stale_assertions.",
       "collected_tests": 15,
-      "baseline_result": "fail_1"
+      "baseline_result": "fail_1",
+      "readme_publishes_command": false
     },
     {
       "id": "node.z06-registry-publication",
@@ -740,7 +760,8 @@
       "readme_reference": "z06-registry-publication",
       "notes": "Currently FAILING — see stale_assertions.",
       "collected_tests": 2,
-      "baseline_result": "fail_1"
+      "baseline_result": "fail_1",
+      "readme_publishes_command": false
     },
     {
       "id": "node.tracked-artifacts-guard",
@@ -772,7 +793,8 @@
       "readme_reference": "tracked-artifacts-guard",
       "notes": "",
       "collected_tests": 7,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "node.grand-sport-contract-preview",
@@ -807,7 +829,8 @@
       "readme_reference": "grand-sport-contract-preview",
       "notes": "Currently FAILING — see stale_assertions (seventh, outside the documented six).",
       "collected_tests": 5,
-      "baseline_result": "fail_1"
+      "baseline_result": "fail_1",
+      "readme_publishes_command": false
     },
     {
       "id": "node.z06-contract-preview",
@@ -842,7 +865,8 @@
       "readme_reference": "z06-contract-preview",
       "notes": "",
       "collected_tests": 2,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_generation_safety",
@@ -872,7 +896,8 @@
       "readme_reference": "test_generation_safety",
       "notes": "",
       "collected_tests": 13,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_generate_form_model_discovery_cli",
@@ -905,7 +930,8 @@
       "readme_reference": "test_generate_form_model_discovery_cli",
       "notes": "",
       "collected_tests": 3,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_runtime_contract_builder",
@@ -936,7 +962,8 @@
       "readme_reference": "test_runtime_contract_builder",
       "notes": "STATE 2026-07-26 records that assert_runtime_contract() does not enforce the full spec rejection matrix (variant drop/duplicate/rename and dataset.source_workbook binding are accepted). That gap is a Checkpoint 2 parity item, not a stale literal.",
       "collected_tests": 13,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_model_config_metadata",
@@ -968,7 +995,8 @@
       "readme_reference": "test_model_config_metadata",
       "notes": "",
       "collected_tests": 23,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_promote_model",
@@ -1000,7 +1028,8 @@
       "readme_reference": "test_promote_model",
       "notes": "",
       "collected_tests": 10,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_registry_promotion_metadata",
@@ -1032,7 +1061,8 @@
       "readme_reference": "test_registry_promotion_metadata",
       "notes": "",
       "collected_tests": 13,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_schema_validation_metadata",
@@ -1064,7 +1094,8 @@
       "readme_reference": "test_schema_validation_metadata",
       "notes": "",
       "collected_tests": 46,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_rule_derivation",
@@ -1094,7 +1125,8 @@
       "readme_reference": "test_rule_derivation",
       "notes": "Requires PYTHONPATH=scripts when selected alone; see finding.import_order_dependence.",
       "collected_tests": 15,
-      "baseline_result": "pass_only_with_pythonpath_scripts"
+      "baseline_result": "pass_only_with_pythonpath_scripts",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_model_generation_route",
@@ -1127,7 +1159,8 @@
       "readme_reference": "test_model_generation_route",
       "notes": "",
       "collected_tests": 23,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_all_model_runtime_generation",
@@ -1161,7 +1194,8 @@
       "readme_reference": "test_all_model_runtime_generation",
       "notes": "",
       "collected_tests": 30,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_verify_workbook_candidate",
@@ -1197,7 +1231,8 @@
       "readme_reference": "test_verify_workbook_candidate",
       "notes": "",
       "collected_tests": 16,
-      "baseline_result": "fail_2"
+      "baseline_result": "fail_2",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_options_sheet_quality",
@@ -1231,7 +1266,8 @@
       "readme_reference": "test_options_sheet_quality",
       "notes": "Requires PYTHONPATH=scripts when selected alone; see finding.import_order_dependence.",
       "collected_tests": 18,
-      "baseline_result": "pass_only_with_pythonpath_scripts"
+      "baseline_result": "pass_only_with_pythonpath_scripts",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_atomic_registry_write",
@@ -1263,7 +1299,8 @@
       "readme_reference": "test_atomic_registry_write",
       "notes": "",
       "collected_tests": 9,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_source_assembly_characterization",
@@ -1293,7 +1330,8 @@
       "readme_reference": "test_source_assembly_characterization",
       "notes": "Requires PYTHONPATH=scripts when selected alone; see finding.import_order_dependence.",
       "collected_tests": 32,
-      "baseline_result": "pass_only_with_pythonpath_scripts"
+      "baseline_result": "pass_only_with_pythonpath_scripts",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_runtime_metadata_guards",
@@ -1326,7 +1364,8 @@
       "readme_reference": "test_runtime_metadata_guards",
       "notes": "",
       "collected_tests": 11,
-      "baseline_result": "fail_1"
+      "baseline_result": "fail_1",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_corvette_form_generator_contract",
@@ -1356,7 +1395,8 @@
       "readme_reference": "test_corvette_form_generator_contract",
       "notes": "",
       "collected_tests": 10,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_editor_ops_apply",
@@ -1389,7 +1429,8 @@
       "readme_reference": "test_editor_ops_apply",
       "notes": "",
       "collected_tests": 63,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_editor_ops_meta",
@@ -1420,7 +1461,8 @@
       "readme_reference": "test_editor_ops_meta",
       "notes": "",
       "collected_tests": 9,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_editor_ops_global_families",
@@ -1453,7 +1495,8 @@
       "readme_reference": "test_editor_ops_global_families",
       "notes": "",
       "collected_tests": 16,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_editor_lints",
@@ -1484,7 +1527,8 @@
       "readme_reference": "test_editor_lints",
       "notes": "",
       "collected_tests": 27,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_editor_server_payload",
@@ -1517,7 +1561,8 @@
       "readme_reference": "test_editor_server_payload",
       "notes": "",
       "collected_tests": 21,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_editor_server_write_api",
@@ -1551,7 +1596,8 @@
       "readme_reference": "test_editor_server_write_api",
       "notes": "",
       "collected_tests": 4,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_workbook_domain_registry",
@@ -1581,7 +1627,8 @@
       "readme_reference": "test_workbook_domain_registry",
       "notes": "",
       "collected_tests": 9,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_workbook_changeset",
@@ -1611,7 +1658,8 @@
       "readme_reference": "test_workbook_changeset",
       "notes": "",
       "collected_tests": 33,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_workbook_changeset_service",
@@ -1644,7 +1692,8 @@
       "readme_reference": "test_workbook_changeset_service",
       "notes": "",
       "collected_tests": 17,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_workbook_bool_hygiene",
@@ -1676,7 +1725,8 @@
       "readme_reference": "test_workbook_bool_hygiene",
       "notes": "",
       "collected_tests": 7,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_asset_map_sync",
@@ -1709,7 +1759,8 @@
       "readme_reference": "test_asset_map_sync",
       "notes": "Also listed in the Workbook Manager checkpoint inventory.",
       "collected_tests": 50,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_set_asset_display",
@@ -1741,7 +1792,8 @@
       "readme_reference": "test_set_asset_display",
       "notes": "",
       "collected_tests": 3,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_fable5_loop_contract",
@@ -1774,7 +1826,8 @@
       "readme_reference": "test_fable5_loop_contract",
       "notes": "",
       "collected_tests": 14,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_validation_catalog",
@@ -1799,14 +1852,15 @@
       "serial_group": null,
       "ci_policy": "not_run_now",
       "checkpoint_policy": "default_readiness",
-      "approximate_seconds": 0.03,
+      "approximate_seconds": 0.04,
       "acceptance_locks": [],
       "disposition": "keep",
-      "disposition_reason": "The §7 catalog contract test. Fails when a default/checkpoint test file has no catalog entry, when two entries claim one named acceptance lock, when a generating gate lacks an isolated output declaration, when a protected-output gate is assigned unsafe parallel execution, or when README disagrees with the catalog. Each condition has a forced-failure mutation so the check is never green for the wrong reason.",
+      "disposition_reason": "The §7 catalog contract test. Fails when a default/checkpoint test file has no catalog entry, when two entries claim one named acceptance lock, when a generating gate lacks an isolated output declaration, when a protected-output gate — or a SUITE that would run one — is assigned unsafe parallel execution, or when README disagrees with the catalog. Each condition is proved by a forced failure so the check is never green for the wrong reason. Suite membership is derived from the command, not trusted from gate_ids, and file discovery is recursive.",
       "readme_reference": "test_validation_catalog",
       "notes": "",
-      "collected_tests": 17,
-      "baseline_result": "pass"
+      "collected_tests": 19,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_workbook_manager",
@@ -1839,7 +1893,8 @@
       "readme_reference": "test_workbook_manager",
       "notes": "",
       "collected_tests": 65,
-      "baseline_result": "pass_63_skip_2"
+      "baseline_result": "pass_63_skip_2",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_workbook_manager_catalog",
@@ -1871,7 +1926,8 @@
       "readme_reference": "test_workbook_manager_catalog",
       "notes": "",
       "collected_tests": 5,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_workbook_manager_import_projection",
@@ -1904,7 +1960,8 @@
       "readme_reference": "test_workbook_manager_import_projection",
       "notes": "",
       "collected_tests": 21,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_workbook_manager_generated_parity",
@@ -1938,7 +1995,8 @@
       "readme_reference": "test_workbook_manager_generated_parity",
       "notes": "",
       "collected_tests": 4,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_workbook_manager_api_concurrency",
@@ -1970,7 +2028,8 @@
       "readme_reference": "test_workbook_manager_api_concurrency",
       "notes": "",
       "collected_tests": 32,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_workbook_manager_drafts",
@@ -2002,7 +2061,8 @@
       "readme_reference": "test_workbook_manager_drafts",
       "notes": "",
       "collected_tests": 6,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_workbook_manager_changeset_lifecycle",
@@ -2035,7 +2095,8 @@
       "readme_reference": "test_workbook_manager_changeset_lifecycle",
       "notes": "",
       "collected_tests": 36,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "py.test_workbook_manager_apply_rebuild",
@@ -2070,14 +2131,15 @@
       "readme_reference": "test_workbook_manager_apply_rebuild",
       "notes": "",
       "collected_tests": 7,
-      "baseline_result": "pass"
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     }
   ],
   "suites": [
     {
       "id": "suite.node_default_readiness",
       "description": "The fourteen documented node readiness gates, run serially.",
-      "command": "for f in <the fourteen files>; do node --test $f; done",
+      "command": "for f in tests/workbook-schema-standardization.test.mjs tests/workbook-visual-copy-standardization.test.mjs tests/nonruntime-option-source-purge.test.mjs tests/stingray-runtime-contract.test.mjs tests/grand-sport-runtime-contract.test.mjs tests/z06-runtime-contract.test.mjs tests/z06-interior-accessory-cleanup.test.mjs tests/stingray-form-regression.test.mjs tests/z06-published-runtime.test.mjs tests/multi-model-runtime-switching.test.mjs tests/z06-performance-package-interactions.test.mjs tests/z06-runtime-rule-corrections.test.mjs tests/z06-registry-publication.test.mjs tests/tracked-artifacts-guard.test.mjs; do node --test \"$f\"; done",
       "layer": 1,
       "gate_ids": [
         "node.workbook-schema-standardization",
@@ -2097,12 +2159,13 @@
       ],
       "serial_required": true,
       "measured_seconds": 109.27,
-      "measured_note": "Sum of the fourteen readiness files at this baseline. The 2026-08-17 documented audit measured 106.38s for 298 tests under the same runtime."
+      "measured_note": "Sum of the fourteen readiness files at this baseline. The 2026-08-17 documented audit measured 106.38s for 298 tests under the same runtime.",
+      "readme_publishes_command": false
     },
     {
       "id": "suite.node_diagnostics",
       "description": "Optional inspection diagnostics; not readiness gates.",
-      "command": "node --test tests/grand-sport-contract-preview.test.mjs tests/z06-contract-preview.test.mjs",
+      "command": "for f in tests/grand-sport-contract-preview.test.mjs tests/z06-contract-preview.test.mjs; do node --test \"$f\"; done",
       "layer": 4,
       "gate_ids": [
         "node.grand-sport-contract-preview",
@@ -2110,7 +2173,8 @@
       ],
       "serial_required": true,
       "measured_seconds": 2.48,
-      "measured_note": ""
+      "measured_note": "",
+      "readme_publishes_command": false
     },
     {
       "id": "suite.python_metadata",
@@ -2131,7 +2195,8 @@
       ],
       "serial_required": false,
       "measured_seconds": 179.16,
-      "measured_note": "Sum of the ten files run one process each at this baseline. test_model_config_metadata alone is 150.33s — 83.9% of the lane. The 2026-08-09 audit measured 166.55s for the lane and attributed 126.43s to one repeated workbook mutation/generation owner; this baseline identifies that owner as test_model_config_metadata.py."
+      "measured_note": "Sum of the ten files run one process each at this baseline. test_model_config_metadata alone is 150.33s — 83.9% of the lane. The 2026-08-09 audit measured 166.55s for the lane and attributed 126.43s to one repeated workbook mutation/generation owner; this baseline identifies that owner as test_model_config_metadata.py.",
+      "readme_publishes_command": true
     },
     {
       "id": "suite.workbook_manager_checkpoint",
@@ -2151,27 +2216,86 @@
       ],
       "serial_required": true,
       "measured_seconds": 1123.47,
-      "measured_note": "Sum of the nine files run one process each at this baseline (18.7 min), against the 791.25s recorded on 2026-08-10. test_workbook_manager (810.34s) and test_workbook_manager_import_projection (222.91s) are 92.0% of it. Checkpoint 5 targets a material improvement without losing a distinct protected-boundary proof."
+      "measured_note": "Sum of the nine files run one process each at this baseline (18.7 min), against the 791.25s recorded on 2026-08-10. test_workbook_manager (810.34s) and test_workbook_manager_import_projection (222.91s) are 92.0% of it. Checkpoint 5 targets a material improvement without losing a distinct protected-boundary proof.",
+      "readme_publishes_command": false
     },
     {
       "id": "suite.full_python_inventory",
       "description": "Full pytest inventory. Diagnostic until every owner is classified and green.",
       "command": ".venv/bin/python -m pytest tests/ -q",
       "layer": 4,
-      "gate_ids": [],
-      "serial_required": false,
+      "gate_ids": [
+        "py.test_generation_safety",
+        "py.test_generate_form_model_discovery_cli",
+        "py.test_runtime_contract_builder",
+        "py.test_model_config_metadata",
+        "py.test_promote_model",
+        "py.test_registry_promotion_metadata",
+        "py.test_schema_validation_metadata",
+        "py.test_rule_derivation",
+        "py.test_model_generation_route",
+        "py.test_all_model_runtime_generation",
+        "py.test_verify_workbook_candidate",
+        "py.test_options_sheet_quality",
+        "py.test_atomic_registry_write",
+        "py.test_source_assembly_characterization",
+        "py.test_runtime_metadata_guards",
+        "py.test_corvette_form_generator_contract",
+        "py.test_editor_ops_apply",
+        "py.test_editor_ops_meta",
+        "py.test_editor_ops_global_families",
+        "py.test_editor_lints",
+        "py.test_editor_server_payload",
+        "py.test_editor_server_write_api",
+        "py.test_workbook_domain_registry",
+        "py.test_workbook_changeset",
+        "py.test_workbook_changeset_service",
+        "py.test_workbook_bool_hygiene",
+        "py.test_asset_map_sync",
+        "py.test_set_asset_display",
+        "py.test_fable5_loop_contract",
+        "py.test_validation_catalog",
+        "py.test_workbook_manager",
+        "py.test_workbook_manager_catalog",
+        "py.test_workbook_manager_import_projection",
+        "py.test_workbook_manager_generated_parity",
+        "py.test_workbook_manager_api_concurrency",
+        "py.test_workbook_manager_drafts",
+        "py.test_workbook_manager_changeset_lifecycle",
+        "py.test_workbook_manager_apply_rebuild"
+      ],
+      "serial_required": true,
       "measured_seconds": 2381.46,
-      "measured_note": "37 pre-existing files, 734 tests collected on 2026-08-17. Measured as one process per file; a single pytest invocation is faster because interpreter and workbook import costs are paid once."
+      "measured_note": "37 pre-existing files, 734 tests collected on 2026-08-17. Measured as one process per file; a single pytest invocation is faster because interpreter and workbook import costs are paid once. SERIAL: this command collects py.test_verify_workbook_candidate, which hashes form-output/ and form-app/ whole, so the inventory must not run beside any gate that writes a tracked artifact — pytest itself is serial within one process, but this suite must not be scheduled alongside the Node lane.",
+      "readme_publishes_command": false
     },
     {
       "id": "suite.full_node_inventory",
       "description": "Every tests/*.test.mjs file, serially. Diagnostic.",
-      "command": "for f in tests/*.test.mjs; do node --test $f; done",
+      "command": "for f in tests/*.test.mjs; do node --test \"$f\"; done",
       "layer": 4,
-      "gate_ids": [],
+      "gate_ids": [
+        "node.workbook-schema-standardization",
+        "node.workbook-visual-copy-standardization",
+        "node.nonruntime-option-source-purge",
+        "node.stingray-runtime-contract",
+        "node.grand-sport-runtime-contract",
+        "node.z06-runtime-contract",
+        "node.z06-interior-accessory-cleanup",
+        "node.stingray-form-regression",
+        "node.z06-published-runtime",
+        "node.multi-model-runtime-switching",
+        "node.z06-performance-package-interactions",
+        "node.z06-runtime-rule-corrections",
+        "node.z06-registry-publication",
+        "node.tracked-artifacts-guard",
+        "node.grand-sport-contract-preview",
+        "node.z06-contract-preview"
+      ],
       "serial_required": true,
       "measured_seconds": 111.75,
-      "measured_note": "16 files at this baseline; 6 files failing."
+      "measured_note": "16 files at this baseline; 6 files failing. Every Node gate hashes the protected roots or sits beside one that does, so this inventory is serial by construction — the loop form is the command, not `node --test tests/*.test.mjs`, which would run the files concurrently.",
+      "readme_publishes_command": false
     }
   ],
   "stale_assertions": [
@@ -2328,6 +2452,14 @@
       "evidence": "STATE.md records an open failure from 2026-07-25: these lines assert sec_perf_support_001 has step_key 'wheels' / section_name 'Mechanical' for a section the workbook no longer defines, and the file rewrites tracked artifacts. Measured at this baseline: 4 of 5 tests pass and the only failure is the hot-spot count at line 94; the file generates into /tmp/27vette-grand-sport-contract-preview-test and asserts tracked artifacts unchanged. The companion file the entry names, tests/grand-sport-draft-data.test.mjs, no longer exists.",
       "classification": "Both halves of that entry are resolved: the section pins were retargeted and the output was isolated in the 2026-07-27 node-gate isolation pass.",
       "action": "None. STATE's 2026-07-25 open-failure entry is withdrawn; the remaining line-94 drift is tracked as stale.grand_sport_preview_requires_hotspot_count."
+    },
+    {
+      "id": "finding.vacuous_suite_serial_check",
+      "severity": "medium",
+      "surface": "tests/validation_catalog.json suites, tests/test_validation_catalog.py",
+      "evidence": "Review of PR #25 found that suite.full_python_inventory declared gate_ids: [] and serial_required: false while its command, `pytest tests/`, collects py.test_verify_workbook_candidate — a gate this same catalog marks hashes_protected_roots: true. The serial check read only gate_ids, so an empty list satisfied it for any serial_required value, and the condition-4 mutation only flipped a gate's serial_group, never a suite's.",
+      "classification": "A live misclassification plus an unenforced §7 condition 4 at suite level — the exact 'a check only observed passing is not a check' failure mode this catalog exists to prevent, in the catalog's own contract test.",
+      "action": "Fixed in this checkpoint. Both full-inventory suites now declare complete membership, the Python inventory is serial, membership is derived from the command and must match the declaration, and two forced mutations cover the suite-level case. Generating gates may no longer declare in_process or read_only isolation, and generates / hashes_protected_roots are required fields."
     }
   ],
   "expensive_setups": [

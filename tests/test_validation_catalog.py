@@ -32,6 +32,11 @@ NON_GATE_FILES = {
     "workbook_domain_fixtures.py",
 }
 
+# Directories under tests/ that hold helpers or fixtures rather than gates.
+# Discovery walks recursively so a future tests/unit/test_*.py cannot slip in
+# uncataloged — `pytest tests/` would collect it while a flat scan would not.
+NON_GATE_DIRS = {"lib", "fixtures", "__pycache__"}
+
 REQUIRED_GATE_FIELDS = (
     "id",
     "command",
@@ -51,11 +56,16 @@ REQUIRED_GATE_FIELDS = (
     "disposition_reason",
     "collected_tests",
     "baseline_result",
+    # Conditions 3 and 4 are defined in terms of these two. A gate that omits
+    # them would otherwise be skipped by the very checks that police it.
+    "generates",
+    "hashes_protected_roots",
 )
 
+# A gate that writes generated output must name a concrete disposable location.
+# `read_only` and `in_process` are not isolated *output* declarations — they are
+# claims that there is no output — so a generating gate may not use them.
 ISOLATED_OUTPUT_KINDS = {
-    "read_only",
-    "in_process",
     "tmp_path_fixture",
     "temp_output_root",
     "temp_workbook_copy",
@@ -86,6 +96,48 @@ def _gate_test_files(catalog: dict) -> dict[str, str]:
         for path in gate["test_files"]:
             owners.setdefault(path, gate["id"])
     return owners
+
+
+def _discover_test_files() -> set[str]:
+    """Every gate file on disk, as repo-relative paths.
+
+    Recursive on purpose. `pytest tests/` collects nested packages, so a flat
+    scan would let tests/unit/test_new.py exist with no catalog entry while the
+    completeness check stayed green.
+    """
+    found: set[str] = set()
+    for path in TESTS_DIR.rglob("*"):
+        if not path.is_file():
+            continue
+        if NON_GATE_DIRS & set(path.relative_to(TESTS_DIR).parts[:-1]):
+            continue
+        if path.name in NON_GATE_FILES:
+            continue
+        if not (path.name.endswith(".test.mjs") or path.name.startswith("test_")):
+            continue
+        if path.suffix not in {".mjs", ".py"}:
+            continue
+        found.add(path.relative_to(REPO_ROOT).as_posix())
+    return found
+
+
+def _suite_member_gate_ids(catalog: dict, suite: dict) -> set[str]:
+    """The gates a suite's command would actually run.
+
+    Derived from the command rather than trusted from `gate_ids`, because an
+    empty or short `gate_ids` is exactly how a protected-output gate slips into
+    a suite that claims it can run in parallel.
+    """
+    owners = _gate_test_files(catalog)
+    command = suite["command"]
+
+    files = set(re.findall(r"tests/[\w.\-]+\.(?:py|mjs)", command))
+    if re.search(r"tests/\*\.test\.mjs", command):
+        files |= {path for path in owners if path.endswith(".test.mjs")}
+    if re.search(r"pytest\s+tests/(?:\s|$)", command):
+        files |= {path for path in owners if path.endswith(".py")}
+
+    return {owners[path] for path in files if path in owners}
 
 
 # --- structural validity of the catalog itself -----------------------------
@@ -159,14 +211,7 @@ def test_suite_and_ledger_references_resolve(catalog):
 
 def test_every_test_file_has_a_catalog_entry(catalog):
     owners = _gate_test_files(catalog)
-    on_disk = {
-        f"tests/{path.name}"
-        for path in TESTS_DIR.iterdir()
-        if path.is_file()
-        and path.name not in NON_GATE_FILES
-        and (path.name.endswith(".test.mjs") or path.name.startswith("test_"))
-        and path.suffix in {".mjs", ".py"}
-    }
+    on_disk = _discover_test_files()
     uncataloged = sorted(on_disk - set(owners))
     assert not uncataloged, f"test files with no catalog entry: {uncataloged}"
 
@@ -254,12 +299,32 @@ def test_protected_output_gates_are_serialized(catalog):
         )
 
 
+def test_suite_gate_ids_match_what_the_command_would_run(catalog):
+    """A suite cannot under-declare its membership.
+
+    `gate_ids` is what the serial check reads, so an empty or short list makes
+    that check vacuous — `pytest tests/` with `gate_ids: []` would pass as
+    parallel-safe while collecting a gate that hashes the protected roots.
+    """
+    for suite in catalog["suites"]:
+        expected = _suite_member_gate_ids(catalog, suite)
+        if not expected:
+            continue
+        missing = sorted(expected - set(suite["gate_ids"]))
+        extra = sorted(set(suite["gate_ids"]) - expected)
+        assert not missing, f"{suite['id']} command runs gates it does not declare: {missing}"
+        assert not extra, f"{suite['id']} declares gates its command does not run: {extra}"
+
+
 def test_suites_containing_protected_gates_require_serial_execution(catalog):
     by_id = {gate["id"]: gate for gate in catalog["gates"]}
     for suite in catalog["suites"]:
-        protected = [
-            gate_id for gate_id in suite["gate_ids"] if by_id[gate_id]["hashes_protected_roots"]
-        ]
+        # Union of declared and command-derived membership: neither side alone
+        # can hide a protected gate from this check.
+        members = set(suite["gate_ids"]) | _suite_member_gate_ids(catalog, suite)
+        protected = sorted(
+            gate_id for gate_id in members if by_id[gate_id]["hashes_protected_roots"]
+        )
         if protected:
             assert suite["serial_required"], (
                 f"{suite['id']} contains protected-output gates {protected} "
@@ -268,6 +333,26 @@ def test_suites_containing_protected_gates_require_serial_execution(catalog):
 
 
 # --- §7 condition 5: README agrees with the catalog ------------------------
+
+
+def test_readme_command_blocks_match_the_catalog_command(catalog, readme_text):
+    """AGENTS.md §3: README owns exact commands. Where it publishes one as a
+    runnable block, the catalog's `command` must be that same string.
+
+    The weaker `readme_reference` check below only asks that a substring appear,
+    so changing an interpreter, a flag, or a path on `command` would not move
+    it. This one compares the whole command.
+    """
+    normalized = _normalize(readme_text)
+    mismatched = [
+        (entry["id"], entry["command"])
+        for entry in list(catalog["gates"]) + list(catalog["suites"])
+        if entry.get("readme_publishes_command")
+        and _normalize(entry["command"]) not in normalized
+    ]
+    assert not mismatched, (
+        f"catalog commands README is supposed to publish verbatim but does not: {mismatched}"
+    )
 
 
 def test_readme_publishes_every_catalog_command_it_claims(catalog, readme_text):
@@ -339,6 +424,13 @@ def test_checks_fail_on_a_mutated_catalog(catalog):
     with pytest.raises(AssertionError):
         test_generating_gates_declare_isolated_output(mutated)
 
+    # condition 3, the subtler half: `in_process` is a claim that there is no
+    # output at all, so it must not satisfy a generating gate.
+    mutated = copy_catalog()
+    next(g for g in mutated["gates"] if g["generates"])["isolation"] = "in_process"
+    with pytest.raises(AssertionError):
+        test_generating_gates_declare_isolated_output(mutated)
+
     # condition 4: a protected-output gate loses its serial group
     mutated = copy_catalog()
     protected = next(g for g in mutated["gates"] if g["hashes_protected_roots"])
@@ -346,12 +438,43 @@ def test_checks_fail_on_a_mutated_catalog(catalog):
     with pytest.raises(AssertionError):
         test_protected_output_gates_are_serialized(mutated)
 
+    # condition 4 at suite level: a suite that runs a protected gate is marked
+    # parallel. This is the case the original check could not see, because
+    # emptying gate_ids made it vacuously true.
+    mutated = copy_catalog()
+    suite = next(
+        s
+        for s in mutated["suites"]
+        if any(
+            g["hashes_protected_roots"]
+            for g in mutated["gates"]
+            if g["id"] in _suite_member_gate_ids(mutated, s)
+        )
+    )
+    suite["serial_required"] = False
+    with pytest.raises(AssertionError):
+        test_suites_containing_protected_gates_require_serial_execution(mutated)
+
+    # ...and emptying its membership no longer hides that.
+    suite["gate_ids"] = []
+    with pytest.raises(AssertionError):
+        test_suites_containing_protected_gates_require_serial_execution(mutated)
+    with pytest.raises(AssertionError):
+        test_suite_gate_ids_match_what_the_command_would_run(mutated)
+
     # condition 5: README disagreement, both directions
     mutated = copy_catalog()
     published = next(g for g in mutated["gates"] if g.get("readme_reference"))
     published["readme_reference"] = "a command README does not publish"
     with pytest.raises(AssertionError):
         test_readme_publishes_every_catalog_command_it_claims(mutated, README_PATH.read_text())
+
+    mutated = copy_catalog()
+    published = next(g for g in mutated["gates"] if g.get("readme_publishes_command"))
+    published["command"] = published["command"] + " --a-flag-readme-does-not-publish"
+    with pytest.raises(AssertionError):
+        test_readme_command_blocks_match_the_catalog_command(mutated, README_PATH.read_text())
+
     with pytest.raises(AssertionError):
         test_readme_does_not_hand_maintain_a_collection_count("README says 678 tests collected.")
     with pytest.raises(AssertionError):
