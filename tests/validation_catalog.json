@@ -1,0 +1,2804 @@
+{
+  "schema": "27vette-validation-catalog-1",
+  "owning_specification": "docs/superpowers/specs/2026-08-17-fast-layered-validation-suite.md",
+  "checkpoint": "Checkpoint 0 — freeze and classify the live inventory",
+  "description": "Machine-readable inventory of every default and checkpoint validation gate. Dependency-free JSON: read it with the standard library. This catalog owns collection descriptions and measured counts; README owns operator commands and approximate timing prose.",
+  "enums": {
+    "layer": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "primary_authority": [
+      "structural_invariant",
+      "workbook_to_output_parity",
+      "runtime_state_invariant",
+      "intentional_product_acceptance_lock"
+    ],
+    "isolation": [
+      "read_only",
+      "in_process",
+      "tmp_path_fixture",
+      "temp_output_root",
+      "temp_workbook_copy",
+      "tracked_write"
+    ],
+    "ci_policy": [
+      "required_now",
+      "not_run_now"
+    ],
+    "checkpoint_policy": [
+      "default_readiness",
+      "changed_surface",
+      "workbook_write",
+      "manager_checkpoint",
+      "loop_artifacts",
+      "diagnostic"
+    ],
+    "disposition": [
+      "keep",
+      "rewrite",
+      "merge",
+      "move_to_checkpoint",
+      "diagnostic_only",
+      "retire_after_parity"
+    ]
+  },
+  "baseline": {
+    "captured": "2026-08-17",
+    "source_commit": "3a7fc52",
+    "branch": "claude/fast-layered-validation-suite-4c31f6",
+    "method": "each gate run once, serially, from a clean worktree; wall time measured around the process",
+    "runtimes_measured": {
+      "node": "26.7.0",
+      "python": "3.14.7",
+      "platform": "darwin 25.6.0 (arm64)"
+    },
+    "ci_reference_runtimes": {
+      "node": "22",
+      "python": "3.12",
+      "source": ".github/workflows/release-candidate.yml"
+    },
+    "ci_reference_status": "OPEN. Node 22 and Python 3.12 are not installed on the reference machine (available: node 23/24/25/26, python 3.13/3.14). Every approximate_seconds value below is local Node 26.7.0 / Python 3.14.7 evidence and is explicitly NOT the CI baseline the specification asks Checkpoint 0 to record. Capturing the CI-version baseline requires a workflow run or an approved local toolchain install.",
+    "python_collection_total": 734,
+    "python_collection_note": "Measured by `.venv/bin/python -m pytest tests/ -q --collect-only` on 2026-08-17, before tests/test_validation_catalog.py was added (which brings it to 751). README previously hand-maintained 678, which was stale; README now points here.",
+    "python_file_count": 38,
+    "python_serial_total_seconds": 2381.46,
+    "python_serial_total_note": "Sum of 37 pre-existing files run one process each. About 40 minutes. Three owners account for 74.5%: test_workbook_manager (810.34s), test_verify_workbook_candidate (694.43s), test_workbook_manager_import_projection (222.91s).",
+    "node_serial_total_seconds": 111.75,
+    "node_file_count": 16,
+    "node_collected_tests": 305,
+    "node_baseline_result": "298 pass, 7 fail across 6 files (all 16 files). Restricted to the fourteen documented readiness gates: 298 tests, 292 pass, 6 fail across 5 files — an exact match for the specification's 2026-08-17 audit.",
+    "python_baseline_result": "3 files fail when run alone: test_runtime_metadata_guards (1 stale literal), test_verify_workbook_candidate (2 dead drift canaries), and — only for want of PYTHONPATH=scripts — test_rule_derivation, test_source_assembly_characterization and test_options_sheet_quality collect or fail alone while passing inside their documented multi-file gate."
+  },
+  "acceptance_locks": [
+    {
+      "id": "default_model_is_stingray",
+      "status": "established",
+      "decision": "The published registry opens on the Stingray model.",
+      "authoritative_source": "model_registry_promotion default selection row; published registry field defaultModelKey",
+      "why_generic_detection_insufficient": "A valid workbook edit can move the default to another promoted model without breaking any structural or parity rule. Which model a customer lands on is a product decision.",
+      "primary_owner": "node.multi-model-runtime-switching",
+      "restated_by": [
+        "node.z06-registry-publication",
+        "node.z06-published-runtime"
+      ],
+      "restatement_disposition": "Checkpoint 1/2 removes the two restatements. §4.4 allows one lock owner per decision; three files currently assert defaultModelKey === \"stingray\".",
+      "approval_to_change": "product owner"
+    },
+    {
+      "id": "zr1x_standard_j59_no_j58",
+      "status": "established",
+      "decision": "ZR1X ships J59 as the standard, selectable, default-selected brake in all four variants and publishes no J58 row; ZTK does not auto-add or reclassify J59.",
+      "authoritative_source": "zr1x_options / zr1x_ovs / zr1x_rule_mapping rows corrected on 2026-08-17 (PR #23, 7eb366f)",
+      "why_generic_detection_insufficient": "Both J58-standard and J59-standard are structurally valid and internally consistent. Only a named lock distinguishes the corrected decision from the erroneous 2026-08-16 hotfix it replaced.",
+      "primary_owner": "node.multi-model-runtime-switching",
+      "restated_by": [],
+      "restatement_disposition": "none required",
+      "approval_to_change": "product owner"
+    },
+    {
+      "id": "dealer_payload_and_security_contract",
+      "status": "established",
+      "decision": "The dealer submit modal, Turnstile element, required-field gating, payload shape, model scoping, and single-post-on-success behavior are protected and may not change without approval.",
+      "authoritative_source": "AGENTS.md §6 protected boundary; form-app/index.html dealer modal markup; app.js dealerSubmissionPayload",
+      "why_generic_detection_insufficient": "The payload is a contract with an external system. Generic runtime invariants cannot detect a shape change that is internally consistent.",
+      "primary_owner": "node.stingray-form-regression",
+      "restated_by": [
+        "node.multi-model-runtime-switching"
+      ],
+      "restatement_disposition": "The multi-model file covers generic per-model payload identity, which §4.3 item 12 assigns to the runtime state matrix. Keep the security/error owner in stingray-form-regression; Checkpoint 3 moves identity coverage to the matrix. No live submission in either.",
+      "approval_to_change": "product owner (AGENTS.md §6)"
+    },
+    {
+      "id": "promoted_model_membership",
+      "status": "proposed",
+      "decision": "Which models are promoted to the published registry (currently six: stingray, grandSport, grand_sport_x, z06, zr1, zr1x).",
+      "authoritative_source": "model_registry_promotion active rows",
+      "why_generic_detection_insufficient": "Spec §8 canary 3 requires that adding or removing a valid promoted-model row expands dynamic coverage while a declared membership lock fails deliberately. A set derived from the sheet it polices cannot detect a change to that sheet.",
+      "primary_owner": "node.z06-registry-publication",
+      "restated_by": [],
+      "restatement_disposition": "This is the stale ['stingray','grandSport','z06'] literal at z06-registry-publication.test.mjs:41. Checkpoint 1 either promotes it to a named lock over the current six or rewrites it as a parity comparison against active promotion rows. Declaring the lock freezes a membership decision, so §12 approval is required before it becomes a lock.",
+      "approval_to_change": "product owner — approval REQUIRED before this proposed lock is created"
+    },
+    {
+      "id": "included_seatbelt_lock",
+      "status": "superseded",
+      "decision": "SUPERSEDED. Three current assertions still encode the retired behavior that an included seatbelt colour (3A9 / 3LZ_AE4_H8T-class interiors) locks out every other seatbelt choice and permits only the included colour or Black.",
+      "authoritative_source": "Seatbelt_Rules.txt task authority and the workbook rows landed by PR #19 (3ce3cae); the six-model authority now proves workbook-approved paid alternatives.",
+      "why_generic_detection_insufficient": "n/a — this is not a live lock. It is recorded here so no Checkpoint mistakes the three failing assertions for an unprotected decision.",
+      "primary_owner": null,
+      "restated_by": [
+        "node.stingray-form-regression",
+        "node.z06-runtime-contract",
+        "node.z06-runtime-rule-corrections"
+      ],
+      "restatement_disposition": "Checkpoint 1 rewrites all three as workbook-to-output parity against the active seatbelt OVS/rule rows. Do not refresh the literals.",
+      "approval_to_change": "n/a — already superseded by an approved product change"
+    }
+  ],
+  "gates": [
+    {
+      "id": "cmd.release_candidate_lane",
+      "command": "python scripts/verify_workbook_candidate.py --workbook stingray_master.xlsx --changed-model '*' --report candidate-report.json",
+      "test_files": [],
+      "layer": 1,
+      "primary_authority": "workbook_to_output_parity",
+      "changed_surfaces": [
+        "workbook",
+        "generator",
+        "runtime_contract",
+        "registry_publication",
+        "runtime_js"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "scripts/**",
+        "form-app/app.js"
+      ],
+      "writes": [
+        "<temp candidate root>/**",
+        "./candidate-report.json"
+      ],
+      "isolation": "temp_workbook_copy",
+      "generates": true,
+      "hashes_protected_roots": true,
+      "serial_group": "protected_artifacts",
+      "ci_policy": "required_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": null,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "This is the Layer 1 spine. Spec §5 Layer 1 adds stage timing, one shared candidate result, the independent workbook-truth snapshot, and the generated runtime state matrix to it. Not measured in this baseline: it hashes the protected roots whole and cannot run beside the node generating gates.",
+      "readme_reference": "python scripts/verify_workbook_candidate.py",
+      "notes": "Ten stages: copy_candidate, workbook_package, workbook_schema, options_sheet_quality, discover_models, generate_models, validate_contracts, candidate_registry, browser_harness, semantic_drift.",
+      "collected_tests": null,
+      "baseline_result": "not_run_in_this_baseline",
+      "isolation_exceptions": [
+        "./candidate-report.json is written to the invocation directory, not a temp root. It is a readiness report, not a generated product artifact, and it is not tracked or gitignored — CI uploads it and discards it. Declared here rather than left implicit by the isolation kind."
+      ],
+      "readme_publishes_command": true
+    },
+    {
+      "id": "cmd.workbook_schema",
+      "command": ".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx",
+      "test_files": [],
+      "layer": 1,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook",
+        "workbook_domain_registry",
+        "schema_validation"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "scripts/corvette_form_generator/workbook_domain/registry.py"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 62.0,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Single schema authority. Checkpoint 1 removes the SECOND invocation of this same command from node.workbook-schema-standardization, which is where the duplicate ~60s comes from — not from this gate.",
+      "readme_reference": ".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx",
+      "notes": "Also runs as stage 3 of the candidate lane against the temporary copy.",
+      "collected_tests": null,
+      "baseline_result": "not_run_standalone_in_this_baseline",
+      "readme_publishes_command": true
+    },
+    {
+      "id": "cmd.workbook_package",
+      "command": ".venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx",
+      "test_files": [],
+      "layer": 1,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook"
+      ],
+      "reads": [
+        "stingray_master.xlsx"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "workbook_write",
+      "approximate_seconds": 2.0,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Cheap package-integrity authority; also stage 2 of the candidate lane.",
+      "readme_reference": ".venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx",
+      "notes": "",
+      "collected_tests": null,
+      "baseline_result": "not_run_standalone_in_this_baseline",
+      "readme_publishes_command": true
+    },
+    {
+      "id": "cmd.options_sheet_quality",
+      "command": "PYTHONPATH=scripts .venv/bin/python -m corvette_form_generator.options_sheet_quality --workbook stingray_master.xlsx --allowlist tests/fixtures/options-sheet-quality-allowlist.json",
+      "test_files": [],
+      "layer": 1,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook",
+        "customer_copy"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "tests/fixtures/options-sheet-quality-allowlist.json"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "workbook_write",
+      "approximate_seconds": 6.0,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Source-quality authority over all configured option sheets including inactive scaffolds; also stage 4 of the candidate lane.",
+      "readme_reference": "corvette_form_generator.options_sheet_quality",
+      "notes": "",
+      "collected_tests": null,
+      "baseline_result": "not_run_standalone_in_this_baseline",
+      "readme_publishes_command": true
+    },
+    {
+      "id": "cmd.fable5_loop_validator",
+      "command": ".venv/bin/python scripts/validate_fable5_loop.py",
+      "test_files": [],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "fable5_loop"
+      ],
+      "reads": [
+        "fable5loop/**"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "loop_artifacts",
+      "approximate_seconds": 1.0,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Loop-scaffold structure authority; unrelated to product validation cost.",
+      "readme_reference": ".venv/bin/python scripts/validate_fable5_loop.py",
+      "notes": "",
+      "collected_tests": null,
+      "baseline_result": "pass",
+      "readme_publishes_command": true
+    },
+    {
+      "id": "node.workbook-schema-standardization",
+      "command": "node --test tests/workbook-schema-standardization.test.mjs",
+      "test_files": [
+        "tests/workbook-schema-standardization.test.mjs"
+      ],
+      "layer": 1,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook",
+        "workbook_domain_registry",
+        "schema_validation"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "form-app/data.js",
+        "tests/lib/workbook-registry-snapshot.mjs"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 64.97,
+      "acceptance_locks": [],
+      "disposition": "rewrite",
+      "disposition_reason": "Slowest gate in the inventory and the single largest duplicated cost: it invokes scripts/validate_workbook_schema.py, which full default validation already runs directly (spec §3.2). Checkpoint 1 removes the duplicate invocation while keeping this file's registry-derived structural sweeps and their named pinned expectations.",
+      "readme_reference": "workbook-schema-standardization",
+      "notes": "Holds KNOWN_TYPE_DRIFT — nine registry-declared typed columns holding text. That is a recorded workbook non-conformance, not a stale test literal.",
+      "collected_tests": 13,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "node.workbook-visual-copy-standardization",
+      "command": "node --test tests/workbook-visual-copy-standardization.test.mjs",
+      "test_files": [
+        "tests/workbook-visual-copy-standardization.test.mjs"
+      ],
+      "layer": 1,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook",
+        "customer_copy"
+      ],
+      "reads": [
+        "stingray_master.xlsx"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 0.62,
+      "acceptance_locks": [],
+      "disposition": "rewrite",
+      "disposition_reason": "Cheap and green, but OPTION_SHEETS is a hardcoded three-model list (stingray, grandSport, z06) while six models are workbook-active. Its copy rules are model-neutral, so Checkpoint 2 derives the sheet list from model_sheet_registry() and pairs it with a named expected set.",
+      "readme_reference": "workbook-visual-copy-standardization",
+      "notes": "",
+      "collected_tests": 8,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "node.nonruntime-option-source-purge",
+      "command": "node --test tests/nonruntime-option-source-purge.test.mjs",
+      "test_files": [
+        "tests/nonruntime-option-source-purge.test.mjs"
+      ],
+      "layer": 1,
+      "primary_authority": "workbook_to_output_parity",
+      "changed_surfaces": [
+        "workbook"
+      ],
+      "reads": [
+        "stingray_master.xlsx"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 1.56,
+      "acceptance_locks": [],
+      "disposition": "rewrite",
+      "disposition_reason": "Carries an approvedDeletes literal inventory of purged option/OVS rows per model. §4.4 says product-specific literals belong in a named acceptance lock; a purge list is a historical decision, not a live customer behavior. Checkpoint 2 decides between an absence-parity check against the active sheets and a single named lock.",
+      "readme_reference": "nonruntime-option-source-purge",
+      "notes": "",
+      "collected_tests": 6,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "node.stingray-runtime-contract",
+      "command": "node --test tests/stingray-runtime-contract.test.mjs",
+      "test_files": [
+        "tests/stingray-runtime-contract.test.mjs"
+      ],
+      "layer": 1,
+      "primary_authority": "workbook_to_output_parity",
+      "changed_surfaces": [
+        "generator",
+        "runtime_contract",
+        "workbook"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "form-output/**",
+        "form-app/**"
+      ],
+      "writes": [
+        "/tmp/27vette-stingray-runtime-contract-test/**"
+      ],
+      "isolation": "temp_output_root",
+      "generates": true,
+      "hashes_protected_roots": true,
+      "serial_group": "protected_artifacts",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 16.46,
+      "acceptance_locks": [],
+      "disposition": "retire_after_parity",
+      "disposition_reason": "Second-slowest gate. It regenerates one model that the candidate lane and test_all_model_runtime_generation.py already generate and strictly validate (spec §3.2). Its unique value is the per-collection contract assertions; Checkpoint 4 removes model-specific regeneration once candidate parity proves equivalent or stronger failure detection. No assertion is removed before that proof.",
+      "readme_reference": "stingray-runtime-contract",
+      "notes": "",
+      "collected_tests": 12,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "node.grand-sport-runtime-contract",
+      "command": "node --test tests/grand-sport-runtime-contract.test.mjs",
+      "test_files": [
+        "tests/grand-sport-runtime-contract.test.mjs"
+      ],
+      "layer": 1,
+      "primary_authority": "workbook_to_output_parity",
+      "changed_surfaces": [
+        "generator",
+        "runtime_contract",
+        "workbook",
+        "asset_map"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "form-output/**",
+        "form-app/**"
+      ],
+      "writes": [
+        "/tmp/27vette-grand-sport-runtime-contract-test/**"
+      ],
+      "isolation": "temp_output_root",
+      "generates": true,
+      "hashes_protected_roots": true,
+      "serial_group": "protected_artifacts",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 3.07,
+      "acceptance_locks": [],
+      "disposition": "rewrite",
+      "disposition_reason": "Owns two of the six stale assertions (colorOverrides count literal, J6F asset URL literal). Checkpoint 1 rewrites both as workbook-to-output parity against active source rows and the active asset_map row, without substituting new literals. The rest of the file follows stingray-runtime-contract's retire_after_parity path in Checkpoint 4.",
+      "readme_reference": "grand-sport-runtime-contract",
+      "notes": "Currently FAILING — see stale_assertions.",
+      "collected_tests": 18,
+      "baseline_result": "fail_2",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "node.z06-runtime-contract",
+      "command": "node --test tests/z06-runtime-contract.test.mjs",
+      "test_files": [
+        "tests/z06-runtime-contract.test.mjs"
+      ],
+      "layer": 1,
+      "primary_authority": "workbook_to_output_parity",
+      "changed_surfaces": [
+        "generator",
+        "runtime_contract",
+        "workbook"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "form-output/**",
+        "form-app/**"
+      ],
+      "writes": [
+        "/tmp/27vette-z06-runtime-contract-test/**"
+      ],
+      "isolation": "temp_output_root",
+      "generates": true,
+      "hashes_protected_roots": true,
+      "serial_group": "protected_artifacts",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 1.19,
+      "acceptance_locks": [],
+      "disposition": "rewrite",
+      "disposition_reason": "Owns one of the three superseded included-seatbelt assertions. Checkpoint 1 rewrites it as parity against the active seatbelt OVS/rule rows. Also carries expectedVariantIds and a standardSections literal set; Checkpoint 2 routes those to parity against workbook-declared variant and section rows.",
+      "readme_reference": "z06-runtime-contract",
+      "notes": "Currently FAILING — see stale_assertions. Measured wall time is low because the run aborts at the failing assertion before later cases.",
+      "collected_tests": 24,
+      "baseline_result": "fail_1",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "node.z06-interior-accessory-cleanup",
+      "command": "node --test tests/z06-interior-accessory-cleanup.test.mjs",
+      "test_files": [
+        "tests/z06-interior-accessory-cleanup.test.mjs"
+      ],
+      "layer": 1,
+      "primary_authority": "runtime_state_invariant",
+      "changed_surfaces": [
+        "generator",
+        "runtime_contract",
+        "runtime_js"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "form-app/app.js",
+        "form-output/**",
+        "form-app/**"
+      ],
+      "writes": [
+        "/tmp/27vette-z06-interior-accessory-runtime-test/**"
+      ],
+      "isolation": "temp_output_root",
+      "generates": true,
+      "hashes_protected_roots": true,
+      "serial_group": "protected_artifacts",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 1.71,
+      "acceptance_locks": [],
+      "disposition": "rewrite",
+      "disposition_reason": "Generic interior/accessory reconciliation behavior expressed as one model's example. Checkpoint 3 folds it into the generated runtime state matrix (§4.3 items 5, 6, 9) and drops the private regeneration.",
+      "readme_reference": "z06-interior-accessory-cleanup",
+      "notes": "",
+      "collected_tests": 7,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "node.stingray-form-regression",
+      "command": "node --test tests/stingray-form-regression.test.mjs",
+      "test_files": [
+        "tests/stingray-form-regression.test.mjs"
+      ],
+      "layer": 1,
+      "primary_authority": "runtime_state_invariant",
+      "changed_surfaces": [
+        "runtime_js",
+        "registry_publication",
+        "styling",
+        "dealer"
+      ],
+      "reads": [
+        "form-app/data.js",
+        "form-app/app.js",
+        "form-app/index.html",
+        "form-app/styles.css",
+        "stingray_master.xlsx"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 2.54,
+      "acceptance_locks": [
+        "dealer_payload_and_security_contract"
+      ],
+      "disposition": "rewrite",
+      "disposition_reason": "Largest node file (2,949 lines) and the primary owner of the dealer payload/security lock, which must stay. Owns one of the three superseded included-seatbelt assertions (Checkpoint 1 rewrite). Its generic single-model runtime behavior moves to the Checkpoint 3 matrix; the dealer lock, CSS/HTML contract assertions, and the default-model restatement removal stay here.",
+      "readme_reference": "stingray-form-regression",
+      "notes": "Currently FAILING — see stale_assertions.",
+      "collected_tests": 91,
+      "baseline_result": "fail_1",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "node.z06-published-runtime",
+      "command": "node --test tests/z06-published-runtime.test.mjs",
+      "test_files": [
+        "tests/z06-published-runtime.test.mjs"
+      ],
+      "layer": 1,
+      "primary_authority": "runtime_state_invariant",
+      "changed_surfaces": [
+        "registry_publication",
+        "runtime_js"
+      ],
+      "reads": [
+        "form-app/data.js",
+        "form-app/app.js"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 0.3,
+      "acceptance_locks": [],
+      "disposition": "rewrite",
+      "disposition_reason": "Read-only published-registry checks for one model, plus a restatement of the default-model lock. Checkpoint 3 replaces the per-model assertions with matrix coverage over every promoted model; Checkpoint 1/2 removes the defaultModelKey restatement.",
+      "readme_reference": "z06-published-runtime",
+      "notes": "Carries expectedZ06VariantIds and a standardSections literal set duplicated from z06-runtime-contract.",
+      "collected_tests": 4,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "node.multi-model-runtime-switching",
+      "command": "node --test tests/multi-model-runtime-switching.test.mjs",
+      "test_files": [
+        "tests/multi-model-runtime-switching.test.mjs"
+      ],
+      "layer": 1,
+      "primary_authority": "runtime_state_invariant",
+      "changed_surfaces": [
+        "runtime_js",
+        "registry_publication",
+        "workbook",
+        "dealer"
+      ],
+      "reads": [
+        "form-app/data.js",
+        "form-app/app.js"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 4.26,
+      "acceptance_locks": [
+        "default_model_is_stingray",
+        "zr1x_standard_j59_no_j58"
+      ],
+      "disposition": "keep",
+      "disposition_reason": "This is the spine the Checkpoint 3 generated runtime state matrix is built on (spec §10). It already honors CORVETTE_FORM_DATA_JS with no fallback, so Layer 1 can point it at a candidate registry. Keep, then parameterize over promoted models and declared variants.",
+      "readme_reference": "multi-model-runtime-switching",
+      "notes": "Also holds the largest static product matrix in JavaScript (13 URLs, six-model seatbelt sweep). Checkpoint 3 replaces the static sweep with data-discovered cases; the two named locks stay.",
+      "collected_tests": 70,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "node.z06-performance-package-interactions",
+      "command": "node --test tests/z06-performance-package-interactions.test.mjs",
+      "test_files": [
+        "tests/z06-performance-package-interactions.test.mjs"
+      ],
+      "layer": 1,
+      "primary_authority": "runtime_state_invariant",
+      "changed_surfaces": [
+        "runtime_js",
+        "registry_publication"
+      ],
+      "reads": [
+        "form-app/data.js",
+        "form-app/app.js"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 6.41,
+      "acceptance_locks": [],
+      "disposition": "rewrite",
+      "disposition_reason": "Package include/require/exclude/replace behavior expressed as one model's examples. Checkpoint 3 covers it generically (§4.3 item 9) over every promoted model; keep whatever remains genuinely Z06-specific as named cases.",
+      "readme_reference": "z06-performance-package-interactions",
+      "notes": "",
+      "collected_tests": 21,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "node.z06-runtime-rule-corrections",
+      "command": "node --test tests/z06-runtime-rule-corrections.test.mjs",
+      "test_files": [
+        "tests/z06-runtime-rule-corrections.test.mjs"
+      ],
+      "layer": 1,
+      "primary_authority": "runtime_state_invariant",
+      "changed_surfaces": [
+        "runtime_js",
+        "registry_publication",
+        "workbook"
+      ],
+      "reads": [
+        "form-app/data.js",
+        "form-app/app.js"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 3.91,
+      "acceptance_locks": [],
+      "disposition": "rewrite",
+      "disposition_reason": "Owns one of the three superseded included-seatbelt assertions (Checkpoint 1 rewrite as parity). The remaining rule-correction cases are generic exclusive-group and auto-add invariants that Checkpoint 3 covers in the matrix.",
+      "readme_reference": "z06-runtime-rule-corrections",
+      "notes": "Currently FAILING — see stale_assertions.",
+      "collected_tests": 15,
+      "baseline_result": "fail_1",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "node.z06-registry-publication",
+      "command": "node --test tests/z06-registry-publication.test.mjs",
+      "test_files": [
+        "tests/z06-registry-publication.test.mjs"
+      ],
+      "layer": 1,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "registry_publication",
+        "promotion"
+      ],
+      "reads": [
+        "form-app/data.js",
+        "stingray_master.xlsx"
+      ],
+      "writes": [
+        "<os.tmpdir()>/registry-publication/**"
+      ],
+      "isolation": "temp_output_root",
+      "generates": true,
+      "hashes_protected_roots": true,
+      "serial_group": "protected_artifacts",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 1.21,
+      "acceptance_locks": [],
+      "disposition": "rewrite",
+      "disposition_reason": "Owns the stale three-model-key literal. Checkpoint 1 rewrites it as parity against active model_registry_promotion rows, or — with approval — promotes it to the named promoted_model_membership lock. Also restates the default-model lock, which is removed. The isolated-publication and atomic-boundary assertions are structural and stay.",
+      "readme_reference": "z06-registry-publication",
+      "notes": "Currently FAILING — see stale_assertions.",
+      "collected_tests": 2,
+      "baseline_result": "fail_1",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "node.tracked-artifacts-guard",
+      "command": "node --test tests/tracked-artifacts-guard.test.mjs",
+      "test_files": [
+        "tests/tracked-artifacts-guard.test.mjs"
+      ],
+      "layer": 1,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "validation_infrastructure"
+      ],
+      "reads": [
+        "form-output/**",
+        "form-app/**",
+        "tests/lib/tracked-artifacts.mjs"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": true,
+      "serial_group": "protected_artifacts",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 1.06,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Proves the shared boundary helper is not vacuous. Spec §8 canary 8 (forced tracked-output write from an isolated generating gate) belongs here. Keep and extend.",
+      "readme_reference": "tracked-artifacts-guard",
+      "notes": "",
+      "collected_tests": 7,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "node.grand-sport-contract-preview",
+      "command": "node --test tests/grand-sport-contract-preview.test.mjs",
+      "test_files": [
+        "tests/grand-sport-contract-preview.test.mjs"
+      ],
+      "layer": 4,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "generator",
+        "raw_source_provenance"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "form-output/**",
+        "form-app/**"
+      ],
+      "writes": [
+        "/tmp/27vette-grand-sport-contract-preview-test/**"
+      ],
+      "isolation": "temp_output_root",
+      "generates": true,
+      "hashes_protected_roots": true,
+      "serial_group": "protected_artifacts",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "diagnostic",
+      "approximate_seconds": 1.25,
+      "acceptance_locks": [],
+      "disposition": "diagnostic_only",
+      "disposition_reason": "README already classifies it as an optional inspection diagnostic, not a readiness gate. It is currently FAILING on a stale rule-hot-spot count literal that the documented fourteen-gate audit never saw, which is exactly the drift Layer 4 exists to surface. Keep as diagnostic; give the count a source-derived expectation in Checkpoint 2.",
+      "readme_reference": "grand-sport-contract-preview",
+      "notes": "Currently FAILING — see stale_assertions (seventh, outside the documented six).",
+      "collected_tests": 5,
+      "baseline_result": "fail_1",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "node.z06-contract-preview",
+      "command": "node --test tests/z06-contract-preview.test.mjs",
+      "test_files": [
+        "tests/z06-contract-preview.test.mjs"
+      ],
+      "layer": 4,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "generator",
+        "raw_source_provenance"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "form-output/**",
+        "form-app/**"
+      ],
+      "writes": [
+        "/tmp/27vette-z06-contract-preview-test/**"
+      ],
+      "isolation": "temp_output_root",
+      "generates": true,
+      "hashes_protected_roots": true,
+      "serial_group": "protected_artifacts",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "diagnostic",
+      "approximate_seconds": 1.23,
+      "acceptance_locks": [],
+      "disposition": "diagnostic_only",
+      "disposition_reason": "Optional inspection diagnostic per README. Green at this baseline.",
+      "readme_reference": "z06-contract-preview",
+      "notes": "",
+      "collected_tests": 2,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_generation_safety",
+      "command": ".venv/bin/python -m pytest tests/test_generation_safety.py -q",
+      "test_files": [
+        "tests/test_generation_safety.py"
+      ],
+      "layer": 0,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "generator"
+      ],
+      "reads": [
+        "scripts/corvette_form_generator/**"
+      ],
+      "writes": [],
+      "isolation": "in_process",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 0.33,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Fail-closed isolated-generation invariants. Pure structural, no canonical workbook generation — Layer 0 material as written.",
+      "readme_reference": "test_generation_safety",
+      "notes": "",
+      "collected_tests": 13,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_generate_form_model_discovery_cli",
+      "command": ".venv/bin/python -m pytest tests/test_generate_form_model_discovery_cli.py -q",
+      "test_files": [
+        "tests/test_generate_form_model_discovery_cli.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "generator"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "scripts/generate_form.py"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": true,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 1.75,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "CLI-argument contract for generate_form.py. Distinct from generation output parity.",
+      "readme_reference": "test_generate_form_model_discovery_cli",
+      "notes": "",
+      "collected_tests": 3,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_runtime_contract_builder",
+      "command": ".venv/bin/python -m pytest tests/test_runtime_contract_builder.py -q",
+      "test_files": [
+        "tests/test_runtime_contract_builder.py"
+      ],
+      "layer": 0,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "generator",
+        "runtime_contract"
+      ],
+      "reads": [
+        "scripts/corvette_form_generator/runtime_contract.py"
+      ],
+      "writes": [],
+      "isolation": "in_process",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 3.73,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Explicit literal contract plus rejection matrix; §4.1 names runtime_contract.py as the runtime shape authority this derives from.",
+      "readme_reference": "test_runtime_contract_builder",
+      "notes": "STATE 2026-07-26 records that assert_runtime_contract() does not enforce the full spec rejection matrix (variant drop/duplicate/rename and dataset.source_workbook binding are accepted). That gap is a Checkpoint 2 parity item, not a stale literal.",
+      "collected_tests": 13,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_model_config_metadata",
+      "command": ".venv/bin/python -m pytest tests/test_model_config_metadata.py -q",
+      "test_files": [
+        "tests/test_model_config_metadata.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "generator",
+        "workbook"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "scripts/corvette_form_generator/model_configs.py"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 150.33,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "§4.1 names model_configs.py as the model-discovery authority; this gate polices it.",
+      "readme_reference": "test_model_config_metadata",
+      "notes": "",
+      "collected_tests": 23,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_promote_model",
+      "command": ".venv/bin/python -m pytest tests/test_promote_model.py -q",
+      "test_files": [
+        "tests/test_promote_model.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "promotion"
+      ],
+      "reads": [
+        "scripts/promote_model.py"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 0.58,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Promotion gating parity with generator discovery metadata; includes the candidate-lane gate on promote.",
+      "readme_reference": "test_promote_model",
+      "notes": "",
+      "collected_tests": 10,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_registry_promotion_metadata",
+      "command": ".venv/bin/python -m pytest tests/test_registry_promotion_metadata.py -q",
+      "test_files": [
+        "tests/test_registry_promotion_metadata.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "promotion",
+        "registry_publication"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "form-output/**"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 0.35,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Workbook-owned promotion metadata; the artifact_type domain derives from workbook_domain/registry.py.",
+      "readme_reference": "test_registry_promotion_metadata",
+      "notes": "",
+      "collected_tests": 13,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_schema_validation_metadata",
+      "command": ".venv/bin/python -m pytest tests/test_schema_validation_metadata.py -q",
+      "test_files": [
+        "tests/test_schema_validation_metadata.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "schema_validation",
+        "workbook_domain_registry"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "form-output/**"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 1.71,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Largest structural Python owner (46 tests). Schema vocabulary derives from the shared registry as §4.1 requires.",
+      "readme_reference": "test_schema_validation_metadata",
+      "notes": "",
+      "collected_tests": 46,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_rule_derivation",
+      "command": "PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_rule_derivation.py -q",
+      "test_files": [
+        "tests/test_rule_derivation.py"
+      ],
+      "layer": 0,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "generator"
+      ],
+      "reads": [
+        "scripts/corvette_form_generator/rule_derivation.py"
+      ],
+      "writes": [],
+      "isolation": "in_process",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 0.01,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Pure-function unit tests over includes-closure swap derivation. Ideal Layer 0 content.",
+      "readme_reference": "test_rule_derivation",
+      "notes": "Requires PYTHONPATH=scripts when selected alone; see finding.import_order_dependence.",
+      "collected_tests": 15,
+      "baseline_result": "pass_only_with_pythonpath_scripts",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_model_generation_route",
+      "command": ".venv/bin/python -m pytest tests/test_model_generation_route.py -q",
+      "test_files": [
+        "tests/test_model_generation_route.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "generator"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "scripts/generate_form.py"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 13.39,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Proves no model has a private generation route, by execution with the callee patched out. Cheap because generation itself is spied, not run.",
+      "readme_reference": "test_model_generation_route",
+      "notes": "",
+      "collected_tests": 23,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_all_model_runtime_generation",
+      "command": ".venv/bin/python -m pytest tests/test_all_model_runtime_generation.py -q",
+      "test_files": [
+        "tests/test_all_model_runtime_generation.py"
+      ],
+      "layer": 1,
+      "primary_authority": "workbook_to_output_parity",
+      "changed_surfaces": [
+        "generator",
+        "runtime_contract",
+        "workbook"
+      ],
+      "reads": [
+        "stingray_master.xlsx"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": true,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 6.7,
+      "acceptance_locks": [],
+      "disposition": "merge",
+      "disposition_reason": "Generates and validates every discovered model — the same expensive work the candidate lane performs (spec §3.2, §10). Checkpoint 4 merges it into the shared Layer 1 candidate result so the six-model generation is paid once per run. Its named six-model expected set (deliberately hardcoded so a derived set cannot hide a sheet change) is retained as the promoted_model_membership evidence until that lock is decided.",
+      "readme_reference": "test_all_model_runtime_generation",
+      "notes": "",
+      "collected_tests": 30,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_verify_workbook_candidate",
+      "command": ".venv/bin/python -m pytest tests/test_verify_workbook_candidate.py -q",
+      "test_files": [
+        "tests/test_verify_workbook_candidate.py"
+      ],
+      "layer": 1,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "validation_infrastructure",
+        "generator",
+        "registry_publication"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "form-output/**",
+        "form-app/data.js"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": true,
+      "hashes_protected_roots": true,
+      "serial_group": "protected_artifacts",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 694.43,
+      "acceptance_locks": [],
+      "disposition": "rewrite",
+      "disposition_reason": "The single most expensive Python owner: the 2026-08-09 audit measured 648.04s for 16 tests, with repeated complete six-model candidates at roughly 61–67s each. Spec §6.3 rewrites the stage-mapping, unknown-input, skipped-stage and report-schema cases onto compact fixtures with stage injection, retaining exactly six named complete-candidate acceptance tests. Keep at least one test that runs the whole lane — a file where every test disables the expensive stage gives that stage zero coverage.",
+      "readme_reference": "test_verify_workbook_candidate",
+      "notes": "",
+      "collected_tests": 16,
+      "baseline_result": "fail_2",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_options_sheet_quality",
+      "command": "PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_options_sheet_quality.py -q",
+      "test_files": [
+        "tests/test_options_sheet_quality.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook",
+        "customer_copy"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "tests/fixtures/options-sheet-quality-allowlist.json"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 0.27,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Owns the source-quality module the candidate lane's stage 4 calls. Honors OPTIONS_SHEET_QUALITY_WORKBOOK for reviewed pre-write repair.",
+      "readme_reference": "test_options_sheet_quality",
+      "notes": "Requires PYTHONPATH=scripts when selected alone; see finding.import_order_dependence.",
+      "collected_tests": 18,
+      "baseline_result": "pass_only_with_pythonpath_scripts",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_atomic_registry_write",
+      "command": ".venv/bin/python -m pytest tests/test_atomic_registry_write.py -q",
+      "test_files": [
+        "tests/test_atomic_registry_write.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "registry_publication"
+      ],
+      "reads": [
+        "scripts/generate_registry.py"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 0.23,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Atomic-replacement and destination-mode invariants for the published registry (§4.1 last bullet). Covers the 0644→0600 class of defect that git cannot see.",
+      "readme_reference": "test_atomic_registry_write",
+      "notes": "",
+      "collected_tests": 9,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_source_assembly_characterization",
+      "command": "PYTHONPATH=scripts .venv/bin/python -m pytest tests/test_source_assembly_characterization.py -q",
+      "test_files": [
+        "tests/test_source_assembly_characterization.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "generator"
+      ],
+      "reads": [
+        "stingray_master.xlsx"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 9.33,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Model-neutral contract invariants that must hold for all six models under one builder — already the shape §4.1 asks for.",
+      "readme_reference": "test_source_assembly_characterization",
+      "notes": "Requires PYTHONPATH=scripts when selected alone; see finding.import_order_dependence.",
+      "collected_tests": 32,
+      "baseline_result": "pass_only_with_pythonpath_scripts",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_runtime_metadata_guards",
+      "command": ".venv/bin/python -m pytest tests/test_runtime_metadata_guards.py -q",
+      "test_files": [
+        "tests/test_runtime_metadata_guards.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "generator",
+        "runtime_contract",
+        "promotion"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "form-output/**"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 0.39,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Promoted models must not fall back to code-authored runtime metadata. Protects the model_key-scoped presentation sheets whose absence only surfaces at post-promotion generation.",
+      "readme_reference": "test_runtime_metadata_guards",
+      "notes": "",
+      "collected_tests": 11,
+      "baseline_result": "fail_1",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_corvette_form_generator_contract",
+      "command": ".venv/bin/python -m pytest tests/test_corvette_form_generator_contract.py -q",
+      "test_files": [
+        "tests/test_corvette_form_generator_contract.py"
+      ],
+      "layer": 0,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "generator"
+      ],
+      "reads": [
+        "scripts/corvette_form_generator/**"
+      ],
+      "writes": [],
+      "isolation": "in_process",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 0.3,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Shared contract-surface helpers; pure and fast. Layer 0 content.",
+      "readme_reference": "test_corvette_form_generator_contract",
+      "notes": "",
+      "collected_tests": 10,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_editor_ops_apply",
+      "command": ".venv/bin/python -m pytest tests/test_editor_ops_apply.py -q",
+      "test_files": [
+        "tests/test_editor_ops_apply.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook_write",
+        "editor"
+      ],
+      "reads": [
+        "stingray_master.xlsx"
+      ],
+      "writes": [
+        "<tmp copies>/**"
+      ],
+      "isolation": "temp_workbook_copy",
+      "generates": true,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 147.75,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Largest editor owner (63 tests) and the guarded save_workbook_safely()/apply_batch write-path authority. Candidate for the §3.2 'repeated workbook mutation/generation owner' cost — see expensive_setups; if the measured baseline confirms it, Checkpoint 4 shares one base copy rather than removing proof.",
+      "readme_reference": "test_editor_ops_apply",
+      "notes": "",
+      "collected_tests": 63,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_editor_ops_meta",
+      "command": ".venv/bin/python -m pytest tests/test_editor_ops_meta.py -q",
+      "test_files": [
+        "tests/test_editor_ops_meta.py"
+      ],
+      "layer": 0,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "editor",
+        "workbook_domain_registry"
+      ],
+      "reads": [
+        "scripts/corvette_form_generator/workbook_domain/**"
+      ],
+      "writes": [],
+      "isolation": "in_process",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 0.34,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Sheet-meta registry unit tests; pure. Layer 0 content.",
+      "readme_reference": "test_editor_ops_meta",
+      "notes": "",
+      "collected_tests": 9,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_editor_ops_global_families",
+      "command": ".venv/bin/python -m pytest tests/test_editor_ops_global_families.py -q",
+      "test_files": [
+        "tests/test_editor_ops_global_families.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "editor",
+        "workbook_write"
+      ],
+      "reads": [
+        "tests/workbook_domain_fixtures.py"
+      ],
+      "writes": [
+        "<tempfile>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 4.42,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Already compact-fixture based — the shape Checkpoint 5 wants everywhere.",
+      "readme_reference": "test_editor_ops_global_families",
+      "notes": "",
+      "collected_tests": 16,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_editor_lints",
+      "command": ".venv/bin/python -m pytest tests/test_editor_lints.py -q",
+      "test_files": [
+        "tests/test_editor_lints.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "editor",
+        "workbook"
+      ],
+      "reads": [
+        "stingray_master.xlsx"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 1.4,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "STATE 2026-07-26 recorded four RealWorkbookCompareTest failures (orphan_ref findings on valid interior ids, a display_order_collision expectation with zero collisions, two KeyErrors on resolved deviations). Measured at this baseline: 27 passed, 0 failed. Those failures are resolved; the file is a working structural owner. See finding.editor_lints_failures_resolved.",
+      "readme_reference": "test_editor_lints",
+      "notes": "",
+      "collected_tests": 27,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_editor_server_payload",
+      "command": ".venv/bin/python -m pytest tests/test_editor_server_payload.py -q",
+      "test_files": [
+        "tests/test_editor_server_payload.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "editor"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "scripts/workbook_editor_server.py"
+      ],
+      "writes": [
+        "<tempfile>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 2.23,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Editor payload derivation; no product literals.",
+      "readme_reference": "test_editor_server_payload",
+      "notes": "",
+      "collected_tests": 21,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_editor_server_write_api",
+      "command": ".venv/bin/python -m pytest tests/test_editor_server_write_api.py -q",
+      "test_files": [
+        "tests/test_editor_server_write_api.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "editor",
+        "workbook_write"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "scripts/workbook_editor_server.py"
+      ],
+      "writes": [
+        "<tmp copies>/**"
+      ],
+      "isolation": "temp_workbook_copy",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 220.06,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Write-API boundary for the editor server; routes through the same guarded write contract.",
+      "readme_reference": "test_editor_server_write_api",
+      "notes": "",
+      "collected_tests": 4,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_workbook_domain_registry",
+      "command": ".venv/bin/python -m pytest tests/test_workbook_domain_registry.py -q",
+      "test_files": [
+        "tests/test_workbook_domain_registry.py"
+      ],
+      "layer": 0,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook_domain_registry"
+      ],
+      "reads": [
+        "scripts/corvette_form_generator/workbook_domain/registry.py"
+      ],
+      "writes": [],
+      "isolation": "in_process",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 0.35,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Polices the single workbook shape authority every structural test derives from. Layer 0 content.",
+      "readme_reference": "test_workbook_domain_registry",
+      "notes": "",
+      "collected_tests": 9,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_workbook_changeset",
+      "command": ".venv/bin/python -m pytest tests/test_workbook_changeset.py -q",
+      "test_files": [
+        "tests/test_workbook_changeset.py"
+      ],
+      "layer": 0,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "changeset"
+      ],
+      "reads": [
+        "scripts/corvette_form_generator/workbook_domain/changeset.py"
+      ],
+      "writes": [],
+      "isolation": "in_process",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 0.35,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "workbook-changeset-1 contract, pure. Layer 0 content.",
+      "readme_reference": "test_workbook_changeset",
+      "notes": "",
+      "collected_tests": 33,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_workbook_changeset_service",
+      "command": ".venv/bin/python -m pytest tests/test_workbook_changeset_service.py -q",
+      "test_files": [
+        "tests/test_workbook_changeset_service.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "changeset",
+        "workbook_write"
+      ],
+      "reads": [
+        "scripts/corvette_form_generator/workbook_domain/service.py"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 3.51,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Fault-injection and lifecycle proof for the approved write service; fixture-based already.",
+      "readme_reference": "test_workbook_changeset_service",
+      "notes": "",
+      "collected_tests": 17,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_workbook_bool_hygiene",
+      "command": ".venv/bin/python -m pytest tests/test_workbook_bool_hygiene.py -q",
+      "test_files": [
+        "tests/test_workbook_bool_hygiene.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook_write"
+      ],
+      "reads": [
+        "scripts/corvette_form_generator/workbook.py"
+      ],
+      "writes": [
+        "<tempfile>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 0.52,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Bool-like cell storage hygiene through save_workbook_safely(); protects the normalization the workbook-truth snapshot will rely on in Checkpoint 2.",
+      "readme_reference": "test_workbook_bool_hygiene",
+      "notes": "",
+      "collected_tests": 7,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_asset_map_sync",
+      "command": ".venv/bin/python -m pytest tests/test_asset_map_sync.py -q",
+      "test_files": [
+        "tests/test_asset_map_sync.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "asset_map"
+      ],
+      "reads": [
+        "scripts/sync_asset_map.py",
+        "tests/fixtures/asset-map-sync-media-urls.txt"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 1.15,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Asset/media sync owner (50 tests) using the deterministic fixture media list. Never touches the live asset library.",
+      "readme_reference": "test_asset_map_sync",
+      "notes": "Also listed in the Workbook Manager checkpoint inventory.",
+      "collected_tests": 50,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_set_asset_display",
+      "command": ".venv/bin/python -m pytest tests/test_set_asset_display.py -q",
+      "test_files": [
+        "tests/test_set_asset_display.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "asset_map"
+      ],
+      "reads": [
+        "scripts/set_asset_display.py"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 0.36,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Guarded card-presentation override command; preview by default, --write required.",
+      "readme_reference": "test_set_asset_display",
+      "notes": "",
+      "collected_tests": 3,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_fable5_loop_contract",
+      "command": ".venv/bin/python -m pytest tests/test_fable5_loop_contract.py -q",
+      "test_files": [
+        "tests/test_fable5_loop_contract.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "fable5_loop"
+      ],
+      "reads": [
+        "fable5loop/**",
+        "scripts/validate_fable5_loop.py"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "loop_artifacts",
+      "approximate_seconds": 1.23,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Loop-scaffold contract. Note the stale-last-session test depends on receipt completeness at the moment it runs (STATE 2026-07-27).",
+      "readme_reference": "test_fable5_loop_contract",
+      "notes": "",
+      "collected_tests": 14,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_validation_catalog",
+      "command": ".venv/bin/python -m pytest tests/test_validation_catalog.py -q",
+      "test_files": [
+        "tests/test_validation_catalog.py"
+      ],
+      "layer": 0,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "validation_infrastructure"
+      ],
+      "reads": [
+        "tests/validation_catalog.json",
+        "tests/**",
+        "README.md"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 0.04,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "The §7 catalog contract test. Fails when a default/checkpoint test file has no catalog entry, when two entries claim one named acceptance lock, when a generating gate lacks an isolated output declaration, when a protected-output gate — or a SUITE that would run one — is assigned unsafe parallel execution, or when README disagrees with the catalog. Each condition is proved by a forced failure so the check is never green for the wrong reason. Suite membership is derived from the command, not trusted from gate_ids, and file discovery is recursive.",
+      "readme_reference": "test_validation_catalog",
+      "notes": "",
+      "collected_tests": 19,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_workbook_manager",
+      "command": ".venv/bin/python -m pytest tests/test_workbook_manager.py -q",
+      "test_files": [
+        "tests/test_workbook_manager.py"
+      ],
+      "layer": 3,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook_manager"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "workbook-manager/**"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": true,
+      "hashes_protected_roots": false,
+      "serial_group": "workbook_manager",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "manager_checkpoint",
+      "approximate_seconds": 810.34,
+      "acceptance_locks": [],
+      "disposition": "rewrite",
+      "disposition_reason": "Largest Python file (65 tests) and the main contributor to the 791.25s Manager checkpoint. Checkpoint 5 builds one verified immutable real-workbook projection/candidate fixture per checkpoint run and clones it; negative cases move to compact workbooks and SQLite fixtures. Every distinct Layer 3 real-workbook acceptance boundary is retained. WBM_SLOW_GATE=1 adds two scratch-copy shared-writer tests.",
+      "readme_reference": "test_workbook_manager",
+      "notes": "",
+      "collected_tests": 65,
+      "baseline_result": "pass_63_skip_2",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_workbook_manager_catalog",
+      "command": ".venv/bin/python -m pytest tests/test_workbook_manager_catalog.py -q",
+      "test_files": [
+        "tests/test_workbook_manager_catalog.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook_manager"
+      ],
+      "reads": [
+        "workbook-manager/**"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": "workbook_manager",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "manager_checkpoint",
+      "approximate_seconds": 0.93,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Shared-registry/catalog and requiredness regressions; small and fixture-based.",
+      "readme_reference": "test_workbook_manager_catalog",
+      "notes": "",
+      "collected_tests": 5,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_workbook_manager_import_projection",
+      "command": ".venv/bin/python -m pytest tests/test_workbook_manager_import_projection.py -q",
+      "test_files": [
+        "tests/test_workbook_manager_import_projection.py"
+      ],
+      "layer": 3,
+      "primary_authority": "workbook_to_output_parity",
+      "changed_surfaces": [
+        "workbook_manager"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "workbook-manager/**"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": "workbook_manager",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "manager_checkpoint",
+      "approximate_seconds": 222.91,
+      "acceptance_locks": [],
+      "disposition": "rewrite",
+      "disposition_reason": "Real-workbook import/projection is one of the 66–75s owners. Checkpoint 5 clones the immutable verified projection fixture rather than re-importing. Keep one real import proof.",
+      "readme_reference": "test_workbook_manager_import_projection",
+      "notes": "",
+      "collected_tests": 21,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_workbook_manager_generated_parity",
+      "command": ".venv/bin/python -m pytest tests/test_workbook_manager_generated_parity.py -q",
+      "test_files": [
+        "tests/test_workbook_manager_generated_parity.py"
+      ],
+      "layer": 3,
+      "primary_authority": "workbook_to_output_parity",
+      "changed_surfaces": [
+        "workbook_manager",
+        "generator"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "workbook-manager/**"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": true,
+      "hashes_protected_roots": false,
+      "serial_group": "workbook_manager",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "manager_checkpoint",
+      "approximate_seconds": 82.22,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "The only owner proving a Manager reconstruction generates the same primary runtime contracts as its bound source workbook (§4.2). AGENTS.md §10 forbids claiming reconstruction parity without it. Distinct Layer 3 boundary — must not be collapsed into an equality check against itself.",
+      "readme_reference": "test_workbook_manager_generated_parity",
+      "notes": "",
+      "collected_tests": 4,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_workbook_manager_api_concurrency",
+      "command": ".venv/bin/python -m pytest tests/test_workbook_manager_api_concurrency.py -q",
+      "test_files": [
+        "tests/test_workbook_manager_api_concurrency.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook_manager"
+      ],
+      "reads": [
+        "workbook-manager/**"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": "workbook_manager",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "manager_checkpoint",
+      "approximate_seconds": 3.1,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Request-scoped connections, lock starvation, projection gating, and single-worker refusal. Mutation-proved in its owning pass; do not fold into a shared-fixture rewrite that changes process/thread assumptions.",
+      "readme_reference": "test_workbook_manager_api_concurrency",
+      "notes": "",
+      "collected_tests": 32,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_workbook_manager_drafts",
+      "command": ".venv/bin/python -m pytest tests/test_workbook_manager_drafts.py -q",
+      "test_files": [
+        "tests/test_workbook_manager_drafts.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook_manager"
+      ],
+      "reads": [
+        "workbook-manager/**"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": "workbook_manager",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "manager_checkpoint",
+      "approximate_seconds": 0.4,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Durable draft behavior; Draft Save must not write or regenerate.",
+      "readme_reference": "test_workbook_manager_drafts",
+      "notes": "",
+      "collected_tests": 6,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_workbook_manager_changeset_lifecycle",
+      "command": ".venv/bin/python -m pytest tests/test_workbook_manager_changeset_lifecycle.py -q",
+      "test_files": [
+        "tests/test_workbook_manager_changeset_lifecycle.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook_manager",
+        "changeset"
+      ],
+      "reads": [
+        "workbook-manager/**"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": "workbook_manager",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "manager_checkpoint",
+      "approximate_seconds": 1.83,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Immutable ChangeSet lifecycle (36 tests), fixture-based.",
+      "readme_reference": "test_workbook_manager_changeset_lifecycle",
+      "notes": "",
+      "collected_tests": 36,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_workbook_manager_apply_rebuild",
+      "command": ".venv/bin/python -m pytest tests/test_workbook_manager_apply_rebuild.py -q",
+      "test_files": [
+        "tests/test_workbook_manager_apply_rebuild.py"
+      ],
+      "layer": 3,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook_manager",
+        "workbook_write",
+        "registry_publication"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "workbook-manager/**"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": true,
+      "hashes_protected_roots": false,
+      "serial_group": "workbook_manager",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "manager_checkpoint",
+      "approximate_seconds": 0.59,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "The only path that may reach the bound writer and downstream generation/publication. Rollback preparation, staged off-path generation, complete-candidate-only publication, and hash-verified restore are distinct Layer 3 boundaries.",
+      "readme_reference": "test_workbook_manager_apply_rebuild",
+      "notes": "",
+      "collected_tests": 7,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    }
+  ],
+  "suites": [
+    {
+      "id": "suite.node_default_readiness",
+      "description": "The fourteen documented node readiness gates, run serially.",
+      "command": "for f in tests/workbook-schema-standardization.test.mjs tests/workbook-visual-copy-standardization.test.mjs tests/nonruntime-option-source-purge.test.mjs tests/stingray-runtime-contract.test.mjs tests/grand-sport-runtime-contract.test.mjs tests/z06-runtime-contract.test.mjs tests/z06-interior-accessory-cleanup.test.mjs tests/stingray-form-regression.test.mjs tests/z06-published-runtime.test.mjs tests/multi-model-runtime-switching.test.mjs tests/z06-performance-package-interactions.test.mjs tests/z06-runtime-rule-corrections.test.mjs tests/z06-registry-publication.test.mjs tests/tracked-artifacts-guard.test.mjs; do node --test \"$f\"; done",
+      "layer": 1,
+      "gate_ids": [
+        "node.workbook-schema-standardization",
+        "node.workbook-visual-copy-standardization",
+        "node.nonruntime-option-source-purge",
+        "node.stingray-runtime-contract",
+        "node.grand-sport-runtime-contract",
+        "node.z06-runtime-contract",
+        "node.z06-interior-accessory-cleanup",
+        "node.stingray-form-regression",
+        "node.z06-published-runtime",
+        "node.multi-model-runtime-switching",
+        "node.z06-performance-package-interactions",
+        "node.z06-runtime-rule-corrections",
+        "node.z06-registry-publication",
+        "node.tracked-artifacts-guard"
+      ],
+      "serial_required": true,
+      "measured_seconds": 109.27,
+      "measured_note": "Sum of the fourteen readiness files at this baseline. The 2026-08-17 documented audit measured 106.38s for 298 tests under the same runtime.",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "suite.node_diagnostics",
+      "description": "Optional inspection diagnostics; not readiness gates.",
+      "command": "for f in tests/grand-sport-contract-preview.test.mjs tests/z06-contract-preview.test.mjs; do node --test \"$f\"; done",
+      "layer": 4,
+      "gate_ids": [
+        "node.grand-sport-contract-preview",
+        "node.z06-contract-preview"
+      ],
+      "serial_required": true,
+      "measured_seconds": 2.48,
+      "measured_note": "",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "suite.python_metadata",
+      "description": "The default Python gate for generation/contract/promotion changes.",
+      "command": ".venv/bin/python -m pytest tests/test_generation_safety.py tests/test_generate_form_model_discovery_cli.py tests/test_runtime_contract_builder.py tests/test_model_config_metadata.py tests/test_promote_model.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py tests/test_rule_derivation.py tests/test_model_generation_route.py tests/test_all_model_runtime_generation.py -q",
+      "layer": 1,
+      "gate_ids": [
+        "py.test_generation_safety",
+        "py.test_generate_form_model_discovery_cli",
+        "py.test_runtime_contract_builder",
+        "py.test_model_config_metadata",
+        "py.test_promote_model",
+        "py.test_registry_promotion_metadata",
+        "py.test_schema_validation_metadata",
+        "py.test_rule_derivation",
+        "py.test_model_generation_route",
+        "py.test_all_model_runtime_generation"
+      ],
+      "serial_required": false,
+      "measured_seconds": 179.16,
+      "measured_note": "Sum of the ten files run one process each at this baseline. test_model_config_metadata alone is 150.33s — 83.9% of the lane. The 2026-08-09 audit measured 166.55s for the lane and attributed 126.43s to one repeated workbook mutation/generation owner; this baseline identifies that owner as test_model_config_metadata.py.",
+      "readme_publishes_command": true
+    },
+    {
+      "id": "suite.workbook_manager_checkpoint",
+      "description": "Workbook Manager pass/checkpoint acceptance inventory (workbook-manager/README.md).",
+      "command": ".venv/bin/python -m pytest tests/test_asset_map_sync.py tests/test_workbook_manager_catalog.py tests/test_workbook_manager_import_projection.py tests/test_workbook_manager_generated_parity.py tests/test_workbook_manager_api_concurrency.py tests/test_workbook_manager_drafts.py tests/test_workbook_manager_changeset_lifecycle.py tests/test_workbook_manager_apply_rebuild.py tests/test_workbook_manager.py -q",
+      "layer": 3,
+      "gate_ids": [
+        "py.test_asset_map_sync",
+        "py.test_workbook_manager_catalog",
+        "py.test_workbook_manager_import_projection",
+        "py.test_workbook_manager_generated_parity",
+        "py.test_workbook_manager_api_concurrency",
+        "py.test_workbook_manager_drafts",
+        "py.test_workbook_manager_changeset_lifecycle",
+        "py.test_workbook_manager_apply_rebuild",
+        "py.test_workbook_manager"
+      ],
+      "serial_required": true,
+      "measured_seconds": 1123.47,
+      "measured_note": "Sum of the nine files run one process each at this baseline (18.7 min), against the 791.25s recorded on 2026-08-10. test_workbook_manager (810.34s) and test_workbook_manager_import_projection (222.91s) are 92.0% of it. Checkpoint 5 targets a material improvement without losing a distinct protected-boundary proof.",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "suite.full_python_inventory",
+      "description": "Full pytest inventory. Diagnostic until every owner is classified and green.",
+      "command": ".venv/bin/python -m pytest tests/ -q",
+      "layer": 4,
+      "gate_ids": [
+        "py.test_generation_safety",
+        "py.test_generate_form_model_discovery_cli",
+        "py.test_runtime_contract_builder",
+        "py.test_model_config_metadata",
+        "py.test_promote_model",
+        "py.test_registry_promotion_metadata",
+        "py.test_schema_validation_metadata",
+        "py.test_rule_derivation",
+        "py.test_model_generation_route",
+        "py.test_all_model_runtime_generation",
+        "py.test_verify_workbook_candidate",
+        "py.test_options_sheet_quality",
+        "py.test_atomic_registry_write",
+        "py.test_source_assembly_characterization",
+        "py.test_runtime_metadata_guards",
+        "py.test_corvette_form_generator_contract",
+        "py.test_editor_ops_apply",
+        "py.test_editor_ops_meta",
+        "py.test_editor_ops_global_families",
+        "py.test_editor_lints",
+        "py.test_editor_server_payload",
+        "py.test_editor_server_write_api",
+        "py.test_workbook_domain_registry",
+        "py.test_workbook_changeset",
+        "py.test_workbook_changeset_service",
+        "py.test_workbook_bool_hygiene",
+        "py.test_asset_map_sync",
+        "py.test_set_asset_display",
+        "py.test_fable5_loop_contract",
+        "py.test_validation_catalog",
+        "py.test_workbook_manager",
+        "py.test_workbook_manager_catalog",
+        "py.test_workbook_manager_import_projection",
+        "py.test_workbook_manager_generated_parity",
+        "py.test_workbook_manager_api_concurrency",
+        "py.test_workbook_manager_drafts",
+        "py.test_workbook_manager_changeset_lifecycle",
+        "py.test_workbook_manager_apply_rebuild"
+      ],
+      "serial_required": true,
+      "measured_seconds": 2381.46,
+      "measured_note": "37 pre-existing files, 734 tests collected on 2026-08-17. Measured as one process per file; a single pytest invocation is faster because interpreter and workbook import costs are paid once. SERIAL: this command collects py.test_verify_workbook_candidate, which hashes form-output/ and form-app/ whole, so the inventory must not run beside any gate that writes a tracked artifact — pytest itself is serial within one process, but this suite must not be scheduled alongside the Node lane.",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "suite.full_node_inventory",
+      "description": "Every tests/*.test.mjs file, serially. Diagnostic.",
+      "command": "for f in tests/*.test.mjs; do node --test \"$f\"; done",
+      "layer": 4,
+      "gate_ids": [
+        "node.workbook-schema-standardization",
+        "node.workbook-visual-copy-standardization",
+        "node.nonruntime-option-source-purge",
+        "node.stingray-runtime-contract",
+        "node.grand-sport-runtime-contract",
+        "node.z06-runtime-contract",
+        "node.z06-interior-accessory-cleanup",
+        "node.stingray-form-regression",
+        "node.z06-published-runtime",
+        "node.multi-model-runtime-switching",
+        "node.z06-performance-package-interactions",
+        "node.z06-runtime-rule-corrections",
+        "node.z06-registry-publication",
+        "node.tracked-artifacts-guard",
+        "node.grand-sport-contract-preview",
+        "node.z06-contract-preview"
+      ],
+      "serial_required": true,
+      "measured_seconds": 111.75,
+      "measured_note": "16 files at this baseline; 6 files failing. Every Node gate hashes the protected roots or sits beside one that does, so this inventory is serial by construction — the loop form is the command, not `node --test tests/*.test.mjs`, which would run the files concurrently.",
+      "readme_publishes_command": false
+    }
+  ],
+  "stale_assertions": [
+    {
+      "id": "stale.grand_sport_color_override_count",
+      "file": "tests/grand-sport-runtime-contract.test.mjs",
+      "line": 350,
+      "assertion": "assert.equal(draft.colorOverrides.length, 263)",
+      "measured_actual": 281,
+      "measured_expected": 263,
+      "current_class": "product literal embedded in a parity gate",
+      "target_class": "workbook_to_output_parity",
+      "disposition": "Checkpoint 1 — compare the emitted colorOverrides identity set against active source override rows read directly from the workbook. Do not substitute 281.",
+      "in_documented_six": true
+    },
+    {
+      "id": "stale.grand_sport_j6f_image_url",
+      "file": "tests/grand-sport-runtime-contract.test.mjs",
+      "line": 782,
+      "assertion": "expects .../brakes/e-j6f.png",
+      "measured_actual": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-g-j6f-o-cmp.webp",
+      "measured_expected": "https://stingraychevroletcorvette.com/wp-content/uploads/pictures/27vette/brakes/e-j6f.png",
+      "current_class": "mutable asset URL literal",
+      "target_class": "workbook_to_output_parity",
+      "disposition": "Checkpoint 1 — compare the generated image against the applicable active asset_map row. Spec §8 canary 1 then proves that changing a valid active asset URL in a copied workbook keeps structural and parity layers green with no literal URL test failing.",
+      "in_documented_six": true
+    },
+    {
+      "id": "stale.stingray_included_seatbelt_lock",
+      "file": "tests/stingray-form-regression.test.mjs",
+      "line": 2854,
+      "assertion": "included 3A9 should block other seatbelt choices",
+      "measured_actual": true,
+      "measured_expected": false,
+      "current_class": "superseded product behavior asserted as runtime state",
+      "target_class": "workbook_to_output_parity",
+      "disposition": "Checkpoint 1 — rewrite against the active seatbelt OVS/rule rows. The sibling assertion at line 2859 (D30 should not unlock a 3LT included seatbelt peer) encodes the same superseded decision and is rewritten with it. No assertion is deleted in Checkpoint 0.",
+      "in_documented_six": true
+    },
+    {
+      "id": "stale.z06_included_color_or_black",
+      "file": "tests/z06-runtime-contract.test.mjs",
+      "line": 273,
+      "assertion": "${interiorId} should allow the included color or Black",
+      "measured_actual": "undefined",
+      "measured_expected": true,
+      "current_class": "superseded product behavior asserted against a generated contract",
+      "target_class": "workbook_to_output_parity",
+      "disposition": "Checkpoint 1 — rewrite against the active seatbelt OVS/rule rows for the affected interiors.",
+      "in_documented_six": true
+    },
+    {
+      "id": "stale.z06_included_seatbelt_block",
+      "file": "tests/z06-runtime-rule-corrections.test.mjs",
+      "line": 233,
+      "assertion": "${interiorId} should block other seatbelts",
+      "measured_actual": true,
+      "measured_expected": false,
+      "current_class": "superseded product behavior asserted as runtime state",
+      "target_class": "workbook_to_output_parity",
+      "disposition": "Checkpoint 1 — rewrite against the active seatbelt rows. The sibling at line 238 (even with D30) encodes the same decision and is rewritten with it.",
+      "in_documented_six": true
+    },
+    {
+      "id": "stale.registry_three_model_keys",
+      "file": "tests/z06-registry-publication.test.mjs",
+      "line": 41,
+      "assertion": "assert.deepEqual(result.models, [\"stingray\", \"grandSport\", \"z06\"])",
+      "measured_actual": [
+        "stingray",
+        "grandSport",
+        "grand_sport_x",
+        "z06",
+        "zr1",
+        "zr1x"
+      ],
+      "measured_expected": [
+        "stingray",
+        "grandSport",
+        "z06"
+      ],
+      "current_class": "product literal (model membership) embedded in a structural gate",
+      "target_class": "workbook_to_output_parity, or intentional_product_acceptance_lock with approval",
+      "disposition": "Checkpoint 1 — compare against active model_registry_promotion rows. Promoting it to the named promoted_model_membership lock instead freezes a business decision and needs §12 approval first.",
+      "in_documented_six": true
+    },
+    {
+      "id": "stale.grand_sport_preview_requires_hotspot_count",
+      "file": "tests/grand-sport-contract-preview.test.mjs",
+      "line": 94,
+      "assertion": "assert.equal(preview.ruleDetailHotSpots.counts.requires, 25)",
+      "measured_actual": 22,
+      "measured_expected": 25,
+      "current_class": "aggregate count literal in an optional diagnostic",
+      "target_class": "structural_invariant",
+      "disposition": "Checkpoint 2 — derive the expected hot-spot counts from the raw-source rows the preview summarizes, or drop the count in favor of a shape assertion. Diagnostic-only; it does not gate readiness.",
+      "in_documented_six": false,
+      "new_finding": "NOT part of the documented six. The 2026-08-17 fourteen-gate audit did not run the optional diagnostics, so this drift was invisible. Recorded here as Checkpoint 0 evidence."
+    }
+  ],
+  "new_findings": [
+    {
+      "id": "finding.node_diagnostic_hotspot_count",
+      "severity": "low",
+      "surface": "tests/grand-sport-contract-preview.test.mjs:94",
+      "evidence": "requires hot-spot count measured 22, expected 25.",
+      "classification": "stale aggregate literal in an optional diagnostic. Also recorded under stale_assertions.",
+      "action": "Checkpoint 2. Diagnostic-only; does not gate readiness."
+    },
+    {
+      "id": "finding.runtime_metadata_guard_stale_row_list",
+      "severity": "medium",
+      "surface": "tests/test_runtime_metadata_guards.py:303 (test_live_workbook_default_selection_display_behavior_rows_are_explicit)",
+      "evidence": "Asserts a hardcoded three-row list of default-selection display rules over a hardcoded three-model tuple ('stingray', 'grand_sport', 'z06'). The workbook now also has ('z06', 'z06_default_nga_unless_nwi', 'default_selected'), so the test fails with one extra element. Fails identically with and without PYTHONPATH=scripts, so it is not an import artifact.",
+      "classification": "Exactly the §3.1 defect class the specification describes — a product literal restated in a structural gate, plus a three-model sweep where six models are active. It was NOT in the documented six because the audit covered the Node lane only.",
+      "action": "Checkpoint 1 — rewrite as parity against the active default_selection_rules rows for every promoted model. Do not refresh the literal to four rows."
+    },
+    {
+      "id": "finding.dead_semantic_drift_canary",
+      "severity": "high",
+      "surface": "tests/test_verify_workbook_candidate.py — test_undeclared_semantic_drift_is_reported_and_fails and test_declaring_drift_moves_it_out_of_unexpected_and_passes",
+      "evidence": "Both fixtures perturb the ZR1 EFR option_name in a copied workbook and expect semantic_drift_vs_retained == ['choices', 'standardEquipment'] for zr1. Measured: unexpected_drift == [] and semantic_drift_vs_retained == []. Direct probe of form-output/runtime/zr1-runtime-contract.json finds zero EFR rows among 800 choices and 318 standardEquipment entries, while zr1_options row opt_efr_001 is active=True, selectable=False. The mutation therefore cannot produce drift: the probe target no longer reaches the generated contract.",
+      "classification": "The candidate lane's semantic_drift stage currently has NO live positive proof — its two forcing tests are inert. That is the 'a check only ever observed passing is not a check' failure mode, on the stage the release gate depends on. Separately, an active workbook option row producing no runtime output is a workbook/generator question this checkpoint is not authorized to decide (§12: classify, do not choose product truth in test code).",
+      "action": "Checkpoint 1/4 — pick a probe target proven to reach the contract and assert the mutation moves drift, then answer the separate question of why an active zr1 EFR row emits nothing. The Checkpoint 2 workbook-truth snapshot is the mechanism that would have caught this class."
+    },
+    {
+      "id": "finding.import_order_dependence",
+      "severity": "medium",
+      "surface": "tests/test_rule_derivation.py, tests/test_source_assembly_characterization.py, tests/test_options_sheet_quality.py",
+      "evidence": "Run alone without PYTHONPATH=scripts: test_rule_derivation errors at collection, test_source_assembly_characterization errors at collection, test_options_sheet_quality reports 17 failed / 1 passed. With PYTHONPATH=scripts all three pass (15, 32, 18). README documents PYTHONPATH only for the options-quality CLI, and includes test_rule_derivation.py in the Python metadata gate command with no PYTHONPATH at all — that gate passes because a sibling file inserts scripts/ into sys.path first.",
+      "classification": "Layer 0 selection hazard. Spec §5 Layer 0 selects gates by changed surface, so a file that only passes beside its siblings is unusable as a selected-alone gate. Not a product defect and not a stale literal.",
+      "action": "Checkpoint 1 — give the three files a self-sufficient import path (or document the requirement in the catalog command, which now records it) before any layer selects them individually. The catalog command for test_rule_derivation already carries PYTHONPATH=scripts."
+    },
+    {
+      "id": "finding.editor_lints_failures_resolved",
+      "severity": "informational",
+      "surface": "tests/test_editor_lints.py",
+      "evidence": "STATE 2026-07-26 records four RealWorkbookCompareTest failures. Measured at this baseline: 27 passed, 0 failed.",
+      "classification": "Resolved since that entry was written. Recorded so Checkpoint 1 does not go looking for a defect that is gone.",
+      "action": "None. STATE's open-failure entry for this file is withdrawn."
+    },
+    {
+      "id": "finding.manager_generated_parity_failure_resolved",
+      "severity": "informational",
+      "surface": "tests/test_workbook_manager_generated_parity.py",
+      "evidence": "STATE.md records an open failure from 2026-08-14: test_source_and_identity_reconstruction_runtime_contracts_match hardcodes the former three-model promoted tuple and fails against the six-model workbook. Measured at this baseline: 4 passed in 82.22s.",
+      "classification": "Resolved since that entry was written.",
+      "action": "None. STATE's 2026-08-14 open-failure entry is withdrawn."
+    },
+    {
+      "id": "finding.grand_sport_preview_sec_perf_support_resolved",
+      "severity": "informational",
+      "surface": "tests/grand-sport-contract-preview.test.mjs:67-68",
+      "evidence": "STATE.md records an open failure from 2026-07-25: these lines assert sec_perf_support_001 has step_key 'wheels' / section_name 'Mechanical' for a section the workbook no longer defines, and the file rewrites tracked artifacts. Measured at this baseline: 4 of 5 tests pass and the only failure is the hot-spot count at line 94; the file generates into /tmp/27vette-grand-sport-contract-preview-test and asserts tracked artifacts unchanged. The companion file the entry names, tests/grand-sport-draft-data.test.mjs, no longer exists.",
+      "classification": "Both halves of that entry are resolved: the section pins were retargeted and the output was isolated in the 2026-07-27 node-gate isolation pass.",
+      "action": "None. STATE's 2026-07-25 open-failure entry is withdrawn; the remaining line-94 drift is tracked as stale.grand_sport_preview_requires_hotspot_count."
+    },
+    {
+      "id": "finding.vacuous_suite_serial_check",
+      "severity": "medium",
+      "surface": "tests/validation_catalog.json suites, tests/test_validation_catalog.py",
+      "evidence": "Review of PR #25 found that suite.full_python_inventory declared gate_ids: [] and serial_required: false while its command, `pytest tests/`, collects py.test_verify_workbook_candidate — a gate this same catalog marks hashes_protected_roots: true. The serial check read only gate_ids, so an empty list satisfied it for any serial_required value, and the condition-4 mutation only flipped a gate's serial_group, never a suite's.",
+      "classification": "A live misclassification plus an unenforced §7 condition 4 at suite level — the exact 'a check only observed passing is not a check' failure mode this catalog exists to prevent, in the catalog's own contract test.",
+      "action": "Fixed in this checkpoint. Both full-inventory suites now declare complete membership, the Python inventory is serial, membership is derived from the command and must match the declaration, and two forced mutations cover the suite-level case. Generating gates may no longer declare in_process or read_only isolation, and generates / hashes_protected_roots are required fields."
+    }
+  ],
+  "expensive_setups": [
+    {
+      "id": "cost.duplicate_schema_invocation",
+      "evidence": "node.workbook-schema-standardization measured 64.97s at this baseline and invokes scripts/validate_workbook_schema.py, which full default validation already runs directly. Spec §3.2 attributes roughly one minute of the Node lane to the repeated invocation.",
+      "share_of_measured_node_lane": "59.5% of the 109.27s fourteen-gate readiness total",
+      "disposition": "Checkpoint 1 — remove the duplicate invocation from the node path; keep cmd.workbook_schema as the single schema authority."
+    },
+    {
+      "id": "cost.model_specific_regeneration",
+      "evidence": "Three node contract files (stingray/grand-sport/z06 runtime-contract) plus z06-interior-accessory-cleanup and the two preview diagnostics each spawn generate_form.py, while test_all_model_runtime_generation.py and verify_workbook_candidate.py already generate and validate every discovered model. Measured here: 16.46 + 3.07 + 1.19 + 1.71 + 1.25 + 1.23 = 24.91s, understated because three of those files aborted early on stale assertions.",
+      "share_of_measured_node_lane": "at least 20.6% of the 109.27s readiness total",
+      "disposition": "Checkpoint 4 — remove model-specific regeneration from default node gates once candidate coverage is proven equivalent or stronger. Nothing is removed before that proof."
+    },
+    {
+      "id": "cost.candidate_verifier_full_candidates",
+      "evidence": "Spec §3.2 / 2026-08-09 audit: 648.04s for the 16 tests in test_verify_workbook_candidate.py, with repeated complete six-model candidates at about 61–67s each.",
+      "share_of_measured_node_lane": "n/a (Python)",
+      "disposition": "Checkpoint 4 / §6.3 — compact fixtures and stage injection for stage-mapping, unknown-input, skipped-stage and report-schema cases; exactly six named complete-candidate acceptance tests retained, module/session scoped where isolation permits, cloned before mutation."
+    },
+    {
+      "id": "cost.python_metadata_mutation_owner",
+      "evidence": "Spec §3.2: the default Python metadata lane was 166.55s and one repeated workbook mutation/generation owner consumed 126.43s of it. This baseline identifies the owner: tests/test_model_config_metadata.py measured 150.33s for 23 tests plus 88 subtests, 83.9% of the 179.16s ten-file lane.",
+      "share_of_measured_node_lane": "n/a (Python)",
+      "disposition": "Checkpoint 4 — refactor tests/test_model_config_metadata.py onto compact workbooks or one shared base copy while retaining representative real-workbook mutation proof. Every other file in the metadata lane is under 14s."
+    },
+    {
+      "id": "cost.workbook_manager_checkpoint",
+      "evidence": "2026-08-10 Manager checkpoint inventory: 791.25s. Real-workbook promotion/import/export owners near 66–75s each; the changed-overlay comparison export about 213s.",
+      "share_of_measured_node_lane": "n/a (Python)",
+      "disposition": "Checkpoint 5 — one verified immutable projection/candidate fixture per checkpoint run, cloned into test-local directories; negative cases on compact workbooks and SQLite fixtures; every distinct Layer 3 boundary retained; isolated, combined, and order-sensitive runs measured to prevent shared-module contamination."
+    },
+    {
+      "id": "cost.stale_readme_collection_count",
+      "evidence": "README stated 678 collected pytest tests; measured 734 on 2026-08-17.",
+      "share_of_measured_node_lane": "n/a",
+      "disposition": "Checkpoint 0 — README no longer hand-maintains the count; this catalog owns it (§7). The catalog contract test fails if README reintroduces a hardcoded count."
+    },
+    {
+      "id": "cost.editor_server_write_api",
+      "evidence": "tests/test_editor_server_write_api.py measured 220.06s for 4 tests — about 55s per test, and the second most expensive Python owner outside the candidate lane and the Manager. It is not named anywhere in the specification's §3.2 evidence.",
+      "share_of_measured_node_lane": "n/a (Python)",
+      "disposition": "Checkpoint 4 — new finding from this baseline. Each test drives a real workbook copy through the editor write API. Share one verified base copy per module and keep one end-to-end write proof, the same shape §6.3 applies to the candidate verifier."
+    },
+    {
+      "id": "cost.editor_ops_apply",
+      "evidence": "tests/test_editor_ops_apply.py measured 147.75s for 63 tests plus 13 subtests; it copies and mutates the canonical workbook repeatedly.",
+      "share_of_measured_node_lane": "n/a (Python)",
+      "disposition": "Checkpoint 4 — share one immutable base copy per module and clone it, retaining the distinct guarded-write proofs. No proof is removed."
+    }
+  ],
+  "coverage_ledger": [
+    {
+      "behavior": "Registered sheets and fields have valid, registry-declared types",
+      "authority_class": "structural_invariant",
+      "primary_owner": "py.test_schema_validation_metadata",
+      "secondary_evidence": [
+        "node.workbook-schema-standardization",
+        "cmd.workbook_schema"
+      ]
+    },
+    {
+      "behavior": "Workbook shape (sheet families, writable columns, shared enums) has one authority",
+      "authority_class": "structural_invariant",
+      "primary_owner": "py.test_workbook_domain_registry",
+      "secondary_evidence": [
+        "node.workbook-schema-standardization",
+        "py.test_editor_ops_meta"
+      ]
+    },
+    {
+      "behavior": "Workbook package integrity (openable, tables intact)",
+      "authority_class": "structural_invariant",
+      "primary_owner": "cmd.workbook_package",
+      "secondary_evidence": [
+        "cmd.release_candidate_lane"
+      ]
+    },
+    {
+      "behavior": "Customer-facing option-sheet source quality across all configured sheets",
+      "authority_class": "structural_invariant",
+      "primary_owner": "cmd.options_sheet_quality",
+      "secondary_evidence": [
+        "py.test_options_sheet_quality",
+        "node.workbook-visual-copy-standardization"
+      ]
+    },
+    {
+      "behavior": "Model discovery reflects workbook-active model_master rows",
+      "authority_class": "structural_invariant",
+      "primary_owner": "py.test_model_config_metadata",
+      "secondary_evidence": [
+        "py.test_generate_form_model_discovery_cli",
+        "py.test_all_model_runtime_generation"
+      ]
+    },
+    {
+      "behavior": "Every model generates through one shared route; no model has a private path",
+      "authority_class": "structural_invariant",
+      "primary_owner": "py.test_model_generation_route",
+      "secondary_evidence": [
+        "py.test_source_assembly_characterization"
+      ]
+    },
+    {
+      "behavior": "Runtime contracts contain the required shapes and no error-severity findings",
+      "authority_class": "structural_invariant",
+      "primary_owner": "py.test_runtime_contract_builder",
+      "secondary_evidence": [
+        "cmd.release_candidate_lane",
+        "py.test_all_model_runtime_generation"
+      ],
+      "known_gap": "assert_runtime_contract() accepts variant drop/duplicate/rename and a wrong dataset.source_workbook (STATE 2026-07-26). Checkpoint 2 parity item."
+    },
+    {
+      "behavior": "Generation is isolated and fail-closed; no tracked artifact is written by validation",
+      "authority_class": "structural_invariant",
+      "primary_owner": "node.tracked-artifacts-guard",
+      "secondary_evidence": [
+        "py.test_generation_safety",
+        "cmd.release_candidate_lane"
+      ]
+    },
+    {
+      "behavior": "Registry publication is atomic and preserves destination mode",
+      "authority_class": "structural_invariant",
+      "primary_owner": "py.test_atomic_registry_write",
+      "secondary_evidence": [
+        "node.z06-registry-publication"
+      ]
+    },
+    {
+      "behavior": "Promotion metadata is workbook-owned and runtime_contract is the only promotable artifact type",
+      "authority_class": "structural_invariant",
+      "primary_owner": "py.test_registry_promotion_metadata",
+      "secondary_evidence": [
+        "py.test_promote_model"
+      ]
+    },
+    {
+      "behavior": "Promotion is gated on a passing composed candidate",
+      "authority_class": "structural_invariant",
+      "primary_owner": "py.test_promote_model",
+      "secondary_evidence": [
+        "py.test_verify_workbook_candidate"
+      ]
+    },
+    {
+      "behavior": "Promoted models never fall back to code-authored runtime metadata",
+      "authority_class": "structural_invariant",
+      "primary_owner": "py.test_runtime_metadata_guards",
+      "secondary_evidence": []
+    },
+    {
+      "behavior": "Workbook writes route through guarded tooling and save_workbook_safely()",
+      "authority_class": "structural_invariant",
+      "primary_owner": "py.test_editor_ops_apply",
+      "secondary_evidence": [
+        "py.test_workbook_bool_hygiene",
+        "py.test_editor_server_write_api",
+        "py.test_workbook_changeset_service"
+      ]
+    },
+    {
+      "behavior": "ChangeSet contract and staged-vs-staged validation",
+      "authority_class": "structural_invariant",
+      "primary_owner": "py.test_workbook_changeset",
+      "secondary_evidence": [
+        "py.test_workbook_changeset_service",
+        "py.test_workbook_manager_changeset_lifecycle"
+      ]
+    },
+    {
+      "behavior": "asset_map sync is workbook-authored, guarded, and never touches the live library in tests",
+      "authority_class": "structural_invariant",
+      "primary_owner": "py.test_asset_map_sync",
+      "secondary_evidence": [
+        "py.test_set_asset_display"
+      ]
+    },
+    {
+      "behavior": "Generated model keys equal active promotion rows",
+      "authority_class": "workbook_to_output_parity",
+      "primary_owner": "node.z06-registry-publication",
+      "secondary_evidence": [
+        "py.test_all_model_runtime_generation"
+      ],
+      "known_gap": "Currently a three-model literal. See stale.registry_three_model_keys."
+    },
+    {
+      "behavior": "Generated variants equal workbook-declared active variant facts",
+      "authority_class": "workbook_to_output_parity",
+      "primary_owner": null,
+      "secondary_evidence": [
+        "node.z06-runtime-contract",
+        "node.z06-published-runtime",
+        "py.test_source_assembly_characterization"
+      ],
+      "known_gap": "UNOWNED. Variant identity is asserted today as per-model literal id lists (expectedVariantIds). Checkpoint 2 creates the parity owner against the workbook-truth snapshot."
+    },
+    {
+      "behavior": "A generated image equals the applicable active asset_map row",
+      "authority_class": "workbook_to_output_parity",
+      "primary_owner": null,
+      "secondary_evidence": [
+        "node.grand-sport-runtime-contract"
+      ],
+      "known_gap": "UNOWNED. Today one hardcoded URL literal, currently stale. Checkpoint 1/2 creates the parity owner."
+    },
+    {
+      "behavior": "Emitted option/rule/group/price/override identity sets equal active source rows",
+      "authority_class": "workbook_to_output_parity",
+      "primary_owner": null,
+      "secondary_evidence": [
+        "node.stingray-runtime-contract",
+        "node.grand-sport-runtime-contract",
+        "node.z06-runtime-contract",
+        "cmd.release_candidate_lane"
+      ],
+      "known_gap": "UNOWNED as parity. The candidate lane's semantic_drift stage compares generated-to-retained, not generated-to-source, so it cannot detect a generator defect that is consistent across both. Checkpoint 2 builds the independent workbook-truth snapshot to close this."
+    },
+    {
+      "behavior": "A Workbook Manager reconstruction generates the same primary runtime contracts as its bound source workbook",
+      "authority_class": "workbook_to_output_parity",
+      "primary_owner": "py.test_workbook_manager_generated_parity",
+      "secondary_evidence": [
+        "py.test_workbook_manager_import_projection"
+      ]
+    },
+    {
+      "behavior": "Model activation selects only that model's registry data; model switching clears incompatible prior-model state",
+      "authority_class": "runtime_state_invariant",
+      "primary_owner": "node.multi-model-runtime-switching",
+      "secondary_evidence": [
+        "node.z06-published-runtime"
+      ]
+    },
+    {
+      "behavior": "Body style and trim resolve to the intended variant",
+      "authority_class": "runtime_state_invariant",
+      "primary_owner": "node.multi-model-runtime-switching",
+      "secondary_evidence": [
+        "node.stingray-form-regression"
+      ]
+    },
+    {
+      "behavior": "Reset plus reconciliation reaches a stable fixed point and a second reconciliation is idempotent",
+      "authority_class": "runtime_state_invariant",
+      "primary_owner": null,
+      "secondary_evidence": [],
+      "known_gap": "UNOWNED. No gate asserts reconciliation idempotence. Checkpoint 3 §4.3 items 3–4."
+    },
+    {
+      "behavior": "Include / require / exclude / replace / default / price rules preserve their generic contract after transitions",
+      "authority_class": "runtime_state_invariant",
+      "primary_owner": "node.z06-performance-package-interactions",
+      "secondary_evidence": [
+        "node.z06-runtime-rule-corrections",
+        "node.stingray-form-regression",
+        "node.multi-model-runtime-switching"
+      ],
+      "known_gap": "Covered only through one model's named examples. Checkpoint 3 generalizes over every promoted model and declared variant."
+    },
+    {
+      "behavior": "At most one peer selected in a single-selection exclusive group; required selections satisfied or reported",
+      "authority_class": "runtime_state_invariant",
+      "primary_owner": "node.z06-runtime-rule-corrections",
+      "secondary_evidence": [
+        "node.stingray-form-regression"
+      ],
+      "known_gap": "Not swept over every promoted model. Checkpoint 3 §4.3 items 7–8."
+    },
+    {
+      "behavior": "Totals equal the independently recomputed base, option, component, override and charge lines",
+      "authority_class": "runtime_state_invariant",
+      "primary_owner": "node.stingray-form-regression",
+      "secondary_evidence": [
+        "node.multi-model-runtime-switching"
+      ],
+      "known_gap": "Single-model. Checkpoint 3 §4.3 item 10."
+    },
+    {
+      "behavior": "Interior/accessory reconciliation and included/display-only locked states",
+      "authority_class": "runtime_state_invariant",
+      "primary_owner": "node.z06-interior-accessory-cleanup",
+      "secondary_evidence": [
+        "node.z06-runtime-contract"
+      ],
+      "known_gap": "Single-model. Checkpoint 3 §4.3 items 5–6."
+    },
+    {
+      "behavior": "Download and stubbed dealer payload identity match the active model and variant",
+      "authority_class": "runtime_state_invariant",
+      "primary_owner": "node.multi-model-runtime-switching",
+      "secondary_evidence": [
+        "node.stingray-form-regression"
+      ],
+      "known_gap": "Explicit examples for Stingray, Grand Sport and Z06 only (spec §3.3). Checkpoint 3 sweeps every promoted model. No live submission in any layer."
+    },
+    {
+      "behavior": "Dealer modal, Turnstile, required-field gating, payload shape and no-duplicate-post behavior",
+      "authority_class": "intentional_product_acceptance_lock",
+      "primary_owner": "node.stingray-form-regression",
+      "secondary_evidence": [
+        "node.multi-model-runtime-switching"
+      ]
+    },
+    {
+      "behavior": "The published registry opens on Stingray",
+      "authority_class": "intentional_product_acceptance_lock",
+      "primary_owner": "node.multi-model-runtime-switching",
+      "secondary_evidence": [],
+      "known_gap": "Restated by node.z06-registry-publication and node.z06-published-runtime, violating §4.4 one-decision-one-owner. Restatements removed in Checkpoint 1/2."
+    },
+    {
+      "behavior": "ZR1X ships J59 standard with no J58; ZTK does not claim J59",
+      "authority_class": "intentional_product_acceptance_lock",
+      "primary_owner": "node.multi-model-runtime-switching",
+      "secondary_evidence": []
+    },
+    {
+      "behavior": "Loop scaffold structure, receipts, and state handoff contract",
+      "authority_class": "structural_invariant",
+      "primary_owner": "py.test_fable5_loop_contract",
+      "secondary_evidence": [
+        "cmd.fable5_loop_validator"
+      ]
+    },
+    {
+      "behavior": "Every default/checkpoint gate is cataloged with one primary authority and a safe isolation declaration",
+      "authority_class": "structural_invariant",
+      "primary_owner": "py.test_validation_catalog",
+      "secondary_evidence": []
+    }
+  ],
+  "modeling_notes": [
+    "No gate declares intentional_product_acceptance_lock as its PRIMARY authority. Locks attach to gates through the acceptance_locks field and are tracked as behaviors in the coverage ledger. stingray-form-regression owns the dealer lock but its dominant job is runtime state, so that is what it declares. When Checkpoint 1 splits the dealer lock out of that 2,949-line file, the split-out owner should declare the lock class directly. Deliberate choice, recorded so a later reader does not read it as an omission.",
+    "Two of the six documented stale assertions have SIBLING assertions in the same test encoding the same superseded decision: stingray-form-regression.test.mjs:2859 and z06-runtime-rule-corrections.test.mjs:238. Those siblings currently PASS, which makes them the dangerous ones — a rewrite that fixes only the failing line leaves the superseded behavior pinned.",
+    "approximate_seconds is wall time for one process per gate. A single pytest invocation over several files is faster than the sum, because interpreter startup and workbook import are paid once. Compare like with like before claiming an improvement."
+  ]
+}
