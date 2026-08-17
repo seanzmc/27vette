@@ -230,7 +230,9 @@ Fable 5 compounding loop scaffold:
 
 The operating entrypoint is `fable5loop/README.md`. Use this gate after any change to the loop scaffold, run receipts, state file, or compounding skill.
 
-Workbook schema gate:
+Workbook schema gate — the single schema authority. No test re-runs it; the
+`workbook-schema-standardization` node gate owns only the structural conformance
+this command does not check:
 
 ```sh
 .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
@@ -289,6 +291,11 @@ The remaining `tests/test_*.py` files are not in that gate and are chosen by cha
 | Promotion preflight (slow) | `test_verify_workbook_candidate` |
 | Fable 5 loop | `test_fable5_loop_contract` |
 | Validation catalog | `test_validation_catalog` |
+
+Every `tests/test_*.py` file runs standalone: `tests/conftest.py` puts `scripts/`
+on `sys.path` for the whole directory, so no pytest command needs
+`PYTHONPATH=scripts`. The options-sheet quality CLI above still does, because it
+is a module invocation rather than a pytest run.
 
 `tests/validation_catalog.json` is the machine-readable inventory of every gate above: its layer, authority class, isolation, serialization requirement, measured duration, and collection counts. `test_validation_catalog` enforces it and fails when a test file is missing from the catalog, when two gates claim one named acceptance lock, when a generating gate lacks an isolated output declaration, when a protected-output gate is not serialized, or when this README disagrees with the catalog. Read counts and timings from the catalog rather than adding them here.
 

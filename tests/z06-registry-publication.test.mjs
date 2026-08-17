@@ -7,6 +7,8 @@ import path from "node:path";
 import test from "node:test";
 import vm from "node:vm";
 
+import { cell, workbookRows, workbookTruthy } from "./lib/workbook-rows.mjs";
+
 // Spec Pass 3 requirements 6 and 9. Split out of the published-runtime gate
 // so the read-only promotion assertions never invoke the publisher, then given an
 // isolated `--output` by requirement 9 so this file no longer rewrites the tracked
@@ -25,6 +27,15 @@ function loadRegistry(file) {
   return context.window.CORVETTE_FORM_DATA;
 }
 
+// Expected side of the publication parity check: a direct read of the
+// `model_registry_promotion` rows, ordered the way the sheet orders them.
+function promotedRegistryKeys() {
+  return workbookRows("model_registry_promotion")
+    .filter((row) => workbookTruthy(row.active) && workbookTruthy(row.promoted_to_runtime))
+    .sort((a, b) => Number(a.display_order) - Number(b.display_order))
+    .map((row) => cell(row.registry_key));
+}
+
 test("dedicated registry generator publishes promoted runtime artifacts", () => {
   const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "registry-publication-"));
   const target = path.join(scratch, "data.js");
@@ -38,12 +49,37 @@ test("dedicated registry generator publishes promoted runtime artifacts", () => 
   const result = JSON.parse(output);
   assert.equal(result.status, "registry_generated");
   assert.equal(result.output, target);
-  assert.deepEqual(result.models, ["stingray", "grandSport", "z06"]);
+
+  // Checkpoint 1 of the fast layered validation suite (spec §9) replaced the
+  // literal ["stingray", "grandSport", "z06"] here. Three models were promoted
+  // when it was written and six are promoted now, so the literal failed for a
+  // valid workbook state. Which models are promoted is workbook data, compared
+  // against the promotion rows themselves; the catalog records
+  // `promoted_model_membership` as a proposed acceptance lock, which stays
+  // proposed because declaring it freezes a business decision (spec §12).
+  const expectedModels = promotedRegistryKeys();
+  assert.ok(expectedModels.length > 0, "model_registry_promotion promotes no model");
+  assert.deepEqual(result.models, expectedModels);
 
   const registry = loadRegistry(target);
-  assert.equal(registry.defaultModelKey, "stingray");
-  assert.equal(registry.models.z06.data.dataset.status, "runtime_active");
-  assert.equal(registry.models.grandSport.data.dataset.status, "runtime_active");
+  // `defaultModelKey === "stingray"` is the default_model_is_stingray
+  // acceptance lock, owned by tests/multi-model-runtime-switching.test.mjs.
+  // This gate asserts only that publication carries the workbook's flagged row
+  // through, without restating which model that is (spec §4.4).
+  const defaultRows = workbookRows("model_registry_promotion").filter(
+    (row) => workbookTruthy(row.active) && workbookTruthy(row.default_model)
+  );
+  assert.equal(defaultRows.length, 1, "exactly one active promotion row may be the default model");
+  assert.equal(registry.defaultModelKey, cell(defaultRows[0].registry_key));
+
+  for (const registryKey of expectedModels) {
+    assert.ok(registry.models[registryKey], `${registryKey} is promoted but absent from the registry`);
+    assert.equal(
+      registry.models[registryKey].data.dataset.status,
+      "runtime_active",
+      `${registryKey} published a contract that is not runtime_active`
+    );
+  }
 
   // Requirement 9's practical payoff: publishing to an explicit target must not
   // touch the tracked registry. Breaks if --output is ever ignored or partially

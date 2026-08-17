@@ -4,7 +4,9 @@ import fs from "node:fs";
 import test from "node:test";
 
 import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
+import { cell, modelSourceSheet, workbookRows } from "./lib/workbook-rows.mjs";
 
+const MODEL_KEY = "z06";
 const outputRoot = "/tmp/27vette-z06-runtime-contract-test";
 const runtimePath = `${outputRoot}/form-output/runtime/z06-runtime-contract.json`;
 const expectedVariantIds = ["1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67", "3lz_h67"];
@@ -18,30 +20,6 @@ const standardSections = new Set([
   "sec_stan_002",
   "sec_tech_001",
 ]);
-const z06InteriorSeatbeltIncludes = [
-  ["3LZ_AE4_H8T", "opt_3a9_001"],
-  ["3LZ_AE4_HAG", "opt_3a9_001"],
-  ["3LZ_AE4_HNK", "opt_3f9_001"],
-  ["3LZ_AE4_EJH", "opt_3n9_001"],
-  ["3LZ_AE4_EPX_N2Z", "opt_3n9_001"],
-  ["3LZ_AE4_HUF_N2Z", "opt_3n9_001"],
-  ["3LZ_AE4_HUW", "opt_379_001"],
-  ["3LZ_AE4_HUX_N2Z", "opt_379_001"],
-  ["3LZ_AE4_HZN", "opt_3n9_001"],
-  ["3LZ_AH2_H8T", "opt_3a9_001"],
-  ["3LZ_AH2_HAG", "opt_3a9_001"],
-  ["3LZ_AH2_HNK", "opt_3f9_001"],
-  ["3LZ_AH2_EJH", "opt_3n9_001"],
-  ["3LZ_AH2_EPX_N2Z", "opt_3n9_001"],
-  ["3LZ_AH2_HUF_N2Z", "opt_3n9_001"],
-  ["3LZ_AH2_HUW", "opt_379_001"],
-  ["3LZ_AH2_HUX_N2Z", "opt_379_001"],
-  ["3LZ_AH2_HZN", "opt_3n9_001"],
-  ["3LZ_AUP_HAG", "opt_3a9_001"],
-  ["3LZ_AH2_HVZ", "opt_3f9_001"],
-  ["3LZ_AE4_HVZ", "opt_3f9_001"],
-  ["3LZ_AUP_HVZ", "opt_3f9_001"],
-];
 const fullLengthStripeOptionIds = [
   "opt_dpb_001", "opt_dpc_001", "opt_dpg_001", "opt_dpl_001", "opt_dpt_001", "opt_dsy_001", "opt_dsz_001", "opt_dt0_001",
   "opt_dth_001", "opt_dub_001", "opt_due_001", "opt_duk_001", "opt_duw_001", "opt_dzu_001", "opt_dzv_001", "opt_dzx_001",
@@ -258,22 +236,85 @@ test("Z06 gas guzzler tax drafts as standard-equipment default charge with T0F/T
   }
 });
 
-test("Z06 3LZ interiors include zero-price seatbelt colors with authored Black alternatives", () => {
-  const ruleKeys = new Set(draft.rules.map((rule) => `${rule.source_id}::${rule.rule_type}::${rule.target_id}`));
-  const priceKeys = new Set(draft.priceRules.map((rule) => `${rule.condition_option_id}::${rule.target_option_id}::${rule.price_rule_type}::${rule.price_value}`));
-  for (const [interiorId, seatbeltOptionId] of z06InteriorSeatbeltIncludes) {
-    assert.ok(ruleKeys.has(`${interiorId}::includes::${seatbeltOptionId}`), `${interiorId} should include ${seatbeltOptionId}`);
-    assert.ok(priceKeys.has(`${interiorId}::${seatbeltOptionId}::override::0`), `${interiorId} should zero-price ${seatbeltOptionId}`);
-    const replacementGroup = draft.ruleGroups.find(
-      (group) => group.source_id === interiorId && group.group_type === "requires_any",
-    );
-    if (/_(HAG|HVZ)$/.test(interiorId)) {
-      assert.equal(replacementGroup, undefined, `${interiorId} should lock its asymmetrical included color`);
-    } else {
-      assert.ok(replacementGroup, `${interiorId} should allow the included color or Black`);
-      assert.deepEqual([...replacementGroup.target_ids].sort(), [seatbeltOptionId, "opt_719_001"].sort());
-    }
+// Checkpoint 1 of the fast layered validation suite (spec §9) rewrote this
+// test. It used to walk a 22-row interior/seatbelt table copied into this file
+// and require, for every non-asymmetrical interior, a `requires_any` group
+// pairing the included colour with Black — the retired "included colour or
+// Black only" behaviour. PR #19 replaced that with the Seatbelt_Rules.txt
+// authority, where an alternative colour is available and adds D30 plus its own
+// charge, so the group is gone and the table was a parallel copy of workbook
+// data. Both sides are read from their owners now: the expected side is a
+// direct read of the model's rule-mapping and price-rule sheets, the actual
+// side is the generated contract.
+test("interior-included options and their price overrides match the workbook source rows", () => {
+  const interiorIds = new Set(draft.interiors.map((interior) => interior.interior_id));
+  const optionIds = new Set(draft.choices.map((choice) => choice.option_id));
+
+  const ruleRows = workbookRows(modelSourceSheet(MODEL_KEY, "rule_mapping_sheet"));
+  const expectedIncludes = ruleRows
+    .filter(
+      (row) =>
+        cell(row.rule_type).toLowerCase() === "includes" &&
+        interiorIds.has(cell(row.source_id)) &&
+        optionIds.has(cell(row.target_id)),
+    )
+    .map((row) => `${cell(row.source_id)}::${cell(row.target_id)}`)
+    .sort();
+
+  const actualIncludes = draft.rules
+    .filter((rule) => rule.rule_type === "includes" && interiorIds.has(rule.source_id))
+    .map((rule) => `${rule.source_id}::${rule.target_id}`)
+    .sort();
+
+  assert.ok(expectedIncludes.length > 0, "no interior-sourced includes row resolves into the contract");
+  assert.deepEqual(
+    actualIncludes,
+    expectedIncludes,
+    "emitted interior-sourced includes rules drifted from their workbook rows",
+  );
+
+  // Every emitted interior include must carry the source row's customer copy
+  // and auto-add flag; a dropped disabled_reason is invisible to the set
+  // comparison above and reaches the browser.
+  const sourceById = new Map(ruleRows.map((row) => [cell(row.rule_id), row]));
+  for (const rule of draft.rules.filter((row) => row.rule_type === "includes" && interiorIds.has(row.source_id))) {
+    const source = sourceById.get(rule.rule_id);
+    assert.ok(source, `${rule.rule_id} is not a workbook-authored rule row`);
+    assert.equal(rule.disabled_reason, cell(source.disabled_reason), `${rule.rule_id} disabled_reason drifted`);
+    assert.equal(rule.auto_add, "True", `${rule.rule_id} should auto-add its included option`);
+    assert.equal(rule.active, "True", `${rule.rule_id} should be emitted active`);
   }
+
+  const priceRows = workbookRows(modelSourceSheet(MODEL_KEY, "price_rules_sheet"));
+  const priceIdentity = (conditionId, targetId, type, value) =>
+    `${conditionId}::${targetId}::${type}::${Number(value)}`;
+  const expectedInteriorPrices = priceRows
+    .filter(
+      (row) =>
+        interiorIds.has(cell(row.condition_option_id)) && optionIds.has(cell(row.target_option_id)),
+    )
+    .map((row) =>
+      priceIdentity(
+        cell(row.condition_option_id),
+        cell(row.target_option_id),
+        cell(row.price_rule_type).toLowerCase(),
+        row.price_value,
+      ),
+    )
+    .sort();
+  const actualInteriorPrices = draft.priceRules
+    .filter((rule) => interiorIds.has(rule.condition_option_id))
+    .map((rule) =>
+      priceIdentity(rule.condition_option_id, rule.target_option_id, rule.price_rule_type, rule.price_value),
+    )
+    .sort();
+
+  assert.ok(expectedInteriorPrices.length > 0, "no interior-conditioned price rule resolves into the contract");
+  assert.deepEqual(
+    actualInteriorPrices,
+    expectedInteriorPrices,
+    "emitted interior-conditioned price rules drifted from their workbook rows",
+  );
 });
 
 test("Z06 GBA excludes CBF and EDU, not CFL, through workbook group metadata", () => {

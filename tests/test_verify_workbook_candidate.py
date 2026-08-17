@@ -72,6 +72,43 @@ def declared_run(tmp_path_factory) -> dict:
     return report
 
 
+DRIFT_MODEL_KEY = "zr1"
+RETAINED_DRIFT_CONTRACT = ROOT / "form-output" / "runtime" / "zr1-runtime-contract.json"
+
+
+def _live_drift_probe() -> tuple[str, list[str]]:
+    """An option id proven to reach the retained contract, and the collections it moves.
+
+    Checkpoint 1 of the fast layered validation suite (spec §9) replaced the
+    hardcoded EFR probe these canaries used. `zr1_options.opt_efr_001` is
+    `active=True, selectable=False` and appears in NEITHER the choices nor the
+    standardEquipment of the retained zr1 contract, so renaming it could not
+    move anything: both forcing tests measured an empty drift set while
+    asserting a non-empty one, and the `semantic_drift` stage the release gate
+    depends on had no live positive proof. (Why an active workbook option row
+    emits nothing is a separate workbook/generator question, recorded as
+    `finding.dead_semantic_drift_canary`; §12 forbids answering it in test code.)
+
+    The probe is chosen from the retained artifact itself, so it cannot go inert
+    again silently — if no option reaches both collections, this raises instead
+    of quietly asserting nothing.
+    """
+
+    contract = json.loads(RETAINED_DRIFT_CONTRACT.read_text())
+    in_choices = {str(row.get("option_id") or "") for row in contract["choices"]}
+    in_standard = {str(row.get("option_id") or "") for row in contract["standardEquipment"]}
+    reaches_both = sorted(option_id for option_id in in_choices & in_standard if option_id)
+    if not reaches_both:
+        raise AssertionError(
+            f"no {DRIFT_MODEL_KEY} option reaches both retained collections; "
+            "the drift canary has no probe target"
+        )
+    return reaches_both[0], ["choices", "standardEquipment"]
+
+
+DRIFT_PROBE_OPTION_ID, DRIFT_COLLECTIONS = _live_drift_probe()
+
+
 def workbook_with_a_drifting_model(directory: Path) -> Path:
     """A candidate workbook whose zr1 output differs from the retained artifact.
 
@@ -84,15 +121,17 @@ def workbook_with_a_drifting_model(directory: Path) -> Path:
     candidate = directory / WORKBOOK.name
     shutil.copy2(WORKBOOK, candidate)
     workbook = load_workbook(candidate)
-    sheet = workbook["zr1_options"]
+    sheet = workbook[f"{DRIFT_MODEL_KEY}_options"]
     headers = {cell.value: idx for idx, cell in enumerate(sheet[1], start=1) if cell.value}
     for row in range(2, sheet.max_row + 1):
-        if str(sheet.cell(row, headers["rpo"]).value or "").strip().upper() == "EFR":
+        if str(sheet.cell(row, headers["option_id"]).value or "").strip() == DRIFT_PROBE_OPTION_ID:
             cell = sheet.cell(row, headers["option_name"])
             cell.value = f"{cell.value} (drift probe)"
             break
     else:  # pragma: no cover - the row exists; this guards a silent no-op
-        raise AssertionError("zr1_options has no EFR row to perturb")
+        raise AssertionError(
+            f"{DRIFT_MODEL_KEY}_options has no {DRIFT_PROBE_OPTION_ID} row to perturb"
+        )
     workbook.save(candidate)
     workbook.close()
     return candidate
@@ -158,13 +197,10 @@ def test_undeclared_semantic_drift_is_reported_and_fails(drifting_undeclared) ->
     assert drifting_undeclared["ok"] is False
     assert drifting_undeclared["failedStage"] == "semantic_drift"
     assert drifting_undeclared["models"]["zr1"]["declared_changed"] is False
-    # EFR is standard on zr1, so renaming it moves both collections that carry
-    # its label. Asserting the exact set, not just "non-empty", keeps this from
-    # passing on unrelated drift.
-    assert drifting_undeclared["models"]["zr1"]["semantic_drift_vs_retained"] == [
-        "choices",
-        "standardEquipment",
-    ]
+    # The probe option is standard on zr1, so renaming it moves both collections
+    # that carry its label. Asserting the exact set, not just "non-empty", keeps
+    # this from passing on unrelated drift.
+    assert drifting_undeclared["models"]["zr1"]["semantic_drift_vs_retained"] == DRIFT_COLLECTIONS
     # Only the edited model moves; the other five must stay clean, or the drift
     # signal is noise rather than a pointer.
     assert set(drifting_undeclared["partition"]["unchanged"]) == ALL_MODEL_KEYS - {"zr1"}
@@ -191,10 +227,7 @@ def test_declaring_drift_moves_it_out_of_unexpected_and_passes(drifting_declared
 
     assert drifting_declared["partition"]["unexpected_drift"] == []
     assert drifting_declared["partition"]["changed"] == ["zr1"]
-    assert drifting_declared["models"]["zr1"]["semantic_drift_vs_retained"] == [
-        "choices",
-        "standardEquipment",
-    ]
+    assert drifting_declared["models"]["zr1"]["semantic_drift_vs_retained"] == DRIFT_COLLECTIONS
     assert drifting_declared["ok"] is True
 
 

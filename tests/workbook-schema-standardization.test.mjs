@@ -16,7 +16,6 @@
 // each derived sweep is paired with a named expectation that pins the shape the
 // derivation must produce. Where those two disagree, the gate fails.
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
 
@@ -69,17 +68,13 @@ function liveRegistry() {
   return JSON.parse(json);
 }
 
-test("schema validation CLI accepts the standardized workbook", () => {
-  const output = execFileSync(
-    ".venv/bin/python",
-    ["scripts/validate_workbook_schema.py", "stingray_master.xlsx"],
-    { encoding: "utf8" },
-  );
-  const result = JSON.parse(output);
-  assert.equal(result.status, "valid");
-  assert.equal(result.error_count, 0);
-  assert.deepEqual(result.issues, []);
-});
+// Checkpoint 1 of the fast layered validation suite (spec §9) removed the
+// duplicate schema invocation that stood here. This gate re-ran
+// `scripts/validate_workbook_schema.py stingray_master.xlsx`, which the
+// documented validation lane already runs directly, and that one call was
+// 59.5% of the measured fourteen-gate node readiness lane. The schema command
+// remains the single schema authority (catalog gate `cmd.workbook_schema`);
+// this file owns only the structural conformance the command does not check.
 
 test("every workbook-active model is registered with the full generation source role set", () => {
   const modelKeys = Object.keys(snapshot.models).sort();
