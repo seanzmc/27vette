@@ -356,9 +356,11 @@ def test_the_browser_stage_reads_the_candidate_registry_not_the_published_one(tm
 def test_the_harness_override_env_var_is_the_one_the_harness_reads() -> None:
     """Breaks if the override name drifts on either side of the contract."""
 
-    harness_source = (ROOT / "tests" / "multi-model-runtime-switching.test.mjs").read_text(encoding="utf-8")
+    switching = (ROOT / "tests" / "multi-model-runtime-switching.test.mjs").read_text(encoding="utf-8")
+    matrix = (ROOT / "tests" / "lib" / "runtime-harness.mjs").read_text(encoding="utf-8")
 
-    assert f"process.env.{HARNESS_DATA_JS_ENV}" in harness_source
+    assert f"process.env.{HARNESS_DATA_JS_ENV}" in switching
+    assert f"process.env.{HARNESS_DATA_JS_ENV}" in matrix
 
 
 def test_protected_surface_hashes_ignore_macos_finder_metadata(tmp_path) -> None:

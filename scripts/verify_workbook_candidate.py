@@ -87,6 +87,7 @@ HARNESS_DATA_JS_ENV = "CORVETTE_FORM_DATA_JS"
 WORKBOOK_TRUTH_ENV = "CORVETTE_WORKBOOK_TRUTH"
 CONTRACT_ROOT_ENV = "CORVETTE_CONTRACT_ROOT"
 DEFAULT_HARNESS = Path("tests/multi-model-runtime-switching.test.mjs")
+RUNTIME_STATE_MATRIX = Path("tests/runtime-state-matrix.test.mjs")
 
 # The §4.2 parity owners. They read the candidate's contracts and registry
 # through the environment above, so the same files serve Layer 1 here and Layer
@@ -354,9 +355,16 @@ def run_workbook_truth(candidate: Path, out_path: Path) -> StageResult:
 
 
 def run_browser_harness(data_js: Path, harness: Path) -> StageResult:
+    # Checkpoint 3 joins the generated runtime state matrix to this stage.
+    # --harness still names the historical switching file; the matrix always
+    # rides along unless the caller already pointed --harness at it.
+    gates = [harness]
+    matrix = ROOT / RUNTIME_STATE_MATRIX
+    if harness.resolve() != matrix.resolve():
+        gates.append(matrix)
     return run_node_gates(
         "browser_harness",
-        [harness],
+        gates,
         {HARNESS_DATA_JS_ENV: str(data_js)},
         detail={"harness": str(harness), "data_js": str(data_js)},
     )
