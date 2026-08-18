@@ -354,18 +354,30 @@ def run_workbook_truth(candidate: Path, out_path: Path) -> StageResult:
     )
 
 
-def run_browser_harness(data_js: Path, harness: Path) -> StageResult:
+def run_browser_harness(
+    data_js: Path,
+    harness: Path,
+    *,
+    truth_path: Path | None = None,
+) -> StageResult:
     # Checkpoint 3 joins the generated runtime state matrix to this stage.
     # --harness still names the historical switching file; the matrix always
     # rides along unless the caller already pointed --harness at it.
+    #
+    # The matrix discovers cases from the §6.2 snapshot. Layer 1 already built
+    # that snapshot in stage 9, so this stage must pass the path through.
+    # Rebuilding it here would spawn `.venv/bin/python`, which CI does not have.
     gates = [harness]
     matrix = ROOT / RUNTIME_STATE_MATRIX
     if harness.resolve() != matrix.resolve():
         gates.append(matrix)
+    env = {HARNESS_DATA_JS_ENV: str(data_js)}
+    if truth_path is not None:
+        env[WORKBOOK_TRUTH_ENV] = str(truth_path)
     return run_node_gates(
         "browser_harness",
         gates,
-        {HARNESS_DATA_JS_ENV: str(data_js)},
+        env,
         detail={"harness": str(harness), "data_js": str(data_js)},
     )
 
@@ -545,7 +557,7 @@ def verify_candidate(
 
               # Stage 11: the browser harness, against the candidate registry.
               if run_harness:
-                  result = run_browser_harness(candidate_data_js, harness)
+                  result = run_browser_harness(candidate_data_js, harness, truth_path=truth_path)
                   stages.append(result)
                   if not result.ok:
                       raise StageFailure(result)
