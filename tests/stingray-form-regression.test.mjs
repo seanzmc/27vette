@@ -18,6 +18,10 @@ const appSource = fs.readFileSync("form-app/app.js", "utf8");
 const htmlSource = fs.readFileSync("form-app/index.html", "utf8");
 const stylesSource = fs.readFileSync("form-app/styles.css", "utf8");
 
+// Only the truthiness convention, not the snapshot: this file keeps its own
+// per-sheet reader, and one shared definition of "active" is the point.
+import { workbookTruthy } from "./lib/workbook-truth.mjs";
+
 function workbookRows(sheetName) {
   const output = execFileSync(
     ".venv/bin/python",
@@ -44,7 +48,7 @@ function workbookRows(sheetName) {
   return JSON.parse(output);
 }
 
-const stingrayScopeRows = workbookRows("model_interior_scope").filter((row) => row.model_key === "stingray" && row.active === "True");
+const stingrayScopeRows = workbookRows("model_interior_scope").filter((row) => row.model_key === "stingray" && workbookTruthy(row.active));
 const stingrayScopeIds = new Set(stingrayScopeRows.map((row) => row.interior_id));
 const activeInteriors = data.interiors.filter((interior) => interior.active_for_stingray === true);
 

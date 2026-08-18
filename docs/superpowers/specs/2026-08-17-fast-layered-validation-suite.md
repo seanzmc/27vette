@@ -1,7 +1,8 @@
 # Fast Layered Validation Suite Specification
 
-Status: IN IMPLEMENTATION — Checkpoints 0 and 1 complete 2026-08-17;
-Checkpoint 2 is the next authorized slice.
+Status: IN IMPLEMENTATION — Checkpoints 0, 1 and 2 complete 2026-08-17,
+Checkpoint 2 review response applied 2026-08-18; Checkpoint 3 is the next
+authorized slice.
 Date: 2026-08-17
 Branch: `claude/fast-layered-validation-suite-4c31f6` (spec authored on `main`)
 Recommended implementation reasoning: medium. Escalate only for a specific
@@ -265,9 +266,11 @@ each expensive stage once:
 7. strictly validate every written contract;
 8. build the complete candidate registry;
 9. build the independent temporary workbook-truth snapshot;
-10. run parity assertions and the generated runtime state matrix against the
-    candidate registry;
-11. report semantic drift and protected-surface hashes.
+10. run source-to-output parity assertions against the candidate contracts and
+    the candidate registry;
+11. run the browser harness against the candidate registry — joined by the
+    generated runtime state matrix once Checkpoint 3 lands;
+12. report semantic drift and protected-surface hashes.
 
 The report must include stage durations, artifact identities, discovered and
 promoted model/variant sets, skipped stages, failures, and protected-boundary
@@ -688,6 +691,244 @@ Acceptance: every runtime collection with a workbook source has a documented
 parity disposition; no default structural/parity gate embeds complete business
 rows or mutable asset URLs.
 
+#### Checkpoint 2 result — 2026-08-17 (COMPLETE)
+
+**The snapshot.** `scripts/build_workbook_truth.py` builds the §6.2 document
+from a read-only openpyxl handle plus `workbook_domain/registry` metadata:
+registered sheets and their family key columns, model topology, promotion rows
+and default selection, and `asset_map` addressing with wildcard/exact precedence
+resolved. 73 sheets, 0.9 seconds, written to an explicit temporary path and
+never committed.
+
+Two properties make it usable as an oracle, and `tests/test_workbook_truth.py`
+(58 tests) asserts both rather than asserting that it produces rows:
+
+- **Independence.** A freshly launched interpreter that builds a snapshot loads
+  no generation module. Checked in a subprocess, because this process is
+  already polluted by sibling imports — and with a mutation proving the check
+  can fail. The two cell helpers are implemented locally rather than imported
+  from `corvette_form_generator.workbook`, so one representation bug cannot make
+  every parity gate blind at once.
+- **Agreement.** Those same two helpers are pinned to `workbook.clean` and
+  `workbook.workbook_truthy` over a 22-value table. Independent must not quietly
+  mean different.
+
+Every other claim has a forced mutation behind it: dropping a registration row
+narrows the snapshot, a second `default_model` row is reported rather than
+resolved, duplicate `asset_map` rows are reported as conflicts rather than
+adjudicated, and a registration pointing at a missing sheet is surfaced.
+
+**The parity owners.** Two new gates, both model-neutral — the model list,
+source sheets, and contract paths all come from the workbook, so promoting a
+seventh model widens them with no edit:
+
+| Gate | Proves |
+|---|---|
+| `source-to-contract-parity` (102 tests, 1.09 s) | variants, steps, sections, choices, standard equipment, rules, rule groups, exclusive groups, price rules, default selections, interiors, colour overrides, order summary, option media, and dataset binding, for every promoted model |
+| `source-to-registry-parity` (29 tests, 1.16 s) | membership, declared order, default model, labels, slugs, composed model name, setup copy, card media, legacy aliases, and that each published payload is exactly the contract its promotion row names |
+
+Every relationship was measured against all six promoted models, in both
+directions, before it was written. Where the workbook has a suppressor it is
+named from workbook columns; what is deliberately not reimplemented is
+generation. Two rules are stated as transforms rather than compared loosely:
+trim level is upper-cased (`inspection.py:651`), and `standardEquipment` is
+exactly the choices the workbook marks standard.
+
+**The lane.** `verify_workbook_candidate.py` grew stages 9 and 10,
+`workbook_truth` and `source_parity`. The snapshot is built from the
+**candidate** workbook and both gates run against the candidate contracts and
+candidate registry through explicit temporary paths, so Layer 1 pays the build
+once and proves the candidate rather than the retained artifacts. Full lane:
+`ok: true`, twelve stages run, `unexpected_drift: []`, no boundary violation.
+
+**Literals routed.**
+
+| Owner | Was | Now |
+|---|---|---|
+| `grand-sport-contract-preview` | 9 aggregate counts, one of them the recorded stale `requires: 25` | membership from the snapshot; hot-spot counts recomputed from the rows they summarize; every bucketed row traced to an active source row |
+| `workbook-visual-copy-standardization` | `OPTION_SHEETS` hardcoded to three sheets | derived from each model's own registration — the generic sweeps now cover six models; named decisions discover their scope with `sheetsCarrying` |
+| same file, R-6 seats and roof labels | per-model option ids and absolute `display_order` | keyed by RPO with a relative-order rule, which covers six models instead of three and still fails on a reorder, rename, addition, or removal |
+| `nonruntime-option-source-purge` | 57 deleted ids, 21 deferred ids, per-model component RPO lists | four source-hygiene rules over every active model; the "deferred rows remain" half moved to `source-to-contract-parity` |
+| `z06-runtime-contract` | six variant ids, an eight-section standard set, two order-summary counts | `model_variants`, `section_presentation.standard_equipment_bucket`, and membership comparisons |
+| `tests/lib/workbook-rows.mjs` | the interim per-sheet reader | retired; its four callers read the snapshot |
+
+Rewriting the preview counts found four more stale literals than the catalog
+recorded: `not_available` 46 against 52, `includes` 41 against 40,
+`special_package_review` 27 against 25, and two buckets the current workbook
+produces none of. The fourteen-gate readiness lane never ran the diagnostics, so
+none of them was visible.
+
+**Oracle independence proved by injected mismatch (§8 canary 5).** Thirteen
+canaries in a throwaway `git worktree`; the canonical workbook, the working
+tree, and the tracked artifacts were never mutated. The bar was not "something
+fails" but "its own assertion fails and no unrelated one does" — a parity suite
+where one defect fails six tests localizes nothing.
+
+- Six injected generator defects — a corrupted choice label, a silently dropped
+  choice, a dropped authored rule, a dropped price rule, a dropped colour
+  override, a dropped variant — each failed exactly one assertion, its own.
+- Three registry defects — a payload no longer equal to its promoted contract, a
+  missing promoted model, a reordered registry — each failed exactly the
+  assertion that owns it.
+- De-promoting a model in a workbook copy moved the **expected** side: the
+  snapshot promoted five models and the unchanged six-model registry was
+  reported as carrying an unpromoted model. The oracle follows the workbook,
+  not the artifact.
+- §8 canary 1 was re-run against the widened media sweep: the stale artifact
+  fails, and after regeneration all 102 assertions are green with no literal URL
+  anywhere to fail.
+
+**Acceptance evidence** (local Node 26.7.0 / Python 3.14.7, serial):
+
+| Lane | Result |
+|---|---|
+| 16 node readiness gates (14 documented + 2 parity owners) | all pass, 54.88 s |
+| All 18 node files | 437 tests, all pass, 60.0 s — against 16 files / 305 tests / 111.75 s and six failures at the Checkpoint 0 baseline |
+| `test_workbook_truth.py` | 58 passed, 7.93 s |
+| `test_validation_catalog.py` | 19 passed |
+| Composed candidate lane, all six models | `ok: true`, 12 stages, no unexpected drift, no boundary violation |
+| Protected tracked artifacts | unchanged |
+
+`node --test tests/*.test.mjs` — the concurrent form — failed
+`z06-contract-preview` while every file passed alone. That is the collision the
+catalog's `serial_group` exists to prevent, and it is why the inventory command
+is the serial loop.
+
+**One carried question answered, with evidence.** Why active
+`zr1_options.opt_efr_001` emits nothing is no longer open, and it is not a
+defect. The row carries `display_behavior='hidden'`;
+`inspection.display_behavior_status` (`inspection.py:223`) maps `hidden` to
+status `unavailable`, and `inspection.py:777` drops any choice whose resolved
+status is neither `available` nor `standard`. It emits nothing because the
+workbook authored it hidden. Measured across all six models: with `hidden` named
+as a suppressor, emitted choices equal the emittable OVS rows exactly — zero
+unexplained drops, zero unexplained keeps. ZR1 is the only model with an active
+hidden row. No product decision was made in test code; the suppressor is a
+documented term of the parity rule.
+
+**One new finding, left for a workbook-owned cleanup.**
+`section_presentation` has two active rows scoping Grand Sport sections
+(`sec_gsha_001`, `sec_gsce_001`) to Stingray, which emits neither. Deleting them
+is a workbook write §11 does not authorize, so the gate asserts the general rule
+instead: an orphaned presentation row may exist, but it may not carry
+`step_key`, `display_label`, `display_behavior`, or any bucket value — that
+would be a section the workbook expects to present and the contract does not
+have.
+
+**Carried forward, unchanged by this checkpoint:**
+
+- `promoted_model_membership` stays **proposed**. Checkpoint 2 took the parity
+  route again, which needs no approval; declaring the lock still freezes a
+  business decision and needs §12 approval. The literal in
+  `multi-model-runtime-switching` remains the de-facto pin.
+- Node 22 / Python 3.12 CI reference timings are still **uncaptured**.
+- `grand-sport-runtime-contract`'s Checkpoint 1 asset and colour-override parity
+  tests are now also covered model-neutrally. The duplication is deliberate
+  until the `retire_after_parity` pass in Checkpoint 4.
+- `stingray-runtime-contract` keeps its own private workbook reader. It is on
+  the Checkpoint 4 retirement path and was left alone rather than migrated
+  mid-checkpoint.
+
+#### Checkpoint 2 review response — 2026-08-18
+
+Pull request review of #28 found one defect that would have made Layer 1 reject
+a correct candidate, plus four narrower problems. All are fixed on the same
+branch; the parity owners' shape is unchanged.
+
+**Blocking: inactive variant overrides shaped the expected side.**
+`variant_overrides` carries an `active` column and
+`runtime_metadata.load_variant_option_overrides` reads the sheet through
+`active_rows`, so a deactivated override restates nothing. The parity owner
+indexed every override row, then used that map for section membership, `hidden`
+suppression, and authored status. Deactivating an override — an ordinary
+authoring edit — would have left the gate resolving through a dead row and
+failing correct output. That is a false red on the composed readiness lane,
+which is the failure class this checkpoint exists to remove.
+
+Three changes, together:
+
+- The override index filters on `active`.
+- Emitted-section membership is derived from the resolved section of the
+  emittable source rows plus the two synthesized context sections, matching
+  `inspection.py`'s `section_ids_with_choices`. It previously unioned every
+  active option row's section with every override's section, which could
+  conjure a section no emitted choice uses. The emittable set is now stated once
+  from workbook columns and is no longer filtered by the contract's own emitted
+  sections — the expected side may not read the actual side.
+- Each emitted choice's `section_id` is compared to the section its source row
+  resolves to. Membership alone cannot see a choice landing in the wrong section
+  while both sections stay populated by other rows, which is exactly what a
+  mis-resolved override looks like.
+
+`tests/test_source_parity_canaries.py` is the forced mutation behind it:
+deactivate one override on a workbook copy, regenerate that model into a
+temporary root, assert `source-to-contract-parity` still passes — and assert
+first that the edit is observable in generated output, so the canary cannot pass
+vacuously. Verified to fail (`sec_inte_001` where the dead override said
+`sec_2lte_001`) with the `active` filter removed. Every override row in the
+tracked workbook is currently active, so a green parity run could not have ruled
+this out on its own. 3.5 s.
+
+**Four narrower fixes.**
+
+- *One truthiness convention.* Seventeen assertions re-checked snapshot rows
+  with `active === "True"` while the snapshot's own `workbookTruthy` accepts
+  `true|yes|1|y`; `workbook-visual-copy-standardization` had a third, wider
+  spelling with a dead `=== true` arm. All snapshot-row checks now call
+  `workbookTruthy`, including `z06-runtime-contract`'s
+  `standard_equipment_bucket` filter, where the non-empty string `"False"` read
+  as true. Assertions about values in *generated* artifacts keep the literal:
+  that is the emitted representation, not the authored one.
+- *Representation independence is now asserted.* The subprocess boundary test
+  cannot see this failure: `corvette_form_generator.workbook` is loaded in
+  process regardless, because the shared `workbook_domain.registry` metadata
+  imports it. Re-exporting `workbook.clean` or `workbook.workbook_truthy` from
+  the snapshot builder would leave every parity gate reading cells through the
+  same code generation reads them through, and one representation bug would
+  blind all of them while every test stayed green. The agreement table keeps the
+  two definitions equal; two new assertions keep them two.
+- *Promotion topology no longer resolves silently.* `model_registry_promotion`
+  by `model_key` and `variant_master` by `variant_id` were indexed
+  last-write-wins. A duplicate row is as unadjudicable as a duplicate
+  `asset_map` row, so it is now reported in `topologyConflicts` and asserted
+  empty by the parity gate, with a forced mutation behind it.
+- *`variant_overrides` has no `status` column.* The writable contract is
+  `option_id, variant_id, selectable, display_behavior, section_id, active,
+  note`, and the loader hardcodes an empty status. The parity gate no longer
+  lets an override win the authored-status comparison, and the `resolved()`
+  contract names the three columns an override may actually restate.
+
+**Left deliberately, with reasons.**
+
+- `standardEquipment` parity was renamed, not re-derived. Both sides come from
+  the artifact under test, so it is a contract-internal invariant; a generator
+  that mis-derived status into both collections would stay green. Authored
+  status is covered separately on the rows where the workbook states it.
+  Driving expected membership from OVS instead would duplicate the status
+  derivation this gate deliberately does not reimplement.
+- The Grand Sport preview hot-spot counts recompute from `hotSpots.rows`, which
+  catches a counter disagreeing with its own list but not a classifier moving
+  rows between buckets — what the retired `requires: 25` literal incidentally
+  detected. Restoring source-side classifier coverage needs a decision about
+  whether that diagnostic still owns classifier behavior; Checkpoint 4 owns the
+  diagnostics.
+- `rules.py` drops an authored `requires` already expressed by a `requires_any`
+  group, and parity expects every resolvable `rule_mapping` id. This holds on
+  today's workbook; a valid grouping edit would false-fail. Naming the
+  suppressor or accepting grouped-requires as derived is a rule decision, not a
+  test edit.
+- `test_model_topology_matches_the_workbook_metadata_rows` requires every active
+  membership to be declared and active in `variant_master`. The snapshot already
+  records `declared_in_variant_master` / `active_in_variant_master`, so a
+  dangling membership could be a gate finding instead of an oracle invariant.
+  Left as-is; it is the same §12 territory as `promoted_model_membership`.
+- `workbook-truth.mjs`'s `cell()` does not mirror Python `clean()` on booleans
+  (`"true"` vs `"True"`). Snapshot rows arrive pre-cleaned, so this is only
+  reachable if a generated boolean is passed through it.
+- `stingray-form-regression` keeps its private per-sheet reader and now imports
+  only `workbookTruthy` from the snapshot module. Migrating the reader is on the
+  Checkpoint 4 path.
+
 ### Checkpoint 3 — generate the runtime state matrix
 
 - Parameterize candidate runtime checks over every promoted model and declared
@@ -858,30 +1099,39 @@ The implementation is complete only when all of the following are true:
 
 ## 15. Next action
 
-Checkpoints 0 and 1 are complete (see their result blocks in §9). The catalog,
-coverage ledger, and contract test are in place; the six documented stale
-assertions and both new stale owners are rewritten as parity or data-derived
-runtime sweeps with no refreshed literals; the duplicate schema invocation is
-gone; and every Python test file is independently runnable.
+Checkpoints 0, 1 and 2 are complete (see their result blocks in §9). The
+catalog, coverage ledger, and contract test are in place; every documented stale
+assertion is closed with no literal refreshed; the workbook-truth snapshot
+exists and is proved independent of the generator; source-to-contract and
+source-to-registry parity own every runtime collection that has a workbook
+source; and the composed candidate lane builds the snapshot once and runs both
+parity gates against the candidate. Pull request review of Checkpoint 2 found
+one defect that would have failed a correct candidate — inactive variant
+overrides shaping the expected side — and four narrower problems; all are fixed
+with a forced-mutation canary behind the blocking one, and what was deliberately
+left is listed in the §9 review-response block.
 
-The next authorized implementation slice is Checkpoint 2: implement the
-temporary workbook-truth snapshot (§6.2), add source-to-contract and
-source-to-registry parity owners, route the remaining model-specific literal
-assertions to the parity owner or the acceptance-lock inventory, and prove oracle
-independence with injected mismatch tests. `tests/lib/workbook-rows.mjs` is the
-interim expected-side reader Checkpoint 1 introduced; the snapshot replaces it.
+The next authorized implementation slice is Checkpoint 3: parameterize the
+candidate runtime checks over every promoted model and declared variant,
+implement the §4.3 state invariants with a forced-failure test behind each, add
+generic model/variant dealer-payload identity coverage without live submission,
+and replace duplicated model-specific behavior tests only after the matrix
+demonstrates equivalent or stronger failure detection.
 
-Three items carry approval or classification gates into Checkpoint 2:
+Two items carry approval or classification gates into Checkpoint 3:
 
 - promoting `promoted_model_membership` from a proposed record to a real
   acceptance lock freezes a business decision and needs approval (§12).
-  Checkpoint 1 used the parity route instead, which needs none; the literal in
-  `multi-model-runtime-switching` remains the de-facto pin until approval;
-- deciding why `zr1_options` `opt_efr_001` is active in the workbook yet absent
-  from the generated ZR1 contract is a workbook/generator question, not a test
-  question. The drift canary no longer depends on it. Classify the defect; do not
-  choose product truth in test code;
-- `grand-sport-contract-preview.test.mjs:94` (hot-spot count 22 vs 25) is the
-  remaining stale aggregate literal, deferred here by its recorded disposition.
+  Checkpoints 1 and 2 both took the parity route instead, which needs none; the
+  literal in `multi-model-runtime-switching` remains the de-facto pin until
+  approval;
+- `section_presentation` carries two active Stingray-scoped rows for Grand Sport
+  sections that Stingray never emits. Inert today, and the parity gate now
+  enforces that they stay inert, but removing them is a workbook write no
+  specification authorizes yet.
+
+The `zr1_options` `opt_efr_001` question that Checkpoints 0 and 1 carried is
+**answered** and closed in the Checkpoint 2 result block: the row is authored
+`display_behavior='hidden'`, which generation drops by design.
 
 Still open from Checkpoint 0: the Node 22 / Python 3.12 CI reference timings.

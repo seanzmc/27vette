@@ -4,7 +4,7 @@ import fs from "node:fs";
 import test from "node:test";
 
 import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
-import { cell, modelSourceSheet, workbookRows, workbookTruthy } from "./lib/workbook-rows.mjs";
+import { cell, modelSourceSheet, workbookRows, workbookTruthy } from "./lib/workbook-truth.mjs";
 
 const outputRoot = "/tmp/27vette-grand-sport-runtime-contract-test";
 const runtimePath = `${outputRoot}/form-output/runtime/grand-sport-runtime-contract.json`;
