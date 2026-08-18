@@ -263,6 +263,7 @@ Node gate matrix (run each with `node --test tests/<name>.test.mjs`):
 | Fresh generation and strict runtime contracts | `stingray-runtime-contract`, `grand-sport-runtime-contract`, `z06-runtime-contract`, `z06-interior-accessory-cleanup` |
 | Published registry and browser runtime | `stingray-form-regression`, `z06-published-runtime`, `multi-model-runtime-switching`, `z06-performance-package-interactions`, `z06-runtime-rule-corrections` |
 | Isolated registry publication | `z06-registry-publication` |
+| Workbook-to-output parity, all promoted models | `source-to-contract-parity`, `source-to-registry-parity` |
 | Generated-artifact boundary helper | `tracked-artifacts-guard` |
 
 This matrix does not run the workbook schema gate. It used to, inside `workbook-schema-standardization`, and that one duplicated call was more than half the lane's wall time. Run the schema gate above alongside the node files: full default validation is the schema gate **plus** this matrix **plus** the Python metadata gate, never the matrix alone.
@@ -272,6 +273,21 @@ Optional inspection diagnostics (not readiness gates): `grand-sport-contract-pre
 Those tables are the complete set of `tests/*.test.mjs`; a new node gate must be added here and assigned one authority. Default gates are read-only or write only below a temporary root. Publication verification is explicit and isolated from the published `form-app/data.js` path.
 
 Six node files invoke `scripts/generate_form.py` — the three strict model runtime-contract gates, the two optional preview diagnostics, and `z06-interior-accessory-cleanup`. Each generates into a temporary `--output-root` and asserts every file under `form-output/` and `form-app/` is byte-identical afterwards. That check reads both roots whole, so run those files serially — a concurrent process writing a protected artifact is reported as a boundary violation.
+
+The two parity gates compare the emitted contracts and the published registry
+against the workbook rows behind them, for every promoted model. Their expected
+side is a snapshot built from a read-only workbook handle:
+
+```sh
+.venv/bin/python scripts/build_workbook_truth.py --out /tmp/workbook-truth.json
+```
+
+Each gate builds its own snapshot when run standalone (about a second). Set
+`CORVETTE_WORKBOOK_TRUTH` to an already-built one to skip that, and
+`CORVETTE_CONTRACT_ROOT` / `CORVETTE_FORM_DATA_JS` to point them at a candidate
+tree instead of the tracked artifacts — which is what `verify_workbook_candidate.py`
+does in its `workbook_truth` and `source_parity` stages. The snapshot is
+temporary and untracked; nothing reads a committed copy of it.
 
 Python metadata gate — the default for generation/contract/promotion changes:
 
@@ -293,6 +309,7 @@ The remaining `tests/test_*.py` files are not in that gate and are chosen by cha
 | Promotion preflight (slow) | `test_verify_workbook_candidate` |
 | Fable 5 loop | `test_fable5_loop_contract` |
 | Validation catalog | `test_validation_catalog` |
+| Workbook-truth snapshot | `test_workbook_truth` |
 
 Every `tests/test_*.py` file runs standalone: `tests/conftest.py` puts `scripts/`
 on `sys.path` for the whole directory, so no pytest command needs
@@ -301,7 +318,7 @@ is a module invocation rather than a pytest run.
 
 `tests/validation_catalog.json` is the machine-readable inventory of every gate above: its layer, authority class, isolation, serialization requirement, measured duration, and collection counts. `test_validation_catalog` enforces it and fails when a test file is missing from the catalog, when two gates claim one named acceptance lock, when a generating gate lacks an isolated output declaration, when a protected-output gate is not serialized, or when this README disagrees with the catalog. Read counts and timings from the catalog rather than adding them here.
 
-`.venv/bin/python -m pytest tests/ -q` runs everything (~18 min). Three tests in `test_verify_workbook_candidate.py` are ~63s each because each runs the full ten-stage candidate lane over six models; everything outside the slowest ~15 tests is sub-second. Reserve the full run for canonical-workbook writes and publication, per AGENTS.md §10.
+`.venv/bin/python -m pytest tests/ -q` runs everything (~18 min). Three tests in `test_verify_workbook_candidate.py` are ~63s each because each runs the full twelve-stage candidate lane over six models; everything outside the slowest ~15 tests is sub-second. Reserve the full run for canonical-workbook writes and publication, per AGENTS.md §10.
 
 Full default validation = schema gate + every default-readiness row of the node matrix + the Python metadata gate. Optional inspection diagnostics run only when their raw-source evidence is relevant. Choose additional gates by changed surface per AGENTS.md §10.
 

@@ -264,8 +264,19 @@ def retained_contract_for(model_key: str) -> dict[str, Any] | None:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def run_node_gates(stage: str, gates: tuple[Path, ...] | list[Path], env_overrides: dict[str, str]) -> StageResult:
-    """Run node test files against the candidate, in one process."""
+def run_node_gates(
+    stage: str,
+    gates: tuple[Path, ...] | list[Path],
+    env_overrides: dict[str, str],
+    detail: dict[str, Any] | None = None,
+) -> StageResult:
+    """Run node test files against the candidate, in one process.
+
+    `detail` is merged into the reported stage detail. The browser stage's
+    `harness`/`data_js` keys are part of the report contract that callers and
+    tests read, so they are passed explicitly rather than left to be inferred
+    from the env override names.
+    """
 
     import os
     import subprocess
@@ -293,6 +304,7 @@ def run_node_gates(stage: str, gates: tuple[Path, ...] | list[Path], env_overrid
             "gates": [str(gate) for gate in gates],
             "returncode": completed.returncode,
             **env_overrides,
+            **(detail or {}),
         },
     )
 
@@ -342,7 +354,12 @@ def run_workbook_truth(candidate: Path, out_path: Path) -> StageResult:
 
 
 def run_browser_harness(data_js: Path, harness: Path) -> StageResult:
-    return run_node_gates("browser_harness", [harness], {HARNESS_DATA_JS_ENV: str(data_js)})
+    return run_node_gates(
+        "browser_harness",
+        [harness],
+        {HARNESS_DATA_JS_ENV: str(data_js)},
+        detail={"harness": str(harness), "data_js": str(data_js)},
+    )
 
 
 def verify_candidate(
