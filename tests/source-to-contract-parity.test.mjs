@@ -234,7 +234,9 @@ for (const promotion of promoted) {
     // The reverse direction, and the one that catches silent loss. A source row
     // is not emitted only when the workbook says so: the option row is
     // inactive, the variant is not an active member, the resolved section is
-    // not emitted, or the resolved display_behavior is `hidden`.
+    // absent from section_master, or the resolved display_behavior is `hidden`.
+    // Every suppressor is a workbook column; the emittable set never reads the
+    // contract it is checking.
     const expected = emittable.map((row) => row.key);
 
     assert.ok(expected.length > 0, `${modelKey} resolved no OVS row into the contract`);
@@ -292,7 +294,7 @@ for (const promotion of promoted) {
     assert.deepEqual(
       contract.standardEquipment.map((item) => `${item.option_id}::${item.variant_id}`).sort(),
       expected,
-      "standardEquipment drifted from the choices the workbook marks standard",
+      "standardEquipment drifted from the emitted choices marked standard",
     );
   });
 

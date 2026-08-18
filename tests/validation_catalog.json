@@ -3067,7 +3067,7 @@
       ]
     },
     {
-      "behavior": "Emitted `standardEquipment` equals its workbook source: exactly the emitted choices the workbook marks standard",
+      "behavior": "Emitted `standardEquipment` agrees with the emitted choices marked standard, and authored status is compared to the workbook on the rows where the workbook states it",
       "authority_class": "workbook_to_output_parity",
       "primary_owner": "node.source-to-contract-parity",
       "secondary_evidence": [
