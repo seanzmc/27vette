@@ -91,6 +91,23 @@ def test_builder_imports_no_generation_module() -> None:
     assert not (loaded & GENERATOR_MODULES), sorted(loaded & GENERATOR_MODULES)
 
 
+def test_local_cell_helpers_are_not_the_generator_functions() -> None:
+    """Independence has to include representation, not only module names.
+
+    `corvette_form_generator.workbook` is loaded in-process regardless — the
+    shared `workbook_domain.registry` metadata imports it — so the module list
+    above cannot see the failure this guards. Re-exporting `workbook.clean` or
+    `workbook.workbook_truthy` here would leave every parity gate reading cells
+    through the same code generation reads them through, and one representation
+    bug would blind all of them at once while every test stayed green. The
+    agreement table below is what keeps the two definitions equal; this is what
+    keeps them two.
+    """
+
+    assert truth.clean is not generator_workbook.clean
+    assert truth.truthy is not generator_workbook.workbook_truthy
+
+
 def test_import_boundary_check_would_notice_a_generator_import() -> None:
     """The boundary test above is only worth its runtime if it can fail."""
 
@@ -296,6 +313,51 @@ def test_asset_precedence_prefers_the_exact_model_row(snapshot: dict) -> None:
             assert resolved[target]["image_url"] == row["image_url"], f"{model_key} {target}"
         for target in wildcard_targets - set(exact):
             assert target in resolved, f"{model_key} lost shared media for {target}"
+
+
+def test_the_tracked_workbook_has_no_topology_conflicts(snapshot: dict) -> None:
+    """Promotion and variant identity are assumed unique; check that they are."""
+
+    assert snapshot["topologyConflicts"] == []
+
+
+def test_duplicate_promotion_and_variant_rows_are_reported(tmp_path: Path) -> None:
+    """Forced mutation: a second row for a key the topology indexes uniquely.
+
+    A duplicate promotion is exactly as unadjudicable as a duplicate
+    `asset_map` row, so it is reported rather than decided by row order.
+    """
+
+    copy = tmp_path / "topology.xlsx"
+    wb = Workbook()
+    sources = wb.active
+    sources.title = "model_workbook_sources"
+    sources.append(["model_key", "source_role", "sheet_name", "active"])
+
+    master = wb.create_sheet("model_master")
+    master.append(["model_key", "registry_key", "model_label", "active"])
+    master.append(["stingray", "stingray", "Stingray", True])
+
+    variants = wb.create_sheet("variant_master")
+    variants.append(["variant_id", "body_style", "trim_level", "base_price", "active"])
+    variants.append(["1lt_c07", "coupe", "1lt", "68300", True])
+    variants.append(["1lt_c07", "convertible", "1lt", "75800", True])
+
+    promotion = wb.create_sheet("model_registry_promotion")
+    promotion.append(["model_key", "registry_key", "artifact_path", "promoted_to_runtime", "active"])
+    promotion.append(["stingray", "stingray", "form-output/a.json", True, True])
+    promotion.append(["stingray", "stingray", "form-output/b.json", True, True])
+    wb.save(copy)
+    wb.close()
+
+    built = truth.build_workbook_truth(copy)
+    assert built["topologyConflicts"] == [
+        {"sheet": "variant_master", "variant_id": "1lt_c07"},
+        {"sheet": "model_registry_promotion", "model_key": "stingray"},
+    ]
+    # First row wins the resolved view, which is safe to look at only because
+    # the conflict list above is asserted empty for the tracked workbook.
+    assert built["models"]["stingray"]["promotion"]["artifact_path"] == "form-output/a.json"
 
 
 def test_conflicting_asset_rows_are_reported(tmp_path: Path) -> None:

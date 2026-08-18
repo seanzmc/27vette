@@ -24,13 +24,13 @@ import fs from "node:fs";
 import test from "node:test";
 
 import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
-import { cell, modelSourceRows, workbookRows, workbookTruth } from "./lib/workbook-truth.mjs";
+import { cell, modelSourceRows, workbookRows, workbookTruth, workbookTruthy } from "./lib/workbook-truth.mjs";
 
 const truth = workbookTruth();
 const model = truth.models[MODEL_KEY];
 
 function activeModelRows(sheetName) {
-  return workbookRows(sheetName).filter((row) => row.model_key === MODEL_KEY && row.active === "True");
+  return workbookRows(sheetName).filter((row) => row.model_key === MODEL_KEY && workbookTruthy(row.active));
 }
 
 const reviewDir = "/tmp/27vette-grand-sport-contract-preview-test";

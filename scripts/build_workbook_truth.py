@@ -148,15 +148,45 @@ def row_identity(row: dict[str, str], key_columns: tuple[str, ...]) -> str:
     return "::".join(clean(row.get(column)) for column in key_columns)
 
 
-def build_models(sheets: dict[str, Any]) -> dict[str, dict[str, Any]]:
+def index_unique(
+    rows: list[dict[str, str]],
+    key_column: str,
+    sheet_name: str,
+    conflicts: list[dict[str, str]],
+) -> dict[str, dict[str, str]]:
+    """Index rows by a key that must be unique, recording collisions.
+
+    A second row for the same key is not adjudicable by any rule the workbook
+    states, so it is reported the same way a duplicate `asset_map` row is:
+    surfaced as a conflict rather than silently resolved by row order. Without
+    this, a duplicate promotion or variant row would be a last-write-wins
+    decision made by whichever row happened to be lower in the sheet.
+    """
+
+    indexed: dict[str, dict[str, str]] = {}
+    for row in rows:
+        key = clean(row.get(key_column))
+        if not key:
+            continue
+        if key in indexed:
+            conflicts.append({"sheet": sheet_name, key_column: key})
+            continue
+        indexed[key] = row
+    return indexed
+
+
+def build_models(sheets: dict[str, Any]) -> tuple[dict[str, dict[str, Any]], list[dict[str, str]]]:
     """Model topology, assembled only from the workbook's own metadata rows."""
 
     def rows(name: str) -> list[dict[str, str]]:
         entry = sheets.get(name)
         return entry["rows"] if entry else []
 
-    variant_facts = {clean(row.get("variant_id")): row for row in rows("variant_master")}
-    promotion_by_model = {clean(row.get("model_key")): row for row in rows("model_registry_promotion")}
+    conflicts: list[dict[str, str]] = []
+    variant_facts = index_unique(rows("variant_master"), "variant_id", "variant_master", conflicts)
+    promotion_by_model = index_unique(
+        rows("model_registry_promotion"), "model_key", "model_registry_promotion", conflicts
+    )
 
     models: dict[str, dict[str, Any]] = {}
     for row in rows("model_master"):
@@ -248,7 +278,7 @@ def build_models(sheets: dict[str, Any]) -> dict[str, dict[str, Any]]:
             "active": truthy(promotion.get("active")),
         }
 
-    return models
+    return models, conflicts
 
 
 def build_promotions(models: dict[str, dict[str, Any]]) -> dict[str, Any]:
@@ -357,7 +387,7 @@ def build_workbook_truth(workbook_path: Path) -> dict[str, Any]:
     finally:
         wb.close()
 
-    models = build_models(sheets)
+    models, topology_conflicts = build_models(sheets)
     promotions = build_promotions(models)
     asset_entry = sheets.get("asset_map")
     assets, asset_conflicts = build_assets(
@@ -379,6 +409,9 @@ def build_workbook_truth(workbook_path: Path) -> dict[str, Any]:
         "promotions": promotions,
         "assets": assets,
         "assetConflicts": asset_conflicts,
+        # Duplicate rows on the sheets whose keys the topology assumes unique.
+        # Reported, never resolved — see `index_unique`.
+        "topologyConflicts": topology_conflicts,
     }
 
 

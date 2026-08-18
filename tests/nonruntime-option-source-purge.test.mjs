@@ -28,7 +28,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { activeModelKeys, modelSourceRows, workbookRows } from "./lib/workbook-truth.mjs";
+import { activeModelKeys, modelSourceRows, workbookRows, workbookTruthy } from "./lib/workbook-truth.mjs";
 
 const MODEL_KEYS = activeModelKeys();
 assert.ok(MODEL_KEYS.length > 0, "the workbook declares no active model");
@@ -52,7 +52,7 @@ const ovsRowsByModel = new Map(
 const componentRows = workbookRows("interior_components");
 const sectionPresentationRows = workbookRows("section_presentation");
 
-const isActive = (row) => row.active === "True";
+const isActive = (row) => workbookTruthy(row.active);
 
 test("component-owned RPOs keep no retained inactive option row", () => {
   // An RPO owned by an active `interior_components` row is presented through

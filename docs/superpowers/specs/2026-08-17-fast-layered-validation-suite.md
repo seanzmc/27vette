@@ -1,7 +1,8 @@
 # Fast Layered Validation Suite Specification
 
-Status: IN IMPLEMENTATION — Checkpoints 0, 1 and 2 complete 2026-08-17;
-Checkpoint 3 is the next authorized slice.
+Status: IN IMPLEMENTATION — Checkpoints 0, 1 and 2 complete 2026-08-17,
+Checkpoint 2 review response applied 2026-08-18; Checkpoint 3 is the next
+authorized slice.
 Date: 2026-08-17
 Branch: `claude/fast-layered-validation-suite-4c31f6` (spec authored on `main`)
 Recommended implementation reasoning: medium. Escalate only for a specific
@@ -265,9 +266,11 @@ each expensive stage once:
 7. strictly validate every written contract;
 8. build the complete candidate registry;
 9. build the independent temporary workbook-truth snapshot;
-10. run parity assertions and the generated runtime state matrix against the
-    candidate registry;
-11. report semantic drift and protected-surface hashes.
+10. run source-to-output parity assertions against the candidate contracts and
+    the candidate registry;
+11. run the browser harness against the candidate registry — joined by the
+    generated runtime state matrix once Checkpoint 3 lands;
+12. report semantic drift and protected-surface hashes.
 
 The report must include stage durations, artifact identities, discovered and
 promoted model/variant sets, skipped stages, failures, and protected-boundary
@@ -826,6 +829,106 @@ have.
   the Checkpoint 4 retirement path and was left alone rather than migrated
   mid-checkpoint.
 
+#### Checkpoint 2 review response — 2026-08-18
+
+Pull request review of #28 found one defect that would have made Layer 1 reject
+a correct candidate, plus four narrower problems. All are fixed on the same
+branch; the parity owners' shape is unchanged.
+
+**Blocking: inactive variant overrides shaped the expected side.**
+`variant_overrides` carries an `active` column and
+`runtime_metadata.load_variant_option_overrides` reads the sheet through
+`active_rows`, so a deactivated override restates nothing. The parity owner
+indexed every override row, then used that map for section membership, `hidden`
+suppression, and authored status. Deactivating an override — an ordinary
+authoring edit — would have left the gate resolving through a dead row and
+failing correct output. That is a false red on the composed readiness lane,
+which is the failure class this checkpoint exists to remove.
+
+Three changes, together:
+
+- The override index filters on `active`.
+- Emitted-section membership is derived from the resolved section of the
+  emittable source rows plus the two synthesized context sections, matching
+  `inspection.py`'s `section_ids_with_choices`. It previously unioned every
+  active option row's section with every override's section, which could
+  conjure a section no emitted choice uses. The emittable set is now stated once
+  from workbook columns and is no longer filtered by the contract's own emitted
+  sections — the expected side may not read the actual side.
+- Each emitted choice's `section_id` is compared to the section its source row
+  resolves to. Membership alone cannot see a choice landing in the wrong section
+  while both sections stay populated by other rows, which is exactly what a
+  mis-resolved override looks like.
+
+`tests/test_source_parity_canaries.py` is the forced mutation behind it:
+deactivate one override on a workbook copy, regenerate that model into a
+temporary root, assert `source-to-contract-parity` still passes — and assert
+first that the edit is observable in generated output, so the canary cannot pass
+vacuously. Verified to fail (`sec_inte_001` where the dead override said
+`sec_2lte_001`) with the `active` filter removed. Every override row in the
+tracked workbook is currently active, so a green parity run could not have ruled
+this out on its own. 3.5 s.
+
+**Four narrower fixes.**
+
+- *One truthiness convention.* Seventeen assertions re-checked snapshot rows
+  with `active === "True"` while the snapshot's own `workbookTruthy` accepts
+  `true|yes|1|y`; `workbook-visual-copy-standardization` had a third, wider
+  spelling with a dead `=== true` arm. All snapshot-row checks now call
+  `workbookTruthy`, including `z06-runtime-contract`'s
+  `standard_equipment_bucket` filter, where the non-empty string `"False"` read
+  as true. Assertions about values in *generated* artifacts keep the literal:
+  that is the emitted representation, not the authored one.
+- *Representation independence is now asserted.* The subprocess boundary test
+  cannot see this failure: `corvette_form_generator.workbook` is loaded in
+  process regardless, because the shared `workbook_domain.registry` metadata
+  imports it. Re-exporting `workbook.clean` or `workbook.workbook_truthy` from
+  the snapshot builder would leave every parity gate reading cells through the
+  same code generation reads them through, and one representation bug would
+  blind all of them while every test stayed green. The agreement table keeps the
+  two definitions equal; two new assertions keep them two.
+- *Promotion topology no longer resolves silently.* `model_registry_promotion`
+  by `model_key` and `variant_master` by `variant_id` were indexed
+  last-write-wins. A duplicate row is as unadjudicable as a duplicate
+  `asset_map` row, so it is now reported in `topologyConflicts` and asserted
+  empty by the parity gate, with a forced mutation behind it.
+- *`variant_overrides` has no `status` column.* The writable contract is
+  `option_id, variant_id, selectable, display_behavior, section_id, active,
+  note`, and the loader hardcodes an empty status. The parity gate no longer
+  lets an override win the authored-status comparison, and the `resolved()`
+  contract names the three columns an override may actually restate.
+
+**Left deliberately, with reasons.**
+
+- `standardEquipment` parity was renamed, not re-derived. Both sides come from
+  the artifact under test, so it is a contract-internal invariant; a generator
+  that mis-derived status into both collections would stay green. Authored
+  status is covered separately on the rows where the workbook states it.
+  Driving expected membership from OVS instead would duplicate the status
+  derivation this gate deliberately does not reimplement.
+- The Grand Sport preview hot-spot counts recompute from `hotSpots.rows`, which
+  catches a counter disagreeing with its own list but not a classifier moving
+  rows between buckets — what the retired `requires: 25` literal incidentally
+  detected. Restoring source-side classifier coverage needs a decision about
+  whether that diagnostic still owns classifier behavior; Checkpoint 4 owns the
+  diagnostics.
+- `rules.py` drops an authored `requires` already expressed by a `requires_any`
+  group, and parity expects every resolvable `rule_mapping` id. This holds on
+  today's workbook; a valid grouping edit would false-fail. Naming the
+  suppressor or accepting grouped-requires as derived is a rule decision, not a
+  test edit.
+- `test_model_topology_matches_the_workbook_metadata_rows` requires every active
+  membership to be declared and active in `variant_master`. The snapshot already
+  records `declared_in_variant_master` / `active_in_variant_master`, so a
+  dangling membership could be a gate finding instead of an oracle invariant.
+  Left as-is; it is the same §12 territory as `promoted_model_membership`.
+- `workbook-truth.mjs`'s `cell()` does not mirror Python `clean()` on booleans
+  (`"true"` vs `"True"`). Snapshot rows arrive pre-cleaned, so this is only
+  reachable if a generated boolean is passed through it.
+- `stingray-form-regression` keeps its private per-sheet reader and now imports
+  only `workbookTruthy` from the snapshot module. Migrating the reader is on the
+  Checkpoint 4 path.
+
 ### Checkpoint 3 — generate the runtime state matrix
 
 - Parameterize candidate runtime checks over every promoted model and declared
@@ -1002,7 +1105,11 @@ assertion is closed with no literal refreshed; the workbook-truth snapshot
 exists and is proved independent of the generator; source-to-contract and
 source-to-registry parity own every runtime collection that has a workbook
 source; and the composed candidate lane builds the snapshot once and runs both
-parity gates against the candidate.
+parity gates against the candidate. Pull request review of Checkpoint 2 found
+one defect that would have failed a correct candidate — inactive variant
+overrides shaping the expected side — and four narrower problems; all are fixed
+with a forced-mutation canary behind the blocking one, and what was deliberately
+left is listed in the §9 review-response block.
 
 The next authorized implementation slice is Checkpoint 3: parameterize the
 candidate runtime checks over every promoted model and declared variant,

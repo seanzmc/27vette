@@ -310,6 +310,7 @@ The remaining `tests/test_*.py` files are not in that gate and are chosen by cha
 | Fable 5 loop | `test_fable5_loop_contract` |
 | Validation catalog | `test_validation_catalog` |
 | Workbook-truth snapshot | `test_workbook_truth` |
+| Source-parity canaries | `test_source_parity_canaries` |
 
 Every `tests/test_*.py` file runs standalone: `tests/conftest.py` puts `scripts/`
 on `sys.path` for the whole directory, so no pytest command needs

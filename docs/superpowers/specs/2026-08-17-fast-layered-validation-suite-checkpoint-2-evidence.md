@@ -120,3 +120,77 @@ Not established here:
 - Any independent verifier judgment. Checkpoint 2, like Checkpoints 0 and 1, was
   direct specification execution rather than a Fable loop run, so review comes
   from the pull request rather than from a separate verifier context.
+
+## 5. Review-response run — 2026-08-18
+
+Pull request review of #28 found one defect that would have made Layer 1 reject
+a correct candidate (inactive `variant_option_overrides` rows shaping the
+expected side) and four narrower problems. The fixes and what was deliberately
+left are in the §9 "Checkpoint 2 review response" block. This is the closing
+run for them, same machine and versions, same serial method.
+
+```text
+node inventory, 18 files, one process per file
+  tests 437  pass 437  fail 0
+
+.venv/bin/python -m pytest tests/test_workbook_truth.py \
+  tests/test_validation_catalog.py tests/test_source_parity_canaries.py -q
+  81 passed in 11.22s                            exit=0
+     test_workbook_truth            61  (58 + 2 topology conflict + 1 helper identity)
+     test_validation_catalog        19
+     test_source_parity_canaries     1
+
+metadata gate (10 files, one process)
+  189 passed, 111 subtests passed in 179.67s     exit=0
+
+.venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
+  "issues": []                                   exit=0
+
+.venv/bin/python -m pytest tests/test_verify_workbook_candidate.py -q
+  16 passed in 691.82s (0:11:31)                 exit=0
+
+.venv/bin/python scripts/validate_fable5_loop.py
+  passed                                         exit=0
+
+git status --porcelain -- form-output form-app
+  (no output)
+
+git diff --check
+  (clean)
+```
+
+Node test count is unchanged at 437: the new per-choice section assertion is a
+loop inside an existing test and `standardEquipment` was renamed, not added.
+Per-gate seconds were not re-measured this run; the §1 table stands as the
+timing reference and nothing here changes the shape of a gate's work.
+
+### 5.1 The canary has teeth
+
+`tests/test_source_parity_canaries.py` deactivates one `stingray_variant_overrides`
+row on a workbook copy, regenerates Stingray into a temporary root, and asserts
+`source-to-contract-parity` still passes. Removing the `active` filter from the
+override index — the pre-fix behavior — makes it fail:
+
+```text
+actual:   'sec_inte_001'
+expected: 'sec_2lte_001'
+```
+
+The dead override still claimed `sec_2lte_001` while generation, which reads
+that sheet through `active_rows`, correctly returned the choice to the option
+row's own `sec_inte_001`. Restored, the canary passes in 3.5 s.
+
+All sixteen override rows in the tracked workbook are active, so the tracked
+workbook cannot exercise this path. That is why the canary mutates a copy.
+
+### 5.2 A note on how the Node lane is run
+
+`node --test tests/*.test.mjs` — one process, files in parallel — fails
+`z06-contract-preview` intermittently, before and after these changes.
+`tests/lib/tracked-artifacts.mjs` states the reason in its own header: it hashes
+the whole tracked generated surface, so it cannot run concurrently with another
+process that touches those files. The catalog's `suite.full_node_inventory`
+command is the serial loop (`for f in tests/*.test.mjs; do node --test "$f"; done`),
+which is what every measurement in this file used. Recorded here because the
+parallel invocation is an easy mistake to make and its failure looks like a real
+regression.

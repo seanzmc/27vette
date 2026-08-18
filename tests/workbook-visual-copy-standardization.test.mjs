@@ -20,7 +20,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { activeModelKeys, modelSourceSheet, workbookRows } from "./lib/workbook-truth.mjs";
+import { activeModelKeys, modelSourceSheet, workbookRows, workbookTruthy } from "./lib/workbook-truth.mjs";
 
 const MODEL_KEYS = activeModelKeys();
 assert.ok(MODEL_KEYS.length > 0, "the workbook declares no active model");
@@ -31,7 +31,7 @@ const OPTION_SHEETS = MODEL_KEYS.map(optionSheet);
 const rowsBySheet = new Map(OPTION_SHEETS.map((sheetName) => [sheetName, workbookRows(sheetName)]));
 
 function isActive(row) {
-  return row.active === true || String(row.active).toLowerCase() === "true";
+  return workbookTruthy(row.active);
 }
 
 function rowFor(sheetName, optionId) {

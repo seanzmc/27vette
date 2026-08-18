@@ -336,7 +336,8 @@ def test_the_browser_stage_reads_the_candidate_registry_not_the_published_one(tm
     """The failure this exists to catch: a harness that silently falls back.
 
     If the harness ignored the override and read the tracked `form-app/data.js`,
-    stage 9 would pass against a registry the candidate never produced — a green
+    the `browser_harness` stage would pass against a registry the candidate never
+    produced — a green
     readiness verdict proving nothing. Pointed at a deliberately broken registry
     it must fail, and the published file must be untouched.
     """
@@ -398,10 +399,10 @@ def test_the_lane_detects_and_reports_a_protected_path_write(monkeypatch) -> Non
 
 
 def test_the_lane_runs_the_browser_stage_against_a_temporary_registry() -> None:
-    """Breaks if stage 9 is removed or stops using the candidate's data.js.
+    """Breaks if `browser_harness` is removed or stops using the candidate's data.js.
 
     Every other test in this file passes `run_harness=False`, so without this one
-    deleting stage 9 outright would be invisible to the whole suite.
+    deleting that stage outright would be invisible to the whole suite.
     """
 
     report = verify_candidate(WORKBOOK, changed_models=["*"], run_harness=True)

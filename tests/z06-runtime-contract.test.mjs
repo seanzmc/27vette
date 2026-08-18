@@ -4,7 +4,7 @@ import fs from "node:fs";
 import test from "node:test";
 
 import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
-import { cell, modelSourceSheet, workbookRows, workbookTruth } from "./lib/workbook-truth.mjs";
+import { cell, modelSourceSheet, workbookRows, workbookTruth, workbookTruthy } from "./lib/workbook-truth.mjs";
 
 const MODEL_KEY = "z06";
 const outputRoot = "/tmp/27vette-z06-runtime-contract-test";
@@ -21,10 +21,10 @@ const truth = workbookTruth();
 const expectedVariantIds = truth.models[MODEL_KEY].variants.map((variant) => variant.variant_id);
 
 const modelPresentationRows = workbookRows("section_presentation").filter(
-  (row) => row.model_key === MODEL_KEY && row.active === "True",
+  (row) => row.model_key === MODEL_KEY && workbookTruthy(row.active),
 );
 const standardSections = new Set(
-  modelPresentationRows.filter((row) => row.standard_equipment_bucket).map((row) => row.section_id),
+  modelPresentationRows.filter((row) => workbookTruthy(row.standard_equipment_bucket)).map((row) => row.section_id),
 );
 const fullLengthStripeOptionIds = [
   "opt_dpb_001", "opt_dpc_001", "opt_dpg_001", "opt_dpl_001", "opt_dpt_001", "opt_dsy_001", "opt_dsz_001", "opt_dt0_001",
@@ -91,7 +91,7 @@ test("Z06 fresh runtime contract preserves the required top-level contract", () 
   assert.deepEqual(
     draft.orderSummary.sections.map((section) => section.section_key).sort(),
     workbookRows("order_summary_sections")
-      .filter((row) => row.model_key === MODEL_KEY && row.active === "True")
+      .filter((row) => row.model_key === MODEL_KEY && workbookTruthy(row.active))
       .map((row) => row.section_key)
       .sort()
   );
@@ -100,7 +100,7 @@ test("Z06 fresh runtime contract preserves the required top-level contract", () 
     [
       ...new Set(
         workbookRows("step_order_summary_map")
-          .filter((row) => row.model_key === MODEL_KEY && row.active === "True")
+          .filter((row) => row.model_key === MODEL_KEY && workbookTruthy(row.active))
           .map((row) => row.step_key)
       ),
     ].sort()

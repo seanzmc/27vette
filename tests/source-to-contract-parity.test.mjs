@@ -31,7 +31,7 @@ import { resolve } from "node:path";
 import process from "node:process";
 import test from "node:test";
 
-import { cell, workbookRows, workbookTruth } from "./lib/workbook-truth.mjs";
+import { cell, workbookRows, workbookTruth, workbookTruthy } from "./lib/workbook-truth.mjs";
 
 const truth = workbookTruth();
 
@@ -63,14 +63,15 @@ function sourceRows(modelKey, role) {
 /** Rows of a global sheet scoped to one model and active. */
 function activeModelRows(sheetName, modelKey) {
   return workbookRows(sheetName).filter(
-    (row) => row.model_key === modelKey && row.active === "True",
+    (row) => row.model_key === modelKey && workbookTruthy(row.active),
   );
 }
 
 /**
- * A variant override, where one exists, wins over the option row for the three
- * columns it may restate. This is the override sheet's own documented purpose,
- * not a generation rule.
+ * An active variant override, where one exists, wins over the option row for
+ * the three columns the writable `variant_overrides` contract lets it restate:
+ * `selectable`, `display_behavior`, `section_id`. This is the override sheet's
+ * own documented purpose, not a generation rule.
  */
 function resolved(optionRow, overrideRow, column) {
   return cell(overrideRow?.[column]) || cell(optionRow?.[column]);
@@ -84,16 +85,40 @@ for (const promotion of promoted) {
   const activeVariantIds = new Set(model.variants.map((variant) => variant.variant_id));
   const emittedSectionIds = new Set(contract.sections.map((section) => section.section_id));
   const optionRows = new Map(sourceRows(modelKey, "source_option_sheet").map((row) => [row.option_id, row]));
+  // Only active rows. `variant_overrides` carries an `active` column and
+  // generation reads the sheet through `active_rows`, so a deactivated
+  // override restates nothing. Indexing every row instead would make this gate
+  // reject a correctly generated candidate the moment an author turns one off.
   const overrideRows = new Map(
-    sourceRows(modelKey, "variant_option_overrides_sheet").map((row) => [
-      `${row.option_id}::${row.variant_id}`,
-      row,
-    ]),
+    sourceRows(modelKey, "variant_option_overrides_sheet")
+      .filter((row) => workbookTruthy(row.active))
+      .map((row) => [`${row.option_id}::${row.variant_id}`, row]),
   );
 
   const choicePairs = new Map(
     contract.choices.map((choice) => [`${choice.option_id}::${choice.variant_id}`, choice]),
   );
+
+  const masterSectionIds = new Set(workbookRows("section_master").map((row) => row.section_id));
+
+  // Which source rows the workbook says may reach the contract, and the section
+  // each one resolves to. Stated once, from workbook columns only: the option
+  // row is active, the variant is an active member of this model, the resolved
+  // section exists in section_master, and the resolved display_behavior is not
+  // `hidden`. Both the reverse-direction membership check and the emitted
+  // section set are the same question, so neither may answer it from the
+  // contract it is checking.
+  const emittable = [];
+  for (const row of sourceRows(modelKey, "status_sheet")) {
+    const optionRow = optionRows.get(row.option_id);
+    if (!optionRow || !workbookTruthy(optionRow.active)) continue;
+    if (!activeVariantIds.has(row.variant_id)) continue;
+    const overrideRow = overrideRows.get(`${row.option_id}::${row.variant_id}`);
+    const sectionId = resolved(optionRow, overrideRow, "section_id");
+    if (!masterSectionIds.has(sectionId)) continue;
+    if (resolved(optionRow, overrideRow, "display_behavior") === "hidden") continue;
+    emittable.push({ key: `${row.option_id}::${row.variant_id}`, sectionId });
+  }
 
   // ── Model topology ────────────────────────────────────────────────────────
 
@@ -142,19 +167,18 @@ for (const promotion of promoted) {
     }
   });
 
-  test(`${modelKey}: emitted sections equal the sections its active rows reference`, () => {
-    const masterSectionIds = new Set(workbookRows("section_master").map((row) => row.section_id));
+  test(`${modelKey}: emitted sections equal the sections its emittable rows resolve to`, () => {
+    // A section is emitted because a choice landed in it, so expected
+    // membership is the resolved section of every emittable row plus the two
+    // synthesized context sections. A section_master row nothing resolves to is
+    // not expected, and an override that names a section no emittable row uses
+    // does not conjure one.
     const referenced = new Set(CONTEXT_SECTION_IDS);
-    for (const row of optionRows.values()) {
-      if (row.active === "True" && masterSectionIds.has(row.section_id)) referenced.add(row.section_id);
-    }
-    for (const row of overrideRows.values()) {
-      if (row.section_id && masterSectionIds.has(row.section_id)) referenced.add(row.section_id);
-    }
+    for (const row of emittable) referenced.add(row.sectionId);
     assert.deepEqual(
       [...emittedSectionIds].sort(),
       [...referenced].sort(),
-      "emitted sections drifted from the section_master rows this model's active option rows reference",
+      "emitted sections drifted from the sections this model's emittable source rows resolve to",
     );
 
     // Presentation is an overlay, not a membership list. An active row for a
@@ -190,7 +214,10 @@ for (const promotion of promoted) {
     for (const [key, choice] of choicePairs) {
       const optionRow = optionRows.get(choice.option_id);
       assert.ok(optionRow, `${choice.choice_id} has no row in the model's option sheet`);
-      assert.equal(optionRow.active, "True", `${choice.choice_id} traces to an inactive option row`);
+      assert.ok(
+        workbookTruthy(optionRow.active),
+        `${choice.choice_id} traces to an inactive option row`,
+      );
       assert.equal(
         activeVariantIds.has(choice.variant_id),
         true,
@@ -208,16 +235,7 @@ for (const promotion of promoted) {
     // is not emitted only when the workbook says so: the option row is
     // inactive, the variant is not an active member, the resolved section is
     // not emitted, or the resolved display_behavior is `hidden`.
-    const expected = [];
-    for (const row of sourceRows(modelKey, "status_sheet")) {
-      const optionRow = optionRows.get(row.option_id);
-      if (!optionRow || optionRow.active !== "True") continue;
-      if (!activeVariantIds.has(row.variant_id)) continue;
-      const overrideRow = overrideRows.get(`${row.option_id}::${row.variant_id}`);
-      if (!emittedSectionIds.has(resolved(optionRow, overrideRow, "section_id"))) continue;
-      if (resolved(optionRow, overrideRow, "display_behavior") === "hidden") continue;
-      expected.push(`${row.option_id}::${row.variant_id}`);
-    }
+    const expected = emittable.map((row) => row.key);
 
     assert.ok(expected.length > 0, `${modelKey} resolved no OVS row into the contract`);
     assert.deepEqual(
@@ -225,6 +243,17 @@ for (const promotion of promoted) {
       expected.sort(),
       "emitted choices drifted from the emittable rows of the model's OVS sheet",
     );
+
+    // Membership alone would not notice a choice landing in the wrong section
+    // while both sections stay populated by other rows, which is exactly what a
+    // mis-resolved override looks like.
+    for (const row of emittable) {
+      assert.equal(
+        cell(choicePairs.get(row.key).section_id),
+        row.sectionId,
+        `${row.key} resolved section`,
+      );
+    }
   });
 
   test(`${modelKey}: emitted choice status equals its authored status`, () => {
@@ -242,14 +271,19 @@ for (const promotion of promoted) {
       compared += 1;
       assert.equal(
         cell(choice.status),
-        (cell(overrideRow?.status) || cell(row.status)).toLowerCase(),
+        cell(row.status).toLowerCase(),
         `${choice.choice_id} status`,
       );
     }
     assert.ok(compared > 0, `${modelKey} compared no authored status`);
   });
 
-  test(`${modelKey}: standard equipment is exactly the standard choices`, () => {
+  // Contract-internal, not source parity: both sides of this comparison come
+  // from the artifact under test, so a generator that mis-derives status and
+  // copies it into both collections stays green here. Authored status is
+  // covered above, on the rows where the workbook states it. What this catches
+  // is the two collections disagreeing with each other.
+  test(`${modelKey}: standardEquipment agrees with the choices marked standard`, () => {
     const expected = [...choicePairs.values()]
       .filter((choice) => choice.status === "standard")
       .map((choice) => `${choice.option_id}::${choice.variant_id}`)
@@ -303,7 +337,7 @@ for (const promotion of promoted) {
   });
 
   test(`${modelKey}: emitted rule groups equal the active rule_groups rows`, () => {
-    const expected = sourceRows(modelKey, "rule_groups_sheet").filter((row) => row.active === "True");
+    const expected = sourceRows(modelKey, "rule_groups_sheet").filter((row) => workbookTruthy(row.active));
     assert.ok(expected.length > 0, `${modelKey} declares no active rule group`);
     assert.deepEqual(
       contract.ruleGroups.map((group) => group.group_id).sort(),
@@ -311,7 +345,7 @@ for (const promotion of promoted) {
     );
 
     const memberRows = sourceRows(modelKey, "rule_group_members_sheet").filter(
-      (row) => row.active === "True",
+      (row) => workbookTruthy(row.active),
     );
     const membersByGroup = new Map();
     for (const row of memberRows) {
@@ -328,7 +362,7 @@ for (const promotion of promoted) {
   });
 
   test(`${modelKey}: emitted exclusive groups equal the active exclusive rows`, () => {
-    const expected = sourceRows(modelKey, "exclusive_groups_sheet").filter((row) => row.active === "True");
+    const expected = sourceRows(modelKey, "exclusive_groups_sheet").filter((row) => workbookTruthy(row.active));
     assert.ok(expected.length > 0, `${modelKey} declares no active exclusive group`);
     assert.deepEqual(
       contract.exclusiveGroups.map((group) => group.group_id).sort(),
@@ -336,7 +370,7 @@ for (const promotion of promoted) {
     );
 
     const memberRows = sourceRows(modelKey, "exclusive_group_members_sheet").filter(
-      (row) => row.active === "True",
+      (row) => workbookTruthy(row.active),
     );
     const membersByGroup = new Map();
     for (const row of memberRows) {
@@ -478,6 +512,11 @@ for (const promotion of promoted) {
       "hover_image_position",
     ];
     assert.deepEqual(truth.assetConflicts, [], "asset_map has unadjudicable duplicate rows");
+    assert.deepEqual(
+      truth.topologyConflicts,
+      [],
+      "a promotion or variant key the topology indexes uniquely has duplicate rows",
+    );
 
     const applicable = truth.assets[modelKey] ?? {};
     const optionIds = new Set(contract.choices.map((choice) => choice.option_id));
