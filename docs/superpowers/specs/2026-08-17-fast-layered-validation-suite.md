@@ -1,8 +1,7 @@
 # Fast Layered Validation Suite Specification
 
-Status: IN IMPLEMENTATION — Checkpoints 0, 1 and 2 complete 2026-08-17,
-Checkpoint 2 review response applied 2026-08-18; Checkpoint 3 is the next
-authorized slice.
+Status: IN IMPLEMENTATION — Checkpoints 0, 1, 2 and 3 complete 2026-08-18;
+Checkpoint 4 is the next authorized slice.
 Date: 2026-08-17
 Branch: `claude/fast-layered-validation-suite-4c31f6` (spec authored on `main`)
 Recommended implementation reasoning: medium. Escalate only for a specific
@@ -268,8 +267,8 @@ each expensive stage once:
 9. build the independent temporary workbook-truth snapshot;
 10. run source-to-output parity assertions against the candidate contracts and
     the candidate registry;
-11. run the browser harness against the candidate registry — joined by the
-    generated runtime state matrix once Checkpoint 3 lands;
+11. run the browser harness against the candidate registry, joined by the
+    generated runtime state matrix;
 12. report semantic drift and protected-surface hashes.
 
 The report must include stage durations, artifact identities, discovered and
@@ -948,6 +947,38 @@ Acceptance: all promoted models and active variants appear in the report; each
 state invariant has a forced-failure test; model switching and payload identity
 are covered uniformly.
 
+#### Checkpoint 3 result — 2026-08-18 (COMPLETE)
+
+The generated runtime state matrix is `tests/runtime-state-matrix.test.mjs`,
+backed by `tests/lib/runtime-state-matrix.mjs` and the shared harness in
+`tests/lib/runtime-harness.mjs`. Cases come from the §6.2 workbook-truth
+snapshot, not from the payload under test: six promoted models, 32 declared
+active variants. Each variant is activated, reset, reconciled, and checked
+against the twelve §4.3 invariants. One representative transition sequence per
+model covers include / exclude / replace / require / exclusive-group swap /
+priced-line behavior. Model switching is swept over every adjacent promoted
+pair. Download and stubbed dealer payload identity are checked for every
+variant; no live dealer request is made.
+
+Each invariant has a forced-failure test. 27 collected tests, 27 passed in
+2.67 s against the published registry. The candidate lane's `browser_harness`
+stage now runs the matrix beside `multi-model-runtime-switching` through the
+same `CORVETTE_FORM_DATA_JS` override.
+
+Named model-specific generic tests were **not** retired. Spec Checkpoint 3
+says they move only after the matrix demonstrates equivalent or stronger
+failure detection; that retirement canary belongs to Checkpoint 4.
+
+Raw output: `docs/superpowers/specs/2026-08-17-fast-layered-validation-suite-checkpoint-3-evidence.md`.
+
+Carried forward, unchanged by this checkpoint:
+
+- `promoted_model_membership` stays **proposed**. The literal in
+  `multi-model-runtime-switching` remains the de-facto pin.
+- `section_presentation` still carries two inert Stingray-scoped Grand Sport
+  rows. Deleting them is a workbook write no specification authorizes.
+- Node 22 / Python 3.12 CI reference timings remain uncaptured.
+
 ### Checkpoint 4 — consolidate the candidate and Python lanes
 
 - Make the composed candidate the single expensive workbook-to-browser lane.
@@ -1104,39 +1135,32 @@ The implementation is complete only when all of the following are true:
 
 ## 15. Next action
 
-Checkpoints 0, 1 and 2 are complete (see their result blocks in §9). The
+Checkpoints 0, 1, 2 and 3 are complete (see their result blocks in §9). The
 catalog, coverage ledger, and contract test are in place; every documented stale
 assertion is closed with no literal refreshed; the workbook-truth snapshot
 exists and is proved independent of the generator; source-to-contract and
 source-to-registry parity own every runtime collection that has a workbook
-source; and the composed candidate lane builds the snapshot once and runs both
-parity gates against the candidate. Pull request review of Checkpoint 2 found
-one defect that would have failed a correct candidate — inactive variant
-overrides shaping the expected side — and four narrower problems; all are fixed
-with a forced-mutation canary behind the blocking one, and what was deliberately
-left is listed in the §9 review-response block.
+source; and every promoted model and declared active variant now passes the
+generated runtime state matrix, with a forced-failure behind each §4.3
+invariant. The candidate lane's browser stage runs that matrix against the
+candidate registry.
 
-The next authorized implementation slice is Checkpoint 3: parameterize the
-candidate runtime checks over every promoted model and declared variant,
-implement the §4.3 state invariants with a forced-failure test behind each, add
-generic model/variant dealer-payload identity coverage without live submission,
-and replace duplicated model-specific behavior tests only after the matrix
-demonstrates equivalent or stronger failure detection.
+The next authorized implementation slice is Checkpoint 4: make the composed
+candidate the single expensive workbook-to-browser lane, share one generated
+candidate within the run, convert candidate report/stage tests to compact
+fixtures where end-to-end generation is not their subject, and retire
+model-specific generic Node tests only after the matrix demonstrates equivalent
+or stronger failure detection.
 
-Two items carry approval or classification gates into Checkpoint 3:
+Two items still carry approval or classification gates:
 
 - promoting `promoted_model_membership` from a proposed record to a real
   acceptance lock freezes a business decision and needs approval (§12).
-  Checkpoints 1 and 2 both took the parity route instead, which needs none; the
-  literal in `multi-model-runtime-switching` remains the de-facto pin until
-  approval;
+  Checkpoints 1–3 all took the parity route; the literal in
+  `multi-model-runtime-switching` remains the de-facto pin until approval;
 - `section_presentation` carries two active Stingray-scoped rows for Grand Sport
   sections that Stingray never emits. Inert today, and the parity gate now
   enforces that they stay inert, but removing them is a workbook write no
   specification authorizes yet.
-
-The `zr1_options` `opt_efr_001` question that Checkpoints 0 and 1 carried is
-**answered** and closed in the Checkpoint 2 result block: the row is authored
-`display_behavior='hidden'`, which generation drops by design.
 
 Still open from Checkpoint 0: the Node 22 / Python 3.12 CI reference timings.

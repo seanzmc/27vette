@@ -23,7 +23,7 @@
 // the difference is that one python process now serves every sheet and every
 // gate instead of one process per sheet per gate.
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import process from "node:process";
@@ -33,12 +33,21 @@ export const TRUTH_PATH_ENV = "CORVETTE_WORKBOOK_TRUTH";
 
 const cache = new Map();
 
+function pythonExecutable() {
+  // Local developer machines keep the project interpreter at `.venv/bin/python`.
+  // CI and other PATH-only environments do not have that path; they already
+  // installed Python onto PATH. Prefer the venv when it exists so standalone
+  // gates keep using the project's pinned interpreter.
+  if (existsSync(".venv/bin/python")) return ".venv/bin/python";
+  return process.env.CORVETTE_PYTHON || "python3";
+}
+
 function buildSnapshot(workbookPath) {
   const directory = mkdtempSync(join(tmpdir(), "workbook-truth-"));
   const target = join(directory, "workbook-truth.json");
   try {
     execFileSync(
-      ".venv/bin/python",
+      pythonExecutable(),
       ["scripts/build_workbook_truth.py", "--workbook", workbookPath, "--out", target],
       { encoding: "utf8" },
     );

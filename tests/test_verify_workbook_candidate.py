@@ -26,6 +26,7 @@ from verify_workbook_candidate import (  # noqa: E402
     HARNESS_DATA_JS_ENV,
     REPORT_SCHEMA_VERSION,
     STAGES,
+    WORKBOOK_TRUTH_ENV,
     protected_surface_hashes,
     run_browser_harness,
     semantic_drift,
@@ -356,9 +357,36 @@ def test_the_browser_stage_reads_the_candidate_registry_not_the_published_one(tm
 def test_the_harness_override_env_var_is_the_one_the_harness_reads() -> None:
     """Breaks if the override name drifts on either side of the contract."""
 
-    harness_source = (ROOT / "tests" / "multi-model-runtime-switching.test.mjs").read_text(encoding="utf-8")
+    switching = (ROOT / "tests" / "multi-model-runtime-switching.test.mjs").read_text(encoding="utf-8")
+    matrix = (ROOT / "tests" / "lib" / "runtime-harness.mjs").read_text(encoding="utf-8")
 
-    assert f"process.env.{HARNESS_DATA_JS_ENV}" in harness_source
+    assert f"process.env.{HARNESS_DATA_JS_ENV}" in switching
+    assert f"process.env.{HARNESS_DATA_JS_ENV}" in matrix
+    matrix_truth = (ROOT / "tests" / "lib" / "workbook-truth.mjs").read_text(encoding="utf-8")
+    assert f"process.env[{WORKBOOK_TRUTH_ENV!r}]" in matrix_truth or f"process.env.{WORKBOOK_TRUTH_ENV}" in matrix_truth or WORKBOOK_TRUTH_ENV in matrix_truth
+
+
+def test_the_browser_stage_receives_the_already_built_snapshot(tmp_path) -> None:
+    """The matrix must not rebuild the snapshot inside Layer 1.
+
+    CI has no `.venv/bin/python`. If browser_harness omits CORVETTE_WORKBOOK_TRUTH,
+    the matrix falls through to that hardcoded interpreter and the lane dies with
+    ENOENT after ten expensive stages. The snapshot already exists from stage 9.
+    """
+
+    data_js = tmp_path / "data.js"
+    data_js.write_text("window.CORVETTE_FORM_DATA = {};\n", encoding="utf-8")
+    truth = tmp_path / "workbook-truth.json"
+    truth.write_text("{}", encoding="utf-8")
+
+    result = run_browser_harness(
+        data_js,
+        ROOT / "tests" / "multi-model-runtime-switching.test.mjs",
+        truth_path=truth,
+    )
+
+    assert result.detail[WORKBOOK_TRUTH_ENV] == str(truth)
+    assert result.detail["data_js"] == str(data_js)
 
 
 def test_protected_surface_hashes_ignore_macos_finder_metadata(tmp_path) -> None:

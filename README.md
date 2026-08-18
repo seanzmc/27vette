@@ -261,7 +261,7 @@ Node gate matrix (run each with `node --test tests/<name>.test.mjs`):
 |---|---|
 | Workbook source and schema | `workbook-schema-standardization`, `workbook-visual-copy-standardization`, `nonruntime-option-source-purge` |
 | Fresh generation and strict runtime contracts | `stingray-runtime-contract`, `grand-sport-runtime-contract`, `z06-runtime-contract`, `z06-interior-accessory-cleanup` |
-| Published registry and browser runtime | `stingray-form-regression`, `z06-published-runtime`, `multi-model-runtime-switching`, `z06-performance-package-interactions`, `z06-runtime-rule-corrections` |
+| Published registry and browser runtime | `stingray-form-regression`, `z06-published-runtime`, `multi-model-runtime-switching`, `runtime-state-matrix`, `z06-performance-package-interactions`, `z06-runtime-rule-corrections` |
 | Isolated registry publication | `z06-registry-publication` |
 | Workbook-to-output parity, all promoted models | `source-to-contract-parity`, `source-to-registry-parity` |
 | Generated-artifact boundary helper | `tracked-artifacts-guard` |
@@ -288,6 +288,14 @@ Each gate builds its own snapshot when run standalone (about a second). Set
 tree instead of the tracked artifacts — which is what `verify_workbook_candidate.py`
 does in its `workbook_truth` and `source_parity` stages. The snapshot is
 temporary and untracked; nothing reads a committed copy of it.
+
+`runtime-state-matrix` is the §4.3 runtime owner. It discovers every promoted
+model and declared active variant from that same snapshot, then exercises
+activation, variant resolution, reset/idempotence, exclusive groups, required
+selections, representative rule transitions, totals, model switching, and
+stubbed dealer/download identity against the published or candidate registry.
+No live dealer request is made. The candidate lane's `browser_harness` stage
+runs it beside `multi-model-runtime-switching`.
 
 Python metadata gate — the default for generation/contract/promotion changes:
 

@@ -1,7 +1,7 @@
 {
   "schema": "27vette-validation-catalog-1",
   "owning_specification": "docs/superpowers/specs/2026-08-17-fast-layered-validation-suite.md",
-  "checkpoint": "Checkpoint 2 \u2014 build independent truth and composed parity",
+  "checkpoint": "Checkpoint 3 \u2014 generate the runtime state matrix",
   "description": "Machine-readable inventory of every default and checkpoint validation gate. Dependency-free JSON: read it with the standard library. This catalog owns collection descriptions and measured counts; README owns operator commands and approximate timing prose.",
   "enums": {
     "layer": [
@@ -414,13 +414,51 @@
         "zr1x_standard_j59_no_j58"
       ],
       "disposition": "keep",
-      "disposition_reason": "This is the spine the Checkpoint 3 generated runtime state matrix is built on (spec \u00a710). It already honors CORVETTE_FORM_DATA_JS with no fallback, so Layer 1 can point it at a candidate registry. Keep, then parameterize over promoted models and declared variants.",
+      "disposition_reason": "Named-lock and historical switching owner. Checkpoint 3 moved generic model/variant state coverage to node.runtime-state-matrix. This file keeps the default-model and ZR1X J59 locks plus the remaining named product cases. The matrix honors CORVETTE_FORM_DATA_JS through tests/lib/runtime-harness.mjs.",
       "readme_reference": "multi-model-runtime-switching",
-      "notes": "Also holds the largest static product matrix in JavaScript (13 URLs, six-model seatbelt sweep). Checkpoint 3 replaces the static sweep with data-discovered cases; the two named locks stay.",
+      "notes": "Still holds the largest static product matrix in JavaScript (13 URLs, six-model seatbelt sweep). Checkpoint 3 did not retire those named cases; the generic sweep now lives in runtime-state-matrix. The two named locks stay.",
       "collected_tests": 70,
       "baseline_result": "pass",
       "readme_publishes_command": false,
       "checkpoint_1_result": "Unchanged except for comments. This file is now the single asserting owner of `defaultModelKey === \"stingray\"` and the only place a promoted-model change fails deliberately (spec \u00a78 canary 3); both are labelled in the source. Canary 3 measured it: after de-promoting zr1x in a copied workbook and republishing, this gate fails 8 of 70 while both parity gates follow the change."
+    },
+    {
+      "id": "node.runtime-state-matrix",
+      "command": "node --test tests/runtime-state-matrix.test.mjs",
+      "test_files": [
+        "tests/runtime-state-matrix.test.mjs"
+      ],
+      "layer": 1,
+      "primary_authority": "runtime_state_invariant",
+      "changed_surfaces": [
+        "runtime_js",
+        "registry_publication",
+        "workbook",
+        "dealer"
+      ],
+      "reads": [
+        "form-app/data.js",
+        "form-app/app.js",
+        "stingray_master.xlsx"
+      ],
+      "writes": [
+        "<os tmpdir>/workbook-truth-*/workbook-truth.json"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 3,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Checkpoint 3 \u00a74.3 owner. Discovers every promoted model and declared active variant from the workbook-truth snapshot, then proves activation, variant resolution, reset/idempotence, selected-option validity, exclusive-group singularity, required reporting, representative include/require/exclude/replace/default/price transitions, totals, model-switch clearance, and stubbed dealer/download identity. Each invariant has a forced-failure test. No live dealer request.",
+      "readme_reference": "runtime-state-matrix",
+      "notes": "Honors CORVETTE_FORM_DATA_JS through tests/lib/runtime-harness.mjs with no fallback. The candidate lane's browser_harness stage runs this beside multi-model-runtime-switching. Named model-specific generic tests stay until Checkpoint 4 mutation-proves equivalent coverage.",
+      "collected_tests": 27,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
     },
     {
       "id": "node.nonruntime-option-source-purge",
@@ -2302,8 +2340,8 @@
   "suites": [
     {
       "id": "suite.node_default_readiness",
-      "description": "The documented node readiness gates, run serially. Fourteen at the Checkpoint 0 baseline; sixteen since Checkpoint 2 added the two \u00a74.2 parity owners.",
-      "command": "for f in tests/workbook-schema-standardization.test.mjs tests/workbook-visual-copy-standardization.test.mjs tests/nonruntime-option-source-purge.test.mjs tests/stingray-runtime-contract.test.mjs tests/grand-sport-runtime-contract.test.mjs tests/z06-runtime-contract.test.mjs tests/z06-interior-accessory-cleanup.test.mjs tests/stingray-form-regression.test.mjs tests/z06-published-runtime.test.mjs tests/multi-model-runtime-switching.test.mjs tests/z06-performance-package-interactions.test.mjs tests/z06-runtime-rule-corrections.test.mjs tests/z06-registry-publication.test.mjs tests/tracked-artifacts-guard.test.mjs tests/source-to-contract-parity.test.mjs tests/source-to-registry-parity.test.mjs; do node --test \"$f\"; done",
+      "description": "The documented node readiness gates, run serially. Fourteen at the Checkpoint 0 baseline; sixteen since Checkpoint 2 added the two \u00a74.2 parity owners; seventeen since Checkpoint 3 added the runtime state matrix.",
+      "command": "for f in tests/workbook-schema-standardization.test.mjs tests/workbook-visual-copy-standardization.test.mjs tests/nonruntime-option-source-purge.test.mjs tests/stingray-runtime-contract.test.mjs tests/grand-sport-runtime-contract.test.mjs tests/z06-runtime-contract.test.mjs tests/z06-interior-accessory-cleanup.test.mjs tests/stingray-form-regression.test.mjs tests/z06-published-runtime.test.mjs tests/multi-model-runtime-switching.test.mjs tests/runtime-state-matrix.test.mjs tests/z06-performance-package-interactions.test.mjs tests/z06-runtime-rule-corrections.test.mjs tests/z06-registry-publication.test.mjs tests/tracked-artifacts-guard.test.mjs tests/source-to-contract-parity.test.mjs tests/source-to-registry-parity.test.mjs; do node --test \"$f\"; done",
       "layer": 1,
       "gate_ids": [
         "node.workbook-schema-standardization",
@@ -2316,6 +2354,7 @@
         "node.stingray-form-regression",
         "node.z06-published-runtime",
         "node.multi-model-runtime-switching",
+        "node.runtime-state-matrix",
         "node.z06-performance-package-interactions",
         "node.z06-runtime-rule-corrections",
         "node.z06-registry-publication",
@@ -2324,8 +2363,8 @@
         "node.source-to-registry-parity"
       ],
       "serial_required": true,
-      "measured_seconds": 54.88,
-      "measured_note": "Checkpoint 2, 16 gates, all pass. Checkpoint 1 measured 52.63 s for the original fourteen; the two parity owners add 2.25 s and 131 assertions. Checkpoint 0 measured 109.27 s with six failures.",
+      "measured_seconds": 57.88,
+      "measured_note": "Checkpoint 3 adds node.runtime-state-matrix (~3 s / 27 tests) to the Checkpoint 2 16-gate readiness lane. Exact serial retime of the 17-file lane is recorded in the Checkpoint 3 evidence file.",
       "readme_publishes_command": false
     },
     {
@@ -2453,6 +2492,7 @@
         "node.stingray-form-regression",
         "node.z06-published-runtime",
         "node.multi-model-runtime-switching",
+        "node.runtime-state-matrix",
         "node.z06-performance-package-interactions",
         "node.z06-runtime-rule-corrections",
         "node.z06-registry-publication",
@@ -2932,72 +2972,73 @@
     {
       "behavior": "Model activation selects only that model's registry data; model switching clears incompatible prior-model state",
       "authority_class": "runtime_state_invariant",
-      "primary_owner": "node.multi-model-runtime-switching",
+      "primary_owner": "node.runtime-state-matrix",
       "secondary_evidence": [
+        "node.multi-model-runtime-switching",
         "node.z06-published-runtime"
       ]
     },
     {
       "behavior": "Body style and trim resolve to the intended variant",
       "authority_class": "runtime_state_invariant",
-      "primary_owner": "node.multi-model-runtime-switching",
+      "primary_owner": "node.runtime-state-matrix",
       "secondary_evidence": [
+        "node.multi-model-runtime-switching",
         "node.stingray-form-regression"
       ]
     },
     {
       "behavior": "Reset plus reconciliation reaches a stable fixed point and a second reconciliation is idempotent",
       "authority_class": "runtime_state_invariant",
-      "primary_owner": null,
-      "secondary_evidence": [],
-      "known_gap": "UNOWNED. No gate asserts reconciliation idempotence. Checkpoint 3 \u00a74.3 items 3\u20134."
+      "primary_owner": "node.runtime-state-matrix",
+      "secondary_evidence": []
     },
     {
       "behavior": "Include / require / exclude / replace / default / price rules preserve their generic contract after transitions",
       "authority_class": "runtime_state_invariant",
-      "primary_owner": "node.z06-performance-package-interactions",
+      "primary_owner": "node.runtime-state-matrix",
       "secondary_evidence": [
+        "node.z06-performance-package-interactions",
         "node.z06-runtime-rule-corrections",
         "node.stingray-form-regression",
         "node.multi-model-runtime-switching"
-      ],
-      "known_gap": "Covered only through one model's named examples. Checkpoint 3 generalizes over every promoted model and declared variant."
+      ]
     },
     {
       "behavior": "At most one peer selected in a single-selection exclusive group; required selections satisfied or reported",
       "authority_class": "runtime_state_invariant",
-      "primary_owner": "node.z06-runtime-rule-corrections",
+      "primary_owner": "node.runtime-state-matrix",
       "secondary_evidence": [
+        "node.z06-runtime-rule-corrections",
         "node.stingray-form-regression"
-      ],
-      "known_gap": "Not swept over every promoted model. Checkpoint 3 \u00a74.3 items 7\u20138."
+      ]
     },
     {
       "behavior": "Totals equal the independently recomputed base, option, component, override and charge lines",
       "authority_class": "runtime_state_invariant",
-      "primary_owner": "node.stingray-form-regression",
+      "primary_owner": "node.runtime-state-matrix",
       "secondary_evidence": [
+        "node.stingray-form-regression",
         "node.multi-model-runtime-switching"
-      ],
-      "known_gap": "Single-model. Checkpoint 3 \u00a74.3 item 10."
+      ]
     },
     {
       "behavior": "Interior/accessory reconciliation and included/display-only locked states",
       "authority_class": "runtime_state_invariant",
-      "primary_owner": "node.z06-interior-accessory-cleanup",
+      "primary_owner": "node.runtime-state-matrix",
       "secondary_evidence": [
+        "node.z06-interior-accessory-cleanup",
         "node.z06-runtime-contract"
-      ],
-      "known_gap": "Single-model. Checkpoint 3 \u00a74.3 items 5\u20136."
+      ]
     },
     {
       "behavior": "Download and stubbed dealer payload identity match the active model and variant",
       "authority_class": "runtime_state_invariant",
-      "primary_owner": "node.multi-model-runtime-switching",
+      "primary_owner": "node.runtime-state-matrix",
       "secondary_evidence": [
+        "node.multi-model-runtime-switching",
         "node.stingray-form-regression"
-      ],
-      "known_gap": "Explicit examples for Stingray, Grand Sport and Z06 only (spec \u00a73.3). Checkpoint 3 sweeps every promoted model. No live submission in any layer."
+      ]
     },
     {
       "behavior": "Dealer modal, Turnstile, required-field gating, payload shape and no-duplicate-post behavior",
