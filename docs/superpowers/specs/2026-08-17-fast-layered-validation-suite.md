@@ -732,7 +732,7 @@ directions, before it was written. Where the workbook has a suppressor it is
 named from workbook columns; what is deliberately not reimplemented is
 generation. Two rules are stated as transforms rather than compared loosely:
 trim level is upper-cased (`inspection.py:651`), and `standardEquipment` is
-exactly the choices the workbook marks standard.
+exactly the emitted choices marked standard.
 
 **The lane.** `verify_workbook_candidate.py` grew stages 9 and 10,
 `workbook_truth` and `source_parity`. The snapshot is built from the
@@ -900,6 +900,16 @@ this out on its own. 3.5 s.
 
 **Left deliberately, with reasons.**
 
+- **First residual risk.** `rules.py` drops an authored `requires` already
+  expressed by a `requires_any` group, and parity expects every resolvable
+  `rule_mapping` id. This holds on today's workbook — 59 authored `requires`
+  rows, 8 active `requires_any` groups, no overlap that `rules.py` currently
+  suppresses — so it is latent, not live. It goes live the moment an authoring
+  pass starts collapsing `requires` rows into `requires_any` groups: the first
+  collapsed pair makes `source-to-contract-parity` reject a correct candidate.
+  Naming the suppressor or accepting grouped-requires as derived is a rule
+  decision, not a test edit, and is the first thing to settle when such a pass
+  is scheduled.
 - `standardEquipment` parity was renamed, not re-derived. Both sides come from
   the artifact under test, so it is a contract-internal invariant; a generator
   that mis-derived status into both collections would stay green. Authored
@@ -912,11 +922,6 @@ this out on its own. 3.5 s.
   detected. Restoring source-side classifier coverage needs a decision about
   whether that diagnostic still owns classifier behavior; Checkpoint 4 owns the
   diagnostics.
-- `rules.py` drops an authored `requires` already expressed by a `requires_any`
-  group, and parity expects every resolvable `rule_mapping` id. This holds on
-  today's workbook; a valid grouping edit would false-fail. Naming the
-  suppressor or accepting grouped-requires as derived is a rule decision, not a
-  test edit.
 - `test_model_topology_matches_the_workbook_metadata_rows` requires every active
   membership to be declared and active in `variant_master`. The snapshot already
   records `declared_in_variant_master` / `active_in_variant_master`, so a
