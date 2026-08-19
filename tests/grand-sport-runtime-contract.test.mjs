@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
 
@@ -99,7 +98,7 @@ const expectedGrandSportExclusiveGroups = [
   },
 ];
 
-test("Grand Sport fresh runtime contract preserves the required top-level contract", () => {
+test("Grand Sport retained runtime contract preserves the required top-level contract", () => {
   for (const key of [
     "dataset",
     "variants",

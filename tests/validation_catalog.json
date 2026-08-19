@@ -363,8 +363,10 @@
         "form-output/**",
         "form-app/**"
       ],
-      "writes": [],
-      "isolation": "read_only",
+      "writes": [
+        "<os tmpdir>/workbook-truth-*/workbook-truth.json"
+      ],
+      "isolation": "tmp_path_fixture",
       "generates": false,
       "hashes_protected_roots": false,
       "serial_group": null,
@@ -621,8 +623,11 @@
         "form-output/**",
         "form-app/**"
       ],
-      "writes": [],
-      "isolation": "read_only",
+      "writes": [
+        "<os tmpdir>/vette-workbook-package-*/**",
+        "<os tmpdir>/vette-stingray-variant-override-*/**"
+      ],
+      "isolation": "temp_workbook_copy",
       "generates": false,
       "hashes_protected_roots": false,
       "serial_group": null,
@@ -633,7 +638,7 @@
       "disposition": "keep",
       "disposition_reason": "Checkpoint 4 removed private model generation. The gate now reads the retained contract for focused contract/product assertions; the composed candidate lane owns fresh all-model generation, strict validation, source parity, registry publication, and browser proof once.",
       "readme_reference": "stingray-runtime-contract",
-      "notes": "Checkpoint 4: no generate_form.py subprocess.",
+      "notes": "Checkpoint 4: no generate_form.py subprocess. Not read-only, though: two tests copy stingray_master.xlsx into a mkdtemp directory, mutate the copy, and read it back through validate_workbook_package and assemble_model_source. Those copies are not removed on exit.",
       "collected_tests": 12,
       "baseline_result": "pass",
       "readme_publishes_command": false
@@ -932,8 +937,10 @@
         "form-output/**",
         "form-app/**"
       ],
-      "writes": [],
-      "isolation": "read_only",
+      "writes": [
+        "<os tmpdir>/workbook-truth-*/workbook-truth.json"
+      ],
+      "isolation": "tmp_path_fixture",
       "generates": false,
       "hashes_protected_roots": false,
       "serial_group": null,
@@ -1847,10 +1854,10 @@
       "approximate_seconds": 0.04,
       "acceptance_locks": [],
       "disposition": "keep",
-      "disposition_reason": "The \u00a77 catalog contract test. Fails when a default/checkpoint test file has no catalog entry, when two entries claim one named acceptance lock, when a generating gate lacks an isolated output declaration, when a protected-output gate \u2014 or a SUITE that would run one \u2014 is assigned unsafe parallel execution, or when README disagrees with the catalog. Each condition is proved by a forced failure so the check is never green for the wrong reason. Suite membership is derived from the command, not trusted from gate_ids, and file discovery is recursive.",
+      "disposition_reason": "The \u00a77 catalog contract test. Fails when a default/checkpoint test file has no catalog entry, when two entries claim one named acceptance lock, when a generating gate lacks an isolated output declaration, when a gate claims read_only or in_process while naming writes, when a protected-output gate \u2014 or a SUITE that would run one \u2014 is assigned unsafe parallel execution, or when README disagrees with the catalog. Each condition is proved by a forced failure so the check is never green for the wrong reason. Suite membership is derived from the command, not trusted from gate_ids, and file discovery is recursive.",
       "readme_reference": "test_validation_catalog",
-      "notes": "",
-      "collected_tests": 19,
+      "notes": "Checkpoint 4 review added the read_only/in_process honesty check. Every other isolation assertion branches on `generates`, so a gate declaring generates:false escaped all of them \u2014 which is how three Node gates came to claim read_only while writing temp workbook and workbook-truth copies.",
+      "collected_tests": 20,
       "baseline_result": "pass",
       "readme_publishes_command": false
     },
@@ -1881,13 +1888,13 @@
       "serial_group": "protected_artifacts",
       "ci_policy": "not_run_now",
       "checkpoint_policy": "changed_surface",
-      "approximate_seconds": 389.07,
+      "approximate_seconds": 457.54,
       "acceptance_locks": [],
       "disposition": "keep",
-      "disposition_reason": "Checkpoint 4 shares one canonical full run (including browser harness) and one controlled-drift full run. Stage order, report schema, all-model marker, browser temporary-registry proof, and boundary assertions reuse those results or compact early-failure inputs.",
+      "disposition_reason": "Checkpoint 4 shares three full runs: the canonical workbook with nothing declared (including browser harness), and one controlled-drift workbook read once undeclared and once declared. Stage order, report schema, all-model marker, browser temporary-registry proof, and boundary assertions reuse those results or compact early-failure inputs.",
       "readme_reference": "test_verify_workbook_candidate",
-      "notes": "",
-      "collected_tests": 16,
+      "notes": "Checkpoint 4 review: the canonical run declares nothing rather than '*'. Declaring every model makes unexpected_drift unreachable (it is 'drifted AND not declared'), which silently voided the stale-retained-artifact and generation-filter proofs. The third full run restores the declared-suppression proof no other run can make. 389.07s -> 457.54s, against 684.74s inherited from Checkpoint 3.",
+      "collected_tests": 17,
       "baseline_result": "pass",
       "readme_publishes_command": false,
       "checkpoint_1_result": "DONE for the dead canaries. finding.dead_semantic_drift_canary is closed: the drift probe is selected from the retained zr1 contract itself (an option present in both choices and standardEquipment) instead of the hardcoded EFR row, which reaches neither and made both forcing tests inert. The semantic_drift stage now has live positive proof \u2014 the undeclared run reports unexpected_drift ['zr1'] and fails at that stage. The separate workbook/generator question of why active zr1_options.opt_efr_001 emits nothing is NOT answered here (\u00a712)."

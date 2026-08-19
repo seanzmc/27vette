@@ -17,14 +17,6 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 from corvette_form_generator.model_generation import generate_model_artifacts  # noqa: E402
-
-
-def generated_steps(result: dict) -> list[dict]:
-    import json
-
-    contract = json.loads(Path(result["runtime_contract_json"]).read_text(encoding="utf-8"))
-    return contract["steps"]
-
 from corvette_form_generator.model_configs import (  # noqa: E402
     REQUIRED_GENERATION_SOURCE_ROLES,
     base_model_config,
@@ -462,23 +454,37 @@ class WorkbookOwnedPresentationMetadataTests(unittest.TestCase):
         finally:
             wb.close()
 
-    def test_dropping_any_single_runtime_step_fails_generation(self) -> None:
+    def test_deactivating_any_single_runtime_step_is_rejected(self) -> None:
         """Every authored step is load-bearing, for every active model.
 
         The earlier version of this check compared the workbook against a Python
         list of expected steps and only ran for promoted models. Its replacement
-        must not be weaker: dropping ANY one of ANY model's steps must fail,
+        must not be weaker: losing ANY one of ANY model's steps must fail,
         promoted or not.
+
+        This sweep deactivates rows rather than deleting them, because it reuses
+        one in-memory workbook instead of writing 84 snapshots. `active_rows()`
+        treats the two identically, and the deleted-row path keeps its own proofs
+        in the snapshot-based tests below. Generation is not run here either: it
+        is the caller of `load_runtime_steps`, and the last test in this class
+        holds that wiring against a real `generate_model_artifacts` run.
         """
 
-        wb = load_workbook(WORKBOOK)
+        # Opened writable because the sweep flips cells, and never saved — the
+        # canonical workbook is source data, not a fixture. Nothing below may
+        # call wb.save().
+        wb = load_workbook(WORKBOOK, data_only=True)
         try:
             ws = wb["runtime_steps"]
             headers = {cell.value: index for index, cell in enumerate(ws[1], start=1)}
+            master = wb["model_master"]
+            master_headers = {cell.value: index for index, cell in enumerate(master[1], start=1)}
             active_models = sorted(
-                str(row[0]).strip()
-                for row in wb["model_master"].iter_rows(min_row=2, values_only=True)
-                if row[0] and str(row[8]).strip().lower() in {"true", "1", "yes"}
+                str(master.cell(row_index, master_headers["model_key"]).value or "").strip()
+                for row_index in range(2, master.max_row + 1)
+                if str(master.cell(row_index, master_headers["model_key"]).value or "").strip()
+                and str(master.cell(row_index, master_headers["active"]).value or "").strip().lower()
+                in {"true", "1", "yes"}
             )
             self.assertEqual(len(active_models), 6)
 

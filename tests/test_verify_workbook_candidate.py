@@ -2,9 +2,11 @@
 """Proofs required of the composed candidate lane (spec Pass 3 requirement 12).
 
 Each test names the change it would catch. The lane is expensive — it generates
-six models — so one canonical full run and one controlled-drift full run are
-module-scoped fixtures. Stage/report mechanics use compact or early-failure
-inputs instead of rebuilding an equivalent candidate.
+six models — so the three full runs it genuinely needs are module-scoped
+fixtures: the canonical workbook with nothing declared, and the same
+controlled-drift workbook read once undeclared and once declared. Stage/report
+mechanics use compact or early-failure inputs instead of rebuilding an
+equivalent candidate.
 """
 
 from __future__ import annotations
@@ -28,6 +30,7 @@ from verify_workbook_candidate import (  # noqa: E402
     REPORT_SCHEMA_VERSION,
     STAGES,
     WORKBOOK_TRUTH_ENV,
+    declared_changed_set,
     protected_surface_hashes,
     run_browser_harness,
     semantic_drift,
@@ -50,12 +53,17 @@ ALL_MODEL_KEYS = {"stingray", "grand_sport", "grand_sport_x", "z06", "zr1", "zr1
 # is module-scoped and shared. Adding an unshared full run costs about a minute.
 @pytest.fixture(scope="module")
 def canonical_run(tmp_path_factory) -> dict:
-    """The canonical workbook, all models declared, including browser proof."""
+    """The canonical workbook with nothing declared changed, including browser proof.
+
+    Declaring nothing is what gives the drift and generation-set assertions below
+    their teeth. `unexpected_drift` is "drifted AND not declared", so a run that
+    declares every model can never populate it, and a generation set filtered by
+    the touched models would still look complete. The `*` marker keeps its own
+    proof in `test_all_models_marker_declares_every_model`.
+    """
 
     report_path = tmp_path_factory.mktemp("canonical") / "readiness.json"
-    report = verify_candidate(
-        WORKBOOK, changed_models=["*"], report_path=report_path, run_harness=True
-    )
+    report = verify_candidate(WORKBOOK, report_path=report_path, run_harness=True)
     report["_report_path"] = str(report_path)
     return report
 
@@ -133,6 +141,22 @@ def drifting_undeclared(tmp_path_factory) -> dict:
     return verify_candidate(workbook_with_a_drifting_model(directory), run_harness=False)
 
 
+@pytest.fixture(scope="module")
+def drifting_declared(tmp_path_factory) -> dict:
+    """The same drifting workbook, declaring zr1 changed: the run must pass.
+
+    The only run in this file that pairs real drift with a declaration. Without
+    it, `declared_changed` could be ignored outright — every other run either has
+    no drift (so suppression never fires) or declares nothing (so it never
+    applies) — and the whole suite would still be green.
+    """
+
+    directory = tmp_path_factory.mktemp("drift-declared")
+    return verify_candidate(
+        workbook_with_a_drifting_model(directory), changed_models=["zr1"], run_harness=False
+    )
+
+
 def test_every_stage_runs_in_order_against_a_candidate_copy(canonical_run) -> None:
     """Breaks if a stage is reordered, dropped, or silently skipped."""
 
@@ -184,33 +208,56 @@ def test_undeclared_semantic_drift_is_reported_and_fails(drifting_undeclared) ->
     assert set(drifting_undeclared["partition"]["unchanged"]) == ALL_MODEL_KEYS - {"zr1"}
 
 
-def test_declaring_a_changed_model_does_not_reduce_the_generated_set(canonical_run) -> None:
-    """Breaks if the touched-model set is ever used as a generation filter (§3.7.1.5)."""
+def test_the_touched_model_set_never_reduces_the_generated_set(
+    canonical_run, drifting_declared
+) -> None:
+    """Breaks if the touched-model set is ever used as a generation filter (§3.7.1.5).
 
-    assert set(canonical_run["models"]) == ALL_MODEL_KEYS
-    assert set(canonical_run["stages"][5]["detail"]["generated"]) == ALL_MODEL_KEYS
-    assert set(canonical_run["declaredChangedModels"]) == ALL_MODEL_KEYS
-    assert all(row["generated"] for row in canonical_run["models"].values())
+    Both ends of the range are covered on runs that already exist: nothing
+    declared, and one model declared. A filter keyed on the touched set would
+    generate zero and one. A run declaring `*` proves nothing here, because the
+    filtered and unfiltered sets are identical.
+    """
+
+    for report in (canonical_run, drifting_declared):
+        assert set(report["models"]) == ALL_MODEL_KEYS
+        assert set(report["stages"][5]["detail"]["generated"]) == ALL_MODEL_KEYS
+        assert all(row["generated"] for row in report["models"].values())
+
+    assert canonical_run["declaredChangedModels"] == []
+    assert drifting_declared["declaredChangedModels"] == ["zr1"]
+
+
+def test_declaring_drift_moves_it_out_of_unexpected_and_passes(drifting_declared) -> None:
+    """Breaks if declaring a model stops suppressing its expected drift."""
+
+    assert drifting_declared["partition"]["unexpected_drift"] == []
+    assert drifting_declared["partition"]["changed"] == ["zr1"]
+    assert drifting_declared["models"]["zr1"]["semantic_drift_vs_retained"] == DRIFT_COLLECTIONS
+    assert drifting_declared["ok"] is True
 
 
 def test_the_canonical_workbook_has_no_undeclared_drift(canonical_run) -> None:
     """The tree is clean: every retained contract matches what the workbook generates.
 
     Breaks the moment a retained artifact goes stale again — which is exactly the
-    class of defect that went unnoticed until this lane existed.
+    class of defect that went unnoticed until this lane existed. This only holds
+    because the fixture declares nothing: every model must reach `unchanged` on
+    its own merits rather than by being excused.
     """
 
     assert canonical_run["partition"]["unexpected_drift"] == []
-    assert set(canonical_run["partition"]["changed"]) == ALL_MODEL_KEYS
+    assert set(canonical_run["partition"]["unchanged"]) == ALL_MODEL_KEYS
     assert canonical_run["ok"] is True
 
 
 def test_all_models_marker_declares_every_model() -> None:
     """§3.7.1.1: a global-family row marks the touched set as all models."""
 
-    from verify_workbook_candidate import declared_changed_set
-
     assert declared_changed_set(["*"], ALL_MODEL_KEYS) == ALL_MODEL_KEYS
+    assert declared_changed_set(["*", "zr1"], ALL_MODEL_KEYS) == ALL_MODEL_KEYS
+    assert declared_changed_set(["zr1"], ALL_MODEL_KEYS) == {"zr1"}
+    assert declared_changed_set([], ALL_MODEL_KEYS) == set()
 
 
 def test_an_unknown_changed_model_fails_rather_than_being_ignored(tmp_path) -> None:
@@ -357,6 +404,11 @@ def test_the_lane_detects_and_reports_a_protected_path_write(monkeypatch) -> Non
     Every other assertion here checks `boundaryViolations == []`, which a lane
     that never computes it would satisfy trivially. This one makes a stage write
     a tracked file and requires the lane to notice, then restores the file.
+
+    The stage is also forced to fail, purely so the lane stops before generation
+    and this test costs seconds instead of a minute. That is why the assertion
+    below is on `boundaryViolations` rather than on `ok`: `ok is False` is
+    already guaranteed by the forced failure and proves nothing on its own.
     """
 
     import verify_workbook_candidate as lane
@@ -386,8 +438,9 @@ def test_the_lane_detects_and_reports_a_protected_path_write(monkeypatch) -> Non
 def test_the_lane_runs_the_browser_stage_against_a_temporary_registry(canonical_run) -> None:
     """Breaks if `browser_harness` is removed or stops using the candidate's data.js.
 
-    Every other test in this file passes `run_harness=False`, so without this one
-    deleting that stage outright would be invisible to the whole suite.
+    `canonical_run` is the only fixture in this file that enables the harness;
+    every other run passes `run_harness=False`. Without this test, deleting that
+    stage outright would be invisible to the whole suite.
     """
 
     report = canonical_run

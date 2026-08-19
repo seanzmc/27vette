@@ -315,7 +315,6 @@ The remaining `tests/test_*.py` files are not in that gate and are chosen by cha
 | Publication | `test_atomic_registry_write` |
 | Asset map | `test_asset_map_sync`, `test_set_asset_display` |
 | Options-sheet quality | `test_options_sheet_quality` |
-
 | Fable 5 loop | `test_fable5_loop_contract` |
 | Validation catalog | `test_validation_catalog` |
 | Workbook-truth snapshot | `test_workbook_truth` |

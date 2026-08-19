@@ -1,12 +1,10 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
 
 import { cell, modelSourceSheet, workbookRows, workbookTruth, workbookTruthy } from "./lib/workbook-truth.mjs";
 
 const MODEL_KEY = "z06";
-
 
 // Checkpoint 2 of the fast layered validation suite (spec §9) replaced two
 // literals that opened this file. Both restated workbook rows: the six variant
@@ -33,7 +31,7 @@ const fullLengthStripeOptionIds = [
 // this file as focused retained-contract/product evidence only.
 const draft = JSON.parse(fs.readFileSync("form-output/runtime/z06-runtime-contract.json", "utf8"));
 
-test("Z06 fresh runtime contract preserves the required top-level contract", () => {
+test("Z06 retained runtime contract preserves the required top-level contract", () => {
   for (const key of [
     "dataset",
     "variants",

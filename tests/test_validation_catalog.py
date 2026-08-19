@@ -306,6 +306,25 @@ def test_generating_gates_declare_isolated_output(catalog):
             )
 
 
+def test_no_output_isolation_kinds_declare_no_writes(catalog):
+    """`read_only` and `in_process` are claims about output, not just about generation.
+
+    Every check above branches on `generates`, so a gate that declares
+    `generates: false` escapes all of them — and can then claim `read_only`
+    while still copying the workbook into a temp directory and mutating it.
+    Checkpoint 4 shipped exactly that for node.stingray-runtime-contract. A
+    gate that writes anywhere must name an isolation kind that says so.
+    """
+
+    for gate in catalog["gates"]:
+        if gate["isolation"] not in ("read_only", "in_process"):
+            continue
+        assert not gate["writes"], (
+            f"{gate['id']} declares isolation {gate['isolation']!r} but names writes "
+            f"{gate['writes']}; pick an isolation kind that admits output"
+        )
+
+
 # --- §7 condition 4: protected-output gates are not run in parallel --------
 
 

@@ -65,30 +65,69 @@ The separately retained Layer 3 all-model CLI/summary owner remains green:
 
 ## Candidate lane test consolidation
 
-`tests/test_verify_workbook_candidate.py` now shares one canonical full run
-(including the candidate browser harness) and one controlled-drift full run.
-Stage order, report serialization, all-model marker behavior, temporary-registry
-browser proof, and protected-boundary assertions reuse those results or compact
-early-failure inputs.
+`tests/test_verify_workbook_candidate.py` shares the three full runs it needs:
+the canonical workbook with nothing declared changed (including the candidate
+browser harness), and one controlled-drift workbook read once undeclared and
+once declared. Stage order, report serialization, all-model marker behavior,
+temporary-registry browser proof, and protected-boundary assertions reuse those
+results or compact early-failure inputs.
 
 ```text
-16 passed in 389.07s (0:06:29)
+17 passed in 457.54s (0:07:37)
 ```
 
 Checkpoint 3 inherited 684.74 s for this file. The retained end-to-end owners
 still cover: successful complete candidate; pre-generation schema failure;
-controlled generator/contract drift and later-stage partitioning; protected-path
-mutation detection; and candidate browser/runtime matrix execution.
+controlled generator/contract drift and later-stage partitioning; declared-drift
+suppression; protected-path mutation detection; and candidate browser/runtime
+matrix execution.
+
+### Review correction to the first Checkpoint 4 consolidation
+
+The first version of this consolidation ran its shared canonical fixture with
+`changed_models=["*"]` and measured 389.07 s over 16 tests. That is cheaper but
+unsound. `verify_candidate` computes `unexpected_drift` as "drifted AND not
+declared", and `declared_changed_set(["*"], …)` returns every model, so
+declaring `*` makes that set unreachable. Three proofs went quiet at once:
+
+- `test_the_canonical_workbook_has_no_undeclared_drift` could no longer fail on
+  a stale retained artifact — the defect class it exists for, and the one the
+  four de-generated Node gates now depend on being absent.
+- `test_declaring_a_changed_model_does_not_reduce_the_generated_set` could no
+  longer catch a generation filter keyed on the touched set, because the
+  filtered and unfiltered sets are identical when everything is declared.
+- `test_declaring_drift_moves_it_out_of_unexpected_and_passes` had been deleted,
+  leaving no run at all that pairs real drift with a declaration.
+
+The fixture now declares nothing, which makes the first two assertions load
+bearing again and, with an empty declared set, proves the generation set is not
+filtered more strongly than the `*` run did. The deleted test is restored
+against a third full run. The `*` marker keeps a direct unit proof over
+`declared_changed_set`. Net cost of the correction: +68.47 s, still 227.20 s
+below the Checkpoint 3 inheritance.
 
 ## Catalog and closeout
 
 ```text
 .venv/bin/python -m pytest tests/test_validation_catalog.py -q
-19 passed in 0.04s
+20 passed in 0.03s
 
 git diff --check
 passed
 ```
+
+The catalog contract gained `test_no_output_isolation_kinds_declare_no_writes`.
+Every other isolation assertion branches on `generates`, so a gate declaring
+`generates: false` escaped all of them. That is how three Node gates came to be
+declared `read_only` with no writes while still writing:
+
+| Gate | What it actually writes | Corrected isolation |
+|---|---|---|
+| `node.stingray-runtime-contract` | mkdtemp copies of `stingray_master.xlsx`, mutated and read back | `temp_workbook_copy` |
+| `node.grand-sport-runtime-contract` | workbook-truth snapshot via `tests/lib/workbook-truth.mjs` | `tmp_path_fixture` |
+| `node.z06-runtime-contract` | workbook-truth snapshot via `tests/lib/workbook-truth.mjs` | `tmp_path_fixture` |
+
+`node.z06-interior-accessory-cleanup` is genuinely read-only and is unchanged.
 
 No workbook, generated artifact, published registry, runtime implementation,
 dealer submission, deployment, dependency, or schema was changed. The

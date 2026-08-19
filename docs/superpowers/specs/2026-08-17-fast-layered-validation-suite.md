@@ -1015,19 +1015,41 @@ promoted and unpromoted real-generation failures remain. The focused file fell
 from 118.48 s to 14.97 s; the complete default metadata lane is 159 tests plus
 111 subtests in 35.0 s.
 
-Candidate verifier tests now share one canonical complete run (including the
-candidate browser harness) and one controlled-drift complete run. Stage order,
-report schema, all-model marker behavior, temporary-registry browser proof, and
-protected-boundary tests reuse those runs or stop on compact early-stage
-failures. The file fell from the inherited 684.74 s to 389.07 s while retaining
-successful complete-candidate, pre-generation failure, controlled drift,
+Candidate verifier tests share the three complete runs the file genuinely needs:
+the canonical workbook with nothing declared changed (including the candidate
+browser harness), and one controlled-drift workbook read once undeclared and
+once declared. Stage order, report schema, all-model marker behavior,
+temporary-registry browser proof, and protected-boundary tests reuse those runs
+or stop on compact early-stage failures. The file fell from the inherited
+684.74 s to 457.54 s while retaining successful complete-candidate,
+pre-generation failure, controlled drift, declared-drift suppression,
 protected-write, and browser/runtime-matrix owners.
 
-Closing results: the seventeen-file default Node lane passed in 51.34 s; the
-Python metadata lane passed in 35.0 s; the Layer 3 all-model CLI owner passed 30
-tests in 6.19 s; the candidate verifier passed 16 tests in 389.07 s; the catalog
-contract passed 19 tests; `git diff --check` passed. Raw output and disposition
-details:
+Review correction. The first version of this consolidation shared a canonical
+run declaring `*` and measured 389.07 s over 16 tests. Because `unexpected_drift`
+is "drifted AND not declared", declaring every model made that set unreachable,
+which silently voided the stale-retained-artifact proof, voided the
+generation-filter proof, and — with one test deleted — left declared-drift
+suppression unproven. The canonical fixture now declares nothing, the deleted
+test is restored on a third full run, and the `*` marker keeps a direct unit
+proof over `declared_changed_set`. This matters at this checkpoint specifically,
+because Checkpoint 4 is what makes four default Node gates read retained
+artifacts rather than regenerate them.
+
+The catalog contract also gained
+`test_no_output_isolation_kinds_declare_no_writes`. Every other isolation
+assertion branches on `generates`, so gates declaring `generates: false` escaped
+all of them; `node.stingray-runtime-contract`,
+`node.grand-sport-runtime-contract`, and `node.z06-runtime-contract` are
+corrected from `read_only` to `temp_workbook_copy` / `tmp_path_fixture` with
+their real temporary writes declared.
+
+Closing results: the seventeen-file default Node lane passed in 51.34 s (52 s on
+the review re-run); the Python metadata lane passed 159 tests plus 111 subtests
+in 35.0 s (36.99 s on the review re-run); the Layer 3 all-model CLI owner passed
+30 tests in 6.19 s; the candidate verifier passed 17 tests in 457.54 s; the
+catalog contract passed 20 tests; `git diff --check` passed. Raw output and
+disposition details:
 `docs/superpowers/specs/2026-08-17-fast-layered-validation-suite-checkpoint-4-evidence.md`.
 
 No workbook, generated artifact, published registry, runtime implementation,

@@ -337,7 +337,7 @@ test("workbook package validation rejects duplicate worksheet AutoFilters on tab
   );
 });
 
-test("fresh Stingray runtime contract keeps its workbook-bound identity", () => {
+test("retained Stingray runtime contract keeps its workbook-bound identity", () => {
   assert.equal(jsonData.dataset.name, "2027 Corvette Stingray operational form");
   assert.equal(jsonData.dataset.status, "runtime_active");
   assert.deepEqual(
