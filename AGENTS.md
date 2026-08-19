@@ -167,6 +167,33 @@ Proportional to risk. Per changed surface, inspect the companions that may co-ch
 - [ ] Companion-file impact per §11.
 - [ ] Validation: checks run and outcomes; gates not run and why; manual verification still pending.
 - [ ] Residual risks and follow-up (say "none implied" rather than inventing work).
+- [ ] Delivery: branch name, commit SHA, pushed remote branch, and pull-request URL.
+
+### Pull-Request-Only Delivery
+
+All repository commits must reach `main` through a pull request. Never commit
+directly on `main`, push commits directly to `main`, or merge a completed task
+locally into `main`.
+
+For every implementation or documentation task that changes tracked files:
+
+1. Work on a task branch created from current `origin/main`. If edits began on
+   `main`, preserve them, create the task branch before committing, and confirm
+   `main` itself remains unchanged.
+2. Complete the scoped implementation, required validation, diff review, and
+   `fable5loop/STATE.md` handoff update before delivery.
+3. Commit only the reviewed task files to the task branch and push that branch.
+4. Create a pull request targeting `main` as the final repository action of the
+   task. The PR body must summarize scope, validation, preserved boundaries,
+   and residual risks or explicitly state that none are implied.
+5. End the user handoff with the branch, commit, and PR URL. Do not begin the
+   next checkpoint or make additional repository edits after opening the PR.
+
+Creating a PR is authorized as part of completing a user-requested repository
+change; it does not require a second approval. Merging remains a separate action
+and requires an explicit user request or an active workflow that expressly
+authorizes merge after review. Analysis-only or review-only work with no tracked
+changes does not require an empty commit or PR.
 
 When completing an approved spec/plan, close the owning file before handoff: date, changed surfaces, validation results, residual risks, follow-up. Leave no active approval prompts or obsolete next-step claims.
 
