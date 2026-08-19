@@ -17,20 +17,15 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 from corvette_form_generator.model_generation import generate_model_artifacts  # noqa: E402
-
-
-def generated_steps(result: dict) -> list[dict]:
-    import json
-
-    contract = json.loads(Path(result["runtime_contract_json"]).read_text(encoding="utf-8"))
-    return contract["steps"]
-
 from corvette_form_generator.model_configs import (  # noqa: E402
     REQUIRED_GENERATION_SOURCE_ROLES,
     base_model_config,
     discover_generation_model_configs,
 )
-from corvette_form_generator.runtime_metadata import load_model_config_overrides  # noqa: E402
+from corvette_form_generator.runtime_metadata import (  # noqa: E402
+    load_model_config_overrides,
+    load_runtime_steps,
+)
 
 BASE_STINGRAY_CONFIG = base_model_config("stingray")
 
@@ -449,34 +444,73 @@ class WorkbookOwnedPresentationMetadataTests(unittest.TestCase):
         wb.close()
         return target
 
-    def assert_generation_rejects(self, snapshot: Path, model_key: str, label: str) -> None:
-        configs = discover_generation_model_configs(snapshot, root=Path(self.tmpdir.name) / f"out-{label}")
-        with self.assertRaisesRegex(ValueError, "incomplete workbook-owned runtime_steps rows"):
-            generate_model_artifacts(configs[model_key])
+    def assert_runtime_step_metadata_rejects(self, snapshot: Path, model_key: str) -> None:
+        """Exercise the metadata owner directly; generation has a retained proof below."""
 
-    def test_dropping_any_single_runtime_step_fails_generation(self) -> None:
+        wb = load_workbook(snapshot, read_only=True, data_only=True)
+        try:
+            with self.assertRaisesRegex(ValueError, "incomplete workbook-owned runtime_steps rows"):
+                load_runtime_steps(wb, model_key)
+        finally:
+            wb.close()
+
+    def test_deactivating_any_single_runtime_step_is_rejected(self) -> None:
         """Every authored step is load-bearing, for every active model.
 
         The earlier version of this check compared the workbook against a Python
         list of expected steps and only ran for promoted models. Its replacement
-        must not be weaker: dropping ANY one of ANY model's steps must fail,
+        must not be weaker: losing ANY one of ANY model's steps must fail,
         promoted or not.
+
+        This sweep deactivates rows rather than deleting them, because it reuses
+        one in-memory workbook instead of writing 84 snapshots. `active_rows()`
+        treats the two identically, and the deleted-row path keeps its own proofs
+        in the snapshot-based tests below. Generation is not run here either: it
+        is the caller of `load_runtime_steps`, and the last test in this class
+        holds that wiring against a real `generate_model_artifacts` run.
         """
 
-        configs = discover_generation_model_configs(WORKBOOK, root=Path(self.tmpdir.name) / "base")
-        self.assertEqual(len(configs), 6)
+        # Opened writable because the sweep flips cells, and never saved — the
+        # canonical workbook is source data, not a fixture. Nothing below may
+        # call wb.save().
+        wb = load_workbook(WORKBOOK, data_only=True)
+        try:
+            ws = wb["runtime_steps"]
+            headers = {cell.value: index for index, cell in enumerate(ws[1], start=1)}
+            master = wb["model_master"]
+            master_headers = {cell.value: index for index, cell in enumerate(master[1], start=1)}
+            active_models = sorted(
+                str(master.cell(row_index, master_headers["model_key"]).value or "").strip()
+                for row_index in range(2, master.max_row + 1)
+                if str(master.cell(row_index, master_headers["model_key"]).value or "").strip()
+                and str(master.cell(row_index, master_headers["active"]).value or "").strip().lower()
+                in {"true", "1", "yes"}
+            )
+            self.assertEqual(len(active_models), 6)
 
-        for model_key in sorted(configs):
-            step_keys = [step["step_key"] for step in generated_steps(generate_model_artifacts(configs[model_key]))]
-            self.assertGreaterEqual(len(step_keys), 10)
-
-            for step_key in step_keys:
-                with self.subTest(model=model_key, step=step_key):
-                    self.assert_generation_rejects(
-                        self.workbook_without_step(model_key, step_key),
-                        model_key,
-                        f"{model_key}-{step_key}",
-                    )
+            for model_key in active_models:
+                model_rows = [
+                    row_index
+                    for row_index in range(2, ws.max_row + 1)
+                    if str(ws.cell(row_index, headers["model_key"]).value or "").strip().lower()
+                    == model_key
+                ]
+                self.assertGreaterEqual(len(model_rows), 10)
+                for row_index in model_rows:
+                    step_key = str(ws.cell(row_index, headers["step_key"]).value or "")
+                    with self.subTest(model=model_key, step=step_key):
+                        active_cell = ws.cell(row_index, headers["active"])
+                        original = active_cell.value
+                        active_cell.value = False
+                        try:
+                            with self.assertRaisesRegex(
+                                ValueError, "incomplete workbook-owned runtime_steps rows"
+                            ):
+                                load_runtime_steps(wb, model_key)
+                        finally:
+                            active_cell.value = original
+        finally:
+            wb.close()
 
     def test_dropping_one_step_from_two_models_still_fails(self) -> None:
         """The cross-model rule is a union, so surviving peers still demand the step.
@@ -490,7 +524,7 @@ class WorkbookOwnedPresentationMetadataTests(unittest.TestCase):
 
         for model_key in ("z06", "zr1"):
             with self.subTest(model=model_key):
-                self.assert_generation_rejects(snapshot, model_key, f"two-model-{model_key}")
+                self.assert_runtime_step_metadata_rejects(snapshot, model_key)
 
     def test_workbook_scoped_sources_catch_a_step_no_peer_authors(self) -> None:
         """Pin the model-scoped sheets independently of the cross-model rule.
@@ -504,7 +538,7 @@ class WorkbookOwnedPresentationMetadataTests(unittest.TestCase):
             snapshot = self.workbook_without_step(model_key, "paint", source=snapshot)
 
         # No peer authors `paint` any more, so only step_order_summary_map can catch it.
-        self.assert_generation_rejects(snapshot, "z06", "no-peer-paint")
+        self.assert_runtime_step_metadata_rejects(snapshot, "z06")
 
     def test_missing_presentation_rows_still_fail_for_a_promoted_model(self) -> None:
         snapshot = self.workbook_without("runtime_steps", "z06")

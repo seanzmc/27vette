@@ -1,13 +1,8 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 
-import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
-
-const testRoot = "/tmp/27vette-z06-interior-accessory-runtime-test";
-const runtimePath = `${testRoot}/form-output/runtime/z06-runtime-contract.json`;
 let cachedContract;
 
 function makeElement() {
@@ -138,29 +133,7 @@ function autoAddedRpos(runtime) {
 
 function runtimeContract() {
   if (cachedContract) return cachedContract;
-  fs.rmSync(testRoot, { recursive: true, force: true });
-  fs.mkdirSync(testRoot, { recursive: true });
-  const before = readTrackedArtifacts();
-  execFileSync(
-    ".venv/bin/python",
-    [
-      "scripts/generate_form.py",
-      "--model",
-      "z06",
-      "--output-root",
-      testRoot,
-    ],
-    {
-      encoding: "utf8",
-      stdio: "pipe",
-    }
-  );
-  assertTrackedArtifactsUnchanged(before);
-  assert.ok(
-    fs.existsSync(runtimePath),
-    "--output-root must receive the strict runtime contract this gate consumes"
-  );
-  cachedContract = JSON.parse(fs.readFileSync(runtimePath, "utf8"));
+  cachedContract = JSON.parse(fs.readFileSync("form-output/runtime/z06-runtime-contract.json", "utf8"));
   assert.equal(cachedContract.dataset.status, "runtime_active");
   return cachedContract;
 }

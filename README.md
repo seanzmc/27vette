@@ -260,7 +260,7 @@ Node gate matrix (run each with `node --test tests/<name>.test.mjs`):
 | Authority / purpose | Default readiness gates |
 |---|---|
 | Workbook source and schema | `workbook-schema-standardization`, `workbook-visual-copy-standardization`, `nonruntime-option-source-purge` |
-| Fresh generation and strict runtime contracts | `stingray-runtime-contract`, `grand-sport-runtime-contract`, `z06-runtime-contract`, `z06-interior-accessory-cleanup` |
+| Retained contract and focused product assertions | `stingray-runtime-contract`, `grand-sport-runtime-contract`, `z06-runtime-contract`, `z06-interior-accessory-cleanup` |
 | Published registry and browser runtime | `stingray-form-regression`, `z06-published-runtime`, `multi-model-runtime-switching`, `runtime-state-matrix`, `z06-performance-package-interactions`, `z06-runtime-rule-corrections` |
 | Isolated registry publication | `z06-registry-publication` |
 | Workbook-to-output parity, all promoted models | `source-to-contract-parity`, `source-to-registry-parity` |
@@ -272,7 +272,7 @@ Optional inspection diagnostics (not readiness gates): `grand-sport-contract-pre
 
 Those tables are the complete set of `tests/*.test.mjs`; a new node gate must be added here and assigned one authority. Default gates are read-only or write only below a temporary root. Publication verification is explicit and isolated from the published `form-app/data.js` path.
 
-Six node files invoke `scripts/generate_form.py` — the three strict model runtime-contract gates, the two optional preview diagnostics, and `z06-interior-accessory-cleanup`. Each generates into a temporary `--output-root` and asserts every file under `form-output/` and `form-app/` is byte-identical afterwards. That check reads both roots whole, so run those files serially — a concurrent process writing a protected artifact is reported as a boundary violation.
+Two optional inspection diagnostics invoke `scripts/generate_form.py`: `grand-sport-contract-preview` and `z06-contract-preview`. Each generates into a temporary `--output-root` and asserts every file under `form-output/` and `form-app/` is byte-identical afterwards. Fresh all-model generation, strict validation, parity, registry publication, and browser proof belong to the composed candidate lane above; the model runtime-contract files read retained artifacts and do not regenerate them.
 
 The two parity gates compare the emitted contracts and the published registry
 against the workbook rows behind them, for every promoted model. Their expected
@@ -300,7 +300,7 @@ runs it beside `multi-model-runtime-switching`.
 Python metadata gate — the default for generation/contract/promotion changes:
 
 ```sh
-.venv/bin/python -m pytest tests/test_generation_safety.py tests/test_generate_form_model_discovery_cli.py tests/test_runtime_contract_builder.py tests/test_model_config_metadata.py tests/test_promote_model.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py tests/test_rule_derivation.py tests/test_model_generation_route.py tests/test_all_model_runtime_generation.py -q
+.venv/bin/python -m pytest tests/test_generation_safety.py tests/test_generate_form_model_discovery_cli.py tests/test_runtime_contract_builder.py tests/test_model_config_metadata.py tests/test_promote_model.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py tests/test_rule_derivation.py tests/test_model_generation_route.py -q
 ```
 
 The remaining `tests/test_*.py` files are not in that gate and are chosen by changed surface:
@@ -311,10 +311,10 @@ The remaining `tests/test_*.py` files are not in that gate and are chosen by cha
 | Workbook domain / ChangeSet | `test_workbook_domain_registry`, `test_workbook_changeset`, `test_workbook_changeset_service`, `test_workbook_bool_hygiene` |
 | Workbook Manager | `test_workbook_manager`, `test_workbook_manager_catalog`, `test_workbook_manager_import_projection`, `test_workbook_manager_generated_parity`, `test_workbook_manager_api_concurrency`, `test_workbook_manager_drafts`, `test_workbook_manager_changeset_lifecycle`, `test_workbook_manager_apply_rebuild` |
 | Source assembly / runtime metadata | `test_source_assembly_characterization`, `test_runtime_metadata_guards`, `test_corvette_form_generator_contract` |
+| Composed candidate / real all-model generation | `test_verify_workbook_candidate`, `test_all_model_runtime_generation` |
 | Publication | `test_atomic_registry_write` |
 | Asset map | `test_asset_map_sync`, `test_set_asset_display` |
 | Options-sheet quality | `test_options_sheet_quality` |
-| Promotion preflight (slow) | `test_verify_workbook_candidate` |
 | Fable 5 loop | `test_fable5_loop_contract` |
 | Validation catalog | `test_validation_catalog` |
 | Workbook-truth snapshot | `test_workbook_truth` |
