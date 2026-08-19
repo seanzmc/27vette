@@ -1,7 +1,7 @@
 # Fast Layered Validation Suite Specification
 
-Status: IN IMPLEMENTATION — Checkpoints 0, 1, 2 and 3 complete 2026-08-18;
-Checkpoint 4 is the next authorized slice.
+Status: IN IMPLEMENTATION — Checkpoints 0–4 complete 2026-08-19;
+Checkpoint 5 is the next authorized slice.
 Date: 2026-08-17
 Branch: `claude/fast-layered-validation-suite-4c31f6` (spec authored on `main`)
 Recommended implementation reasoning: medium. Escalate only for a specific
@@ -994,6 +994,48 @@ Acceptance: no default layer pays the same schema, model generation, or
 candidate-registry cost twice; retained end-to-end owners still fail when their
 protected stage is broken.
 
+#### Checkpoint 4 result — 2026-08-19 (COMPLETE)
+
+The composed candidate is now the single default expensive
+workbook-to-browser lane. Four default Node files
+(`stingray-runtime-contract`, `grand-sport-runtime-contract`,
+`z06-runtime-contract`, and `z06-interior-accessory-cleanup`) no longer spawn
+private `generate_form.py` runs; they retain focused contract/product assertions
+against tracked contracts. Fresh all-model generation, strict validation,
+workbook-truth parity, candidate registry publication, and runtime/browser proof
+remain joined in `verify_workbook_candidate.py`. Only the two optional Layer 4
+preview diagnostics still generate models independently.
+
+The default Python metadata suite no longer includes the separate
+`test_all_model_runtime_generation.py` real-workbook CLI/summary proof. That file
+remains green as a Layer 3 workbook-write/checkpoint owner. The metadata mutation
+hotspot now runs its 84 runtime-step mutations through the owning
+`load_runtime_steps()` function on one in-memory workbook, while representative
+promoted and unpromoted real-generation failures remain. The focused file fell
+from 118.48 s to 14.97 s; the complete default metadata lane is 159 tests plus
+111 subtests in 35.0 s.
+
+Candidate verifier tests now share one canonical complete run (including the
+candidate browser harness) and one controlled-drift complete run. Stage order,
+report schema, all-model marker behavior, temporary-registry browser proof, and
+protected-boundary tests reuse those runs or stop on compact early-stage
+failures. The file fell from the inherited 684.74 s to 389.07 s while retaining
+successful complete-candidate, pre-generation failure, controlled drift,
+protected-write, and browser/runtime-matrix owners.
+
+Closing results: the seventeen-file default Node lane passed in 51.34 s; the
+Python metadata lane passed in 35.0 s; the Layer 3 all-model CLI owner passed 30
+tests in 6.19 s; the candidate verifier passed 16 tests in 389.07 s; the catalog
+contract passed 19 tests; `git diff --check` passed. Raw output and disposition
+details:
+`docs/superpowers/specs/2026-08-17-fast-layered-validation-suite-checkpoint-4-evidence.md`.
+
+No workbook, generated artifact, published registry, runtime implementation,
+dealer boundary, deployment path, dependency, or schema changed. Checkpoint 5
+remains the next authorized slice. The proposed promoted-model membership lock,
+two inert `section_presentation` rows, and Node 22 / Python 3.12 reference
+timings remain open and unchanged.
+
 ### Checkpoint 5 — optimize Workbook Manager checkpoint fixtures
 
 - Implement the immutable verified projection/candidate fixture and safe clones.
@@ -1135,7 +1177,7 @@ The implementation is complete only when all of the following are true:
 
 ## 15. Next action
 
-Checkpoints 0, 1, 2 and 3 are complete (see their result blocks in §9). The
+Checkpoints 0–4 are complete (see their result blocks in §9). The
 catalog, coverage ledger, and contract test are in place; every documented stale
 assertion is closed with no literal refreshed; the workbook-truth snapshot
 exists and is proved independent of the generator; source-to-contract and
@@ -1145,12 +1187,10 @@ generated runtime state matrix, with a forced-failure behind each §4.3
 invariant. The candidate lane's browser stage runs that matrix against the
 candidate registry.
 
-The next authorized implementation slice is Checkpoint 4: make the composed
-candidate the single expensive workbook-to-browser lane, share one generated
-candidate within the run, convert candidate report/stage tests to compact
-fixtures where end-to-end generation is not their subject, and retire
-model-specific generic Node tests only after the matrix demonstrates equivalent
-or stronger failure detection.
+The next authorized implementation slice is Checkpoint 5: optimize Workbook
+Manager checkpoint fixtures around one immutable verified projection/candidate,
+move negative cases to compact fixtures, and preserve each distinct Layer 3
+real-workbook boundary.
 
 Two items still carry approval or classification gates:
 

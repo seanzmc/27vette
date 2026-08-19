@@ -3,12 +3,10 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
 
-import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
 import { cell, modelSourceSheet, workbookRows, workbookTruth, workbookTruthy } from "./lib/workbook-truth.mjs";
 
 const MODEL_KEY = "z06";
-const outputRoot = "/tmp/27vette-z06-runtime-contract-test";
-const runtimePath = `${outputRoot}/form-output/runtime/z06-runtime-contract.json`;
+
 
 // Checkpoint 2 of the fast layered validation suite (spec §9) replaced two
 // literals that opened this file. Both restated workbook rows: the six variant
@@ -31,33 +29,9 @@ const fullLengthStripeOptionIds = [
   "opt_dth_001", "opt_dub_001", "opt_due_001", "opt_duk_001", "opt_duw_001", "opt_dzu_001", "opt_dzv_001", "opt_dzx_001",
 ];
 
-function generateRuntimeContractWithoutTrackedMutation() {
-  fs.rmSync(outputRoot, { recursive: true, force: true });
-  fs.mkdirSync(outputRoot, { recursive: true });
-  const before = readTrackedArtifacts();
-  execFileSync(
-    ".venv/bin/python",
-    [
-      "scripts/generate_form.py",
-      "--model",
-      "z06",
-      "--output-root",
-      outputRoot,
-    ],
-    {
-      encoding: "utf8",
-      stdio: "pipe",
-    }
-  );
-  assertTrackedArtifactsUnchanged(before);
-  assert.ok(
-    fs.existsSync(runtimePath),
-    "--output-root must receive the strict runtime contract this gate consumes"
-  );
-  return JSON.parse(fs.readFileSync(runtimePath, "utf8"));
-}
-
-const draft = generateRuntimeContractWithoutTrackedMutation();
+// The composed candidate lane owns fresh generation and source parity. Keep
+// this file as focused retained-contract/product evidence only.
+const draft = JSON.parse(fs.readFileSync("form-output/runtime/z06-runtime-contract.json", "utf8"));
 
 test("Z06 fresh runtime contract preserves the required top-level contract", () => {
   for (const key of [

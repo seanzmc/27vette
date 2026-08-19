@@ -3,39 +3,11 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
 
-import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
 import { cell, modelSourceSheet, workbookRows, workbookTruthy } from "./lib/workbook-truth.mjs";
 
-const outputRoot = "/tmp/27vette-grand-sport-runtime-contract-test";
-const runtimePath = `${outputRoot}/form-output/runtime/grand-sport-runtime-contract.json`;
-
-function generateRuntimeContractWithoutTrackedMutation() {
-  fs.rmSync(outputRoot, { recursive: true, force: true });
-  fs.mkdirSync(outputRoot, { recursive: true });
-  const before = readTrackedArtifacts();
-  execFileSync(
-    ".venv/bin/python",
-    [
-      "scripts/generate_form.py",
-      "--model",
-      "grand_sport",
-      "--output-root",
-      outputRoot,
-    ],
-    {
-      encoding: "utf8",
-      stdio: "pipe",
-    }
-  );
-  assertTrackedArtifactsUnchanged(before);
-  assert.ok(
-    fs.existsSync(runtimePath),
-    "--output-root must receive the strict runtime contract this gate consumes"
-  );
-  return JSON.parse(fs.readFileSync(runtimePath, "utf8"));
-}
-
-const draft = generateRuntimeContractWithoutTrackedMutation();
+// The composed candidate lane owns fresh generation and source parity. Keep
+// this file as focused retained-contract/product evidence only.
+const draft = JSON.parse(fs.readFileSync("form-output/runtime/grand-sport-runtime-contract.json", "utf8"));
 const heritageHashOptionIds = ["opt_17a_001", "opt_20a_001", "opt_55a_001", "opt_75a_001", "opt_97a_001", "opt_dx4_001"];
 const heritageCenterStripeOptionIds = ["opt_dmu_001", "opt_dmv_001", "opt_dmw_001", "opt_dmx_001", "opt_dmy_001"];
 const nonCenterStripeOptionIds = [

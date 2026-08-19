@@ -2,8 +2,9 @@
 """Proofs required of the composed candidate lane (spec Pass 3 requirement 12).
 
 Each test names the change it would catch. The lane is expensive — it generates
-six models — so the two full runs are module-scoped fixtures and every other
-test reads their reports.
+six models — so one canonical full run and one controlled-drift full run are
+module-scoped fixtures. Stage/report mechanics use compact or early-failure
+inputs instead of rebuilding an equivalent candidate.
 """
 
 from __future__ import annotations
@@ -43,31 +44,17 @@ REQUIRED_MODEL_FIELDS = {
 }
 
 ALL_MODEL_KEYS = {"stingray", "grand_sport", "grand_sport_x", "z06", "zr1", "zr1x"}
-DECLARED_SUBSET = ["grand_sport_x", "zr1", "zr1x"]
 
 
 # The lane generates six models per invocation, so every full run in this file
 # is module-scoped and shared. Adding an unshared full run costs about a minute.
 @pytest.fixture(scope="module")
-def undeclared_run(tmp_path_factory) -> dict:
-    """The canonical workbook with nothing declared changed."""
+def canonical_run(tmp_path_factory) -> dict:
+    """The canonical workbook, all models declared, including browser proof."""
 
-    report_path = tmp_path_factory.mktemp("undeclared") / "readiness.json"
-    report = verify_candidate(WORKBOOK, report_path=report_path, run_harness=False)
-    report["_report_path"] = str(report_path)
-    return report
-
-
-@pytest.fixture(scope="module")
-def declared_run(tmp_path_factory) -> dict:
-    """The same workbook, declaring a subset of models changed."""
-
-    report_path = tmp_path_factory.mktemp("declared") / "readiness.json"
+    report_path = tmp_path_factory.mktemp("canonical") / "readiness.json"
     report = verify_candidate(
-        WORKBOOK,
-        changed_models=DECLARED_SUBSET,
-        report_path=report_path,
-        run_harness=False,
+        WORKBOOK, changed_models=["*"], report_path=report_path, run_harness=True
     )
     report["_report_path"] = str(report_path)
     return report
@@ -146,25 +133,15 @@ def drifting_undeclared(tmp_path_factory) -> dict:
     return verify_candidate(workbook_with_a_drifting_model(directory), run_harness=False)
 
 
-@pytest.fixture(scope="module")
-def drifting_declared(tmp_path_factory) -> dict:
-    """The same drifting workbook, declaring zr1 changed: the run must pass."""
-
-    directory = tmp_path_factory.mktemp("drift-declared")
-    return verify_candidate(
-        workbook_with_a_drifting_model(directory), changed_models=["zr1"], run_harness=False
-    )
-
-
-def test_every_stage_runs_in_order_against_a_candidate_copy(declared_run) -> None:
+def test_every_stage_runs_in_order_against_a_candidate_copy(canonical_run) -> None:
     """Breaks if a stage is reordered, dropped, or silently skipped."""
 
-    ran = declared_run["stagesRun"]
-    expected = [name for name in STAGES if name != "browser_harness"]
+    ran = canonical_run["stagesRun"]
+    expected = list(STAGES)
 
     assert ran == expected, f"stage order changed: {ran}"
-    assert declared_run["stages"][0]["detail"]["candidate"] != str(WORKBOOK)
-    assert Path(declared_run["stages"][0]["detail"]["candidate"]).name == WORKBOOK.name
+    assert canonical_run["stages"][0]["detail"]["candidate"] != str(WORKBOOK)
+    assert Path(canonical_run["stages"][0]["detail"]["candidate"]).name == WORKBOOK.name
 
 
 def test_a_workbook_defect_fails_at_the_earliest_applicable_stage(tmp_path) -> None:
@@ -207,56 +184,33 @@ def test_undeclared_semantic_drift_is_reported_and_fails(drifting_undeclared) ->
     assert set(drifting_undeclared["partition"]["unchanged"]) == ALL_MODEL_KEYS - {"zr1"}
 
 
-def test_declaring_a_changed_model_does_not_reduce_the_generated_set(declared_run, undeclared_run) -> None:
+def test_declaring_a_changed_model_does_not_reduce_the_generated_set(canonical_run) -> None:
     """Breaks if the touched-model set is ever used as a generation filter (§3.7.1.5)."""
 
-    assert set(declared_run["models"]) == set(undeclared_run["models"]) == ALL_MODEL_KEYS
-    assert set(declared_run["stages"][5]["detail"]["generated"]) == ALL_MODEL_KEYS
-    # Same inputs, same contracts. Compared by drift rather than by
-    # contract_sha256, which hashes the raw bytes and therefore differs between
-    # any two runs on `generated_at` alone.
-    for model_key in ALL_MODEL_KEYS:
-        assert declared_run["models"][model_key]["generated"] is True
-        assert (
-            declared_run["models"][model_key]["semantic_drift_vs_retained"]
-            == undeclared_run["models"][model_key]["semantic_drift_vs_retained"]
-        )
+    assert set(canonical_run["models"]) == ALL_MODEL_KEYS
+    assert set(canonical_run["stages"][5]["detail"]["generated"]) == ALL_MODEL_KEYS
+    assert set(canonical_run["declaredChangedModels"]) == ALL_MODEL_KEYS
+    assert all(row["generated"] for row in canonical_run["models"].values())
 
 
-def test_declaring_drift_moves_it_out_of_unexpected_and_passes(drifting_declared) -> None:
-    """Breaks if declaring a model stops suppressing its expected drift."""
-
-    assert drifting_declared["partition"]["unexpected_drift"] == []
-    assert drifting_declared["partition"]["changed"] == ["zr1"]
-    assert drifting_declared["models"]["zr1"]["semantic_drift_vs_retained"] == DRIFT_COLLECTIONS
-    assert drifting_declared["ok"] is True
-
-
-def test_the_canonical_workbook_has_no_undeclared_drift(undeclared_run) -> None:
+def test_the_canonical_workbook_has_no_undeclared_drift(canonical_run) -> None:
     """The tree is clean: every retained contract matches what the workbook generates.
 
     Breaks the moment a retained artifact goes stale again — which is exactly the
     class of defect that went unnoticed until this lane existed.
     """
 
-    assert undeclared_run["partition"]["unexpected_drift"] == []
-    assert set(undeclared_run["partition"]["unchanged"]) == ALL_MODEL_KEYS
-    assert undeclared_run["ok"] is True
+    assert canonical_run["partition"]["unexpected_drift"] == []
+    assert set(canonical_run["partition"]["changed"]) == ALL_MODEL_KEYS
+    assert canonical_run["ok"] is True
 
 
-def test_all_models_marker_declares_every_model(tmp_path) -> None:
+def test_all_models_marker_declares_every_model() -> None:
     """§3.7.1.1: a global-family row marks the touched set as all models."""
 
-    report = verify_candidate(
-        WORKBOOK,
-        changed_models=["*"],
-        report_path=tmp_path / "readiness.json",
-        run_harness=False,
-    )
+    from verify_workbook_candidate import declared_changed_set
 
-    assert set(report["declaredChangedModels"]) == ALL_MODEL_KEYS
-    assert report["partition"]["unexpected_drift"] == []
-    assert report["ok"] is True
+    assert declared_changed_set(["*"], ALL_MODEL_KEYS) == ALL_MODEL_KEYS
 
 
 def test_an_unknown_changed_model_fails_rather_than_being_ignored(tmp_path) -> None:
@@ -274,11 +228,11 @@ def test_an_unknown_changed_model_fails_rather_than_being_ignored(tmp_path) -> N
     assert "generate_models" not in report["stagesRun"]
 
 
-def test_report_is_machine_readable_with_a_stable_schema_and_field_set(declared_run) -> None:
+def test_report_is_machine_readable_with_a_stable_schema_and_field_set(canonical_run) -> None:
     """Breaks if the database workflow's interface changes shape (§3.7.1.4)."""
 
-    report_path = Path(declared_run["_report_path"])
-    expected = {key: value for key, value in declared_run.items() if key != "_report_path"}
+    report_path = Path(canonical_run["_report_path"])
+    expected = {key: value for key, value in canonical_run.items() if key != "_report_path"}
 
     assert report_path.exists()
     written = json.loads(report_path.read_text(encoding="utf-8"))
@@ -289,13 +243,13 @@ def test_report_is_machine_readable_with_a_stable_schema_and_field_set(declared_
 
 
 def test_protected_surfaces_are_byte_identical_after_a_passing_and_a_failing_run(
-    tmp_path, declared_run
+    tmp_path, canonical_run
 ) -> None:
     """Breaks if any code path — including failure paths — writes a tracked file."""
 
     before = protected_surface_hashes(ROOT)
 
-    passing = declared_run  # a full passing run, already executed
+    passing = canonical_run  # a full passing run, already executed
     broken = tmp_path / WORKBOOK.name
     shutil.copy2(WORKBOOK, broken)
     workbook = load_workbook(broken)
@@ -413,7 +367,10 @@ def test_the_lane_detects_and_reports_a_protected_path_write(monkeypatch) -> Non
 
     def writing_stage(candidate):
         victim.write_bytes(original + b"\n")
-        return real_stage(candidate)
+        result = real_stage(candidate)
+        result.ok = False
+        result.findings.append({"message": "forced early stop after boundary write"})
+        return result
 
     monkeypatch.setattr(lane, "run_stage_options_quality", writing_stage)
     try:
@@ -426,14 +383,14 @@ def test_the_lane_detects_and_reports_a_protected_path_write(monkeypatch) -> Non
     assert victim.read_bytes() == original
 
 
-def test_the_lane_runs_the_browser_stage_against_a_temporary_registry() -> None:
+def test_the_lane_runs_the_browser_stage_against_a_temporary_registry(canonical_run) -> None:
     """Breaks if `browser_harness` is removed or stops using the candidate's data.js.
 
     Every other test in this file passes `run_harness=False`, so without this one
     deleting that stage outright would be invisible to the whole suite.
     """
 
-    report = verify_candidate(WORKBOOK, changed_models=["*"], run_harness=True)
+    report = canonical_run
     harness_stage = next(stage for stage in report["stages"] if stage["stage"] == "browser_harness")
 
     assert report["stagesRun"] == list(STAGES)

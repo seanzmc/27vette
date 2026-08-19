@@ -5,26 +5,10 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { assertTrackedArtifactsUnchanged, readTrackedArtifacts } from "./lib/tracked-artifacts.mjs";
-
-const outputRoot = "/tmp/27vette-stingray-runtime-contract-test";
-const runtimePath = `${outputRoot}/form-output/runtime/stingray-runtime-contract.json`;
-
-function generateRuntimeContractWithoutTrackedMutation() {
-  fs.rmSync(outputRoot, { recursive: true, force: true });
-  fs.mkdirSync(outputRoot, { recursive: true });
-  const before = readTrackedArtifacts();
-  execFileSync(
-    ".venv/bin/python",
-    ["scripts/generate_form.py", "--model", "stingray", "--output-root", outputRoot],
-    { encoding: "utf8", stdio: "pipe" }
-  );
-  assertTrackedArtifactsUnchanged(before);
-  assert.ok(fs.existsSync(runtimePath), "isolated generation must write the strict Stingray runtime contract");
-  return JSON.parse(fs.readFileSync(runtimePath, "utf8"));
-}
-
-const jsonData = generateRuntimeContractWithoutTrackedMutation();
+// Fresh generation, strict validation, and source parity are owned once by the
+// composed candidate lane. This focused gate keeps its contract/product checks
+// against the retained artifact without paying a second generation cost.
+const jsonData = JSON.parse(fs.readFileSync("form-output/runtime/stingray-runtime-contract.json", "utf8"));
 const stingrayVariantIds = ["1lt_c07", "2lt_c07", "3lt_c07", "1lt_c67", "2lt_c67", "3lt_c67"];
 const grandSportVariantIds = ["1lt_e07", "2lt_e07", "3lt_e07", "1lt_e67", "2lt_e67", "3lt_e67"];
 const optionSourceHeaders = [
