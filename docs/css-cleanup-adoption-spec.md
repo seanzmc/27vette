@@ -22,8 +22,10 @@ checklist item, this file wins.
 **read as raw text and regex-asserted** by:
 
 - `tests/stingray-form-regression.test.mjs` — reads it into `stylesSource` at line 19;
-  ~53 assertions, plus helpers `cssOrderFor()` (line 55) and `cssBlock()` (line 61).
-- `tests/multi-model-runtime-switching.test.mjs` — line 855, two `.choice-relationship-badge`
+  **89** `assert.*` calls take CSS text as their first argument (`stylesSource`, a media-query
+  slice, `cssBlock(...)`, or `cssOrderFor(...)`), via helpers `cssOrderFor()` (line 55, 5 call
+  sites) and `cssBlock()` (line 61, 16 call sites). Budget each step against 89, not ~50.
+- `tests/multi-model-runtime-switching.test.mjs` — lines 856–857, two `.choice-relationship-badge`
   assertions.
 - `tests/validation_catalog.json` line 585 lists it as a read input of the styling lane.
 
@@ -46,6 +48,11 @@ Three properties of those assertions constrain every step:
 Current `@media` source order (verified): 1400 (701), 760 (711), 1121 (2198), 1120 (2227),
 761–887 (2316), 760 (2378), reduced-motion (2882).
 
+**Line numbers in this spec are provenance, not edit addresses.** They were re-derived against
+`form-app/styles.css` at `3ce3cae` (2,891 lines) and go stale the moment a step lands. Every step
+below is addressed by selector plus enclosing `@media`; re-grep for the selector immediately
+before editing and never edit by line number alone.
+
 ## Source-of-truth decision
 
 - `form-app/styles.css` owns presentation. It is source, not a generated artifact.
@@ -65,7 +72,7 @@ Re-checked against the live files:
 
 | Audit claim | Verified |
 | --- | --- |
-| `.auto-reason` color set at 1446–1447 (`--warn`), overridden at 1557 (`--ok`) | Yes |
+| `.auto-reason` in the 1446–1451 group, `color: var(--warn)` at 1448, overridden at 1557–1559 (`--ok`) | Yes |
 | 7 `@media` blocks, two at `max-width: 760px` (711, 2378) | Yes |
 | 8 dead selector families | Present in CSS; all 8 have zero emitters in `app.js`/`index.html` |
 | `.summary-drawer-icon`, `.vehicle-setup-intro`, `.choice-relation-count` | Dead in CSS, but each has a `doesNotMatch` **negative** assertion (stingray 770 / 1027; multi-model 883) proving the DOM must never re-emit them. Those assertions stay. |
@@ -141,10 +148,16 @@ Risk: low.
   declaration by splitting the shared block into (a) shared `font-size`/`font-weight` for both
   and (b) `color: var(--warn)` on `.disabled-reason` alone; delete the 1557 override and set
   `color: var(--ok)` at the single definition point. Rendered color must remain `--ok`.
-- Merge the three duplicate selector pairs inside `@media (max-width: 760px)` into one block
-  each, keeping the later (winning) values: `.choice-panel` (2626 + 2779),
-  `.vehicle-setup-next-action` (2682 + 2860 → `display: none` wins, so the flex properties
-  become dead and are dropped), `.setup-choice-grid` (2630 + 2691).
+- Merge the two genuine duplicate selector pairs inside `@media (max-width: 760px)` into one
+  block each, keeping the later (winning) values: `.choice-panel` (2625 + 2779) and
+  `.vehicle-setup-next-action` (2682 + 2855 → `display: none` wins, so the flex properties
+  become dead and are dropped).
+- `.setup-choice-grid` is **not** one of those merges. 2630–2634 is the grouped selector
+  `.setup-choice-grid, .trim-setup-group .setup-choice-grid` carrying `grid-template-columns: 1fr`
+  **and `min-width: 0`**; 2691 is the bare `.setup-choice-grid` carrying only
+  `grid-template-columns: 1fr`, which the grouped block already sets. Delete the 2691 block and
+  leave 2630–2634 untouched. Applying "keep the later values" here would silently drop
+  `min-width: 0` and the `.trim-setup-group` scoping.
 
 Test impact: check `stingray:1239` still matches (it asserts the emitted class list, not the
 rule) and that no `cssBlock(".choice-panel")`-style assertion depends on the earlier block.
@@ -171,19 +184,29 @@ Risk: medium-high — this is the only step that changes cascade order. It ships
 
 ### Step 4 — Deduplicate re-declared properties
 
-Remove the identical re-declarations the audit names: `.summary-panel` 9 properties at 2253,
-`.mobile-drawer-backdrop:not([hidden])` at 2277 and 2748 (keep 1605),
-`#requirementsCard`/`#selectedRposCard`/`#autoAddedCard`/`#summaryOverviewCard` order values at
-2758–2771 (keep base 1941–1954), `.topbar { align-items: center }` in the two redundant media
-blocks, `.step-link` at 2715.
+Remove the identical re-declarations the audit names:
+
+- The 9 duplicated `.summary-panel` properties in the `max-width: 1120px` copy at 2276. Leave that
+  block's `border: 0` and `padding: 16px` — base sets no `border` and uses `padding: 14px 12px`,
+  so those two are live overrides, not duplicates. Do not delete the block wholesale.
+- `.mobile-drawer-backdrop:not([hidden])` at 2307 (`max-width: 1120px`) and 2750
+  (`max-width: 760px`), keeping base 1604. **Do not touch the fourth declaration at 2222**, inside
+  `@media (min-width: 1121px)`: it is `display: none`, the override that hides the backdrop in the
+  docked desktop layout. The audit's original "declared 3 times, all identical" was wrong; there
+  are four, and one carries behavior.
+- `#requirementsCard`/`#selectedRposCard`/`#autoAddedCard`/`#summaryOverviewCard` order values at
+  2758–2771, keeping base 1941–1955.
+- `.topbar { align-items: center }` in the three redundant media blocks (2233, 2320, 2397),
+  keeping base 86.
+- `.step-link` at 2715.
 
 Guard rails:
 - `cssOrderFor()` (stingray 55) finds the **first** `order:` after a selector — keeping the base
   declarations means order assertions still resolve. Confirm each affected assertion after edit.
 - Line 833 asserts `.mobile-drawer-backdrop:not([hidden])` against `baseStyles` only (the slice
-  before the 1120px block) — keeping 1605 satisfies it.
-- Line 829 asserts `.summary-panel` fixed/translateX against `baseStyles` — keeping base 1568–1581
-  satisfies it; only the 2253 copy goes.
+  before the 1120px block) — keeping base 1604 satisfies it.
+- Line 829 asserts `.summary-panel` fixed/translateX against `baseStyles` — keeping base 1567–1581
+  satisfies it; only the 9 duplicated properties inside the 2276 copy go.
 - Do **not** reorder surviving declarations (constraint 2 above).
 - Do **not** invent a shared `.backdrop` class. Deleting the duplicate media copies is enough.
 
@@ -198,9 +221,9 @@ rejected collapse does not block mechanical cleanup.
 
 - Weights: 400 → `--fw-regular`, 600/650 → `--fw-medium` (600), 700/750 → `--fw-bold` (700),
   800/850/900 → `--fw-heavy` (800). Collapsing 650/750/850 is a **visible** change on a variable
-  font. Do it as two commits: first introduce tokens at the existing 9 values, then collapse to 4
+  font. Do it as two commits: first introduce tokens at the existing 8 numeric values, then collapse to 4
   with before/after screenshots of the step rail, choice cards, summary rows, and stage pills.
-- Palette: `#cfd3d6` (6 uses), `#1a1d1f`, `#101214`, `#0f1112`, `#172026`, `#f0c07a`,
+- Palette: `#cfd3d6` (4 uses), `#1a1d1f`, `#101214`, `#0f1112`, `#172026`, `#f0c07a`,
   `rgba(232,161,60,0.4)`, `rgba(53,184,93,0.4)` → named `:root` variables.
 
 Test impact: any assertion matching a literal weight or hex must be updated to the token name.
@@ -362,8 +385,14 @@ and the topbar.
 CSS-only. Zero rendered-appearance change on current WebKit/Blink. Ships last so it does
 not collide with Step 3's 760px merge or Step 10's motion block.
 
-- Add `summary::marker { display: none }` beside each of the three
-  `summary::-webkit-details-marker` rules (988, 1189, 2165).
+- Add a `::marker { display: none }` companion beside each of the three
+  `::-webkit-details-marker` rules. None of them is a bare `summary::` selector, so each companion
+  mirrors its own selector — a blanket `summary::marker` rule is both wrong for 1189 and broader
+  than any of the three:
+  - `.vehicle-setup-equipment-disclosure summary::marker` (beside 988)
+  - `.interior-group-header::marker` (beside 1189) — that class renders as a `<div>` at
+    `app.js:2110` and as a `<summary>` at `app.js:2118`; only the `<summary>` draws a marker
+  - `.standard-equipment-rollup > summary.standard-equipment-summary::marker` (beside 2165)
 - Add unprefixed `line-clamp: 3` / `line-clamp: unset` beside the two `-webkit-line-clamp`
   declarations (2825, 2831). Keep the `-webkit-box` recipe.
 - Expand `* { box-sizing: border-box }` to `*, *::before, *::after`.
@@ -375,7 +404,7 @@ Risk: low. Spot-check a disclosure caret in Safari and Firefox and a clamped not
 | Surface | Action |
 | --- | --- |
 | `tests/stingray-form-regression.test.mjs` | Updated in Steps 1, 3, 4, 5, 7, 9, 10 (assertions + stale comment) |
-| `tests/multi-model-runtime-switching.test.mjs` | Inspect at each step; `.choice-relationship-badge` rules (line 855–857) are not touched by Steps 1–7 or 12. Re-check in 8–11. |
+| `tests/multi-model-runtime-switching.test.mjs` | Inspect at each step; `.choice-relationship-badge` rules (lines 856–857) are not touched by Steps 1–7 or 12. Re-check in 8–11. |
 | `tests/validation_catalog.json` | Inspected — styling lane already lists `form-app/styles.css` as a read; no change unless Step 8 adds a new HTML/JS assertion file (it should not) |
 | `form-app/styles.css` | Edited in every shipping step except that Step 8 may be HTML/JS-only |
 | `form-app/index.html`, `form-app/app.js` | Read-only except Step 8 (orphan table) and the primary-class additions allowed in Step 9 |

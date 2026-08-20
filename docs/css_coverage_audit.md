@@ -2,7 +2,9 @@
 
 An exhaustive coverage and structural audit of `form-app/styles.css` (2,891 lines, 411 rule blocks) cross-referenced against `form-app/index.html` and `form-app/app.js`.
 
-A second pass on 2026-08-19 completed the first run after it hit the tool-iteration budget. Sections 1–7 are the original diagnosis. Sections 8–13 are new, verified findings that the first pass missed. Nothing in 1–7 was rewritten.
+A second pass on 2026-08-19 completed the first run after it hit the tool-iteration budget. Sections 1–7 are the original diagnosis. Sections 8–13 are new, verified findings that the first pass missed.
+
+A third pass on 2026-08-19 corrected stale line references and two miscounts in §1–§5 and §8 after review. No finding was withdrawn; the diagnosis is unchanged. Every line number below was re-derived against `form-app/styles.css` at `3ce3cae` (2,891 lines). Line numbers are provenance, not edit addresses — re-grep by selector before editing.
 
 Adoption contract: `docs/css-cleanup-adoption-spec.md`. That file owns step order, scope, and what may change HTML/JS. This audit stays the diagnosis.
 
@@ -19,7 +21,7 @@ Adoption contract: `docs/css-cleanup-adoption-spec.md`. That file owns step orde
 | Dead / Orphan Selectors | 8 classes (16 rules) | 0 DOM or JS consumers |
 | Redundant Property Declarations | 24+ instances | Base properties re-declared with identical values in `@media` |
 | High-Priority Value Conflicts | 1 critical (`.auto-reason`) | Direct property collision / overwrite |
-| Font Weight Spectrum | 9 distinct weights | 400, 600, 650, 700, 750, 800, 850, 900, `inherit` |
+| Font Weight Spectrum | 8 numeric weights + `inherit` | 400, 600, 650, 700, 750, 800, 850, 900, plus `font-weight: inherit` |
 
 ---
 
@@ -27,11 +29,11 @@ Adoption contract: `docs/css-cleanup-adoption-spec.md`. That file owns step orde
 
 ### Critical: `.auto-reason` Color Conflict
 
-- **Location:** Line 1446 vs Line 1557
+- **Location:** Lines 1446–1451 (`color` at 1448) vs Lines 1557–1559
 - **Issue:**
 
 ```css
-/* Line 1446 */
+/* Lines 1446-1451; color at 1448 */
 .disabled-reason,
 .auto-reason {
   color: var(--warn); /* Sets warning color on auto-reason */
@@ -59,11 +61,16 @@ Adoption contract: `docs/css-cleanup-adoption-spec.md`. That file owns step orde
 
 ### Duplicate Selectors Inside the Same Media Query
 
-In `@media (max-width: 760px)` (Lines 2378–2880), several identical selectors appear twice:
+In `@media (max-width: 760px)` (Lines 2378–2880), several selectors appear twice. Two are true duplicate pairs; the third is a redundant re-declaration against a grouped selector and is not merged the same way:
 
-1. `.choice-panel`: Line 2626 (`order: 2; min-width: 0;`) and Line 2779 (`padding: 16px;`).
-2. `.vehicle-setup-next-action`: Line 2682 (`align-items: stretch; flex-direction: column;`) and Line 2860 (`display: none;`).
-3. `.setup-choice-grid`: Line 2630 (`grid-template-columns: 1fr; min-width: 0;`) and Line 2691 (`grid-template-columns: 1fr;`).
+1. `.choice-panel`: Line 2625 (`order: 2; min-width: 0;`) and Line 2779 (`padding: 16px;`).
+2. `.vehicle-setup-next-action`: Line 2682 (`align-items: stretch; flex-direction: column;`) and Line 2855 (`display: none;`).
+3. `.setup-choice-grid`: **not a duplicate pair.** Lines 2630–2634 are the *grouped* selector
+   `.setup-choice-grid, .trim-setup-group .setup-choice-grid` carrying `grid-template-columns: 1fr;`
+   and `min-width: 0;`. Line 2691 is the bare `.setup-choice-grid` carrying only
+   `grid-template-columns: 1fr;`, which the grouped block already sets. The bare block is a
+   redundant re-declaration: delete 2691 and leave 2630–2634 intact. Merging the two “keeping the
+   later values” would drop `min-width: 0` and the `.trim-setup-group` scoping.
 
 ---
 
@@ -90,14 +97,14 @@ Dozens of rules inside responsive media queries repeat properties that already m
 
 **Redundant Declarations in Media Queries:**
 
-1. **`.summary-panel`** (Line 2253 in `@media (max-width: 1120px)`):
-   Repeats 9 properties identical to base lines 1568–1581 (`position: fixed`, `inset: 0 0 0 auto`, `z-index: 30`, `width: min(88vw, 380px)`, `max-width: 380px`, `border-left: 1px solid var(--hairline)`, `overflow-y: auto`, `transform: translateX(100%)`, `transition: transform 180ms ease`).
+1. **`.summary-panel`** (Line 2276 in `@media (max-width: 1120px)`):
+   Repeats 9 properties identical to base lines 1567–1581 (`position: fixed`, `inset: 0 0 0 auto`, `z-index: 30`, `width: min(88vw, 380px)`, `max-width: 380px`, `border-left: 1px solid var(--hairline)`, `overflow-y: auto`, `transform: translateX(100%)`, `transition: transform 180ms ease`). The same block also sets `border: 0` and `padding: 16px`, which are **not** redundant — base sets no `border` and uses `padding: 14px 12px`. Only the 9 identical properties are removable.
 2. **`.mobile-drawer-backdrop:not([hidden])`**:
-   Declared 3 times with identical properties (Lines 1605, 2277, 2748).
+   Declared **4** times, three of them identical. Base Line 1604 (`position: fixed; inset: 0; z-index: 20; display: block; background: rgba(0, 0, 0, 0.55)`) is repeated verbatim at Line 2307 (`@media (max-width: 1120px)`) and Line 2750 (`@media (max-width: 760px)`). The fourth, Line 2222 inside `@media (min-width: 1121px)`, is `display: none` — a live override that hides the backdrop in the docked desktop layout. It is not a copy and must not be deleted with them.
 3. **Card Reordering (`order: 1..4`)**:
-   `#requirementsCard` (`order: 2`), `#selectedRposCard` (`order: 3`), `#autoAddedCard` (`order: 4`), and `#summaryOverviewCard` (`order: 1`) are defined identically in base (Lines 1941–1954) and re-declared identically in `@media (max-width: 760px)` (Lines 2758–2771).
+   `#requirementsCard` (`order: 2`), `#selectedRposCard` (`order: 3`), `#autoAddedCard` (`order: 4`), and `#summaryOverviewCard` (`order: 1`) are defined identically in base (Lines 1941–1955) and re-declared identically in `@media (max-width: 760px)` (Lines 2758–2771).
 4. **`.topbar`**:
-   `align-items: center` is re-declared in 3 separate `@media` queries without variation.
+   `align-items: center` is re-declared in 3 separate `@media` queries without variation — Lines 2233 (`max-width: 1120px`), 2320 (`min-width: 761px) and (max-width: 887px`), and 2397 (`max-width: 760px`) — against base Line 86.
 5. **`.step-link`** (Line 2715):
    Redeclares `width: 100%`, `grid-template-columns: 26px 1fr`, and `text-align: left`.
 
@@ -107,7 +114,7 @@ Dozens of rules inside responsive media queries repeat properties that already m
 
 ### Font Weight Clutter
 
-The stylesheet uses 9 different font weights (400, 600, 650, 700, 750, 800, 850, 900). Standard variable font scaling for the UI should be consolidated to 4 semantic tokens:
+The stylesheet uses 8 numeric font weights (400, 600, 650, 700, 750, 800, 850, 900), plus `font-weight: inherit`. Standard variable font scaling for the UI should be consolidated to 4 semantic tokens:
 
 - **Regular:** 400
 - **Semi-bold / Medium:** 600
@@ -118,7 +125,7 @@ The stylesheet uses 9 different font weights (400, 600, 650, 700, 750, 800, 850,
 
 Rather than referencing `:root` CSS variables, several arbitrary hex and rgba values are scattered in component blocks:
 
-- `#cfd3d6` (used 6 times across icon buttons, step rail, stage pills)
+- `#cfd3d6` (used 4 times across icon buttons, step rail, stage pills)
 - `#1a1d1f`, `#101214`, `#0f1112`, `#172026` (hardcoded dark backgrounds)
 - `#f0c07a` (hardcoded amber text)
 - `rgba(232, 161, 60, 0.4)` / `rgba(53, 184, 93, 0.4)` (hardcoded warning/ok borders)
@@ -157,8 +164,8 @@ Rather than referencing `:root` CSS variables, several arbitrary hex and rgba va
 
 `form-app/styles.css` is hand-authored source, not a generated artifact. Two runtime suites read it as raw text and regex-assert against it:
 
-- `tests/stingray-form-regression.test.mjs` — `stylesSource` at line 19; helpers `cssOrderFor()` (line 55) and `cssBlock()` (line 61); ~53 assertions.
-- `tests/multi-model-runtime-switching.test.mjs` — line 855, two `.choice-relationship-badge` assertions.
+- `tests/stingray-form-regression.test.mjs` — `stylesSource` at line 19; helpers `cssOrderFor()` (line 55, 5 call sites) and `cssBlock()` (line 61, 16 call sites). **89** `assert.*` calls take CSS text as their first argument (`stylesSource`, a media-query slice, `cssBlock(...)`, or `cssOrderFor(...)`) — measured, not estimated.
+- `tests/multi-model-runtime-switching.test.mjs` — lines 856–857, two `.choice-relationship-badge` assertions.
 - `tests/validation_catalog.json` line 585 lists the file as a styling-lane read input.
 
 Three properties of those assertions constrain any cleanup:
@@ -223,9 +230,9 @@ There is no `button:focus-visible` rule. Browser-default outline is the only foc
 The reduce block (2882–2891) clears transitions on `button`, `.step-link`, `.choice-card`, `.summary-card`, `.info-icon`, `.tooltip-panel`. Live transitions it does **not** disable:
 
 - `.interior-group` (1164)
-- `.choice-media.has-hover-media img` (opacity 280ms, plus `will-change: opacity` at 1348)
+- `.choice-media.has-hover-media img` (opacity 280ms, plus `will-change: opacity` at 1347)
 - `.summary-panel` drawer slide (1580, 180ms)
-- `.step-rail` drawer slide (2714 area, 180ms)
+- `.step-rail` drawer slide (line 2706, 180ms)
 
 Hover-swap images and both mobile drawers still animate when the user asked for reduced motion.
 
@@ -246,7 +253,7 @@ Hover-swap images and both mobile drawers still animate when the user asked for 
 
 ### Duplicated carbon texture
 
-The 6×6 checker (`linear-gradient(45deg, #181c1f …)` + `background-size: 6px 6px`) is copied verbatim on `body` (50–54) and again on the sticky paint stage (665–668) so cards can scroll underneath. It is not a token or a utility class. Any texture tweak must be made twice or the paint step desyncs from the page.
+The 6×6 checker (`linear-gradient(45deg, #181c1f …)` + `background-size: 6px 6px`) is copied verbatim on `body` (49–54) and again on the sticky paint stage (663–668) so cards can scroll underneath. It is not a token or a utility class. Any texture tweak must be made twice or the paint step desyncs from the page.
 
 ### Two visually-hidden recipes
 
@@ -261,10 +268,10 @@ These sit beside §6; they were not in the first pass.
 1. **Inter is named and never loaded.** `body` asks for `Inter, ui-sans-serif, …` (`styles.css:56`). `index.html` has no Google Fonts link, no `@font-face`, and no local Inter files. Production falls through to the system stack. Either load Inter or drop the name so the intended face is honest.
 2. **`will-change: opacity` is always on** for `.choice-media.has-hover-media img`. That promotes a layer per media card for the life of the page. Prefer setting it on `:hover` / `:focus-visible` only, or drop it — `opacity` compositing does not need a permanent hint.
 3. **`* { box-sizing: border-box }` does not cover pseudo-elements.** `::before` / `::after` (disclosure carets, the empty complete-chip after) inherit content-box unless listed. Use `*, *::before, *::after`.
-4. **Disclosure markers are WebKit-only.** Three `summary::-webkit-details-marker { display: none }` rules (988, 1189, 2165) have no `summary::marker` companion, so non-WebKit engines may still show the native triangle next to the custom ▸/▾.
+4. **Disclosure markers are WebKit-only.** Three `::-webkit-details-marker { display: none }` rules have no `::marker` companion, so non-WebKit engines may still show the native triangle next to the custom ▸/▾. None of the three is a bare `summary::` selector, so each companion must mirror its own selector: `.vehicle-setup-equipment-disclosure summary` (988), `.interior-group-header` (1189), and `.standard-equipment-rollup > summary.standard-equipment-summary` (2165). `.interior-group-header` is rendered as a `<div>` at `app.js:2110` and as a `<summary>` at `app.js:2118`; only the `<summary>` instance draws a marker.
 5. **Mobile line-clamp is prefixed only.** The 760px block uses `display: -webkit-box` + `-webkit-line-clamp: 3` (2822–2825, 2831) and never sets standard `line-clamp`. Add the unprefixed property beside it.
 6. **Hardcoded white-alpha scale is the real palette bloat.** Unique `rgba(255,255,255,α)` stops already in the file: 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.1, 0.12, 0.14, 0.16, 0.18, 0.24, 0.3, 0.32. That is 15 hairline/fill opacities on top of `--hairline` / `--hairline-strong` / `--control-*` / `--ghost-*`. Collapse to 4–5 surface tokens (`--surface-1` … `--line-strong`) before adding more component hexes.
-7. **21 distinct `font-size` values**, including 9px, 10px, 11.5px, 12.5px. Pair this with the 9-weight problem in §5. A type scale (`--fs-2xs` … `--fs-xl`) is the higher-leverage cleanup.
+7. **21 distinct `font-size` values**, including 9px, 10px, 11.5px, 12.5px. Pair this with the 8-weight problem in §5. A type scale (`--fs-2xs` … `--fs-xl`) is the higher-leverage cleanup.
 8. **8 distinct `border-radius` values** (4 / 6 / 7 / 8 / 10 / 14 / 50% / 999px). Buttons are 7px, cards 10px, inputs 6px, icon buttons 8px. Pick two radii plus pill/circle.
 9. **No `@media (hover: hover)` / `(pointer: coarse)`.** Card hover-swap, `6px 6px 0` hover shadow, and `filter: brightness` all fire on tap-and-hold on coarse pointers. Coarse should skip hover chrome and keep the selected/focus styles.
 10. **No `accent-color`, scrollbar, or `text-wrap: balance` on headings.** Low priority; listed so a modernization pass does not rediscover them.
@@ -281,7 +288,7 @@ Append to §7; do not replace it.
 - [ ] **Step 9: Scope the `button` element rule** — introduce an explicit primary class and stop paying the 11× `filter: none` tax. Must preserve the CSS-text assertions on `.choice-card` / `.vehicle-setup-chip`.
 - [ ] **Step 10: Finish reduced-motion and focus rings** — extend the reduce block to drawers, interior groups, and hover-swap images; add `:focus-visible` on primary, ghost, icon, step-link, and toast-dismiss.
 - [ ] **Step 11: Tokenize stacking, type, radius, and the carbon fill** — named `--z-*`, a 4-step type scale, 2 radii, one carbon utility used by `body` and the paint stage.
-- [ ] **Step 12: Prefix companions** — `summary::marker`, unprefixed `line-clamp`, `*::before, *::after` box-sizing.
+- [ ] **Step 12: Prefix companions** — per-selector `::marker` companions, unprefixed `line-clamp`, `*::before, *::after` box-sizing.
 
 **Still out of scope until explicitly approved:** changing dealer-submission markup or Turnstile behavior (styling the mount is fine; changing the widget is not), any visual redesign, workbook/generator/registry edits.
 

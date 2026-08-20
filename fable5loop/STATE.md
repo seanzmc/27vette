@@ -14,15 +14,15 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 
 - **Updated:** 2026-08-19
 - **Owning specification:** `docs/css-cleanup-adoption-spec.md` owns the twelve-step CSS cleanup contract. `docs/css_coverage_audit.md` remains the diagnosis. Validation-suite Checkpoint 5 remains owned by `docs/superpowers/specs/2026-08-17-fast-layered-validation-suite.md`.
-- **Active workflow:** Docs-only update of the CSS cleanup adoption spec so it absorbs audit §8–§13 without breaking step order or scope.
-- **Branch/commit:** `docs/css-coverage-audit`; follow-on commit on the open audit PR. No CSS implementation and no deployment.
-- **Last completed:** Rewrote `docs/css-cleanup-adoption-spec.md` so Steps 1–12, scope, companions, and acceptance stay coherent: Step 6 deferred, Step 8 is the only HTML/JS orphan-emitter pass, Steps 7/9–12 now have explicit shipping rules, and Inter-loading / hover-media / dealer Turnstile behavior stay out of scope.
-- **Current status:** Diagnosis and adoption contract now agree. Cleanup remains unstarted and still needs explicit per-step approval.
-- **Validation:** Spec cross-checked against audit §7/§13 and the live CSS-text helpers in `tests/stingray-form-regression.test.mjs`. `git diff --check` on the spec, audit pointer, and handoff. Runtime, workbook, generation, and dealer gates were not run (docs-only).
-- **Next action:** Review the updated audit PR. Do not start CSS cleanup until a listed step is explicitly approved, in spec order.
+- **Active workflow:** Docs-only correction pass on the CSS audit and adoption spec after PR review found stale line references and two miscounts.
+- **Branch/commit:** `docs/css-coverage-audit`; third follow-on commit on open PR #33. No CSS implementation and no deployment.
+- **Last completed:** Re-derived every line reference in `docs/css_coverage_audit.md` and `docs/css-cleanup-adoption-spec.md` against `form-app/styles.css` at `3ce3cae` and corrected the review findings: `.summary-panel` duplicate is at 2276 (not 2253) and its `border: 0` / `padding: 16px` are live overrides; `.mobile-drawer-backdrop:not([hidden])` is declared 4 times (1604, 2222, 2307, 2750) and 2222 is a `display: none` override that must not be deduped; `.setup-choice-grid` 2630–2634 is a grouped selector carrying `min-width: 0`, so Step 2 now deletes the redundant bare block at 2691 instead of merging; the CSS-text contract is 89 assert calls, not ~53; `#cfd3d6` has 4 uses, not 6; the three `::-webkit-details-marker` rules each need a selector-matched `::marker` companion, not a blanket `summary::marker`; `.topbar` redundancy is three media blocks (2233, 2320, 2397); assorted off-by-one references fixed (1604, 1567, 1347, 2706, 1941–1955, 49–54, 663–668, 2625, 2855, 856–857). Both files now state that line numbers are provenance, not edit addresses.
+- **Current status:** Diagnosis and adoption contract agree and their line references are verified. No finding was withdrawn. Cleanup remains unstarted and still needs explicit per-step approval.
+- **Validation:** Every corrected line reference re-checked programmatically against `form-app/styles.css` (44 selector/line assertions, all matching); assertion and usage counts measured by grep, not estimated. `git diff --check` on both docs and this handoff. Runtime, workbook, generation, and dealer gates were not run (docs-only, no source file touched).
+- **Next action:** Re-review and merge PR #33. Do not start CSS cleanup until a listed step is explicitly approved, in spec order.
 - **Blockers or closeout gaps:** Carried validation-suite gaps unchanged. No implementation authorized.
 - **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This docs pass produced no Fable receipt.
-- **Protected boundaries:** Canonical workbook, generators, generated artifacts, published registry, customer runtime, dealer submission, deployment, schema, and dependencies are untouched. Only the adoption spec, the audit pointer, and this handoff block changed.
+- **Protected boundaries:** Canonical workbook, generators, generated artifacts, published registry, customer runtime, dealer submission, deployment, schema, and dependencies are untouched. `form-app/styles.css`, `form-app/app.js`, `form-app/index.html`, and both test files were read only. Only the audit, the adoption spec, and this handoff block changed.
 
 ## Verified facts
 
