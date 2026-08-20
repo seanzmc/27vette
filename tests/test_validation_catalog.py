@@ -149,8 +149,43 @@ def _suite_member_gate_ids(catalog: dict, suite: dict) -> set[str]:
 def test_catalog_is_dependency_free_json():
     data = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
     assert data["schema"] == "27vette-validation-catalog-1"
-    for key in ("enums", "baseline", "acceptance_locks", "gates", "suites", "coverage_ledger"):
+    for key in (
+        "enums",
+        "baseline",
+        "serial_groups",
+        "acceptance_locks",
+        "gates",
+        "suites",
+        "coverage_ledger",
+    ):
         assert key in data, f"catalog is missing required top-level key {key!r}"
+
+
+def test_serial_groups_define_timing_semantics(catalog):
+    """Shared setup makes member timings non-additive and must be explicit."""
+    groups = catalog["serial_groups"]
+    referenced = {gate["serial_group"] for gate in catalog["gates"] if gate["serial_group"]}
+
+    assert referenced <= set(groups), f"serial groups missing metadata: {referenced - set(groups)}"
+    for name, metadata in groups.items():
+        assert metadata["timing_semantics"] in {"additive", "shared_setup_non_additive"}, name
+        assert str(metadata["selection_policy"]).strip(), name
+        if metadata["timing_semantics"] == "shared_setup_non_additive":
+            assert metadata["shared_setup_seconds"] is not None, name
+            assert str(metadata["shared_setup_description"]).strip(), name
+
+
+def test_workbook_manager_shared_timing_is_not_summed(catalog):
+    metadata = catalog["serial_groups"]["workbook_manager"]
+    assert metadata["timing_semantics"] == "shared_setup_non_additive"
+    assert metadata["standalone_selection"] == "select_entire_group"
+
+    parity = next(
+        gate for gate in catalog["gates"]
+        if gate["id"] == "py.test_workbook_manager_generated_parity"
+    )
+    assert parity["standalone_seconds"] == 147.68
+    assert parity["shared_fixture_incremental_seconds"] is not None
 
 
 def test_every_gate_declares_the_required_fields(catalog):

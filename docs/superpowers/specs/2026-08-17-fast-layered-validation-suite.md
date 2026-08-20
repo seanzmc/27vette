@@ -1,7 +1,6 @@
 # Fast Layered Validation Suite Specification
 
-Status: IN IMPLEMENTATION — Checkpoints 0–5 complete 2026-08-20;
-Checkpoint 6 is the next authorized slice.
+Status: COMPLETE — Checkpoints 0–6 complete 2026-08-20.
 Date: 2026-08-17
 Branch: `claude/fast-layered-validation-suite-4c31f6` (spec authored on `main`)
 Recommended implementation reasoning: medium. Escalate only for a specific
@@ -1097,13 +1096,33 @@ Measured on local Node 26.7.0 / Python 3.14.7, serial:
 | Manager checkpoint, reverse order | 230 passed, 2 skipped, 36 subtests, 742.62 s |
 | Catalog + fixture closeout | 26 passed, 0.26 s |
 
+Measurement correction recorded during Checkpoint 6. The 791.25-second
+2026-08-10 baseline and the 745.31-second Checkpoint 5 run are not directly
+comparable per-gate measurements. The later run shares one process-wide verified
+projection/candidate; isolated `test_workbook_manager_generated_parity.py` now
+pays that full setup and measures 147.68 s, while the setup is already warm when
+that file runs inside the checkpoint. Its former 82.22-second isolated result is
+therefore only the best available estimate of incremental parity work, not a
+post-change in-suite measurement. For every gate in catalog serial group
+`workbook_manager`, `approximate_seconds` is a standalone observation and is
+non-additive: scheduling and budget logic must use the suite measurement and run
+the group in one process, never sum member values. The observed isolated deltas
+(`test_workbook_manager` -236.08 s, import/projection -17.66 s, generated parity
++65.46 s, fixture contract +0.28 s) net to -188.00 s, while the two suite totals
+differ by only -45.94 s. Roughly 142.06 s is unattributed because the baseline
+and closing runs did not capture comparable per-file stage timings. Checkpoint 6
+does not re-time the full Manager checkpoint; the catalog records the shared
+setup and this comparison gap instead of attributing it speculatively.
+
 The reverse-order run initially exposed two generated-parity mocks patching a
 stale module object after `TestApi` deliberately reloaded the `app` package.
 Both now patch the imported functions' actual globals; the focused canary passed
-2 tests and the complete reverse-order run passed. The checkpoint is 48.63 s
-(6.15%) faster than the 791.25-second baseline while retaining all named Layer
-3 boundaries. The existing FastAPI/Starlette deprecation warning remains; no
-dependency change is authorized by this checkpoint.
+2 tests and the complete reverse-order run passed. The closing checkpoint run is
+45.94 s shorter than the earlier 791.25-second run, but that difference is not
+claimed as an attributable performance improvement because the measurements are
+not comparable as described above. All named Layer 3 boundaries remain. The
+existing FastAPI/Starlette deprecation warning remains; no dependency change is
+authorized by this checkpoint.
 
 No canonical workbook, generated artifact, published registry, runtime
 implementation, dealer boundary, deployment path, dependency, or schema
@@ -1126,6 +1145,39 @@ changed.
 Acceptance: required CI proves the documented release path; local and CI
 commands agree; no stale gate remains silently outside the catalog; all retired
 owners have explicit replacement evidence.
+
+#### Checkpoint 6 result — 2026-08-20 (COMPLETE)
+
+CI now runs `scripts/run_layered_validation.py`, which reads commands and
+changed-surface ownership from `tests/validation_catalog.json`. Layer 0 oracle,
+catalog, and runner contracts plus the composed Layer 1 candidate run on every
+pull request. Cataloged Layer 2/3 owners join for changed surfaces; unclassified
+paths take a conservative validation/generator fallback. Selecting one
+`workbook_manager` member co-selects its entire serial group in one process. The
+uploaded report records selected files, surfaces, gates, stage durations,
+outputs, exit statuses, and the overall result. Local and CI use the same runner.
+
+The Checkpoint 5 correction is recorded above and in catalog `serial_groups`.
+Shared-build cost and non-additive timing are explicit, isolated parity cost is
+distinct from its estimated shared-fixture increment, and the arithmetic gap is
+quantified. No full Manager checkpoint re-timing was performed: 142.06 seconds
+remains unattributed and the 791.25/745.31 totals are explicitly non-comparable.
+
+No complete gate file was retired. Distinct named locks, focused product cases,
+atomic publication, and diagnostic owners still lack equivalent retirement
+canaries, so deletion would reduce proof. The first full Node run found a live
+Finder-created `form-output/.DS_Store`; the protected-artifact helper now excludes
+only that gitignored basename, with an explicit canary. All other untracked files
+remain failures.
+
+Final local diagnostics (Node 26.7.0 / Python 3.14.7): all 19 Node files passed
+serially; full Python inventory passed 827, skipped 2 documented scratch-writer
+tests, and passed 160 subtests in 1672.16 s. The existing FastAPI/Starlette
+deprecation warning remains. Catalog/runner contracts passed 26 tests. No
+workbook, generated artifact, published registry, customer runtime, dealer
+boundary, deployment path, dependency, or schema changed. Residual risks are the
+Manager timing gap, uncaptured Node 22/Python 3.12 CI timing until GitHub runs the
+workflow, the approval-gated promoted-model lock, and the inert workbook rows.
 
 ## 10. Files and surfaces expected to change during implementation
 

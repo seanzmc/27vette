@@ -14,6 +14,7 @@ import fs from "node:fs";
 
 const TRACKED_ARTIFACT_ROOTS = ["form-output", "form-app"];
 const MISSING = "missing";
+const AMBIENT_METADATA_BASENAMES = new Set([".DS_Store"]);
 
 // Tracked files, plus whatever is on disk under the same roots. The disk walk is
 // what catches a generator writing a brand-new untracked file into a protected
@@ -25,7 +26,9 @@ function artifactPaths() {
   const paths = new Set(tracked);
   for (const root of TRACKED_ARTIFACT_ROOTS) {
     for (const entry of fs.readdirSync(root, { recursive: true, withFileTypes: true })) {
-      if (entry.isFile()) paths.add(`${entry.parentPath}/${entry.name}`);
+      if (entry.isFile() && !AMBIENT_METADATA_BASENAMES.has(entry.name)) {
+        paths.add(`${entry.parentPath}/${entry.name}`);
+      }
     }
   }
   return [...paths].sort();

@@ -13,16 +13,16 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 ## Current handoff
 
 - **Updated:** 2026-08-20
-- **Owning specification:** `docs/superpowers/specs/2026-08-17-fast-layered-validation-suite.md` owns the fast layered validation suite and completed Checkpoint 5 evidence.
-- **Active workflow:** Fast layered validation suite Checkpoint 5 — Workbook Manager fixture optimization and order-isolation proof.
-- **Branch/commit:** `hermes/checkpoint-5-manager-fixtures`; implementation complete and awaiting PR delivery.
-- **Last completed:** Added one lazy immutable verified Workbook Manager projection/candidate with safe workbook/SQLite/export clones; moved missing-identifier, unresolved-reference, and missing-sheet cases to compact workbooks; retained verified promotion, atomic replacement, source drift, comparison export, generated parity, Apply/Rebuild, and scratch-writer Layer 3 owners; fixed stale-module mock contamination found by reverse-order execution.
-- **Current status:** Checkpoint 5 is complete. Documented-order and reverse-order Manager checkpoint runs are green. Checkpoint 6 is the next authorized validation-suite slice; it has not started.
-- **Validation:** Fixture gate 6 passed in 0.28 s; `test_workbook_manager.py` 63 passed / 2 skipped in 574.26 s; documented-order checkpoint 230 passed / 2 skipped plus 36 subtests in 745.31 s; reverse-order checkpoint same counts in 742.62 s; catalog + fixture closeout 26 passed; Fable validator and `git diff --check` passed. Existing FastAPI/Starlette deprecation warning only.
-- **Next action:** Deliver Checkpoint 5 through a pull request to `main`, then wait for review. Do not begin Checkpoint 6 after opening the PR.
-- **Blockers or closeout gaps:** Node 22 / Python 3.12 CI reference timings remain open for Checkpoint 6. Proposed promoted-model membership lock and two inert `section_presentation` rows retain their existing approval gates.
-- **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This docs pass produced no Fable receipt.
-- **Protected boundaries:** Canonical workbook, generators, generated artifacts, published registry, customer runtime, dealer submission, deployment, workbook schema, and dependencies are untouched. Changes are limited to test fixtures/tests, validation catalog metadata, operator test inventories, the owning specification, and this handoff.
+- **Owning specification:** `docs/superpowers/specs/2026-08-17-fast-layered-validation-suite.md` owns the completed fast layered validation suite and Checkpoint 6 evidence.
+- **Active workflow:** Fast layered validation suite Checkpoint 6 — catalog-driven CI, operator guidance, final inventory, and closeout.
+- **Branch/commit:** `hermes/checkpoint-6-layered-ci`; implementation complete and awaiting PR delivery.
+- **Last completed:** Wired pull-request CI to catalog-driven Layer 0/1 plus changed-surface Layer 2/3 selection and a stage-timed report; made Workbook Manager shared setup/timing non-additivity explicit; aligned README guidance; retained narrowed owners where no equivalent retirement canary exists; corrected the protected-artifact guard for Finder metadata only.
+- **Current status:** Checkpoint 6 and the owning fast layered validation specification are complete. No further implementation slice is authorized by this specification.
+- **Validation:** Catalog/runner contracts 26 passed; all 19 Node files passed serially after the `.DS_Store` correction; full Python inventory 827 passed / 2 skipped plus 160 subtests in 1672.16 s, with the existing FastAPI/Starlette deprecation warning only; Fable validator and `git diff --check` passed.
+- **Next action:** Deliver Checkpoint 6 through a pull request to `main`, then wait for review.
+- **Blockers or closeout gaps:** GitHub's Node 22/Python 3.12 timing remains uncaptured until CI runs. The Manager baseline/closing totals are non-comparable with 142.06 s unattributed; no full re-timing was performed. Proposed promoted-model membership lock and two inert `section_presentation` rows retain their existing approval gates.
+- **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This pass produced no Fable receipt.
+- **Protected boundaries:** Canonical workbook, generators, generated artifacts, published registry, customer runtime, dealer submission, deployment, workbook schema, and dependencies are untouched. Changes are limited to CI/validation tooling, catalog/test contracts, operator guidance, the owning specification, and this handoff.
 
 ## Verified facts
 

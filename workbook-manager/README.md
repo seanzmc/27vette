@@ -282,12 +282,14 @@ newline-delimited URL list instead; `WBM_ASSET_MEDIA_TIMEOUT` (default 10),
 ## Tests
 
 Use the exact affected test or class while editing. The command below is the
-Pass/checkpoint acceptance inventory, not the inner edit loop. At the 2026-08-10
-validation-efficiency checkpoint it completed in 791.25 seconds. Complete
-real-workbook promotion, unchanged comparison export, API import/export, and
-generated-parity owners take about 68–75 seconds each; the changed-overlay
-comparison-export owner takes about 213 seconds because it exercises the full
-overlay write and reconstruction-validation path.
+Pass/checkpoint acceptance inventory, not the inner edit loop. The catalog
+records standalone gate observations and the measured whole-suite runtime. For
+the `workbook_manager` serial group, standalone values are not additive: the
+suite shares one process-wide verified projection/candidate build. Run the
+checkpoint in one pytest process as shown below; do not estimate its runtime by
+summing member `approximate_seconds` values. In particular, generated parity
+measures 147.68 seconds alone because it pays the shared build, while the same
+build is already warm inside the complete checkpoint.
 
 ```sh
 .venv/bin/python -m pytest \

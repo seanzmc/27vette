@@ -212,7 +212,17 @@ The first command is the no-write preflight/proposal. Run `--write` only after t
 
 ## Validation
 
-Pull requests targeting `main` run the required `release-candidate` GitHub check from `.github/workflows/release-candidate.yml`. That check invokes the single composed six-model lane and uploads its JSON report:
+Pull requests targeting `main` run the required `release-candidate` GitHub check from `.github/workflows/release-candidate.yml`. The catalog-driven runner executes Layer 0 plus the composed Layer 1 candidate on every PR, adds Layer 2/3 gates for changed surfaces, co-selects the complete `workbook_manager` serial group when its shared fixture is needed, and uses a conservative validation/generator fallback for unclassified paths. It uploads one stage-timed JSON report:
+
+```sh
+python scripts/run_layered_validation.py \
+  --report layered-validation-report.json \
+  --changed-file <repo-relative-path>
+```
+
+Repeat `--changed-file` for each changed path. The runner reads commands and surface ownership from `tests/validation_catalog.json`; it does not sum member timings for shared-setup serial groups. This PR gate intentionally does not run the Layer 4 full inventory, access the live asset library, or submit a dealer build. Choose any additional local gates by changed surface as described below.
+
+The Layer 1 spine the runner invokes remains available directly:
 
 ```sh
 python scripts/verify_workbook_candidate.py \
@@ -220,8 +230,6 @@ python scripts/verify_workbook_candidate.py \
   --changed-model '*' \
   --report candidate-report.json
 ```
-
-This PR gate intentionally does not duplicate the complete test inventory, access the live asset library, or submit a dealer build. Choose any additional local gates by changed surface as described below.
 
 Fable 5 compounding loop scaffold:
 
