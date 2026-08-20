@@ -26,7 +26,7 @@ from app.contract_parity import (  # noqa: E402
     promoted_runtime_models,
     validate_primary_runtime_parity,
 )
-from app import config, db, importer, sync  # noqa: E402
+from workbook_manager_fixtures import verified_manager_fixture  # noqa: E402
 
 WORKBOOK = ROOT / "stingray_master.xlsx"
 
@@ -54,9 +54,9 @@ class TestWorkbookManagerGeneratedParity(unittest.TestCase):
             raise DiscoveryObserved
 
         with tempfile.TemporaryDirectory(prefix="wbm-pass4-discovery-") as tempdir:
-            with mock.patch(
-                "app.contract_parity.discover_generation_model_configs",
-                side_effect=observe_discovery,
+            with mock.patch.dict(
+                generate_contract_snapshot.__globals__,
+                {"discover_generation_model_configs": observe_discovery},
             ), self.assertRaises(DiscoveryObserved):
                 generate_contract_snapshot(
                     WORKBOOK,
@@ -82,12 +82,14 @@ class TestWorkbookManagerGeneratedParity(unittest.TestCase):
                 output.write_text(json.dumps(payload), encoding="utf-8")
                 return output
 
-            with mock.patch(
-                "app.contract_parity.promoted_runtime_models",
-                return_value=("stingray",),
-            ), mock.patch(
-                "app.contract_parity.generate_contract_snapshot",
-                side_effect=write_contract,
+            with mock.patch.dict(
+                validate_primary_runtime_parity.__globals__,
+                {
+                    "promoted_runtime_models": mock.Mock(
+                        return_value=("stingray",)
+                    ),
+                    "generate_contract_snapshot": write_contract,
+                },
             ):
                 issues = validate_primary_runtime_parity(source, reconstructed, ROOT)
 
@@ -122,23 +124,9 @@ class TestWorkbookManagerGeneratedParity(unittest.TestCase):
             reconstruction = temp / "reconstruction" / "candidate.xlsx"
             source.parent.mkdir()
             reconstruction.parent.mkdir()
-            shutil.copy2(WORKBOOK, source)
-            projection_path = temp / "projection.sqlite3"
-            connection = db.connect(projection_path)
-            previous_export_dir = config.EXPORT_DIR
-            try:
-                db.init_projection_schema(connection)
-                import_report = importer.import_workbook(connection, source)
-                self.assertFalse(
-                    [issue for issue in import_report["issues"] if issue["severity"] == "error"]
-                )
-                config.EXPORT_DIR = temp / "exports"
-                export = sync.export_comparison_workbook(connection, source)
-                self.assertTrue(export["ok"], export)
-                shutil.copy2(export["path"], reconstruction)
-            finally:
-                config.EXPORT_DIR = previous_export_dir
-                connection.close()
+            fixture = verified_manager_fixture()
+            fixture.clone_workbook(source)
+            fixture.clone_unchanged_export(reconstruction)
             models = promoted_runtime_models(source, ROOT)
             self.assertEqual(
                 models,

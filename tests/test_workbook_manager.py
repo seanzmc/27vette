@@ -15,7 +15,6 @@ import sqlite3
 import sys
 import tempfile
 import unittest
-from copy import deepcopy
 from pathlib import Path
 from unittest import mock
 
@@ -26,7 +25,7 @@ for p in (str(BACKEND), str(REPO_ROOT / "scripts")):
         sys.path.insert(0, p)
 
 from app import db as dbmod                     # noqa: E402
-from app import importer, naming, staging, sync as syncmod  # noqa: E402
+from app import naming, staging, sync as syncmod  # noqa: E402
 from app.catalog import (  # noqa: E402
     SPEC_BY_TABLE,
     TABLE_SPECS,
@@ -34,14 +33,13 @@ from app.catalog import (  # noqa: E402
 )
 from app.staging import StagingError            # noqa: E402
 from app.validation import find_dependents      # noqa: E402
+from workbook_manager_fixtures import (  # noqa: E402
+    clone_combined_projection,
+    sha256_file,
+    verified_manager_fixture,
+)
 
 WORKBOOK = REPO_ROOT / "stingray_master.xlsx"
-
-_IMMUTABLE_FIXTURE_ROOT: Path | None = None
-_IMMUTABLE_PROJECTION: Path | None = None
-_IMMUTABLE_PROJECTION_SHA256 = ""
-_IMMUTABLE_WORKBOOK_SHA256 = ""
-_IMMUTABLE_IMPORT_REPORT: dict | None = None
 
 try:
     import fastapi  # noqa: F401
@@ -57,50 +55,11 @@ def fresh_db(tmpdir: Path) -> sqlite3.Connection:
 
 
 def _sha256(path: Path) -> str:
-    import hashlib
-
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def setUpModule() -> None:
-    """Build the real-workbook imported projection once; tests clone it only."""
-    global _IMMUTABLE_FIXTURE_ROOT
-    global _IMMUTABLE_PROJECTION
-    global _IMMUTABLE_PROJECTION_SHA256
-    global _IMMUTABLE_WORKBOOK_SHA256
-    global _IMMUTABLE_IMPORT_REPORT
-
-    _IMMUTABLE_FIXTURE_ROOT = Path(tempfile.mkdtemp(prefix="wbm-import-base-"))
-    connection = fresh_db(_IMMUTABLE_FIXTURE_ROOT)
-    try:
-        import_report = importer.import_workbook(connection, WORKBOOK)
-        _IMMUTABLE_IMPORT_REPORT = import_report
-        errors = [
-            issue
-            for issue in import_report["issues"]
-            if issue["severity"] == "error"
-        ]
-        if errors:
-            raise AssertionError(f"immutable imported fixture has errors: {errors}")
-        connection.execute("PRAGMA wal_checkpoint(TRUNCATE)")
-    finally:
-        connection.close()
-    _IMMUTABLE_PROJECTION = _IMMUTABLE_FIXTURE_ROOT / "test.sqlite3"
-    _IMMUTABLE_PROJECTION_SHA256 = _sha256(_IMMUTABLE_PROJECTION)
-    _IMMUTABLE_WORKBOOK_SHA256 = _sha256(WORKBOOK)
-
-
-def tearDownModule() -> None:
-    """Prove sharing did not mutate either reusable source."""
-    assert _IMMUTABLE_PROJECTION is not None
-    assert _IMMUTABLE_FIXTURE_ROOT is not None
-    assert _sha256(_IMMUTABLE_PROJECTION) == _IMMUTABLE_PROJECTION_SHA256
-    assert _sha256(WORKBOOK) == _IMMUTABLE_WORKBOOK_SHA256
-    shutil.rmtree(_IMMUTABLE_FIXTURE_ROOT, ignore_errors=True)
+    return sha256_file(path)
 
 
 class ImportedWorkbookCase(unittest.TestCase):
-    """Focused behavior fixture cloned from one immutable real import."""
+    """Focused behavior fixture cloned from the shared verified projection."""
 
     tmpdir: Path
     conn: sqlite3.Connection
@@ -108,21 +67,19 @@ class ImportedWorkbookCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        assert _IMMUTABLE_PROJECTION is not None
-        assert _IMMUTABLE_IMPORT_REPORT is not None
+        fixture = verified_manager_fixture()
         cls.tmpdir = Path(tempfile.mkdtemp(prefix="wbm-test-"))
         projection = cls.tmpdir / "test.sqlite3"
-        shutil.copy2(_IMMUTABLE_PROJECTION, projection)
+        _, report = clone_combined_projection(projection)
         cls.conn = dbmod.connect(projection)
-        cls.report = deepcopy(_IMMUTABLE_IMPORT_REPORT)
+        cls.report = report
+        cls._fixture = fixture
 
     @classmethod
     def tearDownClass(cls):
-        assert _IMMUTABLE_PROJECTION is not None
         cls.conn.close()
         shutil.rmtree(cls.tmpdir, ignore_errors=True)
-        assert _sha256(_IMMUTABLE_PROJECTION) == _IMMUTABLE_PROJECTION_SHA256
-        assert _sha256(WORKBOOK) == _IMMUTABLE_WORKBOOK_SHA256
+        cls._fixture.assert_unmutated()
 
 
 class TestImportFidelity(ImportedWorkbookCase):
@@ -703,21 +660,19 @@ class TestComparisonExport(ImportedWorkbookCase):
         super().setUpClass()
         from app import config  # type: ignore[import-not-found]
 
+        fixture = verified_manager_fixture()
         cls.workbook = cls.tmpdir / "valid-source.xlsx"
-        shutil.copy2(WORKBOOK, cls.workbook)
+        fixture.clone_workbook(cls.workbook)
         cls._previous_config = (
             config.VAR_DIR,
             config.EXPORT_DIR,
             config.DB_BACKUP_DIR,
         )
         config.VAR_DIR = cls.tmpdir / "var"
-        cls.unchanged_export_dir = config.VAR_DIR / "unchanged-export"
-        config.EXPORT_DIR = cls.unchanged_export_dir
-        config.DB_BACKUP_DIR = config.VAR_DIR / "db-backups"
-        cls.unchanged_export = syncmod.export_comparison_workbook(
-            cls.conn, cls.workbook
-        )
+        cls.unchanged_export = fixture.unchanged_export_result()
+        cls.unchanged_export_dir = Path(cls.unchanged_export["path"]).parent
         config.EXPORT_DIR = config.VAR_DIR / "per-test-exports"
+        config.DB_BACKUP_DIR = config.VAR_DIR / "db-backups"
 
     @classmethod
     def tearDownClass(cls):
@@ -923,11 +878,13 @@ class TestApi(unittest.TestCase):
     def setUpClass(cls):
         import os
         cls.tmpdir = Path(tempfile.mkdtemp(prefix="wbm-api-"))
+        fixture = verified_manager_fixture()
         cls.workbook = cls.tmpdir / "source.xlsx"
-        shutil.copy2(WORKBOOK, cls.workbook)
+        fixture.clone_workbook(cls.workbook)
         cls.previous_workbook_env = os.environ.get("WBM_WORKBOOK")
         cls.previous_asset_media_env = os.environ.get("WBM_ASSET_MEDIA_URL_LIST")
         cls.previous_apply_output_env = os.environ.get("WBM_APPLY_OUTPUT_ROOT")
+        cls.previous_projection_env = os.environ.get("WBM_PROJECTION_DB")
         cls.apply_output_root = cls.tmpdir / "apply-output"
         shutil.copytree(REPO_ROOT / "form-output", cls.apply_output_root / "form-output")
         (cls.apply_output_root / "form-app").mkdir(parents=True)
@@ -939,6 +896,7 @@ class TestApi(unittest.TestCase):
         os.environ["WBM_DB"] = str(cls.tmpdir / "api.sqlite3")
         os.environ["WBM_VAR_DIR"] = str(cls.tmpdir / "var")
         os.environ["WBM_WORKBOOK"] = str(cls.workbook)
+        os.environ["WBM_PROJECTION_DB"] = str(cls.tmpdir / "workbook_projection.sqlite3")
         os.environ["WBM_APPLY_OUTPUT_ROOT"] = str(cls.apply_output_root)
         os.environ["WBM_ASSET_MEDIA_URL_LIST"] = str(
             REPO_ROOT / "tests" / "fixtures" / "asset-map-sync-media-urls.txt"
@@ -960,7 +918,8 @@ class TestApi(unittest.TestCase):
         # runs in the FastAPI lifespan, not lazily inside a request.
         cls.client = TestClient(mainmod.app)
         cls.client.__enter__()
-        cls.client.post("/api/import")
+        fixture.clone_projection(mainmod.config.DEFAULT_PROJECTION_DB)
+        fixture.assert_unmutated()
 
     @classmethod
     def tearDownClass(cls):
@@ -979,6 +938,10 @@ class TestApi(unittest.TestCase):
             os.environ.pop("WBM_APPLY_OUTPUT_ROOT", None)
         else:
             os.environ["WBM_APPLY_OUTPUT_ROOT"] = cls.previous_apply_output_env
+        if cls.previous_projection_env is None:
+            os.environ.pop("WBM_PROJECTION_DB", None)
+        else:
+            os.environ["WBM_PROJECTION_DB"] = cls.previous_projection_env
         shutil.rmtree(cls.tmpdir, ignore_errors=True)
 
     def test_status_and_models(self):
@@ -1408,14 +1371,49 @@ class TestApi(unittest.TestCase):
 
             committed = self.client.post(f"/api/drafts/{draft_id}/commit")
             self.assertEqual(committed.status_code, 200, committed.text)
-            preview = self.client.post(f"/api/drafts/{draft_id}/preview")
-            self.assertEqual(preview.status_code, 200, preview.text)
-            self.assertEqual(preview.json()["manager_state"], "preview_ready")
-            confirmable = preview.json()["result"]["warningPolicy"]["confirmableIds"]
-            approved = self.client.post(
-                f"/api/drafts/{draft_id}/approve",
-                json={"actor": "mixed-proof", "warning_ids": confirmable},
-            )
+            changeset = committed.json()
+            preview_artifact = {
+                "ok": True,
+                "schemaVersion": "workbook-change-preview-1",
+                "changeSetId": changeset["changeSetId"],
+                "semanticFingerprint": changeset["semanticFingerprint"],
+                "workbook": changeset["workbook"],
+                "status": "validated",
+                "errors": [],
+                "warnings": [],
+                "warningPolicy": {"blockingIds": [], "confirmableIds": []},
+                "previewFingerprint": "a" * 64,
+            }
+            approval_artifact = {
+                "ok": True,
+                "schemaVersion": "workbook-change-approval-1",
+                "actor": "mixed-proof",
+                "changeSetId": changeset["changeSetId"],
+                "semanticFingerprint": changeset["semanticFingerprint"],
+                "previewFingerprint": preview_artifact["previewFingerprint"],
+                "workbook": changeset["workbook"],
+                "acceptedWarningIds": [],
+                "approvalFingerprint": "b" * 64,
+            }
+            with (
+                mock.patch.object(
+                    self.mainmod.drafts.workbook_service,
+                    "preview_changeset",
+                    return_value=preview_artifact,
+                ),
+                mock.patch.object(
+                    self.mainmod.drafts.workbook_service,
+                    "approve_changeset",
+                    return_value=approval_artifact,
+                ),
+            ):
+                preview = self.client.post(f"/api/drafts/{draft_id}/preview")
+                self.assertEqual(preview.status_code, 200, preview.text)
+                self.assertEqual(preview.json()["manager_state"], "preview_ready")
+                approved = self.client.post(
+                    f"/api/drafts/{draft_id}/approve",
+                    json={"actor": "mixed-proof", "warning_ids": []},
+                )
             self.assertEqual(approved.status_code, 200, approved.text)
             self.assertEqual(approved.json()["manager_state"], "approved")
             final = self.client.get(f"/api/drafts/{draft_id}").json()
@@ -1788,14 +1786,40 @@ class TestApi(unittest.TestCase):
             finally:
                 conn.close()
 
-    def test_reimport_atomically_replaces_an_active_projection(self):
+    def test_reimport_endpoint_promotes_a_verified_replacement(self):
+        fixture = verified_manager_fixture()
         conn = self.mainmod.open_projection_connection()
         before_manifest = self.mainmod._projection_manifest(conn)
         before_options = conn.execute("SELECT COUNT(*) c FROM options").fetchone()["c"]
         conn.close()
-        resp = self.client.post("/api/import")
+
+        def promote_fixture(_workbook, destination):
+            candidate = self.tmpdir / "api-reimport-candidate.sqlite3"
+            fixture.clone_projection(candidate)
+            replacement = self.mainmod.dbmod.connect(candidate)
+            try:
+                replacement.execute(
+                    "UPDATE storage_manifest SET migration_id='import-api-reimport'"
+                )
+                replacement.commit()
+                replacement.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+            finally:
+                replacement.close()
+            self.mainmod.dbmod._replace_projection(candidate, destination)
+            return dict(fixture.promotion_report)
+
+        with mock.patch.object(
+            self.mainmod.importer,
+            "promote_verified_projection",
+            side_effect=promote_fixture,
+        ) as promote:
+            resp = self.client.post("/api/import")
         self.assertEqual(resp.status_code, 200, resp.text)
         self.assertTrue(resp.json()["promoted"])
+        promote.assert_called_once_with(
+            self.mainmod.config.DEFAULT_WORKBOOK,
+            self.mainmod.config.DEFAULT_PROJECTION_DB,
+        )
         conn = self.mainmod.open_projection_connection()
         self.addCleanup(conn.close)
         self.assertNotEqual(self.mainmod._projection_manifest(conn), before_manifest)
@@ -1806,10 +1830,23 @@ class TestApi(unittest.TestCase):
     def test_current_projection_allows_verified_comparison_export(self):
         status = self.client.get("/api/status").json()
         self.assertEqual(status["projection"]["state"], "current")
-        resp = self.client.post("/api/export")
+        export = {
+            "ok": True,
+            "status": "exported",
+            "byte_identical": True,
+            "semantic_readback_verified": True,
+            "path": str(self.tmpdir / "DISPOSABLE-api-export.xlsx"),
+        }
+        with mock.patch.object(
+            self.mainmod.syncmod,
+            "export_comparison_workbook",
+            return_value=export,
+        ) as export_workbook:
+            resp = self.client.post("/api/export")
         self.assertEqual(resp.status_code, 200, resp.text)
         self.assertTrue(resp.json()["byte_identical"])
         self.assertTrue(resp.json()["semantic_readback_verified"])
+        export_workbook.assert_called_once()
 
     def test_import_reports_all_unresolved_legacy_workflow_blockers(self):
         conn = self.mainmod.open_state_connection()

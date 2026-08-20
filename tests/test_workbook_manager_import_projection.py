@@ -22,6 +22,12 @@ for path in (BACKEND, SCRIPTS):
 from app import db as dbmod  # noqa: E402
 from app import catalog  # noqa: E402
 from app import importer  # noqa: E402
+from workbook_manager_fixtures import (  # noqa: E402
+    verified_manager_fixture,
+    write_compact_missing_identifier_workbook,
+    write_compact_missing_sheet_workbook,
+    write_compact_unresolved_reference_workbook,
+)
 
 
 class TestSplitStoreMigration(unittest.TestCase):
@@ -352,48 +358,31 @@ class TestAtomicProjectionPromotion(unittest.TestCase):
             conn.close()
 
     def test_incomplete_asset_rows_block_promotion(self):
-        from openpyxl import load_workbook
-
-        canonical = self.root / "canonical.xlsx"
-        shutil.copy2(ROOT / "stingray_master.xlsx", canonical)
-        workbook = load_workbook(canonical)
-        sheet = workbook["asset_map"]
-        headers = {cell.value: cell.column for cell in sheet[1]}
-        self.assertTrue(
-            all(isinstance(headers[name], int) for name in ("model_key", "image_url", "active"))
+        workbook = write_compact_missing_identifier_workbook(
+            self.root / "missing-identifier.xlsx"
         )
-        sheet.insert_rows(30, 2)
-        for row, suffix in ((30, "2"), (31, "1")):
-            sheet.cell(row, headers["model_key"]).value = "stingray"
-            sheet.cell(row, headers["image_url"]).value = (
-                "https://example.invalid/unresolved-c-07-" + suffix + ".png"
-            )
-            sheet.cell(row, headers["active"]).value = False
-        workbook.save(canonical)
-        workbook.close()
         before = self._projection_hash()
 
-        result = importer.promote_verified_projection(canonical, self.projection)
+        with mock.patch.object(dbmod, "_replace_projection") as replace:
+            result = importer.promote_verified_projection(workbook, self.projection)
 
         self.assertFalse(result["promoted"])
         self.assertEqual(result["status"], "blocked")
         self.assertEqual(
             [issue["category"] for issue in result["issues"]],
-            ["missing_identifier", "missing_identifier"],
+            ["missing_identifier"],
         )
+        replace.assert_not_called()
         self.assertEqual(self._projection_hash(), before)
+        self.assertFalse(list(self.root.glob(".wbm-import-candidate-*")))
 
     def test_unresolved_reference_disposition_records_offending_value(self):
-        from openpyxl import load_workbook
+        workbook = write_compact_unresolved_reference_workbook(
+            self.root / "unresolved.xlsx"
+        )
+        missing_target = "missing_target_for_checkpoint_5"
 
-        workbook = load_workbook(self.workbook)
-        sheet = workbook["rule_mapping"]
-        missing_target = "missing_target_for_pass4_test"
-        sheet["D2"] = missing_target
-        workbook.save(self.workbook)
-        workbook.close()
-
-        result = importer.promote_verified_projection(self.workbook, self.projection)
+        result = importer.promote_verified_projection(workbook, self.projection)
 
         self.assertFalse(result["promoted"])
         disposition = next(
@@ -504,15 +493,12 @@ class TestAtomicProjectionPromotion(unittest.TestCase):
         self.assertEqual(sidecar.read_bytes(), b"residual WAL")
 
     def test_malformed_candidate_leaves_prior_projection_byte_identical(self):
-        from openpyxl import load_workbook
-
-        workbook = load_workbook(self.workbook)
-        del workbook["model_master"]
-        workbook.save(self.workbook)
-        workbook.close()
+        workbook = write_compact_missing_sheet_workbook(
+            self.root / "missing-sheet.xlsx"
+        )
         before = self._projection_hash()
 
-        result = importer.promote_verified_projection(self.workbook, self.projection)
+        result = importer.promote_verified_projection(workbook, self.projection)
 
         self.assertFalse(result["promoted"])
         self.assertEqual(result["status"], "blocked")
@@ -521,6 +507,9 @@ class TestAtomicProjectionPromotion(unittest.TestCase):
 
     def test_real_workbook_acceptance_promotes_verified_projection_once(self):
         """Own success, manifest, row reconciliation, and state-store isolation."""
+        fixture = verified_manager_fixture()
+        fixture.clone_workbook(self.workbook)
+        result = fixture.promotion_report
         state = self.root / "workbook_manager.sqlite3"
         dbmod.bootstrap_storage(state, self.projection)
         conn = dbmod.connect(state, foreign_keys=True)
@@ -534,7 +523,7 @@ class TestAtomicProjectionPromotion(unittest.TestCase):
         finally:
             conn.close()
         state_before = state.read_bytes()
-        result = importer.promote_verified_projection(self.workbook, self.projection)
+        fixture.clone_projection(self.projection)
 
         self.assertTrue(result["promoted"], result)
         self.assertEqual(result["status"], "promoted")
@@ -565,16 +554,13 @@ class TestAtomicProjectionPromotion(unittest.TestCase):
         self._assert_complete_managed_row_dispositions()
 
     def test_blocking_import_findings_never_call_atomic_replace(self):
-        from openpyxl import load_workbook
-
-        workbook = load_workbook(self.workbook)
-        workbook["model_master"].cell(2, 1).value = None
-        workbook.save(self.workbook)
-        workbook.close()
+        workbook = write_compact_missing_identifier_workbook(
+            self.root / "blocking-findings.xlsx"
+        )
         before = self._projection_hash()
 
         with mock.patch.object(dbmod, "_replace_projection") as replace:
-            result = importer.promote_verified_projection(self.workbook, self.projection)
+            result = importer.promote_verified_projection(workbook, self.projection)
 
         self.assertFalse(result["promoted"])
         replace.assert_not_called()

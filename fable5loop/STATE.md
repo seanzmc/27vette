@@ -12,17 +12,17 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 
 ## Current handoff
 
-- **Updated:** 2026-08-19
-- **Owning specification:** `docs/css-cleanup-adoption-spec.md` owns the twelve-step CSS cleanup contract. `docs/css_coverage_audit.md` remains the diagnosis. Validation-suite Checkpoint 5 remains owned by `docs/superpowers/specs/2026-08-17-fast-layered-validation-suite.md`.
-- **Active workflow:** Docs-only correction pass on the CSS audit and adoption spec after PR review found stale line references and two miscounts.
-- **Branch/commit:** `docs/css-coverage-audit`; third follow-on commit on open PR #33. No CSS implementation and no deployment.
-- **Last completed:** Re-derived every line reference in `docs/css_coverage_audit.md` and `docs/css-cleanup-adoption-spec.md` against `form-app/styles.css` at `3ce3cae` and corrected the review findings: `.summary-panel` duplicate is at 2276 (not 2253) and its `border: 0` / `padding: 16px` are live overrides; `.mobile-drawer-backdrop:not([hidden])` is declared 4 times (1604, 2222, 2307, 2750) and 2222 is a `display: none` override that must not be deduped; `.setup-choice-grid` 2630–2634 is a grouped selector carrying `min-width: 0`, so Step 2 now deletes the redundant bare block at 2691 instead of merging; the CSS-text contract is 89 assert calls, not ~53; `#cfd3d6` has 4 uses, not 6; the three `::-webkit-details-marker` rules each need a selector-matched `::marker` companion, not a blanket `summary::marker`; `.topbar` redundancy is three media blocks (2233, 2320, 2397); assorted off-by-one references fixed (1604, 1567, 1347, 2706, 1941–1955, 49–54, 663–668, 2625, 2855, 856–857). Both files now state that line numbers are provenance, not edit addresses.
-- **Current status:** Diagnosis and adoption contract agree and their line references are verified. No finding was withdrawn. Cleanup remains unstarted and still needs explicit per-step approval.
-- **Validation:** Every corrected line reference re-checked programmatically against `form-app/styles.css` (44 selector/line assertions, all matching); assertion and usage counts measured by grep, not estimated. `git diff --check` on both docs and this handoff. Runtime, workbook, generation, and dealer gates were not run (docs-only, no source file touched).
-- **Next action:** Re-review and merge PR #33. Do not start CSS cleanup until a listed step is explicitly approved, in spec order.
-- **Blockers or closeout gaps:** Carried validation-suite gaps unchanged. No implementation authorized.
+- **Updated:** 2026-08-20
+- **Owning specification:** `docs/superpowers/specs/2026-08-17-fast-layered-validation-suite.md` owns the fast layered validation suite and completed Checkpoint 5 evidence.
+- **Active workflow:** Fast layered validation suite Checkpoint 5 — Workbook Manager fixture optimization and order-isolation proof.
+- **Branch/commit:** `hermes/checkpoint-5-manager-fixtures`; implementation complete and awaiting PR delivery.
+- **Last completed:** Added one lazy immutable verified Workbook Manager projection/candidate with safe workbook/SQLite/export clones; moved missing-identifier, unresolved-reference, and missing-sheet cases to compact workbooks; retained verified promotion, atomic replacement, source drift, comparison export, generated parity, Apply/Rebuild, and scratch-writer Layer 3 owners; fixed stale-module mock contamination found by reverse-order execution.
+- **Current status:** Checkpoint 5 is complete. Documented-order and reverse-order Manager checkpoint runs are green. Checkpoint 6 is the next authorized validation-suite slice; it has not started.
+- **Validation:** Fixture gate 6 passed in 0.28 s; `test_workbook_manager.py` 63 passed / 2 skipped in 574.26 s; documented-order checkpoint 230 passed / 2 skipped plus 36 subtests in 745.31 s; reverse-order checkpoint same counts in 742.62 s; catalog + fixture closeout 26 passed; Fable validator and `git diff --check` passed. Existing FastAPI/Starlette deprecation warning only.
+- **Next action:** Deliver Checkpoint 5 through a pull request to `main`, then wait for review. Do not begin Checkpoint 6 after opening the PR.
+- **Blockers or closeout gaps:** Node 22 / Python 3.12 CI reference timings remain open for Checkpoint 6. Proposed promoted-model membership lock and two inert `section_presentation` rows retain their existing approval gates.
 - **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This docs pass produced no Fable receipt.
-- **Protected boundaries:** Canonical workbook, generators, generated artifacts, published registry, customer runtime, dealer submission, deployment, schema, and dependencies are untouched. `form-app/styles.css`, `form-app/app.js`, `form-app/index.html`, and both test files were read only. Only the audit, the adoption spec, and this handoff block changed.
+- **Protected boundaries:** Canonical workbook, generators, generated artifacts, published registry, customer runtime, dealer submission, deployment, workbook schema, and dependencies are untouched. Changes are limited to test fixtures/tests, validation catalog metadata, operator test inventories, the owning specification, and this handoff.
 
 ## Verified facts
 

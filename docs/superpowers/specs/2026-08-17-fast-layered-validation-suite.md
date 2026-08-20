@@ -1,7 +1,7 @@
 # Fast Layered Validation Suite Specification
 
-Status: IN IMPLEMENTATION — Checkpoints 0–4 complete 2026-08-19;
-Checkpoint 5 is the next authorized slice.
+Status: IN IMPLEMENTATION — Checkpoints 0–5 complete 2026-08-20;
+Checkpoint 6 is the next authorized slice.
 Date: 2026-08-17
 Branch: `claude/fast-layered-validation-suite-4c31f6` (spec authored on `main`)
 Recommended implementation reasoning: medium. Escalate only for a specific
@@ -1070,6 +1070,45 @@ Acceptance: Manager fast tests are suitable for Layer 0/2 selection; checkpoint
 runtime materially improves from the 791.25-second baseline without removing a
 distinct protected-boundary proof.
 
+#### Checkpoint 5 result — 2026-08-20 (COMPLETE)
+
+`tests/workbook_manager_fixtures.py` now owns one process-wide, lazily built,
+verified real-workbook projection/candidate. Consumers receive byte copies of
+the workbook, projection, or lazy unchanged comparison export, and the helper
+hash-checks every shared source after use. Missing-identifier,
+unresolved-reference, and missing-required-sheet cases now use compact
+self-contained workbooks that do not read the canonical workbook. The six-test
+Layer 0 helper contract passed in 0.28 s.
+
+The retained Layer 3 owners remain distinct: verified promotion and complete
+row dispositions, atomic replacement, source-identity drift, changed and
+unchanged comparison exports, generated-contract parity, Apply/Rebuild, and the
+opt-in scratch-copy writer. API integration tests now consume verified clones
+or compact service artifacts where the real workbook boundary is already owned
+elsewhere; they still prove route binding and durable lifecycle behavior.
+
+Measured on local Node 26.7.0 / Python 3.14.7, serial:
+
+| Run | Result |
+|---|---|
+| Fixture contract alone | 6 passed, 0.28 s |
+| `test_workbook_manager.py` | 63 passed, 2 skipped, 574.26 s (catalog baseline 810.34 s) |
+| Manager checkpoint, documented order | 230 passed, 2 skipped, 36 subtests, 745.31 s |
+| Manager checkpoint, reverse order | 230 passed, 2 skipped, 36 subtests, 742.62 s |
+| Catalog + fixture closeout | 26 passed, 0.26 s |
+
+The reverse-order run initially exposed two generated-parity mocks patching a
+stale module object after `TestApi` deliberately reloaded the `app` package.
+Both now patch the imported functions' actual globals; the focused canary passed
+2 tests and the complete reverse-order run passed. The checkpoint is 48.63 s
+(6.15%) faster than the 791.25-second baseline while retaining all named Layer
+3 boundaries. The existing FastAPI/Starlette deprecation warning remains; no
+dependency change is authorized by this checkpoint.
+
+No canonical workbook, generated artifact, published registry, runtime
+implementation, dealer boundary, deployment path, dependency, or schema
+changed.
+
 ### Checkpoint 6 — CI, documentation, and retirement
 
 - Wire CI to the cataloged layers: Layer 0 plus Layer 1 on every PR, affected
@@ -1209,10 +1248,13 @@ generated runtime state matrix, with a forced-failure behind each §4.3
 invariant. The candidate lane's browser stage runs that matrix against the
 candidate registry.
 
-The next authorized implementation slice is Checkpoint 5: optimize Workbook
-Manager checkpoint fixtures around one immutable verified projection/candidate,
-move negative cases to compact fixtures, and preserve each distinct Layer 3
-real-workbook boundary.
+Checkpoint 5 is complete: Workbook Manager tests share one immutable verified
+projection/candidate, negative cases use compact fixtures, every distinct Layer
+3 real-workbook boundary remains, and both documented-order and reverse-order
+checkpoint runs are green. The next authorized implementation slice is
+Checkpoint 6: wire CI to the cataloged layers, publish the composed report,
+align operator documentation, and retire obsolete owners only with the required
+coverage and mutation evidence.
 
 Two items still carry approval or classification gates:
 

@@ -30,6 +30,7 @@ TESTS_DIR = REPO_ROOT / "tests"
 # how a gate silently leaves the catalog.
 NON_GATE_FILES = {
     "workbook_domain_fixtures.py",
+    "workbook_manager_fixtures.py",
 }
 
 # Directories under tests/ that hold helpers or fixtures rather than gates.
