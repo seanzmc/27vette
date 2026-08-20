@@ -11,6 +11,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = REPO_ROOT / "scripts" / "run_layered_validation.py"
 CATALOG = REPO_ROOT / "tests" / "validation_catalog.json"
+WORKFLOW = REPO_ROOT / ".github" / "workflows" / "release-candidate.yml"
 
 
 def _catalog(tmp_path: Path) -> Path:
@@ -60,6 +61,23 @@ def _catalog(tmp_path: Path) -> Path:
         ],
         "fallback_surfaces": ["asset_map"],
     }
+    data["serial_groups"] = {
+        "protected_artifacts": {
+            "standalone_selection": "selected_members",
+        },
+        "workbook_manager": {
+            "standalone_selection": "select_entire_group",
+            "suite_id": "suite.workbook_manager_serial_group",
+        },
+    }
+    data["suites"] = [
+        {
+            "id": "suite.workbook_manager_serial_group",
+            "layer": 3,
+            "command": f'{sys.executable} -c "print(\'manager suite\')"',
+            "gate_ids": ["manager.parity", "manager.peer"],
+        }
+    ]
     path = tmp_path / "catalog.json"
     path.write_text(json.dumps(data), encoding="utf-8")
     return path
@@ -102,6 +120,50 @@ def test_always_layers_and_changed_surface_are_selected(tmp_path):
 def test_shared_serial_group_is_co_selected(tmp_path):
     report = _run(tmp_path, "workbook-manager/frontend/src/App.jsx")
     assert {"manager.parity", "manager.peer"} <= set(report["selected_gate_ids"])
+    assert [stage["stage_id"] for stage in report["stages"]] == [
+        "layer.zero",
+        "layer.one",
+        "suite.workbook_manager_serial_group",
+    ]
+    assert report["stages"][-1]["gate_ids"] == ["manager.parity", "manager.peer"]
+
+
+def test_changed_surface_selects_matching_layer_zero_gate(tmp_path):
+    catalog_path = _catalog(tmp_path)
+    data = json.loads(catalog_path.read_text(encoding="utf-8"))
+    data["gates"].append(
+        {
+            "id": "manager.fast",
+            "layer": 0,
+            "command": f'{sys.executable} -c "print(\'fast\')"',
+            "changed_surfaces": ["workbook_manager"],
+            "serial_group": None,
+        }
+    )
+    catalog_path.write_text(json.dumps(data), encoding="utf-8")
+
+    report = tmp_path / "report.json"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--catalog",
+            str(catalog_path),
+            "--report",
+            str(report),
+            "--changed-file",
+            "workbook-manager/backend/app/main.py",
+        ],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "manager.fast" in json.loads(report.read_text(encoding="utf-8"))[
+        "selected_gate_ids"
+    ]
 
 
 def test_unknown_path_uses_conservative_fallback(tmp_path):
@@ -113,3 +175,70 @@ def test_unknown_path_uses_conservative_fallback(tmp_path):
 def test_docs_only_change_skips_changed_surface_gates(tmp_path):
     report = _run(tmp_path, "docs/operator-note.md")
     assert report["selected_gate_ids"] == ["layer.zero", "layer.one"]
+
+
+def test_workflow_fetches_and_classifies_deleted_paths():
+    workflow = WORKFLOW.read_text(encoding="utf-8")
+    assert "fetch-depth: 0" in workflow
+    assert "--diff-filter=ACMRD" in workflow
+    assert "timeout-minutes: 30" in workflow
+    assert "--changed-file-list changed-files.txt" in workflow
+    assert "$(while IFS=" not in workflow
+
+
+def test_changed_file_list_preserves_paths_with_spaces(tmp_path):
+    report = tmp_path / "report.json"
+    changed_files = tmp_path / "changed-files.txt"
+    changed_files.write_text("docs/operator note.md\n", encoding="utf-8")
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--catalog",
+            str(_catalog(tmp_path)),
+            "--report",
+            str(report),
+            "--changed-file-list",
+            str(changed_files),
+        ],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert json.loads(report.read_text(encoding="utf-8"))["changed_files"] == [
+        "docs/operator note.md"
+    ]
+
+
+def test_layer_zero_runs_before_layer_one_even_when_catalog_order_is_reversed(tmp_path):
+    catalog_path = _catalog(tmp_path)
+    data = json.loads(catalog_path.read_text(encoding="utf-8"))
+    data["gates"][0], data["gates"][1] = data["gates"][1], data["gates"][0]
+    catalog_path.write_text(json.dumps(data), encoding="utf-8")
+
+    report = tmp_path / "report.json"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--catalog",
+            str(catalog_path),
+            "--report",
+            str(report),
+            "--changed-file",
+            "docs/operator-note.md",
+        ],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert [stage["stage_id"] for stage in json.loads(report.read_text())["stages"]] == [
+        "layer.zero",
+        "layer.one",
+    ]

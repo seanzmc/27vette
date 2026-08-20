@@ -96,8 +96,9 @@
       "timing_semantics": "shared_setup_non_additive",
       "selection_policy": "Select the entire workbook_manager group when any member requiring verified_manager_fixture is selected; run it in one pytest process so the process-wide verified projection/candidate build is paid once.",
       "standalone_selection": "select_entire_group",
+      "suite_id": "suite.workbook_manager_serial_group",
       "shared_setup_seconds": 65.46,
-      "shared_setup_description": "Checkpoint 5 measured py.test_workbook_manager_generated_parity at 147.68 s standalone after it moved to verified_manager_fixture, versus 82.22 s before that move. The 65.46 s delta is the best available measurement of the full promote_verified_projection setup now shared inside suite.workbook_manager_checkpoint; it is not an additive per-gate cost. No full checkpoint re-timing was performed for this metadata correction."
+      "shared_setup_description": "Checkpoint 5 measured py.test_workbook_manager_generated_parity at 147.68 s standalone after it moved to verified_manager_fixture, versus 82.22 s before that move. The 65.46 s delta is the best available measurement of the full promote_verified_projection setup now shared inside suite.workbook_manager_serial_group; it is not an additive per-gate cost. No full checkpoint re-timing was performed for this metadata correction."
     }
   },
   "acceptance_locks": [
@@ -2412,10 +2413,10 @@
       "approximate_seconds": 0.6,
       "acceptance_locks": [],
       "disposition": "keep",
-      "disposition_reason": "Catalog-driven CI selection, conservative fallback, shared serial-group co-selection, and stage-timed report contract.",
+      "disposition_reason": "Catalog-driven CI selection, conservative fallback, shared serial-group one-process execution, changed-path transport, and stage-timed report contract.",
       "readme_reference": "run_layered_validation.py",
-      "notes": "",
-      "collected_tests": 4,
+      "notes": "CI passes changed paths through --changed-file-list so spaces are preserved and deleted paths remain classifiable.",
+      "collected_tests": 8,
       "baseline_result": "pass",
       "readme_publishes_command": false
     }
@@ -2484,6 +2485,27 @@
       "measured_seconds": 35.0,
       "measured_note": "Checkpoint 4 removes the Layer 3 all-model CLI proof and replaces the 126s metadata mutation hotspot with direct in-memory metadata checks. Exact closing timing is recorded in Checkpoint 4 evidence.",
       "readme_publishes_command": true
+    },
+    {
+      "id": "suite.workbook_manager_serial_group",
+      "description": "Exact workbook_manager serial group, run in one pytest process so verified_manager_fixture is built once.",
+      "command": ".venv/bin/python -m pytest tests/test_workbook_manager_catalog.py tests/test_workbook_manager_import_projection.py tests/test_workbook_manager_fixtures.py tests/test_workbook_manager_generated_parity.py tests/test_workbook_manager_api_concurrency.py tests/test_workbook_manager_drafts.py tests/test_workbook_manager_changeset_lifecycle.py tests/test_workbook_manager_apply_rebuild.py tests/test_workbook_manager.py -q",
+      "layer": 3,
+      "gate_ids": [
+        "py.test_workbook_manager_catalog",
+        "py.test_workbook_manager_import_projection",
+        "py.test_workbook_manager_fixtures",
+        "py.test_workbook_manager_generated_parity",
+        "py.test_workbook_manager_api_concurrency",
+        "py.test_workbook_manager_drafts",
+        "py.test_workbook_manager_changeset_lifecycle",
+        "py.test_workbook_manager_apply_rebuild",
+        "py.test_workbook_manager"
+      ],
+      "serial_required": true,
+      "measured_seconds": 745.31,
+      "measured_note": "Checkpoint 5 documented-order whole-group measurement. Member timings are non-additive because verified_manager_fixture is shared.",
+      "readme_publishes_command": false
     },
     {
       "id": "suite.workbook_manager_checkpoint",

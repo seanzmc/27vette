@@ -173,6 +173,14 @@ def test_serial_groups_define_timing_semantics(catalog):
         if metadata["timing_semantics"] == "shared_setup_non_additive":
             assert metadata["shared_setup_seconds"] is not None, name
             assert str(metadata["shared_setup_description"]).strip(), name
+            suite_id = metadata.get("suite_id")
+            assert suite_id, f"{name} shared setup has no one-process suite"
+            suite = next((suite for suite in catalog["suites"] if suite["id"] == suite_id), None)
+            assert suite is not None, f"{name} references unknown suite {suite_id!r}"
+            members = {gate["id"] for gate in catalog["gates"] if gate["serial_group"] == name}
+            assert set(suite["gate_ids"]) == members, (
+                f"{name} suite does not contain exactly its serial-group members"
+            )
 
 
 def test_workbook_manager_shared_timing_is_not_summed(catalog):

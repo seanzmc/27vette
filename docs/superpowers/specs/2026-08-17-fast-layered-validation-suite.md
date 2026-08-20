@@ -1146,14 +1146,21 @@ Acceptance: required CI proves the documented release path; local and CI
 commands agree; no stale gate remains silently outside the catalog; all retired
 owners have explicit replacement evidence.
 
-#### Checkpoint 6 result — 2026-08-20 (COMPLETE)
+#### Checkpoint 6 result — 2026-08-20 (COMPLETE, corrected 2026-08-20)
 
 CI now runs `scripts/run_layered_validation.py`, which reads commands and
 changed-surface ownership from `tests/validation_catalog.json`. Layer 0 oracle,
 catalog, and runner contracts plus the composed Layer 1 candidate run on every
 pull request. Cataloged Layer 2/3 owners join for changed surfaces; unclassified
 paths take a conservative validation/generator fallback. Selecting one
-`workbook_manager` member co-selects its entire serial group in one process. The
+`workbook_manager` member co-selects and executes its entire serial group in one
+pytest process. The original Checkpoint 6 commit had co-selected those gates but
+still launched each as a separate process, defeating the shared fixture; it also
+omitted changed-surface Layer 0 gates. The corrected runner selects affected
+Layer 0/2/3 gates, collapses shared groups to a cataloged suite command, and
+orders execution by layer. CI now fetches complete history, includes deleted
+paths in classification, transports changed paths without shell word-splitting,
+and allows 30 minutes for the measured Layer 1 plus changed-surface work. The
 uploaded report records selected files, surfaces, gates, stage durations,
 outputs, exit statuses, and the overall result. Local and CI use the same runner.
 
@@ -1173,7 +1180,8 @@ remain failures.
 Final local diagnostics (Node 26.7.0 / Python 3.14.7): all 19 Node files passed
 serially; full Python inventory passed 827, skipped 2 documented scratch-writer
 tests, and passed 160 subtests in 1672.16 s. The existing FastAPI/Starlette
-deprecation warning remains. Catalog/runner contracts passed 26 tests. No
+deprecation warning remains. Catalog/runner contracts passed 30 tests after the
+Checkpoint 6 correction. No
 workbook, generated artifact, published registry, customer runtime, dealer
 boundary, deployment path, dependency, or schema changed. Residual risks are the
 Manager timing gap, uncaptured Node 22/Python 3.12 CI timing until GitHub runs the
@@ -1300,13 +1308,13 @@ generated runtime state matrix, with a forced-failure behind each §4.3
 invariant. The candidate lane's browser stage runs that matrix against the
 candidate registry.
 
-Checkpoint 5 is complete: Workbook Manager tests share one immutable verified
-projection/candidate, negative cases use compact fixtures, every distinct Layer
-3 real-workbook boundary remains, and both documented-order and reverse-order
-checkpoint runs are green. The next authorized implementation slice is
-Checkpoint 6: wire CI to the cataloged layers, publish the composed report,
-align operator documentation, and retire obsolete owners only with the required
-coverage and mutation evidence.
+Checkpoints 5 and 6 are complete. Workbook Manager tests share one immutable
+verified projection/candidate, negative cases use compact fixtures, every
+distinct Layer 3 real-workbook boundary remains, and both documented-order and
+reverse-order checkpoint runs are green. CI now runs catalog-driven layered
+selection, executes shared-setup groups through their one-process suite,
+publishes the composed report, and has aligned operator documentation. No later
+implementation checkpoint is authorized by this specification.
 
 Two items still carry approval or classification gates:
 

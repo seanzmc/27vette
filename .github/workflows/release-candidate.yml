@@ -17,11 +17,13 @@ jobs:
   release-candidate:
     name: release-candidate
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v7
@@ -40,13 +42,13 @@ jobs:
       - name: Select changed files
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: git diff --name-only --diff-filter=ACMR "${BASE_SHA:-HEAD^}" HEAD > changed-files.txt
+        run: git diff --name-only --diff-filter=ACMRD "${BASE_SHA:-HEAD^}" HEAD > changed-files.txt
 
       - name: Run layered validation
         run: >-
           python scripts/run_layered_validation.py
           --report layered-validation-report.json
-          $(while IFS= read -r path; do printf '%s\n' "--changed-file=$path"; done < changed-files.txt)
+          --changed-file-list changed-files.txt
 
       - name: Upload layered validation report
         if: always()

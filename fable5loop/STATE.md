@@ -15,10 +15,10 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 - **Updated:** 2026-08-20
 - **Owning specification:** `docs/superpowers/specs/2026-08-17-fast-layered-validation-suite.md` owns the completed fast layered validation suite and Checkpoint 6 evidence.
 - **Active workflow:** Fast layered validation suite Checkpoint 6 — catalog-driven CI, operator guidance, final inventory, and closeout.
-- **Branch/commit:** `hermes/checkpoint-6-layered-ci`; implementation complete and awaiting PR delivery.
-- **Last completed:** Wired pull-request CI to catalog-driven Layer 0/1 plus changed-surface Layer 2/3 selection and a stage-timed report; made Workbook Manager shared setup/timing non-additivity explicit; aligned README guidance; retained narrowed owners where no equivalent retirement canary exists; corrected the protected-artifact guard for Finder metadata only.
-- **Current status:** Checkpoint 6 and the owning fast layered validation specification are complete. No further implementation slice is authorized by this specification.
-- **Validation:** Catalog/runner contracts 26 passed; all 19 Node files passed serially after the `.DS_Store` correction; full Python inventory 827 passed / 2 skipped plus 160 subtests in 1672.16 s, with the existing FastAPI/Starlette deprecation warning only; Fable validator and `git diff --check` passed.
+- **Branch/commit:** `hermes/checkpoint-6-layered-ci`; corrected implementation is complete after auditing commit `6efd300` and awaits final commit/push/PR delivery.
+- **Last completed:** Corrected the layered runner so affected Layer 0 gates are selected and the co-selected Workbook Manager shared-fixture group actually executes in one pytest process; added a catalog-enforced exact serial-group suite; made CI classify deleted paths from complete history without shell path splitting and raised its timeout to 30 minutes.
+- **Current status:** Checkpoint 6 implementation and closeout are corrected and green; only PR delivery remains. No further implementation slice is authorized by this specification.
+- **Validation:** Prior full diagnostics remain 19 Node files passed serially and full Python inventory 827 passed / 2 skipped plus 160 subtests in 1672.16 s. Correction-focused catalog/runner contracts pass 30 tests; Fable validator and `git diff --check` pass.
 - **Next action:** Deliver Checkpoint 6 through a pull request to `main`, then wait for review.
 - **Blockers or closeout gaps:** GitHub's Node 22/Python 3.12 timing remains uncaptured until CI runs. The Manager baseline/closing totals are non-comparable with 142.06 s unattributed; no full re-timing was performed. Proposed promoted-model membership lock and two inert `section_presentation` rows retain their existing approval gates.
 - **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This pass produced no Fable receipt.

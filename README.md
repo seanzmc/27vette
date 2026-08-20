@@ -212,7 +212,7 @@ The first command is the no-write preflight/proposal. Run `--write` only after t
 
 ## Validation
 
-Pull requests targeting `main` run the required `release-candidate` GitHub check from `.github/workflows/release-candidate.yml`. The catalog-driven runner executes Layer 0 plus the composed Layer 1 candidate on every PR, adds Layer 2/3 gates for changed surfaces, co-selects the complete `workbook_manager` serial group when its shared fixture is needed, and uses a conservative validation/generator fallback for unclassified paths. It uploads one stage-timed JSON report:
+Pull requests targeting `main` run the required `release-candidate` GitHub check from `.github/workflows/release-candidate.yml`. The catalog-driven runner executes the catalog/oracle Layer 0 core plus the composed Layer 1 candidate on every PR, adds affected Layer 0 and Layer 2/3 gates by changed surface, co-selects and executes the complete `workbook_manager` serial group in one pytest process when its shared fixture is needed, and uses a conservative validation/generator fallback for unclassified paths. It uploads one stage-timed JSON report:
 
 ```sh
 python scripts/run_layered_validation.py \
@@ -220,7 +220,13 @@ python scripts/run_layered_validation.py \
   --changed-file <repo-relative-path>
 ```
 
-Repeat `--changed-file` for each changed path. The runner reads commands and surface ownership from `tests/validation_catalog.json`; it does not sum member timings for shared-setup serial groups. This PR gate intentionally does not run the Layer 4 full inventory, access the live asset library, or submit a dealer build. Choose any additional local gates by changed surface as described below.
+Repeat `--changed-file` for each changed path, or pass a newline-delimited file
+with `--changed-file-list changed-files.txt` (the CI path). The runner reads
+commands and surface ownership from `tests/validation_catalog.json`; it does not
+sum member timings for shared-setup serial groups. This PR gate intentionally
+does not run the Layer 4 full inventory, access the live asset library, or submit
+a dealer build. Choose any additional local gates by changed surface as
+described below.
 
 The Layer 1 spine the runner invokes remains available directly:
 

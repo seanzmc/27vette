@@ -291,6 +291,10 @@ summing member `approximate_seconds` values. In particular, generated parity
 measures 147.68 seconds alone because it pays the shared build, while the same
 build is already warm inside the complete checkpoint.
 
+Changed-surface CI uses the same one-process Manager serial-group command but
+does not add the separately cataloged `test_asset_map_sync.py`; that asset gate
+is selected only for `asset_map` changes.
+
 ```sh
 .venv/bin/python -m pytest \
   tests/test_asset_map_sync.py \

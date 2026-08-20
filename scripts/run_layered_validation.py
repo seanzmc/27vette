@@ -20,6 +20,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--catalog", type=Path, default=DEFAULT_CATALOG)
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--changed-file", action="append", default=[])
+    parser.add_argument(
+        "--changed-file-list",
+        type=Path,
+        help="newline-delimited changed paths (preserves spaces)",
+    )
     return parser.parse_args()
 
 
@@ -49,7 +54,7 @@ def selected_gates(catalog: dict, paths: list[str]) -> tuple[list[dict], set[str
     selected.update(
         gate["id"]
         for gate in catalog["gates"]
-        if gate["layer"] in (2, 3) and surfaces.intersection(gate["changed_surfaces"])
+        if gate["layer"] in (0, 2, 3) and surfaces.intersection(gate["changed_surfaces"])
     )
 
     shared_groups = {
@@ -69,17 +74,64 @@ def selected_gates(catalog: dict, paths: list[str]) -> tuple[list[dict], set[str
     return [gate for gate in catalog["gates"] if gate["id"] in selected], surfaces, fallback
 
 
+def execution_stages(catalog: dict, gates: list[dict]) -> list[dict]:
+    """Collapse shared-setup groups into their cataloged one-process suite."""
+    suites = {suite["id"]: suite for suite in catalog["suites"]}
+    selected_ids = {gate["id"] for gate in gates}
+    stages: list[dict] = []
+    emitted_groups: set[str] = set()
+
+    for gate in gates:
+        group_name = gate.get("serial_group")
+        group = catalog["serial_groups"].get(group_name, {})
+        suite_id = group.get("suite_id")
+        if group.get("standalone_selection") == "select_entire_group" and suite_id:
+            if group_name in emitted_groups:
+                continue
+            suite = suites[suite_id]
+            gate_ids = [gate_id for gate_id in suite["gate_ids"] if gate_id in selected_ids]
+            stages.append(
+                {
+                    "stage_id": suite_id,
+                    "layer": suite["layer"],
+                    "command": suite["command"],
+                    "gate_ids": gate_ids,
+                }
+            )
+            assert group_name is not None
+            emitted_groups.add(group_name)
+            continue
+
+        stages.append(
+            {
+                "stage_id": gate["id"],
+                "layer": gate["layer"],
+                "command": gate["command"],
+                "gate_ids": [gate["id"]],
+            }
+        )
+    return sorted(stages, key=lambda stage: stage["layer"])
+
+
 def main() -> int:
     args = parse_args()
     catalog = json.loads(args.catalog.read_text(encoding="utf-8"))
-    gates, surfaces, fallback = selected_gates(catalog, args.changed_file)
+    changed_files = list(args.changed_file)
+    if args.changed_file_list:
+        changed_files.extend(
+            path
+            for path in args.changed_file_list.read_text(encoding="utf-8").splitlines()
+            if path
+        )
+    gates, surfaces, fallback = selected_gates(catalog, changed_files)
+    selected_stages = execution_stages(catalog, gates)
     stages = []
     ok = True
     started = time.monotonic()
 
-    for gate in gates:
+    for stage in selected_stages:
         gate_started = time.monotonic()
-        command = gate["command"]
+        command = stage["command"]
         if command.startswith(".venv/bin/python"):
             command = sys.executable + command.removeprefix(".venv/bin/python")
         result = subprocess.run(
@@ -93,8 +145,9 @@ def main() -> int:
         duration = round(time.monotonic() - gate_started, 3)
         stages.append(
             {
-                "gate_id": gate["id"],
-                "layer": gate["layer"],
+                "stage_id": stage["stage_id"],
+                "gate_ids": stage["gate_ids"],
+                "layer": stage["layer"],
                 "command": command,
                 "duration_seconds": duration,
                 "exit_code": result.returncode,
@@ -102,7 +155,7 @@ def main() -> int:
                 "stderr": result.stderr,
             }
         )
-        print(f"[{gate['id']}] exit={result.returncode} duration={duration:.3f}s")
+        print(f"[{stage['stage_id']}] exit={result.returncode} duration={duration:.3f}s")
         if result.stdout:
             print(result.stdout, end="" if result.stdout.endswith("\n") else "\n")
         if result.stderr:
@@ -114,7 +167,7 @@ def main() -> int:
     report = {
         "schema": "27vette-layered-validation-report-1",
         "ok": ok,
-        "changed_files": args.changed_file,
+        "changed_files": changed_files,
         "selected_surfaces": sorted(surfaces),
         "selection_fallback": fallback,
         "selected_gate_ids": [gate["id"] for gate in gates],
