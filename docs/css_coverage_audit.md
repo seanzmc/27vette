@@ -4,6 +4,8 @@ An exhaustive coverage and structural audit of `form-app/styles.css` (2,891 line
 
 A second pass on 2026-08-19 completed the first run after it hit the tool-iteration budget. Sections 1–7 are the original diagnosis. Sections 8–13 are new, verified findings that the first pass missed. Nothing in 1–7 was rewritten.
 
+Adoption contract: `docs/css-cleanup-adoption-spec.md`. That file owns step order, scope, and what may change HTML/JS. This audit stays the diagnosis.
+
 ---
 
 ## 1. Executive Summary & File Metrics

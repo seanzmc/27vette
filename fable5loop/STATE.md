@@ -13,16 +13,16 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 ## Current handoff
 
 - **Updated:** 2026-08-19
-- **Owning specification:** `docs/css_coverage_audit.md` owns this styling diagnosis. `docs/css-cleanup-adoption-spec.md` is a local untracked follow-on plan and is not part of this delivery. Validation-suite Checkpoint 5 remains owned by `docs/superpowers/specs/2026-08-17-fast-layered-validation-suite.md`.
-- **Active workflow:** Docs-only CSS coverage-audit completion after the first pass hit the tool-iteration budget.
-- **Branch/commit:** Task branch from current `origin/main` at `7d44569`; PR opened as the final repository action. No CSS implementation and no deployment.
-- **Last completed:** Appended verified second-pass findings (§8–§13) to `docs/css_coverage_audit.md`: test-asserted CSS contract, unused tokens/no-ops, live classes with no CSS, unscoped `button` / reduced-motion / z-index gaps, and extra streamline items. Original §1–§7 left intact.
-- **Current status:** Audit diagnosis is complete enough to drive a later styling cleanup. No stylesheet, HTML, or JS change was made.
-- **Validation:** Cross-checked `form-app/styles.css` against `form-app/index.html` and `form-app/app.js`; confirmed CSS-text assertions in `tests/stingray-form-regression.test.mjs` and `tests/multi-model-runtime-switching.test.mjs`. `git diff --check` on the audit/handoff. Runtime, workbook, generation, and dealer gates were not run (docs-only).
-- **Next action:** Review and merge the audit PR. CSS cleanup remains unstarted and needs explicit implementation approval; if adopted, follow the audit checklist and do not nest until the CSS-text test contract is migrated.
-- **Blockers or closeout gaps:** Carried validation-suite gaps unchanged. Local untracked `docs/css-cleanup-adoption-spec.md` was left out of this commit.
+- **Owning specification:** `docs/css-cleanup-adoption-spec.md` owns the twelve-step CSS cleanup contract. `docs/css_coverage_audit.md` remains the diagnosis. Validation-suite Checkpoint 5 remains owned by `docs/superpowers/specs/2026-08-17-fast-layered-validation-suite.md`.
+- **Active workflow:** Docs-only update of the CSS cleanup adoption spec so it absorbs audit §8–§13 without breaking step order or scope.
+- **Branch/commit:** `docs/css-coverage-audit`; follow-on commit on the open audit PR. No CSS implementation and no deployment.
+- **Last completed:** Rewrote `docs/css-cleanup-adoption-spec.md` so Steps 1–12, scope, companions, and acceptance stay coherent: Step 6 deferred, Step 8 is the only HTML/JS orphan-emitter pass, Steps 7/9–12 now have explicit shipping rules, and Inter-loading / hover-media / dealer Turnstile behavior stay out of scope.
+- **Current status:** Diagnosis and adoption contract now agree. Cleanup remains unstarted and still needs explicit per-step approval.
+- **Validation:** Spec cross-checked against audit §7/§13 and the live CSS-text helpers in `tests/stingray-form-regression.test.mjs`. `git diff --check` on the spec, audit pointer, and handoff. Runtime, workbook, generation, and dealer gates were not run (docs-only).
+- **Next action:** Review the updated audit PR. Do not start CSS cleanup until a listed step is explicitly approved, in spec order.
+- **Blockers or closeout gaps:** Carried validation-suite gaps unchanged. No implementation authorized.
 - **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This docs pass produced no Fable receipt.
-- **Protected boundaries:** Canonical workbook, generators, generated artifacts, published registry, customer runtime, dealer submission, deployment, schema, and dependencies are untouched. Only the audit doc and this handoff block changed.
+- **Protected boundaries:** Canonical workbook, generators, generated artifacts, published registry, customer runtime, dealer submission, deployment, schema, and dependencies are untouched. Only the adoption spec, the audit pointer, and this handoff block changed.
 
 ## Verified facts
 
