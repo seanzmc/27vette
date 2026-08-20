@@ -1167,7 +1167,10 @@ outputs, exit statuses, and the overall result. Local and CI use the same runner
 
 The final review correction makes ownership automatic rather than adding broad
 exceptions. `requirements-test.txt` composes the minimal workbook, pytest, and
-Workbook Manager backend environments for local and CI use. Narrow
+Workbook Manager backend environments for local and CI use. The first exact-head
+CI run exposed Node gates invoking the documented `.venv/bin/python` path while
+the workflow had installed into the hosted interpreter; CI now creates the same
+repo-local virtual environment and runs installation plus the runner through it. Narrow
 asset/editor/write-path mappings accumulate with generic `scripts/` ownership.
 Every executable cataloged `test_files` path resolves back to its owning gate,
 with mutation proof. A `form-app/` path selects the focused Layer 1 dealer and
