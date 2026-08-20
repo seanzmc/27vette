@@ -45,6 +45,11 @@ def surfaces_for_paths(catalog: dict, paths: list[str]) -> tuple[set[str], list[
 
 def selected_gates(catalog: dict, paths: list[str]) -> tuple[list[dict], set[str], bool]:
     by_id = {gate["id"]: gate for gate in catalog["gates"]}
+    test_owner_by_path = {
+        path: gate["id"]
+        for gate in catalog["gates"]
+        for path in gate.get("test_files", [])
+    }
     surfaces, unmatched = surfaces_for_paths(catalog, paths)
     fallback = bool(unmatched)
     if fallback:
@@ -52,9 +57,15 @@ def selected_gates(catalog: dict, paths: list[str]) -> tuple[list[dict], set[str
 
     selected = set(catalog["ci"]["always_gate_ids"])
     selected.update(
+        test_owner_by_path[path]
+        for path in paths
+        if path in test_owner_by_path and by_id[test_owner_by_path[path]]["layer"] < 4
+    )
+    selected.update(
         gate["id"]
         for gate in catalog["gates"]
-        if gate["layer"] in (0, 2, 3) and surfaces.intersection(gate["changed_surfaces"])
+        if gate["layer"] in (0, 1, 2, 3)
+        and surfaces.intersection(gate["changed_surfaces"])
     )
 
     shared_groups = {

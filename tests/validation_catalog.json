@@ -1008,6 +1008,41 @@
       "checkpoint_1_result": "DONE. The 22-row table and the superseded 'included colour blocks every peer' behaviour are replaced by a sweep whose cases, blocked peers, and added RPOs are read from the model's registered rule-mapping and colour-override sheets, with registry-vs-workbook parity asserted first. Slower than the stale version (3.91 s -> 5.44 s) because it exercises every peer of every case instead of one. Mutation-proved three ways: suppressing the seat-belt disable reason in app.js, dropping one interior-targeted excludes row, and dropping one resolvable colour-override row each fail it."
     },
     {
+      "id": "cmd.workbook_manager_frontend_build",
+      "command": "npm --prefix workbook-manager/frontend ci && npm --prefix workbook-manager/frontend run build",
+      "test_files": [],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook_manager"
+      ],
+      "reads": [
+        "workbook-manager/frontend/package.json",
+        "workbook-manager/frontend/package-lock.json",
+        "workbook-manager/frontend/src/**",
+        "workbook-manager/frontend/vite.config.js"
+      ],
+      "writes": [
+        "workbook-manager/frontend/node_modules/**",
+        "workbook-manager/frontend/dist/**"
+      ],
+      "isolation": "tracked_write",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "required_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 3.0,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "First-class production-build owner for Workbook Manager frontend changes; browser UX acceptance remains a separately recorded manual checkpoint until an approved browser-test dependency exists.",
+      "readme_reference": "npm --prefix workbook-manager/frontend ci && npm --prefix workbook-manager/frontend run build",
+      "notes": "Uses the committed lockfile and writes only gitignored frontend dependency/build directories.",
+      "collected_tests": 0,
+      "baseline_result": "pass",
+      "readme_publishes_command": true
+    },
+    {
       "id": "py.test_all_model_runtime_generation",
       "command": ".venv/bin/python -m pytest tests/test_all_model_runtime_generation.py -q",
       "test_files": [
@@ -3537,6 +3572,91 @@
         ]
       },
       {
+        "prefix": "scripts/sync_asset_map.py",
+        "surfaces": [
+          "asset_map"
+        ]
+      },
+      {
+        "prefix": "scripts/set_asset_display.py",
+        "surfaces": [
+          "asset_map"
+        ]
+      },
+      {
+        "prefix": "scripts/corvette_form_generator/asset_map_sync.py",
+        "surfaces": [
+          "asset_map"
+        ]
+      },
+      {
+        "prefix": "scripts/workbook_editor_server.py",
+        "surfaces": [
+          "editor",
+          "workbook_write"
+        ]
+      },
+      {
+        "prefix": "scripts/apply_workbook_ops.py",
+        "surfaces": [
+          "editor",
+          "workbook_write"
+        ]
+      },
+      {
+        "prefix": "scripts/apply_workbook_changeset.py",
+        "surfaces": [
+          "changeset",
+          "workbook_write"
+        ]
+      },
+      {
+        "prefix": "scripts/corvette_form_generator/editor_ops.py",
+        "surfaces": [
+          "editor",
+          "workbook_write"
+        ]
+      },
+      {
+        "prefix": "scripts/corvette_form_generator/editor_lints.py",
+        "surfaces": [
+          "editor"
+        ]
+      },
+      {
+        "prefix": "scripts/corvette_form_generator/workbook.py",
+        "surfaces": [
+          "workbook_write"
+        ]
+      },
+      {
+        "prefix": "scripts/corvette_form_generator/workbook_bool_hygiene.py",
+        "surfaces": [
+          "workbook_write"
+        ]
+      },
+      {
+        "prefix": "scripts/corvette_form_generator/workbook_domain/changeset.py",
+        "surfaces": [
+          "changeset"
+        ]
+      },
+      {
+        "prefix": "scripts/corvette_form_generator/workbook_domain/service.py",
+        "surfaces": [
+          "changeset",
+          "workbook_write"
+        ]
+      },
+      {
+        "prefix": "scripts/corvette_form_generator/workbook_domain/registry.py",
+        "surfaces": [
+          "workbook_domain_registry",
+          "editor",
+          "workbook_write"
+        ]
+      },
+      {
         "prefix": "scripts/corvette_form_generator/workbook_domain/",
         "surfaces": [
           "workbook_domain_registry",
@@ -3608,6 +3728,6 @@
       "validation_infrastructure",
       "generator"
     ],
-    "notes": "Layer 0 catalog/runner/oracle canaries plus the composed Layer 1 candidate run on every PR. Layer 2/3 selection follows changed surfaces. Unclassified paths conservatively select validation and generator acceptance. workbook_manager selections co-select the entire shared serial group so verified_manager_fixture is built once."
+    "notes": "Always select always_gate_ids. Add directly changed cataloged test owners and all surface-matching gates in Layers 0-3, expand shared serial groups, and execute by layer. Layer 4 remains diagnostic-only. Unclassified paths conservatively select validation and generator acceptance. workbook_manager selections co-select the entire shared serial group so verified_manager_fixture is built once."
   }
 }

@@ -20,6 +20,7 @@ def _catalog(tmp_path: Path) -> Path:
         {
             "id": "layer.zero",
             "layer": 0,
+            "test_files": ["tests/test_layer_zero.py"],
             "command": f'{sys.executable} -c "print(\'zero\')"',
             "changed_surfaces": ["validation_infrastructure"],
             "serial_group": None,
@@ -27,6 +28,7 @@ def _catalog(tmp_path: Path) -> Path:
         {
             "id": "layer.one",
             "layer": 1,
+            "test_files": ["tests/layer-one.test.mjs"],
             "command": f'{sys.executable} -c "print(\'one\')"',
             "changed_surfaces": ["workbook"],
             "serial_group": "protected_artifacts",
@@ -34,6 +36,7 @@ def _catalog(tmp_path: Path) -> Path:
         {
             "id": "manager.parity",
             "layer": 3,
+            "test_files": ["tests/test_manager_parity.py"],
             "command": f'{sys.executable} -c "print(\'manager\')"',
             "changed_surfaces": ["workbook_manager"],
             "serial_group": "workbook_manager",
@@ -41,6 +44,7 @@ def _catalog(tmp_path: Path) -> Path:
         {
             "id": "manager.peer",
             "layer": 2,
+            "test_files": ["tests/test_manager_peer.py"],
             "command": f'{sys.executable} -c "print(\'peer\')"',
             "changed_surfaces": ["workbook_manager"],
             "serial_group": "workbook_manager",
@@ -48,6 +52,7 @@ def _catalog(tmp_path: Path) -> Path:
         {
             "id": "asset.focused",
             "layer": 2,
+            "test_files": ["tests/test_asset_focused.py"],
             "command": f'{sys.executable} -c "print(\'asset\')"',
             "changed_surfaces": ["asset_map"],
             "serial_group": None,
@@ -57,6 +62,7 @@ def _catalog(tmp_path: Path) -> Path:
         "always_gate_ids": ["layer.zero", "layer.one"],
         "path_surfaces": [
             {"prefix": "workbook-manager/", "surfaces": ["workbook_manager"]},
+            {"prefix": "form-app/", "surfaces": ["workbook"]},
             {"prefix": "docs/", "surfaces": ["docs"]},
         ],
         "fallback_surfaces": ["asset_map"],
@@ -135,6 +141,7 @@ def test_changed_surface_selects_matching_layer_zero_gate(tmp_path):
         {
             "id": "manager.fast",
             "layer": 0,
+            "test_files": [],
             "command": f'{sys.executable} -c "print(\'fast\')"',
             "changed_surfaces": ["workbook_manager"],
             "serial_group": None,
@@ -164,6 +171,52 @@ def test_changed_surface_selects_matching_layer_zero_gate(tmp_path):
     assert "manager.fast" in json.loads(report.read_text(encoding="utf-8"))[
         "selected_gate_ids"
     ]
+
+
+def test_changed_surface_selects_matching_layer_one_gate(tmp_path):
+    report = _run(tmp_path, "form-app/app.js")
+    assert "layer.one" in report["selected_gate_ids"]
+
+
+def test_changed_test_selects_its_catalog_owner(tmp_path):
+    report = _run(tmp_path, "tests/test_asset_focused.py")
+    assert "asset.focused" in report["selected_gate_ids"]
+
+
+def test_layer_four_is_never_automatically_selected(tmp_path):
+    catalog_path = _catalog(tmp_path)
+    data = json.loads(catalog_path.read_text(encoding="utf-8"))
+    data["gates"].append(
+        {
+            "id": "diagnostic.full",
+            "layer": 4,
+            "test_files": ["tests/test_full_diagnostic.py"],
+            "command": f'{sys.executable} -c "print(\'diagnostic\')"',
+            "changed_surfaces": ["workbook_manager"],
+            "serial_group": None,
+        }
+    )
+    catalog_path.write_text(json.dumps(data), encoding="utf-8")
+
+    report = tmp_path / "report.json"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--catalog",
+            str(catalog_path),
+            "--report",
+            str(report),
+            "--changed-file",
+            "tests/test_full_diagnostic.py",
+        ],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "diagnostic.full" not in json.loads(report.read_text())["selected_gate_ids"]
 
 
 def test_unknown_path_uses_conservative_fallback(tmp_path):

@@ -174,11 +174,11 @@ approved direction.
 ## Setup
 
 ```sh
-# backend deps (repo venv)
-.venv/bin/python -m pip install -r workbook-manager/backend/requirements.txt
+# shared test environment (repo venv; includes backend deps)
+.venv/bin/python -m pip install -r requirements-test.txt
 
 # frontend build (one-time per change; FastAPI serves dist/)
-cd workbook-manager/frontend && npm install && npm run build
+npm --prefix workbook-manager/frontend ci && npm --prefix workbook-manager/frontend run build
 ```
 
 ## Run

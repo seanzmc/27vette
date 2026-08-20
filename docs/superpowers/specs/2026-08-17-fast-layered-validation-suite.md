@@ -1151,18 +1151,30 @@ owners have explicit replacement evidence.
 CI now runs `scripts/run_layered_validation.py`, which reads commands and
 changed-surface ownership from `tests/validation_catalog.json`. Layer 0 oracle,
 catalog, and runner contracts plus the composed Layer 1 candidate run on every
-pull request. Cataloged Layer 2/3 owners join for changed surfaces; unclassified
-paths take a conservative validation/generator fallback. Selecting one
+pull request. Directly changed cataloged tests select their owners, cataloged
+Layer 0–3 owners join for changed surfaces, and Layer 4 remains diagnostic-only;
+unclassified paths take a conservative validation/generator fallback. Selecting one
 `workbook_manager` member co-selects and executes its entire serial group in one
 pytest process. The original Checkpoint 6 commit had co-selected those gates but
 still launched each as a separate process, defeating the shared fixture; it also
 omitted changed-surface Layer 0 gates. The corrected runner selects affected
-Layer 0/2/3 gates, collapses shared groups to a cataloged suite command, and
+Layer 0–3 gates, collapses shared groups to a cataloged suite command, and
 orders execution by layer. CI now fetches complete history, includes deleted
 paths in classification, transports changed paths without shell word-splitting,
 and allows 30 minutes for the measured Layer 1 plus changed-surface work. The
 uploaded report records selected files, surfaces, gates, stage durations,
 outputs, exit statuses, and the overall result. Local and CI use the same runner.
+
+The final review correction makes ownership automatic rather than adding broad
+exceptions. `requirements-test.txt` composes the minimal workbook, pytest, and
+Workbook Manager backend environments for local and CI use. Narrow
+asset/editor/write-path mappings accumulate with generic `scripts/` ownership.
+Every executable cataloged `test_files` path resolves back to its owning gate,
+with mutation proof. A `form-app/` path selects the focused Layer 1 dealer and
+runtime owners. A Workbook Manager frontend path selects the shared Manager
+group plus the lockfile-driven production build; browser UX proof remains manual
+until a browser-test dependency is separately approved. The next authorized
+work is Workbook Manager UX Recovery Checkpoint 1; it is not part of this pass.
 
 The Checkpoint 5 correction is recorded above and in catalog `serial_groups`.
 Shared-build cost and non-additive timing are explicit, isolated parity cost is
@@ -1180,8 +1192,10 @@ remain failures.
 Final local diagnostics (Node 26.7.0 / Python 3.14.7): all 19 Node files passed
 serially; full Python inventory passed 827, skipped 2 documented scratch-writer
 tests, and passed 160 subtests in 1672.16 s. The existing FastAPI/Starlette
-deprecation warning remains. Catalog/runner contracts passed 30 tests after the
-Checkpoint 6 correction. No
+deprecation warning remains. Catalog/runner contracts passed 36 tests after the
+final Checkpoint 6 correction, the frontend production build passed, and the
+composed test-requirements install resolved locally. Exact-head Node 22/Python
+3.12 GitHub CI remains the final closeout gate. No
 workbook, generated artifact, published registry, customer runtime, dealer
 boundary, deployment path, dependency, or schema changed. Residual risks are the
 Manager timing gap, uncaptured Node 22/Python 3.12 CI timing until GitHub runs the

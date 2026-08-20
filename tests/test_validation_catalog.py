@@ -14,6 +14,7 @@ standard library so the contract holds wherever pytest runs.
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import re
 from pathlib import Path
@@ -24,6 +25,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = REPO_ROOT / "tests" / "validation_catalog.json"
 README_PATH = REPO_ROOT / "README.md"
 TESTS_DIR = REPO_ROOT / "tests"
+RUNNER_PATH = REPO_ROOT / "scripts" / "run_layered_validation.py"
 
 # Files under tests/ that are helpers or data, not gates. Everything else must
 # be cataloged. Keep this list short and explicit — an unexplained exemption is
@@ -141,6 +143,22 @@ def _suite_member_gate_ids(catalog: dict, suite: dict) -> set[str]:
         files |= {path for path in owners if path.endswith(".py")}
 
     return {owners[path] for path in files if path in owners}
+
+
+def _load_runner():
+    spec = importlib.util.spec_from_file_location("run_layered_validation", RUNNER_PATH)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _assert_ci_test_owners_select(catalog: dict, expected: dict[str, str]) -> None:
+    runner = _load_runner()
+    for path, gate_id in expected.items():
+        selected, _, _ = runner.selected_gates(catalog, [path])
+        selected_ids = {gate["id"] for gate in selected}
+        assert gate_id in selected_ids, f"{path} did not select its owner {gate_id}"
 
 
 # --- structural validity of the catalog itself -----------------------------
@@ -279,6 +297,63 @@ def test_no_test_file_is_claimed_by_two_gates(catalog):
             claims.setdefault(path, []).append(gate["id"])
     doubled = {path: ids for path, ids in claims.items() if len(ids) > 1}
     assert not doubled, f"test files claimed by more than one gate: {doubled}"
+
+
+def test_ci_selects_every_executable_test_file_owner(catalog):
+    expected = {
+        path: gate["id"]
+        for gate in catalog["gates"]
+        if gate["layer"] < 4
+        for path in gate["test_files"]
+    }
+    _assert_ci_test_owners_select(catalog, expected)
+
+    mutated = json.loads(json.dumps(catalog))
+    path, owner = next(iter(expected.items()))
+    next(gate for gate in mutated["gates"] if gate["id"] == owner)["test_files"].remove(path)
+    with pytest.raises(AssertionError):
+        _assert_ci_test_owners_select(mutated, {path: owner})
+
+
+def test_ci_path_routing_selects_focused_owners_and_accumulates(catalog):
+    runner = _load_runner()
+    cases = {
+        "scripts/sync_asset_map.py": ({"asset_map", "generator"}, {"py.test_asset_map_sync"}),
+        "scripts/workbook_editor_server.py": (
+            {"editor", "workbook_write", "generator"},
+            {"py.test_editor_server_payload", "py.test_editor_server_write_api"},
+        ),
+        "scripts/corvette_form_generator/workbook_domain/registry.py": (
+            {"workbook_domain_registry", "editor", "workbook_write", "generator"},
+            {"py.test_workbook_domain_registry", "py.test_editor_ops_global_families"},
+        ),
+    }
+    for path, (expected_surfaces, expected_gates) in cases.items():
+        selected, surfaces, _ = runner.selected_gates(catalog, [path])
+        assert expected_surfaces <= surfaces, path
+        assert expected_gates <= {gate["id"] for gate in selected}, path
+
+
+def test_ci_acceptance_examples_and_layer_four_exclusion(catalog):
+    runner = _load_runner()
+
+    form_gates, _, _ = runner.selected_gates(catalog, ["form-app/app.js"])
+    assert {
+        "node.stingray-form-regression",
+        "node.multi-model-runtime-switching",
+        "node.runtime-state-matrix",
+    } <= {gate["id"] for gate in form_gates}
+
+    manager_gates, _, _ = runner.selected_gates(
+        catalog, ["workbook-manager/frontend/src/App.jsx"]
+    )
+    manager_ids = {gate["id"] for gate in manager_gates}
+    assert "cmd.workbook_manager_frontend_build" in manager_ids
+    assert {
+        gate["id"] for gate in catalog["gates"] if gate.get("serial_group") == "workbook_manager"
+    } <= manager_ids
+
+    assert all(gate["layer"] < 4 for gate in form_gates + manager_gates)
 
 
 # --- §7 condition 2: one acceptance lock, one primary owner ----------------

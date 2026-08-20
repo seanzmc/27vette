@@ -15,14 +15,14 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 - **Updated:** 2026-08-20
 - **Owning specification:** `docs/superpowers/specs/2026-08-17-fast-layered-validation-suite.md` owns the completed fast layered validation suite and Checkpoint 6 evidence.
 - **Active workflow:** Fast layered validation suite Checkpoint 6 — catalog-driven CI, operator guidance, final inventory, and closeout.
-- **Branch/commit:** `hermes/checkpoint-6-layered-ci`; corrected implementation is complete after auditing commit `6efd300` and awaits final commit/push/PR delivery.
-- **Last completed:** Corrected the layered runner so affected Layer 0 gates are selected and the co-selected Workbook Manager shared-fixture group actually executes in one pytest process; added a catalog-enforced exact serial-group suite; made CI classify deleted paths from complete history without shell path splitting and raised its timeout to 30 minutes.
-- **Current status:** Checkpoint 6 implementation and closeout are corrected and green; only PR delivery remains. No further implementation slice is authorized by this specification.
-- **Validation:** Prior full diagnostics remain 19 Node files passed serially and full Python inventory 827 passed / 2 skipped plus 160 subtests in 1672.16 s. Correction-focused catalog/runner contracts pass 30 tests; Fable validator and `git diff --check` pass.
-- **Next action:** Deliver Checkpoint 6 through a pull request to `main`, then wait for review.
-- **Blockers or closeout gaps:** GitHub's Node 22/Python 3.12 timing remains uncaptured until CI runs. The Manager baseline/closing totals are non-comparable with 142.06 s unattributed; no full re-timing was performed. Proposed promoted-model membership lock and two inert `section_presentation` rows retain their existing approval gates.
+- **Branch/commit:** `hermes/checkpoint-6-layered-ci`; PR #35 final review correction is locally green and awaiting exact-head commit/push/CI proof.
+- **Last completed:** Made CI dependencies explicit; derived changed-test ownership from catalog `test_files`; selected affected owners across Layers 0–3 while excluding Layer 4; accumulated narrow asset/editor/write routing with broad script ownership; added the lockfile-driven Workbook Manager frontend build gate.
+- **Current status:** Checkpoint 6 implementation meets its local acceptance points. Closure requires the required GitHub check to pass on the final exact head; no further implementation slice is authorized by this specification.
+- **Validation:** Prior full diagnostics remain 19 Node files passed serially and full Python inventory 827 passed / 2 skipped plus 160 subtests in 1672.16 s. Final correction contracts pass 36 tests; test-requirement resolution, frontend production build, Fable validator, and `git diff --check` pass locally.
+- **Next action:** Commit and push the final PR #35 correction, require exact-head Node 22/Python 3.12 CI green, then begin only Workbook Manager UX Recovery Checkpoint 1 in a fresh task.
+- **Blockers or closeout gaps:** Exact-head GitHub CI is not yet green. The Manager baseline/closing totals remain non-comparable with 142.06 s unattributed; no full re-timing was performed. Proposed promoted-model membership lock and two inert `section_presentation` rows retain their existing approval gates.
 - **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This pass produced no Fable receipt.
-- **Protected boundaries:** Canonical workbook, generators, generated artifacts, published registry, customer runtime, dealer submission, deployment, workbook schema, and dependencies are untouched. Changes are limited to CI/validation tooling, catalog/test contracts, operator guidance, the owning specification, and this handoff.
+- **Protected boundaries:** Canonical workbook, generators, generated artifacts, published registry, customer runtime, dealer submission, deployment, and workbook schema are untouched. Changes are limited to test-environment composition, CI/validation tooling, catalog/test contracts, operator guidance, the owning specification, and this handoff.
 
 ## Verified facts
 

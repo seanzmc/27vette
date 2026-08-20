@@ -96,10 +96,13 @@ cd <repo-root>
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+python -m pip install -r requirements-test.txt
 ```
 
-Do not commit `.venv/`. Always run Python tooling with `.venv/bin/python` or the activated venv.
+`requirements.txt` remains the minimal workbook runtime environment;
+`requirements-test.txt` adds pytest and Workbook Manager backend dependencies for
+the shared local/CI validation environment. Do not commit `.venv/`. Always run
+Python tooling with `.venv/bin/python` or the activated venv.
 
 ## Raw Order-Guide Ingest (retired)
 
@@ -212,7 +215,7 @@ The first command is the no-write preflight/proposal. Run `--write` only after t
 
 ## Validation
 
-Pull requests targeting `main` run the required `release-candidate` GitHub check from `.github/workflows/release-candidate.yml`. The catalog-driven runner executes the catalog/oracle Layer 0 core plus the composed Layer 1 candidate on every PR, adds affected Layer 0 and Layer 2/3 gates by changed surface, co-selects and executes the complete `workbook_manager` serial group in one pytest process when its shared fixture is needed, and uses a conservative validation/generator fallback for unclassified paths. It uploads one stage-timed JSON report:
+Pull requests targeting `main` run the required `release-candidate` GitHub check from `.github/workflows/release-candidate.yml`. The catalog-driven runner executes the catalog/oracle Layer 0 core plus the composed Layer 1 candidate on every PR, selects directly changed test owners and affected Layer 0–3 gates, co-selects and executes the complete `workbook_manager` serial group in one pytest process when its shared fixture is needed, and uses a conservative validation/generator fallback for unclassified paths. Layer 4 remains diagnostic-only. It uploads one stage-timed JSON report:
 
 ```sh
 python scripts/run_layered_validation.py \
@@ -227,6 +230,12 @@ sum member timings for shared-setup serial groups. This PR gate intentionally
 does not run the Layer 4 full inventory, access the live asset library, or submit
 a dealer build. Choose any additional local gates by changed surface as
 described below.
+
+Workbook Manager frontend changes also run the cataloged production build:
+
+```sh
+npm --prefix workbook-manager/frontend ci && npm --prefix workbook-manager/frontend run build
+```
 
 The Layer 1 spine the runner invokes remains available directly:
 
