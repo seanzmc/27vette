@@ -13,16 +13,16 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 ## Current handoff
 
 - **Updated:** 2026-08-19
-- **Owning specification:** `docs/superpowers/specs/2026-08-17-fast-layered-validation-suite.md` owns the completed Checkpoint 4 and next authorized Checkpoint 5. `docs/asset-map-sync.md` owns the merged operator-guide rewrite. `docs/superpowers/specs/2026-08-15-workbook-manager-ux-recovery.md` owns the paused Manager recovery.
-- **Active workflow:** Repository delivery-guidance update after the merged Checkpoint 4 closeout. No Checkpoint 5 implementation has started.
-- **Branch/commit:** PR-only guidance is being delivered from a task branch based on `main` at `99444ff`; PR #31 merged 2026-08-19. No deployment or production verification.
-- **Last completed:** Added repository-owned instructions requiring all tracked changes to be committed on a task branch and delivered through a pull request, with PR creation as the final repository action before handoff. Also recorded the completed PR #31 merge. Evidence: `AGENTS.md` §12 and PR #31.
-- **Current status:** Checkpoint 4 is green, recorded, and merged. PR-only delivery guidance is now the required conduct for subsequent repository changes. Workbook Manager Checkpoint 5 remains unstarted and is the next authorized validation-suite slice after this guidance PR is reviewed and merged.
-- **Validation:** Default Node lane 17 files green / 52 s; Python metadata 159 tests + 111 subtests green / 36.99 s; candidate verifier 17 green / 457.54 s; Layer 3 all-model CLI owner 30 green / 6.19 s (not rerun in review); catalog 20 green; `git diff --check` green. The asset-map docs rewrite's prior help/source checks remain as previously recorded; asset sync tests and live WordPress access were not rerun.
-- **Next action:** Review and merge the PR-only guidance change. After it lands, start validation-suite Checkpoint 5 only; first inspect the live Manager fixtures and establish the bounded Checkpoint 5 definition of done from the owning specification.
-- **Blockers or closeout gaps:** No Checkpoint 4 blocker. Carried gaps: `promoted_model_membership` still needs §12 approval, two inert Stingray-scoped Grand Sport `section_presentation` rows remain, and Node 22 / Python 3.12 CI timings remain uncaptured. Newly recorded, not fixed: `tests/stingray-runtime-contract.test.mjs` leaves its two mkdtemp workbook copies on disk, and `py.test_model_config_metadata` still declares `read_only` / `generates: false` while writing workbook snapshots and calling `generate_model_artifacts` into a temp root.
-- **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This docs rewrite produced no Fable receipt.
-- **Protected boundaries:** Canonical workbook, generators, generated artifacts, published registry, customer runtime, dealer submission, deployment, schema, and dependencies are untouched. This task changes only agent conduct/handoff guidance and the centralized handoff.
+- **Owning specification:** `docs/css_coverage_audit.md` owns this styling diagnosis. `docs/css-cleanup-adoption-spec.md` is a local untracked follow-on plan and is not part of this delivery. Validation-suite Checkpoint 5 remains owned by `docs/superpowers/specs/2026-08-17-fast-layered-validation-suite.md`.
+- **Active workflow:** Docs-only CSS coverage-audit completion after the first pass hit the tool-iteration budget.
+- **Branch/commit:** Task branch from current `origin/main` at `7d44569`; PR opened as the final repository action. No CSS implementation and no deployment.
+- **Last completed:** Appended verified second-pass findings (§8–§13) to `docs/css_coverage_audit.md`: test-asserted CSS contract, unused tokens/no-ops, live classes with no CSS, unscoped `button` / reduced-motion / z-index gaps, and extra streamline items. Original §1–§7 left intact.
+- **Current status:** Audit diagnosis is complete enough to drive a later styling cleanup. No stylesheet, HTML, or JS change was made.
+- **Validation:** Cross-checked `form-app/styles.css` against `form-app/index.html` and `form-app/app.js`; confirmed CSS-text assertions in `tests/stingray-form-regression.test.mjs` and `tests/multi-model-runtime-switching.test.mjs`. `git diff --check` on the audit/handoff. Runtime, workbook, generation, and dealer gates were not run (docs-only).
+- **Next action:** Review and merge the audit PR. CSS cleanup remains unstarted and needs explicit implementation approval; if adopted, follow the audit checklist and do not nest until the CSS-text test contract is migrated.
+- **Blockers or closeout gaps:** Carried validation-suite gaps unchanged. Local untracked `docs/css-cleanup-adoption-spec.md` was left out of this commit.
+- **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This docs pass produced no Fable receipt.
+- **Protected boundaries:** Canonical workbook, generators, generated artifacts, published registry, customer runtime, dealer submission, deployment, schema, and dependencies are untouched. Only the audit doc and this handoff block changed.
 
 ## Verified facts
 
