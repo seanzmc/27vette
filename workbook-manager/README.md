@@ -294,6 +294,7 @@ overlay write and reconstruction-validation path.
   tests/test_asset_map_sync.py \
   tests/test_workbook_manager_catalog.py \
   tests/test_workbook_manager_import_projection.py \
+  tests/test_workbook_manager_fixtures.py \
   tests/test_workbook_manager_generated_parity.py \
   tests/test_workbook_manager_api_concurrency.py \
   tests/test_workbook_manager_drafts.py \

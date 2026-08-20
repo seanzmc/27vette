@@ -157,6 +157,7 @@ mutations and any future candidate promotion — so supported serving is
 containment behavior, and test commands: `workbook-manager/README.md`. Focused
 tests: `tests/test_workbook_manager_catalog.py`,
 `tests/test_workbook_manager_import_projection.py`,
+`tests/test_workbook_manager_fixtures.py`,
 `tests/test_workbook_manager_api_concurrency.py`,
 `tests/test_workbook_manager_drafts.py`,
 `tests/test_workbook_manager_changeset_lifecycle.py`,

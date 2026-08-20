@@ -2052,7 +2052,7 @@
       "serial_group": "workbook_manager",
       "ci_policy": "not_run_now",
       "checkpoint_policy": "manager_checkpoint",
-      "approximate_seconds": 810.34,
+      "approximate_seconds": 574.26,
       "acceptance_locks": [],
       "disposition": "rewrite",
       "disposition_reason": "Largest Python file (65 tests) and the main contributor to the 791.25s Manager checkpoint. Checkpoint 5 builds one verified immutable real-workbook projection/candidate fixture per checkpoint run and clones it; negative cases move to compact workbooks and SQLite fixtures. Every distinct Layer 3 real-workbook acceptance boundary is retained. WBM_SLOW_GATE=1 adds two scratch-copy shared-writer tests.",
@@ -2232,6 +2232,40 @@
       "readme_publishes_command": false
     },
     {
+      "id": "py.test_workbook_manager_fixtures",
+      "command": ".venv/bin/python -m pytest tests/test_workbook_manager_fixtures.py -q",
+      "test_files": [
+        "tests/test_workbook_manager_fixtures.py"
+      ],
+      "layer": 0,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook_manager",
+        "validation"
+      ],
+      "reads": [
+        "tests/workbook_manager_fixtures.py"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": "workbook_manager",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "manager_checkpoint",
+      "approximate_seconds": 0.28,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Checkpoint 5 helper contract: clone isolation and compact negative workbooks. Does not import or promote the canonical workbook.",
+      "readme_reference": "test_workbook_manager_fixtures",
+      "notes": "",
+      "collected_tests": 6,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
       "id": "py.test_workbook_manager_generated_parity",
       "command": ".venv/bin/python -m pytest tests/test_workbook_manager_generated_parity.py -q",
       "test_files": [
@@ -2256,7 +2290,7 @@
       "serial_group": "workbook_manager",
       "ci_policy": "not_run_now",
       "checkpoint_policy": "manager_checkpoint",
-      "approximate_seconds": 82.22,
+      "approximate_seconds": 147.68,
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "The only owner proving a Manager reconstruction generates the same primary runtime contracts as its bound source workbook (\u00a74.2). AGENTS.md \u00a710 forbids claiming reconstruction parity without it. Distinct Layer 3 boundary \u2014 must not be collapsed into an equality check against itself.",
@@ -2290,7 +2324,7 @@
       "serial_group": "workbook_manager",
       "ci_policy": "not_run_now",
       "checkpoint_policy": "manager_checkpoint",
-      "approximate_seconds": 222.91,
+      "approximate_seconds": 205.25,
       "acceptance_locks": [],
       "disposition": "rewrite",
       "disposition_reason": "Real-workbook import/projection is one of the 66\u201375s owners. Checkpoint 5 clones the immutable verified projection fixture rather than re-importing. Keep one real import proof.",
@@ -2404,12 +2438,13 @@
     {
       "id": "suite.workbook_manager_checkpoint",
       "description": "Workbook Manager pass/checkpoint acceptance inventory (workbook-manager/README.md).",
-      "command": ".venv/bin/python -m pytest tests/test_asset_map_sync.py tests/test_workbook_manager_catalog.py tests/test_workbook_manager_import_projection.py tests/test_workbook_manager_generated_parity.py tests/test_workbook_manager_api_concurrency.py tests/test_workbook_manager_drafts.py tests/test_workbook_manager_changeset_lifecycle.py tests/test_workbook_manager_apply_rebuild.py tests/test_workbook_manager.py -q",
+      "command": ".venv/bin/python -m pytest tests/test_asset_map_sync.py tests/test_workbook_manager_catalog.py tests/test_workbook_manager_import_projection.py tests/test_workbook_manager_fixtures.py tests/test_workbook_manager_generated_parity.py tests/test_workbook_manager_api_concurrency.py tests/test_workbook_manager_drafts.py tests/test_workbook_manager_changeset_lifecycle.py tests/test_workbook_manager_apply_rebuild.py tests/test_workbook_manager.py -q",
       "layer": 3,
       "gate_ids": [
         "py.test_asset_map_sync",
         "py.test_workbook_manager_catalog",
         "py.test_workbook_manager_import_projection",
+        "py.test_workbook_manager_fixtures",
         "py.test_workbook_manager_generated_parity",
         "py.test_workbook_manager_api_concurrency",
         "py.test_workbook_manager_drafts",
@@ -2465,6 +2500,7 @@
         "py.test_workbook_manager_catalog",
         "py.test_workbook_manager_changeset_lifecycle",
         "py.test_workbook_manager_drafts",
+        "py.test_workbook_manager_fixtures",
         "py.test_workbook_manager_generated_parity",
         "py.test_workbook_manager_import_projection",
         "py.test_workbook_truth"
