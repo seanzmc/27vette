@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import shlex
 import subprocess
@@ -11,8 +12,17 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = REPO_ROOT / "scripts" / "run_layered_validation.py"
+PLANNER = REPO_ROOT / "scripts" / "plan_ci_validation.py"
 CATALOG = REPO_ROOT / "tests" / "validation_catalog.json"
 WORKFLOW = REPO_ROOT / ".github" / "workflows" / "release-candidate.yml"
+
+
+def _load_planner():
+    spec = importlib.util.spec_from_file_location("plan_ci_validation", PLANNER)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def _catalog(tmp_path: Path) -> Path:
@@ -243,16 +253,93 @@ def test_nested_operator_doc_skips_workbook_manager_gates(tmp_path):
     assert report["selected_gate_ids"] == ["layer.zero", "layer.one"]
 
 
-def test_workflow_fetches_and_classifies_deleted_paths():
+def test_workflow_fetches_deleted_paths_and_runs_a_bounded_matrix():
     workflow = WORKFLOW.read_text(encoding="utf-8")
     assert "fetch-depth: 0" in workflow
     assert "--diff-filter=ACMRD" in workflow
-    assert "timeout-minutes: 25" in workflow
+    assert "timeout-minutes: 15" in workflow
+    assert "timeout-minutes: 25" not in workflow
     assert "python -m venv .venv" in workflow
     assert ".venv/bin/python -m pip install --requirement requirements-test.txt" in workflow
-    assert ".venv/bin/python scripts/run_layered_validation.py" in workflow
-    assert "--changed-file-list changed-files.txt" in workflow
+    assert "python scripts/plan_ci_validation.py" in workflow
+    assert "fromJSON(needs.plan.outputs.matrix)" in workflow
+    assert "VALIDATION_COMMAND" in workflow
+    assert "name: release-candidate" in workflow
     assert "$(while IFS=" not in workflow
+
+
+def test_pr_planner_routes_read_only_manager_ux_to_focused_shards():
+    planner = _load_planner()
+    plan = planner.plan_validation(
+        [
+            ".github/workflows/release-candidate.yml",
+            "tests/test_run_layered_validation.py",
+            "tests/test_workbook_manager.py",
+            "workbook-manager/backend/app/explorer.py",
+            "workbook-manager/backend/app/main.py",
+            "workbook-manager/frontend/src/App.jsx",
+            "workbook-manager/frontend/src/api.js",
+            "workbook-manager/frontend/src/components/ConnectedExplorer.jsx",
+            "workbook-manager/frontend/src/components/ExplorerPanel.jsx",
+            "workbook-manager/frontend/src/styles.css",
+            "workbook-manager/README.md",
+            "fable5loop/STATE.md",
+        ]
+    )
+
+    assert [shard["name"] for shard in plan["include"]] == [
+        "ci-contracts",
+        "manager-frontend",
+        "manager-explorer",
+    ]
+    commands = "\n".join(str(shard["command"]) for shard in plan["include"])
+    assert "test_workbook_manager_generated_parity.py" not in commands
+    assert "test_workbook_manager_apply_rebuild.py" not in commands
+    assert "test_verify_workbook_candidate.py" not in commands
+    assert "-k 'not TestApi'" not in commands
+
+
+def test_pr_planner_covers_a_test_only_manager_change_without_one_monolith():
+    planner = _load_planner()
+    plan = planner.plan_validation(["tests/test_workbook_manager.py"])
+    assert [shard["name"] for shard in plan["include"]] == [
+        "ci-contracts",
+        "manager-api",
+        "manager-non-api",
+    ]
+
+
+def test_pr_planner_delegates_non_manager_changes_to_the_catalog_runner():
+    planner = _load_planner()
+    plan = planner.plan_validation(["scripts/corvette_form_generator/rules.py"])
+    assert [shard["name"] for shard in plan["include"]] == [
+        "ci-contracts",
+        "layered-changed-surfaces",
+    ]
+    assert (
+        "--changed-file scripts/corvette_form_generator/rules.py"
+        in plan["include"][-1]["command"]
+    )
+
+
+def test_manual_full_plan_parallelizes_each_expensive_owner():
+    planner = _load_planner()
+    plan = planner.plan_validation([], full=True)
+    names = {shard["name"] for shard in plan["include"]}
+    assert {
+        "full-release-candidate",
+        "full-python-core",
+        "full-python-candidate-tests",
+        "full-python-editor-writes",
+        "manager-api",
+        "manager-non-api",
+        "manager-projection",
+        "manager-boundaries",
+        "full-node-inventory",
+        "full-manager-frontend-build",
+    } <= names
+    assert all(shard["name"] != "full-python-inventory" for shard in plan["include"])
+    assert len(plan["include"]) == 11
 
 
 def test_changed_file_list_preserves_paths_with_spaces(tmp_path):
