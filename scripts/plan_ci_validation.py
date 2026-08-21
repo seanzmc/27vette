@@ -114,7 +114,7 @@ def _manager_frontend_shard() -> dict[str, object]:
         ),
         python=True,
         node=True,
-        description="Build the changed frontend and validate its source-level shell contracts.",
+        description="Build the changed frontend and validate its readiness-shell containment contracts.",
     )
 
 
@@ -213,6 +213,8 @@ def _full_suite_shards() -> tuple[dict[str, object], ...]:
         "tests/test_verify_workbook_candidate.py",
         "tests/test_editor_ops_apply.py",
         "tests/test_editor_server_write_api.py",
+        "tests/test_run_layered_validation.py",
+        "tests/test_validation_catalog.py",
     ]
     core_command = shlex.join(
         [
@@ -227,11 +229,12 @@ def _full_suite_shards() -> tuple[dict[str, object], ...]:
     return (
         _shard(
             "full-release-candidate",
-            ".venv/bin/python scripts/run_layered_validation.py "
-            "--report layered-validation-report.json --changed-file stingray_master.xlsx",
+            ".venv/bin/python scripts/verify_workbook_candidate.py "
+            "--workbook stingray_master.xlsx --changed-model '*' "
+            "--report candidate-report.json",
             python=True,
             node=True,
-            description="Run the composed candidate and all workbook-selected readiness owners.",
+            description="Run the composed six-model candidate boundary once.",
         ),
         _shard(
             "full-python-core",
@@ -356,7 +359,7 @@ def plan_validation(changed_paths: Iterable[str], *, full: bool = False) -> dict
 
     # main.py plus explorer.py is the normal shape of a read-only explorer route
     # change. A main.py change without explorer.py runs the complete API class.
-    focused_explorer = read_changed and (not main_changed or not unknown_manager_source)
+    focused_explorer = read_changed and not unknown_manager_source
     if main_changed and not read_changed:
         api_changed = True
     if focused_explorer and not api_changed and not draft_changed and not apply_changed:
@@ -367,7 +370,11 @@ def plan_validation(changed_paths: Iterable[str], *, full: bool = False) -> dict
     if draft_changed:
         _add(shards, _manager_drafts_shard())
     if apply_changed:
-        _add(shards, _manager_apply_shard())
+        # Apply/Rebuild is the protected writer/recovery boundary. Preserve the
+        # complete Manager inventory, but split it across isolated jobs so the
+        # required wall-clock path remains bounded.
+        for shard in _manager_full_shards():
+            _add(shards, shard)
         _add(
             shards,
             _shard(
