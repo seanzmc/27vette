@@ -15,14 +15,14 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 - **Updated:** 2026-08-21
 - **Owning specification:** `docs/superpowers/specs/2026-08-15-workbook-manager-ux-recovery.md` owns the active Workbook Manager UX recovery and Checkpoint 1.
 - **Active workflow:** Workbook Manager Product and UX Recovery — Checkpoint 1 readiness shell and read-only connected explorer.
-- **Branch/commit:** `hermes/workbook-manager-ux-recovery-cp1-impl` from merged `origin/main` (`f6a3092`); Checkpoint 1 implementation is complete and awaiting PR delivery.
-- **Last completed:** Implemented Checkpoint 1 readiness-first navigation, connected read-only option/group/section/rule projections, typed cross-entity search, five named diagnostics, Advanced & Recovery containment, and removal of arbitrary row comparison.
-- **Current status:** Checkpoint 1 exit gate is green. Checkpoints 2–6 remain unauthorized and unstarted.
-- **Validation:** Focused explorer/shell tests passed; complete Manager suite 185 passed, 2 skipped, 36 subtests passed; frontend production build passed; headless Chrome proved stale recovery, 5ZU search, connected option/group navigation, named members, and 390 x 844 no-overflow layout; protected workbook/generated/publication/customer-runtime hashes matched; `git diff --check` passed.
-- **Next action:** Deliver the Checkpoint 1 branch through its PR and stop. After review, obtain the three explicit Checkpoint 2 approvals before any schema, workbook, generated-contract, or customer-runtime work.
-- **Blockers or closeout gaps:** None for Checkpoint 1 delivery. Checkpoint 2 requires explicit approval for the schema addition, complete group-label list, and customer-runtime heading switch.
+- **Branch/commit:** `hermes/workbook-manager-ux-recovery-cp1-impl` from merged `origin/main` (`f6a3092`); PR 37 repair is locally green and awaiting commit/push on the existing Checkpoint 1 branch.
+- **Last completed:** Diagnosed PR 37 as a GitHub job-timeout cancellation after all earlier selected stages passed, raised the job limit without widening gate selection, and made the API's entity-specific named diagnostics reachable beside connected option/group detail.
+- **Current status:** Checkpoint 1 repair is implemented and locally green. Checkpoints 2–6 remain unauthorized and unstarted.
+- **Validation:** Exact catalog-selected PR path passed all ten stages in 793.239 seconds, including composed Layer 1, frontend production build, Fable, protected-artifact guard, and complete Manager group (`185 passed, 2 skipped, 36 subtests passed`); focused runner/catalog/shell tests and `git diff --check` passed; protected workbook/generated/customer-runtime surfaces have no diff. No green remote CI claim yet.
+- **Next action:** Commit/push the repair to PR 37 and verify the required 25-minute check completes green. Then stop before Checkpoint 2.
+- **Blockers or closeout gaps:** PR 37 required check is not green until the repaired branch is pushed and the 25-minute run completes. Checkpoint 2 still requires explicit approval for the schema addition, complete group-label list, and customer-runtime heading switch.
 - **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This startup pass produced no Fable receipt.
-- **Protected boundaries:** Canonical workbook, workbook schema, generators, generated artifacts, published registry, customer runtime, dealer submission, WordPress media, and deployment remain byte-identical or untouched. Checkpoint 1 changes only Manager read projections, shell/presentation, focused tests, the owning spec, and this handoff.
+- **Protected boundaries:** Canonical workbook, workbook schema, generators, generated artifacts, published registry, customer runtime, dealer submission, WordPress media, and deployment remain untouched. The repair changes only Manager read-only presentation, CI timing/docs/catalog metadata, focused tests, the owning spec, and this handoff.
 
 ## Verified facts
 

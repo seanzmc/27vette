@@ -17,7 +17,10 @@ jobs:
   release-candidate:
     name: release-candidate
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # Manager changes add the complete shared-fixture acceptance group after
+    # the composed candidate lane; the first PR 37 run reached this group but
+    # GitHub cancelled it at the previous 15-minute job limit.
+    timeout-minutes: 25
 
     steps:
       - name: Check out repository

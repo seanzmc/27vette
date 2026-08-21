@@ -247,7 +247,7 @@ def test_workflow_fetches_and_classifies_deleted_paths():
     workflow = WORKFLOW.read_text(encoding="utf-8")
     assert "fetch-depth: 0" in workflow
     assert "--diff-filter=ACMRD" in workflow
-    assert "timeout-minutes: 15" in workflow
+    assert "timeout-minutes: 25" in workflow
     assert "python -m venv .venv" in workflow
     assert ".venv/bin/python -m pip install --requirement requirements-test.txt" in workflow
     assert ".venv/bin/python scripts/run_layered_validation.py" in workflow

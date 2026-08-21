@@ -95,6 +95,7 @@ main { padding: 20px 22px 60px; max-width: 1280px; margin: 0 auto; }
 .detail-facts { display: grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap: 8px; }
 .detail-facts > span { display: grid; gap: 3px; padding: 10px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; }
 .detail-facts strong { color: var(--text-dim); font-size: 10px; text-transform: uppercase; }
+.detail-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
 .availability-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(170px,1fr)); gap: 7px; }
 .availability-grid > div { display: grid; gap: 3px; padding: 9px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 7px; }
 .availability-grid span { color: var(--green); text-transform: capitalize; }

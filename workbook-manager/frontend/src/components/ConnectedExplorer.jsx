@@ -20,7 +20,24 @@ function EntityLink({ destination, children, onNavigate }) {
   );
 }
 
-function GroupDetail({ detail, onNavigate, onBack }) {
+function DiagnosticResults({ result, onNavigate }) {
+  if (!result) return null;
+  return (
+    <div className="panel diagnostic-results">
+      <div className="panel-head"><strong>{result.diagnostic.label}</strong><span>{result.results.length} results</span></div>
+      <div className="relationship-list">
+        {result.results.map((row) => (
+          <EntityLink key={`${row.entity_type}:${row.entity_id}`} destination={row.destination} onNavigate={onNavigate}>
+            <strong>{row.label}</strong><span>{row.direction || row.distinct_status_count || row.distinct_group_count || "Open connected detail"}</span>
+          </EntityLink>
+        ))}
+        {!result.results.length && <p className="muted">No matching relationships in this model.</p>}
+      </div>
+    </div>
+  );
+}
+
+function GroupDetail({ detail, onNavigate, onBack, onDiagnostic, diagnosticResult }) {
   return (
     <section className="explorer-detail" aria-labelledby="group-detail-heading">
       <button className="btn small" onClick={onBack}><ArrowLeft size={14} /> Back to results</button>
@@ -31,6 +48,11 @@ function GroupDetail({ detail, onNavigate, onBack }) {
         <span><strong>Type</strong>{detail.group_type}</span>
         <span><strong>Behavior</strong>{detail.behavior?.replaceAll("_", " ")}</span>
         <span><strong>Members</strong>{detail.member_count}</span>
+      </div>
+      <div className="detail-actions">
+        <button className="btn small" onClick={() => onDiagnostic("where_used", detail.destination.entity_id)}>
+          Where this group is used
+        </button>
       </div>
       <h3>Members</h3>
       <div className="relationship-list">
@@ -43,12 +65,13 @@ function GroupDetail({ detail, onNavigate, onBack }) {
           </EntityLink>
         ))}
       </div>
+      <DiagnosticResults result={diagnosticResult} onNavigate={onNavigate} />
       <TechnicalDetails data={{ group_id: detail.group_id, ...detail.technical }} />
     </section>
   );
 }
 
-function OptionDetail({ detail, onNavigate, onBack }) {
+function OptionDetail({ detail, onNavigate, onBack, onDiagnostic, diagnosticResult }) {
   const { option } = detail;
   return (
     <section className="explorer-detail" aria-labelledby="option-detail-heading">
@@ -61,6 +84,14 @@ function OptionDetail({ detail, onNavigate, onBack }) {
         <span><strong>Base price</strong>{option.price === null ? "Not specified" : `$${Number(option.price).toLocaleString()}`}</span>
         <span><strong>Selectable</strong>{option.selectable === "True" ? "Yes" : "No"}</span>
         <span><strong>Active</strong>{option.active === "True" ? "Yes" : "No"}</span>
+      </div>
+      <div className="detail-actions">
+        <button className="btn small" onClick={() => onDiagnostic("where_used", option.option_id)}>
+          Where this option is used
+        </button>
+        <button className="btn small" onClick={() => onDiagnostic("option_relationships", option.option_id)}>
+          Show option relationships
+        </button>
       </div>
       <h3>Availability by variant</h3>
       <div className="availability-grid">
@@ -91,6 +122,7 @@ function OptionDetail({ detail, onNavigate, onBack }) {
         <span><strong>Variant overrides</strong>{detail.variant_overrides.length}</span>
         <span><strong>Images</strong>{detail.assets.length}</span>
       </div>
+      <DiagnosticResults result={diagnosticResult} onNavigate={onNavigate} />
       <TechnicalDetails data={detail.technical} />
     </section>
   );
@@ -144,6 +176,7 @@ export default function ConnectedExplorer({ mode, modelKey }) {
   const navigate = async (destination) => {
     try {
       setError("");
+      setDiagnosticResult(null);
       if (destination.entity_type === "option") {
         setSelected(await api.connectedOption(modelKey, destination.entity_id));
       } else if (destination.entity_type === "group") {
@@ -175,16 +208,17 @@ export default function ConnectedExplorer({ mode, modelKey }) {
     }, 180);
   };
 
-  const runDiagnostic = async (item) => {
+  const runDiagnostic = async (item, entityId = "") => {
     try {
-      const entityId = selected?.option?.option_id || "";
       const data = await api.explorerDiagnostic(modelKey, item.key, { entityId, limit: 100 });
       setDiagnosticResult(data); setError("");
     } catch (e) { setError(e.message); }
   };
 
-  if (selected?.entity_type === "option") return <OptionDetail detail={selected} onNavigate={navigate} onBack={() => setSelected(null)} />;
-  if (selected?.entity_type === "group") return <GroupDetail detail={selected} onNavigate={navigate} onBack={() => setSelected(null)} />;
+  const runEntityDiagnostic = (key, entityId) => runDiagnostic({ key }, entityId);
+
+  if (selected?.entity_type === "option") return <OptionDetail detail={selected} onNavigate={navigate} onBack={() => { setSelected(null); setDiagnosticResult(null); }} onDiagnostic={runEntityDiagnostic} diagnosticResult={diagnosticResult} />;
+  if (selected?.entity_type === "group") return <GroupDetail detail={selected} onNavigate={navigate} onBack={() => { setSelected(null); setDiagnosticResult(null); }} onDiagnostic={runEntityDiagnostic} diagnosticResult={diagnosticResult} />;
   if (selected?.entity_type === "section") return <SectionDetail detail={selected} onNavigate={navigate} onBack={() => setSelected(null)} />;
   if (selected?.entity_type === "rule") return <RuleDetail detail={selected} onNavigate={navigate} onBack={() => setSelected(null)} />;
 
@@ -228,18 +262,7 @@ export default function ConnectedExplorer({ mode, modelKey }) {
           </button>
         ))}
       </div>
-      {diagnosticResult && (
-        <div className="panel diagnostic-results">
-          <div className="panel-head"><strong>{diagnosticResult.diagnostic.label}</strong><span>{diagnosticResult.results.length} results</span></div>
-          <div className="relationship-list">
-            {diagnosticResult.results.map((row) => (
-              <EntityLink key={`${row.entity_type}:${row.entity_id}`} destination={row.destination} onNavigate={navigate}>
-                <strong>{row.label}</strong><span>{row.direction || row.distinct_status_count || row.distinct_group_count || "Open connected detail"}</span>
-              </EntityLink>
-            ))}
-          </div>
-        </div>
-      )}
+      <DiagnosticResults result={diagnosticResult} onNavigate={navigate} />
     </section>
   );
 }

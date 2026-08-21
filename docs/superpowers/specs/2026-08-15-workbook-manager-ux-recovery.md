@@ -744,6 +744,22 @@ and the customer runtime files. No workbook schema, draft-write lifecycle,
 generated contract, customer runtime, dealer, media, deployment, or publication
 behavior changed.
 
+PR 37 repair, 2026-08-21: the first GitHub run did not report an assertion
+failure; it reached the complete shared-fixture Manager group after all earlier
+selected stages passed, then GitHub cancelled the job at the former 15-minute
+limit. The required job now allows 25 minutes without changing catalog
+selection or adding Layer 4. Review also found that the two entity-specific
+named diagnostics were implemented in the API but unreachable in the connected
+UI because their landing-page controls were disabled after entity detail had
+replaced that page. Connected option detail now exposes `Where this option is
+used` and `Show option relationships`; connected group detail exposes `Where
+this group is used`, with results kept beside the selected entity. This is a
+read-only Manager UX correction only; Checkpoint 2 remains gated and unstarted.
+The exact local catalog-selected PR path then passed all ten stages in 793.239
+seconds: Layer 0 owners, composed Layer 1 candidate, protected-artifact guard,
+Fable validators, lockfile-driven frontend build, and the complete Manager group
+(`185 passed, 2 skipped, 36 subtests passed`).
+
 ### Checkpoint 2 — group display-label contract and reviewed migration
 
 - Add registry/workbook/schema/projection/generated-contract ownership for

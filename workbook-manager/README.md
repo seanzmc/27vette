@@ -178,7 +178,7 @@ approved direction.
 .venv/bin/python -m pip install -r requirements-test.txt
 
 # frontend build (one-time per change; FastAPI serves dist/)
-npm --prefix workbook-manager/frontend ci && npm --prefix workbook-manager/frontend run build
+npm --prefix workbook-manager/frontend ci --include=dev && npm --prefix workbook-manager/frontend run build
 ```
 
 ## Run
