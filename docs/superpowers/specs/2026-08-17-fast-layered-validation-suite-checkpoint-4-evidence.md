@@ -1,6 +1,6 @@
 # Checkpoint 4 measured evidence — fast layered validation suite
 
-Evidence file for `docs/archive/completed-specs/fast-layered-validation/2026-08-17-fast-layered-validation-suite.md` §9,
+Evidence file for `docs/superpowers/specs/2026-08-17-fast-layered-validation-suite.md` §9,
 Checkpoint 4. Closing acceptance output captured 2026-08-19.
 
 Environment: darwin arm64; node v26.7.0; python 3.14.7 (`.venv`).

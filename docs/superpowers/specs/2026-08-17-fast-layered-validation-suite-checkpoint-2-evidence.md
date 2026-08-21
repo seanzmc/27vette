@@ -1,6 +1,6 @@
 # Checkpoint 2 measured evidence — fast layered validation suite
 
-Evidence file for `docs/archive/completed-specs/fast-layered-validation/2026-08-17-fast-layered-validation-suite.md` §9,
+Evidence file for `docs/superpowers/specs/2026-08-17-fast-layered-validation-suite.md` §9,
 Checkpoint 2. Raw tool output from the closing acceptance run, captured 2026-08-17.
 The durable, queryable form of these numbers is `tests/validation_catalog.json`;
 this file is the transcript behind it.

@@ -489,7 +489,7 @@ Delivered:
 
 Measured baseline (local Node 26.7.0 / Python 3.14.7 on darwin arm64, serial;
 one process per file except where noted). Raw output:
-`docs/archive/completed-specs/fast-layered-validation/2026-08-17-fast-layered-validation-suite-checkpoint-0-baseline.md`.
+`docs/superpowers/specs/2026-08-17-fast-layered-validation-suite-checkpoint-0-baseline.md`.
 
 | Lane | Wall time | Tests | Result |
 |---|---|---|---|
@@ -968,7 +968,7 @@ Named model-specific generic tests were **not** retired. Spec Checkpoint 3
 says they move only after the matrix demonstrates equivalent or stronger
 failure detection; that retirement canary belongs to Checkpoint 4.
 
-Raw output: `docs/archive/completed-specs/fast-layered-validation/2026-08-17-fast-layered-validation-suite-checkpoint-3-evidence.md`.
+Raw output: `docs/superpowers/specs/2026-08-17-fast-layered-validation-suite-checkpoint-3-evidence.md`.
 
 Carried forward, unchanged by this checkpoint:
 
@@ -1049,7 +1049,7 @@ in 35.0 s (36.99 s on the review re-run); the Layer 3 all-model CLI owner passed
 30 tests in 6.19 s; the candidate verifier passed 17 tests in 457.54 s; the
 catalog contract passed 20 tests; `git diff --check` passed. Raw output and
 disposition details:
-`docs/archive/completed-specs/fast-layered-validation/2026-08-17-fast-layered-validation-suite-checkpoint-4-evidence.md`.
+`docs/superpowers/specs/2026-08-17-fast-layered-validation-suite-checkpoint-4-evidence.md`.
 
 No workbook, generated artifact, published registry, runtime implementation,
 dealer boundary, deployment path, dependency, or schema changed. Checkpoint 5

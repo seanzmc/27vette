@@ -1,6 +1,6 @@
 # Checkpoint 3 measured evidence — fast layered validation suite
 
-Evidence file for `docs/archive/completed-specs/fast-layered-validation/2026-08-17-fast-layered-validation-suite.md` §9,
+Evidence file for `docs/superpowers/specs/2026-08-17-fast-layered-validation-suite.md` §9,
 Checkpoint 3. Raw tool output from the closing acceptance run, captured 2026-08-18.
 
 Environment: darwin arm64; node v26.7.0; python 3.14.7 (`.venv`).
