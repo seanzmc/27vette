@@ -1214,7 +1214,10 @@ composed test-requirements install resolved locally. The locally executed
 catalog-driven path also passed all selected Layer 0 gates and all twelve stages
 of the Layer 1 candidate in 83.741 seconds; its recorded candidate command used
 the active virtual-environment interpreter. Exact-head Node 22/Python 3.12
-GitHub CI remains the final closeout gate. One exact-head run after the interpreter
+GitHub CI passed at `54a554c794be7518333fe4a9dfeffcc827555a64`: the required
+`release-candidate` check completed successfully in 2m46s, including dependency
+installation, changed-file selection, layered validation, and report upload. One
+earlier exact-head run after the interpreter
 fix reached the workflow timeout because broad `tests/`, `scripts/`, and nested
 Workbook Manager documentation ownership selected 33 gates, including the
 expensive Manager serial group. The final routing correction reduces this PR's
@@ -1223,8 +1226,9 @@ the tracked-artifact guard, and two Fable gates) without weakening direct
 changed-test ownership or source-path surface coverage. No
 workbook, generated artifact, published registry, customer runtime, dealer
 boundary, deployment path, dependency, or schema changed. Residual risks are the
-Manager timing gap, uncaptured Node 22/Python 3.12 CI timing until GitHub runs the
-workflow, the approval-gated promoted-model lock, and the inert workbook rows.
+Manager timing gap, the approval-gated promoted-model lock, and the inert workbook
+rows. Checkpoint 6 is closed green; its next project action is Workbook Manager UX
+Recovery Checkpoint 1 in a fresh task.
 
 ## 10. Files and surfaces expected to change during implementation
 
