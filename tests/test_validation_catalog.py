@@ -315,6 +315,20 @@ def test_ci_selects_every_executable_test_file_owner(catalog):
         _assert_ci_test_owners_select(mutated, {path: owner})
 
 
+def test_ci_changed_test_selects_only_its_owner_not_the_broad_test_surface(catalog):
+    runner = _load_runner()
+    selected, surfaces, fallback = runner.selected_gates(
+        catalog, ["tests/test_validation_catalog.py"]
+    )
+
+    assert surfaces == set()
+    assert fallback is False
+    assert "py.test_validation_catalog" in {gate["id"] for gate in selected}
+    assert "py.test_verify_workbook_candidate" not in {
+        gate["id"] for gate in selected
+    }
+
+
 def test_ci_path_routing_selects_focused_owners_and_accumulates(catalog):
     runner = _load_runner()
     cases = {
@@ -332,6 +346,24 @@ def test_ci_path_routing_selects_focused_owners_and_accumulates(catalog):
         selected, surfaces, _ = runner.selected_gates(catalog, [path])
         assert expected_surfaces <= surfaces, path
         assert expected_gates <= {gate["id"] for gate in selected}, path
+
+
+def test_ci_routes_workbook_manager_operator_docs_as_docs_only(catalog):
+    runner = _load_runner()
+    selected, surfaces, fallback = runner.selected_gates(
+        catalog, ["workbook-manager/README.md"]
+    )
+
+    assert surfaces == {"docs"}
+    assert fallback is False
+    assert "cmd.workbook_manager_frontend_build" not in {
+        gate["id"] for gate in selected
+    }
+    assert not {
+        gate["id"]
+        for gate in selected
+        if gate.get("serial_group") == "workbook_manager"
+    }
 
 
 def test_ci_acceptance_examples_and_layer_four_exclusion(catalog):

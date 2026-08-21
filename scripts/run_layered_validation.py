@@ -36,9 +36,12 @@ def surfaces_for_paths(catalog: dict, paths: list[str]) -> tuple[set[str], list[
     for path in paths:
         matched = False
         for mapping in mappings:
-            if path.startswith(mapping["prefix"]):
+            prefix = mapping["prefix"]
+            if path.startswith(prefix):
                 surfaces.update(mapping["surfaces"])
                 matched = True
+                if mapping.get("stop_after_match"):
+                    break
         if not matched:
             unmatched.append(path)
     return surfaces, unmatched
@@ -51,7 +54,9 @@ def selected_gates(catalog: dict, paths: list[str]) -> tuple[list[dict], set[str
         for gate in catalog["gates"]
         for path in gate.get("test_files", [])
     }
-    surfaces, unmatched = surfaces_for_paths(catalog, paths)
+    surfaces, unmatched = surfaces_for_paths(
+        catalog, [path for path in paths if path not in test_owner_by_path]
+    )
     fallback = bool(unmatched)
     if fallback:
         surfaces.update(catalog["ci"]["fallback_surfaces"])

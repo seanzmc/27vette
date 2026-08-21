@@ -1153,7 +1153,11 @@ changed-surface ownership from `tests/validation_catalog.json`. Layer 0 oracle,
 catalog, and runner contracts plus the composed Layer 1 candidate run on every
 pull request. Directly changed cataloged tests select their owners, cataloged
 Layer 0–3 owners join for changed surfaces, and Layer 4 remains diagnostic-only;
-unclassified paths take a conservative validation/generator fallback. Selecting one
+unclassified paths take a conservative validation/generator fallback. Cataloged
+test files select their exact owner without also inheriting the broad `tests/`
+surface. Narrow CI, dependency, tracked-artifact, and nested operator-doc paths
+stop after their explicit classification, while ordinary Workbook Manager source
+paths still select the Manager surface. Selecting one
 `workbook_manager` member co-selects and executes its entire serial group in one
 pytest process. The original Checkpoint 6 commit had co-selected those gates but
 still launched each as a separate process, defeating the shared fixture; it also
@@ -1161,7 +1165,10 @@ omitted changed-surface Layer 0 gates. The corrected runner selects affected
 Layer 0–3 gates, collapses shared groups to a cataloged suite command, and
 orders execution by layer. CI now fetches complete history, includes deleted
 paths in classification, transports changed paths without shell word-splitting,
-and allows 30 minutes for the measured Layer 1 plus changed-surface work. The
+and allows 15 minutes for the measured Layer 1 plus changed-surface work; the
+first 30-minute run proved that a broad-path over-selection of the Manager group
+could exceed its former timeout, and the corrected exact-path contracts prevent
+that unrelated suite from joining a layered-validation-only PR. The
 uploaded report records selected files, surfaces, gates, stage durations,
 outputs, exit statuses, and the overall result. Local and CI use the same runner.
 
@@ -1201,13 +1208,19 @@ remain failures.
 Final local diagnostics (Node 26.7.0 / Python 3.14.7): all 19 Node files passed
 serially; full Python inventory passed 827, skipped 2 documented scratch-writer
 tests, and passed 160 subtests in 1672.16 s. The existing FastAPI/Starlette
-deprecation warning remains. Catalog/runner contracts passed 37 tests after the
+deprecation warning remains. Catalog/runner contracts passed 40 tests after the
 final Checkpoint 6 correction, the frontend production build passed, and the
 composed test-requirements install resolved locally. The locally executed
 catalog-driven path also passed all selected Layer 0 gates and all twelve stages
 of the Layer 1 candidate in 83.741 seconds; its recorded candidate command used
 the active virtual-environment interpreter. Exact-head Node 22/Python 3.12
-GitHub CI remains the final closeout gate. No
+GitHub CI remains the final closeout gate. One exact-head run after the interpreter
+fix reached the workflow timeout because broad `tests/`, `scripts/`, and nested
+Workbook Manager documentation ownership selected 33 gates, including the
+expensive Manager serial group. The final routing correction reduces this PR's
+exact-head selection to eight gates (four Layer 0, the composed Layer 1 candidate,
+the tracked-artifact guard, and two Fable gates) without weakening direct
+changed-test ownership or source-path surface coverage. No
 workbook, generated artifact, published registry, customer runtime, dealer
 boundary, deployment path, dependency, or schema changed. Residual risks are the
 Manager timing gap, uncaptured Node 22/Python 3.12 CI timing until GitHub runs the

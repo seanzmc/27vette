@@ -62,6 +62,11 @@ def _catalog(tmp_path: Path) -> Path:
     data["ci"] = {
         "always_gate_ids": ["layer.zero", "layer.one"],
         "path_surfaces": [
+            {
+                "prefix": "workbook-manager/README.md",
+                "surfaces": ["docs"],
+                "stop_after_match": True,
+            },
             {"prefix": "workbook-manager/", "surfaces": ["workbook_manager"]},
             {"prefix": "form-app/", "surfaces": ["workbook"]},
             {"prefix": "docs/", "surfaces": ["docs"]},
@@ -182,6 +187,7 @@ def test_changed_surface_selects_matching_layer_one_gate(tmp_path):
 def test_changed_test_selects_its_catalog_owner(tmp_path):
     report = _run(tmp_path, "tests/test_asset_focused.py")
     assert "asset.focused" in report["selected_gate_ids"]
+    assert report["selected_surfaces"] == []
 
 
 def test_layer_four_is_never_automatically_selected(tmp_path):
@@ -231,11 +237,17 @@ def test_docs_only_change_skips_changed_surface_gates(tmp_path):
     assert report["selected_gate_ids"] == ["layer.zero", "layer.one"]
 
 
+def test_nested_operator_doc_skips_workbook_manager_gates(tmp_path):
+    report = _run(tmp_path, "workbook-manager/README.md")
+    assert report["selected_surfaces"] == ["docs"]
+    assert report["selected_gate_ids"] == ["layer.zero", "layer.one"]
+
+
 def test_workflow_fetches_and_classifies_deleted_paths():
     workflow = WORKFLOW.read_text(encoding="utf-8")
     assert "fetch-depth: 0" in workflow
     assert "--diff-filter=ACMRD" in workflow
-    assert "timeout-minutes: 30" in workflow
+    assert "timeout-minutes: 15" in workflow
     assert "python -m venv .venv" in workflow
     assert ".venv/bin/python -m pip install --requirement requirements-test.txt" in workflow
     assert ".venv/bin/python scripts/run_layered_validation.py" in workflow

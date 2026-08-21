@@ -667,7 +667,8 @@
       "layer": 1,
       "primary_authority": "structural_invariant",
       "changed_surfaces": [
-        "validation_infrastructure"
+        "validation_infrastructure",
+        "layered_validation"
       ],
       "reads": [
         "form-output/**",
@@ -3562,8 +3563,36 @@
       {
         "prefix": ".github/",
         "surfaces": [
-          "validation_infrastructure"
+          "layered_validation"
         ]
+      },
+      {
+        "prefix": "requirements-test.txt",
+        "surfaces": [
+          "dependency_environment"
+        ],
+        "stop_after_match": true
+      },
+      {
+        "prefix": "scripts/run_layered_validation.py",
+        "surfaces": [
+          "layered_validation"
+        ],
+        "stop_after_match": true
+      },
+      {
+        "prefix": "tests/validation_catalog.json",
+        "surfaces": [
+          "layered_validation"
+        ],
+        "stop_after_match": true
+      },
+      {
+        "prefix": "tests/lib/tracked-artifacts.mjs",
+        "surfaces": [
+          "layered_validation"
+        ],
+        "stop_after_match": true
       },
       {
         "prefix": "tests/",
@@ -3670,6 +3699,20 @@
           "generator",
           "validation_infrastructure"
         ]
+      },
+      {
+        "prefix": "workbook-manager/README.md",
+        "surfaces": [
+          "docs"
+        ],
+        "stop_after_match": true
+      },
+      {
+        "prefix": "workbook-manager/USER-GUIDE.md",
+        "surfaces": [
+          "docs"
+        ],
+        "stop_after_match": true
       },
       {
         "prefix": "workbook-manager/",
