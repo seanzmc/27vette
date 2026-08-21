@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -267,6 +268,40 @@ def test_changed_file_list_preserves_paths_with_spaces(tmp_path):
     assert json.loads(report.read_text(encoding="utf-8"))["changed_files"] == [
         "docs/operator note.md"
     ]
+
+
+def test_catalog_python_commands_use_the_runner_interpreter(tmp_path):
+    catalog_path = _catalog(tmp_path)
+    data = json.loads(catalog_path.read_text(encoding="utf-8"))
+    marker = tmp_path / "python-command.json"
+    data["gates"][0]["command"] = (
+        "python -c \"import json, pathlib, sys; "
+        f"pathlib.Path({str(marker)!r}).write_text(json.dumps(sys.executable))\""
+    )
+    catalog_path.write_text(json.dumps(data), encoding="utf-8")
+
+    report = tmp_path / "report.json"
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--catalog",
+            str(catalog_path),
+            "--report",
+            str(report),
+            "--changed-file",
+            "docs/operator-note.md",
+        ],
+        cwd=REPO_ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    stage = json.loads(report.read_text(encoding="utf-8"))["stages"][0]
+    assert shlex.split(stage["command"])[0] == sys.executable
+    assert json.loads(marker.read_text(encoding="utf-8")) == sys.executable
 
 
 def test_layer_zero_runs_before_layer_one_even_when_catalog_order_is_reversed(tmp_path):

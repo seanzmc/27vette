@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shlex
 import subprocess
 import sys
 import time
@@ -124,6 +125,14 @@ def execution_stages(catalog: dict, gates: list[dict]) -> list[dict]:
     return sorted(stages, key=lambda stage: stage["layer"])
 
 
+def command_for_active_interpreter(command: str) -> str:
+    """Run cataloged Python commands in the interpreter running this process."""
+    parts = shlex.split(command)
+    if parts and parts[0] in {"python", ".venv/bin/python"}:
+        return shlex.join([sys.executable, *parts[1:]])
+    return command
+
+
 def main() -> int:
     args = parse_args()
     catalog = json.loads(args.catalog.read_text(encoding="utf-8"))
@@ -142,9 +151,7 @@ def main() -> int:
 
     for stage in selected_stages:
         gate_started = time.monotonic()
-        command = stage["command"]
-        if command.startswith(".venv/bin/python"):
-            command = sys.executable + command.removeprefix(".venv/bin/python")
+        command = command_for_active_interpreter(stage["command"])
         result = subprocess.run(
             command,
             cwd=REPO_ROOT,

@@ -1170,7 +1170,13 @@ exceptions. `requirements-test.txt` composes the minimal workbook, pytest, and
 Workbook Manager backend environments for local and CI use. The first exact-head
 CI run exposed Node gates invoking the documented `.venv/bin/python` path while
 the workflow had installed into the hosted interpreter; CI now creates the same
-repo-local virtual environment and runs installation plus the runner through it. Narrow
+repo-local virtual environment and runs installation plus the runner through it.
+The next exact-head run reached the Layer 1 candidate, then exposed its catalog
+command beginning with bare `python`, which selected the hosted system
+interpreter instead of that virtual environment. The runner now normalizes both
+supported Python command prefixes (`python` and `.venv/bin/python`) to the
+interpreter running the runner, with an execution test that records and verifies
+the child interpreter path. Narrow
 asset/editor/write-path mappings accumulate with generic `scripts/` ownership.
 Every executable cataloged `test_files` path resolves back to its owning gate,
 with mutation proof. A `form-app/` path selects the focused Layer 1 dealer and
@@ -1195,10 +1201,13 @@ remain failures.
 Final local diagnostics (Node 26.7.0 / Python 3.14.7): all 19 Node files passed
 serially; full Python inventory passed 827, skipped 2 documented scratch-writer
 tests, and passed 160 subtests in 1672.16 s. The existing FastAPI/Starlette
-deprecation warning remains. Catalog/runner contracts passed 36 tests after the
+deprecation warning remains. Catalog/runner contracts passed 37 tests after the
 final Checkpoint 6 correction, the frontend production build passed, and the
-composed test-requirements install resolved locally. Exact-head Node 22/Python
-3.12 GitHub CI remains the final closeout gate. No
+composed test-requirements install resolved locally. The locally executed
+catalog-driven path also passed all selected Layer 0 gates and all twelve stages
+of the Layer 1 candidate in 83.741 seconds; its recorded candidate command used
+the active virtual-environment interpreter. Exact-head Node 22/Python 3.12
+GitHub CI remains the final closeout gate. No
 workbook, generated artifact, published registry, customer runtime, dealer
 boundary, deployment path, dependency, or schema changed. Residual risks are the
 Manager timing gap, uncaptured Node 22/Python 3.12 CI timing until GitHub runs the
