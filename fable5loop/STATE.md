@@ -15,14 +15,14 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 - **Updated:** 2026-08-21
 - **Owning specification:** `docs/superpowers/specs/2026-08-15-workbook-manager-ux-recovery.md` owns the active Workbook Manager UX recovery and Checkpoint 1.
 - **Active workflow:** Workbook Manager Product and UX Recovery — Checkpoint 1 readiness shell and read-only connected explorer.
-- **Branch/commit:** `hermes/workbook-manager-ux-recovery-cp1` from current `origin/main` (`c5cdf082d42b45f790ba397f8f5b71d26602165c`); no task commit yet.
-- **Last completed:** Retired the completed fast layered validation specification and its Checkpoint 0–4 evidence from the active specs directory into `docs/archive/completed-specs/fast-layered-validation/`, activated the Workbook Manager UX recovery specification, and created the fresh Checkpoint 1 work branch.
-- **Current status:** Checkpoint 1 is authorized and started at its documentation/workbranch boundary. No React, FastAPI, projection, browser-test, workbook, or runtime implementation has changed yet.
-- **Validation:** Active-path reference review found no current pointer to the retired spec location; archived evidence links now resolve within the archive. Fable loop validation and `git diff --check` pass.
-- **Next action:** Inventory the live Checkpoint 1 React, FastAPI, projection-query, and browser acceptance surfaces; record the bounded implementation and test set before the first code edit.
-- **Blockers or closeout gaps:** None for starting Checkpoint 1. Checkpoints 2–6 remain unauthorized; Checkpoint 2 still requires the schema and customer-copy approvals in the owning specification.
+- **Branch/commit:** `hermes/workbook-manager-ux-recovery-cp1-impl` from merged `origin/main` (`f6a3092`); Checkpoint 1 implementation is complete and awaiting PR delivery.
+- **Last completed:** Implemented Checkpoint 1 readiness-first navigation, connected read-only option/group/section/rule projections, typed cross-entity search, five named diagnostics, Advanced & Recovery containment, and removal of arbitrary row comparison.
+- **Current status:** Checkpoint 1 exit gate is green. Checkpoints 2–6 remain unauthorized and unstarted.
+- **Validation:** Focused explorer/shell tests passed; complete Manager suite 185 passed, 2 skipped, 36 subtests passed; frontend production build passed; headless Chrome proved stale recovery, 5ZU search, connected option/group navigation, named members, and 390 x 844 no-overflow layout; protected workbook/generated/publication/customer-runtime hashes matched; `git diff --check` passed.
+- **Next action:** Deliver the Checkpoint 1 branch through its PR and stop. After review, obtain the three explicit Checkpoint 2 approvals before any schema, workbook, generated-contract, or customer-runtime work.
+- **Blockers or closeout gaps:** None for Checkpoint 1 delivery. Checkpoint 2 requires explicit approval for the schema addition, complete group-label list, and customer-runtime heading switch.
 - **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This startup pass produced no Fable receipt.
-- **Protected boundaries:** Canonical workbook, generators, generated artifacts, published registry, customer runtime, dealer submission, deployment, and workbook schema remain untouched. This checkpoint changes documentation locations, the active specification status, and the operational handoff only.
+- **Protected boundaries:** Canonical workbook, workbook schema, generators, generated artifacts, published registry, customer runtime, dealer submission, WordPress media, and deployment remain byte-identical or untouched. Checkpoint 1 changes only Manager read projections, shell/presentation, focused tests, the owning spec, and this handoff.
 
 ## Verified facts
 

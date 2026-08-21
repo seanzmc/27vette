@@ -721,6 +721,29 @@ search or a relationship returns the same stable detail workspace; and the
 initial named diagnostics return traceable, model-scoped results. Workbook,
 generated, and publication bytes remain unchanged.
 
+Checkpoint 1 completed 2026-08-21. The Manager now resolves readiness before
+rendering normal workspaces; exposes model-scoped connected option, group,
+section, and rule projections; ranks typed cross-entity search results to stable
+destinations; and serves the five named diagnostics as bounded read-only
+queries. The normal shell leads with Form Overview, Options & Relationships,
+Groups, Images, and Review & Apply. Raw collection browsing and history remain
+under Advanced & Recovery. Arbitrary two-row comparison was removed, while the
+separate workbook review export remains intact. Group labels in this checkpoint
+use existing canonical IDs when readable or factual group/section status when
+hash-like; notes were not promoted into label authority and no workbook display
+label was invented.
+
+Acceptance evidence: focused RED/GREEN API and shell tests passed; the complete
+Workbook Manager suite passed 185 tests plus 36 subtests with two intentional
+slow-gate skips; the frontend production build passed; a headless Chrome session
+proved stale recovery, readiness, model-scoped 5ZU search, connected option to
+group navigation, named members, and a 390 x 844 layout with no horizontal
+overflow. Protected pre/post SHA-256 manifests matched for
+`stingray_master.xlsx`, all tracked `form-output/` artifacts, `form-app/data.js`,
+and the customer runtime files. No workbook schema, draft-write lifecycle,
+generated contract, customer runtime, dealer, media, deployment, or publication
+behavior changed.
+
 ### Checkpoint 2 — group display-label contract and reviewed migration
 
 - Add registry/workbook/schema/projection/generated-contract ownership for
@@ -877,7 +900,6 @@ workbook evidence do not establish a field's complete allowed domain, stop for
 an explicit product/workbook decision instead of guessing choices or leaving
 the field as accidental free text.
 
-The active action is Checkpoint 1 only: confirm the live React, FastAPI,
-projection, and browser-test surfaces, then implement the readiness shell and
-read-only connected Option/Group Explorer while leaving all workbook write,
-generated output, customer runtime, dealer, and deployment surfaces unchanged.
+Checkpoint 1 is complete. Do not begin Checkpoint 2 automatically. Its active
+gate remains explicit approval for the `display_label` schema addition, the
+complete reviewed group-label list, and the customer-runtime heading switch.

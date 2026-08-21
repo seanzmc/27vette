@@ -28,6 +28,7 @@ from . import (
     asset_workspace,
     db as dbmod,
     drafts,
+    explorer,
     importer,
     staging,
     sync as syncmod,
@@ -536,6 +537,105 @@ def collections(model_key: str, conn=Depends(projection_connection)):
             "scaffold": False,
         })
     return {"model_key": model_key, "collections": out}
+
+
+@app.get("/api/explorer/{model_key}/options/{option_id}")
+def connected_option(
+    model_key: str, option_id: str, conn=Depends(projection_connection)
+):
+    detail = explorer.option_detail(conn, model_key, option_id)
+    if detail is None:
+        raise HTTPException(
+            404,
+            detail={
+                "status": "option_not_found",
+                "message": f"option {option_id!r} was not found for model {model_key!r}",
+            },
+        )
+    return detail
+
+
+@app.get("/api/explorer/{model_key}/groups/{group_type}/{group_id}")
+def connected_group(
+    model_key: str, group_type: str, group_id: str,
+    conn=Depends(projection_connection),
+):
+    detail = explorer.group_detail(conn, model_key, group_type, group_id)
+    if detail is None:
+        raise HTTPException(404, detail={
+            "status": "group_not_found",
+            "message": f"{group_type} group {group_id!r} was not found for model {model_key!r}",
+        })
+    return detail
+
+
+@app.get("/api/explorer/{model_key}/sections/{section_id}")
+def connected_section(
+    model_key: str, section_id: str, conn=Depends(projection_connection)
+):
+    detail = explorer.section_detail(conn, model_key, section_id)
+    if detail is None:
+        raise HTTPException(404, detail={
+            "status": "section_not_found",
+            "message": "section not found in selected model",
+        })
+    return detail
+
+
+@app.get("/api/explorer/{model_key}/rules/{rule_id}")
+def connected_rule(
+    model_key: str, rule_id: str, conn=Depends(projection_connection)
+):
+    detail = explorer.rule_detail(conn, model_key, rule_id)
+    if detail is None:
+        raise HTTPException(404, detail={
+            "status": "rule_not_found",
+            "message": "rule not found in selected model",
+        })
+    return detail
+
+
+@app.get("/api/explorer/{model_key}/search")
+def explorer_search(
+    model_key: str,
+    query: str = Query(..., min_length=1, max_length=200),
+    limit: int = Query(40, ge=1, le=100),
+    conn=Depends(projection_connection),
+):
+    return {"model_key": model_key, "query": query,
+            "results": explorer.search(conn, model_key, query, limit=limit)}
+
+
+@app.get("/api/explorer/{model_key}/diagnostics")
+def explorer_diagnostics(model_key: str):
+    return {"model_key": model_key, "diagnostics": explorer.diagnostic_catalog()}
+
+
+@app.get("/api/explorer/{model_key}/diagnostics/{diagnostic_key}")
+def explorer_diagnostic_results(
+    model_key: str,
+    diagnostic_key: str,
+    entity_id: str = Query("", max_length=240),
+    limit: int = Query(100, ge=1, le=200),
+    conn=Depends(projection_connection),
+):
+    try:
+        results = explorer.diagnostic_results(
+            conn, model_key, diagnostic_key, entity_id=entity_id, limit=limit
+        )
+    except ValueError as exc:
+        raise HTTPException(422, detail={
+            "status": "diagnostic_entity_required", "message": str(exc),
+        }) from exc
+    if results is None:
+        raise HTTPException(404, detail={
+            "status": "diagnostic_not_found",
+            "message": f"unknown diagnostic {diagnostic_key!r}",
+        })
+    definition = next(item for item in explorer.diagnostic_catalog()
+                      if item["key"] == diagnostic_key)
+    return {"model_key": model_key, "diagnostic": definition,
+            "entity_id": entity_id, "results": results}
 
 
 @app.get("/api/assets/reconciliation")

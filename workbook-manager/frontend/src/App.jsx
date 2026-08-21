@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  Database, History, Images, ListOrdered, Settings2, GitBranch,
+  BookOpen, Database, Images, Layers3, Search, Settings2, GitBranch,
 } from "lucide-react";
 import { api } from "./api.js";
 import FormStructure from "./components/FormStructure.jsx";
@@ -8,6 +8,7 @@ import ModelOperations from "./components/ModelOperations.jsx";
 import AssetManager from "./components/AssetManager.jsx";
 import ChangesSync from "./components/ChangesSync.jsx";
 import HistoryView from "./components/HistoryView.jsx";
+import ConnectedExplorer from "./components/ConnectedExplorer.jsx";
 
 const DRAFT_STORAGE_KEY = "27vette-workbook-manager-draft";
 const TERMINAL_DRAFT_STATES = new Set([
@@ -20,32 +21,41 @@ function newDraftId() {
 }
 
 export default function App() {
-  const [tab, setTab] = useState("structure");
+  const [tab, setTab] = useState("overview");
   const [status, setStatus] = useState(null);
   const [models, setModels] = useState([]);
   const [modelKey, setModelKey] = useState("stingray");
   const [fatal, setFatal] = useState("");
   const [draftId, setDraftId] = useState("");
   const [draftLifecycle, setDraftLifecycle] = useState(null);
+  const [startup, setStartup] = useState("Starting Workbook Manager");
 
   const refreshStatus = useCallback(async () => {
     try {
+      setStartup("Loading and checking workbook data");
       const s = await api.status();
       setStatus(s);
-      if (!s.last_import) {
-        const report = await api.runImport().catch((e) => {
-          setFatal(`Initial import failed: ${e.message}`);
-          return null;
-        });
-        if (report) setStatus(await api.status());
+      const projectionReady = s.projection?.state === "current";
+      const modelResponse = projectionReady ? await api.models() : { models: [] };
+      setModels(modelResponse.models);
+      if (
+        modelResponse.models.length &&
+        !modelResponse.models.some((model) => model.model_key === modelKey)
+      ) {
+        setModelKey(modelResponse.models[0].model_key);
       }
-      const m = await api.models();
-      setModels(m.models);
-      if (m.models.length && !m.models.some((x) => x.model_key === modelKey)) {
-        setModelKey(m.models[0].model_key);
+      if (projectionReady) {
+        setStartup(s.draft?.unresolved_total ? "Draft requires attention" : "Ready to edit");
+      } else if (s.workbook?.state === "stale") {
+        setStartup("Workbook changed—reload latest data");
+      } else if (s.projection?.reimport_allowed) {
+        setStartup("Loading and checking workbook data");
+      } else {
+        setStartup("Workbook recovery required");
       }
       setFatal("");
     } catch (e) {
+      setStartup("Cannot reach Manager backend");
       setFatal(`Backend unreachable: ${e.message}`);
     }
   }, [modelKey]);
@@ -53,6 +63,11 @@ export default function App() {
   const refreshDraft = useCallback(async (id = draftId) => {
     if (!id) return null;
     try {
+      const listed = await api.drafts();
+      if (!listed.drafts.some((draft) => draft.id === id)) {
+        setDraftLifecycle(null);
+        return null;
+      }
       const lifecycle = await api.draftLifecycle(id);
       setDraftLifecycle(lifecycle);
       return lifecycle;
@@ -73,7 +88,7 @@ export default function App() {
 
   const startNewDraft = useCallback(() => {
     selectDraft(newDraftId());
-    setTab("operations");
+    setTab("options");
   }, [selectDraft]);
 
   const refreshManager = useCallback(async ({ draft = true } = {}) => {
@@ -106,27 +121,52 @@ export default function App() {
 
   const operationCount = draftLifecycle?.operations?.length ?? 0;
   const draftMutable = !draftLifecycle || draftLifecycle.draft.status === "draft";
+  const ready = startup === "Ready to edit" || startup === "Draft requires attention";
 
   const tabs = [
-    { id: "structure", label: "Form Structure", icon: ListOrdered },
-    { id: "operations", label: "Model Operations", icon: Settings2 },
-    { id: "assets", label: "Asset Manager", icon: Images },
+    { id: "overview", label: "Form Overview", icon: BookOpen },
+    { id: "options", label: "Options & Relationships", icon: Search },
+    { id: "groups", label: "Groups", icon: Layers3 },
+    { id: "assets", label: "Images", icon: Images },
     {
       id: "changes",
-      label: "Draft Review",
+      label: "Review & Apply",
       icon: GitBranch,
       badge: operationCount || null,
     },
-    { id: "history", label: "History", icon: History },
+    { id: "advanced", label: "Advanced & Recovery", icon: Settings2 },
   ];
+
+  const reloadWorkbook = async () => {
+    try {
+      setStartup("Loading and checking workbook data");
+      setFatal("");
+      await api.runImport();
+      await refreshStatus();
+    } catch (e) {
+      setStartup("Workbook recovery required");
+      setFatal(`Reload failed: ${e.message}`);
+    }
+  };
 
   return (
     <div>
-      <div className="provisional-banner" role="status">
+      <div className="readiness-banner" role="status">
         <div>
-          <strong>Guarded workbook workflow</strong>
-          <span>Draft saves stay provisional. Only an exact approved Apply and Rebuild updates the workbook and local runtime outputs.</span>
+          <strong>{startup}</strong>
+          <span>{ready
+            ? "Connected views are current. Guarded workbook workflow keeps draft saves provisional."
+            : "Normal workspaces wait for verified workbook data."}</span>
         </div>
+        <span className="chip">{operationCount} draft change{operationCount === 1 ? "" : "s"}</span>
+        {!ready && status?.projection?.reimport_allowed && (
+          <button className="btn primary small" onClick={reloadWorkbook}>
+            Reload Latest Workbook Data
+          </button>
+        )}
+      </div>
+      <details className="system-details">
+        <summary>System details</summary>
         <div className="status-surfaces" aria-label="Workbook Manager states">
           <span className="chip">projection: {status?.projection?.state || "loading"}</span>
           <span className="chip">draft: {status?.draft?.state || "loading"}</span>
@@ -134,7 +174,7 @@ export default function App() {
           <span className="chip">generated artifacts: {status?.generated_artifacts?.state || "loading"}</span>
           <span className="chip">publication: {status?.publication?.state || "loading"}</span>
         </div>
-      </div>
+      </details>
       <header className="app-header">
         <div className="app-title">
           <Database size={20} color="var(--accent)" />
@@ -142,25 +182,19 @@ export default function App() {
             <h1>27vette Workbook Manager</h1>
             <div className="sub">
               {status?.workbook?.workbook_path?.split("/").pop() || "…"}
-              {status?.workbook?.stale && (
-                <span className="chip warn" style={{ marginLeft: 8 }}>
-                  workbook changed on disk — verified re-import required
-                </span>
-              )}
               {status?.workbook?.excel_lock && (
-                <span className="chip err" style={{ marginLeft: 8 }}>
-                  Excel lock present
-                </span>
+                <span className="chip err" style={{ marginLeft: 8 }}>Excel lock present</span>
               )}
             </div>
           </div>
         </div>
-        <nav className="tabs">
+        <nav className="tabs" aria-label="Workbook Manager workspaces">
           {tabs.map(({ id, label, icon: Icon, badge }) => (
             <button
               key={id}
               className={tab === id ? "active" : ""}
               onClick={() => setTab(id)}
+              disabled={!ready}
             >
               <Icon size={14} /> {label}
               {badge ? <span className="badge">{badge}</span> : null}
@@ -169,8 +203,24 @@ export default function App() {
         </nav>
       </header>
       <main>
-        {fatal && <div className="notice err">{fatal}</div>}
-        {tab === "structure" && (
+        {fatal && (
+          <div className="notice err">
+            {fatal}<div className="muted">The canonical workbook was not changed.</div>
+          </div>
+        )}
+        {!ready && (
+          <section className="startup-state">
+            <Database size={34} />
+            <h2>{startup}</h2>
+            <p>Workbook data must be verified before connected options, groups, images, or draft actions can load.</p>
+            {status?.projection?.reimport_allowed && (
+              <button className="btn primary" onClick={reloadWorkbook}>
+                Reload Latest Workbook Data
+              </button>
+            )}
+          </section>
+        )}
+        {ready && tab === "overview" && (
           <FormStructure
             models={models}
             modelKey={modelKey}
@@ -180,17 +230,10 @@ export default function App() {
             onChanged={refreshManager}
           />
         )}
-        {tab === "operations" && (
-          <ModelOperations
-            models={models}
-            modelKey={modelKey}
-            setModelKey={setModelKey}
-            draftId={draftId}
-            draftMutable={draftMutable}
-            onChanged={refreshManager}
-          />
+        {ready && (tab === "options" || tab === "groups") && (
+          <ConnectedExplorer mode={tab} modelKey={modelKey} />
         )}
-        {tab === "assets" && (
+        {ready && tab === "assets" && (
           <AssetManager
             models={models}
             modelKey={modelKey}
@@ -201,7 +244,7 @@ export default function App() {
             onChanged={refreshManager}
           />
         )}
-        {tab === "changes" && (
+        {ready && tab === "changes" && (
           <ChangesSync
             status={status}
             draftId={draftId}
@@ -210,7 +253,23 @@ export default function App() {
             onStartNew={startNewDraft}
           />
         )}
-        {tab === "history" && <HistoryView models={models} />}
+        {ready && tab === "advanced" && (
+          <div className="advanced-layout">
+            <section>
+              <h2>Raw collection browser</h2>
+              <p className="muted">Workbook-shaped tables remain available for advanced traceability and maintenance.</p>
+              <ModelOperations
+                models={models}
+                modelKey={modelKey}
+                setModelKey={setModelKey}
+                draftId={draftId}
+                draftMutable={draftMutable}
+                onChanged={refreshManager}
+              />
+            </section>
+            <HistoryView models={models} />
+          </div>
+        )}
       </main>
     </div>
   );
