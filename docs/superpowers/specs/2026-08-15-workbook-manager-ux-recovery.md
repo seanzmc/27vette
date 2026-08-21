@@ -1,8 +1,8 @@
 # Workbook Manager Product and UX Recovery Specification
 
-Status: proposed product recovery; specification approved for documentation on
-2026-08-15; implementation not started or authorized by this documentation
-task.
+Status: active product recovery; Checkpoint 1 implementation authorized and
+started 2026-08-21. Later checkpoints remain gated by §19 and must not begin
+automatically.
 
 Recommended implementation reasoning: medium. Escalate only for a specific
 workbook-schema, customer-facing copy, data-integrity, or apply/recovery
@@ -860,10 +860,12 @@ destructive actions.
 
 ## 19. Approval gates and next action
 
-This file authorizes no implementation by itself. Before Checkpoint 1 begins,
-confirm its bounded code surface and acceptance test inventory. Before
-Checkpoint 2 writes the workbook or changes a generated contract, obtain
-explicit approval for:
+Checkpoint 1 began on 2026-08-21 after the completed fast layered validation
+specification and evidence moved to
+`docs/archive/completed-specs/fast-layered-validation/`. Its bounded code
+surface and acceptance test inventory must be confirmed before implementation
+edits. Before Checkpoint 2 writes the workbook or changes a generated contract,
+obtain explicit approval for:
 
 - the `display_label` workbook-schema addition;
 - the complete proposed group-label list;
@@ -875,6 +877,7 @@ workbook evidence do not establish a field's complete allowed domain, stop for
 an explicit product/workbook decision instead of guessing choices or leaving
 the field as accidental free text.
 
-The recommended next action is Checkpoint 1 only: implement the readiness shell
-and read-only connected Option/Group Explorer while leaving all workbook write,
+The active action is Checkpoint 1 only: confirm the live React, FastAPI,
+projection, and browser-test surfaces, then implement the readiness shell and
+read-only connected Option/Group Explorer while leaving all workbook write,
 generated output, customer runtime, dealer, and deployment surfaces unchanged.
