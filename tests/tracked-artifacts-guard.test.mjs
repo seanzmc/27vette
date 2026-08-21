@@ -59,6 +59,17 @@ test("assertTrackedArtifactsUnchanged reports a real untracked file written into
   assertTrackedArtifactsUnchanged(before);
 });
 
+test("readTrackedArtifacts ignores Finder metadata only", () => {
+  const metadataPath = "form-output/.DS_Store";
+  const before = readTrackedArtifacts();
+  fs.writeFileSync(metadataPath, "ambient metadata\n");
+  try {
+    assertTrackedArtifactsUnchanged(before);
+  } finally {
+    fs.rmSync(metadataPath, { force: true });
+  }
+});
+
 test("assertTrackedArtifactsUnchanged reports a real deleted artifact without crashing", () => {
   const victimPath = "form-output/runtime/z06-runtime-contract.json";
   const before = readTrackedArtifacts();

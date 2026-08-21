@@ -1,7 +1,6 @@
 # Fast Layered Validation Suite Specification
 
-Status: IN IMPLEMENTATION — Checkpoints 0–5 complete 2026-08-20;
-Checkpoint 6 is the next authorized slice.
+Status: COMPLETE — Checkpoints 0–6 complete 2026-08-20.
 Date: 2026-08-17
 Branch: `claude/fast-layered-validation-suite-4c31f6` (spec authored on `main`)
 Recommended implementation reasoning: medium. Escalate only for a specific
@@ -1097,13 +1096,33 @@ Measured on local Node 26.7.0 / Python 3.14.7, serial:
 | Manager checkpoint, reverse order | 230 passed, 2 skipped, 36 subtests, 742.62 s |
 | Catalog + fixture closeout | 26 passed, 0.26 s |
 
+Measurement correction recorded during Checkpoint 6. The 791.25-second
+2026-08-10 baseline and the 745.31-second Checkpoint 5 run are not directly
+comparable per-gate measurements. The later run shares one process-wide verified
+projection/candidate; isolated `test_workbook_manager_generated_parity.py` now
+pays that full setup and measures 147.68 s, while the setup is already warm when
+that file runs inside the checkpoint. Its former 82.22-second isolated result is
+therefore only the best available estimate of incremental parity work, not a
+post-change in-suite measurement. For every gate in catalog serial group
+`workbook_manager`, `approximate_seconds` is a standalone observation and is
+non-additive: scheduling and budget logic must use the suite measurement and run
+the group in one process, never sum member values. The observed isolated deltas
+(`test_workbook_manager` -236.08 s, import/projection -17.66 s, generated parity
++65.46 s, fixture contract +0.28 s) net to -188.00 s, while the two suite totals
+differ by only -45.94 s. Roughly 142.06 s is unattributed because the baseline
+and closing runs did not capture comparable per-file stage timings. Checkpoint 6
+does not re-time the full Manager checkpoint; the catalog records the shared
+setup and this comparison gap instead of attributing it speculatively.
+
 The reverse-order run initially exposed two generated-parity mocks patching a
 stale module object after `TestApi` deliberately reloaded the `app` package.
 Both now patch the imported functions' actual globals; the focused canary passed
-2 tests and the complete reverse-order run passed. The checkpoint is 48.63 s
-(6.15%) faster than the 791.25-second baseline while retaining all named Layer
-3 boundaries. The existing FastAPI/Starlette deprecation warning remains; no
-dependency change is authorized by this checkpoint.
+2 tests and the complete reverse-order run passed. The closing checkpoint run is
+45.94 s shorter than the earlier 791.25-second run, but that difference is not
+claimed as an attributable performance improvement because the measurements are
+not comparable as described above. All named Layer 3 boundaries remain. The
+existing FastAPI/Starlette deprecation warning remains; no dependency change is
+authorized by this checkpoint.
 
 No canonical workbook, generated artifact, published registry, runtime
 implementation, dealer boundary, deployment path, dependency, or schema
@@ -1126,6 +1145,90 @@ changed.
 Acceptance: required CI proves the documented release path; local and CI
 commands agree; no stale gate remains silently outside the catalog; all retired
 owners have explicit replacement evidence.
+
+#### Checkpoint 6 result — 2026-08-20 (COMPLETE, corrected 2026-08-20)
+
+CI now runs `scripts/run_layered_validation.py`, which reads commands and
+changed-surface ownership from `tests/validation_catalog.json`. Layer 0 oracle,
+catalog, and runner contracts plus the composed Layer 1 candidate run on every
+pull request. Directly changed cataloged tests select their owners, cataloged
+Layer 0–3 owners join for changed surfaces, and Layer 4 remains diagnostic-only;
+unclassified paths take a conservative validation/generator fallback. Cataloged
+test files select their exact owner without also inheriting the broad `tests/`
+surface. Narrow CI, dependency, tracked-artifact, and nested operator-doc paths
+stop after their explicit classification, while ordinary Workbook Manager source
+paths still select the Manager surface. Selecting one
+`workbook_manager` member co-selects and executes its entire serial group in one
+pytest process. The original Checkpoint 6 commit had co-selected those gates but
+still launched each as a separate process, defeating the shared fixture; it also
+omitted changed-surface Layer 0 gates. The corrected runner selects affected
+Layer 0–3 gates, collapses shared groups to a cataloged suite command, and
+orders execution by layer. CI now fetches complete history, includes deleted
+paths in classification, transports changed paths without shell word-splitting,
+and allows 15 minutes for the measured Layer 1 plus changed-surface work; the
+first 30-minute run proved that a broad-path over-selection of the Manager group
+could exceed its former timeout, and the corrected exact-path contracts prevent
+that unrelated suite from joining a layered-validation-only PR. The
+uploaded report records selected files, surfaces, gates, stage durations,
+outputs, exit statuses, and the overall result. Local and CI use the same runner.
+
+The final review correction makes ownership automatic rather than adding broad
+exceptions. `requirements-test.txt` composes the minimal workbook, pytest, and
+Workbook Manager backend environments for local and CI use. The first exact-head
+CI run exposed Node gates invoking the documented `.venv/bin/python` path while
+the workflow had installed into the hosted interpreter; CI now creates the same
+repo-local virtual environment and runs installation plus the runner through it.
+The next exact-head run reached the Layer 1 candidate, then exposed its catalog
+command beginning with bare `python`, which selected the hosted system
+interpreter instead of that virtual environment. The runner now normalizes both
+supported Python command prefixes (`python` and `.venv/bin/python`) to the
+interpreter running the runner, with an execution test that records and verifies
+the child interpreter path. Narrow
+asset/editor/write-path mappings accumulate with generic `scripts/` ownership.
+Every executable cataloged `test_files` path resolves back to its owning gate,
+with mutation proof. A `form-app/` path selects the focused Layer 1 dealer and
+runtime owners. A Workbook Manager frontend path selects the shared Manager
+group plus the lockfile-driven production build; browser UX proof remains manual
+until a browser-test dependency is separately approved. The next authorized
+work is Workbook Manager UX Recovery Checkpoint 1; it is not part of this pass.
+
+The Checkpoint 5 correction is recorded above and in catalog `serial_groups`.
+Shared-build cost and non-additive timing are explicit, isolated parity cost is
+distinct from its estimated shared-fixture increment, and the arithmetic gap is
+quantified. No full Manager checkpoint re-timing was performed: 142.06 seconds
+remains unattributed and the 791.25/745.31 totals are explicitly non-comparable.
+
+No complete gate file was retired. Distinct named locks, focused product cases,
+atomic publication, and diagnostic owners still lack equivalent retirement
+canaries, so deletion would reduce proof. The first full Node run found a live
+Finder-created `form-output/.DS_Store`; the protected-artifact helper now excludes
+only that gitignored basename, with an explicit canary. All other untracked files
+remain failures.
+
+Final local diagnostics (Node 26.7.0 / Python 3.14.7): all 19 Node files passed
+serially; full Python inventory passed 827, skipped 2 documented scratch-writer
+tests, and passed 160 subtests in 1672.16 s. The existing FastAPI/Starlette
+deprecation warning remains. Catalog/runner contracts passed 40 tests after the
+final Checkpoint 6 correction, the frontend production build passed, and the
+composed test-requirements install resolved locally. The locally executed
+catalog-driven path also passed all selected Layer 0 gates and all twelve stages
+of the Layer 1 candidate in 83.741 seconds; its recorded candidate command used
+the active virtual-environment interpreter. Exact-head Node 22/Python 3.12
+GitHub CI passed at `54a554c794be7518333fe4a9dfeffcc827555a64`: the required
+`release-candidate` check completed successfully in 2m46s, including dependency
+installation, changed-file selection, layered validation, and report upload. One
+earlier exact-head run after the interpreter
+fix reached the workflow timeout because broad `tests/`, `scripts/`, and nested
+Workbook Manager documentation ownership selected 33 gates, including the
+expensive Manager serial group. The final routing correction reduces this PR's
+exact-head selection to eight gates (four Layer 0, the composed Layer 1 candidate,
+the tracked-artifact guard, and two Fable gates) without weakening direct
+changed-test ownership or source-path surface coverage. No
+workbook, generated artifact, published registry, customer runtime, dealer
+boundary, deployment path, dependency, or schema changed. Residual risks are the
+Manager timing gap, the approval-gated promoted-model lock, and the inert workbook
+rows. Checkpoint 6 is closed green; its next project action is Workbook Manager UX
+Recovery Checkpoint 1 in a fresh task.
 
 ## 10. Files and surfaces expected to change during implementation
 
@@ -1248,13 +1351,13 @@ generated runtime state matrix, with a forced-failure behind each §4.3
 invariant. The candidate lane's browser stage runs that matrix against the
 candidate registry.
 
-Checkpoint 5 is complete: Workbook Manager tests share one immutable verified
-projection/candidate, negative cases use compact fixtures, every distinct Layer
-3 real-workbook boundary remains, and both documented-order and reverse-order
-checkpoint runs are green. The next authorized implementation slice is
-Checkpoint 6: wire CI to the cataloged layers, publish the composed report,
-align operator documentation, and retire obsolete owners only with the required
-coverage and mutation evidence.
+Checkpoints 5 and 6 are complete. Workbook Manager tests share one immutable
+verified projection/candidate, negative cases use compact fixtures, every
+distinct Layer 3 real-workbook boundary remains, and both documented-order and
+reverse-order checkpoint runs are green. CI now runs catalog-driven layered
+selection, executes shared-setup groups through their one-process suite,
+publishes the composed report, and has aligned operator documentation. No later
+implementation checkpoint is authorized by this specification.
 
 Two items still carry approval or classification gates:
 

@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v7
@@ -34,21 +36,27 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Install workbook dependencies
-        run: python -m pip install --requirement requirements.txt
+      - name: Install test dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install --requirement requirements-test.txt
 
-      - name: Verify six-model release candidate
+      - name: Select changed files
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: git diff --name-only --diff-filter=ACMRD "${BASE_SHA:-HEAD^}" HEAD > changed-files.txt
+
+      - name: Run layered validation
         run: >-
-          python scripts/verify_workbook_candidate.py
-          --workbook stingray_master.xlsx
-          --changed-model '*'
-          --report candidate-report.json
+          .venv/bin/python scripts/run_layered_validation.py
+          --report layered-validation-report.json
+          --changed-file-list changed-files.txt
 
-      - name: Upload candidate report
+      - name: Upload layered validation report
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: release-candidate-report
-          path: candidate-report.json
+          name: layered-validation-report
+          path: layered-validation-report.json
           if-no-files-found: ignore
           retention-days: 14

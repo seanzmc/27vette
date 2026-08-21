@@ -174,11 +174,11 @@ approved direction.
 ## Setup
 
 ```sh
-# backend deps (repo venv)
-.venv/bin/python -m pip install -r workbook-manager/backend/requirements.txt
+# shared test environment (repo venv; includes backend deps)
+.venv/bin/python -m pip install -r requirements-test.txt
 
 # frontend build (one-time per change; FastAPI serves dist/)
-cd workbook-manager/frontend && npm install && npm run build
+npm --prefix workbook-manager/frontend ci && npm --prefix workbook-manager/frontend run build
 ```
 
 ## Run
@@ -282,12 +282,18 @@ newline-delimited URL list instead; `WBM_ASSET_MEDIA_TIMEOUT` (default 10),
 ## Tests
 
 Use the exact affected test or class while editing. The command below is the
-Pass/checkpoint acceptance inventory, not the inner edit loop. At the 2026-08-10
-validation-efficiency checkpoint it completed in 791.25 seconds. Complete
-real-workbook promotion, unchanged comparison export, API import/export, and
-generated-parity owners take about 68–75 seconds each; the changed-overlay
-comparison-export owner takes about 213 seconds because it exercises the full
-overlay write and reconstruction-validation path.
+Pass/checkpoint acceptance inventory, not the inner edit loop. The catalog
+records standalone gate observations and the measured whole-suite runtime. For
+the `workbook_manager` serial group, standalone values are not additive: the
+suite shares one process-wide verified projection/candidate build. Run the
+checkpoint in one pytest process as shown below; do not estimate its runtime by
+summing member `approximate_seconds` values. In particular, generated parity
+measures 147.68 seconds alone because it pays the shared build, while the same
+build is already warm inside the complete checkpoint.
+
+Changed-surface CI uses the same one-process Manager serial-group command but
+does not add the separately cataloged `test_asset_map_sync.py`; that asset gate
+is selected only for `asset_map` changes.
 
 ```sh
 .venv/bin/python -m pytest \

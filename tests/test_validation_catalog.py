@@ -14,6 +14,7 @@ standard library so the contract holds wherever pytest runs.
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import re
 from pathlib import Path
@@ -24,6 +25,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = REPO_ROOT / "tests" / "validation_catalog.json"
 README_PATH = REPO_ROOT / "README.md"
 TESTS_DIR = REPO_ROOT / "tests"
+RUNNER_PATH = REPO_ROOT / "scripts" / "run_layered_validation.py"
 
 # Files under tests/ that are helpers or data, not gates. Everything else must
 # be cataloged. Keep this list short and explicit — an unexplained exemption is
@@ -143,14 +145,73 @@ def _suite_member_gate_ids(catalog: dict, suite: dict) -> set[str]:
     return {owners[path] for path in files if path in owners}
 
 
+def _load_runner():
+    spec = importlib.util.spec_from_file_location("run_layered_validation", RUNNER_PATH)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _assert_ci_test_owners_select(catalog: dict, expected: dict[str, str]) -> None:
+    runner = _load_runner()
+    for path, gate_id in expected.items():
+        selected, _, _ = runner.selected_gates(catalog, [path])
+        selected_ids = {gate["id"] for gate in selected}
+        assert gate_id in selected_ids, f"{path} did not select its owner {gate_id}"
+
+
 # --- structural validity of the catalog itself -----------------------------
 
 
 def test_catalog_is_dependency_free_json():
     data = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
     assert data["schema"] == "27vette-validation-catalog-1"
-    for key in ("enums", "baseline", "acceptance_locks", "gates", "suites", "coverage_ledger"):
+    for key in (
+        "enums",
+        "baseline",
+        "serial_groups",
+        "acceptance_locks",
+        "gates",
+        "suites",
+        "coverage_ledger",
+    ):
         assert key in data, f"catalog is missing required top-level key {key!r}"
+
+
+def test_serial_groups_define_timing_semantics(catalog):
+    """Shared setup makes member timings non-additive and must be explicit."""
+    groups = catalog["serial_groups"]
+    referenced = {gate["serial_group"] for gate in catalog["gates"] if gate["serial_group"]}
+
+    assert referenced <= set(groups), f"serial groups missing metadata: {referenced - set(groups)}"
+    for name, metadata in groups.items():
+        assert metadata["timing_semantics"] in {"additive", "shared_setup_non_additive"}, name
+        assert str(metadata["selection_policy"]).strip(), name
+        if metadata["timing_semantics"] == "shared_setup_non_additive":
+            assert metadata["shared_setup_seconds"] is not None, name
+            assert str(metadata["shared_setup_description"]).strip(), name
+            suite_id = metadata.get("suite_id")
+            assert suite_id, f"{name} shared setup has no one-process suite"
+            suite = next((suite for suite in catalog["suites"] if suite["id"] == suite_id), None)
+            assert suite is not None, f"{name} references unknown suite {suite_id!r}"
+            members = {gate["id"] for gate in catalog["gates"] if gate["serial_group"] == name}
+            assert set(suite["gate_ids"]) == members, (
+                f"{name} suite does not contain exactly its serial-group members"
+            )
+
+
+def test_workbook_manager_shared_timing_is_not_summed(catalog):
+    metadata = catalog["serial_groups"]["workbook_manager"]
+    assert metadata["timing_semantics"] == "shared_setup_non_additive"
+    assert metadata["standalone_selection"] == "select_entire_group"
+
+    parity = next(
+        gate for gate in catalog["gates"]
+        if gate["id"] == "py.test_workbook_manager_generated_parity"
+    )
+    assert parity["standalone_seconds"] == 147.68
+    assert parity["shared_fixture_incremental_seconds"] is not None
 
 
 def test_every_gate_declares_the_required_fields(catalog):
@@ -236,6 +297,95 @@ def test_no_test_file_is_claimed_by_two_gates(catalog):
             claims.setdefault(path, []).append(gate["id"])
     doubled = {path: ids for path, ids in claims.items() if len(ids) > 1}
     assert not doubled, f"test files claimed by more than one gate: {doubled}"
+
+
+def test_ci_selects_every_executable_test_file_owner(catalog):
+    expected = {
+        path: gate["id"]
+        for gate in catalog["gates"]
+        if gate["layer"] < 4
+        for path in gate["test_files"]
+    }
+    _assert_ci_test_owners_select(catalog, expected)
+
+    mutated = json.loads(json.dumps(catalog))
+    path, owner = next(iter(expected.items()))
+    next(gate for gate in mutated["gates"] if gate["id"] == owner)["test_files"].remove(path)
+    with pytest.raises(AssertionError):
+        _assert_ci_test_owners_select(mutated, {path: owner})
+
+
+def test_ci_changed_test_selects_only_its_owner_not_the_broad_test_surface(catalog):
+    runner = _load_runner()
+    selected, surfaces, fallback = runner.selected_gates(
+        catalog, ["tests/test_validation_catalog.py"]
+    )
+
+    assert surfaces == set()
+    assert fallback is False
+    assert "py.test_validation_catalog" in {gate["id"] for gate in selected}
+    assert "py.test_verify_workbook_candidate" not in {
+        gate["id"] for gate in selected
+    }
+
+
+def test_ci_path_routing_selects_focused_owners_and_accumulates(catalog):
+    runner = _load_runner()
+    cases = {
+        "scripts/sync_asset_map.py": ({"asset_map", "generator"}, {"py.test_asset_map_sync"}),
+        "scripts/workbook_editor_server.py": (
+            {"editor", "workbook_write", "generator"},
+            {"py.test_editor_server_payload", "py.test_editor_server_write_api"},
+        ),
+        "scripts/corvette_form_generator/workbook_domain/registry.py": (
+            {"workbook_domain_registry", "editor", "workbook_write", "generator"},
+            {"py.test_workbook_domain_registry", "py.test_editor_ops_global_families"},
+        ),
+    }
+    for path, (expected_surfaces, expected_gates) in cases.items():
+        selected, surfaces, _ = runner.selected_gates(catalog, [path])
+        assert expected_surfaces <= surfaces, path
+        assert expected_gates <= {gate["id"] for gate in selected}, path
+
+
+def test_ci_routes_workbook_manager_operator_docs_as_docs_only(catalog):
+    runner = _load_runner()
+    selected, surfaces, fallback = runner.selected_gates(
+        catalog, ["workbook-manager/README.md"]
+    )
+
+    assert surfaces == {"docs"}
+    assert fallback is False
+    assert "cmd.workbook_manager_frontend_build" not in {
+        gate["id"] for gate in selected
+    }
+    assert not {
+        gate["id"]
+        for gate in selected
+        if gate.get("serial_group") == "workbook_manager"
+    }
+
+
+def test_ci_acceptance_examples_and_layer_four_exclusion(catalog):
+    runner = _load_runner()
+
+    form_gates, _, _ = runner.selected_gates(catalog, ["form-app/app.js"])
+    assert {
+        "node.stingray-form-regression",
+        "node.multi-model-runtime-switching",
+        "node.runtime-state-matrix",
+    } <= {gate["id"] for gate in form_gates}
+
+    manager_gates, _, _ = runner.selected_gates(
+        catalog, ["workbook-manager/frontend/src/App.jsx"]
+    )
+    manager_ids = {gate["id"] for gate in manager_gates}
+    assert "cmd.workbook_manager_frontend_build" in manager_ids
+    assert {
+        gate["id"] for gate in catalog["gates"] if gate.get("serial_group") == "workbook_manager"
+    } <= manager_ids
+
+    assert all(gate["layer"] < 4 for gate in form_gates + manager_gates)
 
 
 # --- §7 condition 2: one acceptance lock, one primary owner ----------------

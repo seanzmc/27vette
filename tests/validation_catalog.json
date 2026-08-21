@@ -1,7 +1,7 @@
 {
   "schema": "27vette-validation-catalog-1",
   "owning_specification": "docs/superpowers/specs/2026-08-17-fast-layered-validation-suite.md",
-  "checkpoint": "Checkpoint 4 \u2014 consolidate the candidate and Python lanes",
+  "checkpoint": "Checkpoint 6 \u2014 CI, documentation, and retirement (complete 2026-08-20)",
   "description": "Machine-readable inventory of every default and checkpoint validation gate. Dependency-free JSON: read it with the standard library. This catalog owns collection descriptions and measured counts; README owns operator commands and approximate timing prose.",
   "enums": {
     "layer": [
@@ -84,6 +84,21 @@
       "ci_reference_status": "STILL OPEN. Node 22 / Python 3.12 remain uninstalled on the reference machine; every number here is local Node 26.7.0 / Python 3.14.7 evidence, not the CI baseline.",
       "node_readiness_collected_tests": 298,
       "counts_note": "Collected tests are unchanged in total: 305 across all 16 files, 298 across the 14 readiness gates. grand-sport-runtime-contract went 18 -> 19 (one stale test split into two parity tests) and workbook-schema-standardization 13 -> 12 (duplicate schema invocation removed); those cancel."
+    }
+  },
+  "serial_groups": {
+    "protected_artifacts": {
+      "timing_semantics": "additive",
+      "selection_policy": "Run members serially because each hashes protected generated roots and a concurrent writer would be reported as its own violation.",
+      "standalone_selection": "selected_members"
+    },
+    "workbook_manager": {
+      "timing_semantics": "shared_setup_non_additive",
+      "selection_policy": "Select the entire workbook_manager group when any member requiring verified_manager_fixture is selected; run it in one pytest process so the process-wide verified projection/candidate build is paid once.",
+      "standalone_selection": "select_entire_group",
+      "suite_id": "suite.workbook_manager_serial_group",
+      "shared_setup_seconds": 65.46,
+      "shared_setup_description": "Checkpoint 5 measured py.test_workbook_manager_generated_parity at 147.68 s standalone after it moved to verified_manager_fixture, versus 82.22 s before that move. The 65.46 s delta is the best available measurement of the full promote_verified_projection setup now shared inside suite.workbook_manager_serial_group; it is not an additive per-gate cost. No full checkpoint re-timing was performed for this metadata correction."
     }
   },
   "acceptance_locks": [
@@ -652,7 +667,8 @@
       "layer": 1,
       "primary_authority": "structural_invariant",
       "changed_surfaces": [
-        "validation_infrastructure"
+        "validation_infrastructure",
+        "layered_validation"
       ],
       "reads": [
         "form-output/**",
@@ -672,7 +688,7 @@
       "disposition_reason": "Proves the shared boundary helper is not vacuous. Spec \u00a78 canary 8 (forced tracked-output write from an isolated generating gate) belongs here. Keep and extend.",
       "readme_reference": "tracked-artifacts-guard",
       "notes": "",
-      "collected_tests": 7,
+      "collected_tests": 8,
       "baseline_result": "pass",
       "readme_publishes_command": false
     },
@@ -991,6 +1007,41 @@
       "baseline_result": "pass",
       "readme_publishes_command": false,
       "checkpoint_1_result": "DONE. The 22-row table and the superseded 'included colour blocks every peer' behaviour are replaced by a sweep whose cases, blocked peers, and added RPOs are read from the model's registered rule-mapping and colour-override sheets, with registry-vs-workbook parity asserted first. Slower than the stale version (3.91 s -> 5.44 s) because it exercises every peer of every case instead of one. Mutation-proved three ways: suppressing the seat-belt disable reason in app.js, dropping one interior-targeted excludes row, and dropping one resolvable colour-override row each fail it."
+    },
+    {
+      "id": "cmd.workbook_manager_frontend_build",
+      "command": "npm --prefix workbook-manager/frontend ci && npm --prefix workbook-manager/frontend run build",
+      "test_files": [],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook_manager"
+      ],
+      "reads": [
+        "workbook-manager/frontend/package.json",
+        "workbook-manager/frontend/package-lock.json",
+        "workbook-manager/frontend/src/**",
+        "workbook-manager/frontend/vite.config.js"
+      ],
+      "writes": [
+        "workbook-manager/frontend/node_modules/**",
+        "workbook-manager/frontend/dist/**"
+      ],
+      "isolation": "tracked_write",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "required_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 3.0,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "First-class production-build owner for Workbook Manager frontend changes; browser UX acceptance remains a separately recorded manual checkpoint until an approved browser-test dependency exists.",
+      "readme_reference": "npm --prefix workbook-manager/frontend ci && npm --prefix workbook-manager/frontend run build",
+      "notes": "Uses the committed lockfile and writes only gitignored frontend dependency/build directories.",
+      "collected_tests": 0,
+      "baseline_result": "pass",
+      "readme_publishes_command": true
     },
     {
       "id": "py.test_all_model_runtime_generation",
@@ -2295,10 +2346,12 @@
       "disposition": "keep",
       "disposition_reason": "The only owner proving a Manager reconstruction generates the same primary runtime contracts as its bound source workbook (\u00a74.2). AGENTS.md \u00a710 forbids claiming reconstruction parity without it. Distinct Layer 3 boundary \u2014 must not be collapsed into an equality check against itself.",
       "readme_reference": "test_workbook_manager_generated_parity",
-      "notes": "",
+      "notes": "Timing semantics changed in Checkpoint 5: standalone pays the process-wide verified_manager_fixture build; inside suite.workbook_manager_checkpoint that build is shared. Do not sum this gate's approximate_seconds with other workbook_manager members. The 82.22 s incremental value is an estimate from the pre-shared-fixture isolated measurement, not a fresh post-change in-suite timing.",
       "collected_tests": 4,
       "baseline_result": "pass",
-      "readme_publishes_command": false
+      "readme_publishes_command": false,
+      "standalone_seconds": 147.68,
+      "shared_fixture_incremental_seconds": 82.22
     },
     {
       "id": "py.test_workbook_manager_import_projection",
@@ -2366,6 +2419,40 @@
       "readme_reference": "| Workbook-truth snapshot | `test_workbook_truth` |",
       "notes": "Spawns subprocesses to test the import boundary, which is why it costs ~8 s despite being Layer 0. Building the snapshot itself is ~0.9 s.",
       "collected_tests": 61,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
+      "id": "py.test_run_layered_validation",
+      "command": ".venv/bin/python -m pytest tests/test_run_layered_validation.py -q",
+      "test_files": [
+        "tests/test_run_layered_validation.py"
+      ],
+      "layer": 0,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "validation_infrastructure"
+      ],
+      "reads": [
+        "scripts/run_layered_validation.py",
+        "tests/validation_catalog.json"
+      ],
+      "writes": [
+        "<pytest tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "required_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 0.6,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Catalog-driven CI selection, conservative fallback, shared serial-group one-process execution, changed-path transport, and stage-timed report contract.",
+      "readme_reference": "run_layered_validation.py",
+      "notes": "CI passes changed paths through --changed-file-list so spaces are preserved and deleted paths remain classifiable.",
+      "collected_tests": 8,
       "baseline_result": "pass",
       "readme_publishes_command": false
     }
@@ -2436,6 +2523,27 @@
       "readme_publishes_command": true
     },
     {
+      "id": "suite.workbook_manager_serial_group",
+      "description": "Exact workbook_manager serial group, run in one pytest process so verified_manager_fixture is built once.",
+      "command": ".venv/bin/python -m pytest tests/test_workbook_manager_catalog.py tests/test_workbook_manager_import_projection.py tests/test_workbook_manager_fixtures.py tests/test_workbook_manager_generated_parity.py tests/test_workbook_manager_api_concurrency.py tests/test_workbook_manager_drafts.py tests/test_workbook_manager_changeset_lifecycle.py tests/test_workbook_manager_apply_rebuild.py tests/test_workbook_manager.py -q",
+      "layer": 3,
+      "gate_ids": [
+        "py.test_workbook_manager_catalog",
+        "py.test_workbook_manager_import_projection",
+        "py.test_workbook_manager_fixtures",
+        "py.test_workbook_manager_generated_parity",
+        "py.test_workbook_manager_api_concurrency",
+        "py.test_workbook_manager_drafts",
+        "py.test_workbook_manager_changeset_lifecycle",
+        "py.test_workbook_manager_apply_rebuild",
+        "py.test_workbook_manager"
+      ],
+      "serial_required": true,
+      "measured_seconds": 745.31,
+      "measured_note": "Checkpoint 5 documented-order whole-group measurement. Member timings are non-additive because verified_manager_fixture is shared.",
+      "readme_publishes_command": false
+    },
+    {
       "id": "suite.workbook_manager_checkpoint",
       "description": "Workbook Manager pass/checkpoint acceptance inventory (workbook-manager/README.md).",
       "command": ".venv/bin/python -m pytest tests/test_asset_map_sync.py tests/test_workbook_manager_catalog.py tests/test_workbook_manager_import_projection.py tests/test_workbook_manager_fixtures.py tests/test_workbook_manager_generated_parity.py tests/test_workbook_manager_api_concurrency.py tests/test_workbook_manager_drafts.py tests/test_workbook_manager_changeset_lifecycle.py tests/test_workbook_manager_apply_rebuild.py tests/test_workbook_manager.py -q",
@@ -2483,6 +2591,7 @@
         "py.test_registry_promotion_metadata",
         "py.test_rule_derivation",
         "py.test_runtime_contract_builder",
+        "py.test_run_layered_validation",
         "py.test_runtime_metadata_guards",
         "py.test_schema_validation_metadata",
         "py.test_set_asset_display",
@@ -2506,8 +2615,8 @@
         "py.test_workbook_truth"
       ],
       "serial_required": true,
-      "measured_seconds": 2381.46,
-      "measured_note": "37 pre-existing files, 734 tests collected on 2026-08-17. Measured as one process per file; a single pytest invocation is faster because interpreter and workbook import costs are paid once. SERIAL: this command collects py.test_verify_workbook_candidate, which hashes form-output/ and form-app/ whole, so the inventory must not run beside any gate that writes a tracked artifact \u2014 pytest itself is serial within one process, but this suite must not be scheduled alongside the Node lane.",
+      "measured_seconds": 1672.16,
+      "measured_note": "Checkpoint 6 final diagnostic: 827 passed, 2 skipped, 160 subtests, one existing FastAPI/Starlette deprecation warning, 1672.16 s on local Python 3.14.7.",
       "readme_publishes_command": false
     },
     {
@@ -2538,7 +2647,7 @@
       ],
       "serial_required": true,
       "measured_seconds": 60.0,
-      "measured_note": "Checkpoint 2: 18 files, 437 tests, all pass, 60 s serial. Checkpoint 0 measured 111.75 s over 16 files with 6 failing. Serial by construction \u2014 `node --test tests/*.test.mjs` runs the files concurrently and the generating gates then collide; that concurrent form was measured failing z06-contract-preview while every file passed alone.",
+      "measured_note": "Checkpoint 6 final diagnostic: all 19 files pass serially. The first run exposed ambient form-output/.DS_Store churn; the protected-artifact helper now excludes only that gitignored Finder basename and has an explicit canary. The clean rerun passed.",
       "readme_publishes_command": false
     }
   ],
@@ -3441,5 +3550,227 @@
         }
       ]
     }
+  },
+  "ci": {
+    "always_gate_ids": [
+      "py.test_validation_catalog",
+      "py.test_run_layered_validation",
+      "py.test_source_parity_canaries",
+      "py.test_workbook_truth",
+      "cmd.release_candidate_lane"
+    ],
+    "path_surfaces": [
+      {
+        "prefix": ".github/",
+        "surfaces": [
+          "layered_validation"
+        ]
+      },
+      {
+        "prefix": "requirements-test.txt",
+        "surfaces": [
+          "dependency_environment"
+        ],
+        "stop_after_match": true
+      },
+      {
+        "prefix": "scripts/run_layered_validation.py",
+        "surfaces": [
+          "layered_validation"
+        ],
+        "stop_after_match": true
+      },
+      {
+        "prefix": "tests/validation_catalog.json",
+        "surfaces": [
+          "layered_validation"
+        ],
+        "stop_after_match": true
+      },
+      {
+        "prefix": "tests/lib/tracked-artifacts.mjs",
+        "surfaces": [
+          "layered_validation"
+        ],
+        "stop_after_match": true
+      },
+      {
+        "prefix": "tests/",
+        "surfaces": [
+          "validation_infrastructure"
+        ]
+      },
+      {
+        "prefix": "scripts/sync_asset_map.py",
+        "surfaces": [
+          "asset_map"
+        ]
+      },
+      {
+        "prefix": "scripts/set_asset_display.py",
+        "surfaces": [
+          "asset_map"
+        ]
+      },
+      {
+        "prefix": "scripts/corvette_form_generator/asset_map_sync.py",
+        "surfaces": [
+          "asset_map"
+        ]
+      },
+      {
+        "prefix": "scripts/workbook_editor_server.py",
+        "surfaces": [
+          "editor",
+          "workbook_write"
+        ]
+      },
+      {
+        "prefix": "scripts/apply_workbook_ops.py",
+        "surfaces": [
+          "editor",
+          "workbook_write"
+        ]
+      },
+      {
+        "prefix": "scripts/apply_workbook_changeset.py",
+        "surfaces": [
+          "changeset",
+          "workbook_write"
+        ]
+      },
+      {
+        "prefix": "scripts/corvette_form_generator/editor_ops.py",
+        "surfaces": [
+          "editor",
+          "workbook_write"
+        ]
+      },
+      {
+        "prefix": "scripts/corvette_form_generator/editor_lints.py",
+        "surfaces": [
+          "editor"
+        ]
+      },
+      {
+        "prefix": "scripts/corvette_form_generator/workbook.py",
+        "surfaces": [
+          "workbook_write"
+        ]
+      },
+      {
+        "prefix": "scripts/corvette_form_generator/workbook_bool_hygiene.py",
+        "surfaces": [
+          "workbook_write"
+        ]
+      },
+      {
+        "prefix": "scripts/corvette_form_generator/workbook_domain/changeset.py",
+        "surfaces": [
+          "changeset"
+        ]
+      },
+      {
+        "prefix": "scripts/corvette_form_generator/workbook_domain/service.py",
+        "surfaces": [
+          "changeset",
+          "workbook_write"
+        ]
+      },
+      {
+        "prefix": "scripts/corvette_form_generator/workbook_domain/registry.py",
+        "surfaces": [
+          "workbook_domain_registry",
+          "editor",
+          "workbook_write"
+        ]
+      },
+      {
+        "prefix": "scripts/corvette_form_generator/workbook_domain/",
+        "surfaces": [
+          "workbook_domain_registry",
+          "changeset",
+          "workbook_write"
+        ]
+      },
+      {
+        "prefix": "scripts/",
+        "surfaces": [
+          "generator",
+          "validation_infrastructure"
+        ]
+      },
+      {
+        "prefix": "workbook-manager/README.md",
+        "surfaces": [
+          "docs"
+        ],
+        "stop_after_match": true
+      },
+      {
+        "prefix": "workbook-manager/USER-GUIDE.md",
+        "surfaces": [
+          "docs"
+        ],
+        "stop_after_match": true
+      },
+      {
+        "prefix": "workbook-manager/",
+        "surfaces": [
+          "workbook_manager"
+        ]
+      },
+      {
+        "prefix": "form-app/",
+        "surfaces": [
+          "runtime_js",
+          "registry_publication",
+          "styling",
+          "dealer"
+        ]
+      },
+      {
+        "prefix": "form-output/",
+        "surfaces": [
+          "runtime_contract",
+          "registry_publication"
+        ]
+      },
+      {
+        "prefix": "fable5loop/",
+        "surfaces": [
+          "fable5_loop"
+        ]
+      },
+      {
+        "prefix": "docs/",
+        "surfaces": [
+          "docs"
+        ]
+      },
+      {
+        "prefix": "README.md",
+        "surfaces": [
+          "docs"
+        ]
+      },
+      {
+        "prefix": "AGENTS.md",
+        "surfaces": [
+          "docs"
+        ]
+      },
+      {
+        "prefix": "stingray_master.xlsx",
+        "surfaces": [
+          "workbook"
+        ]
+      }
+    ],
+    "fallback_surfaces": [
+      "validation_infrastructure",
+      "generator"
+    ],
+    "notes": "Always select always_gate_ids. Add directly changed cataloged test owners and all surface-matching gates in Layers 0-3, expand shared serial groups, and execute by layer. Layer 4 remains diagnostic-only. Unclassified paths conservatively select validation and generator acceptance. workbook_manager selections co-select the entire shared serial group so verified_manager_fixture is built once."
   }
 }
