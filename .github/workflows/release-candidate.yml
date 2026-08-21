@@ -32,12 +32,18 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v7
         with:
-          fetch-depth: 0
+          fetch-depth: 2
 
       - name: Select changed files
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: git diff --name-only --diff-filter=ACMRD "${BASE_SHA:-HEAD^}" HEAD > changed-files.txt
+        run: |
+          if [[ -n "$BASE_SHA" ]] && git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
+            diff_base="$BASE_SHA"
+          else
+            diff_base="HEAD^"
+          fi
+          git diff --name-only --diff-filter=ACMRD "$diff_base" HEAD > changed-files.txt
 
       - name: Build validation plan
         id: plan
@@ -49,13 +55,15 @@ jobs:
             --output validation-matrix.json
           )
           if [[ "$FULL_SUITE" == "true" ]] || grep -Eq \
-            '^(\.github/|scripts/(finalize_ci_validation_plan|plan_ci_validation|run_layered_validation|test_finalize_ci_validation_plan)\.py$|tests/(test_run_layered_validation|test_validation_catalog)\.py$|tests/validation_catalog\.json$)' \
+            '^(\.github/|scripts/(finalize_ci_validation_plan|plan_ci_validation|run_layered_validation|split_ci_validation_plan|test_finalize_ci_validation_plan|test_split_ci_validation_plan)\.py$|tests/(test_run_layered_validation|test_validation_catalog)\.py$|tests/validation_catalog\.json$)' \
             changed-files.txt; then
             args+=(--full)
           fi
           python scripts/test_finalize_ci_validation_plan.py
+          python scripts/test_split_ci_validation_plan.py
           python scripts/plan_ci_validation.py "${args[@]}"
           python scripts/finalize_ci_validation_plan.py --plan validation-matrix.json
+          python scripts/split_ci_validation_plan.py --plan validation-matrix.json
           echo "matrix=$(jq -c '{include: .include}' validation-matrix.json)" >> "$GITHUB_OUTPUT"
           echo "shard-count=$(jq '.include | length' validation-matrix.json)" >> "$GITHUB_OUTPUT"
 
@@ -66,6 +74,8 @@ jobs:
           jq -r '.include[] | "- **\(.name)** — \(.description)"' validation-matrix.json \
             >> "$GITHUB_STEP_SUMMARY"
           jq -r 'select(.coverage.full == true) | "- **Complete inventory audit** — \(.coverage.python_test_files) Python files, \(.coverage.node_test_files) Node files, and \(.coverage.candidate_verifier_tests) candidate-verifier tests; composed candidate and frontend build included."' \
+            validation-matrix.json >> "$GITHUB_STEP_SUMMARY"
+          jq -r 'select(.coverage.full == true) | "- **Bounded Manager split** — \(.coverage.manager_non_api_partitions | length) exhaustive non-API partitions."' \
             validation-matrix.json >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload validation plan
