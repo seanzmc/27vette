@@ -49,11 +49,13 @@ jobs:
             --output validation-matrix.json
           )
           if [[ "$FULL_SUITE" == "true" ]] || grep -Eq \
-            '^(\.github/|scripts/(plan_ci_validation|run_layered_validation)\.py$|tests/(test_run_layered_validation|test_validation_catalog)\.py$|tests/validation_catalog\.json$)' \
+            '^(\.github/|scripts/(finalize_ci_validation_plan|plan_ci_validation|run_layered_validation|test_finalize_ci_validation_plan)\.py$|tests/(test_run_layered_validation|test_validation_catalog)\.py$|tests/validation_catalog\.json$)' \
             changed-files.txt; then
             args+=(--full)
           fi
+          python scripts/test_finalize_ci_validation_plan.py
           python scripts/plan_ci_validation.py "${args[@]}"
+          python scripts/finalize_ci_validation_plan.py --plan validation-matrix.json
           echo "matrix=$(jq -c '{include: .include}' validation-matrix.json)" >> "$GITHUB_OUTPUT"
           echo "shard-count=$(jq '.include | length' validation-matrix.json)" >> "$GITHUB_OUTPUT"
 
@@ -63,6 +65,8 @@ jobs:
           echo >> "$GITHUB_STEP_SUMMARY"
           jq -r '.include[] | "- **\(.name)** — \(.description)"' validation-matrix.json \
             >> "$GITHUB_STEP_SUMMARY"
+          jq -r 'select(.coverage.full == true) | "- **Complete inventory audit** — \(.coverage.python_test_files) Python files, \(.coverage.node_test_files) Node files, and \(.coverage.candidate_verifier_tests) candidate-verifier tests; composed candidate and frontend build included."' \
+            validation-matrix.json >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload validation plan
         uses: actions/upload-artifact@v7
