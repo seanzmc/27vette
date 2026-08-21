@@ -48,7 +48,9 @@ jobs:
             --changed-file-list changed-files.txt
             --output validation-matrix.json
           )
-          if [[ "$FULL_SUITE" == "true" ]]; then
+          if [[ "$FULL_SUITE" == "true" ]] || grep -Eq \
+            '^(\.github/|scripts/(plan_ci_validation|run_layered_validation)\.py$|tests/(test_run_layered_validation|test_validation_catalog)\.py$|tests/validation_catalog\.json$)' \
+            changed-files.txt; then
             args+=(--full)
           fi
           python scripts/plan_ci_validation.py "${args[@]}"
