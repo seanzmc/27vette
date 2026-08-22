@@ -1,6 +1,12 @@
 # Workbook Manager Product and UX Recovery Specification
 
-Status: active product recovery; Checkpoint 1 implementation authorized and
+Status: **SUPERSEDED 2026-08-22** by
+`docs/superpowers/specs/2026-08-21-workbook-manager-ux-recovery.md` (hardened
+revision). That file owns the active recovery plan, including completed
+Checkpoint 1 status and Checkpoints 2–6. This file is retained as historical
+evidence only; do not implement from it.
+
+Original status: active product recovery; Checkpoint 1 implementation authorized and
 started 2026-08-21. Later checkpoints remain gated by §19 and must not begin
 automatically.
 
