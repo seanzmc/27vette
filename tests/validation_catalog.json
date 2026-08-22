@@ -61,7 +61,7 @@
       "python": "3.12",
       "source": ".github/workflows/release-candidate.yml"
     },
-    "ci_reference_status": "OPEN. Node 22 and Python 3.12 are not installed on the reference machine (available: node 23/24/25/26, python 3.13/3.14). Every approximate_seconds value below is local Node 26.7.0 / Python 3.14.7 evidence and is explicitly NOT the CI baseline the specification asks Checkpoint 0 to record. Capturing the CI-version baseline requires a workflow run or an approved local toolchain install.",
+    "ci_reference_status": "Node 22 / Python 3.12 CI evidence exists. PR 37 reached the complete Workbook Manager shared-fixture group after the composed candidate lane, but GitHub cancelled the job at the former 15-minute limit before that group completed. The required job now allows 25 minutes; every approximate_seconds value below remains local Node 26.7.0 / Python 3.14.7 evidence and is not a hard per-gate CI budget.",
     "python_collection_total": 734,
     "python_collection_note": "Measured by `.venv/bin/python -m pytest tests/ -q --collect-only` on 2026-08-17, before tests/test_validation_catalog.py was added (which brings it to 751). README previously hand-maintained 678, which was stale; README now points here.",
     "python_file_count": 38,
@@ -98,7 +98,7 @@
       "standalone_selection": "select_entire_group",
       "suite_id": "suite.workbook_manager_serial_group",
       "shared_setup_seconds": 65.46,
-      "shared_setup_description": "Checkpoint 5 measured py.test_workbook_manager_generated_parity at 147.68 s standalone after it moved to verified_manager_fixture, versus 82.22 s before that move. The 65.46 s delta is the best available measurement of the full promote_verified_projection setup now shared inside suite.workbook_manager_serial_group; it is not an additive per-gate cost. No full checkpoint re-timing was performed for this metadata correction."
+      "shared_setup_description": "Checkpoint 5 measured py.test_workbook_manager_generated_parity at 147.68 s standalone after it moved to verified_manager_fixture, versus 82.22 s before that move. The 65.46 s delta is the best available measurement of the full promote_verified_projection setup now shared inside suite.workbook_manager_serial_group; it is not an additive per-gate cost. PR 37 proved that the composed candidate plus this complete group can exceed the former 15-minute CI job limit, so the workflow now allows 25 minutes without changing selection or suite composition."
     }
   },
   "acceptance_locks": [
@@ -1010,7 +1010,7 @@
     },
     {
       "id": "cmd.workbook_manager_frontend_build",
-      "command": "npm --prefix workbook-manager/frontend ci && npm --prefix workbook-manager/frontend run build",
+      "command": "npm --prefix workbook-manager/frontend ci --include=dev && npm --prefix workbook-manager/frontend run build",
       "test_files": [],
       "layer": 2,
       "primary_authority": "structural_invariant",
@@ -1037,8 +1037,8 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "First-class production-build owner for Workbook Manager frontend changes; browser UX acceptance remains a separately recorded manual checkpoint until an approved browser-test dependency exists.",
-      "readme_reference": "npm --prefix workbook-manager/frontend ci && npm --prefix workbook-manager/frontend run build",
-      "notes": "Uses the committed lockfile and writes only gitignored frontend dependency/build directories.",
+      "readme_reference": "npm --prefix workbook-manager/frontend ci --include=dev && npm --prefix workbook-manager/frontend run build",
+      "notes": "Uses the committed lockfile, explicitly includes the Vite build devDependencies even under NODE_ENV=production, and writes only gitignored frontend dependency/build directories.",
       "collected_tests": 0,
       "baseline_result": "pass",
       "readme_publishes_command": true

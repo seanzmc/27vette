@@ -231,10 +231,17 @@ does not run the Layer 4 full inventory, access the live asset library, or submi
 a dealer build. Choose any additional local gates by changed surface as
 described below.
 
+The required job allows 25 minutes because a Workbook Manager source change
+runs the composed candidate lane and then the complete shared-fixture Manager
+acceptance group. Selection remains catalog-driven; the larger limit does not
+add the Layer 4 full inventory. The frontend install explicitly includes
+lockfile-pinned development dependencies because Vite is the production build
+tool, even when the invoking environment sets `NODE_ENV=production`.
+
 Workbook Manager frontend changes also run the cataloged production build:
 
 ```sh
-npm --prefix workbook-manager/frontend ci && npm --prefix workbook-manager/frontend run build
+npm --prefix workbook-manager/frontend ci --include=dev && npm --prefix workbook-manager/frontend run build
 ```
 
 The Layer 1 spine the runner invokes remains available directly:

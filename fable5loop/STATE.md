@@ -15,14 +15,14 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 - **Updated:** 2026-08-21
 - **Owning specification:** `docs/superpowers/specs/2026-08-15-workbook-manager-ux-recovery.md` owns the active Workbook Manager UX recovery and Checkpoint 1.
 - **Active workflow:** Workbook Manager Product and UX Recovery — Checkpoint 1 readiness shell and read-only connected explorer.
-- **Branch/commit:** `hermes/workbook-manager-ux-recovery-cp1` from current `origin/main` (`c5cdf082d42b45f790ba397f8f5b71d26602165c`); no task commit yet.
-- **Last completed:** Retired the completed fast layered validation specification and its Checkpoint 0–4 evidence from the active specs directory into `docs/archive/completed-specs/fast-layered-validation/`, activated the Workbook Manager UX recovery specification, and created the fresh Checkpoint 1 work branch.
-- **Current status:** Checkpoint 1 is authorized and started at its documentation/workbranch boundary. No React, FastAPI, projection, browser-test, workbook, or runtime implementation has changed yet.
-- **Validation:** Active-path reference review found no current pointer to the retired spec location; archived evidence links now resolve within the archive. Fable loop validation and `git diff --check` pass.
-- **Next action:** Inventory the live Checkpoint 1 React, FastAPI, projection-query, and browser acceptance surfaces; record the bounded implementation and test set before the first code edit.
-- **Blockers or closeout gaps:** None for starting Checkpoint 1. Checkpoints 2–6 remain unauthorized; Checkpoint 2 still requires the schema and customer-copy approvals in the owning specification.
+- **Branch/commit:** `hermes/workbook-manager-ux-recovery-cp1-impl` from merged `origin/main` (`f6a3092`); PR 37 repair is locally green and awaiting commit/push on the existing Checkpoint 1 branch.
+- **Last completed:** Diagnosed PR 37 as a GitHub job-timeout cancellation after all earlier selected stages passed, raised the job limit without widening gate selection, and made the API's entity-specific named diagnostics reachable beside connected option/group detail.
+- **Current status:** Checkpoint 1 repair is implemented and locally green. Checkpoints 2–6 remain unauthorized and unstarted.
+- **Validation:** Exact catalog-selected PR path passed all ten stages in 793.239 seconds, including composed Layer 1, frontend production build, Fable, protected-artifact guard, and complete Manager group (`185 passed, 2 skipped, 36 subtests passed`); focused runner/catalog/shell tests and `git diff --check` passed; protected workbook/generated/customer-runtime surfaces have no diff. No green remote CI claim yet.
+- **Next action:** Commit/push the repair to PR 37 and verify the required 25-minute check completes green. Then stop before Checkpoint 2.
+- **Blockers or closeout gaps:** PR 37 required check is not green until the repaired branch is pushed and the 25-minute run completes. Checkpoint 2 still requires explicit approval for the schema addition, complete group-label list, and customer-runtime heading switch.
 - **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This startup pass produced no Fable receipt.
-- **Protected boundaries:** Canonical workbook, generators, generated artifacts, published registry, customer runtime, dealer submission, deployment, and workbook schema remain untouched. This checkpoint changes documentation locations, the active specification status, and the operational handoff only.
+- **Protected boundaries:** Canonical workbook, workbook schema, generators, generated artifacts, published registry, customer runtime, dealer submission, WordPress media, and deployment remain untouched. The repair changes only Manager read-only presentation, CI timing/docs/catalog metadata, focused tests, the owning spec, and this handoff.
 
 ## Verified facts
 

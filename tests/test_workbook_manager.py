@@ -829,7 +829,8 @@ class TestPass1BrowserContainment(unittest.TestCase):
                       "App.jsx").read_text()
         asset_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
                         "components" / "AssetManager.jsx").read_text()
-        self.assertIn('label: "Asset Manager"', app_source)
+        self.assertIn('id: "assets", label: "Images"', app_source)
+        self.assertIn("<AssetManager", app_source)
         self.assertIn("PAGE_SIZE = 24", asset_source)
         self.assertIn('loading="lazy"', asset_source)
         self.assertIn("data.controls?.image_fit", asset_source)
@@ -869,6 +870,46 @@ class TestPass1BrowserContainment(unittest.TestCase):
         self.assertIn("blank / SQL NULL", record_form)
         self.assertIn('col.name === "setup_description"', record_form)
         self.assertIn("Edit model metadata &amp; Vehicle Setup copy", structure)
+
+    def test_checkpoint_one_shell_is_readiness_first_and_explorers_are_read_only(self):
+        app_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                      "App.jsx").read_text()
+        explorer_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                           "components" / "ConnectedExplorer.jsx").read_text()
+        operations_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                             "components" / "ModelOperations.jsx").read_text()
+
+        for state in (
+            "Starting Workbook Manager",
+            "Loading and checking workbook data",
+            "Ready to edit",
+            "Workbook changed—reload latest data",
+            "Draft requires attention",
+            "Workbook recovery required",
+            "Cannot reach Manager backend",
+        ):
+            self.assertIn(state, app_source)
+        self.assertIn('id: "overview", label: "Form Overview"', app_source)
+        self.assertIn('id: "options", label: "Options & Relationships"', app_source)
+        self.assertIn('id: "groups", label: "Groups"', app_source)
+        self.assertIn('id: "advanced", label: "Advanced & Recovery"', app_source)
+        self.assertIn("System details", app_source)
+        self.assertIn("Reload Latest Workbook Data", app_source)
+        self.assertLess(
+            app_source.index("await api.draftLifecycle(id)"),
+            app_source.index("setDraftLifecycle(lifecycle)"),
+        )
+        self.assertIn("listed.drafts.some", app_source)
+        self.assertIn("api.connectedOption", explorer_source)
+        self.assertIn("api.connectedGroup", explorer_source)
+        self.assertIn("api.explorerSearch", explorer_source)
+        self.assertIn("api.explorerDiagnostics", explorer_source)
+        self.assertIn("Where this option is used", explorer_source)
+        self.assertIn("Show option relationships", explorer_source)
+        self.assertIn("Where this group is used", explorer_source)
+        self.assertNotIn("saveDraftOperation", explorer_source)
+        self.assertNotIn("Record Comparison", operations_source)
+        self.assertNotIn('type="checkbox"', operations_source)
 
 
 @unittest.skipUnless(HAVE_FASTAPI, "fastapi not installed; install "
@@ -1513,6 +1554,184 @@ class TestApi(unittest.TestCase):
             "/api/records/options", params={"model": "stingray",
                                             "search": "Z51"}).json()
         self.assertGreater(resp["total"], 0)
+
+    def test_connected_option_detail_is_model_scoped_complete_and_read_only(self):
+        protected = [
+            self.workbook,
+            self.mainmod.config.DEFAULT_PROJECTION_DB,
+            self.mainmod.config.DEFAULT_DB,
+            self.apply_output_root / "form-app" / "data.js",
+        ]
+        before = {path: _sha256(path) for path in protected}
+
+        response = self.client.get(
+            "/api/explorer/stingray/options/opt_5zu_001"
+        )
+
+        self.assertEqual(response.status_code, 200, response.text)
+        detail = response.json()
+        self.assertEqual(detail["model_key"], "stingray")
+        self.assertEqual(detail["entity_type"], "option")
+        self.assertEqual(detail["option"]["option_id"], "opt_5zu_001")
+        self.assertEqual(detail["option"]["rpo"], "5ZU")
+        self.assertEqual(detail["option"]["name"], "Body-Color High Wing Spoiler")
+        self.assertEqual(detail["section"]["section_id"], "sec_spoi_001")
+        self.assertEqual(len(detail["availability"]), 6)
+        self.assertTrue(detail["exclusive_groups"])
+        self.assertTrue(detail["rule_groups"])
+        self.assertTrue(detail["rules"])
+        self.assertTrue(detail["assets"])
+        self.assertIn("technical", detail)
+        self.assertEqual(detail["destination"], {
+            "workspace": "options",
+            "entity_type": "option",
+            "entity_id": "opt_5zu_001",
+        })
+        self.assertEqual({path: _sha256(path) for path in protected}, before)
+
+        missing = self.client.get(
+            "/api/explorer/grand_sport/options/opt_5zu_001"
+        )
+        self.assertEqual(missing.status_code, 404)
+
+    def test_connected_group_detail_leads_with_description_and_named_members(self):
+        group_id = "grand_sport_x_excl_1623e1da9d59"
+        response = self.client.get(
+            f"/api/explorer/grand_sport_x/groups/exclusive/{group_id}"
+        )
+
+        self.assertEqual(response.status_code, 200, response.text)
+        detail = response.json()
+        self.assertEqual(detail["model_key"], "grand_sport_x")
+        self.assertEqual(detail["entity_type"], "group")
+        self.assertEqual(detail["group_type"], "exclusive")
+        self.assertEqual(detail["label"], "Exclusive group · Engine Appearance")
+        self.assertNotIn("1623e1da9d59", detail["label"])
+        self.assertIn("Engine cover choices", detail["notes"])
+        self.assertGreater(detail["member_count"], 1)
+        self.assertTrue(all(member["rpo"] and member["option_name"]
+                            for member in detail["members"]))
+        self.assertEqual(detail["technical"]["lineage"]["source_sheet"],
+                         "grand_sport_x_exclusive_groups")
+        self.assertEqual(detail["destination"]["entity_id"],
+                         f"exclusive:{group_id}")
+
+    def test_cross_entity_search_is_ranked_typed_scoped_and_stable(self):
+        option = self.client.get(
+            "/api/explorer/stingray/search", params={"query": "5ZU"}
+        ).json()
+        self.assertEqual(option["model_key"], "stingray")
+        self.assertEqual(option["results"][0]["entity_type"], "option")
+        self.assertEqual(option["results"][0]["entity_id"], "opt_5zu_001")
+        self.assertEqual(option["results"][0]["destination"], {
+            "workspace": "options", "entity_type": "option",
+            "entity_id": "opt_5zu_001",
+        })
+        other_model_ids = {
+            row["entity_id"] for row in self.client.get(
+                "/api/explorer/grand_sport/search", params={"query": "5ZU"}
+            ).json()["results"] if row["entity_type"] == "option"
+        }
+        self.assertNotIn("opt_5zu_001", other_model_ids)
+
+        for query, entity_type in (
+            ("Engine cover choices", "group"),
+            ("Engine Appearance", "section"),
+            ("excludes", "rule"),
+        ):
+            result = self.client.get(
+                "/api/explorer/grand_sport_x/search", params={"query": query}
+            )
+            self.assertEqual(result.status_code, 200, result.text)
+            self.assertIn(entity_type, {
+                row["entity_type"] for row in result.json()["results"]
+            })
+
+        section = self.client.get(
+            "/api/explorer/grand_sport_x/sections/sec_engi_001"
+        )
+        self.assertEqual(section.status_code, 200, section.text)
+        self.assertEqual(section.json()["destination"], {
+            "workspace": "sections", "entity_type": "section",
+            "entity_id": "sec_engi_001",
+        })
+        self.assertTrue(section.json()["options"])
+
+        rule_search = self.client.get(
+            "/api/explorer/grand_sport_x/search", params={"query": "excludes"}
+        ).json()["results"]
+        rule_result = next(row for row in rule_search if row["entity_type"] == "rule")
+        rule = self.client.get(
+            f"/api/explorer/grand_sport_x/rules/{rule_result['entity_id']}"
+        )
+        self.assertEqual(rule.status_code, 200, rule.text)
+        self.assertEqual(rule.json()["destination"], rule_result["destination"])
+        self.assertIn("source_option", rule.json())
+        self.assertIn("target_option", rule.json())
+
+    def test_named_diagnostics_are_bounded_defined_scoped_and_traceable(self):
+        catalog = self.client.get(
+            "/api/explorer/stingray/diagnostics"
+        ).json()
+        self.assertEqual([item["key"] for item in catalog["diagnostics"]], [
+            "missing_required_images",
+            "multiple_exclusive_groups",
+            "where_used",
+            "option_relationships",
+            "variant_availability_differences",
+        ])
+        for item in catalog["diagnostics"]:
+            self.assertTrue(item["label"])
+            self.assertTrue(item["definition"])
+
+        missing = self.client.get(
+            "/api/explorer/stingray/diagnostics/missing_required_images",
+            params={"limit": 5},
+        ).json()
+        self.assertEqual(missing["model_key"], "stingray")
+        self.assertLessEqual(len(missing["results"]), 5)
+        self.assertTrue(all(row["destination"]["workspace"] == "options"
+                            for row in missing["results"]))
+
+        multiple = self.client.get(
+            "/api/explorer/stingray/diagnostics/multiple_exclusive_groups"
+        ).json()
+        self.assertEqual(multiple["model_key"], "stingray")
+
+        used = self.client.get(
+            "/api/explorer/stingray/diagnostics/where_used",
+            params={"entity_id": "opt_5zu_001"},
+        ).json()
+        self.assertTrue(used["results"])
+        self.assertTrue(all(row["technical"]["source_sheet"]
+                            for row in used["results"]))
+
+        group_used = self.client.get(
+            "/api/explorer/grand_sport_x/diagnostics/where_used",
+            params={"entity_id": "exclusive:grand_sport_x_excl_1623e1da9d59"},
+        ).json()
+        self.assertTrue(group_used["results"])
+        self.assertTrue(all(row["technical"]["source_sheet"]
+                            for row in group_used["results"]))
+
+        relationships = self.client.get(
+            "/api/explorer/stingray/diagnostics/option_relationships",
+            params={"entity_id": "opt_5zu_001"},
+        ).json()
+        self.assertTrue(relationships["results"])
+
+        differences = self.client.get(
+            "/api/explorer/stingray/diagnostics/variant_availability_differences",
+            params={"limit": 5},
+        ).json()
+        self.assertLessEqual(len(differences["results"]), 5)
+        self.assertTrue(all(row["distinct_status_count"] > 1
+                            for row in differences["results"]))
+
+        missing_entity = self.client.get(
+            "/api/explorer/stingray/diagnostics/where_used"
+        )
+        self.assertEqual(missing_entity.status_code, 422)
 
     def test_schema_exposes_final_shared_field_and_model_context_metadata(self):
         defaults = self.client.get(

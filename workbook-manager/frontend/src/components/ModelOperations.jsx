@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Columns2, PlusCircle, Pencil, Search, Table2, Trash2, TriangleAlert,
+  PlusCircle, Pencil, Search, Table2, Trash2, TriangleAlert,
 } from "lucide-react";
 import { api } from "../api.js";
 import { displayId } from "../naming.js";
@@ -17,7 +17,6 @@ export default function ModelOperations({
   const [offset, setOffset] = useState(0);
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState(null);
-  const [compare, setCompare] = useState([]); // selected row ids for diff
   const [deps, setDeps] = useState(null);     // dependency dialog state
   const [notice, setNotice] = useState(null);
   const searchTimer = useRef(null);
@@ -47,7 +46,6 @@ export default function ModelOperations({
 
   useEffect(() => {
     setOffset(0);
-    setCompare([]);
     setEditing(null);
     setDeps(null);
     loadRows(table, search, 0);
@@ -111,12 +109,6 @@ export default function ModelOperations({
     }
   };
 
-  const toggleCompare = (row) =>
-    setCompare((cur) => {
-      const id = row.id;
-      if (cur.some((r) => r.id === id)) return cur.filter((r) => r.id !== id);
-      return [...cur.slice(-1), row]; // keep at most two
-    });
 
   const saved = async (operation) => {
     setEditing(null);
@@ -202,7 +194,6 @@ export default function ModelOperations({
           <table className="data">
             <thead>
               <tr>
-                <th title="compare"><Columns2 size={12} /></th>
                 {previewCols.map((c) => <th key={c.name}>{c.label}</th>)}
                 <th style={{ textAlign: "right" }}>Actions</th>
               </tr>
@@ -210,20 +201,13 @@ export default function ModelOperations({
             <tbody>
               {rows.length === 0 && (
                 <tr>
-                  <td colSpan={previewCols.length + 2} className="empty">
+                  <td colSpan={previewCols.length + 1} className="empty">
                     No records{search ? " match the search" : ""}.
                   </td>
                 </tr>
               )}
               {rows.map((r) => (
-                <tr key={r.id} className={compare.some((x) => x.id === r.id) ? "selected" : ""}>
-                  <td>
-                    <input
-                      type="checkbox"
-                      checked={compare.some((x) => x.id === r.id)}
-                      onChange={() => toggleCompare(r)}
-                    />
-                  </td>
+                <tr key={r.id}>
                   {previewCols.map((c) => (
                     <td key={c.name} title={r[c.name]}>
                       {c.is_key && c.name === schema.key[0] ? (
@@ -287,31 +271,6 @@ export default function ModelOperations({
 
       {notice && <div className={`notice ${notice.kind}`}>{notice.text}</div>}
 
-      {compare.length === 2 && schema && (
-        <div className="panel" style={{ marginTop: 14 }}>
-          <div className="panel-head">
-            <strong>Record Comparison</strong>
-            <button className="btn small" onClick={() => setCompare([])}>Clear</button>
-          </div>
-          <div className="diff-grid">
-            <div className="head">Field</div>
-            <div className="head mono">{compare[0][schema.key[0]]}</div>
-            <div className="head mono">{compare[1][schema.key[0]]}</div>
-            {schema.columns.map((c) => {
-              const a = String(compare[0][c.name] ?? "");
-              const b = String(compare[1][c.name] ?? "");
-              const changed = a !== b;
-              return (
-                <React.Fragment key={c.name}>
-                  <div className="field-name">{c.name}</div>
-                  <div className={changed ? "changed" : ""}>{a || "—"}</div>
-                  <div className={changed ? "changed" : ""}>{b || "—"}</div>
-                </React.Fragment>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
       {editing && schema && (
         <div style={{ marginTop: 14 }}>
