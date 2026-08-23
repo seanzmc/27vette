@@ -37,6 +37,15 @@ SOURCE_ROLE_FAMILIES: dict[str, str] = {
 REGISTRY_PROMOTION_ARTIFACT_TYPES: tuple[str, ...] = ("runtime_contract",)
 DEFAULT_REGISTRY_PROMOTION_ARTIFACT_TYPE = "runtime_contract"
 
+GROUP_DISPLAY_LABEL_MIN_LENGTH = 3
+GROUP_DISPLAY_LABEL_MAX_LENGTH = 100
+GROUP_DISPLAY_LABEL_PLACEHOLDERS = frozenset({
+    "Related options",
+    "Unnamed group",
+    "Label pending workbook review",
+})
+GROUP_DISPLAY_LABEL_HASH_SUFFIX_PATTERN = r"[_-]([0-9a-f]{6,})$"
+
 # Per-family editing metadata. Columns absent from types/enums/refs are
 # free text. Headers always come from the sheet itself, never from here.
 EDITOR_SHEET_META: dict[str, dict] = {
@@ -266,9 +275,9 @@ WRITABLE_COLUMNS: dict[str, tuple[str, ...]] = {
     "options": ("option_id", "rpo", "price", "option_name", "description", "detail_raw", "section_id", "selectable", "display_order", "active", "display_behavior"),
     "ovs": ("option_id", "variant_id", "status"),
     "rule_mapping": ("rule_id", "source_id", "rule_type", "target_id", "original_detail_raw", "body_style_scope", "runtime_action", "disabled_reason"),
-    "rule_groups": ("group_id", "group_type", "source_id", "body_style_scope", "trim_level_scope", "variant_scope", "disabled_reason", "active", "notes"),
+    "rule_groups": ("group_id", "display_label", "group_type", "source_id", "body_style_scope", "trim_level_scope", "variant_scope", "disabled_reason", "active", "notes"),
     "rule_group_members": ("group_id", "target_id", "display_order", "active"),
-    "exclusive_groups": ("group_id", "selection_mode", "active", "notes"),
+    "exclusive_groups": ("group_id", "display_label", "selection_mode", "active", "notes"),
     "exclusive_members": ("group_id", "option_id", "display_order", "active"),
     "price_rules": ("price_rule_id", "condition_option_id", "price_rule_type", "target_option_id", "price_value", "body_style_scope", "trim_level_scope", "notes"),
     "variant_overrides": ("option_id", "variant_id", "selectable", "display_behavior", "section_id", "active", "note"),
@@ -296,7 +305,10 @@ WRITABLE_COLUMNS: dict[str, tuple[str, ...]] = {
 OPTIONAL_COLUMNS: dict[str, tuple[str, ...]] = {
     "options": ("rpo", "price", "description", "detail_raw", "display_order", "display_behavior"),
     "rule_mapping": ("original_detail_raw", "body_style_scope", "runtime_action", "disabled_reason"),
-    "rule_groups": ("body_style_scope", "trim_level_scope", "variant_scope", "disabled_reason", "notes"),
+    # Checkpoint 2B: display_label is deliberate human copy, optional until the
+    # approved migration (Checkpoint 2D) fills it. Blank means label pending.
+    "rule_groups": ("display_label", "body_style_scope", "trim_level_scope", "variant_scope", "disabled_reason", "notes"),
+    "exclusive_groups": ("display_label", "notes"),
     "rule_group_members": ("display_order",),
     "price_rules": ("body_style_scope", "trim_level_scope", "notes"),
     "variant_overrides": ("selectable", "display_behavior", "section_id", "note"),

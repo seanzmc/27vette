@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "z06_options",
-    "generated_at": "2026-08-17T02:46:33+00:00",
+    "generated_at": "2026-08-23T07:05:25+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -41707,6 +41707,7 @@
   "ruleGroups": [
     {
       "group_id": "z06_group_z07_requires_aero",
+      "display_label": "Z07 Performance Package \u2014 Aero Requirements",
       "group_type": "requires_any",
       "source_id": "opt_z07_001",
       "target_ids": [
@@ -41722,6 +41723,7 @@
     },
     {
       "group_id": "z06_group_pdb_requires_carbon_wheel",
+      "display_label": "PDB Carbon Fiber Wheel and Brake Package \u2014 Carbon Fiber Wheel Requirements",
       "group_type": "requires_any",
       "source_id": "opt_pdb_001",
       "target_ids": [
@@ -41738,6 +41740,7 @@
     },
     {
       "group_id": "z06_group_pdd_requires_carbon_wheel",
+      "display_label": "PDD Z07 Carbon Flash Aero and Wheel Package \u2014 Carbon Fiber Wheel Requirements",
       "group_type": "requires_any",
       "source_id": "opt_pdd_001",
       "target_ids": [
@@ -41754,6 +41757,7 @@
     },
     {
       "group_id": "z06_group_pdf_requires_carbon_wheel",
+      "display_label": "PDF Z07 Visible Carbon Aero and Wheel Package \u2014 Carbon Fiber Wheel Requirements",
       "group_type": "requires_any",
       "source_id": "opt_pdf_001",
       "target_ids": [
@@ -41770,6 +41774,7 @@
     },
     {
       "group_id": "z06_group_r88_excludes_badge_and_stripe_choices",
+      "display_label": "R88 Front Illuminated Crossed Flags Emblem \u2014 Badge and Stripe Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_r88_001",
       "target_ids": [
@@ -41798,6 +41803,7 @@
     },
     {
       "group_id": "z06_group_sfz_excludes_badge_and_stripe_choices",
+      "display_label": "SFZ Dark Stealth Crossed Flags Emblems \u2014 Badge and Stripe Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_sfz_001",
       "target_ids": [
@@ -41825,6 +41831,7 @@
     },
     {
       "group_id": "z06_group_cf8_excludes_full_length_stripes",
+      "display_label": "CF8 Electrochromic Dimming Roof Panel \u2014 Full-Length Stripe Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_cf8_001",
       "target_ids": [
@@ -41851,6 +41858,7 @@
     },
     {
       "group_id": "z06_group_sht_excludes_full_length_stripes",
+      "display_label": "SHT Tech Bronze Jake Hood Graphic \u2014 Full-Length Stripe Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_sht_001",
       "target_ids": [
@@ -41882,6 +41890,7 @@
     },
     {
       "group_id": "z06_group_gba_excludes_accent_and_roof_choices",
+      "display_label": "GBA Black \u2014 Accent and Roof Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_gba_001",
       "target_ids": [
@@ -41901,6 +41910,7 @@
     },
     {
       "group_id": "z06_group_z07_excludes_non_z07_aero",
+      "display_label": "Z07 Performance Package \u2014 Non-Z07 Aero Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_z07_001",
       "target_ids": [
@@ -41916,6 +41926,7 @@
     },
     {
       "group_id": "z06_group_z07_excludes_j56_brakes",
+      "display_label": "Z07 Performance Package \u2014 J56 Brake Exclusion",
       "group_type": "excludes_any",
       "source_id": "opt_z07_001",
       "target_ids": [
@@ -41930,6 +41941,7 @@
     },
     {
       "group_id": "z06_group_pdb_excludes_j56_brakes",
+      "display_label": "PDB Carbon Fiber Wheel and Brake Package \u2014 J56 Brake Exclusion",
       "group_type": "excludes_any",
       "source_id": "opt_pdb_001",
       "target_ids": [
@@ -41944,6 +41956,7 @@
     },
     {
       "group_id": "z06_group_pdb_excludes_aluminum_wheels",
+      "display_label": "PDB Carbon Fiber Wheel and Brake Package \u2014 Aluminum Wheel Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_pdb_001",
       "target_ids": [
@@ -41966,6 +41979,7 @@
     },
     {
       "group_id": "z06_group_pdd_excludes_aluminum_wheels",
+      "display_label": "PDD Z07 Carbon Flash Aero and Wheel Package \u2014 Aluminum Wheel Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_pdd_001",
       "target_ids": [
@@ -41988,6 +42002,7 @@
     },
     {
       "group_id": "z06_group_pdf_excludes_aluminum_wheels",
+      "display_label": "PDF Z07 Visible Carbon Aero and Wheel Package \u2014 Aluminum Wheel Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_pdf_001",
       "target_ids": [
@@ -42010,6 +42025,7 @@
     },
     {
       "group_id": "z06_group_pda_excludes_dual_racing_stripes",
+      "display_label": "PDA Jake C8.R Graphics Package \u2014 Dual Racing Stripe Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_pda_001",
       "target_ids": [
@@ -42039,6 +42055,7 @@
     },
     {
       "group_id": "z06_group_sne_excludes_stripes_and_tech_bronze_jake",
+      "display_label": "SNE Jake Hood Graphic \u2014 Stripe and Tech Bronze Jake Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_sne_001",
       "target_ids": [
@@ -42070,6 +42087,7 @@
     },
     {
       "group_id": "z06_group_vpw_excludes_tech_bronze_jake",
+      "display_label": "VPW Jake C8.R Rear Hash Graphic \u2014 Tech Bronze Jake Exclusion",
       "group_type": "excludes_any",
       "source_id": "opt_vpw_001",
       "target_ids": [
@@ -42085,6 +42103,7 @@
     },
     {
       "group_id": "z06_group_vpo_excludes_jake_graphics",
+      "display_label": "VPO Tech Bronze Jake C8.R Rear Hash Graphic \u2014 Jake Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_vpo_001",
       "target_ids": [
@@ -42100,6 +42119,7 @@
     },
     {
       "group_id": "z06_group_dpb_excludes_jake_hood_graphics",
+      "display_label": "DPB Carbon Flash/Blue Racing Stripes \u2014 Jake Hood Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dpb_001",
       "target_ids": [
@@ -42115,6 +42135,7 @@
     },
     {
       "group_id": "z06_group_dpc_excludes_jake_hood_graphics",
+      "display_label": "DPC Carbon Flash/Yellow Racing Stripes \u2014 Jake Hood Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dpc_001",
       "target_ids": [
@@ -42130,6 +42151,7 @@
     },
     {
       "group_id": "z06_group_dpg_excludes_jake_hood_graphics",
+      "display_label": "DPG Carbon Flash/Orange Racing Stripes \u2014 Jake Hood Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dpg_001",
       "target_ids": [
@@ -42145,6 +42167,7 @@
     },
     {
       "group_id": "z06_group_dpl_excludes_jake_hood_graphics",
+      "display_label": "DPL Carbon Flash/Red Racing Stripes \u2014 Jake Hood Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dpl_001",
       "target_ids": [
@@ -42160,6 +42183,7 @@
     },
     {
       "group_id": "z06_group_dpt_excludes_jake_hood_graphics",
+      "display_label": "DPT Carbon Flash/Silver Racing Stripes \u2014 Jake Hood Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dpt_001",
       "target_ids": [
@@ -42175,6 +42199,7 @@
     },
     {
       "group_id": "z06_group_dsy_excludes_jake_hood_graphics",
+      "display_label": "DSY Edge Orange Racing Stripes \u2014 Jake Hood Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dsy_001",
       "target_ids": [
@@ -42190,6 +42215,7 @@
     },
     {
       "group_id": "z06_group_dsz_excludes_jake_hood_graphics",
+      "display_label": "DSZ Edge Red Racing Stripes \u2014 Jake Hood Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dsz_001",
       "target_ids": [
@@ -42205,6 +42231,7 @@
     },
     {
       "group_id": "z06_group_dt0_excludes_jake_hood_graphics",
+      "display_label": "DT0 Competition Yellow Racing Stripes \u2014 Jake Hood Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dt0_001",
       "target_ids": [
@@ -42220,6 +42247,7 @@
     },
     {
       "group_id": "z06_group_dth_excludes_jake_hood_graphics",
+      "display_label": "DTH Carbon Flash Metallic Racing Stripes \u2014 Jake Hood Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dth_001",
       "target_ids": [
@@ -42235,6 +42263,7 @@
     },
     {
       "group_id": "z06_group_dub_excludes_jake_hood_graphics",
+      "display_label": "DUB Sterling Silver Racing Stripes \u2014 Jake Hood Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dub_001",
       "target_ids": [
@@ -42250,6 +42279,7 @@
     },
     {
       "group_id": "z06_group_due_excludes_jake_hood_graphics",
+      "display_label": "DUE Santorini Blue/Carbon Flash Racing Stripes \u2014 Jake Hood Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_due_001",
       "target_ids": [
@@ -42265,6 +42295,7 @@
     },
     {
       "group_id": "z06_group_duk_excludes_jake_hood_graphics",
+      "display_label": "DUK Edge Red/Carbon Flash Racing Stripes \u2014 Jake Hood Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_duk_001",
       "target_ids": [
@@ -42280,6 +42311,7 @@
     },
     {
       "group_id": "z06_group_duw_excludes_jake_hood_graphics",
+      "display_label": "DUW Edge Blue Racing Stripes \u2014 Jake Hood Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_duw_001",
       "target_ids": [
@@ -42295,6 +42327,7 @@
     },
     {
       "group_id": "z06_group_dzu_excludes_jake_hood_graphics",
+      "display_label": "DZU Carbon Flash/Competition Yellow Stinger Stripe \u2014 Jake Hood Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dzu_001",
       "target_ids": [
@@ -42310,6 +42343,7 @@
     },
     {
       "group_id": "z06_group_dzv_excludes_jake_hood_graphics",
+      "display_label": "DZV Carbon Flash/Midnight Silver Stinger Stripe \u2014 Jake Hood Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dzv_001",
       "target_ids": [
@@ -42325,6 +42359,7 @@
     },
     {
       "group_id": "z06_group_dzx_excludes_jake_hood_graphics",
+      "display_label": "DZX Carbon Flash/Edge Red Stinger Stripe \u2014 Jake Hood Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dzx_001",
       "target_ids": [
@@ -42342,6 +42377,7 @@
   "exclusiveGroups": [
     {
       "group_id": "z06_excl_center_caps",
+      "display_label": "Wheel Center Caps",
       "option_ids": [
         "opt_5zc_001",
         "opt_5zd_001"
@@ -42352,6 +42388,7 @@
     },
     {
       "group_id": "z06_excl_indoor_car_covers",
+      "display_label": "Indoor Car Covers",
       "option_ids": [
         "opt_rwh_001",
         "opt_wkr_001",
@@ -42363,6 +42400,7 @@
     },
     {
       "group_id": "z06_excl_rear_script_badges",
+      "display_label": "Rear Corvette Script Badge Color",
       "option_ids": [
         "opt_rik_001",
         "opt_rin_001",
@@ -42374,6 +42412,7 @@
     },
     {
       "group_id": "z06_excl_suede_compartment_liners",
+      "display_label": "Suede Frunk and Trunk Liners",
       "option_ids": [
         "opt_sxb_001",
         "opt_sxr_001",
@@ -42385,6 +42424,7 @@
     },
     {
       "group_id": "z06_excl_ground_effects",
+      "display_label": "Ground Effects",
       "option_ids": [
         "opt_cfl_001",
         "opt_cfz_001",
@@ -42396,6 +42436,7 @@
     },
     {
       "group_id": "z06_excl_exterior_accents",
+      "display_label": "Exterior Accents",
       "option_ids": [
         "opt_efr_001",
         "opt_edu_001",
@@ -42407,6 +42448,7 @@
     },
     {
       "group_id": "z06_excl_performance_brakes",
+      "display_label": "Performance Brakes",
       "option_ids": [
         "opt_j56_001",
         "opt_j57_001"
@@ -42417,6 +42459,7 @@
     },
     {
       "group_id": "z06_excl_carbon_wheel_packages",
+      "display_label": "Carbon Fiber Wheel and Aero Packages",
       "option_ids": [
         "opt_pdb_001",
         "opt_pdd_001",
@@ -42428,6 +42471,7 @@
     },
     {
       "group_id": "z06_excl_fa5_fa6_interior_trim",
+      "display_label": "Carbon Fiber Interior Trim",
       "option_ids": [
         "opt_fa5_001",
         "opt_fa6_001"
@@ -42438,6 +42482,7 @@
     },
     {
       "group_id": "z06_excl_aero_packages",
+      "display_label": "Aero Package",
       "option_ids": [
         "opt_t0e_001",
         "opt_t0f_001",
@@ -42450,6 +42495,7 @@
     },
     {
       "group_id": "z06_excl_exhaust_tips",
+      "display_label": "Exhaust Tips",
       "option_ids": [
         "opt_nga_001",
         "opt_nwi_001"
@@ -42460,6 +42506,7 @@
     },
     {
       "group_id": "z06_excl_default_and_carbon_wheels",
+      "display_label": "Wheel Style",
       "option_ids": [
         "opt_soe_002",
         "opt_roy_001",
@@ -42480,6 +42527,7 @@
     },
     {
       "group_id": "z06_excl_seat_belts",
+      "display_label": "Seat Belt Color",
       "option_ids": [
         "opt_719_001",
         "opt_3n9_001",

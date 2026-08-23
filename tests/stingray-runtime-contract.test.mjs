@@ -680,6 +680,7 @@ test("Grand Sport draft rule source sheets use workbook-backed contracts", () =>
   assert.deepEqual(workbookHeaders("grandSport_price_rules"), priceRuleHeaders);
   assert.deepEqual(workbookHeaders("grandSport_rule_groups"), [
     "group_id",
+    "display_label",
     "group_type",
     "source_id",
     "body_style_scope",
@@ -690,7 +691,7 @@ test("Grand Sport draft rule source sheets use workbook-backed contracts", () =>
     "notes",
   ]);
   assert.deepEqual(workbookHeaders("grandSport_rule_group_members"), ["group_id", "target_id", "display_order", "active"]);
-  assert.deepEqual(workbookHeaders("grandSport_exclusive_groups"), ["group_id", "selection_mode", "active", "notes"]);
+  assert.deepEqual(workbookHeaders("grandSport_exclusive_groups"), ["group_id", "display_label", "selection_mode", "active", "notes"]);
   assert.deepEqual(workbookHeaders("grandSport_exclusive_members"), ["group_id", "option_id", "display_order", "active"]);
   assert.ok(workbookRows("grandSport_rule_mapping").length > 0);
   const grandSportPriceRuleIds = new Set(workbookRows("grandSport_price_rules").map((row) => row.price_rule_id));
@@ -704,6 +705,7 @@ test("Grand Sport draft rule source sheets use workbook-backed contracts", () =>
 test("generator-owned compatibility groups are authored in workbook source sheets", () => {
   assert.deepEqual(workbookHeaders("rule_groups"), [
     "group_id",
+    "display_label",
     "group_type",
     "source_id",
     "body_style_scope",
@@ -714,6 +716,6 @@ test("generator-owned compatibility groups are authored in workbook source sheet
     "notes",
   ]);
   assert.deepEqual(workbookHeaders("rule_group_members"), ["group_id", "target_id", "display_order", "active"]);
-  assert.deepEqual(workbookHeaders("exclusive_groups"), ["group_id", "selection_mode", "active", "notes"]);
+  assert.deepEqual(workbookHeaders("exclusive_groups"), ["group_id", "display_label", "selection_mode", "active", "notes"]);
   assert.deepEqual(workbookHeaders("exclusive_group_members"), ["group_id", "option_id", "display_order", "active"]);
 });

@@ -12,6 +12,14 @@ from corvette_form_generator.rule_derivation import derive_swap_rules
 from corvette_form_generator.workbook import clean, intish, rows_from_optional_sheet
 
 
+def _display_label(row: dict[str, str]) -> str:
+    """Workbook-authored group label; absent column loads as blank (label pending)."""
+
+    if "display_label" not in row:
+        return ""
+    return clean(row.get("display_label"))
+
+
 def active_source_row(row: dict[str, str]) -> bool:
     return clean(row.get("active", "True")) == "True"
 
@@ -55,6 +63,7 @@ def load_rule_groups(wb, config: ModelConfig) -> list[dict[str, Any]]:
         rule_groups.append(
             {
                 "group_id": group_id,
+                "display_label": _display_label(row),
                 "group_type": row.get("group_type", ""),
                 "source_id": row.get("source_id", ""),
                 "target_ids": [member.get("target_id", "") for member in members if member.get("target_id", "")],
@@ -84,6 +93,7 @@ def load_exclusive_groups(wb, config: ModelConfig) -> list[dict[str, Any]]:
         exclusive_groups.append(
             {
                 "group_id": group_id,
+                "display_label": _display_label(row),
                 "option_ids": [member.get("option_id", "") for member in members if member.get("option_id", "")],
                 "selection_mode": row.get("selection_mode", ""),
                 "active": row.get("active", ""),
