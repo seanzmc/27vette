@@ -142,6 +142,8 @@ Claude Code project files under `.claude/` are thin launch/wrapper surfaces for 
 
 Choose gates by changed surface and risk — don't run irrelevant gates from old plans, don't skip relevant ones because a change looked small. Commands live in README ("Workbook And Generator Workflows", "Validation").
 
+Treat `tests/validation_catalog.json` and the CI planning scripts as the executable owners for gate layer, authority, isolation, serialization, changed-surface selection, and full-suite sharding. Do not re-derive those from README prose or old plans. Local and CI layered runs should use the active virtualenv interpreter and the README-owned Node/toolchain setup; Layer 4 is diagnostic unless the task explicitly calls for a full inventory.
+
 - Docs-only: diff review + consistency with README/active docs.
 - Workbook writes: package/schema validation, verify saved file on disk, regenerate affected artifacts, review generated diffs.
 - Asset/media sync: review manifest/report outputs first; for deterministic checks prefer the fixture media list in README/docs; if a real workbook apply is approved, run workbook package/schema gates, then regenerate affected active models and registry only if workbook data changed.

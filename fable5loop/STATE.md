@@ -12,17 +12,17 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 
 ## Current handoff
 
-- **Updated:** 2026-08-21
-- **Owning specification:** `docs/superpowers/specs/2026-08-15-workbook-manager-ux-recovery.md` owns the active Workbook Manager UX recovery and Checkpoint 1.
-- **Active workflow:** Workbook Manager Product and UX Recovery — Checkpoint 1 readiness shell and read-only connected explorer.
-- **Branch/commit:** `hermes/workbook-manager-ux-recovery-cp1-impl` from merged `origin/main` (`f6a3092`); PR 37 repair is locally green and awaiting commit/push on the existing Checkpoint 1 branch.
-- **Last completed:** Diagnosed PR 37 as a GitHub job-timeout cancellation after all earlier selected stages passed, raised the job limit without widening gate selection, and made the API's entity-specific named diagnostics reachable beside connected option/group detail.
-- **Current status:** Checkpoint 1 repair is implemented and locally green. Checkpoints 2–6 remain unauthorized and unstarted.
-- **Validation:** Exact catalog-selected PR path passed all ten stages in 793.239 seconds, including composed Layer 1, frontend production build, Fable, protected-artifact guard, and complete Manager group (`185 passed, 2 skipped, 36 subtests passed`); focused runner/catalog/shell tests and `git diff --check` passed; protected workbook/generated/customer-runtime surfaces have no diff. No green remote CI claim yet.
-- **Next action:** Commit/push the repair to PR 37 and verify the required 25-minute check completes green. Then stop before Checkpoint 2.
-- **Blockers or closeout gaps:** PR 37 required check is not green until the repaired branch is pushed and the 25-minute run completes. Checkpoint 2 still requires explicit approval for the schema addition, complete group-label list, and customer-runtime heading switch.
+- **Updated:** 2026-08-23
+- **Owning specification:** None; automation-only AGENTS.md guidance refresh.
+- **Active workflow:** Update AGENTS.md automation for newly discovered validation workflow guidance.
+- **Branch/commit:** `codex/update-agents-md-validation-workflow` from current `origin/main` (`aa28e8a`); docs-only PR pending.
+- **Last completed:** Added minimal AGENTS.md guidance that the validation catalog and CI planners own gate layers, authority, isolation, serialization, changed-surface selection, active-interpreter execution, and full-suite sharding.
+- **Current status:** Docs-only automation update is implemented in an isolated worktree; no workbook, generated artifact, runtime, README command table, deployment, or dealer surface changed.
+- **Validation:** Fable loop validator passed using the main repo virtualenv; `git diff --check -- AGENTS.md fable5loop/STATE.md` passed; `git diff --stat` reviewed. Product tests were not run because this is guidance-only.
+- **Next action:** Review and merge the docs-only PR when ready; resume Workbook Manager UX recovery from its owning spec and active branch, not from this automation branch.
+- **Blockers or closeout gaps:** None for this automation. Existing Workbook Manager Checkpoint 2 work remains separate from this branch.
 - **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This startup pass produced no Fable receipt.
-- **Protected boundaries:** Canonical workbook, workbook schema, generators, generated artifacts, published registry, customer runtime, dealer submission, WordPress media, and deployment remain untouched. The repair changes only Manager read-only presentation, CI timing/docs/catalog metadata, focused tests, the owning spec, and this handoff.
+- **Protected boundaries:** Canonical workbook, workbook schema, generators, generated artifacts, published registry, customer runtime, dealer submission, WordPress media, and deployment remain untouched.
 
 ## Verified facts
 
