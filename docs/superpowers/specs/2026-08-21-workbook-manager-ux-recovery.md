@@ -1,16 +1,15 @@
 # Workbook Manager Product and UX Recovery Specification
 
-Status: active product recovery. Checkpoint 1 is implementation-complete and
-validated on PR 37 at the inspected baseline commit
-`bd0ef07bd98702526fb67a033c7e7bbefefbf690`; the pull request was still open and
-unmerged when this revision was authored on 2026-08-21. Checkpoints 2–6 remain
+Status: active product recovery. Checkpoint 1 merged through PR 37 at `aa28e8a`.
+Checkpoint 2 completed on 2026-08-23 at implementation commit `ff28eb5` and
+passed full-inventory Release candidate run 32626231858. Checkpoints 3–6 remain
 separately gated by §19 and must not begin automatically.
 
-This revision is specification hardening only. It does **not** authorize a
-workbook-schema change, a workbook write, customer-facing copy, runtime heading
-migration, group-ID strategy, new dependency, deployment, or any later
-checkpoint. A coding agent must re-resolve the live branch, PR, repository, and
-workbook state before relying on the inspected baseline.
+Checkpoint 2 added the approved workbook schema/data and additive generated
+label fields, but did **not** authorize or perform the Checkpoint 5 customer
+heading switch, a group-ID strategy, a new dependency, deployment, media
+mutation, or dealer behavior. A coding agent must re-resolve the live branch,
+PR, repository, and workbook state before relying on any recorded baseline.
 
 Recommended implementation reasoning: medium for read-only UI/query work; high
 for schema, migration, workbook-write, generated-contract, customer-runtime,
@@ -159,8 +158,8 @@ At the inspected PR 37 baseline:
 | 1 | Generic row Edit rendered the form after a 100-row table, outside the viewport. | Primary connected views no longer depend on that interaction. The raw Advanced & Recovery browser still uses a below-table generic editor and is not the target experience. | 3 |
 | 2 | `/api/structure/{model_key}` joined only the model-specific `section_presentation` subset and reported false `no sections mapped` results. | Open. The endpoint still assembles steps primarily from `form_steps`, `section_presentation`, and `form_sections`; the complete runtime graph is not yet the primary source. | 4 |
 | 3 | No option- or group-centered relationship view existed. | Resolved for read-only use. Connected option, group, section, and rule endpoints and one typed search now exist. | 1 complete |
-| 4 | Group lists led with hash-like canonical IDs. | Partially resolved. Connected views use factual fallbacks such as `Label pending workbook review`; no workbook-authored label contract exists yet. | 2 and 5 |
-| 5 | The display-ID helper could manufacture visually plausible but false names. | Resolved in the connected group view for hash-like IDs; raw advanced tables may still show canonical identity because they are technical surfaces. | 1 complete; 2 for final labels |
+| 4 | Group lists led with hash-like canonical IDs. | Resolved in the Manager by Checkpoint 2's approved workbook-authored labels. Customer-runtime heading consumption remains gated to Checkpoint 5. | 2 complete; 5 |
+| 5 | The display-ID helper could manufacture visually plausible but false names. | Resolved in connected views by factual fallbacks first and approved workbook labels in Checkpoint 2; raw advanced tables may still show canonical identity because they are technical surfaces. | 1 and 2 complete |
 | 6 | Customer runtime hardcoded generic group headings. | Open. Workbook-owned group headings and runtime migration remain gated. | 5 |
 | 7 | Dense lists repeated ambiguous edit/delete icons and blurred read-only versus editable state. | Partially resolved in primary read-only workspaces. The advanced raw browser intentionally remains technical; contextual primary editing is not implemented. | 3 |
 | 8 | First-run and stale projection surfaced lifecycle errors instead of a controlled state. | Resolved for the Checkpoint 1 readiness shell; later checkpoints must preserve it. | 1 complete |
@@ -695,18 +694,16 @@ shape, and result completeness are hard tests.
 
 ## 7. Group Manager and workbook-owned labels
 
-### 7.1 Proposed workbook contract—approval required
+### 7.1 Implemented workbook contract
 
-Checkpoint 2 proposes a `display_label` column for the registered
-`exclusive_groups` and `rule_groups` families. The proposal is not authorized
-merely because it appears here.
+Checkpoint 2 implemented a `display_label` column for the registered
+`exclusive_groups` and `rule_groups` families. Customer-runtime heading
+consumption remains separately gated to Checkpoint 5.
 
-Proposed shape:
+Implemented shape:
 
 - column name: `display_label`;
-- proposed physical position: immediately after `group_id` in each registered
-  family, unless live workbook/generator evidence requires a documented
-  alternate position;
+- physical position: immediately after `group_id` in each registered family;
 - `group_id` remains immutable canonical identity;
 - `display_label` is deliberate human copy, never generated from a hash;
 - active customer-rendered exclusive groups require an approved nonblank label;
@@ -714,7 +711,7 @@ Proposed shape:
   them customer-visible;
 - `notes` remains internal/explanatory prose and is never parsed or promoted;
 - the registry, workbook schema validator, importer/projection, editor schema,
-  generator, generated contract, and runtime consumer must agree on ownership;
+  generator, generated contract, and Manager consumer agree on ownership;
 - missing or invalid labels fail the appropriate migration/generation gate; they
   do not silently fall back in the completed contract.
 
@@ -723,8 +720,8 @@ Proposed shape:
 An approved display label must:
 
 - be trimmed, single-line Unicode text;
-- contain a practical human-label length (roughly 3–80 visible characters,
-  bounded by the registry validation implemented in Checkpoint 2B);
+- contain 3–100 visible characters, the registry-owned validation bound
+  implemented in Checkpoint 2B;
 - not equal its canonical `group_id`;
 - not equal a placeholder such as `Related options`, `Unnamed group`, or
   `Label pending workbook review`;
@@ -1510,11 +1507,12 @@ Inspected acceptance baseline:
 Checkpoint 1 is not reopened merely because later work touches its components.
 Later checkpoints add regression tests for every preserved behavior.
 
-### Checkpoint 2 — group display-label contract and reviewed migration
+### Checkpoint 2 — group display-label contract and reviewed migration — complete 2026-08-23
 
-**Authorization gate:** explicit approval of the `display_label` schema proposal
-is required before implementation. Approval to generate a review artifact does
-not approve its labels or a workbook write.
+**Authorization gate:** fulfilled in two stages: schema/review generation was
+authorized first, then the complete reviewed label set and guarded workbook
+migration were explicitly authorized. Neither authorization included the
+Checkpoint 5 customer-runtime heading switch.
 
 **Objective:** establish one workbook-owned group label contract and a complete
 reviewed migration without changing customer runtime headings.
@@ -1567,6 +1565,38 @@ package/schema and all affected generation/parity gates pass; runtime still uses
 its pre-Checkpoint-5 fallback; rollback evidence is complete.
 
 **Mandatory stop:** after 2C and after 2D.
+
+**Completion evidence:**
+
+- the CSV and JSON review companions contain the same stable 224-record
+  inventory and approved decisions: 61 customer exclusive groups and 163
+  Manager-facing rule groups, with no blank, pending, duplicate, or invented
+  hash-derived labels;
+- `display_label` sits immediately after `group_id` in all 12 registered group
+  sheets; the guarded 224-operation batch matches every saved label on readback;
+- rollback points `stingray_master-20260823-015333.xlsx` and
+  `stingray_master-20260823-015719.xlsx` hash to the pre-schema and exact
+  pre-label-apply identities respectively; the latter matches the bound apply
+  batch SHA-256;
+- package/schema/options quality pass with zero issues; all six runtime
+  contracts and `form-app/data.js` were regenerated, and every non-timestamp
+  contract change is a `display_label` under `ruleGroups` or `exclusiveGroups`;
+- Manager connected group reads lead with workbook-authored labels and retain
+  canonical IDs under technical evidence; a real single-process import/query
+  smoke returned `LS6 Engine Covers`, `audience=customer`, and
+  `label_status=authored`;
+- `form-app/app.js` is unchanged, the `Related options` fallback remains tested,
+  and the cache token advanced from 35 to 36 only because the inert additive
+  registry payload changed;
+- local gates passed: focused label/catalog owners (46), Python metadata (159
+  plus 111 subtests), Manager checkpoint (248 passed, 2 skipped, 36 subtests),
+  copied-workbook slow Manager gate (70), every Node test file, frontend build,
+  Fable validation, and the complete 12-stage all-model candidate lane;
+- full-inventory GitHub run 32626231858 passed all 13 planned shards and the
+  aggregate `release-candidate` gate at implementation commit `ff28eb5`.
+
+Checkpoint 2 is stopped at its required post-2D boundary. Customer headings
+remain owned by separately authorized Checkpoint 5.
 
 ### Checkpoint 3 — contextual option/group editing and complete control metadata
 
@@ -1930,18 +1960,18 @@ runtime parity from an adjacent test or remembered prior run.
 
 ### 19.1 Current authorization state
 
-Checkpoint 1 is complete. This specification revision does not authorize
-Checkpoint 2 or implementation of any new requirement. The next implementation
-agent must receive an explicit checkpoint instruction.
+Checkpoints 1 and 2 are complete. Checkpoints 3–6 remain unauthorized. The next
+implementation agent must receive an explicit checkpoint instruction and must
+not treat the completed label migration as authorization for customer headings.
 
 ### 19.2 Decision matrix
 
 | Decision | Required before | Current state |
 |---|---|---|
-| Add `display_label` to exclusive/rule group workbook families | Checkpoint 2A/2B | Awaiting explicit approval. |
-| Exact column placement and compatibility behavior | Checkpoint 2B | Proposed in §7.1; confirm against live evidence. |
-| Complete actual group label/classification list | Checkpoint 2D | Awaiting generated review artifact and explicit approval. |
-| Switch customer headings to workbook labels | Checkpoint 5 | Awaiting complete approved labels and explicit approval. |
+| Add `display_label` to exclusive/rule group workbook families | Checkpoint 2A/2B | Complete: registry, validation, projection, generator, and all 12 workbook sheets agree. |
+| Exact column placement and compatibility behavior | Checkpoint 2B | Complete: immediately after `group_id`; pre-migration workbooks report an explicit pending-migration state. |
+| Complete actual group label/classification list | Checkpoint 2D | Complete: 224/224 reviewed labels approved and written; CSV/JSON companions and workbook readback agree. |
+| Switch customer headings to workbook labels | Checkpoint 5 | Label prerequisite is complete; runtime switch still requires explicit Checkpoint 5 approval. |
 | New group canonical-ID allocation strategy | Any Add Group feature | Unresolved; Add Group remains blocked. |
 | Any new frontend/backend dependency | Before dependency change | Not approved. |
 | Breaking/removing existing Manager API members | Before API break | Not approved; changes must be additive. |
@@ -1958,11 +1988,11 @@ free text.
 
 ### 19.4 Current next action
 
-Obtain a direct user decision on whether to authorize Checkpoint 2's proposed
-`display_label` schema support and review-artifact generation. If authorized,
-execute only subpasses 2A–2C, produce the complete review artifact, and stop for
-label approval before any canonical-workbook migration. Do not begin customer
-runtime migration.
+Remain stopped after Checkpoint 2. The next sequential implementation action is
+an explicit decision on Checkpoint 3 and its 3A control inventory/RED matrix.
+Do not begin Checkpoint 3 automatically, and do not begin the non-sequential
+Checkpoint 5 customer-runtime heading switch merely because its label
+prerequisite is now complete.
 
 ## 20. Coding-agent checkpoint execution protocol
 
@@ -2056,6 +2086,18 @@ Acceptance:
 ```
 
 ## 21. Revision record
+
+2026-08-23 Checkpoint 2 closure:
+
+- recorded the two-stage authorization, reviewed 224-label inventory, guarded
+  12-sheet migration, rollback hashes, regenerated six-model artifacts, and
+  Manager authored-label presentation;
+- reconciled the CSV/JSON review companions and pinned their validation domain
+  to the workbook registry rather than a review-script-local taxonomy;
+- recorded local package/schema/generation/Manager/Node/frontend evidence and
+  full-inventory Release candidate run 32626231858;
+- preserved the customer runtime heading fallback and stopped before
+  Checkpoints 3–6.
 
 2026-08-22 tightening revision:
 
