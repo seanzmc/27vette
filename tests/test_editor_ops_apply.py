@@ -566,7 +566,71 @@ class ValidateBatchTest(OpsFixtureBase):
         lone_excl = op("add", "exclusive_groups", {"group_id": "excl_new"},
                        {"group_id": "excl_new", "selection_mode": "single_within_group",
                         "active": True, "notes": None})
-        self.assertTrue(any("member" in e for e in self.errors_of(lone_excl)))
+        self.assertTrue(any("member" in e for e in self.errors_of(lone_excl)),
+                        self.errors_of(lone_excl))
+
+    def test_active_exclusive_group_requires_display_label_once_migrated(self):
+        """With the column present, blank is rejected on an active group."""
+        import copy
+
+        migrated = copy.deepcopy(self.extract)
+        sheet = migrated["sheets"]["exclusive_groups"]
+        sheet["headers"] = list(sheet["headers"]) + ["display_label"]
+        for row in sheet.get("rows", []):
+            row.setdefault("display_label", "Existing label")
+
+        unlabeled = op("add", "exclusive_groups", {"group_id": "excl_blank"},
+                       {"group_id": "excl_blank",
+                        "selection_mode": "single_within_group",
+                        "active": True, "notes": None})
+        errors = validate_batch(migrated, batch(unlabeled))["errors"]
+        self.assertTrue(
+            [e for e in errors if "display_label" in e], errors
+        )
+
+        labeled = op("add", "exclusive_groups", {"group_id": "excl_ok"},
+                     {"group_id": "excl_ok", "display_label": "Wheel selection",
+                      "selection_mode": "single_within_group",
+                      "active": True, "notes": None})
+        labeled_errors = validate_batch(migrated, batch(labeled))["errors"]
+        self.assertFalse(
+            [e for e in labeled_errors if "display_label" in e], labeled_errors
+        )
+
+        inactive = op("add", "exclusive_groups", {"group_id": "excl_off"},
+                      {"group_id": "excl_off",
+                       "selection_mode": "single_within_group",
+                       "active": False, "notes": None})
+        inactive_errors = validate_batch(migrated, batch(inactive))["errors"]
+        self.assertFalse(
+            [e for e in inactive_errors if "display_label" in e], inactive_errors
+        )
+
+        # Deleting a row must never require filling in its label first.
+        removal = op("delete", "exclusive_groups", {"group_id": "excl_one"}, {})
+        delete_errors = validate_batch(migrated, batch(removal))["errors"]
+        self.assertFalse(
+            [e for e in delete_errors if "display_label" in e], delete_errors
+        )
+
+    def test_premigration_sheet_without_display_label_stays_writable(self):
+        """§7.1's label requirement keys on the column, not the value.
+
+        This fixture's `exclusive_groups` sheet predates the Checkpoint 2
+        migration and has no `display_label` column, so an active group must
+        still be addable without one.
+        """
+        self.assertNotIn(
+            "display_label",
+            set(self.extract["sheets"]["exclusive_groups"]["headers"]),
+        )
+        labeled = op("add", "exclusive_groups", {"group_id": "excl_new"},
+                     {"group_id": "excl_new", "selection_mode": "single_within_group",
+                      "active": True, "notes": None})
+        self.assertFalse(
+            [e for e in self.errors_of(labeled) if "display_label" in e],
+            self.errors_of(labeled),
+        )
 
     def test_display_order_collision_warns(self):
         warnings = self.warnings_of(op("update", "stingray_options", {"option_id": "opt_two_001"},

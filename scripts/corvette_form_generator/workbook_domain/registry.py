@@ -329,6 +329,19 @@ OPTIONAL_COLUMNS: dict[str, tuple[str, ...]] = {
     "context_section_master_meta": ("section_display_order",),
 }
 
+# Columns required only once a row is effectively active, beyond the generic
+# derivation above. Spec §7.1 (Checkpoint 2): an active customer-rendered
+# exclusive group must carry an approved nonblank `display_label`. These stay
+# in `optional_columns`, so blank remains meaningful ("label pending") on an
+# inactive row and the §10.2 blank-semantics invariant is unchanged.
+#
+# `rule_groups` is deliberately absent: §7.1 keeps rule-group labels
+# Manager-facing unless a separate runtime contract makes them customer-visible.
+ACTIVE_ROW_REQUIRED_COLUMNS: dict[str, tuple[str, ...]] = {
+    "exclusive_groups": ("display_label",),
+}
+
+
 for _family, _meta in EDITOR_SHEET_META.items():
     _columns = WRITABLE_COLUMNS[_family]
     _explicit_optional = set(OPTIONAL_COLUMNS.get(_family, ()))
@@ -349,10 +362,198 @@ for _family, _meta in EDITOR_SHEET_META.items():
     _meta["columns"] = _columns
     _meta["optional_columns"] = _optional
     _meta["required_on_add"] = _required
-    _meta["required_on_effective_active_row"] = _required
+    _meta["required_on_effective_active_row"] = tuple(
+        column for column in _columns
+        if column in _required_set
+        or column in ACTIVE_ROW_REQUIRED_COLUMNS.get(_family, ())
+    )
 
-# Fixed sheet-name -> family mapping for global sheets. Kept out of
-# model_sheet_registry on purpose: only batch preparation/apply consult it.
+# ── Checkpoint 3B field-control metadata (spec §10.1) ─────────────────
+#
+# Every writable field above has an explicit control entry in FIELD_CONTROLS;
+# absence of a control is an error, never an implicit free-text input. Kinds
+# come from the §10.1 vocabulary in CONTROL_KINDS. Finite values are encoded
+# only for domains proven per §19.3 (workbook rows + generator parsing +
+# runtime consumers); unproven candidate vocabularies stay deliberate text and
+# are listed in the owning specification's unresolved-domain inventory.
+#
+# blank semantics: "forbidden" = registry-required, must be non-blank;
+# "allowed" = optional or the registered domain contains "" (blank means
+# inherit/unset); "never_blank_key" = key columns, required always.
+CONTROL_KINDS: frozenset[str] = frozenset((
+    "boolean", "finite", "reference", "integer", "money", "url",
+    "structured_text", "short_text", "long_text",
+    "immutable", "generated", "read_only",
+))
+
+
+def humanize(name: str) -> str:
+    """Human label from a column name ('section_display_order' ->
+    'Section display order'). Header spellings pass through unchanged."""
+    cleaned = name.replace("_", " ").strip()
+    return cleaned[:1].upper() + cleaned[1:] if cleaned else cleaned
+
+
+# Free-text controls are named explicitly. Structural type/enum/reference
+# metadata below remains deliberate registry metadata, but a new untyped
+# writable field gets no control until it is added to one of these sets. That is
+# what makes the §10.8 missing-control test capable of failing.
+LONG_FORM_FIELDS: frozenset[str] = frozenset((
+    "description", "detail_raw", "original_detail_raw", "disabled_reason",
+    "notes", "note", "setup_description", "section_name", "display_name",
+    "interior_seat_label", "interior_parent_group_label", "interior_leaf_label",
+    "interior_variant_label", "interior_color_family", "interior_material_family",
+))
+
+SHORT_FORM_FIELDS: frozenset[str] = frozenset((
+    "Color Overrides", "Detail from Disclosure", "Interior Code",
+    "Interior Name", "Material", "Seat", "Stitch", "Suede", "Trim",
+    "Two Tone", "artifact_path", "body_style", "choice_mode",
+    "context_type", "dataset_name", "display_behavior", "display_label",
+    "export_slug", "group_id", "grouping_source", "hover_image_alt",
+    "hover_image_position", "image_alt", "image_position",
+    "interior_choice_display_order", "interior_group_display_order",
+    "interior_hierarchy_levels", "interior_id",
+    "interior_material_display_order", "interior_reference_order", "label",
+    "legacy_alias", "model_key", "model_label", "option_id", "option_name",
+    "price_ref_code", "price_ref_type", "price_rule_id", "price_trim_scope",
+    "registry_key", "rpo", "rule_id", "section_id", "section_key",
+    "section_label", "setup_card_subtitle", "setup_eyebrow", "setup_fact_1",
+    "setup_fact_2", "setup_fact_3", "setup_title", "sheet_name", "source",
+    "standard_behavior", "step_key", "step_label", "target_type",
+    "trim_level", "variant_id",
+))
+
+STRUCTURED_TEXT_FIELDS: frozenset[str] = frozenset((
+    "body_style_scope", "trim_level_scope", "variant_scope",
+))
+
+URL_FIELDS: frozenset[str] = frozenset(("image_url", "hover_image_url"))
+
+# Boolean-with-inherit columns: workbook authors only True or blank; blank
+# inherits False through runtime_metadata.presentation_bool().
+BOOLEAN_INHERIT_BLANK: frozenset[tuple[str, str]] = frozenset((
+    ("section_presentation_meta", "standard_equipment_bucket"),
+    ("section_presentation_meta", "auto_added_bucket"),
+))
+
+# Proven finite domains (§19.3 evidence recorded inline):
+# - interior_components.component_type: five authored values across 1,044
+#   workbook rows; consumed by interiors.py/runtime_metadata.py assembly.
+# - context_section_master_meta.selection_mode: exact parity with the
+#   generator's SELECTION_MODE_LABELS customer-label vocabulary
+#   (model_configs.py); observed rows use single_select_req.
+# - section_presentation_meta.standard_equipment_group_type: only "" /
+#   "trim_equipment" authored; app.js compares === "trim_equipment".
+PROVEN_FINITE_VALUES: dict[tuple[str, str], tuple[str, ...]] = {
+    ("interior_components", "component_type"): (
+        "seat", "suede", "stitching", "r6x", "two_tone",
+    ),
+    ("context_section_master_meta", "selection_mode"): (
+        "single_select_req", "single_select_opt", "multi_select_opt",
+        "display_only",
+    ),
+    ("section_presentation_meta", "standard_equipment_group_type"): (
+        "", "trim_equipment",
+    ),
+}
+
+
+def _controls_for(family: str) -> dict[str, dict]:
+    """Build controls from deliberate structural and text classifications."""
+    meta = EDITOR_SHEET_META[family]
+    keys = set(meta["key"])
+    types = meta.get("types", {})
+    enums = meta.get("enums", {})
+    refs = meta.get("refs", {})
+    unions = meta.get("ref_unions", {})
+    conditional_column = (meta.get("conditional_ref") or {}).get("column")
+    optional = set(meta.get("optional_columns", ()))
+    controls: dict[str, dict] = {}
+    for order, column in enumerate(WRITABLE_COLUMNS[family], start=1):
+        label = humanize(column)
+        proven = PROVEN_FINITE_VALUES.get((family, column))
+        inherit_blank = (family, column) in BOOLEAN_INHERIT_BLANK
+        if refs.get(column) or unions.get(column) or column == conditional_column:
+            kind = "reference"
+        elif proven:
+            kind = "finite"
+        elif enums.get(column):
+            kind = "finite"
+        elif types.get(column) == "bool" or inherit_blank:
+            kind = "boolean"
+        elif types.get(column) == "int":
+            # Price-shaped names are whole-dollar MSRP contributions (§10.1).
+            kind = "money" if "price" in column.lower() else "integer"
+        elif column in URL_FIELDS:
+            kind = "url"
+        elif column in STRUCTURED_TEXT_FIELDS:
+            kind = "structured_text"
+        elif column in LONG_FORM_FIELDS:
+            kind = "long_text"
+        elif column in SHORT_FORM_FIELDS:
+            kind = "short_text"
+        else:
+            # Fail closed: the exhaustive inventory test and Manager schema
+            # construction report the family/field instead of silently exposing
+            # an arbitrary text input.
+            continue
+        # Blank semantics are one rule for every kind: blank is meaningful
+        # when the field is registry-optional, the registered domain contains
+        # "", or the column inherits on blank (presentation_bool).
+        blank_allowed = (
+            column in optional
+            or "" in enums.get(column, ())
+            or inherit_blank
+        )
+        kind = "finite" if proven else kind
+        values = tuple(proven or enums.get(column, ()))
+        controls[column] = {
+            "kind": kind,
+            "label": label,
+            "group": humanize(family),
+            "order": order,
+            "blank": "never_blank_key" if column in keys
+            else ("allowed" if blank_allowed else "forbidden"),
+            "help": {
+                "boolean": "Choose Yes or No; use inherit only when blank is allowed.",
+                "finite": "Choose one registered value.",
+                "reference": "Choose a current referenced record by human label.",
+                "integer": "Enter a whole number.",
+                "money": "Enter a whole-dollar amount.",
+                "url": "Enter the complete media URL.",
+                "structured_text": "Enter the registered structured scope syntax.",
+                "short_text": "Enter the workbook value for this field.",
+                "long_text": "Enter the workbook copy or notes for this field.",
+            }[kind],
+            "affects": (family,),
+            **({"values": values} if values else {}),
+            **({"values": ("True", "False")} if kind == "boolean" else {}),
+            **({"step": 1} if kind in ("integer", "money") else {}),
+            **({"source": "projection_reference_options"}
+               if kind == "reference" else {}),
+            # Keys stay locked on update (§10.3); the structural kind above
+            # still drives add-flow rendering and domain validation.
+            **({"immutable_on_edit": True} if column in keys else {}),
+        }
+    return controls
+
+
+for _family in WRITABLE_COLUMNS:
+    EDITOR_SHEET_META[_family]["controls"] = _controls_for(_family)
+
+# Compatibility/public convenience alias. The family-owned mapping above is
+# authoritative; consumers must not maintain a parallel list.
+FIELD_CONTROLS: dict[str, dict[str, dict]] = {
+    family: meta["controls"] for family, meta in EDITOR_SHEET_META.items()
+}
+
+
+def normalize_control(entry: dict) -> dict:
+    """Normalized public shape for schema responses (§10.2)."""
+    return {key: entry[key] for key in sorted(entry)}
+
+
 GLOBAL_SHEET_FAMILIES: dict[str, str] = {
     "model_master": "model_master",
     "model_variants": "model_variants",
@@ -393,6 +594,49 @@ READONLY_SHEET_META: dict[str, dict] = {
         "id_prefixes": ("sec_",),
     },
 }
+
+
+def _readonly_controls_for(family: str) -> dict[str, dict]:
+    """Control metadata for a projected read-only family.
+
+    Read-only families have no editor controls, but §10.2 still requires every
+    exposed column to carry deliberate control metadata rather than falling
+    through to an implicit text input. ``read_only`` is the §10.1 kind for a
+    field the Manager projects and renders but never writes.
+    """
+    meta = READONLY_SHEET_META[family]
+    keys = meta["key"]
+    return {
+        column: {
+            "kind": "read_only",
+            "label": humanize(column),
+            "group": meta.get("label") or humanize(family),
+            "order": order,
+            "blank": "never_blank_key" if column in keys else "allowed",
+            "help": "Workbook-owned value; not editable in the Manager.",
+            "affects": (family,),
+        }
+        for order, column in enumerate(meta["columns"], start=1)
+    }
+
+
+for _readonly_family in READONLY_SHEET_META:
+    READONLY_SHEET_META[_readonly_family]["controls"] = _readonly_controls_for(
+        _readonly_family
+    )
+
+
+def controls_for_family(family: str) -> dict[str, dict]:
+    """Control metadata for any projected family, writable or read-only.
+
+    Single lookup for consumers that project both kinds of family, so a
+    read-only spec cannot be silently graded against the writable inventory.
+    """
+    if family in EDITOR_SHEET_META:
+        return EDITOR_SHEET_META[family]["controls"]
+    if family in READONLY_SHEET_META:
+        return READONLY_SHEET_META[family]["controls"]
+    raise KeyError(f"Unknown workbook family: {family}")
 
 
 def family_spec(name: str) -> dict:

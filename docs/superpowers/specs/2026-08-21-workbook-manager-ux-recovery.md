@@ -2,7 +2,10 @@
 
 Status: active product recovery. Checkpoint 1 merged through PR 37 at `aa28e8a`.
 Checkpoint 2 completed on 2026-08-23 at implementation commit `ff28eb5` and
-passed full-inventory Release candidate run 32626231858. Checkpoints 3–6 remain
+passed full-inventory Release candidate run 32626231858. Checkpoint 3A/3B's
+registry/schema/reference slice completed locally on 2026-08-23; its commit,
+`3085d87`, is followed by this closeout. PR and required full-inventory CI
+evidence are recorded at delivery. Checkpoint 3C–3F and Checkpoints 4–6 remain
 separately gated by §19 and must not begin automatically.
 
 Checkpoint 2 added the approved workbook schema/data and additive generated
@@ -1067,7 +1070,14 @@ routing and presentation facts but not override allowed values.
 - a reference target/scope cannot be resolved;
 - blank/required behavior disagrees with registry validation;
 - a key is editable during update;
-- a generated/read-only field is included in a mutation payload.
+- a generated/read-only field is included in a mutation payload;
+- a projected read-only family exposes a column with no control metadata, or
+  with a control kind other than `read_only`.
+
+Read-only projections (`form_sections`) are graded against the read-only
+contract above, never against the writable inventory. Exempting them from
+validation entirely would let a projected column ship with no control metadata
+at all, which is the failure this section exists to prevent.
 
 The schema response exposes normalized metadata and a schema version. React has
 one renderer map keyed by `kind`; it has no generic fallback to `<input
@@ -1657,6 +1667,83 @@ cannot render as arbitrary text; connected option/group edits remain draft-only;
 overlay/impact and draft tray are correct; all focused, broad Manager, frontend,
 accessibility/browser, protected-boundary, and full-suite gates pass.
 
+**Checkpoint 3A/3B completion evidence (2026-08-23):**
+
+- the registry owns exact control metadata for all 220 writable fields across
+  all 25 families; the exhaustive owner fails on missing/extra metadata,
+  structural-kind/finite-domain disagreement, key mutability, blank-semantics
+  disagreement, and unresolved or malformed reference presentation;
+- `GET /api/records/{table}/schema` is additively versioned and preserves every
+  prior member while requiring normalized `control` metadata; mutation
+  validation rejects generated/read-only/immutable control kinds;
+- the additive bounded reference-options endpoint derives direct, union, and
+  conditional targets from registry/catalog contracts, requires model and
+  discriminator context where applicable, returns human labels plus canonical
+  secondary IDs, caps pages at 100, and executes exactly one count plus one page
+  query; the canonical projection smoke measured two SQL statements and 0.637
+  ms for the filtered section lookup;
+- the focused owner passed 24 tests and 25 subtests; final catalog/API owners
+  passed 56 tests and 25 subtests; the README-owned Manager serial group passed
+  223 tests, skipped the two intentional slow-only cases, and passed 61
+  subtests; frontend production build, package/schema, catalog/CI planner,
+  Fable-contract, and Python compile gates passed;
+- the complete 12-stage all-model candidate passed with zero findings,
+  unexpected drift, or boundary violations; canonical workbook, retained
+  generated contracts, published registry, customer runtime, dealer, media,
+  deployment, dependency, durable draft, and apply/rebuild behavior remain
+  unchanged.
+
+**Checkpoint 3A/3B defect correction (2026-08-23):** the evidence above
+covered only the writable inventory. The read-only `form_sections` projection
+carries no `editor_family`, so `_schema_dict()` graded its columns against an
+empty writable control set and raised `SchemaIntegrityError` on the first
+column, returning 500 from `GET /api/tables` (all structure tables) and
+`GET /api/records/form_sections/schema`. The fail-closed owner did not catch it
+because its matrix iterated `catalog.WRITABLE_SPECS` rather than
+`catalog.TABLE_SPECS`. Corrected by giving read-only families registry-owned
+`read_only` control metadata, resolving controls through
+`registry.controls_for_family()`, and validating read-only specs against the
+read-only contract in §10.2. The matrix now iterates every projected spec and
+asserts the read-only projections are present in it. Route-level coverage
+asserts `GET /api/tables` returns 200 with `read_only` controls on
+`form_sections`.
+
+**Checkpoint 3A/3B review-finding corrections (2026-08-24):** two further
+Codex findings on the delivery PR were implemented inside the closed slice.
+
+- *Reference scoping.* A `global` RefSpec applied no model filter, so pickers
+  offered other models' rows (`option_availability.variant_id` offered all 32
+  variants where 6 are valid). Narrowing now derives from model topology rather
+  than the declared scope, and applies only when a model is supplied, so no
+  field newly requires one. It is gated on the source row having a model
+  identity: `option_availability.variant_id`, `variant_option_overrides.
+  variant_id`, `model_interior_scope.interior_id`, and
+  `interior_components.interior_id` narrow; `color_overrides.interior_id` does
+  not, because that table has no model column. All four narrowed references
+  measured zero cross-model rows in the canonical projection, so no stored
+  value became unselectable. The finding's stated cause — that the write path
+  rejects these values — was incorrect: `_ref_exists()` checks existence only
+  for `global` refs, so API and writer already agreed.
+- *Section references are deliberately excluded.* The projected
+  `form_sections.model_context` is empty for all 48 rows, so the existing
+  json_each filter matches zero sections for every model; enabling it would
+  empty the section picker. Recorded here as an open projection/contract gap.
+- *Blank group labels.* §7.1 requires an approved label on active
+  customer-rendered exclusive groups, but blank exited validation unchecked and
+  the registry marked the field optional, so an editor operation could clear
+  it. `schema_validation` now raises `group_display_label_missing` for a blank
+  label on an active `exclusive_groups` row, and
+  `registry.ACTIVE_ROW_REQUIRED_COLUMNS` adds `display_label` to
+  `required_on_effective_active_row` for that family only — rule-group labels
+  stay Manager-facing per §7.1. The requirement applies only once the sheet
+  carries the column, and never on a delete. The canonical workbook validates
+  clean; `display_label` remains in `optional_columns`, so the §10.2
+  blank-semantics invariant is unchanged.
+
+Mandatory stop: this evidence closes only subpasses 3A and 3B. Subpasses 3C–3F
+remain unimplemented and require explicit sequential authorization; no editor
+shell or contextual option/group mutation UI was started.
+
 ### Checkpoint 4 — complete form graph and contextual section management
 
 **Authorization gate:** explicit Checkpoint 4 authorization after Checkpoint 3
@@ -1960,9 +2047,11 @@ runtime parity from an adjacent test or remembered prior run.
 
 ### 19.1 Current authorization state
 
-Checkpoints 1 and 2 are complete. Checkpoints 3–6 remain unauthorized. The next
-implementation agent must receive an explicit checkpoint instruction and must
-not treat the completed label migration as authorization for customer headings.
+Checkpoints 1 and 2 are complete. Checkpoint 3A/3B's bounded
+registry/schema/reference slice is complete and stopped. Checkpoint 3C–3F and
+Checkpoints 4–6 remain unauthorized. The next implementation agent must receive
+an explicit checkpoint instruction and must not treat either the completed
+label migration or control metadata as authorization for customer headings.
 
 ### 19.2 Decision matrix
 
@@ -1972,6 +2061,8 @@ not treat the completed label migration as authorization for customer headings.
 | Exact column placement and compatibility behavior | Checkpoint 2B | Complete: immediately after `group_id`; pre-migration workbooks report an explicit pending-migration state. |
 | Complete actual group label/classification list | Checkpoint 2D | Complete: 224/224 reviewed labels approved and written; CSV/JSON companions and workbook readback agree. |
 | Switch customer headings to workbook labels | Checkpoint 5 | Label prerequisite is complete; runtime switch still requires explicit Checkpoint 5 approval. |
+| Add complete control metadata and bounded reference lookup | Checkpoint 3A/3B | Complete locally: 25 families / 220 fields have exact coverage; schema/reference APIs are additive and fail closed. Delivery CI is recorded with the PR. |
+| Render and save contextual option/group editors | Checkpoint 3C–3F | Unresolved and unauthorized; backend metadata does not authorize frontend mutation UI. |
 | New group canonical-ID allocation strategy | Any Add Group feature | Unresolved; Add Group remains blocked. |
 | Any new frontend/backend dependency | Before dependency change | Not approved. |
 | Breaking/removing existing Manager API members | Before API break | Not approved; changes must be additive. |
@@ -1986,13 +2077,42 @@ When evidence is incomplete, record family/field/current values/consumers and
 stop for the narrow product decision instead of guessing or leaving accidental
 free text.
 
+Checkpoint 3A resolved the complete writable inventory as 25 registered
+families / 220 fields, with exact control coverage and no fallback: boolean 30,
+finite 18, integer 15, long text 31, money 4, reference 27, short text 85,
+structured text 8, and URL 2. The accepted additional finite domains are:
+
+| Family / field | Registered values | Evidence and consumers |
+|---|---|---|
+| `interior_components.component_type` | `seat`, `suede`, `stitching`, `r6x`, `two_tone` | All 1,044 authored component rows plus `interiors.py` / `runtime_metadata.py` assembly. |
+| `context_section_master_meta.selection_mode` | `single_select_req`, `single_select_opt`, `multi_select_opt`, `display_only` | Exact `SELECTION_MODE_LABELS` generator vocabulary in `model_configs.py`; authored rows use a member of that set. |
+| `section_presentation_meta.standard_equipment_group_type` | blank or `trim_equipment` | Authored rows contain only this domain and `form-app/app.js` performs the exact `trim_equipment` comparison. |
+
+The following candidate domains remain deliberately non-finite. Checkpoint 3B
+records them as explicit text/structured-text controls rather than inferring a
+dropdown; a later UI may not convert them to a finite/reference selector until
+the named decision is resolved:
+
+| Family / field | Current authored evidence | Unresolved decision / consumer |
+|---|---|---|
+| rule/default/price families: `body_style_scope`, `trim_level_scope`, `variant_scope` | `*`, coupe/convertible, LT/LZ values with mixed case; current `variant_scope` rows use only `*` | Scope grammar and case normalization belong to the existing rule/price parsers; one observed token set does not prove the full grammar. |
+| `asset_map.target_type` | `context_choice`, `model`, `option` | Only `option` currently has a conditional registry reference. Defining identity/reference sources for context choices and models is a separate registry decision. |
+| `variant_master.body_style`, `variant_master.trim_level`, `model_interior_scope.trim_level` | body values `*`, coupe, convertible; trim values span 1LT–3LT and 1LZ–3LZ with upper/lower-case rows | Whether these become model-variant references or a normalized vocabulary would change workbook authoring behavior and is not proven by current rows alone. |
+| `interior_components.price_ref_type`, `interior_components.price_trim_scope` | types include both `two_tone` and `twotone`; scopes include LT/LZ and `_R6X` forms | Existing component-pricing consumers accept aliases/special scopes; normalization or retirement is a business-data migration, not a control inference. |
+| context metadata: `choice_mode`, `context_type`, `standard_behavior` | `single`; `body_style`/`trim_level`; three standard-behavior values | Current workbook rows are examples, not a complete registry/generator vocabulary. |
+| provenance/presentation text: `source`, `grouping_source`, `display_behavior` where no family enum exists | source labels and audit paths are intentionally open-ended; some presentation families currently author no value | These are provenance or family-specific presentation fields, so values observed in a different family do not establish a shared finite domain. |
+
+This inventory stops only the unresolved conversions above. It does not block
+the registry/schema metadata slice because those controls are now deliberate,
+exhaustively tested text controls rather than accidental frontend defaults.
+
 ### 19.4 Current next action
 
-Remain stopped after Checkpoint 2. The next sequential implementation action is
-an explicit decision on Checkpoint 3 and its 3A control inventory/RED matrix.
-Do not begin Checkpoint 3 automatically, and do not begin the non-sequential
-Checkpoint 5 customer-runtime heading switch merely because its label
-prerequisite is now complete.
+Remain stopped after Checkpoint 3B. The next sequential implementation action
+is an explicit decision on Checkpoint 3C's reusable editor shell. Do not begin
+3C automatically, do not skip ahead to later Checkpoint 3 editors, and do not
+begin the non-sequential Checkpoint 5 customer-runtime heading switch merely
+because its label prerequisite is complete.
 
 ## 20. Coding-agent checkpoint execution protocol
 

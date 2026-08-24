@@ -25,6 +25,9 @@ from openpyxl import load_workbook  # noqa: E402
 from corvette_form_generator.model_configs import discover_generation_model_configs  # noqa: E402
 from corvette_form_generator.rules import load_exclusive_groups, load_rule_groups  # noqa: E402
 from corvette_form_generator.workbook import clean, rows_from_optional_sheet  # noqa: E402
+from corvette_form_generator.workbook_domain.registry import (  # noqa: E402
+    READONLY_SHEET_META,
+)
 
 ARTIFACT_SCHEMA_VERSION = "1"
 REVIEW_DIR = ROOT / "workbook-manager" / "review"
@@ -46,6 +49,42 @@ def _fallback_label(group_id: str) -> str:
     if _HASH_SUFFIX.search(group_id or ""):
         return PLACEHOLDER_FALLBACK
     return (group_id or "Unnamed group").replace("_", " ").strip().title()
+
+
+def _section_names(wb) -> dict[str, str]:
+    """section_id -> section_name from the registry-owned read-only sheet."""
+    sheet = READONLY_SHEET_META["sections"]["sheet"]
+    names: dict[str, str] = {}
+    for row in rows_from_optional_sheet(wb, sheet):
+        sid = clean(row.get("section_id"))
+        if sid:
+            names[sid] = clean(row.get("section_name"))
+    return names
+
+
+def _exclusive_fallback_label(
+    group_id: str,
+    member_ids: list[str],
+    option_sections: dict[str, str],
+    section_names: dict[str, str],
+) -> str:
+    """Mirror the Manager's full pre-label path (explorer._exclusive_group_label).
+
+    `_group_fallback` alone is not what the Manager renders: for a hash-suffixed
+    group whose members resolve to exactly one section it shows
+    `Exclusive group · <section_name>`. Recording the placeholder instead
+    misstates what a reviewer would actually see today.
+    """
+    if not _HASH_SUFFIX.search(group_id or ""):
+        return _fallback_label(group_id)
+    resolved = {
+        section_names.get(option_sections.get(oid, ""), "")
+        for oid in member_ids
+    }
+    resolved.discard("")
+    if len(resolved) == 1:
+        return f"Exclusive group \u00b7 {next(iter(resolved))}"
+    return _fallback_label(group_id)
 
 
 def _member_rows(wb, config, sheet_name: str) -> dict[str, list[dict]]:
@@ -125,6 +164,7 @@ def main() -> None:
         for model_key in sorted(configs):
             cfg = configs[model_key]
             option_labels, option_sections = _option_labels(wb, cfg)
+            section_names = _section_names(wb)
             excl_members = _member_rows(wb, cfg, cfg.exclusive_group_members_sheet)
             rule_members = _member_rows(wb, cfg, cfg.rule_group_members_sheet)
 
@@ -175,7 +215,9 @@ def main() -> None:
                     "model_key": model_key,
                     "group_type": "exclusive",
                     "group_id": gid,
-                    "current_fallback_label": _fallback_label(gid),
+                    "current_fallback_label": _exclusive_fallback_label(
+                        gid, member_ids, option_sections, section_names
+                    ),
                     "source_sheet_row": "",
                     "active": clean(group.get("active")) == "True",
                     "customer_visible": True,
