@@ -12,17 +12,17 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 
 ## Current handoff
 
-- **Updated:** 2026-08-21
-- **Owning specification:** `docs/superpowers/specs/2026-08-15-workbook-manager-ux-recovery.md` owns the active Workbook Manager UX recovery and Checkpoint 1.
-- **Active workflow:** Workbook Manager Product and UX Recovery — Checkpoint 1 readiness shell and read-only connected explorer.
-- **Branch/commit:** `hermes/workbook-manager-ux-recovery-cp1-impl` from merged `origin/main` (`f6a3092`); PR 37 repair is locally green and awaiting commit/push on the existing Checkpoint 1 branch.
-- **Last completed:** Diagnosed PR 37 as a GitHub job-timeout cancellation after all earlier selected stages passed, raised the job limit without widening gate selection, and made the API's entity-specific named diagnostics reachable beside connected option/group detail.
-- **Current status:** Checkpoint 1 repair is implemented and locally green. Checkpoints 2–6 remain unauthorized and unstarted.
-- **Validation:** Exact catalog-selected PR path passed all ten stages in 793.239 seconds, including composed Layer 1, frontend production build, Fable, protected-artifact guard, and complete Manager group (`185 passed, 2 skipped, 36 subtests passed`); focused runner/catalog/shell tests and `git diff --check` passed; protected workbook/generated/customer-runtime surfaces have no diff. No green remote CI claim yet.
-- **Next action:** Commit/push the repair to PR 37 and verify the required 25-minute check completes green. Then stop before Checkpoint 2.
-- **Blockers or closeout gaps:** PR 37 required check is not green until the repaired branch is pushed and the 25-minute run completes. Checkpoint 2 still requires explicit approval for the schema addition, complete group-label list, and customer-runtime heading switch.
-- **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This startup pass produced no Fable receipt.
-- **Protected boundaries:** Canonical workbook, workbook schema, generators, generated artifacts, published registry, customer runtime, dealer submission, WordPress media, and deployment remain untouched. The repair changes only Manager read-only presentation, CI timing/docs/catalog metadata, focused tests, the owning spec, and this handoff.
+- **Updated:** 2026-08-24
+- **Owning specification:** None; this is a bounded GitHub review-gate implementation requested directly by the repository owner.
+- **Active workflow:** Codex finding disposition gate for pull requests targeting `main`.
+- **Branch/commit:** `codex/codex-finding-disposition-gate` from `origin/main` (`aa28e8a`); implementation commit `2cdaa51` is locally complete and this handoff is the remaining delivery commit.
+- **Last completed:** Added a trusted-default-branch evaluator and GitHub workflow that publish the `codex-finding-disposition` head status, failing only for current unresolved structured Codex P0/P1 findings and reconciling review-thread resolution on a 15-minute schedule.
+- **Current status:** Implementation and focused local validation are green. The status is not yet active or required because the workflow must first land on `main` and publish its context.
+- **Validation:** Focused Codex/catalog/runner contracts passed (`62 passed`); CI finalizer and splitter self-tests passed (`4` and `5`); `actionlint v1.7.12` passed both workflows; live authenticated dry-run correctly failed PR 40 for one current unresolved P1 and ignored PR 8's outdated P1; the full CI plan finalized at 43 Python files, 19 Node files, and 17 candidate-verifier tests. The full matrix was planned but not executed locally; remote `release-candidate` evidence is pending the PR.
+- **Next action:** Review and merge the delivery PR after remote CI is green; then let the default-branch workflow publish once and add `codex-finding-disposition` to the `Release candidate gate` ruleset's required contexts.
+- **Blockers or closeout gaps:** Ruleset activation before merge would deadlock open PRs on a context the default branch cannot yet publish. Merge remains separately authorized; no remote CI claim exists until the PR runs.
+- **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This task used the normal repository path and produced no Fable receipt.
+- **Protected boundaries:** Canonical workbook, workbook schema, generators, generated artifacts, published registry, customer runtime, dealer submission, WordPress media, and deployment remain untouched. Changes are limited to GitHub workflow/status evaluation, validation-planner/catalog coverage, operator docs, focused tests, and this handoff.
 
 ## Verified facts
 
