@@ -55,6 +55,16 @@ export const api = {
     request(`/api/assets/media-options?query=${encodeURIComponent(query)}&limit=${limit}`),
   schema: (table, model = "") =>
     request(`/api/records/${table}/schema?model=${encodeURIComponent(model)}`),
+  referenceOptions: (
+    table,
+    field,
+    { model = "", query = "", discriminator = "", limit = 25, offset = 0 } = {}
+  ) => {
+    const params = new URLSearchParams({
+      field, model, query, discriminator, limit: String(limit), offset: String(offset),
+    });
+    return request(`/api/records/${table}/reference-options?${params.toString()}`);
+  },
   records: (table, { model = "", search = "", limit = 200, offset = 0 } = {}) =>
     request(
       `/api/records/${table}?model=${encodeURIComponent(model)}&search=${encodeURIComponent(search)}&limit=${limit}&offset=${offset}`

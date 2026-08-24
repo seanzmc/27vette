@@ -36,6 +36,7 @@ from corvette_form_generator.workbook_bool_hygiene import (
 # Compatibility aliases re-exported from workbook_domain.registry; the
 # canonical registry literals now live in that module.
 from corvette_form_generator.workbook_domain.registry import (
+    ACTIVE_ROW_REQUIRED_COLUMNS,
     EDITOR_SHEET_META,
     GLOBAL_SHEET_FAMILIES,
     SOURCE_ROLE_FAMILIES,
@@ -747,6 +748,15 @@ def _prepare_batch(extract, batch):
         )
         if effective_is_active:
             required_columns.update(meta.get("required_on_effective_active_row", ()))
+        # A requirement introduced by a completed migration applies only once
+        # the sheet actually carries the column, and never to a delete: the
+        # pre-migration case is distinguished by the column being absent, and
+        # removing a row must not require filling in its copy first (§7.1).
+        required_columns.difference_update(
+            column
+            for column in ACTIVE_ROW_REQUIRED_COLUMNS.get(family, ())
+            if action == "delete" or column not in headers
+        )
         for required_column in sorted(required_columns):
             value = effective_row.get(required_column)
             if value is None or not str(value).strip():

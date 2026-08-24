@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "zr1_options",
-    "generated_at": "2026-08-17T02:46:34+00:00",
+    "generated_at": "2026-08-23T07:05:26+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -23891,6 +23891,7 @@
   "ruleGroups": [
     {
       "group_id": "zr1_group_r88_excludes_badge_and_stripe_choices",
+      "display_label": "R88 Front Illuminated Crossed Flags Emblem \u2014 Badge and Stripe Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_r88_001",
       "target_ids": [
@@ -23919,6 +23920,7 @@
     },
     {
       "group_id": "zr1_group_sfz_excludes_badge_and_stripe_choices",
+      "display_label": "SFZ Dark Stealth Crossed Flags Emblems \u2014 Badge and Stripe Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_sfz_001",
       "target_ids": [
@@ -23946,6 +23948,7 @@
     },
     {
       "group_id": "zr1_group_sb9_excludes_full_length_stripe_choices",
+      "display_label": "SB9 Hood and Roof Decal Package \u2014 Full-Length Stripe Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_sb9_001",
       "target_ids": [
@@ -23972,6 +23975,7 @@
     },
     {
       "group_id": "zr1_group_ztk_excludes_j58_brakes",
+      "display_label": "ZTK Track Performance Package \u2014 J58 Brake Exclusion",
       "group_type": "excludes_any",
       "source_id": "opt_ztk_001",
       "target_ids": [
@@ -23986,6 +23990,7 @@
     },
     {
       "group_id": "zr1_group_ztk_excludes_non_ztk_aero",
+      "display_label": "ZTK Track Performance Package \u2014 Non-ZTK Aero Exclusion",
       "group_type": "excludes_any",
       "source_id": "opt_ztk_001",
       "target_ids": [
@@ -24002,6 +24007,7 @@
   "exclusiveGroups": [
     {
       "group_id": "zr1_excl_center_caps",
+      "display_label": "Wheel Center Caps",
       "option_ids": [
         "opt_5zc_001",
         "opt_5zd_001"
@@ -24012,6 +24018,7 @@
     },
     {
       "group_id": "zr1_excl_indoor_car_covers",
+      "display_label": "Indoor Car Covers",
       "option_ids": [
         "opt_rwh_001",
         "opt_wkr_001"
@@ -24022,6 +24029,7 @@
     },
     {
       "group_id": "zr1_excl_rear_script_badges",
+      "display_label": "Rear Corvette Script Badge Color",
       "option_ids": [
         "opt_rik_001",
         "opt_rin_001",
@@ -24033,6 +24041,7 @@
     },
     {
       "group_id": "zr1_excl_suede_compartment_liners",
+      "display_label": "Suede Frunk and Trunk Liners",
       "option_ids": [
         "opt_sxb_001",
         "opt_sxr_001",
@@ -24044,6 +24053,7 @@
     },
     {
       "group_id": "zr1_excl_46da2c68b0f9",
+      "display_label": "Exhaust Tips",
       "option_ids": [
         "opt_nga_001",
         "opt_nwi_001"
@@ -24054,6 +24064,7 @@
     },
     {
       "group_id": "zr1_excl_ba636d8cad42",
+      "display_label": "Seat Belt Color",
       "option_ids": [
         "opt_379_001",
         "opt_3a9_001",
@@ -24068,6 +24079,7 @@
     },
     {
       "group_id": "zr1_excl_cdb87e21ebb0",
+      "display_label": "Carbon Fiber Interior Trim",
       "option_ids": [
         "opt_fa5_001",
         "opt_fa6_001"
@@ -24078,6 +24090,7 @@
     },
     {
       "group_id": "zr1_excl_performance_brakes",
+      "display_label": "Performance Brakes",
       "option_ids": [
         "opt_j58_002",
         "opt_j59_002"
@@ -24088,6 +24101,7 @@
     },
     {
       "group_id": "zr1_excl_aero_packages",
+      "display_label": "Aero Package",
       "option_ids": [
         "opt_t0e_001",
         "opt_tom_001"

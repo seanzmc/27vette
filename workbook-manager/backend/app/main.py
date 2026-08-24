@@ -49,6 +49,7 @@ from .schemas import (
 )
 from .catalog import (
     MODEL_COLLECTIONS,
+    REFERENCE_OPTION_PRESENTATION,
     SPEC_BY_FAMILY,
     SHARED_TABLES,
     SPEC_BY_TABLE,
@@ -742,12 +743,245 @@ def tables(conn=Depends(projection_connection)):
 
 # ── records ──────────────────────────────────────────────────────────
 
+class SchemaIntegrityError(RuntimeError):
+    """Raised when schema construction would expose uncontrolled or
+    contradictory field metadata (spec §10.2 fail-closed requirements)."""
+
+
+def _family_controls(spec) -> dict:
+    """Registry-owned control metadata for a spec's family.
+
+    Writable specs resolve through ``editor_family``; read-only projections
+    such as ``form_sections`` carry no editor family and resolve through
+    ``family``. The registry owns both inventories (AGENTS.md §3).
+    """
+    from corvette_form_generator.workbook_domain import registry
+
+    return registry.controls_for_family(spec.editor_family or spec.family)
+
+
+def _validate_control_integrity(spec) -> None:
+    """Fail closed before any column is exposed (§10.2).
+
+    - a writable field has no control metadata;
+    - metadata kind contradicts registered type/enum/reference data;
+    - blank/required behavior disagrees with registry validation;
+    - a key is editable during update / generated-read-only fields are
+      excluded from payloads by the mutation guard on `control.kind`.
+    """
+    from corvette_form_generator.workbook_domain import registry
+
+    family_controls = _family_controls(spec)
+    if not spec.editable:
+        # Read-only projections carry no writable controls; grading them
+        # against the writable inventory would fail closed on every column
+        # (§10.2 applies to writable fields). Still fail closed on a column
+        # with no deliberate read-only control at all.
+        for c in spec.columns:
+            control = family_controls.get(c.header)
+            if control is None:
+                raise SchemaIntegrityError(
+                    f"{spec.table}.{c.sql_name()}: read-only field has no "
+                    "control metadata"
+                )
+            if control.get("kind") != "read_only":
+                raise SchemaIntegrityError(
+                    f"{spec.table}.{c.header}: read-only field has control "
+                    f"kind {control.get('kind')!r}"
+                )
+        return
+    for c in spec.columns:
+        header = c.header
+        control = family_controls.get(header)
+        if control is None:
+            raise SchemaIntegrityError(
+                f"{spec.table}.{c.sql_name()}: writable field has no "
+                "control metadata"
+            )
+        kind = control.get("kind")
+        if kind not in registry.CONTROL_KINDS:
+            raise SchemaIntegrityError(
+                f"{spec.table}.{header}: unknown control kind {kind!r}"
+            )
+        structural_kind = _structural_kind(spec, c)
+        if structural_kind == "reference" and kind != "reference":
+            raise SchemaIntegrityError(
+                f"{spec.table}.{header}: reference field has control kind {kind!r}"
+            )
+        if structural_kind == "finite" and kind not in ("finite", "reference"):
+            raise SchemaIntegrityError(
+                f"{spec.table}.{header}: finite field has control kind {kind!r}"
+            )
+        if structural_kind == "boolean" and kind != "boolean":
+            raise SchemaIntegrityError(
+                f"{spec.table}.{header}: boolean field has control kind {kind!r}"
+            )
+        if structural_kind == "integer" and kind not in ("integer", "money"):
+            raise SchemaIntegrityError(
+                f"{spec.table}.{header}: integer field has control kind {kind!r}"
+            )
+        if structural_kind == "text":
+            allowed_text_kinds = {"short_text", "long_text", "structured_text", "url"}
+            if (spec.editor_family, header) in registry.PROVEN_FINITE_VALUES:
+                allowed_text_kinds.add("finite")
+            if (spec.editor_family, header) in registry.BOOLEAN_INHERIT_BLANK:
+                allowed_text_kinds.add("boolean")
+            if kind not in allowed_text_kinds:
+                raise SchemaIntegrityError(
+                    f"{spec.table}.{header}: text field has control kind {kind!r}"
+                )
+        expected_values = tuple(
+            registry.PROVEN_FINITE_VALUES.get(
+                (spec.editor_family, header), c.enum
+            )
+        )
+        if expected_values and tuple(control.get("values", ())) != expected_values:
+            raise SchemaIntegrityError(
+                f"{spec.table}.{header}: control values disagree with registry domain"
+            )
+        if c.sql_name() in spec.key and not control.get("immutable_on_edit"):
+            raise SchemaIntegrityError(
+                f"{spec.table}.{header}: key control must be immutable on edit"
+            )
+        blank = control.get("blank", "")
+        should_allow_blank = (
+            header in spec.optional_columns
+            or "" in c.enum
+            or (spec.editor_family, header)
+            in registry.BOOLEAN_INHERIT_BLANK
+        )
+        actual_blank_allowed = blank != "forbidden" and blank != "never_blank_key"
+        if should_allow_blank != actual_blank_allowed:
+            raise SchemaIntegrityError(
+                f"{spec.table}.{header}: blank={blank!r} disagrees with "
+                f"registry optional={header in spec.optional_columns}"
+            )
+    _reference_contract(spec)
+
+
+def _structural_kind(spec, c) -> str:
+    ref_by_col = {ref.column: ref for ref in spec.refs}
+    conditional_column = dict(spec.conditional_ref).get("column", "")
+    if c.sql_name() in ref_by_col:
+        return "reference"
+    if c.header == conditional_column:
+        return "reference"
+    if c.enum:
+        return "finite"
+    if c.ctype == "bool":
+        return "boolean"
+    return "integer" if c.ctype == "int" else "text"
+
+
+def _reference_presentation(target: str) -> dict:
+    """Return a presentation adapter only when every named column exists."""
+    presentation = REFERENCE_OPTION_PRESENTATION.get(target)
+    if presentation is None:
+        raise SchemaIntegrityError(
+            f"reference target {target!r} has no human-label presentation"
+        )
+    table = str(presentation.get("table") or target)
+    target_spec = SPEC_BY_TABLE.get(table)
+    if target_spec is None:
+        raise SchemaIntegrityError(
+            f"reference target {target!r} resolves to unknown table {table!r}"
+        )
+    registered = {column.sql_name() for column in target_spec.columns}
+    required = {
+        str(presentation["value"]),
+        *(str(column) for column in presentation["labels"]),
+    }
+    active_column = str(presentation.get("active") or "")
+    if active_column:
+        required.add(active_column)
+    missing = sorted(required - registered)
+    if missing:
+        raise SchemaIntegrityError(
+            f"reference target {target!r} presentation uses unregistered "
+            f"columns: {missing}"
+        )
+    return presentation
+
+
+def _reference_contract(spec, field: str | None = None,
+                        discriminator: str = "") -> dict:
+    """Resolve registry-owned reference targets without accepting table input."""
+    direct = {
+        ref.column: ref for ref in spec.refs
+    }
+    conditional = dict(spec.conditional_ref)
+    conditional_column = conditional.get("column", "")
+
+    if field is None:
+        targets = []
+        for ref in spec.refs:
+            targets.extend(ref.union_tables or (ref.target_table,))
+        for family in dict(spec.conditional_refs).values():
+            if family is None:
+                continue
+            targets.append(
+                SPEC_BY_FAMILY[family].table if family in SPEC_BY_FAMILY else family
+            )
+        for target in set(targets):
+            _reference_presentation(target)
+        return {}
+
+    column = spec.column_by_name(field)
+    if column is None:
+        raise HTTPException(404, detail={
+            "status": "unknown_reference_field",
+            "message": f"{spec.table}.{field} is not a registered field",
+        })
+    ref = direct.get(column.sql_name())
+    if ref:
+        for target in ref.union_tables or (ref.target_table,):
+            _reference_presentation(target)
+        return {
+            "scope": ref.scope,
+            "targets": list(ref.union_tables or (ref.target_table,)),
+        }
+    if column.header != conditional_column:
+        raise HTTPException(422, detail={
+            "status": "field_is_not_reference",
+            "message": f"{spec.table}.{field} is not a reference field",
+        })
+    if not discriminator:
+        raise HTTPException(422, detail={
+            "status": "reference_discriminator_required",
+            "message": f"{spec.table}.{field} requires "
+                       f"{conditional.get('discriminator', 'a discriminator')}",
+        })
+    conditional_targets = dict(spec.conditional_refs)
+    if discriminator not in conditional_targets:
+        raise HTTPException(422, detail={
+            "status": "invalid_reference_discriminator",
+            "message": f"{discriminator!r} is not registered for "
+                       f"{spec.table}.{field}",
+        })
+    family = conditional_targets[discriminator]
+    if family is None:
+        return {"scope": "none", "targets": []}
+    target = SPEC_BY_FAMILY[family].table if family in SPEC_BY_FAMILY else family
+    _reference_presentation(target)
+    return {"scope": "model", "targets": [target]}
+
+
+# Version of the normalized table-schema response contract. Bump when the
+# per-column metadata shape changes so stale browser bundles cannot silently
+# misrender new kinds.
+TABLE_SCHEMA_VERSION = "workbook-manager-table-schema-2"
+
+
 def _schema_dict(conn, spec, model_key: str | None) -> dict:
     cols = []
     ref_by_col = {r.column: r for r in spec.refs}
     conditional = dict(spec.conditional_ref)
     conditional_column = conditional.get("column", "")
     conditional_targets = dict(spec.conditional_refs)
+    _validate_control_integrity(spec)
+    from corvette_form_generator.workbook_domain import registry as _registry
+
+    family_controls = _family_controls(spec)
     for c in spec.columns:
         ref = ref_by_col.get(c.sql_name())
         reference = None
@@ -798,10 +1032,14 @@ def _schema_dict(conn, spec, model_key: str | None) -> dict:
             "reference": reference,
             # Retain the existing response member through Pass 7's UI update.
             "ref": reference if ref else None,
+            # Checkpoint 3B: normalized control metadata from the shared
+            # registry (spec §10.1/§10.2).
+            "control": _registry.normalize_control(family_controls[c.header]),
         })
     return {
         "table": spec.table, "label": spec.label or humanize(spec.table),
         "key": list(spec.key), "model_scoped": spec.model_scoped,
+        "schema_version": TABLE_SCHEMA_VERSION,
         "model_context": {
             "required": bool(spec.model_scoped or spec.has_model_key_column or spec.role),
             "source": "row_model_key" if spec.has_model_key_column else (
@@ -824,6 +1062,185 @@ def record_schema(
     if spec is None:
         raise HTTPException(404, f"unknown table {table!r}")
     return _schema_dict(conn, spec, model or None)
+
+
+REFERENCE_OPTIONS_VERSION = "workbook-manager-reference-options-1"
+
+
+def _label_sql(columns: tuple[str, ...]) -> str:
+    parts = [
+        f"COALESCE(NULLIF(TRIM(CAST(\"{column}\" AS TEXT)), ''), '')"
+        for column in columns
+    ]
+    return "TRIM(" + " || ' ' || ".join(parts) + ")"
+
+
+# Targets whose rows can be partitioned by model. Narrowing applies whenever the
+# caller supplies a model, independent of the RefSpec's declared scope: a
+# `global` write contract still must not offer another model's rows in a picker.
+# Each entry was measured against the canonical projection and still offers
+# every value the real data stores, so narrowing never hides a row's current
+# value from the editor.
+#
+# `form_sections` is deliberately absent. Its projected `model_context` is empty
+# for all 48 rows (the read-only section spec carries no `source_role`, so the
+# importer records no context), so the json_each filter matches zero sections
+# for every model. Narrowing section pickers would empty them. That is a
+# projection/contract gap, not a query fix.
+#
+# Narrowing a `global` ref also requires the SOURCE row to have a model
+# identity. `color_overrides` has neither `model_id` nor `model_key`, so its
+# rows are not owned by a model; restricting its interior choice to one model
+# would block legitimate shared authoring even though the target is
+# partitionable.
+def _model_partition_sql(table: str, target_spec) -> str | None:
+    if target_spec is not None and target_spec.model_scoped:
+        return '"model_id"=?'
+    if target_spec is not None and target_spec.has_model_key_column:
+        return '"model_key"=?'
+    if table == "interiors":
+        return ('"src_sheet" IN (SELECT "sheet_name" FROM "sheet_registry" '
+                'WHERE "model_key"=? AND '
+                "\"source_role\"='interior_source_sheet')")
+    if table == "variants":
+        return ('"variant_id" IN (SELECT "variant_id" FROM "model_variants" '
+                'WHERE "model_key"=?)')
+    return None
+
+
+def _reference_target_select(target: str, scope: str, model: str,
+                             source_model_owned: bool
+                             ) -> tuple[str, list[str]]:
+    presentation = _reference_presentation(target)
+    table = str(presentation.get("table") or target)
+    value = str(presentation["value"])
+    labels = tuple(str(item) for item in presentation["labels"])
+    active_column = str(presentation.get("active") or "")
+    where = [f"TRIM(COALESCE(CAST(\"{value}\" AS TEXT), '')) <> ''"]
+    params: list[str] = []
+    target_spec = SPEC_BY_TABLE.get(table)
+
+    narrowing = _model_partition_sql(table, target_spec)
+    if scope in ("model", "model_union"):
+        if not model:
+            raise HTTPException(422, detail={
+                "status": "reference_model_required",
+                "message": "this reference field requires a selected model",
+            })
+        if table == "form_sections":
+            # Only reachable for a declared model-scoped ref into sections;
+            # left exactly as before rather than widened to `global` refs.
+            narrowing = (
+                "EXISTS (SELECT 1 FROM json_each(COALESCE(\"model_context\", '[]')) "
+                "WHERE json_each.value=?)"
+            )
+    elif not source_model_owned:
+        # Global ref on a row that is not owned by a model: the supplied model
+        # is context for the browsing session, not a constraint on the value.
+        narrowing = None
+    if model and narrowing:
+        where.append(narrowing)
+        params.append(model)
+
+    label = _label_sql(labels)
+    active = (
+        f"CASE WHEN COALESCE(CAST(\"{active_column}\" AS TEXT), 'True')="
+        "'False' THEN 0 ELSE 1 END"
+        if active_column else "1"
+    )
+    sql = (
+        f'SELECT CAST("{value}" AS TEXT) AS value, '
+        f"COALESCE(NULLIF({label}, ''), CAST(\"{value}\" AS TEXT)) AS label, "
+        f"{active} AS active FROM \"{table}\" WHERE " + " AND ".join(where)
+    )
+    return sql, params
+
+
+def _reference_options(conn, spec, field: str, model: str, query: str,
+                       discriminator: str, limit: int, offset: int) -> dict:
+    contract = _reference_contract(spec, field, discriminator)
+    targets = contract["targets"]
+    scope = contract["scope"]
+    if not targets:
+        return {
+            "schema_version": REFERENCE_OPTIONS_VERSION,
+            "field": field,
+            "scope": scope,
+            "query": query,
+            "total": 0,
+            "offset": offset,
+            "limit": limit,
+            "options": [],
+        }
+
+    selects, base_params = [], []
+    for target in targets:
+        sql, params = _reference_target_select(
+            target, scope, model,
+            bool(spec.model_scoped or spec.has_model_key_column),
+        )
+        selects.append(sql)
+        base_params.extend(params)
+    raw = " UNION ALL ".join(selects)
+    cte = (
+        "WITH raw_candidates AS (" + raw + "), candidates AS ("
+        "SELECT value, MIN(label) AS label, MAX(active) AS active "
+        "FROM raw_candidates GROUP BY value) "
+    )
+    normalized_query = query.strip()
+    filter_sql = ""
+    filter_params: list[str] = []
+    if normalized_query:
+        filter_sql = "WHERE value LIKE ? COLLATE NOCASE OR label LIKE ? COLLATE NOCASE"
+        like = f"%{normalized_query}%"
+        filter_params = [like, like]
+    count = conn.execute(
+        cte + "SELECT COUNT(*) AS total FROM candidates " + filter_sql,
+        [*base_params, *filter_params],
+    ).fetchone()["total"]
+    rows = conn.execute(
+        cte + "SELECT value, label, active FROM candidates " + filter_sql
+        + " ORDER BY label COLLATE NOCASE, value COLLATE NOCASE LIMIT ? OFFSET ?",
+        [*base_params, *filter_params, limit, offset],
+    ).fetchall()
+    return {
+        "schema_version": REFERENCE_OPTIONS_VERSION,
+        "field": field,
+        "scope": scope,
+        "query": normalized_query,
+        "total": count,
+        "offset": offset,
+        "limit": limit,
+        "options": [
+            {
+                "value": row["value"],
+                "label": row["label"],
+                "secondary": row["value"],
+                "active": bool(row["active"]),
+            }
+            for row in rows
+        ],
+    }
+
+
+@app.get("/api/records/{table}/reference-options")
+def reference_options(
+    table: str,
+    field: str,
+    model: str = "",
+    query: str = Query("", max_length=200),
+    discriminator: str = Query("", max_length=200),
+    limit: int = Query(25, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    conn=Depends(projection_connection),
+):
+    spec = SPEC_BY_TABLE.get(table)
+    if spec is None:
+        raise HTTPException(404, f"unknown table {table!r}")
+    _validate_control_integrity(spec)
+    return _reference_options(
+        conn, spec, field, model, query, discriminator, limit, offset
+    )
 
 
 @app.get("/api/records/{table}")

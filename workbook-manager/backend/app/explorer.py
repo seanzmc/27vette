@@ -54,6 +54,9 @@ def _group_fallback(group_id: str) -> str:
 
 def _exclusive_group_label(group: dict, members: list[dict]) -> str:
     """Use factual projection context only; notes are not display-label authority."""
+    display_label = (group.get("display_label") or "").strip()
+    if display_label:
+        return display_label
     if not _HASH_SUFFIX.search(group.get("group_id", "")):
         return _group_fallback(group.get("group_id", ""))
     if members:
@@ -64,6 +67,9 @@ def _exclusive_group_label(group: dict, members: list[dict]) -> str:
 
 
 def _rule_group_label(group: dict, source: dict | None, members: list[dict]) -> str:
+    display_label = (group.get("display_label") or "").strip()
+    if display_label:
+        return display_label
     source_name = option_label(source) if source else "Rule"
     behavior = (group.get("group_type") or "related options").replace("_", " ")
     if source:
@@ -94,6 +100,21 @@ def _option_member_rows(conn, model_key: str, table: str, id_column: str, group_
     )
 
 
+def _label_state(group: dict, audience: str) -> dict:
+    """Additive Checkpoint 2B label/audience/status exposure.
+
+    ``display_label`` is workbook-authored; blank or an absent column means
+    label pending (the factual fallback label stays authoritative until the
+    approved migration fills the column). Rule-group labels are Manager-facing
+    unless a separate runtime contract makes them customer-visible.
+    """
+
+    label = (group.get("display_label") or "").strip()
+    if not label:
+        return {"display_label": "", "audience": audience, "label_status": "pending"}
+    return {"display_label": label, "audience": audience, "label_status": "authored"}
+
+
 def _exclusive_group_summary(conn, model_key: str, group: dict) -> dict:
     members = _option_member_rows(
         conn, model_key, "exclusive_group_members", "option_id", group["group_id"]
@@ -103,6 +124,7 @@ def _exclusive_group_summary(conn, model_key: str, group: dict) -> dict:
         "group_type": "exclusive",
         "group_id": group["group_id"],
         "label": _exclusive_group_label(group, members),
+        **_label_state(group, "customer"),
         "behavior": group.get("selection_mode") or "",
         "active": group.get("active") == "True",
         "notes": group.get("notes") or "",
@@ -127,6 +149,7 @@ def _rule_group_summary(conn, model_key: str, group: dict) -> dict:
         "group_type": "rule",
         "group_id": group["group_id"],
         "label": _rule_group_label(group, source, members),
+        **_label_state(group, "manager"),
         "behavior": group.get("group_type") or "",
         "active": group.get("active") == "True",
         "notes": group.get("notes") or "",

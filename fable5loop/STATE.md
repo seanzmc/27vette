@@ -12,17 +12,17 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 
 ## Current handoff
 
-- **Updated:** 2026-08-23
-- **Owning specification:** None; automation-only AGENTS.md guidance refresh.
-- **Active workflow:** Update AGENTS.md automation for newly discovered validation workflow guidance.
-- **Branch/commit:** `codex/update-agents-md-validation-workflow` from current `origin/main` (`aa28e8a`); docs-only PR pending.
-- **Last completed:** Added minimal AGENTS.md guidance that the validation catalog and CI planners own gate layers, authority, isolation, serialization, changed-surface selection, active-interpreter execution, and full-suite sharding.
-- **Current status:** Docs-only automation update is implemented in an isolated worktree; no workbook, generated artifact, runtime, README command table, deployment, or dealer surface changed.
-- **Validation:** Fable loop validator passed using the main repo virtualenv; `git diff --check -- AGENTS.md fable5loop/STATE.md` passed; `git diff --stat` reviewed. Product tests were not run because this is guidance-only.
-- **Next action:** Review and merge the docs-only PR when ready; resume Workbook Manager UX recovery from its owning spec and active branch, not from this automation branch.
-- **Blockers or closeout gaps:** None for this automation. Existing Workbook Manager Checkpoint 2 work remains separate from this branch.
-- **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This startup pass produced no Fable receipt.
-- **Protected boundaries:** Canonical workbook, workbook schema, generators, generated artifacts, published registry, customer runtime, dealer submission, WordPress media, and deployment remain untouched.
+- **Updated:** 2026-08-24
+- **Owning specification:** `docs/superpowers/specs/2026-08-21-workbook-manager-ux-recovery.md` owns the active Workbook Manager UX recovery (Checkpoints 1–6, §16 runbooks, §19 gates).
+- **Active workflow:** Workbook Manager Product and UX Recovery — Checkpoints 1 and 2 and the bounded Checkpoint 3A/3B registry/schema/reference slice are complete. The workflow is stopped before 3C; 3C–3F and Checkpoints 4–6 remain separately gated.
+- **Branch/commit:** `codex/update-agents-md-validation-workflow`, a docs-only branch carrying the AGENTS.md Layer 4 correction. PRs 39 and 40 are merged to `main`.
+- **Last completed:** Closed all seven Codex review findings across PRs 38/39/40, executed the branch cleanup (remote 48 -> 6, local 69 -> 9, 21 archive tags pushed), closed the stale PRs 1 and 8, and merged PRs 39 and 40 into `main`.
+- **Current status:** No open review findings. PRs 39 and 40 are merged; PR 38 is the last one outstanding and carries only the AGENTS.md correction that planner-selected and manual-dispatch runs also trigger a full inventory. This merge of `origin/main` resolves a `STATE.md` handoff conflict by keeping the newer merged handoff, per AGENTS.md section 9, which makes the fixed block a single overwritten surface.
+- **Validation:** All five PRs verified OPEN with unchanged head refs after the deletions; 21 archive tags confirmed present on the remote before any branch was removed; 41 remote and 60 local deletions all reported success with zero failures. Earlier code validation stands: Manager serial gate 287 passed / 2 skips / 62 subtests / exit 0, editor-ops 142, metadata gate 168 + 111 subtests, group label contract 24, workbook schema gate valid with 0 issues, Fable loop validator passed. The canonical workbook is byte-identical to HEAD (`8975a596`).
+- **Next action:** Merge PR 38. Checkpoint 3C still requires explicit authorization.
+- **Blockers or closeout gaps:** No implementation blocker. Carried gap: projected `form_sections.model_context` is empty for all 48 rows, so section reference pickers cannot be model-scoped until the read-only section spec carries a source role. A pre-existing unrelated stash (`pre-main asset-map workbook edits`, from `ingest-wizard`) remains at `stash@{0}`, intact.
+- **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. Checkpoint 2 and Checkpoint 3A/3B produced no Fable receipt (normal repo path per AGENTS.md §9).
+- **Protected boundaries:** Canonical workbook, generated contracts, published registry, customer runtime heading/selection/pricing/membership behavior, durable draft/apply/rebuild behavior, dealer submission, WordPress media, deployment, dependencies, and group IDs remain unchanged. Checkpoint 3A/3B adds Manager metadata/read APIs only.
 
 ## Verified facts
 

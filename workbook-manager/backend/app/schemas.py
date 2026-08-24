@@ -111,9 +111,11 @@ class ColumnOut(BaseModel):
     finite_values: list[str] = Field(default_factory=list)
     reference: Optional[dict] = None
     ref: Optional[dict] = None
+    control: dict
 
 
 class TableSchemaOut(BaseModel):
+    schema_version: str
     table: str
     label: str
     key: list[str]

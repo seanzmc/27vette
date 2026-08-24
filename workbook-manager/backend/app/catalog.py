@@ -167,6 +167,44 @@ _ROUTING: dict[str, tuple] = {
 _FAMILY_TO_TABLE = {family: routing[0] for family, routing in _ROUTING.items()}
 _FAMILY_TO_TABLE.update({"sections": "form_sections", "variants": "variants"})
 
+# Database presentation facts for bounded reference selectors. Allowed targets,
+# values, and scope still come from the shared workbook registry; this adapter
+# only states which projected columns form a human label. ``option_rpos`` is the
+# one derived conditional-reference domain and is read from the option RPO
+# column rather than exposed as an arbitrary table.
+REFERENCE_OPTION_PRESENTATION: dict[str, dict] = {
+    "options": {
+        "value": "option_id", "labels": ("rpo", "option_name"),
+        "active": "active",
+    },
+    "option_rpos": {
+        "table": "options", "value": "rpo",
+        "labels": ("rpo", "option_name"), "active": "active",
+    },
+    "interiors": {
+        "value": "interior_id", "labels": ("interior_name",),
+    },
+    "form_sections": {
+        "value": "section_id", "labels": ("section_name",),
+    },
+    "sections": {
+        "table": "form_sections", "value": "section_id",
+        "labels": ("section_name",),
+    },
+    "variants": {
+        "value": "variant_id", "labels": ("display_name",),
+        "active": "active",
+    },
+    "rule_groups": {
+        "value": "group_id", "labels": ("display_label",),
+        "active": "active",
+    },
+    "exclusive_groups": {
+        "value": "group_id", "labels": ("display_label",),
+        "active": "active",
+    },
+}
+
 
 def _reference_specs(family: str, meta: dict) -> tuple[RefSpec, ...]:
     union_map = meta.get("ref_unions", {})

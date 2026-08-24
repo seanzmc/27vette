@@ -565,6 +565,7 @@ test("Grand Sport runtime contract suppresses inactive option rows without hidin
     draft.ruleGroups.find((group) => group.group_id === "gs_group_t0f_z52_requirement"),
     {
       group_id: "gs_group_t0f_z52_requirement",
+      display_label: "T0F Carbon Flash-Painted Carbon Fiber Aero Package — Z52 Requirements",
       group_type: "requires_any",
       source_id: "opt_t0f_001",
       target_ids: ["opt_feb_001", "opt_fey_001"],
@@ -580,6 +581,7 @@ test("Grand Sport runtime contract suppresses inactive option rows without hidin
     draft.ruleGroups.find((group) => group.group_id === "gs_group_j57_z52_requirement"),
     {
       group_id: "gs_group_j57_z52_requirement",
+      display_label: "J57 Carbon Ceramic Brakes — Z52 Requirements",
       group_type: "requires_any",
       source_id: "opt_j57_001",
       target_ids: ["opt_feb_001", "opt_fey_001"],

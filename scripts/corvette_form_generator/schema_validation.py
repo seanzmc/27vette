@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Iterable
@@ -21,6 +22,10 @@ from corvette_form_generator.workbook import workbook_truthy
 from corvette_form_generator.workbook_domain.registry import (
     GLOBAL_SHEET_FAMILIES,
     DEFAULT_REGISTRY_PROMOTION_ARTIFACT_TYPE,
+    GROUP_DISPLAY_LABEL_HASH_SUFFIX_PATTERN,
+    GROUP_DISPLAY_LABEL_MAX_LENGTH,
+    GROUP_DISPLAY_LABEL_MIN_LENGTH,
+    GROUP_DISPLAY_LABEL_PLACEHOLDERS,
     REGISTRY_PROMOTION_ARTIFACT_TYPES,
     SOURCE_ROLE_FAMILIES,
     WRITABLE_COLUMNS,
@@ -995,19 +1000,39 @@ def validate_registry_family_columns(wb, source_graph: dict[str, dict[str, str]]
         expected = WRITABLE_COLUMNS[family]
         actual = nonblank_headers(wb[sheet_name])
         for column in expected:
-            if column not in actual:
+            if column in actual:
+                continue
+            if column == "display_label" and family in ("exclusive_groups", "rule_groups"):
+                # Checkpoint 2B: workbooks authored before the approved
+                # display-label migration are an explicit migration-required
+                # state, not invalid workbooks. The column becomes a hard
+                # requirement once Checkpoint 2D writes it to every sheet.
                 add_issue(
                     issues,
-                    "error",
-                    "registry_family_columns_missing",
+                    "warning",
+                    "group_display_label_column_pending_migration",
                     sheet=sheet_name,
                     column=column,
                     value={"family": family, "actual": actual},
                     message=(
-                        f"{sheet_name} is missing registry-owned column {column!r} "
-                        f"for family {family!r}."
+                        f"{sheet_name} predates the group display-label migration: "
+                        f"registry-owned column {column!r} for family {family!r} "
+                        "is absent and every group label is pending workbook review."
                     ),
                 )
+                continue
+            add_issue(
+                issues,
+                "error",
+                "registry_family_columns_missing",
+                sheet=sheet_name,
+                column=column,
+                value={"family": family, "actual": actual},
+                message=(
+                    f"{sheet_name} is missing registry-owned column {column!r} "
+                    f"for family {family!r}."
+                ),
+            )
         for column in actual:
             if column not in expected:
                 add_issue(
@@ -1020,6 +1045,97 @@ def validate_registry_family_columns(wb, source_graph: dict[str, dict[str, str]]
                     message=(
                         f"{sheet_name} has column {column!r}, which family {family!r} "
                         "does not own in the shared workbook registry."
+                    ),
+                )
+
+
+def validate_group_display_labels(wb, source_graph: dict[str, dict[str, str]], issues: list[SchemaIssue]) -> None:
+    """Validate workbook-authored group display labels (Checkpoint 2 contract).
+
+    ``display_label`` is deliberate human copy owned by the exclusive_groups and
+    rule_groups families. Blank means label pending; a present label must be
+    trimmed single-line text of practical human-label length that never equals
+    its canonical ``group_id`` or a Manager fallback placeholder, and never
+    carries the terminal hash token of a hash-like canonical ID. Notes are not
+    label authority and are never parsed here.
+    """
+
+    _hash_suffix = re.compile(GROUP_DISPLAY_LABEL_HASH_SUFFIX_PATTERN, re.IGNORECASE)
+    label_sheets = {
+        sheet_name: "exclusive_groups"
+        for sheet_name, family in registered_family_sheets(source_graph).items()
+        if family == "exclusive_groups"
+    }
+    label_sheets.update({
+        sheet_name: "rule_groups"
+        for sheet_name, family in registered_family_sheets(source_graph).items()
+        if family == "rule_groups"
+    })
+
+    for sheet_name in sorted(label_sheets):
+        if sheet_name not in wb.sheetnames:
+            continue
+        headers = header_index(wb[sheet_name])
+        if "display_label" not in headers or "group_id" not in headers:
+            continue
+        family = label_sheets[sheet_name]
+        for row_number, row in records(wb[sheet_name]):
+            value = row.get("display_label")
+            if value is None or str(value).strip() == "":
+                # Blank means "label pending". Once the column exists the
+                # Checkpoint 2 migration is complete for this sheet, so §7.1
+                # requires an approved label on every active customer-rendered
+                # exclusive group. Rule-group labels stay Manager-facing and
+                # may remain blank; inactive rows are not customer-rendered.
+                active = "active" not in headers or workbook_truthy(
+                    row.get("active")
+                )
+                if family == "exclusive_groups" and active:
+                    add_issue(
+                        issues,
+                        "error",
+                        "group_display_label_missing",
+                        sheet=sheet_name,
+                        row=row_number,
+                        column="display_label",
+                        value="",
+                        message=(
+                            f"{sheet_name}.display_label is blank on active "
+                            f"exclusive group "
+                            f"{clean_text(row.get('group_id'))!r}; §7.1 "
+                            "requires an approved customer-facing label"
+                        ),
+                    )
+                continue
+            raw = str(value)
+            group_id = clean_text(row.get("group_id"))
+            hash_match = _hash_suffix.search(group_id)
+            invalid = (
+                raw != raw.strip()
+                or "\n" in raw or "\r" in raw
+                or not (
+                    GROUP_DISPLAY_LABEL_MIN_LENGTH
+                    <= len(raw.strip())
+                    <= GROUP_DISPLAY_LABEL_MAX_LENGTH
+                )
+                or raw.strip() == group_id
+                or raw.strip() in GROUP_DISPLAY_LABEL_PLACEHOLDERS
+                or bool(hash_match and hash_match.group(1).casefold() in raw.strip().casefold())
+            )
+            if invalid:
+                add_issue(
+                    issues,
+                    "error",
+                    "group_display_label_invalid",
+                    sheet=sheet_name,
+                    row=row_number,
+                    column="display_label",
+                    value=raw,
+                    message=(
+                        f"{sheet_name}.display_label {raw!r} violates the Checkpoint 2 "
+                        "label contract: trimmed single-line "
+                        f"{GROUP_DISPLAY_LABEL_MIN_LENGTH}-{GROUP_DISPLAY_LABEL_MAX_LENGTH} chars, never equal to "
+                        "group_id or a fallback placeholder, no hash-suffix token."
                     ),
                 )
 
@@ -1046,6 +1162,7 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
         source_graph = metadata_source_graph(wb, issues)
         source_sheets_by_role = sheets_by_role(source_graph)
         validate_registry_family_columns(wb, source_graph, issues)
+        validate_group_display_labels(wb, source_graph, issues)
 
         if model_master_valid:
             validate_model_variant_topology(wb, issues)
