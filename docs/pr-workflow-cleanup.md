@@ -171,8 +171,10 @@ Both of its stated follow-ups are resolved: six models are live where it
 targeted three, and the ingest wizard was deliberately retired on 2026-07-23
 (AGENTS.md §8) rather than left pending.
 
-Restore either with `git checkout -b <branch> archive/<branch>`. Their remote
-branches were left in place; delete them whenever you want.
+Both branches were deleted after closing — remote and local, plus the stale
+`.worktrees/codex-workbook-relational-db` worktree, which was clean and held
+no commits beyond its archive tag. Restore either with
+`git checkout -b <branch> archive/<branch>`.
 
 ## Candidate workflow automation
 
