@@ -148,13 +148,31 @@ removed.
 | `safety/main-before-tree-repair-20260609-211401` | `3099c4de` |
 | `schema_refactor` | `d08fec19` |
 
-## Old pull requests
+## Old pull requests — closed 2026-08-24
 
-- **#1 `cloudflare/workers-autoconfig`** — 2026-04-26, 20 lines, 676 behind,
-  conflicting. Close; re-add fresh if Workers are ever wanted.
-- **#8 `codex/workbook-relational-db`** — 2026-07-17, draft, 20,970 additions,
-  142 behind, conflicting. Harvest anything not yet reimplemented, note it in
-  `fable5loop/STATE.md`, then close pointing at the successor branches.
+Both were checked for salvageable work before closing, and both branches were
+tagged first, so the code is recoverable from the remote.
+
+**#1 `cloudflare/workers-autoconfig`** — closed as unadopted. Cloudflare
+Workers was never taken up: `main` has no `wrangler` config, and the
+documented deploy path is the WordPress endpoint (README, AGENTS.md §6). Its
+two files also conflict, because `main` has long had its own `.gitignore`.
+At 676 behind, the `compatibility_date` and `form-app` layout would both need
+rewriting anyway.
+
+**#8 `codex/workbook-relational-db`** — closed as superseded. Nothing needed
+harvesting: the architecture was absorbed through a different structure, not
+this implementation. None of its compiler stack exists on `main`
+(`central_compiler`, `model_compiler`, `shared_compiler`, `migration`,
+`export_adapter`, `workbook_profile`, `contract_audit`, `compile_types`);
+`main` uses `catalog`, `drafts`, `apply_rebuild`, `contract_parity`, and the
+asset modules instead. The `specs.py` consolidation it proposed did happen.
+Both of its stated follow-ups are resolved: six models are live where it
+targeted three, and the ingest wizard was deliberately retired on 2026-07-23
+(AGENTS.md §8) rather than left pending.
+
+Restore either with `git checkout -b <branch> archive/<branch>`. Their remote
+branches were left in place; delete them whenever you want.
 
 ## Candidate workflow automation
 
