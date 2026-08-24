@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "stingray_options",
-    "generated_at": "2026-08-17T02:46:32+00:00",
+    "generated_at": "2026-08-23T07:05:23+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -40703,6 +40703,7 @@
   "ruleGroups": [
     {
       "group_id": "grp_5v7_spoiler_requirement",
+      "display_label": "5V7 Black Ground Effects \u2014 High Wing Spoiler Requirements",
       "group_type": "requires_any",
       "source_id": "opt_5v7_001",
       "target_ids": [
@@ -40718,6 +40719,7 @@
     },
     {
       "group_id": "grp_5zu_paint_requirement",
+      "display_label": "5ZU Body-Color High Wing Spoiler \u2014 Paint Color Requirements",
       "group_type": "requires_any",
       "source_id": "opt_5zu_001",
       "target_ids": [
@@ -40734,6 +40736,7 @@
     },
     {
       "group_id": "grp_pcx_excludes_blocked_choices",
+      "display_label": "PCX Tech Bronze Accent Package \u2014 Conflicting Choice Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_pcx_001",
       "target_ids": [
@@ -40771,6 +40774,7 @@
     },
     {
       "group_id": "grp_pdv_excludes_full_length_stripes",
+      "display_label": "PDV Stingray R Appearance Package \u2014 Full-Length Stripe Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_pdv_001",
       "target_ids": [
@@ -40800,6 +40804,7 @@
     },
     {
       "group_id": "grp_r88_excludes_badge_and_stripe_choices",
+      "display_label": "R88 Front Illuminated Crossed Flags Emblem \u2014 Badge and Stripe Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_r88_001",
       "target_ids": [
@@ -40828,6 +40833,7 @@
     },
     {
       "group_id": "grp_sfz_excludes_badge_and_stripe_choices",
+      "display_label": "SFZ Dark Stealth Crossed Flags Front Emblem \u2014 Badge and Stripe Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_sfz_001",
       "target_ids": [
@@ -40855,6 +40861,7 @@
     },
     {
       "group_id": "grp_cf8_excludes_full_length_stripes",
+      "display_label": "CF8 Electrochromic Dimming Removable Roof Panel \u2014 Full-Length Stripe Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_cf8_001",
       "target_ids": [
@@ -40881,6 +40888,7 @@
     },
     {
       "group_id": "grp_sb7_excludes_dual_racing_and_sht",
+      "display_label": "SB7 Corvette Racing Jake and Stingray R Graphics Package \u2014 Stripe and Jake Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_sb7_001",
       "target_ids": [
@@ -40911,6 +40919,7 @@
     },
     {
       "group_id": "grp_sht_excludes_dual_racing_and_sb7",
+      "display_label": "SHT Tech Bronze Jake Hood Graphic \u2014 Stripe and SB7 Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_sht_001",
       "target_ids": [
@@ -40941,6 +40950,7 @@
     },
     {
       "group_id": "grp_dpb_excludes_stingray_jake_graphics",
+      "display_label": "DPB Carbon Flash/Blue Racing Stripes \u2014 Jake Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dpb_001",
       "target_ids": [
@@ -40956,6 +40966,7 @@
     },
     {
       "group_id": "grp_dpc_excludes_stingray_jake_graphics",
+      "display_label": "DPC Carbon Flash/Yellow Racing Stripes \u2014 Jake Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dpc_001",
       "target_ids": [
@@ -40971,6 +40982,7 @@
     },
     {
       "group_id": "grp_dpg_excludes_stingray_jake_graphics",
+      "display_label": "DPG Carbon Flash/Orange Racing Stripes \u2014 Jake Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dpg_001",
       "target_ids": [
@@ -40986,6 +40998,7 @@
     },
     {
       "group_id": "grp_dpl_excludes_stingray_jake_graphics",
+      "display_label": "DPL Carbon Flash/Red Racing Stripes \u2014 Jake Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dpl_001",
       "target_ids": [
@@ -41001,6 +41014,7 @@
     },
     {
       "group_id": "grp_dpt_excludes_stingray_jake_graphics",
+      "display_label": "DPT Carbon Flash/Silver Racing Stripes \u2014 Jake Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dpt_001",
       "target_ids": [
@@ -41016,6 +41030,7 @@
     },
     {
       "group_id": "grp_dsy_excludes_stingray_jake_graphics",
+      "display_label": "DSY Edge Orange Racing Stripes \u2014 Jake Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dsy_001",
       "target_ids": [
@@ -41031,6 +41046,7 @@
     },
     {
       "group_id": "grp_dsz_excludes_stingray_jake_graphics",
+      "display_label": "DSZ Edge Red Racing Stripes \u2014 Jake Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dsz_001",
       "target_ids": [
@@ -41046,6 +41062,7 @@
     },
     {
       "group_id": "grp_dt0_excludes_stingray_jake_graphics",
+      "display_label": "DT0 Competition Yellow Racing Stripes \u2014 Jake Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dt0_001",
       "target_ids": [
@@ -41061,6 +41078,7 @@
     },
     {
       "group_id": "grp_dth_excludes_stingray_jake_graphics",
+      "display_label": "DTH Carbon Flash Metallic Racing Stripes \u2014 Jake Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dth_001",
       "target_ids": [
@@ -41076,6 +41094,7 @@
     },
     {
       "group_id": "grp_dub_excludes_stingray_jake_graphics",
+      "display_label": "DUB Sterling Silver Racing Stripes \u2014 Jake Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dub_001",
       "target_ids": [
@@ -41091,6 +41110,7 @@
     },
     {
       "group_id": "grp_due_excludes_stingray_jake_graphics",
+      "display_label": "DUE Santorini Blue/Carbon Flash Racing Stripes \u2014 Jake Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_due_001",
       "target_ids": [
@@ -41106,6 +41126,7 @@
     },
     {
       "group_id": "grp_duk_excludes_stingray_jake_graphics",
+      "display_label": "DUK Edge Red/Carbon Flash Racing Stripes \u2014 Jake Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_duk_001",
       "target_ids": [
@@ -41121,6 +41142,7 @@
     },
     {
       "group_id": "grp_duw_excludes_stingray_jake_graphics",
+      "display_label": "DUW Edge Blue Racing Stripes \u2014 Jake Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_duw_001",
       "target_ids": [
@@ -41136,6 +41158,7 @@
     },
     {
       "group_id": "grp_dzu_excludes_stingray_jake_graphics",
+      "display_label": "DZU Carbon Flash/Competition Yellow Stinger Stripe \u2014 Jake Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dzu_001",
       "target_ids": [
@@ -41151,6 +41174,7 @@
     },
     {
       "group_id": "grp_dzv_excludes_stingray_jake_graphics",
+      "display_label": "DZV Carbon Flash/Midnight Silver Stinger Stripe \u2014 Jake Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dzv_001",
       "target_ids": [
@@ -41166,6 +41190,7 @@
     },
     {
       "group_id": "grp_dzx_excludes_stingray_jake_graphics",
+      "display_label": "DZX Carbon Flash/Edge Red Stinger Stripe \u2014 Jake Graphic Exclusions",
       "group_type": "excludes_any",
       "source_id": "opt_dzx_001",
       "target_ids": [
@@ -41181,6 +41206,7 @@
     },
     {
       "group_id": "grp_gba_excludes_edu",
+      "display_label": "GBA Black \u2014 Body-Color Accent Exclusion",
       "group_type": "excludes_any",
       "source_id": "opt_gba_001",
       "target_ids": [
@@ -41195,6 +41221,7 @@
     },
     {
       "group_id": "grp_gba_excludes_zyc",
+      "display_label": "GBA Black \u2014 Carbon Flash Mirror and Spoiler Exclusion",
       "group_type": "excludes_any",
       "source_id": "opt_gba_001",
       "target_ids": [
@@ -41211,6 +41238,7 @@
   "exclusiveGroups": [
     {
       "group_id": "grp_ls6_engine_covers",
+      "display_label": "LS6 Engine Covers",
       "option_ids": [
         "opt_bc7_001",
         "opt_bcp_001",
@@ -41223,6 +41251,7 @@
     },
     {
       "group_id": "grp_spoiler_high_wing",
+      "display_label": "Spoiler",
       "option_ids": [
         "opt_t0a_001",
         "opt_tvs_001",
@@ -41235,6 +41264,7 @@
     },
     {
       "group_id": "excl_center_caps",
+      "display_label": "Wheel Center Caps",
       "option_ids": [
         "opt_rxj_001",
         "opt_vwd_001",
@@ -41248,6 +41278,7 @@
     },
     {
       "group_id": "excl_indoor_car_covers",
+      "display_label": "Indoor Car Covers",
       "option_ids": [
         "opt_rwh_001",
         "opt_sl1_001",
@@ -41260,6 +41291,7 @@
     },
     {
       "group_id": "excl_outdoor_car_covers",
+      "display_label": "Outdoor Car Covers",
       "option_ids": [
         "opt_rnx_001",
         "opt_rwj_001"
@@ -41270,6 +41302,7 @@
     },
     {
       "group_id": "excl_suede_trunk_liner",
+      "display_label": "Suede Frunk and Trunk Liners",
       "option_ids": [
         "opt_sxb_001",
         "opt_sxr_001",
@@ -41281,6 +41314,7 @@
     },
     {
       "group_id": "excl_ext_accents",
+      "display_label": "Exterior Accents",
       "option_ids": [
         "opt_efr_001",
         "opt_efy_001",
@@ -41292,6 +41326,7 @@
     },
     {
       "group_id": "excl_seat_belts",
+      "display_label": "Seat Belt Color",
       "option_ids": [
         "opt_719_001",
         "opt_3n9_001",
@@ -41306,6 +41341,7 @@
     },
     {
       "group_id": "excl_rear_script_badges",
+      "display_label": "Rear Corvette Script Badge Color",
       "option_ids": [
         "opt_rik_001",
         "opt_rin_001",
@@ -41317,6 +41353,7 @@
     },
     {
       "group_id": "excl_exhaust_path",
+      "display_label": "Exhaust Tips",
       "option_ids": [
         "opt_nga_001",
         "opt_nwi_001"

@@ -148,6 +148,23 @@ def validate_record(conn: sqlite3.Connection, spec: TableSpec, model_id: str,
             "entity_key": "/".join(str(record.get(k, "")) for k in spec.key),
         })
 
+    # Checkpoint 3B: fields whose control kind marks them read_only,
+    # generated, or immutable are never valid in a mutation payload. Key
+    # immutability on update is enforced below; this guard covers the
+    # non-key generated/read-only surface.
+    from corvette_form_generator.workbook_domain import registry as _registry
+
+    family_controls = _registry.EDITOR_SHEET_META.get(
+        spec.editor_family, {}
+    ).get("controls", {})
+    for col in spec.columns:
+        kind = (family_controls.get(col.header) or {}).get("kind")
+        if kind in ("immutable", "read_only", "generated") and (
+                col.sql_name() in record):
+            err(col.sql_name(),
+                f"{col.sql_name()} is {kind} and cannot be set through a "
+                "draft operation")
+
     # key completeness
     for k in spec.key:
         if str(record.get(k, "")).strip() == "":
