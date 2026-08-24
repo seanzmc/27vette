@@ -6,9 +6,10 @@ passed full-inventory Release candidate run 32626231858. Checkpoint 3A/3B's
 registry/schema/reference slice completed locally on 2026-08-23; its commit,
 `3085d87`, is followed by this closeout. PR and required full-inventory CI
 evidence are recorded at delivery. Checkpoint 3C's reusable editor shell
-completed locally on 2026-08-24; its PR and required full-inventory CI evidence
-are recorded at delivery. Checkpoint 3D–3F and Checkpoints 4–6 remain separately
-gated by §19 and must not begin automatically.
+completed locally on 2026-08-24 and was opened as PR 42; its initial delivery
+head passed full-inventory Release candidate run 32775301054. The review-follow-up
+head reruns that required evidence after push. Checkpoint 3D–3F and Checkpoints
+4–6 remain separately gated by §19 and must not begin automatically.
 
 Checkpoint 2 added the approved workbook schema/data and additive generated
 label fields, but did **not** authorize or perform the Checkpoint 5 customer
@@ -1774,6 +1775,13 @@ Codex findings on the delivery PR were implemented inside the closed slice.
   generated outputs, published registry, customer runtime, and cache-bearing HTML.
   Dependencies, backend/durable draft semantics, apply/rebuild, dealer, media,
   deployment, and customer runtime remain unchanged.
+- PR 42's three P2 editor findings were accepted as contract-preserving corrections:
+  initial heading focus now wraps backward Tab to the last editor control, blank
+  `never_blank_key` values fail client validation and present as required, and
+  Enter in reference search no longer submits the draft form. Focused coverage
+  passed 8 tests, the production frontend build passed, and the exact catalog-owned
+  Manager serial group passed 251 tests / skipped 2 intentional slow cases / passed
+  62 subtests.
 
 Mandatory stop: this evidence closes only subpass 3C. Subpasses 3D–3F remain
 unimplemented and require explicit sequential authorization; no contextual

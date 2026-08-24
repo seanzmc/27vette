@@ -98,17 +98,20 @@ def test_draft_validation_and_dirty_state_are_deterministic():
     result = run_validation(
         "const schema={columns:["
         "{name:'name', control:{kind:'short_text', label:'Name', blank:'forbidden'}},"
+        "{name:'key', control:{kind:'short_text', label:'Key', blank:'never_blank_key'}},"
         "{name:'notes', control:{kind:'long_text', label:'Notes', blank:'allowed'}}"
         "]};"
         "console.log(JSON.stringify({"
-        "errors:api.validateDraft(schema,{name:'',notes:''}),"
-        "unchanged:api.isDraftDirty(schema,{name:'A',notes:null},{name:'A',notes:''}),"
-        "changed:api.isDraftDirty(schema,{name:'A',notes:''},{name:'B',notes:''})"
+        "errors:api.validateDraft(schema,{name:'',key:'',notes:''}),"
+        "validKey:api.validateField(schema.columns[1],'option-key'),"
+        "unchanged:api.isDraftDirty(schema,{name:'A',key:'K',notes:null},{name:'A',key:'K',notes:''}),"
+        "changed:api.isDraftDirty(schema,{name:'A',key:'K',notes:''},{name:'B',key:'K',notes:''})"
         "}));"
     )
 
     assert result == {
-        "errors": {"name": "Name is required."},
+        "errors": {"name": "Name is required.", "key": "Key is required."},
+        "validKey": "",
         "unchanged": False,
         "changed": True,
     }
@@ -127,6 +130,7 @@ def test_reusable_shell_owns_dialog_focus_close_and_scroll_contracts():
         "opener.focus()",
         "window.confirm",
         'className="editor-footer"',
+        "!focusable.includes(document.activeElement)",
     ):
         assert required in source
 
@@ -156,6 +160,8 @@ def test_record_form_validates_before_one_in_flight_draft_save():
     assert "disabled={busy}" in source
     assert "firstInvalid.focus()" in source
     assert "dirty={dirty}" in source
+    assert 'if (event.key === "Enter") event.preventDefault();' in source
+    assert '["forbidden", "never_blank_key"].includes(control.blank)' in source
 
 
 def test_shell_css_is_a_desktop_drawer_and_narrow_full_screen_sheet():

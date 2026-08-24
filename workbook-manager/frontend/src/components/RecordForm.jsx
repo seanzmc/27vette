@@ -53,6 +53,9 @@ function ReferenceControl({
           setQuery(event.target.value);
           onReferenceQuery(event.target.value);
         }}
+        onKeyDown={(event) => {
+          if (event.key === "Enter") event.preventDefault();
+        }}
         placeholder={`Search ${control.label} choices`}
         aria-label={`Search ${control.label} choices`}
         disabled={disabled}
@@ -354,7 +357,9 @@ export default function RecordForm({
                   >
                     <label htmlFor={inputId}>
                       {control.label}
-                      {control.blank === "forbidden" && <span className="required"> Required</span>}
+                      {["forbidden", "never_blank_key"].includes(control.blank) && (
+                        <span className="required"> Required</span>
+                      )}
                     </label>
                     <Renderer
                       id={inputId}

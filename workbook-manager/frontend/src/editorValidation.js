@@ -10,7 +10,9 @@ export function validateField(column, value, referenceState = {}) {
   const text = value == null ? "" : String(value).trim();
 
   if (!control) return `${label} has no registered editor control.`;
-  if (!text && control.blank === "forbidden") return `${label} is required.`;
+  if (!text && ["forbidden", "never_blank_key"].includes(control.blank)) {
+    return `${label} is required.`;
+  }
   if (!text) return "";
 
   if (["boolean", "finite"].includes(control.kind) && !control.values.includes(value)) {
