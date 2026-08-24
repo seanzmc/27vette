@@ -13,16 +13,16 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 ## Current handoff
 
 - **Updated:** 2026-08-24
-- **Owning specification:** None; this is a bounded GitHub review-gate implementation requested directly by the repository owner.
-- **Active workflow:** Codex finding disposition gate for pull requests targeting `main`.
-- **Branch/commit:** `codex/codex-finding-disposition-gate` from `origin/main` (`aa28e8a`); implementation commit `2cdaa51` is locally complete and this handoff is the remaining delivery commit.
-- **Last completed:** Added a trusted-default-branch evaluator and GitHub workflow that publish the `codex-finding-disposition` head status, failing only for current unresolved structured Codex P0/P1 findings and reconciling review-thread resolution on a 15-minute schedule.
-- **Current status:** Implementation and focused local validation are green. The status is not yet active or required because the workflow must first land on `main` and publish its context.
-- **Validation:** Focused Codex/catalog/runner contracts passed (`62 passed`); CI finalizer and splitter self-tests passed (`4` and `5`); `actionlint v1.7.12` passed both workflows; live authenticated dry-run correctly failed PR 40 for one current unresolved P1 and ignored PR 8's outdated P1; the full CI plan finalized at 43 Python files, 19 Node files, and 17 candidate-verifier tests. The full matrix was planned but not executed locally; remote `release-candidate` evidence is pending the PR.
-- **Next action:** Review and merge the delivery PR after remote CI is green; then let the default-branch workflow publish once and add `codex-finding-disposition` to the `Release candidate gate` ruleset's required contexts.
-- **Blockers or closeout gaps:** Ruleset activation before merge would deadlock open PRs on a context the default branch cannot yet publish. Merge remains separately authorized; no remote CI claim exists until the PR runs.
+- **Owning specification:** `docs/superpowers/specs/2026-08-21-workbook-manager-ux-recovery.md` owns the active Workbook Manager UX recovery and Checkpoint 3C evidence.
+- **Active workflow:** Workbook Manager Product and UX Recovery — Checkpoints 1, 2, 3A/3B, and the bounded Checkpoint 3C reusable editor shell are locally complete. The workflow is stopped before 3D; 3D–3F and Checkpoints 4–6 remain separately gated.
+- **Branch/commit:** `hermes/workbook-manager-ux-recovery-cp3c` from `origin/main` (`9b09b23`); implementation, validation, and closeout are complete locally, with commit/PR delivery pending.
+- **Last completed:** Replaced the inline generic record form with one registry-control-driven desktop drawer/narrow sheet, including no-fallback renderer coverage, bounded human-label references, local validation, dirty-close handling, focus containment/return, and one-in-flight draft Save behavior.
+- **Current status:** Checkpoint 3C is stopped at its required boundary. No contextual option/group editor, member editing, draft tray/navigation, workbook write, or later-checkpoint work was started.
+- **Validation:** Focused connected-editing and catalog owners passed (8 and 35); the README-owned Manager checkpoint passed 301 / skipped 2 intentional slow cases / 62 subtests; frontend build, Python compile, planner finalizer/splitter (4/5), Fable validation, protected-hash comparison, and `git diff --check` passed; the complete 12-stage all-model candidate passed with zero findings/skips. Isolated browser proof passed desktop and literal 390x844 drawer/sheet, validation, dirty close, focus trap/return, bounded labeled references, sticky footer, and zero sheet-local overflow with zero draft saves. Required remote full-inventory Release candidate evidence remains pending the delivery PR.
+- **Next action:** Deliver and review the Checkpoint 3C PR; merge only after required full-inventory CI and review are green. Checkpoint 3D still requires explicit authorization.
+- **Blockers or closeout gaps:** No local implementation blocker. Remote full-inventory CI and review are pending; merge remains separately authorized.
 - **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This task used the normal repository path and produced no Fable receipt.
-- **Protected boundaries:** Canonical workbook, workbook schema, generators, generated artifacts, published registry, customer runtime, dealer submission, WordPress media, and deployment remain untouched. Changes are limited to GitHub workflow/status evaluation, validation-planner/catalog coverage, operator docs, focused tests, and this handoff.
+- **Protected boundaries:** Canonical workbook, workbook schema/data, generators, generated artifacts, published registry, customer runtime, dependencies, durable draft/apply/rebuild semantics, dealer submission, WordPress media, and deployment remain untouched. Changes are limited to the Manager frontend shell/validation, focused tests/catalog, operator docs, owning spec, and this handoff.
 
 ## Verified facts
 

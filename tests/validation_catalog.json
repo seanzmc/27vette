@@ -2151,6 +2151,37 @@
       "readme_publishes_command": false
     },
     {
+      "id": "py.test_workbook_manager_connected_editing",
+      "command": ".venv/bin/python -m pytest tests/test_workbook_manager_connected_editing.py -q",
+      "test_files": [
+        "tests/test_workbook_manager_connected_editing.py"
+      ],
+      "layer": 2,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook_manager"
+      ],
+      "reads": [
+        "workbook-manager/frontend/src/**"
+      ],
+      "writes": [],
+      "isolation": "in_process",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": "workbook_manager",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "manager_checkpoint",
+      "approximate_seconds": 0.15,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Checkpoint 3C owner for registry-control validation, explicit renderer coverage, drawer/sheet accessibility, unsaved-close handling, bounded references, and one-in-flight draft Save behavior.",
+      "readme_reference": "test_workbook_manager_connected_editing",
+      "notes": "Uses Node only for dependency-free validation-helper execution; browser viewport and focus evidence remains a separate checkpoint gate.",
+      "collected_tests": 8,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
       "id": "py.test_workbook_manager",
       "command": ".venv/bin/python -m pytest tests/test_workbook_manager.py -q",
       "test_files": [
@@ -2628,11 +2659,12 @@
     {
       "id": "suite.workbook_manager_serial_group",
       "description": "Exact workbook_manager serial group, run in one pytest process so verified_manager_fixture is built once.",
-      "command": ".venv/bin/python -m pytest tests/test_group_display_label_contract.py tests/test_workbook_manager_control_metadata.py tests/test_workbook_manager_catalog.py tests/test_workbook_manager_import_projection.py tests/test_workbook_manager_fixtures.py tests/test_workbook_manager_generated_parity.py tests/test_workbook_manager_api_concurrency.py tests/test_workbook_manager_drafts.py tests/test_workbook_manager_changeset_lifecycle.py tests/test_workbook_manager_apply_rebuild.py tests/test_workbook_manager.py -q",
+      "command": ".venv/bin/python -m pytest tests/test_group_display_label_contract.py tests/test_workbook_manager_control_metadata.py tests/test_workbook_manager_connected_editing.py tests/test_workbook_manager_catalog.py tests/test_workbook_manager_import_projection.py tests/test_workbook_manager_fixtures.py tests/test_workbook_manager_generated_parity.py tests/test_workbook_manager_api_concurrency.py tests/test_workbook_manager_drafts.py tests/test_workbook_manager_changeset_lifecycle.py tests/test_workbook_manager_apply_rebuild.py tests/test_workbook_manager.py -q",
       "layer": 3,
       "gate_ids": [
         "py.test_group_display_label_contract",
         "py.test_workbook_manager_control_metadata",
+        "py.test_workbook_manager_connected_editing",
         "py.test_workbook_manager_catalog",
         "py.test_workbook_manager_import_projection",
         "py.test_workbook_manager_fixtures",
@@ -2651,12 +2683,13 @@
     {
       "id": "suite.workbook_manager_checkpoint",
       "description": "Workbook Manager pass/checkpoint acceptance inventory (workbook-manager/README.md).",
-      "command": ".venv/bin/python -m pytest tests/test_asset_map_sync.py tests/test_group_display_label_contract.py tests/test_workbook_manager_control_metadata.py tests/test_workbook_manager_catalog.py tests/test_workbook_manager_import_projection.py tests/test_workbook_manager_fixtures.py tests/test_workbook_manager_generated_parity.py tests/test_workbook_manager_api_concurrency.py tests/test_workbook_manager_drafts.py tests/test_workbook_manager_changeset_lifecycle.py tests/test_workbook_manager_apply_rebuild.py tests/test_workbook_manager.py -q",
+      "command": ".venv/bin/python -m pytest tests/test_asset_map_sync.py tests/test_group_display_label_contract.py tests/test_workbook_manager_control_metadata.py tests/test_workbook_manager_connected_editing.py tests/test_workbook_manager_catalog.py tests/test_workbook_manager_import_projection.py tests/test_workbook_manager_fixtures.py tests/test_workbook_manager_generated_parity.py tests/test_workbook_manager_api_concurrency.py tests/test_workbook_manager_drafts.py tests/test_workbook_manager_changeset_lifecycle.py tests/test_workbook_manager_apply_rebuild.py tests/test_workbook_manager.py -q",
       "layer": 3,
       "gate_ids": [
         "py.test_asset_map_sync",
         "py.test_group_display_label_contract",
         "py.test_workbook_manager_control_metadata",
+        "py.test_workbook_manager_connected_editing",
         "py.test_workbook_manager_catalog",
         "py.test_workbook_manager_import_projection",
         "py.test_workbook_manager_fixtures",
@@ -2717,6 +2750,7 @@
         "py.test_workbook_manager_apply_rebuild",
         "py.test_workbook_manager_catalog",
         "py.test_workbook_manager_control_metadata",
+        "py.test_workbook_manager_connected_editing",
         "py.test_workbook_manager_changeset_lifecycle",
         "py.test_workbook_manager_drafts",
         "py.test_workbook_manager_fixtures",

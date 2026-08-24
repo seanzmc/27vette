@@ -5,8 +5,10 @@ Checkpoint 2 completed on 2026-08-23 at implementation commit `ff28eb5` and
 passed full-inventory Release candidate run 32626231858. Checkpoint 3A/3B's
 registry/schema/reference slice completed locally on 2026-08-23; its commit,
 `3085d87`, is followed by this closeout. PR and required full-inventory CI
-evidence are recorded at delivery. Checkpoint 3C–3F and Checkpoints 4–6 remain
-separately gated by §19 and must not begin automatically.
+evidence are recorded at delivery. Checkpoint 3C's reusable editor shell
+completed locally on 2026-08-24; its PR and required full-inventory CI evidence
+are recorded at delivery. Checkpoint 3D–3F and Checkpoints 4–6 remain separately
+gated by §19 and must not begin automatically.
 
 Checkpoint 2 added the approved workbook schema/data and additive generated
 label fields, but did **not** authorize or perform the Checkpoint 5 customer
@@ -1740,9 +1742,42 @@ Codex findings on the delivery PR were implemented inside the closed slice.
   clean; `display_label` remains in `optional_columns`, so the §10.2
   blank-semantics invariant is unchanged.
 
-Mandatory stop: this evidence closes only subpasses 3A and 3B. Subpasses 3C–3F
-remain unimplemented and require explicit sequential authorization; no editor
-shell or contextual option/group mutation UI was started.
+**Checkpoint 3C completion evidence (2026-08-24):**
+
+- one reusable `EditorShell` now presents existing schema-driven record forms as
+  a right-side desktop drawer and full-screen narrow sheet with dialog semantics,
+  synchronous heading focus, contained Tab/Shift+Tab, safe Escape/backdrop/Close,
+  dirty-close confirmation, opener focus return, body-scroll containment, and a
+  sticky Save/Cancel footer;
+- `RecordForm` now renders normalized registry `control.kind` through one exact
+  12-kind renderer map and throws on an unknown kind; the legacy `field_kind`
+  branches, 2,000-row generic reference loads, setup-description special case,
+  and arbitrary text fallback are removed;
+- client validation covers blank, finite/boolean, integer/money bounds, URL, and
+  loaded/stale reference states on change/blur and before Save; bounded reference
+  lookup uses the 3B endpoint with human labels and canonical IDs; one synchronous
+  busy guard plus the existing durable coalescing identity prevents duplicate
+  draft intent;
+- dependency-free focused coverage passed 8 tests; the catalog owner plus catalog
+  contracts passed 35; the README-owned Manager checkpoint passed 301 tests,
+  skipped the two intentional slow-only cases, and passed 62 subtests; frontend
+  production build, CI planner/finalizer self-tests (5/4), Python compile,
+  `git diff --check`, and the complete 12-stage all-model candidate passed with
+  zero findings or skipped stages;
+- isolated real-browser proof covered desktop drawer geometry and sticky footer,
+  required numeric rejection, dirty-close refusal and confirmed discard, heading
+  focus, Tab/Shift+Tab containment, Escape, focus/scroll restoration, a bounded
+  human-label section reference request, and a literal 390x844 sheet whose shell
+  and body had zero local horizontal overflow; no Save ran and draft count stayed
+  zero;
+- 17 protected baseline hashes stayed identical: canonical workbook, tracked
+  generated outputs, published registry, customer runtime, and cache-bearing HTML.
+  Dependencies, backend/durable draft semantics, apply/rebuild, dealer, media,
+  deployment, and customer runtime remain unchanged.
+
+Mandatory stop: this evidence closes only subpass 3C. Subpasses 3D–3F remain
+unimplemented and require explicit sequential authorization; no contextual
+option/group editor, member management, or persistent draft tray was started.
 
 ### Checkpoint 4 — complete form graph and contextual section management
 
@@ -2048,8 +2083,9 @@ runtime parity from an adjacent test or remembered prior run.
 ### 19.1 Current authorization state
 
 Checkpoints 1 and 2 are complete. Checkpoint 3A/3B's bounded
-registry/schema/reference slice is complete and stopped. Checkpoint 3C–3F and
-Checkpoints 4–6 remain unauthorized. The next implementation agent must receive
+registry/schema/reference slice and Checkpoint 3C's reusable shell are complete
+and stopped. Checkpoint 3D–3F and Checkpoints 4–6 remain unauthorized. The next
+implementation agent must receive
 an explicit checkpoint instruction and must not treat either the completed
 label migration or control metadata as authorization for customer headings.
 
@@ -2062,7 +2098,8 @@ label migration or control metadata as authorization for customer headings.
 | Complete actual group label/classification list | Checkpoint 2D | Complete: 224/224 reviewed labels approved and written; CSV/JSON companions and workbook readback agree. |
 | Switch customer headings to workbook labels | Checkpoint 5 | Label prerequisite is complete; runtime switch still requires explicit Checkpoint 5 approval. |
 | Add complete control metadata and bounded reference lookup | Checkpoint 3A/3B | Complete locally: 25 families / 220 fields have exact coverage; schema/reference APIs are additive and fail closed. Delivery CI is recorded with the PR. |
-| Render and save contextual option/group editors | Checkpoint 3C–3F | Unresolved and unauthorized; backend metadata does not authorize frontend mutation UI. |
+| Reusable accessible registry-control editor shell | Checkpoint 3C | Complete locally: drawer/sheet, no-fallback renderer map, validation, dirty-close, busy Save, focus, and responsive browser proof are green; delivery CI is recorded with the PR. |
+| Render and save contextual option/group editors | Checkpoint 3D–3F | Unresolved and unauthorized; the reusable shell does not authorize contextual mutation UI. |
 | New group canonical-ID allocation strategy | Any Add Group feature | Unresolved; Add Group remains blocked. |
 | Any new frontend/backend dependency | Before dependency change | Not approved. |
 | Breaking/removing existing Manager API members | Before API break | Not approved; changes must be additive. |
@@ -2108,9 +2145,9 @@ exhaustively tested text controls rather than accidental frontend defaults.
 
 ### 19.4 Current next action
 
-Remain stopped after Checkpoint 3B. The next sequential implementation action
-is an explicit decision on Checkpoint 3C's reusable editor shell. Do not begin
-3C automatically, do not skip ahead to later Checkpoint 3 editors, and do not
+Remain stopped after Checkpoint 3C. The next sequential implementation action
+is an explicit decision on Checkpoint 3D's contextual option editor. Do not begin
+3D automatically, do not skip ahead to later Checkpoint 3 editors, and do not
 begin the non-sequential Checkpoint 5 customer-runtime heading switch merely
 because its label prerequisite is complete.
 
@@ -2206,6 +2243,17 @@ Acceptance:
 ```
 
 ## 21. Revision record
+
+2026-08-24 Checkpoint 3C closure:
+
+- replaced the inline generic form with the reusable accessible desktop
+  drawer/narrow sheet and explicit registry-control renderer map;
+- added client validation, bounded human-label references, dirty-close handling,
+  synchronous focus containment/return, and one-in-flight draft Save behavior;
+- recorded focused, Manager checkpoint, frontend build, browser/responsive,
+  all-model candidate, planner, protected-hash, and diff evidence;
+- preserved workbook/generated/runtime/dealer/media/deployment and durable
+  apply/rebuild boundaries and stopped before Checkpoint 3D.
 
 2026-08-23 Checkpoint 2 closure:
 

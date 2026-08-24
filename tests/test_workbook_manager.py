@@ -859,16 +859,17 @@ class TestPass1BrowserContainment(unittest.TestCase):
         self.assertIn("saveFn={saveDraft}", structure)
         self.assertNotIn('model_id: ""', structure)
 
-    def test_form_controls_follow_registry_field_kinds_and_keep_setup_copy(self):
+    def test_form_controls_follow_registry_controls_and_keep_setup_copy(self):
         record_form = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
                        "components" / "RecordForm.jsx").read_text()
         structure = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
                      "components" / "FormStructure.jsx").read_text()
-        self.assertIn('col.field_kind === "finite"', record_form)
-        self.assertIn('col.field_kind === "reference"', record_form)
-        self.assertIn("col.finite_values", record_form)
-        self.assertIn("blank / SQL NULL", record_form)
-        self.assertIn('col.name === "setup_description"', record_form)
+        self.assertIn("CONTROL_RENDERERS[control.kind]", record_form)
+        self.assertIn("Unsupported control kind", record_form)
+        self.assertIn("api.referenceOptions", record_form)
+        self.assertNotIn("field_kind", record_form)
+        self.assertNotIn("finite_values", record_form)
+        self.assertIn("Not specified / inherit", record_form)
         self.assertIn("Edit model metadata &amp; Vehicle Setup copy", structure)
 
     def test_checkpoint_one_shell_is_readiness_first_and_explorers_are_read_only(self):
