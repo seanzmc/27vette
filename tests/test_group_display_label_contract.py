@@ -275,6 +275,93 @@ class GroupDisplayLabelGeneratorTests(unittest.TestCase):
         self.assertEqual(matching[0].get("display_label"), "Required wheels")
 
 
+class GroupDisplayLabelReviewToolingTests(unittest.TestCase):
+    """§7.3 review tooling: accurate evidence, immutable evidence fields."""
+
+    @staticmethod
+    def _generator():
+        import importlib.util
+
+        path = ROOT / "workbook-manager" / "review" / "generate_group_display_label_review.py"
+        spec = importlib.util.spec_from_file_location("_gen_review", path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+
+    @staticmethod
+    def _syncer():
+        import importlib.util
+
+        path = ROOT / "workbook-manager" / "review" / "sync_group_display_label_review.py"
+        spec = importlib.util.spec_from_file_location("_sync_review", path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+
+    def test_hash_suffixed_group_reports_the_manager_section_fallback(self) -> None:
+        """The Manager renders `Exclusive group . <section>`, not the placeholder."""
+        gen = self._generator()
+        label = gen._exclusive_fallback_label(
+            "z06_excl_engine_covers_1623e1da9d59",
+            ["opt_a", "opt_b"],
+            {"opt_a": "sec_engi_001", "opt_b": "sec_engi_001"},
+            {"sec_engi_001": "Engine Appearance"},
+        )
+        self.assertEqual("Exclusive group \u00b7 Engine Appearance", label)
+        self.assertNotEqual(gen.PLACEHOLDER_FALLBACK, label)
+
+    def test_hash_suffixed_group_spanning_sections_keeps_the_placeholder(self) -> None:
+        gen = self._generator()
+        label = gen._exclusive_fallback_label(
+            "z06_excl_mixed_1623e1da9d59",
+            ["opt_a", "opt_b"],
+            {"opt_a": "sec_engi_001", "opt_b": "sec_whee_001"},
+            {"sec_engi_001": "Engine Appearance", "sec_whee_001": "Wheels"},
+        )
+        self.assertEqual(gen.PLACEHOLDER_FALLBACK, label)
+
+    def test_unhashed_group_still_uses_the_humanized_id(self) -> None:
+        gen = self._generator()
+        self.assertEqual(
+            "Excl Engine Covers",
+            gen._exclusive_fallback_label("excl_engine_covers", [], {}, {}),
+        )
+
+    def test_sync_rejects_edits_to_generated_evidence_fields(self) -> None:
+        sync = self._syncer()
+        record = {
+            "model_key": "z06", "group_type": "exclusive", "group_id": "g1",
+            "notes": "generated note", "active": True, "member_count": 3,
+        }
+        row = dict(
+            model_key="z06", group_type="exclusive", group_id="g1",
+            notes="hand edited", active="TRUE", member_count="3",
+        )
+        with self.assertRaises(ValueError) as caught:
+            sync.assert_evidence_unchanged(row, record)
+        self.assertIn("notes", str(caught.exception))
+
+    def test_sync_tolerates_spreadsheet_boolean_case(self) -> None:
+        """A spreadsheet rewrites `true` as `TRUE`; that is not an edit."""
+        sync = self._syncer()
+        record = {"model_key": "z06", "group_type": "exclusive", "group_id": "g1",
+                  "active": True}
+        row = {"model_key": "z06", "group_type": "exclusive", "group_id": "g1",
+               "active": "TRUE"}
+        sync.assert_evidence_unchanged(row, record)
+
+    def test_sync_allows_decision_field_edits(self) -> None:
+        sync = self._syncer()
+        record = {"model_key": "z06", "group_type": "exclusive", "group_id": "g1",
+                  "notes": "n", "proposed_display_label": "", "review_status": "pending",
+                  "reviewer_note": "", "audience": "customer", "customer_visible": True}
+        row = {"model_key": "z06", "group_type": "exclusive", "group_id": "g1",
+               "notes": "n", "proposed_display_label": "Engine Appearance",
+               "review_status": "approved", "reviewer_note": "ok",
+               "audience": "customer", "customer_visible": "FALSE"}
+        sync.assert_evidence_unchanged(row, record)
+
+
 class GroupDisplayLabelReviewArtifactTests(unittest.TestCase):
     def test_csv_and_json_are_exact_approved_decision_companions(self) -> None:
         csv_path = REVIEW_DIR / "group-display-label-review.csv"

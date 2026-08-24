@@ -55,6 +55,54 @@ def parse_bool(value: str) -> bool:
     raise ValueError(f"expected TRUE or FALSE, got {value!r}")
 
 
+def csv_text(value) -> str:
+    """Render a JSON record value exactly as the generator wrote it to CSV."""
+    if isinstance(value, bool):
+        return json.dumps(value, ensure_ascii=False)
+    if value is None:
+        return ""
+    return str(value)
+
+
+def assert_evidence_unchanged(row: dict, record: dict) -> None:
+    """Reject edits to any non-decision field.
+
+    Only the decision fields and `customer_visible` are copied into the JSON
+    companion, so an edit to an evidence column such as `active`,
+    `member_count`, `notes`, or `current_fallback_label` would otherwise be
+    written back to the CSV while the JSON kept the generated value, leaving
+    two artifacts that are no longer exact companions.
+    """
+    key = identity(row)
+    changed = []
+    for field, value in row.items():
+        if field in DECISION_FIELDS or field == "customer_visible":
+            continue
+        if field not in record:
+            continue
+        generated = record[field]
+        if isinstance(generated, bool):
+            # A spreadsheet round-trip rewrites `true` as `TRUE`; the artifact
+            # contract already reads booleans case-insensitively, so compare
+            # the value rather than the text.
+            try:
+                edited = parse_bool(value)
+            except ValueError:
+                changed.append(f"{field}: {generated!r} -> {value!r}")
+                continue
+            if edited != generated:
+                changed.append(f"{field}: {generated!r} -> {value!r}")
+            continue
+        if value != csv_text(generated):
+            changed.append(f"{field}: {generated!r} -> {value!r}")
+    if changed:
+        raise ValueError(
+            f"{key}: evidence fields are generated and must not be edited; "
+            "regenerate the review artifacts instead of hand-editing them "
+            f"({'; '.join(sorted(changed))})"
+        )
+
+
 def validate_decision(row: dict) -> None:
     key = identity(row)
     status = row["review_status"].strip().casefold()
@@ -96,9 +144,13 @@ def main() -> None:
         raise ValueError("review CSV identity set differs from the generated JSON inventory")
 
     source_sha = payload["source_workbook_sha256"]
+    schema_version = payload["artifact_schema_version"]
     for row in csv_rows:
         if row["source_workbook_sha256"] != source_sha:
             raise ValueError(f"{identity(row)}: source workbook binding changed")
+        if row["artifact_schema_version"] != schema_version:
+            raise ValueError(f"{identity(row)}: artifact schema version changed")
+        assert_evidence_unchanged(row, json_by_key[identity(row)])
         validate_decision(row)
 
     csv_rows.sort(key=stable_key)

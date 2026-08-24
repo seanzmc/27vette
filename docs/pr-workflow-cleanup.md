@@ -15,9 +15,9 @@ Owning specification for the Workbook Manager rows:
 | 2 | 40 | P2 — reference choices not scoped to the selected model | Real in part; stated cause wrong | **Done** — see below |
 | 3 | 40 | P2 — blank labels accepted on active exclusive groups | Real | **Done** — see below |
 | 4 | 39 | P2 — blank labels (duplicate of #3) | Duplicate | **Closed by #3** |
-| 5 | 39 | P2 — sync rewrites CSV but not JSON for non-decision fields | Real, low | Open |
-| 6 | 39 | P2 — review artifact records a placeholder fallback label | Real, evidence quality | Open |
-| 7 | 38 | P2 — AGENTS.md omits planner-triggered full runs | Real, doc accuracy | Open |
+| 5 | 39 | P2 — sync rewrites CSV but not JSON for non-decision fields | Real, low | **Done** — see below |
+| 6 | 39 | P2 — review artifact records a placeholder fallback label | Real in code; artifact left as-is | **Done** — see below |
+| 7 | 38 | P2 — AGENTS.md omits planner-triggered full runs | Real, doc accuracy | **Done** — commit `13acd7f` |
 
 ### Finding 2 — corrections to the report
 
@@ -70,6 +70,34 @@ removing a row must not require filling in its copy first.
 
 The canonical workbook already has labels on all 220 group rows across every
 sheet, so the schema gate stays clean.
+
+### Findings 5 and 6 — review tooling
+
+Both fixed in `workbook-manager/review/`. Note these live on the cp2 branch's
+files but were committed on cp3 (PR 40), which is stacked on top of cp2 and
+contains it. If PR 39 is merged and PR 40 abandoned, these fixes go with it.
+
+**Finding 5.** `sync_group_display_label_review.py` copied only the four
+decision fields plus `customer_visible`, so an edit to an evidence column was
+written back to the CSV while the JSON kept the generated value. Sync now
+rejects any change to a non-decision field and tells the operator to
+regenerate instead. Booleans compare by value, not text: a spreadsheet
+round-trip rewrites `true` as `TRUE`, and the artifact contract already reads
+them case-insensitively. Verified idempotent against the committed artifacts,
+and verified to reject a tampered `notes` value.
+
+**Finding 6.** `current_fallback_label` recorded
+`Label pending workbook review` for all 15 hash-suffixed exclusive groups,
+where the Manager's `_exclusive_group_label` would render
+`Exclusive group · <section_name>`. The generator mirrored only
+`_group_fallback`. It now mirrors the full pre-label path.
+
+The committed artifacts are deliberately **not** regenerated. All 224
+decisions are already `approved` and their labels are migrated into the
+canonical workbook, so these files are the historical record of a completed
+review — the generator's own guard exists to protect exactly that. Rewriting
+`current_fallback_label` now would misstate what reviewers actually saw when
+they decided. The code fix applies to any future inventory.
 
 ## Branch cleanup
 
