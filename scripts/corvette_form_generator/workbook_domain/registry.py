@@ -579,6 +579,49 @@ READONLY_SHEET_META: dict[str, dict] = {
 }
 
 
+def _readonly_controls_for(family: str) -> dict[str, dict]:
+    """Control metadata for a projected read-only family.
+
+    Read-only families have no editor controls, but §10.2 still requires every
+    exposed column to carry deliberate control metadata rather than falling
+    through to an implicit text input. ``read_only`` is the §10.1 kind for a
+    field the Manager projects and renders but never writes.
+    """
+    meta = READONLY_SHEET_META[family]
+    keys = meta["key"]
+    return {
+        column: {
+            "kind": "read_only",
+            "label": humanize(column),
+            "group": meta.get("label") or humanize(family),
+            "order": order,
+            "blank": "never_blank_key" if column in keys else "allowed",
+            "help": "Workbook-owned value; not editable in the Manager.",
+            "affects": (family,),
+        }
+        for order, column in enumerate(meta["columns"], start=1)
+    }
+
+
+for _readonly_family in READONLY_SHEET_META:
+    READONLY_SHEET_META[_readonly_family]["controls"] = _readonly_controls_for(
+        _readonly_family
+    )
+
+
+def controls_for_family(family: str) -> dict[str, dict]:
+    """Control metadata for any projected family, writable or read-only.
+
+    Single lookup for consumers that project both kinds of family, so a
+    read-only spec cannot be silently graded against the writable inventory.
+    """
+    if family in EDITOR_SHEET_META:
+        return EDITOR_SHEET_META[family]["controls"]
+    if family in READONLY_SHEET_META:
+        return READONLY_SHEET_META[family]["controls"]
+    raise KeyError(f"Unknown workbook family: {family}")
+
+
 def family_spec(name: str) -> dict:
     try:
         return EDITOR_SHEET_META[name]

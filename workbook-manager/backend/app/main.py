@@ -748,6 +748,18 @@ class SchemaIntegrityError(RuntimeError):
     contradictory field metadata (spec §10.2 fail-closed requirements)."""
 
 
+def _family_controls(spec) -> dict:
+    """Registry-owned control metadata for a spec's family.
+
+    Writable specs resolve through ``editor_family``; read-only projections
+    such as ``form_sections`` carry no editor family and resolve through
+    ``family``. The registry owns both inventories (AGENTS.md §3).
+    """
+    from corvette_form_generator.workbook_domain import registry
+
+    return registry.controls_for_family(spec.editor_family or spec.family)
+
+
 def _validate_control_integrity(spec) -> None:
     """Fail closed before any column is exposed (§10.2).
 
@@ -759,9 +771,25 @@ def _validate_control_integrity(spec) -> None:
     """
     from corvette_form_generator.workbook_domain import registry
 
-    family_controls = registry.EDITOR_SHEET_META.get(
-        spec.editor_family, {}
-    ).get("controls", {})
+    family_controls = _family_controls(spec)
+    if not spec.editable:
+        # Read-only projections carry no writable controls; grading them
+        # against the writable inventory would fail closed on every column
+        # (§10.2 applies to writable fields). Still fail closed on a column
+        # with no deliberate read-only control at all.
+        for c in spec.columns:
+            control = family_controls.get(c.header)
+            if control is None:
+                raise SchemaIntegrityError(
+                    f"{spec.table}.{c.sql_name()}: read-only field has no "
+                    "control metadata"
+                )
+            if control.get("kind") != "read_only":
+                raise SchemaIntegrityError(
+                    f"{spec.table}.{c.header}: read-only field has control "
+                    f"kind {control.get('kind')!r}"
+                )
+        return
     for c in spec.columns:
         header = c.header
         control = family_controls.get(header)
@@ -953,7 +981,7 @@ def _schema_dict(conn, spec, model_key: str | None) -> dict:
     _validate_control_integrity(spec)
     from corvette_form_generator.workbook_domain import registry as _registry
 
-    family_controls = _registry.EDITOR_SHEET_META[spec.editor_family]["controls"]
+    family_controls = _family_controls(spec)
     for c in spec.columns:
         ref = ref_by_col.get(c.sql_name())
         reference = None

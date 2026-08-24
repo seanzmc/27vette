@@ -292,9 +292,19 @@ class TestSchemaResponseContract(unittest.TestCase):
         self.assertEqual("money", serialized_by_name["price"]["control"]["kind"])
 
     def test_every_projected_family_passes_fail_closed_integrity(self):
+        """Every projected spec, not only the writable ones.
+
+        ``TABLE_SPECS`` includes the read-only projections that ``/api/tables``
+        renders. Grading only ``WRITABLE_SPECS`` here let a read-only spec
+        reach ``_schema_dict`` untested and 500 the whole endpoint.
+        """
         from app import catalog
 
-        for spec in catalog.WRITABLE_SPECS:
+        self.assertTrue(
+            [spec for spec in catalog.TABLE_SPECS if not spec.editable],
+            "TABLE_SPECS must include the read-only projections",
+        )
+        for spec in catalog.TABLE_SPECS:
             with self.subTest(table=spec.table):
                 with mock.patch.object(
                     __import__("app.staging", fromlist=["target_sheet_for"]),
@@ -302,8 +312,58 @@ class TestSchemaResponseContract(unittest.TestCase):
                     return_value=None,
                 ):
                     schema = self.mainmod._schema_dict(self.conn, spec, None)
+                self.assertEqual(spec.editable, schema["editable"], spec.table)
                 for column in schema["columns"]:
                     self.assertIn("control", column, spec.table)
+
+    def test_read_only_projection_exposes_read_only_controls(self):
+        schema = self._schema("form_sections")
+        self.assertFalse(schema["editable"])
+        self.assertTrue(schema["columns"])
+        for column in schema["columns"]:
+            self.assertEqual(
+                "read_only", column["control"]["kind"], column["name"]
+            )
+        from app.schemas import TableSchemaOut
+
+        # The response model requires `control` on every column, so a
+        # read-only projection must serialize as well as a writable one.
+        serialized = TableSchemaOut(**schema).model_dump()
+        self.assertFalse(serialized["editable"])
+
+    def test_read_only_control_metadata_gap_fails_closed(self):
+        """Fail-closed still applies to read-only families (§10.2)."""
+        controls = dict(registry.READONLY_SHEET_META["sections"]["controls"])
+        del controls["section_id"]
+        with mock.patch.dict(
+            registry.READONLY_SHEET_META["sections"], {"controls": controls}
+        ), mock.patch.object(
+            __import__("app.staging", fromlist=["target_sheet_for"]),
+            "target_sheet_for",
+            return_value=None,
+        ):
+            with self.assertRaises(self.mainmod.SchemaIntegrityError) as caught:
+                self._schema("form_sections")
+        self.assertIn("form_sections.section_id", str(caught.exception))
+
+    def test_read_only_family_with_writable_control_kind_fails_closed(self):
+        controls = {
+            column: dict(control)
+            for column, control in
+            registry.READONLY_SHEET_META["sections"]["controls"].items()
+        }
+        controls["section_name"] = dict(
+            controls["section_name"], kind="short_text"
+        )
+        with mock.patch.dict(
+            registry.READONLY_SHEET_META["sections"], {"controls": controls}
+        ), mock.patch.object(
+            __import__("app.staging", fromlist=["target_sheet_for"]),
+            "target_sheet_for",
+            return_value=None,
+        ):
+            with self.assertRaises(self.mainmod.SchemaIntegrityError):
+                self._schema("form_sections")
 
     def test_missing_control_metadata_fails_closed(self):
         controls = dict(registry.FIELD_CONTROLS["options"])

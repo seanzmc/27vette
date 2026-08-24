@@ -624,6 +624,39 @@ class TestLifespanAndRequestConnections(unittest.TestCase):
                 )
                 self.assertEqual(client.get("/api/status").status_code, 200)
 
+    def test_structure_schema_endpoint_serves_read_only_projections(self):
+        """`/api/tables` renders every STRUCTURE_TABLE, writable or not.
+
+        `form_sections` is a read-only projection with no editor family; when
+        its columns were graded against the writable control inventory the
+        whole endpoint returned 500.
+        """
+        from fastapi.testclient import TestClient
+
+        with manager_app(self.root) as main:
+            with TestClient(main.app) as client:
+                response = client.get("/api/tables")
+                self.assertEqual(200, response.status_code, response.text)
+                tables = {
+                    t["table"]: t
+                    for t in response.json()["structure_tables"]
+                }
+                self.assertEqual(
+                    set(main.STRUCTURE_TABLES), set(tables),
+                    "every structure table must be rendered",
+                )
+                sections = tables["form_sections"]
+                self.assertFalse(sections["editable"])
+                self.assertTrue(sections["columns"])
+                for column in sections["columns"]:
+                    self.assertEqual(
+                        "read_only", column["control"]["kind"], column["name"]
+                    )
+
+                schema = client.get("/api/records/form_sections/schema")
+                self.assertEqual(200, schema.status_code, schema.text)
+                self.assertFalse(schema.json()["editable"])
+
     def test_each_request_opens_and_closes_its_own_connections(self):
         from fastapi.testclient import TestClient
 

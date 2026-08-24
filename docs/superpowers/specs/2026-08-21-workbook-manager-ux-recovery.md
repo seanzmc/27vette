@@ -1070,7 +1070,14 @@ routing and presentation facts but not override allowed values.
 - a reference target/scope cannot be resolved;
 - blank/required behavior disagrees with registry validation;
 - a key is editable during update;
-- a generated/read-only field is included in a mutation payload.
+- a generated/read-only field is included in a mutation payload;
+- a projected read-only family exposes a column with no control metadata, or
+  with a control kind other than `read_only`.
+
+Read-only projections (`form_sections`) are graded against the read-only
+contract above, never against the writable inventory. Exempting them from
+validation entirely would let a projected column ship with no control metadata
+at all, which is the failure this section exists to prevent.
 
 The schema response exposes normalized metadata and a schema version. React has
 one renderer map keyed by `kind`; it has no generic fallback to `<input
@@ -1685,6 +1692,21 @@ accessibility/browser, protected-boundary, and full-suite gates pass.
   generated contracts, published registry, customer runtime, dealer, media,
   deployment, dependency, durable draft, and apply/rebuild behavior remain
   unchanged.
+
+**Checkpoint 3A/3B defect correction (2026-08-23):** the evidence above
+covered only the writable inventory. The read-only `form_sections` projection
+carries no `editor_family`, so `_schema_dict()` graded its columns against an
+empty writable control set and raised `SchemaIntegrityError` on the first
+column, returning 500 from `GET /api/tables` (all structure tables) and
+`GET /api/records/form_sections/schema`. The fail-closed owner did not catch it
+because its matrix iterated `catalog.WRITABLE_SPECS` rather than
+`catalog.TABLE_SPECS`. Corrected by giving read-only families registry-owned
+`read_only` control metadata, resolving controls through
+`registry.controls_for_family()`, and validating read-only specs against the
+read-only contract in §10.2. The matrix now iterates every projected spec and
+asserts the read-only projections are present in it. Route-level coverage
+asserts `GET /api/tables` returns 200 with `read_only` controls on
+`form_sections`.
 
 Mandatory stop: this evidence closes only subpasses 3A and 3B. Subpasses 3C–3F
 remain unimplemented and require explicit sequential authorization; no editor
