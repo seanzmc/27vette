@@ -1078,9 +1078,34 @@ def validate_group_display_labels(wb, source_graph: dict[str, dict[str, str]], i
         headers = header_index(wb[sheet_name])
         if "display_label" not in headers or "group_id" not in headers:
             continue
+        family = label_sheets[sheet_name]
         for row_number, row in records(wb[sheet_name]):
             value = row.get("display_label")
             if value is None or str(value).strip() == "":
+                # Blank means "label pending". Once the column exists the
+                # Checkpoint 2 migration is complete for this sheet, so §7.1
+                # requires an approved label on every active customer-rendered
+                # exclusive group. Rule-group labels stay Manager-facing and
+                # may remain blank; inactive rows are not customer-rendered.
+                active = "active" not in headers or workbook_truthy(
+                    row.get("active")
+                )
+                if family == "exclusive_groups" and active:
+                    add_issue(
+                        issues,
+                        "error",
+                        "group_display_label_missing",
+                        sheet=sheet_name,
+                        row=row_number,
+                        column="display_label",
+                        value="",
+                        message=(
+                            f"{sheet_name}.display_label is blank on active "
+                            f"exclusive group "
+                            f"{clean_text(row.get('group_id'))!r}; §7.1 "
+                            "requires an approved customer-facing label"
+                        ),
+                    )
                 continue
             raw = str(value)
             group_id = clean_text(row.get("group_id"))

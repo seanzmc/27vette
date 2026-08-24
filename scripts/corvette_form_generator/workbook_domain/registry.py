@@ -329,6 +329,19 @@ OPTIONAL_COLUMNS: dict[str, tuple[str, ...]] = {
     "context_section_master_meta": ("section_display_order",),
 }
 
+# Columns required only once a row is effectively active, beyond the generic
+# derivation above. Spec §7.1 (Checkpoint 2): an active customer-rendered
+# exclusive group must carry an approved nonblank `display_label`. These stay
+# in `optional_columns`, so blank remains meaningful ("label pending") on an
+# inactive row and the §10.2 blank-semantics invariant is unchanged.
+#
+# `rule_groups` is deliberately absent: §7.1 keeps rule-group labels
+# Manager-facing unless a separate runtime contract makes them customer-visible.
+ACTIVE_ROW_REQUIRED_COLUMNS: dict[str, tuple[str, ...]] = {
+    "exclusive_groups": ("display_label",),
+}
+
+
 for _family, _meta in EDITOR_SHEET_META.items():
     _columns = WRITABLE_COLUMNS[_family]
     _explicit_optional = set(OPTIONAL_COLUMNS.get(_family, ()))
@@ -349,7 +362,11 @@ for _family, _meta in EDITOR_SHEET_META.items():
     _meta["columns"] = _columns
     _meta["optional_columns"] = _optional
     _meta["required_on_add"] = _required
-    _meta["required_on_effective_active_row"] = _required
+    _meta["required_on_effective_active_row"] = tuple(
+        column for column in _columns
+        if column in _required_set
+        or column in ACTIVE_ROW_REQUIRED_COLUMNS.get(_family, ())
+    )
 
 # ── Checkpoint 3B field-control metadata (spec §10.1) ─────────────────
 #

@@ -1075,8 +1075,42 @@ def _label_sql(columns: tuple[str, ...]) -> str:
     return "TRIM(" + " || ' ' || ".join(parts) + ")"
 
 
-def _reference_target_select(target: str, scope: str,
-                             model: str) -> tuple[str, list[str]]:
+# Targets whose rows can be partitioned by model. Narrowing applies whenever the
+# caller supplies a model, independent of the RefSpec's declared scope: a
+# `global` write contract still must not offer another model's rows in a picker.
+# Each entry was measured against the canonical projection and still offers
+# every value the real data stores, so narrowing never hides a row's current
+# value from the editor.
+#
+# `form_sections` is deliberately absent. Its projected `model_context` is empty
+# for all 48 rows (the read-only section spec carries no `source_role`, so the
+# importer records no context), so the json_each filter matches zero sections
+# for every model. Narrowing section pickers would empty them. That is a
+# projection/contract gap, not a query fix.
+#
+# Narrowing a `global` ref also requires the SOURCE row to have a model
+# identity. `color_overrides` has neither `model_id` nor `model_key`, so its
+# rows are not owned by a model; restricting its interior choice to one model
+# would block legitimate shared authoring even though the target is
+# partitionable.
+def _model_partition_sql(table: str, target_spec) -> str | None:
+    if target_spec is not None and target_spec.model_scoped:
+        return '"model_id"=?'
+    if target_spec is not None and target_spec.has_model_key_column:
+        return '"model_key"=?'
+    if table == "interiors":
+        return ('"src_sheet" IN (SELECT "sheet_name" FROM "sheet_registry" '
+                'WHERE "model_key"=? AND '
+                "\"source_role\"='interior_source_sheet')")
+    if table == "variants":
+        return ('"variant_id" IN (SELECT "variant_id" FROM "model_variants" '
+                'WHERE "model_key"=?)')
+    return None
+
+
+def _reference_target_select(target: str, scope: str, model: str,
+                             source_model_owned: bool
+                             ) -> tuple[str, list[str]]:
     presentation = _reference_presentation(target)
     table = str(presentation.get("table") or target)
     value = str(presentation["value"])
@@ -1086,31 +1120,27 @@ def _reference_target_select(target: str, scope: str,
     params: list[str] = []
     target_spec = SPEC_BY_TABLE.get(table)
 
+    narrowing = _model_partition_sql(table, target_spec)
     if scope in ("model", "model_union"):
         if not model:
             raise HTTPException(422, detail={
                 "status": "reference_model_required",
                 "message": "this reference field requires a selected model",
             })
-        if target_spec and target_spec.model_scoped:
-            where.append('"model_id"=?')
-            params.append(model)
-        elif target_spec and target_spec.has_model_key_column:
-            where.append('"model_key"=?')
-            params.append(model)
-        elif table == "interiors":
-            where.append(
-                '"src_sheet" IN (SELECT "sheet_name" FROM "sheet_registry" '
-                "WHERE \"model_key\"=? AND "
-                '"source_role"=\'interior_source_sheet\')'
-            )
-            params.append(model)
-        elif table == "form_sections":
-            where.append(
+        if table == "form_sections":
+            # Only reachable for a declared model-scoped ref into sections;
+            # left exactly as before rather than widened to `global` refs.
+            narrowing = (
                 "EXISTS (SELECT 1 FROM json_each(COALESCE(\"model_context\", '[]')) "
                 "WHERE json_each.value=?)"
             )
-            params.append(model)
+    elif not source_model_owned:
+        # Global ref on a row that is not owned by a model: the supplied model
+        # is context for the browsing session, not a constraint on the value.
+        narrowing = None
+    if model and narrowing:
+        where.append(narrowing)
+        params.append(model)
 
     label = _label_sql(labels)
     active = (
@@ -1145,7 +1175,10 @@ def _reference_options(conn, spec, field: str, model: str, query: str,
 
     selects, base_params = [], []
     for target in targets:
-        sql, params = _reference_target_select(target, scope, model)
+        sql, params = _reference_target_select(
+            target, scope, model,
+            bool(spec.model_scoped or spec.has_model_key_column),
+        )
         selects.append(sql)
         base_params.extend(params)
     raw = " UNION ALL ".join(selects)

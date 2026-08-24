@@ -97,6 +97,28 @@ class GroupDisplayLabelRegistryTests(unittest.TestCase):
             self.assertIn("display_label", meta["optional_columns"], family)
             self.assertNotIn("display_label", meta["required_on_add"], family)
 
+    def test_active_exclusive_group_requires_a_label_on_the_write_path(self) -> None:
+        """§7.1: the editor cannot clear the label of an active group.
+
+        `display_label` stays optional overall -- blank means "label pending"
+        on an inactive row -- so the requirement is carried by
+        `required_on_effective_active_row`, which `editor_ops` unions in when
+        the effective row is active.
+        """
+        self.assertIn(
+            "display_label",
+            registry.EDITOR_SHEET_META["exclusive_groups"][
+                "required_on_effective_active_row"
+            ],
+        )
+        self.assertNotIn(
+            "display_label",
+            registry.EDITOR_SHEET_META["rule_groups"][
+                "required_on_effective_active_row"
+            ],
+            "rule-group labels stay Manager-facing per §7.1",
+        )
+
 
 class GroupDisplayLabelSchemaValidationTests(unittest.TestCase):
     """§7.2 label rules enforced by validate_group_display_labels()."""
@@ -111,6 +133,54 @@ class GroupDisplayLabelSchemaValidationTests(unittest.TestCase):
         self.assertFalse(
             [i for i in issues if i.severity == "error"],
             [(i.check_id, i.message) for i in issues if i.severity == "error"],
+        )
+
+    def test_blank_label_on_active_exclusive_group_is_rejected(self) -> None:
+        """The migration is complete, so blank is no longer a free pass.
+
+        Pre-migration sheets are distinguished by the column being absent,
+        not by the value being blank.
+        """
+        wb = _minimal_group_workbook()
+        headers = [c.value for c in wb["z06_rule_groups"][1]]
+        wb["z06_rule_groups"].cell(
+            row=wb["z06_rule_groups"].max_row,
+            column=headers.index("display_label") + 1,
+        ).value = "Required wheels"
+        issues = _validate(wb)
+        missing = [i for i in issues if i.check_id == "group_display_label_missing"]
+        self.assertEqual(1, len(missing), [(i.check_id, i.message) for i in issues])
+        self.assertEqual("z06_exclusive_groups", missing[0].sheet)
+        self.assertEqual("error", missing[0].severity)
+
+    def test_blank_label_on_inactive_exclusive_group_is_allowed(self) -> None:
+        wb = _minimal_group_workbook()
+        sheet = "z06_exclusive_groups"
+        headers = [c.value for c in wb[sheet][1]]
+        wb[sheet].cell(
+            row=wb[sheet].max_row, column=headers.index("active") + 1
+        ).value = False
+        rg_headers = [c.value for c in wb["z06_rule_groups"][1]]
+        wb["z06_rule_groups"].cell(
+            row=wb["z06_rule_groups"].max_row,
+            column=rg_headers.index("display_label") + 1,
+        ).value = "Required wheels"
+        issues = _validate(wb)
+        self.assertEqual(
+            [], [i for i in issues if i.check_id == "group_display_label_missing"]
+        )
+
+    def test_blank_label_on_active_rule_group_is_allowed(self) -> None:
+        """Rule-group labels are Manager-facing per §7.1, not customer copy."""
+        wb = _minimal_group_workbook()
+        sheet = "z06_exclusive_groups"
+        headers = [c.value for c in wb[sheet][1]]
+        wb[sheet].cell(
+            row=wb[sheet].max_row, column=headers.index("display_label") + 1
+        ).value = "Wheel selection"
+        issues = _validate(wb)
+        self.assertEqual(
+            [], [i for i in issues if i.check_id == "group_display_label_missing"]
         )
 
     def test_display_label_must_not_equal_placeholder(self) -> None:

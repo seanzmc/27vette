@@ -1708,6 +1708,38 @@ asserts the read-only projections are present in it. Route-level coverage
 asserts `GET /api/tables` returns 200 with `read_only` controls on
 `form_sections`.
 
+**Checkpoint 3A/3B review-finding corrections (2026-08-24):** two further
+Codex findings on the delivery PR were implemented inside the closed slice.
+
+- *Reference scoping.* A `global` RefSpec applied no model filter, so pickers
+  offered other models' rows (`option_availability.variant_id` offered all 32
+  variants where 6 are valid). Narrowing now derives from model topology rather
+  than the declared scope, and applies only when a model is supplied, so no
+  field newly requires one. It is gated on the source row having a model
+  identity: `option_availability.variant_id`, `variant_option_overrides.
+  variant_id`, `model_interior_scope.interior_id`, and
+  `interior_components.interior_id` narrow; `color_overrides.interior_id` does
+  not, because that table has no model column. All four narrowed references
+  measured zero cross-model rows in the canonical projection, so no stored
+  value became unselectable. The finding's stated cause — that the write path
+  rejects these values — was incorrect: `_ref_exists()` checks existence only
+  for `global` refs, so API and writer already agreed.
+- *Section references are deliberately excluded.* The projected
+  `form_sections.model_context` is empty for all 48 rows, so the existing
+  json_each filter matches zero sections for every model; enabling it would
+  empty the section picker. Recorded here as an open projection/contract gap.
+- *Blank group labels.* §7.1 requires an approved label on active
+  customer-rendered exclusive groups, but blank exited validation unchecked and
+  the registry marked the field optional, so an editor operation could clear
+  it. `schema_validation` now raises `group_display_label_missing` for a blank
+  label on an active `exclusive_groups` row, and
+  `registry.ACTIVE_ROW_REQUIRED_COLUMNS` adds `display_label` to
+  `required_on_effective_active_row` for that family only — rule-group labels
+  stay Manager-facing per §7.1. The requirement applies only once the sheet
+  carries the column, and never on a delete. The canonical workbook validates
+  clean; `display_label` remains in `optional_columns`, so the §10.2
+  blank-semantics invariant is unchanged.
+
 Mandatory stop: this evidence closes only subpasses 3A and 3B. Subpasses 3C–3F
 remain unimplemented and require explicit sequential authorization; no editor
 shell or contextual option/group mutation UI was started.

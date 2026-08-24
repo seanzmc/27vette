@@ -524,7 +524,29 @@ class TestBoundedReferenceOptions(unittest.TestCase):
             CREATE TABLE sheet_registry (
               model_key TEXT, source_role TEXT, sheet_name TEXT
             );
+            CREATE TABLE variants (
+              variant_id TEXT, variant_name TEXT, active TEXT
+            );
+            CREATE TABLE model_variants (
+              model_key TEXT, variant_id TEXT
+            );
             """
+        )
+        self.conn.executemany(
+            "INSERT INTO variants VALUES(?,?,?)",
+            [
+                ("var_1lt", "1LT", "True"),
+                ("var_2lt", "2LT", "True"),
+                ("var_1lz", "1LZ", "True"),
+            ],
+        )
+        self.conn.executemany(
+            "INSERT INTO model_variants VALUES(?,?)",
+            [
+                ("stingray", "var_1lt"),
+                ("stingray", "var_2lt"),
+                ("z06", "var_1lz"),
+            ],
         )
         self.conn.executemany(
             "INSERT INTO options VALUES(?,?,?,?,?)",
@@ -642,6 +664,80 @@ class TestBoundedReferenceOptions(unittest.TestCase):
         with self.assertRaises(HTTPException) as caught:
             self._options("rule_mappings", "source_id")
         self.assertEqual(422, caught.exception.status_code)
+
+    def test_global_variant_reference_is_narrowed_to_the_model(self):
+        """A `global` RefSpec must still not offer another model's variants.
+
+        `option_availability.variant_id` is declared `global`, so nothing
+        filtered it and the picker offered every row of `variant_master`.
+        """
+        scoped = self._options(
+            "option_availability", "variant_id", model="stingray"
+        )
+        self.assertEqual(
+            ["var_1lt", "var_2lt"],
+            sorted(o["value"] for o in scoped["options"]),
+        )
+        self.assertEqual(2, scoped["total"])
+
+        other = self._options("option_availability", "variant_id", model="z06")
+        self.assertEqual(
+            ["var_1lz"], [o["value"] for o in other["options"]]
+        )
+
+    def test_global_reference_stays_unfiltered_without_a_model(self):
+        """Narrowing must not newly require a model on a `global` field."""
+        every = self._options("option_availability", "variant_id")
+        self.assertEqual(3, every["total"])
+
+    def test_global_interior_reference_is_narrowed_for_model_owned_rows(self):
+        scoped = self._options(
+            "model_interior_scope", "interior_id", model="z06"
+        )
+        self.assertEqual(
+            ["int_z06"], [o["value"] for o in scoped["options"]]
+        )
+
+    def test_global_reference_from_unowned_row_is_not_narrowed(self):
+        """`color_overrides` rows have no model identity.
+
+        Restricting their interior choice to one model would block legitimate
+        shared authoring, so a supplied model is browsing context only.
+        """
+        from app import catalog
+
+        spec = catalog.SPEC_BY_TABLE["color_overrides"]
+        self.assertFalse(spec.model_scoped)
+        self.assertFalse(spec.has_model_key_column)
+        scoped = self._options(
+            "color_overrides", "interior_id", model="stingray"
+        )
+        self.assertEqual(
+            ["int_black", "int_z06"],
+            sorted(o["value"] for o in scoped["options"]),
+        )
+
+    def test_section_reference_is_not_narrowed_by_model(self):
+        """Sections stay unfiltered for `global` refs.
+
+        Projected `model_context` is empty for every section, so narrowing
+        here would empty the picker rather than scope it. Deliberate: see
+        `_model_partition_sql`.
+        """
+        self.conn.execute("UPDATE form_sections SET model_context='[]'")
+        scoped = self._options("options", "section_id", model="stingray")
+        self.assertEqual(2, scoped["total"])
+
+    def test_narrowed_reference_still_uses_exactly_two_queries(self):
+        statements = []
+        self.conn.set_trace_callback(statements.append)
+        try:
+            self._options(
+                "option_availability", "variant_id", model="stingray"
+            )
+        finally:
+            self.conn.set_trace_callback(None)
+        self.assertEqual(2, len(statements), statements)
 
     def test_http_route_is_additive_and_enforces_limit_bound(self):
         from fastapi.testclient import TestClient
