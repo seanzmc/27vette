@@ -24,10 +24,19 @@ CANDIDATE_SHARDS = (
     "full-python-candidate-drift-and-fast",
 )
 MANAGER_MAIN_TEST = "tests/test_workbook_manager.py"
+_OVERLAY = "test_export_overlays_registry_owned_projection_fields"
+# Union is every test in the Manager main owner; the five are mutually
+# exclusive. tests/test_run_layered_validation.py proves both by collection.
 MANAGER_MAIN_PARTITIONS = {
     "manager-api-assets": "TestApi and asset",
     "manager-api-core": "TestApi and not asset",
-    "manager-non-api": "not TestApi",
+    "manager-non-api-core": (
+        "not TestApi and not TestSyncBatch and not TestComparisonExport"
+    ),
+    "manager-non-api-sync-and-export": (
+        f"(TestSyncBatch or TestComparisonExport) and not {_OVERLAY}"
+    ),
+    "manager-non-api-export-overlay": _OVERLAY,
 }
 
 

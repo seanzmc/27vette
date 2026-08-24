@@ -45,6 +45,31 @@ MANAGER_EXPLORER_NODES = (
 )
 MANAGER_BROWSER_NODE = "tests/test_workbook_manager.py::TestPass1BrowserContainment"
 
+# Measured decomposition of the non-API owner (local, 2026-08-24): a 71.01s
+# verified-fixture build every shard pays, a 67.91s unchanged comparison export
+# that only the acceptance test reads, and a 211.88s changed-overlay export in
+# one test. Run unsplit it measures 372.77s locally, roughly 810-890s in CI
+# against a 900s job timeout, so these partitions apply to every plan rather
+# than only to the full inventory. They must stay disjoint and exhaustive.
+MANAGER_OVERLAY_NODE = "test_export_overlays_registry_owned_projection_fields"
+MANAGER_NON_API_PARTITIONS = (
+    (
+        "manager-non-api-core",
+        "not TestApi and not TestSyncBatch and not TestComparisonExport",
+        "Run non-API Manager tests outside the measured sync/export owners.",
+    ),
+    (
+        "manager-non-api-sync-and-export",
+        "(TestSyncBatch or TestComparisonExport) and not " + MANAGER_OVERLAY_NODE,
+        "Run the sync and comparison-export owners without the overlay proof.",
+    ),
+    (
+        "manager-non-api-export-overlay",
+        MANAGER_OVERLAY_NODE,
+        "Run the measured changed-overlay export proof on its own.",
+    ),
+)
+
 # These two lists are the complete 17-test candidate-verifier inventory. The
 # first shard owns canonical + declared-drift fixtures; the second owns the
 # undeclared-drift fixture and fast/early-failure contracts.
@@ -279,12 +304,15 @@ def _manager_api_core_shard() -> dict[str, object]:
     )
 
 
-def _manager_non_api_shard() -> dict[str, object]:
-    return _shard(
-        "manager-non-api",
-        _pytest_command(MANAGER_MAIN_TEST, expression="not TestApi"),
-        node=True,
-        description="Run the non-API half of the large Manager regression owner.",
+def _manager_non_api_shards() -> tuple[dict[str, object], ...]:
+    return tuple(
+        _shard(
+            name,
+            _pytest_command(MANAGER_MAIN_TEST, expression=expression),
+            node=True,
+            description=description,
+        )
+        for name, expression, description in MANAGER_NON_API_PARTITIONS
     )
 
 
@@ -294,7 +322,7 @@ def _manager_main_shards() -> tuple[dict[str, object], ...]:
     return (
         _manager_api_assets_shard(),
         _manager_api_core_shard(),
-        _manager_non_api_shard(),
+        *_manager_non_api_shards(),
     )
 
 

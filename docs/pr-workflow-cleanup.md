@@ -214,3 +214,81 @@ Not changed, and still open if you want them: the shard balance is lopsided
 `manager-non-api-sync-and-export` at 584 s sits close enough to the 900 s
 timeout that one slow test would time out rather than fail. Rebalancing needs
 per-test `--durations` profiling first.
+
+## Shard rebalancing — 2026-08-24
+
+Profiling replaced the audit's guess. Per-shard totals came from PR #43's green
+run; per-test durations were measured locally, where the whole suite runs about
+2.3x faster than CI but the proportions hold.
+
+### The unit costs
+
+```
+verified fixture build (first call in a process) :  71.01s
+verified fixture (cached)                        :   0.00s
+clone_combined_projection                        :   0.03s
+unchanged_export_result (first)                  :  67.91s
+workbook 0.6 MB   projection 6.0 MB
+```
+
+Every shard pays the 71s fixture build once. The 830s sync/export shard was
+71s fixture + 68s unchanged export + 212s changed-overlay export + ~5s for the
+other eight tests.
+
+### Rebalancing by itself returns nothing
+
+Any shard containing `test_export_overlays_registry_owned_projection_fields`
+had to pay 71 + 68 + 212 = 351s, which is 99% of the 356s the whole shard cost.
+`manager-api-core` is the same shape: 71s fixture + 213s for
+`test_zz_apply_rebuild_copied_workbook_mixed_draft_and_replay` equals its full
+284s. Partitioning `-k` expressions cannot help when one test is the shard.
+
+### A latent timeout, found while measuring
+
+The split only ran on full plans, so narrow plans used the monolithic
+`manager-non-api` owner. It measures **372.77s locally, roughly 810-890s in CI
+against a 900s job timeout** — ordinary pull requests were running within
+seconds of a hard timeout, which reads as infrastructure flake rather than a
+test failure. The partitions now apply to every plan.
+
+### What was changed
+
+`TestComparisonExport.setUpClass` built the 68s unchanged export eagerly, but
+only `test_acceptance_export_is_disposable_and_preserves_unchanged_workbook`
+reads it. It is now a lazy property, still process-cached, so a shard that does
+not run the acceptance test no longer pays for an export it never opens. The
+overlay proof then moved into its own partition.
+
+| | before | after |
+|---|---|---|
+| `manager-non-api` unsplit (narrow plans) | 372.77s | n/a — partitioned |
+| `manager-non-api-sync-and-export` | 356s | 154.16s |
+| `manager-non-api-export-overlay` | — | 311.63s |
+| local critical path for the owner | 372.77s | 311.63s |
+
+Roughly 850s to 730s in CI; timeout headroom moves from about 95% to about 80%.
+The five Manager partitions are proven disjoint and exhaustive by collection
+(70 tests, 70 owned, 0 duplicated) in
+`tests/test_run_layered_validation.py::test_manager_main_partitions_are_disjoint_and_exhaustive`.
+
+### The real cost is one quadratic loop — not yet fixed
+
+Both slow paths profile to the same place.
+`schema_validation.validate_workbook_schema` opens the workbook with
+`load_workbook(..., read_only=True)` at
+`scripts/corvette_form_generator/schema_validation.py:1145`, then does random
+access with `ws.cell(row, column)` at lines 1232, 1256, and 1280. On a
+read-only openpyxl worksheet every `.cell()` restarts the streaming row
+parser, so those loops are quadratic.
+
+| profiled call | total | `validate_workbook_schema` | `.cell()` calls | cells parsed |
+|---|---|---|---|---|
+| `promote_verified_projection` (the 71s build) | 205s | 188s (92%) | 9,303 | 14.1M |
+| `export_comparison_workbook` (the 212s test) | 655s | 595s (91%) | 216,713 | 42.6M |
+
+The real import work is 14.5s of that 205s. Fixing the access pattern — read
+each sheet once instead of per cell — would cut roughly 90% off the 71s fixture
+build that every Manager shard pays, and off the workbook schema gate wherever
+it runs. That is a far larger win than any shard arrangement, but it is product
+code inside the fail-closed schema gate, so it needs its own change with
+before/after proof that the emitted issue list is identical.

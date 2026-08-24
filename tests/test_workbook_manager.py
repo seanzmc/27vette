@@ -669,10 +669,23 @@ class TestComparisonExport(ImportedWorkbookCase):
             config.DB_BACKUP_DIR,
         )
         config.VAR_DIR = cls.tmpdir / "var"
-        cls.unchanged_export = fixture.unchanged_export_result()
-        cls.unchanged_export_dir = Path(cls.unchanged_export["path"]).parent
         config.EXPORT_DIR = config.VAR_DIR / "per-test-exports"
         config.DB_BACKUP_DIR = config.VAR_DIR / "db-backups"
+
+    # The unchanged export is a real comparison export of the whole workbook,
+    # measured at 67.91s. Only the acceptance test below reads it, but building
+    # it in setUpClass charged it to all three tests, so a shard running just
+    # the overlay proof paid 68s for an export it never opened.
+    # unchanged_export_result() is process-cached, so this is still executed
+    # exactly once, and _build_unchanged_export saves and restores config
+    # itself, so calling it from a test rather than from setUpClass is safe.
+    @property
+    def unchanged_export(self) -> dict:
+        return verified_manager_fixture().unchanged_export_result()
+
+    @property
+    def unchanged_export_dir(self) -> Path:
+        return Path(self.unchanged_export["path"]).parent
 
     @classmethod
     def tearDownClass(cls):

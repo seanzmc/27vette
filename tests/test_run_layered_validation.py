@@ -309,7 +309,9 @@ def test_pr_planner_keeps_manager_partitions_when_the_diff_adds_frontend_files()
         "manager-read-ui",
         "manager-api-assets",
         "manager-api-core",
-        "manager-non-api",
+        "manager-non-api-core",
+        "manager-non-api-sync-and-export",
+        "manager-non-api-export-overlay",
         "fable-contracts",
     ]
     commands = "\n".join(str(shard["command"]) for shard in plan["include"])
@@ -378,7 +380,9 @@ def test_pr_planner_preserves_complete_manager_coverage_for_apply_rebuild():
         "ci-contracts",
         "manager-api-assets",
         "manager-api-core",
-        "manager-non-api",
+        "manager-non-api-core",
+        "manager-non-api-sync-and-export",
+        "manager-non-api-export-overlay",
         "manager-projection",
         "manager-drafts",
         "manager-apply-boundaries",
@@ -393,7 +397,9 @@ def test_pr_planner_falls_back_for_unknown_manager_code():
         "ci-contracts",
         "manager-api-assets",
         "manager-api-core",
-        "manager-non-api",
+        "manager-non-api-core",
+        "manager-non-api-sync-and-export",
+        "manager-non-api-export-overlay",
         "manager-projection",
         "manager-drafts",
         "manager-apply-boundaries",
@@ -427,7 +433,9 @@ def test_pr_planner_covers_test_only_manager_change_in_three_partitions():
         "ci-contracts",
         "manager-api-assets",
         "manager-api-core",
-        "manager-non-api",
+        "manager-non-api-core",
+        "manager-non-api-sync-and-export",
+        "manager-non-api-export-overlay",
     ]
 
 
@@ -468,7 +476,9 @@ def test_manual_full_plan_partitions_every_measured_heavy_owner():
         "full-python-editor-server",
         "manager-api-assets",
         "manager-api-core",
-        "manager-non-api",
+        "manager-non-api-core",
+        "manager-non-api-sync-and-export",
+        "manager-non-api-export-overlay",
         "manager-projection",
         "manager-drafts",
         "manager-apply-boundaries",
@@ -505,7 +515,22 @@ def test_manual_full_plan_partitions_every_measured_heavy_owner():
     }
     assert "TestApi and asset" in manager_commands["manager-api-assets"]
     assert "TestApi and not asset" in manager_commands["manager-api-core"]
-    assert "not TestApi" in manager_commands["manager-non-api"]
+    # The non-API owner is partitioned in every plan, not only the full one:
+    # unsplit it measures 372.77s locally, roughly 810-890s in CI against a
+    # 900s job timeout.
+    assert (
+        "not TestApi and not TestSyncBatch and not TestComparisonExport"
+        in manager_commands["manager-non-api-core"]
+    )
+    assert (
+        "(TestSyncBatch or TestComparisonExport) and not "
+        "test_export_overlays_registry_owned_projection_fields"
+        in manager_commands["manager-non-api-sync-and-export"]
+    )
+    assert (
+        "-k test_export_overlays_registry_owned_projection_fields"
+        in manager_commands["manager-non-api-export-overlay"]
+    )
     assert not any(
         command.endswith("tests/test_workbook_manager.py -q")
         for command in manager_commands.values()
@@ -644,7 +669,7 @@ def test_review_tooling_does_not_escalate_alongside_a_classified_backend_change(
     assert "manager-review-tooling" in names
     assert "manager-read-explorer" in names
     assert "manager-projection" not in names
-    assert "manager-non-api" not in names
+    assert not any(name.startswith("manager-non-api") for name in names)
 
 
 def test_unclassified_manager_backend_code_still_escalates():
@@ -653,7 +678,8 @@ def test_unclassified_manager_backend_code_still_escalates():
 
     names = [shard["name"] for shard in plan["include"]]
     assert "manager-projection" in names
-    assert "manager-non-api" in names
+    assert "manager-non-api-core" in names
+    assert "manager-non-api-export-overlay" in names
 
 
 def test_an_additive_catalog_edit_runs_only_the_new_gate():
@@ -687,3 +713,48 @@ def test_the_codex_disposition_owner_is_an_always_gate():
     # The ci-contracts shard runs this owner whenever no layered shard does.
     # Both paths must agree, or the gate depends on which branch CI takes.
     assert "py.test_codex_finding_disposition" in catalog["ci"]["always_gate_ids"]
+
+
+def test_manager_main_partitions_are_disjoint_and_exhaustive():
+    """The five -k expressions must together own every Manager main test once.
+
+    Splitting the owner is only safe while this holds. Collection is the
+    authority here; reasoning about ``-k`` precedence is not.
+    """
+
+    planner = _load_planner()
+    expressions = [
+        "TestApi and asset",
+        "TestApi and not asset",
+        *(expression for _, expression, _ in planner.MANAGER_NON_API_PARTITIONS),
+    ]
+
+    def collect(*args: str) -> set[str]:
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "pytest",
+                "tests/test_workbook_manager.py",
+                *args,
+                "--collect-only", "-q",
+            ],
+            cwd=REPO_ROOT, text=True, capture_output=True, check=False,
+        )
+        return {
+            line.strip()
+            for line in result.stdout.splitlines()
+            if "::" in line and line.strip().startswith("tests/")
+        }
+
+    everything = collect()
+    assert everything, "Manager main owner collected no tests"
+
+    owners: dict[str, list[str]] = {}
+    for expression in expressions:
+        for node in collect("-k", expression):
+            owners.setdefault(node, []).append(expression)
+
+    duplicated = {node: owner for node, owner in owners.items() if len(owner) > 1}
+    assert not duplicated, f"partitions overlap: {duplicated}"
+    assert set(owners) == everything, (
+        f"partitions miss {sorted(everything - set(owners))}"
+    )

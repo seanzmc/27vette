@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
-"""Split the slow Workbook Manager non-API owner into bounded full-suite shards.
+"""Validate, and if needed perform, the Workbook Manager non-API split.
 
-The complete-inventory audit runs before this transformation. This pass accepts
-only the known exhaustive ``not TestApi`` owner and replaces it with two
-disjoint expressions whose union is exactly the same test set.
+The planner now emits the three non-API partitions directly, because the
+monolithic owner measures roughly 810-890s in CI against a 900s job timeout and
+narrow plans used it unsplit. This pass therefore usually just proves the
+partitions arrived intact. The legacy path remains for a plan that still
+carries the exhaustive ``not TestApi`` owner: it is replaced by three disjoint
+expressions whose union is exactly the same test set. Partial splits and
+unexpected expressions fail closed.
 """
 
 from __future__ import annotations
@@ -16,6 +20,7 @@ from pathlib import Path
 MANAGER_TEST_PATH = "tests/test_workbook_manager.py"
 LEGACY_SHARD_NAME = "manager-non-api"
 LEGACY_EXPRESSION = "not TestApi"
+MANAGER_OVERLAY_NODE = "test_export_overlays_registry_owned_projection_fields"
 PARTITIONS = (
     (
         "manager-non-api-core",
@@ -24,8 +29,13 @@ PARTITIONS = (
     ),
     (
         "manager-non-api-sync-and-export",
-        "TestSyncBatch or TestComparisonExport",
-        "Run the measured sync and comparison-export owners independently.",
+        "(TestSyncBatch or TestComparisonExport) and not " + MANAGER_OVERLAY_NODE,
+        "Run the sync and comparison-export owners without the overlay proof.",
+    ),
+    (
+        "manager-non-api-export-overlay",
+        MANAGER_OVERLAY_NODE,
+        "Run the measured changed-overlay export proof on its own.",
     ),
 )
 
