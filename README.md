@@ -233,6 +233,31 @@ does not run the Layer 4 full inventory, access the live asset library, or submi
 a dealer build. Choose any additional local gates by changed surface as
 described below.
 
+`.github/workflows/codex-finding-disposition.yml` maintains the
+`codex-finding-disposition` commit status from GitHub review threads. A current,
+unresolved structured Codex P0 or P1 finding fails the status; resolved or
+outdated findings and P2/P3 findings do not block. Review events refresh it
+immediately, while a 15-minute reconciliation schedule picks up thread
+resolution because GitHub Actions exposes no review-thread-resolution trigger.
+The workflow checks out and executes only the trusted default-branch evaluator,
+never pull-request head code. Focused local contract:
+
+```sh
+.venv/bin/python -m pytest tests/test_codex_finding_disposition.py -q
+```
+
+Read-only live inspection (requires an authenticated `gh` session):
+
+```sh
+GH_TOKEN="$(gh auth token)" python .github/scripts/codex_finding_disposition.py \
+  --repository <owner>/<repo> --pr-number <number> --dry-run
+```
+
+After the workflow lands on `main` and publishes the status at least once, add
+`codex-finding-disposition` to the `Release candidate gate` ruleset's required
+status contexts. Do not register it before the default branch can publish the
+context, or every open PR will be blocked by a missing status.
+
 The required job allows 25 minutes because a Workbook Manager source change
 runs the composed candidate lane and then the complete shared-fixture Manager
 acceptance group. Selection remains catalog-driven; the larger limit does not

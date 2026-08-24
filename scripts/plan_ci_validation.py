@@ -27,7 +27,8 @@ MANAGER_FIXTURE_HELPER = "tests/workbook_manager_fixtures.py"
 
 CI_CONTRACT_COMMAND = (
     ".venv/bin/python -m pytest "
-    "tests/test_validation_catalog.py tests/test_run_layered_validation.py -q"
+    "tests/test_validation_catalog.py tests/test_run_layered_validation.py "
+    "tests/test_codex_finding_disposition.py -q"
 )
 
 MANAGER_EXPLORER_NODES = (
@@ -112,8 +113,11 @@ MANAGER_SUPPORT_TESTS = (
 
 CI_INFRA_PATHS = {
     ".github/workflows/release-candidate.yml",
+    ".github/workflows/codex-finding-disposition.yml",
+    ".github/scripts/codex_finding_disposition.py",
     "scripts/plan_ci_validation.py",
     "scripts/run_layered_validation.py",
+    "tests/test_codex_finding_disposition.py",
     "tests/test_run_layered_validation.py",
     "tests/test_validation_catalog.py",
     "tests/validation_catalog.json",
