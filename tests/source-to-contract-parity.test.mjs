@@ -349,12 +349,18 @@ for (const promotion of promoted) {
     const memberRows = sourceRows(modelKey, "rule_group_members_sheet").filter(
       (row) => workbookTruthy(row.active),
     );
+    const sourceByGroup = new Map(expected.map((row) => [row.group_id, row]));
     const membersByGroup = new Map();
     for (const row of memberRows) {
       if (!membersByGroup.has(row.group_id)) membersByGroup.set(row.group_id, []);
       membersByGroup.get(row.group_id).push(row.target_id);
     }
     for (const group of contract.ruleGroups) {
+      assert.equal(
+        cell(group.display_label),
+        cell(sourceByGroup.get(group.group_id)?.display_label),
+        `${group.group_id} display_label`,
+      );
       assert.deepEqual(
         [...group.target_ids].sort(),
         (membersByGroup.get(group.group_id) ?? []).sort(),
@@ -374,12 +380,18 @@ for (const promotion of promoted) {
     const memberRows = sourceRows(modelKey, "exclusive_group_members_sheet").filter(
       (row) => workbookTruthy(row.active),
     );
+    const sourceByGroup = new Map(expected.map((row) => [row.group_id, row]));
     const membersByGroup = new Map();
     for (const row of memberRows) {
       if (!membersByGroup.has(row.group_id)) membersByGroup.set(row.group_id, []);
       membersByGroup.get(row.group_id).push(row.option_id);
     }
     for (const group of contract.exclusiveGroups) {
+      assert.equal(
+        cell(group.display_label),
+        cell(sourceByGroup.get(group.group_id)?.display_label),
+        `${group.group_id} display_label`,
+      );
       assert.deepEqual(
         [...group.option_ids].sort(),
         (membersByGroup.get(group.group_id) ?? []).sort(),

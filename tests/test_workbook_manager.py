@@ -1605,7 +1605,10 @@ class TestApi(unittest.TestCase):
         self.assertEqual(detail["model_key"], "grand_sport_x")
         self.assertEqual(detail["entity_type"], "group")
         self.assertEqual(detail["group_type"], "exclusive")
-        self.assertEqual(detail["label"], "Exclusive group · Engine Appearance")
+        self.assertEqual(detail["label"], "LS6 Engine Covers")
+        self.assertEqual(detail["display_label"], "LS6 Engine Covers")
+        self.assertEqual(detail["audience"], "customer")
+        self.assertEqual(detail["label_status"], "authored")
         self.assertNotIn("1623e1da9d59", detail["label"])
         self.assertIn("Engine cover choices", detail["notes"])
         self.assertGreater(detail["member_count"], 1)
@@ -1615,6 +1618,19 @@ class TestApi(unittest.TestCase):
                          "grand_sport_x_exclusive_groups")
         self.assertEqual(detail["destination"]["entity_id"],
                          f"exclusive:{group_id}")
+
+        rule_group_id = "grand_sport_x_group_dpb_excludes_any_096f31ba6bc8"
+        rule_response = self.client.get(
+            f"/api/explorer/grand_sport_x/groups/rule/{rule_group_id}"
+        )
+        self.assertEqual(rule_response.status_code, 200, rule_response.text)
+        rule_detail = rule_response.json()
+        self.assertEqual(
+            rule_detail["label"],
+            "DPB Carbon Flash/Blue Racing Stripes — Hash Mark and Z15 Exclusions",
+        )
+        self.assertEqual(rule_detail["audience"], "manager")
+        self.assertEqual(rule_detail["label_status"], "authored")
 
     def test_cross_entity_search_is_ranked_typed_scoped_and_stable(self):
         option = self.client.get(

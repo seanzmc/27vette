@@ -1,0 +1,2248 @@
+{
+  "batchId": "cp2-group-display-label-migration",
+  "workbookMtimeNs": 1787464410520858327,
+  "workbookSha256": "e841c368e01024c8d8e91d247f0a3f4bf04b646f1c210fd465ba4df92288e986",
+  "source": "cli",
+  "items": [
+    {
+      "action": "update",
+      "sheet": "grandSport_exclusive_groups",
+      "key": {
+        "group_id": "gs_excl_center_caps"
+      },
+      "row": {
+        "display_label": "Wheel Center Caps"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_exclusive_groups",
+      "key": {
+        "group_id": "gs_excl_exhaust_path"
+      },
+      "row": {
+        "display_label": "Exhaust Tips"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_exclusive_groups",
+      "key": {
+        "group_id": "gs_excl_exterior_accents"
+      },
+      "row": {
+        "display_label": "Exterior Accents"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_exclusive_groups",
+      "key": {
+        "group_id": "gs_excl_ground_effects"
+      },
+      "row": {
+        "display_label": "Ground Effects"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_exclusive_groups",
+      "key": {
+        "group_id": "gs_excl_indoor_car_covers"
+      },
+      "row": {
+        "display_label": "Indoor Car Covers"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_exclusive_groups",
+      "key": {
+        "group_id": "gs_excl_ls6_engine_covers"
+      },
+      "row": {
+        "display_label": "LS6 Engine Covers"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_exclusive_groups",
+      "key": {
+        "group_id": "gs_excl_performance_aero"
+      },
+      "row": {
+        "display_label": "Performance Aero"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_exclusive_groups",
+      "key": {
+        "group_id": "gs_excl_performance_brakes"
+      },
+      "row": {
+        "display_label": "Performance Brakes"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_exclusive_groups",
+      "key": {
+        "group_id": "gs_excl_rear_script_badges"
+      },
+      "row": {
+        "display_label": "Rear Corvette Script Badge Color"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_exclusive_groups",
+      "key": {
+        "group_id": "gs_excl_seat_belts"
+      },
+      "row": {
+        "display_label": "Seat Belt Color"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_exclusive_groups",
+      "key": {
+        "group_id": "gs_excl_suede_compartment_liners"
+      },
+      "row": {
+        "display_label": "Suede Frunk and Trunk Liners"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_exclusive_groups",
+      "key": {
+        "group_id": "gs_excl_z52_packages"
+      },
+      "row": {
+        "display_label": "Z52 Performance Package"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_cf8_excludes_stripe_choices"
+      },
+      "row": {
+        "display_label": "CF8 Electrochromic Dimming Roof Panel — Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dpb_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "DPB Carbon Flash/Blue Racing Stripes — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dpb_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DPB Carbon Flash/Blue Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dpc_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "DPC Carbon Flash/Yellow Racing Stripes — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dpc_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DPC Carbon Flash/Yellow Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dpg_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "DPG Carbon Flash/Orange Racing Stripes — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dpg_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DPG Carbon Flash/Orange Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dpl_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "DPL Carbon Flash/Red Racing Stripes — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dpl_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DPL Carbon Flash/Red Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dpt_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "DPT Carbon Flash/Silver Racing Stripes — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dpt_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DPT Carbon Flash/Silver Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dsy_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "DSY Edge Orange Racing Stripes — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dsy_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DSY Edge Orange Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dsz_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "DSZ Edge Red Racing Stripes — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dsz_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DSZ Edge Red Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dt0_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "DT0 Competition Yellow Racing Stripes — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dt0_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DT0 Competition Yellow Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dth_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "DTH Carbon Flash Metallic Racing Stripes — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dth_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DTH Carbon Flash Metallic Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dub_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "DUB Sterling Silver Racing Stripes — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dub_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DUB Sterling Silver Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_due_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "DUE Santorini Blue/Carbon Flash Racing Stripes — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_due_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DUE Santorini Blue/Carbon Flash Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_duk_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "DUK Edge Red/Carbon Flash Racing Stripes — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_duk_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DUK Edge Red/Carbon Flash Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_duw_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "DUW Edge Blue Racing Stripes — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_duw_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DUW Edge Blue Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dzu_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "DZU Carbon Flash/Competition Yellow Stinger Stripe — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dzu_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DZU Carbon Flash/Competition Yellow Stinger Stripe — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dzv_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "DZV Carbon Flash/Midnight Silver Stinger Stripe — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dzv_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DZV Carbon Flash/Midnight Silver Stinger Stripe — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dzx_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "DZX Carbon Flash/Edge Red Stinger Stripe — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_dzx_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DZX Carbon Flash/Edge Red Stinger Stripe — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_gba_excludes_edu"
+      },
+      "row": {
+        "display_label": "GBA Black — Exterior Accent Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_j57_z52_requirement"
+      },
+      "row": {
+        "display_label": "J57 Carbon Ceramic Brakes — Z52 Requirements"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_pda_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "PDA Jake C8.R Graphics Package — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_pda_excludes_stripes_and_z15"
+      },
+      "row": {
+        "display_label": "PDA Jake C8.R Graphics Package — Stripe and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_r88_excludes_badge_and_stripe_choices"
+      },
+      "row": {
+        "display_label": "R88 Front Illuminated Crossed Flags Emblem — Badge and Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_sfz_excludes_badge_and_stripe_choices"
+      },
+      "row": {
+        "display_label": "SFZ Dark Stealth Crossed Flags Emblems — Badge and Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_sht_excludes_full_length_stripes"
+      },
+      "row": {
+        "display_label": "SHT Tech Bronze Jake Hood Graphic — Stripe and Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_sht_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "SHT Tech Bronze Jake Hood Graphic — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_sne_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "SNE Jake Hood Graphic — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_sne_excludes_stripes_and_z15"
+      },
+      "row": {
+        "display_label": "SNE Jake Hood Graphic — Stripe and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_t0f_z52_requirement"
+      },
+      "row": {
+        "display_label": "T0F Carbon Flash-Painted Carbon Fiber Aero Package — Z52 Requirements"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_vpo_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "VPO Tech Bronze Jake C8.R Rear Hash Graphic — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_vpo_excludes_jake_and_z15"
+      },
+      "row": {
+        "display_label": "VPO Tech Bronze Jake C8.R Rear Hash Graphic — Jake Graphic and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_vpw_excludes_heritage_hash_and_z15"
+      },
+      "row": {
+        "display_label": "VPW Jake C8.R Rear Hash Graphic — Heritage Hash and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_vpw_excludes_jake_rear_hash_peers"
+      },
+      "row": {
+        "display_label": "VPW Jake C8.R Rear Hash Graphic — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grandSport_rule_groups",
+      "key": {
+        "group_id": "gs_group_z15_excludes_non_center_stripes"
+      },
+      "row": {
+        "display_label": "Z15 Grand Sport Heritage Graphics — Stripe and Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_exclusive_groups",
+      "key": {
+        "group_id": "grand_sport_x_excl_1623e1da9d59"
+      },
+      "row": {
+        "display_label": "LS6 Engine Covers"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_exclusive_groups",
+      "key": {
+        "group_id": "grand_sport_x_excl_1a2557e86349"
+      },
+      "row": {
+        "display_label": "Suede Frunk and Trunk Liners"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_exclusive_groups",
+      "key": {
+        "group_id": "grand_sport_x_excl_4c81a57b1440"
+      },
+      "row": {
+        "display_label": "Indoor Car Covers"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_exclusive_groups",
+      "key": {
+        "group_id": "grand_sport_x_excl_72b09b9f4530"
+      },
+      "row": {
+        "display_label": "Ground Effects"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_exclusive_groups",
+      "key": {
+        "group_id": "grand_sport_x_excl_88226d3d71bc"
+      },
+      "row": {
+        "display_label": "Rear Corvette Script Badge Color"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_exclusive_groups",
+      "key": {
+        "group_id": "grand_sport_x_excl_ba636d8cad42"
+      },
+      "row": {
+        "display_label": "Seat Belt Color"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_exclusive_groups",
+      "key": {
+        "group_id": "grand_sport_x_excl_c874eb278e64"
+      },
+      "row": {
+        "display_label": "Exterior Accents"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_exclusive_groups",
+      "key": {
+        "group_id": "grand_sport_x_excl_cb34bcaa3d0b"
+      },
+      "row": {
+        "display_label": "Exhaust Tips"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_exclusive_groups",
+      "key": {
+        "group_id": "grand_sport_x_excl_cb3c5e229696"
+      },
+      "row": {
+        "display_label": "Wheel Center Caps"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dpb_excludes_any_096f31ba6bc8"
+      },
+      "row": {
+        "display_label": "DPB Carbon Flash/Blue Racing Stripes — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dpb_excludes_any_bc7ac3cd5712"
+      },
+      "row": {
+        "display_label": "DPB Carbon Flash/Blue Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dpc_excludes_any_057217c745ee"
+      },
+      "row": {
+        "display_label": "DPC Carbon Flash/Yellow Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dpc_excludes_any_781d50c26209"
+      },
+      "row": {
+        "display_label": "DPC Carbon Flash/Yellow Racing Stripes — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dpg_excludes_any_23a48cca709a"
+      },
+      "row": {
+        "display_label": "DPG Carbon Flash/Orange Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dpg_excludes_any_8dde793fb122"
+      },
+      "row": {
+        "display_label": "DPG Carbon Flash/Orange Racing Stripes — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dpl_excludes_any_6b907dfa0c76"
+      },
+      "row": {
+        "display_label": "DPL Carbon Flash/Red Racing Stripes — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dpl_excludes_any_942680f3c88f"
+      },
+      "row": {
+        "display_label": "DPL Carbon Flash/Red Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dpt_excludes_any_a11da78c868a"
+      },
+      "row": {
+        "display_label": "DPT Carbon Flash/Silver Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dpt_excludes_any_d2c54fb4969b"
+      },
+      "row": {
+        "display_label": "DPT Carbon Flash/Silver Racing Stripes — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dsy_excludes_any_d2babd95ee7d"
+      },
+      "row": {
+        "display_label": "DSY Edge Orange Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dsy_excludes_any_d5ceed8abc92"
+      },
+      "row": {
+        "display_label": "DSY Edge Orange Racing Stripes — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dsz_excludes_any_f155d35085ec"
+      },
+      "row": {
+        "display_label": "DSZ Edge Red Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dsz_excludes_any_faf3811968a9"
+      },
+      "row": {
+        "display_label": "DSZ Edge Red Racing Stripes — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dt0_excludes_any_c98fc7b8e3ef"
+      },
+      "row": {
+        "display_label": "DT0 Competition Yellow Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dt0_excludes_any_ea411b392043"
+      },
+      "row": {
+        "display_label": "DT0 Competition Yellow Racing Stripes — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dth_excludes_any_77b6e2847689"
+      },
+      "row": {
+        "display_label": "DTH Carbon Flash Metallic Racing Stripes — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dth_excludes_any_e136eb3a8eda"
+      },
+      "row": {
+        "display_label": "DTH Carbon Flash Metallic Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dub_excludes_any_3b70d8743ca9"
+      },
+      "row": {
+        "display_label": "DUB Sterling Silver Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dub_excludes_any_733d1232a80c"
+      },
+      "row": {
+        "display_label": "DUB Sterling Silver Racing Stripes — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_due_excludes_any_03f04853fdcf"
+      },
+      "row": {
+        "display_label": "DUE Santorini Blue/Carbon Flash Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_due_excludes_any_2e1e846fd4ce"
+      },
+      "row": {
+        "display_label": "DUE Santorini Blue/Carbon Flash Racing Stripes — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_duk_excludes_any_6cf775f69001"
+      },
+      "row": {
+        "display_label": "DUK Edge Red/Carbon Flash Racing Stripes — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_duk_excludes_any_f243b10fb86e"
+      },
+      "row": {
+        "display_label": "DUK Edge Red/Carbon Flash Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dzu_excludes_any_7adc71f358d8"
+      },
+      "row": {
+        "display_label": "DZU Carbon Flash/Competition Yellow Stinger Stripe — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dzu_excludes_any_985acc11b53e"
+      },
+      "row": {
+        "display_label": "DZU Carbon Flash/Competition Yellow Stinger Stripe — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dzv_excludes_any_69cae05f1cfe"
+      },
+      "row": {
+        "display_label": "DZV Carbon Flash/Midnight Silver Stinger Stripe — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dzv_excludes_any_a44bbdfaaf85"
+      },
+      "row": {
+        "display_label": "DZV Carbon Flash/Midnight Silver Stinger Stripe — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dzx_excludes_any_8eb7137839ef"
+      },
+      "row": {
+        "display_label": "DZX Carbon Flash/Edge Red Stinger Stripe — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_dzx_excludes_any_f830aa822d8e"
+      },
+      "row": {
+        "display_label": "DZX Carbon Flash/Edge Red Stinger Stripe — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_pda_excludes_any_191458a71598"
+      },
+      "row": {
+        "display_label": "PDA Jake C8.R Graphics Package — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_sht_excludes_any_ed76175b16f3"
+      },
+      "row": {
+        "display_label": "SHT Tech Bronze Jake Hood Graphic — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_sne_excludes_any_1102a28431ec"
+      },
+      "row": {
+        "display_label": "SNE Jake Hood Graphic — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_vpo_excludes_any_cb63cd4970bf"
+      },
+      "row": {
+        "display_label": "VPO Tech Bronze Jake C8.R Rear Hash Graphic — Jake Graphic and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_vpo_excludes_any_e4140e073049"
+      },
+      "row": {
+        "display_label": "VPO Tech Bronze Jake C8.R Rear Hash Graphic — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_vpw_excludes_any_84d1271c9187"
+      },
+      "row": {
+        "display_label": "VPW Jake C8.R Rear Hash Graphic — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "grand_sport_x_group_vpw_excludes_any_c8bc4a394620"
+      },
+      "row": {
+        "display_label": "VPW Jake C8.R Rear Hash Graphic — Hash Mark and Z15 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "gsx_group_cf8_excludes_stripe_choices"
+      },
+      "row": {
+        "display_label": "CF8 Electrochromic Dimming Roof Panel — Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "gsx_group_dtc_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DTC Royal Blue Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "gsx_group_pda_excludes_full_length_stripes"
+      },
+      "row": {
+        "display_label": "PDA Jake C8.R Graphics Package — Full-Length Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "gsx_group_sfz_excludes_badge_and_stripe_choices"
+      },
+      "row": {
+        "display_label": "SFZ Dark Stealth Crossed Flags Emblems — Badge and Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "gsx_group_sht_excludes_full_length_stripes_and_jake_conflicts"
+      },
+      "row": {
+        "display_label": "SHT Tech Bronze Jake Hood Graphic — Stripe and Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "grand_sport_x_rule_groups",
+      "key": {
+        "group_id": "gsx_group_sne_excludes_full_length_stripes_and_jake_conflicts"
+      },
+      "row": {
+        "display_label": "SNE Jake Hood Graphic — Stripe and Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "exclusive_groups",
+      "key": {
+        "group_id": "excl_center_caps"
+      },
+      "row": {
+        "display_label": "Wheel Center Caps"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "exclusive_groups",
+      "key": {
+        "group_id": "excl_exhaust_path"
+      },
+      "row": {
+        "display_label": "Exhaust Tips"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "exclusive_groups",
+      "key": {
+        "group_id": "excl_ext_accents"
+      },
+      "row": {
+        "display_label": "Exterior Accents"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "exclusive_groups",
+      "key": {
+        "group_id": "excl_indoor_car_covers"
+      },
+      "row": {
+        "display_label": "Indoor Car Covers"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "exclusive_groups",
+      "key": {
+        "group_id": "excl_outdoor_car_covers"
+      },
+      "row": {
+        "display_label": "Outdoor Car Covers"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "exclusive_groups",
+      "key": {
+        "group_id": "excl_rear_script_badges"
+      },
+      "row": {
+        "display_label": "Rear Corvette Script Badge Color"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "exclusive_groups",
+      "key": {
+        "group_id": "excl_seat_belts"
+      },
+      "row": {
+        "display_label": "Seat Belt Color"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "exclusive_groups",
+      "key": {
+        "group_id": "excl_suede_trunk_liner"
+      },
+      "row": {
+        "display_label": "Suede Frunk and Trunk Liners"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_5v7_spoiler_requirement"
+      },
+      "row": {
+        "display_label": "5V7 Black Ground Effects — High Wing Spoiler Requirements"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_5zu_paint_requirement"
+      },
+      "row": {
+        "display_label": "5ZU Body-Color High Wing Spoiler — Paint Color Requirements"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_cf8_excludes_full_length_stripes"
+      },
+      "row": {
+        "display_label": "CF8 Electrochromic Dimming Removable Roof Panel — Full-Length Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_dpb_excludes_stingray_jake_graphics"
+      },
+      "row": {
+        "display_label": "DPB Carbon Flash/Blue Racing Stripes — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_dpc_excludes_stingray_jake_graphics"
+      },
+      "row": {
+        "display_label": "DPC Carbon Flash/Yellow Racing Stripes — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_dpg_excludes_stingray_jake_graphics"
+      },
+      "row": {
+        "display_label": "DPG Carbon Flash/Orange Racing Stripes — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_dpl_excludes_stingray_jake_graphics"
+      },
+      "row": {
+        "display_label": "DPL Carbon Flash/Red Racing Stripes — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_dpt_excludes_stingray_jake_graphics"
+      },
+      "row": {
+        "display_label": "DPT Carbon Flash/Silver Racing Stripes — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_dsy_excludes_stingray_jake_graphics"
+      },
+      "row": {
+        "display_label": "DSY Edge Orange Racing Stripes — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_dsz_excludes_stingray_jake_graphics"
+      },
+      "row": {
+        "display_label": "DSZ Edge Red Racing Stripes — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_dt0_excludes_stingray_jake_graphics"
+      },
+      "row": {
+        "display_label": "DT0 Competition Yellow Racing Stripes — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_dth_excludes_stingray_jake_graphics"
+      },
+      "row": {
+        "display_label": "DTH Carbon Flash Metallic Racing Stripes — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_dub_excludes_stingray_jake_graphics"
+      },
+      "row": {
+        "display_label": "DUB Sterling Silver Racing Stripes — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_due_excludes_stingray_jake_graphics"
+      },
+      "row": {
+        "display_label": "DUE Santorini Blue/Carbon Flash Racing Stripes — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_duk_excludes_stingray_jake_graphics"
+      },
+      "row": {
+        "display_label": "DUK Edge Red/Carbon Flash Racing Stripes — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_duw_excludes_stingray_jake_graphics"
+      },
+      "row": {
+        "display_label": "DUW Edge Blue Racing Stripes — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_dzu_excludes_stingray_jake_graphics"
+      },
+      "row": {
+        "display_label": "DZU Carbon Flash/Competition Yellow Stinger Stripe — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_dzv_excludes_stingray_jake_graphics"
+      },
+      "row": {
+        "display_label": "DZV Carbon Flash/Midnight Silver Stinger Stripe — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_dzx_excludes_stingray_jake_graphics"
+      },
+      "row": {
+        "display_label": "DZX Carbon Flash/Edge Red Stinger Stripe — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_gba_excludes_edu"
+      },
+      "row": {
+        "display_label": "GBA Black — Body-Color Accent Exclusion"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_gba_excludes_zyc"
+      },
+      "row": {
+        "display_label": "GBA Black — Carbon Flash Mirror and Spoiler Exclusion"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "exclusive_groups",
+      "key": {
+        "group_id": "grp_ls6_engine_covers"
+      },
+      "row": {
+        "display_label": "LS6 Engine Covers"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_pcx_excludes_blocked_choices"
+      },
+      "row": {
+        "display_label": "PCX Tech Bronze Accent Package — Conflicting Choice Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_pdv_excludes_full_length_stripes"
+      },
+      "row": {
+        "display_label": "PDV Stingray R Appearance Package — Full-Length Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_r88_excludes_badge_and_stripe_choices"
+      },
+      "row": {
+        "display_label": "R88 Front Illuminated Crossed Flags Emblem — Badge and Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_sb7_excludes_dual_racing_and_sht"
+      },
+      "row": {
+        "display_label": "SB7 Corvette Racing Jake and Stingray R Graphics Package — Stripe and Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_sfz_excludes_badge_and_stripe_choices"
+      },
+      "row": {
+        "display_label": "SFZ Dark Stealth Crossed Flags Front Emblem — Badge and Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "rule_groups",
+      "key": {
+        "group_id": "grp_sht_excludes_dual_racing_and_sb7"
+      },
+      "row": {
+        "display_label": "SHT Tech Bronze Jake Hood Graphic — Stripe and SB7 Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "exclusive_groups",
+      "key": {
+        "group_id": "grp_spoiler_high_wing"
+      },
+      "row": {
+        "display_label": "Spoiler"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_exclusive_groups",
+      "key": {
+        "group_id": "z06_excl_aero_packages"
+      },
+      "row": {
+        "display_label": "Aero Package"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_exclusive_groups",
+      "key": {
+        "group_id": "z06_excl_carbon_wheel_packages"
+      },
+      "row": {
+        "display_label": "Carbon Fiber Wheel and Aero Packages"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_exclusive_groups",
+      "key": {
+        "group_id": "z06_excl_center_caps"
+      },
+      "row": {
+        "display_label": "Wheel Center Caps"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_exclusive_groups",
+      "key": {
+        "group_id": "z06_excl_default_and_carbon_wheels"
+      },
+      "row": {
+        "display_label": "Wheel Style"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_exclusive_groups",
+      "key": {
+        "group_id": "z06_excl_exhaust_tips"
+      },
+      "row": {
+        "display_label": "Exhaust Tips"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_exclusive_groups",
+      "key": {
+        "group_id": "z06_excl_exterior_accents"
+      },
+      "row": {
+        "display_label": "Exterior Accents"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_exclusive_groups",
+      "key": {
+        "group_id": "z06_excl_fa5_fa6_interior_trim"
+      },
+      "row": {
+        "display_label": "Carbon Fiber Interior Trim"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_exclusive_groups",
+      "key": {
+        "group_id": "z06_excl_ground_effects"
+      },
+      "row": {
+        "display_label": "Ground Effects"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_exclusive_groups",
+      "key": {
+        "group_id": "z06_excl_indoor_car_covers"
+      },
+      "row": {
+        "display_label": "Indoor Car Covers"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_exclusive_groups",
+      "key": {
+        "group_id": "z06_excl_performance_brakes"
+      },
+      "row": {
+        "display_label": "Performance Brakes"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_exclusive_groups",
+      "key": {
+        "group_id": "z06_excl_rear_script_badges"
+      },
+      "row": {
+        "display_label": "Rear Corvette Script Badge Color"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_exclusive_groups",
+      "key": {
+        "group_id": "z06_excl_seat_belts"
+      },
+      "row": {
+        "display_label": "Seat Belt Color"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_exclusive_groups",
+      "key": {
+        "group_id": "z06_excl_suede_compartment_liners"
+      },
+      "row": {
+        "display_label": "Suede Frunk and Trunk Liners"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_cf8_excludes_full_length_stripes"
+      },
+      "row": {
+        "display_label": "CF8 Electrochromic Dimming Roof Panel — Full-Length Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_dpb_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DPB Carbon Flash/Blue Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_dpc_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DPC Carbon Flash/Yellow Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_dpg_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DPG Carbon Flash/Orange Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_dpl_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DPL Carbon Flash/Red Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_dpt_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DPT Carbon Flash/Silver Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_dsy_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DSY Edge Orange Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_dsz_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DSZ Edge Red Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_dt0_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DT0 Competition Yellow Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_dth_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DTH Carbon Flash Metallic Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_dub_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DUB Sterling Silver Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_due_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DUE Santorini Blue/Carbon Flash Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_duk_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DUK Edge Red/Carbon Flash Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_duw_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DUW Edge Blue Racing Stripes — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_dzu_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DZU Carbon Flash/Competition Yellow Stinger Stripe — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_dzv_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DZV Carbon Flash/Midnight Silver Stinger Stripe — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_dzx_excludes_jake_hood_graphics"
+      },
+      "row": {
+        "display_label": "DZX Carbon Flash/Edge Red Stinger Stripe — Jake Hood Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_gba_excludes_accent_and_roof_choices"
+      },
+      "row": {
+        "display_label": "GBA Black — Accent and Roof Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_pda_excludes_dual_racing_stripes"
+      },
+      "row": {
+        "display_label": "PDA Jake C8.R Graphics Package — Dual Racing Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_pdb_excludes_aluminum_wheels"
+      },
+      "row": {
+        "display_label": "PDB Carbon Fiber Wheel and Brake Package — Aluminum Wheel Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_pdb_excludes_j56_brakes"
+      },
+      "row": {
+        "display_label": "PDB Carbon Fiber Wheel and Brake Package — J56 Brake Exclusion"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_pdb_requires_carbon_wheel"
+      },
+      "row": {
+        "display_label": "PDB Carbon Fiber Wheel and Brake Package — Carbon Fiber Wheel Requirements"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_pdd_excludes_aluminum_wheels"
+      },
+      "row": {
+        "display_label": "PDD Z07 Carbon Flash Aero and Wheel Package — Aluminum Wheel Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_pdd_requires_carbon_wheel"
+      },
+      "row": {
+        "display_label": "PDD Z07 Carbon Flash Aero and Wheel Package — Carbon Fiber Wheel Requirements"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_pdf_excludes_aluminum_wheels"
+      },
+      "row": {
+        "display_label": "PDF Z07 Visible Carbon Aero and Wheel Package — Aluminum Wheel Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_pdf_requires_carbon_wheel"
+      },
+      "row": {
+        "display_label": "PDF Z07 Visible Carbon Aero and Wheel Package — Carbon Fiber Wheel Requirements"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_r88_excludes_badge_and_stripe_choices"
+      },
+      "row": {
+        "display_label": "R88 Front Illuminated Crossed Flags Emblem — Badge and Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_sfz_excludes_badge_and_stripe_choices"
+      },
+      "row": {
+        "display_label": "SFZ Dark Stealth Crossed Flags Emblems — Badge and Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_sht_excludes_full_length_stripes"
+      },
+      "row": {
+        "display_label": "SHT Tech Bronze Jake Hood Graphic — Full-Length Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_sne_excludes_stripes_and_tech_bronze_jake"
+      },
+      "row": {
+        "display_label": "SNE Jake Hood Graphic — Stripe and Tech Bronze Jake Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_vpo_excludes_jake_graphics"
+      },
+      "row": {
+        "display_label": "VPO Tech Bronze Jake C8.R Rear Hash Graphic — Jake Graphic Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_vpw_excludes_tech_bronze_jake"
+      },
+      "row": {
+        "display_label": "VPW Jake C8.R Rear Hash Graphic — Tech Bronze Jake Exclusion"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_z07_excludes_j56_brakes"
+      },
+      "row": {
+        "display_label": "Z07 Performance Package — J56 Brake Exclusion"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_z07_excludes_non_z07_aero"
+      },
+      "row": {
+        "display_label": "Z07 Performance Package — Non-Z07 Aero Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "z06_rule_groups",
+      "key": {
+        "group_id": "z06_group_z07_requires_aero"
+      },
+      "row": {
+        "display_label": "Z07 Performance Package — Aero Requirements"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1_exclusive_groups",
+      "key": {
+        "group_id": "zr1_excl_46da2c68b0f9"
+      },
+      "row": {
+        "display_label": "Exhaust Tips"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1_exclusive_groups",
+      "key": {
+        "group_id": "zr1_excl_aero_packages"
+      },
+      "row": {
+        "display_label": "Aero Package"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1_exclusive_groups",
+      "key": {
+        "group_id": "zr1_excl_ba636d8cad42"
+      },
+      "row": {
+        "display_label": "Seat Belt Color"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1_exclusive_groups",
+      "key": {
+        "group_id": "zr1_excl_cdb87e21ebb0"
+      },
+      "row": {
+        "display_label": "Carbon Fiber Interior Trim"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1_exclusive_groups",
+      "key": {
+        "group_id": "zr1_excl_center_caps"
+      },
+      "row": {
+        "display_label": "Wheel Center Caps"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1_exclusive_groups",
+      "key": {
+        "group_id": "zr1_excl_indoor_car_covers"
+      },
+      "row": {
+        "display_label": "Indoor Car Covers"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1_exclusive_groups",
+      "key": {
+        "group_id": "zr1_excl_performance_brakes"
+      },
+      "row": {
+        "display_label": "Performance Brakes"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1_exclusive_groups",
+      "key": {
+        "group_id": "zr1_excl_rear_script_badges"
+      },
+      "row": {
+        "display_label": "Rear Corvette Script Badge Color"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1_exclusive_groups",
+      "key": {
+        "group_id": "zr1_excl_suede_compartment_liners"
+      },
+      "row": {
+        "display_label": "Suede Frunk and Trunk Liners"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1_rule_groups",
+      "key": {
+        "group_id": "zr1_group_r88_excludes_badge_and_stripe_choices"
+      },
+      "row": {
+        "display_label": "R88 Front Illuminated Crossed Flags Emblem — Badge and Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1_rule_groups",
+      "key": {
+        "group_id": "zr1_group_sb9_excludes_full_length_stripe_choices"
+      },
+      "row": {
+        "display_label": "SB9 Hood and Roof Decal Package — Full-Length Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1_rule_groups",
+      "key": {
+        "group_id": "zr1_group_sfz_excludes_badge_and_stripe_choices"
+      },
+      "row": {
+        "display_label": "SFZ Dark Stealth Crossed Flags Emblems — Badge and Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1_rule_groups",
+      "key": {
+        "group_id": "zr1_group_ztk_excludes_j58_brakes"
+      },
+      "row": {
+        "display_label": "ZTK Track Performance Package — J58 Brake Exclusion"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1_rule_groups",
+      "key": {
+        "group_id": "zr1_group_ztk_excludes_non_ztk_aero"
+      },
+      "row": {
+        "display_label": "ZTK Track Performance Package — Non-ZTK Aero Exclusion"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1x_exclusive_groups",
+      "key": {
+        "group_id": "zr1x_excl_46da2c68b0f9"
+      },
+      "row": {
+        "display_label": "Exhaust Tips"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1x_exclusive_groups",
+      "key": {
+        "group_id": "zr1x_excl_aero_packages"
+      },
+      "row": {
+        "display_label": "Aero Package"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1x_exclusive_groups",
+      "key": {
+        "group_id": "zr1x_excl_ba636d8cad42"
+      },
+      "row": {
+        "display_label": "Seat Belt Color"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1x_exclusive_groups",
+      "key": {
+        "group_id": "zr1x_excl_cdb87e21ebb0"
+      },
+      "row": {
+        "display_label": "Carbon Fiber Interior Trim"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1x_exclusive_groups",
+      "key": {
+        "group_id": "zr1x_excl_center_caps"
+      },
+      "row": {
+        "display_label": "Wheel Center Caps"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1x_exclusive_groups",
+      "key": {
+        "group_id": "zr1x_excl_indoor_car_covers"
+      },
+      "row": {
+        "display_label": "Indoor Car Covers"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1x_exclusive_groups",
+      "key": {
+        "group_id": "zr1x_excl_rear_script_badges"
+      },
+      "row": {
+        "display_label": "Rear Corvette Script Badge Color"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1x_exclusive_groups",
+      "key": {
+        "group_id": "zr1x_excl_suede_compartment_liners"
+      },
+      "row": {
+        "display_label": "Suede Frunk and Trunk Liners"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1x_rule_groups",
+      "key": {
+        "group_id": "zr1x_group_r88_excludes_badge_and_stripe_choices"
+      },
+      "row": {
+        "display_label": "R88 Front Illuminated Crossed Flags Emblem — Badge and Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1x_rule_groups",
+      "key": {
+        "group_id": "zr1x_group_sb9_excludes_full_length_stripe_choices"
+      },
+      "row": {
+        "display_label": "SB9 Hood and Roof Decal Package — Full-Length Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1x_rule_groups",
+      "key": {
+        "group_id": "zr1x_group_sfz_excludes_badge_and_stripe_choices"
+      },
+      "row": {
+        "display_label": "SFZ Dark Stealth Crossed Flags Emblems — Badge and Stripe Exclusions"
+      }
+    },
+    {
+      "action": "update",
+      "sheet": "zr1x_rule_groups",
+      "key": {
+        "group_id": "zr1x_group_ztk_excludes_non_ztk_aero"
+      },
+      "row": {
+        "display_label": "ZTK Track Performance Package — Non-ZTK Aero Exclusion"
+      }
+    }
+  ]
+}

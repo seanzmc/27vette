@@ -12,17 +12,17 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 
 ## Current handoff
 
-- **Updated:** 2026-08-21
-- **Owning specification:** `docs/superpowers/specs/2026-08-15-workbook-manager-ux-recovery.md` owns the active Workbook Manager UX recovery and Checkpoint 1.
-- **Active workflow:** Workbook Manager Product and UX Recovery — Checkpoint 1 readiness shell and read-only connected explorer.
-- **Branch/commit:** `hermes/workbook-manager-ux-recovery-cp1-impl` from merged `origin/main` (`f6a3092`); PR 37 repair is locally green and awaiting commit/push on the existing Checkpoint 1 branch.
-- **Last completed:** Diagnosed PR 37 as a GitHub job-timeout cancellation after all earlier selected stages passed, raised the job limit without widening gate selection, and made the API's entity-specific named diagnostics reachable beside connected option/group detail.
-- **Current status:** Checkpoint 1 repair is implemented and locally green. Checkpoints 2–6 remain unauthorized and unstarted.
-- **Validation:** Exact catalog-selected PR path passed all ten stages in 793.239 seconds, including composed Layer 1, frontend production build, Fable, protected-artifact guard, and complete Manager group (`185 passed, 2 skipped, 36 subtests passed`); focused runner/catalog/shell tests and `git diff --check` passed; protected workbook/generated/customer-runtime surfaces have no diff. No green remote CI claim yet.
-- **Next action:** Commit/push the repair to PR 37 and verify the required 25-minute check completes green. Then stop before Checkpoint 2.
-- **Blockers or closeout gaps:** PR 37 required check is not green until the repaired branch is pushed and the 25-minute run completes. Checkpoint 2 still requires explicit approval for the schema addition, complete group-label list, and customer-runtime heading switch.
-- **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This startup pass produced no Fable receipt.
-- **Protected boundaries:** Canonical workbook, workbook schema, generators, generated artifacts, published registry, customer runtime, dealer submission, WordPress media, and deployment remain untouched. The repair changes only Manager read-only presentation, CI timing/docs/catalog metadata, focused tests, the owning spec, and this handoff.
+- **Updated:** 2026-08-23
+- **Owning specification:** `docs/superpowers/specs/2026-08-21-workbook-manager-ux-recovery.md` owns the active Workbook Manager UX recovery (Checkpoints 1–6, §16 runbooks, §19 gates).
+- **Active workflow:** Workbook Manager Product and UX Recovery — Checkpoints 1 and 2 complete. Checkpoint 2 is stopped at its mandatory post-2D boundary; Checkpoints 3–6 remain separately gated.
+- **Branch/commit:** `hermes/workbook-manager-ux-recovery-cp2`; implementation commit `ff28eb5` is pushed and full-inventory validated. The closeout/spec commit is the branch HEAD following that implementation commit.
+- **Last completed:** Landed the workbook-owned `display_label` contract across registry, schema validation, loaders, Manager projection/connected reads, all 12 registered group sheets, all six generated runtime contracts, and the published registry. Reconciled the reviewed CSV/JSON companions and preserved the exact 224-operation apply artifact.
+- **Current status:** 224/224 labels are approved and read back exactly from the canonical workbook: 61 customer exclusive groups and 163 Manager-facing rule groups. Manager group responses now lead with authored labels. The workbook is `922de392…743b7`; verified rollback points preserve pre-schema `b2df4edd…43f8a91` and pre-label-apply `e841c368…88e986` identities.
+- **Validation:** Package/schema/options quality clean; focused label/catalog owners 46 passed; Python metadata 159 plus 111 subtests; Manager checkpoint 248 passed, 2 skipped, 36 subtests; copied-workbook slow Manager gate 70 passed; every Node file passed; frontend build passed; all-model candidate passed all 12 stages with zero retained drift/boundary violations; full Release candidate run 32626231858 passed all 13 planned shards at `ff28eb5`.
+- **Next action:** Stop. A future run requires explicit Checkpoint 3 authorization and begins with 3A's complete control inventory/RED matrix. Checkpoint 5 customer headings remain separately gated even though their label prerequisite is complete.
+- **Blockers or closeout gaps:** None for Checkpoint 2. Checkpoints 3–6 are intentionally unresolved future scope, not Checkpoint 2 defects.
+- **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. Checkpoint 2 produced no Fable receipt (normal repo path per AGENTS.md §9).
+- **Protected boundaries:** Customer runtime heading logic, selection behavior, pricing, membership, dealer submission, WordPress media, deployment, dependencies, and group IDs remain unchanged. Generated contracts/registry changed only by additive reviewed `display_label` fields plus timestamps; `form-app/app.js` is byte-unchanged.
 
 ## Verified facts
 
