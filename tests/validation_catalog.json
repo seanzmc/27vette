@@ -2494,6 +2494,38 @@
       "readme_publishes_command": false
     },
     {
+      "id": "py.test_catalog_change_scope",
+      "command": ".venv/bin/python -m pytest tests/test_catalog_change_scope.py -q",
+      "test_files": [
+        "tests/test_catalog_change_scope.py"
+      ],
+      "layer": 0,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "validation_infrastructure"
+      ],
+      "reads": [
+        "scripts/catalog_change_scope.py",
+        "tests/validation_catalog.json"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "required_now",
+      "checkpoint_policy": "default_readiness",
+      "approximate_seconds": 0.1,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Executable contract for classifying a catalog edit as additive or selection-changing, so a routine gate addition stops forcing the complete validation inventory while every reroute still does.",
+      "readme_reference": "test_catalog_change_scope",
+      "notes": "Pure comparison of two in-memory catalogs; performs no subprocess, network, or filesystem writes.",
+      "collected_tests": 21,
+      "baseline_result": "pass",
+      "readme_publishes_command": true
+    },
+    {
       "id": "py.test_codex_finding_disposition",
       "command": ".venv/bin/python -m pytest tests/test_codex_finding_disposition.py -q",
       "test_files": [
@@ -2682,6 +2714,7 @@
         "py.test_asset_map_sync",
         "py.test_atomic_registry_write",
         "py.test_corvette_form_generator_contract",
+        "py.test_catalog_change_scope",
         "py.test_codex_finding_disposition",
         "py.test_editor_lints",
         "py.test_editor_ops_apply",
@@ -3665,6 +3698,7 @@
     "always_gate_ids": [
       "py.test_validation_catalog",
       "py.test_run_layered_validation",
+      "py.test_codex_finding_disposition",
       "py.test_source_parity_canaries",
       "py.test_workbook_truth",
       "cmd.release_candidate_lane"

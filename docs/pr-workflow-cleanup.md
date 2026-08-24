@@ -180,6 +180,37 @@ no commits beyond its archive tag. Restore either with
 
 1. Repo setting: automatically delete head branches on merge.
 2. Weekly branch reaper for merged branches untouched 30+ days.
-3. Required check that fails while an unresolved Codex P1 comment is open.
+3. ~~Required check that fails while an unresolved Codex P1 comment is open.~~ Done 2026-08-24, PR #41.
 4. Stale-PR bot: comment at 30 days, close at 45.
 5. Fail a PR that is more than ~20 commits behind `main`.
+
+## Validation-gate efficiency audit — 2026-08-24
+
+Audited the `release-candidate` gates for redundant or over-broad selection.
+No test-level redundancy exists: the full plan schedules every repository test
+exactly once (938 unique tests, 938 scheduled executions, 0 duplicated, 0
+unowned), and `finalize_ci_validation_plan.py` already proves that invariant.
+Cost is concentrated instead — the six slowest shards were 3,195 s of 4,451 s
+for 90 tests, while 664 tests ran in 192 s.
+
+The waste was in *when* the full suite fired, not in what it contained. All six
+runs sampled went full; PRs #39 and #40 did so solely because they touched
+`tests/validation_catalog.json` to add one gate entry.
+
+| Fix | Effect |
+|---|---|
+| `scripts/catalog_change_scope.py` classifies catalog edits | Adding a gate entry runs the CI contract owners plus that gate instead of the full inventory; removals, retargeting, and `ci`/`serial_groups`/suite edits still escalate, as does an unreadable base catalog |
+| `workbook-manager/review/**` owns `test_group_display_label_contract.py` | Editing review tooling or its reviewed CSV/JSON no longer escalates to the complete Manager suite |
+| Removed the `focused_main_test_covered` carve-out | Coverage fix: editing `tests/test_workbook_manager.py` alongside a frontend file used to *drop* all three Manager partitions |
+| `fable5loop/` edits no longer select `ci-contracts` | A Fable state edit cannot break catalog, planner, or workflow contracts |
+| `py.test_codex_finding_disposition` added to `always_gate_ids` | The layered path and the `ci-contracts` shard now agree on that owner |
+
+Measured on the historical diffs, PR #39 drops from 4,451 s to roughly 1,925 s
+and PR #40 to roughly 2,800 s. Those figures reuse per-shard timings from run
+`32754913746` and estimate shards that run did not execute.
+
+Not changed, and still open if you want them: the shard balance is lopsided
+(`manager-drafts` 20 s against `manager-projection` 647 s), and
+`manager-non-api-sync-and-export` at 584 s sits close enough to the 900 s
+timeout that one slow test would time out rather than fail. Rebalancing needs
+per-test `--durations` profiling first.
