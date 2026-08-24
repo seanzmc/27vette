@@ -99,16 +99,54 @@ review — the generator's own guard exists to protect exactly that. Rewriting
 `current_fallback_label` now would misstate what reviewers actually saw when
 they decided. The code fix applies to any future inventory.
 
-## Branch cleanup
+## Branch cleanup — done 2026-08-24
 
-48 remote branches; roughly 40 are dead.
+Remote went from 48 branches to 6; local from 69 to 9. Nothing was discarded:
+every branch carrying commits not already in `main` was tagged `archive/<branch>`
+and the tags were pushed, so all 21 are recoverable from the remote.
 
-- 3 live (the open PR heads)
-- ~10 merged/superseded checkpoints from 2026-08-13..22
-- ~28 stale from 2026-04..07, 145-676 commits behind
-- 4 with large unmerged divergence and no PR — tag before deleting:
-  `newSchemaData` (160 ahead), `schema_refactor` (154), `ingest-wizard` (88),
-  `db-workflow` (12)
+Restore any of them with:
+
+```bash
+git checkout -b <branch> archive/<branch>
+```
+
+**Kept:** `main`, the five open PR heads (`cloudflare/workers-autoconfig`,
+`codex/workbook-relational-db`, `codex/update-agents-md-validation-workflow`,
+`hermes/workbook-manager-ux-recovery-cp2`,
+`hermes/workbook-manager-ux-recovery-cp3`), and four local-only branches still
+checked out in worktrees.
+
+**Deleted:** 41 remote branches (18 tagged first, 23 already contained in
+`main`) and 60 local branches (3 local-only ones tagged first). A stale
+`refs/remotes/origin/origin` ref that never existed on the remote was also
+removed.
+
+### Archive tags
+
+| Branch | Commit |
+|---|---|
+| `claude/checkpoint-2-pr27-9f6332` | `7bd73740` |
+| `claude/fast-layered-validation-checkpoint-1-55546e` | `2eb33f15` |
+| `claude/fast-layered-validation-suite-4c31f6` | `cacc9f35` |
+| `claude/pr28-assertion-comment-updates-08f007` | `e5592c26` |
+| `codex/gsx-ah2-c2z-standard` | `5dfd7580` |
+| `codex/workbook-manager-closeout` | `8f9c756b` |
+| `codex/workbook-manager-guide-closeout` | `df367ba3` |
+| `codex/workbook-manager-user-guide` | `8cc69e0f` |
+| `codex/zr1x-j58-closeout` | `dc369e80` |
+| `db-workflow` | `dde3e2b1` |
+| `docs/pr-only-delivery` | `4c6fa7f7` |
+| `hermes/checkpoint-3-runtime-state-matrix` | `a22b0e6e` |
+| `hermes/checkpoint-4-validation-and-asset-docs` | `4afe298a` |
+| `hermes/hermes-62195f2e` | `cd95f9dc` |
+| `ingest-wizard` | `b78d7bf2` |
+| `interior-media-pass1` | `2ba26913` |
+| `newSchemaData` | `1066b744` |
+| `pr31` | `4afe298a` |
+| `revert-36-hermes/workbook-manager-ux-recovery-cp1` | `64f393f8` |
+| `safety/main-before-tree-repair-20260609-211401` | `3099c4de` |
+| `schema_refactor` | `d08fec19` |
 
 ## Old pull requests
 
