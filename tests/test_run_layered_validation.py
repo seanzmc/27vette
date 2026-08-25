@@ -461,7 +461,10 @@ def test_ci_infrastructure_only_runs_contracts_not_product_inventory():
     plan = planner.plan_validation(["scripts/plan_ci_validation.py"])
     assert plan["full"] is False
     assert [shard["name"] for shard in plan["include"]] == ["ci-contracts"]
-    assert plan["include"][0]["python_dependencies"] == "pytest"
+    # The shard installs project dependencies, but only so its own contracts can
+    # import what they collect. Running the product inventory is what this test
+    # forbids, and the single-shard assertion above is what forbids it.
+    assert plan["include"][0]["python_dependencies"] == "project"
 
 
 def test_manual_full_plan_partitions_every_measured_heavy_owner():
@@ -739,14 +742,23 @@ def test_manager_main_partitions_are_disjoint_and_exhaustive():
             ],
             cwd=REPO_ROOT, text=True, capture_output=True, check=False,
         )
-        return {
+        nodes = {
             line.strip()
             for line in result.stdout.splitlines()
             if "::" in line and line.strip().startswith("tests/")
         }
+        if not nodes:
+            # Either the partition selects nothing or the environment cannot
+            # import the owner. Both are failures, and both are unreadable as
+            # a bare empty set, so report what pytest actually said.
+            raise AssertionError(
+                "collected no tests from the Manager main owner with "
+                f"{list(args) or 'no -k'}; pytest exited {result.returncode}.\n"
+                f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+            )
+        return nodes
 
     everything = collect()
-    assert everything, "Manager main owner collected no tests"
 
     owners: dict[str, list[str]] = {}
     for expression in expressions:

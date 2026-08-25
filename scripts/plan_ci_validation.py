@@ -194,7 +194,11 @@ def _ci_contract_shard() -> dict[str, object]:
     return _shard(
         "ci-contracts",
         CI_CONTRACT_COMMAND,
-        python_dependencies="pytest",
+        # Project deps, not bare pytest: the partition disjointness contract
+        # shells out to collect tests/test_workbook_manager.py, which cannot be
+        # imported without them. Under bare pytest that collection returns no
+        # nodes and the contract silently proves nothing.
+        python_dependencies="project",
         description="Validate catalog, path transport, planner, and workflow contracts.",
     )
 
