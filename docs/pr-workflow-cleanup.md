@@ -323,13 +323,39 @@ Measured downstream, all passing:
 | `test_editor_server_write_api.py` | 486s (CI) | 28.43s |
 | `test_verify_workbook_candidate.py` (all 17) | ~900s (CI, 2 shards) | 35.70s |
 
+### Measured in CI
+
+Full inventory, run `32777596688` before against run `32792294585` after. Both
+green.
+
+| shard | before | after | factor |
+|---|---|---|---|
+| manager-non-api-sync-and-export | 851s | 41s | 20.8x |
+| manager-api-core | 654s | 79s | 8.3x |
+| manager-projection | 627s | 102s | 6.1x |
+| full-python-editor-server | 486s | 82s | 5.9x |
+| full-python-candidate-canonical | 454s | 62s | 7.3x |
+| full-python-candidate-drift-and-fast | 452s | 40s | 11.3x |
+| full-python-editor-ops | 351s | 58s | 6.1x |
+| manager-non-api-core | 216s | 32s | 6.8x |
+| manager-api-assets | 212s | 31s | 6.8x |
+| full-product-readiness | 279s | 144s | 1.9x |
+| full-python-core | 230s | 173s | 1.3x |
+| manager-non-api-export-overlay | — | 88s | new shard |
+| **total billable job-seconds** | **4,899s** | **1,000s** | **4.9x** |
+| **critical path** | **851s** | **173s** | **4.9x** |
+| timeout headroom used | 95% | 19% | |
+
 ### Two consequences worth deciding on
 
-The shard partitioning is now over-engineered. Unsplit, the non-API owner is
-38.35s locally, roughly 113s in CI including setup, against a 900s timeout.
-Split across three jobs it costs about 215s billable for the same wall clock,
-because each job pays its own ~25s setup. Collapsing the partitions back to one
-shard would now be both simpler and cheaper.
+The shard partitioning is now optional rather than protective. Unsplit, the
+non-API owner is 38.35s locally and would be roughly 80s in CI including setup,
+against a 900s timeout. The three partitions cost 32 + 41 + 88 = 161s billable
+with an 88s critical path, because each job pays its own setup. Collapsing them
+back to one shard would save roughly 80s billable per full run and about 10s of
+wall clock — real but small, and it trades away per-partition failure isolation.
+An earlier note here called the collapse plainly cheaper; that was extrapolated
+from local timings before the CI numbers above existed.
 
 `approximate_seconds` in `tests/validation_catalog.json` is a baseline captured
 2026-08-17 and is now wrong by roughly 10x for every workbook-touching gate. It
