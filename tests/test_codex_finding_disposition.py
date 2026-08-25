@@ -144,6 +144,9 @@ def test_workflow_uses_trusted_base_code_and_reconciles_resolution():
     assert "github.event.repository.default_branch" in workflow
     assert "github.event.pull_request.head" not in workflow
     assert ".github/scripts/codex_finding_disposition.py" in workflow
+    # Cancelled runs read as failures on the PR; Codex fires several events at
+    # once, so overlapping runs must queue rather than cancel each other.
+    assert "cancel-in-progress: false" in workflow
 
 
 def _stale_badge_comment(priority: str, *, url: str = "https://example.test/stale"):
