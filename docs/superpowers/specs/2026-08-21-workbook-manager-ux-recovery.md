@@ -8,8 +8,9 @@ registry/schema/reference slice completed locally on 2026-08-23; its commit,
 evidence are recorded at delivery. Checkpoint 3C's reusable editor shell
 completed locally on 2026-08-24 and was opened as PR 42; its initial delivery
 head passed full-inventory Release candidate run 32775301054. The review-follow-up
-head reruns that required evidence after push. Checkpoint 3D–3F and Checkpoints
-4–6 remain separately gated by §19 and must not begin automatically.
+head reruns that required evidence after push. Checkpoint 3D completed locally
+on 2026-08-25; its delivery evidence is recorded below. Checkpoints 3E–3F and
+Checkpoints 4–6 remain separately gated by §19 and must not begin automatically.
 
 Checkpoint 2 added the approved workbook schema/data and additive generated
 label fields, but did **not** authorize or perform the Checkpoint 5 customer
@@ -1783,9 +1784,32 @@ Codex findings on the delivery PR were implemented inside the closed slice.
   Manager serial group passed 251 tests / skipped 2 intentional slow cases / passed
   62 subtests.
 
-Mandatory stop: this evidence closes only subpass 3C. Subpasses 3D–3F remain
-unimplemented and require explicit sequential authorization; no contextual
-option/group editor, member management, or persistent draft tray was started.
+**Checkpoint 3D completion evidence (2026-08-25):**
+
+- a mutable option detail now opens a dedicated editor whose direct fields and
+  controls derive from existing registry metadata and whose Save uses the
+  existing durable draft-operation route; it does not write the workbook or
+  rebuild outputs;
+- the editor stays open after Save and presents the exact field-level draft
+  overlay plus direct-impact counts while the connected detail behind it retains
+  availability, groups, rules, pricing, images, and navigation context;
+- real-browser proof on Stingray option `5ZU` changed only `option_name`, showed
+  the old/new values and impact counts in the post-Save overlay, and showed the
+  same field-level operation in Review & Apply; the temporary proof draft was
+  cancelled and no Apply/Rebuild ran;
+- focused connected-editing tests and the frontend production build passed;
+  the README-owned complete Workbook Manager checkpoint passed 306 tests,
+  skipped the two intentional slow-only cases, and passed 62 subtests;
+  protected workbook/generated/runtime-contract hashes
+  matched `origin/main`, and `git diff --check` passed;
+- workbook, schema, backend/durable draft contract, generated artifacts,
+  published registry, customer runtime, dependencies, deployment, media,
+  security, dealer behavior, group/member editing, and persistent draft-tray
+  behavior remain unchanged.
+
+Mandatory stop: this evidence closes only subpass 3D. Subpasses 3E–3F remain
+unimplemented and require explicit sequential authorization; no group/member
+editor or persistent draft tray was started.
 
 ### Checkpoint 4 — complete form graph and contextual section management
 
@@ -2091,9 +2115,9 @@ runtime parity from an adjacent test or remembered prior run.
 ### 19.1 Current authorization state
 
 Checkpoints 1 and 2 are complete. Checkpoint 3A/3B's bounded
-registry/schema/reference slice and Checkpoint 3C's reusable shell are complete
-and stopped. Checkpoint 3D–3F and Checkpoints 4–6 remain unauthorized. The next
-implementation agent must receive
+registry/schema/reference slice, Checkpoint 3C's reusable shell, and Checkpoint
+3D's direct option editor are complete and stopped. Checkpoint 3E–3F and
+Checkpoints 4–6 remain unauthorized. The next implementation agent must receive
 an explicit checkpoint instruction and must not treat either the completed
 label migration or control metadata as authorization for customer headings.
 
@@ -2107,7 +2131,8 @@ label migration or control metadata as authorization for customer headings.
 | Switch customer headings to workbook labels | Checkpoint 5 | Label prerequisite is complete; runtime switch still requires explicit Checkpoint 5 approval. |
 | Add complete control metadata and bounded reference lookup | Checkpoint 3A/3B | Complete locally: 25 families / 220 fields have exact coverage; schema/reference APIs are additive and fail closed. Delivery CI is recorded with the PR. |
 | Reusable accessible registry-control editor shell | Checkpoint 3C | Complete locally: drawer/sheet, no-fallback renderer map, validation, dirty-close, busy Save, focus, and responsive browser proof are green; delivery CI is recorded with the PR. |
-| Render and save contextual option/group editors | Checkpoint 3D–3F | Unresolved and unauthorized; the reusable shell does not authorize contextual mutation UI. |
+| Render and save a contextual direct option editor | Checkpoint 3D | Complete locally: registry-driven direct fields, durable draft Save, field overlay, impact summary, connected detail, focused/build/Manager gates, and browser proof are green. |
+| Render and save contextual group/member editors | Checkpoint 3E | Unresolved and unauthorized; the direct option editor does not authorize group/member mutation UI. |
 | New group canonical-ID allocation strategy | Any Add Group feature | Unresolved; Add Group remains blocked. |
 | Any new frontend/backend dependency | Before dependency change | Not approved. |
 | Breaking/removing existing Manager API members | Before API break | Not approved; changes must be additive. |
@@ -2153,11 +2178,11 @@ exhaustively tested text controls rather than accidental frontend defaults.
 
 ### 19.4 Current next action
 
-Remain stopped after Checkpoint 3C. The next sequential implementation action
-is an explicit decision on Checkpoint 3D's contextual option editor. Do not begin
-3D automatically, do not skip ahead to later Checkpoint 3 editors, and do not
-begin the non-sequential Checkpoint 5 customer-runtime heading switch merely
-because its label prerequisite is complete.
+Remain stopped after Checkpoint 3D. The next sequential implementation action
+is an explicit decision on Checkpoint 3E's group/member editor. Do not begin 3E
+automatically, do not skip ahead to later checkpoints, and do not begin the
+non-sequential Checkpoint 5 customer-runtime heading switch merely because its
+label prerequisite is complete.
 
 ## 20. Coding-agent checkpoint execution protocol
 

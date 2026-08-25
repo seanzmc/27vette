@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ArrowLeft, ExternalLink, LockKeyhole, Search } from "lucide-react";
+import { ArrowLeft, ExternalLink, LockKeyhole, Pencil, Search } from "lucide-react";
 import { api } from "../api.js";
+import OptionEditor from "./OptionEditor.jsx";
 
 function TechnicalDetails({ data }) {
   if (!data) return null;
@@ -71,12 +72,16 @@ function GroupDetail({ detail, onNavigate, onBack, onDiagnostic, diagnosticResul
   );
 }
 
-function OptionDetail({ detail, onNavigate, onBack, onDiagnostic, diagnosticResult }) {
+function OptionDetail({
+  detail, onNavigate, onBack, onDiagnostic, diagnosticResult,
+  draftId, draftMutable, onChanged,
+}) {
+  const [editing, setEditing] = useState(false);
   const { option } = detail;
   return (
     <section className="explorer-detail" aria-labelledby="option-detail-heading">
       <button className="btn small" onClick={onBack}><ArrowLeft size={14} /> Back to results</button>
-      <div className="readonly-label"><LockKeyhole size={14} /> Reference only · editing arrives in Checkpoint 3</div>
+      <div className="readonly-label"><LockKeyhole size={14} /> Reference view · edits save to the durable draft</div>
       <h2 id="option-detail-heading">{option.label}</h2>
       <p>{option.description || option.detail_raw || "No additional customer copy is authored."}</p>
       <div className="detail-facts">
@@ -86,6 +91,15 @@ function OptionDetail({ detail, onNavigate, onBack, onDiagnostic, diagnosticResu
         <span><strong>Active</strong>{option.active === "True" ? "Yes" : "No"}</span>
       </div>
       <div className="detail-actions">
+        <button
+          className="btn small"
+          disabled={!draftMutable}
+          title={draftMutable ? "Edit this option in the durable draft" : "The active draft is locked; start a new draft to edit."}
+          onClick={() => setEditing(true)}
+        >
+          <Pencil size={14} /> Edit option in draft
+        </button>
+        {!draftMutable && <span className="muted">Draft locked — editing unavailable.</span>}
         <button className="btn small" onClick={() => onDiagnostic("where_used", option.option_id)}>
           Where this option is used
         </button>
@@ -124,6 +138,16 @@ function OptionDetail({ detail, onNavigate, onBack, onDiagnostic, diagnosticResu
       </div>
       <DiagnosticResults result={diagnosticResult} onNavigate={onNavigate} />
       <TechnicalDetails data={detail.technical} />
+      {editing && (
+        <OptionEditor
+          detail={detail}
+          modelKey={detail.model_key}
+          draftId={draftId}
+          draftMutable={draftMutable}
+          onChanged={onChanged}
+          onClose={() => setEditing(false)}
+        />
+      )}
     </section>
   );
 }
@@ -164,7 +188,9 @@ function RuleDetail({ detail, onNavigate, onBack }) {
   );
 }
 
-export default function ConnectedExplorer({ mode, modelKey }) {
+export default function ConnectedExplorer({
+  mode, modelKey, draftId, draftMutable, onChanged,
+}) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -217,7 +243,7 @@ export default function ConnectedExplorer({ mode, modelKey }) {
 
   const runEntityDiagnostic = (key, entityId) => runDiagnostic({ key }, entityId);
 
-  if (selected?.entity_type === "option") return <OptionDetail detail={selected} onNavigate={navigate} onBack={() => { setSelected(null); setDiagnosticResult(null); }} onDiagnostic={runEntityDiagnostic} diagnosticResult={diagnosticResult} />;
+  if (selected?.entity_type === "option") return <OptionDetail detail={selected} onNavigate={navigate} onBack={() => { setSelected(null); setDiagnosticResult(null); }} onDiagnostic={runEntityDiagnostic} diagnosticResult={diagnosticResult} draftId={draftId} draftMutable={draftMutable} onChanged={onChanged} />;
   if (selected?.entity_type === "group") return <GroupDetail detail={selected} onNavigate={navigate} onBack={() => { setSelected(null); setDiagnosticResult(null); }} onDiagnostic={runEntityDiagnostic} diagnosticResult={diagnosticResult} />;
   if (selected?.entity_type === "section") return <SectionDetail detail={selected} onNavigate={navigate} onBack={() => setSelected(null)} />;
   if (selected?.entity_type === "rule") return <RuleDetail detail={selected} onNavigate={navigate} onBack={() => setSelected(null)} />;
