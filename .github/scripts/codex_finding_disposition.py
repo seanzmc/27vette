@@ -5,6 +5,14 @@ The script deliberately executes from the trusted default branch. It reads pull
 request review threads through GraphQL and writes one commit status per open PR
 head. Current unresolved Codex P0/P1 findings fail the status; resolved or
 outdated findings and P2/P3 advisories do not.
+
+Absence of evidence is not evidence of absence: if the Codex badge markup drifts
+away from the strict pattern the parser knows, the run reports ``error`` rather
+than silently passing a PR whose findings it could no longer read.
+
+Blocking findings are also mirrored into a single sticky pull request comment so
+the reason for a red gate is visible without opening the checks tab. The comment
+is edited in place across runs and deleted once the PR is clean.
 """
 
 from __future__ import annotations
@@ -23,7 +31,16 @@ API_ROOT = "https://api.github.com"
 GRAPHQL_URL = f"{API_ROOT}/graphql"
 CODEX_LOGIN = "chatgpt-codex-connector"
 STATUS_CONTEXT = "codex-finding-disposition"
+COMMENT_MARKER = "<!-- codex-finding-disposition -->"
+
+# The markup Codex is known to emit today. Findings parsed from this pattern are
+# trusted verbatim.
 PRIORITY_BADGE = re.compile(r"!\[P([0-3]) Badge\]")
+
+# A deliberately looser net for the same badge. Anything this matches is a real
+# finding, so a comment that trips the fallback without tripping PRIORITY_BADGE
+# means the upstream markup drifted and PRIORITY_BADGE has gone stale.
+PRIORITY_BADGE_FALLBACK = re.compile(r"shields\.io/badge/P([0-3])")
 
 
 class Finding(NamedTuple):
@@ -38,42 +55,58 @@ class Evaluation(NamedTuple):
     blockers: tuple[Finding, ...]
     advisories: tuple[Finding, ...]
     status_state: str
+    stale_parser: tuple[Finding, ...] = ()
 
     @property
     def blocking_count(self) -> int:
         return len(self.blockers)
+
+    @property
+    def parser_is_stale(self) -> bool:
+        return bool(self.stale_parser)
 
 
 def evaluate_threads(threads: Sequence[dict[str, Any]]) -> Evaluation:
     """Classify current structured findings from the Codex connector."""
 
     findings: list[Finding] = []
+    stale_parser: list[Finding] = []
     for thread in threads:
         if thread.get("isResolved") or thread.get("isOutdated"):
             continue
         for comment in thread.get("comments", {}).get("nodes", ()):
             if (comment.get("author") or {}).get("login") != CODEX_LOGIN:
                 continue
-            match = PRIORITY_BADGE.search(str(comment.get("body") or ""))
-            if not match:
+            body = str(comment.get("body") or "")
+            match = PRIORITY_BADGE.search(body)
+            fallback = PRIORITY_BADGE_FALLBACK.search(body)
+            if not match and not fallback:
                 continue
-            findings.append(
-                Finding(
-                    priority=int(match.group(1)),
-                    url=str(comment.get("url") or ""),
-                    path=str(thread.get("path") or ""),
-                    line=thread.get("line"),
-                )
+            finding = Finding(
+                priority=int((match or fallback).group(1)),
+                url=str(comment.get("url") or ""),
+                path=str(thread.get("path") or ""),
+                line=thread.get("line"),
             )
+            findings.append(finding)
+            if not match:
+                stale_parser.append(finding)
 
     ordered = tuple(sorted(findings, key=lambda item: (item.priority, item.url)))
     blockers = tuple(item for item in ordered if item.priority <= 1)
     advisories = tuple(item for item in ordered if item.priority > 1)
+    if stale_parser:
+        status_state = "error"
+    elif blockers:
+        status_state = "failure"
+    else:
+        status_state = "success"
     return Evaluation(
         findings=ordered,
         blockers=blockers,
         advisories=advisories,
-        status_state="failure" if blockers else "success",
+        status_state=status_state,
+        stale_parser=tuple(sorted(stale_parser, key=lambda item: (item.priority, item.url))),
     )
 
 
@@ -81,7 +114,9 @@ def status_payload(evaluation: Evaluation, pull_request_url: str) -> dict[str, s
     """Build the stable commit-status payload consumed by the main ruleset."""
 
     count = evaluation.blocking_count
-    if count:
+    if evaluation.parser_is_stale:
+        description = "Codex badge markup changed; disposition parser needs an update"
+    elif count:
         noun = "finding" if count == 1 else "findings"
         description = f"{count} unresolved current Codex P0/P1 {noun} blocks merge"
     else:
@@ -92,6 +127,49 @@ def status_payload(evaluation: Evaluation, pull_request_url: str) -> dict[str, s
         "description": description,
         "target_url": pull_request_url,
     }
+
+
+def _finding_bullet(finding: Finding) -> str:
+    location = finding.path or "(no file)"
+    if finding.line is not None:
+        location = f"{location}:{finding.line}"
+    return f"- **P{finding.priority}** [`{location}`]({finding.url})"
+
+
+def comment_body(evaluation: Evaluation) -> str:
+    """Render the sticky pull request comment for a non-clean evaluation."""
+
+    lines = [COMMENT_MARKER, "### Codex finding disposition", ""]
+
+    if evaluation.parser_is_stale:
+        lines += [
+            "> [!CAUTION]",
+            "> Codex priority badges no longer match the pattern this gate parses, so"
+            " findings may be missing from the list below. Update `PRIORITY_BADGE` in"
+            " `.github/scripts/codex_finding_disposition.py` before trusting a green run.",
+            "",
+        ]
+
+    if evaluation.blockers:
+        noun = "finding" if evaluation.blocking_count == 1 else "findings"
+        lines.append(f"**{evaluation.blocking_count} unresolved P0/P1 {noun} blocking merge:**")
+        lines += [_finding_bullet(item) for item in evaluation.blockers]
+        lines.append("")
+    elif not evaluation.parser_is_stale:
+        lines += ["No unresolved P0/P1 findings.", ""]
+
+    if evaluation.advisories:
+        noun = "advisory" if len(evaluation.advisories) == 1 else "advisories"
+        lines.append(f"<details><summary>{len(evaluation.advisories)} P2/P3 {noun} (non-blocking)</summary>")
+        lines.append("")
+        lines += [_finding_bullet(item) for item in evaluation.advisories]
+        lines += ["", "</details>", ""]
+
+    lines.append(
+        "Resolve or dismiss each thread above to clear the "
+        f"`{STATUS_CONTEXT}` status. This comment is updated in place and removed once the PR is clean."
+    )
+    return "\n".join(lines)
 
 
 class GitHubClient:
@@ -106,7 +184,13 @@ class GitHubClient:
         self.name = name
         self.token = token
 
-    def _request(self, url: str, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+    def _request(
+        self,
+        url: str,
+        payload: dict[str, Any] | None = None,
+        *,
+        method: str | None = None,
+    ) -> Any:
         data = None if payload is None else json.dumps(payload).encode("utf-8")
         request = urllib.request.Request(
             url,
@@ -118,11 +202,12 @@ class GitHubClient:
                 "User-Agent": "27vette-codex-finding-disposition",
                 "X-GitHub-Api-Version": "2022-11-28",
             },
-            method="GET" if data is None else "POST",
+            method=method or ("GET" if data is None else "POST"),
         )
         try:
             with urllib.request.urlopen(request, timeout=30) as response:
-                return json.load(response)
+                body = response.read()
+                return json.loads(body) if body else None
         except urllib.error.HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")
             raise RuntimeError(f"GitHub API returned HTTP {exc.code}: {detail}") from exc
@@ -224,6 +309,45 @@ class GitHubClient:
             payload,
         )
 
+    def find_sticky_comment_id(self, number: int) -> int | None:
+        page = 1
+        while True:
+            comments = self._request(
+                f"{API_ROOT}/repos/{self.repository}/issues/{number}"
+                f"/comments?per_page=100&page={page}"
+            )
+            if not comments:
+                return None
+            for comment in comments:
+                if COMMENT_MARKER in str(comment.get("body") or ""):
+                    return int(comment["id"])
+            if len(comments) < 100:
+                return None
+            page += 1
+
+    def upsert_sticky_comment(self, number: int, body: str) -> None:
+        comment_id = self.find_sticky_comment_id(number)
+        if comment_id is None:
+            self._request(
+                f"{API_ROOT}/repos/{self.repository}/issues/{number}/comments",
+                {"body": body},
+            )
+        else:
+            self._request(
+                f"{API_ROOT}/repos/{self.repository}/issues/comments/{comment_id}",
+                {"body": body},
+                method="PATCH",
+            )
+
+    def delete_sticky_comment(self, number: int) -> None:
+        comment_id = self.find_sticky_comment_id(number)
+        if comment_id is None:
+            return
+        self._request(
+            f"{API_ROOT}/repos/{self.repository}/issues/comments/{comment_id}",
+            method="DELETE",
+        )
+
 
 def evaluate_pull_request(
     client: GitHubClient,
@@ -245,8 +369,29 @@ def evaluate_pull_request(
             location = f"{location}:{finding.line}"
         print(f"  P{finding.priority} {location} {finding.url}")
 
-    if not dry_run:
-        client.set_status(pull_request["headRefOid"], payload)
+    if evaluation.parser_is_stale:
+        print(
+            f"PR #{number}: {len(evaluation.stale_parser)} finding(s) matched only the "
+            "fallback badge pattern — update PRIORITY_BADGE in this script.",
+            file=sys.stderr,
+        )
+
+    if dry_run:
+        return evaluation
+
+    client.set_status(pull_request["headRefOid"], payload)
+
+    # The commit status is the enforcement; the sticky comment is only a mirror of
+    # it. A comment API failure must never leave the gate unset, so it is reported
+    # without failing the run.
+    try:
+        if evaluation.blockers or evaluation.parser_is_stale:
+            client.upsert_sticky_comment(number, comment_body(evaluation))
+        else:
+            client.delete_sticky_comment(number)
+    except RuntimeError as exc:
+        print(f"PR #{number}: could not update the sticky comment: {exc}", file=sys.stderr)
+
     return evaluation
 
 
