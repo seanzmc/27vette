@@ -160,6 +160,7 @@ mutations and any future candidate promotion — so supported serving is
 containment behavior, and test commands: `workbook-manager/README.md`. Focused
 tests: `tests/test_group_display_label_contract.py`,
 `tests/test_workbook_manager_control_metadata.py`,
+`tests/test_workbook_manager_connected_editing.py`,
 `tests/test_workbook_manager_catalog.py`,
 `tests/test_workbook_manager_import_projection.py`,
 `tests/test_workbook_manager_fixtures.py`,
@@ -380,7 +381,7 @@ The remaining `tests/test_*.py` files are not in that gate and are chosen by cha
 |---|---|
 | Workbook write path / editor | `test_editor_ops_apply`, `test_editor_ops_meta`, `test_editor_ops_global_families`, `test_editor_lints`, `test_editor_server_payload`, `test_editor_server_write_api` |
 | Workbook domain / ChangeSet | `test_workbook_domain_registry`, `test_workbook_changeset`, `test_workbook_changeset_service`, `test_workbook_bool_hygiene` |
-| Workbook Manager | `test_group_display_label_contract`, `test_workbook_manager_control_metadata`, `test_workbook_manager`, `test_workbook_manager_catalog`, `test_workbook_manager_import_projection`, `test_workbook_manager_generated_parity`, `test_workbook_manager_api_concurrency`, `test_workbook_manager_drafts`, `test_workbook_manager_changeset_lifecycle`, `test_workbook_manager_apply_rebuild` |
+| Workbook Manager | `test_group_display_label_contract`, `test_workbook_manager_control_metadata`, `test_workbook_manager_connected_editing`, `test_workbook_manager`, `test_workbook_manager_catalog`, `test_workbook_manager_import_projection`, `test_workbook_manager_generated_parity`, `test_workbook_manager_api_concurrency`, `test_workbook_manager_drafts`, `test_workbook_manager_changeset_lifecycle`, `test_workbook_manager_apply_rebuild` |
 | Source assembly / runtime metadata | `test_source_assembly_characterization`, `test_runtime_metadata_guards`, `test_corvette_form_generator_contract` |
 | Composed candidate / real all-model generation | `test_verify_workbook_candidate`, `test_all_model_runtime_generation` |
 | Publication | `test_atomic_registry_write` |
