@@ -485,6 +485,13 @@ def test_manual_full_plan_partitions_every_measured_heavy_owner():
         "manager-projection",
         "manager-drafts",
         "manager-apply-boundaries",
+        # Narrow-plan-only wiring, smoked so planner changes cannot break it
+        # silently. See test_every_narrow_plan_only_shard_is_smoked_by_full_runs.
+        "smoke-ci-contracts",
+        "smoke-manager-review-tooling",
+        "smoke-fable-contracts",
+        "smoke-manager-read-explorer",
+        "smoke-docs-only",
     ]
 
     product = plan["include"][0]
@@ -716,6 +723,209 @@ def test_the_codex_disposition_owner_is_an_always_gate():
     # The ci-contracts shard runs this owner whenever no layered shard does.
     # Both paths must agree, or the gate depends on which branch CI takes.
     assert "py.test_codex_finding_disposition" in catalog["ci"]["always_gate_ids"]
+
+
+def _every_shard_the_planner_can_build(planner) -> dict[str, dict]:
+    """Every shard reachable from any planner factory, found by reflection.
+
+    A hand-written list of sample diffs cannot stay exhaustive: a new route added
+    later is simply absent, and the guard below then passes while proving less.
+    Reflection over the factories keeps the universe honest, and
+    ``test_no_shard_is_built_outside_a_factory`` stops a shard from hiding in an
+    inline ``_shard(...)`` call where reflection cannot see it.
+    """
+
+    built: dict[str, dict] = {}
+    for name in dir(planner):
+        if not name.startswith("_") or not name.endswith(("_shard", "_shards")):
+            continue
+        factory = getattr(planner, name)
+        if not callable(factory) or name == "_shard":
+            continue
+        try:
+            produced = factory()
+        except TypeError:
+            # Parameterised factories are covered by the scenario cross-check.
+            continue
+        if isinstance(produced, dict):
+            produced = (produced,)
+        for shard in produced:
+            built[str(shard["name"])] = shard
+    return built
+
+
+def _scenario_reachable_shards(planner) -> dict[str, dict]:
+    """Shards produced by running the planner over representative diffs."""
+
+    scenarios = (
+        ["docs/operator-note.md"],
+        ["scripts/corvette_form_generator/rules.py"],
+        ["scripts/plan_ci_validation.py"],
+        ["workbook-manager/frontend/src/components/EditorShell.jsx"],
+        ["workbook-manager/review/tool.py"],
+        ["workbook-manager/backend/app/explorer.py"],
+        ["workbook-manager/frontend/src/x.jsx", "workbook-manager/backend/app/explorer.py"],
+        ["workbook-manager/backend/app/apply_rebuild.py"],
+        ["workbook-manager/backend/app/drafts.py"],
+        ["workbook-manager/backend/app/projection.py"],
+        ["workbook-manager/backend/app/config.py"],
+        ["workbook-manager/backend/app.py"],
+        ["tests/test_workbook_manager.py"],
+        ["tests/test_workbook_manager_drafts.py"],
+        ["tests/workbook_manager_fixtures.py"],
+        ["form-app/app.js"],
+        ["fable5loop/STATE.md"],
+    )
+    reachable = {
+        str(shard["name"]): shard
+        for scenario in scenarios
+        for shard in planner.plan_validation(scenario)["include"]
+    }
+    reachable.update({
+        str(shard["name"]): shard
+        for shard in planner.plan_validation(
+            ["tests/validation_catalog.json"],
+            catalog_gate_ids=["py.test_catalog_change_scope"],
+        )["include"]
+    })
+    return reachable
+
+
+def _is_exempt(planner, name: str) -> bool:
+    if name in planner.SMOKE_EXEMPT_SHARDS:
+        return True
+    return any(
+        name.startswith(prefix) for prefix in planner.SMOKE_EXEMPT_SHARD_PREFIXES
+    )
+
+
+def test_no_shard_is_built_outside_a_factory():
+    """Reflection is only exhaustive while every shard comes from a factory.
+
+    A ``_shard(...)`` call inside plan_validation builds a shard that
+    _every_shard_the_planner_can_build cannot see, silently shrinking the guard
+    below. manager-apply-candidate was exactly that until it was extracted.
+
+    This reads the source rather than the module: keeping a factory around while
+    plan_validation still constructs the shard inline would defeat any check
+    based on the names reflection can reach.
+    """
+
+    import ast
+
+    source = (REPO_ROOT / "scripts" / "plan_ci_validation.py").read_text(
+        encoding="utf-8"
+    )
+    tree = ast.parse(source)
+
+    offenders = []
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        if node.name.endswith(("_shard", "_shards")):
+            continue
+        for inner in ast.walk(node):
+            if (
+                isinstance(inner, ast.Call)
+                and isinstance(inner.func, ast.Name)
+                and inner.func.id == "_shard"
+            ):
+                offenders.append(f"{node.name}:{inner.lineno}")
+
+    assert not offenders, (
+        f"_shard() called outside a factory at {offenders}. Extract each into a "
+        "_*_shard() factory so the smoke guard can see it."
+    )
+
+
+def test_every_narrow_plan_only_shard_is_smoked_by_full_runs():
+    """A shard a full run never reaches is a shard no planner change can test.
+
+    Every edit to the planner forces a full run, so without this the wiring of a
+    narrow-plan-only shard is only ever executed by unrelated pull requests. That
+    is exactly how ci-contracts shipped with bare pytest while its own contract
+    needed openpyxl to collect anything.
+    """
+
+    planner = _load_planner()
+
+    full_names = {
+        str(shard["name"])
+        for shard in planner.plan_validation([], full=True)["include"]
+    }
+    smoked = {
+        name[len("smoke-"):] for name in full_names if name.startswith("smoke-")
+    }
+
+    universe = set(_every_shard_the_planner_can_build(planner))
+    universe |= set(_scenario_reachable_shards(planner))
+    universe -= {name for name in universe if name.startswith("smoke-")}
+
+    narrow_only = universe - full_names
+    unsmoked = {
+        name
+        for name in narrow_only
+        if name not in smoked and not _is_exempt(planner, name)
+    }
+    assert not unsmoked, (
+        f"narrow-plan-only shards a full run never exercises: {sorted(unsmoked)}. "
+        "Add them to _smoke_shards() or justify them in SMOKE_EXEMPT_SHARDS."
+    )
+
+
+def test_smoke_exemptions_stay_honest():
+    """An exemption must name a shard the planner still builds and never smokes."""
+
+    planner = _load_planner()
+    universe = set(_every_shard_the_planner_can_build(planner))
+    universe |= set(_scenario_reachable_shards(planner))
+
+    stale = set(planner.SMOKE_EXEMPT_SHARDS) - universe
+    assert not stale, f"SMOKE_EXEMPT_SHARDS names no longer planned: {sorted(stale)}"
+
+    full_names = {
+        str(shard["name"])
+        for shard in planner.plan_validation([], full=True)["include"]
+    }
+    smoked = {
+        name[len("smoke-"):] for name in full_names if name.startswith("smoke-")
+    }
+    both = set(planner.SMOKE_EXEMPT_SHARDS) & smoked
+    assert not both, f"shards both smoked and exempt: {sorted(both)}"
+
+    unused_prefixes = {
+        prefix
+        for prefix in planner.SMOKE_EXEMPT_SHARD_PREFIXES
+        if not any(name.startswith(prefix) for name in universe)
+    }
+    assert not unused_prefixes, (
+        f"SMOKE_EXEMPT_SHARD_PREFIXES matches nothing planned: {sorted(unused_prefixes)}"
+    )
+
+
+def test_smoke_shards_keep_the_real_shard_wiring():
+    """A smoke shard proves nothing if its command or toolchain has drifted."""
+
+    planner = _load_planner()
+    full = {shard["name"]: shard for shard in planner.plan_validation([], full=True)["include"]}
+    originals = {
+        shard["name"]: shard
+        for shard in (
+            planner._ci_contract_shard(),
+            planner._manager_review_shard(),
+            planner._fable_contract_shard(),
+            planner._docs_only_shard(),
+        )
+    }
+
+    assert originals, "no smoke sources to compare"
+    for name, original in originals.items():
+        smoke = full.get(f"smoke-{name}")
+        assert smoke is not None, f"full plan lost smoke-{name}"
+        for field in ("command", "python", "node", "python_dependencies"):
+            assert smoke[field] == original[field], (
+                f"smoke-{name} {field} drifted from the real {name} shard"
+            )
 
 
 def test_manager_main_partitions_are_disjoint_and_exhaustive():

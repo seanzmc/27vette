@@ -218,7 +218,7 @@ The first command is the no-write preflight/proposal. Run `--write` only after t
 
 ## Validation
 
-Pull requests targeting `main` run the required `release-candidate` GitHub check from `.github/workflows/release-candidate.yml`. The catalog-driven runner executes the catalog/oracle Layer 0 core plus the composed Layer 1 candidate on every PR, selects directly changed test owners and affected Layer 0–3 gates, co-selects and executes the complete `workbook_manager` serial group in one pytest process when its shared fixture is needed, and uses a conservative validation/generator fallback for unclassified paths. Layer 4 remains diagnostic-only. It uploads one stage-timed JSON report:
+Pull requests targeting `main` run the required `release-candidate` GitHub check from `.github/workflows/release-candidate.yml`. The catalog-driven runner executes the catalog/oracle Layer 0 core plus the composed Layer 1 candidate on every PR, selects directly changed test owners and affected Layer 0–3 gates, co-selects the complete `workbook_manager` serial group when its shared fixture is needed, and uses a conservative validation/generator fallback for unclassified paths. That group no longer runs in one pytest process: `scripts/plan_ci_validation.py` splits its main owner into five disjoint partitions on every plan, not only on full runs, because unsplit it measured close to the job timeout. `tests/test_run_layered_validation.py` proves by collection that the five own every test in that file exactly once. Layer 4 remains diagnostic-only. It uploads one stage-timed JSON report:
 
 ```sh
 python scripts/run_layered_validation.py \
@@ -247,6 +247,15 @@ contract:
 .venv/bin/python -m pytest tests/test_catalog_change_scope.py -q
 ```
 
+A full run also smokes every shard that only change-aware plans produce. Those
+shards are unreachable from a full plan, and any edit to the planner forces a
+full plan, so without this their command and dependency wiring is only ever
+executed by unrelated pull requests. `tests/test_run_layered_validation.py`
+derives the shard universe by reflection over the planner's factories, requires
+each narrow-only shard to be smoked or justified in `SMOKE_EXEMPT_SHARDS`, and
+parses the planner with `ast` to reject a shard built outside a factory, where
+reflection could not see it.
+
 `.github/workflows/codex-finding-disposition.yml` maintains the
 `codex-finding-disposition` commit status from GitHub review threads. A current,
 unresolved structured Codex P0 or P1 finding fails the status; resolved or
@@ -272,10 +281,11 @@ After the workflow lands on `main` and publishes the status at least once, add
 status contexts. Do not register it before the default branch can publish the
 context, or every open PR will be blocked by a missing status.
 
-The required job allows 25 minutes because a Workbook Manager source change
-runs the composed candidate lane and then the complete shared-fixture Manager
-acceptance group. Selection remains catalog-driven; the larger limit does not
-add the Layer 4 full inventory. The frontend install explicitly includes
+Every validation job has a 15-minute hard limit. A Workbook Manager source
+change runs the composed candidate lane and the shared-fixture Manager
+acceptance group, which is why that group is split across parallel partitions
+rather than given a longer timeout. Selection remains catalog-driven; the
+partitions do not add the Layer 4 full inventory. The frontend install explicitly includes
 lockfile-pinned development dependencies because Vite is the production build
 tool, even when the invoking environment sets `NODE_ENV=production`.
 

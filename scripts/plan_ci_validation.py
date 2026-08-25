@@ -367,12 +367,104 @@ def _manager_apply_boundaries_shard() -> dict[str, object]:
     )
 
 
+def _layered_changed_surfaces_shard(
+    layered_paths: Iterable[str],
+) -> dict[str, object]:
+    command = [
+        ".venv/bin/python",
+        "scripts/run_layered_validation.py",
+        "--report",
+        "layered-validation-report.json",
+    ]
+    for path in layered_paths:
+        command.extend(("--changed-file", path))
+    return _shard(
+        "layered-changed-surfaces",
+        shlex.join(command),
+        node=True,
+        description="Delegate non-Manager changes to the catalog selector.",
+    )
+
+
+def _manager_apply_candidate_shard() -> dict[str, object]:
+    return _shard(
+        "manager-apply-candidate",
+        ".venv/bin/python scripts/verify_workbook_candidate.py "
+        "--workbook stingray_master.xlsx --changed-model '*' "
+        "--report candidate-report.json",
+        node=True,
+        description="Run the composed candidate for Apply/Rebuild changes.",
+    )
+
+
 def _manager_full_shards() -> tuple[dict[str, object], ...]:
     return (
         *_manager_main_shards(),
         _manager_projection_shard(),
         _manager_drafts_shard(),
         _manager_apply_boundaries_shard(),
+    )
+
+
+# Shards that only ever appear in change-aware plans. A full run reaches none of
+# them, and every change to this planner forces a full run, so their command and
+# environment wiring was never executed by the pull request that changed it. That
+# is how ci-contracts shipped declaring bare pytest while its own contract shelled
+# out to collect a module needing openpyxl: collection returned nothing and the
+# contract asserted against an empty set. Full runs now smoke them.
+#
+# Exemptions are shards whose wiring an ordinary full shard already proves, or
+# whose command cannot be smoked meaningfully:
+SMOKE_EXEMPT_SHARDS = {
+    # Identical npm ci + build wiring to full-product-readiness, which every full
+    # run executes. Its one extra test is owned by manager-non-api-core.
+    "manager-frontend": "full-product-readiness runs the same node wiring",
+    # Same npm wiring again, and its pytest node ids are the explorer set that
+    # smoke-manager-read-explorer already proves still resolve.
+    "manager-read-ui": "node wiring and node ids are smoked elsewhere",
+    # Byte-identical python command to the first stage of full-product-readiness.
+    "manager-apply-candidate": "full-product-readiness runs the same command",
+}
+
+# Shards whose names are built from the diff, so there is no fixed name to smoke.
+# Each entry must still describe wiring an ordinary shard already proves.
+SMOKE_EXEMPT_SHARD_PREFIXES = {
+    # Command is derived from the changed paths themselves, so a synthetic
+    # invocation would prove nothing about any real one.
+    "layered-changed-surfaces": "command is diff-derived, not static",
+    # One "pytest <changed test file> -q" per changed Manager support test. The
+    # wiring is what smoke-manager-review-tooling already runs.
+    "changed-": "plain pytest wiring, smoked by smoke-manager-review-tooling",
+    # Emitted only for gates a purely additive catalog edit declared, and the
+    # command is those gates' own catalog commands.
+    "catalog-new-gates": "requires an additive catalog diff to exist",
+}
+
+
+def _smoke_shards() -> tuple[dict[str, object], ...]:
+    """Prove the narrow-plan-only shards can still run, on every full run.
+
+    Each keeps the exact command, toolchain flags, and dependency profile of the
+    real shard, so a break in that wiring fails here instead of on some unrelated
+    pull request that happens to plan narrowly.
+    """
+
+    return tuple(
+        _shard(
+            f"smoke-{shard['name']}",
+            str(shard["command"]),
+            python=bool(shard["python"]),
+            node=bool(shard["node"]),
+            python_dependencies=str(shard["python_dependencies"]),
+            description=f"Smoke the narrow-plan {shard['name']} shard wiring.",
+        )
+        for shard in (
+            _ci_contract_shard(),
+            _manager_review_shard(),
+            _fable_contract_shard(),
+            _manager_read_explorer_shard(),
+            _docs_only_shard(),
+        )
     )
 
 
@@ -477,7 +569,7 @@ def plan_validation(
     )
     if full or GLOBAL_TEST_ENVIRONMENT_PATHS.intersection(paths):
         return {
-            "include": list(_full_suite_shards()),
+            "include": [*_full_suite_shards(), *_smoke_shards()],
             "changed_paths": list(paths),
             "full": True,
         }
@@ -566,17 +658,7 @@ def plan_validation(
         for shard in _manager_full_shards():
             _add(shards, shard)
         if apply_changed:
-            _add(
-                shards,
-                _shard(
-                    "manager-apply-candidate",
-                    ".venv/bin/python scripts/verify_workbook_candidate.py "
-                    "--workbook stingray_master.xlsx --changed-model '*' "
-                    "--report candidate-report.json",
-                    node=True,
-                    description="Run the composed candidate for Apply/Rebuild changes.",
-                ),
-            )
+            _add(shards, _manager_apply_candidate_shard())
     else:
         focused_read = read_changed and not (
             draft_changed or projection_changed or api_changed
@@ -621,23 +703,7 @@ def plan_validation(
         _add(shards, _fable_contract_shard())
 
     if layered_paths:
-        command = [
-            ".venv/bin/python",
-            "scripts/run_layered_validation.py",
-            "--report",
-            "layered-validation-report.json",
-        ]
-        for path in layered_paths:
-            command.extend(("--changed-file", path))
-        _add(
-            shards,
-            _shard(
-                "layered-changed-surfaces",
-                shlex.join(command),
-                node=True,
-                description="Delegate non-Manager changes to the catalog selector.",
-            ),
-        )
+        _add(shards, _layered_changed_surfaces_shard(layered_paths))
 
     if manager_source_paths and not any(
         str(shard["name"]).startswith("manager-") for shard in shards.values()

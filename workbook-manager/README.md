@@ -291,9 +291,13 @@ summing member `approximate_seconds` values. In particular, generated parity
 measures 147.68 seconds alone because it pays the shared build, while the same
 build is already warm inside the complete checkpoint.
 
-Changed-surface CI uses the same one-process Manager serial-group command but
-does not add the separately cataloged `test_asset_map_sync.py`; that asset gate
-is selected only for `asset_map` changes.
+Run it in one process locally, as shown. CI no longer does: the planner splits
+this owner into five disjoint partitions across parallel jobs on every plan,
+because unsplit it measured close to the 15-minute job timeout. Each partition
+pays the shared build once, so per-partition wall clock is not comparable to the
+standalone values above. CI also does not add the separately cataloged
+`test_asset_map_sync.py`; that asset gate is selected only for `asset_map`
+changes.
 
 ```sh
 .venv/bin/python -m pytest \

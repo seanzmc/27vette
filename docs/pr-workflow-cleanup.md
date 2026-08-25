@@ -441,3 +441,73 @@ cold spots share the shape and were left alone:
 `workbook-manager/review/generate_group_display_label_review.py:131` (offline
 review tooling, its gate runs in 1.6s) and `scripts/promote_model.py:51,68`
 (a manual promotion CLI, in no gate).
+
+## Narrow-plan-only shards were never exercised by the changes that broke them
+
+Merging PR 43 into PR 42 produced the first change-aware plan that selected
+`ci-contracts`, and it failed immediately:
+
+```
+AssertionError: Manager main owner collected no tests
+assert set()
+```
+
+`test_manager_main_partitions_are_disjoint_and_exhaustive` shells out to
+`pytest --collect-only` on `tests/test_workbook_manager.py` to prove the five
+Manager `-k` expressions own every test exactly once. The `ci-contracts` shard
+installed bare `pytest`, so that collection died on a missing `openpyxl`,
+returned no nodes, and the contract compared two empty sets. It had been
+proving nothing.
+
+PR 43 could not have caught this. Every edit to the planner forces a full run,
+and **the full plan contains no `ci-contracts` shard at all** — the contract ran
+under `full-python-core`, which installs project dependencies. The shard only
+appears in narrow plans, so no pull request that changes it can execute it.
+
+Two fixes, one local and one structural:
+
+1. `ci-contracts` installs project dependencies, because its own contracts
+   import what they collect. Zero collected nodes now raises with pytest's real
+   stdout and stderr instead of a bare empty set.
+2. Full runs now smoke every narrow-plan-only shard, keeping the real command,
+   toolchain flags, and dependency profile. `smoke-ci-contracts`,
+   `smoke-manager-review-tooling`, `smoke-fable-contracts`, and
+   `smoke-docs-only` add roughly three minutes billable and nothing to the
+   critical path, since they run in parallel with the heavy owners.
+
+`test_every_narrow_plan_only_shard_is_smoked_by_full_runs` is the durable part.
+It enumerates each routed path surface, subtracts the full plan, and requires
+every remaining shard to be smoked or justified in `SMOKE_EXEMPT_SHARDS`. It
+found `fable-contracts` on its first run: a full inventory never validated the
+Fable 5 loop. Exemptions must name a shard that is still actually planned.
+
+### The first version of that guard was not exhaustive
+
+Codex review caught it: the guard enumerated a hand-written list of sample
+diffs, so `manager-read-explorer`, `manager-read-ui`, `manager-apply-candidate`,
+and the `changed-*` family were never reached, smoked, or exempted. A sample
+list cannot stay exhaustive — a route added later is simply absent, and the
+guard then passes while proving less.
+
+The universe is now found by reflection over the planner's `_*_shard()`
+factories, unioned with the scenario sweep. That only holds while every shard
+comes from a factory, so `test_no_shard_is_built_outside_a_factory` parses the
+planner with `ast` and fails on any `_shard(...)` call outside one. Reflection
+alone could not do this: keeping a factory while `plan_validation` builds the
+shard inline still hides it, and an early version of the check passed against
+exactly that mutation. The AST check found `layered-changed-surfaces` still
+inline on its first run; both it and `manager-apply-candidate` are now factories.
+
+`smoke-manager-read-explorer` was added, which also guards the four pytest node
+ids that shard names against a rename.
+
+Exempt by name, each already proven by an ordinary full shard:
+`manager-frontend` and `manager-read-ui` (identical `npm ci` and build wiring to
+`full-product-readiness`; `manager-read-ui`'s node ids are the explorer set) and
+`manager-apply-candidate` (byte-identical command to that shard's first stage).
+
+Exempt by prefix, because the diff builds the name so there is none to smoke:
+`layered-changed-surfaces`, `changed-` (plain `pytest <file> -q`, the wiring
+`smoke-manager-review-tooling` runs), and `catalog-new-gates`. Exemptions must
+name something still planned, must not also be smoked, and prefixes must match
+at least one real shard.
