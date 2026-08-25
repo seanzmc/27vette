@@ -23,3 +23,7 @@ form-output/ingest/
 form-output/ingest-wizard/
 
 graphify-out/
+
+# release-candidate lane report, written to the repo root by
+# scripts/verify_workbook_candidate.py --report (CI uploads it as an artifact)
+candidate-report.json
