@@ -271,7 +271,7 @@ The five Manager partitions are proven disjoint and exhaustive by collection
 (70 tests, 70 owned, 0 duplicated) in
 `tests/test_run_layered_validation.py::test_manager_main_partitions_are_disjoint_and_exhaustive`.
 
-### The real cost is one quadratic loop — not yet fixed
+### The real cost was one quadratic loop — fixed
 
 Both slow paths profile to the same place.
 `schema_validation.validate_workbook_schema` opens the workbook with
@@ -286,9 +286,52 @@ parser, so those loops are quadratic.
 | `promote_verified_projection` (the 71s build) | 205s | 188s (92%) | 9,303 | 14.1M |
 | `export_comparison_workbook` (the 212s test) | 655s | 595s (91%) | 216,713 | 42.6M |
 
-The real import work is 14.5s of that 205s. Fixing the access pattern — read
-each sheet once instead of per cell — would cut roughly 90% off the 71s fixture
-build that every Manager shard pays, and off the workbook schema gate wherever
-it runs. That is a far larger win than any shard arrangement, but it is product
-code inside the fail-closed schema gate, so it needs its own change with
-before/after proof that the emitted issue list is identical.
+The real import work was 14.5s of that 205s.
+
+`column_values()` now reads each sheet in one streaming pass and returns values
+keyed by column in row order, so the three checks still emit issues column-major
+in exactly the original sequence.
+
+Because this is the fail-closed schema gate, the change was proved by
+differential rather than by inspection. A fixed corpus — the canonical workbook
+with and without the live-contract check, plus four mutated copies injecting
+boolean, RPO, price, and combined drift — was validated before and after, and
+every issue list matched exactly, order included.
+
+| case | issues | identical | before | after |
+|---|---|---|---|---|
+| canonical | 0 | yes | 66.54s | 1.23s |
+| canonical-no-live | 0 | yes | 67.36s | 0.89s |
+| boolean-drift | 7 | yes | 67.82s | 0.76s |
+| rpo-drift | 3 | yes | 67.31s | 0.76s |
+| price-drift | 2 | yes | 63.88s | 0.77s |
+| all-drift | 12 | yes | 64.65s | 0.79s |
+
+Measured downstream, all passing:
+
+| | before | after |
+|---|---|---|
+| `scripts/validate_workbook_schema.py` (the gate) | ~66s | 1.36s |
+| verified fixture build (per Manager shard) | 71.01s | 7.31s |
+| unchanged comparison export | 67.91s | 5.41s |
+| `manager-non-api` unsplit | 372.77s | 38.35s |
+| `manager-non-api-export-overlay` | 311.63s | 38.73s |
+| `manager-api-core` | 284.49s | 40.27s |
+| `manager-projection` | 290.33s | 42.25s |
+| whole `tests/test_workbook_manager.py` | ~640s | 71.47s |
+| `test_editor_ops_apply.py` | 361s (CI) | 24.76s |
+| `test_editor_server_write_api.py` | 486s (CI) | 28.43s |
+| `test_verify_workbook_candidate.py` (all 17) | ~900s (CI, 2 shards) | 35.70s |
+
+### Two consequences worth deciding on
+
+The shard partitioning is now over-engineered. Unsplit, the non-API owner is
+38.35s locally, roughly 113s in CI including setup, against a 900s timeout.
+Split across three jobs it costs about 215s billable for the same wall clock,
+because each job pays its own ~25s setup. Collapsing the partitions back to one
+shard would now be both simpler and cheaper.
+
+`approximate_seconds` in `tests/validation_catalog.json` is a baseline captured
+2026-08-17 and is now wrong by roughly 10x for every workbook-touching gate. It
+was left as captured rather than hand-edited, because re-baselining means
+re-running the whole inventory under the documented method.

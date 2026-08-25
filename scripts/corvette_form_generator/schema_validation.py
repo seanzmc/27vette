@@ -150,6 +150,39 @@ def header_index(ws) -> dict[str, int]:
     }
 
 
+def column_values(
+    ws,
+    headers: dict[str, int],
+    columns: Iterable[str],
+) -> dict[str, list[tuple[int, Any]]]:
+    """Read the requested columns of one sheet in a single streaming pass.
+
+    The workbook is opened ``read_only=True``, where ``ws.cell(row, column)``
+    restarts the streaming row parser on every call. Looping cells that way is
+    quadratic in sheet size: profiled against the canonical workbook it was 92%
+    of ``validate_workbook_schema`` (9,303 ``.cell()`` calls parsing 14.1M
+    cells) while the surrounding real work was seconds.
+
+    Values come back keyed by column and ordered by row so callers keep
+    emitting issues column-major, exactly as the per-cell loops did. Row
+    numbers are 1-based and start at 2, matching the old
+    ``range(2, ws.max_row + 1)``.
+    """
+
+    wanted = {column: headers[column] - 1 for column in columns if column in headers}
+    if not wanted:
+        return {}
+    collected: dict[str, list[tuple[int, Any]]] = {column: [] for column in wanted}
+    for row_number, values in enumerate(
+        ws.iter_rows(min_row=2, max_row=ws.max_row, values_only=True), start=2
+    ):
+        for column, index in wanted.items():
+            collected[column].append(
+                (row_number, values[index] if index < len(values) else None)
+            )
+    return collected
+
+
 def records(ws) -> Iterable[tuple[int, dict[str, Any]]]:
     headers = [str(value).strip() if value else "" for value in next(ws.iter_rows(min_row=1, max_row=1, values_only=True))]
     for row_number, values in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
@@ -1225,11 +1258,11 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                 continue
             ws = wb[sheet]
             headers = header_index(ws)
+            by_column = column_values(ws, headers, columns)
             for column in columns:
                 if column not in headers:
                     continue
-                for row_number in range(2, ws.max_row + 1):
-                    value = ws.cell(row_number, headers[column]).value
+                for row_number, value in by_column[column]:
                     if value is None:
                         continue
                     if not isinstance(value, bool):
@@ -1249,11 +1282,11 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                 continue
             ws = wb[sheet]
             headers = header_index(ws)
+            by_column = column_values(ws, headers, columns)
             for column in columns:
                 if column not in headers:
                     continue
-                for row_number in range(2, ws.max_row + 1):
-                    value = ws.cell(row_number, headers[column]).value
+                for row_number, value in by_column[column]:
                     if value is None:
                         continue
                     if not isinstance(value, str):
@@ -1273,11 +1306,11 @@ def validate_workbook_schema(workbook: str | Path, *, check_live_contract: bool 
                 continue
             ws = wb[sheet]
             headers = header_index(ws)
+            by_column = column_values(ws, headers, columns)
             for column in columns:
                 if column not in headers:
                     continue
-                for row_number in range(2, ws.max_row + 1):
-                    value = ws.cell(row_number, headers[column]).value
+                for row_number, value in by_column[column]:
                     if value is None:
                         continue
                     if not is_number(value):
