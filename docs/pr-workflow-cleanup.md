@@ -387,4 +387,57 @@ one that shells out to `pytest --collect-only` to prove the Manager partitions
 are disjoint and exhaustive.
 
 The 2026-08-17 and Checkpoint 1 records are preserved; this run is recorded
-alongside them as `baseline.schema_read_pattern_fix`.
+alongside them as `baseline.read_pattern_fixes`.
+
+## Second read-pattern fix — bool hygiene — 2026-08-24
+
+After the schema fix, the remaining cost was re-profiled rather than guessed.
+`openpyxl` load plus save of the 0.58 MB workbook is only 1.16s, and a full
+read-only scan of all 77 sheets is 0.45s, so tests costing 20-30s were still
+15-30x their floor.
+
+Profiling a real apply in-process pointed at `workbook_bool_hygiene`:
+`_cells_by_row` ran 348,930 times for 34.8s, of which `row_key_counts` was
+19.9s and `snapshot_bool_like_cells` 8.7s, while the now-fixed
+`validate_workbook_schema` was down to 4.1s.
+
+Cause is the same class as before. `row_key_counts` called `ws.iter_rows` once
+per matching entry in `ROW_KEY_CANDIDATES`, and the snapshot loop then scanned
+the sheet again. On a `read_only=True` handle each `iter_rows` re-parses the
+sheet XML from the start, so a sheet matching four candidates was parsed five
+times. The sheet is now read once and both consumers work from those rows.
+
+Proved by differential over the canonical workbook plus two mutated copies:
+7,501 bool-like cells each, lists identical including order, 1.78s to 0.68s per
+snapshot (2.6x).
+
+| owner | before | after |
+|---|---|---|
+| `py.test_workbook_manager` | 74.52s | 55.88s |
+| `py.test_editor_server_write_api` | 27.90s | 17.76s |
+| `py.test_editor_ops_apply` | 23.54s | 16.74s |
+| **full serial inventory** | **385.2s** | **350.1s** |
+
+Against the 2026-08-17 baseline of 1,970.1s that is a **5.6x** reduction
+overall, still with every gate exiting zero.
+
+### Where the remaining time is, and why it is not the same problem
+
+The survivors are individual end-to-end tests doing real work, not a repeated
+pattern: `test_zz_apply_rebuild_copied_workbook_mixed_draft_and_replay` 28.6s,
+`test_validate_then_apply_then_visible` 29.8s,
+`test_source_and_identity_reconstruction_runtime_contracts_match` 25.7s, and the
+three module fixtures in `test_verify_workbook_candidate` at 7.8-10.8s each,
+which are full candidate-lane runs. Each is one real generation, apply, or
+export, so cutting them means changing what they prove rather than how they read
+the workbook.
+
+A repository-wide sweep for the same anti-pattern — `read_only=True` plus
+`.cell()` or repeated `iter_rows` inside a row loop — found no further live
+instances in the hot path. `editor_ops` and `asset_map_sync` call `.cell()` on
+read-write handles, where it is O(1). `workbook.py:55` and
+`build_workbook_truth.py:107` touch only row 1, so the restart is cheap. Two
+cold spots share the shape and were left alone:
+`workbook-manager/review/generate_group_display_label_review.py:131` (offline
+review tooling, its gate runs in 1.6s) and `scripts/promote_model.py:51,68`
+(a manual promotion CLI, in no gate).
