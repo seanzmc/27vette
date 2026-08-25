@@ -233,6 +233,19 @@ does not run the Layer 4 full inventory, access the live asset library, or submi
 a dealer build. Choose any additional local gates by changed surface as
 described below.
 
+When a pull request edits `tests/validation_catalog.json`, the plan job first
+classifies that edit with `scripts/catalog_change_scope.py`. Adding a gate entry
+is additive: the plan runs the CI contract owners plus the newly declared gate's
+own command. Removing a gate, retargeting an existing gate's command, layer,
+test files, changed surfaces, or serial group, editing `ci`/`serial_groups`, or
+changing suite membership beyond the added gate still selects the complete
+inventory, as does an unreadable or missing base catalog. Focused local
+contract:
+
+```sh
+.venv/bin/python -m pytest tests/test_catalog_change_scope.py -q
+```
+
 `.github/workflows/codex-finding-disposition.yml` maintains the
 `codex-finding-disposition` commit status from GitHub review threads. A current,
 unresolved structured Codex P0 or P1 finding fails the status; resolved or

@@ -44,6 +44,7 @@ jobs:
             diff_base="HEAD^"
           fi
           git diff --name-only --diff-filter=ACMRD "$diff_base" HEAD > changed-files.txt
+          echo "DIFF_BASE=$diff_base" >> "$GITHUB_ENV"
 
       - name: Build validation plan
         id: plan
@@ -55,9 +56,22 @@ jobs:
             --output validation-matrix.json
           )
           if [[ "$FULL_SUITE" == "true" ]] || grep -Eq \
-            '^(\.github/|scripts/(finalize_ci_validation_plan|plan_ci_validation|run_layered_validation|split_ci_validation_plan|test_finalize_ci_validation_plan|test_split_ci_validation_plan)\.py$|tests/(test_run_layered_validation|test_validation_catalog)\.py$|tests/validation_catalog\.json$)' \
+            '^(\.github/|scripts/(catalog_change_scope|finalize_ci_validation_plan|plan_ci_validation|run_layered_validation|split_ci_validation_plan|test_finalize_ci_validation_plan|test_split_ci_validation_plan)\.py$|tests/(test_catalog_change_scope|test_run_layered_validation|test_validation_catalog)\.py$)' \
             changed-files.txt; then
             args+=(--full)
+          fi
+          if grep -qx 'tests/validation_catalog.json' changed-files.txt; then
+            catalog_ref="$DIFF_BASE:tests/validation_catalog.json"
+            if git cat-file -e "$catalog_ref" 2>/dev/null; then
+              git show "$catalog_ref" > base-catalog.json
+            else
+              : > base-catalog.json
+            fi
+            python scripts/catalog_change_scope.py \
+              --base base-catalog.json \
+              --head tests/validation_catalog.json > catalog-scope.json
+            cat catalog-scope.json
+            args+=(--catalog-scope catalog-scope.json)
           fi
           python scripts/test_finalize_ci_validation_plan.py
           python scripts/test_split_ci_validation_plan.py
@@ -84,6 +98,7 @@ jobs:
           name: validation-plan
           path: |
             changed-files.txt
+            catalog-scope.json
             validation-matrix.json
           retention-days: 14
 
