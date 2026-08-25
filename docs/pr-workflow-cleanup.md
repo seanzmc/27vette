@@ -357,7 +357,34 @@ wall clock — real but small, and it trades away per-partition failure isolatio
 An earlier note here called the collapse plainly cheaper; that was extrapolated
 from local timings before the CI numbers above existed.
 
-`approximate_seconds` in `tests/validation_catalog.json` is a baseline captured
-2026-08-17 and is now wrong by roughly 10x for every workbook-touching gate. It
-was left as captured rather than hand-edited, because re-baselining means
-re-running the whole inventory under the documented method.
+`approximate_seconds` in `tests/validation_catalog.json` was a baseline captured
+2026-08-17 and had gone stale by up to 47x. Re-baselining used to mean a 33
+minute serial run, which is why it was left alone; after the fix the same run is
+6.4 minutes, so it was redone under the catalog's documented method — each gate
+once, serially, one process each — on matching runtimes (Node 26.7.0, Python
+3.14.7, darwin arm64), directly comparable to Checkpoints 0 and 1.
+
+**All 71 gates in 385.2s against 1,970.1s, a 5.1x reduction, and every gate
+exited zero.** That is the first recorded clean run of the complete inventory:
+Checkpoint 0 recorded 7 node failures across 6 files plus 3 Python files failing
+when run alone, and Checkpoint 1 still had `node.grand-sport-contract-preview`
+failing on its own count literal.
+
+| gate | 8-17 | now | factor |
+|---|---|---|---|
+| `cmd.workbook_schema` | 62.0s | 1.31s | 47.3x |
+| `cmd.options_sheet_quality` | 6.0s | 0.24s | 25.0x |
+| `py.test_verify_workbook_candidate` | 457.5s | 38.19s | 12.0x |
+| `py.test_workbook_manager_import_projection` | 205.2s | 23.98s | 8.6x |
+| `py.test_editor_server_write_api` | 220.1s | 27.90s | 7.9x |
+| `py.test_workbook_manager` | 574.3s | 74.52s | 7.7x |
+| `py.test_editor_ops_apply` | 147.8s | 23.54s | 6.3x |
+| `py.test_workbook_manager_generated_parity` | 147.7s | 26.40s | 5.6x |
+
+One gate got slower and should stay that way: `py.test_run_layered_validation`
+went 0.6s to 4.51s because this branch added planner contracts to it, including
+one that shells out to `pytest --collect-only` to prove the Manager partitions
+are disjoint and exhaustive.
+
+The 2026-08-17 and Checkpoint 1 records are preserved; this run is recorded
+alongside them as `baseline.schema_read_pattern_fix`.
