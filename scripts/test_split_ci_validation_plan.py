@@ -132,15 +132,15 @@ class ManagerSplitContracts(unittest.TestCase):
         ):
             self.splitter.split_manager_non_api(plan)
 
-    def test_repository_full_plan_finishes_with_eighteen_owned_shards(self) -> None:
+    def test_repository_full_plan_finishes_with_nineteen_owned_shards(self) -> None:
         plan = self.planner.plan_validation([], full=True)
         plan = self.finalizer.finalize_plan(plan, repo_root=REPO_ROOT)
         plan = self.splitter.split_manager_non_api(plan)
         names = [str(shard["name"]) for shard in plan["include"]]
 
-        # Fourteen product shards plus the four narrow-plan-only smoke shards.
-        self.assertEqual(len(names), 18)
-        self.assertEqual(len([n for n in names if n.startswith("smoke-")]), 4)
+        # Fourteen product shards plus the five narrow-plan-only smoke shards.
+        self.assertEqual(len(names), 19)
+        self.assertEqual(len([n for n in names if n.startswith("smoke-")]), 5)
         self.assertNotIn("manager-non-api", names)
         self.assertIn("manager-non-api-core", names)
         self.assertIn("manager-non-api-sync-and-export", names)

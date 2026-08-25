@@ -481,8 +481,33 @@ every remaining shard to be smoked or justified in `SMOKE_EXEMPT_SHARDS`. It
 found `fable-contracts` on its first run: a full inventory never validated the
 Fable 5 loop. Exemptions must name a shard that is still actually planned.
 
-Three shards stay exempt: `manager-frontend` (identical `npm ci` and build
-wiring to `full-product-readiness`, and its one extra test is owned by
-`manager-non-api-core`), `layered-changed-surfaces` (its command is derived from
-the changed paths, so a synthetic invocation proves nothing about a real one),
-and `catalog-new-gates` (it requires an additive catalog diff to exist).
+### The first version of that guard was not exhaustive
+
+Codex review caught it: the guard enumerated a hand-written list of sample
+diffs, so `manager-read-explorer`, `manager-read-ui`, `manager-apply-candidate`,
+and the `changed-*` family were never reached, smoked, or exempted. A sample
+list cannot stay exhaustive — a route added later is simply absent, and the
+guard then passes while proving less.
+
+The universe is now found by reflection over the planner's `_*_shard()`
+factories, unioned with the scenario sweep. That only holds while every shard
+comes from a factory, so `test_no_shard_is_built_outside_a_factory` parses the
+planner with `ast` and fails on any `_shard(...)` call outside one. Reflection
+alone could not do this: keeping a factory while `plan_validation` builds the
+shard inline still hides it, and an early version of the check passed against
+exactly that mutation. The AST check found `layered-changed-surfaces` still
+inline on its first run; both it and `manager-apply-candidate` are now factories.
+
+`smoke-manager-read-explorer` was added, which also guards the four pytest node
+ids that shard names against a rename.
+
+Exempt by name, each already proven by an ordinary full shard:
+`manager-frontend` and `manager-read-ui` (identical `npm ci` and build wiring to
+`full-product-readiness`; `manager-read-ui`'s node ids are the explorer set) and
+`manager-apply-candidate` (byte-identical command to that shard's first stage).
+
+Exempt by prefix, because the diff builds the name so there is none to smoke:
+`layered-changed-surfaces`, `changed-` (plain `pytest <file> -q`, the wiring
+`smoke-manager-review-tooling` runs), and `catalog-new-gates`. Exemptions must
+name something still planned, must not also be smoked, and prefixes must match
+at least one real shard.
