@@ -180,6 +180,264 @@ no commits beyond its archive tag. Restore either with
 
 1. Repo setting: automatically delete head branches on merge.
 2. Weekly branch reaper for merged branches untouched 30+ days.
-3. Required check that fails while an unresolved Codex P1 comment is open.
+3. ~~Required check that fails while an unresolved Codex P1 comment is open.~~ Done 2026-08-24, PR #41.
 4. Stale-PR bot: comment at 30 days, close at 45.
 5. Fail a PR that is more than ~20 commits behind `main`.
+
+## Validation-gate efficiency audit — 2026-08-24
+
+Audited the `release-candidate` gates for redundant or over-broad selection.
+No test-level redundancy exists: the full plan schedules every repository test
+exactly once (938 unique tests, 938 scheduled executions, 0 duplicated, 0
+unowned), and `finalize_ci_validation_plan.py` already proves that invariant.
+Cost is concentrated instead — the six slowest shards were 3,195 s of 4,451 s
+for 90 tests, while 664 tests ran in 192 s.
+
+The waste was in *when* the full suite fired, not in what it contained. All six
+runs sampled went full; PRs #39 and #40 did so solely because they touched
+`tests/validation_catalog.json` to add one gate entry.
+
+| Fix | Effect |
+|---|---|
+| `scripts/catalog_change_scope.py` classifies catalog edits | Adding a gate entry runs the CI contract owners plus that gate instead of the full inventory; removals, retargeting, and `ci`/`serial_groups`/suite edits still escalate, as does an unreadable base catalog |
+| `workbook-manager/review/**` owns `test_group_display_label_contract.py` | Editing review tooling or its reviewed CSV/JSON no longer escalates to the complete Manager suite |
+| Removed the `focused_main_test_covered` carve-out | Coverage fix: editing `tests/test_workbook_manager.py` alongside a frontend file used to *drop* all three Manager partitions |
+| `fable5loop/` edits no longer select `ci-contracts` | A Fable state edit cannot break catalog, planner, or workflow contracts |
+| `py.test_codex_finding_disposition` added to `always_gate_ids` | The layered path and the `ci-contracts` shard now agree on that owner |
+
+Measured on the historical diffs, PR #39 drops from 4,451 s to roughly 1,925 s
+and PR #40 to roughly 2,800 s. Those figures reuse per-shard timings from run
+`32754913746` and estimate shards that run did not execute.
+
+Not changed, and still open if you want them: the shard balance is lopsided
+(`manager-drafts` 20 s against `manager-projection` 647 s), and
+`manager-non-api-sync-and-export` at 584 s sits close enough to the 900 s
+timeout that one slow test would time out rather than fail. Rebalancing needs
+per-test `--durations` profiling first.
+
+## Shard rebalancing — 2026-08-24
+
+Profiling replaced the audit's guess. Per-shard totals came from PR #43's green
+run; per-test durations were measured locally, where the whole suite runs about
+2.3x faster than CI but the proportions hold.
+
+### The unit costs
+
+```
+verified fixture build (first call in a process) :  71.01s
+verified fixture (cached)                        :   0.00s
+clone_combined_projection                        :   0.03s
+unchanged_export_result (first)                  :  67.91s
+workbook 0.6 MB   projection 6.0 MB
+```
+
+Every shard pays the 71s fixture build once. The 830s sync/export shard was
+71s fixture + 68s unchanged export + 212s changed-overlay export + ~5s for the
+other eight tests.
+
+### Rebalancing by itself returns nothing
+
+Any shard containing `test_export_overlays_registry_owned_projection_fields`
+had to pay 71 + 68 + 212 = 351s, which is 99% of the 356s the whole shard cost.
+`manager-api-core` is the same shape: 71s fixture + 213s for
+`test_zz_apply_rebuild_copied_workbook_mixed_draft_and_replay` equals its full
+284s. Partitioning `-k` expressions cannot help when one test is the shard.
+
+### A latent timeout, found while measuring
+
+The split only ran on full plans, so narrow plans used the monolithic
+`manager-non-api` owner. It measures **372.77s locally, roughly 810-890s in CI
+against a 900s job timeout** — ordinary pull requests were running within
+seconds of a hard timeout, which reads as infrastructure flake rather than a
+test failure. The partitions now apply to every plan.
+
+### What was changed
+
+`TestComparisonExport.setUpClass` built the 68s unchanged export eagerly, but
+only `test_acceptance_export_is_disposable_and_preserves_unchanged_workbook`
+reads it. It is now a lazy property, still process-cached, so a shard that does
+not run the acceptance test no longer pays for an export it never opens. The
+overlay proof then moved into its own partition.
+
+| | before | after |
+|---|---|---|
+| `manager-non-api` unsplit (narrow plans) | 372.77s | n/a — partitioned |
+| `manager-non-api-sync-and-export` | 356s | 154.16s |
+| `manager-non-api-export-overlay` | — | 311.63s |
+| local critical path for the owner | 372.77s | 311.63s |
+
+Roughly 850s to 730s in CI; timeout headroom moves from about 95% to about 80%.
+The five Manager partitions are proven disjoint and exhaustive by collection
+(70 tests, 70 owned, 0 duplicated) in
+`tests/test_run_layered_validation.py::test_manager_main_partitions_are_disjoint_and_exhaustive`.
+
+### The real cost was one quadratic loop — fixed
+
+Both slow paths profile to the same place.
+`schema_validation.validate_workbook_schema` opens the workbook with
+`load_workbook(..., read_only=True)` at
+`scripts/corvette_form_generator/schema_validation.py:1145`, then does random
+access with `ws.cell(row, column)` at lines 1232, 1256, and 1280. On a
+read-only openpyxl worksheet every `.cell()` restarts the streaming row
+parser, so those loops are quadratic.
+
+| profiled call | total | `validate_workbook_schema` | `.cell()` calls | cells parsed |
+|---|---|---|---|---|
+| `promote_verified_projection` (the 71s build) | 205s | 188s (92%) | 9,303 | 14.1M |
+| `export_comparison_workbook` (the 212s test) | 655s | 595s (91%) | 216,713 | 42.6M |
+
+The real import work was 14.5s of that 205s.
+
+`column_values()` now reads each sheet in one streaming pass and returns values
+keyed by column in row order, so the three checks still emit issues column-major
+in exactly the original sequence.
+
+Because this is the fail-closed schema gate, the change was proved by
+differential rather than by inspection. A fixed corpus — the canonical workbook
+with and without the live-contract check, plus four mutated copies injecting
+boolean, RPO, price, and combined drift — was validated before and after, and
+every issue list matched exactly, order included.
+
+| case | issues | identical | before | after |
+|---|---|---|---|---|
+| canonical | 0 | yes | 66.54s | 1.23s |
+| canonical-no-live | 0 | yes | 67.36s | 0.89s |
+| boolean-drift | 7 | yes | 67.82s | 0.76s |
+| rpo-drift | 3 | yes | 67.31s | 0.76s |
+| price-drift | 2 | yes | 63.88s | 0.77s |
+| all-drift | 12 | yes | 64.65s | 0.79s |
+
+Measured downstream, all passing:
+
+| | before | after |
+|---|---|---|
+| `scripts/validate_workbook_schema.py` (the gate) | ~66s | 1.36s |
+| verified fixture build (per Manager shard) | 71.01s | 7.31s |
+| unchanged comparison export | 67.91s | 5.41s |
+| `manager-non-api` unsplit | 372.77s | 38.35s |
+| `manager-non-api-export-overlay` | 311.63s | 38.73s |
+| `manager-api-core` | 284.49s | 40.27s |
+| `manager-projection` | 290.33s | 42.25s |
+| whole `tests/test_workbook_manager.py` | ~640s | 71.47s |
+| `test_editor_ops_apply.py` | 361s (CI) | 24.76s |
+| `test_editor_server_write_api.py` | 486s (CI) | 28.43s |
+| `test_verify_workbook_candidate.py` (all 17) | ~900s (CI, 2 shards) | 35.70s |
+
+### Measured in CI
+
+Full inventory, run `32777596688` before against run `32792294585` after. Both
+green.
+
+| shard | before | after | factor |
+|---|---|---|---|
+| manager-non-api-sync-and-export | 851s | 41s | 20.8x |
+| manager-api-core | 654s | 79s | 8.3x |
+| manager-projection | 627s | 102s | 6.1x |
+| full-python-editor-server | 486s | 82s | 5.9x |
+| full-python-candidate-canonical | 454s | 62s | 7.3x |
+| full-python-candidate-drift-and-fast | 452s | 40s | 11.3x |
+| full-python-editor-ops | 351s | 58s | 6.1x |
+| manager-non-api-core | 216s | 32s | 6.8x |
+| manager-api-assets | 212s | 31s | 6.8x |
+| full-product-readiness | 279s | 144s | 1.9x |
+| full-python-core | 230s | 173s | 1.3x |
+| manager-non-api-export-overlay | — | 88s | new shard |
+| **total billable job-seconds** | **4,899s** | **1,000s** | **4.9x** |
+| **critical path** | **851s** | **173s** | **4.9x** |
+| timeout headroom used | 95% | 19% | |
+
+### Two consequences worth deciding on
+
+The shard partitioning is now optional rather than protective. Unsplit, the
+non-API owner is 38.35s locally and would be roughly 80s in CI including setup,
+against a 900s timeout. The three partitions cost 32 + 41 + 88 = 161s billable
+with an 88s critical path, because each job pays its own setup. Collapsing them
+back to one shard would save roughly 80s billable per full run and about 10s of
+wall clock — real but small, and it trades away per-partition failure isolation.
+An earlier note here called the collapse plainly cheaper; that was extrapolated
+from local timings before the CI numbers above existed.
+
+`approximate_seconds` in `tests/validation_catalog.json` was a baseline captured
+2026-08-17 and had gone stale by up to 47x. Re-baselining used to mean a 33
+minute serial run, which is why it was left alone; after the fix the same run is
+6.4 minutes, so it was redone under the catalog's documented method — each gate
+once, serially, one process each — on matching runtimes (Node 26.7.0, Python
+3.14.7, darwin arm64), directly comparable to Checkpoints 0 and 1.
+
+**All 71 gates in 385.2s against 1,970.1s, a 5.1x reduction, and every gate
+exited zero.** That is the first recorded clean run of the complete inventory:
+Checkpoint 0 recorded 7 node failures across 6 files plus 3 Python files failing
+when run alone, and Checkpoint 1 still had `node.grand-sport-contract-preview`
+failing on its own count literal.
+
+| gate | 8-17 | now | factor |
+|---|---|---|---|
+| `cmd.workbook_schema` | 62.0s | 1.31s | 47.3x |
+| `cmd.options_sheet_quality` | 6.0s | 0.24s | 25.0x |
+| `py.test_verify_workbook_candidate` | 457.5s | 38.19s | 12.0x |
+| `py.test_workbook_manager_import_projection` | 205.2s | 23.98s | 8.6x |
+| `py.test_editor_server_write_api` | 220.1s | 27.90s | 7.9x |
+| `py.test_workbook_manager` | 574.3s | 74.52s | 7.7x |
+| `py.test_editor_ops_apply` | 147.8s | 23.54s | 6.3x |
+| `py.test_workbook_manager_generated_parity` | 147.7s | 26.40s | 5.6x |
+
+One gate got slower and should stay that way: `py.test_run_layered_validation`
+went 0.6s to 4.51s because this branch added planner contracts to it, including
+one that shells out to `pytest --collect-only` to prove the Manager partitions
+are disjoint and exhaustive.
+
+The 2026-08-17 and Checkpoint 1 records are preserved; this run is recorded
+alongside them as `baseline.read_pattern_fixes`.
+
+## Second read-pattern fix — bool hygiene — 2026-08-24
+
+After the schema fix, the remaining cost was re-profiled rather than guessed.
+`openpyxl` load plus save of the 0.58 MB workbook is only 1.16s, and a full
+read-only scan of all 77 sheets is 0.45s, so tests costing 20-30s were still
+15-30x their floor.
+
+Profiling a real apply in-process pointed at `workbook_bool_hygiene`:
+`_cells_by_row` ran 348,930 times for 34.8s, of which `row_key_counts` was
+19.9s and `snapshot_bool_like_cells` 8.7s, while the now-fixed
+`validate_workbook_schema` was down to 4.1s.
+
+Cause is the same class as before. `row_key_counts` called `ws.iter_rows` once
+per matching entry in `ROW_KEY_CANDIDATES`, and the snapshot loop then scanned
+the sheet again. On a `read_only=True` handle each `iter_rows` re-parses the
+sheet XML from the start, so a sheet matching four candidates was parsed five
+times. The sheet is now read once and both consumers work from those rows.
+
+Proved by differential over the canonical workbook plus two mutated copies:
+7,501 bool-like cells each, lists identical including order, 1.78s to 0.68s per
+snapshot (2.6x).
+
+| owner | before | after |
+|---|---|---|
+| `py.test_workbook_manager` | 74.52s | 55.88s |
+| `py.test_editor_server_write_api` | 27.90s | 17.76s |
+| `py.test_editor_ops_apply` | 23.54s | 16.74s |
+| **full serial inventory** | **385.2s** | **350.1s** |
+
+Against the 2026-08-17 baseline of 1,970.1s that is a **5.6x** reduction
+overall, still with every gate exiting zero.
+
+### Where the remaining time is, and why it is not the same problem
+
+The survivors are individual end-to-end tests doing real work, not a repeated
+pattern: `test_zz_apply_rebuild_copied_workbook_mixed_draft_and_replay` 28.6s,
+`test_validate_then_apply_then_visible` 29.8s,
+`test_source_and_identity_reconstruction_runtime_contracts_match` 25.7s, and the
+three module fixtures in `test_verify_workbook_candidate` at 7.8-10.8s each,
+which are full candidate-lane runs. Each is one real generation, apply, or
+export, so cutting them means changing what they prove rather than how they read
+the workbook.
+
+A repository-wide sweep for the same anti-pattern — `read_only=True` plus
+`.cell()` or repeated `iter_rows` inside a row loop — found no further live
+instances in the hot path. `editor_ops` and `asset_map_sync` call `.cell()` on
+read-write handles, where it is O(1). `workbook.py:55` and
+`build_workbook_truth.py:107` touch only row 1, so the restart is cheap. Two
+cold spots share the shape and were left alone:
+`workbook-manager/review/generate_group_display_label_review.py:131` (offline
+review tooling, its gate runs in 1.6s) and `scripts/promote_model.py:51,68`
+(a manual promotion CLI, in no gate).

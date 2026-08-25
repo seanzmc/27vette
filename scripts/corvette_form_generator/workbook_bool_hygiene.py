@@ -112,7 +112,20 @@ def header_row(ws) -> list[str]:
     return [clean_key_value(cell.value) for cell in next(ws.iter_rows(min_row=1, max_row=1), [])]
 
 
-def row_key_counts(ws, headers: list[str]) -> dict[tuple[str, ...], Counter[tuple[str, ...]]]:
+def row_key_counts(
+    value_rows: list[tuple[Any, ...]],
+    headers: list[str],
+) -> dict[tuple[str, ...], Counter[tuple[str, ...]]]:
+    """Count each candidate row key over rows already read into memory.
+
+    This used to take the worksheet and call ``ws.iter_rows`` once per
+    candidate. The workbook is opened ``read_only=True``, where every
+    ``iter_rows`` re-parses the sheet XML from the start, so a sheet matching
+    four candidates was parsed four times, and then a fifth time by the
+    snapshot loop below. Profiled during a real apply that was 19.9s of
+    read-only row parsing here plus 8.7s in the snapshot loop.
+    """
+
     counts: dict[tuple[str, ...], Counter[tuple[str, ...]]] = {}
     header_set = set(headers)
     for candidate in ROW_KEY_CANDIDATES:
@@ -120,7 +133,7 @@ def row_key_counts(ws, headers: list[str]) -> dict[tuple[str, ...], Counter[tupl
             continue
         indexes = [headers.index(column) for column in candidate]
         counter: Counter[tuple[str, ...]] = Counter()
-        for row in ws.iter_rows(min_row=2, values_only=True):
+        for row in value_rows:
             values = tuple(clean_key_value(row[index]) if index < len(row) else "" for index in indexes)
             if all(values):
                 counter[values] += 1
@@ -147,9 +160,12 @@ def snapshot_bool_like_cells(workbook_path: str | Path) -> list[BoolLikeCell]:
     try:
         for ws in wb.worksheets:
             headers = header_row(ws)
-            counts = row_key_counts(ws, headers)
-            for row_number, row in enumerate(ws.iter_rows(min_row=2), start=2):
-                row_values = tuple(cell.value for cell in row)
+            # One read-only parse of the sheet feeds both the candidate-key
+            # counters and the scan below.
+            rows = list(ws.iter_rows(min_row=2))
+            value_rows = [tuple(cell.value for cell in row) for row in rows]
+            counts = row_key_counts(value_rows, headers)
+            for row_number, (row, row_values) in enumerate(zip(rows, value_rows), start=2):
                 stable_key = stable_row_key(row_values, headers, counts)
                 if stable_key:
                     row_key_kind = "stable"

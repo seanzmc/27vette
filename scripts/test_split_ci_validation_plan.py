@@ -65,7 +65,7 @@ class ManagerSplitContracts(unittest.TestCase):
         cls.finalizer = _load(FINALIZER, "finalize_ci_validation_split_contract")
         cls.splitter = _load(SPLITTER, "split_ci_validation_split_contract")
 
-    def test_legacy_owner_becomes_two_disjoint_exhaustive_partitions(self) -> None:
+    def test_legacy_owner_becomes_three_disjoint_exhaustive_partitions(self) -> None:
         plan = self.splitter.split_manager_non_api(_legacy_plan())
         names = [str(shard["name"]) for shard in plan["include"]]
 
@@ -75,6 +75,7 @@ class ManagerSplitContracts(unittest.TestCase):
                 "before",
                 "manager-non-api-core",
                 "manager-non-api-sync-and-export",
+                "manager-non-api-export-overlay",
                 "after",
             ],
         )
@@ -91,11 +92,19 @@ class ManagerSplitContracts(unittest.TestCase):
             self.splitter._k_expression(
                 str(shards["manager-non-api-sync-and-export"]["command"])
             ),
-            "TestSyncBatch or TestComparisonExport",
+            "(TestSyncBatch or TestComparisonExport) and not "
+            "test_export_overlays_registry_owned_projection_fields",
+        )
+        self.assertEqual(
+            self.splitter._k_expression(
+                str(shards["manager-non-api-export-overlay"]["command"])
+            ),
+            "test_export_overlays_registry_owned_projection_fields",
         )
         for name in (
             "manager-non-api-core",
             "manager-non-api-sync-and-export",
+            "manager-non-api-export-overlay",
         ):
             self.assertTrue(shards[name]["python"])
             self.assertTrue(shards[name]["node"])
@@ -103,7 +112,7 @@ class ManagerSplitContracts(unittest.TestCase):
 
         self.assertEqual(
             len(plan["coverage"]["manager_non_api_partitions"]),
-            2,
+            3,
         )
 
     def test_split_is_idempotent(self) -> None:
@@ -123,20 +132,21 @@ class ManagerSplitContracts(unittest.TestCase):
         ):
             self.splitter.split_manager_non_api(plan)
 
-    def test_repository_full_plan_finishes_with_thirteen_owned_shards(self) -> None:
+    def test_repository_full_plan_finishes_with_fourteen_owned_shards(self) -> None:
         plan = self.planner.plan_validation([], full=True)
         plan = self.finalizer.finalize_plan(plan, repo_root=REPO_ROOT)
         plan = self.splitter.split_manager_non_api(plan)
         names = [str(shard["name"]) for shard in plan["include"]]
 
-        self.assertEqual(len(names), 13)
+        self.assertEqual(len(names), 14)
         self.assertNotIn("manager-non-api", names)
         self.assertIn("manager-non-api-core", names)
         self.assertIn("manager-non-api-sync-and-export", names)
+        self.assertIn("manager-non-api-export-overlay", names)
         self.assertTrue(plan["coverage"]["full"])
         self.assertEqual(
             len(plan["coverage"]["manager_non_api_partitions"]),
-            2,
+            3,
         )
 
     def test_workflow_tests_audits_splits_then_exports(self) -> None:

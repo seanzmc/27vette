@@ -21,6 +21,8 @@ from typing import Iterable
 
 MANAGER_ROOT = "workbook-manager/"
 MANAGER_FRONTEND_ROOT = "workbook-manager/frontend/"
+MANAGER_REVIEW_ROOT = "workbook-manager/review/"
+MANAGER_REVIEW_TEST = "tests/test_group_display_label_contract.py"
 MANAGER_MAIN_TEST = "tests/test_workbook_manager.py"
 MANAGER_TEST_PREFIX = "tests/test_workbook_manager_"
 MANAGER_FIXTURE_HELPER = "tests/workbook_manager_fixtures.py"
@@ -42,6 +44,31 @@ MANAGER_EXPLORER_NODES = (
     "test_named_diagnostics_are_bounded_defined_scoped_and_traceable",
 )
 MANAGER_BROWSER_NODE = "tests/test_workbook_manager.py::TestPass1BrowserContainment"
+
+# Measured decomposition of the non-API owner (local, 2026-08-24): a 71.01s
+# verified-fixture build every shard pays, a 67.91s unchanged comparison export
+# that only the acceptance test reads, and a 211.88s changed-overlay export in
+# one test. Run unsplit it measures 372.77s locally, roughly 810-890s in CI
+# against a 900s job timeout, so these partitions apply to every plan rather
+# than only to the full inventory. They must stay disjoint and exhaustive.
+MANAGER_OVERLAY_NODE = "test_export_overlays_registry_owned_projection_fields"
+MANAGER_NON_API_PARTITIONS = (
+    (
+        "manager-non-api-core",
+        "not TestApi and not TestSyncBatch and not TestComparisonExport",
+        "Run non-API Manager tests outside the measured sync/export owners.",
+    ),
+    (
+        "manager-non-api-sync-and-export",
+        "(TestSyncBatch or TestComparisonExport) and not " + MANAGER_OVERLAY_NODE,
+        "Run the sync and comparison-export owners without the overlay proof.",
+    ),
+    (
+        "manager-non-api-export-overlay",
+        MANAGER_OVERLAY_NODE,
+        "Run the measured changed-overlay export proof on its own.",
+    ),
+)
 
 # These two lists are the complete 17-test candidate-verifier inventory. The
 # first shard owns canonical + declared-drift fixtures; the second owns the
@@ -115,14 +142,18 @@ CI_INFRA_PATHS = {
     ".github/workflows/release-candidate.yml",
     ".github/workflows/codex-finding-disposition.yml",
     ".github/scripts/codex_finding_disposition.py",
+    "scripts/catalog_change_scope.py",
     "scripts/plan_ci_validation.py",
     "scripts/run_layered_validation.py",
+    "tests/test_catalog_change_scope.py",
     "tests/test_codex_finding_disposition.py",
     "tests/test_run_layered_validation.py",
     "tests/test_validation_catalog.py",
     "tests/validation_catalog.json",
 }
 GLOBAL_TEST_ENVIRONMENT_PATHS = {"requirements-test.txt", "tests/conftest.py"}
+CATALOG_PATH = "tests/validation_catalog.json"
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def _shard(
@@ -168,6 +199,27 @@ def _ci_contract_shard() -> dict[str, object]:
     )
 
 
+def _catalog_gate_shard(
+    gate_ids: Iterable[str],
+    *,
+    repo_root: Path = REPO_ROOT,
+) -> dict[str, object]:
+    """Run exactly the gates a purely additive catalog edit declared."""
+
+    catalog = json.loads((repo_root / CATALOG_PATH).read_text(encoding="utf-8"))
+    by_id = {gate["id"]: gate for gate in catalog["gates"]}
+    ordered = sorted(dict.fromkeys(gate_ids))
+    missing = [gate_id for gate_id in ordered if gate_id not in by_id]
+    if missing:
+        raise KeyError("catalog has no gate(s): " + ", ".join(missing))
+    return _shard(
+        "catalog-new-gates",
+        " && ".join(str(by_id[gate_id]["command"]) for gate_id in ordered),
+        node=True,
+        description="Run the newly declared catalog gate(s): " + ", ".join(ordered),
+    )
+
+
 def _docs_only_shard() -> dict[str, object]:
     return _shard(
         "docs-only",
@@ -183,6 +235,16 @@ def _fable_contract_shard() -> dict[str, object]:
         ".venv/bin/python scripts/validate_fable5_loop.py && "
         ".venv/bin/python -m pytest tests/test_fable5_loop_contract.py -q",
         description="Validate Fable state, receipts, and handoff contracts.",
+    )
+
+
+def _manager_review_shard() -> dict[str, object]:
+    return _shard(
+        "manager-review-tooling",
+        _pytest_command(MANAGER_REVIEW_TEST),
+        description=(
+            "Run the offline review-tooling owner for workbook-manager/review."
+        ),
     )
 
 
@@ -242,12 +304,15 @@ def _manager_api_core_shard() -> dict[str, object]:
     )
 
 
-def _manager_non_api_shard() -> dict[str, object]:
-    return _shard(
-        "manager-non-api",
-        _pytest_command(MANAGER_MAIN_TEST, expression="not TestApi"),
-        node=True,
-        description="Run the non-API half of the large Manager regression owner.",
+def _manager_non_api_shards() -> tuple[dict[str, object], ...]:
+    return tuple(
+        _shard(
+            name,
+            _pytest_command(MANAGER_MAIN_TEST, expression=expression),
+            node=True,
+            description=description,
+        )
+        for name, expression, description in MANAGER_NON_API_PARTITIONS
     )
 
 
@@ -257,7 +322,7 @@ def _manager_main_shards() -> tuple[dict[str, object], ...]:
     return (
         _manager_api_assets_shard(),
         _manager_api_core_shard(),
-        _manager_non_api_shard(),
+        *_manager_non_api_shards(),
     )
 
 
@@ -398,10 +463,14 @@ def plan_validation(
     changed_paths: Iterable[str],
     *,
     full: bool = False,
+    catalog_gate_ids: Iterable[str] = (),
 ) -> dict[str, object]:
     """Return a deterministic, de-duplicated GitHub matrix plan."""
 
     paths = tuple(dict.fromkeys(path.strip() for path in changed_paths if path.strip()))
+    catalog_gates = tuple(
+        dict.fromkeys(gate.strip() for gate in catalog_gate_ids if gate.strip())
+    )
     if full or GLOBAL_TEST_ENVIRONMENT_PATHS.intersection(paths):
         return {
             "include": list(_full_suite_shards()),
@@ -409,10 +478,20 @@ def plan_validation(
             "full": True,
         }
 
+    # workbook-manager/review holds offline review tooling and its reviewed
+    # CSV/JSON evidence. No Manager runtime test imports it, so it must not
+    # reach the unclassified-source escalation below; it owns one focused test.
+    manager_review_paths = {
+        path
+        for path in paths
+        if path.startswith(MANAGER_REVIEW_ROOT) and not _is_documentation(path)
+    }
     manager_source_paths = {
         path
         for path in paths
-        if path.startswith(MANAGER_ROOT) and not _is_documentation(path)
+        if path.startswith(MANAGER_ROOT)
+        and not path.startswith(MANAGER_REVIEW_ROOT)
+        and not _is_documentation(path)
     }
     manager_test_paths = {
         path
@@ -428,6 +507,7 @@ def plan_validation(
         path
         for path in paths
         if path not in manager_source_paths
+        and path not in manager_review_paths
         and path not in manager_test_paths
         and path != MANAGER_FIXTURE_HELPER
         and not path.startswith("fable5loop/")
@@ -442,7 +522,6 @@ def plan_validation(
         or manager_source_paths
         or manager_test_paths
         or manager_fixture_changed
-        or fable_changed
     ):
         _add(shards, _ci_contract_shard())
 
@@ -519,21 +598,20 @@ def plan_validation(
         if projection_changed:
             _add(shards, _manager_projection_shard())
 
-    # The current PR changes this large test owner only to lock the focused
-    # read/UI behavior. Test-only or broader edits get all three partitions.
-    main_test_changed = MANAGER_MAIN_TEST in manager_test_paths
-    focused_main_test_covered = bool(
-        main_test_changed
-        and manager_source_paths
-        and not complete_manager_required
-        and not (api_changed or draft_changed or projection_changed)
-        and (frontend_changed or read_changed)
-    )
-    if main_test_changed and not focused_main_test_covered:
+    # Editing this owner always runs all three partitions. An earlier carve-out
+    # skipped them whenever a frontend file was also touched, so adding a file
+    # to a diff could remove coverage instead of adding it.
+    if MANAGER_MAIN_TEST in manager_test_paths:
         for shard in _manager_main_shards():
             _add(shards, shard)
     for path in sorted(manager_test_paths - {MANAGER_MAIN_TEST}):
         _add(shards, _direct_manager_test_shard(path))
+
+    if catalog_gates:
+        _add(shards, _catalog_gate_shard(catalog_gates))
+
+    if manager_review_paths:
+        _add(shards, _manager_review_shard())
 
     if fable_changed:
         _add(shards, _fable_contract_shard())
@@ -578,6 +656,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--changed-file-list", type=Path)
     parser.add_argument("--changed-file", action="append", default=[])
     parser.add_argument("--full", action="store_true")
+    parser.add_argument("--catalog-gate", action="append", default=[])
+    parser.add_argument(
+        "--catalog-scope",
+        type=Path,
+        help="catalog_change_scope.py report; forces --full when it says full",
+    )
     parser.add_argument("--output", type=Path, required=True)
     return parser.parse_args()
 
@@ -587,7 +671,13 @@ def main() -> int:
     changed = list(args.changed_file)
     if args.changed_file_list and args.changed_file_list.exists():
         changed.extend(args.changed_file_list.read_text(encoding="utf-8").splitlines())
-    plan = plan_validation(changed, full=args.full)
+    full = args.full
+    catalog_gates = list(args.catalog_gate)
+    if args.catalog_scope:
+        scope = json.loads(args.catalog_scope.read_text(encoding="utf-8"))
+        full = full or bool(scope.get("full"))
+        catalog_gates.extend(scope.get("added_gate_ids") or [])
+    plan = plan_validation(changed, full=full, catalog_gate_ids=catalog_gates)
     args.output.write_text(json.dumps(plan, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(plan, indent=2))
     return 0

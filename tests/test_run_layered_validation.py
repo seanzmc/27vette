@@ -9,6 +9,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = REPO_ROOT / "scripts" / "run_layered_validation.py"
@@ -266,9 +268,16 @@ def test_workflow_fetches_deleted_paths_and_runs_a_bounded_matrix():
     assert "VALIDATION_COMMAND" in workflow
     assert "name: release-candidate" in workflow
     assert "$(while IFS=" not in workflow
+    # The catalog is classified rather than blanket-escalated, so it must not
+    # sit in the unconditional full-suite trigger any more.
+    assert "tests/validation_catalog\\.json$" not in workflow
+    assert "python scripts/catalog_change_scope.py" in workflow
+    assert "--catalog-scope catalog-scope.json" in workflow
+    assert 'grep -qx \'tests/validation_catalog.json\' changed-files.txt' in workflow
+    assert "DIFF_BASE=$diff_base" in workflow
 
 
-def test_pr_planner_routes_pr_37_to_changed_read_ui_and_fable_contracts():
+def test_pr_planner_keeps_manager_partitions_when_the_diff_adds_frontend_files():
     planner = _load_planner()
     plan = planner.plan_validation(
         [
@@ -292,16 +301,23 @@ def test_pr_planner_routes_pr_37_to_changed_read_ui_and_fable_contracts():
     )
 
     assert plan["full"] is False
+    # Editing tests/test_workbook_manager.py always runs its three partitions.
+    # A carve-out once dropped them whenever the same diff touched a frontend
+    # file, so adding a file to a diff removed coverage instead of adding it.
     assert [shard["name"] for shard in plan["include"]] == [
         "ci-contracts",
         "manager-read-ui",
+        "manager-api-assets",
+        "manager-api-core",
+        "manager-non-api-core",
+        "manager-non-api-sync-and-export",
+        "manager-non-api-export-overlay",
         "fable-contracts",
     ]
     commands = "\n".join(str(shard["command"]) for shard in plan["include"])
     assert "test_workbook_manager_generated_parity.py" not in commands
     assert "test_workbook_manager_apply_rebuild.py" not in commands
     assert "test_verify_workbook_candidate.py" not in commands
-    assert "TestApi and asset" not in commands
 
     read_ui = plan["include"][1]
     assert read_ui["python"] is True
@@ -364,7 +380,9 @@ def test_pr_planner_preserves_complete_manager_coverage_for_apply_rebuild():
         "ci-contracts",
         "manager-api-assets",
         "manager-api-core",
-        "manager-non-api",
+        "manager-non-api-core",
+        "manager-non-api-sync-and-export",
+        "manager-non-api-export-overlay",
         "manager-projection",
         "manager-drafts",
         "manager-apply-boundaries",
@@ -379,7 +397,9 @@ def test_pr_planner_falls_back_for_unknown_manager_code():
         "ci-contracts",
         "manager-api-assets",
         "manager-api-core",
-        "manager-non-api",
+        "manager-non-api-core",
+        "manager-non-api-sync-and-export",
+        "manager-non-api-export-overlay",
         "manager-projection",
         "manager-drafts",
         "manager-apply-boundaries",
@@ -399,10 +419,9 @@ def test_pr_planner_routes_drafts_to_api_and_lifecycle_owners():
 def test_pr_planner_runs_fable_contracts_for_state_changes():
     planner = _load_planner()
     plan = planner.plan_validation(["fable5loop/STATE.md"])
-    assert [shard["name"] for shard in plan["include"]] == [
-        "ci-contracts",
-        "fable-contracts",
-    ]
+    # A Fable state edit cannot change catalog, planner, or workflow contracts,
+    # so it must not drag the CI contract owners along.
+    assert [shard["name"] for shard in plan["include"]] == ["fable-contracts"]
     assert "scripts/validate_fable5_loop.py" in plan["include"][-1]["command"]
     assert "tests/test_fable5_loop_contract.py" in plan["include"][-1]["command"]
 
@@ -414,7 +433,9 @@ def test_pr_planner_covers_test_only_manager_change_in_three_partitions():
         "ci-contracts",
         "manager-api-assets",
         "manager-api-core",
-        "manager-non-api",
+        "manager-non-api-core",
+        "manager-non-api-sync-and-export",
+        "manager-non-api-export-overlay",
     ]
 
 
@@ -455,7 +476,9 @@ def test_manual_full_plan_partitions_every_measured_heavy_owner():
         "full-python-editor-server",
         "manager-api-assets",
         "manager-api-core",
-        "manager-non-api",
+        "manager-non-api-core",
+        "manager-non-api-sync-and-export",
+        "manager-non-api-export-overlay",
         "manager-projection",
         "manager-drafts",
         "manager-apply-boundaries",
@@ -492,7 +515,22 @@ def test_manual_full_plan_partitions_every_measured_heavy_owner():
     }
     assert "TestApi and asset" in manager_commands["manager-api-assets"]
     assert "TestApi and not asset" in manager_commands["manager-api-core"]
-    assert "not TestApi" in manager_commands["manager-non-api"]
+    # The non-API owner is partitioned in every plan, not only the full one:
+    # unsplit it measures 372.77s locally, roughly 810-890s in CI against a
+    # 900s job timeout.
+    assert (
+        "not TestApi and not TestSyncBatch and not TestComparisonExport"
+        in manager_commands["manager-non-api-core"]
+    )
+    assert (
+        "(TestSyncBatch or TestComparisonExport) and not "
+        "test_export_overlays_registry_owned_projection_fields"
+        in manager_commands["manager-non-api-sync-and-export"]
+    )
+    assert (
+        "-k test_export_overlays_registry_owned_projection_fields"
+        in manager_commands["manager-non-api-export-overlay"]
+    )
     assert not any(
         command.endswith("tests/test_workbook_manager.py -q")
         for command in manager_commands.values()
@@ -596,3 +634,127 @@ def test_layer_zero_runs_before_layer_one_when_catalog_order_is_reversed(tmp_pat
         "layer.zero",
         "layer.one",
     ]
+
+
+def test_pr_planner_routes_review_tooling_to_its_own_owner():
+    planner = _load_planner()
+    plan = planner.plan_validation(
+        [
+            "workbook-manager/review/sync_group_display_label_review.py",
+            "workbook-manager/review/group-display-label-review.csv",
+        ]
+    )
+
+    # workbook-manager/review is offline tooling plus reviewed evidence files.
+    # It used to land in the unclassified-source branch and drag in the entire
+    # shared-fixture Manager suite.
+    assert plan["full"] is False
+    assert [shard["name"] for shard in plan["include"]] == ["manager-review-tooling"]
+    command = str(plan["include"][0]["command"])
+    assert "tests/test_group_display_label_contract.py" in command
+    assert "test_workbook_manager.py" not in command
+    assert "test_workbook_manager_generated_parity.py" not in command
+
+
+def test_review_tooling_does_not_escalate_alongside_a_classified_backend_change():
+    planner = _load_planner()
+    plan = planner.plan_validation(
+        [
+            "workbook-manager/review/sync_group_display_label_review.py",
+            "workbook-manager/backend/app/explorer.py",
+        ]
+    )
+
+    names = [shard["name"] for shard in plan["include"]]
+    assert "manager-review-tooling" in names
+    assert "manager-read-explorer" in names
+    assert "manager-projection" not in names
+    assert not any(name.startswith("manager-non-api") for name in names)
+
+
+def test_unclassified_manager_backend_code_still_escalates():
+    planner = _load_planner()
+    plan = planner.plan_validation(["workbook-manager/backend/app/new_boundary.py"])
+
+    names = [shard["name"] for shard in plan["include"]]
+    assert "manager-projection" in names
+    assert "manager-non-api-core" in names
+    assert "manager-non-api-export-overlay" in names
+
+
+def test_an_additive_catalog_edit_runs_only_the_new_gate():
+    planner = _load_planner()
+    plan = planner.plan_validation(
+        ["tests/validation_catalog.json"],
+        catalog_gate_ids=["py.test_catalog_change_scope"],
+    )
+
+    assert plan["full"] is False
+    assert [shard["name"] for shard in plan["include"]] == [
+        "ci-contracts",
+        "catalog-new-gates",
+    ]
+    command = str(plan["include"][-1]["command"])
+    assert "tests/test_catalog_change_scope.py" in command
+    assert "tests/test_workbook_manager.py" not in command
+
+
+def test_an_unknown_catalog_gate_id_fails_closed():
+    planner = _load_planner()
+    with pytest.raises(KeyError):
+        planner.plan_validation(
+            ["tests/validation_catalog.json"],
+            catalog_gate_ids=["py.does_not_exist"],
+        )
+
+
+def test_the_codex_disposition_owner_is_an_always_gate():
+    catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
+    # The ci-contracts shard runs this owner whenever no layered shard does.
+    # Both paths must agree, or the gate depends on which branch CI takes.
+    assert "py.test_codex_finding_disposition" in catalog["ci"]["always_gate_ids"]
+
+
+def test_manager_main_partitions_are_disjoint_and_exhaustive():
+    """The five -k expressions must together own every Manager main test once.
+
+    Splitting the owner is only safe while this holds. Collection is the
+    authority here; reasoning about ``-k`` precedence is not.
+    """
+
+    planner = _load_planner()
+    expressions = [
+        "TestApi and asset",
+        "TestApi and not asset",
+        *(expression for _, expression, _ in planner.MANAGER_NON_API_PARTITIONS),
+    ]
+
+    def collect(*args: str) -> set[str]:
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "pytest",
+                "tests/test_workbook_manager.py",
+                *args,
+                "--collect-only", "-q",
+            ],
+            cwd=REPO_ROOT, text=True, capture_output=True, check=False,
+        )
+        return {
+            line.strip()
+            for line in result.stdout.splitlines()
+            if "::" in line and line.strip().startswith("tests/")
+        }
+
+    everything = collect()
+    assert everything, "Manager main owner collected no tests"
+
+    owners: dict[str, list[str]] = {}
+    for expression in expressions:
+        for node in collect("-k", expression):
+            owners.setdefault(node, []).append(expression)
+
+    duplicated = {node: owner for node, owner in owners.items() if len(owner) > 1}
+    assert not duplicated, f"partitions overlap: {duplicated}"
+    assert set(owners) == everything, (
+        f"partitions miss {sorted(everything - set(owners))}"
+    )
