@@ -2,16 +2,20 @@ import React, { useEffect, useMemo, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { api } from "../api.js";
 import {
+  applyDraftOverlay,
   editorTarget,
   entityLabel,
   initialDraftFromDetail,
+  matchingDraftOperation,
   relationshipImpact,
 } from "../optionEditorModel.js";
 import RecordForm from "./RecordForm.jsx";
 import EditorShell from "./EditorShell.jsx";
 
 // These are contextual intent headings only. The schema still owns every
-// included field, renderer kind, label, blank rule, and validation constraint.
+// included field (the schema column list is the editable field list), renderer
+// kind, label, blank rule, and validation constraint. Fields not named here
+// fall through to their registry control group.
 const OPTION_FIELD_GROUPS = [
   {
     label: "Identity and customer copy",
@@ -71,6 +75,7 @@ export default function OptionEditor({
   detail, modelKey, draftId, draftMutable, onClose, onChanged,
 }) {
   const [schema, setSchema] = useState(null);
+  const [draftOperations, setDraftOperations] = useState(null);
   const [error, setError] = useState("");
   const [savedOperation, setSavedOperation] = useState(null);
   const [hasSaved, setHasSaved] = useState(false);
@@ -79,22 +84,37 @@ export default function OptionEditor({
   useEffect(() => {
     let current = true;
     setSchema(null);
+    setDraftOperations(null);
     setSavedOperation(null);
     setHasSaved(false);
     setError("");
-    api.schema("options", modelKey).then((spec) => {
-      if (current) setSchema(spec);
+    Promise.all([
+      api.schema("options", modelKey),
+      draftId ? api.draftOperations(draftId) : Promise.resolve(null),
+    ]).then(([spec, operations]) => {
+      if (!current) return;
+      setSchema(spec);
+      setDraftOperations(operations?.operations ?? []);
     }).catch((e) => {
       if (current) setError(e.message);
     });
     return () => { current = false; };
-  }, [modelKey]);
+  }, [modelKey, draftId]);
 
   const target = useMemo(() => editorTarget(detail), [detail]);
-  const initial = useMemo(
-    () => initialDraftFromDetail(detail),
-    [detail],
-  );
+  // Seed from the coalesced draft operation for this physical row when one
+  // exists, so reopening — or "Keep editing" after a save — never resubmits
+  // untouched projected values over previously drafted changes.
+  const initial = useMemo(() => {
+    const projected = initialDraftFromDetail(detail, schema);
+    return {
+      ...projected,
+      draft: applyDraftOverlay(
+        projected.draft,
+        savedOperation ?? matchingDraftOperation(draftOperations, target),
+      ),
+    };
+  }, [detail, schema, draftOperations, target, savedOperation]);
   const impact = useMemo(() => relationshipImpact(detail), [detail]);
   const label = useMemo(() => entityLabel(detail), [detail]);
 
@@ -130,6 +150,8 @@ export default function OptionEditor({
       onRequestClose={onClose}
       footer={(requestClose) =>
         <>
+          {/* Keep editing returns to the form seeded from the just-saved
+              operation via the `savedOperation` fallback in `initial`. */}
           <button type="button" className="btn small" onClick={() => setHasSaved(false)}>
             <ArrowLeft size={14} /> Keep editing
           </button>
@@ -144,10 +166,10 @@ export default function OptionEditor({
     </EditorShell>
   );
 
-  if (!schema) return (
+  if (!schema || draftOperations === null) return (
     <EditorShell
       title={`Edit option · ${label}`}
-      subtitle="Loading registry controls for this option."
+      subtitle="Loading registry controls and draft evidence for this option."
       target={`${label} · ${target.lineage.source_sheet || "options"}`}
       dirty={false}
       busy={false}

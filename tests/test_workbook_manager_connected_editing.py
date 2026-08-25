@@ -230,11 +230,26 @@ CONNECTED_DETAIL = {
 }
 
 
+CONNECTED_SCHEMA = {
+    "table": "options",
+    "key": ["option_id"],
+    "columns": [
+        {"name": name, "control": {"kind": "short_text"}}
+        for name in [
+            "option_id", "rpo", "price", "option_name", "description",
+            "detail_raw", "section_id", "selectable", "display_order",
+            "display_behavior", "active",
+        ]
+    ],
+}
+
+
 def test_connected_option_detail_derives_a_prefilled_registry_draft():
     """The editor opens pre-filled from the connected detail, not a raw row."""
     result = run_option_model(
         "console.log(JSON.stringify(api.initialDraftFromDetail("
-        + json.dumps(CONNECTED_DETAIL)
+        + json.dumps(CONNECTED_DETAIL) + ", "
+        + json.dumps(CONNECTED_SCHEMA)
         + ")));"
     )
     draft = result["draft"]
@@ -257,6 +272,101 @@ def test_connected_option_detail_derives_a_prefilled_registry_draft():
     assert result["label"] == "5ZU — Body-Color High Wing Spoiler"
     assert result["lineage"]["source_sheet"] == "stingray_options"
     assert result["lineage"]["source_row"] == 12
+
+
+def test_option_editor_fields_come_from_the_registry_schema_not_a_local_list():
+    """The editable field set is the schema's, so registry additions are kept."""
+    schema = {
+        "columns": [
+            {"name": "option_id", "control": {"kind": "immutable"}},
+            {"name": "rpo", "control": {"kind": "short_text"}},
+            {"name": "brand_new_registry_column", "control": {"kind": "short_text"}},
+        ],
+    }
+    detail = {
+        "model_key": "stingray",
+        "option": {
+            "option_id": "opt_x_001", "rpo": "5ZU", "src_sheet": "s",
+            "src_row": 1, "physical_key": '["opt_x_001"]',
+        },
+    }
+    result = run_option_model(
+        "console.log(JSON.stringify(api.initialDraftFromDetail("
+        + json.dumps(detail) + ", " + json.dumps(schema)
+        + ")));"
+    )
+
+    # A column the registry added after this file was written is prefilled
+    # from the projection rather than silently initialized to "" — a stale
+    # local list here would erase its workbook value on an unrelated save.
+    assert result["draft"]["brand_new_registry_column"] == ""
+    assert set(result["draft"]) == {
+        "option_id", "rpo", "brand_new_registry_column",
+    }
+
+    source = (FRONTEND / "optionEditorModel.js").read_text()
+    assert "OPTION_FIELD_ORDER" not in source
+    # No parallel field list may reappear: field names may only occur in the
+    # generic helpers, never as an enumerated editable set.
+    assert '"option_name"' not in source
+    assert '"display_order"' not in source
+
+
+def test_editor_seeds_reopened_forms_from_the_coalesced_draft_operation():
+    """Reopening or Keep-editing must not resubmit projected over drafted values."""
+    projected = run_option_model(
+        "const d = api.initialDraftFromDetail("
+        + json.dumps(CONNECTED_DETAIL) + ", "
+        + json.dumps(CONNECTED_SCHEMA) + ");"
+        "console.log(JSON.stringify({"
+        "target: d.target,"
+        "seeded: api.applyDraftOverlay(d.draft, "
+        + json.dumps({
+            "final": {
+                "price": 700,
+                "option_name": "Drafted wing name",
+                "detail_raw": None,
+                "selectable": "",
+            },
+        })
+        + ")"
+        "}));"
+    )
+    seeded = projected["seeded"]
+
+    # Drafted non-blank values win; NULL/blank final entries keep the
+    # projected value because both render as "not specified / inherit".
+    assert seeded["price"] == "700"
+    assert seeded["option_name"] == "Drafted wing name"
+    assert seeded["detail_raw"] == ""
+    assert seeded["selectable"] == "True"
+
+    operations = [
+        {"id": 1, "source_sheet": "other_sheet", "physical_key": '["opt_z_009"]',
+         "final": {"price": 999}},
+        {"id": 2, "source_sheet": "stingray_options",
+         "physical_key": '["opt_x_001"]', "final": {"price": 700}},
+    ]
+    match = run_option_model(
+        "console.log(JSON.stringify(api.matchingDraftOperation("
+        + json.dumps(operations) + ", "
+        + json.dumps(projected["target"])
+        + ")));"
+    )
+    assert match["id"] == 2
+
+    no_match = run_option_model(
+        "console.log(JSON.stringify(api.matchingDraftOperation("
+        + json.dumps(operations[:1]) + ", "
+        + json.dumps(projected["target"])
+        + ")));"
+    )
+    assert no_match is None
+
+    source = (FRONTEND / "components" / "OptionEditor.jsx").read_text()
+    # The component seeds the form from durable evidence before allowing a save.
+    assert "applyDraftOverlay" in source
+    assert "matchingDraftOperation" in source
 
 
 def test_relationship_impact_is_summarized_from_the_connected_detail():

@@ -2,36 +2,26 @@
 //
 // Pure functions only: the React component wires these to the shared
 // EditorShell/RecordForm surfaces. Everything here is derived from the
-// connected option detail (`GET /api/explorer/{model}/options/{id}`) and from
-// registry-owned schema controls — no product knowledge lives in this module.
+// connected option detail (`GET /api/explorer/{model}/options/{id}`), the
+// registry-owned table schema (`GET /api/records/options/schema`), and the
+// durable draft operations — no product knowledge lives in this module.
 
 function text(value) {
   if (value === null || value === undefined) return "";
   return String(value);
 }
 
-// The projected option fields the option editor edits, in §10.6 group order.
-// Identity (option_id) is locked on edit; everything else renders through the
-// schema's registry control kinds.
-export const OPTION_FIELD_ORDER = [
-  "option_id",
-  "rpo",
-  "price",
-  "option_name",
-  "description",
-  "detail_raw",
-  "section_id",
-  "selectable",
-  "display_order",
-  "display_behavior",
-  "active",
-];
-
-export function initialDraftFromDetail(detail) {
+// Editable fields come from the registry schema's column list, never a local
+// copy: RecordForm renders and submits every schema column, and
+// drafts.save_operation overlays every submitted value onto the coalesced
+// draft operation. A local field list here could go stale when the registry
+// adds or renames an option column, leaving that column initialized to ""
+// and erasing workbook-authored data on an unrelated save.
+export function initialDraftFromDetail(detail, schema) {
   const option = detail?.option || {};
   const draft = {};
-  for (const name of OPTION_FIELD_ORDER) {
-    draft[name] = text(option[name]);
+  for (const column of schema?.columns || []) {
+    draft[column.name] = text(option[column.name]);
   }
   const target = editorTarget(detail);
   return {
@@ -40,6 +30,44 @@ export function initialDraftFromDetail(detail) {
     label: entityLabel(detail),
     lineage: target.lineage,
   };
+}
+
+// Overlay the effective draft state of this physical row (if any) onto the
+// projected values, so reopening the editor — or choosing "Keep editing"
+// after a save — seeds from the coalesced operation instead of from the
+// untouched projection. Otherwise a second save would resubmit projected
+// values and silently revert previously drafted fields. NULL and blank
+// entries keep the projected value: blank renders as "not specified /
+// inherit", which is identical presentation for both states.
+export function applyDraftOverlay(draft, operation) {
+  const final = operation?.final;
+  if (!final || typeof final !== "object") return draft;
+  const seeded = { ...draft };
+  for (const name of Object.keys(seeded)) {
+    const value = final[name];
+    if (value !== null && value !== undefined && String(value) !== "") {
+      seeded[name] = String(value);
+    }
+  }
+  return seeded;
+}
+
+// Latest durable operation bound to this exact physical row, matched by the
+// same identity drafts.save_operation uses (source_sheet + physical_key).
+export function matchingDraftOperation(operations, target) {
+  const sheet = target?.lineage?.source_sheet || "";
+  const physicalKey = target?.lineage?.physical_key || "";
+  const rows = Array.isArray(operations) ? operations : [];
+  for (let index = rows.length - 1; index >= 0; index -= 1) {
+    const operation = rows[index];
+    if (
+      (operation?.source_sheet || "") === sheet &&
+      (operation?.physical_key || "") === physicalKey
+    ) {
+      return operation;
+    }
+  }
+  return null;
 }
 
 export function editorTarget(detail) {
