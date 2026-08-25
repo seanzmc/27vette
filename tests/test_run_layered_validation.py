@@ -485,6 +485,12 @@ def test_manual_full_plan_partitions_every_measured_heavy_owner():
         "manager-projection",
         "manager-drafts",
         "manager-apply-boundaries",
+        # Narrow-plan-only wiring, smoked so planner changes cannot break it
+        # silently. See test_every_narrow_plan_only_shard_is_smoked_by_full_runs.
+        "smoke-ci-contracts",
+        "smoke-manager-review-tooling",
+        "smoke-fable-contracts",
+        "smoke-docs-only",
     ]
 
     product = plan["include"][0]
@@ -716,6 +722,88 @@ def test_the_codex_disposition_owner_is_an_always_gate():
     # The ci-contracts shard runs this owner whenever no layered shard does.
     # Both paths must agree, or the gate depends on which branch CI takes.
     assert "py.test_codex_finding_disposition" in catalog["ci"]["always_gate_ids"]
+
+
+def test_every_narrow_plan_only_shard_is_smoked_by_full_runs():
+    """A shard a full run never reaches is a shard no planner change can test.
+
+    Every edit to the planner forces a full run, so without this the wiring of a
+    narrow-plan-only shard is only ever executed by unrelated pull requests. That
+    is exactly how ci-contracts shipped with bare pytest while its own contract
+    needed openpyxl to collect anything.
+    """
+
+    planner = _load_planner()
+
+    full = planner.plan_validation([], full=True)["include"]
+    full_names = {shard["name"] for shard in full}
+    smoked = {
+        name[len("smoke-"):] for name in full_names if name.startswith("smoke-")
+    }
+
+    # Representative of each path surface the planner routes on. A new surface
+    # that introduces a shard belongs here.
+    scenarios = (
+        ["docs/operator-note.md"],
+        ["scripts/corvette_form_generator/rules.py"],
+        ["scripts/plan_ci_validation.py"],
+        ["workbook-manager/frontend/src/components/EditorShell.jsx"],
+        ["workbook-manager/review/tool.py"],
+        ["workbook-manager/backend/app.py"],
+        ["tests/test_workbook_manager.py"],
+        ["form-app/app.js"],
+        ["fable5loop/STATE.md"],
+    )
+    reachable = {
+        shard["name"]
+        for scenario in scenarios
+        for shard in planner.plan_validation(scenario)["include"]
+    }
+    # An additive catalog edit is the only way to reach the new-gate shard, so it
+    # needs its own call rather than a changed-path scenario.
+    reachable |= {
+        shard["name"]
+        for shard in planner.plan_validation(
+            ["tests/validation_catalog.json"],
+            catalog_gate_ids=["py.test_catalog_change_scope"],
+        )["include"]
+    }
+
+    narrow_only = reachable - full_names
+    unsmoked = narrow_only - smoked - set(planner.SMOKE_EXEMPT_SHARDS)
+    assert not unsmoked, (
+        f"narrow-plan-only shards a full run never exercises: {sorted(unsmoked)}. "
+        "Add them to _smoke_shards() or justify them in SMOKE_EXEMPT_SHARDS."
+    )
+
+    # Exemptions must stay honest: an exempt name has to be a real narrow shard.
+    stale = set(planner.SMOKE_EXEMPT_SHARDS) - reachable
+    assert not stale, f"SMOKE_EXEMPT_SHARDS names no longer planned: {sorted(stale)}"
+
+
+def test_smoke_shards_keep_the_real_shard_wiring():
+    """A smoke shard proves nothing if its command or toolchain has drifted."""
+
+    planner = _load_planner()
+    full = {shard["name"]: shard for shard in planner.plan_validation([], full=True)["include"]}
+    originals = {
+        shard["name"]: shard
+        for shard in (
+            planner._ci_contract_shard(),
+            planner._manager_review_shard(),
+            planner._fable_contract_shard(),
+            planner._docs_only_shard(),
+        )
+    }
+
+    assert originals, "no smoke sources to compare"
+    for name, original in originals.items():
+        smoke = full.get(f"smoke-{name}")
+        assert smoke is not None, f"full plan lost smoke-{name}"
+        for field in ("command", "python", "node", "python_dependencies"):
+            assert smoke[field] == original[field], (
+                f"smoke-{name} {field} drifted from the real {name} shard"
+            )
 
 
 def test_manager_main_partitions_are_disjoint_and_exhaustive():

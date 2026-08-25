@@ -376,6 +376,54 @@ def _manager_full_shards() -> tuple[dict[str, object], ...]:
     )
 
 
+# Shards that only ever appear in change-aware plans. A full run reaches none of
+# them, and every change to this planner forces a full run, so their command and
+# environment wiring was never executed by the pull request that changed it. That
+# is how ci-contracts shipped declaring bare pytest while its own contract shelled
+# out to collect a module needing openpyxl: collection returned nothing and the
+# contract asserted against an empty set. Full runs now smoke them.
+#
+# Exemptions are shards whose wiring an ordinary full shard already proves, or
+# whose command cannot be smoked meaningfully:
+SMOKE_EXEMPT_SHARDS = {
+    # Identical npm ci + build wiring to full-product-readiness, which every full
+    # run executes. Its one extra test is owned by manager-non-api-core.
+    "manager-frontend": "full-product-readiness runs the same node wiring",
+    # The command is derived from the changed paths themselves, so a synthetic
+    # invocation would prove nothing about any real one.
+    "layered-changed-surfaces": "command is diff-derived, not static",
+    # Emitted only for gates a purely additive catalog edit declared; there is no
+    # such gate on a full run.
+    "catalog-new-gates": "requires an additive catalog diff to exist",
+}
+
+
+def _smoke_shards() -> tuple[dict[str, object], ...]:
+    """Prove the narrow-plan-only shards can still run, on every full run.
+
+    Each keeps the exact command, toolchain flags, and dependency profile of the
+    real shard, so a break in that wiring fails here instead of on some unrelated
+    pull request that happens to plan narrowly.
+    """
+
+    return tuple(
+        _shard(
+            f"smoke-{shard['name']}",
+            str(shard["command"]),
+            python=bool(shard["python"]),
+            node=bool(shard["node"]),
+            python_dependencies=str(shard["python_dependencies"]),
+            description=f"Smoke the narrow-plan {shard['name']} shard wiring.",
+        )
+        for shard in (
+            _ci_contract_shard(),
+            _manager_review_shard(),
+            _fable_contract_shard(),
+            _docs_only_shard(),
+        )
+    )
+
+
 def _full_suite_shards() -> tuple[dict[str, object], ...]:
     ignored = [
         MANAGER_MAIN_TEST,
@@ -477,7 +525,7 @@ def plan_validation(
     )
     if full or GLOBAL_TEST_ENVIRONMENT_PATHS.intersection(paths):
         return {
-            "include": list(_full_suite_shards()),
+            "include": [*_full_suite_shards(), *_smoke_shards()],
             "changed_paths": list(paths),
             "full": True,
         }
