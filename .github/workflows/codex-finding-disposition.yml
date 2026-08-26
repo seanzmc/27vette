@@ -30,12 +30,17 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
+  pull-requests: write
   statuses: write
 
+# Codex emits its review and each review comment in the same second, so three
+# events share one group. Cancelling the losers marks them red on the PR even
+# though the survivor sets the status correctly. Each run is short and
+# recomputes from current state, so queueing is both cheaper to read and
+# last-writer-correct.
 concurrency:
   group: codex-finding-disposition-${{ github.event.pull_request.number || inputs.pr_number || github.event_name }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   evaluate:
@@ -53,6 +58,7 @@ jobs:
         with:
           ref: refs/heads/${{ github.event.repository.default_branch }}
           fetch-depth: 1
+          persist-credentials: false
 
       - name: Evaluate current Codex findings
         env:
