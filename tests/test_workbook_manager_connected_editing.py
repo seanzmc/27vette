@@ -74,6 +74,21 @@ def test_navigation_state_round_trips_only_canonical_reloadable_context():
     }
 
 
+def test_detail_clears_cross_model_selection_before_the_next_load():
+    source = (FRONTEND / "components" / "ConnectedExplorer.jsx").read_text()
+
+    # Codex P1 (PR 50): when modelKey changes with a detail open, the stale
+    # detail must stop rendering immediately instead of staying interactive
+    # until the replacement request resolves.
+    assert (
+        "setSelected((current) => (current?.model_key === modelKey ? current : null))"
+        in source
+    )
+    load_effect = source.index("const generation = ++detailRequest.current;")
+    guard = source.index("current?.model_key === modelKey")
+    assert 0 < guard - load_effect < 800
+
+
 def test_app_owns_native_history_and_reuses_lifecycle_for_the_draft_tray():
     app_source = (FRONTEND / "App.jsx").read_text()
     explorer_source = (FRONTEND / "components" / "ConnectedExplorer.jsx").read_text()

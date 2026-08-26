@@ -284,6 +284,11 @@ export default function ConnectedExplorer({
       setDetailError("");
       return;
     }
+    // A previous model's detail must never stay interactive under a new
+    // model header, or its edit buttons could stage durable intent against
+    // the wrong model while the replacement detail loads.
+    setSelected((current) => (current?.model_key === modelKey ? current : null));
+    setDetailError("");
     const load = async () => {
       try {
         setDetailError("");
