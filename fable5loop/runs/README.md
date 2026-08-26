@@ -1,6 +1,11 @@
-# Fable 5 Run Receipts
+# Fable 5 Run Receipts (retired)
 
-Every non-trivial Fable 5 run in this repo must leave a receipt folder here before closeout.
+The Fable 5 loop is retired as of 2026-08-26; see `docs/archive/fable5-loop/README-ARCHIVE.md`.
+These folders are immutable historical evidence and are kept at these exact paths because
+specifications, archived documents, and other receipts link them. No new receipts are written.
+The original shape is recorded below for reading old receipts.
+
+Historically, every non-trivial Fable 5 run left a receipt folder here before closeout.
 
 Required shape:
 

@@ -1832,6 +1832,8 @@ Review-fix implementation commit: `4b7c06c`.
 Review-fix delivery receipt: PR 48 head `4be55b4`; all three Codex threads
 resolved; pull-request Release candidate run `32973751490` and full-inventory
 workflow-dispatch run `32973812575` passed for that head.
+Final delivery head `d2d5c4e` passed the current-head Release candidate and
+Codex disposition gates; PR 48 merged to `main` as `bf6db32` on 2026-08-26.
 
 - connected group detail now additively exposes the complete projected group row
   plus backend-owned parent/member table and member key/order/active field
@@ -1876,9 +1878,9 @@ workflow-dispatch run `32973812575` passed for that head.
   remain unchanged. The browser proofs intentionally created two durable audit
   drafts and then cancelled both; no canonical or generated write ran.
 
-Mandatory stop: this evidence closes only subpass 3E. Subpass 3F remains
-unimplemented and requires explicit sequential authorization; no persistent
-draft tray, URL/history, deep-link, or reload-resume work was started.
+Mandatory stop: this evidence closes only subpass 3E. The user explicitly
+authorized subpass 3F on 2026-08-26 after PR 48 merged; no persistent draft
+tray, URL/history, deep-link, or reload-resume work is included in PR 49.
 
 ### Checkpoint 4 — complete form graph and contextual section management
 
@@ -2060,10 +2062,10 @@ Before checkpoint closeout:
 git diff --check
 ```
 
-If Fable loop artifacts or `fable5loop/STATE.md` change:
+If `fable5loop/STATE.md` or `fable5loop/STATE-archive.md` change:
 
 ```sh
-.venv/bin/python scripts/validate_fable5_loop.py
+.venv/bin/python scripts/validate_state_handoff.py
 ```
 
 The pull request must receive one successful full-inventory Release candidate
@@ -2186,10 +2188,10 @@ runtime parity from an adjacent test or remembered prior run.
 Checkpoints 1 and 2 are complete. Checkpoint 3A/3B's bounded
 registry/schema/reference slice, Checkpoint 3C's reusable shell, Checkpoint
 3D's direct option editor, and Checkpoint 3E's contextual group/member editor
-are complete and stopped. Checkpoint 3F and Checkpoints 4–6 remain unauthorized.
-The next implementation agent must receive an explicit checkpoint instruction
-and must not treat either the completed label migration or control metadata as
-authorization for customer headings.
+are complete and stopped. The user explicitly authorized Checkpoint 3F on
+2026-08-26; implementation has not started in PR 49. Checkpoints 4–6 remain
+unauthorized. The next implementation agent must not treat either the completed
+label migration or control metadata as authorization for customer headings.
 
 ### 19.2 Decision matrix
 
@@ -2202,7 +2204,8 @@ authorization for customer headings.
 | Add complete control metadata and bounded reference lookup | Checkpoint 3A/3B | Complete locally: 25 families / 220 fields have exact coverage; schema/reference APIs are additive and fail closed. Delivery CI is recorded with the PR. |
 | Reusable accessible registry-control editor shell | Checkpoint 3C | Complete locally: drawer/sheet, no-fallback renderer map, validation, dirty-close, busy Save, focus, and responsive browser proof are green; delivery CI is recorded with the PR. |
 | Render and save a contextual direct option editor | Checkpoint 3D | Complete and merged: registry-driven direct fields, durable draft Save, field overlay, impact summary, connected detail, focused/build/Manager gates, and browser proof are green; both Codex review-bug fixes landed on the PR head, post-sync CI passed, and PR 45 merged at `3a8369b`. |
-| Render and save contextual group/member editors | Checkpoint 3E | Complete locally: registry-driven group facts, durable member add/remove/reorder/active operations, deterministic final order, direct dependency refusal, reversion, focused/build/Manager/all-model gates, protected hashes, and browser proof are green. Delivery CI is recorded with the PR. |
+| Render and save contextual group/member editors | Checkpoint 3E | Complete and merged through PR 48 at `bf6db32`: registry-driven group facts, durable member add/remove/reorder/active operations, deterministic final order, direct dependency refusal, reversion, focused/build/Manager/all-model gates, protected hashes, and browser proof are green. |
+| Persistent draft tray, URL/history, and reload-safe connected navigation | Checkpoint 3F | Explicitly authorized on 2026-08-26; implementation has not started in PR 49. |
 | New group canonical-ID allocation strategy | Any Add Group feature | Unresolved; Add Group remains blocked. |
 | Any new frontend/backend dependency | Before dependency change | Not approved. |
 | Breaking/removing existing Manager API members | Before API break | Not approved; changes must be additive. |
@@ -2248,11 +2251,13 @@ exhaustively tested text controls rather than accidental frontend defaults.
 
 ### 19.4 Current next action
 
-Remain stopped after Checkpoint 3E. The next sequential implementation action
-is an explicit decision on Checkpoint 3F's persistent draft tray/navigation.
-Do not begin 3F automatically, do not skip ahead to later checkpoints, and do
-not begin the non-sequential Checkpoint 5 customer-runtime heading switch merely
-because its label prerequisite is complete.
+After PR 49's current-head checks pass, begin the explicitly authorized
+Checkpoint 3F persistent draft tray/navigation on a separate clean branch from
+current `origin/main`; update that branch from `main` after PR 49 merges. Keep
+the implementation to the existing durable draft lane plus dependency-free URL
+and browser-history state; do not skip ahead to later checkpoints or begin the
+non-sequential Checkpoint 5 customer-runtime heading switch merely because its
+label prerequisite is complete.
 
 ## 20. Coding-agent checkpoint execution protocol
 
@@ -2287,7 +2292,7 @@ Execute Checkpoint <N / subpass> of
 
 Authority and scope:
 - Read `AGENTS.md`, the reliable workflow specification, the Workbook Manager
-  README, this specification, and the current Fable handoff before editing.
+  README, this specification, and the current operational handoff before editing.
 - This task authorizes only <checkpoint/subpass>.
 - Do not begin any later checkpoint.
 - Preserve workbook/generated/runtime/dealer/media/deployment boundaries except
