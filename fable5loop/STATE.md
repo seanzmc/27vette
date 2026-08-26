@@ -12,17 +12,17 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 
 ## Current handoff
 
-- **Updated:** 2026-08-24
-- **Owning specification:** None; bounded CI validation-gate efficiency work requested directly by the repository owner. Findings and dispositions are tracked in `docs/pr-workflow-cleanup.md`.
-- **Active workflow:** `release-candidate` change-aware validation planning.
-- **Branch/commit:** `ci/narrow-plan-smoke`, PR 44, branched from `main` at `4c595da` after PRs 43 and 42 both landed; second commit addresses the Codex P2 on guard exhaustiveness; third updates the documentation the shard changes made stale.
-- **Last completed:** Closed the structural gap that let a broken shard ship. Shards that only appear in change-aware plans are never reached by a full run, and every planner edit forces a full run, so no pull request can execute the shard it just changed. Full runs now smoke each such shard with its real command, toolchain flags, and dependency profile, and a contract requires every narrow-only shard to be smoked or justified in `SMOKE_EXEMPT_SHARDS`.
-- **Current status:** Implementation and local validation green; not yet opened as a pull request.
-- **Validation:** 118 passed across the planner, catalog, classifier, disposition, and review contracts. Both planner self-tests OK. Fable loop validator passed. All four smoke commands executed for real: `smoke-ci-contracts` 71 passed, `smoke-manager-review-tooling` 24 passed, `smoke-fable-contracts` 14 passed, `smoke-docs-only` exit 0. All five contracts were proved by negative control: deleting a smoke shard, drifting a smoke command, re-inlining a shard while keeping its factory, a stale exemption, and an exempt prefix matching nothing each fail with the intended message. The re-inlining control initially passed against a reflection-based check, which is why that check now parses the planner with `ast` instead.
-- **Next action:** Review and merge PR 44. Its CI is green on the full inventory with all five smoke shards passing remotely.
-- **Blockers or closeout gaps:** The contract found that a full inventory never validated the Fable 5 loop; `smoke-fable-contracts` closes it. The narrow `ci-contracts` path itself still has no remote proof, because any change to the planner forces a full plan — that is the gap this work makes visible rather than one it removes. The first narrow-planning pull request after this lands is what confirms it.
+- **Updated:** 2026-08-25
+- **Owning specification:** `docs/superpowers/specs/2026-08-21-workbook-manager-ux-recovery.md`, Checkpoint 3D only.
+- **Active workflow:** Normal repository path; no Fable run.
+- **Branch/commit:** PR #45 review-fix commit on `hermes/workbook-manager-ux-recovery-cp3d`.
+- **Last completed:** Dispositioned both Codex review suggestions on PR #45 as real bugs and fixed them. (1) The contextual option editor now seeds its form from the coalesced durable draft operation for the exact physical row (`applyDraftOverlay` + `matchingDraftOperation`, fetched via new `GET /api/drafts/{id}/operations` wrapper), so reopening or "Keep editing" after a save no longer resubmits untouched projected values that would silently revert previously drafted fields in `drafts.save_operation()`. (2) The editable field list is now derived from the registry table schema (`initialDraftFromDetail(detail, schema)`); the parallel hardcoded `OPTION_FIELD_ORDER` was deleted, so registry-added option columns can no longer be posted blank and erase workbook-authored data.
+- **Current status:** Both fixes implemented on the PR head; focused connected-editing suite green at 15 tests, draft/lifecycle suites green, frontend build green.
+- **Validation:** `.venv/bin/python -m pytest tests/test_workbook_manager_connected_editing.py -q` — 15 passed. `tests/test_workbook_manager_drafts.py` + `tests/test_workbook_manager_changeset_lifecycle.py` — 42 passed, 36 subtests passed. `tests/test_workbook_manager.py -q` — 68 passed, 2 intentional skips. `npm --prefix workbook-manager/frontend run build` — passed. `git diff --check` — passed.
+- **Next action:** Push the fix commit to `hermes/workbook-manager-ux-recovery-cp3d` and reply to the two review threads; merge remains a separate user decision. Checkpoint 3E requires a new explicit instruction.
+- **Blockers or closeout gaps:** Remote CI is pending push; real-browser re-proof of the reopen/Keep-editing path is optional follow-up (behavior covered by Node-run helper tests plus source contracts).
 - **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This task used the normal repository path and produced no Fable receipt.
-- **Protected boundaries:** Canonical workbook, workbook schema/data, generators, generated artifacts, published registry, customer runtime, dependencies, backend and durable draft/apply/rebuild semantics, dealer submission, WordPress media, and deployment remain untouched. This change adds validation jobs only; it removes no coverage.
+- **Protected boundaries:** Canonical workbook, workbook schema/data, generators, generated artifacts, published registry, customer runtime, dependencies, backend and durable draft/apply/rebuild semantics, dealer submission, WordPress media, deployment, group/member editing, persistent draft tray, and later checkpoints remain untouched.
 
 ## Verified facts
 

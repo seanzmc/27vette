@@ -98,6 +98,14 @@ export default function App() {
     ]);
   }, [refreshStatus, refreshDraft]);
 
+  // Contextual editors must keep their post-Save overlay mounted. Refreshing
+  // global status temporarily marks the app unready and unmounts the active
+  // workspace, so these editors refresh only the durable draft evidence.
+  const refreshDraftInPlace = useCallback(
+    () => refreshDraft(),
+    [refreshDraft],
+  );
+
   useEffect(() => {
     refreshStatus();
     (async () => {
@@ -231,7 +239,13 @@ export default function App() {
           />
         )}
         {ready && (tab === "options" || tab === "groups") && (
-          <ConnectedExplorer mode={tab} modelKey={modelKey} />
+          <ConnectedExplorer
+            mode={tab}
+            modelKey={modelKey}
+            draftId={draftId}
+            draftMutable={draftMutable}
+            onChanged={refreshDraftInPlace}
+          />
         )}
         {ready && tab === "assets" && (
           <AssetManager

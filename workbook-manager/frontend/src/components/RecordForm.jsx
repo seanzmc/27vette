@@ -148,6 +148,11 @@ function mergeOptions(...groups) {
 
 export default function RecordForm({
   schema, mode, initial, modelKey, onSaved, onCancel, saveFn,
+  // Contextual-editor additions are optional so existing callers are unchanged.
+  saveLabel = "Save change to draft",
+  fieldGroups,
+  title,
+  target,
 }) {
   const [draft, setDraft] = useState(() => initialDraft(schema, initial));
   const [errors, setErrors] = useState({});
@@ -306,30 +311,31 @@ export default function RecordForm({
 
   const dirty = isDraftDirty(schema, initial || {}, draft);
   const groupedColumns = useMemo(() => {
-    const groups = new Map();
+    const groups = new Map((fieldGroups || []).map((group) => [group.label, []]));
     for (const column of schema.columns) {
-      const group = column.control.group || "Other";
+      const contextual = (fieldGroups || []).find((group) => group.fields.includes(column.name));
+      const group = contextual?.label || column.control.group || "Other";
       if (!groups.has(group)) groups.set(group, []);
       groups.get(group).push(column);
     }
-    return [...groups.entries()].map(([group, columns]) => [
+    return [...groups.entries()].filter(([, columns]) => columns.length).map(([group, columns]) => [
       group,
       columns.sort((left, right) => left.control.order - right.control.order),
     ]);
-  }, [schema]);
+  }, [schema, fieldGroups]);
 
   return (
     <EditorShell
-      title={`${mode === "edit" ? "Edit" : "Add"} ${schema.label}`}
+      title={title || `${mode === "edit" ? "Edit" : "Add"} ${schema.label}`}
       subtitle="Changes are saved to the durable draft only. The workbook is not changed here."
-      target={`${schema.label}${schema.sheet_for_model ? ` · ${schema.sheet_for_model}` : ""}`}
+      target={target || `${schema.label}${schema.sheet_for_model ? ` · ${schema.sheet_for_model}` : ""}`}
       dirty={dirty}
       busy={busy}
       onRequestClose={onCancel}
       footer={(requestClose) => (
         <>
           <button type="button" className="btn primary" onClick={submit} disabled={busy}>
-            <Check size={15} /> {busy ? "Saving to draft…" : "Save change to draft"}
+            <Check size={15} /> {busy ? "Saving to draft…" : saveLabel}
           </button>
           <button type="button" className="btn" onClick={requestClose} disabled={busy}>Cancel</button>
           <span className="muted">Draft only · no workbook write or rebuild</span>

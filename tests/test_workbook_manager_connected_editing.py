@@ -1,8 +1,9 @@
-"""Checkpoint 3C frontend editor-shell contracts.
+"""Checkpoint 3C/3D frontend editor-shell and contextual option editor contracts.
 
 The production frontend has no DOM test dependency. Behavioral helpers are
-exercised through Node, while shell accessibility and renderer ownership are
-checked from the shipped source. Browser evidence remains a separate gate.
+exercised through Node, while shell accessibility, renderer ownership, and
+contextual-editor wiring are checked from the shipped source. Browser evidence
+remains a separate gate.
 """
 
 from __future__ import annotations
@@ -174,3 +175,282 @@ def test_shell_css_is_a_desktop_drawer_and_narrow_full_screen_sheet():
     assert "position: sticky" in source
     assert "@media (max-width: 760px)" in source
     assert ".editor-shell { width: 100%; max-width: none; height: 100%;" in source
+
+
+# ── Checkpoint 3D — contextual option editor (spec §16 subpass 4) ────────────
+
+
+OPTION_EDITOR_MODULE = FRONTEND / "optionEditorModel.js"
+
+
+def run_option_model(script: str):
+    result = subprocess.run(
+        [
+            "node",
+            "--input-type=module",
+            "--eval",
+            (
+                "import { pathToFileURL } from 'node:url';"
+                f"const moduleUrl = pathToFileURL({json.dumps(str(OPTION_EDITOR_MODULE))}).href;"
+                "const api = await import(moduleUrl);"
+                + script
+            ),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return json.loads(result.stdout)
+
+
+CONNECTED_DETAIL = {
+    "model_key": "stingray",
+    "entity_type": "option",
+    "destination": {
+        "workspace": "options", "entity_type": "option", "entity_id": "opt_x_001",
+    },
+    "option": {
+        "option_id": "opt_x_001", "rpo": "5ZU",
+        "option_name": "Body-Color High Wing Spoiler", "name": "Body-Color High Wing Spoiler",
+        "price": "625", "description": "Spoiler.", "detail_raw": "",
+        "section_id": "sec_spoi_001", "selectable": "True",
+        "display_order": "30", "active": "True", "display_behavior": "",
+        "src_sheet": "stingray_options", "src_row": 12, "physical_key": "[\"opt_x_001\"]",
+    },
+    "section": {"section_id": "sec_spoi_001", "section_name": "Spoilers"},
+    "availability": [],
+    "exclusive_groups": [{"group_id": "g1", "member_count": 4}],
+    "rule_groups": [],
+    "rules": [{"rule_id": "r1"}, {"rule_id": "r2"}],
+    "pricing": [],
+    "variant_overrides": [{"override_id": "v1"}],
+    "default_rules": [{"rule_id": "d1"}],
+    "assets": [],
+}
+
+
+CONNECTED_SCHEMA = {
+    "table": "options",
+    "key": ["option_id"],
+    "columns": [
+        {"name": name, "control": {"kind": "short_text"}}
+        for name in [
+            "option_id", "rpo", "price", "option_name", "description",
+            "detail_raw", "section_id", "selectable", "display_order",
+            "display_behavior", "active",
+        ]
+    ],
+}
+
+
+def test_connected_option_detail_derives_a_prefilled_registry_draft():
+    """The editor opens pre-filled from the connected detail, not a raw row."""
+    result = run_option_model(
+        "console.log(JSON.stringify(api.initialDraftFromDetail("
+        + json.dumps(CONNECTED_DETAIL) + ", "
+        + json.dumps(CONNECTED_SCHEMA)
+        + ")));"
+    )
+    draft = result["draft"]
+
+    # Every projected option field the operator edits is prefilled from the
+    # connected detail; blank stays blank rather than the string "null".
+    assert draft["option_id"] == "opt_x_001"
+    assert draft["rpo"] == "5ZU"
+    assert draft["option_name"] == "Body-Color High Wing Spoiler"
+    assert draft["price"] == "625"
+    assert draft["section_id"] == "sec_spoi_001"
+    assert draft["selectable"] == "True"
+    assert draft["display_order"] == "30"
+    assert draft["active"] == "True"
+    assert draft["display_behavior"] == ""
+
+    assert result["target"]["table"] == "options"
+    assert result["target"]["key"] == {"option_id": "opt_x_001"}
+    assert result["target"]["model_id"] == "stingray"
+    assert result["label"] == "5ZU — Body-Color High Wing Spoiler"
+    assert result["lineage"]["source_sheet"] == "stingray_options"
+    assert result["lineage"]["source_row"] == 12
+
+
+def test_option_editor_fields_come_from_the_registry_schema_not_a_local_list():
+    """The editable field set is the schema's, so registry additions are kept."""
+    schema = {
+        "columns": [
+            {"name": "option_id", "control": {"kind": "immutable"}},
+            {"name": "rpo", "control": {"kind": "short_text"}},
+            {"name": "brand_new_registry_column", "control": {"kind": "short_text"}},
+        ],
+    }
+    detail = {
+        "model_key": "stingray",
+        "option": {
+            "option_id": "opt_x_001", "rpo": "5ZU", "src_sheet": "s",
+            "src_row": 1, "physical_key": '["opt_x_001"]',
+        },
+    }
+    result = run_option_model(
+        "console.log(JSON.stringify(api.initialDraftFromDetail("
+        + json.dumps(detail) + ", " + json.dumps(schema)
+        + ")));"
+    )
+
+    # A column the registry added after this file was written is prefilled
+    # from the projection rather than silently initialized to "" — a stale
+    # local list here would erase its workbook value on an unrelated save.
+    assert result["draft"]["brand_new_registry_column"] == ""
+    assert set(result["draft"]) == {
+        "option_id", "rpo", "brand_new_registry_column",
+    }
+
+    source = (FRONTEND / "optionEditorModel.js").read_text()
+    assert "OPTION_FIELD_ORDER" not in source
+    # No parallel field list may reappear: field names may only occur in the
+    # generic helpers, never as an enumerated editable set.
+    assert '"option_name"' not in source
+    assert '"display_order"' not in source
+
+
+def test_editor_seeds_reopened_forms_from_the_coalesced_draft_operation():
+    """Reopening or Keep-editing must not resubmit projected over drafted values."""
+    projected = run_option_model(
+        "const d = api.initialDraftFromDetail("
+        + json.dumps(CONNECTED_DETAIL) + ", "
+        + json.dumps(CONNECTED_SCHEMA) + ");"
+        "console.log(JSON.stringify({"
+        "target: d.target,"
+        "seeded: api.applyDraftOverlay(d.draft, "
+        + json.dumps({
+            "final": {
+                "price": 700,
+                "option_name": "Drafted wing name",
+                "detail_raw": None,
+                "selectable": "",
+            },
+        })
+        + ")"
+        "}));"
+    )
+    seeded = projected["seeded"]
+
+    # Drafted non-blank values win; NULL/blank final entries keep the
+    # projected value because both render as "not specified / inherit".
+    assert seeded["price"] == "700"
+    assert seeded["option_name"] == "Drafted wing name"
+    assert seeded["detail_raw"] == ""
+    assert seeded["selectable"] == "True"
+
+    operations = [
+        {"id": 1, "source_sheet": "other_sheet", "physical_key": '["opt_z_009"]',
+         "final": {"price": 999}},
+        {"id": 2, "source_sheet": "stingray_options",
+         "physical_key": '["opt_x_001"]', "final": {"price": 700}},
+    ]
+    match = run_option_model(
+        "console.log(JSON.stringify(api.matchingDraftOperation("
+        + json.dumps(operations) + ", "
+        + json.dumps(projected["target"])
+        + ")));"
+    )
+    assert match["id"] == 2
+
+    no_match = run_option_model(
+        "console.log(JSON.stringify(api.matchingDraftOperation("
+        + json.dumps(operations[:1]) + ", "
+        + json.dumps(projected["target"])
+        + ")));"
+    )
+    assert no_match is None
+
+    source = (FRONTEND / "components" / "OptionEditor.jsx").read_text()
+    # The component seeds the form from durable evidence before allowing a save.
+    assert "applyDraftOverlay" in source
+    assert "matchingDraftOperation" in source
+
+
+def test_relationship_impact_is_summarized_from_the_connected_detail():
+    """Direct impact counts come from the same connected read, not new queries."""
+    result = run_option_model(
+        "console.log(JSON.stringify(api.relationshipImpact("
+        + json.dumps(CONNECTED_DETAIL)
+        + ")));"
+    )
+
+    # Counts only; §10.6 keeps relationships as semantic panels that link out.
+    assert result == {
+        "availability": 0,
+        "groups": 1,
+        "rules": 2,
+        "pricingRules": 0,
+        "variantOverrides": 1,
+        "defaultRules": 1,
+        "images": 0,
+    }
+
+
+def test_option_editor_target_binds_to_this_exact_projected_row():
+    result = run_option_model(
+        "console.log(JSON.stringify(api.editorTarget("
+        + json.dumps(CONNECTED_DETAIL)
+        + ")));"
+    )
+    assert result["table"] == "options"
+    assert result["model_id"] == "stingray"
+    assert result["key"] == {"option_id": "opt_x_001"}
+    assert result["lineage"] == {
+        "source_sheet": "stingray_options",
+        "source_row": 12,
+        "physical_key": '["opt_x_001"]',
+    }
+
+
+def test_contextual_option_editor_wires_the_shared_shell_and_registry_controls():
+    source = (FRONTEND / "components" / "OptionEditor.jsx").read_text()
+    explorer_source = (FRONTEND / "components" / "ConnectedExplorer.jsx").read_text()
+
+    # The contextual drawer reuses the 3C shell and the schema-driven form;
+    # it does not fork a second renderer map or bypass registry controls.
+    assert "EditorShell" in source
+    assert "RecordForm" in source
+    assert "CONTROL_RENDERERS" not in source
+
+    # Field headings are contextual, while renderer kinds and validation remain
+    # owned by the registry controls RecordForm renders.
+    assert "control.kind" not in source.replace("RecordForm", "")
+    assert "Identity and customer copy" in source
+    assert "Form placement and display" in source
+    assert "Base pricing" in source
+
+    # Opened from connected context, with the entity-specific §12 verb.
+    assert "Save option change to draft" in source
+    assert "api.schema" in source or "schema(table" in source
+    assert "api.connectedOption" in explorer_source
+
+    # After Save the drawer stays open on this entity's overlay/impact view
+    # instead of closing back to the read-only detail.
+    assert "overlay" in source.lower()
+    assert "impact" in source.lower()
+
+
+def test_explorer_offers_edit_only_for_mutable_options_in_context():
+    explorer_source = (FRONTEND / "components" / "ConnectedExplorer.jsx").read_text()
+    app_source = (FRONTEND / "App.jsx").read_text()
+
+    # The edit affordance lives on the connected option detail and requires an
+    # active mutable draft plus readiness; it never writes outside the draft lane.
+    assert "OptionEditor" in explorer_source
+    assert "draftMutable" in explorer_source
+    assert "draftId" in explorer_source
+    assert "onChanged" in explorer_source
+    assert "draftId={draftId}" in explorer_source
+    assert "draftMutable={draftMutable}" in explorer_source
+    assert "api.saveDraftOperation" not in explorer_source
+    assert "draftId={draftId}" in app_source
+    assert "draftMutable={draftMutable}" in app_source
+    # Saving must refresh draft evidence without toggling the app-level ready
+    # state, which would unmount the connected explorer and lose the immediate
+    # post-Save overlay required by 3D.
+    assert "refreshDraftInPlace" in app_source
+    connected_wiring = app_source[app_source.index("<ConnectedExplorer"):]
+    assert "onChanged={refreshDraftInPlace}" in connected_wiring

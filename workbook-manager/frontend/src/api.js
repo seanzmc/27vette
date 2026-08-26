@@ -76,6 +76,8 @@ export const api = {
     }),
   drafts: (limit = 50) => request(`/api/drafts?limit=${limit}`),
   draftLifecycle: (draftId) => request(`/api/drafts/${draftId}`),
+  draftOperations: (draftId) =>
+    request(`/api/drafts/${draftId}/operations`),
   saveDraftOperation: (draftId, payload) =>
     request(`/api/drafts/${draftId}/operations`, {
       method: "POST",
