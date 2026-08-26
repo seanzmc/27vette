@@ -1828,10 +1828,14 @@ follow-up only: real-browser re-proof of the reopen/Keep-editing path
 
 **Checkpoint 3E completion evidence (2026-08-26):**
 
+Review-fix implementation commit: `4b7c06c`.
+
 - connected group detail now additively exposes the complete projected group row
   plus backend-owned parent/member table and member key/order/active field
-  metadata for both exclusive and rule groups; canonical IDs and source lineage
-  remain in technical evidence;
+  metadata for both exclusive and rule groups. The shared workbook-domain
+  registry owns the group/member family relationship and the Manager catalog
+  derives every table/key/reference/order/active binding from those registered
+  specs; canonical IDs and source lineage remain in technical evidence;
 - mutable group detail opens the existing registry-driven `RecordForm` for
   authorized group facts, and a bounded contextual member editor composes the
   existing schema, human-label reference lookup, dependency inspection, and
@@ -1839,10 +1843,12 @@ follow-up only: real-browser re-proof of the reopen/Keep-editing path
   frontend relationship map was added;
 - member proposals show one deterministic final order, swap only the two
   adjacent order values when possible, support activate/deactivate and
-  add/remove, and coalesce complete reversion to no effective operation. Parent
-  removal checks direct dependents first and refuses a group with remaining
-  members. Group creation remains unavailable because canonical-ID allocation
-  is still unresolved;
+  add/remove, and coalesce complete reversion to no effective operation. Blank
+  authored member orders normalize to `10/20/...` rather than colliding at zero.
+  Parent removal first requires unsaved member edits to be saved, then evaluates
+  the draft-effective member set so staged deletes remove stale projection
+  dependencies while staged adds still block removal. Group creation remains
+  unavailable because canonical-ID allocation is still unresolved;
 - real-browser proof on Stingray `Wheel Center Caps` changed and fully reverted
   the group note to zero draft operations; then staged one add, one removal, and
   one adjacent reorder as four durable operations, showed the exact final
@@ -1850,18 +1856,22 @@ follow-up only: real-browser re-proof of the reopen/Keep-editing path
   and cancelled the proof draft without Apply/Rebuild. The final backend-
   metadata rebuild reopened the original `10/20/30/40/50` member order with no
   active draft, and a literal 390x844 sheet had zero document, shell, or body
-  horizontal overflow;
-- focused connected-editing coverage passed 21 tests and the frontend production
+  horizontal overflow. Review-fix browser proof on Z06
+  `z06_group_z07_excludes_non_z07_aero` normalized two blank authored orders to
+  `10/20`, blocked parent removal while member deletes were unsaved, saved both
+  deletes, then reached parent-removal confirmation after the draft-effective
+  dependency check; the review proof draft was cancelled with no Apply/Rebuild;
+- focused connected-editing coverage passed 23 tests and the frontend production
   build transformed 1,526 modules. The README-owned Manager checkpoint passed
-  314 tests, skipped the two intentional slow cases, and passed 62 subtests. The
+  317 tests, skipped the two intentional slow cases, and passed 62 subtests. The
   complete 12-stage all-model candidate passed with no skipped stages or
   findings, `git diff --check` passed, and all 18 protected workbook,
   `form-output`, published registry, customer runtime, and cache-bearing HTML
   hashes matched `origin/main`;
 - workbook/schema data, generated and customer-runtime contracts, publication,
   dependencies, apply/rebuild, dealer, media, deployment, and security behavior
-  remain unchanged. The browser proof intentionally created one durable audit
-  draft and then cancelled it; no canonical or generated write ran.
+  remain unchanged. The browser proofs intentionally created two durable audit
+  drafts and then cancelled both; no canonical or generated write ran.
 
 Mandatory stop: this evidence closes only subpass 3E. Subpass 3F remains
 unimplemented and requires explicit sequential authorization; no persistent
