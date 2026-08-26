@@ -2060,10 +2060,10 @@ Before checkpoint closeout:
 git diff --check
 ```
 
-If Fable loop artifacts or `fable5loop/STATE.md` change:
+If `fable5loop/STATE.md` or `fable5loop/STATE-archive.md` change:
 
 ```sh
-.venv/bin/python scripts/validate_fable5_loop.py
+.venv/bin/python scripts/validate_state_handoff.py
 ```
 
 The pull request must receive one successful full-inventory Release candidate
@@ -2287,7 +2287,7 @@ Execute Checkpoint <N / subpass> of
 
 Authority and scope:
 - Read `AGENTS.md`, the reliable workflow specification, the Workbook Manager
-  README, this specification, and the current Fable handoff before editing.
+  README, this specification, and the current operational handoff before editing.
 - This task authorizes only <checkpoint/subpass>.
 - Do not begin any later checkpoint.
 - Preserve workbook/generated/runtime/dealer/media/deployment boundaries except
