@@ -13,16 +13,16 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 ## Current handoff
 
 - **Updated:** 2026-08-26
-- **Owning specification:** `docs/superpowers/specs/2026-08-21-workbook-manager-ux-recovery.md`, Checkpoint 3D only.
+- **Owning specification:** `docs/superpowers/specs/2026-08-21-workbook-manager-ux-recovery.md`, Checkpoint 3E only.
 - **Active workflow:** Normal repository path; no Fable run.
-- **Branch/commit:** Merged to `main` as `3a8369b` (PR #45, head branch `hermes/workbook-manager-ux-recovery-cp3d` at `e72ef4a` + main sync merge `b09140b`). This STATE.md update rides its own docs PR from `origin/main`.
-- **Last completed:** PR #45 (Checkpoint 3D: contextual option draft editor, including both Codex review-bug fixes) is merged into `main`. Branch was updated with main's 3 CI commits (`gh pr update-branch`); the re-run Release candidate suite and Codex disposition gate all passed; merged via GitHub with a merge commit. No workbook, generated-artifact, runtime, dealer, or deployment surface was touched by this closeout action itself.
-- **Current status:** Checkpoint 3D is landed on `main`. Local checkout moved to a fresh docs task branch off `origin/main`; the PR head branch still exists locally as `pr45-fixes`.
-- **Validation:** Post-update CI on the PR head: full Release candidate suite green (plan validation, changed-workbook-manager-connected-editing, ci-contracts, fable-contracts, manager-frontend, release-candidate) plus `codex-finding-disposition` pass — verified via `gh pr checks 45 --watch`. Merge state confirmed via `gh pr view 45` (`MERGED`, merge commit `3a8369b`) and `git fetch origin main` + log inspection.
-- **Next action:** None pending for Checkpoint 3D; it is complete through merge. Checkpoint 3E requires a new explicit instruction.
-- **Blockers or closeout gaps:** Real-browser re-proof of the reopen/Keep-editing path remains optional follow-up only (behavior covered by Node-run helper tests plus source contracts).
-- **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. Neither this merge nor this handoff update used Fable or produced a receipt.
-- **Protected boundaries:** Canonical workbook, workbook schema/data, generators, generated artifacts, published registry, customer runtime, dependencies, backend and durable draft/apply/rebuild semantics, dealer submission, WordPress media, deployment, group/member editing, persistent draft tray, and later checkpoints remain untouched.
+- **Branch/commit:** `hermes/workbook-manager-ux-recovery-cp3e`; implementation is locally complete and uncommitted at this handoff update. Delivery commit/PR evidence is the remaining closeout action.
+- **Last completed:** Checkpoint 3E now provides contextual registry-driven group-fact editing plus exclusive/rule member add, remove, activate, and deterministic adjacent reorder through the existing durable operation lane. Parent deletion inspects and refuses direct dependents; Add Group remains blocked. Browser proof staged four member operations, verified dependency refusal and group-fact no-op reversion, then cancelled the proof draft without Apply/Rebuild.
+- **Current status:** Implementation, focused/browser proof, README-owned Manager acceptance, the all-model candidate, and protected-hash proof are green. No active browser-proof draft remains; one cancelled audit draft remains in ignored local Manager state as expected. The branch is ready for final diff review, commit, push, PR, and full-inventory delivery CI.
+- **Validation:** `tests/test_workbook_manager_connected_editing.py` 21 passed; frontend production build passed (1,526 modules); README-owned Manager command 314 passed / 2 intentional skips / 62 subtests; complete 12-stage `verify_workbook_candidate.py --changed-model '*'` passed with no findings/skips; literal 390x844 browser sheet had zero document/shell/body horizontal overflow; all 18 protected hashes match `origin/main`; `git diff --check` passed before this docs update.
+- **Next action:** Review the final scoped diff, run Fable validation and final diff checks, commit/push, open the Checkpoint 3E PR, and verify its required full-inventory Release candidate run. Stop after delivery; Checkpoint 3F still requires explicit authorization.
+- **Blockers or closeout gaps:** No implementation blocker. Remote full-inventory CI and final branch/commit/PR identifiers are pending delivery.
+- **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. Checkpoint 3E did not use Fable or produce a receipt.
+- **Protected boundaries:** Canonical workbook/schema/data, generators, generated artifacts, published registry, customer runtime, dependencies, durable draft and Apply/Rebuild contracts, dealer submission, WordPress media, deployment, persistent draft tray/navigation, and later checkpoints remain untouched.
 
 ## Verified facts
 

@@ -11,8 +11,10 @@ head passed full-inventory Release candidate run 32775301054. The review-follow-
 head reruns that required evidence after push. Checkpoint 3D was implemented
 locally on 2026-08-25, received its review fixes on the PR head, and merged
 through PR 45 at `3a8369b` on 2026-08-26; its full delivery evidence, including
-the post-sync CI rerun and both Codex review-bug fixes, is recorded below. Checkpoints 3E–3F and
-Checkpoints 4–6 remain separately gated by §19 and must not begin automatically.
+the post-sync CI rerun and both Codex review-bug fixes, is recorded below.
+Checkpoint 3E completed locally on 2026-08-26; its delivery evidence is recorded
+with the PR. Checkpoint 3F and Checkpoints 4–6 remain separately gated by §19
+and must not begin automatically.
 
 Checkpoint 2 added the approved workbook schema/data and additive generated
 label fields, but did **not** authorize or perform the Checkpoint 5 customer
@@ -1824,9 +1826,46 @@ on the merged head; PR 45 merged at `3a8369b` on 2026-08-26. Optional residual
 follow-up only: real-browser re-proof of the reopen/Keep-editing path
 (behavior covered by Node-run helper tests plus source contracts).
 
-Mandatory stop: this evidence closes only subpass 3D. Subpasses 3E–3F remain
-unimplemented and require explicit sequential authorization; no group/member
-editor or persistent draft tray was started.
+**Checkpoint 3E completion evidence (2026-08-26):**
+
+- connected group detail now additively exposes the complete projected group row
+  plus backend-owned parent/member table and member key/order/active field
+  metadata for both exclusive and rule groups; canonical IDs and source lineage
+  remain in technical evidence;
+- mutable group detail opens the existing registry-driven `RecordForm` for
+  authorized group facts, and a bounded contextual member editor composes the
+  existing schema, human-label reference lookup, dependency inspection, and
+  durable update/add/delete operation routes; no second mutation contract or
+  frontend relationship map was added;
+- member proposals show one deterministic final order, swap only the two
+  adjacent order values when possible, support activate/deactivate and
+  add/remove, and coalesce complete reversion to no effective operation. Parent
+  removal checks direct dependents first and refuses a group with remaining
+  members. Group creation remains unavailable because canonical-ID allocation
+  is still unresolved;
+- real-browser proof on Stingray `Wheel Center Caps` changed and fully reverted
+  the group note to zero draft operations; then staged one add, one removal, and
+  one adjacent reorder as four durable operations, showed the exact final
+  `10/20/30/40/60` order, refused parent removal with five direct dependents,
+  and cancelled the proof draft without Apply/Rebuild. The final backend-
+  metadata rebuild reopened the original `10/20/30/40/50` member order with no
+  active draft, and a literal 390x844 sheet had zero document, shell, or body
+  horizontal overflow;
+- focused connected-editing coverage passed 21 tests and the frontend production
+  build transformed 1,526 modules. The README-owned Manager checkpoint passed
+  314 tests, skipped the two intentional slow cases, and passed 62 subtests. The
+  complete 12-stage all-model candidate passed with no skipped stages or
+  findings, `git diff --check` passed, and all 18 protected workbook,
+  `form-output`, published registry, customer runtime, and cache-bearing HTML
+  hashes matched `origin/main`;
+- workbook/schema data, generated and customer-runtime contracts, publication,
+  dependencies, apply/rebuild, dealer, media, deployment, and security behavior
+  remain unchanged. The browser proof intentionally created one durable audit
+  draft and then cancelled it; no canonical or generated write ran.
+
+Mandatory stop: this evidence closes only subpass 3E. Subpass 3F remains
+unimplemented and requires explicit sequential authorization; no persistent
+draft tray, URL/history, deep-link, or reload-resume work was started.
 
 ### Checkpoint 4 — complete form graph and contextual section management
 
@@ -2132,11 +2171,12 @@ runtime parity from an adjacent test or remembered prior run.
 ### 19.1 Current authorization state
 
 Checkpoints 1 and 2 are complete. Checkpoint 3A/3B's bounded
-registry/schema/reference slice, Checkpoint 3C's reusable shell, and Checkpoint
-3D's direct option editor are complete and stopped. Checkpoint 3E–3F and
-Checkpoints 4–6 remain unauthorized. The next implementation agent must receive
-an explicit checkpoint instruction and must not treat either the completed
-label migration or control metadata as authorization for customer headings.
+registry/schema/reference slice, Checkpoint 3C's reusable shell, Checkpoint
+3D's direct option editor, and Checkpoint 3E's contextual group/member editor
+are complete and stopped. Checkpoint 3F and Checkpoints 4–6 remain unauthorized.
+The next implementation agent must receive an explicit checkpoint instruction
+and must not treat either the completed label migration or control metadata as
+authorization for customer headings.
 
 ### 19.2 Decision matrix
 
@@ -2149,7 +2189,7 @@ label migration or control metadata as authorization for customer headings.
 | Add complete control metadata and bounded reference lookup | Checkpoint 3A/3B | Complete locally: 25 families / 220 fields have exact coverage; schema/reference APIs are additive and fail closed. Delivery CI is recorded with the PR. |
 | Reusable accessible registry-control editor shell | Checkpoint 3C | Complete locally: drawer/sheet, no-fallback renderer map, validation, dirty-close, busy Save, focus, and responsive browser proof are green; delivery CI is recorded with the PR. |
 | Render and save a contextual direct option editor | Checkpoint 3D | Complete and merged: registry-driven direct fields, durable draft Save, field overlay, impact summary, connected detail, focused/build/Manager gates, and browser proof are green; both Codex review-bug fixes landed on the PR head, post-sync CI passed, and PR 45 merged at `3a8369b`. |
-| Render and save contextual group/member editors | Checkpoint 3E | Unresolved and unauthorized; the direct option editor does not authorize group/member mutation UI. |
+| Render and save contextual group/member editors | Checkpoint 3E | Complete locally: registry-driven group facts, durable member add/remove/reorder/active operations, deterministic final order, direct dependency refusal, reversion, focused/build/Manager/all-model gates, protected hashes, and browser proof are green. Delivery CI is recorded with the PR. |
 | New group canonical-ID allocation strategy | Any Add Group feature | Unresolved; Add Group remains blocked. |
 | Any new frontend/backend dependency | Before dependency change | Not approved. |
 | Breaking/removing existing Manager API members | Before API break | Not approved; changes must be additive. |
@@ -2195,11 +2235,11 @@ exhaustively tested text controls rather than accidental frontend defaults.
 
 ### 19.4 Current next action
 
-Remain stopped after Checkpoint 3D. The next sequential implementation action
-is an explicit decision on Checkpoint 3E's group/member editor. Do not begin 3E
-automatically, do not skip ahead to later checkpoints, and do not begin the
-non-sequential Checkpoint 5 customer-runtime heading switch merely because its
-label prerequisite is complete.
+Remain stopped after Checkpoint 3E. The next sequential implementation action
+is an explicit decision on Checkpoint 3F's persistent draft tray/navigation.
+Do not begin 3F automatically, do not skip ahead to later checkpoints, and do
+not begin the non-sequential Checkpoint 5 customer-runtime heading switch merely
+because its label prerequisite is complete.
 
 ## 20. Coding-agent checkpoint execution protocol
 

@@ -270,17 +270,33 @@ def group_detail(conn, model_key: str, group_type: str, group_id: str) -> dict |
             (model_key, group_id),
         ).fetchone())
         summary = _exclusive_group_summary(conn, model_key, group) if group else None
+        editor = {
+            "group_table": "exclusive_groups",
+            "member_table": "exclusive_group_members",
+            "member_id_field": "option_id",
+            "member_group_field": "group_id",
+            "member_order_field": "display_order",
+            "member_active_field": "active",
+        }
     elif group_type == "rule":
         group = _row(conn.execute(
             "SELECT * FROM rule_groups WHERE model_id=? AND group_id=?",
             (model_key, group_id),
         ).fetchone())
         summary = _rule_group_summary(conn, model_key, group) if group else None
+        editor = {
+            "group_table": "rule_groups",
+            "member_table": "rule_group_members",
+            "member_id_field": "target_id",
+            "member_group_field": "group_id",
+            "member_order_field": "display_order",
+            "member_active_field": "active",
+        }
     else:
         return None
     if summary is None:
         return None
-    return {"model_key": model_key, **summary}
+    return {"model_key": model_key, **summary, "group": group, "editor": editor}
 
 
 def section_detail(conn, model_key: str, section_id: str) -> dict | None:
