@@ -167,8 +167,10 @@ def _rule_group_summary(conn, model_key: str, group: dict) -> dict:
     }
 
 
-def option_detail(conn, model_key: str, option_id: str) -> dict | None:
-    option = _option_lookup(conn, model_key, option_id)
+def option_detail(
+    conn, model_key: str, option_id: str, *, option_record: dict | None = None
+) -> dict | None:
+    option = option_record or _option_lookup(conn, model_key, option_id)
     if not option:
         return None
     section = _row(conn.execute(

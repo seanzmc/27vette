@@ -9,6 +9,7 @@ import AssetManager from "./components/AssetManager.jsx";
 import ChangesSync from "./components/ChangesSync.jsx";
 import HistoryView from "./components/HistoryView.jsx";
 import ConnectedExplorer from "./components/ConnectedExplorer.jsx";
+import { parseNavigation, serializeNavigation } from "./navigationState.js";
 
 const DRAFT_STORAGE_KEY = "27vette-workbook-manager-draft";
 const TERMINAL_DRAFT_STATES = new Set([
@@ -21,14 +22,34 @@ function newDraftId() {
 }
 
 export default function App() {
-  const [tab, setTab] = useState("overview");
+  const [navigation, setNavigation] = useState(
+    () => parseNavigation(window.location.search)
+  );
   const [status, setStatus] = useState(null);
   const [models, setModels] = useState([]);
-  const [modelKey, setModelKey] = useState("stingray");
   const [fatal, setFatal] = useState("");
   const [draftId, setDraftId] = useState("");
   const [draftLifecycle, setDraftLifecycle] = useState(null);
   const [startup, setStartup] = useState("Starting Workbook Manager");
+  const tab = navigation.workspace;
+  const modelKey = navigation.model;
+
+  const commitNavigation = useCallback((next, { replace = false, state = {} } = {}) => {
+    if (replace) {
+      window.history.replaceState(state, "", serializeNavigation(next));
+    } else {
+      window.history.pushState(state, "", serializeNavigation(next));
+    }
+    setNavigation(next);
+  }, []);
+
+  const setTab = useCallback((workspace) => {
+    commitNavigation({ ...navigation, workspace, type: "", id: "" });
+  }, [commitNavigation, navigation]);
+
+  const setModelKey = useCallback((model) => {
+    commitNavigation({ ...navigation, model });
+  }, [commitNavigation, navigation]);
 
   const refreshStatus = useCallback(async () => {
     try {
@@ -107,6 +128,17 @@ export default function App() {
   );
 
   useEffect(() => {
+    window.history.replaceState(
+      window.history.state || {}, "", serializeNavigation(navigation)
+    );
+    const restoreNavigation = () => {
+      setNavigation(parseNavigation(window.location.search));
+    };
+    window.addEventListener("popstate", restoreNavigation);
+    return () => window.removeEventListener("popstate", restoreNavigation);
+  }, []); // eslint-disable-line
+
+  useEffect(() => {
     refreshStatus();
     (async () => {
       try {
@@ -128,6 +160,7 @@ export default function App() {
   }, []); // eslint-disable-line
 
   const operationCount = draftLifecycle?.operations?.length ?? 0;
+  const draftRevision = draftLifecycle?.draft?.updated_ts || "";
   const draftMutable = !draftLifecycle || draftLifecycle.draft.status === "draft";
   const ready = startup === "Ready to edit" || startup === "Draft requires attention";
 
@@ -196,6 +229,30 @@ export default function App() {
             </div>
           </div>
         </div>
+        <label className="model-context">
+          <span>Model</span>
+          <select
+            value={modelKey}
+            onChange={(e) => setModelKey(e.target.value)}
+            disabled={!ready}
+          >
+            {models.map((model) => (
+              <option key={model.model_key} value={model.model_key}>
+                {model.label || model.model_key}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button
+          className="draft-tray"
+          onClick={() => setTab("changes")}
+          disabled={!ready}
+        >
+          <strong>{draftLifecycle?.draft?.id || draftId || "Preparing draft"}</strong>
+          <span>
+            {draftLifecycle?.draft?.status || "draft"} · {operationCount} change{operationCount === 1 ? "" : "s"}
+          </span>
+        </button>
         <nav className="tabs" aria-label="Workbook Manager workspaces">
           {tabs.map(({ id, label, icon: Icon, badge }) => (
             <button
@@ -242,7 +299,10 @@ export default function App() {
           <ConnectedExplorer
             mode={tab}
             modelKey={modelKey}
+            navigation={navigation}
+            onNavigationChange={commitNavigation}
             draftId={draftId}
+            draftRevision={draftRevision}
             draftMutable={draftMutable}
             onChanged={refreshDraftInPlace}
           />

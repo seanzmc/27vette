@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ExternalLink, LockKeyhole, Pencil, Search } from "lucide-react";
 import { api } from "../api.js";
+import { navigationForDestination } from "../navigationState.js";
 import GroupEditor from "./GroupEditor.jsx";
 import OptionEditor from "./OptionEditor.jsx";
 
@@ -14,9 +15,31 @@ function TechnicalDetails({ data }) {
   );
 }
 
-function EntityLink({ destination, children, onNavigate }) {
+function DraftOverlay({ overlay }) {
+  if (!overlay || overlay.state === "unchanged") return null;
+  const changed = Object.keys(overlay.effective || overlay.base || {}).filter(
+    (key) => overlay.base?.[key] !== overlay.effective?.[key]
+  );
   return (
-    <button className="entity-link" onClick={() => onNavigate(destination)}>
+    <div className={`panel draft-overlay ${overlay.state}`} role="status">
+      <strong>Draft {overlay.state.replaceAll("_", " ")}</strong>
+      <span>
+        {overlay.state === "pending_deletion"
+          ? "This record remains in the workbook until Apply and Rebuild."
+          : `${changed.length} proposed field change${changed.length === 1 ? "" : "s"}.`}
+      </span>
+    </div>
+  );
+}
+
+function EntityLink({ destination, children, onNavigate }) {
+  const focusKey = `${destination.entity_type}:${destination.entity_id}`;
+  return (
+    <button
+      className="entity-link"
+      data-focus-key={focusKey}
+      onClick={() => onNavigate(destination)}
+    >
       {children}<ExternalLink size={12} />
     </button>
   );
@@ -49,6 +72,7 @@ function GroupDetail({
       <button className="btn small" onClick={onBack}><ArrowLeft size={14} /> Back to results</button>
       <div className="readonly-label"><LockKeyhole size={14} /> Reference view · edits save to the durable draft</div>
       <h2 id="group-detail-heading">{detail.label}</h2>
+      <DraftOverlay overlay={detail.draft_overlay} />
       <p>{detail.notes || "No explanatory notes are authored for this group."}</p>
       <div className="detail-facts">
         <span><strong>Type</strong>{detail.group_type}</span>
@@ -116,6 +140,7 @@ function OptionDetail({
       <button className="btn small" onClick={onBack}><ArrowLeft size={14} /> Back to results</button>
       <div className="readonly-label"><LockKeyhole size={14} /> Reference view · edits save to the durable draft</div>
       <h2 id="option-detail-heading">{option.label}</h2>
+      <DraftOverlay overlay={detail.draft_overlay} />
       <p>{option.description || option.detail_raw || "No additional customer copy is authored."}</p>
       <div className="detail-facts">
         <span><strong>Section</strong>{detail.section?.section_name || "Unmapped"}</span>
@@ -222,49 +247,103 @@ function RuleDetail({ detail, onNavigate, onBack }) {
 }
 
 export default function ConnectedExplorer({
-  mode, modelKey, draftId, draftMutable, onChanged,
+  mode, modelKey, navigation, onNavigationChange,
+  draftId, draftRevision, draftMutable, onChanged,
 }) {
-  const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [selected, setSelected] = useState(null);
   const [diagnostics, setDiagnostics] = useState([]);
   const [diagnosticResult, setDiagnosticResult] = useState(null);
   const [error, setError] = useState("");
+  const [detailError, setDetailError] = useState("");
   const timer = useRef(null);
+  const detailRequest = useRef(0);
+  const searchRequest = useRef(0);
+  const query = navigation.query;
 
-  const navigate = async (destination) => {
-    try {
-      setError("");
-      setDiagnosticResult(null);
-      if (destination.entity_type === "option") {
-        setSelected(await api.connectedOption(modelKey, destination.entity_id));
-      } else if (destination.entity_type === "group") {
-        const [type, ...id] = destination.entity_id.split(":");
-        setSelected(await api.connectedGroup(modelKey, type, id.join(":")));
-      } else if (destination.entity_type === "section") {
-        setSelected(await api.connectedSection(modelKey, destination.entity_id));
-      } else if (destination.entity_type === "rule") {
-        setSelected(await api.connectedRule(modelKey, destination.entity_id));
-      } else {
-        setError(`${destination.entity_type} results remain read-only in Checkpoint 1.`);
-      }
-    } catch (e) { setError(e.message); }
+  const navigate = (destination) => {
+    const focusKey = `${destination.entity_type}:${destination.entity_id}`;
+    window.history.replaceState(
+      { ...window.history.state, focusKey }, "", window.location.href
+    );
+    setDiagnosticResult(null);
+    onNavigationChange(navigationForDestination(navigation, destination), {
+      state: { returnNavigation: navigation },
+    });
   };
 
   useEffect(() => {
-    setSelected(null); setResults([]); setQuery(""); setDiagnosticResult(null);
+    setDiagnosticResult(null);
     api.explorerDiagnostics(modelKey).then((data) => setDiagnostics(data.diagnostics)).catch((e) => setError(e.message));
   }, [modelKey]);
 
-  useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => {
+    const generation = ++detailRequest.current;
+    if (!navigation.type || !navigation.id) {
+      setSelected(null);
+      setDetailError("");
+      return;
+    }
+    const load = async () => {
+      try {
+        setDetailError("");
+        let detail;
+        if (navigation.type === "option") {
+          detail = await api.connectedOption(modelKey, navigation.id, draftId);
+        } else if (navigation.type === "exclusive_group") {
+          detail = await api.connectedGroup(modelKey, "exclusive", navigation.id, draftId);
+        } else if (navigation.type === "rule_group") {
+          detail = await api.connectedGroup(modelKey, "rule", navigation.id, draftId);
+        } else if (navigation.type === "section") {
+          detail = await api.connectedSection(modelKey, navigation.id);
+        } else if (navigation.type === "rule") {
+          detail = await api.connectedRule(modelKey, navigation.id);
+        }
+        if (generation === detailRequest.current) setSelected(detail || null);
+      } catch (e) {
+        if (generation !== detailRequest.current) return;
+        setSelected(null);
+        setDetailError(e.status === 404
+          ? "This connected item is not available for the selected model. Return to results."
+          : e.message);
+      }
+    };
+    load();
+  }, [modelKey, navigation.type, navigation.id, draftId, draftRevision]);
+
+  useEffect(() => {
+    clearTimeout(timer.current);
+    const generation = ++searchRequest.current;
+    if (!query.trim()) {
+      setResults([]);
+      return;
+    }
+    timer.current = setTimeout(async () => {
+      try {
+        const data = await api.explorerSearch(modelKey, query);
+        if (generation !== searchRequest.current) return;
+        setResults(data.results);
+        setError("");
+      } catch (e) {
+        if (generation === searchRequest.current) setError(e.message);
+      }
+    }, 180);
+    return () => clearTimeout(timer.current);
+  }, [modelKey, query]);
+
+  useEffect(() => {
+    const focusKey = window.history.state?.focusKey;
+    if (navigation.type || !focusKey || !results.length) return;
+    requestAnimationFrame(() => {
+      const target = [...document.querySelectorAll("[data-focus-key]")].find(
+        (node) => node.dataset.focusKey === focusKey
+      );
+      target?.focus();
+    });
+  }, [navigation.type, results]);
 
   const search = (value) => {
-    setQuery(value); clearTimeout(timer.current);
-    if (!value.trim()) { setResults([]); return; }
-    timer.current = setTimeout(async () => {
-      try { setResults((await api.explorerSearch(modelKey, value)).results); setError(""); }
-      catch (e) { setError(e.message); }
-    }, 180);
+    onNavigationChange({ ...navigation, query: value }, { replace: true });
   };
 
   const runDiagnostic = async (item, entityId = "") => {
@@ -276,10 +355,19 @@ export default function ConnectedExplorer({
 
   const runEntityDiagnostic = (key, entityId) => runDiagnostic({ key }, entityId);
 
-  if (selected?.entity_type === "option") return <OptionDetail detail={selected} onNavigate={navigate} onBack={() => { setSelected(null); setDiagnosticResult(null); }} onDiagnostic={runEntityDiagnostic} diagnosticResult={diagnosticResult} draftId={draftId} draftMutable={draftMutable} onChanged={onChanged} />;
-  if (selected?.entity_type === "group") return <GroupDetail detail={selected} onNavigate={navigate} onBack={() => { setSelected(null); setDiagnosticResult(null); }} onDiagnostic={runEntityDiagnostic} diagnosticResult={diagnosticResult} draftId={draftId} draftMutable={draftMutable} onChanged={onChanged} />;
-  if (selected?.entity_type === "section") return <SectionDetail detail={selected} onNavigate={navigate} onBack={() => setSelected(null)} />;
-  if (selected?.entity_type === "rule") return <RuleDetail detail={selected} onNavigate={navigate} onBack={() => setSelected(null)} />;
+  const backToResults = () => {
+    const previous = window.history.state?.returnNavigation;
+    if (previous) {
+      window.history.back();
+    } else {
+      onNavigationChange({ ...navigation, type: "", id: "" });
+    }
+  };
+
+  if (selected?.entity_type === "option") return <OptionDetail detail={selected} onNavigate={navigate} onBack={backToResults} onDiagnostic={runEntityDiagnostic} diagnosticResult={diagnosticResult} draftId={draftId} draftMutable={draftMutable} onChanged={onChanged} />;
+  if (selected?.entity_type === "group") return <GroupDetail detail={selected} onNavigate={navigate} onBack={backToResults} onDiagnostic={runEntityDiagnostic} diagnosticResult={diagnosticResult} draftId={draftId} draftMutable={draftMutable} onChanged={onChanged} />;
+  if (selected?.entity_type === "section") return <SectionDetail detail={selected} onNavigate={navigate} onBack={backToResults} />;
+  if (selected?.entity_type === "rule") return <RuleDetail detail={selected} onNavigate={navigate} onBack={backToResults} />;
 
   const visible = results.filter((row) => mode !== "groups" || row.entity_type === "group");
   return (
@@ -298,6 +386,10 @@ export default function ConnectedExplorer({
         <input autoFocus className="text" value={query} onChange={(e) => search(e.target.value)} placeholder="Search by RPO, name, group, section, rule, or ID…" />
       </label>
       {error && <div className="notice err">{error}</div>}
+      {detailError && <div className="notice err">{detailError}</div>}
+      {detailError && navigation.type && (
+        <button className="btn small" onClick={backToResults}>Return to results</button>
+      )}
       <div className="search-results" aria-live="polite">
         {visible.map((row) => (
           <EntityLink key={`${row.entity_type}:${row.entity_id}`} destination={row.destination} onNavigate={navigate}>

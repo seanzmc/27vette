@@ -23,6 +23,10 @@ async function request(path, options = {}) {
   return body;
 }
 
+function draftQuery(draftId) {
+  return draftId ? `?draft_id=${encodeURIComponent(draftId)}` : "";
+}
+
 export const api = {
   status: () => request("/api/status"),
   runImport: () => request("/api/import", { method: "POST" }),
@@ -30,10 +34,10 @@ export const api = {
   models: () => request("/api/models"),
   structure: (model) => request(`/api/structure/${model}`),
   collections: (model) => request(`/api/models/${model}/collections`),
-  connectedOption: (model, optionId) =>
-    request(`/api/explorer/${encodeURIComponent(model)}/options/${encodeURIComponent(optionId)}`),
-  connectedGroup: (model, groupType, groupId) =>
-    request(`/api/explorer/${encodeURIComponent(model)}/groups/${encodeURIComponent(groupType)}/${encodeURIComponent(groupId)}`),
+  connectedOption: (model, optionId, draftId = "") =>
+    request(`/api/explorer/${encodeURIComponent(model)}/options/${encodeURIComponent(optionId)}${draftQuery(draftId)}`),
+  connectedGroup: (model, groupType, groupId, draftId = "") =>
+    request(`/api/explorer/${encodeURIComponent(model)}/groups/${encodeURIComponent(groupType)}/${encodeURIComponent(groupId)}${draftQuery(draftId)}`),
   connectedSection: (model, sectionId) =>
     request(`/api/explorer/${encodeURIComponent(model)}/sections/${encodeURIComponent(sectionId)}`),
   connectedRule: (model, ruleId) =>
