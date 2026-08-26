@@ -1,4 +1,4 @@
-"""Checkpoint 3C-3E frontend shell and contextual editor contracts.
+"""Checkpoint 3C-3F frontend shell and contextual editor contracts.
 
 The production frontend has no DOM test dependency. Behavioral helpers are
 exercised through Node, while shell accessibility, renderer ownership, and
@@ -84,6 +84,7 @@ def test_app_owns_native_history_and_reuses_lifecycle_for_the_draft_tray():
     assert "window.history.pushState" in app_source
     assert "window.history.replaceState" in app_source
     assert 'window.addEventListener("popstate"' in app_source
+    assert "}, [selectDraft, setTab]);" in app_source
     assert 'className="draft-tray"' in app_source
     assert 'className="model-context"' in app_source
     assert "value={modelKey}" in app_source

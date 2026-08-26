@@ -110,7 +110,7 @@ export default function App() {
   const startNewDraft = useCallback(() => {
     selectDraft(newDraftId());
     setTab("options");
-  }, [selectDraft]);
+  }, [selectDraft, setTab]);
 
   const refreshManager = useCallback(async ({ draft = true } = {}) => {
     await Promise.all([
