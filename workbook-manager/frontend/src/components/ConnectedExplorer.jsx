@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ExternalLink, LockKeyhole, Pencil, Search } from "lucide-react";
 import { api } from "../api.js";
+import GroupEditor from "./GroupEditor.jsx";
 import OptionEditor from "./OptionEditor.jsx";
 
 function TechnicalDetails({ data }) {
@@ -38,11 +39,15 @@ function DiagnosticResults({ result, onNavigate }) {
   );
 }
 
-function GroupDetail({ detail, onNavigate, onBack, onDiagnostic, diagnosticResult }) {
+function GroupDetail({
+  detail, onNavigate, onBack, onDiagnostic, diagnosticResult,
+  draftId, draftMutable, onChanged,
+}) {
+  const [editing, setEditing] = useState("");
   return (
     <section className="explorer-detail" aria-labelledby="group-detail-heading">
       <button className="btn small" onClick={onBack}><ArrowLeft size={14} /> Back to results</button>
-      <div className="readonly-label"><LockKeyhole size={14} /> Reference only · workbook-authored group</div>
+      <div className="readonly-label"><LockKeyhole size={14} /> Reference view · edits save to the durable draft</div>
       <h2 id="group-detail-heading">{detail.label}</h2>
       <p>{detail.notes || "No explanatory notes are authored for this group."}</p>
       <div className="detail-facts">
@@ -51,6 +56,23 @@ function GroupDetail({ detail, onNavigate, onBack, onDiagnostic, diagnosticResul
         <span><strong>Members</strong>{detail.member_count}</span>
       </div>
       <div className="detail-actions">
+        <button
+          className="btn small"
+          disabled={!draftMutable}
+          title={draftMutable ? "Edit registered group fields in the durable draft" : "The active draft is locked; start a new draft to edit."}
+          onClick={() => setEditing("facts")}
+        >
+          <Pencil size={14} /> Edit group in draft
+        </button>
+        <button
+          className="btn small"
+          disabled={!draftMutable}
+          title={draftMutable ? "Add, remove, activate, or reorder members in the durable draft" : "The active draft is locked; start a new draft to edit."}
+          onClick={() => setEditing("members")}
+        >
+          <Pencil size={14} /> Manage members in draft
+        </button>
+        {!draftMutable && <span className="muted">Draft locked — editing unavailable.</span>}
         <button className="btn small" onClick={() => onDiagnostic("where_used", detail.destination.entity_id)}>
           Where this group is used
         </button>
@@ -68,6 +90,17 @@ function GroupDetail({ detail, onNavigate, onBack, onDiagnostic, diagnosticResul
       </div>
       <DiagnosticResults result={diagnosticResult} onNavigate={onNavigate} />
       <TechnicalDetails data={{ group_id: detail.group_id, ...detail.technical }} />
+      {editing && (
+        <GroupEditor
+          detail={detail}
+          mode={editing}
+          modelKey={detail.model_key}
+          draftId={draftId}
+          draftMutable={draftMutable}
+          onChanged={onChanged}
+          onClose={() => setEditing("")}
+        />
+      )}
     </section>
   );
 }
@@ -244,7 +277,7 @@ export default function ConnectedExplorer({
   const runEntityDiagnostic = (key, entityId) => runDiagnostic({ key }, entityId);
 
   if (selected?.entity_type === "option") return <OptionDetail detail={selected} onNavigate={navigate} onBack={() => { setSelected(null); setDiagnosticResult(null); }} onDiagnostic={runEntityDiagnostic} diagnosticResult={diagnosticResult} draftId={draftId} draftMutable={draftMutable} onChanged={onChanged} />;
-  if (selected?.entity_type === "group") return <GroupDetail detail={selected} onNavigate={navigate} onBack={() => { setSelected(null); setDiagnosticResult(null); }} onDiagnostic={runEntityDiagnostic} diagnosticResult={diagnosticResult} />;
+  if (selected?.entity_type === "group") return <GroupDetail detail={selected} onNavigate={navigate} onBack={() => { setSelected(null); setDiagnosticResult(null); }} onDiagnostic={runEntityDiagnostic} diagnosticResult={diagnosticResult} draftId={draftId} draftMutable={draftMutable} onChanged={onChanged} />;
   if (selected?.entity_type === "section") return <SectionDetail detail={selected} onNavigate={navigate} onBack={() => setSelected(null)} />;
   if (selected?.entity_type === "rule") return <RuleDetail detail={selected} onNavigate={navigate} onBack={() => setSelected(null)} />;
 

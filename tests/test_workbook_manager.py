@@ -1628,6 +1628,19 @@ class TestApi(unittest.TestCase):
         self.assertGreater(detail["member_count"], 1)
         self.assertTrue(all(member["rpo"] and member["option_name"]
                             for member in detail["members"]))
+        self.assertEqual(detail["group"]["group_id"], group_id)
+        self.assertEqual(detail["group"]["display_label"], "LS6 Engine Covers")
+        self.assertTrue(all(member["physical_key"] and member["src_sheet"]
+                            for member in detail["members"]))
+        self.assertEqual(detail["editor"], {
+            "group_table": "exclusive_groups",
+            "group_id_field": "group_id",
+            "member_table": "exclusive_group_members",
+            "member_id_field": "option_id",
+            "member_group_field": "group_id",
+            "member_order_field": "display_order",
+            "member_active_field": "active",
+        })
         self.assertEqual(detail["technical"]["lineage"]["source_sheet"],
                          "grand_sport_x_exclusive_groups")
         self.assertEqual(detail["destination"]["entity_id"],
@@ -1645,6 +1658,16 @@ class TestApi(unittest.TestCase):
         )
         self.assertEqual(rule_detail["audience"], "manager")
         self.assertEqual(rule_detail["label_status"], "authored")
+        self.assertEqual(rule_detail["group"]["group_id"], rule_group_id)
+        self.assertEqual(rule_detail["editor"], {
+            "group_table": "rule_groups",
+            "group_id_field": "group_id",
+            "member_table": "rule_group_members",
+            "member_id_field": "target_id",
+            "member_group_field": "group_id",
+            "member_order_field": "display_order",
+            "member_active_field": "active",
+        })
 
     def test_cross_entity_search_is_ranked_typed_scoped_and_stable(self):
         option = self.client.get(

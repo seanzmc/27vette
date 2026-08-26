@@ -1,4 +1,4 @@
-"""Checkpoint 3C/3D frontend editor-shell and contextual option editor contracts.
+"""Checkpoint 3C-3E frontend shell and contextual editor contracts.
 
 The production frontend has no DOM test dependency. Behavioral helpers are
 exercised through Node, while shell accessibility, renderer ownership, and
@@ -454,3 +454,282 @@ def test_explorer_offers_edit_only_for_mutable_options_in_context():
     assert "refreshDraftInPlace" in app_source
     connected_wiring = app_source[app_source.index("<ConnectedExplorer"):]
     assert "onChanged={refreshDraftInPlace}" in connected_wiring
+
+
+# ── Checkpoint 3E — contextual group/member editor (spec §16 subpass 5) ─────
+
+
+GROUP_EDITOR_MODULE = FRONTEND / "groupEditorModel.js"
+
+
+def run_group_model(script: str):
+    result = subprocess.run(
+        [
+            "node",
+            "--input-type=module",
+            "--eval",
+            (
+                "import { pathToFileURL } from 'node:url';"
+                f"const moduleUrl = pathToFileURL({json.dumps(str(GROUP_EDITOR_MODULE))}).href;"
+                "const api = await import(moduleUrl);"
+                + script
+            ),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return json.loads(result.stdout)
+
+
+CONNECTED_GROUP_DETAIL = {
+    "model_key": "stingray",
+    "entity_type": "group",
+    "group_type": "exclusive",
+    "group_id": "excl_wheels",
+    "label": "Wheel selection",
+    "group": {
+        "group_id": "excl_wheels", "display_label": "Wheel selection",
+        "selection_mode": "single_within_group", "active": "True", "notes": "",
+        "src_sheet": "exclusive_groups", "src_row": 12,
+        "physical_key": '["excl_wheels"]',
+    },
+    "members": [
+        {
+            "group_id": "excl_wheels", "option_id": "opt_a", "rpo": "A1",
+            "option_name": "Alpha wheel", "display_order": "10", "active": "True",
+            "src_sheet": "exclusive_group_members", "src_row": 20,
+            "physical_key": '["excl_wheels","opt_a"]',
+        },
+        {
+            "group_id": "excl_wheels", "option_id": "opt_b", "rpo": "B2",
+            "option_name": "Bravo wheel", "display_order": "20", "active": "True",
+            "src_sheet": "exclusive_group_members", "src_row": 21,
+            "physical_key": '["excl_wheels","opt_b"]',
+        },
+    ],
+    "editor": {
+        "group_table": "exclusive_groups",
+        "group_id_field": "group_id",
+        "member_table": "exclusive_group_members",
+        "member_id_field": "option_id",
+        "member_group_field": "group_id",
+        "member_order_field": "display_order",
+        "member_active_field": "active",
+    },
+    "technical": {"lineage": {"source_sheet": "exclusive_groups"}},
+}
+
+CONNECTED_GROUP_SCHEMA = {
+    "table": "exclusive_groups",
+    "key": ["group_id"],
+    "columns": [
+        {"name": name, "control": {"kind": "short_text"}}
+        for name in ["group_id", "display_label", "selection_mode", "active", "notes"]
+    ],
+}
+
+
+def test_connected_group_detail_derives_registry_group_draft_and_semantic_targets():
+    result = run_group_model(
+        "console.log(JSON.stringify(api.initialGroupDraft("
+        + json.dumps(CONNECTED_GROUP_DETAIL) + ", "
+        + json.dumps(CONNECTED_GROUP_SCHEMA)
+        + ")));"
+    )
+
+    assert result["draft"] == {
+        "group_id": "excl_wheels",
+        "display_label": "Wheel selection",
+        "selection_mode": "single_within_group",
+        "active": "True",
+        "notes": "",
+    }
+    assert result["target"] == {
+        "table": "exclusive_groups",
+        "model_id": "stingray",
+        "key": {"group_id": "excl_wheels"},
+    }
+    assert result["member_table"] == "exclusive_group_members"
+    assert result["member_id_field"] == "option_id"
+    assert result["member_group_field"] == "group_id"
+    assert result["member_order_field"] == "display_order"
+    assert result["member_active_field"] == "active"
+
+
+def test_group_editor_reopens_from_the_coalesced_parent_operation():
+    operation = {
+        "table_name": "exclusive_groups",
+        "source_sheet": "exclusive_groups",
+        "physical_key": '["excl_wheels"]',
+        "final": {
+            "group_id": "excl_wheels", "display_label": "Draft wheel choices",
+            "selection_mode": "required_single_within_group", "active": "True",
+            "notes": None,
+        },
+    }
+    result = run_group_model(
+        "const initial=api.initialGroupDraft("
+        + json.dumps(CONNECTED_GROUP_DETAIL) + ", "
+        + json.dumps(CONNECTED_GROUP_SCHEMA) + ");"
+        "const operation=api.matchingGroupOperation("
+        + json.dumps([operation]) + ", "
+        + json.dumps(CONNECTED_GROUP_DETAIL) + ");"
+        "console.log(JSON.stringify(api.applyGroupDraftOverlay(initial.draft,operation)));"
+    )
+
+    assert result["display_label"] == "Draft wheel choices"
+    assert result["selection_mode"] == "required_single_within_group"
+    assert result["notes"] == ""
+
+
+def test_durable_member_overlay_produces_one_deterministic_final_order():
+    operations = [
+        {
+            "table_name": "exclusive_group_members", "action": "update",
+            "entity_key": {"group_id": "excl_wheels", "option_id": "opt_a"},
+            "final": {"group_id": "excl_wheels", "option_id": "opt_a",
+                      "display_order": 20, "active": "True"},
+        },
+        {
+            "table_name": "exclusive_group_members", "action": "update",
+            "entity_key": {"group_id": "excl_wheels", "option_id": "opt_b"},
+            "final": {"group_id": "excl_wheels", "option_id": "opt_b",
+                      "display_order": 10, "active": "True"},
+        },
+        {
+            "table_name": "exclusive_group_members", "action": "add",
+            "entity_key": {"group_id": "excl_wheels", "option_id": "opt_c"},
+            "final": {"group_id": "excl_wheels", "option_id": "opt_c",
+                      "display_order": 30, "active": "True"},
+        },
+    ]
+    result = run_group_model(
+        "console.log(JSON.stringify(api.effectiveMembers("
+        + json.dumps(CONNECTED_GROUP_DETAIL) + ", "
+        + json.dumps(operations) + ", {opt_c:'C3 — Carbon wheel'}"
+        + ")));"
+    )
+
+    assert [row["member_id"] for row in result] == ["opt_b", "opt_a", "opt_c"]
+    assert [row["display_order"] for row in result] == [10, 20, 30]
+    assert result[2]["label"] == "C3 — Carbon wheel"
+
+
+def test_member_move_and_operation_plan_are_bounded_and_reversible():
+    result = run_group_model(
+        "const original=api.effectiveMembers("
+        + json.dumps(CONNECTED_GROUP_DETAIL) + ", []);"
+        "const moved=api.moveMember(original,'opt_b',-1);"
+        "const plan=api.membershipOperations(original,moved,"
+        + json.dumps(CONNECTED_GROUP_DETAIL) + ");"
+        "const restored=api.moveMember(moved,'opt_b',1);"
+        "console.log(JSON.stringify({moved,plan,restoredPlan:api.membershipOperations(original,restored,"
+        + json.dumps(CONNECTED_GROUP_DETAIL) + ")}));"
+    )
+
+    assert [row["member_id"] for row in result["moved"]] == ["opt_b", "opt_a"]
+    assert [row["display_order"] for row in result["moved"]] == [10, 20]
+    assert len(result["plan"]) == 2
+    assert {row["op"] for row in result["plan"]} == {"update"}
+    assert result["restoredPlan"] == []
+
+
+def test_member_planning_uses_backend_relationship_field_metadata():
+    detail = json.loads(json.dumps(CONNECTED_GROUP_DETAIL))
+    detail["editor"].update({
+        "member_id_field": "choice_key",
+        "member_group_field": "parent_key",
+        "member_order_field": "sequence",
+        "member_active_field": "enabled",
+    })
+    detail["members"] = [{
+        "parent_key": "excl_wheels", "choice_key": "opt_a", "sequence": 5,
+        "enabled": True, "option_name": "Alpha",
+    }]
+    result = run_group_model(
+        "const original=api.effectiveMembers(" + json.dumps(detail) + ", []);"
+        "const desired=[...original,{parent_key:'excl_wheels',choice_key:'opt_b',"
+        "sequence:15,enabled:true,member_id:'opt_b',label:'Beta'}];"
+        "console.log(JSON.stringify({original,plan:api.membershipOperations(original,desired,"
+        + json.dumps(detail) + ")}));"
+    )
+
+    assert result["original"][0]["display_order"] == 5
+    assert result["original"][0]["active"] is True
+    assert result["plan"] == [{
+        "table": "exclusive_group_members",
+        "model_id": "stingray",
+        "op": "add",
+        "key": {
+            "parent_key": "excl_wheels",
+            "choice_key": "opt_b",
+        },
+        "record": {
+            "parent_key": "excl_wheels",
+            "choice_key": "opt_b",
+            "sequence": 15,
+            "enabled": True,
+        },
+    }]
+
+
+def test_blank_member_orders_are_normalized_before_add():
+    detail = json.loads(json.dumps(CONNECTED_GROUP_DETAIL))
+    detail["members"][0]["display_order"] = ""
+    detail["members"][1]["display_order"] = None
+    result = run_group_model(
+        "const normalized=api.effectiveMembers(" + json.dumps(detail) + ", []);"
+        "const added=api.addMember(normalized," + json.dumps(detail)
+        + ",'opt_c','C3 — Carbon wheel');"
+        "console.log(JSON.stringify({normalized,added}));"
+    )
+
+    assert [row["display_order"] for row in result["normalized"]] == [10, 20]
+    assert [row["display_order"] for row in result["added"]] == [10, 20, 30]
+
+
+def test_parent_dependencies_use_the_draft_effective_member_set():
+    dependents = [
+        {"table": "exclusive_group_members", "key": {"option_id": "opt_a"}},
+        {"table": "exclusive_group_members", "key": {"option_id": "opt_b"}},
+        {"table": "rule_mappings", "key": {"rule_id": "rule_1"}},
+    ]
+    result = run_group_model(
+        "console.log(JSON.stringify({"
+        "afterDeletes:api.groupDependencyCounts(" + json.dumps(dependents) + ","
+        + json.dumps(CONNECTED_GROUP_DETAIL) + ",[]),"
+        "oneMember:api.groupDependencyCounts(" + json.dumps(dependents) + ","
+        + json.dumps(CONNECTED_GROUP_DETAIL) + ",[{member_id:'opt_b'}])"
+        "}));"
+    )
+
+    assert result["afterDeletes"] == [{"table": "rule_mappings", "count": 1}]
+    assert result["oneMember"] == [
+        {"table": "exclusive_group_members", "count": 1},
+        {"table": "rule_mappings", "count": 1},
+    ]
+
+
+def test_group_editor_wires_existing_draft_dependency_and_registry_contracts():
+    source = (FRONTEND / "components" / "GroupEditor.jsx").read_text()
+    explorer_source = (FRONTEND / "components" / "ConnectedExplorer.jsx").read_text()
+
+    assert "RecordForm" in source
+    assert "EditorShell" in source
+    assert "CONTROL_RENDERERS" not in source
+    assert "api.schema" in source
+    assert "api.referenceOptions" in source
+    assert "api.saveDraftOperation" in source
+    assert "api.dependencies" in source
+    assert "Save membership changes before removing the parent group" in source
+    assert "hasSubmitted ? savedOperation" in source
+    assert "Move up" in source
+    assert "Move down" in source
+    assert "Proposed final order" in source
+    assert "Add existing member" in source
+    assert "Add group" not in source
+    assert "GroupEditor" in explorer_source
+    assert "draftMutable" in explorer_source
+    assert "api.saveDraftOperation" not in explorer_source

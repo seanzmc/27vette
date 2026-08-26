@@ -26,6 +26,14 @@ SOURCE_ROLE_FAMILIES: dict[str, str] = {
     "interior_source_sheet": "interiors",
 }
 
+# Semantic group/member relationships. Family names live here while the
+# Manager catalog derives tables, keys, reference columns, order, and active
+# fields from the registered family specs.
+GROUP_MEMBERSHIP_FAMILIES: dict[str, tuple[str, str]] = {
+    "exclusive": ("exclusive_groups", "exclusive_members"),
+    "rule": ("rule_groups", "rule_group_members"),
+}
+
 # Promotable artifact-type domain. Owned here so schema validation, promotion
 # parsing, and the editor cannot drift into three different vocabularies.
 #

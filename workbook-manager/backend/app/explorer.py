@@ -10,6 +10,8 @@ import json
 import re
 from typing import Any
 
+from .catalog import group_editor_metadata
+
 
 _HASH_SUFFIX = re.compile(r"_[0-9a-f]{12}$", re.IGNORECASE)
 
@@ -264,23 +266,24 @@ def option_detail(conn, model_key: str, option_id: str) -> dict | None:
 
 
 def group_detail(conn, model_key: str, group_type: str, group_id: str) -> dict | None:
+    try:
+        editor = group_editor_metadata(group_type)
+    except ValueError:
+        return None
+    group = _row(conn.execute(
+        f'SELECT * FROM "{editor["group_table"]}" WHERE model_id=? '
+        f'AND "{editor["group_id_field"]}"=?',
+        (model_key, group_id),
+    ).fetchone())
     if group_type == "exclusive":
-        group = _row(conn.execute(
-            "SELECT * FROM exclusive_groups WHERE model_id=? AND group_id=?",
-            (model_key, group_id),
-        ).fetchone())
         summary = _exclusive_group_summary(conn, model_key, group) if group else None
     elif group_type == "rule":
-        group = _row(conn.execute(
-            "SELECT * FROM rule_groups WHERE model_id=? AND group_id=?",
-            (model_key, group_id),
-        ).fetchone())
         summary = _rule_group_summary(conn, model_key, group) if group else None
     else:
         return None
     if summary is None:
         return None
-    return {"model_key": model_key, **summary}
+    return {"model_key": model_key, **summary, "group": group, "editor": editor}
 
 
 def section_detail(conn, model_key: str, section_id: str) -> dict | None:
