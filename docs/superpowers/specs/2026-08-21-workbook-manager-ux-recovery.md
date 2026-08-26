@@ -8,8 +8,10 @@ registry/schema/reference slice completed locally on 2026-08-23; its commit,
 evidence are recorded at delivery. Checkpoint 3C's reusable editor shell
 completed locally on 2026-08-24 and was opened as PR 42; its initial delivery
 head passed full-inventory Release candidate run 32775301054. The review-follow-up
-head reruns that required evidence after push. Checkpoint 3D completed locally
-on 2026-08-25; its delivery evidence is recorded below. Checkpoints 3E–3F and
+head reruns that required evidence after push. Checkpoint 3D was implemented
+locally on 2026-08-25, received its review fixes on the PR head, and merged
+through PR 45 at `3a8369b` on 2026-08-26; its full delivery evidence, including
+the post-sync CI rerun and both Codex review-bug fixes, is recorded below. Checkpoints 3E–3F and
 Checkpoints 4–6 remain separately gated by §19 and must not begin automatically.
 
 Checkpoint 2 added the approved workbook schema/data and additive generated
@@ -1807,6 +1809,21 @@ Codex findings on the delivery PR were implemented inside the closed slice.
   security, dealer behavior, group/member editing, and persistent draft-tray
   behavior remain unchanged.
 
+**Checkpoint 3D delivery closeout (2026-08-26):** both Codex review findings on
+PR 45 were dispositioned as real bugs and fixed on the PR head — the contextual
+option editor now seeds its form from the coalesced durable draft operation for
+the exact physical row (fetched via `GET /api/drafts/{id}/operations`), so
+reopening or "Keep editing" no longer silently reverts previously drafted
+fields, and the editable field list derives from the registry table schema
+(hardcoded `OPTION_FIELD_ORDER` deleted), so registry-added option columns can
+no longer be posted blank. The branch was synced with `main` via
+`gh pr update-branch`; the rerun Release candidate suite (plan validation,
+changed-workbook-manager-connected-editing, ci-contracts, fable-contracts,
+manager-frontend, release-candidate) and the Codex disposition gate all passed
+on the merged head; PR 45 merged at `3a8369b` on 2026-08-26. Optional residual
+follow-up only: real-browser re-proof of the reopen/Keep-editing path
+(behavior covered by Node-run helper tests plus source contracts).
+
 Mandatory stop: this evidence closes only subpass 3D. Subpasses 3E–3F remain
 unimplemented and require explicit sequential authorization; no group/member
 editor or persistent draft tray was started.
@@ -2131,7 +2148,7 @@ label migration or control metadata as authorization for customer headings.
 | Switch customer headings to workbook labels | Checkpoint 5 | Label prerequisite is complete; runtime switch still requires explicit Checkpoint 5 approval. |
 | Add complete control metadata and bounded reference lookup | Checkpoint 3A/3B | Complete locally: 25 families / 220 fields have exact coverage; schema/reference APIs are additive and fail closed. Delivery CI is recorded with the PR. |
 | Reusable accessible registry-control editor shell | Checkpoint 3C | Complete locally: drawer/sheet, no-fallback renderer map, validation, dirty-close, busy Save, focus, and responsive browser proof are green; delivery CI is recorded with the PR. |
-| Render and save a contextual direct option editor | Checkpoint 3D | Complete locally: registry-driven direct fields, durable draft Save, field overlay, impact summary, connected detail, focused/build/Manager gates, and browser proof are green. |
+| Render and save a contextual direct option editor | Checkpoint 3D | Complete and merged: registry-driven direct fields, durable draft Save, field overlay, impact summary, connected detail, focused/build/Manager gates, and browser proof are green; both Codex review-bug fixes landed on the PR head, post-sync CI passed, and PR 45 merged at `3a8369b`. |
 | Render and save contextual group/member editors | Checkpoint 3E | Unresolved and unauthorized; the direct option editor does not authorize group/member mutation UI. |
 | New group canonical-ID allocation strategy | Any Add Group feature | Unresolved; Add Group remains blocked. |
 | Any new frontend/backend dependency | Before dependency change | Not approved. |
