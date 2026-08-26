@@ -1829,6 +1829,9 @@ follow-up only: real-browser re-proof of the reopen/Keep-editing path
 **Checkpoint 3E completion evidence (2026-08-26):**
 
 Review-fix implementation commit: `4b7c06c`.
+Review-fix delivery receipt: PR 48 head `4be55b4`; all three Codex threads
+resolved; pull-request Release candidate run `32973751490` and full-inventory
+workflow-dispatch run `32973812575` passed for that head.
 
 - connected group detail now additively exposes the complete projected group row
   plus backend-owned parent/member table and member key/order/active field
