@@ -10,6 +10,7 @@ function text(value) {
 }
 
 function numberOrder(value, fallback) {
+  if (value === null || value === undefined || String(value).trim() === "") return fallback;
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : fallback;
 }
@@ -18,6 +19,7 @@ function config(detail) {
   const editor = detail?.editor || {};
   return {
     groupTable: text(editor.group_table),
+    groupIdField: text(editor.group_id_field),
     memberTable: text(editor.member_table),
     memberIdField: text(editor.member_id_field),
     memberGroupField: text(editor.member_group_field),
@@ -40,7 +42,7 @@ export function initialGroupDraft(detail, schema) {
     target: {
       table: editor.groupTable,
       model_id: editor.modelId,
-      key: { group_id: editor.groupId },
+      key: { [editor.groupIdField]: editor.groupId },
     },
     member_table: editor.memberTable,
     member_id_field: editor.memberIdField,
@@ -176,6 +178,18 @@ export function addMember(members, detail, memberId, label) {
 
 export function removeMember(members, memberId) {
   return members.filter((member) => member.member_id !== memberId);
+}
+
+export function groupDependencyCounts(dependents, detail, members) {
+  const editor = config(detail);
+  const counts = new Map();
+  if (members.length) counts.set(editor.memberTable, members.length);
+  for (const dependency of Array.isArray(dependents) ? dependents : []) {
+    const table = text(dependency?.table) || "connected record";
+    if (table === editor.memberTable) continue;
+    counts.set(table, (counts.get(table) || 0) + 1);
+  }
+  return [...counts.entries()].map(([table, count]) => ({ table, count }));
 }
 
 export function membershipOperations(originalMembers, desiredMembers, detail) {

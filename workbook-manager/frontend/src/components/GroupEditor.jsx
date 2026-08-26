@@ -5,6 +5,7 @@ import {
   addMember,
   applyGroupDraftOverlay,
   effectiveMembers,
+  groupDependencyCounts,
   initialGroupDraft,
   matchingGroupOperation,
   membershipOperations,
@@ -131,12 +132,7 @@ function GroupFactsEditor({
 
 function dependencySummary(dependencies) {
   if (!dependencies?.length) return "";
-  const counts = new Map();
-  for (const dependency of dependencies) {
-    const label = dependency.table || "connected record";
-    counts.set(label, (counts.get(label) || 0) + 1);
-  }
-  return [...counts.entries()].map(([label, count]) => `${count} ${label}`).join(", ");
+  return dependencies.map(({ table, count }) => `${count} ${table}`).join(", ");
 }
 
 function MemberEditor({
@@ -245,14 +241,19 @@ function MemberEditor({
     setError("");
     setNotice("");
     try {
+      if (plan.length) {
+        setError("Save membership changes before removing the parent group.");
+        return;
+      }
       const result = await api.dependencies(
         detail.editor.group_table,
         detail.model_key,
-        { group_id: detail.group_id },
+        { [detail.editor.group_id_field]: detail.group_id },
       );
-      if (result.count) {
+      const dependencies = groupDependencyCounts(result.dependents, detail, desired);
+      if (dependencies.length) {
         setError(
-          `Group removal refused: ${dependencySummary(result.dependents)} still depend on this group. ` +
+          `Group removal refused: ${dependencySummary(dependencies)} still depend on this group. ` +
           "Remove the dependent members first; the complete final graph is checked again in Review & Apply.",
         );
         return;
@@ -262,7 +263,7 @@ function MemberEditor({
         table: detail.editor.group_table,
         model_id: detail.model_key,
         op: "delete",
-        key: { group_id: detail.group_id },
+        key: { [detail.editor.group_id_field]: detail.group_id },
         record: null,
         actor: "workbook-manager-ui",
         session_id: "browser",

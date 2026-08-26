@@ -6,7 +6,9 @@ import shutil
 import sys
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
+from unittest import mock
 
 from openpyxl import load_workbook
 
@@ -30,6 +32,38 @@ WORKBOOK = ROOT / "stingray_master.xlsx"
 
 
 class TestCatalogParity(unittest.TestCase):
+    def test_group_editor_metadata_follows_registry_derived_specs(self):
+        group = replace(
+            catalog.SPEC_BY_FAMILY["exclusive_groups"],
+            table="groups_v2",
+            key=("parent_key",),
+        )
+        members = replace(
+            catalog.SPEC_BY_FAMILY["exclusive_members"],
+            table="members_v2",
+            key=("parent_key", "member_key"),
+            columns=(
+                catalog.ColumnSpec("parent_key"),
+                catalog.ColumnSpec("member_key"),
+                catalog.ColumnSpec("sequence", "int"),
+                catalog.ColumnSpec("enabled", "bool"),
+            ),
+            refs=(catalog.RefSpec("parent_key", "groups_v2", "parent_key"),),
+        )
+        with mock.patch.dict(catalog.SPEC_BY_FAMILY, {
+            "exclusive_groups": group,
+            "exclusive_members": members,
+        }):
+            self.assertEqual(catalog.group_editor_metadata("exclusive"), {
+                "group_table": "groups_v2",
+                "group_id_field": "parent_key",
+                "member_table": "members_v2",
+                "member_id_field": "member_key",
+                "member_group_field": "parent_key",
+                "member_order_field": "sequence",
+                "member_active_field": "enabled",
+            })
+
     def test_every_writable_family_uses_shared_contract_metadata(self):
         self.assertEqual(set(catalog.WRITABLE_FAMILIES), set(EDITOR_SHEET_META))
         for family, shared in EDITOR_SHEET_META.items():

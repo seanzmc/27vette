@@ -511,6 +511,7 @@ CONNECTED_GROUP_DETAIL = {
     ],
     "editor": {
         "group_table": "exclusive_groups",
+        "group_id_field": "group_id",
         "member_table": "exclusive_group_members",
         "member_id_field": "option_id",
         "member_group_field": "group_id",
@@ -674,6 +675,43 @@ def test_member_planning_uses_backend_relationship_field_metadata():
     }]
 
 
+def test_blank_member_orders_are_normalized_before_add():
+    detail = json.loads(json.dumps(CONNECTED_GROUP_DETAIL))
+    detail["members"][0]["display_order"] = ""
+    detail["members"][1]["display_order"] = None
+    result = run_group_model(
+        "const normalized=api.effectiveMembers(" + json.dumps(detail) + ", []);"
+        "const added=api.addMember(normalized," + json.dumps(detail)
+        + ",'opt_c','C3 — Carbon wheel');"
+        "console.log(JSON.stringify({normalized,added}));"
+    )
+
+    assert [row["display_order"] for row in result["normalized"]] == [10, 20]
+    assert [row["display_order"] for row in result["added"]] == [10, 20, 30]
+
+
+def test_parent_dependencies_use_the_draft_effective_member_set():
+    dependents = [
+        {"table": "exclusive_group_members", "key": {"option_id": "opt_a"}},
+        {"table": "exclusive_group_members", "key": {"option_id": "opt_b"}},
+        {"table": "rule_mappings", "key": {"rule_id": "rule_1"}},
+    ]
+    result = run_group_model(
+        "console.log(JSON.stringify({"
+        "afterDeletes:api.groupDependencyCounts(" + json.dumps(dependents) + ","
+        + json.dumps(CONNECTED_GROUP_DETAIL) + ",[]),"
+        "oneMember:api.groupDependencyCounts(" + json.dumps(dependents) + ","
+        + json.dumps(CONNECTED_GROUP_DETAIL) + ",[{member_id:'opt_b'}])"
+        "}));"
+    )
+
+    assert result["afterDeletes"] == [{"table": "rule_mappings", "count": 1}]
+    assert result["oneMember"] == [
+        {"table": "exclusive_group_members", "count": 1},
+        {"table": "rule_mappings", "count": 1},
+    ]
+
+
 def test_group_editor_wires_existing_draft_dependency_and_registry_contracts():
     source = (FRONTEND / "components" / "GroupEditor.jsx").read_text()
     explorer_source = (FRONTEND / "components" / "ConnectedExplorer.jsx").read_text()
@@ -685,6 +723,7 @@ def test_group_editor_wires_existing_draft_dependency_and_registry_contracts():
     assert "api.referenceOptions" in source
     assert "api.saveDraftOperation" in source
     assert "api.dependencies" in source
+    assert "Save membership changes before removing the parent group" in source
     assert "hasSubmitted ? savedOperation" in source
     assert "Move up" in source
     assert "Move down" in source

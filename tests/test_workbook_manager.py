@@ -1634,6 +1634,7 @@ class TestApi(unittest.TestCase):
                             for member in detail["members"]))
         self.assertEqual(detail["editor"], {
             "group_table": "exclusive_groups",
+            "group_id_field": "group_id",
             "member_table": "exclusive_group_members",
             "member_id_field": "option_id",
             "member_group_field": "group_id",
@@ -1660,6 +1661,7 @@ class TestApi(unittest.TestCase):
         self.assertEqual(rule_detail["group"]["group_id"], rule_group_id)
         self.assertEqual(rule_detail["editor"], {
             "group_table": "rule_groups",
+            "group_id_field": "group_id",
             "member_table": "rule_group_members",
             "member_id_field": "target_id",
             "member_group_field": "group_id",

@@ -16,6 +16,7 @@ from corvette_form_generator.workbook import workbook_truthy
 from corvette_form_generator.workbook_domain.registry import (
     EDITOR_SHEET_META,
     GLOBAL_SHEET_FAMILIES,
+    GROUP_MEMBERSHIP_FAMILIES,
     READONLY_SHEET_META,
     SOURCE_ROLE_FAMILIES,
 )
@@ -292,6 +293,41 @@ _SECTION_SPEC = _build_readonly_spec("sections", "form_sections")
 
 TABLE_SPECS = (*WRITABLE_SPECS, _SECTION_SPEC)
 SPEC_BY_TABLE = {spec.table: spec for spec in TABLE_SPECS}
+
+
+def group_editor_metadata(group_type: str) -> dict[str, str]:
+    """Derive one group/member editor binding from registered family specs."""
+    try:
+        group_family, member_family = GROUP_MEMBERSHIP_FAMILIES[group_type]
+        group_spec = SPEC_BY_FAMILY[group_family]
+        member_spec = SPEC_BY_FAMILY[member_family]
+    except KeyError as exc:
+        raise ValueError(f"unknown registered group type {group_type!r}") from exc
+
+    if len(group_spec.key) != 1:
+        raise ValueError(f"{group_family} must have exactly one registered key")
+    group_id_field = group_spec.key[0]
+    group_refs = [
+        ref for ref in member_spec.refs
+        if ref.target_table == group_spec.table and ref.target_column == group_id_field
+    ]
+    member_ids = [column for column in member_spec.key
+                  if column not in {ref.column for ref in group_refs}]
+    order_fields = [column.sql_name() for column in member_spec.columns
+                    if column.ctype == "int" and column.sql_name() not in member_spec.key]
+    active_fields = [column.sql_name() for column in member_spec.columns
+                     if column.ctype == "bool" and column.sql_name() not in member_spec.key]
+    if not (len(group_refs) == len(member_ids) == len(order_fields) == len(active_fields) == 1):
+        raise ValueError(f"{member_family} has an ambiguous registered membership shape")
+    return {
+        "group_table": group_spec.table,
+        "group_id_field": group_id_field,
+        "member_table": member_spec.table,
+        "member_id_field": member_ids[0],
+        "member_group_field": group_refs[0].column,
+        "member_order_field": order_fields[0],
+        "member_active_field": active_fields[0],
+    }
 
 MODEL_COLLECTIONS = (
     "options",
