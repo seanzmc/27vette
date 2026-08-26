@@ -233,12 +233,12 @@ def _docs_only_shard() -> dict[str, object]:
     )
 
 
-def _fable_contract_shard() -> dict[str, object]:
+def _handoff_contract_shard() -> dict[str, object]:
     return _shard(
-        "fable-contracts",
-        ".venv/bin/python scripts/validate_fable5_loop.py && "
-        ".venv/bin/python -m pytest tests/test_fable5_loop_contract.py -q",
-        description="Validate Fable state, receipts, and handoff contracts.",
+        "handoff-contracts",
+        ".venv/bin/python scripts/validate_state_handoff.py && "
+        ".venv/bin/python -m pytest tests/test_state_handoff.py -q",
+        description="Validate the operational handoff contract.",
     )
 
 
@@ -461,7 +461,7 @@ def _smoke_shards() -> tuple[dict[str, object], ...]:
         for shard in (
             _ci_contract_shard(),
             _manager_review_shard(),
-            _fable_contract_shard(),
+            _handoff_contract_shard(),
             _manager_read_explorer_shard(),
             _docs_only_shard(),
         )
@@ -596,7 +596,7 @@ def plan_validation(
         or (path.startswith(MANAGER_TEST_PREFIX) and path.endswith(".py"))
     }
     manager_fixture_changed = MANAGER_FIXTURE_HELPER in paths
-    fable_changed = any(path.startswith("fable5loop/") for path in paths)
+    handoff_changed = any(path.startswith("fable5loop/") for path in paths)
     ci_changed = any(_is_ci_infrastructure(path) for path in paths)
 
     layered_paths = [
@@ -699,8 +699,8 @@ def plan_validation(
     if manager_review_paths:
         _add(shards, _manager_review_shard())
 
-    if fable_changed:
-        _add(shards, _fable_contract_shard())
+    if handoff_changed:
+        _add(shards, _handoff_contract_shard())
 
     if layered_paths:
         _add(shards, _layered_changed_surfaces_shard(layered_paths))

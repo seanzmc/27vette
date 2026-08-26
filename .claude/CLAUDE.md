@@ -1,13 +1,15 @@
 # 27vette Claude Project Context
 
-For Fable 5 work in this repo, start at `fable5loop/README.md`.
-
 Before non-trivial work, read:
 
 1. `AGENTS.md`
-2. `fable5loop/README.md`
-3. `fable5loop/STATE.md`
-4. `fable5loop/skills/27vette-fable5-compounding.md`
-5. Task-relevant repo files
+2. `fable5loop/STATE.md` — start with the `Current handoff` block
+3. Task-relevant repo files
 
-Follow the run receipt, independent verifier, STATE update, skill-update decision, and validation requirements in the Fable loop docs. Do not duplicate the loop workflow here; `fable5loop/` is the source of truth.
+`AGENTS.md` is the source of truth for workflow, spec, workbook, generated-artifact,
+runtime, styling, and dealer-submission boundaries; do not duplicate it here.
+
+After every substantive repository task, overwrite the `Current handoff` block in
+`fable5loop/STATE.md`, then run `.venv/bin/python scripts/validate_state_handoff.py`
+if that file changed. Retired detail belongs in `fable5loop/STATE-archive.md`;
+the retired Fable 5 loop scaffold is archived under `docs/archive/fable5-loop/`.

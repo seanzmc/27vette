@@ -34,7 +34,7 @@
       "changed_surface",
       "workbook_write",
       "manager_checkpoint",
-      "loop_artifacts",
+      "state_handoff",
       "diagnostic"
     ],
     "disposition": [
@@ -184,16 +184,18 @@
   ],
   "gates": [
     {
-      "id": "cmd.fable5_loop_validator",
-      "command": ".venv/bin/python scripts/validate_fable5_loop.py",
+      "id": "cmd.state_handoff_validator",
+      "command": ".venv/bin/python scripts/validate_state_handoff.py",
       "test_files": [],
       "layer": 2,
       "primary_authority": "structural_invariant",
       "changed_surfaces": [
-        "fable5_loop"
+        "state_handoff"
       ],
       "reads": [
-        "fable5loop/**"
+        "fable5loop/STATE.md",
+        "fable5loop/STATE-archive.md",
+        "README.md"
       ],
       "writes": [],
       "isolation": "read_only",
@@ -201,12 +203,12 @@
       "hashes_protected_roots": false,
       "serial_group": null,
       "ci_policy": "not_run_now",
-      "checkpoint_policy": "loop_artifacts",
+      "checkpoint_policy": "state_handoff",
       "approximate_seconds": 0.07,
       "acceptance_locks": [],
       "disposition": "keep",
-      "disposition_reason": "Loop-scaffold structure authority; unrelated to product validation cost.",
-      "readme_reference": ".venv/bin/python scripts/validate_fable5_loop.py",
+      "disposition_reason": "Operational-handoff structure authority; unrelated to product validation cost.",
+      "readme_reference": ".venv/bin/python scripts/validate_state_handoff.py",
       "notes": "",
       "collected_tests": null,
       "baseline_result": "pass",
@@ -1400,19 +1402,20 @@
       "readme_publishes_command": false
     },
     {
-      "id": "py.test_fable5_loop_contract",
-      "command": ".venv/bin/python -m pytest tests/test_fable5_loop_contract.py -q",
+      "id": "py.test_state_handoff",
+      "command": ".venv/bin/python -m pytest tests/test_state_handoff.py -q",
       "test_files": [
-        "tests/test_fable5_loop_contract.py"
+        "tests/test_state_handoff.py"
       ],
       "layer": 2,
       "primary_authority": "structural_invariant",
       "changed_surfaces": [
-        "fable5_loop"
+        "state_handoff"
       ],
       "reads": [
-        "fable5loop/**",
-        "scripts/validate_fable5_loop.py"
+        "fable5loop/STATE.md",
+        "fable5loop/STATE-archive.md",
+        "scripts/validate_state_handoff.py"
       ],
       "writes": [
         "<tmp_path>/**"
@@ -1422,14 +1425,14 @@
       "hashes_protected_roots": false,
       "serial_group": null,
       "ci_policy": "not_run_now",
-      "checkpoint_policy": "loop_artifacts",
+      "checkpoint_policy": "state_handoff",
       "approximate_seconds": 1.19,
       "acceptance_locks": [],
       "disposition": "keep",
-      "disposition_reason": "Loop-scaffold contract. Note the stale-last-session test depends on receipt completeness at the moment it runs (STATE 2026-07-27).",
-      "readme_reference": "test_fable5_loop_contract",
+      "disposition_reason": "Operational-handoff contract owner.",
+      "readme_reference": "test_state_handoff",
       "notes": "",
-      "collected_tests": 14,
+      "collected_tests": 11,
       "baseline_result": "pass",
       "readme_publishes_command": false
     },
@@ -2777,7 +2780,7 @@
         "py.test_editor_ops_meta",
         "py.test_editor_server_payload",
         "py.test_editor_server_write_api",
-        "py.test_fable5_loop_contract",
+        "py.test_state_handoff",
         "py.test_generate_form_model_discovery_cli",
         "py.test_generation_safety",
         "py.test_group_display_label_contract",
@@ -3404,11 +3407,11 @@
       "secondary_evidence": []
     },
     {
-      "behavior": "Loop scaffold structure, receipts, and state handoff contract",
+      "behavior": "Operational handoff structure and evidence contract",
       "authority_class": "structural_invariant",
-      "primary_owner": "py.test_fable5_loop_contract",
+      "primary_owner": "py.test_state_handoff",
       "secondary_evidence": [
-        "cmd.fable5_loop_validator"
+        "cmd.state_handoff_validator"
       ]
     },
     {
@@ -3939,7 +3942,7 @@
       {
         "prefix": "fable5loop/",
         "surfaces": [
-          "fable5_loop"
+          "state_handoff"
         ]
       },
       {

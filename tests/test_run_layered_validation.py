@@ -312,7 +312,7 @@ def test_pr_planner_keeps_manager_partitions_when_the_diff_adds_frontend_files()
         "manager-non-api-core",
         "manager-non-api-sync-and-export",
         "manager-non-api-export-overlay",
-        "fable-contracts",
+        "handoff-contracts",
     ]
     commands = "\n".join(str(shard["command"]) for shard in plan["include"])
     assert "test_workbook_manager_generated_parity.py" not in commands
@@ -416,14 +416,14 @@ def test_pr_planner_routes_drafts_to_api_and_lifecycle_owners():
     ]
 
 
-def test_pr_planner_runs_fable_contracts_for_state_changes():
+def test_pr_planner_runs_handoff_contracts_for_state_changes():
     planner = _load_planner()
     plan = planner.plan_validation(["fable5loop/STATE.md"])
     # A Fable state edit cannot change catalog, planner, or workflow contracts,
     # so it must not drag the CI contract owners along.
-    assert [shard["name"] for shard in plan["include"]] == ["fable-contracts"]
-    assert "scripts/validate_fable5_loop.py" in plan["include"][-1]["command"]
-    assert "tests/test_fable5_loop_contract.py" in plan["include"][-1]["command"]
+    assert [shard["name"] for shard in plan["include"]] == ["handoff-contracts"]
+    assert "scripts/validate_state_handoff.py" in plan["include"][-1]["command"]
+    assert "tests/test_state_handoff.py" in plan["include"][-1]["command"]
 
 
 def test_pr_planner_covers_test_only_manager_change_in_three_partitions():
@@ -489,7 +489,7 @@ def test_manual_full_plan_partitions_every_measured_heavy_owner():
         # silently. See test_every_narrow_plan_only_shard_is_smoked_by_full_runs.
         "smoke-ci-contracts",
         "smoke-manager-review-tooling",
-        "smoke-fable-contracts",
+        "smoke-handoff-contracts",
         "smoke-manager-read-explorer",
         "smoke-docs-only",
     ]
@@ -913,7 +913,7 @@ def test_smoke_shards_keep_the_real_shard_wiring():
         for shard in (
             planner._ci_contract_shard(),
             planner._manager_review_shard(),
-            planner._fable_contract_shard(),
+            planner._handoff_contract_shard(),
             planner._docs_only_shard(),
         )
     }
