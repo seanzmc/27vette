@@ -12,16 +12,16 @@ Every new bullet under `Verified facts`, `General rules`, `Open failures`, and `
 
 ## Current handoff
 
-- **Updated:** 2026-08-25
+- **Updated:** 2026-08-26
 - **Owning specification:** `docs/superpowers/specs/2026-08-21-workbook-manager-ux-recovery.md`, Checkpoint 3D only.
 - **Active workflow:** Normal repository path; no Fable run.
-- **Branch/commit:** PR #45 review-fix commit on `hermes/workbook-manager-ux-recovery-cp3d`.
-- **Last completed:** Dispositioned both Codex review suggestions on PR #45 as real bugs and fixed them. (1) The contextual option editor now seeds its form from the coalesced durable draft operation for the exact physical row (`applyDraftOverlay` + `matchingDraftOperation`, fetched via new `GET /api/drafts/{id}/operations` wrapper), so reopening or "Keep editing" after a save no longer resubmits untouched projected values that would silently revert previously drafted fields in `drafts.save_operation()`. (2) The editable field list is now derived from the registry table schema (`initialDraftFromDetail(detail, schema)`); the parallel hardcoded `OPTION_FIELD_ORDER` was deleted, so registry-added option columns can no longer be posted blank and erase workbook-authored data.
-- **Current status:** Both fixes implemented on the PR head; focused connected-editing suite green at 15 tests, draft/lifecycle suites green, frontend build green.
-- **Validation:** `.venv/bin/python -m pytest tests/test_workbook_manager_connected_editing.py -q` — 15 passed. `tests/test_workbook_manager_drafts.py` + `tests/test_workbook_manager_changeset_lifecycle.py` — 42 passed, 36 subtests passed. `tests/test_workbook_manager.py -q` — 68 passed, 2 intentional skips. `npm --prefix workbook-manager/frontend run build` — passed. `git diff --check` — passed.
-- **Next action:** Push the fix commit to `hermes/workbook-manager-ux-recovery-cp3d` and reply to the two review threads; merge remains a separate user decision. Checkpoint 3E requires a new explicit instruction.
-- **Blockers or closeout gaps:** Remote CI is pending push; real-browser re-proof of the reopen/Keep-editing path is optional follow-up (behavior covered by Node-run helper tests plus source contracts).
-- **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. This task used the normal repository path and produced no Fable receipt.
+- **Branch/commit:** Merged to `main` as `3a8369b` (PR #45, head branch `hermes/workbook-manager-ux-recovery-cp3d` at `e72ef4a` + main sync merge `b09140b`). This STATE.md update rides its own docs PR from `origin/main`.
+- **Last completed:** PR #45 (Checkpoint 3D: contextual option draft editor, including both Codex review-bug fixes) is merged into `main`. Branch was updated with main's 3 CI commits (`gh pr update-branch`); the re-run Release candidate suite and Codex disposition gate all passed; merged via GitHub with a merge commit. No workbook, generated-artifact, runtime, dealer, or deployment surface was touched by this closeout action itself.
+- **Current status:** Checkpoint 3D is landed on `main`. Local checkout moved to a fresh docs task branch off `origin/main`; the PR head branch still exists locally as `pr45-fixes`.
+- **Validation:** Post-update CI on the PR head: full Release candidate suite green (plan validation, changed-workbook-manager-connected-editing, ci-contracts, fable-contracts, manager-frontend, release-candidate) plus `codex-finding-disposition` pass — verified via `gh pr checks 45 --watch`. Merge state confirmed via `gh pr view 45` (`MERGED`, merge commit `3a8369b`) and `git fetch origin main` + log inspection.
+- **Next action:** None pending for Checkpoint 3D; it is complete through merge. Checkpoint 3E requires a new explicit instruction.
+- **Blockers or closeout gaps:** Real-browser re-proof of the reopen/Keep-editing path remains optional follow-up only (behavior covered by Node-run helper tests plus source contracts).
+- **Latest completed receipt:** `fable5loop/runs/2026-08-14-dbpass6b-durable-apply/`. Neither this merge nor this handoff update used Fable or produced a receipt.
 - **Protected boundaries:** Canonical workbook, workbook schema/data, generators, generated artifacts, published registry, customer runtime, dependencies, backend and durable draft/apply/rebuild semantics, dealer submission, WordPress media, deployment, group/member editing, persistent draft tray, and later checkpoints remain untouched.
 
 ## Verified facts
