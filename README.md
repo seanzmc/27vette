@@ -304,13 +304,13 @@ python scripts/verify_workbook_candidate.py \
   --report candidate-report.json
 ```
 
-Fable 5 compounding loop scaffold:
+Operational handoff gate:
 
 ```sh
-.venv/bin/python scripts/validate_fable5_loop.py
+.venv/bin/python scripts/validate_state_handoff.py
 ```
 
-The operating entrypoint is `fable5loop/README.md`. Use this gate after any change to the loop scaffold, run receipts, state file, or compounding skill.
+`fable5loop/STATE.md` is the centralized operational handoff read at the start of every session; `fable5loop/STATE-archive.md` holds retired detail. Use this gate after any change to either file. The retired Fable 5 loop scaffold is archived under `docs/archive/fable5-loop/`.
 
 Workbook schema gate — the single schema authority. No test re-runs it; the
 `workbook-schema-standardization` node gate owns only the structural conformance
@@ -397,7 +397,7 @@ The remaining `tests/test_*.py` files are not in that gate and are chosen by cha
 | Publication | `test_atomic_registry_write` |
 | Asset map | `test_asset_map_sync`, `test_set_asset_display` |
 | Options-sheet quality | `test_options_sheet_quality` |
-| Fable 5 loop | `test_fable5_loop_contract` |
+| Operational handoff | `test_state_handoff` |
 | Validation catalog | `test_validation_catalog` |
 | Workbook-truth snapshot | `test_workbook_truth` |
 | Source-parity canaries | `test_source_parity_canaries` |
