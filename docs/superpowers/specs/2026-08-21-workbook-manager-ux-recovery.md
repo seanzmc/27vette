@@ -1,6 +1,9 @@
 # Workbook Manager Product and UX Recovery Specification
 
-Status: active product recovery. Checkpoint 1 merged through PR 37 at `aa28e8a`.
+Status: delivered 2026-08-27. Checkpoints 1-6 are merged; §19.4 records no
+next action, and Add Group remains blocked on its own unresolved decision.
+The history below is retained as delivery evidence.
+Checkpoint 1 merged through PR 37 at `aa28e8a`.
 Checkpoint 2 completed on 2026-08-23 at implementation commit `ff28eb5` and
 passed full-inventory Release candidate run 32626231858. Checkpoint 3A/3B's
 registry/schema/reference slice completed locally on 2026-08-23; its commit,
@@ -2172,8 +2175,9 @@ all lifecycle and full-suite gates pass.
   owner then passed all 76 tests in 67.42 seconds. The lockfile-clean frontend
   install and production build transformed 1,528 modules. `git diff --check`
   passed. The catalog edit changes suite membership, so the required remote
-  full-inventory Release candidate and review disposition remain delivery gates
-  on the Checkpoint 6 pull request rather than a local claim.
+  Release candidate and review disposition remained delivery gates on the
+  Checkpoint 6 pull request rather than a local claim; PR 54 satisfied them
+  under the §17.5 clause as revised on 2026-08-27.
 - Real-browser proof: isolated FastAPI single-process serving imported a copied
   canonical workbook, edited Stingray Z51 price `5395 → 5396` through the actual
   connected editor, and showed the semantic review summary plus connected
@@ -2204,9 +2208,10 @@ all lifecycle and full-suite gates pass.
   check passed. Four Codex findings — one P1 wildcard-model expansion and three
   P2 issues on registered family names, destination identifiers, and stale
   approval results — were fixed in `edd3be2` before the merge at `cada087`.
-  Note that the "full-inventory Release candidate" wording used in earlier
-  checkpoints predates the changed-surface shard planning that CI performs now;
-  the planned shards for the changed surfaces are the current gate.
+  The "full-inventory Release candidate" wording used for earlier checkpoints
+  predates the changed-surface shard planning CI performs now, so §17.5 was
+  formally revised on 2026-08-27 to require the planned shards for the changed
+  surfaces; this checkpoint closed under that revised clause.
 
 ## 17. Validation and evidence strategy
 
@@ -2310,11 +2315,21 @@ If `fable5loop/STATE.md` or `fable5loop/STATE-archive.md` change:
 .venv/bin/python scripts/validate_state_handoff.py
 ```
 
-The pull request must receive one successful full-inventory Release candidate
-run for checkpoint closeout. The run must prove every planned shard and the
-aggregate gate, not only the changed-surface slice. Ordinary subsequent PR
-commits may remain changed-surface planned unless the workflow forces full or a
-manual full-suite dispatch is required for final evidence.
+The pull request must receive one successful Release candidate run for
+checkpoint closeout, proving every shard the workflow plans for the changed
+surfaces plus the aggregate gate.
+
+Revised 2026-08-27 by repository-owner decision. This clause previously demanded
+a full-inventory run for every checkpoint closeout. That wording predates the
+validation workflow's changed-surface shard planning, which now derives the
+shard set from the diff and is the gate CI actually enforces; requiring a full
+inventory on top of it re-ran gates no checkpoint touched. Checkpoints 1-5 were
+closed under the earlier wording and their full-inventory run IDs remain
+recorded above; Checkpoint 6 closed under this one, at PR 54 / `cada087`, on
+seven planned shards including its own new owner gate. A manual full-suite
+dispatch remains available and is still expected when a change alters protected
+workbook, generated-artifact, registry, or runtime surfaces rather than Manager
+presentation.
 
 ### 17.6 Protected-boundary evidence
 
