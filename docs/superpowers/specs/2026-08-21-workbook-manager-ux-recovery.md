@@ -1989,6 +1989,38 @@ model parity, browser, and full-suite gates pass.
   customer runtime, dependencies, Apply/Rebuild, dealer submission, media,
   deployment, and security behavior are unchanged.
 
+**PR #51 review remediation (2026-08-27):**
+
+- fix commit `eb2050f` validates every persisted draft overlay against the
+  current projection workbook hash and the centralized terminal-state set.
+  Stale or terminal intent now produces an explicit conflicted overlay and is
+  never rendered as effective graph data; a browser-reserved draft id with no
+  persisted operation remains an unchanged prospective draft;
+- graph overlay operations are typed by owning family. Ordinary option/variant
+  edits can no longer overwrite section fields or enter the Sections Draft
+  Changes filter. Option `section_id`/`active` changes update nested source and
+  destination membership, including a newly model-connected destination built
+  only from its referenced `sections_master` row rather than a global master
+  union;
+- section placement, activation, and standard-equipment bucket edits now rebuild
+  the effective step/bucket/unresolved topology, classifications, counts, and
+  fingerprint from authored context/presentation/master precedence before the
+  graph is returned;
+- the focused graph owner passed 21 tests, including regressions for stale and
+  terminal bindings, prospective draft ids, ordinary option/override exclusion,
+  option moves into existing and previously unconnected sections, step moves,
+  bucket reclassification, and six-model fresh-generation parity. The final
+  catalog-owned serialized Manager suite passed 297 tests with two intentional
+  skips and 62 subtests in 96.51 seconds; the production frontend build again
+  transformed 1,528 modules;
+- trusted headless-Chrome proof on a fresh copied-workbook import moved Stingray
+  Paint from `paint` to `wheels` through the actual section editor, changed the
+  graph fingerprint, retained exact one-change filtering, and produced no page
+  console or overflow errors. After the temporary draft binding was made stale,
+  API and detail UI both showed the binding conflict, zero effective draft
+  changes, and the unchanged base topology. Canonical and copied workbook hashes
+  remained identical at `922de392`; Apply and Rebuild was not invoked.
+
 Mandatory stop: this evidence closes Checkpoint 4 locally. Its delivery PR must
 receive the required current-head validation and review disposition before
 merge. Checkpoint 5 remains unauthorized and must not begin automatically.
