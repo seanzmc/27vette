@@ -180,6 +180,7 @@ window.__testApi = {
   renderContextCard,
   renderInteriorGroups: typeof renderInteriorGroups === "function" ? renderInteriorGroups : undefined,
   formatTooltipContent: typeof formatTooltipContent === "function" ? formatTooltipContent : undefined,
+  renderChoiceRelationGroup: typeof renderChoiceRelationGroup === "function" ? renderChoiceRelationGroup : undefined,
   renderStepChoiceGroups: typeof renderStepChoiceGroups === "function" ? renderStepChoiceGroups : undefined,
   currentStepSummary: typeof currentStepSummary === "function" ? currentStepSummary : undefined,
   goToNextStep: typeof goToNextStep === "function" ? goToNextStep : undefined,
@@ -878,17 +879,39 @@ test("runtime groups visible exclusive-group peers within option sections", () =
 
   const html = runtime.elements.get("#stepContent").innerHTML;
   assert.match(html, /choice-relation-group/);
-  assert.match(html, /Related options/);
-  assert.doesNotMatch(html, /Choose one required option|Choose one of these related options/);
+  assert.match(html, /<h4 class="choice-relation-title">Performance Brakes<\/h4>/);
+  assert.match(html, /<p class="choice-relation-instruction">Selection required<\/p>/);
+  assert.doesNotMatch(html, /Related options|Choose one required option|Choose one of these related options/);
   assert.doesNotMatch(html, /choice-relation-count/);
   assert.match(html, /data-choice-relation-group="gs_excl_performance_brakes"/);
   assert.match(html, /data-option="opt_jx6_001"/);
   assert.match(html, /data-option="opt_j56_001"/);
   assert.match(html, /data-option="opt_j57_001"/);
-  assert.doesNotMatch(html, /Choose one|Choose up to one|Choose any that apply/);
+  assert.doesNotMatch(html, /Choose up to one|Choose any that apply/);
   assert.doesNotMatch(html, /Required choice|choice-relationship-badge required|choice-relationship-badge exclusive/);
   assert.match(html, /required-mark/);
   assert.doesNotMatch(html, /Required single choice|Optional multiple choice/);
+});
+
+test("every promoted exclusive group renders its workbook heading and a separate selection instruction", () => {
+  const dataWindow = loadDataWindow();
+  const registry = dataWindow.CORVETTE_FORM_DATA;
+  const runtime = loadRuntime();
+
+  for (const [modelKey, model] of Object.entries(registry.models)) {
+    runtime.activateModel(modelKey);
+    for (const group of model.data.exclusiveGroups || []) {
+      if (group.active && group.active !== "True") continue;
+      assert.ok(group.display_label?.trim(), `${modelKey}:${group.group_id} is missing its approved workbook heading`);
+      const instruction = group.selection_mode === "required_single_within_group"
+        ? "Selection required"
+        : "Choose one";
+      const html = runtime.renderChoiceRelationGroup(group, [], new Map());
+      assert.match(html, new RegExp(`<h4 class="choice-relation-title">${group.display_label}</h4>`));
+      assert.match(html, new RegExp(`<p class="choice-relation-instruction">${instruction}</p>`));
+      assert.doesNotMatch(html, /Related options|Choose one required option|Choose one of these related options/);
+    }
+  }
 });
 
 test("runtime avoids duplicate Interior Color headings and keeps interior groups interactive", () => {

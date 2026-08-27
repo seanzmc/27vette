@@ -1530,16 +1530,10 @@ function requiredExclusiveGroups() {
   return (data.exclusiveGroups || []).filter((group) => group.active === "True" && exclusiveGroupRequiresSelection(group));
 }
 
-function exclusiveGroupVisualLabel(group) {
-  if (exclusiveGroupRequiresSelection(group)) return "Required choice";
+function exclusiveGroupSelectionInstruction(group) {
+  if (exclusiveGroupRequiresSelection(group)) return "Selection required";
   if (exclusiveGroupAllowsSingleSelection(group)) return "Choose one";
-  return "Related options";
-}
-
-function exclusiveGroupHeading(group) {
-  if (exclusiveGroupRequiresSelection(group)) return "Choose one required option";
-  if (exclusiveGroupAllowsSingleSelection(group)) return "Choose one of these related options";
-  return "Related options";
+  return "";
 }
 
 function includeRulesForChoice(choice) {
@@ -2558,11 +2552,13 @@ function customerSafeGroupNote(group) {
 
 function renderChoiceRelationGroup(group, choices, autoAdded) {
   const note = customerSafeGroupNote(group);
+  const instruction = exclusiveGroupSelectionInstruction(group);
   return `
     <div class="choice-relation-group" data-choice-relation-group="${escapeHtml(group.group_id)}">
       <div class="choice-relation-heading">
         <div>
-          <h4 class="choice-relation-title">Related options</h4>
+          <h4 class="choice-relation-title">${escapeHtml(group.display_label)}</h4>
+          ${instruction ? `<p class="choice-relation-instruction">${escapeHtml(instruction)}</p>` : ""}
           ${note ? `<p class="choice-relation-note">${escapeHtml(note)}</p>` : ""}
         </div>
       </div>

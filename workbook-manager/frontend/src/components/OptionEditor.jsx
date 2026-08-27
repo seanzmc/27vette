@@ -65,7 +65,7 @@ function DraftOverlay({ detail, operation, impact }) {
       </div>
       <p className="muted">
         Saved to the durable draft only. Review the complete graph in Review &amp;
-        Apply; the workbook changes only through Apply and Rebuild.
+        Apply; the workbook changes only through Write Approved Changes &amp; Rebuild Form Data.
       </p>
     </div>
   );
