@@ -1951,6 +1951,48 @@ bucket edge has workbook and fresh-runtime evidence; unresolved differences are
 explicit; option placement and section edits remain draft-only; all promoted
 model parity, browser, and full-suite gates pass.
 
+**Checkpoint 4 local completion evidence (2026-08-26):**
+
+- implementation commit `0e1b904` replaces the presentation-only structure join
+  with one model-scoped graph assembler. Active option ownership, authored
+  context placement, presentation-to-master step resolution, and applicable
+  interior model contexts produce the navigable graph; standard equipment,
+  summary mappings, inactive records, dedicated runtime structures, and genuine
+  unresolved differences retain distinct classifications and evidence;
+- `/api/structure/{model_key}` preserves compatible top-level records while
+  additively exposing complete section nodes, ordered option references, variant
+  placement overrides, deterministic membership fingerprints, workbook/runtime
+  evidence, counts, projection identity, and durable-draft overlays. Draft
+  presentation changes remain proposed data and report pending final-graph
+  parity impact rather than claiming generated parity;
+- Form Overview now presents evidence-backed runtime steps, ordinary/context
+  sections, dedicated runtime content, buckets, summary mappings, and proven
+  empty states. The first-class Sections & Layout workspace adds all/unresolved/
+  empty/inactive/bucket/draft filters, connected section detail, option links,
+  native deep-link and Back/Forward behavior, and owner-family RecordForm editing
+  into the persistent draft tray;
+- the focused graph gate passed 16 tests. It generates fresh contract snapshots
+  from a copied workbook and proves exact `steps[].section_ids` membership for
+  all six promoted models. The catalog-owned serialized Workbook Manager suite
+  passed 292 tests, skipped two intentional slow cases, and passed 62 subtests in
+  86.10 seconds. Catalog/connected-editing/control-metadata owners passed, and
+  the production frontend build transformed 1,528 modules;
+- real headless-Chrome proof against a freshly imported copied workbook showed
+  37 complete Stingray section nodes, 14 runtime steps, six filters, zero false
+  unresolved states, zero horizontal overflow, and no page console errors. It
+  exercised section deep link plus Back/Forward, connected option navigation,
+  a durable `section_presentation` add operation, one-change draft overlay,
+  exact Draft Changes filtering, and pending parity impact. At 390x844 the
+  full-screen owner-labelled editor retained a visible Save/Cancel footer;
+- canonical and copied workbook SHA-256 remained identical at `922de392` after
+  Draft Save. Canonical workbook/data, generated artifacts, published registry,
+  customer runtime, dependencies, Apply/Rebuild, dealer submission, media,
+  deployment, and security behavior are unchanged.
+
+Mandatory stop: this evidence closes Checkpoint 4 locally. Its delivery PR must
+receive the required current-head validation and review disposition before
+merge. Checkpoint 5 remains unauthorized and must not begin automatically.
+
 ### Checkpoint 5 — customer group headings and terminology migration
 
 **Authorization gate:** explicit approval of the complete customer label set and
