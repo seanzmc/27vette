@@ -3,7 +3,7 @@ const WORKSPACES = new Set([
 ]);
 
 const ENTITY_TYPES = new Set([
-  "option", "exclusive_group", "rule_group", "section", "rule",
+  "option", "exclusive_group", "rule_group", "section", "rule", "asset",
 ]);
 
 function text(value) {

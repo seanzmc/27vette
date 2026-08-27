@@ -334,6 +334,8 @@ export default function App() {
             models={models}
             modelKey={modelKey}
             setModelKey={setModelKey}
+            navigation={navigation}
+            onNavigationChange={commitNavigation}
             draftId={draftId}
             draftMutable={draftMutable}
             draftLifecycle={draftLifecycle}
