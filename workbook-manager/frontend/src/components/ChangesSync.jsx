@@ -125,6 +125,16 @@ export default function ChangesSync({
   const rebuild = applyAttempt?.result?.applyRebuild || null;
   const review = lifecycle?.review || null;
 
+  // A failed approval can be superseded by a named revalidation transition:
+  // the immutable approval attempt stays, a newer preview attempt is appended,
+  // and the draft returns to preview_ready. Present the attempt that matches
+  // the current lifecycle state rather than always preferring approval.
+  const revalidatedAfterApproval =
+    draftState === "preview_ready" &&
+    Boolean(previewAttempt) &&
+    Boolean(approvalAttempt) &&
+    Number(previewAttempt.id) > Number(approvalAttempt.id);
+
   // §13.5: results derive from immutable attempt records, keyed by attempt id,
   // and persist until dismissed or superseded by the named lifecycle state.
   const pinnedResults = useMemo(() => {
@@ -151,7 +161,7 @@ export default function ChangesSync({
           : "The approved write did not finish cleanly. Exact evidence is below.",
         state: applyAttempt.manager_state,
       });
-    } else if (approvalAttempt) {
+    } else if (approvalAttempt && !revalidatedAfterApproval) {
       const ok = draftState === "approved";
       items.push({
         id: `approval-${approvalAttempt.id}`,
@@ -179,7 +189,7 @@ export default function ChangesSync({
     return items.filter((item) => !dismissedResults.includes(item.id));
   }, [
     approvalAttempt, applyAttempt, artifacts.cancellation, changeSet, draftState,
-    dismissedResults, manualResolution, previewAttempt,
+    dismissedResults, manualResolution, previewAttempt, revalidatedAfterApproval,
   ]);
 
   // App status refreshes temporarily unmount this workspace. Keep explicit
