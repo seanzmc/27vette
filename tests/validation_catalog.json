@@ -2481,6 +2481,43 @@
       "shared_fixture_incremental_seconds": 82.22
     },
     {
+      "id": "py.test_workbook_manager_form_graph",
+      "command": ".venv/bin/python -m pytest tests/test_workbook_manager_form_graph.py -q",
+      "test_files": [
+        "tests/test_workbook_manager_form_graph.py"
+      ],
+      "layer": 3,
+      "primary_authority": "workbook_to_output_parity",
+      "changed_surfaces": [
+        "workbook_manager",
+        "generator",
+        "validation"
+      ],
+      "reads": [
+        "stingray_master.xlsx",
+        "workbook-manager/**",
+        "scripts/corvette_form_generator/**"
+      ],
+      "writes": [
+        "<tmp_path>/**"
+      ],
+      "isolation": "tmp_path_fixture",
+      "generates": true,
+      "hashes_protected_roots": false,
+      "serial_group": "workbook_manager",
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "manager_checkpoint",
+      "approximate_seconds": 11.62,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Checkpoint 4 owner for model-scoped form-graph membership, non-navigable classifications, contextual section/step editing integration, and fresh runtime evidence across every promoted model.",
+      "readme_reference": "",
+      "notes": "Generates six runtime contracts under an isolated temporary root and verifies protected workbook/generated/publication hashes remain unchanged. Catalog hashes_protected_roots is false because this gate belongs to the workbook_manager serial group; that field denotes protected_artifacts group selection rather than internal hash assertions.",
+      "collected_tests": 16,
+      "baseline_result": "pass",
+      "readme_publishes_command": false
+    },
+    {
       "id": "py.test_workbook_manager_import_projection",
       "command": ".venv/bin/python -m pytest tests/test_workbook_manager_import_projection.py -q",
       "test_files": [
@@ -2716,7 +2753,7 @@
     {
       "id": "suite.workbook_manager_serial_group",
       "description": "Exact workbook_manager serial group, run in one pytest process so verified_manager_fixture is built once.",
-      "command": ".venv/bin/python -m pytest tests/test_group_display_label_contract.py tests/test_workbook_manager_control_metadata.py tests/test_workbook_manager_connected_editing.py tests/test_workbook_manager_catalog.py tests/test_workbook_manager_import_projection.py tests/test_workbook_manager_fixtures.py tests/test_workbook_manager_generated_parity.py tests/test_workbook_manager_api_concurrency.py tests/test_workbook_manager_drafts.py tests/test_workbook_manager_changeset_lifecycle.py tests/test_workbook_manager_apply_rebuild.py tests/test_workbook_manager.py -q",
+      "command": ".venv/bin/python -m pytest tests/test_group_display_label_contract.py tests/test_workbook_manager_control_metadata.py tests/test_workbook_manager_connected_editing.py tests/test_workbook_manager_catalog.py tests/test_workbook_manager_import_projection.py tests/test_workbook_manager_fixtures.py tests/test_workbook_manager_generated_parity.py tests/test_workbook_manager_form_graph.py tests/test_workbook_manager_api_concurrency.py tests/test_workbook_manager_drafts.py tests/test_workbook_manager_changeset_lifecycle.py tests/test_workbook_manager_apply_rebuild.py tests/test_workbook_manager.py -q",
       "layer": 3,
       "gate_ids": [
         "py.test_group_display_label_contract",
@@ -2726,6 +2763,7 @@
         "py.test_workbook_manager_import_projection",
         "py.test_workbook_manager_fixtures",
         "py.test_workbook_manager_generated_parity",
+        "py.test_workbook_manager_form_graph",
         "py.test_workbook_manager_api_concurrency",
         "py.test_workbook_manager_drafts",
         "py.test_workbook_manager_changeset_lifecycle",
@@ -2740,7 +2778,7 @@
     {
       "id": "suite.workbook_manager_checkpoint",
       "description": "Workbook Manager pass/checkpoint acceptance inventory (workbook-manager/README.md).",
-      "command": ".venv/bin/python -m pytest tests/test_asset_map_sync.py tests/test_group_display_label_contract.py tests/test_workbook_manager_control_metadata.py tests/test_workbook_manager_connected_editing.py tests/test_workbook_manager_catalog.py tests/test_workbook_manager_import_projection.py tests/test_workbook_manager_fixtures.py tests/test_workbook_manager_generated_parity.py tests/test_workbook_manager_api_concurrency.py tests/test_workbook_manager_drafts.py tests/test_workbook_manager_changeset_lifecycle.py tests/test_workbook_manager_apply_rebuild.py tests/test_workbook_manager.py -q",
+      "command": ".venv/bin/python -m pytest tests/test_asset_map_sync.py tests/test_group_display_label_contract.py tests/test_workbook_manager_control_metadata.py tests/test_workbook_manager_connected_editing.py tests/test_workbook_manager_catalog.py tests/test_workbook_manager_import_projection.py tests/test_workbook_manager_fixtures.py tests/test_workbook_manager_generated_parity.py tests/test_workbook_manager_form_graph.py tests/test_workbook_manager_api_concurrency.py tests/test_workbook_manager_drafts.py tests/test_workbook_manager_changeset_lifecycle.py tests/test_workbook_manager_apply_rebuild.py tests/test_workbook_manager.py -q",
       "layer": 3,
       "gate_ids": [
         "py.test_asset_map_sync",
@@ -2751,6 +2789,7 @@
         "py.test_workbook_manager_import_projection",
         "py.test_workbook_manager_fixtures",
         "py.test_workbook_manager_generated_parity",
+        "py.test_workbook_manager_form_graph",
         "py.test_workbook_manager_api_concurrency",
         "py.test_workbook_manager_drafts",
         "py.test_workbook_manager_changeset_lifecycle",
@@ -2813,6 +2852,7 @@
         "py.test_workbook_manager_drafts",
         "py.test_workbook_manager_fixtures",
         "py.test_workbook_manager_generated_parity",
+        "py.test_workbook_manager_form_graph",
         "py.test_workbook_manager_import_projection",
         "py.test_workbook_truth"
       ],

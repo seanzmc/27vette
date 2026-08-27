@@ -32,7 +32,8 @@ export const api = {
   runImport: () => request("/api/import", { method: "POST" }),
   latestImport: () => request("/api/import/latest"),
   models: () => request("/api/models"),
-  structure: (model) => request(`/api/structure/${model}`),
+  structure: (model, draftId = "") =>
+    request(`/api/structure/${encodeURIComponent(model)}${draftQuery(draftId)}`),
   collections: (model) => request(`/api/models/${model}/collections`),
   connectedOption: (model, optionId, draftId = "") =>
     request(`/api/explorer/${encodeURIComponent(model)}/options/${encodeURIComponent(optionId)}${draftQuery(draftId)}`),
