@@ -6,7 +6,7 @@ import { api } from "./api.js";
 import FormStructure from "./components/FormStructure.jsx";
 import ModelOperations from "./components/ModelOperations.jsx";
 import AssetManager from "./components/AssetManager.jsx";
-import ChangesSync from "./components/ChangesSync.jsx";
+import ChangesSync, { operatorLifecycle } from "./components/ChangesSync.jsx";
 import HistoryView from "./components/HistoryView.jsx";
 import ConnectedExplorer from "./components/ConnectedExplorer.jsx";
 import SectionsLayout from "./components/SectionsLayout.jsx";
@@ -146,10 +146,15 @@ export default function App() {
         const listed = await api.drafts();
         const saved = localStorage.getItem(DRAFT_STORAGE_KEY);
         const savedRow = listed.drafts.find((draft) => draft.id === saved);
+        const savedTerminalReview = savedRow
+          && TERMINAL_DRAFT_STATES.has(savedRow.status)
+          && parseNavigation(window.location.search).workspace === "changes";
         const resumable = listed.drafts.find(
           (draft) => !TERMINAL_DRAFT_STATES.has(draft.status)
         );
-        const recoveredId = savedRow && !TERMINAL_DRAFT_STATES.has(savedRow.status)
+        const recoveredId = savedRow && (
+          !TERMINAL_DRAFT_STATES.has(savedRow.status) || savedTerminalReview
+        )
           ? savedRow.id
           : resumable?.id;
         selectDraft(recoveredId || newDraftId());
@@ -164,6 +169,10 @@ export default function App() {
   const draftRevision = draftLifecycle?.draft?.updated_ts || "";
   const draftMutable = !draftLifecycle || draftLifecycle.draft.status === "draft";
   const ready = startup === "Ready to edit" || startup === "Draft requires attention";
+  // Apply intentionally makes the projection stale. Keep Review & Apply
+  // mounted so the operator can read the durable completion/recovery evidence
+  // before choosing the separately guarded workbook reload.
+  const reviewAvailable = tab === "changes" && Boolean(draftLifecycle);
 
   const tabs = [
     { id: "overview", label: "Form Overview", icon: BookOpen },
@@ -248,11 +257,11 @@ export default function App() {
         <button
           className="draft-tray"
           onClick={() => setTab("changes")}
-          disabled={!ready}
+          disabled={!ready && !draftLifecycle}
         >
           <strong>{draftLifecycle?.draft?.id || draftId || "Preparing draft"}</strong>
           <span>
-            {draftLifecycle?.draft?.status || "draft"} · {operationCount} change{operationCount === 1 ? "" : "s"}
+            {operatorLifecycle[draftLifecycle?.draft?.status] || "Collecting draft changes"} · {operationCount} change{operationCount === 1 ? "" : "s"}
           </span>
         </button>
         <nav className="tabs" aria-label="Workbook Manager workspaces">
@@ -261,7 +270,7 @@ export default function App() {
               key={id}
               className={tab === id ? "active" : ""}
               onClick={() => setTab(id)}
-              disabled={!ready}
+              disabled={!ready && id !== "changes"}
             >
               <Icon size={14} /> {label}
               {badge ? <span className="badge">{badge}</span> : null}
@@ -275,7 +284,7 @@ export default function App() {
             {fatal}<div className="muted">The canonical workbook was not changed.</div>
           </div>
         )}
-        {!ready && (
+        {!ready && !reviewAvailable && (
           <section className="startup-state">
             <Database size={34} />
             <h2>{startup}</h2>
@@ -331,7 +340,7 @@ export default function App() {
             onChanged={refreshManager}
           />
         )}
-        {ready && tab === "changes" && (
+        {(ready || reviewAvailable) && tab === "changes" && (
           <ChangesSync
             status={status}
             draftId={draftId}

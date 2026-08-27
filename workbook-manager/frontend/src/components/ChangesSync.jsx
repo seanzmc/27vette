@@ -10,6 +10,67 @@ const TERMINAL = new Set([
   "manually_resolved_applied", "abandoned_unknown",
 ]);
 
+// §14.4 lifecycle language: the state card leads with what the state means
+// for the operator, not the raw machine value. Raw values remain available in
+// the expandable evidence panels.
+export const operatorLifecycle = {
+  draft: "Collecting draft changes",
+  changeset_emitted: "Draft locked for validation",
+  preview_retryable: "Draft locked for validation",
+  approval_repreview_required: "Draft locked for validation",
+  preview_ready: "Validated against the workbook",
+  preview_rejected: "Validation found problems",
+  approval_confirmation_required: "Validated against the workbook",
+  approved: "Validated changes approved",
+  applying: "Writing approved changes",
+  apply_retryable: "Write did not finish",
+  apply_restored_retryable: "Write did not finish (restored)",
+  workbook_state_unknown: "Manual recovery required",
+  applied: "Approved changes written",
+  cancelled: "Draft cancelled, audit record kept",
+  manually_resolved_restored: "Manually resolved: workbook restored",
+  manually_resolved_applied: "Manually resolved: workbook written",
+  abandoned_unknown: "Abandoned after unknown write state",
+};
+
+// §14.4: the one lifecycle-authorized primary next action per state.
+const NEXT_ACTIONS = {
+  draft: "Lock Draft for Validation",
+  changeset_emitted: "Validate Draft Against Workbook",
+  preview_retryable: "Retry Draft Validation",
+  approval_repreview_required: "Validate Draft Against Workbook",
+  preview_ready: "Approve Validated Changes",
+  preview_rejected: "Fix the reported problems, then revalidate",
+  approval_confirmation_required: "Approve Validated Changes",
+  approved: "Write Approved Changes & Rebuild Form Data",
+  apply_retryable: "Retry Writing Approved Changes & Rebuild Form Data",
+  apply_restored_retryable: "Retry Writing Approved Changes & Rebuild Form Data",
+  workbook_state_unknown: "Record only a manually verified recovery resolution",
+};
+
+const DISMISSED_RESULTS_KEY = "27vette-workbook-manager-dismissed-results";
+
+function readDismissedResults(draftId) {
+  if (!draftId) return [];
+  try {
+    const stored = JSON.parse(localStorage.getItem(DISMISSED_RESULTS_KEY) || "{}");
+    return Array.isArray(stored[draftId]) ? stored[draftId] : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeDismissedResults(draftId, ids) {
+  if (!draftId) return;
+  try {
+    const stored = JSON.parse(localStorage.getItem(DISMISSED_RESULTS_KEY) || "{}");
+    stored[draftId] = ids;
+    localStorage.setItem(DISMISSED_RESULTS_KEY, JSON.stringify(stored));
+  } catch {
+    // Dismissal remains usable for this mount when storage is unavailable.
+  }
+}
+
 function compact(value, length = 16) {
   if (!value) return "—";
   return value.length > length ? `${value.slice(0, length)}…` : value;
@@ -40,11 +101,18 @@ export default function ChangesSync({
   const [acceptedWarnings, setAcceptedWarnings] = useState([]);
   const [importReport, setImportReport] = useState(null);
   const [applyConfirmation, setApplyConfirmation] = useState("");
+  // §13.5 persistent operation results: results pinned beside their operation
+  // stay until the operator dismisses them or a named state transition
+  // supersedes them. An unrelated status refresh cannot clear them.
+  const [dismissedResults, setDismissedResults] = useState(
+    () => readDismissedResults(draftId)
+  );
 
   const artifacts = lifecycle?.artifacts || {};
   const previewAttempt = latest(artifacts.preview_attempts);
   const approvalAttempt = latest(artifacts.approval_attempts);
   const applyAttempt = latest(artifacts.apply_attempts);
+  const manualResolution = latest(artifacts.manual_resolutions);
   const preview = previewAttempt?.result || null;
   const approval = approvalAttempt?.result || null;
   const changeSet = artifacts.changeset?.artifact || null;
@@ -55,6 +123,88 @@ export default function ChangesSync({
   const confirmableWarnings = preview?.warningPolicy?.confirmableIds || [];
   const visibleWarnings = preview?.warnings || [];
   const rebuild = applyAttempt?.result?.applyRebuild || null;
+  const review = lifecycle?.review || null;
+
+  // A failed approval can be superseded by a named revalidation transition:
+  // the immutable approval attempt stays, a newer preview attempt is appended,
+  // and the draft returns to preview_ready. Present the attempt that matches
+  // the current lifecycle state rather than always preferring approval.
+  const revalidatedAfterApproval =
+    draftState === "preview_ready" &&
+    Boolean(previewAttempt) &&
+    Boolean(approvalAttempt) &&
+    Number(previewAttempt.id) > Number(approvalAttempt.id);
+
+  // §13.5: results derive from immutable attempt records, keyed by attempt id,
+  // and persist until dismissed or superseded by the named lifecycle state.
+  const pinnedResults = useMemo(() => {
+    const items = [];
+    if (manualResolution) {
+      items.push({
+        id: `recovery-${manualResolution.id}`,
+        kind: draftState === "abandoned_unknown" ? "err" : "ok",
+        text: `Manual recovery was recorded: ${operatorLifecycle[draftState] || draftState.replaceAll("_", " ")}.`,
+      });
+    } else if (artifacts.cancellation) {
+      items.push({
+        id: `cancel-${artifacts.cancellation.updated_ts}`,
+        kind: "ok",
+        text: "Draft cancelled. Its audit record was kept.",
+      });
+    } else if (applyAttempt) {
+      const ok = applyAttempt.manager_state === "applied";
+      items.push({
+        id: `apply-${applyAttempt.id}`,
+        kind: ok ? "ok" : "err",
+        text: ok
+          ? "Approved changes were written and the affected form data was rebuilt."
+          : "The approved write did not finish cleanly. Exact evidence is below.",
+        state: applyAttempt.manager_state,
+      });
+    } else if (approvalAttempt && !revalidatedAfterApproval) {
+      const ok = draftState === "approved";
+      items.push({
+        id: `approval-${approvalAttempt.id}`,
+        kind: ok ? "ok" : "err",
+        text: ok
+          ? "Validated changes were approved. Nothing was written."
+          : "Approval did not finish. Nothing was written; review the exact evidence below.",
+      });
+    } else if (previewAttempt) {
+      const ok = draftState === "preview_ready";
+      items.push({
+        id: `preview-${previewAttempt.id}`,
+        kind: ok ? "ok" : "err",
+        text: ok
+          ? "Draft validation passed. Nothing was written."
+          : "Validation found problems. Nothing was written.",
+      });
+    } else if (changeSet && draftState === "changeset_emitted") {
+      items.push({
+        id: `changeset-${changeSet.changeSetId}`,
+        kind: "ok",
+        text: "Draft locked for validation. Nothing was written.",
+      });
+    }
+    return items.filter((item) => !dismissedResults.includes(item.id));
+  }, [
+    approvalAttempt, applyAttempt, artifacts.cancellation, changeSet, draftState,
+    dismissedResults, manualResolution, previewAttempt, revalidatedAfterApproval,
+  ]);
+
+  // App status refreshes temporarily unmount this workspace. Keep explicit
+  // dismissals by draft so refresh cannot resurrect a dismissed result.
+  useEffect(() => {
+    setDismissedResults(readDismissedResults(draftId));
+  }, [draftId]);
+
+  const dismissResult = (resultId) => {
+    setDismissedResults((current) => {
+      const next = [...new Set([...current, resultId])];
+      writeDismissedResults(draftId, next);
+      return next;
+    });
+  };
 
   useEffect(() => {
     setAcceptedWarnings((current) => current.filter(
@@ -104,16 +254,98 @@ export default function ChangesSync({
         </div>
         <div className="draft-state-card">
           <span className="muted">Current state</span>
-          <strong>{draftState.replaceAll("_", " ")}</strong>
+          <strong>{operatorLifecycle[draftState] || draftState.replaceAll("_", " ")}</strong>
+          {NEXT_ACTIONS[draftState] && (
+            <span className="next-action">
+              Next: {NEXT_ACTIONS[draftState]}
+            </span>
+          )}
           <span className="mono faint" title={draftId}>{compact(draftId, 24)}</span>
         </div>
       </div>
 
+      {pinnedResults.map((result) => (
+        <div className={`notice ${result.kind} pinned-result`} key={result.id}>
+          <span>{result.text}</span>
+          <button
+            className="btn small"
+            onClick={() => dismissResult(result.id)}
+          >
+            Dismiss
+          </button>
+        </div>
+      ))}
       {notice && <div className={`notice ${notice.kind}`}>{notice.text}</div>}
       {status?.projection?.blocking_findings > 0 && (
         <div className="notice err">
           Projection has {status.projection.blocking_findings} blocking finding(s).
           Draft authoring and lifecycle advancement remain fail-closed.
+        </div>
+      )}
+
+      <div className="section-heading">Review — what this draft proposes</div>
+      {review?.groups?.length ? (
+        <div className="review-groups">
+          {review.groups.map((group) => (
+            <div className="panel review-group" key={`${group.model_key}:${group.entity_type}`}>
+              <div className="panel-head">
+                <strong>
+                  {group.model_key ? `${group.model_key} — ` : ""}
+                  {group.entity_type.replaceAll("_", " ")}
+                </strong>
+                <span>{group.entities.length} entr{group.entities.length === 1 ? "y" : "ies"}</span>
+              </div>
+              {group.entities.map((entity) => (
+                <div className="review-entity" key={entity.technical.physical_key}>
+                  <div className="operation-heading">
+                    <span className={`op-tag ${entity.actions[0]}`}>
+                      {entity.actions.join(" + ").toUpperCase()}
+                    </span>
+                    <strong>{entity.entity_label}</strong>
+                    <span className="spacer" />
+                    {review.affected_models.length > 0 && (
+                      <span className="muted">affects {review.affected_models.join(", ")}</span>
+                    )}
+                  </div>
+                  <ul className="review-summaries">
+                    {entity.summaries.map((summary, index) => (
+                      <li key={index}>{summary}</li>
+                    ))}
+                  </ul>
+                  <div className="review-entity-links">
+                    {entity.destination && (
+                      <a
+                        className="entity-link"
+                        href={`?model=${encodeURIComponent(group.model_key || "stingray")}&workspace=${entity.destination.workspace}&type=${entity.destination.entity_type}&id=${encodeURIComponent(entity.destination.entity_id)}`}
+                      >
+                        Open connected detail
+                      </a>
+                    )}
+                  </div>
+                  <details className="technical-details">
+                    <summary>Technical details</summary>
+                    <div className="lineage-row">
+                      <span>table <strong>{entity.technical.table_name}</strong></span>
+                      <span>sheet <strong>{entity.technical.source_sheet}</strong></span>
+                      <span>row <strong>{entity.technical.source_row ?? "new"}</strong></span>
+                      <span className="mono" title={entity.technical.physical_key}>
+                        physical {compact(entity.technical.physical_key, 28)}
+                      </span>
+                    </div>
+                    <div className="mono faint">
+                      operations: {entity.operation_ids.join(", ")}
+                    </div>
+                  </details>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="panel">
+          <div className="empty">
+            No draft changes yet. Edits you save appear here as human summaries before anything can reach the workbook.
+          </div>
         </div>
       )}
 
