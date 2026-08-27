@@ -41,6 +41,13 @@ class DraftError(ValueError):
 
 TRANSIENT_PREVIEW_EXCEPTIONS = (BlockingIOError, PermissionError, TimeoutError)
 TRANSIENT_APPLY_EXCEPTIONS = (BlockingIOError, PermissionError, TimeoutError)
+TERMINAL_DRAFT_STATUSES = frozenset({
+    "applied",
+    "cancelled",
+    "manually_resolved_restored",
+    "manually_resolved_applied",
+    "abandoned_unknown",
+})
 
 
 def _now() -> str:
@@ -74,6 +81,36 @@ def list_operations(state_conn: sqlite3.Connection, draft_id: str) -> list[dict]
         "SELECT * FROM draft_operations WHERE draft_id=? ORDER BY id", (draft_id,)
     ).fetchall()
     return [_operation_dict(row) for row in rows]
+
+
+def overlay_binding_conflicts(
+    state_conn: sqlite3.Connection,
+    *,
+    draft_id: str,
+    projection_workbook_sha256: str,
+) -> list[dict]:
+    """Validate one draft before its intent is rendered over a projection."""
+
+    row = state_conn.execute(
+        "SELECT status, base_workbook_sha256 FROM workflow_drafts WHERE id=?",
+        (draft_id,),
+    ).fetchone()
+    if row is None:
+        # The browser reserves a draft id before its first durable operation.
+        # Until that row exists there is no intent to overlay or binding to
+        # validate, so render the unchanged projection.
+        return []
+    if row["status"] in TERMINAL_DRAFT_STATUSES:
+        return [{
+            "code": "draft_terminal",
+            "message": f"Draft status {row['status']!r} cannot be rendered as active intent.",
+        }]
+    if row["base_workbook_sha256"] != projection_workbook_sha256:
+        return [{
+            "code": "draft_binding_stale",
+            "message": "The draft is bound to a different workbook import.",
+        }]
+    return []
 
 
 def connected_addition(

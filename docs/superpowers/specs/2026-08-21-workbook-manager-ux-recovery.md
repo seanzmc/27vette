@@ -14,14 +14,15 @@ through PR 45 at `3a8369b` on 2026-08-26; its full delivery evidence, including
 the post-sync CI rerun and both Codex review-bug fixes, is recorded below.
 Checkpoint 3E completed locally on 2026-08-26; its delivery evidence is recorded
 with the PR. Checkpoint 3F completed locally on 2026-08-26; its delivery evidence
-is recorded below. Checkpoints 4–6 remain separately gated by §19 and must not
-begin automatically.
+is recorded below. Checkpoint 4 merged through PR 51 at `8adf6ef` on 2026-08-27.
+Checkpoint 5 completed locally on 2026-08-27 at implementation commit `91510b0`;
+its delivery evidence is recorded below. Checkpoint 6 remains separately gated
+by §19 and must not begin automatically.
 
-Checkpoint 2 added the approved workbook schema/data and additive generated
-label fields, but did **not** authorize or perform the Checkpoint 5 customer
-heading switch, a group-ID strategy, a new dependency, deployment, media
-mutation, or dealer behavior. A coding agent must re-resolve the live branch,
-PR, repository, and workbook state before relying on any recorded baseline.
+Checkpoint 5 consumed Checkpoint 2's approved workbook labels without changing
+the workbook, generated group contract, group IDs, dependencies, deployment,
+media, or dealer behavior. A coding agent must re-resolve the live branch, PR,
+repository, and workbook state before relying on any recorded baseline.
 
 Recommended implementation reasoning: medium for read-only UI/query work; high
 for schema, migration, workbook-write, generated-contract, customer-runtime,
@@ -1951,11 +1952,85 @@ bucket edge has workbook and fresh-runtime evidence; unresolved differences are
 explicit; option placement and section edits remain draft-only; all promoted
 model parity, browser, and full-suite gates pass.
 
-### Checkpoint 5 — customer group headings and terminology migration
+**Checkpoint 4 local completion evidence (2026-08-26):**
 
-**Authorization gate:** explicit approval of the complete customer label set and
-the runtime switch. Every promoted visible exclusive group must satisfy the
-Checkpoint 2 contract.
+- implementation commit `0e1b904` replaces the presentation-only structure join
+  with one model-scoped graph assembler. Active option ownership, authored
+  context placement, presentation-to-master step resolution, and applicable
+  interior model contexts produce the navigable graph; standard equipment,
+  summary mappings, inactive records, dedicated runtime structures, and genuine
+  unresolved differences retain distinct classifications and evidence;
+- `/api/structure/{model_key}` preserves compatible top-level records while
+  additively exposing complete section nodes, ordered option references, variant
+  placement overrides, deterministic membership fingerprints, workbook/runtime
+  evidence, counts, projection identity, and durable-draft overlays. Draft
+  presentation changes remain proposed data and report pending final-graph
+  parity impact rather than claiming generated parity;
+- Form Overview now presents evidence-backed runtime steps, ordinary/context
+  sections, dedicated runtime content, buckets, summary mappings, and proven
+  empty states. The first-class Sections & Layout workspace adds all/unresolved/
+  empty/inactive/bucket/draft filters, connected section detail, option links,
+  native deep-link and Back/Forward behavior, and owner-family RecordForm editing
+  into the persistent draft tray;
+- the focused graph gate passed 16 tests. It generates fresh contract snapshots
+  from a copied workbook and proves exact `steps[].section_ids` membership for
+  all six promoted models. The catalog-owned serialized Workbook Manager suite
+  passed 292 tests, skipped two intentional slow cases, and passed 62 subtests in
+  86.10 seconds. Catalog/connected-editing/control-metadata owners passed, and
+  the production frontend build transformed 1,528 modules;
+- real headless-Chrome proof against a freshly imported copied workbook showed
+  37 complete Stingray section nodes, 14 runtime steps, six filters, zero false
+  unresolved states, zero horizontal overflow, and no page console errors. It
+  exercised section deep link plus Back/Forward, connected option navigation,
+  a durable `section_presentation` add operation, one-change draft overlay,
+  exact Draft Changes filtering, and pending parity impact. At 390x844 the
+  full-screen owner-labelled editor retained a visible Save/Cancel footer;
+- canonical and copied workbook SHA-256 remained identical at `922de392` after
+  Draft Save. Canonical workbook/data, generated artifacts, published registry,
+  customer runtime, dependencies, Apply/Rebuild, dealer submission, media,
+  deployment, and security behavior are unchanged.
+
+**PR #51 review remediation (2026-08-27):**
+
+- fix commit `eb2050f` validates every persisted draft overlay against the
+  current projection workbook hash and the centralized terminal-state set.
+  Stale or terminal intent now produces an explicit conflicted overlay and is
+  never rendered as effective graph data; a browser-reserved draft id with no
+  persisted operation remains an unchanged prospective draft;
+- graph overlay operations are typed by owning family. Ordinary option/variant
+  edits can no longer overwrite section fields or enter the Sections Draft
+  Changes filter. Option `section_id`/`active` changes update nested source and
+  destination membership, including a newly model-connected destination built
+  only from its referenced `sections_master` row rather than a global master
+  union;
+- section placement, activation, and standard-equipment bucket edits now rebuild
+  the effective step/bucket/unresolved topology, classifications, counts, and
+  fingerprint from authored context/presentation/master precedence before the
+  graph is returned;
+- the focused graph owner passed 21 tests, including regressions for stale and
+  terminal bindings, prospective draft ids, ordinary option/override exclusion,
+  option moves into existing and previously unconnected sections, step moves,
+  bucket reclassification, and six-model fresh-generation parity. The final
+  catalog-owned serialized Manager suite passed 297 tests with two intentional
+  skips and 62 subtests in 96.51 seconds; the production frontend build again
+  transformed 1,528 modules;
+- trusted headless-Chrome proof on a fresh copied-workbook import moved Stingray
+  Paint from `paint` to `wheels` through the actual section editor, changed the
+  graph fingerprint, retained exact one-change filtering, and produced no page
+  console or overflow errors. After the temporary draft binding was made stale,
+  API and detail UI both showed the binding conflict, zero effective draft
+  changes, and the unchanged base topology. Canonical and copied workbook hashes
+  remained identical at `922de392`; Apply and Rebuild was not invoked.
+
+Mandatory stop: this evidence closes Checkpoint 4 locally. Its delivery PR must
+receive the required current-head validation and review disposition before
+merge. Checkpoint 5 remains unauthorized and must not begin automatically.
+
+### Checkpoint 5 — customer group headings and terminology migration — complete locally 2026-08-27
+
+**Authorization gate:** fulfilled by the user's explicit `begin checkpoint 5`
+instruction on 2026-08-27. Every promoted visible exclusive group satisfied the
+Checkpoint 2 contract before the runtime switch.
 
 **Objective:** render approved workbook-owned headings in customer forms while
 preserving selection behavior and completing user-facing terminology.
@@ -1977,6 +2052,53 @@ instructions remain separate and behavior-identical; no completed-state generic
 fallback remains; generated diffs are reviewed; all model switching, selection,
 summary/total, download, and safe dealer-modal tests pass without live
 submission.
+
+**Working definition and completion evidence (2026-08-27):**
+
+- Diagnosis: PR 51 was merged at `8adf6ef`; every active generated exclusive
+  group in all six promoted models already carried its approved workbook
+  `display_label` and existing `selection_mode`, but `form-app/app.js` discarded
+  both presentation concepts and hardcoded `Related options`. The §12 audit also
+  found technical lifecycle labels and stale `Draft Review` wording still
+  exposed in the Manager.
+- Intended outcome and owners: `display_label` remains workbook/generated-data
+  authority for the customer heading; existing `selection_mode` remains the
+  behavior authority and now produces a separate `Choose one` or `Selection
+  required` instruction. §12 remains authority for Manager action copy. No new
+  contract field, group-ID strategy, or business decision was introduced.
+- Implementation: `91510b0` switches the generic customer renderer, removes the
+  completed-state generic fallback, gives the heading/instruction distinct
+  presentation, advances only the CSS/JS browser cache tokens, and migrates the
+  audited Manager actions to their specified operator outcomes. Focused tests
+  sweep every active exclusive group in every promoted registry model and pin
+  the Manager terminology while retaining the exact typed apply confirmation.
+- RED proof: the two focused runtime cases failed because rendered groups still
+  contained `Related options`; the two focused Manager cases failed because the
+  old lifecycle and `Draft Review` labels remained. Both lanes then passed after
+  the generic implementation.
+- Validation: `multi-model-runtime-switching` passed 71 tests; the Stingray form
+  regression passed 91; the group-label owner passed 26; the final focused
+  containment/group run passed 31. The README-owned serialized Manager command
+  passed 328 tests with two intentional slow-gate skips and 62 subtests in
+  83.13 seconds. The production Manager build transformed 1,528 modules. The
+  isolated twelve-stage all-model candidate was green with six generated models,
+  zero validation findings, zero semantic drift, and zero boundary violations;
+  its source-parity, model-switching, and runtime-state harnesses all passed.
+  `node --check form-app/app.js` and `git diff --check` passed.
+- Browser proof: isolated headless Chrome rendered Grand Sport headings including
+  `Z52 Performance Package — Choose one` and `Performance Brakes — Selection
+  required`; switching the Z52 peers left only FEY selected. At 1440 px and
+  390 px there was no horizontal overflow, the label/instruction remained
+  present, and no page console errors were recorded. A temporary copied-workbook
+  Manager import showed the renamed Review & Apply projection actions and
+  `Refresh WordPress Image Inventory`, with no stale `Draft Review` copy or
+  overflow. No Apply/Rebuild or live dealer submission ran.
+- Protected/rollback evidence: `stingray_master.xlsx` stayed byte-identical at
+  `922de392`; `form-output/runtime/*` and `form-app/data.js` (`6a06eef1`) remained
+  byte-identical with an empty protected-path diff. Rollback is the single
+  implementation commit; no workbook/output restoration is required.
+- Delivery stop: required full-inventory remote Release candidate evidence and
+  review disposition are delivery gates. Checkpoint 6 remains unauthorized.
 
 ### Checkpoint 6 — Review & Apply presentation recovery
 

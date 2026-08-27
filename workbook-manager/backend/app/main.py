@@ -29,6 +29,7 @@ from . import (
     db as dbmod,
     drafts,
     explorer,
+    form_graph as form_graph_mod,
     importer,
     staging,
     sync as syncmod,
@@ -447,44 +448,63 @@ def models(conn=Depends(projection_connection)):
 
 
 @app.get("/api/structure/{model_key}")
-def structure(model_key: str, conn=Depends(projection_connection)):
-
-    def rows(table, order):
-        spec = SPEC_BY_TABLE[table]
-        return [dict(r) for r in conn.execute(
-            f"SELECT * FROM {table} WHERE model_key=? ORDER BY {order}",
-            (model_key,))]
-
-    steps = rows("form_steps", "CAST(runtime_order AS INTEGER)")
-    presentation = rows("section_presentation",
-                        "CAST(section_display_order AS INTEGER)")
-    sections = {r["section_id"]: dict(r) for r in conn.execute(
-        "SELECT * FROM form_sections")}
-    for p in presentation:
-        master = sections.get(p["section_id"], {})
-        p["step_key"] = p.get("step_key") or master.get("step_key")
-        p["section_name"] = master.get("section_name", "")
-        p["display_name"] = p.get("display_label") or master.get(
-            "section_name") or display_id(p["section_id"], ("sec_",))
-    for s in steps:
-        s["display_name"] = s.get("step_label") or humanize(s["step_key"])
-        s["sections"] = [p for p in presentation
-                         if p.get("step_key") == s["step_key"]]
+def structure(
+    model_key: str,
+    draft_id: str = "",
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
+    # Checkpoint 4: serve the full connected form graph (spec §8) instead of
+    # joining only section_presentation rows. The graph builder resolves step
+    # placement presentation-first/master-fallback, scopes membership to
+    # model-connected sections, and classifies buckets/context/summary/unmapped
+    # records. Top-level legacy keys are preserved so existing consumers keep
+    # their contract; steps[].sections now reflects complete membership.
+    graph = form_graph_mod.build_form_graph(conn, model_key)
+    if draft_id:
+        projection_sha = dbmod.get_meta(conn, "workbook_sha256") or ""
+        conflicts = drafts.overlay_binding_conflicts(
+            state_conn,
+            draft_id=draft_id,
+            projection_workbook_sha256=projection_sha,
+        )
+        if conflicts:
+            graph = form_graph_mod.conflicted_draft_overlay(
+                graph, draft_id, conflicts
+            )
+        else:
+            graph = form_graph_mod.apply_draft_overlay(
+                graph,
+                drafts.list_operations(state_conn, draft_id),
+            )
     return {
-        "model_key": model_key,
-        "steps": steps,
-        "sections_master": list(sections.values()),
-        "section_presentation": presentation,
-        "context_sections": rows("context_sections",
-                                 "CAST(section_display_order AS INTEGER)"),
-        "order_summary_sections": rows("order_summary_sections",
-                                       "CAST(display_order AS INTEGER)"),
-        "step_order_summary_map": rows("step_order_summary_map", "id"),
-        "variants": [dict(r) for r in conn.execute(
-            "SELECT mv.*, vm.trim_level, vm.body_style, vm.display_name, "
-            "vm.base_price FROM model_variants mv LEFT JOIN variants vm ON "
-            "vm.variant_id = mv.variant_id WHERE mv.model_key=? "
-            "ORDER BY CAST(mv.display_order AS INTEGER)", (model_key,))],
+        "model_key": graph["model_key"],
+        "projection_identity": {
+            "workbook_sha256": dbmod.get_meta(conn, "workbook_sha256"),
+            "workbook_mtime_ns": dbmod.get_meta(conn, "workbook_mtime_ns"),
+        },
+        "graph": {
+            "version": graph["graph_version"],
+            "fingerprint": graph["fingerprint"],
+            "steps": graph["steps"],
+            "buckets": graph["buckets"],
+            "summary_only": graph["summary_only"],
+            "section_nodes": graph["section_nodes"],
+            "unmapped_sections": graph["unmapped_sections"],
+            "inactive_records": graph["inactive_records"],
+            "counts": graph["counts"],
+            "draft_overlay": graph["draft_overlay"],
+            "parity": graph["parity"],
+            "evidence": graph["evidence"],
+        },
+        "steps": graph["steps"],
+        "section_presentation": graph["section_presentation"],
+        "context_sections": graph["context_sections"],
+        "order_summary_sections": graph["order_summary_sections"],
+        "step_order_summary_map": graph["step_order_summary_map"],
+        "sections_master": graph["sections_master"],
+        "variants": graph["variants"],
+        "editing": graph["editing"],
     }
 
 

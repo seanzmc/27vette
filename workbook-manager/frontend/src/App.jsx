@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import {
-  BookOpen, Database, Images, Layers3, Search, Settings2, GitBranch,
+  BookOpen, Database, Images, LayoutPanelTop, Layers3, Search, Settings2, GitBranch,
 } from "lucide-react";
 import { api } from "./api.js";
 import FormStructure from "./components/FormStructure.jsx";
@@ -9,6 +9,7 @@ import AssetManager from "./components/AssetManager.jsx";
 import ChangesSync from "./components/ChangesSync.jsx";
 import HistoryView from "./components/HistoryView.jsx";
 import ConnectedExplorer from "./components/ConnectedExplorer.jsx";
+import SectionsLayout from "./components/SectionsLayout.jsx";
 import { parseNavigation, serializeNavigation } from "./navigationState.js";
 
 const DRAFT_STORAGE_KEY = "27vette-workbook-manager-draft";
@@ -166,6 +167,7 @@ export default function App() {
 
   const tabs = [
     { id: "overview", label: "Form Overview", icon: BookOpen },
+    { id: "sections", label: "Sections & Layout", icon: LayoutPanelTop },
     { id: "options", label: "Options & Relationships", icon: Search },
     { id: "groups", label: "Groups", icon: Layers3 },
     { id: "assets", label: "Images", icon: Images },
@@ -293,6 +295,17 @@ export default function App() {
             draftId={draftId}
             draftMutable={draftMutable}
             onChanged={refreshManager}
+          />
+        )}
+        {ready && tab === "sections" && (
+          <SectionsLayout
+            modelKey={modelKey}
+            navigation={navigation}
+            onNavigationChange={commitNavigation}
+            draftId={draftId}
+            draftRevision={draftRevision}
+            draftMutable={draftMutable}
+            onChanged={refreshDraftInPlace}
           />
         )}
         {ready && (tab === "options" || tab === "groups") && (

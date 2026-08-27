@@ -454,5 +454,64 @@ class GroupDisplayLabelReviewArtifactTests(unittest.TestCase):
             self.assertEqual({path.name: path.read_bytes() for path in paths}, before)
 
 
+class Checkpoint5OperatorTerminologyTests(unittest.TestCase):
+    """§12 operator actions use outcomes, not lifecycle implementation terms."""
+
+    def test_review_and_apply_actions_use_the_approved_operator_labels(self) -> None:
+        source = (
+            ROOT
+            / "workbook-manager"
+            / "frontend"
+            / "src"
+            / "components"
+            / "ChangesSync.jsx"
+        ).read_text(encoding="utf-8").replace("&amp;", "&")
+        for label in (
+            "Lock Draft for Validation",
+            "Validate Draft Against Workbook",
+            "Approve Validated Changes",
+            "Write Approved Changes & Rebuild Form Data",
+            "Cancel Draft and Keep Audit Record",
+            "Reload Latest Workbook Data",
+            "Export Workbook Review Copy",
+            "Back Up Drafts & History",
+            "Refresh Screen Status",
+        ):
+            self.assertIn(label, source)
+        for stale in (
+            "> Freeze ChangeSet",
+            '"Run Workbook Preview"',
+            "> Approve Exact Preview",
+            '"Apply and Rebuild" : "Retry Apply and Rebuild"',
+            "> Re-Import Workbook",
+            "> Export Disposable Comparison",
+            "> Backup Manager State",
+        ):
+            self.assertNotIn(stale, source)
+        self.assertNotRegex(source, r">\s*Cancel Draft\s*<")
+        self.assertNotRegex(source, r">\s*Refresh\s*<")
+
+    def test_manager_uses_review_and_apply_and_names_the_image_inventory(self) -> None:
+        source_root = ROOT / "workbook-manager" / "frontend" / "src"
+        components = (
+            "AssetManager.jsx",
+            "ConnectedExplorer.jsx",
+            "ModelOperations.jsx",
+            "OptionEditor.jsx",
+        )
+        combined = "\n".join(
+            (source_root / "components" / name).read_text(encoding="utf-8")
+            for name in components
+        )
+        self.assertNotIn("Draft Review", combined)
+        self.assertNotIn("until Apply and Rebuild", combined)
+        self.assertIn("Review & Apply", combined.replace("&amp;", "&"))
+        asset_source = (source_root / "components" / "AssetManager.jsx").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("Refresh WordPress Image Inventory", asset_source)
+        self.assertNotIn("> Refresh inventory", asset_source)
+
+
 if __name__ == "__main__":
     unittest.main()
