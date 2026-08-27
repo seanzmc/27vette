@@ -36,7 +36,7 @@ HANDOFF_REQUIRED_FIELDS = (
 )
 EVIDENCE_SECTIONS = ("Verified facts", "General rules", "Open failures", "Lessons learned")
 MAX_LAST_SESSION_ENTRIES = 5
-MAX_STATE_BYTES = 60_000
+MAX_STATE_BYTES = 40_000
 
 
 def _section_lines(text: str, heading: str) -> list[str]:
