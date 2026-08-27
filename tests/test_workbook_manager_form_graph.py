@@ -32,6 +32,7 @@ for path in (BACKEND, SCRIPTS):
 
 from app import form_graph  # noqa: E402
 from app import main as mainmod  # noqa: E402
+from app import db as dbmod  # noqa: E402
 from app.contract_parity import (  # noqa: E402
     generate_contract_snapshot,
     promoted_runtime_models,
@@ -238,7 +239,11 @@ class TestGraphMembership(FormGraphCase):
             "model_id": "z06",
             "entity_key": {"model_key": "z06", "section_id": "sec_pain_001"},
             "changed_fields": {"display_label": {"before": "Paint", "after": "Paint finish"}},
-            "final": {"section_id": "sec_pain_001", "display_label": "Paint finish"},
+            "final": {
+                "section_id": "sec_pain_001",
+                "display_label": "Paint finish",
+                "active": "True",
+            },
         }])
         node = next(
             node for node in overlaid["section_nodes"]
@@ -248,6 +253,170 @@ class TestGraphMembership(FormGraphCase):
         self.assertEqual(node["draft_overlay"]["state"], "modified")
         self.assertEqual(overlaid["draft_overlay"]["revision"], 7)
         self.assertEqual(overlaid["parity"]["draft_status"], "pending_preview")
+
+    def test_section_placement_overlay_rebuilds_topology_counts_and_fingerprint(self):
+        graph = form_graph.build_form_graph(self.conn, "z06")
+        before_fingerprint = graph["fingerprint"]
+        overlaid = form_graph.apply_draft_overlay(graph, [{
+            "id": 8,
+            "action": "update",
+            "table_name": "section_presentation",
+            "family": "section_presentation_meta",
+            "model_id": "z06",
+            "entity_key": {"model_key": "z06", "section_id": "sec_pain_001"},
+            "changed_fields": {"step_key": {"before": "paint", "after": "wheels"}},
+            "final": {
+                "section_id": "sec_pain_001",
+                "step_key": "wheels",
+                "active": "True",
+                "standard_equipment_bucket": "False",
+            },
+        }])
+        paint = next(step for step in overlaid["steps"] if step["step_key"] == "paint")
+        wheels = next(step for step in overlaid["steps"] if step["step_key"] == "wheels")
+        self.assertNotIn("sec_pain_001", {row["section_id"] for row in paint["sections"]})
+        self.assertIn("sec_pain_001", {row["section_id"] for row in wheels["sections"]})
+        self.assertEqual(paint["section_count"], len(paint["sections"]))
+        self.assertEqual(wheels["section_count"], len(wheels["sections"]))
+        self.assertNotEqual(overlaid["fingerprint"], before_fingerprint)
+
+    def test_section_bucket_overlay_rebuilds_classification(self):
+        graph = form_graph.build_form_graph(self.conn, "z06")
+        overlaid = form_graph.apply_draft_overlay(graph, [{
+            "id": 81,
+            "action": "update",
+            "table_name": "section_presentation",
+            "family": "section_presentation_meta",
+            "model_id": "z06",
+            "entity_key": {"model_key": "z06", "section_id": "sec_pain_001"},
+            "changed_fields": {
+                "step_key": {"before": "paint", "after": "standard_equipment"},
+                "standard_equipment_bucket": {"before": "False", "after": "True"},
+            },
+            "final": {
+                "section_id": "sec_pain_001",
+                "step_key": "standard_equipment",
+                "active": "True",
+                "standard_equipment_bucket": "True",
+            },
+        }])
+        paint = next(step for step in overlaid["steps"] if step["step_key"] == "paint")
+        bucket = next(
+            bucket for bucket in overlaid["buckets"]
+            if bucket["step_key"] == "standard_equipment"
+        )
+        self.assertNotIn("sec_pain_001", {row["section_id"] for row in paint["sections"]})
+        self.assertIn("sec_pain_001", {row["section_id"] for row in bucket["members"]})
+        node = next(
+            node for node in overlaid["section_nodes"]
+            if node["section_id"] == "sec_pain_001"
+        )
+        self.assertEqual(node["classification"], "bucket_section")
+        self.assertEqual(overlaid["counts"]["buckets"], len(overlaid["buckets"]))
+
+    def test_option_non_graph_edit_does_not_mark_or_overwrite_section(self):
+        graph = form_graph.build_form_graph(self.conn, "z06")
+        paint = next(
+            node for node in graph["section_nodes"]
+            if node["section_id"] == "sec_pain_001"
+        )
+        option = paint["options"][0]
+        overlaid = form_graph.apply_draft_overlay(graph, [
+            {
+                "id": 9,
+                "action": "update",
+                "table_name": "options",
+                "family": "options",
+                "model_id": "z06",
+                "entity_key": {"option_id": option["option_id"]},
+                "changed_fields": {"option_name": {"before": option["option_name"], "after": "Renamed"}},
+                "final": {
+                    **option,
+                    "section_id": "sec_pain_001",
+                    "option_name": "Renamed",
+                    "active": "False",
+                    "display_behavior": "hidden",
+                },
+            },
+            {
+                "id": 10,
+                "action": "update",
+                "table_name": "variant_option_overrides",
+                "family": "variant_option_overrides",
+                "model_id": "z06",
+                "entity_key": {"variant_id": "3lz", "option_id": option["option_id"]},
+                "changed_fields": {"selectable": {"before": "True", "after": "False"}},
+                "final": {
+                    "variant_id": "3lz",
+                    "option_id": option["option_id"],
+                    "section_id": "sec_pain_001",
+                    "active": "False",
+                    "display_behavior": "hidden",
+                    "selectable": "False",
+                },
+            },
+        ])
+        effective = next(
+            node for node in overlaid["section_nodes"]
+            if node["section_id"] == "sec_pain_001"
+        )
+        self.assertEqual(effective["draft_overlay"]["state"], "unchanged")
+        self.assertEqual(effective["active"], paint["active"])
+        self.assertEqual(effective["display_behavior"], paint["display_behavior"])
+        self.assertEqual(overlaid["counts"]["draft_changes"], 0)
+        self.assertEqual(overlaid["parity"]["draft_status"], "unchanged")
+        self.assertEqual(overlaid["fingerprint"], graph["fingerprint"])
+
+    def test_option_section_move_updates_nested_source_and_destination_lists(self):
+        graph = form_graph.build_form_graph(self.conn, "z06")
+        source = next(
+            node for node in graph["section_nodes"]
+            if node["section_id"] == "sec_pain_001"
+        )
+        existing_ids = {node["section_id"] for node in graph["section_nodes"]}
+        known_steps = {step["step_key"] for step in graph["steps"]}
+        destination_master = next(
+            row for row in graph["sections_master"]
+            if row["section_id"] not in existing_ids
+            and row.get("step_key") in known_steps
+            and row.get("step_key") != source["step_key"]
+        )
+        destination_id = destination_master["section_id"]
+        option = source["options"][0]
+        overlaid = form_graph.apply_draft_overlay(graph, [{
+            "id": 10,
+            "action": "update",
+            "table_name": "options",
+            "family": "options",
+            "model_id": "z06",
+            "entity_key": {"option_id": option["option_id"]},
+            "changed_fields": {
+                "section_id": {
+                    "before": source["section_id"],
+                    "after": destination_id,
+                },
+            },
+            "final": {
+                **option,
+                "section_id": destination_id,
+            },
+        }])
+        nodes = {node["section_id"]: node for node in overlaid["section_nodes"]}
+        self.assertNotIn(option["option_id"], {
+            row["option_id"] for row in nodes[source["section_id"]]["options"]
+        })
+        self.assertIn(option["option_id"], {
+            row["option_id"] for row in nodes[destination_id]["options"]
+        })
+        destination_step = next(
+            step for step in overlaid["steps"]
+            if step["step_key"] == destination_master["step_key"]
+        )
+        self.assertIn(
+            destination_id,
+            {row["section_id"] for row in destination_step["sections"]},
+        )
+        self.assertEqual(nodes[source["section_id"]]["display_behavior"], source["display_behavior"])
 
 
 class TestFreshRuntimeParity(FormGraphCase):
@@ -321,6 +490,55 @@ class TestStructureEndpoint(FormGraphCase):
             [section["section_id"] for section in paint["sections"]],
             ["sec_pain_001"],
         )
+
+    def test_structure_rejects_stale_and_terminal_draft_bindings(self):
+        state = sqlite3.connect(":memory:")
+        state.row_factory = sqlite3.Row
+        dbmod.init_durable_schema(state)
+        projection_sha = dbmod.get_meta(self.conn, "workbook_sha256")
+        try:
+            prospective = mainmod.structure(
+                "z06", draft_id="not-yet-persisted", conn=self.conn, state_conn=state
+            )
+            self.assertEqual(
+                prospective["graph"]["draft_overlay"]["state"], "unchanged"
+            )
+            self.assertEqual(
+                prospective["graph"]["draft_overlay"]["conflicts"], []
+            )
+
+            state.execute(
+                "INSERT INTO workflow_drafts(id, created_ts, updated_ts, status, "
+                "base_workbook_sha256, base_workbook_mtime_ns) "
+                "VALUES('bound', 't', 't', 'draft', ?, '1')",
+                ("0" * 64,),
+            )
+            state.commit()
+            stale = mainmod.structure(
+                "z06", draft_id="bound", conn=self.conn, state_conn=state
+            )
+            self.assertEqual(stale["graph"]["draft_overlay"]["state"], "conflicted")
+            self.assertEqual(
+                stale["graph"]["draft_overlay"]["conflicts"][0]["code"],
+                "draft_binding_stale",
+            )
+
+            state.execute(
+                "UPDATE workflow_drafts SET status='cancelled', "
+                "base_workbook_sha256=? WHERE id='bound'",
+                (projection_sha,),
+            )
+            state.commit()
+            terminal = mainmod.structure(
+                "z06", draft_id="bound", conn=self.conn, state_conn=state
+            )
+            self.assertEqual(terminal["graph"]["draft_overlay"]["state"], "conflicted")
+            self.assertEqual(
+                terminal["graph"]["draft_overlay"]["conflicts"][0]["code"],
+                "draft_terminal",
+            )
+        finally:
+            state.close()
 
 
 class TestFormStructureSource(unittest.TestCase):

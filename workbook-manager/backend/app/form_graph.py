@@ -291,6 +291,21 @@ def build_form_graph(conn, model_key: str) -> dict:
             ),
             "step_key": step_key,
             "step_resolution": step_source,
+            "placement_evidence": {
+                "context_step_key": _clean(context.get("step_key")),
+                "context_active": _truthy(context.get("active")),
+                "presentation_step_key": _clean(any_presentation.get("step_key")),
+                "presentation_active": _truthy(any_presentation.get("active")),
+                "presentation_display_label": _clean(
+                    any_presentation.get("display_label")
+                ),
+                "presentation_standard_equipment_bucket": _clean(
+                    any_presentation.get("standard_equipment_bucket")
+                ),
+                "context_section_name": _clean(context.get("section_name")),
+                "master_step_key": _clean(master.get("step_key")),
+                "master_section_name": _clean(master.get("section_name")),
+            },
             "origins": sorted(origins),
             "runtime_evidence": runtime_evidence,
             "workbook_evidence": workbook_evidence,
@@ -313,6 +328,7 @@ def build_form_graph(conn, model_key: str) -> dict:
             "options": [
                 {
                     "option_id": row.get("option_id"),
+                    "section_id": section_id,
                     "rpo": row.get("rpo"),
                     "option_name": row.get("option_name"),
                     "display_order": row.get("display_order"),
@@ -547,59 +563,363 @@ def build_form_graph(conn, model_key: str) -> dict:
     }
 
 
-def apply_draft_overlay(graph: dict, operations: list[dict]) -> dict:
-    """Overlay relevant durable-draft operations on a connected graph copy.
+SECTION_OVERLAY_TABLES = frozenset({"section_presentation", "context_sections"})
+SUMMARY_OVERLAY_TABLES = frozenset({
+    "order_summary_sections",
+    "step_order_summary_map",
+})
+OPTION_GRAPH_FIELDS = frozenset({"section_id", "active"})
 
-    The projection graph remains unchanged. This is presentation-only evidence
-    of proposed values; fresh-runtime parity remains pending until the normal
-    final-graph preview validates the immutable ChangeSet.
-    """
+
+def _overlay_metadata(operation: dict) -> dict:
+    return {
+        "state": (
+            "added" if operation.get("action") == "add"
+            else "pending_deletion" if operation.get("action") == "delete"
+            else "modified"
+        ),
+        "operation_id": operation.get("id"),
+        "family": operation.get("family"),
+        "action": operation.get("action"),
+        "changed_fields": operation.get("changed_fields") or {},
+    }
+
+
+def _is_graph_operation(operation: dict, model_key: str) -> bool:
+    if operation.get("model_id") not in {"", model_key}:
+        return False
+    table = operation.get("table_name")
+    if table in {"form_steps", *SECTION_OVERLAY_TABLES, *SUMMARY_OVERLAY_TABLES}:
+        return True
+    if table != "options":
+        return False
+    if operation.get("action") in {"add", "delete"}:
+        return True
+    return bool(OPTION_GRAPH_FIELDS & set(operation.get("changed_fields") or {}))
+
+
+def _refresh_section_placement(node: dict) -> None:
+    placement = node["placement_evidence"]
+    if placement.get("context_active") and placement.get("context_step_key"):
+        node["step_key"] = placement["context_step_key"]
+        node["step_resolution"] = "draft_context_section"
+    elif placement.get("presentation_active") and placement.get("presentation_step_key"):
+        node["step_key"] = placement["presentation_step_key"]
+        node["step_resolution"] = "draft_section_presentation"
+    elif placement.get("master_step_key"):
+        node["step_key"] = placement["master_step_key"]
+        node["step_resolution"] = "section_master"
+    else:
+        node["step_key"] = ""
+        node["step_resolution"] = "unresolved"
+
+    node["display_label"] = (
+        placement.get("presentation_display_label")
+        if placement.get("presentation_active") else ""
+    )
+    node["standard_equipment_bucket"] = (
+        placement.get("presentation_standard_equipment_bucket")
+        if placement.get("presentation_active") else ""
+    )
+    node["display_name"] = (
+        placement.get("context_section_name")
+        if placement.get("context_active") else ""
+    ) or node["display_label"] or placement.get("master_section_name") or _display_fallback(
+        node["section_id"]
+    )
+
+
+def _apply_section_operation(node: dict, operation: dict, overlay: dict) -> None:
+    table = operation["table_name"]
+    action = operation.get("action")
+    final = operation.get("final") or {}
+    placement = node["placement_evidence"]
+    deleting = action == "delete"
+
+    if table == "context_sections":
+        placement["context_active"] = False if deleting else _truthy(
+            final.get("active", placement.get("context_active"))
+        )
+        if deleting:
+            placement["context_step_key"] = ""
+            placement["context_section_name"] = ""
+        else:
+            if "step_key" in final:
+                placement["context_step_key"] = _clean(final.get("step_key"))
+            if "section_name" in final:
+                placement["context_section_name"] = _clean(final.get("section_name"))
+    else:
+        placement["presentation_active"] = False if deleting else _truthy(
+            final.get("active", placement.get("presentation_active"))
+        )
+        if deleting:
+            placement["presentation_step_key"] = ""
+            placement["presentation_display_label"] = ""
+            placement["presentation_standard_equipment_bucket"] = ""
+        else:
+            if "step_key" in final:
+                placement["presentation_step_key"] = _clean(final.get("step_key"))
+            if "display_label" in final:
+                placement["presentation_display_label"] = _clean(
+                    final.get("display_label")
+                )
+            if "standard_equipment_bucket" in final:
+                placement["presentation_standard_equipment_bucket"] = _clean(
+                    final.get("standard_equipment_bucket")
+                )
+        for key in ("display_behavior", "section_display_order", "notes"):
+            if key in final:
+                node[key] = final[key]
+
+    _refresh_section_placement(node)
+    node["draft_overlay"] = overlay
+
+
+def _draft_section_node(result: dict, section_id: str) -> dict | None:
+    master = next(
+        (
+            row for row in result.get("sections_master", [])
+            if row.get("section_id") == section_id
+        ),
+        None,
+    )
+    if master is None:
+        return None
+    step_key = _clean(master.get("step_key"))
+    display_name = _clean(master.get("section_name")) or _display_fallback(section_id)
+    return {
+        "section_id": section_id,
+        "display_name": display_name,
+        "step_key": step_key,
+        "step_resolution": "section_master",
+        "placement_evidence": {
+            "context_step_key": "",
+            "context_active": False,
+            "presentation_step_key": "",
+            "presentation_active": False,
+            "presentation_display_label": "",
+            "presentation_standard_equipment_bucket": "",
+            "context_section_name": "",
+            "master_step_key": step_key,
+            "master_section_name": display_name,
+        },
+        "origins": ["options"],
+        "runtime_evidence": "sections",
+        "workbook_evidence": "section_master + draft model option",
+        "section_display_order": _clean(master.get("display_order")),
+        "display_behavior": "",
+        "presentation_state": "active",
+        "selection_mode": _clean(master.get("selection_mode")),
+        "is_required": _clean(master.get("is_required")),
+        "standard_behavior": _clean(master.get("standard_behavior")),
+        "standard_equipment_bucket": "",
+        "auto_added_bucket": "",
+        "display_label": "",
+        "option_count": 0,
+        "interior_count": 0,
+        "options": [],
+        "variant_overrides": [],
+        "editor": None,
+        "read_only_reason": (
+            "Section identity and placement are owned by read-only "
+            "section_master; add a section-presentation row to author "
+            "model-specific display metadata."
+        ),
+        "src_sheet": _clean(master.get("src_sheet")),
+        "physical_key": _clean(master.get("physical_key")),
+        "classification": "inactive",
+        "active": False,
+        "empty": True,
+        "draft_overlay": {"state": "unchanged"},
+    }
+
+
+def _apply_option_operation(
+    result: dict,
+    nodes: dict[str, dict],
+    operation: dict,
+    overlay: dict,
+) -> None:
+    entity_key = operation.get("entity_key") or {}
+    final = operation.get("final") or {}
+    option_id = entity_key.get("option_id") or final.get("option_id")
+    source = None
+    current = None
+    for node in nodes.values():
+        match = next(
+            (row for row in node.get("options", []) if row.get("option_id") == option_id),
+            None,
+        )
+        if match is not None:
+            source = node
+            current = match
+            break
+
+    action = operation.get("action")
+    changed = set(operation.get("changed_fields") or {})
+    if source is not None and action in {"update", "delete"}:
+        source["options"] = [
+            row for row in source["options"] if row.get("option_id") != option_id
+        ]
+    if action == "delete":
+        if source is not None:
+            source["draft_overlay"] = overlay
+        return
+
+    effective = deepcopy(current or {"option_id": option_id})
+    fields = set(final) if action == "add" else changed
+    for key in fields:
+        if key in final:
+            effective[key] = final[key]
+    destination_id = _clean(effective.get("section_id")) or (
+        _clean(source.get("section_id")) if source is not None else ""
+    )
+    destination = nodes.get(destination_id)
+    if destination is None:
+        destination = _draft_section_node(result, destination_id)
+        if destination is None:
+            if source is not None:
+                source["options"].append(effective)
+            return
+        result["section_nodes"].append(destination)
+        nodes[destination_id] = destination
+    effective["section_id"] = destination_id
+    effective["draft_overlay"] = overlay
+    destination["options"].append(effective)
+    if source is not None:
+        source["draft_overlay"] = overlay
+    destination["draft_overlay"] = overlay
+
+
+def _rebuild_effective_topology(result: dict) -> None:
+    nodes = result.get("section_nodes", [])
+    known_steps = {step["step_key"] for step in result.get("steps", [])}
+    sections_by_step: dict[str, list[dict]] = defaultdict(list)
+    buckets_by_step: dict[str, list[dict]] = defaultdict(list)
+    unmapped = []
+
+    for node in nodes:
+        _refresh_section_placement(node)
+        node["option_count"] = sum(
+            _truthy(option.get("active")) for option in node.get("options", [])
+        )
+        connected = bool(
+            node["placement_evidence"].get("context_active")
+            or node["option_count"]
+            or node.get("interior_count")
+        )
+        step_key = node.get("step_key") or ""
+        is_bucket = step_key in BUCKET_STEP_KEYS or (
+            node["placement_evidence"].get("presentation_active")
+            and _truthy(node.get("standard_equipment_bucket"))
+        )
+        if connected and is_bucket:
+            node["classification"] = "bucket_section"
+            node["active"] = True
+            buckets_by_step[step_key].append(node)
+        elif connected and step_key in known_steps:
+            node["classification"] = "runtime_section"
+            node["active"] = True
+            sections_by_step[step_key].append(node)
+        elif connected:
+            node["classification"] = "unresolved"
+            node["active"] = False
+            reason = (
+                "No workbook-authored step_key resolves this model-connected section."
+                if not step_key else
+                f"Resolved step {step_key!r} has no active runtime_steps row "
+                f"for model {result['model_key']!r}."
+            )
+            unmapped.append({**node, "reason": reason})
+        else:
+            node["classification"] = "inactive"
+            node["active"] = False
+        node["empty"] = not node.get("options") and not node.get("interior_count")
+
+    def sort_key(row: dict) -> tuple[int, str]:
+        return (_integer(row.get("section_display_order")), row["section_id"])
+
+    for step in result.get("steps", []):
+        members = sorted(sections_by_step.get(step["step_key"], []), key=sort_key)
+        step["sections"] = members
+        step["bucket_members"] = []
+        step["section_count"] = len(members)
+        step["section_state"] = "mapped" if members else "empty_proven"
+        step["empty_reason"] = "" if members else (
+            "Effective runtime metadata contains no section edge for this step; "
+            "the step is terminal or managed by another runtime surface."
+        )
+
+    base_labels = {
+        bucket["step_key"]: bucket.get("label")
+        for bucket in result.get("buckets", [])
+    }
+    result["buckets"] = [
+        {
+            "step_key": step_key,
+            "label": base_labels.get(step_key) or step_key.replace("_", " ").title(),
+            "members": sorted(members, key=sort_key),
+            "member_count": len(members),
+            "classification": "bucket",
+        }
+        for step_key, members in sorted(buckets_by_step.items())
+    ]
+    result["unmapped_sections"] = sorted(unmapped, key=sort_key)
+    result["counts"].update({
+        "active": sum(node.get("active", False) for node in nodes),
+        "hidden_or_conditional": sum(
+            bool(node.get("display_behavior")) for node in nodes
+        ),
+        "buckets": len(result["buckets"]),
+        "context": sum(
+            bool(node["placement_evidence"].get("context_active")) for node in nodes
+        ),
+        "unresolved": len(result["unmapped_sections"]),
+        "inactive": sum(node.get("classification") == "inactive" for node in nodes),
+    })
+    result["fingerprint"] = graph_fingerprint(
+        result["model_key"], result["steps"], result["buckets"]
+    )
+
+
+def conflicted_draft_overlay(graph: dict, draft_id: str, conflicts: list[dict]) -> dict:
+    result = deepcopy(graph)
+    result["draft_overlay"] = {
+        "draft_id": draft_id,
+        "revision": 0,
+        "state": "conflicted",
+        "operations": [],
+        "conflicts": conflicts,
+    }
+    result["counts"]["draft_changes"] = 0
+    result["parity"] = {
+        **result.get("parity", {}),
+        "draft_status": "conflicted",
+        "draft_impact": "Draft intent is not bound to the current editable projection.",
+        "findings": conflicts,
+    }
+    return result
+
+
+def apply_draft_overlay(graph: dict, operations: list[dict]) -> dict:
+    """Build an effective connected graph from typed durable-draft intent."""
 
     result = deepcopy(graph)
     model_key = result["model_key"]
     relevant = [
         operation for operation in operations
-        if operation.get("model_id") in {"", model_key}
-        and operation.get("table_name") in {
-            "form_steps",
-            "section_presentation",
-            "context_sections",
-            "order_summary_sections",
-            "step_order_summary_map",
-            "options",
-            "variant_option_overrides",
-        }
+        if _is_graph_operation(operation, model_key)
     ]
-
-    section_copies = list(result.get("section_nodes", []))
-    section_copies.extend(
-        section
-        for step in result.get("steps", [])
-        for section in step.get("sections", [])
-    )
-    section_copies.extend(
-        section
-        for bucket in result.get("buckets", [])
-        for section in bucket.get("members", [])
-    )
-    section_copies.extend(result.get("unmapped_sections", []))
-
+    nodes = {
+        node["section_id"]: node for node in result.get("section_nodes", [])
+    }
     summaries = []
     for operation in relevant:
+        table = operation.get("table_name")
         entity_key = operation.get("entity_key") or {}
         final = operation.get("final") or {}
-        overlay = {
-            "state": (
-                "added" if operation.get("action") == "add"
-                else "pending_deletion" if operation.get("action") == "delete"
-                else "modified"
-            ),
-            "operation_id": operation.get("id"),
-            "family": operation.get("family"),
-            "action": operation.get("action"),
-            "changed_fields": operation.get("changed_fields") or {},
-        }
-        if operation.get("table_name") == "form_steps":
+        overlay = _overlay_metadata(operation)
+        if table == "form_steps":
             step_key = entity_key.get("step_key") or final.get("step_key")
             for step in result.get("steps", []):
                 if step.get("step_key") != step_key:
@@ -608,34 +928,29 @@ def apply_draft_overlay(graph: dict, operations: list[dict]) -> dict:
                 if final.get("step_label"):
                     step["display_name"] = final["step_label"]
                 step["draft_overlay"] = overlay
-        else:
+        elif table in SECTION_OVERLAY_TABLES:
             section_id = entity_key.get("section_id") or final.get("section_id")
-            if section_id:
-                for section in section_copies:
-                    if section.get("section_id") != section_id:
-                        continue
-                    for key in (
-                        "display_label", "display_behavior", "section_display_order",
-                        "step_key", "active", "notes",
-                    ):
-                        if key in final:
-                            section[key] = final[key]
-                    if final.get("display_label"):
-                        section["display_name"] = final["display_label"]
-                    elif final.get("section_name"):
-                        section["display_name"] = final["section_name"]
-                    section["draft_overlay"] = overlay
+            if section_id in nodes:
+                _apply_section_operation(nodes[section_id], operation, overlay)
+        elif table == "options":
+            _apply_option_operation(result, nodes, operation, overlay)
         summaries.append({
             "operation_id": operation.get("id"),
-            "table_name": operation.get("table_name"),
+            "table_name": table,
             "family": operation.get("family"),
             "action": operation.get("action"),
             "entity_key": entity_key,
             "changed_fields": operation.get("changed_fields") or {},
         })
 
+    _rebuild_effective_topology(result)
     revision = max((int(operation.get("id") or 0) for operation in relevant), default=0)
-    result["draft_overlay"] = {"revision": revision, "operations": summaries}
+    result["draft_overlay"] = {
+        "revision": revision,
+        "state": "modified" if relevant else "unchanged",
+        "operations": summaries,
+        "conflicts": [],
+    }
     result["counts"]["draft_changes"] = len(relevant)
     result["parity"] = {
         **result.get("parity", {}),

@@ -462,10 +462,21 @@ def structure(
     # their contract; steps[].sections now reflects complete membership.
     graph = form_graph_mod.build_form_graph(conn, model_key)
     if draft_id:
-        graph = form_graph_mod.apply_draft_overlay(
-            graph,
-            drafts.list_operations(state_conn, draft_id),
+        projection_sha = dbmod.get_meta(conn, "workbook_sha256") or ""
+        conflicts = drafts.overlay_binding_conflicts(
+            state_conn,
+            draft_id=draft_id,
+            projection_workbook_sha256=projection_sha,
         )
+        if conflicts:
+            graph = form_graph_mod.conflicted_draft_overlay(
+                graph, draft_id, conflicts
+            )
+        else:
+            graph = form_graph_mod.apply_draft_overlay(
+                graph,
+                drafts.list_operations(state_conn, draft_id),
+            )
     return {
         "model_key": graph["model_key"],
         "projection_identity": {
