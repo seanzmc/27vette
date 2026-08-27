@@ -9,7 +9,7 @@ Developer workspace for the 2027 Corvette static order-form app. The published r
 - Runtime promotion is workbook-owned: `model_master`, `model_registry_promotion`, and `variant_master` decide which models reach the registry; `scripts/promote_model.py` applies promotion rows; registry generation embeds promoted `form-output/runtime/*-runtime-contract.json` verbatim.
 - All six workbook-registered models are promoted into `form-app/data.js`; model publication changes must continue through the workbook-owned promotion path rather than direct registry edits.
 - Dealer submission posts to the WordPress endpoint `https://stingraychevroletcorvette.com/wp-json/corvette-build/v1/submit` with Cloudflare Turnstile — protected boundary, see AGENTS.md §6.
-- Some Grand Sport/Z06 artifact names still carry draft/inspection wording from migration; inspect active registry data and tests before treating that wording as runtime status.
+- Generated artifact names no longer carry draft wording: `form-output/runtime/` holds one `<slug>-runtime-contract.json` per promoted model and `form-output/inspection/` holds opt-in derived-swap manifests. Read promotion status from `model_master` / `model_registry_promotion`, never from a filename.
 
 ## Architecture
 
@@ -46,7 +46,7 @@ tests/                        node --test *.mjs + pytest gates
 docs/, .hermes/plans/         active specs, reviews, and plans
 ```
 
-Other dirs (`product/`, `dist_updates/`, `archive/`, `backups/`) are reference/archive surfaces — inspect only when a task names them.
+Other dirs (`product/`, `dist_updates/`, `archive/`) are reference/archive surfaces — inspect only when a task names them.
 
 ## Local Tools and In-Progress Modules
 
@@ -63,7 +63,7 @@ Shared/Stingray source sheets: `model_master`, `model_registry_promotion`, `vari
 
 Runtime metadata/audit sheets: `model_workbook_sources`, `model_variants`, `model_interior_scope`, `interior_components`, `runtime_steps`, `context_section_master`, `context_choice_copy`, `section_presentation`, `order_summary_sections`, `step_order_summary_map`, `default_selection_rules`, `runtime_rule_exceptions`, `variant_option_overrides`, `rule_phrase_map`.
 
-Model-scoped sheets (`grandSport_*`, `z06_*` active; `zr1_*`/`zr1x_*` inactive scaffolds): `<model>_{options, ovs, rule_mapping, price_rules, rule_groups, rule_group_members, exclusive_groups, exclusive_members, variant_overrides}`.
+Model-scoped sheets, all five promoted non-Stingray models active (`grandSport_*`, `grand_sport_x_*`, `z06_*`, `zr1_*`, `zr1x_*`): `<model>_{options, ovs, rule_mapping, price_rules, rule_groups, rule_group_members, exclusive_groups, exclusive_members, variant_overrides}`. `grand_sport_x_*` is the exception to that template — it names its group-member sheet `grand_sport_x_rule_members` and adds `grand_sport_x_color_overrides`. Read the actual sheet names from the workbook rather than deriving them from the prefix.
 
 `category_master` is not active. Historical evidence sheets live in `archive/stingray_archive.xlsx`. Workbook `form_*` generated sheets are retired from routine workflow — edit source rows and regenerate.
 
@@ -74,7 +74,7 @@ Each model dataset: `dataset`, `variants`, `steps`, `sections`, `contextChoices`
 ```js
 window.CORVETTE_FORM_DATA = {
   defaultModelKey: "stingray",
-  models: { stingray: { key, label, modelName, exportSlug, image_url, image_alt, image_fit, image_position, vehicleSetup: { cardSubtitle, eyebrow, title, description, facts }, data }, grandSport: {...}, z06: {...} }
+  models: { stingray: { key, label, modelName, exportSlug, image_url, image_alt, image_fit, image_position, vehicleSetup: { cardSubtitle, eyebrow, title, description, facts }, data }, grandSport: {...}, grand_sport_x: {...}, z06: {...}, zr1: {...}, zr1x: {...} }
 };
 ```
 
@@ -320,7 +320,7 @@ this command does not check:
 .venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx
 ```
 
-Customer-facing option-sheet quality gate (all configured option sheets, including inactive scaffolds):
+Customer-facing option-sheet quality gate (all configured option sheets):
 
 ```sh
 PYTHONPATH=scripts .venv/bin/python -m corvette_form_generator.options_sheet_quality \
@@ -419,9 +419,9 @@ Close Excel before any script that writes `stingray_master.xlsx`; treat `~$sting
 
 ## Roadmap
 
-Keep moving model rules/defaults/pricing/presentation into workbook-authored tables; keep the three live models structurally consistent source-to-contract; complete ZR1/ZR1X source review before any promotion; retire draft/inspection naming once the promotion path is proven; manage image assets via workbook asset maps; simplify customer UX without losing ordering accuracy or dealer detail; strengthen promotion gates; reduce monolithic runtime logic as rules become fully data-owned.
+Keep moving model rules/defaults/pricing/presentation into workbook-authored tables; keep the six promoted models structurally consistent source-to-contract; manage image assets via workbook asset maps; simplify customer UX without losing ordering accuracy or dealer detail; strengthen promotion gates; reduce monolithic runtime logic as rules become fully data-owned.
 
 Larger candidate initiatives (not yet scoped/approved, see `docs/roadmap_wishes.md`):
 
 - Site restyle to the new homepage design system, replacing Elementor while keeping Formidable Forms and wpDataTables.
-- Visualizer integration into the order form (see Planned/In-Progress Modules above) — grouped exterior/interior option presentation feeding a real-time build-and-price view, no change to rule/pricing/submission behavior.
+- Visualizer integration into the order form (see Local Tools and In-Progress Modules above) — grouped exterior/interior option presentation feeding a real-time build-and-price view, no change to rule/pricing/submission behavior.
