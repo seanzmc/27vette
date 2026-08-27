@@ -1,5 +1,5 @@
 const WORKSPACES = new Set([
-  "overview", "options", "groups", "assets", "changes", "advanced",
+  "overview", "sections", "options", "groups", "assets", "changes", "advanced",
 ]);
 
 const ENTITY_TYPES = new Set([
