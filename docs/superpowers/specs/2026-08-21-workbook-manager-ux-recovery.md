@@ -1,6 +1,9 @@
 # Workbook Manager Product and UX Recovery Specification
 
-Status: active product recovery. Checkpoint 1 merged through PR 37 at `aa28e8a`.
+Status: delivered 2026-08-27. Checkpoints 1-6 are merged; §19.4 records no
+next action, and Add Group remains blocked on its own unresolved decision.
+The history below is retained as delivery evidence.
+Checkpoint 1 merged through PR 37 at `aa28e8a`.
 Checkpoint 2 completed on 2026-08-23 at implementation commit `ff28eb5` and
 passed full-inventory Release candidate run 32626231858. Checkpoint 3A/3B's
 registry/schema/reference slice completed locally on 2026-08-23; its commit,
@@ -15,10 +18,10 @@ the post-sync CI rerun and both Codex review-bug fixes, is recorded below.
 Checkpoint 3E completed locally on 2026-08-26; its delivery evidence is recorded
 with the PR. Checkpoint 3F completed locally on 2026-08-26; its delivery evidence
 is recorded below. Checkpoint 4 merged through PR 51 at `8adf6ef` on 2026-08-27.
-Checkpoint 5 completed locally on 2026-08-27 at implementation commit `91510b0`;
-its delivery evidence is recorded below. Checkpoint 6 completed locally on
-2026-08-27; its implementation, copied-workbook lifecycle proof, and delivery
-evidence are recorded below. No later checkpoint is authorized or implied.
+Checkpoint 5 merged through PR 52 at `13dd5a2` on 2026-08-27. Checkpoint 6
+merged through PR 54 at `cada087` on 2026-08-27, completing the phased runbook;
+its implementation, copied-workbook lifecycle proof, and delivery evidence are
+recorded below. No later checkpoint is authorized or implied.
 
 Checkpoint 5 consumed Checkpoint 2's approved workbook labels without changing
 the workbook, generated group contract, group IDs, dependencies, deployment,
@@ -170,16 +173,16 @@ At the inspected PR 37 baseline:
 | # | Baseline finding | Current status | Owning checkpoint |
 |---|---|---|---|
 | 1 | Generic row Edit rendered the form after a 100-row table, outside the viewport. | Primary connected views no longer depend on that interaction. The raw Advanced & Recovery browser still uses a below-table generic editor and is not the target experience. | 3 |
-| 2 | `/api/structure/{model_key}` joined only the model-specific `section_presentation` subset and reported false `no sections mapped` results. | Open. The endpoint still assembles steps primarily from `form_steps`, `section_presentation`, and `form_sections`; the complete runtime graph is not yet the primary source. | 4 |
+| 2 | `/api/structure/{model_key}` joined only the model-specific `section_presentation` subset and reported false `no sections mapped` results. | Resolved in Checkpoint 4. The endpoint now serves `form_graph.build_form_graph()` as the primary source, with draft overlay and conflict handling on top. | 4 complete |
 | 3 | No option- or group-centered relationship view existed. | Resolved for read-only use. Connected option, group, section, and rule endpoints and one typed search now exist. | 1 complete |
-| 4 | Group lists led with hash-like canonical IDs. | Resolved in the Manager by Checkpoint 2's approved workbook-authored labels. Customer-runtime heading consumption remains gated to Checkpoint 5. | 2 complete; 5 |
+| 4 | Group lists led with hash-like canonical IDs. | Resolved. Checkpoint 2 supplied approved workbook-authored labels and Checkpoint 5 consumed them in the customer runtime. | 2 and 5 complete |
 | 5 | The display-ID helper could manufacture visually plausible but false names. | Resolved in connected views by factual fallbacks first and approved workbook labels in Checkpoint 2; raw advanced tables may still show canonical identity because they are technical surfaces. | 1 and 2 complete |
-| 6 | Customer runtime hardcoded generic group headings. | Open. Workbook-owned group headings and runtime migration remain gated. | 5 |
-| 7 | Dense lists repeated ambiguous edit/delete icons and blurred read-only versus editable state. | Partially resolved in primary read-only workspaces. The advanced raw browser intentionally remains technical; contextual primary editing is not implemented. | 3 |
+| 6 | Customer runtime hardcoded generic group headings. | Resolved in Checkpoint 5 at `91510b0`: `form-app/app.js` renders workbook-owned headings and `tests/test_group_display_label_contract.py` owns the contract. | 5 complete |
+| 7 | Dense lists repeated ambiguous edit/delete icons and blurred read-only versus editable state. | Resolved for the primary experience by Checkpoint 3's contextual option/group/member editors and explicit editable/read-only/blocked visual contract. The advanced raw browser intentionally remains technical. | 3 complete |
 | 8 | First-run and stale projection surfaced lifecycle errors instead of a controlled state. | Resolved for the Checkpoint 1 readiness shell; later checkpoints must preserve it. | 1 complete |
-| 9 | Import, backup, refresh, and other unrelated actions appeared as equivalent peers. | Partially resolved. The normal shell is clearer; remaining maintenance and Review & Apply terminology must be audited as their checkpoints change. | 5 and 6 |
+| 9 | Import, backup, refresh, and other unrelated actions appeared as equivalent peers. | Resolved. Checkpoint 5 migrated the shell terminology and Checkpoint 6 completed the §12 action naming across the draft tray, Review, and Apply. | 5 and 6 complete |
 | 10 | Browser checks did not prove visibility, focus, navigation, narrow layout, or expected-error containment. | Improved in Checkpoint 1 with headless-browser evidence. Durable regression ownership must accompany every later interactive checkpoint. | Every implementation checkpoint |
-| 11 | Writable fields without explicit type/enum/reference metadata silently became `free_text`. | Open. `_schema_dict()` still starts from `field_kind = "free_text"`, and `RecordForm` still renders the generic fallback. | 3 |
+| 11 | Writable fields without explicit type/enum/reference metadata silently became `free_text`. | Resolved in Checkpoint 3A. `_validate_control_integrity()` fails closed before any column is exposed, so the remaining `field_kind = "free_text"` initializer in `_schema_dict()` cannot be reached by a field lacking deliberate control metadata; the renderer map has no fallback. | 3 complete |
 | 12 | Raw rows exposed purposeless comparison checkboxes and an arbitrary two-row diff. | Resolved. The separate workbook review export remains. | 1 complete |
 
 The hardened plan also recognizes these relational-product gaps observed in the
@@ -187,17 +190,23 @@ current implementation:
 
 13. Search performs application-side ranking and can issue per-group member
     queries. It needs batched relational assembly, stable filtering, and a query
-    budget before the dataset or diagnostic catalog grows.
+    budget before the dataset or diagnostic catalog grows. *(Open; carried
+    beyond this recovery.)*
 14. Connected entity state is component-local. The selected entity, search,
     origin, and expanded context are not durable URL/browser-history state.
+    *(Closed by Checkpoint 3F, merged as PR 50 at `0245528`.)*
 15. Connected detail shows only the disposable projection. It does not overlay
-    active draft intent, pending addition/deletion, or direct impact.
+    active draft intent, pending addition/deletion, or direct impact. *(Closed
+    by Checkpoints 3D/3E.)*
 16. The primary navigation still lacks the specified **Sections & Layout**
     workspace; Form Overview and raw structure tools remain the only entry.
+    *(Closed by Checkpoint 4, merged as PR 51 at `8adf6ef`.)*
 17. Reference controls download generic record lists and show canonical values
-    without a dedicated bounded human-label option contract.
+    without a dedicated bounded human-label option contract. *(Closed by
+    Checkpoint 3B's bounded reference lookup.)*
 18. Human Review & Apply summaries are not yet the primary grouping model for
-    every operation family.
+    every operation family. *(Closed by Checkpoint 6, merged as PR 54 at
+    `cada087`.)*
 
 The verified projection and canonical workbook may still be healthy while these
 product defects exist. The recovery must not treat UI difficulty as permission
@@ -2101,7 +2110,7 @@ submission.
 - Delivery stop: required full-inventory remote Release candidate evidence and
   review disposition are delivery gates. Checkpoint 6 remains unauthorized.
 
-### Checkpoint 6 — Review & Apply presentation recovery — complete locally 2026-08-27
+### Checkpoint 6 — Review & Apply presentation recovery — merged 2026-08-27 (PR 54, `cada087`)
 
 **Authorization gate:** explicit Checkpoint 6 authorization. Reliability
 semantics remain owned by the completed workflow specification.
@@ -2166,8 +2175,9 @@ all lifecycle and full-suite gates pass.
   owner then passed all 76 tests in 67.42 seconds. The lockfile-clean frontend
   install and production build transformed 1,528 modules. `git diff --check`
   passed. The catalog edit changes suite membership, so the required remote
-  full-inventory Release candidate and review disposition remain delivery gates
-  on the Checkpoint 6 pull request rather than a local claim.
+  Release candidate and review disposition remained delivery gates on the
+  Checkpoint 6 pull request rather than a local claim; PR 54 satisfied them
+  under the §17.5 clause as revised on 2026-08-27.
 - Real-browser proof: isolated FastAPI single-process serving imported a copied
   canonical workbook, edited Stingray Z51 price `5395 → 5396` through the actual
   connected editor, and showed the semantic review summary plus connected
@@ -2192,10 +2202,16 @@ all lifecycle and full-suite gates pass.
   `origin/main` was empty. No canonical workbook, generated contract, customer
   runtime, dependency, dealer, media, deployment, cache-purge, or security
   behavior changed.
-- Delivery stop: open the Checkpoint 6 pull request, record the branch/commit/PR
-  in the operational handoff, and wait for the required current-head remote
-  full-inventory Release candidate and review disposition before merge. Do not
-  begin unrelated follow-up work.
+- Delivery: PR 54 ran the current-head remote Release candidate over its seven
+  planned changed-surface shards, including the new
+  `validation / changed-workbook-manager-review-presentation` gate, and every
+  check passed. Four Codex findings — one P1 wildcard-model expansion and three
+  P2 issues on registered family names, destination identifiers, and stale
+  approval results — were fixed in `edd3be2` before the merge at `cada087`.
+  The "full-inventory Release candidate" wording used for earlier checkpoints
+  predates the changed-surface shard planning CI performs now, so §17.5 was
+  formally revised on 2026-08-27 to require the planned shards for the changed
+  surfaces; this checkpoint closed under that revised clause.
 
 ## 17. Validation and evidence strategy
 
@@ -2299,11 +2315,21 @@ If `fable5loop/STATE.md` or `fable5loop/STATE-archive.md` change:
 .venv/bin/python scripts/validate_state_handoff.py
 ```
 
-The pull request must receive one successful full-inventory Release candidate
-run for checkpoint closeout. The run must prove every planned shard and the
-aggregate gate, not only the changed-surface slice. Ordinary subsequent PR
-commits may remain changed-surface planned unless the workflow forces full or a
-manual full-suite dispatch is required for final evidence.
+The pull request must receive one successful Release candidate run for
+checkpoint closeout, proving every shard the workflow plans for the changed
+surfaces plus the aggregate gate.
+
+Revised 2026-08-27 by repository-owner decision. This clause previously demanded
+a full-inventory run for every checkpoint closeout. That wording predates the
+validation workflow's changed-surface shard planning, which now derives the
+shard set from the diff and is the gate CI actually enforces; requiring a full
+inventory on top of it re-ran gates no checkpoint touched. Checkpoints 1-5 were
+closed under the earlier wording and their full-inventory run IDs remain
+recorded above; Checkpoint 6 closed under this one, at PR 54 / `cada087`, on
+seven planned shards including its own new owner gate. A manual full-suite
+dispatch remains available and is still expected when a change alters protected
+workbook, generated-artifact, registry, or runtime surfaces rather than Manager
+presentation.
 
 ### 17.6 Protected-boundary evidence
 
@@ -2416,12 +2442,11 @@ runtime parity from an adjacent test or remembered prior run.
 
 ### 19.1 Current authorization state
 
-Checkpoints 1–5 are complete and merged. Checkpoint 6 is complete locally on
-its task branch with focused, broad Manager, slow copied-workbook, production
-build, protected-hash, and browser lifecycle evidence recorded in §16. Its pull
-request still requires the current-head full-inventory Release candidate and
-review disposition before merge. No later checkpoint or scope expansion is
-authorized.
+Checkpoints 1–6 are complete and merged, so the phased runbook in §16 is
+finished and this specification is delivered. No later checkpoint or scope
+expansion is authorized. The remaining named product decision is new group
+canonical-ID allocation, which keeps Add Group blocked; gap 13 (search query
+budget) is also carried beyond this recovery.
 
 ### 19.2 Decision matrix
 
@@ -2431,13 +2456,13 @@ authorized.
 | Exact column placement and compatibility behavior | Checkpoint 2B | Complete: immediately after `group_id`; pre-migration workbooks report an explicit pending-migration state. |
 | Complete actual group label/classification list | Checkpoint 2D | Complete: 224/224 reviewed labels approved and written; CSV/JSON companions and workbook readback agree. |
 | Switch customer headings to workbook labels | Checkpoint 5 | Complete and merged through PR 52 at `13dd5a2`; workbook labels lead and selection instructions remain separate. |
-| Add complete control metadata and bounded reference lookup | Checkpoint 3A/3B | Complete locally: 25 families / 220 fields have exact coverage; schema/reference APIs are additive and fail closed. Delivery CI is recorded with the PR. |
-| Reusable accessible registry-control editor shell | Checkpoint 3C | Complete locally: drawer/sheet, no-fallback renderer map, validation, dirty-close, busy Save, focus, and responsive browser proof are green; delivery CI is recorded with the PR. |
+| Add complete control metadata and bounded reference lookup | Checkpoint 3A/3B | Complete and merged: 25 families / 220 fields have exact coverage; schema/reference APIs are additive and fail closed. |
+| Reusable accessible registry-control editor shell | Checkpoint 3C | Complete and merged: drawer/sheet, no-fallback renderer map, validation, dirty-close, busy Save, focus, and responsive browser proof are green. |
 | Render and save a contextual direct option editor | Checkpoint 3D | Complete and merged: registry-driven direct fields, durable draft Save, field overlay, impact summary, connected detail, focused/build/Manager gates, and browser proof are green; both Codex review-bug fixes landed on the PR head, post-sync CI passed, and PR 45 merged at `3a8369b`. |
 | Render and save contextual group/member editors | Checkpoint 3E | Complete and merged through PR 48 at `bf6db32`: registry-driven group facts, durable member add/remove/reorder/active operations, deterministic final order, direct dependency refusal, reversion, focused/build/Manager/all-model gates, protected hashes, and browser proof are green. |
 | Persistent draft tray, URL/history, and reload-safe connected navigation | Checkpoint 3F | Complete and merged through PR 50 at `0245528`. |
 | Complete model-scoped form graph and contextual section editing | Checkpoint 4 | Complete and merged through PR 51 at `8adf6ef`. |
-| Semantic Review & Apply presentation and complete recovery visibility | Checkpoint 6 | Complete locally on 2026-08-27; delivery PR full-inventory CI and review disposition remain required before merge. |
+| Semantic Review & Apply presentation and complete recovery visibility | Checkpoint 6 | Complete and merged through PR 54 at `cada087`: planned changed-surface shards passed and all four Codex findings were fixed in `edd3be2` before merge. |
 | New group canonical-ID allocation strategy | Any Add Group feature | Unresolved; Add Group remains blocked. |
 | Any new frontend/backend dependency | Before dependency change | Not approved. |
 | Breaking/removing existing Manager API members | Before API break | Not approved; changes must be additive. |
@@ -2483,11 +2508,10 @@ exhaustively tested text controls rather than accidental frontend defaults.
 
 ### 19.4 Current next action
 
-Open the Checkpoint 6 delivery PR from
-`hermes/workbook-manager-ux-recovery-cp6`, require one successful current-head
-full-inventory Release candidate run plus review disposition, and merge only
-after those gates are satisfied. Stop after PR delivery; no later checkpoint or
-unrelated cleanup is authorized.
+None. Checkpoint 6 merged at `cada087` on 2026-08-27 and this specification is
+delivered. Do not start a later checkpoint, a scope expansion, or unrelated
+cleanup under this specification. Add Group remains blocked on the unresolved
+canonical-ID allocation decision and needs its own authorization.
 
 ## 20. Coding-agent checkpoint execution protocol
 
