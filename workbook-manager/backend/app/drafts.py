@@ -76,6 +76,172 @@ def _operation_dict(row) -> dict:
     return result
 
 
+REVIEW_SUMMARY_SCHEMA_VERSION = "workbook-manager-review-summary-1"
+
+# §6.1 semantic entity types lead the review grouping; families map to them.
+_REVIEW_ENTITY_TYPES = {
+    "options": "option",
+    "ovs": "option",
+    "exclusive_groups": "exclusive_group",
+    "exclusive_members": "exclusive_group",
+    "rule_groups": "rule_group",
+    "rule_group_members": "rule_group",
+    "rule_mapping": "rule",
+    "price_rules": "rule",
+    "color_overrides": "rule",
+    "variant_overrides": "option",
+    "sections": "section",
+    "section_presentation": "section",
+    "assets": "option",
+    "default_selection_rules": "rule",
+    "interiors": "option",
+}
+
+
+def _review_entity_type(family: str) -> str:
+    return _REVIEW_ENTITY_TYPES.get(family, family)
+
+
+# §14.3: each review entity links to its connected workspace detail. Entity
+# types map to the navigation vocabulary in the frontend navigationState.js
+# (option/exclusive_group/rule_group/section/rule); canonical IDs stay intact.
+_REVIEW_DESTINATIONS = {
+    "option": {"workspace": "options", "entity_type": "option"},
+    "exclusive_group": {"workspace": "groups", "entity_type": "exclusive_group"},
+    "rule_group": {"workspace": "groups", "entity_type": "rule_group"},
+    "section": {"workspace": "sections", "entity_type": "section"},
+    "rule": {"workspace": "options", "entity_type": "rule"},
+}
+
+
+def _review_destination(operation: dict) -> dict | None:
+    entity_type = _review_entity_type(operation["family"])
+    base = _REVIEW_DESTINATIONS.get(entity_type)
+    if base is None:
+        return None
+    key = operation.get("entity_key") or {}
+    entity_id = key.get("option_id") or key.get("group_id") or key.get("rule_id")
+    if entity_id is None and operation["family"] == "options":
+        entity_id = (operation.get("original") or {}).get("option_id") or (
+            operation.get("final") or {}
+        ).get("option_id")
+    if not entity_id:
+        return None
+    return {**base, "entity_id": str(entity_id)}
+
+# §14.2: one shared, backend-owned formatter derives human summaries from the
+# stored semantic row intent. Family labels and field labels come from the
+# registered catalog, never from per-component wording.
+_REVIEW_FIELD_LABELS = {
+    "active": "Active",
+    "display_label": "Customer group label",
+    "display_order": "Position",
+    "display_name": "Name",
+    "image_fit": "Fit",
+    "notes": "Notes",
+    "option_name": "Name",
+    "price": "Price",
+    "price_rule_id": "Price rule",
+    "price_value": "Price",
+    "selection_mode": "Selection mode",
+    "status": "Availability",
+    "variant_id": "Variant",
+}
+
+
+def _review_field_label(name: str) -> str:
+    return _REVIEW_FIELD_LABELS.get(name, str(name).replace("_", " ").capitalize())
+
+
+def _review_entity_label(operation: dict) -> str:
+    """Human entity label: registered option presentation, else key fields."""
+    key = operation.get("entity_key") or {}
+    if operation["family"] == "options":
+        rpo = str((operation.get("original") or operation.get("final") or {}).get("rpo") or "")
+        name = str((operation.get("original") or operation.get("final") or {}).get("option_name") or "")
+        if rpo and name:
+            return f"{rpo} {name}"
+    return " / ".join(str(value) for value in key.values()) or operation["physical_key"]
+
+
+def _review_summaries(operation: dict) -> list[str]:
+    """Backend-owned §14.2 summary grammar over stored before/after intent."""
+    label = _review_entity_label(operation)
+    summaries = []
+    for field, pair in (operation.get("changed_fields") or {}).items():
+        field_label = _review_field_label(field)
+        before, after = pair.get("before"), pair.get("after")
+        if operation["action"] == "add":
+            summaries.append(f"{label}: {field_label} set to {after}")
+        elif operation["action"] == "delete":
+            summaries.append(f"{label}: {field_label} removed (was {before})")
+        else:
+            summaries.append(
+                f"{label}: {field_label} changed from {before} to {after}"
+            )
+    if not summaries:
+        summaries.append(f"{label}: {operation['action']}")
+    return summaries
+
+
+def _review_summary(operations: list[dict]) -> dict:
+    """Build the additive typed review payload from exact stored operations."""
+    groups: dict[tuple[str, str], dict] = {}
+    for operation in operations:
+        for model_key in (
+            [operation.get("model_id")] + (operation.get("model_context") or [])
+        ):
+            if str(model_key or ""):
+                break
+        else:
+            model_key = ""
+        entity_type = _review_entity_type(operation["family"])
+        group_key = (str(model_key or ""), entity_type)
+        group = groups.setdefault(group_key, {
+            "model_key": group_key[0],
+            "entity_type": entity_type,
+            "entities": [],
+        })
+        for entity in group["entities"]:
+            if entity["technical"]["physical_key"] == operation["physical_key"]:
+                break
+        else:
+            entity = {
+                "entity_id": " / ".join(
+                    str(value) for value in (operation.get("entity_key") or {}).values()
+                ) or operation["physical_key"],
+                "entity_label": _review_entity_label(operation),
+                "operation_count": 0,
+                "actions": [],
+                "summaries": [],
+                "operation_ids": [],
+                "destination": _review_destination(operation),
+                "technical": {
+                    "table_name": operation["table_name"],
+                    "source_sheet": operation["source_sheet"],
+                    "source_row": operation["source_row"],
+                    "physical_key": operation["physical_key"],
+                },
+            }
+            group["entities"].append(entity)
+        entity["operation_count"] += 1
+        if operation["action"] not in entity["actions"]:
+            entity["actions"].append(operation["action"])
+        entity["summaries"].extend(_review_summaries(operation))
+        entity["operation_ids"].append(operation["id"])
+
+    ordered_groups = sorted(
+        groups.values(),
+        key=lambda group: (group["model_key"], group["entity_type"]),
+    )
+    affected_models = sorted({group["model_key"] for group in ordered_groups if group["model_key"]})
+    return {
+        "schema_version": REVIEW_SUMMARY_SCHEMA_VERSION,
+        "affected_models": affected_models,
+        "groups": ordered_groups,
+    }
+
+
 def list_operations(state_conn: sqlite3.Connection, draft_id: str) -> list[dict]:
     rows = state_conn.execute(
         "SELECT * FROM draft_operations WHERE draft_id=? ORDER BY id", (draft_id,)
@@ -427,6 +593,7 @@ def lifecycle_view(state_conn: sqlite3.Connection, draft_id: str) -> dict:
             "physical_targets": physical_targets,
         },
         "operations": operations,
+        "review": _review_summary(operations),
         "artifacts": {
             "changeset": changeset,
             "preview_attempts": preview_attempts,

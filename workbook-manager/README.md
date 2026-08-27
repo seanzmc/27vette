@@ -305,6 +305,7 @@ changes.
   tests/test_group_display_label_contract.py \
   tests/test_workbook_manager_control_metadata.py \
   tests/test_workbook_manager_connected_editing.py \
+  tests/test_workbook_manager_review_presentation.py \
   tests/test_workbook_manager_catalog.py \
   tests/test_workbook_manager_import_projection.py \
   tests/test_workbook_manager_fixtures.py \

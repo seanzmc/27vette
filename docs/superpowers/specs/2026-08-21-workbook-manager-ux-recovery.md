@@ -16,8 +16,9 @@ Checkpoint 3E completed locally on 2026-08-26; its delivery evidence is recorded
 with the PR. Checkpoint 3F completed locally on 2026-08-26; its delivery evidence
 is recorded below. Checkpoint 4 merged through PR 51 at `8adf6ef` on 2026-08-27.
 Checkpoint 5 completed locally on 2026-08-27 at implementation commit `91510b0`;
-its delivery evidence is recorded below. Checkpoint 6 remains separately gated
-by §19 and must not begin automatically.
+its delivery evidence is recorded below. Checkpoint 6 completed locally on
+2026-08-27; its implementation, copied-workbook lifecycle proof, and delivery
+evidence are recorded below. No later checkpoint is authorized or implied.
 
 Checkpoint 5 consumed Checkpoint 2's approved workbook labels without changing
 the workbook, generated group contract, group IDs, dependencies, deployment,
@@ -2100,7 +2101,7 @@ submission.
 - Delivery stop: required full-inventory remote Release candidate evidence and
   review disposition are delivery gates. Checkpoint 6 remains unauthorized.
 
-### Checkpoint 6 — Review & Apply presentation recovery
+### Checkpoint 6 — Review & Apply presentation recovery — complete locally 2026-08-27
 
 **Authorization gate:** explicit Checkpoint 6 authorization. Reliability
 semantics remain owned by the completed workflow specification.
@@ -2125,6 +2126,76 @@ behavior.
 what validation proved, what approval means, what Apply will touch, and the
 actual result without reading technical IDs; exact evidence remains accessible;
 all lifecycle and full-suite gates pass.
+
+**Working definition and completion evidence (2026-08-27):**
+
+- Diagnosis and owners: the durable lifecycle response exposed exact operations
+  and immutable attempts but no semantic review contract; Review & Apply led
+  with table names and raw manager states, transient notices disappeared during
+  status refresh, and a successful Apply made the projection stale and thereby
+  hid its own completion evidence. `drafts.py` now owns additive typed review
+  summaries; `ChangesSync.jsx` owns one shared operator presentation over those
+  summaries and stored lifecycle artifacts; `App.jsx` keeps terminal review
+  evidence reachable across the intentional stale-projection boundary.
+- Implementation: `workbook-manager-review-summary-1` groups stored operations
+  by affected model and semantic entity type, carries human entity/field change
+  summaries, affected models, connected destinations, operation IDs, and exact
+  expandable workbook lineage. Review leads with those summaries while the raw
+  operations and immutable attempts remain unchanged below them. Draft tray,
+  state card, action labels, and next-action copy use the §14.4 operator
+  language. Lifecycle results are reconstructed from immutable stored attempts,
+  remain pinned across refresh, and retain explicit per-draft dismissal state in
+  browser storage until a later lifecycle result supersedes them.
+- Completion/recovery visibility: Review & Apply remains available when Apply
+  intentionally leaves the projection stale, including after a direct reload
+  of the saved terminal draft. The completion view separately reports workbook,
+  projection, generated contracts, and publication. Hash-proven downstream
+  restoration presents retry/cancel; unknown restoration presents only the
+  three manual-resolution controls and explicitly states that retry and cancel
+  are unsafe.
+- RED/green evidence: the focused owner first failed on the absent typed review
+  member, operator lifecycle mapping, persistent dismissal/result vocabulary,
+  human draft tray, and stale-projection completion visibility. Its final run
+  passed 15 tests plus 12 subtests. The lifecycle/draft/apply regression run
+  passed 49 tests plus 36 subtests. The permanent owner is registered in both
+  Manager suites and the full Python inventory; catalog and additive-change
+  contracts passed 48 tests.
+- Broader validation: the README-owned Manager checkpoint passed 343 tests,
+  skipped only the two documented optional scratch-copy writer tests, and passed
+  74 subtests in 83.90 seconds. The explicit `WBM_SLOW_GATE=1` copied-workbook
+  owner then passed all 76 tests in 67.42 seconds. The lockfile-clean frontend
+  install and production build transformed 1,528 modules. `git diff --check`
+  passed. The catalog edit changes suite membership, so the required remote
+  full-inventory Release candidate and review disposition remain delivery gates
+  on the Checkpoint 6 pull request rather than a local claim.
+- Real-browser proof: isolated FastAPI single-process serving imported a copied
+  canonical workbook, edited Stingray Z51 price `5395 → 5396` through the actual
+  connected editor, and showed the semantic review summary plus connected
+  detail before any write. The browser then locked, validated, approved, and
+  performed the typed-confirmation Apply and Rebuild against isolated workbook
+  and output roots. Completion reported workbook `applied`, projection `stale`,
+  generated contracts `current`, publication `current`, and cache `36 → 37`;
+  exact replay returned the same apply-attempt ID with the attempt count still
+  one. Desktop and literal 390x844 views had zero horizontal overflow.
+- Failure-boundary proof: the apply/rebuild owner executed real downstream
+  failure/restoration and unknown-state contracts in temporary roots. For
+  browser presentation only, a copied durable-state database derived from the
+  successful proof was isolated from its immutable source and set to the two
+  already-tested result envelopes: hash-proven restoration showed retry/cancel
+  and restored surfaces; unknown restoration showed no retry, cancel, or write
+  button and only `restored`, `applied`, and `abandoned unknown` manual
+  resolution controls. A fresh narrow load recorded no console/runtime errors.
+- Protected/rollback evidence: the successful isolated Apply prepared one
+  verified rollback set and changed only the copied workbook/output tree.
+  Canonical `stingray_master.xlsx` remained `922de392`; canonical
+  `form-app/data.js` remained `6a06eef1`; the protected-path diff against
+  `origin/main` was empty. No canonical workbook, generated contract, customer
+  runtime, dependency, dealer, media, deployment, cache-purge, or security
+  behavior changed.
+- Delivery stop: open the Checkpoint 6 pull request, record the branch/commit/PR
+  in the operational handoff, and wait for the required current-head remote
+  full-inventory Release candidate and review disposition before merge. Do not
+  begin unrelated follow-up work.
 
 ## 17. Validation and evidence strategy
 
@@ -2345,14 +2416,12 @@ runtime parity from an adjacent test or remembered prior run.
 
 ### 19.1 Current authorization state
 
-Checkpoints 1 and 2 are complete. Checkpoint 3A/3B's bounded
-registry/schema/reference slice, Checkpoint 3C's reusable shell, Checkpoint
-3D's direct option editor, Checkpoint 3E's contextual group/member editor, and
-Checkpoint 3F's persistent draft tray/navigation are complete locally and
-stopped. Checkpoint 3F delivery still requires its PR's full-inventory Release
-candidate and review disposition. Checkpoints 4–6 remain unauthorized. The next
-implementation agent must not treat either the completed label migration or
-control metadata as authorization for customer headings.
+Checkpoints 1–5 are complete and merged. Checkpoint 6 is complete locally on
+its task branch with focused, broad Manager, slow copied-workbook, production
+build, protected-hash, and browser lifecycle evidence recorded in §16. Its pull
+request still requires the current-head full-inventory Release candidate and
+review disposition before merge. No later checkpoint or scope expansion is
+authorized.
 
 ### 19.2 Decision matrix
 
@@ -2361,12 +2430,14 @@ control metadata as authorization for customer headings.
 | Add `display_label` to exclusive/rule group workbook families | Checkpoint 2A/2B | Complete: registry, validation, projection, generator, and all 12 workbook sheets agree. |
 | Exact column placement and compatibility behavior | Checkpoint 2B | Complete: immediately after `group_id`; pre-migration workbooks report an explicit pending-migration state. |
 | Complete actual group label/classification list | Checkpoint 2D | Complete: 224/224 reviewed labels approved and written; CSV/JSON companions and workbook readback agree. |
-| Switch customer headings to workbook labels | Checkpoint 5 | Label prerequisite is complete; runtime switch still requires explicit Checkpoint 5 approval. |
+| Switch customer headings to workbook labels | Checkpoint 5 | Complete and merged through PR 52 at `13dd5a2`; workbook labels lead and selection instructions remain separate. |
 | Add complete control metadata and bounded reference lookup | Checkpoint 3A/3B | Complete locally: 25 families / 220 fields have exact coverage; schema/reference APIs are additive and fail closed. Delivery CI is recorded with the PR. |
 | Reusable accessible registry-control editor shell | Checkpoint 3C | Complete locally: drawer/sheet, no-fallback renderer map, validation, dirty-close, busy Save, focus, and responsive browser proof are green; delivery CI is recorded with the PR. |
 | Render and save a contextual direct option editor | Checkpoint 3D | Complete and merged: registry-driven direct fields, durable draft Save, field overlay, impact summary, connected detail, focused/build/Manager gates, and browser proof are green; both Codex review-bug fixes landed on the PR head, post-sync CI passed, and PR 45 merged at `3a8369b`. |
 | Render and save contextual group/member editors | Checkpoint 3E | Complete and merged through PR 48 at `bf6db32`: registry-driven group facts, durable member add/remove/reorder/active operations, deterministic final order, direct dependency refusal, reversion, focused/build/Manager/all-model gates, protected hashes, and browser proof are green. |
-| Persistent draft tray, URL/history, and reload-safe connected navigation | Checkpoint 3F | Complete locally on 2026-08-26: additive draft overlays, dependency-free History API state, reload/deep-link/model-context recovery, focused/Manager/candidate gates, and real-browser proof are green; delivery PR full-inventory CI and review remain required. |
+| Persistent draft tray, URL/history, and reload-safe connected navigation | Checkpoint 3F | Complete and merged through PR 50 at `0245528`. |
+| Complete model-scoped form graph and contextual section editing | Checkpoint 4 | Complete and merged through PR 51 at `8adf6ef`. |
+| Semantic Review & Apply presentation and complete recovery visibility | Checkpoint 6 | Complete locally on 2026-08-27; delivery PR full-inventory CI and review disposition remain required before merge. |
 | New group canonical-ID allocation strategy | Any Add Group feature | Unresolved; Add Group remains blocked. |
 | Any new frontend/backend dependency | Before dependency change | Not approved. |
 | Breaking/removing existing Manager API members | Before API break | Not approved; changes must be additive. |
@@ -2412,13 +2483,11 @@ exhaustively tested text controls rather than accidental frontend defaults.
 
 ### 19.4 Current next action
 
-Open the Checkpoint 3F delivery PR from
-`hermes/workbook-manager-ux-recovery-cp3f`, require one successful current-head
+Open the Checkpoint 6 delivery PR from
+`hermes/workbook-manager-ux-recovery-cp6`, require one successful current-head
 full-inventory Release candidate run plus review disposition, and merge only
-after those gates are satisfied. Then stop and await explicit Checkpoint 4
-authorization; do not begin later checkpoints or the non-sequential Checkpoint
-5 customer-runtime heading switch merely because its label prerequisite is
-complete.
+after those gates are satisfied. Stop after PR delivery; no later checkpoint or
+unrelated cleanup is authorized.
 
 ## 20. Coding-agent checkpoint execution protocol
 
