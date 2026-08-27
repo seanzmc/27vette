@@ -168,7 +168,7 @@ export default function AssetManager({
       setNotice({
         kind: "ok",
         text: bulk
-          ? `${result.accepted} safe asset resolution(s) added to Draft Review.`
+          ? `${result.accepted} safe asset resolution(s) added to Review & Apply.`
           : "Asset resolution added to the shared durable draft.",
       });
       await onChanged();
@@ -197,11 +197,11 @@ export default function AssetManager({
           <p>See what is covered, what the sync engine can match, and how workbook-owned presentation values render before any decision enters a draft.</p>
         </div>
         <button className="btn" disabled={loading} onClick={() => load(true)} type="button">
-          <RefreshCw size={14} className={loading ? "spin" : ""} /> Refresh inventory
+          <RefreshCw size={14} className={loading ? "spin" : ""} /> Refresh WordPress Image Inventory
         </button>
       </div>
       <div className="notice warn asset-readonly-notice">
-        Resolutions enter the same durable draft and Draft Review as ordinary edits. Nothing here writes the workbook or modifies WordPress media.
+        Resolutions enter the same durable draft and Review &amp; Apply as ordinary edits. Nothing here writes the workbook or modifies WordPress media.
       </div>
 
       {notice && <div className={`notice ${notice.kind}`}>{notice.text}</div>}
@@ -531,11 +531,11 @@ function AssetInspector({
           <div>
             <div className="eyebrow">Durable resolution action</div>
             <p className="muted">
-              This records exact reconciliation evidence beside the ordinary asset_map draft operation. Draft Review remains the approval basket.
+              This records exact reconciliation evidence beside the ordinary asset_map draft operation. Review &amp; Apply remains the approval basket.
             </p>
           </div>
           {drafted && (
-            <div className="notice ok">This item already has evidence in Draft Review. Saving again may refine the same physical-row operation, but cannot silently retarget it.</div>
+            <div className="notice ok">This item already has evidence in Review &amp; Apply. Saving again may refine the same physical-row operation, but cannot silently retarget it.</div>
           )}
           {!draftMutable && (
             <div className="notice warn">This draft is no longer mutable. Start a new draft to resolve another asset.</div>

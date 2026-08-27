@@ -204,7 +204,7 @@ export default function ChangesSync({
                 disabled={!operations.length || !!busy}
                 onClick={() => run("commit", () => api.commitDraft(draftId))}
               >
-                <CheckCheck size={15} /> Freeze ChangeSet
+                <CheckCheck size={15} /> Lock Draft for Validation
               </button>
             )}
             {canPreview && (
@@ -216,7 +216,7 @@ export default function ChangesSync({
                 {draftState === "changeset_emitted"
                   ? <ShieldCheck size={15} />
                   : <RotateCcw size={15} />}
-                {draftState === "changeset_emitted" ? "Run Workbook Preview" : "Retry Preview"}
+                {draftState === "changeset_emitted" ? "Validate Draft Against Workbook" : "Retry Draft Validation"}
               </button>
             )}
             {canApprove && (
@@ -227,7 +227,7 @@ export default function ChangesSync({
                   actor: actor.trim(), warning_ids: acceptedWarnings,
                 }))}
               >
-                <CheckCheck size={15} /> Approve Exact Preview
+                <CheckCheck size={15} /> Approve Validated Changes
               </button>
             )}
             {canApply && (
@@ -241,12 +241,14 @@ export default function ChangesSync({
                   const state = attempt.result?.applyRebuild?.status || attempt.manager_state;
                   setNotice({
                     kind: attempt.manager_state === "applied" ? "ok" : "err",
-                    text: `Apply and Rebuild finished: ${state.replaceAll("_", " ")}.`,
+                    text: `Writing approved changes and rebuilding form data finished: ${state.replaceAll("_", " ")}.`,
                   });
                 })}
               >
                 {draftState === "approved" ? <PlayCircle size={15} /> : <RotateCcw size={15} />}
-                {draftState === "approved" ? "Apply and Rebuild" : "Retry Apply and Rebuild"}
+                {draftState === "approved"
+                  ? "Write Approved Changes & Rebuild Form Data"
+                  : "Retry Writing Approved Changes & Rebuild Form Data"}
               </button>
             )}
             {canCancel && (
@@ -255,7 +257,7 @@ export default function ChangesSync({
                 disabled={!!busy}
                 onClick={() => run("cancel", () => api.cancelDraft(draftId))}
               >
-                <StopCircle size={15} /> Cancel Draft
+                <StopCircle size={15} /> Cancel Draft and Keep Audit Record
               </button>
             )}
             {TERMINAL.has(draftState) && (
@@ -330,7 +332,7 @@ export default function ChangesSync({
 
       {rebuild && (
         <>
-          <div className="section-heading">Apply and Rebuild result</div>
+          <div className="section-heading">Write and rebuild result</div>
           <div className="apply-state-grid">
             {[
               ["Workbook", rebuild.workbook],
@@ -415,26 +417,26 @@ export default function ChangesSync({
             disabled={!!busy || !status?.projection?.reimport_allowed}
             onClick={() => run("import", async () => setImportReport(await api.runImport()))}
           >
-            <FileUp size={15} /> Re-Import Workbook
+            <FileUp size={15} /> Reload Latest Workbook Data
           </button>
           <button
             className="btn"
             disabled={!!busy || status?.projection?.state !== "current"}
             onClick={() => run("export", async () => {
               const result = await api.exportWorkbook();
-              setNotice({ kind: "ok", text: `Disposable comparison exported: ${result.path}` });
+              setNotice({ kind: "ok", text: `Workbook review copy exported: ${result.path}` });
             })}
           >
-            <FileDown size={15} /> Export Disposable Comparison
+            <FileDown size={15} /> Export Workbook Review Copy
           </button>
           <button className="btn" disabled={!!busy} onClick={() => run("backup", async () => {
             const result = await api.backup();
-            setNotice({ kind: "ok", text: `Database backup: ${result.path}` });
+            setNotice({ kind: "ok", text: `Drafts and history backup: ${result.path}` });
           })}>
-            <DatabaseBackup size={15} /> Backup Manager State
+            <DatabaseBackup size={15} /> Back Up Drafts &amp; History
           </button>
           <button className="btn" disabled={!!busy} onClick={() => run("refresh", async () => {})}>
-            <RefreshCcw size={15} /> Refresh
+            <RefreshCcw size={15} /> Refresh Screen Status
           </button>
         </div>
         {importReport && (

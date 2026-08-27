@@ -84,7 +84,7 @@ export default function ModelOperations({
         key: Object.fromEntries(schema.key.map((k) => [k, String(row[k] ?? "")])),
       });
       setDeps(null);
-      setNotice({ kind: "ok", text: "Delete saved to the durable draft. Review the complete graph in Draft Review." });
+      setNotice({ kind: "ok", text: "Delete saved to the durable draft. Review the complete graph in Review & Apply." });
       onChanged();
     } catch (e) {
       setNotice({ kind: "err", text: e.message });
@@ -115,7 +115,7 @@ export default function ModelOperations({
     setNotice({
       kind: "ok",
       text: operation
-        ? "Change saved to the durable draft. Review it in Draft Review."
+        ? "Change saved to the durable draft. Review it in Review & Apply."
         : "No effective draft changes remain.",
     });
     await loadRows();

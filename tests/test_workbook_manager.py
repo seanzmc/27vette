@@ -818,9 +818,9 @@ class TestPass1BrowserContainment(unittest.TestCase):
         structure_source = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
                             "components" / "FormStructure.jsx").read_text()
         self.assertIn("Guarded workbook workflow", app_source)
-        self.assertIn("Freeze ChangeSet", sync_source)
-        self.assertIn("Approve Exact Preview", sync_source)
-        self.assertIn("Apply and Rebuild", sync_source)
+        self.assertIn("Lock Draft for Validation", sync_source)
+        self.assertIn("Approve Validated Changes", sync_source)
+        self.assertIn("Write Approved Changes & Rebuild Form Data", sync_source)
         self.assertIn("api.applyRebuildDraft", sync_source)
         self.assertIn("APPLY AND REBUILD", sync_source)
         self.assertIn("api.saveDraftOperation", operations_source)

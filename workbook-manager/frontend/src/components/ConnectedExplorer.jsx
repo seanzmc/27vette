@@ -25,7 +25,7 @@ function DraftOverlay({ overlay }) {
       <strong>Draft {overlay.state.replaceAll("_", " ")}</strong>
       <span>
         {overlay.state === "pending_deletion"
-          ? "This record remains in the workbook until Apply and Rebuild."
+          ? "This record remains in the workbook until Write Approved Changes & Rebuild Form Data."
           : `${changed.length} proposed field change${changed.length === 1 ? "" : "s"}.`}
       </span>
     </div>
