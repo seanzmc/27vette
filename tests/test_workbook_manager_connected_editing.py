@@ -1,4 +1,4 @@
-"""Checkpoint 3C-3E frontend shell and contextual editor contracts.
+"""Checkpoint 3C-3F frontend shell and contextual editor contracts.
 
 The production frontend has no DOM test dependency. Behavioral helpers are
 exercised through Node, while shell accessibility, renderer ownership, and
@@ -15,6 +15,113 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "workbook-manager" / "frontend" / "src"
 VALIDATION_MODULE = FRONTEND / "editorValidation.js"
+NAVIGATION_MODULE = FRONTEND / "navigationState.js"
+
+
+def run_navigation(script: str):
+    result = subprocess.run(
+        [
+            "node",
+            "--input-type=module",
+            "--eval",
+            (
+                "import { pathToFileURL } from 'node:url';"
+                f"const moduleUrl = pathToFileURL({json.dumps(str(NAVIGATION_MODULE))}).href;"
+                "const api = await import(moduleUrl);"
+                + script
+            ),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return json.loads(result.stdout)
+
+
+def test_navigation_state_round_trips_only_canonical_reloadable_context():
+    result = run_navigation(
+        "const parsed=api.parseNavigation('?model=grand_sport_x&workspace=groups&'"
+        "+'type=exclusive_group&id=group_x&query=engine');"
+        "const normalized=api.navigationForDestination(parsed,{"
+        "workspace:'groups',entity_type:'group',entity_id:'rule:rule_y'});"
+        "console.log(JSON.stringify({"
+        "parsed,"
+        "serialized:api.serializeNavigation(parsed),"
+        "normalized"
+        "}));"
+    )
+
+    assert result == {
+        "parsed": {
+            "model": "grand_sport_x",
+            "workspace": "groups",
+            "type": "exclusive_group",
+            "id": "group_x",
+            "query": "engine",
+        },
+        "serialized": (
+            "?model=grand_sport_x&workspace=groups&type=exclusive_group"
+            "&id=group_x&query=engine"
+        ),
+        "normalized": {
+            "model": "grand_sport_x",
+            "workspace": "groups",
+            "type": "rule_group",
+            "id": "rule_y",
+            "query": "engine",
+        },
+    }
+
+
+def test_detail_clears_cross_model_selection_before_the_next_load():
+    source = (FRONTEND / "components" / "ConnectedExplorer.jsx").read_text()
+
+    # Codex P1 (PR 50): when modelKey changes with a detail open, the stale
+    # detail must stop rendering immediately instead of staying interactive
+    # until the replacement request resolves.
+    assert (
+        "setSelected((current) => (current?.model_key === modelKey ? current : null))"
+        in source
+    )
+    load_effect = source.index("const generation = ++detailRequest.current;")
+    guard = source.index("current?.model_key === modelKey")
+    assert 0 < guard - load_effect < 800
+
+
+def test_app_owns_native_history_and_reuses_lifecycle_for_the_draft_tray():
+    app_source = (FRONTEND / "App.jsx").read_text()
+    explorer_source = (FRONTEND / "components" / "ConnectedExplorer.jsx").read_text()
+    api_source = (FRONTEND / "api.js").read_text()
+    styles = (FRONTEND / "styles.css").read_text()
+
+    assert "parseNavigation(window.location.search)" in app_source
+    assert "window.history.pushState" in app_source
+    assert "window.history.replaceState" in app_source
+    assert 'window.addEventListener("popstate"' in app_source
+    assert "}, [selectDraft, setTab]);" in app_source
+    assert 'className="draft-tray"' in app_source
+    assert 'className="model-context"' in app_source
+    assert "value={modelKey}" in app_source
+    assert "setModelKey(e.target.value)" in app_source
+    assert "model.label" in app_source
+    assert "draftLifecycle?.draft" in app_source
+    assert "navigation={navigation}" in app_source
+    assert "draftId" in explorer_source
+    assert "navigation.type" in explorer_source
+    assert "navigation.id" in explorer_source
+    assert "connectedOption(modelKey, navigation.id, draftId)" in explorer_source
+    assert "api.explorerSearch(modelKey, query)" in explorer_source
+    assert "draftRevision" in explorer_source
+    assert "draft_overlay" in explorer_source
+    assert "detailError" in explorer_source
+    assert "focusKey" in explorer_source
+    assert "[data-focus-key" in explorer_source
+    assert "draft_id" in api_source
+    assert ".draft-tray" in styles
+    assert ".draft-tray { width: 100%;" in styles
+    assert ".entity-link > strong { grid-column: 1; overflow-wrap: anywhere; }" in styles
+    assert ".entity-link > svg { grid-column: 2; grid-row: 1 / span 3; }" in styles
 
 
 def run_validation(script: str):

@@ -13,8 +13,9 @@ locally on 2026-08-25, received its review fixes on the PR head, and merged
 through PR 45 at `3a8369b` on 2026-08-26; its full delivery evidence, including
 the post-sync CI rerun and both Codex review-bug fixes, is recorded below.
 Checkpoint 3E completed locally on 2026-08-26; its delivery evidence is recorded
-with the PR. Checkpoint 3F and Checkpoints 4–6 remain separately gated by §19
-and must not begin automatically.
+with the PR. Checkpoint 3F completed locally on 2026-08-26; its delivery evidence
+is recorded below. Checkpoints 4–6 remain separately gated by §19 and must not
+begin automatically.
 
 Checkpoint 2 added the approved workbook schema/data and additive generated
 label fields, but did **not** authorize or perform the Checkpoint 5 customer
@@ -1878,9 +1879,46 @@ Codex disposition gates; PR 48 merged to `main` as `bf6db32` on 2026-08-26.
   remain unchanged. The browser proofs intentionally created two durable audit
   drafts and then cancelled both; no canonical or generated write ran.
 
-Mandatory stop: this evidence closes only subpass 3E. The user explicitly
-authorized subpass 3F on 2026-08-26 after PR 48 merged; no persistent draft
-tray, URL/history, deep-link, or reload-resume work is included in PR 49.
+**Checkpoint 3F local completion evidence (2026-08-26):**
+
+- implementation commit `b1028b0` adds an explicit URL/history navigation
+  owner, persistent model context and draft tray, reload-safe connected entity
+  routing, and draft-aware option/group detail. The branch was then merged with
+  PR 49's `main` merge commit `dca3605` before final validation;
+- connected option/group reads accept an additive `draft_id`, retain projected
+  base data, and expose one explicit unchanged/modified/added/pending-deletion/
+  conflicted overlay. Draft-only added options remain deep-linkable, and a stale
+  workbook binding fails closed without presenting proposed data as effective;
+- native History API state preserves model, workspace, canonical entity type/ID,
+  and search query. Reload restores the same entity and active durable draft;
+  Back/Forward returns between detail and results, invalid model/entity pairs
+  stay in their selected model context with an actionable refusal, and opener
+  focus is restored when results are available;
+- focused backend/frontend owners passed 99 tests with two intentional slow-only
+  skips. The README-owned Manager checkpoint passed 325 tests, skipped the same
+  two cases, and passed 62 subtests in 86.88 seconds. Python/Node syntax checks
+  and the production frontend build passed (1,527 modules transformed);
+- the catalog-driven changed-surface run passed the Manager serial group (275
+  tests, two intentional skips, 62 subtests), frontend build, CI/catalog owners,
+  and complete 12-stage all-model candidate with no skipped stages, findings,
+  unexpected drift, or boundary violations;
+- real-browser proof saved a Stingray option edit to a temporary durable draft,
+  reloaded the exact deep link with its modified overlay and one-change tray,
+  exercised Back/Forward with the search query intact, retained Grand Sport
+  context for an unavailable entity, and measured a literal 390x844 editor sheet
+  at 390 CSS pixels with document `scrollWidth == clientWidth`. The temporary
+  browser state lived under `/tmp`; Apply and Rebuild was never invoked;
+- canonical workbook SHA-256 remained `922de392`, published `form-app/data.js`
+  remained `6a06eef1`, and cache-bearing `form-app/index.html` remained
+  `21a4d7a7`; the branch has no diff under the workbook, `form-output/`, or
+  customer `form-app/` paths. Workbook/schema data, generated and customer
+  runtime contracts, publication, dependencies, apply/rebuild, dealer, media,
+  deployment, and security behavior remain unchanged.
+
+Mandatory stop: this evidence closes only subpass 3F locally. Its delivery PR
+must still receive the §17.5 full-inventory Release candidate run and review
+disposition before merge. Checkpoint 4 and later checkpoints remain unauthorized
+and must not begin automatically.
 
 ### Checkpoint 4 — complete form graph and contextual section management
 
@@ -2187,11 +2225,12 @@ runtime parity from an adjacent test or remembered prior run.
 
 Checkpoints 1 and 2 are complete. Checkpoint 3A/3B's bounded
 registry/schema/reference slice, Checkpoint 3C's reusable shell, Checkpoint
-3D's direct option editor, and Checkpoint 3E's contextual group/member editor
-are complete and stopped. The user explicitly authorized Checkpoint 3F on
-2026-08-26; implementation has not started in PR 49. Checkpoints 4–6 remain
-unauthorized. The next implementation agent must not treat either the completed
-label migration or control metadata as authorization for customer headings.
+3D's direct option editor, Checkpoint 3E's contextual group/member editor, and
+Checkpoint 3F's persistent draft tray/navigation are complete locally and
+stopped. Checkpoint 3F delivery still requires its PR's full-inventory Release
+candidate and review disposition. Checkpoints 4–6 remain unauthorized. The next
+implementation agent must not treat either the completed label migration or
+control metadata as authorization for customer headings.
 
 ### 19.2 Decision matrix
 
@@ -2205,7 +2244,7 @@ label migration or control metadata as authorization for customer headings.
 | Reusable accessible registry-control editor shell | Checkpoint 3C | Complete locally: drawer/sheet, no-fallback renderer map, validation, dirty-close, busy Save, focus, and responsive browser proof are green; delivery CI is recorded with the PR. |
 | Render and save a contextual direct option editor | Checkpoint 3D | Complete and merged: registry-driven direct fields, durable draft Save, field overlay, impact summary, connected detail, focused/build/Manager gates, and browser proof are green; both Codex review-bug fixes landed on the PR head, post-sync CI passed, and PR 45 merged at `3a8369b`. |
 | Render and save contextual group/member editors | Checkpoint 3E | Complete and merged through PR 48 at `bf6db32`: registry-driven group facts, durable member add/remove/reorder/active operations, deterministic final order, direct dependency refusal, reversion, focused/build/Manager/all-model gates, protected hashes, and browser proof are green. |
-| Persistent draft tray, URL/history, and reload-safe connected navigation | Checkpoint 3F | Explicitly authorized on 2026-08-26; implementation has not started in PR 49. |
+| Persistent draft tray, URL/history, and reload-safe connected navigation | Checkpoint 3F | Complete locally on 2026-08-26: additive draft overlays, dependency-free History API state, reload/deep-link/model-context recovery, focused/Manager/candidate gates, and real-browser proof are green; delivery PR full-inventory CI and review remain required. |
 | New group canonical-ID allocation strategy | Any Add Group feature | Unresolved; Add Group remains blocked. |
 | Any new frontend/backend dependency | Before dependency change | Not approved. |
 | Breaking/removing existing Manager API members | Before API break | Not approved; changes must be additive. |
@@ -2251,13 +2290,13 @@ exhaustively tested text controls rather than accidental frontend defaults.
 
 ### 19.4 Current next action
 
-After PR 49's current-head checks pass, begin the explicitly authorized
-Checkpoint 3F persistent draft tray/navigation on a separate clean branch from
-current `origin/main`; update that branch from `main` after PR 49 merges. Keep
-the implementation to the existing durable draft lane plus dependency-free URL
-and browser-history state; do not skip ahead to later checkpoints or begin the
-non-sequential Checkpoint 5 customer-runtime heading switch merely because its
-label prerequisite is complete.
+Open the Checkpoint 3F delivery PR from
+`hermes/workbook-manager-ux-recovery-cp3f`, require one successful current-head
+full-inventory Release candidate run plus review disposition, and merge only
+after those gates are satisfied. Then stop and await explicit Checkpoint 4
+authorization; do not begin later checkpoints or the non-sequential Checkpoint
+5 customer-runtime heading switch merely because its label prerequisite is
+complete.
 
 ## 20. Coding-agent checkpoint execution protocol
 

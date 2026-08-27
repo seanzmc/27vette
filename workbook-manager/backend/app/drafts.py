@@ -76,6 +76,108 @@ def list_operations(state_conn: sqlite3.Connection, draft_id: str) -> list[dict]
     return [_operation_dict(row) for row in rows]
 
 
+def connected_addition(
+    state_conn: sqlite3.Connection,
+    *,
+    draft_id: str,
+    table: str,
+    model_key: str,
+    entity_key: dict,
+) -> dict | None:
+    if not draft_id:
+        return None
+    draft = state_conn.execute(
+        "SELECT id FROM workflow_drafts WHERE id=?", (draft_id,)
+    ).fetchone()
+    if draft is None:
+        return None
+    rows = state_conn.execute(
+        "SELECT * FROM draft_operations WHERE draft_id=? AND table_name=? "
+        "AND action='add' AND (model_id='' OR model_id=?) ORDER BY id DESC",
+        (draft_id, table, model_key),
+    ).fetchall()
+    return next((
+        operation for operation in map(_operation_dict, rows)
+        if operation.get("entity_key") == entity_key
+    ), None)
+
+
+def connected_overlay(
+    state_conn: sqlite3.Connection,
+    *,
+    draft_id: str,
+    model_key: str,
+    lineage: dict,
+    base: dict,
+    projection_workbook_sha256: str,
+) -> dict:
+    """Return one projection-preserving overlay for a connected entity."""
+    empty = {
+        "draft_id": draft_id,
+        "draft_revision": 0,
+        "state": "unchanged",
+        "base": None,
+        "proposed": None,
+        "effective": None,
+        "conflicts": [],
+    }
+    if not draft_id:
+        return empty
+    draft = state_conn.execute(
+        "SELECT * FROM workflow_drafts WHERE id=?", (draft_id,)
+    ).fetchone()
+    if draft is None:
+        return empty
+    operation_row = state_conn.execute(
+        "SELECT * FROM draft_operations WHERE draft_id=? AND source_sheet=? "
+        "AND family=? AND physical_key=? AND (model_id='' OR model_id=?) "
+        "ORDER BY id DESC LIMIT 1",
+        (
+            draft_id,
+            lineage.get("source_sheet"),
+            lineage.get("source_family"),
+            lineage.get("physical_key"),
+            model_key,
+        ),
+    ).fetchone()
+    if operation_row is None:
+        return empty
+    operation = _operation_dict(operation_row)
+    operation_base = (
+        operation.get("original")
+        if operation["action"] == "add"
+        else operation.get("original") or base
+    )
+    if draft["base_workbook_sha256"] != projection_workbook_sha256:
+        return {
+            "draft_id": draft_id,
+            "draft_revision": int(operation["id"]),
+            "state": "conflicted",
+            "base": operation_base,
+            "proposed": operation.get("final"),
+            "effective": None,
+            "conflicts": [{
+                "code": "draft_binding_stale",
+                "message": "The draft is bound to a different workbook import.",
+            }],
+        }
+    state = {
+        "update": "modified",
+        "add": "added",
+        "delete": "pending_deletion",
+    }[operation["action"]]
+    proposed = operation.get("final")
+    return {
+        "draft_id": draft_id,
+        "draft_revision": int(operation["id"]),
+        "state": state,
+        "base": operation_base,
+        "proposed": proposed,
+        "effective": proposed if state != "pending_deletion" else None,
+        "conflicts": [],
+    }
+
+
 def _asset_resolution_dict(row) -> dict:
     result = dict(row)
     result["evidence"] = json.loads(result.pop("evidence_json"))

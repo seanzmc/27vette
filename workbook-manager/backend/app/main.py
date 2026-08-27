@@ -542,9 +542,35 @@ def collections(model_key: str, conn=Depends(projection_connection)):
 
 @app.get("/api/explorer/{model_key}/options/{option_id}")
 def connected_option(
-    model_key: str, option_id: str, conn=Depends(projection_connection)
+    model_key: str,
+    option_id: str,
+    draft_id: str = Query("", max_length=240),
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
 ):
     detail = explorer.option_detail(conn, model_key, option_id)
+    if detail is None and draft_id:
+        try:
+            addition = drafts.connected_addition(
+                state_conn,
+                draft_id=draft_id,
+                table="options",
+                model_key=model_key,
+                entity_key={"option_id": option_id},
+            )
+        except drafts.DraftError as exc:
+            raise _draft_error(exc)
+        if addition is not None:
+            proposed = {
+                **addition["final"],
+                "src_sheet": addition["source_sheet"],
+                "src_family": addition["family"],
+                "src_row": addition["source_row"],
+                "physical_key": addition["physical_key"],
+            }
+            detail = explorer.option_detail(
+                conn, model_key, option_id, option_record=proposed
+            )
     if detail is None:
         raise HTTPException(
             404,
@@ -553,13 +579,28 @@ def connected_option(
                 "message": f"option {option_id!r} was not found for model {model_key!r}",
             },
         )
+    try:
+        detail["draft_overlay"] = drafts.connected_overlay(
+            state_conn,
+            draft_id=draft_id,
+            model_key=model_key,
+            lineage=detail["technical"]["lineage"],
+            base=detail["option"],
+            projection_workbook_sha256=_workbook_state(conn)["imported_sha256"],
+        )
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
     return detail
 
 
 @app.get("/api/explorer/{model_key}/groups/{group_type}/{group_id}")
 def connected_group(
-    model_key: str, group_type: str, group_id: str,
+    model_key: str,
+    group_type: str,
+    group_id: str,
+    draft_id: str = Query("", max_length=240),
     conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
 ):
     detail = explorer.group_detail(conn, model_key, group_type, group_id)
     if detail is None:
@@ -567,6 +608,17 @@ def connected_group(
             "status": "group_not_found",
             "message": f"{group_type} group {group_id!r} was not found for model {model_key!r}",
         })
+    try:
+        detail["draft_overlay"] = drafts.connected_overlay(
+            state_conn,
+            draft_id=draft_id,
+            model_key=model_key,
+            lineage=detail["technical"]["lineage"],
+            base=detail["group"],
+            projection_workbook_sha256=_workbook_state(conn)["imported_sha256"],
+        )
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
     return detail
 
 

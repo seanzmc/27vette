@@ -1608,6 +1608,199 @@ class TestApi(unittest.TestCase):
         )
         self.assertEqual(missing.status_code, 404)
 
+    def test_connected_option_detail_overlays_coalesced_durable_draft_intent(self):
+        base = self.client.get(
+            "/api/explorer/stingray/options/opt_5zu_001"
+        ).json()
+        original_name = base["option"]["option_name"]
+        draft_id = "connected-option-overlay"
+        proposed_name = f"{original_name} draft overlay"
+        saved = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "options",
+                "model_id": "stingray",
+                "op": "update",
+                "key": {"option_id": "opt_5zu_001"},
+                "record": {"option_name": proposed_name},
+                "actor": "connected-overlay-test",
+            },
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+
+        response = self.client.get(
+            "/api/explorer/stingray/options/opt_5zu_001",
+            params={"draft_id": draft_id},
+        )
+
+        self.assertEqual(response.status_code, 200, response.text)
+        detail = response.json()
+        self.assertEqual(detail["option"]["option_name"], original_name)
+        self.assertEqual(detail["draft_overlay"]["draft_id"], draft_id)
+        self.assertEqual(detail["draft_overlay"]["state"], "modified")
+        self.assertEqual(
+            detail["draft_overlay"]["base"]["option_name"], original_name
+        )
+        self.assertEqual(
+            detail["draft_overlay"]["proposed"]["option_name"], proposed_name
+        )
+        self.assertEqual(
+            detail["draft_overlay"]["effective"]["option_name"], proposed_name
+        )
+        self.assertEqual(detail["draft_overlay"]["conflicts"], [])
+        self.assertEqual(
+            self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200
+        )
+
+    def test_connected_detail_accepts_the_reserved_empty_browser_draft_id(self):
+        response = self.client.get(
+            "/api/explorer/stingray/options/opt_5zu_001",
+            params={"draft_id": "reserved-before-first-save"},
+        )
+
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual(response.json()["draft_overlay"], {
+            "draft_id": "reserved-before-first-save",
+            "draft_revision": 0,
+            "state": "unchanged",
+            "base": None,
+            "proposed": None,
+            "effective": None,
+            "conflicts": [],
+        })
+
+    def test_connected_overlay_fails_closed_when_draft_binding_is_stale(self):
+        draft_id = "connected-option-stale-overlay"
+        saved = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "options",
+                "model_id": "stingray",
+                "op": "update",
+                "key": {"option_id": "opt_5zu_001"},
+                "record": {"option_name": "Stale draft name"},
+                "actor": "connected-overlay-test",
+            },
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+        state = self.mainmod.open_state_connection()
+        try:
+            state.execute(
+                "UPDATE workflow_drafts SET base_workbook_sha256=? WHERE id=?",
+                ("stale-workbook-sha", draft_id),
+            )
+            state.commit()
+        finally:
+            state.close()
+
+        detail = self.client.get(
+            "/api/explorer/stingray/options/opt_5zu_001",
+            params={"draft_id": draft_id},
+        ).json()
+
+        self.assertEqual(detail["draft_overlay"]["state"], "conflicted")
+        self.assertEqual(detail["draft_overlay"]["effective"], None)
+        self.assertEqual(
+            detail["draft_overlay"]["conflicts"][0]["code"],
+            "draft_binding_stale",
+        )
+        self.assertEqual(
+            self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200
+        )
+
+    def test_connected_option_deep_link_resolves_a_draft_added_record_only(self):
+        draft_id = "connected-option-added-overlay"
+        option_id = "opt_connected_add_001"
+        record = {
+            "option_id": option_id,
+            "rpo": "C3F",
+            "price": "100",
+            "option_name": "Checkpoint 3F proposed option",
+            "description": "",
+            "detail_raw": "",
+            "section_id": "sec_pain_001",
+            "selectable": "True",
+            "display_order": "999",
+            "active": "True",
+            "display_behavior": "",
+        }
+        saved = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "options",
+                "model_id": "stingray",
+                "op": "add",
+                "key": {"option_id": option_id},
+                "record": record,
+                "actor": "connected-overlay-test",
+            },
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+        self.assertEqual(
+            self.client.get(
+                f"/api/explorer/stingray/options/{option_id}"
+            ).status_code,
+            404,
+        )
+
+        response = self.client.get(
+            f"/api/explorer/stingray/options/{option_id}",
+            params={"draft_id": draft_id},
+        )
+
+        self.assertEqual(response.status_code, 200, response.text)
+        detail = response.json()
+        self.assertEqual(detail["option"]["option_id"], option_id)
+        self.assertEqual(detail["draft_overlay"]["state"], "added")
+        self.assertEqual(detail["draft_overlay"]["base"], None)
+        self.assertEqual(
+            detail["draft_overlay"]["effective"]["option_name"],
+            record["option_name"],
+        )
+        self.assertEqual(
+            self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200
+        )
+
+    def test_connected_option_keeps_pending_deletion_inspectable(self):
+        draft_id = "connected-option-delete-overlay"
+        saved = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "options",
+                "model_id": "stingray",
+                "op": "update",
+                "key": {"option_id": "opt_5zu_001"},
+                "record": {"option_name": "Temporary update"},
+                "actor": "connected-overlay-test",
+            },
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+        state = self.mainmod.open_state_connection()
+        try:
+            state.execute(
+                "UPDATE draft_operations SET action='delete', final_json=NULL "
+                "WHERE draft_id=?",
+                (draft_id,),
+            )
+            state.commit()
+        finally:
+            state.close()
+
+        response = self.client.get(
+            "/api/explorer/stingray/options/opt_5zu_001",
+            params={"draft_id": draft_id},
+        )
+
+        self.assertEqual(response.status_code, 200, response.text)
+        overlay = response.json()["draft_overlay"]
+        self.assertEqual(overlay["state"], "pending_deletion")
+        self.assertIsNotNone(overlay["base"])
+        self.assertIsNone(overlay["proposed"])
+        self.assertIsNone(overlay["effective"])
+        self.assertEqual(
+            self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200
+        )
+
     def test_connected_group_detail_leads_with_description_and_named_members(self):
         group_id = "grand_sport_x_excl_1623e1da9d59"
         response = self.client.get(
@@ -1668,6 +1861,40 @@ class TestApi(unittest.TestCase):
             "member_order_field": "display_order",
             "member_active_field": "active",
         })
+
+    def test_connected_group_detail_uses_the_same_durable_overlay_contract(self):
+        group_id = "grand_sport_x_excl_1623e1da9d59"
+        base = self.client.get(
+            f"/api/explorer/grand_sport_x/groups/exclusive/{group_id}"
+        ).json()
+        draft_id = "connected-group-overlay"
+        proposed_notes = f'{base["group"]["notes"]} draft overlay'
+        saved = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "exclusive_groups",
+                "model_id": "grand_sport_x",
+                "op": "update",
+                "key": {"group_id": group_id},
+                "record": {"notes": proposed_notes},
+                "actor": "connected-overlay-test",
+            },
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+
+        detail = self.client.get(
+            f"/api/explorer/grand_sport_x/groups/exclusive/{group_id}",
+            params={"draft_id": draft_id},
+        ).json()
+
+        self.assertEqual(detail["draft_overlay"]["state"], "modified")
+        self.assertEqual(
+            detail["draft_overlay"]["effective"]["notes"], proposed_notes
+        )
+        self.assertEqual(detail["group"]["notes"], base["group"]["notes"])
+        self.assertEqual(
+            self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200
+        )
 
     def test_cross_entity_search_is_ranked_typed_scoped_and_stable(self):
         option = self.client.get(
