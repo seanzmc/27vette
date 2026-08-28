@@ -677,26 +677,6 @@ textarea {
   }
 }
 
-@media (max-width: 760px) {
-  #stepContent[data-active-step="paint"] .vehicle-stage {
-    height: 176px;
-    padding: 4px 0 12px;
-  }
-
-  #stepContent[data-active-step="paint"] .choice-grid {
-    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
-  }
-
-  #stepContent[data-active-step="paint"] .choice-media,
-  #stepContent[data-active-step="paint"] .choice-media[data-fit="swatch"] {
-    height: 36px;
-  }
-
-  #stepContent[data-active-step="paint"] .choice-name {
-    font-size: 11px;
-  }
-}
-
 .vehicle-setup-section {
   display: grid;
   gap: 10px;
@@ -2286,6 +2266,24 @@ body:has(.app-shell[data-mobile-drawer]) {
 }
 
 @media (max-width: 760px) {
+  #stepContent[data-active-step="paint"] .vehicle-stage {
+    height: 176px;
+    padding: 4px 0 12px;
+  }
+
+  #stepContent[data-active-step="paint"] .choice-grid {
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  }
+
+  #stepContent[data-active-step="paint"] .choice-media,
+  #stepContent[data-active-step="paint"] .choice-media[data-fit="swatch"] {
+    height: 36px;
+  }
+
+  #stepContent[data-active-step="paint"] .choice-name {
+    font-size: 11px;
+  }
+
   .app-shell {
     display: grid;
     gap: 0;

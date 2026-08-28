@@ -813,9 +813,12 @@ test("summary drawer is callable from desktop and condensed at smaller breakpoin
   const baseStyles = stylesSource.slice(0, stylesSource.indexOf("@media (max-width: 1120px)"));
   const middleStart = stylesSource.indexOf("@media (max-width: 1120px)");
   const narrowDesktopStart = stylesSource.indexOf("@media (min-width: 761px) and (max-width: 887px)");
-  // the paint step adds an earlier scoped 760px block; the shell mobile
-  // breakpoint is the one after the narrow-desktop breakpoint
-  const mobileStart = stylesSource.indexOf("@media (max-width: 760px)", narrowDesktopStart);
+  const mobileStart = stylesSource.indexOf("@media (max-width: 760px)");
+  assert.equal(
+    stylesSource.split("@media (max-width: 760px)").length - 1,
+    1,
+    "the mobile breakpoint must stay a single block so this slice is unambiguous",
+  );
   const reducedMotionStart = stylesSource.indexOf("@media (prefers-reduced-motion: reduce)");
   const middleBreakpoint = stylesSource.slice(middleStart, narrowDesktopStart);
   const narrowDesktopBreakpoint = stylesSource.slice(narrowDesktopStart, mobileStart);
