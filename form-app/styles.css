@@ -2176,7 +2176,6 @@ body:has(.app-shell[data-mobile-drawer]) {
   }
 
   .topbar {
-    align-items: center;
     gap: 14px;
   }
 
@@ -2220,17 +2219,8 @@ body:has(.app-shell[data-mobile-drawer]) {
   }
 
   .summary-panel {
-    position: fixed;
-    inset: 0 0 0 auto;
-    z-index: 30;
-    width: min(88vw, 380px);
-    max-width: 380px;
     border: 0;
-    border-left: 1px solid var(--hairline);
     padding: 16px;
-    overflow-y: auto;
-    transform: translateX(100%);
-    transition: transform 180ms ease;
   }
 
   .app-shell[data-mobile-drawer="summary"] .summary-panel {
@@ -2249,21 +2239,12 @@ body:has(.app-shell[data-mobile-drawer]) {
   .summary-panel .mobile-drawer-header h2 {
     font-size: 20px;
   }
-
-  .mobile-drawer-backdrop:not([hidden]) {
-    position: fixed;
-    inset: 0;
-    z-index: 20;
-    display: block;
-    background: rgba(0, 0, 0, 0.55);
-  }
 }
 
 @media (min-width: 761px) and (max-width: 887px) {
   .topbar {
     display: grid;
     grid-template-columns: minmax(200px, 1fr) minmax(0, 360px);
-    align-items: center;
     gap: 12px;
   }
 
@@ -2340,7 +2321,6 @@ body:has(.app-shell[data-mobile-drawer]) {
      padding band. */
   .topbar {
     grid-template-columns: auto minmax(0, 1fr) auto;
-    align-items: center;
     gap: 12px;
     padding: 12px 16px 14px;
   }
@@ -2650,7 +2630,6 @@ body:has(.app-shell[data-mobile-drawer]) {
     width: 100%;
     min-width: 0;
     min-height: 46px;
-    grid-template-columns: 26px 1fr;
     justify-items: stretch;
     margin-bottom: 0;
     padding: 0 14px;
@@ -2679,30 +2658,6 @@ body:has(.app-shell[data-mobile-drawer]) {
 
   .mobile-drawer-header h2 {
     font-size: 20px;
-  }
-
-  .mobile-drawer-backdrop:not([hidden]) {
-    position: fixed;
-    inset: 0;
-    z-index: 20;
-    display: block;
-    background: rgba(0, 0, 0, 0.55);
-  }
-
-  #requirementsCard {
-    order: 2;
-  }
-
-  #selectedRposCard {
-    order: 3;
-  }
-
-  #autoAddedCard {
-    order: 4;
-  }
-
-  #summaryOverviewCard {
-    order: 1;
   }
 
   .summary-card[data-requirements-status="complete"] {
