@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import EditorShell from "./EditorShell.jsx";
+import { operatorLifecycle } from "./ChangesSync.jsx";
 import {
   AlertTriangle, Ban, CheckCircle2, ExternalLink, Image, Images,
   Link, RefreshCw, Save, SearchX,
@@ -6,6 +8,7 @@ import {
 import { api } from "../api.js";
 
 const PAGE_SIZE = 24;
+const LINK_LOOKUP_PAGE_SIZE = 100;
 const STATUS_LABELS = {
   safe_proposal: "Safe proposals",
   covered: "Covered",
@@ -108,16 +111,44 @@ function QueueThumbnail({ item }) {
   );
 }
 
+async function findLinkedAsset(itemId, draftId) {
+  let offset = 0;
+  while (true) {
+    const result = await api.assetReconciliation({
+      offset,
+      limit: LINK_LOOKUP_PAGE_SIZE,
+      draft_id: draftId,
+    });
+    const item = result.queue.items.find((candidate) => candidate.id === itemId);
+    if (item) return item;
+    offset += result.queue.items.length;
+    if (!result.queue.items.length || offset >= result.queue.total) return null;
+  }
+}
+
 export default function AssetManager({
   models, modelKey, setModelKey, draftId, draftMutable, draftLifecycle, onChanged,
+  navigation, onNavigationChange,
 }) {
+  // §3F: the open image decision is navigation state, not component state, so it
+  // survives reload, is linkable, and is preserved when a draft starts. `assets`
+  // was already a workspace; `asset` joins ENTITY_TYPES for the entity half.
+  const selectedId = navigation?.type === "asset" ? navigation.id || "" : "";
+  const selectAsset = useCallback((id) => {
+    onNavigationChange({
+      ...navigation,
+      workspace: "assets",
+      type: id ? "asset" : "",
+      id: id || "",
+    });
+  }, [navigation, onNavigationChange]);
   const [filters, setFilters] = useState({
     model: modelKey || "", section: "", target_type: "",
     coverage_intent: "", status: "",
   });
   const [offset, setOffset] = useState(0);
   const [data, setData] = useState(null);
-  const [selectedId, setSelectedId] = useState("");
+  const [linkedAsset, setLinkedAsset] = useState({ id: "", item: null, loading: false, error: "" });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState(null);
@@ -131,10 +162,6 @@ export default function AssetManager({
         ...filters, offset, limit: PAGE_SIZE, refresh, draft_id: draftId,
       });
       setData(result);
-      setSelectedId((current) => (
-        result.queue.items.some((item) => item.id === current)
-          ? current : result.queue.items[0]?.id || ""
-      ));
     } catch (e) {
       setError(e.message);
     } finally {
@@ -144,6 +171,31 @@ export default function AssetManager({
 
   useEffect(() => { load(false); }, [load]);
 
+  const queuedSelection = data?.queue.items.find((item) => item.id === selectedId) || null;
+  useEffect(() => {
+    if (!selectedId || !data || queuedSelection) {
+      setLinkedAsset({ id: "", item: null, loading: false, error: "" });
+      return undefined;
+    }
+    let cancelled = false;
+    setLinkedAsset({ id: selectedId, item: null, loading: true, error: "" });
+    findLinkedAsset(selectedId, draftId)
+      .then((item) => {
+        if (!cancelled) setLinkedAsset({ id: selectedId, item, loading: false, error: "" });
+      })
+      .catch((lookupError) => {
+        if (!cancelled) {
+          setLinkedAsset({
+            id: selectedId,
+            item: null,
+            loading: false,
+            error: lookupError.message,
+          });
+        }
+      });
+    return () => { cancelled = true; };
+  }, [selectedId, data, queuedSelection, draftId]);
+
   const updateFilter = (key, value) => {
     setFilters((current) => ({
       ...current,
@@ -152,9 +204,11 @@ export default function AssetManager({
     }));
     if (key === "model" && value) setModelKey(value);
     setOffset(0);
-    setSelectedId("");
+    if (selectedId) selectAsset("");
   };
-  const selected = data?.queue.items.find((item) => item.id === selectedId) || null;
+  const selected = queuedSelection || (
+    linkedAsset.id === selectedId ? linkedAsset.item : null
+  );
   const activeModelCoverage = data?.coverage.models.find(
     (model) => model.model_key === filters.model
   );
@@ -248,7 +302,9 @@ export default function AssetManager({
           <div className="asset-draft-toolbar panel panel-body">
             <div>
               <strong>Shared draft basket</strong>
-              <span className="muted">
+              <span className="muted" data-testid="asset-draft-lifecycle">
+                {operatorLifecycle[draftLifecycle?.draft?.status] || "Collecting draft changes"}
+                {" · "}
                 {draftLifecycle?.operations?.length || 0} workbook operation(s) · {data.draft_asset_resolutions?.count || 0} asset evidence record(s)
               </span>
               {data.draft_asset_resolutions?.stale_count > 0 && (
@@ -302,7 +358,7 @@ export default function AssetManager({
                     type="button"
                     key={item.id}
                     className={`asset-inbox-item ${selectedId === item.id ? "selected" : ""}`}
-                    onClick={() => setSelectedId(item.id)}
+                    onClick={() => selectAsset(item.id)}
                   >
                     <QueueThumbnail item={item} />
                     <span className="asset-inbox-copy">
@@ -329,6 +385,19 @@ export default function AssetManager({
             </div>
           </div>
 
+          {selectedId && !selected && linkedAsset.loading && (
+            <div className="notice">Loading the linked image decision…</div>
+          )}
+          {selectedId && !selected && !linkedAsset.loading && (
+            <div className="notice warn">
+              {linkedAsset.error
+                ? `The linked image decision could not be loaded: ${linkedAsset.error}`
+                : "The linked image decision no longer exists in this reconciliation snapshot."}{" "}
+              <button className="btn small" type="button" onClick={() => selectAsset("")}>
+                Clear the link
+              </button>
+            </div>
+          )}
           {selected && (
             <AssetInspector
               item={selected}
@@ -341,6 +410,7 @@ export default function AssetManager({
                 payload.resolution_kind.replaceAll("_", " "),
                 boundPayload({ item_id: selected.id, ...payload }),
               )}
+              onClose={() => selectAsset("")}
             />
           )}
         </>
@@ -350,7 +420,7 @@ export default function AssetManager({
 }
 
 function AssetInspector({
-  item, assignmentTargets, fitValues, draftMutable, drafted, busy, onResolve,
+  item, assignmentTargets, fitValues, draftMutable, drafted, busy, onResolve, onClose,
 }) {
   const initial = useMemo(() => ({
     ...item.proposed_values,
@@ -404,6 +474,17 @@ function AssetInspector({
       setSearching(false);
     }
   };
+  // §3C dirty contract: the shell must be able to refuse a silent close while
+  // unsaved preview, candidate, inventory, or assignment decisions are pending.
+  // Preview is compared against the same `initial` it is seeded from; the three
+  // selection controls start empty and remain explicit pending intent even when
+  // their selected URL happens to match the seeded preview.
+  const dirty = useMemo(
+    () => JSON.stringify(preview) !== JSON.stringify(initial)
+      || Boolean(selectedCandidate || inventoryUrl || targetItemId),
+    [preview, initial, selectedCandidate, inventoryUrl, targetItemId],
+  );
+
   const resolve = (resolution_kind, extra = {}) => onResolve({
     resolution_kind,
     values: resolutionValues,
@@ -412,15 +493,18 @@ function AssetInspector({
     ...extra,
   });
   return (
-    <div className="asset-inspector panel">
-      <div className="panel-head">
-        <div>
-          <strong>{item.rpo?.toUpperCase() || item.label} · {item.label}</strong>
-          <div className="muted">{item.model_key || "unscoped"} / {item.section_id} / {item.target_id || item.kind}</div>
+    <EditorShell
+      title={`${item.rpo?.toUpperCase() || item.label} · ${item.label}`}
+      subtitle={`${item.model_key || "unscoped"} / ${item.section_id} / ${item.target_id || item.kind}`}
+      target="image decision"
+      dirty={dirty}
+      busy={Boolean(busy)}
+      onRequestClose={onClose}
+    >
+      <div className="asset-inspector">
+        <div className="asset-inspector-status">
+          <span className={`chip asset-status-${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
         </div>
-        <span className={`chip asset-status-${item.status}`}>{STATUS_LABELS[item.status] || item.status}</span>
-      </div>
-      <div className="panel-body">
         <div className="asset-reason-grid">
           <div><span>Engine decision</span><strong>{item.action}</strong></div>
           <div><span>Candidate source</span><strong>{item.candidate.source || "none"}</strong></div>
@@ -642,6 +726,6 @@ function AssetInspector({
           )}
         </div>
       </div>
-    </div>
+    </EditorShell>
   );
 }
