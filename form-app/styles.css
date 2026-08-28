@@ -186,20 +186,6 @@ h3 {
   border-left: 1px solid var(--hairline-strong);
 }
 
-.model-picker {
-  display: grid;
-  gap: 4px;
-  min-width: 150px;
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-
-.model-picker select {
-  min-height: 42px;
-}
-
 button {
   min-height: 44px;
   border: 0;
@@ -436,11 +422,6 @@ textarea {
   background: var(--ghost-hover-bg);
   color: var(--ink);
   filter: none;
-}
-
-.summary-drawer-icon {
-  font-size: 16px;
-  line-height: 1;
 }
 
 .workspace {
@@ -733,22 +714,10 @@ textarea {
   gap: 10px;
 }
 
-.vehicle-setup-intro {
-  display: grid;
-  gap: 5px;
-  padding: 2px 2px 8px;
-}
-
-.vehicle-setup-intro h3,
 .vehicle-setup-group-heading h3 {
   margin: 0;
 }
 
-.vehicle-setup-intro .eyebrow {
-  margin: 0;
-}
-
-.vehicle-setup-intro p,
 .vehicle-setup-group-heading p {
   margin: 0;
   color: var(--muted);
@@ -1100,19 +1069,10 @@ textarea {
   gap: 12px;
 }
 
-.choice-relation-eyebrow,
 .choice-relation-title,
 .choice-relation-instruction,
 .choice-relation-note {
   margin: 0;
-}
-
-.choice-relation-eyebrow {
-  color: var(--accent);
-  font-size: 11px;
-  font-weight: 850;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .choice-relation-title {
@@ -1135,17 +1095,6 @@ textarea {
   font-size: 12px;
   font-weight: 700;
   line-height: 1.35;
-}
-
-.choice-relation-count {
-  flex: 0 0 auto;
-  border: 1px solid var(--accent);
-  border-radius: 999px;
-  padding: 3px 8px;
-  background: transparent;
-  color: var(--accent);
-  font-size: 11px;
-  font-weight: 850;
 }
 
 .interior-layout {
@@ -1437,13 +1386,6 @@ textarea {
   flex: 0 0 auto;
 }
 
-.choice-note {
-  margin: 0;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.35;
-}
-
 .choice-availability {
   min-height: 24px;
   display: flex;
@@ -1655,11 +1597,6 @@ body:has(.app-shell[data-mobile-drawer]) {
   border-bottom: 0;
   padding-bottom: 0;
   margin-top: 5px;
-}
-
-.customer-card {
-  display: grid;
-  gap: 12px;
 }
 
 .customer-step-form {
@@ -2063,8 +2000,7 @@ body:has(.app-shell[data-mobile-drawer]) {
   gap: 8px;
 }
 
-.tooltip-lead,
-.tooltip-tail {
+.tooltip-lead {
   display: block;
 }
 
@@ -2691,10 +2627,6 @@ body:has(.app-shell[data-mobile-drawer]) {
     flex-direction: column;
   }
 
-  .vehicle-setup-intro {
-    padding: 0 0 4px;
-  }
-
   .setup-choice-grid {
     grid-template-columns: 1fr;
   }
@@ -2822,7 +2754,6 @@ body:has(.app-shell[data-mobile-drawer]) {
     align-items: flex-start;
   }
 
-  .choice-note,
   .disabled-reason,
   .auto-reason,
   .standard-group .summary-list small {
@@ -2832,7 +2763,6 @@ body:has(.app-shell[data-mobile-drawer]) {
     -webkit-line-clamp: 3;
   }
 
-  .choice-card:focus-visible .choice-note,
   .choice-card:focus-visible .disabled-reason,
   .choice-card:focus-visible .auto-reason {
     -webkit-line-clamp: unset;

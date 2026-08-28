@@ -889,6 +889,11 @@ test("summary drawer redirects page wheel scrolling and lets standard equipment 
   assert.match(appSource, /standard-equipment-summary/);
   assert.doesNotMatch(appSource, /nested-standard-equipment/);
   assert.doesNotMatch(stylesSource, /\.nested-standard-equipment/);
+  assert.doesNotMatch(
+    stylesSource,
+    /\.model-picker|\.tooltip-tail|\.customer-card|\.choice-relation-eyebrow|\.choice-relation-count|\.summary-drawer-icon|\.vehicle-setup-intro|\.choice-note/,
+    "dead selector families removed by the CSS cleanup must not return",
+  );
 
   const summaryDrawer = runtime.elements.get("#summaryDrawer");
   runtime.handleDrawerWheel({ deltaY: 120, deltaX: 7, preventDefault() { this.prevented = true; } });
