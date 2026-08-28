@@ -1394,9 +1394,16 @@ textarea {
 
 .disabled-reason,
 .auto-reason {
-  color: var(--warn);
   font-size: 12px;
   font-weight: 750;
+}
+
+.disabled-reason {
+  color: var(--warn);
+}
+
+.auto-reason {
+  color: var(--ok);
 }
 
 .choice-state {
@@ -1501,10 +1508,6 @@ textarea {
 .choice-relationship-badge.includes.disabled .info-tooltip:focus-visible,
 .choice-relationship-badge.includes.disabled .info-tooltip.is-open {
   color: var(--dim);
-}
-
-.auto-reason {
-  color: var(--ok);
 }
 
 /* summary-drawer action copies (Reset / Download / Submit) are a mobile-only
@@ -2568,6 +2571,7 @@ body:has(.app-shell[data-mobile-drawer]) {
   .choice-panel {
     order: 2;
     min-width: 0;
+    padding: 16px;
   }
 
   .setup-choice-grid,
@@ -2620,15 +2624,6 @@ body:has(.app-shell[data-mobile-drawer]) {
   .choice-card,
   .choice-media {
     min-width: 0;
-  }
-
-  .vehicle-setup-next-action {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .setup-choice-grid {
-    grid-template-columns: 1fr;
   }
 
   .step-rail {
@@ -2713,10 +2708,6 @@ body:has(.app-shell[data-mobile-drawer]) {
   .summary-card[data-requirements-status="complete"] {
     border-color: rgba(53, 184, 93, 0.4);
     background: rgba(53, 184, 93, 0.08);
-  }
-
-  .choice-panel {
-    padding: 16px;
   }
 
   .workspace {
