@@ -45,15 +45,24 @@ class TestImagesWorkspaceParity(unittest.TestCase):
         self.assertIn("onRequestClose={onClose}", self.asset_manager)
         self.assertNotIn('className="asset-inspector panel"', self.asset_manager)
 
-    def test_dirty_signal_compares_preview_against_its_seed(self):
-        """§3C. Fails again if `dirty` is hardcoded or dropped.
+    def test_dirty_signal_covers_preview_and_resolution_selections(self):
+        """§3C. Fails again if any pending resolution choice is unguarded.
 
-        `preview` is seeded and re-seeded from `initial`, so that is the only
-        comparison that reports real unsaved operator edits.
+        `preview` is seeded from `initial`, while candidate, inventory, and
+        assignment choices have independent state and can remain meaningful
+        even when the resulting URL equals the seeded preview.
         """
         self.assertIn("const dirty = useMemo(", self.asset_manager)
         self.assertIn(
             "JSON.stringify(preview) !== JSON.stringify(initial)", self.asset_manager
+        )
+        self.assertIn(
+            "Boolean(selectedCandidate || inventoryUrl || targetItemId)",
+            self.asset_manager,
+        )
+        self.assertIn(
+            "[preview, initial, selectedCandidate, inventoryUrl, targetItemId]",
+            self.asset_manager,
         )
 
     def test_open_image_decision_is_navigation_state(self):
@@ -101,14 +110,22 @@ class TestImagesWorkspaceParity(unittest.TestCase):
             "operatorLifecycle[draftLifecycle?.draft?.status]", self.asset_manager
         )
 
-    def test_a_linked_decision_outside_the_current_page_is_reported(self):
-        """§3F. Fails again if an unresolvable link renders as an empty page.
+    def test_a_linked_decision_is_resolved_outside_the_current_page_and_filters(self):
+        """§3F. Fails again if reload only checks the visible queue page.
 
-        The queue is filtered and paginated, so a valid link can point outside
-        the loaded page; silence there is indistinguishable from a broken link.
+        The locator deliberately omits UI filters and walks bounded server pages,
+        so a link created under another filter or page still opens after reload.
         """
-        self.assertIn("{selectedId && !selected && (", self.asset_manager)
-        self.assertIn("The linked image decision is not in the current filter", self.asset_manager)
+        locator = self.asset_manager.split("async function findLinkedAsset", 1)[1].split(
+            "export default function AssetManager", 1
+        )[0]
+        self.assertIn("limit: LINK_LOOKUP_PAGE_SIZE", locator)
+        self.assertIn("draft_id: draftId", locator)
+        self.assertNotIn("...filters", locator)
+        self.assertIn("candidate.id === itemId", locator)
+        self.assertIn("offset >= result.queue.total", locator)
+        self.assertIn("findLinkedAsset(selectedId, draftId)", self.asset_manager)
+        self.assertIn("linkedAsset.id === selectedId ? linkedAsset.item : null", self.asset_manager)
 
     def test_opening_the_workspace_does_not_auto_open_a_decision(self):
         """§3C. Fails again if load() re-selects the first queue item.

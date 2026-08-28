@@ -61,3 +61,17 @@ one proves necessary it must be additive and named in the delivery record.
 Canonical workbook and data, generated artifacts, published registry, customer
 runtime, dependencies, durable mutation and Apply/Rebuild semantics, dealer
 submission, media, deployment, and security behaviour are untouched.
+
+## 7. Review corrections
+
+- 2026-08-27: A deep link now resolves its exact asset through bounded pages of
+  the existing unfiltered reconciliation API when the visible page or restored
+  default filters do not contain it. No backend or API contract changed.
+- 2026-08-27: The editor dirty signal now includes explicit candidate,
+  inventory, and assignment-target selections as well as preview-field edits.
+- Validation after the review corrections: owner gate 8 passed; its two new
+  assertions each failed under a forced mutation; the full Workbook Manager
+  checkpoint passed 372 tests, 2 skipped, and 74 subtests; the frontend
+  production build and validation-catalog gate passed. Browser proof reopened
+  page-two item `18cfc89cd5ce6d2cc45c` after reload and an assignment-only
+  selection raised the dirty-close confirmation. No resolution was submitted.

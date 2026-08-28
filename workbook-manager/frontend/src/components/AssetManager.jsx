@@ -8,6 +8,7 @@ import {
 import { api } from "../api.js";
 
 const PAGE_SIZE = 24;
+const LINK_LOOKUP_PAGE_SIZE = 100;
 const STATUS_LABELS = {
   safe_proposal: "Safe proposals",
   covered: "Covered",
@@ -110,6 +111,21 @@ function QueueThumbnail({ item }) {
   );
 }
 
+async function findLinkedAsset(itemId, draftId) {
+  let offset = 0;
+  while (true) {
+    const result = await api.assetReconciliation({
+      offset,
+      limit: LINK_LOOKUP_PAGE_SIZE,
+      draft_id: draftId,
+    });
+    const item = result.queue.items.find((candidate) => candidate.id === itemId);
+    if (item) return item;
+    offset += result.queue.items.length;
+    if (!result.queue.items.length || offset >= result.queue.total) return null;
+  }
+}
+
 export default function AssetManager({
   models, modelKey, setModelKey, draftId, draftMutable, draftLifecycle, onChanged,
   navigation, onNavigationChange,
@@ -132,6 +148,7 @@ export default function AssetManager({
   });
   const [offset, setOffset] = useState(0);
   const [data, setData] = useState(null);
+  const [linkedAsset, setLinkedAsset] = useState({ id: "", item: null, loading: false, error: "" });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState(null);
@@ -154,6 +171,31 @@ export default function AssetManager({
 
   useEffect(() => { load(false); }, [load]);
 
+  const queuedSelection = data?.queue.items.find((item) => item.id === selectedId) || null;
+  useEffect(() => {
+    if (!selectedId || !data || queuedSelection) {
+      setLinkedAsset({ id: "", item: null, loading: false, error: "" });
+      return undefined;
+    }
+    let cancelled = false;
+    setLinkedAsset({ id: selectedId, item: null, loading: true, error: "" });
+    findLinkedAsset(selectedId, draftId)
+      .then((item) => {
+        if (!cancelled) setLinkedAsset({ id: selectedId, item, loading: false, error: "" });
+      })
+      .catch((lookupError) => {
+        if (!cancelled) {
+          setLinkedAsset({
+            id: selectedId,
+            item: null,
+            loading: false,
+            error: lookupError.message,
+          });
+        }
+      });
+    return () => { cancelled = true; };
+  }, [selectedId, data, queuedSelection, draftId]);
+
   const updateFilter = (key, value) => {
     setFilters((current) => ({
       ...current,
@@ -164,7 +206,9 @@ export default function AssetManager({
     setOffset(0);
     if (selectedId) selectAsset("");
   };
-  const selected = data?.queue.items.find((item) => item.id === selectedId) || null;
+  const selected = queuedSelection || (
+    linkedAsset.id === selectedId ? linkedAsset.item : null
+  );
   const activeModelCoverage = data?.coverage.models.find(
     (model) => model.model_key === filters.model
   );
@@ -341,9 +385,14 @@ export default function AssetManager({
             </div>
           </div>
 
-          {selectedId && !selected && (
+          {selectedId && !selected && linkedAsset.loading && (
+            <div className="notice">Loading the linked image decision…</div>
+          )}
+          {selectedId && !selected && !linkedAsset.loading && (
             <div className="notice warn">
-              The linked image decision is not in the current filter or page.{" "}
+              {linkedAsset.error
+                ? `The linked image decision could not be loaded: ${linkedAsset.error}`
+                : "The linked image decision no longer exists in this reconciliation snapshot."}{" "}
               <button className="btn small" type="button" onClick={() => selectAsset("")}>
                 Clear the link
               </button>
@@ -426,11 +475,14 @@ function AssetInspector({
     }
   };
   // §3C dirty contract: the shell must be able to refuse a silent close while
-  // unsaved preview, candidate, or inventory edits are pending. Compared against
-  // the same `initial` the preview is seeded and re-seeded from.
+  // unsaved preview, candidate, inventory, or assignment decisions are pending.
+  // Preview is compared against the same `initial` it is seeded from; the three
+  // selection controls start empty and remain explicit pending intent even when
+  // their selected URL happens to match the seeded preview.
   const dirty = useMemo(
-    () => JSON.stringify(preview) !== JSON.stringify(initial),
-    [preview, initial],
+    () => JSON.stringify(preview) !== JSON.stringify(initial)
+      || Boolean(selectedCandidate || inventoryUrl || targetItemId),
+    [preview, initial, selectedCandidate, inventoryUrl, targetItemId],
   );
 
   const resolve = (resolution_kind, extra = {}) => onResolve({
