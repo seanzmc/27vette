@@ -802,6 +802,7 @@ test("shell containers stay full-bleed without the retired desk rhythm", () => {
   assert.match(appShellBlock, /overflow:\s*clip;/);
   assert.doesNotMatch(stylesSource, /--shell-radius/);
   assert.doesNotMatch(stylesSource, /gap:\s*var\(--shell-gap\)/);
+  assert.doesNotMatch(stylesSource, /--shell-gap:|--choice-hover:/);
   assert.match(stylesSource, /\.alert-region:empty\s*\{\s*display:\s*none;\s*\}/);
   assert.doesNotMatch(stylesSource, /\.vehicle-bar/);
   assert.doesNotMatch(stylesSource, /border-radius:\s*8px 8px 0 0/);
