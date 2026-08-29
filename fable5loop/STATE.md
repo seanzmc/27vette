@@ -19,16 +19,15 @@ Keep this file small — it is read at the start of every session:
 ## Current handoff
 
 - **Updated:** 2026-08-29
-- **Owning specification:** `workbook-manager/audit-spec.md` and its evidence source `workbook-manager/wbookMgrAuditRpt.md`; the specification owns checkpoint status and acceptance evidence.
+- **Owning specification:** None; docs-only maintenance pass with no active specification.
 - **Active workflow:** Normal repository path.
-- **Branch/commit:** `feat/workbook-manager-workflow-history`; implementation `230ed99` (`feat: add durable workbook workflow history`), with specification/state closeout following on the same branch.
-- **Last completed:** Closed Checkpoint 1A / P1.1 / WM-001. Added versioned, paginated durable Workflow history composed from existing draft/operation/immutable-attempt evidence; made it primary in Advanced & Recovery; kept retired staging/sync rows in a separate Legacy staging history disclosure; added filters, exact-draft navigation, technical evidence, recovery-mode availability, operator guidance, and HIST-01–04 coverage.
-- **Current status:** Checkpoint 1A is implementation-complete and stopped at its independently useful exit gate. `HIST-01` through `HIST-04` pass. Checkpoint 1B and every later implementation checkpoint remain unauthorized.
-- **Validation:** Final catalog-selected Workbook Manager serial group: 356 passed, 2 skipped, 74 subtests, with one existing Starlette/httpx deprecation warning. Focused RED→GREEN API/presentation tests, Python compilation, frontend production build, and `git diff --check` passed. The history read is fixed-budget and write-denied in tests, and it passes with the projection removed.
-- **Real-browser proof:** Isolated desktop and 390x844 runs showed one successful apply and one proven-restored downstream failure with correct generated/publication/rollback evidence, a separately counted legacy row, projection-independent reload, expandable technical evidence, exact-draft one-change review, Back/Forward restoration, keyboard focus, zero console errors, and 390px scroll/client width with no document overflow.
-- **Next action:** Review and merge the Checkpoint 1A pull request if accepted. Begin Checkpoint 1B only after a separate explicit authorization.
-- **Blockers or closeout gaps:** No Checkpoint 1A implementation blocker or closeout gap is implied. Checkpoint 2D retains its separate approval stop before adding writable registry families for the four preserved sheets.
-- **Protected boundaries:** Canonical workbook/data, generated runtime contracts, published `form-app/data.js`, cache-bearing `form-app/index.html`, dependencies, durable mutation and Apply/Rebuild semantics, dealer submission, media mutation, deployment, and security behavior are unchanged; protected preflight hashes were reproduced exactly.
+- **Branch/commit:** `docs/trim-agent-guides`; pending commit.
+- **Last completed:** De-granularized the authoritative agent docs. `AGENTS.md` rewritten as durable principles only (202 to 122 lines): removed single-incident and module-mechanics prose (asset-sync flag semantics, the Workbook Manager mega-paragraph, catalog change-scope narrative, turn-reservation ritual, PR ceremony verbosity) and delegated it to the owning module READMEs, `docs/`, and `tests/validation_catalog.json`. `README.md` (429 to 367 lines) kept every catalog-enforced command block and gate table verbatim while condensing the CI, codex-disposition, parity-snapshot, and Workbook Manager narrative.
+- **Current status:** Section numbering §1-§12 preserved so external `AGENTS.md §N` references stay valid. No behavior, gate, or contract changed.
+- **Validation:** `tests/test_validation_catalog.py` 27 passed (proves README still publishes every catalog command and lists every node gate); `scripts/validate_state_handoff.py`; `git diff --check`.
+- **Next action:** Review and merge the docs pull request.
+- **Blockers or closeout gaps:** None implied.
+- **Protected boundaries:** Docs-only. Workbook, generated artifacts, published registry, runtime, dealer submission, dependencies, and CI behavior untouched.
 
 ## Verified facts
 
