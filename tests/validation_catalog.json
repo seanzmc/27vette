@@ -1361,7 +1361,7 @@
       "disposition": "keep",
       "disposition_reason": "Operational-handoff contract owner.",
       "notes": "",
-      "collected_tests": 11,
+      "collected_tests": 14,
       "baseline_result": "pass"
     },
     {
