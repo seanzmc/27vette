@@ -228,11 +228,16 @@ newline-delimited URL list instead; `WBM_ASSET_MEDIA_TIMEOUT` (default 10),
    wildcard-conflict, unmatched, and unparseable items. No workbook or media
    write is reachable until the exact approved Apply and Rebuild action.
 3. **Edit durable draft** — Form Structure workspace (models, runtime steps, section
-   presentation/order, context sections, variants) and Model Operations
+   presentation/order, context sections, and a registry-derived structure index
+   for promotion, source routing, variant definitions/membership, and summary
+   mappings) and Model Operations
    workspace (options, OVS, exclusive groups + members, rule mapping, rule
    groups + members, pricing, variant overrides, assets, interior scope,
    components; shared interiors/color overrides). Collections come from the
-   workbook's own `model_workbook_sources` registry, not a hardcoded list.
+   workbook's own `model_workbook_sources` registry, not a hardcoded list. The
+   structure index likewise follows registered fixed-sheet specs and reuses the
+   versioned schema, shared editor shell, dependency inspection, and durable
+   operation lane; Save never writes the workbook.
 4. **Durable draft operations** — update/add/delete requests
    against a current projection resolve one physical workbook target and persist
    one coalesced original-to-final operation in `WBM_DB`. Coordinated

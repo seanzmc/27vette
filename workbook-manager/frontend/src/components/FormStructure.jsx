@@ -4,6 +4,7 @@ import {
 } from "lucide-react";
 import { api } from "../api.js";
 import { humanize } from "../naming.js";
+import ModelOperations from "./ModelOperations.jsx";
 import RecordForm from "./RecordForm.jsx";
 
 const STEP_FIELD_GROUPS = [
@@ -85,12 +86,18 @@ export default function FormStructure({
   models, modelKey, setModelKey, draftId, draftMutable, onChanged,
 }) {
   const [structure, setStructure] = useState(null);
+  const [structureFamilies, setStructureFamilies] = useState([]);
   const [editing, setEditing] = useState(null);
   const [error, setError] = useState("");
 
   const load = async (key) => {
     try {
-      setStructure(await api.structure(key));
+      const [nextStructure, familyIndex] = await Promise.all([
+        api.structure(key),
+        api.structureFamilies(key),
+      ]);
+      setStructure(nextStructure);
+      setStructureFamilies(familyIndex.structure_families || []);
       setError("");
     } catch (loadError) {
       setError(loadError.message);
@@ -99,6 +106,7 @@ export default function FormStructure({
 
   useEffect(() => {
     setStructure(null);
+    setStructureFamilies([]);
     setEditing(null);
     if (modelKey) load(modelKey);
   }, [modelKey]);
@@ -230,6 +238,25 @@ export default function FormStructure({
 
       {structure && (
         <>
+          <div className="section-heading">
+            <Boxes size={14} /> Registered structure management
+          </div>
+          <p className="muted">
+            Promotion, workbook source routing, variant definitions and membership,
+            and order-summary mappings use the same registry schema, editor, and
+            durable draft lane as other workbook records.
+          </p>
+          <ModelOperations
+            models={models}
+            modelKey={modelKey}
+            setModelKey={setModelKey}
+            draftId={draftId}
+            draftMutable={draftMutable}
+            onChanged={onChanged}
+            collectionsOverride={structureFamilies}
+            showModels={false}
+          />
+
           <div className="section-heading">
             <ChevronRight size={14} /> Runtime steps &amp; interface sections — {humanize(modelKey)}
           </div>

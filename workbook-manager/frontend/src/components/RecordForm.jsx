@@ -153,6 +153,7 @@ export default function RecordForm({
   fieldGroups,
   title,
   target,
+  evidence = [],
 }) {
   const [draft, setDraft] = useState(() => initialDraft(schema, initial));
   const [errors, setErrors] = useState({});
@@ -342,6 +343,11 @@ export default function RecordForm({
         </>
       )}
     >
+      {evidence.length > 0 && (
+        <div className="editor-evidence" aria-label="Change impact evidence">
+          {evidence.map((item) => <div key={item}>{item}</div>)}
+        </div>
+      )}
       <form ref={formRef} onSubmit={(event) => { event.preventDefault(); submit(); }} noValidate>
         {groupedColumns.map(([group, columns]) => (
           <fieldset className="editor-field-group" key={group}>
