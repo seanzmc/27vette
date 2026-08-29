@@ -195,7 +195,8 @@
       "reads": [
         "fable5loop/STATE.md",
         "fable5loop/STATE-archive.md",
-        "README.md"
+        "README.md",
+        "tests/validation_catalog.json"
       ],
       "writes": [],
       "isolation": "read_only",
@@ -1345,7 +1346,8 @@
       "reads": [
         "fable5loop/STATE.md",
         "fable5loop/STATE-archive.md",
-        "scripts/validate_state_handoff.py"
+        "scripts/validate_state_handoff.py",
+        "tests/validation_catalog.json"
       ],
       "writes": [
         "<tmp_path>/**"
