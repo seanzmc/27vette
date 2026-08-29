@@ -21,11 +21,11 @@ Keep this file small — it is read at the start of every session:
 - **Updated:** 2026-08-29
 - **Owning specification:** `workbook-manager/audit-spec.md` Checkpoint 1B (P1.2 / registered-family half of WM-002).
 - **Active workflow:** Normal repository path.
-- **Branch/commit:** `feat/workbook-manager-structure-management`; implementation `f0e023d`; closeout/delivery commit pending.
+- **Branch/commit:** `feat/workbook-manager-structure-management`; implementation `f0e023d`; closeout `48dffda`; PR #62 (`https://github.com/seanzmc/27vette/pull/62`).
 - **Last completed:** Closed Checkpoint 1B. Form Overview now derives its structure-family index from registered fixed-sheet specs and reaches promotion, workbook source routing, variant definitions/membership, order-summary sections, and step-summary mappings through the existing versioned schema, shared editor shell, dependency inspection, and durable-operation lane. A real-browser race between the default collection and the derived index was reproduced RED and fixed with a request-identity guard.
 - **Current status:** STRUCT-01–04 pass. One isolated promotion-note edit saved exactly one operation owned by source row 2 and survived reload; no workbook write occurred. README and User Guide describe the new path.
 - **Validation:** focused catalog/form-graph owners → 31 passed; catalog-selected Manager serial group → 333 passed, 2 skipped, 74 subtests (one existing Starlette/httpx deprecation warning); Python compilation and frontend production build passed. Isolated import was package/schema-valid with semantic readback. Desktop/390x844 Chrome reached all six required families, saved/reloaded one operation, had zero console/runtime errors, and no document overflow. Canonical workbook, copied workbook, published data/cache HTML, and all six runtime-contract SHA-256 values match preflight.
-- **Next action:** Deliver the Checkpoint 1B PR; Checkpoint 1C remains unauthorized and requires a new explicit request.
+- **Next action:** Review PR #62; Checkpoint 1C remains unauthorized and requires a new explicit request.
 - **Blockers or closeout gaps:** None implied.
 - **Protected boundaries:** Workbook and generated artifacts, customer runtime, dealer submission, durable lifecycle/apply semantics, dependencies, workbook schema, and deployment are unchanged. No Apply/Rebuild, live dealer submission, deployment/cache purge, or WordPress mutation ran.
 

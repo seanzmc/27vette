@@ -1073,6 +1073,7 @@ Each authorized checkpoint appends one concise dated record containing:
   focused 31-test owners, frontend build, and the 333-pass Manager serial gate
   are recorded above. No workbook, generated, customer-runtime, dealer,
   dependency, schema, or deployment boundary changed. Residual risk: none
-  implied. Delivery branch `feat/workbook-manager-structure-management`; PR/CI
-  and review disposition are pending final delivery. Checkpoint 1C requires new
-  explicit authorization.
+  implied. Delivery branch `feat/workbook-manager-structure-management`;
+  implementation `f0e023d`, closeout `48dffda`, and PR #62
+  (`https://github.com/seanzmc/27vette/pull/62`) are delivered. CI and review
+  disposition are pending. Checkpoint 1C requires new explicit authorization.
