@@ -19,15 +19,15 @@ Keep this file small — it is read at the start of every session:
 ## Current handoff
 
 - **Updated:** 2026-08-29
-- **Owning specification:** None; docs-only maintenance pass with no active specification.
+- **Owning specification:** None; docs/validation-contract maintenance with no active specification. The catalog's own spec is archived at `docs/archive/completed-specs/fast-layered-validation/`.
 - **Active workflow:** Normal repository path.
-- **Branch/commit:** `docs/trim-agent-guides`; pending commit.
-- **Last completed:** De-granularized the authoritative agent docs. `AGENTS.md` rewritten as durable principles only (202 to 122 lines): removed single-incident and module-mechanics prose (asset-sync flag semantics, the Workbook Manager mega-paragraph, catalog change-scope narrative, turn-reservation ritual, PR ceremony verbosity) and delegated it to the owning module READMEs, `docs/`, and `tests/validation_catalog.json`. `README.md` (429 to 367 lines) kept every catalog-enforced command block and gate table verbatim while condensing the CI, codex-disposition, parity-snapshot, and Workbook Manager narrative.
-- **Current status:** Section numbering §1-§12 preserved so external `AGENTS.md §N` references stay valid. No behavior, gate, or contract changed.
-- **Validation:** `tests/test_validation_catalog.py` 27 passed (proves README still publishes every catalog command and lists every node gate); `scripts/validate_state_handoff.py`; `git diff --check`.
-- **Next action:** Review and merge the docs pull request.
+- **Branch/commit:** `docs/trim-agent-guides`; `d487f9d` plus the catalog-coupling commit.
+- **Last completed:** Two-part de-granularization. (1) `AGENTS.md` 202 to 122 lines, rewritten as durable principles with module mechanics delegated to their owning files; `README.md` narrative condensed. (2) Loosened the catalog/README coupling that blocked further trimming: §7 condition 5 no longer requires README to mirror the inventory. `test_readme_publishes_every_catalog_command_it_claims` and `test_readme_lists_every_node_gate` are replaced by drift-only checks — a README `sh` block naming a cataloged script must equal that catalog command, and a gate name in README must still exist on disk. Dead `readme_reference` / `readme_publishes_command` fields removed from 157 catalog entries; README's 15-row per-surface pytest table replaced by a catalog query.
+- **Current status:** README 429 to 357 lines and now free to shrink further without failing a gate. Gate inventory, selection, and CI behavior unchanged.
+- **Validation:** `tests/test_validation_catalog.py`, `tests/test_catalog_change_scope.py`, `tests/test_run_layered_validation.py` → 85 passed. Both new condition-5 checks have a forced mutation in `test_checks_fail_on_a_mutated_catalog`, proved failing before the fix. `scripts/validate_state_handoff.py` and `git diff --check` pass.
+- **Next action:** Review and merge PR #61.
 - **Blockers or closeout gaps:** None implied.
-- **Protected boundaries:** Docs-only. Workbook, generated artifacts, published registry, runtime, dealer submission, dependencies, and CI behavior untouched.
+- **Protected boundaries:** Docs and test-contract only. Workbook, generated artifacts, published registry, runtime, dealer submission, dependencies, gate commands, and CI selection are unchanged; catalog edits touched only descriptive README-pointer fields, which `scripts/catalog_change_scope.py` classifies as non-selection.
 
 ## Verified facts
 
