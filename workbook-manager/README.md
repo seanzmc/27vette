@@ -102,6 +102,11 @@ exact ChangeSet emission, and shared-service preview and approval lifecycles:
 - `GET /api/drafts` lets the single-user browser recover the latest nonterminal
   durable draft, and `POST /api/drafts/{draft_id}/cancel` records a terminal
   cancellation without deleting operation or artifact history.
+- `GET /api/workflow-history` is the versioned, paginated read model over
+  durable workflow outcomes and immutable evidence. It remains available when
+  the disposable projection is unavailable. The separate `GET /api/history`
+  route is retained only as read-only legacy staging/sync evidence and never
+  contributes to current workflow totals.
 - The active Form Structure and Model Operations editors write only durable
   operations. Draft Review shows projected before/final values, physical
   sheet/row lineage, model context, exact ChangeSet/preview/approval identities,

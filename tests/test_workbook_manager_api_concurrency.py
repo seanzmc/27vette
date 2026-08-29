@@ -14,6 +14,7 @@ from __future__ import annotations
 import concurrent.futures
 import contextlib
 import importlib
+import json
 import os
 import sqlite3
 import sys
@@ -600,6 +601,87 @@ class TestLifespanAndRequestConnections(unittest.TestCase):
     def tearDown(self):
         self.tempdir.cleanup()
 
+    @staticmethod
+    def _insert_history_draft(
+        state,
+        *,
+        draft_id: str,
+        status: str,
+        updated_ts: str,
+        model: str = "stingray",
+        apply_result: dict | None = None,
+        allowed_verbs: list[str] | None = None,
+    ) -> None:
+        state.execute(
+            "INSERT INTO workflow_drafts(id, created_ts, updated_ts, session_id, "
+            "actor, status, base_workbook_sha256, base_workbook_mtime_ns) "
+            "VALUES(?,?,?,?,?,?,?,?)",
+            (
+                draft_id, "2026-08-29T10:00:00+00:00", updated_ts, "session-1",
+                "Sean", status, f"{draft_id}-base-sha", "123",
+            ),
+        )
+        state.execute(
+            "INSERT INTO draft_operations(draft_id, created_ts, updated_ts, "
+            "table_name, family, model_id, source_sheet, source_row, physical_key, "
+            "entity_key_json, action, original_json, final_json, changed_fields_json, "
+            "model_context_json) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (
+                draft_id, "2026-08-29T10:00:00+00:00", updated_ts, "options",
+                "options", model, f"{model}_options", 10, '["opt_test"]',
+                '{"option_id":"opt_test"}', "update", "{}", "{}", "{}",
+                json.dumps([model]),
+            ),
+        )
+        if apply_result is None:
+            state.commit()
+            return
+        change_set_id = f"changeset-{draft_id}"
+        semantic = f"semantic-{draft_id}"
+        preview_id = f"preview-{draft_id}"
+        approval_id = f"approval-{draft_id}"
+        state.execute(
+            "INSERT INTO draft_changesets(draft_id, created_ts, change_set_id, "
+            "semantic_fingerprint, payload_json) VALUES(?,?,?,?,?)",
+            (draft_id, updated_ts, change_set_id, semantic, '{"schemaVersion":"workbook-changeset-1"}'),
+        )
+        state.execute(
+            "INSERT INTO draft_preview_attempts(id, draft_id, change_set_id, "
+            "semantic_fingerprint, started_ts, completed_ts, artifact_kind, "
+            "result_json, workbook_identity_state, manager_state, allowed_verbs_json) "
+            "VALUES(?,?,?,?,?,?,?,?,?,?,?)",
+            (
+                preview_id, draft_id, change_set_id, semantic, updated_ts, updated_ts,
+                "formal_preview", "{}", "unchanged", "preview_ready", "[]",
+            ),
+        )
+        state.execute(
+            "INSERT INTO draft_approval_attempts(id, draft_id, preview_attempt_id, "
+            "change_set_id, semantic_fingerprint, preview_fingerprint, actor, "
+            "warning_ids_json, started_ts, completed_ts, artifact_kind, result_json, "
+            "manager_state, allowed_verbs_json) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (
+                approval_id, draft_id, preview_id, change_set_id, semantic,
+                f"preview-fingerprint-{draft_id}", "Sean", "[]", updated_ts,
+                updated_ts, "formal_approval", "{}", "approved", "[]",
+            ),
+        )
+        state.execute(
+            "INSERT INTO draft_apply_attempts(id, draft_id, preview_attempt_id, "
+            "approval_attempt_id, change_set_id, semantic_fingerprint, "
+            "preview_fingerprint, approval_fingerprint, started_ts, completed_ts, "
+            "artifact_kind, result_json, workbook_identity_state, manager_state, "
+            "allowed_verbs_json, active) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0)",
+            (
+                f"apply-{draft_id}", draft_id, preview_id, approval_id, change_set_id,
+                semantic, f"preview-fingerprint-{draft_id}",
+                f"approval-fingerprint-{draft_id}", updated_ts, updated_ts,
+                "formal_receipt", json.dumps(apply_result), "unchanged", status,
+                json.dumps(allowed_verbs or []),
+            ),
+        )
+        state.commit()
+
     def test_lifespan_bootstraps_storage_before_serving_any_request(self):
         from fastapi.testclient import TestClient
 
@@ -623,6 +705,263 @@ class TestLifespanAndRequestConnections(unittest.TestCase):
                     durable["migration_id"],
                 )
                 self.assertEqual(client.get("/api/status").status_code, 200)
+
+    def test_current_workflow_history_is_versioned_and_separate_from_legacy(self):
+        """HIST-01/HIST-04: durable Apply evidence is not legacy history."""
+        from fastapi.testclient import TestClient
+
+        with manager_app(self.root) as main:
+            with TestClient(main.app) as client:
+                state = main.dbmod.connect(
+                    main.config.DEFAULT_DB, foreign_keys=True
+                )
+                try:
+                    state.execute(
+                        "INSERT INTO workflow_drafts(id, created_ts, updated_ts, "
+                        "session_id, actor, status, base_workbook_sha256, "
+                        "base_workbook_mtime_ns) VALUES(?,?,?,?,?,?,?,?)",
+                        (
+                            "draft-applied", "2026-08-29T10:00:00+00:00",
+                            "2026-08-29T10:05:00+00:00", "session-1", "Sean",
+                            "applied", "base-sha", "123",
+                        ),
+                    )
+                    state.execute(
+                        "INSERT INTO draft_operations(draft_id, created_ts, updated_ts, "
+                        "table_name, family, model_id, source_sheet, source_row, "
+                        "physical_key, entity_key_json, action, original_json, "
+                        "final_json, changed_fields_json, model_context_json) "
+                        "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                        (
+                            "draft-applied", "2026-08-29T10:00:00+00:00",
+                            "2026-08-29T10:01:00+00:00", "options", "options",
+                            "stingray", "stingray_options", 10, '["opt_test"]',
+                            '{"option_id":"opt_test"}', "update", "{}", "{}",
+                            "{}", '["stingray"]',
+                        ),
+                    )
+                    state.execute(
+                        "INSERT INTO change_history(ts, actor, entity_type, entity_id, "
+                        "model_id, op, status, sync_status) VALUES(?,?,?,?,?,?,?,?)",
+                        (
+                            "2026-07-01T00:00:00+00:00", "Legacy", "options",
+                            "opt_legacy", "stingray", "update", "committed", "synced",
+                        ),
+                    )
+                    state.commit()
+                finally:
+                    state.close()
+
+                current = client.get(
+                    "/api/workflow-history",
+                    params={"status": "applied", "model": "stingray", "limit": 25},
+                )
+                self.assertEqual(200, current.status_code, current.text)
+                payload = current.json()
+                self.assertEqual(
+                    "workbook-manager-workflow-history-1", payload["schema_version"]
+                )
+                self.assertEqual(1, payload["total"])
+                self.assertEqual(["applied"], payload["available_statuses"])
+                record = payload["history"][0]
+                self.assertEqual("draft-applied", record["draft_id"])
+                self.assertEqual("/api/drafts/draft-applied", record["draft_api_url"])
+                self.assertEqual("Sean", record["actor"])
+                self.assertEqual(["stingray"], record["affected_models"])
+                self.assertEqual(1, record["operation_count"])
+                self.assertEqual("base-sha", record["workbook"]["base_sha256"])
+
+                legacy = client.get("/api/history").json()
+                self.assertEqual(1, legacy["total"])
+                self.assertEqual("opt_legacy", legacy["history"][0]["entity_id"])
+
+    def test_workflow_history_summarizes_apply_and_restored_failure_evidence(self):
+        """HIST-01/HIST-02: outcomes derive from immutable attempts."""
+        from fastapi.testclient import TestClient
+
+        success = {
+            "ok": True,
+            "status": "applied",
+            "workbookState": "saved",
+            "applyRebuild": {
+                "status": "current",
+                "affected_models": ["stingray"],
+                "workbook": {
+                    "state": "applied",
+                    "before_sha256": "before-sha",
+                    "after_sha256": "after-sha",
+                },
+                "generated_contracts": {"state": "current"},
+                "publication": {"state": "current"},
+                "rollback": {"state": "not_required", "verified": True},
+            },
+        }
+        failure = {
+            "ok": False,
+            "status": "apply_rebuild_failed_rolled_back",
+            "workbookState": "restored",
+            "errors": ["RuntimeError: generation failed"],
+            "applyRebuild": {
+                "status": "restored",
+                "workbook": {"state": "restored"},
+                "generated_contracts": {"state": "restored"},
+                "publication": {"state": "restored"},
+                "rollback": {"state": "verified", "verified": True},
+            },
+        }
+        with manager_app(self.root) as main:
+            with TestClient(main.app) as client:
+                state = main.dbmod.connect(main.config.DEFAULT_DB, foreign_keys=True)
+                try:
+                    self._insert_history_draft(
+                        state, draft_id="draft-applied", status="applied",
+                        updated_ts="2026-08-29T10:05:00+00:00", apply_result=success,
+                    )
+                    operation_id = state.execute(
+                        "SELECT id FROM draft_operations WHERE draft_id=?",
+                        ("draft-applied",),
+                    ).fetchone()["id"]
+                    state.execute(
+                        "INSERT INTO draft_asset_resolutions(draft_id, operation_id, "
+                        "created_ts, updated_ts, item_id, resolution_kind, "
+                        "reconciliation_sha256, media_inventory_sha256, workbook_sha256, "
+                        "media_url, candidate_source, candidate_reason, evidence_json) "
+                        "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                        (
+                            "draft-applied", operation_id,
+                            "2026-08-29T10:04:00+00:00",
+                            "2026-08-29T10:04:00+00:00", "asset-item-1", "accepted",
+                            "reconciliation-sha", "inventory-sha", "workbook-sha",
+                            "https://example.invalid/asset.jpg", "exact_rpo",
+                            "deterministic match", '{"reviewed":true}',
+                        ),
+                    )
+                    state.commit()
+                    self._insert_history_draft(
+                        state, draft_id="draft-restored",
+                        status="apply_restored_retryable",
+                        updated_ts="2026-08-29T10:06:00+00:00", apply_result=failure,
+                        allowed_verbs=["retry_apply", "cancel"],
+                    )
+                finally:
+                    state.close()
+
+                records = {
+                    row["draft_id"]: row
+                    for row in client.get("/api/workflow-history").json()["history"]
+                }
+                applied = records["draft-applied"]
+                self.assertEqual("Applied and rebuilt", applied["outcome"]["summary"])
+                self.assertEqual("after-sha", applied["workbook"]["after_sha256"])
+                self.assertEqual("current", applied["outcome"]["generation_state"])
+                self.assertEqual("current", applied["outcome"]["publication_state"])
+                self.assertEqual(
+                    success,
+                    applied["technical_evidence"]["apply_attempts"][0]["result"],
+                )
+                asset_evidence = applied["technical_evidence"]["asset_resolutions"]
+                self.assertEqual("asset-item-1", asset_evidence[0]["item_id"])
+                self.assertEqual({"reviewed": True}, asset_evidence[0]["evidence"])
+
+                restored = records["draft-restored"]
+                self.assertEqual(
+                    "Rebuild or publication failed; protected files restored",
+                    restored["outcome"]["summary"],
+                )
+                self.assertEqual("rebuild_or_publication", restored["outcome"]["failed_stage"])
+                self.assertEqual("RuntimeError: generation failed", restored["outcome"]["error"])
+                self.assertEqual(
+                    ["workbook", "generated_contracts", "publication"],
+                    restored["outcome"]["restored_surfaces"],
+                )
+                self.assertEqual(["retry_apply", "cancel"], restored["outcome"]["next_actions"])
+
+    def test_workflow_history_paginates_terminal_records_without_projection(self):
+        """HIST-03: rejected/cancelled history survives missing projection."""
+        from fastapi.testclient import TestClient
+
+        with manager_app(self.root) as main:
+            with TestClient(main.app) as client:
+                state = main.dbmod.connect(main.config.DEFAULT_DB, foreign_keys=True)
+                try:
+                    self._insert_history_draft(
+                        state, draft_id="draft-rejected", status="preview_rejected",
+                        updated_ts="2026-08-29T10:05:00+00:00",
+                    )
+                    self._insert_history_draft(
+                        state, draft_id="draft-cancelled", status="cancelled",
+                        updated_ts="2026-08-29T10:05:00+00:00",
+                    )
+                finally:
+                    state.close()
+                main.config.DEFAULT_PROJECTION_DB.unlink()
+
+                first = client.get(
+                    "/api/workflow-history", params={"limit": 1, "offset": 0}
+                )
+                second = client.get(
+                    "/api/workflow-history", params={"limit": 1, "offset": 1}
+                )
+                self.assertEqual(200, first.status_code, first.text)
+                self.assertEqual(200, second.status_code, second.text)
+                self.assertEqual(2, first.json()["total"])
+                self.assertEqual("draft-rejected", first.json()["history"][0]["draft_id"])
+                self.assertEqual("draft-cancelled", second.json()["history"][0]["draft_id"])
+                for payload in (first.json(), second.json()):
+                    self.assertNotIn(
+                        "applied", payload["history"][0]["outcome"]["summary"].lower()
+                    )
+
+                invalid = client.get(
+                    "/api/workflow-history", params={"status": "mutable_draft"}
+                )
+                self.assertEqual(422, invalid.status_code, invalid.text)
+                self.assertEqual(
+                    "invalid_history_status", invalid.json()["detail"]["status"]
+                )
+
+    def test_workflow_history_read_is_bounded_and_nonmutating(self):
+        """The durable read model has a fixed query budget and cannot write."""
+        with manager_app(self.root) as main:
+            from fastapi.testclient import TestClient
+
+            with TestClient(main.app):
+                state = main.dbmod.connect(main.config.DEFAULT_DB, foreign_keys=True)
+                try:
+                    self._insert_history_draft(
+                        state, draft_id="draft-a", status="cancelled",
+                        updated_ts="2026-08-29T10:05:00+00:00",
+                    )
+                    self._insert_history_draft(
+                        state, draft_id="draft-b", status="preview_rejected",
+                        updated_ts="2026-08-29T10:05:00+00:00",
+                    )
+                    statements = []
+                    state.set_trace_callback(statements.append)
+
+                    def deny_writes(action, _arg1, _arg2, _database, _trigger):
+                        if action in {
+                            sqlite3.SQLITE_INSERT,
+                            sqlite3.SQLITE_UPDATE,
+                            sqlite3.SQLITE_DELETE,
+                        }:
+                            return sqlite3.SQLITE_DENY
+                        return sqlite3.SQLITE_OK
+
+                    state.set_authorizer(deny_writes)
+                    payload = main.drafts.workflow_history(state, limit=25)
+                finally:
+                    state.close()
+
+                self.assertEqual(
+                    ["draft-b", "draft-a"],
+                    [record["draft_id"] for record in payload["history"]],
+                )
+                select_count = sum(
+                    statement.lstrip().upper().startswith("SELECT")
+                    for statement in statements
+                )
+                self.assertLessEqual(select_count, 10, statements)
 
     def test_structure_schema_endpoint_serves_read_only_projections(self):
         """`/api/tables` renders every STRUCTURE_TABLE, writable or not.

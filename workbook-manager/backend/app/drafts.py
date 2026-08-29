@@ -49,6 +49,20 @@ TERMINAL_DRAFT_STATUSES = frozenset({
     "abandoned_unknown",
 })
 
+WORKFLOW_HISTORY_SCHEMA_VERSION = "workbook-manager-workflow-history-1"
+WORKFLOW_HISTORY_STATUSES = (
+    "applied",
+    "cancelled",
+    "preview_rejected",
+    "approval_rejected",
+    "apply_rejected",
+    "apply_restored_retryable",
+    "workbook_state_unknown",
+    "manually_resolved_restored",
+    "manually_resolved_applied",
+    "abandoned_unknown",
+)
+
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
@@ -532,6 +546,189 @@ def list_drafts(state_conn: sqlite3.Connection, *, limit: int = 50) -> list[dict
         (limit,),
     ).fetchall()
     return [dict(row) for row in rows]
+
+
+def _history_outcome(status: str, apply_attempts: list[dict]) -> dict:
+    latest = apply_attempts[-1] if apply_attempts else {}
+    result = latest.get("result") or {}
+    rebuild = result.get("applyRebuild") or {}
+    summaries = {
+        "applied": "Applied and rebuilt",
+        "cancelled": "Cancelled before workbook write",
+        "preview_rejected": "Validation rejected",
+        "approval_rejected": "Approval rejected",
+        "apply_rejected": "Apply rejected before workbook change",
+        "apply_restored_retryable": (
+            "Rebuild or publication failed; protected files restored"
+        ),
+        "workbook_state_unknown": "Workbook state requires manual recovery",
+        "manually_resolved_restored": "Manual recovery verified restoration",
+        "manually_resolved_applied": "Manual recovery verified workbook changes",
+        "abandoned_unknown": "Recovery abandoned with workbook state unknown",
+    }
+    restored_surfaces = [
+        name
+        for name in ("workbook", "generated_contracts", "publication")
+        if (rebuild.get(name) or {}).get("state") == "restored"
+    ]
+    errors = result.get("errors") or []
+    return {
+        "summary": summaries[status],
+        "failed_stage": (
+            "rebuild_or_publication"
+            if result.get("status") == "apply_rebuild_failed_rolled_back"
+            else ""
+        ),
+        "error": str(errors[0]) if errors else latest.get("exception_message", ""),
+        "restored_surfaces": restored_surfaces,
+        "rollback_state": (rebuild.get("rollback") or {}).get("state", ""),
+        "generation_state": (rebuild.get("generated_contracts") or {}).get("state", ""),
+        "publication_state": (rebuild.get("publication") or {}).get("state", ""),
+        "next_actions": latest.get("allowed_verbs") or [],
+    }
+
+
+def workflow_history(
+    state_conn: sqlite3.Connection,
+    *,
+    status: str = "",
+    model: str = "",
+    limit: int = 50,
+    offset: int = 0,
+) -> dict:
+    """Read terminal/recovery workflow evidence without consulting projection state."""
+
+    if status and status not in WORKFLOW_HISTORY_STATUSES:
+        raise DraftError(
+            "invalid_history_status",
+            f"unsupported workflow-history status {status!r}",
+        )
+    placeholders = ",".join("?" for _ in WORKFLOW_HISTORY_STATUSES)
+    where = [f"d.status IN ({placeholders})"]
+    params: list[Any] = list(WORKFLOW_HISTORY_STATUSES)
+    if status:
+        where.append("d.status=?")
+        params.append(status)
+    if model:
+        where.append(
+            "EXISTS (SELECT 1 FROM draft_operations mo WHERE mo.draft_id=d.id "
+            "AND (mo.model_id=? OR EXISTS (SELECT 1 FROM json_each("
+            "mo.model_context_json) WHERE value=?)))"
+        )
+        params.extend([model, model])
+    predicate = " AND ".join(where)
+    total = state_conn.execute(
+        f"SELECT COUNT(*) c FROM workflow_drafts d WHERE {predicate}", params
+    ).fetchone()["c"]
+    rows = state_conn.execute(
+        "SELECT d.*, COUNT(o.id) operation_count FROM workflow_drafts d "
+        "LEFT JOIN draft_operations o ON o.draft_id=d.id "
+        f"WHERE {predicate} GROUP BY d.id "
+        "ORDER BY d.updated_ts DESC, d.id DESC LIMIT ? OFFSET ?",
+        [*params, limit, offset],
+    ).fetchall()
+    draft_ids = [row["id"] for row in rows]
+    models_by_draft: dict[str, set[str]] = {draft_id: set() for draft_id in draft_ids}
+    if draft_ids:
+        id_placeholders = ",".join("?" for _ in draft_ids)
+        for operation in state_conn.execute(
+            "SELECT draft_id, model_id, model_context_json FROM draft_operations "
+            f"WHERE draft_id IN ({id_placeholders})",
+            draft_ids,
+        ).fetchall():
+            owned = models_by_draft[operation["draft_id"]]
+            model_id = str(operation["model_id"] or "")
+            if model_id and model_id != WILDCARD_MODEL_KEY:
+                owned.add(model_id)
+            owned.update(
+                str(value)
+                for value in json.loads(operation["model_context_json"] or "[]")
+                if str(value) and str(value) != WILDCARD_MODEL_KEY
+            )
+    evidence_by_draft = {
+        draft_id: {
+            "changeset": None,
+            "preview_attempts": [],
+            "approval_attempts": [],
+            "apply_attempts": [],
+            "asset_resolutions": [],
+            "manual_resolutions": [],
+            "cancellation": None,
+        }
+        for draft_id in draft_ids
+    }
+    if draft_ids:
+        id_placeholders = ",".join("?" for _ in draft_ids)
+        for row in state_conn.execute(
+            "SELECT * FROM draft_changesets "
+            f"WHERE draft_id IN ({id_placeholders})",
+            draft_ids,
+        ).fetchall():
+            artifact = dict(row)
+            artifact["artifact"] = json.loads(artifact.pop("payload_json"))
+            evidence_by_draft[row["draft_id"]]["changeset"] = artifact
+        for table, key, converter, order in (
+            ("draft_preview_attempts", "preview_attempts", _preview_attempt_dict, "started_ts, rowid"),
+            ("draft_approval_attempts", "approval_attempts", _approval_attempt_dict, "started_ts, rowid"),
+            ("draft_apply_attempts", "apply_attempts", _apply_attempt_dict, "started_ts, rowid"),
+            ("draft_asset_resolutions", "asset_resolutions", _asset_resolution_dict, "id"),
+            ("draft_manual_resolutions", "manual_resolutions", _manual_resolution_dict, "created_ts, rowid"),
+        ):
+            for row in state_conn.execute(
+                f"SELECT * FROM {table} WHERE draft_id IN ({id_placeholders}) "
+                f"ORDER BY {order}",
+                draft_ids,
+            ).fetchall():
+                evidence_by_draft[row["draft_id"]][key].append(converter(row))
+    available = [
+        row["status"]
+        for row in state_conn.execute(
+            "SELECT DISTINCT status FROM workflow_drafts "
+            f"WHERE status IN ({placeholders}) ORDER BY status",
+            WORKFLOW_HISTORY_STATUSES,
+        ).fetchall()
+    ]
+    history = []
+    for row in rows:
+        draft = dict(row)
+        draft_id = draft.pop("id")
+        evidence = evidence_by_draft[draft_id]
+        if draft["status"] == "cancelled":
+            evidence["cancellation"] = {
+                "status": "cancelled",
+                "updated_ts": draft["updated_ts"],
+            }
+        apply_attempts = evidence["apply_attempts"]
+        latest_result = apply_attempts[-1].get("result") if apply_attempts else None
+        rebuild = (latest_result or {}).get("applyRebuild") or {}
+        workbook_evidence = rebuild.get("workbook") or {}
+        history.append({
+            "draft_id": draft_id,
+            "draft_api_url": f"/api/drafts/{draft_id}",
+            "status": draft["status"],
+            "actor": draft["actor"],
+            "created_ts": draft["created_ts"],
+            "updated_ts": draft["updated_ts"],
+            "operation_count": draft["operation_count"],
+            "affected_models": sorted(models_by_draft[draft_id]),
+            "workbook": {
+                "base_sha256": draft["base_workbook_sha256"],
+                "base_mtime_ns": draft["base_workbook_mtime_ns"],
+                "before_sha256": workbook_evidence.get("before_sha256", ""),
+                "after_sha256": workbook_evidence.get("after_sha256", ""),
+                "state": workbook_evidence.get("state", ""),
+            },
+            "outcome": _history_outcome(draft["status"], apply_attempts),
+            "technical_evidence": evidence,
+        })
+    return {
+        "schema_version": WORKFLOW_HISTORY_SCHEMA_VERSION,
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+        "available_statuses": available,
+        "history": history,
+    }
 
 
 def lifecycle_view(state_conn: sqlite3.Connection, draft_id: str) -> dict:

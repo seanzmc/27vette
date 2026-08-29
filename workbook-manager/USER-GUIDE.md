@@ -65,21 +65,23 @@ wrong](#if-something-goes-wrong) before editing.
 
 ## 3. Choose where to work
 
-The Manager has five tabs:
+The Manager has seven workspaces:
 
 | Tab | Use it for |
 | --- | --- |
-| **Form Structure** | Model name and setup text, customer-facing steps, and section display order. |
-| **Model Operations** | Options, prices, rules, groups, colors, interiors, and other model details. |
-| **Asset Manager** | Image coverage, missing or broken images, image matching, crop, and position. |
-| **Draft Review** | Review every pending change and complete the final approval process. |
-| **History** | Look back at previously recorded changes. This is for reference; the current draft is in **Draft Review**. |
+| **Form Overview** | Model name, vehicle-setup copy, customer-facing steps, and section display order. |
+| **Sections & Layout** | Section structure and layout details. |
+| **Options & Relationships** | Options, prices, rules, colors, interiors, and connected model details. |
+| **Groups** | Rule and exclusive-group relationships. |
+| **Images** | Image coverage, missing or broken images, matching, crop, and position. |
+| **Review & Apply** | Review every pending change and complete the final approval process. |
+| **Advanced & Recovery** | Durable workflow history, recovery evidence, and the raw collection browser. |
 
 ## 4. Make a normal workbook change
 
 ### Change model or form information
 
-1. Open **Form Structure**.
+1. Open **Form Overview**.
 2. Choose the model.
 3. Use **Edit model metadata & Vehicle Setup copy** to change the model name or
    setup wording.
@@ -90,7 +92,7 @@ The Manager has five tabs:
 
 ### Change an option, price, rule, color, or other model item
 
-1. Open **Model Operations**.
+1. Open **Options & Relationships**.
 2. Choose the model across the top.
 3. Choose the type of information on the second row.
 4. Use **Search all fields** to find the item.
@@ -114,7 +116,7 @@ not try to work around that restriction.
 
 ## 5. Review and fix images
 
-Open **Asset Manager**, then select **Refresh inventory** when you want the
+Open **Images**, then select **Refresh inventory** when you want the
 latest image list.
 
 The coverage cards show how much of each model or section already has images.
@@ -152,12 +154,12 @@ beside the selected replacement.
 The card preview is a helpful guide, not proof of the finished order form. The
 final local model files are rebuilt only after **Apply and Rebuild** succeeds.
 
-The Asset Manager does not upload, delete, or rename WordPress images. A manual
+The Images workspace does not upload, delete, or rename WordPress images. A manual
 image link must already exist and load correctly.
 
 ## 6. Review the complete draft
 
-Open **Draft Review**. The number beside the tab is the number of pending
+Open **Review & Apply**. The number beside the workspace is the number of pending
 workbook changes.
 
 1. Read every item in **Draft operations**.
@@ -220,6 +222,19 @@ Then:
 change WordPress media, or send anything to a dealer.** Those are separate
 jobs.
 
+## 9. Review workflow history
+
+Open **Advanced & Recovery** to review completed, cancelled, rejected, restored,
+or recovery-required workflow outcomes. **Workflow history** is the current
+durable record. Filter it by affected model or outcome, and use **Open exact
+draft** to inspect the bound draft and its immutable attempts. Expand
+**Technical evidence** only when exact hashes or attempt details are needed.
+
+**Legacy staging history** is a separate read-only disclosure for the retired
+staging/sync workflow. Its rows are not included in Workflow history totals.
+Workflow history remains available when the Manager cannot verify or load the
+disposable workbook projection, so recovery evidence can still be inspected.
+
 ## If something goes wrong
 
 ### The page does not open
@@ -235,7 +250,7 @@ jobs.
 ### The Manager says “Excel lock present”
 
 Close the workbook in Excel, wait a few seconds, then select **Refresh** in
-**Draft Review**.
+**Review & Apply**.
 
 ### The Manager says “workbook changed on disk”
 
@@ -250,7 +265,7 @@ message and fix the listed workbook problem first.
 
 ### A preview or Apply and Rebuild fails
 
-Read **Warnings & failures** and the latest attempt shown in **Draft Review**.
+Read **Warnings & failures** and the latest attempt shown in **Review & Apply**.
 Use **Retry** only when the Manager offers it and you understand what was fixed.
 If **Cancel Draft** is available and you want to abandon the change, use it.
 
@@ -260,7 +275,7 @@ Stop. Do not guess and do not select a manual result just to clear the message.
 The workbook and rebuilt files must be checked independently before any manual
 choice is recorded.
 
-## Other buttons in Draft Review
+## Other buttons in Review & Apply
 
 - **Re-Import Workbook:** refreshes the Manager's working view from the real
   workbook.

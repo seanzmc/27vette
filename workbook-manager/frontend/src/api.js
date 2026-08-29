@@ -119,6 +119,10 @@ export const api = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
+  workflowHistory: (params = {}) => {
+    const q = new URLSearchParams(params).toString();
+    return request(`/api/workflow-history?${q}`);
+  },
   history: (params = {}) => {
     const q = new URLSearchParams(params).toString();
     return request(`/api/history?${q}`);
