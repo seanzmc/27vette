@@ -463,10 +463,11 @@ schema, `ModelOperations`, `RecordForm`, and `EditorShell` path. Promotion,
 source routing, variant definitions and membership, order-summary sections, and
 step-summary mappings are reachable without Advanced URL knowledge. Contextual
 evidence names source lineage, model/shared scope, dependencies, active state,
-and guarded generated impact before Save. Capabilities and exact read-only
-reasons come from the registered spec; delete inspection still uses the shared
-dependency contract. A synthetic registered fixed-sheet spec proves index
-completeness follows registry membership.
+and guarded generated impact before Save. Action-specific capabilities and
+blocked reasons call the same ownership guard as durable mutation; row-specific
+delete inspection still uses the shared dependency contract. A synthetic
+registered fixed-sheet spec proves API index completeness follows registry
+membership.
 
 Acceptance evidence:
 
@@ -476,13 +477,14 @@ Acceptance evidence:
   coalesced operation owned by `model_registry_promotion`, source row 2,
   `model_context=["stingray"]`; projection and copied/canonical workbooks stayed
   byte-identical.
-- STRUCT-03: every editable required family reports allowed create/update/delete
-  capability, the registered read-only `sections` family reports the exact
-  blocked reason, and editor/delete dependency evidence comes from the existing
-  dependency endpoint.
-- STRUCT-04: injecting a synthetic writable fixed-sheet `TableSpec` makes
-  `structure_specs()` include it; removing Manager exposure can no longer pass
-  against a closed family list.
+- STRUCT-03: create/update/delete capabilities are evaluated independently by
+  the durable mutation ownership guard; model creation and read-only sections
+  expose the guard's exact blocked reason, while row delete dependencies remain
+  enforced by the existing dependency endpoint.
+- STRUCT-04: injecting a synthetic writable fixed-sheet `TableSpec` makes both
+  `structure_specs()` and the `/api/tables` response include its schema and
+  capabilities; removing Manager exposure can no longer pass against a closed
+  family list.
 
 Checkpoint drift disposition:
 
@@ -499,13 +501,18 @@ Checkpoint drift disposition:
 | README/User Guide | Updated structure-index architecture and operator steps. |
 
 Validation: initial focused RED runs failed on the absent registry selector,
-family response, and Form Overview path; the browser-found stale collection
-race received its own RED regression before the request-identity guard. Final
-focused owners passed 31 tests. The catalog-selected Manager serial group passed
-333 tests, 2 skips, 74 subtests, with one existing Starlette/httpx deprecation
-warning. Python compilation, frontend production build, and `git diff --check`
-passed. Isolated import reported package/schema-valid and verified semantic
-readback. Real Chrome at desktop and 390x844 reached counts 1/11/32/6/11/13 for
+family response, and Form Overview path. PR review then reproduced two P2
+defects: stale rows/actions remained available during a family transition, and
+table editability incorrectly advertised model creation. Loaded table/model
+identity now fail-closes every action during transitions, and the API delegates
+each action to the durable mutation guard. A three-second CDP network delay
+proved loading state, zero stale rows/key metadata, disabled Add, correct
+post-load source-routing rows/key, the model-create refusal, and zero console
+errors. Final focused owners passed 33 tests. The catalog-selected Manager
+serial group passed 335 tests, 2 skips, 74 subtests, with one existing
+Starlette/httpx deprecation warning. Python compilation, frontend production
+build, and `git diff --check` passed. Isolated import reported package/schema-
+valid and verified semantic readback. Real Chrome at desktop and 390x844 reached counts 1/11/32/6/11/13 for
 the six families, opened promotion evidence, saved exactly one correctly owned
 draft update, preserved it after reload, reported zero console/runtime errors,
 and measured no document overflow (1425=1425; 390=390). Workbook-write,
@@ -1070,10 +1077,11 @@ Each authorized checkpoint appends one concise dated record containing:
   `f0e023d`; registry-derived structure index, shared schema editor, contextual
   pre-Save evidence, capability/dependency refusal, synthetic completeness,
   isolated durable-save proof, desktop/mobile Chrome proof, protected hashes,
-  focused 31-test owners, frontend build, and the 333-pass Manager serial gate
+  focused 33-test owners, frontend build, and the 335-pass Manager serial gate
   are recorded above. No workbook, generated, customer-runtime, dealer,
   dependency, schema, or deployment boundary changed. Residual risk: none
   implied. Delivery branch `feat/workbook-manager-structure-management`;
-  implementation `f0e023d`, closeout `48dffda`, and PR #62
-  (`https://github.com/seanzmc/27vette/pull/62`) are delivered. CI and review
-  disposition are pending. Checkpoint 1C requires new explicit authorization.
+  implementation `f0e023d`, review remediation `3c37031`, closeout `48dffda`,
+  and PR #62 (`https://github.com/seanzmc/27vette/pull/62`) are delivered. Both
+  P2 review threads are resolved with code and test evidence; current-head CI is
+  pending. Checkpoint 1C requires new explicit authorization.
