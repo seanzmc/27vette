@@ -20,26 +20,47 @@ Authority order:
 
 1. `AGENTS.md` owns conduct, source boundaries, approval gates, validation, and
    handoff.
-2. `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md`
-   remains authoritative for projection safety, durable state, exact ChangeSet
-   identity, preview/approval/apply, rollback, regeneration, publication, and
-   recovery.
-3. `docs/superpowers/specs/2026-08-21-workbook-manager-ux-recovery.md` remains
-   authoritative for the connected product model, registry-driven editor shell,
-   navigation, form graph, and Review & Apply presentation already delivered.
-4. `wbookMgrAuditRpt.md` is the evidence source for the 2026-08-29 audit findings
-   and prioritized backlog.
-5. This specification owns the remediation requirements, pass boundaries, and
-   acceptance mapping for every item in that backlog.
-6. The root and Workbook Manager READMEs own current commands. The validation
+2. `wbookMgrAuditRpt.md` owns the observed 2026-08-29 audit evidence, findings,
+   priorities, and recommended remediation direction.
+3. This specification owns the remediation requirements, checkpoint boundaries,
+   and acceptance mapping for that audit backlog.
+4. The live workbook registry, Workbook Manager code, and tests own current
+   implementation facts and identify the existing mechanisms to reuse.
+5. The root and Workbook Manager READMEs own current commands. The validation
    catalog owns gate selection, isolation, serialization, and CI inventory.
+
+The completed workflow specifications at
+`docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md` and
+`docs/superpowers/specs/2026-08-21-workbook-manager-ux-recovery.md` are historical
+delivery evidence only. They are not implementation authority for this work,
+are not required checkpoint reading, and must not override the audit report or
+this specification. An implementer may consult them only when live code and
+tests do not explain why an existing mechanism is present.
 
 If live code, workbook shape, tests, or a higher authority contradicts this
 specification, implementation stops long enough to classify the discrepancy as
 stale spec text, implementation debt, or a decision requiring approval. It must
 not invent business data or weaken a safety boundary to make a pass green.
 
-### 1.1 In scope
+### 1.1 Implementation simplicity rule
+
+Use the smallest change that directly fixes the audited behavior and passes the
+checkpoint acceptance scenarios. Reuse the current registry, projection,
+durable-draft routes and tables, ChangeSet services, shared editor controls,
+navigation helpers, and test owners wherever they already provide the needed
+path. Extend an existing mechanism before creating a parallel one.
+
+The implementation must not add a framework, abstraction layer, compatibility
+path, database migration, lifecycle state, endpoint, payload shape, or custom
+editor merely because an earlier specification proposed one or because it might
+be useful later. Add such machinery only when live evidence proves the current
+mechanisms cannot satisfy the audited outcome; record that evidence and observe
+the approval gates in §13. The “Required work” lists below define outcomes and
+the expected reuse path, not permission to build every listed idea as a new
+subsystem. Where the audit report offers alternatives, choose the simplest one
+that is truthful, safe, and fully testable.
+
+### 1.2 In scope
 
 - durable workflow history and recovery presentation;
 - reachable management for registered structure families;
@@ -54,7 +75,7 @@ not invent business data or weaken a safety boundary to make a pass green.
 - Groups discovery, search/diagnostic state, navigation cleanup, human labels,
   responsive containment, dead-control removal, and lifecycle-copy cleanup.
 
-### 1.2 Out of scope and preserved boundaries
+### 1.3 Out of scope and preserved boundaries
 
 This work does not:
 
