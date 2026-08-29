@@ -17,7 +17,9 @@ import sqlite3
 import sys
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 BACKEND = ROOT / "workbook-manager" / "backend"
@@ -34,6 +36,7 @@ from app import form_graph  # noqa: E402
 from app import main as mainmod  # noqa: E402
 from app import db as dbmod  # noqa: E402
 from app import drafts  # noqa: E402
+from app import staging  # noqa: E402
 from app.contract_parity import (  # noqa: E402
     generate_contract_snapshot,
     promoted_runtime_models,
@@ -530,19 +533,79 @@ class TestStructureEndpoint(FormGraphCase):
             self.assertEqual(
                 set(item["capabilities"]), {"create", "update", "delete"}
             )
-            self.assertTrue(all(
-                capability["allowed"]
-                for capability in item["capabilities"].values()
-            ))
             self.assertTrue(item["generated_impact"])
+        models = families["model_master"]
+        self.assertFalse(models["capabilities"]["create"]["allowed"])
+        self.assertEqual(
+            models["capabilities"]["create"]["blocked_reason"],
+            "adding a new model_master identity is outside this workflow",
+        )
+        self.assertTrue(models["capabilities"]["update"]["allowed"])
+        self.assertTrue(models["capabilities"]["delete"]["allowed"])
+        for item in families.values():
+            spec = mainmod.SPEC_BY_TABLE[item["table"]]
+            for action, capability in item["capabilities"].items():
+                expected_capability = staging.edit_capability(
+                    self.conn,
+                    spec,
+                    "z06",
+                    op={
+                        "create": "add",
+                        "update": "update",
+                        "delete": "delete",
+                    }[action],
+                )
+                self.assertEqual(
+                    capability, expected_capability, (item["family"], action)
+                )
         read_only = families["sections"]
         self.assertFalse(read_only["editable"])
         for capability in read_only["capabilities"].values():
             self.assertFalse(capability["allowed"])
             self.assertEqual(
                 capability["blocked_reason"],
-                "This registered family is read-only in the Manager.",
+                "form_sections is read-only in phase 1 (no gated workbook write "
+                "path exists for its sheet)",
             )
+
+    def test_structure_family_api_follows_a_synthetic_registered_spec(self):
+        base = mainmod.SPEC_BY_FAMILY["variant_master"]
+        synthetic = replace(
+            base,
+            family="synthetic_structure",
+            table="synthetic_structure",
+        )
+        self.conn.execute(
+            f'CREATE TABLE synthetic_structure AS SELECT * FROM "{base.table}" WHERE 0'
+        )
+        with mock.patch.object(
+            mainmod,
+            "structure_specs",
+            return_value=(*mainmod.structure_specs(), synthetic),
+        ):
+            response = mainmod.tables(model="z06", conn=self.conn)
+        item = next(
+            family for family in response["structure_families"]
+            if family["family"] == "synthetic_structure"
+        )
+        self.assertEqual(item["table"], "synthetic_structure")
+        self.assertEqual(item["schema"]["schema_version"], mainmod.TABLE_SCHEMA_VERSION)
+        self.assertEqual(set(item["capabilities"]), {"create", "update", "delete"})
+
+    def test_edit_capability_delegates_to_the_durable_mutation_guard(self):
+        spec = mainmod.SPEC_BY_FAMILY["model_master"]
+        refusal = [{"message": "guard-owned refusal"}]
+        with mock.patch.object(
+            staging, "_editable_guard", return_value=refusal
+        ) as guard:
+            capability = staging.edit_capability(
+                self.conn, spec, "z06", op="add"
+            )
+        self.assertEqual(capability, {
+            "allowed": False,
+            "blocked_reason": "guard-owned refusal",
+        })
+        guard.assert_called_once()
 
     def test_structure_response_exposes_complete_graph_and_legacy_editing_rows(self):
         response = mainmod.structure("z06", conn=self.conn)
@@ -639,6 +702,10 @@ class TestFormStructureSource(unittest.TestCase):
         self.assertIn(".editor-evidence", styles)
         self.assertIn("const loadToken = useRef(0)", operations)
         self.assertIn("if (token !== loadToken.current) return", operations)
+        self.assertIn("const [loadedIdentity, setLoadedIdentity]", operations)
+        self.assertIn("const dataReady = loadedIdentity?.table === table", operations)
+        self.assertIn("disabled={!dataReady", operations)
+        self.assertIn("{dataReady && rows.map", operations)
 
     def test_form_overview_uses_graph_classifications_and_contextual_drawer_actions(self):
         source = FORM_STRUCTURE.read_text(encoding="utf-8")

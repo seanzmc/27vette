@@ -20,11 +20,14 @@ export default function ModelOperations({
   const [editing, setEditing] = useState(null);
   const [deps, setDeps] = useState(null);     // dependency dialog state
   const [notice, setNotice] = useState(null);
+  const [loadedIdentity, setLoadedIdentity] = useState(null);
   const searchTimer = useRef(null);
   const loadToken = useRef(0);
   const LIMIT = 100;
 
   const activeCollection = collections.find((c) => c.table === table);
+  const dataReady = loadedIdentity?.table === table
+    && loadedIdentity?.modelKey === modelKey;
 
   useEffect(() => {
     (async () => {
@@ -46,12 +49,15 @@ export default function ModelOperations({
     setSchema(spec);
     setRows(resp.records);
     setTotal(resp.total);
+    setLoadedIdentity({ table: t, modelKey });
   };
 
   useEffect(() => {
+    ++loadToken.current;
     setOffset(0);
     setEditing(null);
     setDeps(null);
+    setLoadedIdentity(null);
     loadRows(table, search, 0);
   }, [table, modelKey]); // eslint-disable-line
 
@@ -93,7 +99,7 @@ export default function ModelOperations({
 
   const openEditor = async (mode, row = null) => {
     const action = mode === "add" ? "create" : "update";
-    if (!capability(action).allowed) return;
+    if (!dataReady || !capability(action).allowed) return;
     try {
       let dependents = [];
       if (row && schema) {
@@ -114,6 +120,7 @@ export default function ModelOperations({
   };
 
   const saveDelete = async (row) => {
+    if (!dataReady) return;
     try {
       await saveDraft({
         table,
@@ -132,6 +139,7 @@ export default function ModelOperations({
   };
 
   const inspectDelete = async (row) => {
+    if (!dataReady) return;
     const key = Object.fromEntries(schema.key.map((name) => [name, String(row[name] ?? "")]));
     try {
       const result = await api.dependencies(
@@ -217,7 +225,7 @@ export default function ModelOperations({
             {activeCollection?.sheet && (
               <span className="mono faint">({activeCollection.sheet})</span>
             )}
-            {schema && (
+            {dataReady && schema && (
               <span className="chip">key: {schema.key.join(" + ")}</span>
             )}
             {activeCollection && !activeCollection.editable && (
@@ -235,12 +243,13 @@ export default function ModelOperations({
                 style={{ paddingLeft: 26, width: 220 }}
                 placeholder="Search all fields…"
                 value={search}
+                disabled={!dataReady}
                 onChange={(e) => onSearch(e.target.value)}
               />
             </div>
             <button
               className="btn green small"
-              disabled={!capability("create").allowed || !draftMutable}
+              disabled={!dataReady || !capability("create").allowed || !draftMutable}
               title={capability("create").blocked_reason || "Add a registered record"}
               onClick={() => openEditor("add")}
             >
@@ -258,14 +267,21 @@ export default function ModelOperations({
               </tr>
             </thead>
             <tbody>
-              {rows.length === 0 && (
+              {!dataReady && (
+                <tr>
+                  <td colSpan={previewCols.length + 1} className="empty">
+                    Loading registered family…
+                  </td>
+                </tr>
+              )}
+              {dataReady && rows.length === 0 && (
                 <tr>
                   <td colSpan={previewCols.length + 1} className="empty">
                     No records{search ? " match the search" : ""}.
                   </td>
                 </tr>
               )}
-              {rows.map((r) => (
+              {dataReady && rows.map((r) => (
                 <tr key={r.id}>
                   {previewCols.map((c) => (
                     <td key={c.name} title={r[c.name]}>
@@ -281,7 +297,7 @@ export default function ModelOperations({
                       <button
                         className="icon-btn"
                         title={capability("update").blocked_reason || "Edit"}
-                        disabled={!capability("update").allowed || !draftMutable}
+                        disabled={!dataReady || !capability("update").allowed || !draftMutable}
                         onClick={() => openEditor("edit", r)}
                       >
                         <Pencil size={14} />
@@ -289,7 +305,7 @@ export default function ModelOperations({
                       <button
                         className="icon-btn danger"
                         title={capability("delete").blocked_reason || "Save delete to draft"}
-                        disabled={!capability("delete").allowed || !draftMutable}
+                        disabled={!dataReady || !capability("delete").allowed || !draftMutable}
                         onClick={() => inspectDelete(r)}
                       >
                         <Trash2 size={14} />
@@ -311,14 +327,14 @@ export default function ModelOperations({
             <div className="toolbar">
               <button
                 className="btn small"
-                disabled={offset === 0}
+                disabled={!dataReady || offset === 0}
                 onClick={() => { const o = Math.max(0, offset - LIMIT); setOffset(o); loadRows(table, search, o); }}
               >
                 ‹ Prev
               </button>
               <button
                 className="btn small"
-                disabled={offset + LIMIT >= total}
+                disabled={!dataReady || offset + LIMIT >= total}
                 onClick={() => { const o = offset + LIMIT; setOffset(o); loadRows(table, search, o); }}
               >
                 Next ›
@@ -331,7 +347,7 @@ export default function ModelOperations({
       {notice && <div className={`notice ${notice.kind}`}>{notice.text}</div>}
 
 
-      {editing && schema && (
+      {dataReady && editing && schema && (
         <div style={{ marginTop: 14 }}>
           <RecordForm
             key={`${table}-${editing.mode}-${editing.initial?.id ?? "new"}`}

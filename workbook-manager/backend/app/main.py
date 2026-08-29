@@ -59,7 +59,7 @@ from .catalog import (
     TABLE_SPECS,
     structure_specs,
 )
-from .staging import StagingError
+from .staging import StagingError, edit_capability
 from .validation import find_dependents
 
 WORKFLOW_MODE = "durable_apply_rebuild"
@@ -829,8 +829,15 @@ def tables(model: str = "", conn=Depends(projection_connection)):
             spec.family,
             (spec.label or humanize(spec.table), "Registered workbook structure records."),
         )
-        allowed = bool(spec.editable)
-        reason = "" if allowed else "This registered family is read-only in the Manager."
+        capabilities = {
+            action: edit_capability(
+                conn,
+                spec,
+                model,
+                op={"create": "add", "update": "update", "delete": "delete"}[action],
+            )
+            for action in ("create", "update", "delete")
+        }
         families.append({
             "family": spec.family,
             "table": spec.table,
@@ -838,7 +845,7 @@ def tables(model: str = "", conn=Depends(projection_connection)):
             "description": description,
             "sheet": schema["sheet_for_model"] or (spec.sheet[0] if spec.sheet else ""),
             "count": count,
-            "editable": allowed,
+            "editable": bool(spec.editable),
             "shared": not (spec.model_scoped or spec.has_model_key_column or spec.role),
             "context": "selected_model" if (
                 spec.model_scoped or spec.has_model_key_column or spec.role
@@ -847,10 +854,7 @@ def tables(model: str = "", conn=Depends(projection_connection)):
                 "Guarded Apply and Rebuild conservatively validates all registered models "
                 "for this global workbook family."
             ),
-            "capabilities": {
-                action: {"allowed": allowed, "blocked_reason": reason}
-                for action in ("create", "update", "delete")
-            },
+            "capabilities": capabilities,
             "schema": schema,
         })
     return {
