@@ -152,6 +152,40 @@ def _editable_guard(
     return []
 
 
+def edit_capability(
+    conn,
+    spec: TableSpec,
+    model_id: str,
+    *,
+    op: str,
+) -> dict:
+    """Inspect table/action ownership using the durable mutation guard.
+
+    Row-specific validation and dependency checks still run when an operation
+    is authored. This preflight prevents the Manager from advertising actions
+    that the shared ownership policy rejects for every row in the selected
+    model context.
+    """
+    row_model = str(model_id or "") if spec.column_by_name("model_key") else ""
+    key = {
+        name: row_model if name == "model_key" else ""
+        for name in spec.key
+    }
+    record = {"model_key": row_model} if row_model else {}
+    errors = _editable_guard(
+        conn,
+        spec,
+        model_id,
+        op=op,
+        key=key,
+        record=record,
+    )
+    return {
+        "allowed": not errors,
+        "blocked_reason": errors[0]["message"] if errors else "",
+    }
+
+
 def stage_change(conn: sqlite3.Connection, *, table: str, model_id: str,
                  op: str, key: dict, record: dict | None,
                  session_id: str = "",

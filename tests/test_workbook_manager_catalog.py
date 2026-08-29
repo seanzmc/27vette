@@ -32,6 +32,27 @@ WORKBOOK = ROOT / "stingray_master.xlsx"
 
 
 class TestCatalogParity(unittest.TestCase):
+    def test_structure_specs_follow_registered_fixed_sheet_specs(self):
+        expected_families = {
+            "model_registry_promotion",
+            "model_workbook_sources",
+            "variant_master",
+            "model_variants",
+            "order_summary_sections_meta",
+            "step_order_summary_map_meta",
+        }
+        specs = catalog.structure_specs()
+        self.assertTrue(expected_families.issubset({spec.family for spec in specs}))
+
+        synthetic = catalog.TableSpec(
+            table="synthetic_structure",
+            family="synthetic_structure",
+            sheet=("synthetic_structure",),
+            editable=True,
+        )
+        followed = catalog.structure_specs((*catalog.WRITABLE_SPECS, synthetic))
+        self.assertIn("synthetic_structure", {spec.table for spec in followed})
+
     def test_group_editor_metadata_follows_registry_derived_specs(self):
         group = replace(
             catalog.SPEC_BY_FAMILY["exclusive_groups"],
