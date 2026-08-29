@@ -10,11 +10,11 @@ window.CORVETTE_FORM_DATA = {
         "cardSubtitle": "Refreshed everyday supercar",
         "eyebrow": "Refreshed everyday supercar",
         "title": "Next-generation LS6 power for the everyday supercar",
-        "description": "The 2027 Stingray moves to Corvette\u2019s next-generation LS6 6.7L V8, pairing 535 horsepower with the familiar rear-drive Stingray foundation before you choose colors and options.",
+        "description": "The 2027 Stingray steps up to Corvette\u2019s next-generation LS6 6.7L V8, making 535 horsepower and 520 lb/ft torque.",
         "facts": [
           "LS6 6.7L V8",
           "535 hp / 520 lb-ft",
-          "Available center-exit exhaust"
+          "200mph Top-Speed"
         ]
       },
       "data": {
@@ -24,7 +24,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "stingray_options",
-          "generated_at": "2026-08-23T07:05:23+00:00",
+          "generated_at": "2026-08-27T22:54:48+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -107248,7 +107248,7 @@ window.CORVETTE_FORM_DATA = {
         "title": "Grand Sport balance with the confidence of eAWD",
         "description": "The 2027 Grand Sport X pairs the LS6 6.7L V8 with a front-axle electric motor, delivering 721 combined horsepower and performance-focused all-wheel-drive traction for road and track.",
         "facts": [
-          "LS6 6.7L V8 + front motor",
+          "LS6 6.7L V8 + front e-motor",
           "721 combined hp",
           "Performance eAWD"
         ]
@@ -107260,7 +107260,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grand_sport_x_options",
-          "generated_at": "2026-08-23T07:05:24+00:00",
+          "generated_at": "2026-08-27T22:54:47+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -161339,11 +161339,11 @@ window.CORVETTE_FORM_DATA = {
         "cardSubtitle": "Track-born, street-legal supercar",
         "eyebrow": "TRACK-BORN, STREET-LEGAL SUPERCAR",
         "title": "The most powerful naturally aspirated V8 ever built",
-        "description": "The Z06 pairs the hand-built LT6 5.5L flat-plane V8 \u2014 670 horsepower to an 8,600 rpm redline \u2014 with a wide-body stance, aggressive aero and quad center exhaust.",
+        "description": "The Z06 is powered by the hand-built LT6 5.5L flat-plane V8 producing 670 horsepower with an 8,600 rpm redline, and features a wide-body stance, aggressive aero, and quad center exhaust.",
         "facts": [
           "LT6 5.5L V8",
-          "670 hp / 8,600 rpm",
-          "Quad center exhaust"
+          "1.22g Lateral Grip",
+          "Available Z07"
         ]
       },
       "data": {
@@ -161353,7 +161353,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-08-23T07:05:25+00:00",
+          "generated_at": "2026-08-27T22:54:48+00:00",
           "status": "runtime_active"
         },
         "variants": [

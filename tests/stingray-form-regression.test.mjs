@@ -802,6 +802,7 @@ test("shell containers stay full-bleed without the retired desk rhythm", () => {
   assert.match(appShellBlock, /overflow:\s*clip;/);
   assert.doesNotMatch(stylesSource, /--shell-radius/);
   assert.doesNotMatch(stylesSource, /gap:\s*var\(--shell-gap\)/);
+  assert.doesNotMatch(stylesSource, /--shell-gap:|--choice-hover:/);
   assert.match(stylesSource, /\.alert-region:empty\s*\{\s*display:\s*none;\s*\}/);
   assert.doesNotMatch(stylesSource, /\.vehicle-bar/);
   assert.doesNotMatch(stylesSource, /border-radius:\s*8px 8px 0 0/);
@@ -812,9 +813,12 @@ test("summary drawer is callable from desktop and condensed at smaller breakpoin
   const baseStyles = stylesSource.slice(0, stylesSource.indexOf("@media (max-width: 1120px)"));
   const middleStart = stylesSource.indexOf("@media (max-width: 1120px)");
   const narrowDesktopStart = stylesSource.indexOf("@media (min-width: 761px) and (max-width: 887px)");
-  // the paint step adds an earlier scoped 760px block; the shell mobile
-  // breakpoint is the one after the narrow-desktop breakpoint
-  const mobileStart = stylesSource.indexOf("@media (max-width: 760px)", narrowDesktopStart);
+  const mobileStart = stylesSource.indexOf("@media (max-width: 760px)");
+  assert.equal(
+    stylesSource.split("@media (max-width: 760px)").length - 1,
+    1,
+    "the mobile breakpoint must stay a single block so this slice is unambiguous",
+  );
   const reducedMotionStart = stylesSource.indexOf("@media (prefers-reduced-motion: reduce)");
   const middleBreakpoint = stylesSource.slice(middleStart, narrowDesktopStart);
   const narrowDesktopBreakpoint = stylesSource.slice(narrowDesktopStart, mobileStart);
@@ -889,6 +893,11 @@ test("summary drawer redirects page wheel scrolling and lets standard equipment 
   assert.match(appSource, /standard-equipment-summary/);
   assert.doesNotMatch(appSource, /nested-standard-equipment/);
   assert.doesNotMatch(stylesSource, /\.nested-standard-equipment/);
+  assert.doesNotMatch(
+    stylesSource,
+    /\.model-picker|\.tooltip-tail|\.customer-card|\.choice-relation-eyebrow|\.choice-relation-count|\.summary-drawer-icon|\.vehicle-setup-intro|\.choice-note/,
+    "dead selector families removed by the CSS cleanup must not return",
+  );
 
   const summaryDrawer = runtime.elements.get("#summaryDrawer");
   runtime.handleDrawerWheel({ deltaY: 120, deltaX: 7, preventDefault() { this.prevented = true; } });

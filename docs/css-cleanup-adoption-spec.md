@@ -1,7 +1,7 @@
 # CSS Cleanup Adoption Spec (`form-app/styles.css`)
 
-Date: 2026-08-19
-Status: Proposed — not implemented
+Date: 2026-08-19 (implementation status updated 2026-08-29)
+Status: Partially implemented — Steps 1, 2, 3, 4, and 7 shipped; Steps 5 and 8–12 pending; Step 6 deferred
 Change class: styling-first (Steps 1–5, 7, 9–12 are CSS-only; Step 8 is the only HTML/JS step; Step 6 is deferred)
 Owning audit: `docs/css_coverage_audit.md` §7 and §13
 
@@ -114,6 +114,49 @@ Audit §12 item 11 (shared backdrop recipe) is **not** a new class. Step 4 alrea
 the duplicate media copies of `.mobile-drawer-backdrop:not([hidden])`. Do not introduce
 `.backdrop` here — that would be an HTML change and belongs only if Step 8 is later
 expanded.
+
+## Implementation status
+
+Recorded 2026-08-29 against branch `claude/css-issues-spec-8c60c4` (PR #57). Steps not
+listed below are unstarted; re-grep before editing, because the line numbers throughout
+this spec were derived at `3ce3cae` and every shipped step has moved them.
+
+| Step | Status | Commit | Notes |
+| --- | --- | --- | --- |
+| 1 | Shipped | `c29f405` | All 8 dead families removed. Emitters re-grepped at edit time; a `doesNotMatch` guard now covers all 8, not just the 4 the step named. |
+| 2 | Shipped | `257ccee` | `.auto-reason` defined once as `--ok`; `.choice-panel` and `.vehicle-setup-next-action` merged; the bare `.setup-choice-grid` block deleted and the grouped block left intact as the step required. |
+| 3 | Shipped | `8edc5c6` | Merged forward. Cascade equivalence held: no selector in the 1120px or 761–887px blocks matches the moved paint selectors, and each moved rule is `#stepContent`-scoped. The stale suite comment is gone, `mobileStart` is a plain `indexOf`, and a new assertion pins the breakpoint to one block. |
+| 4 | Shipped | `7b702f3` | The 9 `.summary-panel` duplicates, 2 backdrop copies, 4 card `order` values, 3 `.topbar` `align-items`, and the `.step-link` column. Live overrides kept, including the `min-width: 1121px` backdrop `display: none`. |
+| 5 | Pending | — | Not started. |
+| 6 | Deferred | — | Unchanged: nesting conflicts with `cssBlock()`'s first-`}` match. Not a shipping PR under this spec. |
+| 7 | Shipped | `9c00207` | One deviation from the step's list, below. |
+| 8–12 | Pending | — | Not started. Step 8 remains the only authorized HTML/JS pass. |
+
+`form-app/styles.css` went from 2,898 to 2,757 lines across the five shipped steps.
+
+### Deviation recorded against Step 7
+
+`.choice-card.auto` keeps `border-color: var(--line)`. The step listed it as a redundant
+restate; it is not. It overrides `.choice-card:hover` at equal specificity on later source
+order, so an auto card deliberately does not take the hover border. Only its `background`
+restate was removed. Its `background` was safe to drop because `app.js` never emits
+`.disabled` and `.auto` on the same card — `disabledReason` is empty whenever `autoReason`
+is set (`renderChoiceCard`).
+
+### Acceptance evidence for the shipped steps
+
+- `node --test tests/stingray-form-regression.test.mjs tests/multi-model-runtime-switching.test.mjs`
+  — 162 passed, 0 failed, re-run after every step.
+- `.venv/bin/python -m pytest tests/test_validation_catalog.py -q` — 27 passed.
+- Real-browser computed-style pass on `form-app` at port 4173. At 375px on the paint step
+  the Step 3 rules still win: `.vehicle-stage` `height: 176px` / `padding: 4px 0 12px`,
+  `.choice-media` `36px`, `.choice-name` `11px`, and `.choice-grid` two 167.5px columns
+  rather than the generic mobile `1fr` — the evidence Step 3 required before shipping. The
+  other steps were checked the same way: drawer `position: fixed`, `z-index: 30`,
+  `width: 330px`, `padding: 16px`, `transform: none` when open; backdrop `display: block`
+  at `z-index: 20`; summary cards order 1/2/3/4; `.vehicle-setup-next-action`
+  `display: none`; `.step-link` `26px 1fr`; `.topbar` center-aligned; body font stack
+  starting at `ui-sans-serif`. No console errors.
 
 ## Plan — one PR per shipping step, in this order
 
