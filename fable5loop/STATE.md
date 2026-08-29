@@ -19,16 +19,15 @@ Keep this file small — it is read at the start of every session:
 ## Current handoff
 
 - **Updated:** 2026-08-29
-- **Owning specification:** `workbook-manager/audit-spec.md` (proposed; 963 lines) and its evidence source `workbook-manager/wbookMgrAuditRpt.md`. Together they own the 2026-08-29 audit findings, priorities, remediation checkpoints, and acceptance mapping.
+- **Owning specification:** None; docs-only maintenance pass with no active specification.
 - **Active workflow:** Normal repository path.
-- **Branch/commit:** `docs/workbook-manager-audit-authority`; authority/simplicity update `100a361` (state closeout follows on the same branch).
-- **Last completed:** Revised the audit specification's authority order so `wbookMgrAuditRpt.md` owns audit evidence/priorities and `audit-spec.md` owns remediation checkpoints/acceptance. The two completed Workbook Manager specifications are now historical delivery evidence only, not required checkpoint reading or implementation authority. Added a governing simplicity rule: use the smallest fully tested fix, reuse live registry/draft/ChangeSet/editor/navigation/test mechanisms, and do not add frameworks, migrations, states, endpoints, payloads, or custom editors without evidence that existing mechanisms cannot close the finding. Updated the Workbook Manager README pointer consistently.
-- **Current status:** Specification-only authority clarification complete; no implementation checkpoint is authorized. The audit ledger remains unchanged at 23 items (6 P1, 9 P2, 8 P3), 11 findings, and 64 acceptance scenarios.
-- **Validation:** Programmatic coverage/traceability check passed for all 23 priority IDs, 11 findings, and 64 unique acceptance definitions. Catalog-selected layered validation passed: 1 source-parity canary, 27 catalog tests, 61 workbook-truth tests, 15 disposition tests, 38 runner tests, the complete candidate lane, frontend production build, and the Workbook Manager serial group (322 passed, 2 skipped, 74 subtests). `scripts/validate_state_handoff.py` and `git diff --check` passed.
-- **Real-browser proof:** Not run; this task changes documentation only and authorizes no Manager behavior.
-- **Next action:** Review the clarified authority/simplicity rules and, if accepted, explicitly authorize Checkpoint 1A (trustworthy durable workflow history). Later checkpoints remain unauthorized until their preceding exit gates are recorded.
-- **Blockers or closeout gaps:** Implementation requires explicit authorization to begin; Checkpoint 2D retains its additional approval stop before adding writable registry families for the four preserved sheets. No closeout gap is implied for this docs-only clarification.
-- **Protected boundaries:** Canonical workbook/data, generated artifacts, published registry, customer runtime, dependencies, durable mutation and Apply/Rebuild semantics, dealer submission, media, deployment, and security behavior are untouched.
+- **Branch/commit:** `docs/trim-agent-guides`; pending commit.
+- **Last completed:** De-granularized the authoritative agent docs. `AGENTS.md` rewritten as durable principles only (202 to 122 lines): removed single-incident and module-mechanics prose (asset-sync flag semantics, the Workbook Manager mega-paragraph, catalog change-scope narrative, turn-reservation ritual, PR ceremony verbosity) and delegated it to the owning module READMEs, `docs/`, and `tests/validation_catalog.json`. `README.md` (429 to 367 lines) kept every catalog-enforced command block and gate table verbatim while condensing the CI, codex-disposition, parity-snapshot, and Workbook Manager narrative.
+- **Current status:** Section numbering §1-§12 preserved so external `AGENTS.md §N` references stay valid. No behavior, gate, or contract changed.
+- **Validation:** `tests/test_validation_catalog.py` 27 passed (proves README still publishes every catalog command and lists every node gate); `scripts/validate_state_handoff.py`; `git diff --check`.
+- **Next action:** Review and merge the docs pull request.
+- **Blockers or closeout gaps:** None implied.
+- **Protected boundaries:** Docs-only. Workbook, generated artifacts, published registry, runtime, dealer submission, dependencies, and CI behavior untouched.
 
 ## Verified facts
 
