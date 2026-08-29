@@ -208,11 +208,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Operational-handoff structure authority; unrelated to product validation cost.",
-      "readme_reference": ".venv/bin/python scripts/validate_state_handoff.py",
       "notes": "",
       "collected_tests": null,
-      "baseline_result": "pass",
-      "readme_publishes_command": true
+      "baseline_result": "pass"
     },
     {
       "id": "cmd.options_sheet_quality",
@@ -239,11 +237,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Source-quality authority over all configured option sheets including inactive scaffolds; also stage 4 of the candidate lane.",
-      "readme_reference": "corvette_form_generator.options_sheet_quality",
       "notes": "",
       "collected_tests": null,
-      "baseline_result": "not_run_standalone_in_this_baseline",
-      "readme_publishes_command": true
+      "baseline_result": "not_run_standalone_in_this_baseline"
     },
     {
       "id": "cmd.release_candidate_lane",
@@ -277,14 +273,12 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "This is the Layer 1 spine. Spec \u00a75 Layer 1 adds stage timing, one shared candidate result, the independent workbook-truth snapshot, and the generated runtime state matrix to it. Not measured in this baseline: it hashes the protected roots whole and cannot run beside the node generating gates.",
-      "readme_reference": "python scripts/verify_workbook_candidate.py",
       "notes": "Twelve stages: copy_candidate, workbook_package, workbook_schema, options_sheet_quality, discover_models, generate_models, validate_contracts, candidate_registry, workbook_truth, source_parity, browser_harness, semantic_drift. Checkpoint 2 added workbook_truth (builds the \u00a76.2 snapshot from the CANDIDATE workbook) and source_parity (runs both parity gates against the candidate contracts and registry through explicit temporary paths).",
       "collected_tests": null,
       "baseline_result": "not_run_in_this_baseline",
       "isolation_exceptions": [
         "./candidate-report.json is written to the invocation directory, not a temp root. It is a readiness report, not a generated product artifact, and it is not tracked or gitignored \u2014 CI uploads it and discards it. Declared here rather than left implicit by the isolation kind."
-      ],
-      "readme_publishes_command": true
+      ]
     },
     {
       "id": "cmd.workbook_package",
@@ -309,11 +303,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Cheap package-integrity authority; also stage 2 of the candidate lane.",
-      "readme_reference": ".venv/bin/python scripts/validate_workbook_package.py stingray_master.xlsx",
       "notes": "",
       "collected_tests": null,
-      "baseline_result": "not_run_standalone_in_this_baseline",
-      "readme_publishes_command": true
+      "baseline_result": "not_run_standalone_in_this_baseline"
     },
     {
       "id": "cmd.workbook_schema",
@@ -341,11 +333,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Single schema authority. Checkpoint 1 removes the SECOND invocation of this same command from node.workbook-schema-standardization, which is where the duplicate ~60s comes from \u2014 not from this gate.",
-      "readme_reference": ".venv/bin/python scripts/validate_workbook_schema.py stingray_master.xlsx",
       "notes": "Also runs as stage 3 of the candidate lane against the temporary copy.",
       "collected_tests": null,
-      "baseline_result": "not_run_standalone_in_this_baseline",
-      "readme_publishes_command": true
+      "baseline_result": "not_run_standalone_in_this_baseline"
     },
     {
       "id": "node.grand-sport-contract-preview",
@@ -377,11 +367,9 @@
       "acceptance_locks": [],
       "disposition": "diagnostic_only",
       "disposition_reason": "Still an optional Layer 4 inspection diagnostic. Checkpoint 2 gave every aggregate literal a source-derived or self-consistent expectation, and it now PASSES. Rewriting the one recorded stale count found four more: not_available 46 against 52, includes 41 against 40, special_package_review 27 against 25, and two buckets (not_recommended, except) that no longer occur at all \u2014 none of which the fourteen-gate readiness lane would ever have seen.",
-      "readme_reference": "grand-sport-contract-preview",
       "notes": "Hot-spot counts are now recomputed from the rows they summarize and each bucketed row is traced to an active source option row. Reimplementing the classifier's regexes on the expected side would have been circular; this catches a drifting counter and an invented row without doing that.",
       "collected_tests": 6,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "node.grand-sport-runtime-contract",
@@ -415,11 +403,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Checkpoint 4 removed private model generation. The gate now reads the retained contract for focused contract/product assertions; the composed candidate lane owns fresh all-model generation, strict validation, source parity, registry publication, and browser proof once.",
-      "readme_reference": "grand-sport-runtime-contract",
       "notes": "Reads the workbook through tests/lib/workbook-truth.mjs, the \u00a76.2 snapshot, since Checkpoint 2 retired the interim tests/lib/workbook-rows.mjs reader. Its Checkpoint 1 asset and colour-override parity tests are now also covered model-neutrally by node.source-to-contract-parity; the duplicate is deliberate until the retire_after_parity pass in Checkpoint 4. Checkpoint 4: no generate_form.py subprocess.",
       "collected_tests": 19,
       "baseline_result": "pass",
-      "readme_publishes_command": false,
       "checkpoint_1_result": "DONE. Both stale assertions are rewritten as parity. `colorOverrides.length === 263` became an identity-set comparison against the resolvable rows of the model's registered color_overrides sheet; the pinned J6F PNG became a sweep comparing every option's seven image fields against its applicable active asset_map row, with an unmapped-option guard. Both were mutation-proved: dropping image_alt in the generator and dropping one resolvable override row each fail exactly their own test."
     },
     {
@@ -454,11 +440,9 @@
       ],
       "disposition": "keep",
       "disposition_reason": "Named-lock and historical switching owner. Checkpoint 3 moved generic model/variant state coverage to node.runtime-state-matrix. This file keeps the default-model and ZR1X J59 locks plus the remaining named product cases. The matrix honors CORVETTE_FORM_DATA_JS through tests/lib/runtime-harness.mjs.",
-      "readme_reference": "multi-model-runtime-switching",
       "notes": "Still holds the largest static product matrix in JavaScript (13 URLs, six-model seatbelt sweep). Checkpoint 3 did not retire those named cases; the generic sweep now lives in runtime-state-matrix. The two named locks stay.",
       "collected_tests": 70,
       "baseline_result": "pass",
-      "readme_publishes_command": false,
       "checkpoint_1_result": "Unchanged except for comments. This file is now the single asserting owner of `defaultModelKey === \"stingray\"` and the only place a promoted-model change fails deliberately (spec \u00a78 canary 3); both are labelled in the source. Canary 3 measured it: after de-promoting zr1x in a copied workbook and republishing, this gate fails 8 of 70 while both parity gates follow the change."
     },
     {
@@ -493,11 +477,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Checkpoint 3 \u00a74.3 owner. Discovers every promoted model and declared active variant from the workbook-truth snapshot, then proves activation, variant resolution, reset/idempotence, selected-option validity, exclusive-group singularity, required reporting, representative include/require/exclude/replace/default/price transitions, totals, model-switch clearance, and stubbed dealer/download identity. Each invariant has a forced-failure test. No live dealer request.",
-      "readme_reference": "runtime-state-matrix",
       "notes": "Honors CORVETTE_FORM_DATA_JS through tests/lib/runtime-harness.mjs with no fallback. The candidate lane's browser_harness stage runs this beside multi-model-runtime-switching. Named model-specific generic tests stay until Checkpoint 4 mutation-proves equivalent coverage.",
       "collected_tests": 27,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "node.nonruntime-option-source-purge",
@@ -524,11 +506,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "REWRITTEN in Checkpoint 2. The recorded disposition asked for absence-parity or a named lock; neither fits, and the file says why: absence is recorded nowhere in the workbook so parity has no expected side, and \u00a74.4 reserves locks for customer or safety decisions while a retained non-runtime row is invisible to the customer. The 57 deleted ids, 21 deferred ids, and per-model component RPO lists are replaced by four source-hygiene rules that sweep every active model and catch reintroductions the id list could not. The `deferred rows remain` half moved to node.source-to-contract-parity.",
-      "readme_reference": "nonruntime-option-source-purge",
       "notes": "Retains two section ids (sec_cust_002, sec_onst_001) as the one named product literal: an emptied section and a section that never existed are indistinguishable from the current rows, so which sections were retired has to be recorded rather than derived.",
       "collected_tests": 5,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "node.source-to-contract-parity",
@@ -561,11 +541,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Checkpoint 2 \u00a74.2 owner for source-to-contract parity. Compares every promoted model's emitted variants, steps, sections, choices, standard equipment, rules, rule groups, exclusive groups, price rules, default selection rules, interiors, colour overrides, order summary, option media, and dataset binding against the \u00a76.2 workbook-truth snapshot. Model-neutral: the model list, source sheets, and contract paths all come from the workbook.",
-      "readme_reference": "source-to-contract-parity",
       "notes": "Reads CORVETTE_CONTRACT_ROOT and CORVETTE_WORKBOOK_TRUTH. The candidate lane's source_parity stage sets both so the same file proves the candidate; unset, it proves the tracked artifacts. Every relationship it asserts was measured against all six promoted models in both directions before it was written.",
       "collected_tests": 102,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "node.source-to-registry-parity",
@@ -597,11 +575,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Checkpoint 2 \u00a74.2 owner for source-to-registry parity. Membership, declared order, default model, labels, export slugs, setup copy, card media, legacy aliases, and the published payload against the contract each promotion row names. Generalizes the single membership comparison Checkpoint 1 put in z06-registry-publication.",
-      "readme_reference": "source-to-registry-parity",
       "notes": "Reads CORVETTE_FORM_DATA_JS and CORVETTE_CONTRACT_ROOT, so the candidate lane runs it against the candidate registry. This is the gate that would catch a published bundle carrying a contract other than the one its promotion row names.",
       "collected_tests": 29,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "node.stingray-form-regression",
@@ -637,11 +613,9 @@
       ],
       "disposition": "rewrite",
       "disposition_reason": "Largest node file (2,949 lines) and the primary owner of the dealer payload/security lock, which must stay. Owns one of the three superseded included-seatbelt assertions (Checkpoint 1 rewrite). Its generic single-model runtime behavior moves to the Checkpoint 3 matrix; the dealer lock, CSS/HTML contract assertions, and the default-model restatement removal stay here.",
-      "readme_reference": "stingray-form-regression",
       "notes": "",
       "collected_tests": 91,
       "baseline_result": "pass",
-      "readme_publishes_command": false,
       "checkpoint_1_result": "DONE. Same data-derived sweep as z06-runtime-rule-corrections, including the card-render checks (no interior id leak, no 'unavailable' copy without a blocking row). The superseded 'D30 should not unlock a 3LT included seatbelt peer' assertion is gone. PR review caught the first version deriving its cases, blocked peers, and added RPOs from the payload under test; the expected relationships now come from the model's registered rule-mapping and colour-override sheets via tests/lib/interior-relationships.mjs, and the sweep asserts registry-vs-workbook parity before driving the runtime. The dealer payload/security lock is untouched."
     },
     {
@@ -676,11 +650,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Checkpoint 4 removed private model generation. The gate now reads the retained contract for focused contract/product assertions; the composed candidate lane owns fresh all-model generation, strict validation, source parity, registry publication, and browser proof once.",
-      "readme_reference": "stingray-runtime-contract",
       "notes": "Checkpoint 4: no generate_form.py subprocess. Not read-only, though: two tests copy stingray_master.xlsx into a mkdtemp directory, mutate the copy, and read it back through validate_workbook_package and assemble_model_source. Those copies are not removed on exit.",
       "collected_tests": 12,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "node.tracked-artifacts-guard",
@@ -710,11 +682,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Proves the shared boundary helper is not vacuous. Spec \u00a78 canary 8 (forced tracked-output write from an isolated generating gate) belongs here. Keep and extend.",
-      "readme_reference": "tracked-artifacts-guard",
       "notes": "",
       "collected_tests": 8,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "node.workbook-schema-standardization",
@@ -745,11 +715,9 @@
       "acceptance_locks": [],
       "disposition": "rewrite",
       "disposition_reason": "Was the slowest gate in the inventory and the single largest duplicated cost: it invoked scripts/validate_workbook_schema.py, which full default validation already runs directly (spec \u00a73.2). Checkpoint 1 removed that invocation; the file now owns only its registry-derived structural sweeps and their named pinned expectations, and cmd.workbook_schema is the single schema authority.",
-      "readme_reference": "workbook-schema-standardization",
       "notes": "Holds KNOWN_TYPE_DRIFT \u2014 nine registry-declared typed columns holding text. That is a recorded workbook non-conformance, not a stale test literal.",
       "collected_tests": 12,
       "baseline_result": "pass",
-      "readme_publishes_command": false,
       "checkpoint_1_result": "DONE. The duplicate `scripts/validate_workbook_schema.py` invocation is removed; cmd.workbook_schema is the single schema authority, and README's node matrix section now points operators at it so a node-only run does not silently skip schema validation. 64.97 s -> 0.91 s, 13 -> 12 tests. Every structural sweep and its named pinned expectation is unchanged."
     },
     {
@@ -778,11 +746,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "REWRITTEN in Checkpoint 2. The hardcoded three-sheet OPTION_SHEETS list is gone; the sheet list is derived from each model's own model_workbook_sources registration, so the generic copy sweeps now cover all six active models. Named approved-copy decisions keep their product literals per \u00a74.4 but discover their model scope from the workbook (`sheetsCarrying`), and R-6 seats plus the roof labels are keyed by RPO with a relative-order rule instead of pinning per-model option ids and absolute display_order.",
-      "readme_reference": "workbook-visual-copy-standardization",
       "notes": "Adds a `no dead allowlist entries` test: an allowlisted copy difference that no longer exists must be removed, so the exception list cannot rot the way the retired sheet list did. Widening to six models needed no new allowlist entry \u2014 every difference was already reviewed.",
       "collected_tests": 9,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "node.z06-contract-preview",
@@ -814,11 +780,9 @@
       "acceptance_locks": [],
       "disposition": "diagnostic_only",
       "disposition_reason": "Optional inspection diagnostic per README. Green at this baseline.",
-      "readme_reference": "z06-contract-preview",
       "notes": "",
       "collected_tests": 2,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "node.z06-interior-accessory-cleanup",
@@ -850,11 +814,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Checkpoint 4 removed private model generation. The gate now reads the retained contract for focused contract/product assertions; the composed candidate lane owns fresh all-model generation, strict validation, source parity, registry publication, and browser proof once.",
-      "readme_reference": "z06-interior-accessory-cleanup",
       "notes": "Checkpoint 4: no generate_form.py subprocess.",
       "collected_tests": 7,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "node.z06-performance-package-interactions",
@@ -883,11 +845,9 @@
       "acceptance_locks": [],
       "disposition": "rewrite",
       "disposition_reason": "Package include/require/exclude/replace behavior expressed as one model's examples. Checkpoint 3 covers it generically (\u00a74.3 item 9) over every promoted model; keep whatever remains genuinely Z06-specific as named cases.",
-      "readme_reference": "z06-performance-package-interactions",
       "notes": "",
       "collected_tests": 21,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "node.z06-published-runtime",
@@ -916,11 +876,9 @@
       "acceptance_locks": [],
       "disposition": "rewrite",
       "disposition_reason": "Read-only published-registry checks for one model, plus a restatement of the default-model lock. Checkpoint 3 replaces the per-model assertions with matrix coverage over every promoted model; Checkpoint 1/2 removes the defaultModelKey restatement.",
-      "readme_reference": "z06-published-runtime",
       "notes": "Reads the workbook through the \u00a76.2 snapshot after Checkpoint 2 retired tests/lib/workbook-rows.mjs.",
       "collected_tests": 4,
       "baseline_result": "pass",
-      "readme_publishes_command": false,
       "checkpoint_1_result": "DONE. Both restatements removed: `defaultModelKey === \"stingray\"` (owned by multi-model-runtime-switching) and the six-key membership literal, which now compares against the promotion rows."
     },
     {
@@ -952,11 +910,9 @@
       "acceptance_locks": [],
       "disposition": "rewrite",
       "disposition_reason": "Owns the stale three-model-key literal. Checkpoint 1 rewrites it as parity against active model_registry_promotion rows, or \u2014 with approval \u2014 promotes it to the named promoted_model_membership lock. Also restates the default-model lock, which is removed. The isolated-publication and atomic-boundary assertions are structural and stay.",
-      "readme_reference": "z06-registry-publication",
       "notes": "Reads the workbook through the \u00a76.2 snapshot after Checkpoint 2 retired tests/lib/workbook-rows.mjs. Its membership comparison is now also owned model-neutrally by node.source-to-registry-parity.",
       "collected_tests": 2,
       "baseline_result": "pass",
-      "readme_publishes_command": false,
       "checkpoint_1_result": "DONE. The ['stingray','grandSport','z06'] literal is now a comparison against the active promoted rows of model_registry_promotion, ordered by display_order. The defaultModelKey restatement is replaced by a parity check against the single active default_model row, naming multi-model-runtime-switching as the lock owner. promoted_model_membership stays PROPOSED \u2014 declaring it needs \u00a712 approval, which this checkpoint did not seek."
     },
     {
@@ -990,11 +946,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Checkpoint 4 removed private model generation. The gate now reads the retained contract for focused contract/product assertions; the composed candidate lane owns fresh all-model generation, strict validation, source parity, registry publication, and browser proof once.",
-      "readme_reference": "z06-runtime-contract",
       "notes": "Still carries expectedVariantIds and a standardSections literal set; Checkpoint 2 routes those to parity against workbook-declared variant and section rows. Checkpoint 4: no generate_form.py subprocess.",
       "collected_tests": 24,
       "baseline_result": "pass",
-      "readme_publishes_command": false,
       "checkpoint_1_result": "DONE. The superseded included-seatbelt assertion and the 22-row interior/seatbelt table are replaced by parity between the emitted interior-sourced includes rules and interior-conditioned price rules and the model's registered rule-mapping and price-rule sheets. Mutation-proved: dropping one interior-sourced includes rule in rules.py fails it."
     },
     {
@@ -1025,11 +979,9 @@
       "acceptance_locks": [],
       "disposition": "rewrite",
       "disposition_reason": "Owns one of the three superseded included-seatbelt assertions (Checkpoint 1 rewrite as parity). The remaining rule-correction cases are generic exclusive-group and auto-add invariants that Checkpoint 3 covers in the matrix.",
-      "readme_reference": "z06-runtime-rule-corrections",
       "notes": "",
       "collected_tests": 15,
       "baseline_result": "pass",
-      "readme_publishes_command": false,
       "checkpoint_1_result": "DONE. The 22-row table and the superseded 'included colour blocks every peer' behaviour are replaced by a sweep whose cases, blocked peers, and added RPOs are read from the model's registered rule-mapping and colour-override sheets, with registry-vs-workbook parity asserted first. Slower than the stale version (3.91 s -> 5.44 s) because it exercises every peer of every case instead of one. Mutation-proved three ways: suppressing the seat-belt disable reason in app.js, dropping one interior-targeted excludes row, and dropping one resolvable colour-override row each fail it."
     },
     {
@@ -1061,11 +1013,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "First-class production-build owner for Workbook Manager frontend changes; browser UX acceptance remains a separately recorded manual checkpoint until an approved browser-test dependency exists.",
-      "readme_reference": "npm --prefix workbook-manager/frontend ci --include=dev && npm --prefix workbook-manager/frontend run build",
       "notes": "Uses the committed lockfile, explicitly includes the Vite build devDependencies even under NODE_ENV=production, and writes only gitignored frontend dependency/build directories.",
       "collected_tests": 0,
-      "baseline_result": "pass",
-      "readme_publishes_command": true
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_all_model_runtime_generation",
@@ -1096,11 +1046,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Checkpoint 4 removed this direct CLI/summary proof from the default Python metadata suite. It remains a Layer 3 real-workbook owner; the composed candidate lane is the single default all-model generation path.",
-      "readme_reference": "test_all_model_runtime_generation",
       "notes": "",
       "collected_tests": 30,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_asset_map_sync",
@@ -1130,11 +1078,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Asset/media sync owner (50 tests) using the deterministic fixture media list. Never touches the live asset library.",
-      "readme_reference": "test_asset_map_sync",
       "notes": "Also listed in the Workbook Manager checkpoint inventory.",
       "collected_tests": 50,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_atomic_registry_write",
@@ -1163,11 +1109,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Atomic-replacement and destination-mode invariants for the published registry (\u00a74.1 last bullet). Covers the 0644\u21920600 class of defect that git cannot see.",
-      "readme_reference": "test_atomic_registry_write",
       "notes": "",
       "collected_tests": 9,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_corvette_form_generator_contract",
@@ -1194,11 +1138,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Shared contract-surface helpers; pure and fast. Layer 0 content.",
-      "readme_reference": "test_corvette_form_generator_contract",
       "notes": "",
       "collected_tests": 10,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_editor_lints",
@@ -1226,11 +1168,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "STATE 2026-07-26 recorded four RealWorkbookCompareTest failures (orphan_ref findings on valid interior ids, a display_order_collision expectation with zero collisions, two KeyErrors on resolved deviations). Measured at this baseline: 27 passed, 0 failed. Those failures are resolved; the file is a working structural owner. See finding.editor_lints_failures_resolved.",
-      "readme_reference": "test_editor_lints",
       "notes": "",
       "collected_tests": 27,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_editor_ops_apply",
@@ -1260,11 +1200,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Largest editor owner (63 tests) and the guarded save_workbook_safely()/apply_batch write-path authority. Candidate for the \u00a73.2 'repeated workbook mutation/generation owner' cost \u2014 see expensive_setups; if the measured baseline confirms it, Checkpoint 4 shares one base copy rather than removing proof.",
-      "readme_reference": "test_editor_ops_apply",
       "notes": "",
       "collected_tests": 63,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_editor_ops_global_families",
@@ -1294,11 +1232,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Already compact-fixture based \u2014 the shape Checkpoint 5 wants everywhere.",
-      "readme_reference": "test_editor_ops_global_families",
       "notes": "",
       "collected_tests": 16,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_editor_ops_meta",
@@ -1326,11 +1262,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Sheet-meta registry unit tests; pure. Layer 0 content.",
-      "readme_reference": "test_editor_ops_meta",
       "notes": "",
       "collected_tests": 9,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_editor_server_payload",
@@ -1360,11 +1294,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Editor payload derivation; no product literals.",
-      "readme_reference": "test_editor_server_payload",
       "notes": "",
       "collected_tests": 21,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_editor_server_write_api",
@@ -1395,11 +1327,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Write-API boundary for the editor server; routes through the same guarded write contract.",
-      "readme_reference": "test_editor_server_write_api",
       "notes": "",
       "collected_tests": 4,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_state_handoff",
@@ -1430,11 +1360,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Operational-handoff contract owner.",
-      "readme_reference": "test_state_handoff",
       "notes": "",
       "collected_tests": 11,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_generate_form_model_discovery_cli",
@@ -1464,11 +1392,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "CLI-argument contract for generate_form.py. Distinct from generation output parity.",
-      "readme_reference": "test_generate_form_model_discovery_cli",
       "notes": "",
       "collected_tests": 3,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_generation_safety",
@@ -1495,11 +1421,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Fail-closed isolated-generation invariants. Pure structural, no canonical workbook generation \u2014 Layer 0 material as written.",
-      "readme_reference": "test_generation_safety",
       "notes": "",
       "collected_tests": 13,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_model_config_metadata",
@@ -1528,11 +1452,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Checkpoint 4 moved the 84-case runtime-step mutation sweep to direct load_runtime_steps checks on one in-memory workbook (118.48s -> 14.97s locally), while retaining representative real generation failures for promoted and unpromoted models.",
-      "readme_reference": "test_model_config_metadata",
       "notes": "",
       "collected_tests": 23,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_model_generation_route",
@@ -1562,11 +1484,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Proves no model has a private generation route, by execution with the callee patched out. Cheap because generation itself is spied, not run.",
-      "readme_reference": "test_model_generation_route",
       "notes": "",
       "collected_tests": 23,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_options_sheet_quality",
@@ -1597,11 +1517,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Owns the source-quality module the candidate lane's stage 4 calls. Honors OPTIONS_SHEET_QUALITY_WORKBOOK for reviewed pre-write repair.",
-      "readme_reference": "test_options_sheet_quality",
       "notes": "Checkpoint 0 recorded this file as runnable only with PYTHONPATH=scripts. Checkpoint 1's tests/conftest.py owns that path insertion for the whole directory, so it now runs alone with PYTHONPATH unset; see finding.import_order_dependence.",
       "collected_tests": 18,
       "baseline_result": "pass",
-      "readme_publishes_command": false,
       "checkpoint_1_result": "DONE. Runs alone with no PYTHONPATH (18 passed) via the new tests/conftest.py."
     },
     {
@@ -1631,11 +1549,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Promotion gating parity with generator discovery metadata; includes the candidate-lane gate on promote.",
-      "readme_reference": "test_promote_model",
       "notes": "",
       "collected_tests": 10,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_registry_promotion_metadata",
@@ -1664,11 +1580,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Workbook-owned promotion metadata; the artifact_type domain derives from workbook_domain/registry.py.",
-      "readme_reference": "test_registry_promotion_metadata",
       "notes": "",
       "collected_tests": 13,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_rule_derivation",
@@ -1695,11 +1609,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Pure-function unit tests over includes-closure swap derivation. Ideal Layer 0 content.",
-      "readme_reference": "test_rule_derivation",
       "notes": "Checkpoint 0 recorded this file as runnable only with PYTHONPATH=scripts. Checkpoint 1's tests/conftest.py owns that path insertion for the whole directory, so it now runs alone with PYTHONPATH unset; see finding.import_order_dependence.",
       "collected_tests": 15,
       "baseline_result": "pass",
-      "readme_publishes_command": false,
       "checkpoint_1_result": "DONE. Runs alone with no PYTHONPATH (15 passed) via the new tests/conftest.py."
     },
     {
@@ -1728,11 +1640,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Explicit literal contract plus rejection matrix; \u00a74.1 names runtime_contract.py as the runtime shape authority this derives from.",
-      "readme_reference": "test_runtime_contract_builder",
       "notes": "STATE 2026-07-26 records that assert_runtime_contract() does not enforce the full spec rejection matrix (variant drop/duplicate/rename and dataset.source_workbook binding are accepted). That gap is a Checkpoint 2 parity item, not a stale literal.",
       "collected_tests": 13,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_runtime_metadata_guards",
@@ -1762,11 +1672,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Promoted models must not fall back to code-authored runtime metadata. Protects the model_key-scoped presentation sheets whose absence only surfaces at post-promotion generation.",
-      "readme_reference": "test_runtime_metadata_guards",
       "notes": "",
       "collected_tests": 11,
       "baseline_result": "pass",
-      "readme_publishes_command": false,
       "checkpoint_1_result": "DONE. finding.runtime_metadata_guard_stale_row_list is closed: the hardcoded three-row list over a three-model tuple is now a comparison between the loader's output for every workbook-active model and a direct openpyxl read of the same sheet's active default_selected rows. Mutation-proved: making the loader drop one row per model fails it."
     },
     {
@@ -1796,11 +1704,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Largest structural Python owner (46 tests). Schema vocabulary derives from the shared registry as \u00a74.1 requires.",
-      "readme_reference": "test_schema_validation_metadata",
       "notes": "",
       "collected_tests": 46,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_set_asset_display",
@@ -1829,11 +1735,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Guarded card-presentation override command; preview by default, --write required.",
-      "readme_reference": "test_set_asset_display",
       "notes": "",
       "collected_tests": 3,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_source_assembly_characterization",
@@ -1860,11 +1764,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Model-neutral contract invariants that must hold for all six models under one builder \u2014 already the shape \u00a74.1 asks for.",
-      "readme_reference": "test_source_assembly_characterization",
       "notes": "Checkpoint 0 recorded this file as runnable only with PYTHONPATH=scripts. Checkpoint 1's tests/conftest.py owns that path insertion for the whole directory, so it now runs alone with PYTHONPATH unset; see finding.import_order_dependence.",
       "collected_tests": 32,
       "baseline_result": "pass",
-      "readme_publishes_command": false,
       "checkpoint_1_result": "DONE. Runs alone with no PYTHONPATH (32 passed) via the new tests/conftest.py."
     },
     {
@@ -1898,11 +1800,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Proves the parity gate follows a valid authoring edit instead of matching today's rows. Deactivates a variant override on a workbook copy, regenerates one model into a temporary root, and asserts source-to-contract-parity still passes. Every override row in the tracked workbook is active, so a green parity run cannot rule this failure mode out on its own.",
-      "readme_reference": "| Source-parity canaries | `test_source_parity_canaries` |",
       "notes": "Generates one model against a workbook copy under tmp_path; the canonical workbook and tracked artifacts are read-only. Asserts the mutation is observable in generated output before asserting the gate passes, so the canary cannot pass vacuously.",
       "collected_tests": 1,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_validation_catalog",
@@ -1931,11 +1831,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "The \u00a77 catalog contract test. Fails when a default/checkpoint test file has no catalog entry, when two entries claim one named acceptance lock, when a generating gate lacks an isolated output declaration, when a gate claims read_only or in_process while naming writes, when a protected-output gate \u2014 or a SUITE that would run one \u2014 is assigned unsafe parallel execution, or when README disagrees with the catalog. Each condition is proved by a forced failure so the check is never green for the wrong reason. Suite membership is derived from the command, not trusted from gate_ids, and file discovery is recursive.",
-      "readme_reference": "test_validation_catalog",
       "notes": "Checkpoint 4 review added the read_only/in_process honesty check. Every other isolation assertion branches on `generates`, so a gate declaring generates:false escaped all of them \u2014 which is how three Node gates came to claim read_only while writing temp workbook and workbook-truth copies.",
       "collected_tests": 20,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_verify_workbook_candidate",
@@ -1968,11 +1866,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Checkpoint 4 shares three full runs: the canonical workbook with nothing declared (including browser harness), and one controlled-drift workbook read once undeclared and once declared. Stage order, report schema, all-model marker, browser temporary-registry proof, and boundary assertions reuse those results or compact early-failure inputs.",
-      "readme_reference": "test_verify_workbook_candidate",
       "notes": "Checkpoint 4 review: the canonical run declares nothing rather than '*'. Declaring every model makes unexpected_drift unreachable (it is 'drifted AND not declared'), which silently voided the stale-retained-artifact and generation-filter proofs. The third full run restores the declared-suppression proof no other run can make. 389.07s -> 457.54s, against 684.74s inherited from Checkpoint 3.",
       "collected_tests": 17,
       "baseline_result": "pass",
-      "readme_publishes_command": false,
       "checkpoint_1_result": "DONE for the dead canaries. finding.dead_semantic_drift_canary is closed: the drift probe is selected from the retained zr1 contract itself (an option present in both choices and standardEquipment) instead of the hardcoded EFR row, which reaches neither and made both forcing tests inert. The semantic_drift stage now has live positive proof \u2014 the undeclared run reports unexpected_drift ['zr1'] and fails at that stage. The separate workbook/generator question of why active zr1_options.opt_efr_001 emits nothing is NOT answered here (\u00a712)."
     },
     {
@@ -2002,11 +1898,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Bool-like cell storage hygiene through save_workbook_safely(); protects the normalization the workbook-truth snapshot will rely on in Checkpoint 2.",
-      "readme_reference": "test_workbook_bool_hygiene",
       "notes": "",
       "collected_tests": 7,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_workbook_changeset",
@@ -2033,11 +1927,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "workbook-changeset-1 contract, pure. Layer 0 content.",
-      "readme_reference": "test_workbook_changeset",
       "notes": "",
       "collected_tests": 33,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_workbook_changeset_service",
@@ -2067,11 +1959,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Fault-injection and lifecycle proof for the approved write service; fixture-based already.",
-      "readme_reference": "test_workbook_changeset_service",
       "notes": "",
       "collected_tests": 17,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_workbook_domain_registry",
@@ -2098,11 +1988,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Polices the single workbook shape authority every structural test derives from. Layer 0 content.",
-      "readme_reference": "test_workbook_domain_registry",
       "notes": "",
       "collected_tests": 9,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_group_display_label_contract",
@@ -2135,11 +2023,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Checkpoint 2 owner for the workbook-owned group display-label registry, validation, generated-data passthrough, reviewed migration artifacts, and canonical-workbook readback.",
-      "readme_reference": "test_group_display_label_contract",
       "notes": "Does not pay the verified_manager_fixture setup itself; it remains in the workbook_manager serial group so Manager source changes execute one complete acceptance group.",
       "collected_tests": 14,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_workbook_manager_control_metadata",
@@ -2169,11 +2055,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Checkpoint 3A/3B owner for exhaustive registry controls, fail-closed schema serialization, mutation exclusions, and bounded human-label reference lookup.",
-      "readme_reference": "test_workbook_manager_control_metadata",
       "notes": "Uses only in-memory SQLite fixtures and remains in the complete workbook_manager serial group so registry/schema changes execute the full Manager acceptance boundary.",
       "collected_tests": 24,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_workbook_manager_connected_editing",
@@ -2200,11 +2084,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Checkpoint 3C owner for registry-control validation, explicit renderer coverage, drawer/sheet accessibility, unsaved-close handling, bounded references, and one-in-flight draft Save behavior.",
-      "readme_reference": "test_workbook_manager_connected_editing",
       "notes": "Uses Node only for dependency-free validation-helper execution; browser viewport and focus evidence remains a separate checkpoint gate.",
       "collected_tests": 8,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_workbook_manager_review_presentation",
@@ -2234,11 +2116,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Checkpoint 6 owner for backend semantic review summaries, connected destinations, operator lifecycle language, and persistent dismissible lifecycle results.",
-      "readme_reference": "test_workbook_manager_review_presentation",
       "notes": "Uses compact SQLite lifecycle fixtures plus frontend source contracts; real-browser desktop/narrow acceptance remains checkpoint evidence.",
       "collected_tests": 15,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_workbook_manager_images_workspace_parity",
@@ -2265,11 +2145,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Images-workspace parity owner. The 2026-08-21 recovery rebuilt five of six workspaces and gave Images one clause, so it missed the shared editor shell (3C), navigation state (3F), and operator lifecycle language (6). Each assertion is mutation-verified to fail when its gap reopens.",
-      "readme_reference": "test_workbook_manager_images_workspace_parity",
       "notes": "Frontend source contracts only; real-browser deep-link, reload, and dirty-close acceptance remains delivery evidence.",
       "collected_tests": 8,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_workbook_manager",
@@ -2299,11 +2177,9 @@
       "acceptance_locks": [],
       "disposition": "rewrite",
       "disposition_reason": "Largest Python file (65 tests) and the main contributor to the 791.25s Manager checkpoint. Checkpoint 5 builds one verified immutable real-workbook projection/candidate fixture per checkpoint run and clones it; negative cases move to compact workbooks and SQLite fixtures. Every distinct Layer 3 real-workbook acceptance boundary is retained. WBM_SLOW_GATE=1 adds two scratch-copy shared-writer tests.",
-      "readme_reference": "test_workbook_manager",
       "notes": "",
       "collected_tests": 65,
-      "baseline_result": "pass_63_skip_2",
-      "readme_publishes_command": false
+      "baseline_result": "pass_63_skip_2"
     },
     {
       "id": "py.test_workbook_manager_api_concurrency",
@@ -2332,11 +2208,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Request-scoped connections, lock starvation, projection gating, and single-worker refusal. Mutation-proved in its owning pass; do not fold into a shared-fixture rewrite that changes process/thread assumptions.",
-      "readme_reference": "test_workbook_manager_api_concurrency",
       "notes": "",
       "collected_tests": 32,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_workbook_manager_apply_rebuild",
@@ -2368,11 +2242,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "The only path that may reach the bound writer and downstream generation/publication. Rollback preparation, staged off-path generation, complete-candidate-only publication, and hash-verified restore are distinct Layer 3 boundaries.",
-      "readme_reference": "test_workbook_manager_apply_rebuild",
       "notes": "",
       "collected_tests": 7,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_workbook_manager_catalog",
@@ -2401,11 +2273,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Shared-registry/catalog and requiredness regressions; small and fixture-based.",
-      "readme_reference": "test_workbook_manager_catalog",
       "notes": "",
       "collected_tests": 5,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_workbook_manager_changeset_lifecycle",
@@ -2435,11 +2305,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Immutable ChangeSet lifecycle (36 tests), fixture-based.",
-      "readme_reference": "test_workbook_manager_changeset_lifecycle",
       "notes": "",
       "collected_tests": 36,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_workbook_manager_drafts",
@@ -2468,11 +2336,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Durable draft behavior; Draft Save must not write or regenerate.",
-      "readme_reference": "test_workbook_manager_drafts",
       "notes": "",
       "collected_tests": 6,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_workbook_manager_fixtures",
@@ -2502,11 +2368,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Checkpoint 5 helper contract: clone isolation and compact negative workbooks. Does not import or promote the canonical workbook.",
-      "readme_reference": "test_workbook_manager_fixtures",
       "notes": "",
       "collected_tests": 6,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_workbook_manager_generated_parity",
@@ -2537,11 +2401,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "The only owner proving a Manager reconstruction generates the same primary runtime contracts as its bound source workbook (\u00a74.2). AGENTS.md \u00a710 forbids claiming reconstruction parity without it. Distinct Layer 3 boundary \u2014 must not be collapsed into an equality check against itself.",
-      "readme_reference": "test_workbook_manager_generated_parity",
       "notes": "Timing semantics changed in Checkpoint 5: standalone pays the process-wide verified_manager_fixture build; inside suite.workbook_manager_checkpoint that build is shared. Do not sum this gate's approximate_seconds with other workbook_manager members. The 82.22 s incremental value is an estimate from the pre-shared-fixture isolated measurement, not a fresh post-change in-suite timing.",
       "collected_tests": 4,
       "baseline_result": "pass",
-      "readme_publishes_command": false,
       "standalone_seconds": 147.68,
       "shared_fixture_incremental_seconds": 82.22
     },
@@ -2576,11 +2438,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Checkpoint 4 owner for model-scoped form-graph membership, non-navigable classifications, contextual section/step editing integration, and fresh runtime evidence across every promoted model.",
-      "readme_reference": "",
       "notes": "Generates six runtime contracts under an isolated temporary root and verifies protected workbook/generated/publication hashes remain unchanged. Catalog hashes_protected_roots is false because this gate belongs to the workbook_manager serial group; that field denotes protected_artifacts group selection rather than internal hash assertions.",
       "collected_tests": 21,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_workbook_manager_import_projection",
@@ -2610,11 +2470,9 @@
       "acceptance_locks": [],
       "disposition": "rewrite",
       "disposition_reason": "Real-workbook import/projection is one of the 66\u201375s owners. Checkpoint 5 clones the immutable verified projection fixture rather than re-importing. Keep one real import proof.",
-      "readme_reference": "test_workbook_manager_import_projection",
       "notes": "",
       "collected_tests": 21,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_workbook_truth",
@@ -2645,11 +2503,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Contract test for the \u00a76.2 snapshot. Asserts the two properties that make it usable as an oracle: it imports no generation module (checked in a freshly launched interpreter, with a mutation proving the check can fail) and its local cell helpers are neither the generator's functions nor in disagreement with them over a value table. Every structural claim has a forced mutation behind it.",
-      "readme_reference": "| Workbook-truth snapshot | `test_workbook_truth` |",
       "notes": "Spawns subprocesses to test the import boundary, which is why it costs ~8 s despite being Layer 0. Building the snapshot itself is ~0.9 s.",
       "collected_tests": 61,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_catalog_change_scope",
@@ -2677,11 +2533,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Executable contract for classifying a catalog edit as additive or selection-changing, so a routine gate addition stops forcing the complete validation inventory while every reroute still does.",
-      "readme_reference": "test_catalog_change_scope",
       "notes": "Pure comparison of two in-memory catalogs; performs no subprocess, network, or filesystem writes.",
       "collected_tests": 21,
-      "baseline_result": "pass",
-      "readme_publishes_command": true
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_codex_finding_disposition",
@@ -2709,11 +2563,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Executable contract for structured Codex priority detection, current-thread disposition, stable status publication, and trusted-base workflow execution.",
-      "readme_reference": "test_codex_finding_disposition",
       "notes": "The live API is exercised separately with --dry-run; this gate is deterministic and performs no network writes.",
       "collected_tests": 8,
-      "baseline_result": "pass",
-      "readme_publishes_command": true
+      "baseline_result": "pass"
     },
     {
       "id": "py.test_run_layered_validation",
@@ -2743,11 +2595,9 @@
       "acceptance_locks": [],
       "disposition": "keep",
       "disposition_reason": "Catalog-driven CI selection, conservative fallback, shared serial-group one-process execution, changed-path transport, and stage-timed report contract.",
-      "readme_reference": "run_layered_validation.py",
       "notes": "CI passes changed paths through --changed-file-list so spaces are preserved and deleted paths remain classifiable.",
       "collected_tests": 8,
-      "baseline_result": "pass",
-      "readme_publishes_command": false
+      "baseline_result": "pass"
     }
   ],
   "suites": [
@@ -2777,8 +2627,7 @@
       ],
       "serial_required": true,
       "measured_seconds": 51.34,
-      "measured_note": "Checkpoint 4 removes private generation from four default Node files. Exact closing timing is recorded in Checkpoint 4 evidence.",
-      "readme_publishes_command": false
+      "measured_note": "Checkpoint 4 removes private generation from four default Node files. Exact closing timing is recorded in Checkpoint 4 evidence."
     },
     {
       "id": "suite.node_diagnostics",
@@ -2791,8 +2640,7 @@
       ],
       "serial_required": true,
       "measured_seconds": 2.81,
-      "measured_note": "",
-      "readme_publishes_command": false
+      "measured_note": ""
     },
     {
       "id": "suite.python_metadata",
@@ -2812,8 +2660,7 @@
       ],
       "serial_required": false,
       "measured_seconds": 35.0,
-      "measured_note": "Checkpoint 4 removes the Layer 3 all-model CLI proof and replaces the 126s metadata mutation hotspot with direct in-memory metadata checks. Exact closing timing is recorded in Checkpoint 4 evidence.",
-      "readme_publishes_command": true
+      "measured_note": "Checkpoint 4 removes the Layer 3 all-model CLI proof and replaces the 126s metadata mutation hotspot with direct in-memory metadata checks. Exact closing timing is recorded in Checkpoint 4 evidence."
     },
     {
       "id": "suite.workbook_manager_serial_group",
@@ -2839,8 +2686,7 @@
       ],
       "serial_required": true,
       "measured_seconds": 745.31,
-      "measured_note": "Checkpoint 5 documented-order whole-group measurement. Member timings are non-additive because verified_manager_fixture is shared.",
-      "readme_publishes_command": false
+      "measured_note": "Checkpoint 5 documented-order whole-group measurement. Member timings are non-additive because verified_manager_fixture is shared."
     },
     {
       "id": "suite.workbook_manager_checkpoint",
@@ -2867,8 +2713,7 @@
       ],
       "serial_required": true,
       "measured_seconds": 1123.47,
-      "measured_note": "Sum of the nine files run one process each at this baseline (18.7 min), against the 791.25s recorded on 2026-08-10. test_workbook_manager (810.34s) and test_workbook_manager_import_projection (222.91s) are 92.0% of it. Checkpoint 5 targets a material improvement without losing a distinct protected-boundary proof.",
-      "readme_publishes_command": false
+      "measured_note": "Sum of the nine files run one process each at this baseline (18.7 min), against the 791.25s recorded on 2026-08-10. test_workbook_manager (810.34s) and test_workbook_manager_import_projection (222.91s) are 92.0% of it. Checkpoint 5 targets a material improvement without losing a distinct protected-boundary proof."
     },
     {
       "id": "suite.full_python_inventory",
@@ -2929,8 +2774,7 @@
       ],
       "serial_required": true,
       "measured_seconds": 1672.16,
-      "measured_note": "Checkpoint 6 final diagnostic: 827 passed, 2 skipped, 160 subtests, one existing FastAPI/Starlette deprecation warning, 1672.16 s on local Python 3.14.7.",
-      "readme_publishes_command": false
+      "measured_note": "Checkpoint 6 final diagnostic: 827 passed, 2 skipped, 160 subtests, one existing FastAPI/Starlette deprecation warning, 1672.16 s on local Python 3.14.7."
     },
     {
       "id": "suite.full_node_inventory",
@@ -2960,8 +2804,7 @@
       ],
       "serial_required": true,
       "measured_seconds": 60.0,
-      "measured_note": "Checkpoint 6 final diagnostic: all 19 files pass serially. The first run exposed ambient form-output/.DS_Store churn; the protected-artifact helper now excludes only that gitignored Finder basename and has an explicit canary. The clean rerun passed.",
-      "readme_publishes_command": false
+      "measured_note": "Checkpoint 6 final diagnostic: all 19 files pass serially. The first run exposed ambient form-output/.DS_Store churn; the protected-artifact helper now excludes only that gitignored Finder basename and has an explicit canary. The clean rerun passed."
     }
   ],
   "stale_assertions": [

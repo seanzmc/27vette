@@ -536,54 +536,86 @@ def test_suites_containing_protected_gates_require_serial_execution(catalog):
             )
 
 
-# --- §7 condition 5: README agrees with the catalog ------------------------
+# --- §7 condition 5: README does not contradict the catalog -----------------
+#
+# Condition 5 used to require README to mirror the catalog: every gate carried a
+# `readme_reference` README had to reproduce, so adding a gate meant adding a
+# test name to prose, and README could not shrink below the inventory. The
+# catalog is the owner; a mirror is not what ownership means, and the duplicated
+# inventory cost every reader tokens while going stale in its own way.
+#
+# What actually matters is that a reader who follows README does not run a
+# command the catalog has since changed, or chase a gate that no longer exists.
+# Both checks below run in that direction — drift and staleness — and neither
+# obliges README to publish anything.
+
+# README publishes plenty of commands the catalog does not own (generation,
+# promotion, local serving). A block is only compared when it invokes a script
+# or module some catalog command invokes.
+_INVOCATION_RE = re.compile(r"(?:scripts/[\w./-]+\.py|corvette_form_generator\.[\w.]+|npm --prefix [\w./-]+)")
+
+
+def _sh_blocks(readme_text: str) -> list[str]:
+    blocks = re.findall(r"```sh\n(.*?)```", readme_text, flags=re.S)
+    # Join backslash continuations, then keep one logical command per line.
+    return [block.replace("\\\n", " ") for block in blocks]
 
 
 def test_readme_command_blocks_match_the_catalog_command(catalog, readme_text):
-    """AGENTS.md §3: README owns exact commands. Where it publishes one as a
-    runnable block, the catalog's `command` must be that same string.
+    """A README command that names something the catalog runs must match it.
 
-    The weaker `readme_reference` check below only asks that a substring appear,
-    so changing an interpreter, a flag, or a path on `command` would not move
-    it. This one compares the whole command.
+    Drift-only: changing an interpreter, a flag, or a path on a catalog
+    `command` fails here while that command still appears in README, and
+    deleting the README block is a legitimate way to resolve it.
     """
-    normalized = _normalize(readme_text)
-    mismatched = [
-        (entry["id"], entry["command"])
+    commands = [
+        _normalize(entry["command"])
         for entry in list(catalog["gates"]) + list(catalog["suites"])
-        if entry.get("readme_publishes_command")
-        and _normalize(entry["command"]) not in normalized
     ]
-    assert not mismatched, (
-        f"catalog commands README is supposed to publish verbatim but does not: {mismatched}"
+    by_invocation: dict[str, list[str]] = {}
+    for command in commands:
+        for token in set(_INVOCATION_RE.findall(command)):
+            by_invocation.setdefault(token, []).append(command)
+
+    drifted = []
+    for block in _sh_blocks(readme_text):
+        for line in re.split(r"\n", block):
+            line = _normalize(line)
+            tokens = set(_INVOCATION_RE.findall(line))
+            candidates = [c for token in tokens for c in by_invocation.get(token, [])]
+            if not candidates:
+                continue
+            # Continuations are already joined, so the published line is a whole
+            # command: it must equal one the catalog owns for that script.
+            if any(line == c for c in candidates):
+                continue
+            drifted.append(line)
+    assert not drifted, (
+        "README publishes commands for cataloged scripts that no catalog command "
+        f"matches — update README or the catalog: {drifted}"
     )
 
 
-def test_readme_publishes_every_catalog_command_it_claims(catalog, readme_text):
-    normalized = _normalize(readme_text)
-    missing = [
-        (gate["id"], gate["readme_reference"])
-        for gate in catalog["gates"]
-        if gate.get("readme_reference")
-        and _normalize(gate["readme_reference"]) not in normalized
-    ]
-    assert not missing, f"catalog entries README does not publish: {missing}"
+def test_readme_names_no_gate_that_no_longer_exists(readme_text):
+    """README may list as few gates as it likes, but not gates that are gone.
 
-
-def test_readme_lists_every_node_gate(readme_text):
-    """README states its tables are the complete set of tests/*.test.mjs.
-
-    Discovery is recursive for the same reason the completeness check is: a
-    nested gate that README never lists is the failure this is meant to catch.
+    The inverse of the old completeness check. A renamed or deleted gate whose
+    name survives in README is the failure worth catching; an existing gate
+    README chooses not to name is the catalog's business, not prose's.
     """
-    normalized = _normalize(readme_text)
-    missing = sorted(
-        path.rsplit("/", 1)[-1].removesuffix(".test.mjs")
-        for path in _discover_test_files()
-        if path.endswith(".test.mjs")
-        and path.rsplit("/", 1)[-1].removesuffix(".test.mjs") not in normalized
-    )
-    assert not missing, f"node gates missing from the README matrix: {missing}"
+    on_disk = {path.rsplit("/", 1)[-1] for path in _discover_test_files()}
+    named = set(re.findall(r"[\w-]+\.test\.mjs", readme_text))
+    named |= {
+        f"{name}.test.mjs" for name in re.findall(r"`([\w-]+)`", readme_text)
+        if f"{name}.test.mjs" in {f for f in on_disk if f.endswith(".mjs")}
+        or f"{name}.test.mjs" not in on_disk and name.endswith("-contract")
+    }
+    named |= set(re.findall(r"\btest_\w+\.py\b", readme_text))
+    named |= {
+        f"{name}.py" for name in re.findall(r"`(test_\w+)`", readme_text)
+    }
+    stale = sorted(name for name in named if name not in on_disk)
+    assert not stale, f"README names gates that no longer exist: {stale}"
 
 
 def test_readme_does_not_hand_maintain_a_collection_count(readme_text):
@@ -700,22 +732,22 @@ def test_checks_fail_on_a_mutated_catalog(catalog):
     with pytest.raises(AssertionError):
         test_every_gate_declares_the_required_fields(mutated)
 
-    # condition 5: README disagreement, both directions
+    # condition 5: README contradicting the catalog, both directions
     mutated = copy_catalog()
-    published = next(g for g in mutated["gates"] if g.get("readme_reference"))
-    published["readme_reference"] = "a command README does not publish"
+    for gate in mutated["gates"]:
+        if "validate_workbook_schema.py" in gate["command"]:
+            gate["command"] += " --a-flag-readme-does-not-publish"
     with pytest.raises(AssertionError):
-        test_readme_publishes_every_catalog_command_it_claims(mutated, README_PATH.read_text())
+        test_readme_command_blocks_match_the_catalog_command(
+            mutated, README_PATH.read_text()
+        )
 
-    mutated = copy_catalog()
-    published = next(g for g in mutated["gates"] if g.get("readme_publishes_command"))
-    published["command"] = published["command"] + " --a-flag-readme-does-not-publish"
     with pytest.raises(AssertionError):
-        test_readme_command_blocks_match_the_catalog_command(mutated, README_PATH.read_text())
+        test_readme_names_no_gate_that_no_longer_exists(
+            "run `node --test tests/deleted-gate.test.mjs`"
+        )
 
     with pytest.raises(AssertionError):
         test_readme_does_not_hand_maintain_a_collection_count("README says 678 tests collected.")
     with pytest.raises(AssertionError):
         test_readme_layer_names_are_catalog_layers(catalog, "run the Layer 9 gates")
-    with pytest.raises(AssertionError):
-        test_readme_lists_every_node_gate("this README lists nothing")
