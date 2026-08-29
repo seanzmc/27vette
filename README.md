@@ -220,7 +220,7 @@ The first command is the no-write preflight/proposal. Run `--write` only after t
 
 ## Validation
 
-`tests/validation_catalog.json` is the machine-readable owner of every gate below: layer, authority class, isolation, serialization, measured duration, and collection counts. Read counts and timings from it rather than from prose. `test_validation_catalog` enforces it and fails when a test file is missing from the catalog, when two gates claim one acceptance lock, when a generating gate lacks an isolated output declaration, when a protected-output gate is not serialized, or when this README disagrees with the catalog.
+`tests/validation_catalog.json` is the machine-readable owner of every gate below: layer, authority class, isolation, serialization, measured duration, and collection counts. Read counts and timings from it rather than from prose. `test_validation_catalog` enforces it and fails when a test file is missing from the catalog, when two gates claim one acceptance lock, when a generating gate lacks an isolated output declaration, or when a protected-output gate is not serialized. README is not required to mirror the inventory: it must only avoid contradicting it — a published command must match the catalog's, and a named gate must still exist. Prefer pointing at the catalog over copying it.
 
 ### CI
 
@@ -332,22 +332,12 @@ Metadata gate — the default for generation/contract/promotion changes:
 .venv/bin/python -m pytest tests/test_generation_safety.py tests/test_generate_form_model_discovery_cli.py tests/test_runtime_contract_builder.py tests/test_model_config_metadata.py tests/test_promote_model.py tests/test_registry_promotion_metadata.py tests/test_schema_validation_metadata.py tests/test_rule_derivation.py tests/test_model_generation_route.py -q
 ```
 
-Remaining `tests/test_*.py` files are chosen by changed surface:
+Remaining `tests/test_*.py` files are chosen by changed surface. The catalog owns
+that mapping — query it instead of maintaining a copy here:
 
-| Surface | Tests |
-|---|---|
-| Workbook write path / editor | `test_editor_ops_apply`, `test_editor_ops_meta`, `test_editor_ops_global_families`, `test_editor_lints`, `test_editor_server_payload`, `test_editor_server_write_api` |
-| Workbook domain / ChangeSet | `test_workbook_domain_registry`, `test_workbook_changeset`, `test_workbook_changeset_service`, `test_workbook_bool_hygiene` |
-| Workbook Manager | `test_group_display_label_contract`, `test_workbook_manager_control_metadata`, `test_workbook_manager_connected_editing`, `test_workbook_manager_review_presentation`, `test_workbook_manager_images_workspace_parity`, `test_workbook_manager`, `test_workbook_manager_catalog`, `test_workbook_manager_import_projection`, `test_workbook_manager_generated_parity`, `test_workbook_manager_api_concurrency`, `test_workbook_manager_drafts`, `test_workbook_manager_changeset_lifecycle`, `test_workbook_manager_apply_rebuild`, `test_workbook_manager_form_graph` |
-| Source assembly / runtime metadata | `test_source_assembly_characterization`, `test_runtime_metadata_guards`, `test_corvette_form_generator_contract` |
-| Composed candidate / real all-model generation | `test_verify_workbook_candidate`, `test_all_model_runtime_generation` |
-| Publication | `test_atomic_registry_write` |
-| Asset map | `test_asset_map_sync`, `test_set_asset_display` |
-| Options-sheet quality | `test_options_sheet_quality` |
-| Operational handoff | `test_state_handoff` |
-| Validation catalog | `test_validation_catalog` |
-| Workbook-truth snapshot | `test_workbook_truth` |
-| Source-parity canaries | `test_source_parity_canaries` |
+```sh
+.venv/bin/python -c "import json;[print(g['id'], g['changed_surfaces']) for g in json.load(open('tests/validation_catalog.json'))['gates']]"
+```
 
 Every `tests/test_*.py` runs standalone — `tests/conftest.py` puts `scripts/` on `sys.path`, so no pytest command needs `PYTHONPATH=scripts`. The options-sheet quality CLI above still does, being a module invocation.
 
