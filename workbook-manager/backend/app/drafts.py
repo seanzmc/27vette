@@ -56,12 +56,20 @@ WORKFLOW_HISTORY_STATUSES = (
     "preview_rejected",
     "approval_rejected",
     "apply_rejected",
+    "apply_retryable",
     "apply_restored_retryable",
     "workbook_state_unknown",
     "manually_resolved_restored",
     "manually_resolved_applied",
     "abandoned_unknown",
 )
+
+# Terminal manual resolutions carry their own observed workbook evidence; the
+# failed apply attempt that preceded them remains only as technical evidence.
+RESOLVED_MANUAL_STATUSES = frozenset({
+    "manually_resolved_restored",
+    "manually_resolved_applied",
+})
 
 
 def _now() -> str:
@@ -548,16 +556,61 @@ def list_drafts(state_conn: sqlite3.Connection, *, limit: int = 50) -> list[dict
     return [dict(row) for row in rows]
 
 
-def _history_outcome(status: str, apply_attempts: list[dict]) -> dict:
+def _history_workbook_evidence(
+    status: str,
+    apply_attempts: list[dict],
+    manual_resolutions: list[dict],
+) -> dict:
+    """Compose the outcome-bearing evidence for one history record.
+
+    Terminal manual resolutions carry their own observed workbook state, so
+    resolved records summarize the latest immutable manual-resolution record;
+    every other status derives from the latest apply attempt.
+    """
+
+    latest_manual = manual_resolutions[-1] if manual_resolutions else {}
     latest = apply_attempts[-1] if apply_attempts else {}
     result = latest.get("result") or {}
     rebuild = result.get("applyRebuild") or {}
+    if status in RESOLVED_MANUAL_STATUSES:
+        return {
+            "rebuild": {},
+            "observed_sha256": latest_manual.get("observed_workbook_sha256", ""),
+            "errors": [],
+            "exception_message": "",
+            "next_actions": [],
+        }
+    restored_surfaces = [
+        name
+        for name in ("workbook", "generated_contracts", "publication")
+        if (rebuild.get(name) or {}).get("state") == "restored"
+    ]
+    errors = result.get("errors") or []
+    return {
+        "rebuild": rebuild,
+        "restored_surfaces": restored_surfaces,
+        "errors": errors,
+        "exception_message": latest.get("exception_message", ""),
+        "next_actions": latest.get("allowed_verbs") or [],
+    }
+
+
+def _history_outcome(
+    status: str,
+    apply_attempts: list[dict],
+    manual_resolutions: list[dict] | None = None,
+) -> dict:
+    latest = apply_attempts[-1] if apply_attempts else {}
+    evidence = _history_workbook_evidence(
+        status, apply_attempts, manual_resolutions or []
+    )
     summaries = {
         "applied": "Applied and rebuilt",
         "cancelled": "Cancelled before workbook write",
         "preview_rejected": "Validation rejected",
         "approval_rejected": "Approval rejected",
         "apply_rejected": "Apply rejected before workbook change",
+        "apply_retryable": "Apply did not finish; retry available",
         "apply_restored_retryable": (
             "Rebuild or publication failed; protected files restored"
         ),
@@ -566,25 +619,37 @@ def _history_outcome(status: str, apply_attempts: list[dict]) -> dict:
         "manually_resolved_applied": "Manual recovery verified workbook changes",
         "abandoned_unknown": "Recovery abandoned with workbook state unknown",
     }
-    restored_surfaces = [
-        name
-        for name in ("workbook", "generated_contracts", "publication")
-        if (rebuild.get(name) or {}).get("state") == "restored"
-    ]
-    errors = result.get("errors") or []
+    # A cancellation after a failed apply attempt summarizes the write the
+    # operator cancelled out of instead of claiming no workbook write happened.
+    if status == "cancelled" and (
+        apply_attempts or evidence["exception_message"]
+    ):
+        prior_state = (latest.get("manager_state") or "").replace("_", " ")
+        summaries["cancelled"] = (
+            f"Cancelled after failed apply ({prior_state})"
+            if prior_state
+            else "Cancelled after failed apply"
+        )
+    rebuild = evidence["rebuild"]
+    errors = evidence["errors"]
     return {
         "summary": summaries[status],
         "failed_stage": (
             "rebuild_or_publication"
-            if result.get("status") == "apply_rebuild_failed_rolled_back"
+            if (latest.get("result") or {}).get("status")
+            == "apply_rebuild_failed_rolled_back"
             else ""
         ),
-        "error": str(errors[0]) if errors else latest.get("exception_message", ""),
-        "restored_surfaces": restored_surfaces,
-        "rollback_state": (rebuild.get("rollback") or {}).get("state", ""),
-        "generation_state": (rebuild.get("generated_contracts") or {}).get("state", ""),
-        "publication_state": (rebuild.get("publication") or {}).get("state", ""),
-        "next_actions": latest.get("allowed_verbs") or [],
+        "error": (
+            str(errors[0])
+            if errors
+            else evidence["exception_message"]
+        ),
+        "restored_surfaces": evidence.get("restored_surfaces", []),
+        "rollback_state": (rebuild.get("rollback") or {}).get("state", "") if rebuild else "",
+        "generation_state": (rebuild.get("generated_contracts") or {}).get("state", "") if rebuild else "",
+        "publication_state": (rebuild.get("publication") or {}).get("state", "") if rebuild else "",
+        "next_actions": evidence["next_actions"],
     }
 
 
@@ -699,9 +764,21 @@ def workflow_history(
                 "updated_ts": draft["updated_ts"],
             }
         apply_attempts = evidence["apply_attempts"]
+        manual_resolutions = evidence["manual_resolutions"]
         latest_result = apply_attempts[-1].get("result") if apply_attempts else None
         rebuild = (latest_result or {}).get("applyRebuild") or {}
         workbook_evidence = rebuild.get("workbook") or {}
+        if draft["status"] in RESOLVED_MANUAL_STATUSES:
+            # The terminal manual resolution owns the resolved state: use its
+            # observed workbook evidence and clear the failed attempt's stale
+            # next-action verbs, while the attempt remains technical evidence.
+            workbook_evidence = {
+                "before_sha256": workbook_evidence.get("before_sha256", ""),
+                "after_sha256": manual_resolutions[-1].get(
+                    "observed_workbook_sha256", ""
+                ),
+                "state": "observed",
+            }
         history.append({
             "draft_id": draft_id,
             "draft_api_url": f"/api/drafts/{draft_id}",
@@ -718,7 +795,9 @@ def workflow_history(
                 "after_sha256": workbook_evidence.get("after_sha256", ""),
                 "state": workbook_evidence.get("state", ""),
             },
-            "outcome": _history_outcome(draft["status"], apply_attempts),
+            "outcome": _history_outcome(
+                draft["status"], apply_attempts, manual_resolutions
+            ),
             "technical_evidence": evidence,
         })
     return {

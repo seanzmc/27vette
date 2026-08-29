@@ -18,17 +18,23 @@ export default function HistoryView({ models, onOpenDraft }) {
   const [error, setError] = useState("");
   const [legacyRows, setLegacyRows] = useState([]);
   const [legacyTotal, setLegacyTotal] = useState(0);
+  // Request identity: only the response for the newest filter/page state may
+  // update the view, so a slower earlier response cannot overwrite it.
+  const requestRef = React.useRef(0);
 
   const load = async () => {
+    const requestId = ++requestRef.current;
     try {
       const response = await api.workflowHistory({
         model, status, limit: PAGE_SIZE, offset,
       });
+      if (requestId !== requestRef.current) return;
       setRows(response.history);
       setTotal(response.total);
       setStatuses(response.available_statuses);
       setError("");
     } catch (requestError) {
+      if (requestId !== requestRef.current) return;
       setRows([]);
       setError(`Workflow history could not be loaded: ${requestError.message}`);
     }

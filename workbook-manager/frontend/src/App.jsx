@@ -85,11 +85,9 @@ export default function App() {
   const refreshDraft = useCallback(async (id = draftId) => {
     if (!id) return null;
     try {
-      const listed = await api.drafts();
-      if (!listed.drafts.some((draft) => draft.id === id)) {
-        setDraftLifecycle(null);
-        return null;
-      }
+      // Fetch the exact lifecycle directly: history records can point at
+      // drafts beyond the bounded /api/drafts list window, and a new draft id
+      // has no list row at all. A 404 clears the stale lifecycle view.
       const lifecycle = await api.draftLifecycle(id);
       setDraftLifecycle(lifecycle);
       return lifecycle;

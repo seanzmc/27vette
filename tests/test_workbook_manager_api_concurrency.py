@@ -611,6 +611,7 @@ class TestLifespanAndRequestConnections(unittest.TestCase):
         model: str = "stingray",
         apply_result: dict | None = None,
         allowed_verbs: list[str] | None = None,
+        attempt_manager_state: str | None = None,
     ) -> None:
         state.execute(
             "INSERT INTO workflow_drafts(id, created_ts, updated_ts, session_id, "
@@ -676,7 +677,8 @@ class TestLifespanAndRequestConnections(unittest.TestCase):
                 f"apply-{draft_id}", draft_id, preview_id, approval_id, change_set_id,
                 semantic, f"preview-fingerprint-{draft_id}",
                 f"approval-fingerprint-{draft_id}", updated_ts, updated_ts,
-                "formal_receipt", json.dumps(apply_result), "unchanged", status,
+                "formal_receipt", json.dumps(apply_result), "unchanged",
+                attempt_manager_state or status,
                 json.dumps(allowed_verbs or []),
             ),
         )
@@ -875,6 +877,138 @@ class TestLifespanAndRequestConnections(unittest.TestCase):
                     restored["outcome"]["restored_surfaces"],
                 )
                 self.assertEqual(["retry_apply", "cancel"], restored["outcome"]["next_actions"])
+
+    def test_workflow_history_includes_retryable_and_post_write_cancellation(self):
+        """HIST-01/HIST-02: retryable states and post-write cancellations appear."""
+        from fastapi.testclient import TestClient
+
+        transient_failure = {
+            "ok": False,
+            "status": "locked",
+            "workbookState": "untouched",
+            "errors": ["TimeoutError: workbook lock held"],
+        }
+        with manager_app(self.root) as main:
+            with TestClient(main.app) as client:
+                state = main.dbmod.connect(main.config.DEFAULT_DB, foreign_keys=True)
+                try:
+                    self._insert_history_draft(
+                        state, draft_id="draft-retryable",
+                        status="apply_retryable",
+                        updated_ts="2026-08-29T10:06:00+00:00",
+                        apply_result=transient_failure,
+                        allowed_verbs=["retry_apply", "cancel"],
+                    )
+                    self._insert_history_draft(
+                        state, draft_id="draft-cancelled-postwrite",
+                        status="cancelled",
+                        updated_ts="2026-08-29T10:07:00+00:00",
+                        apply_result=transient_failure,
+                        allowed_verbs=[],
+                        attempt_manager_state="apply_retryable",
+                    )
+                finally:
+                    state.close()
+
+                records = {
+                    row["draft_id"]: row
+                    for row in client.get("/api/workflow-history").json()["history"]
+                }
+                self.assertIn("draft-retryable", records)
+                retryable = records["draft-retryable"]
+                self.assertEqual("apply_retryable", retryable["status"])
+                self.assertEqual(
+                    "Apply did not finish; retry available",
+                    retryable["outcome"]["summary"],
+                )
+                self.assertEqual(
+                    ["retry_apply", "cancel"], retryable["outcome"]["next_actions"]
+                )
+                cancelled = records["draft-cancelled-postwrite"]
+                self.assertEqual(
+                    "Cancelled after failed apply (apply retryable)",
+                    cancelled["outcome"]["summary"],
+                )
+                self.assertEqual(
+                    "TimeoutError: workbook lock held",
+                    cancelled["outcome"]["error"],
+                )
+
+    def test_workflow_history_resolved_outcomes_use_manual_resolution_evidence(self):
+        """HIST-02: resolved records summarize the manual-resolution record."""
+        from fastapi.testclient import TestClient
+
+        unknown_failure = {
+            "ok": False,
+            "status": "apply_rebuild_failed_rolled_back",
+            "workbookState": "unknown",
+            "errors": ["RuntimeError: rebuild failed"],
+            "applyRebuild": {
+                "status": "unknown",
+                "workbook": {"state": "unknown"},
+                "generated_contracts": {"state": "unknown"},
+                "publication": {"state": "unknown"},
+                "rollback": {"state": "unverified"},
+            },
+        }
+        with manager_app(self.root) as main:
+            with TestClient(main.app) as client:
+                state = main.dbmod.connect(main.config.DEFAULT_DB, foreign_keys=True)
+                try:
+                    self._insert_history_draft(
+                        state, draft_id="draft-resolved-restored",
+                        status="manually_resolved_restored",
+                        updated_ts="2026-08-29T10:06:00+00:00",
+                        apply_result=unknown_failure,
+                        allowed_verbs=["resolve_manually"],
+                    )
+                    state.execute(
+                        "INSERT INTO draft_manual_resolutions(id, draft_id, "
+                        "apply_attempt_id, created_ts, actor, resolution, "
+                        "evidence_json, observed_workbook_sha256, "
+                        "observed_workbook_mtime_ns, manager_state) "
+                        "VALUES(?,?,?,?,?,?,?,?,?,?)",
+                        (
+                            "manual-1", "draft-resolved-restored",
+                            "apply-draft-resolved-restored",
+                            "2026-08-29T10:07:00+00:00", "Sean", "restored",
+                            '{"note":"verified"}', "observed-restored-sha", "456",
+                            "manually_resolved_restored",
+                        ),
+                    )
+                    state.commit()
+                finally:
+                    state.close()
+
+                record = next(
+                    row
+                    for row in client.get("/api/workflow-history").json()["history"]
+                    if row["draft_id"] == "draft-resolved-restored"
+                )
+                self.assertEqual("manually_resolved_restored", record["status"])
+                self.assertEqual(
+                    "Manual recovery verified restoration",
+                    record["outcome"]["summary"],
+                )
+                # The failed attempt's exception/next-action must not leak into
+                # the resolved outcome; the observed hash proves the recovery.
+                self.assertEqual("", record["outcome"]["error"])
+                self.assertEqual([], record["outcome"]["next_actions"])
+                self.assertEqual(
+                    "observed-restored-sha", record["workbook"]["after_sha256"]
+                )
+                self.assertEqual(
+                    "observed-restored-sha",
+                    record["technical_evidence"]["manual_resolutions"][0][
+                        "observed_workbook_sha256"
+                    ],
+                )
+                self.assertEqual(
+                    "RuntimeError: rebuild failed",
+                    record["technical_evidence"]["apply_attempts"][0]["result"][
+                        "errors"
+                    ][0],
+                )
 
     def test_workflow_history_paginates_terminal_records_without_projection(self):
         """HIST-03: rejected/cancelled history survives missing projection."""

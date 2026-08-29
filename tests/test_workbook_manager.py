@@ -913,7 +913,11 @@ class TestPass1BrowserContainment(unittest.TestCase):
             app_source.index("await api.draftLifecycle(id)"),
             app_source.index("setDraftLifecycle(lifecycle)"),
         )
-        self.assertIn("listed.drafts.some", app_source)
+        # Exact-draft navigation must request /api/drafts/{id} directly and
+        # never gate on the bounded /api/drafts list window (history records
+        # can point outside it).
+        self.assertNotIn("listed.drafts.some", app_source)
+        self.assertIn("e.status === 404", app_source)
         self.assertIn("api.connectedOption", explorer_source)
         self.assertIn("api.connectedGroup", explorer_source)
         self.assertIn("api.explorerSearch", explorer_source)

@@ -19,15 +19,15 @@ Keep this file small — it is read at the start of every session:
 ## Current handoff
 
 - **Updated:** 2026-08-29
-- **Owning specification:** None; docs/validation-contract maintenance with no active specification. The catalog's own spec is archived at `docs/archive/completed-specs/fast-layered-validation/`.
+- **Owning specification:** `workbook-manager/audit-spec.md` Checkpoint 1A (P1.1 / WM-001); this pass addresses its PR #60 Codex review findings.
 - **Active workflow:** Normal repository path.
-- **Branch/commit:** `docs/trim-agent-guides`; `d487f9d` plus the catalog-coupling commit.
-- **Last completed:** Two-part de-granularization. (1) `AGENTS.md` 202 to 122 lines, rewritten as durable principles with module mechanics delegated to their owning files; `README.md` narrative condensed. (2) Loosened the catalog/README coupling that blocked further trimming: §7 condition 5 no longer requires README to mirror the inventory. `test_readme_publishes_every_catalog_command_it_claims` and `test_readme_lists_every_node_gate` are replaced by drift-only checks — a README `sh` block naming a cataloged script must equal that catalog command, and a gate name in README must still exist on disk. Dead `readme_reference` / `readme_publishes_command` fields removed from 157 catalog entries; README's 15-row per-surface pytest table replaced by a catalog query.
-- **Current status:** README 429 to 357 lines and now free to shrink further without failing a gate. Gate inventory, selection, and CI behavior unchanged.
-- **Validation:** `tests/test_validation_catalog.py`, `tests/test_catalog_change_scope.py`, `tests/test_run_layered_validation.py` → 85 passed. Both new condition-5 checks have a forced mutation in `test_checks_fail_on_a_mutated_catalog`, proved failing before the fix. `scripts/validate_state_handoff.py` and `git diff --check` pass.
-- **Next action:** Review and merge PR #61.
+- **Branch/commit:** `feat/workbook-manager-workflow-history`; review-fix commit on top of `42a4e35`.
+- **Last completed:** Addressed all five PR #60 review findings. P1 `App.jsx`: exact-draft navigation now requests `/api/drafts/{id}` directly with 404 handling instead of gating on the bounded 50-row `api.drafts()` list. P1 `drafts.py`: `apply_retryable` added to `WORKFLOW_HISTORY_STATUSES` (retryable drafts are no longer invisible in history). P1 `drafts.py`: cancellation after a failed apply summarizes "Cancelled after failed apply (…)" using the attempt's `manager_state` instead of always claiming "before workbook write". P1 `drafts.py`: `manually_resolved_*` records now use the latest immutable manual-resolution record for the outcome (error/next-actions cleared, `workbook.after_sha256` = observed hash, state "observed") while the failed attempt remains technical evidence. P2 `HistoryView.jsx`: request-identity guard (`requestRef`) so stale responses cannot overwrite rows/total/statuses.
+- **Current status:** Focused RED→GREEN tests added for retryable visibility, post-write cancellation summaries, and manual-resolution evidence; the shell containment test's old `listed.drafts.some` assertion replaced with the corrected contract (`assertNotIn` + 404 handling).
+- **Validation:** `test_workbook_manager_api_concurrency.py -k workflow_history` → 6 passed; combined WM group (`test_workbook_manager`, `_api_concurrency`, `_changeset_lifecycle`, `_drafts`, `_review_presentation`) → 171 passed, 2 skipped, 48 subtests (existing Starlette/httpx deprecation warning unchanged). `npm --prefix workbook-manager/frontend ci --include=dev` + production build passed. `git diff --check` passed; no protected path differs from `origin/main`.
+- **Next action:** Push the fix commit, let Codex re-review clear the `codex-finding-disposition` status, then resolve the five threads and merge PR #60.
 - **Blockers or closeout gaps:** None implied.
-- **Protected boundaries:** Docs and test-contract only. Workbook, generated artifacts, published registry, runtime, dealer submission, dependencies, gate commands, and CI selection are unchanged; catalog edits touched only descriptive README-pointer fields, which `scripts/catalog_change_scope.py` classifies as non-selection.
+- **Protected boundaries:** Workbook, generated artifacts, `form-app/data.js`, cache-bearing HTML, durable write/apply semantics, dealer submission, dependencies, and schema unchanged. Legacy history stays read-only and excluded from current totals.
 
 ## Verified facts
 
