@@ -54,8 +54,10 @@ from .catalog import (
     SPEC_BY_FAMILY,
     SHARED_TABLES,
     SPEC_BY_TABLE,
+    STRUCTURE_PRESENTATION,
     STRUCTURE_TABLES,
     TABLE_SPECS,
+    structure_specs,
 )
 from .staging import StagingError
 from .validation import find_dependents
@@ -808,9 +810,54 @@ def asset_media_options(
 
 
 @app.get("/api/tables")
-def tables(conn=Depends(projection_connection)):
-    return {"structure_tables": [
-        _schema_dict(conn, SPEC_BY_TABLE[t], None) for t in STRUCTURE_TABLES]}
+def tables(model: str = "", conn=Depends(projection_connection)):
+    families = []
+    for spec in structure_specs():
+        schema = _schema_dict(conn, spec, model or None)
+        where = ""
+        params = []
+        if model and spec.has_model_key_column:
+            where = " WHERE model_key=?"
+            params = [model]
+        elif model and spec.model_scoped:
+            where = " WHERE model_id=?"
+            params = [model]
+        count = conn.execute(
+            f'SELECT COUNT(*) AS count FROM "{spec.table}"{where}', params
+        ).fetchone()["count"]
+        label, description = STRUCTURE_PRESENTATION.get(
+            spec.family,
+            (spec.label or humanize(spec.table), "Registered workbook structure records."),
+        )
+        allowed = bool(spec.editable)
+        reason = "" if allowed else "This registered family is read-only in the Manager."
+        families.append({
+            "family": spec.family,
+            "table": spec.table,
+            "label": label,
+            "description": description,
+            "sheet": schema["sheet_for_model"] or (spec.sheet[0] if spec.sheet else ""),
+            "count": count,
+            "editable": allowed,
+            "shared": not (spec.model_scoped or spec.has_model_key_column or spec.role),
+            "context": "selected_model" if (
+                spec.model_scoped or spec.has_model_key_column or spec.role
+            ) else "shared",
+            "generated_impact": (
+                "Guarded Apply and Rebuild conservatively validates all registered models "
+                "for this global workbook family."
+            ),
+            "capabilities": {
+                action: {"allowed": allowed, "blocked_reason": reason}
+                for action in ("create", "update", "delete")
+            },
+            "schema": schema,
+        })
+    return {
+        "structure_families": families,
+        # Compatibility for the existing schema inventory consumer.
+        "structure_tables": [item["schema"] for item in families],
+    }
 
 
 # ── records ──────────────────────────────────────────────────────────

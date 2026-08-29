@@ -69,7 +69,7 @@ The Manager has seven workspaces:
 
 | Tab | Use it for |
 | --- | --- |
-| **Form Overview** | Model name, vehicle-setup copy, customer-facing steps, and section display order. |
+| **Form Overview** | Model and form copy, steps/sections, plus registered promotion, source-routing, variant, and order-summary structure. |
 | **Sections & Layout** | Section structure and layout details. |
 | **Options & Relationships** | Options, prices, rules, colors, interiors, and connected model details. |
 | **Groups** | Rule and exclusive-group relationships. |
@@ -89,6 +89,22 @@ The Manager has seven workspaces:
 5. Use **Add Section Presentation** only when a new section display entry is
    truly needed.
 6. Select **Save Update to Draft** or **Save Add to Draft**.
+
+### Change registered workbook structure
+
+1. Open **Form Overview** and find **Registered structure management**.
+2. Choose promotion, workbook source routing, variant definitions, model variant
+   membership, order-summary sections, or step-to-summary mappings.
+3. Confirm the model/shared scope, source sheet, and generated-impact note.
+4. Select **Add** or a row's pencil button. Review the lineage, dependency,
+   active-state, and impact evidence before saving.
+5. Save the change to the durable draft. This does not write the workbook or
+   rebuild generated files.
+
+Read-only registered families explain why their controls are blocked. Delete
+requests still use the registered dependency check and must be completed as an
+explicit graph in the draft; the Manager does not choose promotion, routing,
+membership, labels, or ordering for you.
 
 ### Change an option, price, rule, color, or other model item
 

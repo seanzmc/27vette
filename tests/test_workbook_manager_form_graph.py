@@ -33,6 +33,7 @@ for path in (BACKEND, SCRIPTS):
 from app import form_graph  # noqa: E402
 from app import main as mainmod  # noqa: E402
 from app import db as dbmod  # noqa: E402
+from app import drafts  # noqa: E402
 from app.contract_parity import (  # noqa: E402
     generate_contract_snapshot,
     promoted_runtime_models,
@@ -473,6 +474,76 @@ class TestFreshRuntimeParity(FormGraphCase):
 
 class TestStructureEndpoint(FormGraphCase):
 
+    def test_structure_update_saves_owned_draft_intent_without_projection_write(self):
+        state = sqlite3.connect(":memory:")
+        state.row_factory = sqlite3.Row
+        dbmod.init_durable_schema(state)
+        before = dict(self.conn.execute(
+            "SELECT * FROM model_registry_promotion WHERE model_key='z06'"
+        ).fetchone())
+        try:
+            operation = drafts.save_operation(
+                self.conn,
+                state,
+                projection_state="current",
+                base_workbook_sha256=dbmod.get_meta(self.conn, "workbook_sha256"),
+                base_workbook_mtime_ns=dbmod.get_meta(
+                    self.conn, "workbook_mtime_ns"
+                ),
+                draft_id="structure-draft",
+                table="model_registry_promotion",
+                model_id="z06",
+                op="update",
+                key={"model_key": "z06"},
+                record={"notes": "isolated STRUCT-02 authored fixture value"},
+                actor="structure-test",
+            )
+            self.assertEqual(operation["family"], "model_registry_promotion")
+            self.assertEqual(operation["source_sheet"], "model_registry_promotion")
+            self.assertEqual(operation["entity_key"], {"model_key": "z06"})
+            self.assertEqual(operation["model_context"], ["z06"])
+            after = dict(self.conn.execute(
+                "SELECT * FROM model_registry_promotion WHERE model_key='z06'"
+            ).fetchone())
+            self.assertEqual(after, before)
+        finally:
+            state.close()
+
+    def test_structure_family_index_exposes_registered_management_families(self):
+        response = mainmod.tables(model="z06", conn=self.conn)
+        families = {item["family"]: item for item in response["structure_families"]}
+        expected = {
+            "model_registry_promotion",
+            "model_workbook_sources",
+            "variant_master",
+            "model_variants",
+            "order_summary_sections_meta",
+            "step_order_summary_map_meta",
+        }
+        self.assertTrue(expected.issubset(families), expected - set(families))
+        for family in expected:
+            item = families[family]
+            self.assertTrue(item["editable"], family)
+            self.assertEqual(
+                item["schema"]["schema_version"], mainmod.TABLE_SCHEMA_VERSION
+            )
+            self.assertEqual(
+                set(item["capabilities"]), {"create", "update", "delete"}
+            )
+            self.assertTrue(all(
+                capability["allowed"]
+                for capability in item["capabilities"].values()
+            ))
+            self.assertTrue(item["generated_impact"])
+        read_only = families["sections"]
+        self.assertFalse(read_only["editable"])
+        for capability in read_only["capabilities"].values():
+            self.assertFalse(capability["allowed"])
+            self.assertEqual(
+                capability["blocked_reason"],
+                "This registered family is read-only in the Manager.",
+            )
+
     def test_structure_response_exposes_complete_graph_and_legacy_editing_rows(self):
         response = mainmod.structure("z06", conn=self.conn)
         self.assertEqual(response["model_key"], "z06")
@@ -542,6 +613,32 @@ class TestStructureEndpoint(FormGraphCase):
 
 
 class TestFormStructureSource(unittest.TestCase):
+
+    def test_form_overview_exposes_registry_structure_index_through_shared_browser(self):
+        source = FORM_STRUCTURE.read_text(encoding="utf-8")
+        operations = (
+            ROOT / "workbook-manager" / "frontend" / "src" / "components"
+            / "ModelOperations.jsx"
+        ).read_text(encoding="utf-8")
+        api_source = (
+            ROOT / "workbook-manager" / "frontend" / "src" / "api.js"
+        ).read_text(encoding="utf-8")
+        styles = (
+            ROOT / "workbook-manager" / "frontend" / "src" / "styles.css"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("Registered structure management", source)
+        self.assertIn("api.structureFamilies", source)
+        self.assertIn("collectionsOverride", source)
+        self.assertIn("collectionsOverride", operations)
+        self.assertIn("/api/tables", api_source)
+        self.assertIn("RecordForm", operations)
+        self.assertIn("editorEvidence", operations)
+        self.assertIn("api.dependencies", operations)
+        self.assertIn("const active = schema.columns.filter", operations)
+        self.assertIn(".editor-evidence", styles)
+        self.assertIn("const loadToken = useRef(0)", operations)
+        self.assertIn("if (token !== loadToken.current) return", operations)
 
     def test_form_overview_uses_graph_classifications_and_contextual_drawer_actions(self):
         source = FORM_STRUCTURE.read_text(encoding="utf-8")

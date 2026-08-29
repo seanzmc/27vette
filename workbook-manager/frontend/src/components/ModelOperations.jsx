@@ -8,6 +8,7 @@ import RecordForm from "./RecordForm.jsx";
 
 export default function ModelOperations({
   models, modelKey, setModelKey, draftId, draftMutable, onChanged,
+  collectionsOverride = null, showModels = true,
 }) {
   const [collections, setCollections] = useState([]);
   const [table, setTable] = useState("options");
@@ -20,26 +21,29 @@ export default function ModelOperations({
   const [deps, setDeps] = useState(null);     // dependency dialog state
   const [notice, setNotice] = useState(null);
   const searchTimer = useRef(null);
+  const loadToken = useRef(0);
   const LIMIT = 100;
 
   const activeCollection = collections.find((c) => c.table === table);
 
   useEffect(() => {
     (async () => {
-      const c = await api.collections(modelKey);
-      setCollections(c.collections);
-      if (!c.collections.some((x) => x.table === table)) {
-        setTable(c.collections[0]?.table || "options");
+      const next = collectionsOverride || (await api.collections(modelKey)).collections;
+      setCollections(next);
+      if (!next.some((x) => x.table === table)) {
+        setTable(next[0]?.table || "options");
       }
     })();
-  }, [modelKey]); // eslint-disable-line
+  }, [modelKey, collectionsOverride]); // eslint-disable-line
 
   const loadRows = async (t = table, s = search, o = offset) => {
+    const token = ++loadToken.current;
     const spec = await api.schema(t, modelKey);
-    setSchema(spec);
     const resp = await api.records(t, {
       model: modelKey, search: s, limit: LIMIT, offset: o,
     });
+    if (token !== loadToken.current) return;
+    setSchema(spec);
     setRows(resp.records);
     setTotal(resp.total);
   };
@@ -63,8 +67,9 @@ export default function ModelOperations({
   const previewCols = useMemo(() => {
     if (!schema) return [];
     const keys = schema.columns.filter((c) => c.is_key);
-    const rest = schema.columns.filter((c) => !c.is_key);
-    return [...keys, ...rest].slice(0, 7);
+    const active = schema.columns.filter((c) => !c.is_key && c.name === "active");
+    const rest = schema.columns.filter((c) => !c.is_key && c.name !== "active");
+    return [...keys, ...active, ...rest].slice(0, 7);
   }, [schema]);
 
   const saveDraft = (payload) => api.saveDraftOperation(draftId, {
@@ -72,6 +77,41 @@ export default function ModelOperations({
     actor: "workbook-manager-ui",
     session_id: "browser",
   });
+
+  const capability = (action) => activeCollection?.capabilities?.[action] || {
+    allowed: Boolean(activeCollection?.editable),
+    blocked_reason: activeCollection?.editable ? "" : "This family is read-only.",
+  };
+
+  const editorEvidence = (row, dependents = []) => [
+    `Lineage: ${row?.src_sheet || activeCollection?.sheet || "new row"}${row?.src_row ? ` · row ${row.src_row}` : ""}`,
+    `Scope: ${row?.model_key || row?.model_id || row?.model_context?.join(", ") || (activeCollection?.shared ? "shared" : modelKey)}`,
+    `Dependencies: ${dependents.length ? `${dependents.length} projected dependent record(s)` : "none found by the registered dependency contract"}`,
+    `Active state: ${row?.active ?? "set in the authored fields below"}`,
+    `Generated impact: ${activeCollection?.generated_impact || "verified during guarded Apply and Rebuild"}`,
+  ];
+
+  const openEditor = async (mode, row = null) => {
+    const action = mode === "add" ? "create" : "update";
+    if (!capability(action).allowed) return;
+    try {
+      let dependents = [];
+      if (row && schema) {
+        const key = Object.fromEntries(
+          schema.key.map((name) => [name, String(row[name] ?? "")])
+        );
+        const result = await api.dependencies(
+          table,
+          schema.model_context?.required ? (schema.model_context.value || modelKey) : "",
+          key,
+        );
+        dependents = result.dependents || [];
+      }
+      setEditing({ mode, initial: row, evidence: editorEvidence(row, dependents) });
+    } catch (error) {
+      setNotice({ kind: "err", text: `Cannot inspect registered dependencies: ${error.message}` });
+    }
+  };
 
   const saveDelete = async (row) => {
     try {
@@ -124,17 +164,19 @@ export default function ModelOperations({
 
   return (
     <div>
-      <div className="pill-row">
-        {models.map((m) => (
-          <button
-            key={m.model_key}
-            className={`pill ${m.model_key === modelKey ? "active" : ""} ${m.scaffold ? "disabled" : ""}`}
-            onClick={() => setModelKey(m.model_key)}
-          >
-            {m.label}{m.scaffold ? " · scaffold" : ""}
-          </button>
-        ))}
-      </div>
+      {showModels && (
+        <div className="pill-row">
+          {models.map((m) => (
+            <button
+              key={m.model_key}
+              className={`pill ${m.model_key === modelKey ? "active" : ""} ${m.scaffold ? "disabled" : ""}`}
+              onClick={() => setModelKey(m.model_key)}
+            >
+              {m.label}{m.scaffold ? " · scaffold" : ""}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="pill-row">
         {collections.map((c) => (
           <button
@@ -150,6 +192,22 @@ export default function ModelOperations({
           </button>
         ))}
       </div>
+
+      {collectionsOverride && activeCollection && (
+        <div className="panel structure-family-context">
+          <div className="panel-body">
+            <strong>{activeCollection.label}</strong>
+            <p>{activeCollection.description}</p>
+            <div className="tags">
+              <span className="chip">
+                {activeCollection.context === "shared" ? "Shared context" : `Model context · ${modelKey}`}
+              </span>
+              <span className="chip mono">{activeCollection.sheet}</span>
+            </div>
+            <p className="muted">{activeCollection.generated_impact}</p>
+          </div>
+        </div>
+      )}
 
       <div className="panel">
         <div className="panel-head">
@@ -182,8 +240,9 @@ export default function ModelOperations({
             </div>
             <button
               className="btn green small"
-              disabled={!activeCollection?.editable || !draftMutable}
-              onClick={() => setEditing({ mode: "add", initial: null })}
+              disabled={!capability("create").allowed || !draftMutable}
+              title={capability("create").blocked_reason || "Add a registered record"}
+              onClick={() => openEditor("add")}
             >
               <PlusCircle size={14} /> Add
             </button>
@@ -221,16 +280,16 @@ export default function ModelOperations({
                     <div className="row-actions">
                       <button
                         className="icon-btn"
-                        title="Edit"
-                        disabled={!activeCollection?.editable || !draftMutable}
-                        onClick={() => setEditing({ mode: "edit", initial: r })}
+                        title={capability("update").blocked_reason || "Edit"}
+                        disabled={!capability("update").allowed || !draftMutable}
+                        onClick={() => openEditor("edit", r)}
                       >
                         <Pencil size={14} />
                       </button>
                       <button
                         className="icon-btn danger"
-                        title="Save delete to draft"
-                        disabled={!activeCollection?.editable || !draftMutable}
+                        title={capability("delete").blocked_reason || "Save delete to draft"}
+                        disabled={!capability("delete").allowed || !draftMutable}
                         onClick={() => inspectDelete(r)}
                       >
                         <Trash2 size={14} />
@@ -283,6 +342,7 @@ export default function ModelOperations({
             saveFn={saveDraft}
             onSaved={saved}
             onCancel={() => setEditing(null)}
+            evidence={editing.evidence}
           />
         </div>
       )}

@@ -344,20 +344,54 @@ MODEL_COLLECTIONS = (
     "model_interior_scope",
     "interior_components",
 )
-STRUCTURE_TABLES = (
-    "models",
-    "model_registry_promotion",
-    "variants",
-    "model_variants",
-    "form_steps",
-    "form_sections",
-    "section_presentation",
-    "context_sections",
-    "order_summary_sections",
-    "step_order_summary_map",
-    "sheet_registry",
-)
 SHARED_TABLES = ("interiors", "color_overrides", "form_sections")
+
+# Context labels are Manager read-model metadata only. The index membership,
+# writable shape, and capabilities still derive from the registered specs.
+STRUCTURE_PRESENTATION: dict[str, tuple[str, str]] = {
+    "model_registry_promotion": (
+        "Runtime promotion",
+        "Runtime publication, default-model, artifact, and ordering evidence.",
+    ),
+    "model_workbook_sources": (
+        "Workbook source routing",
+        "Model-to-sheet ownership used by projection, generation, and guarded writes.",
+    ),
+    "variant_master": (
+        "Variant definitions",
+        "Shared trim/body definitions and authored display order.",
+    ),
+    "model_variants": (
+        "Model variant membership",
+        "The variants registered to the selected model and their active order.",
+    ),
+    "order_summary_sections_meta": (
+        "Order summary sections",
+        "Authored review-summary headings and their display order.",
+    ),
+    "step_order_summary_map_meta": (
+        "Step to summary mappings",
+        "The selected model's runtime-step contributions to summary sections.",
+    ),
+}
+
+
+def structure_specs(specs: tuple[TableSpec, ...] = WRITABLE_SPECS) -> tuple[TableSpec, ...]:
+    """Registered fixed-sheet families not already routed as operations.
+
+    A newly registered writable fixed-sheet spec therefore reaches the
+    structure index without another table-name inventory. The read-only section
+    projection remains present as explicit workbook evidence.
+    """
+    operation_tables = set(MODEL_COLLECTIONS) | set(SHARED_TABLES)
+    writable = tuple(
+        spec for spec in specs
+        if spec.sheet and spec.table not in operation_tables
+    )
+    return (*writable, _SECTION_SPEC)
+
+
+STRUCTURE_TABLES = tuple(spec.table for spec in structure_specs())
 
 
 def classify_workbook_sheets(wb) -> dict[str, SheetClassification]:
