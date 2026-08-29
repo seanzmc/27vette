@@ -2,8 +2,11 @@
 
 Status: proposed 2026-08-29. This specification resolves the remediation scope
 identified in `wbookMgrAuditRpt.md`; it does not authorize implementation by
-itself. Each implementation checkpoint requires explicit user authorization and
-must stop at its exit gate before a later checkpoint begins.
+itself. Once implementation is authorized, a checkpoint proceeds under
+`AGENTS.md` autonomy rules and must still stop at its exit gate before a later
+checkpoint begins; a further explicit approval is required only where a
+checkpoint raises a new product, architectural, or protected-boundary decision,
+such as Checkpoint 2D's writable-capability expansion.
 
 ## 1. Decision, authority, and scope
 
@@ -193,9 +196,9 @@ cross-draft apply immediately creates a P0 stop and supersedes this sequence.
 | WM-006 | P1.6 | 1E | IMG-SCOPE-01–03 |
 | WM-007 | P2.3, P2.4 | 2A | RAW-01–04 |
 | WM-008 | P2.1, P2.2 | 2A | GRAPH-01–06 |
-| WM-009 | P2.5–P2.7, P3.5, P3.7 | 2B, 3B | MEDIA-01–06, POLISH-05–06 |
+| WM-009 | P2.5–P2.7, P3.5, P3.7 | 2B, 3B | MEDIA-01–06, POLISH-01–06 |
 | WM-010 | P2.8 | 2C | EFFECTIVE-01–04 |
-| WM-011 | P3.1–P3.6, P3.8 | 3A–3C | DISC-01–06, NAV-01–03, RESP-01–02 |
+| WM-011 | P3.1–P3.4, P3.6, P3.8 | 3A, 3C | DISC-01–06, NAV-01–03, RESP-01–02 |
 
 The first implementation edit in any checkpoint must update this table if live
 evidence proves the mapping wrong. No finding may be removed; a remap must name
@@ -347,8 +350,9 @@ Required work:
 Forbidden: migrating or deleting legacy rows, rewriting immutable attempts,
 changing apply semantics, or claiming mutable drafts are applied.
 
-Exit gate: HIST-01–04 pass; an isolated successful apply and a rollback failure
-both appear once with correct evidence; legacy rows remain separately readable.
+Exit gate: HIST-01–04 pass; an isolated successful apply and a downstream
+failure with proven rollback/restoration both appear once with correct evidence;
+legacy rows remain separately readable.
 
 ### Checkpoint 1B — reachable registered structure management
 
