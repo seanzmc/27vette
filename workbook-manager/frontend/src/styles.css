@@ -485,6 +485,19 @@ input.text:disabled { opacity: .5; }
 .artifact-history summary { cursor: pointer; color: var(--text-dim); }
 .artifact-history pre { max-height: 340px; overflow: auto; padding: 10px; background: var(--bg); border-radius: 6px; font: 11px/1.45 var(--mono); }
 
+.workflow-history { display: grid; gap: 10px; }
+.workflow-history .panel-head label { display: grid; gap: 4px; color: var(--text-dim); font-size: 11px; }
+.workflow-history-record { display: grid; gap: 12px; padding: 16px; border-bottom: 1px solid var(--border); }
+.workflow-history-record:last-of-type { border-bottom: 0; }
+.workflow-history-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.workflow-history-record .identity-list { grid-template-columns: max-content minmax(0, 1fr); }
+.workflow-history-record .identity-list dd { overflow-wrap: anywhere; }
+.workflow-history-record .technical-details pre { max-height: 360px; overflow: auto; }
+.history-pagination { display: flex; justify-content: center; align-items: center; gap: 12px; padding: 12px; border-top: 1px solid var(--border); }
+.legacy-history { margin-top: 8px; }
+.legacy-history > summary { cursor: pointer; padding: 14px 16px; font-weight: 700; }
+.legacy-history > p { padding: 0 16px; }
+
 @media (max-width: 760px) {
   .app-header { padding-inline: 14px; }
   .model-context { width: 100%; }

@@ -85,11 +85,9 @@ export default function App() {
   const refreshDraft = useCallback(async (id = draftId) => {
     if (!id) return null;
     try {
-      const listed = await api.drafts();
-      if (!listed.drafts.some((draft) => draft.id === id)) {
-        setDraftLifecycle(null);
-        return null;
-      }
+      // Fetch the exact lifecycle directly: history records can point at
+      // drafts beyond the bounded /api/drafts list window, and a new draft id
+      // has no list row at all. A 404 clears the stale lifecycle view.
       const lifecycle = await api.draftLifecycle(id);
       setDraftLifecycle(lifecycle);
       return lifecycle;
@@ -270,7 +268,7 @@ export default function App() {
               key={id}
               className={tab === id ? "active" : ""}
               onClick={() => setTab(id)}
-              disabled={!ready && id !== "changes"}
+              disabled={!ready && !["changes", "advanced"].includes(id)}
             >
               <Icon size={14} /> {label}
               {badge ? <span className="badge">{badge}</span> : null}
@@ -351,21 +349,34 @@ export default function App() {
             onStartNew={startNewDraft}
           />
         )}
-        {ready && tab === "advanced" && (
+        {(ready || status) && tab === "advanced" && (
           <div className="advanced-layout">
-            <section>
-              <h2>Raw collection browser</h2>
-              <p className="muted">Workbook-shaped tables remain available for advanced traceability and maintenance.</p>
-              <ModelOperations
-                models={models}
-                modelKey={modelKey}
-                setModelKey={setModelKey}
-                draftId={draftId}
-                draftMutable={draftMutable}
-                onChanged={refreshManager}
-              />
-            </section>
-            <HistoryView models={models} />
+            <HistoryView
+              models={models}
+              onOpenDraft={async (id) => {
+                selectDraft(id);
+                await refreshDraft(id);
+                setTab("changes");
+              }}
+            />
+            {ready ? (
+              <section>
+                <h2>Raw collection browser</h2>
+                <p className="muted">Workbook-shaped tables remain available for advanced traceability and maintenance.</p>
+                <ModelOperations
+                  models={models}
+                  modelKey={modelKey}
+                  setModelKey={setModelKey}
+                  draftId={draftId}
+                  draftMutable={draftMutable}
+                  onChanged={refreshManager}
+                />
+              </section>
+            ) : (
+              <div className="notice warn">
+                Raw collection browsing requires a current verified projection. Durable Workflow history remains available.
+              </div>
+            )}
           </div>
         )}
       </main>

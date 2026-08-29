@@ -1750,6 +1750,21 @@ def commit(
 
 # ── history / sync / export / backup ─────────────────────────────────
 
+@app.get("/api/workflow-history")
+def workflow_history(
+    status: str = "",
+    model: str = "",
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
+    conn=Depends(state_connection),
+):
+    try:
+        return drafts.workflow_history(
+            conn, status=status, model=model, limit=limit, offset=offset
+        )
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
+
 @app.get("/api/history")
 def history(model: str = "", entity_type: str = "", sync_status: str = "",
             limit: int = Query(200, le=2000), offset: int = 0,

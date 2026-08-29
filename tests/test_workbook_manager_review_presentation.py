@@ -208,6 +208,30 @@ class TestReviewTerminologyAndResults(unittest.TestCase):
         self.assertIn("ready || reviewAvailable", source)
         self.assertIn("savedTerminalReview", source)
 
+    def test_advanced_leads_with_durable_workflow_history_and_discloses_legacy(self):
+        """HIST-01–04: current workflow evidence is the primary history UI."""
+        history_source = (
+            REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+            "components" / "HistoryView.jsx"
+        ).read_text(encoding="utf-8")
+        app_source = (
+            REPO_ROOT / "workbook-manager" / "frontend" / "src" / "App.jsx"
+        ).read_text(encoding="utf-8")
+        api_source = (
+            REPO_ROOT / "workbook-manager" / "frontend" / "src" / "api.js"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("Workflow history", history_source)
+        self.assertIn("Legacy staging history", history_source)
+        self.assertIn("technical_evidence", history_source)
+        self.assertIn("Open exact draft", history_source)
+        self.assertIn("api.workflowHistory", history_source)
+        self.assertIn("workflowHistory:", api_source)
+        self.assertIn("onOpenDraft", app_source)
+        self.assertIn("await refreshDraft(id)", app_source)
+        self.assertIn("ready || status", app_source)
+        self.assertIn('["changes", "advanced"].includes(id)', app_source)
+
 
 if __name__ == "__main__":
     unittest.main()
