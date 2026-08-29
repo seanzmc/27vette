@@ -18,9 +18,12 @@ The workbook remains canonical. Pass 7 checkpoint 5 enables exactly one
 reviewed Apply and Rebuild route over the bound artifact chain; ordinary draft
 saves never write or regenerate.
 
-The completed Pass 7 plan is owned by
+The completed Pass 7 plan is retained as historical delivery evidence in
 `docs/superpowers/specs/2026-07-22-reliable-workbook-database-workflow.md`.
-Checkpoints 1–5 are complete: explicit safe, ambiguous, inventory, manual,
+It is not current implementation authority. Current audit remediation is owned
+by `workbook-manager/wbookMgrAuditRpt.md` and `workbook-manager/audit-spec.md`;
+implementation should prefer the simplest fix through existing live mechanisms.
+Pass 7 checkpoints 1–5 are complete: explicit safe, ambiguous, inventory, manual,
 assignment, deactivation, ignore, and presentation decisions use the same
 durable draft and Draft Review as ordinary edits. One Apply and Rebuild route
 owns the guarded workbook write plus local generation/publication. No separate
