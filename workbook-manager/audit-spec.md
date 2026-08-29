@@ -143,7 +143,7 @@ cross-draft apply immediately creates a P0 stop and supersedes this sequence.
 
 ### P1 — required before treating the Manager as primary workbook authority
 
-- [ ] **P1.1 / WM-001 — Durable workflow history.** Replace the misleading
+- [x] **P1.1 / WM-001 — Durable workflow history.** Replace the misleading
   legacy-only Change History presentation with current durable draft/apply
   history; retain legacy rows only under an explicitly labeled legacy surface.
 - [ ] **P1.2 / WM-002 — Structure management.** Add reachable schema-driven
@@ -374,6 +374,54 @@ changing apply semantics, or claiming mutable drafts are applied.
 Exit gate: HIST-01–04 pass; an isolated successful apply and a downstream
 failure with proven rollback/restoration both appear once with correct evidence;
 legacy rows remain separately readable.
+
+**Closed 2026-08-29 — implementation `230ed99`.** The additive
+`workbook-manager-workflow-history-1` read model now composes durable draft,
+operation, ChangeSet, preview, approval, apply, asset-resolution, cancellation,
+and manual-recovery evidence without consulting or mutating the projection.
+Server-side status/model filters, deterministic newest-first pagination, a
+fixed ten-query budget, invalid-filter refusal, and a write-denying test cover
+the read contract. Advanced & Recovery leads with the current workflow record,
+keeps retired staging/sync rows in a separately counted legacy disclosure, and
+opens the exact durable draft.
+
+Acceptance evidence:
+
+- HIST-01: isolated applied evidence appears once with actor/time, base and
+  saved hashes, model and operation count, current generation/publication state,
+  and exact-draft navigation.
+- HIST-02: an `apply_rebuild_failed_rolled_back` attempt reports the failed
+  rebuild/publication stage, exception, restored workbook/generated/publication
+  surfaces, verified rollback, and only retry/cancel next actions.
+- HIST-03: cancelled and preview-rejected drafts remain independently paginated
+  and are never summarized as applied, even with the projection removed.
+- HIST-04: one legacy staging row remains readable only in `Legacy staging
+  history` and does not change the two-record workflow total.
+
+Checkpoint drift disposition:
+
+| Surface | Checkpoint 1A disposition |
+|---|---|
+| Registry/workbook authority | Inspected, no change; history reads existing durable evidence only. |
+| Projection representation | Inspected, no change; missing-projection API and browser proofs pass. |
+| API/read model | Added versioned `/api/workflow-history` with filters, bounded pagination, stable ordering, technical evidence, and explicit invalid-status errors. |
+| Editor/mutation capability | No change; authorizer-backed tests prove the history query cannot insert, update, or delete. |
+| Draft overlay/review/history | Workflow history is primary; exact-draft navigation refreshes the bound lifecycle before opening Review & Apply; legacy history remains separate. |
+| Writer/apply impact | Inspected, no change; immutable attempts are read, never rewritten, and apply semantics are untouched. |
+| Generator/publication impact | No change; protected workbook, runtime contracts, registry bundle, and cache-bearing HTML remained byte-identical to preflight. |
+| Focused test owner | `test_workbook_manager_api_concurrency.py` and `test_workbook_manager_review_presentation.py`; catalog placement unchanged because no new test file was added. |
+| README/User Guide | Updated current/legacy history ownership, workspace names, filters, exact-draft navigation, and recovery availability. |
+
+Validation: focused RED failures proved the missing endpoint (`404`), missing
+workflow-first presentation, missing exact-draft refresh, and omitted asset
+evidence before each implementation slice. The final catalog-selected Manager
+serial group passed with 356 tests, 2 skips, 74 subtests, and one existing
+Starlette/httpx deprecation warning. Python compilation, frontend production
+build, and `git diff --check` passed. Isolated real-browser proof at desktop and
+390x844 showed the successful and restored outcomes, separate legacy count,
+projection-independent reload, expandable evidence, exact-draft one-change
+review, Back/Forward restoration, keyboard focus, zero console errors, and no
+document overflow. Checkpoint 1B remains unauthorized.
 
 ### Checkpoint 1B — reachable registered structure management
 
