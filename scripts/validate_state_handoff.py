@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -37,6 +38,24 @@ HANDOFF_REQUIRED_FIELDS = (
 EVIDENCE_SECTIONS = ("Verified facts", "General rules", "Open failures", "Lessons learned")
 MAX_LAST_SESSION_ENTRIES = 5
 MAX_STATE_BYTES = 40_000
+
+CATALOG_FILE = "tests/validation_catalog.json"
+# STATE.md quotes catalog inventory counts as verified facts. They go stale
+# silently: both files stay individually valid while the claim they share
+# becomes false. Each noun below is matched inside any STATE.md sentence that
+# cites the catalog, then checked against the catalog itself.
+CATALOG_COUNT_NOUNS = {
+    "gates": "gates",
+    "suites": "suites",
+    "acceptance-lock records": "acceptance_locks",
+    "coverage-ledger entries": "coverage_ledger",
+    "stale assertions": "stale_assertions",
+    "findings": "new_findings",
+    "expensive setups": "expensive_setups",
+}
+CATALOG_CLAIM_RE = re.compile(
+    r"(\d+)\s+(" + "|".join(re.escape(n) for n in CATALOG_COUNT_NOUNS) + r")\b"
+)
 
 
 def _section_lines(text: str, heading: str) -> list[str]:
@@ -117,6 +136,34 @@ def _validate_state(root: Path, issues: list[str]) -> None:
 
     if not (root / ARCHIVE_FILE).is_file():
         issues.append(f"missing archive file: {ARCHIVE_FILE}")
+
+    _validate_catalog_counts(root, state_text, issues)
+
+
+def _validate_catalog_counts(root: Path, state_text: str, issues: list[str]) -> None:
+    """Any inventory count STATE.md attributes to the catalog must still hold."""
+
+    catalog_path = root / CATALOG_FILE
+    if not catalog_path.is_file():
+        issues.append(f"missing catalog file: {CATALOG_FILE}")
+        return
+    try:
+        catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        issues.append(f"{CATALOG_FILE} is not valid JSON: {exc}")
+        return
+
+    for sentence in re.split(r"(?<=[.;])\s+", state_text):
+        if CATALOG_FILE not in sentence:
+            continue
+        for claimed, noun in CATALOG_CLAIM_RE.findall(sentence):
+            key = CATALOG_COUNT_NOUNS[noun]
+            actual = len(catalog.get(key, ()))
+            if int(claimed) != actual:
+                issues.append(
+                    f"STATE.md claims {claimed} {noun} in {CATALOG_FILE}; it holds "
+                    f"{actual}. Update the claim or move it to {ARCHIVE_FILE}"
+                )
 
 
 def validate(root: Path = ROOT) -> list[str]:

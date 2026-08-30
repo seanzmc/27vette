@@ -56,10 +56,12 @@ def build_fixture_workbook() -> Workbook:
         wb, "model_registry_promotion",
         ["model_key", "promoted_to_runtime", "default_model", "display_order", "active"],
         [
+            # display_order deliberately disagrees with both row order and
+            # alphabetical order, so the sort assertion below can actually fail.
             {"model_key": "stingray", "promoted_to_runtime": True, "default_model": True,
-             "display_order": 1, "active": True},
-            {"model_key": "z06", "promoted_to_runtime": True, "default_model": False,
              "display_order": 3, "active": True},
+            {"model_key": "z06", "promoted_to_runtime": True, "default_model": False,
+             "display_order": 1, "active": True},
         ],
     )
     append_sheet(
@@ -201,8 +203,11 @@ class PayloadTestBase(unittest.TestCase):
 
 class ModelsTest(PayloadTestBase):
     def test_models_sorted_by_promotion_display_order(self):
+        # z06 (display_order 1) must precede stingray (3) even though the
+        # workbook lists stingray first and "stingray" sorts first
+        # alphabetically. zr1 has no promotion row, so it sorts last.
         keys = [m["key"] for m in self.payload["models"]]
-        self.assertEqual(keys, ["stingray", "z06", "zr1"])
+        self.assertEqual(keys, ["z06", "stingray", "zr1"])
 
     def test_model_flags(self):
         by_key = {m["key"]: m for m in self.payload["models"]}

@@ -23,6 +23,8 @@ def copy_scaffold(tmp_path: Path) -> Path:
     for name in ("STATE.md", "STATE-archive.md"):
         shutil.copy2(ROOT / "fable5loop" / name, tmp_path / "fable5loop" / name)
     shutil.copy2(ROOT / "README.md", tmp_path / "README.md")
+    (tmp_path / "tests").mkdir()
+    shutil.copy2(ROOT / "tests" / "validation_catalog.json", tmp_path / "tests" / "validation_catalog.json")
     return tmp_path
 
 
@@ -131,3 +133,32 @@ def test_validator_rejects_readme_without_canonical_command(tmp_path: Path) -> N
     )
     issues = validate(tmp_path)
     assert any("missing canonical validator command" in issue for issue in issues)
+
+
+def test_validator_rejects_stale_catalog_count(tmp_path: Path) -> None:
+    """A count STATE.md attributes to the catalog must track the catalog.
+
+    Both files stay individually valid when this drifts, so nothing else in
+    the suite can see it. The 2026-08-17 entry sat 16 gates stale until this
+    check was added.
+    """
+
+    copy_scaffold(tmp_path)
+    state = state_path(tmp_path)
+    text = state.read_text(encoding="utf-8")
+    assert "holds 75 gates" in text
+    state.write_text(text.replace("holds 75 gates", "holds 59 gates"), encoding="utf-8")
+    issues = validate(tmp_path)
+    assert any("claims 59 gates" in issue for issue in issues), issues
+
+
+def test_validator_accepts_catalog_counts_that_match(tmp_path: Path) -> None:
+    copy_scaffold(tmp_path)
+    assert not [i for i in validate(tmp_path) if "validation_catalog.json" in i]
+
+
+def test_validator_rejects_missing_catalog(tmp_path: Path) -> None:
+    copy_scaffold(tmp_path)
+    (tmp_path / "tests" / "validation_catalog.json").unlink()
+    issues = validate(tmp_path)
+    assert any("missing catalog file" in issue for issue in issues), issues

@@ -121,9 +121,21 @@ def build_master_workbook(path: Path) -> Path:
         "zr1_options",
         option_headers,
         [
-            # Deliberately uses the id the plan builder would mint first for
-            # PDB: locks in the add-after-delete seeding fix (new ids must
-            # avoid keys that exist pre-batch even when deleted in-batch).
+            # Reuses z06's opt_pdb_001 on purpose. The row must collide with a
+            # live key so that excluding it can only be the source's active
+            # flag, never id-uniqueness or a name mismatch.
+            #
+            # This comment previously claimed the row locked in an
+            # "add-after-delete seeding" fix against ids the plan builder
+            # would mint. That claim is retired: the plan builder was removed
+            # with raw ingest on 2026-07-23 (AGENTS.md §8) in the same commit
+            # that added the comment (667aad5), and no id-minting code remains
+            # in scripts/ or workbook-manager/. Verified 2026-08-29 by
+            # mutation: changing this id to opt_zzz_999 leaves the only
+            # consumer (test_editor_ops_global_families.py, which issues add
+            # actions and never a delete) fully green, so nothing proved the
+            # seeding claim. Flipping the source row's active flag to True
+            # does fail, which is the property recorded above.
             ["opt_pdb_001", "PDB", 99999, "WRONG Scaffold Package", "must never surface", "", "sec_pain_001", "", 10, True, ""],
         ],
     )

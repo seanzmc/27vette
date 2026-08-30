@@ -46,7 +46,7 @@ tests/                        node --test *.mjs + pytest gates
 docs/, .hermes/plans/         active specs, reviews, and plans
 ```
 
-Other dirs (`product/`, `dist_updates/`, `archive/`) are reference/archive surfaces — inspect only when a task names them.
+Other dirs (`dist_updates/`, `archive/`) are reference/archive surfaces — inspect only when a task names them.
 
 ## Local Tools and In-Progress Modules
 
