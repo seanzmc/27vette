@@ -18,39 +18,36 @@ Keep this file small — it is read at the start of every session:
 
 ## Current handoff
 
-- **Updated:** 2026-08-30
-- **Owning specification:** `workbook-manager/audit-spec.md` — validation-method
-  alignment only; no checkpoint was implemented or authorized.
+- **Updated:** 2026-08-31
+- **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 1C /
+  P1.3 / WM-003, correctable mutable and rejected drafts.
 - **Active workflow:** Normal repository path.
-- **Branch/commit:** `claude/audit-spec-validation-review-b8f1fe` from
-  `origin/main` (`a59208e`).
-- **Last completed:** Reviewed `workbook-manager/audit-spec.md` against the
-  current gate machinery and updated it where the spec still described the old
-  method. Changes: §11 preamble records that README no longer mirrors the catalog
-  and names the four drift checks in `tests/test_validation_catalog.py`; §11.1
-  requires additive catalog edits and names `scripts/catalog_change_scope.py`'s
-  full-inventory triggers; §11.2 splits the Manager group into local-one-process
-  versus five CI partitions, documents `ci.always_gate_ids` as the layered-runner
-  baseline rather than universal PR gates, and ties
-  `scripts/validate_state_handoff.py` to catalog edits as well as `STATE.md`
-  edits; §11.3, §9, §12, and §13 add the catalog-owns-counts rule, a validation-
-  inventory drift row, a catalog-scope closeout line, and an approval gate on
-  `schema`/`ci`/`serial_groups` edits. The two closed checkpoint records now
-  quote their pass counts as dated one-run evidence rather than live inventory.
-  The uncommitted `AGENTS.md` Workbook Manager paragraph from the main checkout
-  is carried in this branch so it lands with the PR.
-- **Current status:** Documentation only. No ledger item changed status, no
-  acceptance scenario changed, and Checkpoint 1C remains unauthorized.
-- **Validation:** `tests/test_validation_catalog.py` and
-  `scripts/validate_state_handoff.py` — see the closeout report for results.
-  Product gates were not run: no script, test, catalog, workbook, or runtime file
-  changed.
-- **Next action:** None required. Checkpoint 1C needs new explicit authorization.
-- **Blockers or closeout gaps:** The main checkout still holds its own dirty
-  `AGENTS.md`; discard it there after this PR merges.
-- **Protected boundaries:** Workbook, generated artifacts, `form-app/data.js`,
-  cache-bearing HTML, durable write/apply semantics, dealer submission,
-  dependencies, and schema unchanged. No executable file changed.
+- **Branch/commit:** `feat/workbook-manager-checkpoint-1c` from `origin/main`;
+  implementation `5641a72`.
+- **Last completed:** Implemented Checkpoint 1C. Mutable draft operations can be
+  discarded individually with remaining graph/model impact shown. Rejected
+  drafts can atomically create a same-binding correction from selected
+  operations while retaining the rejected ChangeSet and failed attempt. Durable
+  schema version 10 stores an immutable source/correction link, actor, reason,
+  and selected operation IDs. The Review UI and operator documentation expose
+  the real correction route and no longer promise impossible in-place repair.
+- **Current status:** DRAFT-01–05 are evidence-backed closed in the owning spec.
+  The implementation is locally green and commit-ready for delivery; PR and
+  remote CI are the remaining final delivery actions.
+- **Validation:** Focused four-file owners: 103 passed, 48 subtests. Final
+  lifecycle owner: 38 passed, 36 subtests. Catalog-selected layered validation:
+  `ok: true`, 21 selected gates, 118.039 seconds; its Manager serial group was
+  341 passed, 2 skipped, 74 subtests. Python compilation, frontend production
+  build, `git diff --check`, isolated desktop/mobile Chrome workflow proof, and
+  protected-boundary diff/hash checks passed. See the Checkpoint 1C completion
+  record for exact browser and gate evidence.
+- **Next action:** Deliver this branch through its PR and wait for required CI
+  and review disposition. Checkpoint 1D requires new explicit authorization.
+- **Blockers or closeout gaps:** None local. Remote CI/review disposition is
+  pending until the delivery PR exists.
+- **Protected boundaries:** Canonical workbook, generated runtime contracts,
+  `form-app/data.js`, cache-bearing HTML, write/apply semantics, dealer
+  submission, dependencies, deployment, and WordPress media unchanged.
 
 ## Verified facts
 
