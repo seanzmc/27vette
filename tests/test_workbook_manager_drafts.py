@@ -209,6 +209,63 @@ class TestDurableDraftEditing(unittest.TestCase):
                 projection.close()
                 state.close()
 
+    def test_discard_mutable_operation_preserves_unrelated_intent(self):
+        """DRAFT-01/02: discard removes intent, never compensates for it."""
+        with tempfile.TemporaryDirectory(prefix="wbm-draft-discard-") as raw:
+            projection, state = self._stores(Path(raw))
+            try:
+                projection.execute(
+                    "INSERT INTO options(src_sheet, src_row, src_family, physical_key, "
+                    "model_context, model_id, option_id, rpo, option_name, price, active) "
+                    "VALUES(?,?,?,?,?,?,?,?,?,?,?)",
+                    ("stingray_options", 11, "options", '[\"opt_other\"]',
+                     '[\"stingray\"]', "stingray", "opt_other", "OTH", "Other",
+                     "200", "True"),
+                )
+                projection.commit()
+                first = drafts.save_operation(
+                    projection, state, projection_state="current",
+                    base_workbook_sha256="sha", base_workbook_mtime_ns="1",
+                    draft_id="draft-discard", table="options", model_id="stingray",
+                    op="update", key={"option_id": "opt_test"},
+                    record={"option_name": "Changed"},
+                )
+                second = drafts.save_operation(
+                    projection, state, projection_state="current",
+                    base_workbook_sha256="sha", base_workbook_mtime_ns="1",
+                    draft_id="draft-discard", table="options", model_id="stingray",
+                    op="update", key={"option_id": "opt_other"},
+                    record={"price": "250"},
+                )
+
+                result = drafts.discard_operation(
+                    state, draft_id="draft-discard", operation_id=first["id"]
+                )
+
+                self.assertEqual(result["discarded_operation_id"], first["id"])
+                self.assertEqual(result["remaining_operation_count"], 1)
+                self.assertEqual(
+                    [row["id"] for row in drafts.list_operations(state, "draft-discard")],
+                    [second["id"]],
+                )
+                self.assertEqual(
+                    projection.execute(
+                        "SELECT option_name FROM options WHERE option_id='opt_test'"
+                    ).fetchone()["option_name"],
+                    "Original",
+                )
+
+                empty = drafts.discard_operation(
+                    state, draft_id="draft-discard", operation_id=second["id"]
+                )
+                self.assertTrue(empty["draft_removed"])
+                self.assertIsNone(state.execute(
+                    "SELECT 1 FROM workflow_drafts WHERE id='draft-discard'"
+                ).fetchone())
+            finally:
+                projection.close()
+                state.close()
+
     def test_unresolved_physical_target_is_rejected_before_persistence(self):
         with tempfile.TemporaryDirectory(prefix="wbm-draft-lineage-") as raw:
             projection, state = self._stores(Path(raw))

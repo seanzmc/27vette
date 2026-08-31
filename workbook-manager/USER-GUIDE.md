@@ -181,8 +181,11 @@ workbook changes.
 1. Read every item in **Draft operations**.
 2. Check the model, item name, and before-and-after values.
 3. Review image decisions shown with those changes.
-4. If something is wrong and the draft is still open, return to the earlier tab
-   and correct it.
+4. If one operation is wrong and the draft is still open, select **Discard
+   operation** on that item. Read the confirmation, including how many changes
+   and affected models remain, before confirming. You can also return to the
+   earlier workspace and save the authored value again; a full reversion
+   removes that effective operation.
 5. When everything is correct, select **Freeze ChangeSet**.
 
 “Freeze ChangeSet” means “lock this exact group of changes.” After you freeze
@@ -196,8 +199,12 @@ time.
 
 1. Select **Run Workbook Preview**.
 2. Read **Warnings & failures**.
-3. If the preview is rejected, do not force it. Cancel the draft and correct the
-   underlying changes in a new draft.
+3. If the preview is rejected, do not force it. Select only the operations you
+   want to keep, enter your name and a concrete correction reason, then select
+   **Create correction draft**. The rejected ChangeSet and failed validation
+   stay in history; the Manager opens the new mutable draft with the retained
+   operations so you can correct only what failed without recreating unrelated
+   valid work.
 4. If the preview is ready, enter your name in **Operator**.
 5. If warnings are shown, accept only the warnings you understand and intend to
    allow.

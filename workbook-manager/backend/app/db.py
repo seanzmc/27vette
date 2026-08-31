@@ -56,10 +56,11 @@ from .catalog import TABLE_SPECS, TableSpec
 # 7 (Pass 5): immutable approval-attempt evidence. 8 (Pass 6B): durable apply
 # attempts and manual-resolution evidence. 9 (Pass 7 checkpoint 4): mutable
 # asset-resolution evidence beside coalesced draft operations and operational
-# ignores. Versions 4–9 did not change
+# ignores. 10 (audit Checkpoint 1C): immutable rejected-draft correction links.
+# Versions 4–10 did not change
 # projection shape, so a verified version-3
 # projection remains compatible while its durable store upgrades independently.
-SCHEMA_VERSION = 9
+SCHEMA_VERSION = 10
 PROJECTION_SCHEMA_VERSION = 3
 # One process-local lock for bootstrap, durable-state mutation, candidate
 # promotion, and workbook apply.
@@ -330,6 +331,24 @@ DURABLE_SUPPORT_DDL = SUPPORT_DDL[3:5] + [
       base_workbook_sha256 TEXT NOT NULL,
       base_workbook_mtime_ns TEXT NOT NULL
     )""",
+    """CREATE TABLE IF NOT EXISTS draft_corrections (
+      source_draft_id TEXT PRIMARY KEY REFERENCES workflow_drafts(id),
+      correction_draft_id TEXT NOT NULL UNIQUE REFERENCES workflow_drafts(id),
+      created_ts TEXT NOT NULL,
+      actor TEXT NOT NULL,
+      reason TEXT NOT NULL,
+      selected_operation_ids_json TEXT NOT NULL
+    )""",
+    """CREATE TRIGGER IF NOT EXISTS draft_corrections_immutable_update
+    BEFORE UPDATE ON draft_corrections
+    BEGIN
+      SELECT RAISE(ABORT, 'draft correction links are immutable');
+    END""",
+    """CREATE TRIGGER IF NOT EXISTS draft_corrections_immutable_delete
+    BEFORE DELETE ON draft_corrections
+    BEGIN
+      SELECT RAISE(ABORT, 'draft correction links are immutable');
+    END""",
     """CREATE TABLE IF NOT EXISTS draft_operations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       draft_id TEXT NOT NULL REFERENCES workflow_drafts(id),

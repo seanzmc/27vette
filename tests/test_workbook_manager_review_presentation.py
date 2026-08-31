@@ -193,6 +193,29 @@ class TestReviewTerminologyAndResults(unittest.TestCase):
         ):
             self.assertIn(expected, source)
 
+    def test_review_exposes_mutable_discard_and_rejected_correction(self):
+        """DRAFT-01–05: visible actions match the actual lifecycle paths."""
+        source = (
+            REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+            "components" / "ChangesSync.jsx"
+        ).read_text(encoding="utf-8")
+        api_source = (
+            REPO_ROOT / "workbook-manager" / "frontend" / "src" / "api.js"
+        ).read_text(encoding="utf-8")
+        app_source = (
+            REPO_ROOT / "workbook-manager" / "frontend" / "src" / "App.jsx"
+        ).read_text(encoding="utf-8")
+
+        self.assertNotIn("Fix the reported problems, then revalidate", source)
+        self.assertIn("Discard operation", source)
+        self.assertIn("Create correction draft", source)
+        self.assertIn("selectedOperationIds", source)
+        self.assertIn("api.discardDraftOperation", source)
+        self.assertIn("api.createCorrectionDraft", source)
+        self.assertIn("discardDraftOperation:", api_source)
+        self.assertIn("createCorrectionDraft:", api_source)
+        self.assertIn("onSelectDraft", app_source)
+
     def test_persistent_draft_tray_uses_operator_lifecycle_language(self):
         source = (
             REPO_ROOT / "workbook-manager" / "frontend" / "src" / "App.jsx"

@@ -347,6 +347,11 @@ export default function App() {
             lifecycle={draftLifecycle}
             onChanged={refreshManager}
             onStartNew={startNewDraft}
+            onSelectDraft={async (id) => {
+              selectDraft(id);
+              await refreshDraft(id);
+              setTab("changes");
+            }}
           />
         )}
         {(ready || status) && tab === "advanced" && (

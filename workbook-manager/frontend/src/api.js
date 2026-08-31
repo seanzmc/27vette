@@ -90,6 +90,13 @@ export const api = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
+  discardDraftOperation: (draftId, operationId) =>
+    request(`/api/drafts/${draftId}/operations/${operationId}`, { method: "DELETE" }),
+  createCorrectionDraft: (draftId, payload) =>
+    request(`/api/drafts/${draftId}/correction`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
   saveAssetResolution: (draftId, payload) =>
     request(`/api/drafts/${draftId}/asset-resolutions`, {
       method: "POST",

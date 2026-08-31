@@ -465,6 +465,198 @@ class TestDurablePreviewLifecycle(unittest.TestCase):
         changeset = drafts.emit_changeset(state, draft_id=draft_id)
         return projection, state, workbook, changeset
 
+    def test_rejected_draft_correction_is_selective_audited_and_immutable(self):
+        """DRAFT-03: correction keeps failed evidence and unrelated valid work."""
+        with tempfile.TemporaryDirectory(prefix="wbm-correction-") as raw:
+            root = Path(raw)
+            projection, state = self._stores(root)
+            workbook = root / "fixture.xlsx"
+            workbook.write_bytes(b"preview-fixture")
+            try:
+                drafts.save_operation(
+                    projection, state, projection_state="current",
+                    base_workbook_sha256=hashlib.sha256(workbook.read_bytes()).hexdigest(),
+                    base_workbook_mtime_ns=str(workbook.stat().st_mtime_ns),
+                    draft_id="draft-rejected", table="options", model_id="stingray",
+                    op="update", key={"option_id": "opt_test"},
+                    record={"price": "150"},
+                )
+                projection.execute(
+                    "INSERT INTO options(src_sheet, src_row, src_family, physical_key, "
+                    "model_context, model_id, option_id, rpo, option_name, price, active) "
+                    "VALUES(?,?,?,?,?,?,?,?,?,?,?)",
+                    ("stingray_options", 11, "options", '[\"opt_bad\"]',
+                     '[\"stingray\"]', "stingray", "opt_bad", "BAD", "Bad option",
+                     "0", "True"),
+                )
+                projection.commit()
+                bad = drafts.save_operation(
+                    projection, state, projection_state="current",
+                    base_workbook_sha256=hashlib.sha256(workbook.read_bytes()).hexdigest(),
+                    base_workbook_mtime_ns=str(workbook.stat().st_mtime_ns),
+                    draft_id="draft-rejected", table="options", model_id="stingray",
+                    op="update", key={"option_id": "opt_bad"},
+                    record={"option_name": "Missing six OVS rows"},
+                )
+                changeset = drafts.emit_changeset(state, draft_id="draft-rejected")
+                drafts._persist_preview_attempt(
+                    state, draft_id="draft-rejected", changeset=changeset,
+                    started="2026-08-31T12:00:00+00:00", artifact_kind="formal_preview",
+                    result={"ok": False, "status": "invalid", "errors": [
+                        {"message": f"missing OVS row {index}"} for index in range(6)
+                    ]}, exception=None,
+                    identity={
+                        "state": "unchanged",
+                        "sha256": hashlib.sha256(workbook.read_bytes()).hexdigest(),
+                        "mtimeNs": str(workbook.stat().st_mtime_ns),
+                    },
+                    manager_state="preview_rejected", allowed_verbs=["cancel"],
+                )
+                before = state.execute(
+                    "SELECT payload_json FROM draft_changesets WHERE draft_id='draft-rejected'"
+                ).fetchone()["payload_json"]
+                attempt_before = state.execute(
+                    "SELECT result_json FROM draft_preview_attempts "
+                    "WHERE draft_id='draft-rejected'"
+                ).fetchone()["result_json"]
+                valid_id = next(
+                    row["id"] for row in drafts.list_operations(state, "draft-rejected")
+                    if row["id"] != bad["id"]
+                )
+
+                result = drafts.create_correction_draft(
+                    projection, state, projection_state="current",
+                    base_workbook_sha256=hashlib.sha256(workbook.read_bytes()).hexdigest(),
+                    base_workbook_mtime_ns=str(workbook.stat().st_mtime_ns),
+                    source_draft_id="draft-rejected", correction_draft_id="draft-correction",
+                    selected_operation_ids=[valid_id], actor="Sean",
+                    reason="Remove option missing six required OVS rows",
+                )
+
+                self.assertEqual(result["source_draft_id"], "draft-rejected")
+                self.assertEqual(result["correction_draft_id"], "draft-correction")
+                self.assertEqual(result["copied_operation_count"], 1)
+                self.assertEqual(result["affected_models"], ["stingray"])
+                self.assertEqual(
+                    state.execute("SELECT status FROM workflow_drafts WHERE id='draft-rejected'").fetchone()["status"],
+                    "cancelled",
+                )
+                self.assertEqual(len(drafts.list_operations(state, "draft-correction")), 1)
+                self.assertEqual(state.execute(
+                    "SELECT payload_json FROM draft_changesets WHERE draft_id='draft-rejected'"
+                ).fetchone()["payload_json"], before)
+                self.assertEqual(state.execute(
+                    "SELECT result_json FROM draft_preview_attempts WHERE draft_id='draft-rejected'"
+                ).fetchone()["result_json"], attempt_before)
+                view = drafts.lifecycle_view(state, "draft-rejected")
+                self.assertEqual(view["artifacts"]["correction"]["correction_draft_id"],
+                                 "draft-correction")
+                with self.assertRaises(sqlite3.IntegrityError):
+                    state.execute(
+                        "UPDATE draft_corrections SET reason='rewritten' "
+                        "WHERE source_draft_id='draft-rejected'"
+                    )
+                state.rollback()
+                with self.assertRaises(sqlite3.IntegrityError):
+                    state.execute(
+                        "DELETE FROM draft_corrections "
+                        "WHERE source_draft_id='draft-rejected'"
+                    )
+                state.rollback()
+                correction_operation = drafts.list_operations(
+                    state, "draft-correction"
+                )[0]
+                discarded = drafts.discard_operation(
+                    state,
+                    draft_id="draft-correction",
+                    operation_id=correction_operation["id"],
+                )
+                self.assertTrue(discarded["draft_removed"])
+                self.assertEqual(
+                    state.execute(
+                        "SELECT status FROM workflow_drafts WHERE id='draft-correction'"
+                    ).fetchone()["status"],
+                    "cancelled",
+                )
+            finally:
+                projection.close()
+                state.close()
+
+    def test_correction_refusals_and_transaction_rollback(self):
+        """DRAFT-04/05: unsafe identity/state and partial transitions fail closed."""
+        with tempfile.TemporaryDirectory(prefix="wbm-correction-refusal-") as raw:
+            root = Path(raw)
+            projection, state, workbook, changeset = self._emitted_draft(
+                root, draft_id="draft-rejected"
+            )
+            try:
+                state.execute(
+                    "UPDATE workflow_drafts SET status='preview_rejected' "
+                    "WHERE id='draft-rejected'"
+                )
+                state.commit()
+                operation_id = drafts.list_operations(state, "draft-rejected")[0]["id"]
+                kwargs = dict(
+                    projection_state="current",
+                    base_workbook_sha256=hashlib.sha256(workbook.read_bytes()).hexdigest(),
+                    base_workbook_mtime_ns=str(workbook.stat().st_mtime_ns),
+                    source_draft_id="draft-rejected", correction_draft_id="correction",
+                    selected_operation_ids=[operation_id], actor="Sean", reason="Correct",
+                )
+                with self.assertRaises(drafts.DraftError) as stale:
+                    drafts.create_correction_draft(
+                        projection, state, **{**kwargs, "projection_state": "stale"}
+                    )
+                self.assertEqual(stale.exception.code, "projection_not_current")
+
+                state.execute(
+                    "UPDATE workflow_drafts SET status='workbook_state_unknown' "
+                    "WHERE id='draft-rejected'"
+                )
+                state.commit()
+                with self.assertRaises(drafts.DraftError) as unknown:
+                    drafts.create_correction_draft(projection, state, **kwargs)
+                self.assertEqual(unknown.exception.code, "draft_not_correctable")
+                state.execute(
+                    "UPDATE workflow_drafts SET status='preview_rejected' "
+                    "WHERE id='draft-rejected'"
+                )
+                state.execute(
+                    "INSERT INTO workflow_drafts(id, created_ts, updated_ts, status, "
+                    "base_workbook_sha256, base_workbook_mtime_ns) "
+                    "VALUES('competing', 't', 't', 'draft', 'sha', '1')"
+                )
+                state.commit()
+                with self.assertRaises(drafts.DraftError) as competing:
+                    drafts.create_correction_draft(projection, state, **kwargs)
+                self.assertEqual(competing.exception.code, "competing_nonterminal_draft")
+                state.execute("DELETE FROM workflow_drafts WHERE id='competing'")
+                state.commit()
+
+                with patch.object(
+                    drafts,
+                    "_editable_guard",
+                    return_value=[{"message": "ownership no longer resolves"}],
+                ):
+                    with self.assertRaises(drafts.DraftError) as ownership:
+                        drafts.create_correction_draft(projection, state, **kwargs)
+                self.assertEqual(ownership.exception.code, "ownership_rejected")
+
+                with patch.object(
+                    drafts, "_insert_correction_link", side_effect=RuntimeError("forced")
+                ):
+                    with self.assertRaisesRegex(RuntimeError, "forced"):
+                        drafts.create_correction_draft(projection, state, **kwargs)
+                self.assertEqual(state.execute(
+                    "SELECT status FROM workflow_drafts WHERE id='draft-rejected'"
+                ).fetchone()["status"], "preview_rejected")
+                self.assertIsNone(state.execute(
+                    "SELECT 1 FROM workflow_drafts WHERE id='correction'"
+                ).fetchone())
+            finally:
+                projection.close()
+                state.close()
+
     def test_preview_result_mapping_matches_section_4_1(self):
         cases = (
             ({"ok": True, "status": "validated"}, "preview_ready", ["approve", "cancel"]),
@@ -1933,7 +2125,10 @@ class TestDurableSchemaMigrations(unittest.TestCase):
                         "AND name='draft_asset_resolutions'"
                     ).fetchone()
                 )
-                self.assertEqual(dbmod.storage_manifest(state)["schema_version"], 9)
+                self.assertEqual(
+                    dbmod.storage_manifest(state)["schema_version"],
+                    dbmod.SCHEMA_VERSION,
+                )
             finally:
                 state.close()
 
@@ -2008,7 +2203,10 @@ class TestDurableSchemaMigrations(unittest.TestCase):
                         "AND name='draft_asset_resolutions'"
                     ).fetchone()
                 )
-                self.assertEqual(dbmod.storage_manifest(state)["schema_version"], 9)
+                self.assertEqual(
+                    dbmod.storage_manifest(state)["schema_version"],
+                    dbmod.SCHEMA_VERSION,
+                )
             finally:
                 state.close()
 
@@ -2094,7 +2292,10 @@ class TestDurableSchemaMigrations(unittest.TestCase):
                         "AND name='draft_asset_resolutions'"
                     ).fetchone()
                 )
-                self.assertEqual(dbmod.storage_manifest(state)["schema_version"], 9)
+                self.assertEqual(
+                    dbmod.storage_manifest(state)["schema_version"],
+                    dbmod.SCHEMA_VERSION,
+                )
             finally:
                 state.close()
 
