@@ -244,11 +244,30 @@ def _review_model_keys(operation: dict) -> list[str]:
     return sorted(owned) or [""]
 
 
+def _review_scope(operation: dict) -> tuple[list[str], str]:
+    """Return exact operation ownership without inventing selector context."""
+    model_id = str(operation.get("model_id") or "")
+    context = sorted({
+        str(model) for model in (operation.get("model_context") or [])
+        if str(model) and str(model) != WILDCARD_MODEL_KEY
+    })
+    if model_id and model_id != WILDCARD_MODEL_KEY:
+        if context and model_id not in context:
+            return sorted({*context, model_id}), "ambiguous"
+        if len(context) > 1:
+            return sorted({*context, model_id}), "ambiguous"
+        context = sorted({*context, model_id})
+    if not context:
+        return [], "unknown"
+    return context, "exact"
+
+
 def _review_summary(operations: list[dict]) -> dict:
     """Build the additive typed review payload from exact stored operations."""
     groups: dict[tuple[str, str], dict] = {}
     for operation in operations:
         entity_type = _review_entity_type(operation["family"])
+        model_context, scope_state = _review_scope(operation)
         for model_key in _review_model_keys(operation):
             group_key = (model_key, entity_type)
             group = groups.setdefault(group_key, {
@@ -270,7 +289,11 @@ def _review_summary(operations: list[dict]) -> dict:
                     "actions": [],
                     "summaries": [],
                     "operation_ids": [],
-                    "destination": _review_destination(operation),
+                    "model_context": model_context,
+                    "scope_state": scope_state,
+                    "destination": (
+                        _review_destination(operation) if scope_state == "exact" else None
+                    ),
                     "technical": {
                         "table_name": operation["table_name"],
                         "source_sheet": operation["source_sheet"],
@@ -284,6 +307,12 @@ def _review_summary(operations: list[dict]) -> dict:
                 entity["actions"].append(operation["action"])
             entity["summaries"].extend(_review_summaries(operation))
             entity["operation_ids"].append(operation["id"])
+            entity["model_context"] = sorted({
+                *entity["model_context"], *model_context,
+            })
+            if entity["scope_state"] != scope_state:
+                entity["scope_state"] = "ambiguous"
+                entity["destination"] = None
 
     ordered_groups = sorted(
         groups.values(),

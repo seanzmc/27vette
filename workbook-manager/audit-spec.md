@@ -152,9 +152,9 @@ cross-draft apply immediately creates a P0 stop and supersedes this sequence.
 - [x] **P1.3 / WM-003 — Draft correction.** Add operation discard for mutable
   drafts and an audited fork/correction path for validation-rejected immutable
   drafts.
-- [ ] **P1.4 / WM-004 — Apply failure evidence.** Surface apply-attempt failures
+- [x] **P1.4 / WM-004 — Apply failure evidence.** Surface apply-attempt failures
   directly and eliminate the false “No recorded warnings or failures” state.
-- [ ] **P1.5 / WM-005 — Per-entity model scope.** Render operation/entity-specific
+- [x] **P1.5 / WM-005 — Per-entity model scope.** Render operation/entity-specific
   model context; reserve the union for the draft summary.
 - [ ] **P1.6 / WM-006 — Images model scope.** Eliminate disagreement between the
   global model header and Images filters/results/actions.
@@ -570,6 +570,43 @@ Required work:
 
 Exit gate: APPLY-ERR-01–03 and SCOPE-01–03 pass; no contradictory empty state or
 scope label remains.
+
+**Closed 2026-08-31 — implementation `e663793`.** The existing lifecycle view
+now gives every semantic review entity its exact operation IDs, derived concrete
+model context, and an explicit `exact`/`unknown`/`ambiguous` scope state. Unknown
+or contradictory ownership removes the connected-detail destination instead of
+borrowing the current model selector. Review renders that entity scope while
+keeping the operation union only in the draft impact overview and the existing
+Apply/Rebuild impact evidence.
+
+One dependency-free presentation adapter now normalizes preview, approval,
+apply, rollback, and manual-recovery messages without modifying immutable
+attempt JSON. Failed Apply/Rebuild attempts render a concise stage/error,
+workbook/output rollback, safe-retry/cancel, and next-action summary before the
+raw attempt disclosure; unknown restoration always points to manual recovery.
+
+Acceptance evidence:
+
+- APPLY-ERR-01–03: focused Node-executed adapter tests first failed with
+  `ERR_MODULE_NOT_FOUND`; an isolated two-model Apply/Rebuild then failed during
+  candidate publication, restored and hash-verified the copied workbook, showed
+  the apply-only error instead of the empty state, offered retry/cancel only with
+  verified rollback, and retained byte-equivalent API attempt JSON.
+- SCOPE-01–03: focused backend tests cover single-model, mixed-model,
+  shared/global, missing, and contradictory ownership. Isolated Chrome rendered
+  separate `grand_sport` and `stingray` scope labels for two same-ID entities and
+  the two-model union only in the draft overview.
+- Validation: the focused owner passed 23 tests plus 12 subtests. The complete
+  README Manager checkpoint passed 371 tests, 2 skipped, and 74 subtests. The
+  catalog-selected 21-gate layered run reported `ok: true` in 122.502 seconds,
+  including the one-process Manager group (347 passed, 2 skipped, 74 subtests),
+  frontend production build, and isolated six-model candidate lane. Browser
+  console and horizontal-overflow probes were clean. `git diff --check`, Python
+  compilation, and protected-surface hash/diff checks passed.
+- Protected boundaries: canonical workbook, generated contracts, published
+  `data.js`, cache-bearing HTML, write/apply semantics, dealer submission,
+  dependencies, deployment, and WordPress media are unchanged. Residual risk:
+  none implied. Checkpoint 1E remains separately unauthorized.
 
 ### Checkpoint 1E — one visible Images model scope
 
@@ -1181,4 +1218,10 @@ Each authorized checkpoint appends one concise dated record containing:
   not a visible interaction. Current-head release-candidate CI and Codex finding
   disposition passed, and PR #65 merged to `main` as `d0ad7cc` on 2026-08-31.
   Delivery commits are implementation `5641a72`, closeout `4a91c42`, and review
-  remediation `e3bea7a`. Checkpoint 1D remains unauthorized.
+  remediation `e3bea7a`.
+- **2026-08-31 — Checkpoint 1D / P1.4–P1.5 / WM-004–WM-005:** closed by
+  implementation `e663793`; acceptance and validation evidence are recorded in
+  the checkpoint section above. Closeout `a45addd`; delivery PR #67
+  (`https://github.com/seanzmc/27vette/pull/67`). Required release-candidate CI
+  and Codex finding disposition passed at delivery head `44470a6`. Checkpoint 1E
+  remains unauthorized.

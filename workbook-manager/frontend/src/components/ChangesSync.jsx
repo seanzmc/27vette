@@ -4,6 +4,7 @@ import {
   RotateCcw, ShieldCheck, StopCircle, TriangleAlert,
 } from "lucide-react";
 import { api } from "../api.js";
+import { lifecyclePresentation } from "../reviewPresentation.js";
 
 const TERMINAL = new Set([
   "applied", "cancelled", "manually_resolved_restored",
@@ -80,18 +81,6 @@ function latest(items = []) {
   return items[items.length - 1] || null;
 }
 
-function messages(attempt) {
-  if (!attempt) return [];
-  const result = attempt.result || {};
-  const errors = (result.errors || []).map((item) =>
-    typeof item === "string" ? item : (item.message || JSON.stringify(item))
-  );
-  if (attempt.exception_message) errors.unshift(
-    `${attempt.exception_class || "Error"}: ${attempt.exception_message}`
-  );
-  return errors;
-}
-
 export default function ChangesSync({
   status, draftId, lifecycle, onChanged, onStartNew, onSelectDraft,
 }) {
@@ -125,9 +114,11 @@ export default function ChangesSync({
   const assetResolutions = artifacts.asset_resolutions || [];
   const assetIgnores = assetResolutions.filter((item) => item.resolution_kind === "ignore");
   const confirmableWarnings = preview?.warningPolicy?.confirmableIds || [];
-  const visibleWarnings = preview?.warnings || [];
   const rebuild = applyAttempt?.result?.applyRebuild || null;
   const review = lifecycle?.review || null;
+  const presentation = useMemo(() => lifecyclePresentation({
+    previewAttempt, approvalAttempt, applyAttempt, manualResolution,
+  }), [previewAttempt, approvalAttempt, applyAttempt, manualResolution]);
 
   // A failed approval can be superseded by a named revalidation transition:
   // the immutable approval attempt stays, a newer preview attempt is appended,
@@ -336,6 +327,14 @@ export default function ChangesSync({
       )}
 
       <div className="section-heading">Review — what this draft proposes</div>
+      {review?.affected_models?.length > 0 && (
+        <div className="panel panel-body">
+          <strong>Draft impact overview</strong>
+          <span className="muted">
+            {operations.length} operation(s) across {review.affected_models.join(", ")}.
+          </span>
+        </div>
+      )}
       {review?.groups?.length ? (
         <div className="review-groups">
           {review.groups.map((group) => (
@@ -355,9 +354,9 @@ export default function ChangesSync({
                     </span>
                     <strong>{entity.entity_label}</strong>
                     <span className="spacer" />
-                    {review.affected_models.length > 0 && (
-                      <span className="muted">affects {review.affected_models.join(", ")}</span>
-                    )}
+                    {entity.scope_state === "exact"
+                      ? <span className="muted">affects {entity.model_context.join(", ")}</span>
+                      : <span className="muted">model scope {entity.scope_state}; no scope assumed</span>}
                   </div>
                   <ul className="review-summaries">
                     {entity.summaries.map((summary, index) => (
@@ -368,7 +367,7 @@ export default function ChangesSync({
                     {entity.destination && (
                       <a
                         className="entity-link"
-                        href={`?model=${encodeURIComponent(group.model_key || "stingray")}&workspace=${entity.destination.workspace}&type=${entity.destination.entity_type}&id=${encodeURIComponent(entity.destination.entity_id)}`}
+                        href={`?model=${encodeURIComponent(group.model_key)}&workspace=${entity.destination.workspace}&type=${entity.destination.entity_type}&id=${encodeURIComponent(entity.destination.entity_id)}`}
                       >
                         Open connected detail
                       </a>
@@ -692,6 +691,23 @@ export default function ChangesSync({
         </>
       )}
 
+      {presentation.apply_summary && (
+        <>
+          <div className="section-heading">Apply failure summary</div>
+          <div className="panel panel-body">
+            <dl className="identity-list">
+              <dt>Failed stage</dt><dd>{presentation.apply_summary.failed_stage}</dd>
+              <dt>Error</dt><dd>{presentation.apply_summary.error}</dd>
+              <dt>Workbook rollback</dt><dd>{presentation.apply_summary.workbook_rollback}</dd>
+              <dt>Output rollback</dt><dd>{presentation.apply_summary.output_rollback}</dd>
+              <dt>Retry or cancel safe</dt>
+              <dd>{presentation.apply_summary.safe_to_retry_or_cancel ? "yes" : "no"}</dd>
+              <dt>Next action</dt><dd>{presentation.apply_summary.next_action}</dd>
+            </dl>
+          </div>
+        </>
+      )}
+
       <div className="section-heading">Exact lifecycle evidence</div>
       <div className="evidence-grid">
         <div className="panel panel-body">
@@ -707,17 +723,13 @@ export default function ChangesSync({
         </div>
         <div className="panel panel-body">
           <strong>Warnings &amp; failures</strong>
-          {!visibleWarnings.length && !messages(previewAttempt).length && !messages(approvalAttempt).length
+          {presentation.empty
             ? <p className="muted">No recorded warnings or failures.</p>
             : (
               <ul className="error-list compact-list">
-                {visibleWarnings.map((warning, index) => (
-                  <li className="warning" key={`warning-${index}`}>
-                    {warning.id ? `${warning.id}: ` : ""}{warning.message || String(warning)}
-                  </li>
+                {presentation.messages.map((message, index) => (
+                  <li key={`message-${index}`}>{message}</li>
                 ))}
-                {[...messages(previewAttempt), ...messages(approvalAttempt), ...messages(applyAttempt)]
-                  .map((message, index) => <li key={`error-${index}`}>{message}</li>)}
               </ul>
             )}
         </div>
