@@ -30,7 +30,8 @@ Keep this file small — it is read at the start of every session:
   and names the four drift checks in `tests/test_validation_catalog.py`; §11.1
   requires additive catalog edits and names `scripts/catalog_change_scope.py`'s
   full-inventory triggers; §11.2 splits the Manager group into local-one-process
-  versus five CI partitions, adds the `ci.always_gate_ids` layer, and ties
+  versus five CI partitions, documents `ci.always_gate_ids` as the layered-runner
+  baseline rather than universal PR gates, and ties
   `scripts/validate_state_handoff.py` to catalog edits as well as `STATE.md`
   edits; §11.3, §9, §12, and §13 add the catalog-owns-counts rule, a validation-
   inventory drift row, a catalog-scope closeout line, and an approval gate on

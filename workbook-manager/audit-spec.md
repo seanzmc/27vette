@@ -1001,11 +1001,15 @@ Every checkpoint:
    partitions across parallel jobs, so per-partition wall clock is not
    comparable to the local run, and CI omits the separately cataloged
    `test_asset_map_sync.py` unless `asset_map` actually changed;
-4. the catalog's `ci.always_gate_ids` set, which every pull request runs
-   regardless of changed surface: `py.test_validation_catalog`,
+4. when `scripts/run_layered_validation.py` is selected, its catalog-owned
+   `ci.always_gate_ids` baseline: `py.test_validation_catalog`,
    `py.test_run_layered_validation`, `py.test_codex_finding_disposition`,
    `py.test_source_parity_canaries`, `py.test_workbook_truth`, and
-   `cmd.release_candidate_lane`. A UI-only checkpoint still owns their result;
+   `cmd.release_candidate_lane`. This is a layered-runner baseline, not a claim
+   that every pull request executes all six: the path-specific PR planner may
+   select dedicated shards instead (a documentation/handoff-only change selects
+   `handoff-contracts`). Each checkpoint owns the actual plan and rollup selected
+   for its changed paths;
 5. frontend production build for frontend changes;
 6. API schema, pagination, stable ordering, query-budget, no-write, and error-state
    tests for changed read models;
