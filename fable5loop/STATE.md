@@ -23,13 +23,13 @@ Keep this file small — it is read at the start of every session:
   P1.4–P1.5 / WM-004–WM-005, truthful failure and entity scope presentation.
 - **Active workflow:** Normal repository path.
 - **Branch/commit:** `feat/workbook-manager-checkpoint-1d`; implementation
-  `e663793`; closeout commit and PR pending.
+  `e663793`; closeout `a45addd`; PR #67 open.
 - **Last completed:** Checkpoint 1D adds operation-backed model context and exact
   operation IDs to each semantic review entity, fail-closes missing/contradictory
   scope, and renders a normalized Apply failure/rollback/next-action summary
   above unchanged immutable attempt evidence.
 - **Current status:** APPLY-ERR-01–03 and SCOPE-01–03 are evidence-backed closed.
-  Checkpoint 1D implementation is committed locally and awaiting delivery.
+  Checkpoint 1D is pushed and under review in PR #67.
 - **Validation:** Focused owner 23 passed plus 12 subtests; complete README Manager
   checkpoint 371 passed, 2 skipped, 74 subtests. Catalog-selected layered
   validation reported `ok: true` for 21 gates in 122.502 seconds, including the
@@ -38,10 +38,11 @@ Keep this file small — it is read at the start of every session:
   no false empty state, unchanged raw attempt JSON, no console errors, and no
   horizontal overflow. Python compilation, diff checks, and protected hashes
   passed.
-- **Next action:** Push the branch and open the Checkpoint 1D PR. Checkpoint 1E
-  needs new explicit authorization and must not begin automatically.
-- **Blockers or closeout gaps:** None for Checkpoint 1D implementation; remote CI
-  and review are pending until the PR is opened.
+- **Next action:** Review PR #67 and its required CI; merge only on explicit user
+  request. Checkpoint 1E needs new explicit authorization and must not begin
+  automatically.
+- **Blockers or closeout gaps:** None in local Checkpoint 1D work; PR #67 remote
+  CI and review are pending.
 - **Protected boundaries:** Canonical workbook, generated runtime contracts,
   `form-app/data.js`, cache-bearing HTML, write/apply semantics, dealer
   submission, dependencies, deployment, and WordPress media unchanged.

@@ -1221,4 +1221,6 @@ Each authorized checkpoint appends one concise dated record containing:
   remediation `e3bea7a`.
 - **2026-08-31 — Checkpoint 1D / P1.4–P1.5 / WM-004–WM-005:** closed by
   implementation `e663793`; acceptance and validation evidence are recorded in
-  the checkpoint section above. Checkpoint 1E remains unauthorized.
+  the checkpoint section above. Closeout `a45addd`; delivery PR #67
+  (`https://github.com/seanzmc/27vette/pull/67`). Checkpoint 1E remains
+  unauthorized.
