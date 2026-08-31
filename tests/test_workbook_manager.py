@@ -1168,6 +1168,61 @@ class TestApi(unittest.TestCase):
         } & {"ambiguous", "stale_target", "wildcard_conflict", "unmatched", "unparseable"})
         self.assertEqual(self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200)
 
+    def test_bulk_asset_acceptance_enforces_the_requested_model_scope(self):
+        draft_id = "asset-safe-bulk-scoped-api"
+        fixture = self.tmpdir / "scoped-bulk-media.txt"
+        fixture.write_text("https://example.test/h-stx.png\n", encoding="utf-8")
+        original_fixture = os.environ["WBM_ASSET_MEDIA_URL_LIST"]
+        try:
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = str(fixture)
+            self.mainmod.asset_workspace.clear_cache()
+            view = self.client.get(
+                "/api/assets/reconciliation",
+                params={"status": "safe_proposal", "draft_id": draft_id, "refresh": True},
+            ).json()
+            self.assertEqual(view["status_counts"]["safe_proposal"], 1)
+            item = view["queue"]["items"][0]
+            other_models = [
+                model["model_key"]
+                for model in self.client.get("/api/models").json()["models"]
+                if model["model_key"] != item["model_key"]
+            ]
+            self.assertTrue(other_models)
+            refused = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions/safe",
+                json={
+                    "fingerprints": view["fingerprints"],
+                    "model": other_models[0],
+                    "actor": "bulk-scope-test",
+                },
+            )
+            self.assertEqual(refused.status_code, 200, refused.text)
+            self.assertEqual(refused.json()["accepted"], 0)
+            self.assertEqual(
+                self.client.get(f"/api/drafts/{draft_id}").status_code, 404
+            )
+            staged = self.client.post(
+                f"/api/drafts/{draft_id}/asset-resolutions/safe",
+                json={
+                    "fingerprints": view["fingerprints"],
+                    "model": item["model_key"],
+                    "actor": "bulk-scope-test",
+                },
+            )
+            self.assertEqual(staged.status_code, 200, staged.text)
+            self.assertEqual(staged.json()["accepted"], 1)
+            lifecycle = self.client.get(f"/api/drafts/{draft_id}").json()
+            evidence = lifecycle["artifacts"]["asset_resolutions"]
+            self.assertEqual(len(evidence), 1)
+            self.assertEqual(
+                evidence[0]["evidence"]["workbook_target"]["model_key"],
+                item["model_key"],
+            )
+        finally:
+            self.client.post(f"/api/drafts/{draft_id}/cancel")
+            os.environ["WBM_ASSET_MEDIA_URL_LIST"] = original_fixture
+            self.mainmod.asset_workspace.clear_cache()
+
     def test_asset_fingerprint_drift_blocks_changeset_freeze(self):
         draft_id = "asset-stale-freeze-api"
         fixture = self.tmpdir / "stale-freeze-media.txt"

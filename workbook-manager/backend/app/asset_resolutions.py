@@ -355,8 +355,16 @@ def save_all_safe(
 ) -> list[dict]:
     snapshot: AssetManagerSnapshot = kwargs.pop("snapshot")
     fingerprints = kwargs.pop("fingerprints")
+    model_scope = str(kwargs.pop("model", "") or "").strip()
     _check_fingerprints(snapshot, fingerprints)
-    safe_items = [item for item in snapshot.items if item.get("status") == "safe_proposal"]
+    # Enforce the reconciliation view's visible model scope server-side with
+    # the same predicate as filter_asset_manager_snapshot (empty scope = every
+    # model), so bulk acceptance stages only what the operator can see.
+    safe_items = [
+        item for item in snapshot.items
+        if item.get("status") == "safe_proposal"
+        and (not model_scope or item.get("model_key") == model_scope)
+    ]
     results: list[dict] = []
     state_conn.execute("BEGIN IMMEDIATE")
     try:

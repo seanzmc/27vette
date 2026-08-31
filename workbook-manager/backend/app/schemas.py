@@ -74,6 +74,7 @@ class AssetResolutionRequest(BaseModel):
 
 class AssetSafeBulkRequest(BaseModel):
     fingerprints: dict[str, str]
+    model: str = Field("", max_length=80)
     session_id: str = ""
     actor: str = ""
 

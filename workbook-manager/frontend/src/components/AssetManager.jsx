@@ -332,7 +332,7 @@ export default function AssetManager({
               disabled={!draftMutable || !data.status_counts.safe_proposal || !!actionBusy}
               onClick={() => runResolution(
                 "accept safe proposals",
-                boundPayload(),
+                boundPayload({ model: reconciliationModel(modelKey) }),
                 { bulk: true },
               )}
             >

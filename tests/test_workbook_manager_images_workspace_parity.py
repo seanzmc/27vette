@@ -210,6 +210,16 @@ class TestImagesWorkspaceParity(unittest.TestCase):
             self.asset_manager,
         )
 
+    def test_bulk_safe_acceptance_sends_the_visible_model_scope(self):
+        """IMG-SCOPE-02: bulk acceptance stages only the visible scope's items.
+
+        The toolbar's safe-proposal count is the server-scoped count; the bulk
+        payload must carry the same effective model so acceptance cannot
+        diverge from what the operator sees when several models have proposals.
+        """
+        toolbar = self.asset_manager.split('"asset-draft-toolbar', 1)[1]
+        self.assertIn("boundPayload({ model: reconciliationModel(modelKey) })", toolbar)
+
 
 if __name__ == "__main__":
     unittest.main()

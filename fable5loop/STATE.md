@@ -20,32 +20,33 @@ Keep this file small — it is read at the start of every session:
 
 - **Updated:** 2026-08-31
 - **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 1E /
-  P1.6 / WM-006, one visible Images model scope.
+  P1.6 / WM-006, one visible Images model scope; the 1E review follow-up is
+  recorded there.
 - **Active workflow:** Normal repository path.
 - **Branch/commit:** `feat/workbook-manager-checkpoint-1e`; implementation
-  `e41b133`; closeout `f900bd7`; delivery `969fedb`; PR #68 open.
-- **Last completed:** Checkpoint 1E makes the global header the single Images
-  model-scope owner, adds explicit header-level All models, preserves scope when
-  clearing secondary filters, refuses cross-scope deep links until the operator
-  switches visibly, scopes assignment targets, and rejects stale model responses.
-- **Current status:** IMG-SCOPE-01–03 are evidence-backed closed locally. The
-  audit spec now also restores Checkpoint 1C's missing inline closure signal.
-  All P1 Checkpoints 1A–1E are closed; no P2 work is authorized automatically.
-- **Validation:** Owner gate 14 passed after six expected RED failures; frontend
-  production build passed. Complete README Manager checkpoint: 379 passed,
-  2 skipped, 77 subtests in 82.30 seconds. Catalog-selected layered validation:
-  `ok: true`, 22 gates in 122.893 seconds, including frontend build, Manager
-  serial group (355 passed, 2 skipped, 77 subtests), and isolated six-model
-  candidate. Isolated Chrome proved All models/Clear filters, explicit
-  cross-scope refusal and switch, delayed stale-response rejection, concrete
-  scope on workspace exit, zero captured errors, and 390=390 mobile width.
-  Python compilation, diff checks, state validation, and protected hashes passed.
-  Required release-candidate CI and Codex finding disposition passed at delivery
-  head `969fedb`.
-- **Next action:** Review PR #68 and required CI; merge only on explicit user
-  request. Start P2 only after separate authorization.
-- **Blockers or closeout gaps:** None in implementation or required CI; PR #68
-  review and merge decision remain pending.
+  `e41b133`; closeout `f900bd7`; delivery `969fedb`; bulk-scope review fix at
+  HEAD; PR #68 open.
+- **Last completed:** Checkpoint 1E one visible Images model scope, plus the
+  P1 review fix: "Add all safe matches to draft" now sends the effective model
+  (empty = explicit All models) and the server stages only that scope's safe
+  proposals; All-models behavior and the single-item lane are unchanged.
+- **Current status:** IMG-SCOPE-01–03 closed with the bulk lane now inside the
+  same visible-scope contract; the audit-spec 1E follow-up records the finding
+  and fix. All P1 Checkpoints 1A–1E are closed; no P2 work is authorized
+  automatically.
+- **Validation:** For the review fix: frontend production build passed; the
+  Manager serial group ran in one pytest process: 357 passed, 2 skipped, 77
+  subtests in 91.41s, including the new scoped-bulk API test and parity test;
+  diff checks clean. Prior 1E closure evidence at `969fedb`: owner gate 14
+  passed, README Manager checkpoint 379/2/77 in 82.30s, layered 22-gate run
+  `ok: true` 122.893s, isolated Chrome scope proofs. Required
+  release-candidate CI and Codex finding disposition passed at delivery head
+  `969fedb`; the review-fix head is pending CI.
+- **Next action:** Re-review PR #68 for the bulk-scope fix and required CI;
+  merge only on explicit user request. Start P2 only after separate
+  authorization.
+- **Blockers or closeout gaps:** None in implementation; PR review and merge
+  decision remain pending.
 - **Protected boundaries:** Canonical workbook, generated runtime contracts,
   `form-app/data.js`, cache-bearing HTML, backend/API contracts, write/apply
   semantics, dealer submission, dependencies, deployment, and WordPress media

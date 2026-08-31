@@ -1589,6 +1589,7 @@ def save_all_safe_asset_resolutions(
             state_conn,
             snapshot=snapshot,
             fingerprints=payload.fingerprints,
+            model=payload.model,
             projection_state=projection["state"],
             base_workbook_sha256=workbook["imported_sha256"],
             base_workbook_mtime_ns=workbook["imported_mtime_ns"],

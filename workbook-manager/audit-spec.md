@@ -685,6 +685,15 @@ Acceptance evidence:
   deployment, and WordPress media are unchanged. Residual risk: none implied.
   Checkpoint 1 is complete; no P2 checkpoint begins automatically.
 
+**Follow-up 2026-08-31 — P1 review finding on the 1E scope contract.** The PR
+#68 review showed that "Add all safe matches to draft" ignored the visible
+model scope: the bulk lane accepted every safe proposal in the snapshot even
+when the operator worked under one concrete model, so a scoped operator could
+silently stage operations for other models. Required work item 4 now holds for
+the bulk lane as well: the request carries the effective model (empty = the
+explicit All models scope) and `save_all_safe` applies the reconciliation
+view's model predicate server-side before staging anything.
+
 ## 7. P2 implementation checkpoints
 
 ### Checkpoint 2A — coordinated graph maintenance and safe raw operations
