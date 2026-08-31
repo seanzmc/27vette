@@ -132,7 +132,9 @@ exact ChangeSet emission, and shared-service preview and approval lifecycles:
   a runtime-pinned fit/position/body-style-hover preview. `GET
   /api/assets/media-options` provides bounded inventory selection. Individual
   decisions and server-classified safe bulk proposals go through `POST
-  /api/drafts/{draft_id}/asset-resolutions` and `/asset-resolutions/safe`; they
+  /api/drafts/{draft_id}/asset-resolutions` and `/asset-resolutions/safe`; the
+  bulk lane carries the effective Images model scope and enforces it
+  server-side (empty scope = the explicit All models view); they
   create ordinary `assets` draft operations plus manager-owned provenance, or a
   no-workbook operational ignore. Refresh/inventory drift visibly stales that
   evidence and blocks ChangeSet emission until it is resolved again.

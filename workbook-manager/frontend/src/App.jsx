@@ -45,8 +45,11 @@ export default function App() {
   }, []);
 
   const setTab = useCallback((workspace) => {
-    commitNavigation({ ...navigation, workspace, type: "", id: "" });
-  }, [commitNavigation, navigation]);
+    const model = navigation.model === "*" && workspace !== "assets"
+      ? models[0]?.model_key || ""
+      : navigation.model;
+    commitNavigation({ ...navigation, model, workspace, type: "", id: "" });
+  }, [commitNavigation, models, navigation]);
 
   const setModelKey = useCallback((model) => {
     commitNavigation({ ...navigation, model });
@@ -62,6 +65,7 @@ export default function App() {
       setModels(modelResponse.models);
       if (
         modelResponse.models.length &&
+        !(modelKey === "*" && tab === "assets") &&
         !modelResponse.models.some((model) => model.model_key === modelKey)
       ) {
         setModelKey(modelResponse.models[0].model_key);
@@ -80,7 +84,7 @@ export default function App() {
       setStartup("Cannot reach Manager backend");
       setFatal(`Backend unreachable: ${e.message}`);
     }
-  }, [modelKey]);
+  }, [modelKey, tab]);
 
   const refreshDraft = useCallback(async (id = draftId) => {
     if (!id) return null;
@@ -245,6 +249,7 @@ export default function App() {
             onChange={(e) => setModelKey(e.target.value)}
             disabled={!ready}
           >
+            {tab === "assets" && <option value="*">All models</option>}
             {models.map((model) => (
               <option key={model.model_key} value={model.model_key}>
                 {model.label || model.model_key}
@@ -329,7 +334,6 @@ export default function App() {
         )}
         {ready && tab === "assets" && (
           <AssetManager
-            models={models}
             modelKey={modelKey}
             setModelKey={setModelKey}
             navigation={navigation}

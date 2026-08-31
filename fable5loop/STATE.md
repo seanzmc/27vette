@@ -19,36 +19,35 @@ Keep this file small — it is read at the start of every session:
 ## Current handoff
 
 - **Updated:** 2026-08-31
-- **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 1D /
-  P1.4–P1.5 / WM-004–WM-005, truthful failure and entity scope presentation.
+- **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 1E /
+  P1.6 / WM-006, one visible Images model scope; the 1E review follow-up is
+  recorded there.
 - **Active workflow:** Normal repository path.
-- **Branch/commit:** `feat/workbook-manager-checkpoint-1d`; implementation
-  `e663793`; closeout `a45addd`; Codex review fixes on top; PR #67 open.
-- **Last completed:** Checkpoint 1D adds operation-backed model context and exact
-  operation IDs to each semantic review entity, fail-closes missing/contradictory
-  scope, and renders a normalized Apply failure/rollback/next-action summary
-  above unchanged immutable attempt evidence.
-- **Current status:** APPLY-ERR-01–03 and SCOPE-01–03 are evidence-backed closed.
-  Both Codex P2 findings on PR #67 are addressed in the presentation adapter:
-  combined message lists deduplicate rollback errors that
-  `complete_apply_rebuild()` already copies into `result.errors`, and a recorded
-  manual resolution supersedes the stale `manual recovery` next action.
-- **Validation:** Focused owner 25 passed plus 15 subtests after the review fixes
-  (was 23 plus 12); frontend build passed; complete README Manager
-  checkpoint 371 passed, 2 skipped, 74 subtests. Catalog-selected layered
-  validation reported `ok: true` for 21 gates in 122.502 seconds, including the
-  frontend build and isolated six-model candidate lane. Isolated Chrome proved
-  mixed entity scope and a forced downstream failure with verified rollback,
-  no false empty state, unchanged raw attempt JSON, no console errors, and no
-  horizontal overflow. Python compilation, diff checks, and protected hashes
-  passed.
-- **Next action:** Re-review PR #67 after the Codex fixes; merge only on explicit user request. Checkpoint
-  1E needs new explicit authorization and must not begin automatically.
-- **Blockers or closeout gaps:** None in Checkpoint 1D implementation or required
-  CI; PR #67 review and merge decision remain pending.
+- **Branch/commit:** `feat/workbook-manager-checkpoint-1e`; implementation and
+  review fix at `819f442`; PR #68 open and mergeable.
+- **Last completed:** Checkpoint 1E one visible Images model scope plus its P1
+  review closure. The scoped bulk-safe fix was validated at `819f442`, the
+  responder replied to the exact Codex thread with commit/test evidence, and
+  GitHub readback reports that thread resolved.
+- **Current status:** IMG-SCOPE-01–03 and all P1 Checkpoints 1A–1E are closed.
+  PR #68's implementation and review disposition are complete; no P2 work is
+  authorized automatically.
+- **Validation:** At `819f442`, the Manager serial group passed 381 tests with 2
+  skipped and 77 subtests in 87.23s, including the scoped-bulk API and frontend
+  parity owners; the frontend production build passed. GitHub GraphQL readback
+  on 2026-08-31 reported review thread `PRRT_kwDOSMmCTs6dzmdz`
+  `isResolved: true`; the disposition context and every required
+  release-candidate check passed at that implementation head. The responder
+  poller then returned `{ "wakeAgent": false }`. Read the live PR rollup for
+  the docs-only handoff head before merge.
+- **Next action:** After the live PR rollup is green, merge PR #68 only on
+  explicit user request. Start P2 only after separate authorization.
+- **Blockers or closeout gaps:** None; only the user-controlled merge decision
+  remains.
 - **Protected boundaries:** Canonical workbook, generated runtime contracts,
-  `form-app/data.js`, cache-bearing HTML, write/apply semantics, dealer
-  submission, dependencies, deployment, and WordPress media unchanged.
+  `form-app/data.js`, cache-bearing HTML, backend/API contracts, write/apply
+  semantics, dealer submission, dependencies, deployment, and WordPress media
+  unchanged.
 
 ## Verified facts
 
