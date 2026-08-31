@@ -11,6 +11,8 @@ initiating operation until dismissed or superseded by a named state transition.
 from __future__ import annotations
 
 import hashlib
+import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -29,6 +31,8 @@ from test_workbook_manager_changeset_lifecycle import (  # noqa: E402
 
 
 REVIEW_VERSION = "workbook-manager-review-summary-1"
+FRONTEND = REPO_ROOT / "workbook-manager" / "frontend" / "src"
+PRESENTATION_MODULE = FRONTEND / "reviewPresentation.js"
 
 
 def _emitted(root: Path):
@@ -37,6 +41,23 @@ def _emitted(root: Path):
         root, draft_id="draft-review"
     )
     return projection, state, workbook, changeset
+
+
+def _run_presentation(script: str):
+    result = subprocess.run(
+        [
+            "node", "--input-type=module", "--eval",
+            (
+                f"import * as presentation from {json.dumps(PRESENTATION_MODULE.as_uri())};"
+                + script
+            ),
+        ],
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return json.loads(result.stdout)
 
 
 class TestReviewSummaryContract(unittest.TestCase):
@@ -62,6 +83,7 @@ class TestReviewSummaryContract(unittest.TestCase):
                 self.assertEqual(item["entity_id"], "opt_test")
                 self.assertEqual(item["entity_label"], "TST Original")
                 self.assertEqual(item["actions"], ["update"])
+                self.assertEqual(item["model_context"], ["stingray"])
                 # One shared, backend-owned human summary (§14.2 grammar:
                 # "<label>: <Field> changed from <before> to <after>").
                 self.assertEqual(
@@ -155,6 +177,64 @@ class TestReviewSummaryContract(unittest.TestCase):
                 projection.close()
                 state.close()
 
+    def test_entity_scope_is_exact_and_missing_context_fails_closed(self):
+        """SCOPE-01–03: entity scope never borrows the draft-wide union."""
+        operations = [
+            {
+                "id": 1, "family": "options", "table_name": "options",
+                "model_id": "stingray", "model_context": ["stingray"],
+                "entity_key": {"option_id": "opt_stingray"},
+                "physical_key": '["opt_stingray"]', "source_sheet": "stingray_options",
+                "source_row": 2, "action": "update", "changed_fields": {},
+                "original": {}, "final": {},
+            },
+            {
+                "id": 2, "family": "options", "table_name": "options",
+                "model_id": "grandSport", "model_context": ["grandSport"],
+                "entity_key": {"option_id": "opt_gs"},
+                "physical_key": '["opt_gs"]', "source_sheet": "grandSport_options",
+                "source_row": 3, "action": "update", "changed_fields": {},
+                "original": {}, "final": {},
+            },
+            {
+                "id": 3, "family": "interiors", "table_name": "interiors",
+                "model_id": "*", "model_context": ["stingray", "grandSport"],
+                "entity_key": {"interior_id": "int_shared"},
+                "physical_key": '["int_shared"]', "source_sheet": "lt_interiors",
+                "source_row": 4, "action": "update", "changed_fields": {},
+                "original": {}, "final": {},
+            },
+            {
+                "id": 4, "family": "interiors", "table_name": "interiors",
+                "model_id": "*", "model_context": [],
+                "entity_key": {"interior_id": "int_unknown"},
+                "physical_key": '["int_unknown"]', "source_sheet": "lt_interiors",
+                "source_row": 5, "action": "update", "changed_fields": {},
+                "original": {}, "final": {},
+            },
+        ]
+
+        review = drafts._review_summary(operations)
+        entities = {
+            entity["entity_id"]: entity
+            for group in review["groups"]
+            for entity in group["entities"]
+        }
+        self.assertEqual(review["affected_models"], ["grandSport", "stingray"])
+        self.assertEqual(entities["opt_stingray"]["model_context"], ["stingray"])
+        self.assertEqual(entities["opt_gs"]["model_context"], ["grandSport"])
+        self.assertEqual(
+            entities["int_shared"]["model_context"], ["grandSport", "stingray"]
+        )
+        self.assertEqual(entities["int_unknown"]["model_context"], [])
+        self.assertEqual(entities["int_unknown"]["scope_state"], "unknown")
+        self.assertEqual(
+            drafts._review_scope({
+                "model_id": "stingray", "model_context": ["z06"],
+            }),
+            (["stingray", "z06"], "ambiguous"),
+        )
+
 
 class TestReviewTerminologyAndResults(unittest.TestCase):
     """§12 lifecycle language plus §13.5 persistent result states."""
@@ -172,6 +252,15 @@ class TestReviewTerminologyAndResults(unittest.TestCase):
         self.assertIn("Approved changes written", source)
         self.assertIn("Draft cancelled, audit record kept", source)
         self.assertIn("Manual recovery required", source)
+        self.assertIn("lifecyclePresentation", source)
+        self.assertIn("presentation.apply_summary", source)
+        self.assertIn("entity.model_context.join", source)
+        self.assertNotIn('group.model_key || "stingray"', source)
+        self.assertEqual(source.count("review.affected_models.join"), 1)
+        self.assertLess(
+            source.index("review.affected_models.join"),
+            source.index("{review?.groups?.length"),
+        )
 
     def test_operation_results_persist_until_state_transition(self):
         source = (
@@ -192,6 +281,41 @@ class TestReviewTerminologyAndResults(unittest.TestCase):
             "Manual recovery was recorded",
         ):
             self.assertIn(expected, source)
+
+    def test_apply_failure_adapter_includes_rollback_and_safe_next_action(self):
+        """APPLY-ERR-01–03: concise truth precedes unchanged raw evidence."""
+        result = _run_presentation(
+            "const attempt={id:'attempt-1',manager_state:'apply_restored_retryable',"
+            "allowed_verbs:['retry_apply','cancel'],result:{ok:false,"
+            "errors:['RuntimeError: forced generation failure'],"
+            "applyRebuild:{status:'restored',workbook:{state:'restored'},"
+            "generated_contracts:{state:'restored'},publication:{state:'restored'},"
+            "rollback:{state:'verified',verified:true,errors:[]}}}};"
+            "console.log(JSON.stringify(presentation.lifecyclePresentation({applyAttempt:attempt})));"
+        )
+        self.assertFalse(result["empty"])
+        self.assertIn("RuntimeError: forced generation failure", result["messages"])
+        self.assertEqual(result["apply_summary"], {
+            "failed_stage": "form data rebuild or publication",
+            "error": "RuntimeError: forced generation failure",
+            "workbook_rollback": "restored",
+            "output_rollback": "restored",
+            "safe_to_retry_or_cancel": True,
+            "next_action": "retry apply or cancel",
+        })
+
+    def test_unknown_restoration_never_presents_retry_or_cancel_as_safe(self):
+        result = _run_presentation(
+            "const attempt={id:'attempt-2',manager_state:'workbook_state_unknown',"
+            "allowed_verbs:['manual_resolution'],result:{ok:false,errors:['restore failed'],"
+            "applyRebuild:{status:'unknown',workbook:{state:'unknown'},"
+            "generated_contracts:{state:'unknown'},publication:{state:'unknown'},"
+            "rollback:{state:'unknown',verified:false,errors:['hash mismatch']}}}};"
+            "console.log(JSON.stringify(presentation.lifecyclePresentation({applyAttempt:attempt})));"
+        )
+        self.assertFalse(result["apply_summary"]["safe_to_retry_or_cancel"])
+        self.assertEqual(result["apply_summary"]["next_action"], "manual recovery")
+        self.assertIn("hash mismatch", result["messages"])
 
     def test_review_exposes_mutable_discard_and_rejected_correction(self):
         """DRAFT-01–05: visible actions match the actual lifecycle paths."""
