@@ -149,7 +149,7 @@ cross-draft apply immediately creates a P0 stop and supersedes this sequence.
 - [x] **P1.2 / WM-002 — Structure management.** Add reachable schema-driven
   editors for promotion, workbook source routing, variant definitions,
   model-variant membership, order-summary sections, and step-summary mappings.
-- [ ] **P1.3 / WM-003 — Draft correction.** Add operation discard for mutable
+- [x] **P1.3 / WM-003 — Draft correction.** Add operation discard for mutable
   drafts and an audited fork/correction path for validation-rejected immutable
   drafts.
 - [ ] **P1.4 / WM-004 — Apply failure evidence.** Surface apply-attempt failures
@@ -1165,5 +1165,18 @@ Each authorized checkpoint appends one concise dated record containing:
   `origin/main`; no workbook write, dealer submission, deployment/cache purge,
   or WordPress mutation ran. README and operator guide were updated; generated
   and customer-runtime companions were inspected with no change. Residual risk:
-  none implied. Delivery branch `feat/workbook-manager-checkpoint-1c`; PR and
-  remote CI are the final delivery actions. Checkpoint 1D remains unauthorized.
+  none implied. Delivery branch `feat/workbook-manager-checkpoint-1c`; PR #65
+  (`https://github.com/seanzmc/27vette/pull/65`) received three valid review
+  findings, remediated before merge: correction copies now preserve the original
+  asset evidence payload and stale-resolution binding, final-operation discard
+  retains a mutable draft that still owns an operational asset ignore, and the
+  lifecycle view returns every inbound/outbound link for a re-corrected draft.
+  Each regression first failed against `4a91c42`; focused proof passed 3 tests.
+  The catalog-selected layered run then passed all 22 selected gates in 117.070
+  seconds, including the one-process Manager group (344 passed, 2 skipped, 74
+  subtests), frontend build, and isolated six-model candidate lane. Python
+  compilation and `git diff --check` passed; protected workbook/generated/data
+  surfaces remained clean. No additional browser run was needed because the
+  remediation changes backend evidence retention and response completeness,
+  not a visible interaction. Remote current-head CI and review disposition are
+  the remaining delivery checks. Checkpoint 1D remains unauthorized.

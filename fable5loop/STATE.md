@@ -23,28 +23,24 @@ Keep this file small — it is read at the start of every session:
   P1.3 / WM-003, correctable mutable and rejected drafts.
 - **Active workflow:** Normal repository path.
 - **Branch/commit:** `feat/workbook-manager-checkpoint-1c` from `origin/main`;
-  implementation `5641a72`.
-- **Last completed:** Implemented Checkpoint 1C. Mutable draft operations can be
-  discarded individually with remaining graph/model impact shown. Rejected
-  drafts can atomically create a same-binding correction from selected
-  operations while retaining the rejected ChangeSet and failed attempt. Durable
-  schema version 10 stores an immutable source/correction link, actor, reason,
-  and selected operation IDs. The Review UI and operator documentation expose
-  the real correction route and no longer promise impossible in-place repair.
-- **Current status:** DRAFT-01–05 are evidence-backed closed in the owning spec.
-  The implementation is locally green and commit-ready for delivery; PR and
-  remote CI are the remaining final delivery actions.
-- **Validation:** Focused four-file owners: 103 passed, 48 subtests. Final
-  lifecycle owner: 38 passed, 36 subtests. Catalog-selected layered validation:
-  `ok: true`, 21 selected gates, 118.039 seconds; its Manager serial group was
-  341 passed, 2 skipped, 74 subtests. Python compilation, frontend production
-  build, `git diff --check`, isolated desktop/mobile Chrome workflow proof, and
-  protected-boundary diff/hash checks passed. See the Checkpoint 1C completion
-  record for exact browser and gate evidence.
-- **Next action:** Deliver this branch through its PR and wait for required CI
-  and review disposition. Checkpoint 1D requires new explicit authorization.
-- **Blockers or closeout gaps:** None local. Remote CI/review disposition is
-  pending until the delivery PR exists.
+  implementation `5641a72`; PR #65 review remediation pending commit.
+- **Last completed:** Fixed all three valid PR #65 findings. Correction drafts
+  retain the original Asset Manager evidence payload and stale-resolution check;
+  discarding the final workbook operation preserves a mutable draft that still
+  owns a no-workbook asset ignore; lifecycle reads expose both predecessor and
+  successor links when a correction is corrected again.
+- **Current status:** DRAFT-01–05 remain evidence-backed closed. All three review
+  regressions are locally green and the owning spec records the remediation.
+- **Validation:** The three focused regressions passed. Catalog-selected layered
+  validation reported `ok: true` for 22 selected gates in 117.070 seconds; the
+  Manager serial group passed 344 tests, 2 skipped, and 74 subtests. Frontend
+  production build, isolated six-model candidate lane, Python compilation,
+  `git diff --check`, and protected-boundary diff checks passed.
+- **Next action:** Commit and push the remediation, reply to and resolve all three
+  PR #65 threads, then verify current-head CI/review disposition. Checkpoint 1D
+  requires new explicit authorization.
+- **Blockers or closeout gaps:** None local. Current-head remote CI and thread
+  disposition remain pending until the remediation is pushed.
 - **Protected boundaries:** Canonical workbook, generated runtime contracts,
   `form-app/data.js`, cache-bearing HTML, write/apply semantics, dealer
   submission, dependencies, deployment, and WordPress media unchanged.

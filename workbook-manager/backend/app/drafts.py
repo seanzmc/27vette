@@ -897,17 +897,20 @@ def lifecycle_view(state_conn: sqlite3.Connection, draft_id: str) -> dict:
         if draft["status"] == "cancelled"
         else None
     )
-    correction_row = state_conn.execute(
+    correction_rows = state_conn.execute(
         "SELECT * FROM draft_corrections WHERE source_draft_id=? "
-        "OR correction_draft_id=?",
-        (draft_id, draft_id),
-    ).fetchone()
-    correction = None
-    if correction_row is not None:
-        correction = dict(correction_row)
-        correction["selected_operation_ids"] = json.loads(
-            correction.pop("selected_operation_ids_json")
+        "OR correction_draft_id=? "
+        "ORDER BY CASE WHEN correction_draft_id=? THEN 0 ELSE 1 END, created_ts",
+        (draft_id, draft_id, draft_id),
+    ).fetchall()
+    corrections = []
+    for correction_row in correction_rows:
+        correction_link = dict(correction_row)
+        correction_link["selected_operation_ids"] = json.loads(
+            correction_link.pop("selected_operation_ids_json")
         )
+        corrections.append(correction_link)
+    correction = corrections[0] if corrections else None
     return {
         "draft": draft,
         "context": {
@@ -923,6 +926,7 @@ def lifecycle_view(state_conn: sqlite3.Connection, draft_id: str) -> dict:
             "apply_attempts": apply_attempts,
             "cancellation": cancellation,
             "correction": correction,
+            "corrections": corrections,
             "manual_resolutions": manual_resolutions,
             "asset_resolutions": asset_resolutions,
         },
@@ -1928,7 +1932,12 @@ def discard_operation(
         remaining = int(state_conn.execute(
             "SELECT COUNT(*) AS c FROM draft_operations WHERE draft_id=?", (draft_id,)
         ).fetchone()["c"])
-        draft_removed = remaining == 0
+        operational_evidence = remaining == 0 and state_conn.execute(
+            "SELECT 1 FROM draft_asset_resolutions "
+            "WHERE draft_id=? AND operation_id IS NULL LIMIT 1",
+            (draft_id,),
+        ).fetchone() is not None
+        draft_removed = remaining == 0 and not operational_evidence
         if draft_removed:
             _dispose_empty_mutable_draft(state_conn, draft_id=draft_id, timestamp=_now())
         else:
@@ -2062,9 +2071,15 @@ def create_correction_draft(
             resolution = asset_by_operation.get(operation_id)
             asset_evidence = None
             if resolution is not None:
-                asset_evidence = dict(resolution)
-                for name in ("id", "draft_id", "operation_id", "created_ts", "updated_ts"):
-                    asset_evidence.pop(name, None)
+                asset_evidence = dict(resolution["evidence"])
+                for name in (
+                    "item_id",
+                    "resolution_kind",
+                    "reconciliation_sha256",
+                    "media_inventory_sha256",
+                    "workbook_sha256",
+                ):
+                    asset_evidence.setdefault(name, resolution[name])
             if operation["action"] == "update":
                 replay_record = {
                     name: pair["after"]

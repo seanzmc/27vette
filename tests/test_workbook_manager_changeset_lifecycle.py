@@ -9,6 +9,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -473,6 +474,16 @@ class TestDurablePreviewLifecycle(unittest.TestCase):
             workbook = root / "fixture.xlsx"
             workbook.write_bytes(b"preview-fixture")
             try:
+                asset_evidence = {
+                    "item_id": "asset:opt_test",
+                    "resolution_kind": "edit",
+                    "reconciliation_sha256": "reconciliation",
+                    "media_inventory_sha256": "inventory",
+                    "workbook_sha256": hashlib.sha256(workbook.read_bytes()).hexdigest(),
+                    "source_status": "existing",
+                    "coverage": {"model": "stingray", "covered": True},
+                    "final_values": {"price": "150"},
+                }
                 drafts.save_operation(
                     projection, state, projection_state="current",
                     base_workbook_sha256=hashlib.sha256(workbook.read_bytes()).hexdigest(),
@@ -480,6 +491,7 @@ class TestDurablePreviewLifecycle(unittest.TestCase):
                     draft_id="draft-rejected", table="options", model_id="stingray",
                     op="update", key={"option_id": "opt_test"},
                     record={"price": "150"},
+                    asset_evidence=asset_evidence,
                 )
                 projection.execute(
                     "INSERT INTO options(src_sheet, src_row, src_family, physical_key, "
@@ -542,6 +554,35 @@ class TestDurablePreviewLifecycle(unittest.TestCase):
                     "cancelled",
                 )
                 self.assertEqual(len(drafts.list_operations(state, "draft-correction")), 1)
+                copied_asset_evidence = drafts.list_asset_resolutions(
+                    state, "draft-correction"
+                )[0]
+                self.assertEqual(copied_asset_evidence["evidence"], asset_evidence)
+                self.assertEqual(
+                    copied_asset_evidence["reconciliation_sha256"], "reconciliation"
+                )
+                copied_operation = drafts.list_operations(state, "draft-correction")[0]
+                state.execute(
+                    "UPDATE draft_operations SET final_json=? WHERE id=?",
+                    (json.dumps({**copied_operation["final"], "price": "200"}),
+                     copied_operation["id"]),
+                )
+                state.commit()
+                with self.assertRaises(drafts.DraftError) as stale_asset:
+                    drafts.assert_asset_resolutions_current(
+                        state,
+                        draft_id="draft-correction",
+                        snapshot=SimpleNamespace(
+                            items=[{"id": asset_evidence["item_id"]}],
+                            fingerprints={
+                                "reconciliation_sha256": "reconciliation",
+                                "media_inventory_sha256": "inventory",
+                                "workbook_sha256": asset_evidence["workbook_sha256"],
+                            },
+                            media_urls=set(),
+                        ),
+                    )
+                self.assertEqual(stale_asset.exception.code, "asset_reconciliation_stale")
                 self.assertEqual(state.execute(
                     "SELECT payload_json FROM draft_changesets WHERE draft_id='draft-rejected'"
                 ).fetchone()["payload_json"], before)
@@ -577,6 +618,56 @@ class TestDurablePreviewLifecycle(unittest.TestCase):
                         "SELECT status FROM workflow_drafts WHERE id='draft-correction'"
                     ).fetchone()["status"],
                     "cancelled",
+                )
+            finally:
+                projection.close()
+                state.close()
+
+    def test_lifecycle_view_returns_both_links_for_a_recorrected_draft(self):
+        """A draft in the middle of a correction chain exposes predecessor and successor."""
+        with tempfile.TemporaryDirectory(prefix="wbm-correction-chain-") as raw:
+            projection, state = self._stores(Path(raw))
+            try:
+                for draft_id, status in (
+                    ("draft-original", "cancelled"),
+                    ("draft-middle", "cancelled"),
+                    ("draft-latest", "draft"),
+                ):
+                    state.execute(
+                        "INSERT INTO workflow_drafts(id, created_ts, updated_ts, status, "
+                        "base_workbook_sha256, base_workbook_mtime_ns) "
+                        "VALUES(?, 'created', 'updated', ?, 'sha', '1')",
+                        (draft_id, status),
+                    )
+                drafts._insert_correction_link(
+                    state,
+                    source_draft_id="draft-original",
+                    correction_draft_id="draft-middle",
+                    actor="reviewer",
+                    reason="first correction",
+                    selected_operation_ids=[1],
+                    timestamp="first",
+                )
+                drafts._insert_correction_link(
+                    state,
+                    source_draft_id="draft-middle",
+                    correction_draft_id="draft-latest",
+                    actor="reviewer",
+                    reason="second correction",
+                    selected_operation_ids=[2],
+                    timestamp="second",
+                )
+                state.commit()
+
+                view = drafts.lifecycle_view(state, "draft-middle")
+
+                self.assertEqual(
+                    [link["source_draft_id"] for link in view["artifacts"]["corrections"]],
+                    ["draft-original", "draft-middle"],
+                )
+                self.assertEqual(
+                    [link["correction_draft_id"] for link in view["artifacts"]["corrections"]],
+                    ["draft-middle", "draft-latest"],
                 )
             finally:
                 projection.close()
