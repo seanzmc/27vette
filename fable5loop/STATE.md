@@ -22,25 +22,32 @@ Keep this file small — it is read at the start of every session:
 - **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 1C /
   P1.3 / WM-003, correctable mutable and rejected drafts.
 - **Active workflow:** Normal repository path.
-- **Branch/commit:** `feat/workbook-manager-checkpoint-1c` from `origin/main`;
-  implementation `5641a72`; PR #65 review remediation pending commit.
-- **Last completed:** Fixed all three valid PR #65 findings. Correction drafts
+- **Branch/commit:** Checkpoint 1C merged to `main` as `d0ad7cc` via PR #65;
+  implementation `5641a72`, closeout `4a91c42`, review remediation `e3bea7a`.
+  This documentation-only handoff update is not in that merge: it sits on
+  `docs/workbook-manager-checkpoint-1c-merge-closeout` and is under review as
+  PR #66, still undelivered to `main`.
+- **Last completed:** Merged Checkpoint 1C after fixing all three valid PR #65
+  findings. Correction drafts
   retain the original Asset Manager evidence payload and stale-resolution check;
   discarding the final workbook operation preserves a mutable draft that still
   owns a no-workbook asset ignore; lifecycle reads expose both predecessor and
   successor links when a correction is corrected again.
-- **Current status:** DRAFT-01–05 remain evidence-backed closed. All three review
-  regressions are locally green and the owning spec records the remediation.
+- **Current status:** DRAFT-01–05 are evidence-backed closed. PR #65 is merged;
+  current-head release-candidate CI and Codex finding disposition are green.
+  PR #66, carrying only this handoff update, is open and not yet merged.
 - **Validation:** The three focused regressions passed. Catalog-selected layered
   validation reported `ok: true` for 22 selected gates in 117.070 seconds; the
   Manager serial group passed 344 tests, 2 skipped, and 74 subtests. Frontend
   production build, isolated six-model candidate lane, Python compilation,
-  `git diff --check`, and protected-boundary diff checks passed.
-- **Next action:** Commit and push the remediation, reply to and resolve all three
-  PR #65 threads, then verify current-head CI/review disposition. Checkpoint 1D
-  requires new explicit authorization.
-- **Blockers or closeout gaps:** None local. Current-head remote CI and thread
-  disposition remain pending until the remediation is pushed.
+  `git diff --check`, protected-boundary diff checks, all current-head GitHub
+  release-candidate jobs, and Codex finding disposition passed.
+- **Next action:** Land PR #66 on `main` so this handoff update is delivered
+  through its own PR rather than abandoned on its branch. Checkpoint 1D requires
+  new explicit authorization; do not begin implementation automatically.
+- **Blockers or closeout gaps:** Checkpoint 1C implementation has none; its only
+  outstanding delivery is PR #66, this documentation-only handoff update.
+  Checkpoint 1D is blocked only on explicit authorization.
 - **Protected boundaries:** Canonical workbook, generated runtime contracts,
   `form-app/data.js`, cache-bearing HTML, write/apply semantics, dealer
   submission, dependencies, deployment, and WordPress media unchanged.
