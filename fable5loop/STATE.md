@@ -19,35 +19,29 @@ Keep this file small — it is read at the start of every session:
 ## Current handoff
 
 - **Updated:** 2026-08-31
-- **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 1C /
-  P1.3 / WM-003, correctable mutable and rejected drafts.
+- **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 1D /
+  P1.4–P1.5 / WM-004–WM-005, truthful failure and entity scope presentation.
 - **Active workflow:** Normal repository path.
-- **Branch/commit:** Checkpoint 1C merged to `main` as `d0ad7cc` via PR #65;
-  implementation `5641a72`, closeout `4a91c42`, review remediation `e3bea7a`.
-  This documentation-only handoff update is not in that merge: it sits on
-  `docs/workbook-manager-checkpoint-1c-merge-closeout` and is under review as
-  PR #66, still undelivered to `main`.
-- **Last completed:** Merged Checkpoint 1C after fixing all three valid PR #65
-  findings. Correction drafts
-  retain the original Asset Manager evidence payload and stale-resolution check;
-  discarding the final workbook operation preserves a mutable draft that still
-  owns a no-workbook asset ignore; lifecycle reads expose both predecessor and
-  successor links when a correction is corrected again.
-- **Current status:** DRAFT-01–05 are evidence-backed closed. PR #65 is merged;
-  current-head release-candidate CI and Codex finding disposition are green.
-  PR #66, carrying only this handoff update, is open and not yet merged.
-- **Validation:** The three focused regressions passed. Catalog-selected layered
-  validation reported `ok: true` for 22 selected gates in 117.070 seconds; the
-  Manager serial group passed 344 tests, 2 skipped, and 74 subtests. Frontend
-  production build, isolated six-model candidate lane, Python compilation,
-  `git diff --check`, protected-boundary diff checks, all current-head GitHub
-  release-candidate jobs, and Codex finding disposition passed.
-- **Next action:** Land PR #66 on `main` so this handoff update is delivered
-  through its own PR rather than abandoned on its branch. Checkpoint 1D requires
-  new explicit authorization; do not begin implementation automatically.
-- **Blockers or closeout gaps:** Checkpoint 1C implementation has none; its only
-  outstanding delivery is PR #66, this documentation-only handoff update.
-  Checkpoint 1D is blocked only on explicit authorization.
+- **Branch/commit:** `feat/workbook-manager-checkpoint-1d`; implementation
+  `e663793`; closeout commit and PR pending.
+- **Last completed:** Checkpoint 1D adds operation-backed model context and exact
+  operation IDs to each semantic review entity, fail-closes missing/contradictory
+  scope, and renders a normalized Apply failure/rollback/next-action summary
+  above unchanged immutable attempt evidence.
+- **Current status:** APPLY-ERR-01–03 and SCOPE-01–03 are evidence-backed closed.
+  Checkpoint 1D implementation is committed locally and awaiting delivery.
+- **Validation:** Focused owner 23 passed plus 12 subtests; complete README Manager
+  checkpoint 371 passed, 2 skipped, 74 subtests. Catalog-selected layered
+  validation reported `ok: true` for 21 gates in 122.502 seconds, including the
+  frontend build and isolated six-model candidate lane. Isolated Chrome proved
+  mixed entity scope and a forced downstream failure with verified rollback,
+  no false empty state, unchanged raw attempt JSON, no console errors, and no
+  horizontal overflow. Python compilation, diff checks, and protected hashes
+  passed.
+- **Next action:** Push the branch and open the Checkpoint 1D PR. Checkpoint 1E
+  needs new explicit authorization and must not begin automatically.
+- **Blockers or closeout gaps:** None for Checkpoint 1D implementation; remote CI
+  and review are pending until the PR is opened.
 - **Protected boundaries:** Canonical workbook, generated runtime contracts,
   `form-app/data.js`, cache-bearing HTML, write/apply semantics, dealer
   submission, dependencies, deployment, and WordPress media unchanged.

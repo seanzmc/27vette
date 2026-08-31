@@ -118,8 +118,11 @@ exact ChangeSet emission, and shared-service preview and approval lifecycles:
   contributes to current workflow totals.
 - The active Form Structure and Model Operations editors write only durable
   operations. Draft Review shows projected before/final values, physical
-  sheet/row lineage, model context, exact ChangeSet/preview/approval identities,
-  warnings, failures, and immutable attempts. Controls derive from registry
+  sheet/row lineage, each entity's exact operation-backed model context, exact
+  ChangeSet/preview/approval identities, normalized lifecycle warnings/failures,
+  concise Apply rollback/next-action summaries, and immutable attempts. The
+  draft-wide model union stays in the impact overview rather than being repeated
+  as entity scope. Controls derive from registry
   `field_kind`, finite values, and reference metadata; optional blanks remain
   SQL `NULL`.
 - `GET /api/assets/reconciliation` exposes the shared asset-sync reconciliation

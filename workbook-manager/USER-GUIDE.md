@@ -288,9 +288,12 @@ message and fix the listed workbook problem first.
 
 ### A preview or Apply and Rebuild fails
 
-Read **Warnings & failures** and the latest attempt shown in **Review & Apply**.
-Use **Retry** only when the Manager offers it and you understand what was fixed.
-If **Cancel Draft** is available and you want to abandon the change, use it.
+Read **Apply failure summary** first. It names the failed stage, error, workbook
+and output rollback state, whether retry or cancellation is safe, and the next
+available action. Then read **Warnings & failures**; expand the latest immutable
+attempt only when you need the raw technical evidence. Use **Retry** only when
+the summary says it is safe and you understand what was fixed. If **Cancel
+Draft** is offered and you want to abandon the change, use it.
 
 ### The Manager says “Manual recovery required”
 
