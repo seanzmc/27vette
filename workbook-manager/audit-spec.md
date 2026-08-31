@@ -1178,5 +1178,7 @@ Each authorized checkpoint appends one concise dated record containing:
   compilation and `git diff --check` passed; protected workbook/generated/data
   surfaces remained clean. No additional browser run was needed because the
   remediation changes backend evidence retention and response completeness,
-  not a visible interaction. Remote current-head CI and review disposition are
-  the remaining delivery checks. Checkpoint 1D remains unauthorized.
+  not a visible interaction. Current-head release-candidate CI and Codex finding
+  disposition passed, and PR #65 merged to `main` as `d0ad7cc` on 2026-08-31.
+  Delivery commits are implementation `5641a72`, closeout `4a91c42`, and review
+  remediation `e3bea7a`. Checkpoint 1D remains unauthorized.
