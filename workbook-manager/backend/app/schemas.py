@@ -36,6 +36,13 @@ class DraftOperationRequest(BaseModel):
     actor: str = ""
 
 
+class DraftCorrectionRequest(BaseModel):
+    correction_draft_id: str
+    selected_operation_ids: list[int]
+    actor: str
+    reason: str
+
+
 class ApprovalRequest(BaseModel):
     actor: str = ""
     warning_ids: list[str] = Field(default_factory=list)

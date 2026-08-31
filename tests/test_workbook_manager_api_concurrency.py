@@ -323,7 +323,8 @@ class TestDurableSchemaUpgrade(unittest.TestCase):
                 )
             }
             self.assertTrue(
-                {"workflow_drafts", "draft_operations"} <= durable_tables
+                {"workflow_drafts", "draft_operations", "draft_corrections"}
+                <= durable_tables
             )
             with self.assertRaises(sqlite3.IntegrityError):
                 conn.execute(
@@ -1326,6 +1327,18 @@ class TestLifespanAndRequestConnections(unittest.TestCase):
                             },
                         ),
                         "discard": lambda: client.delete("/api/changes/1"),
+                        "discard durable operation": lambda: client.delete(
+                            "/api/drafts/missing/operations/1"
+                        ),
+                        "create correction draft": lambda: client.post(
+                            "/api/drafts/missing/correction",
+                            json={
+                                "correction_draft_id": "correction",
+                                "selected_operation_ids": [1],
+                                "actor": "test",
+                                "reason": "test correction",
+                            },
+                        ),
                         "validate": lambda: client.post("/api/changes/validate"),
                         "commit": lambda: client.post(
                             "/api/changes/commit", json={"actor": "test"}

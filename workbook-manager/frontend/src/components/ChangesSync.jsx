@@ -40,7 +40,7 @@ const NEXT_ACTIONS = {
   preview_retryable: "Retry Draft Validation",
   approval_repreview_required: "Validate Draft Against Workbook",
   preview_ready: "Approve Validated Changes",
-  preview_rejected: "Fix the reported problems, then revalidate",
+  preview_rejected: "Select retained operations and create a correction draft",
   approval_confirmation_required: "Approve Validated Changes",
   approved: "Write Approved Changes & Rebuild Form Data",
   apply_retryable: "Retry Writing Approved Changes & Rebuild Form Data",
@@ -93,7 +93,7 @@ function messages(attempt) {
 }
 
 export default function ChangesSync({
-  status, draftId, lifecycle, onChanged, onStartNew,
+  status, draftId, lifecycle, onChanged, onStartNew, onSelectDraft,
 }) {
   const [busy, setBusy] = useState("");
   const [notice, setNotice] = useState(null);
@@ -101,6 +101,10 @@ export default function ChangesSync({
   const [acceptedWarnings, setAcceptedWarnings] = useState([]);
   const [importReport, setImportReport] = useState(null);
   const [applyConfirmation, setApplyConfirmation] = useState("");
+  const [selectedOperationIds, setSelectedOperationIds] = useState([]);
+  const [correctionReason, setCorrectionReason] = useState(
+    "Correct operations rejected by workbook validation"
+  );
   // §13.5 persistent operation results: results pinned beside their operation
   // stay until the operator dismisses them or a named state transition
   // supersedes them. An unrelated status refresh cannot clear them.
@@ -198,6 +202,14 @@ export default function ChangesSync({
     setDismissedResults(readDismissedResults(draftId));
   }, [draftId]);
 
+  useEffect(() => {
+    if (draftState === "preview_rejected") {
+      setSelectedOperationIds(operations.map((operation) => operation.id));
+    } else {
+      setSelectedOperationIds([]);
+    }
+  }, [draftId, draftState]); // eslint-disable-line
+
   const dismissResult = (resultId) => {
     setDismissedResults((current) => {
       const next = [...new Set([...current, resultId])];
@@ -240,6 +252,46 @@ export default function ChangesSync({
   ].includes(draftState);
   const canApprove = ["preview_ready", "approval_confirmation_required"].includes(draftState);
   const canApply = ["approved", "apply_retryable", "apply_restored_retryable"].includes(draftState);
+  const correctionModels = [...new Set(
+    operations
+      .filter((operation) => selectedOperationIds.includes(operation.id))
+      .flatMap((operation) => operation.model_context || [])
+  )].sort();
+
+  const discardOperation = async (operation) => {
+    const remaining = operations.filter((item) => item.id !== operation.id);
+    const remainingModels = [...new Set(
+      remaining.flatMap((item) => item.model_context || [])
+    )].sort();
+    const key = Object.entries(operation.entity_key || {})
+      .map(([name, value]) => `${name}=${value}`).join(", ");
+    const impact = remaining.length
+      ? `${remaining.length} operation(s) remain, affecting ${remainingModels.join(", ") || "no promoted model"}.`
+      : "No effective draft operations will remain; the empty mutable draft will be removed.";
+    if (!window.confirm(
+      `Discard ${operation.action} ${operation.table_name} ${key}?\n\n${impact}\n\nThe workbook is not changed.`
+    )) return;
+    await run("discard operation", () => api.discardDraftOperation(draftId, operation.id));
+  };
+
+  const createCorrection = async () => {
+    setBusy("create correction draft");
+    setNotice(null);
+    try {
+      const correctionDraftId = crypto.randomUUID();
+      const result = await api.createCorrectionDraft(draftId, {
+        correction_draft_id: correctionDraftId,
+        selected_operation_ids: selectedOperationIds,
+        actor: actor.trim(),
+        reason: correctionReason.trim(),
+      });
+      await onSelectDraft(result.correction_draft_id);
+    } catch (e) {
+      setNotice({ kind: "err", text: e.message });
+    } finally {
+      setBusy("");
+    }
+  };
 
   return (
     <div>
@@ -358,6 +410,18 @@ export default function ChangesSync({
         ) : operations.map((operation) => (
           <div className="draft-operation" key={operation.id}>
             <div className="operation-heading">
+              {draftState === "preview_rejected" && (
+                <input
+                  type="checkbox"
+                  aria-label={`Retain operation ${operation.id} in correction draft`}
+                  checked={selectedOperationIds.includes(operation.id)}
+                  onChange={(event) => setSelectedOperationIds((current) =>
+                    event.target.checked
+                      ? [...new Set([...current, operation.id])]
+                      : current.filter((id) => id !== operation.id)
+                  )}
+                />
+              )}
               <span className={`op-tag ${operation.action}`}>{operation.action.toUpperCase()}</span>
               <strong>{operation.table_name}</strong>
               <span className="mono faint">
@@ -367,6 +431,15 @@ export default function ChangesSync({
               {(operation.model_context || []).map((model) => (
                 <span className="chip blue" key={model}>{model}</span>
               ))}
+              {draftState === "draft" && (
+                <button
+                  className="btn small danger"
+                  disabled={!!busy}
+                  onClick={() => discardOperation(operation)}
+                >
+                  Discard operation
+                </button>
+              )}
             </div>
             <div className="lineage-row">
               <span>sheet <strong>{operation.source_sheet}</strong></span>
@@ -499,6 +572,38 @@ export default function ChangesSync({
             )}
             {busy && <span className="muted">{busy.replaceAll("_", " ")}…</span>}
           </div>
+          {draftState === "preview_rejected" && (
+            <div className="approval-box correction-box">
+              <strong>Create correction draft</strong>
+              <span>
+                {selectedOperationIds.length} of {operations.length} operation(s) retained
+                {correctionModels.length ? ` · affects ${correctionModels.join(", ")}` : ""}.
+                The rejected ChangeSet and validation attempt remain immutable.
+              </span>
+              <label>
+                Operator
+                <input className="text" value={actor} onChange={(event) => setActor(event.target.value)} />
+              </label>
+              <label>
+                Correction reason
+                <input
+                  className="text"
+                  value={correctionReason}
+                  onChange={(event) => setCorrectionReason(event.target.value)}
+                />
+              </label>
+              <button
+                className="btn primary"
+                disabled={
+                  !!busy || !selectedOperationIds.length || !actor.trim()
+                  || !correctionReason.trim()
+                }
+                onClick={createCorrection}
+              >
+                Create correction draft
+              </button>
+            </div>
+          )}
           {canApprove && (
             <div className="approval-box">
               <label>

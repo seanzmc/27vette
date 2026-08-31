@@ -149,7 +149,7 @@ cross-draft apply immediately creates a P0 stop and supersedes this sequence.
 - [x] **P1.2 / WM-002 — Structure management.** Add reachable schema-driven
   editors for promotion, workbook source routing, variant definitions,
   model-variant membership, order-summary sections, and step-summary mappings.
-- [ ] **P1.3 / WM-003 — Draft correction.** Add operation discard for mutable
+- [x] **P1.3 / WM-003 — Draft correction.** Add operation discard for mutable
   drafts and an audited fork/correction path for validation-rejected immutable
   drafts.
 - [ ] **P1.4 / WM-004 — Apply failure evidence.** Surface apply-attempt failures
@@ -522,8 +522,8 @@ draft update, preserved it after reload, reported zero console/runtime errors,
 and measured no document overflow (1425=1425; 390=390). Workbook-write,
 generation/publication, dealer, deployment, and WordPress mutation gates were
 not run because this checkpoint saves draft intent only; protected hashes prove
-those surfaces unchanged. Residual risk: none implied. Checkpoint 1C remains
-unauthorized.
+those surfaces unchanged. Residual risk: none implied. Checkpoint 1C was
+explicitly authorized on 2026-08-31 and is closed by the record below.
 
 ### Checkpoint 1C — correctable mutable and rejected drafts
 
@@ -839,15 +839,15 @@ editable routes, and relevant generated consumers, then classify every member.
 
 ### Draft correction
 
-- **DRAFT-01:** Discarding one mutable operation leaves unrelated operations and
+- **DRAFT-01 — closed 2026-08-31:** Discarding one mutable operation leaves unrelated operations and
   exact navigation context intact.
-- **DRAFT-02:** Full reversion coalesces to no effective operation and updates
+- **DRAFT-02 — closed 2026-08-31:** Full reversion coalesces to no effective operation and updates
   Review/history truthfully.
-- **DRAFT-03:** A rejected option-with-missing-OVS draft creates one correction
+- **DRAFT-03 — closed 2026-08-31:** A rejected option-with-missing-OVS draft creates one correction
   draft; the original immutable ChangeSet and failed attempt remain byte-equal.
-- **DRAFT-04:** Correction refuses stale projection, ownership conflict, unknown
+- **DRAFT-04 — closed 2026-08-31:** Correction refuses stale projection, ownership conflict, unknown
   restoration, and a competing nonterminal draft with actionable reasons.
-- **DRAFT-05:** Forced failure between old-draft cancellation and new-draft
+- **DRAFT-05 — closed 2026-08-31:** Forced failure between old-draft cancellation and new-draft
   creation rolls back both sides transactionally.
 
 ### Apply evidence and scope
@@ -1137,4 +1137,46 @@ Each authorized checkpoint appends one concise dated record containing:
   implementation `f0e023d`, review remediation `3c37031`, closeout `48dffda`,
   and PR #62 (`https://github.com/seanzmc/27vette/pull/62`) are delivered. Both
   P2 review threads are resolved with code and test evidence; current-head CI is
-  pending. Checkpoint 1C requires new explicit authorization.
+  pending. Checkpoint 1C was subsequently authorized and is recorded next.
+- **2026-08-31 — Checkpoint 1C / P1.3 / WM-003:** closed by implementation
+  `5641a72`. Mutable Review operations now expose semantic discard confirmation
+  and preserve unrelated intent; full authored reversion still coalesces away.
+  A schema-version-10 durable store adds database-immutable rejected-draft
+  correction links. One atomic endpoint terminally disposes the rejected source,
+  preserves its exact ChangeSet and failed attempt, and creates a same-binding
+  mutable correction draft from the operator-selected operations with actor and
+  reason evidence. The Review UI defaults all rejected operations selected,
+  shows retained count/affected models, replaces the impossible revalidate copy,
+  and switches to the created draft. RED tests first failed on the absent
+  discard/correction contracts. The final focused owners passed 103 tests plus
+  48 subtests; the final lifecycle owner passed 38 tests plus 36 subtests after
+  the immutable update/delete assertions. Catalog-selected layered validation
+  reported `ok: true` across 21 selected gates in 118.039 seconds, including the
+  six-model release-candidate lane, frontend production build, and one-process
+  Manager serial group (341 passed, 2 skipped, 74 subtests). Python compilation
+  and `git diff --check` passed. Isolated Chrome on `127.0.0.1:8061` discarded
+  one of two mutable operations while preserving the other, displayed six
+  missing-OVS failures, created one correction retaining the unrelated valid
+  operation, and API readback proved the source terminal, its six-error attempt
+  intact, and the actor/reason/selected-operation link durable. Desktop and
+  390x844 reload, focus, Back/Forward, console, and overflow checks passed
+  (`390=390`; zero captured errors). Canonical workbook, generated runtime
+  contracts, published `data.js`, and cache-bearing HTML remained clean versus
+  `origin/main`; no workbook write, dealer submission, deployment/cache purge,
+  or WordPress mutation ran. README and operator guide were updated; generated
+  and customer-runtime companions were inspected with no change. Residual risk:
+  none implied. Delivery branch `feat/workbook-manager-checkpoint-1c`; PR #65
+  (`https://github.com/seanzmc/27vette/pull/65`) received three valid review
+  findings, remediated before merge: correction copies now preserve the original
+  asset evidence payload and stale-resolution binding, final-operation discard
+  retains a mutable draft that still owns an operational asset ignore, and the
+  lifecycle view returns every inbound/outbound link for a re-corrected draft.
+  Each regression first failed against `4a91c42`; focused proof passed 3 tests.
+  The catalog-selected layered run then passed all 22 selected gates in 117.070
+  seconds, including the one-process Manager group (344 passed, 2 skipped, 74
+  subtests), frontend build, and isolated six-model candidate lane. Python
+  compilation and `git diff --check` passed; protected workbook/generated/data
+  surfaces remained clean. No additional browser run was needed because the
+  remediation changes backend evidence retention and response completeness,
+  not a visible interaction. Remote current-head CI and review disposition are
+  the remaining delivery checks. Checkpoint 1D remains unauthorized.

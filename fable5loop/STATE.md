@@ -18,39 +18,32 @@ Keep this file small — it is read at the start of every session:
 
 ## Current handoff
 
-- **Updated:** 2026-08-30
-- **Owning specification:** `workbook-manager/audit-spec.md` — validation-method
-  alignment only; no checkpoint was implemented or authorized.
+- **Updated:** 2026-08-31
+- **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 1C /
+  P1.3 / WM-003, correctable mutable and rejected drafts.
 - **Active workflow:** Normal repository path.
-- **Branch/commit:** `claude/audit-spec-validation-review-b8f1fe` from
-  `origin/main` (`a59208e`).
-- **Last completed:** Reviewed `workbook-manager/audit-spec.md` against the
-  current gate machinery and updated it where the spec still described the old
-  method. Changes: §11 preamble records that README no longer mirrors the catalog
-  and names the four drift checks in `tests/test_validation_catalog.py`; §11.1
-  requires additive catalog edits and names `scripts/catalog_change_scope.py`'s
-  full-inventory triggers; §11.2 splits the Manager group into local-one-process
-  versus five CI partitions, documents `ci.always_gate_ids` as the layered-runner
-  baseline rather than universal PR gates, and ties
-  `scripts/validate_state_handoff.py` to catalog edits as well as `STATE.md`
-  edits; §11.3, §9, §12, and §13 add the catalog-owns-counts rule, a validation-
-  inventory drift row, a catalog-scope closeout line, and an approval gate on
-  `schema`/`ci`/`serial_groups` edits. The two closed checkpoint records now
-  quote their pass counts as dated one-run evidence rather than live inventory.
-  The uncommitted `AGENTS.md` Workbook Manager paragraph from the main checkout
-  is carried in this branch so it lands with the PR.
-- **Current status:** Documentation only. No ledger item changed status, no
-  acceptance scenario changed, and Checkpoint 1C remains unauthorized.
-- **Validation:** `tests/test_validation_catalog.py` and
-  `scripts/validate_state_handoff.py` — see the closeout report for results.
-  Product gates were not run: no script, test, catalog, workbook, or runtime file
-  changed.
-- **Next action:** None required. Checkpoint 1C needs new explicit authorization.
-- **Blockers or closeout gaps:** The main checkout still holds its own dirty
-  `AGENTS.md`; discard it there after this PR merges.
-- **Protected boundaries:** Workbook, generated artifacts, `form-app/data.js`,
-  cache-bearing HTML, durable write/apply semantics, dealer submission,
-  dependencies, and schema unchanged. No executable file changed.
+- **Branch/commit:** `feat/workbook-manager-checkpoint-1c` from `origin/main`;
+  implementation `5641a72`; PR #65 review remediation pending commit.
+- **Last completed:** Fixed all three valid PR #65 findings. Correction drafts
+  retain the original Asset Manager evidence payload and stale-resolution check;
+  discarding the final workbook operation preserves a mutable draft that still
+  owns a no-workbook asset ignore; lifecycle reads expose both predecessor and
+  successor links when a correction is corrected again.
+- **Current status:** DRAFT-01–05 remain evidence-backed closed. All three review
+  regressions are locally green and the owning spec records the remediation.
+- **Validation:** The three focused regressions passed. Catalog-selected layered
+  validation reported `ok: true` for 22 selected gates in 117.070 seconds; the
+  Manager serial group passed 344 tests, 2 skipped, and 74 subtests. Frontend
+  production build, isolated six-model candidate lane, Python compilation,
+  `git diff --check`, and protected-boundary diff checks passed.
+- **Next action:** Commit and push the remediation, reply to and resolve all three
+  PR #65 threads, then verify current-head CI/review disposition. Checkpoint 1D
+  requires new explicit authorization.
+- **Blockers or closeout gaps:** None local. Current-head remote CI and thread
+  disposition remain pending until the remediation is pushed.
+- **Protected boundaries:** Canonical workbook, generated runtime contracts,
+  `form-app/data.js`, cache-bearing HTML, write/apply semantics, dealer
+  submission, dependencies, deployment, and WordPress media unchanged.
 
 ## Verified facts
 

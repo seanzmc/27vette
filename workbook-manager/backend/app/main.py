@@ -42,6 +42,7 @@ from .schemas import (
     AssetSafeBulkRequest,
     ChangeOut,
     CommitRequest,
+    DraftCorrectionRequest,
     DraftOperationRequest,
     ManualResolutionRequest,
     StageChangeRequest,
@@ -1471,6 +1472,51 @@ def draft_operations(draft_id: str, state_conn=Depends(state_connection)):
     return {"draft_id": draft_id, "operations": drafts.list_operations(
         state_conn, draft_id
     )}
+
+
+@app.delete("/api/drafts/{draft_id}/operations/{operation_id}")
+def discard_draft_operation(
+    draft_id: str,
+    operation_id: int,
+    _lock=Depends(durable_write_lock),
+    state_conn=Depends(state_connection),
+):
+    try:
+        return drafts.discard_operation(
+            state_conn, draft_id=draft_id, operation_id=operation_id
+        )
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
+
+
+@app.post("/api/drafts/{draft_id}/correction")
+def create_draft_correction(
+    draft_id: str,
+    payload: DraftCorrectionRequest,
+    _lock=Depends(durable_write_lock),
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
+    workbook = _workbook_state(conn)
+    run = conn.execute(
+        "SELECT * FROM import_runs ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    projection = _projection_state(conn, run, workbook)
+    try:
+        return drafts.create_correction_draft(
+            conn,
+            state_conn,
+            projection_state=projection["state"],
+            base_workbook_sha256=workbook["imported_sha256"],
+            base_workbook_mtime_ns=workbook["imported_mtime_ns"],
+            source_draft_id=draft_id,
+            correction_draft_id=payload.correction_draft_id,
+            selected_operation_ids=payload.selected_operation_ids,
+            actor=payload.actor,
+            reason=payload.reason,
+        )
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
 
 
 def _asset_draft_context(conn):

@@ -94,7 +94,8 @@ exact ChangeSet emission, and shared-service preview and approval lifecycles:
 - `GET /api/drafts/{draft_id}` returns the manager-owned lifecycle view: draft
   status, parsed operations, aggregated model and physical-row context, exact
   stored ChangeSet/preview/approval/apply evidence, cancellation state, and
-  manual-resolution history, and manager-owned asset resolution evidence. It
+  manual-resolution history, immutable rejected-draft correction linkage, and
+  manager-owned asset resolution evidence. It
   does not mutate durable state or reshape the immutable shared artifacts.
   Record responses expose `model_context` as a JSON
   list, and browser form payloads follow schema-declared context for physically
@@ -102,6 +103,14 @@ exact ChangeSet emission, and shared-service preview and approval lifecycles:
 - `GET /api/drafts` lets the single-user browser recover the latest nonterminal
   durable draft, and `POST /api/drafts/{draft_id}/cancel` records a terminal
   cancellation without deleting operation or artifact history.
+- `DELETE /api/drafts/{draft_id}/operations/{operation_id}` discards one
+  operation only while the draft is mutable. It keeps unrelated intent; an
+  ordinary empty draft is removed. `POST /api/drafts/{draft_id}/correction`
+  is limited to validation-rejected drafts and atomically creates one new
+  mutable draft from the operator-selected operations while terminally
+  disposing the source. The source ChangeSet and failed validation attempt
+  remain immutable, and the source/correction link, operator, reason, and
+  selected operation IDs are durable immutable evidence.
 - `GET /api/workflow-history` is the versioned, paginated read model over
   durable workflow outcomes and immutable evidence. It remains available when
   the disposable projection is unavailable. The separate `GET /api/history`
