@@ -553,6 +553,19 @@ ChangeSet, preview, or attempt JSON.
 Exit gate: DRAFT-01–05 pass, including a six-OVS rejection corrected without
 recreating an unrelated valid operation.
 
+**Closed 2026-08-31 — implementation `5641a72`.** Mutable operations now have
+semantic discard confirmation and preserve unrelated intent; complete authored
+reversion still coalesces away. Rejected drafts retain immutable ChangeSet and
+attempt evidence while one atomic correction action terminally disposes the
+source and creates a same-binding mutable draft from operator-selected intent.
+
+Acceptance evidence is recorded in §14: DRAFT-01–05, focused lifecycle and
+draft owners, the complete Manager group, frontend build, isolated browser
+discard/correction proof, protected hashes, review remediation `e3bea7a`, and
+merge `d0ad7cc` all passed. This inline closure restores the same local status
+signal carried by Checkpoints 1A, 1B, and 1D; it does not change the completed
+checkpoint or its delivery record.
+
 ### Checkpoint 1D — truthful failure and entity scope presentation
 
 Objective: close P1.4/P1.5 (WM-004/WM-005).
@@ -606,7 +619,7 @@ Acceptance evidence:
 - Protected boundaries: canonical workbook, generated contracts, published
   `data.js`, cache-bearing HTML, write/apply semantics, dealer submission,
   dependencies, deployment, and WordPress media are unchanged. Residual risk:
-  none implied. Checkpoint 1E remains separately unauthorized.
+  none implied. Checkpoint 1E was subsequently authorized and is closed below.
 
 ### Checkpoint 1E — one visible Images model scope
 
@@ -629,6 +642,48 @@ Required work:
 
 Exit gate: IMG-SCOPE-01–03 pass for single-model clear, explicit all-model mode,
 and rapid model switching.
+
+**Closed 2026-08-31 — implementation `e41b133`.** The global header is now the
+single visible Images model-scope owner. Images exposes an explicit header-level
+All models mode, removes its divergent local model selector, preserves that
+scope when Clear filters resets only secondary filters, and returns to a
+concrete model before another workspace opens. One pure adapter derives the
+reconciliation query, linked-decision membership, and assignment-target scope.
+
+Out-of-scope deep links now retain the requested URL but fail closed without an
+editor or action; the operator must explicitly switch the visible scope. Every
+reconciliation response is bound to its requested model and a monotonically
+increasing request identity, so stale responses cannot replace current results
+or actions during rapid changes.
+
+Acceptance evidence:
+
+- IMG-SCOPE-01: the owner gate first failed on the absent scope adapter/header
+  ownership, then passed 14 tests. Isolated Chrome selected All models in the
+  global header, applied a section filter, and Clear filters reset all three
+  secondary controls while the URL and header remained `model=*`. Leaving
+  Images removed the virtual choice and restored `stingray` before Options &
+  Relationships rendered.
+- IMG-SCOPE-02: a `z06` image decision deep-linked under visible `stingray`
+  rendered a concrete refusal, no dialog, and only `stingray` queue rows. The
+  explicit switch changed the header/URL to `z06` and opened that exact decision.
+  Assignment-target filtering shares the tested scope adapter.
+- IMG-SCOPE-03: with the `grand_sport` reconciliation request deliberately
+  delayed, a rapid switch to `zr1` settled on `model=zr1`, 112 items, and twelve
+  sampled `zr1` rows after the stale response completed. At 390x844 the Images
+  page measured 390px scroll/client width with zero captured console, runtime,
+  or unhandled-rejection errors.
+- Validation: production frontend build passed. The complete README Manager
+  checkpoint passed 379 tests, 2 skipped, and 77 subtests in 82.30 seconds.
+  Catalog-selected layered validation reported `ok: true` for 22 gates in
+  122.893 seconds, including the frontend build, one-process Manager serial
+  group (355 passed, 2 skipped, 77 subtests), and isolated six-model candidate.
+  Python compilation, state-handoff validation, and diff checks passed.
+- Protected boundaries: canonical workbook, all six generated contracts,
+  published `data.js`, cache-bearing HTML, backend/API contracts, durable
+  mutation and Apply/Rebuild semantics, dealer submission, dependencies,
+  deployment, and WordPress media are unchanged. Residual risk: none implied.
+  Checkpoint 1 is complete; no P2 checkpoint begins automatically.
 
 ## 7. P2 implementation checkpoints
 
@@ -1224,4 +1279,14 @@ Each authorized checkpoint appends one concise dated record containing:
   the checkpoint section above. Closeout `a45addd`; delivery PR #67
   (`https://github.com/seanzmc/27vette/pull/67`). Required release-candidate CI
   and Codex finding disposition passed at delivery head `44470a6`. Checkpoint 1E
-  remains unauthorized.
+  was subsequently authorized and is recorded next.
+- **2026-08-31 — Checkpoint 1E / P1.6 / WM-006:** closed by implementation
+  `e41b133`. The global header now owns concrete/All models Images scope; Clear
+  filters preserves it, leaving Images normalizes All models to a concrete
+  model, out-of-scope deep links require an explicit scope switch, assignment
+  targets share the effective scope, and request identity prevents stale model
+  responses from replacing current results. IMG-SCOPE-01–03 browser and owner
+  evidence, the complete Manager checkpoint, catalog-selected 22-gate layered
+  run, protected hashes, and preserved boundaries are recorded in the checkpoint
+  section above. Residual risk: none implied. All P1 audit checkpoints 1A–1E are
+  closed; P2 remains separately authorized checkpoint by checkpoint.

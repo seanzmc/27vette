@@ -19,36 +19,35 @@ Keep this file small — it is read at the start of every session:
 ## Current handoff
 
 - **Updated:** 2026-08-31
-- **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 1D /
-  P1.4–P1.5 / WM-004–WM-005, truthful failure and entity scope presentation.
+- **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 1E /
+  P1.6 / WM-006, one visible Images model scope.
 - **Active workflow:** Normal repository path.
-- **Branch/commit:** `feat/workbook-manager-checkpoint-1d`; implementation
-  `e663793`; closeout `a45addd`; Codex review fixes on top; PR #67 open.
-- **Last completed:** Checkpoint 1D adds operation-backed model context and exact
-  operation IDs to each semantic review entity, fail-closes missing/contradictory
-  scope, and renders a normalized Apply failure/rollback/next-action summary
-  above unchanged immutable attempt evidence.
-- **Current status:** APPLY-ERR-01–03 and SCOPE-01–03 are evidence-backed closed.
-  Both Codex P2 findings on PR #67 are addressed in the presentation adapter:
-  combined message lists deduplicate rollback errors that
-  `complete_apply_rebuild()` already copies into `result.errors`, and a recorded
-  manual resolution supersedes the stale `manual recovery` next action.
-- **Validation:** Focused owner 25 passed plus 15 subtests after the review fixes
-  (was 23 plus 12); frontend build passed; complete README Manager
-  checkpoint 371 passed, 2 skipped, 74 subtests. Catalog-selected layered
-  validation reported `ok: true` for 21 gates in 122.502 seconds, including the
-  frontend build and isolated six-model candidate lane. Isolated Chrome proved
-  mixed entity scope and a forced downstream failure with verified rollback,
-  no false empty state, unchanged raw attempt JSON, no console errors, and no
-  horizontal overflow. Python compilation, diff checks, and protected hashes
-  passed.
-- **Next action:** Re-review PR #67 after the Codex fixes; merge only on explicit user request. Checkpoint
-  1E needs new explicit authorization and must not begin automatically.
-- **Blockers or closeout gaps:** None in Checkpoint 1D implementation or required
-  CI; PR #67 review and merge decision remain pending.
+- **Branch/commit:** `feat/workbook-manager-checkpoint-1e`; implementation
+  `e41b133`; docs closeout on top; delivery PR pending.
+- **Last completed:** Checkpoint 1E makes the global header the single Images
+  model-scope owner, adds explicit header-level All models, preserves scope when
+  clearing secondary filters, refuses cross-scope deep links until the operator
+  switches visibly, scopes assignment targets, and rejects stale model responses.
+- **Current status:** IMG-SCOPE-01–03 are evidence-backed closed locally. The
+  audit spec now also restores Checkpoint 1C's missing inline closure signal.
+  All P1 Checkpoints 1A–1E are closed; no P2 work is authorized automatically.
+- **Validation:** Owner gate 14 passed after six expected RED failures; frontend
+  production build passed. Complete README Manager checkpoint: 379 passed,
+  2 skipped, 77 subtests in 82.30 seconds. Catalog-selected layered validation:
+  `ok: true`, 22 gates in 122.893 seconds, including frontend build, Manager
+  serial group (355 passed, 2 skipped, 77 subtests), and isolated six-model
+  candidate. Isolated Chrome proved All models/Clear filters, explicit
+  cross-scope refusal and switch, delayed stale-response rejection, concrete
+  scope on workspace exit, zero captured errors, and 390=390 mobile width.
+  Python compilation, diff checks, state validation, and protected hashes passed.
+- **Next action:** Deliver the Checkpoint 1E PR to `main`; review and merge only
+  on explicit user request. Start P2 only after separate authorization.
+- **Blockers or closeout gaps:** None in local implementation or validation;
+  remote PR CI/review remains pending until delivery.
 - **Protected boundaries:** Canonical workbook, generated runtime contracts,
-  `form-app/data.js`, cache-bearing HTML, write/apply semantics, dealer
-  submission, dependencies, deployment, and WordPress media unchanged.
+  `form-app/data.js`, cache-bearing HTML, backend/API contracts, write/apply
+  semantics, dealer submission, dependencies, deployment, and WordPress media
+  unchanged.
 
 ## Verified facts
 
