@@ -1288,5 +1288,7 @@ Each authorized checkpoint appends one concise dated record containing:
   responses from replacing current results. IMG-SCOPE-01–03 browser and owner
   evidence, the complete Manager checkpoint, catalog-selected 22-gate layered
   run, protected hashes, and preserved boundaries are recorded in the checkpoint
-  section above. Residual risk: none implied. All P1 audit checkpoints 1A–1E are
+  section above. Delivery branch `feat/workbook-manager-checkpoint-1e`, closeout
+  `f900bd7`, and PR #68 (`https://github.com/seanzmc/27vette/pull/68`) are open
+  for review. Residual risk: none implied. All P1 audit checkpoints 1A–1E are
   closed; P2 remains separately authorized checkpoint by checkpoint.

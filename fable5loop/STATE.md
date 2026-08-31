@@ -23,7 +23,7 @@ Keep this file small — it is read at the start of every session:
   P1.6 / WM-006, one visible Images model scope.
 - **Active workflow:** Normal repository path.
 - **Branch/commit:** `feat/workbook-manager-checkpoint-1e`; implementation
-  `e41b133`; docs closeout on top; delivery PR pending.
+  `e41b133`; closeout `f900bd7`; PR #68 open.
 - **Last completed:** Checkpoint 1E makes the global header the single Images
   model-scope owner, adds explicit header-level All models, preserves scope when
   clearing secondary filters, refuses cross-scope deep links until the operator
@@ -40,10 +40,10 @@ Keep this file small — it is read at the start of every session:
   cross-scope refusal and switch, delayed stale-response rejection, concrete
   scope on workspace exit, zero captured errors, and 390=390 mobile width.
   Python compilation, diff checks, state validation, and protected hashes passed.
-- **Next action:** Deliver the Checkpoint 1E PR to `main`; review and merge only
-  on explicit user request. Start P2 only after separate authorization.
+- **Next action:** Review PR #68 and required CI; merge only on explicit user
+  request. Start P2 only after separate authorization.
 - **Blockers or closeout gaps:** None in local implementation or validation;
-  remote PR CI/review remains pending until delivery.
+  remote PR CI/review is pending.
 - **Protected boundaries:** Canonical workbook, generated runtime contracts,
   `form-app/data.js`, cache-bearing HTML, backend/API contracts, write/apply
   semantics, dealer submission, dependencies, deployment, and WordPress media
