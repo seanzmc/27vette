@@ -18,16 +18,39 @@ Keep this file small — it is read at the start of every session:
 
 ## Current handoff
 
-- **Updated:** 2026-08-29
-- **Owning specification:** None — repository hygiene pass on branch `claude/repo-cleanup-dead-code-90c40a`.
+- **Updated:** 2026-08-30
+- **Owning specification:** `workbook-manager/audit-spec.md` — validation-method
+  alignment only; no checkpoint was implemented or authorized.
 - **Active workflow:** Normal repository path.
-- **Branch/commit:** `claude/repo-cleanup-dead-code-90c40a`, PR #63; head `6c29cf9` merged with `origin/main` (`3c6b0cc`, PR #62) to resolve the `Current handoff` conflict. PR #62's Checkpoint 1B handoff is demoted to `Last session` below rather than dropped — it is merged work, and this block owns in-flight state only.
-- **Last completed:** Addressed PR #63's Codex P2 finding by declaring `tests/validation_catalog.json` in the `reads` sets of `cmd.state_handoff_validator` and `py.test_state_handoff` (`6c29cf9`); `reads` is declaration-only, consumed by no CI selection path, so this was inventory accuracy. Before that, a mutation audit of the two shared Python fixture modules, `tests/workbook_domain_fixtures.py` and `tests/workbook_manager_fixtures.py`. For the three negative fixtures the mutation direction is inverted — repair the deliberate defect and require the owning test to go red — since a negative test that stays red after the defect is fixed is not testing that defect. Result: 4 of 5 discriminate. The blind one is `build_master_workbook`'s `zr1_options` row.
-- **Current status:** That row's comment claimed it locked in an "add-after-delete seeding" fix against ids the plan builder would mint. No plan builder exists — `plan_builder`/`build_plan` and any id-minting code have zero occurrences in `scripts/`, `workbook-manager/backend/`, and `tests/`. It was removed with raw ingest on 2026-07-23, in commit `667aad5`, the same commit that added the comment. The row is still load-bearing for the active-flag property, so the row and its colliding id stay; the comment now records the proven property and the retired claim. No new test was written for a component that does not exist.
-- **Validation:** Five fixture mutations run, each reverted, tree verified clean: MF1 (asset_map row given identifying keys), MF2 (rule_mapping retargeted at a live option), MF3 (required sheet no longer omitted) and DF1 (zr1 source row flipped active) each turn their owning test red; DF2 (collision id changed to `opt_zzz_999`) leaves all 42 tests green. `test_editor_ops_global_families`, `test_validation_catalog`, `test_workbook_manager_fixtures` → 48 passed in 3.54s. `scripts/validate_state_handoff.py` passes.
-- **Next action:** None required. If the audit continues, the remaining shared surfaces are the six Node helpers under `tests/lib/` (`runtime-harness.mjs`, `workbook-truth.mjs`, `tracked-artifacts.mjs`, `interior-relationships.mjs`, `runtime-state-matrix.mjs`, `workbook-registry-snapshot.mjs`), which were not examined in this pass.
-- **Blockers or closeout gaps:** None. `visualizer/workbook-editor/` retirement remains undecided and is not a cleanup task — `workbook-manager/backend/app/sync.py:26,97` imports `corvette_form_generator.editor_ops` and calls `apply_batch()`, so the six editor gates prove the shared write path.
-- **Protected boundaries:** Workbook, generated artifacts, `form-app/data.js`, cache-bearing HTML, durable write/apply semantics, dealer submission, dependencies, and schema unchanged. This pass changed one comment; no fixture data, test assertion, or `scripts/` behavior differs.
+- **Branch/commit:** `claude/audit-spec-validation-review-b8f1fe` from
+  `origin/main` (`a59208e`).
+- **Last completed:** Reviewed `workbook-manager/audit-spec.md` against the
+  current gate machinery and updated it where the spec still described the old
+  method. Changes: §11 preamble records that README no longer mirrors the catalog
+  and names the four drift checks in `tests/test_validation_catalog.py`; §11.1
+  requires additive catalog edits and names `scripts/catalog_change_scope.py`'s
+  full-inventory triggers; §11.2 splits the Manager group into local-one-process
+  versus five CI partitions, documents `ci.always_gate_ids` as the layered-runner
+  baseline rather than universal PR gates, and ties
+  `scripts/validate_state_handoff.py` to catalog edits as well as `STATE.md`
+  edits; §11.3, §9, §12, and §13 add the catalog-owns-counts rule, a validation-
+  inventory drift row, a catalog-scope closeout line, and an approval gate on
+  `schema`/`ci`/`serial_groups` edits. The two closed checkpoint records now
+  quote their pass counts as dated one-run evidence rather than live inventory.
+  The uncommitted `AGENTS.md` Workbook Manager paragraph from the main checkout
+  is carried in this branch so it lands with the PR.
+- **Current status:** Documentation only. No ledger item changed status, no
+  acceptance scenario changed, and Checkpoint 1C remains unauthorized.
+- **Validation:** `tests/test_validation_catalog.py` and
+  `scripts/validate_state_handoff.py` — see the closeout report for results.
+  Product gates were not run: no script, test, catalog, workbook, or runtime file
+  changed.
+- **Next action:** None required. Checkpoint 1C needs new explicit authorization.
+- **Blockers or closeout gaps:** The main checkout still holds its own dirty
+  `AGENTS.md`; discard it there after this PR merges.
+- **Protected boundaries:** Workbook, generated artifacts, `form-app/data.js`,
+  cache-bearing HTML, durable write/apply semantics, dealer submission,
+  dependencies, and schema unchanged. No executable file changed.
 
 ## Verified facts
 
@@ -103,16 +126,12 @@ Keep this file small — it is read at the start of every session:
 
 ## Last session
 
+2026-08-29 (repository hygiene — fixture mutation audit, PR #63): **Merged to `main` as `a59208e`.** Mutation-audited the two shared Python fixture modules; 4 of 5 mutations discriminate, and `build_master_workbook`'s `zr1_options` collision row was proved blind — its comment cited a plan builder retired with raw ingest in `667aad5`, so the comment now records the proven active-flag property instead. Also declared `tests/validation_catalog.json` in the `reads` sets of `cmd.state_handoff_validator` and `py.test_state_handoff` (`6c29cf9`). Evidence: `test_editor_ops_global_families`, `test_validation_catalog`, `test_workbook_manager_fixtures` 48 passed; `scripts/validate_state_handoff.py` passed. Node helpers under `tests/lib/` remain unaudited.
+
 2026-08-29 (Workbook Manager — Checkpoint 1B, registered structure management): **Merged to `main` as `3c6b0cc` via PR #62.** Form Overview derives its structure-family index from registered fixed-sheet specs; loaded table/model identity fail-closes stale actions during transitions, and action capabilities delegate to the durable mutation ownership guard rather than table editability. Both PR #62 P2 findings remediated in `3c37031`. STRUCT-01–04 pass. Evidence: focused catalog/form-graph owners 33 passed; catalog-selected Manager serial group 335 passed, 2 skipped, 74 subtests; canonical workbook, published data/cache HTML and all six runtime-contract SHA-256 values matched preflight. Checkpoint 1C remains unauthorized.
 
 2026-08-27 (repository token-pit audit and state-handoff cleanup): **Docs and validator-constant only; no source, workbook, generator, registry, or runtime change.** Audited the per-task mandatory read chain, which PR #49 had already cut from 220,827 B to 58,144 B. Corrected seven stale factual claims in `README.md`, each checked against `model_master`, `model_registry_promotion`, the live `window.CORVETTE_FORM_DATA` keys, the workbook sheet list, and the `form-output/` tree: the Roadmap still described three live models and gated ZR1/ZR1X behind a pending review, `zr1_*`/`zr1x_*` were labeled inactive scaffolds, the `grand_sport_x_*` sheets were undocumented, `backups/` did not exist, the registry example showed three models, a caveat claimed draft-worded artifact names that no longer exist, and a cross-reference named a missing heading. Closed four `Open failures` proved done against the merged tree, archived five retired-surface `Lessons learned`, added the missing entries for PRs #48/#49/#50, and lowered `MAX_STATE_BYTES` from 60,000 to 40,000. The node gate matrix was confirmed to list exactly the 19 files in `tests/*.test.mjs`. Evidence: `tests/test_validation_catalog.py` + `tests/test_state_handoff.py` 38 passed, `scripts/validate_state_handoff.py` passed, `node --test tests/z06-registry-publication.test.mjs` 2 passed with `form-app/data.js` sha256 unchanged, `tests/test_atomic_registry_write.py` 9 passed.
 
-
 2026-08-26 (Workbook Manager UX recovery — Checkpoint 3F, persistent draft navigation): **Checkpoint 3F merged to `main` as `0245528` via PR #50.** Added a persistent draft tray plus dependency-free URL/navigation state (`workbook-manager/frontend/src/navigationState.js`), preserved the current navigation when a draft starts, and dropped stale cross-model detail before its replacement loads. 12 files, +842/-71, with backend draft and connected-editing test coverage extended. Evidence: `git log 0245528` and `docs/superpowers/specs/2026-08-21-workbook-manager-ux-recovery.md`.
 
 2026-08-26 (retire the Fable 5 loop and cap the state handoff): **Merged to `main` as `dca3605` via PR #49.** Moved the loop scaffold to `docs/archive/fable5-loop/` and 120 KB of history to `fable5loop/STATE-archive.md`, replaced `scripts/validate_fable5_loop.py` with `scripts/validate_state_handoff.py`, and replaced `tests/test_fable5_loop_contract.py` with `tests/test_state_handoff.py`. 39 files, +705/-945. The mandatory per-task read chain fell from 220,827 B to 58,144 B. Evidence: `git log dca3605`.
-
-2026-08-26 (Workbook Manager UX recovery — Checkpoint 3E, connected group-fact editing): **Merged to `main` as `bf6db32` via PR #48.** Contextual registry-driven group-fact editing plus exclusive/rule member add, remove, activate, and deterministic adjacent reorder through the existing durable operation lane; review corrections moved group/member relation ownership into the shared registry/catalog. 12 files, +1252/-38. Add Group remains blocked. Evidence: `git log bf6db32`.
-
-
-Older entries: `fable5loop/STATE-archive.md`.

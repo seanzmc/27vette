@@ -415,10 +415,12 @@ Checkpoint drift disposition:
 Validation: focused RED failures proved the missing endpoint (`404`), missing
 workflow-first presentation, missing exact-draft refresh, and omitted asset
 evidence before each implementation slice. The final catalog-selected Manager
-serial group passed with 356 tests, 2 skips, 74 subtests, and one existing
-Starlette/httpx deprecation warning. Python compilation, frontend production
-build, and `git diff --check` passed. Isolated real-browser proof at desktop and
-390x844 showed the successful and restored outcomes, separate legacy count,
+serial group passed; that run on 2026-08-29 collected 356 tests, 2 skips, and 74
+subtests with one existing Starlette/httpx deprecation warning. Those numbers are
+dated evidence of one run, not a live inventory claim —
+`tests/validation_catalog.json` owns collection counts. Python compilation,
+frontend production build, and `git diff --check` passed. Isolated real-browser
+proof at desktop and 390x844 showed the successful and restored outcomes, separate legacy count,
 projection-independent reload, expandable evidence, exact-draft one-change
 review, Back/Forward restoration, keyboard focus, zero console errors, and no
 document overflow. Checkpoint 1B was separately authorized and is closed below.
@@ -508,11 +510,13 @@ identity now fail-closes every action during transitions, and the API delegates
 each action to the durable mutation guard. A three-second CDP network delay
 proved loading state, zero stale rows/key metadata, disabled Add, correct
 post-load source-routing rows/key, the model-create refusal, and zero console
-errors. Final focused owners passed 33 tests. The catalog-selected Manager
-serial group passed 335 tests, 2 skips, 74 subtests, with one existing
-Starlette/httpx deprecation warning. Python compilation, frontend production
-build, and `git diff --check` passed. Isolated import reported package/schema-
-valid and verified semantic readback. Real Chrome at desktop and 390x844 reached counts 1/11/32/6/11/13 for
+errors. Final focused owners passed. The catalog-selected Manager
+serial group passed; that run on 2026-08-29 collected 33 focused-owner tests and
+335 group tests, 2 skips, and 74 subtests with one existing Starlette/httpx
+deprecation warning. Those numbers are dated evidence of one run, not a live
+inventory claim — `tests/validation_catalog.json` owns collection counts. Python
+compilation, frontend production build, and `git diff --check` passed. Isolated
+import reported package/schema-valid and verified semantic readback. Real Chrome at desktop and 390x844 reached counts 1/11/32/6/11/13 for
 the six families, opened promotion evidence, saved exactly one correctly owned
 draft update, preserved it after reload, reported zero console/runtime errors,
 and measured no document overflow (1425=1425; 390=390). Workbook-write,
@@ -778,6 +782,7 @@ are guidance, not permission to invent or modify absent symbols.
 | Preserved sheets | workbook-domain registry, importer/projection, catalog, changeset/writer consumers | package/schema, generated parity, export/re-import, affected models |
 | Search/Groups/diagnostics | `explorer.py`, connected components, navigation state | pagination, ranking, query budgets, deep links |
 | Responsive/copy | `styles.css`, shared components, User Guide after implementation | frontend build, keyboard/accessibility, 390x844 browser proof |
+| Validation inventory | `tests/validation_catalog.json`, focused test owners | catalog change scope, README drift checks, state-handoff count claims |
 
 For every checkpoint, record a drift table with these states:
 
@@ -789,7 +794,9 @@ For every checkpoint, record a drift table with these states:
 - writer/apply impact;
 - generator/publication impact;
 - focused test owner;
-- README/User Guide impact.
+- README/User Guide impact, recorded as updated without contradicting the
+  catalog: published commands equal the catalog's, named gates still exist, no
+  hand-maintained collection count, and only catalog layer names.
 
 A green comparison over two surfaces that both omit a family is not parity.
 Coverage tests enumerate the union of registry families, projected families,
@@ -944,6 +951,15 @@ Implementation selects exact gates from the live READMEs and
 `tests/validation_catalog.json`; this specification does not freeze command
 strings or measured counts.
 
+The catalog owns gate selection, isolation, serialization, measured timings, and
+collection counts. README no longer mirrors that inventory; it must only avoid
+contradicting it. A checkpoint that edits README therefore satisfies four
+drift checks in `tests/test_validation_catalog.py`: a published command naming a
+cataloged script must equal that catalog command exactly, every gate name in
+README must still exist on disk, README must not hand-maintain a pytest
+collection count, and any `Layer N` reference must name a catalog layer. Prefer
+pointing at the catalog over copying it.
+
 ### 11.1 Focused owners
 
 Prefer bounded owner files rather than expanding the monolithic Manager suite:
@@ -959,10 +975,20 @@ Prefer bounded owner files rather than expanding the monolithic Manager suite:
 - Groups/search/navigation/responsive behavior: connected editing/form graph plus
   dependency-free frontend helper tests and browser proof.
 
-Any new test file must be added to the validation catalog and current Manager
-suite with measured isolation/serialization metadata. Tests must derive family
-coverage from the registry and include forced mutations so completeness cannot
-pass over a shrunken universe.
+Any new test file must be added to the validation catalog with measured
+isolation/serialization metadata; suite and `serial_group` membership is a
+deliberate declaration, not an automatic consequence of being a Manager test.
+Keep the catalog edit purely additive — a new gate object plus the suite
+memberships it joins. `scripts/catalog_change_scope.py` classifies the diff:
+removing or retargeting a gate, or editing `schema`, `ci`, `serial_groups`, or
+an existing gate's `command`, `layer`, `test_files`, `changed_surfaces`, or
+`serial_group`, selects the complete validation inventory on that pull request,
+while a pure addition selects only the CI contract owners and the new gate. Any
+catalog edit runs `tests/test_catalog_change_scope.py` and
+`tests/test_validation_catalog.py`.
+
+Tests must derive family coverage from the registry and include forced mutations
+so completeness cannot pass over a shrunken universe.
 
 ### 11.2 Required layers per checkpoint
 
@@ -970,15 +996,33 @@ Every checkpoint:
 
 1. RED proof against the unmodified implementation;
 2. exact focused tests while editing;
-3. current catalog-selected Manager serial group in one process;
-4. frontend production build for frontend changes;
-5. API schema, pagination, stable ordering, query-budget, no-write, and error-state
+3. current catalog-selected Manager serial group in one process locally; CI no
+   longer runs it that way — the planner splits the owner into five disjoint
+   partitions across parallel jobs, so per-partition wall clock is not
+   comparable to the local run, and CI omits the separately cataloged
+   `test_asset_map_sync.py` unless `asset_map` actually changed;
+4. when `scripts/run_layered_validation.py` is selected, its catalog-owned
+   `ci.always_gate_ids` baseline: `py.test_validation_catalog`,
+   `py.test_run_layered_validation`, `py.test_codex_finding_disposition`,
+   `py.test_source_parity_canaries`, `py.test_workbook_truth`, and
+   `cmd.release_candidate_lane`. This is a layered-runner baseline, not a claim
+   that every pull request executes all six: the path-specific PR planner may
+   select dedicated shards instead (a documentation/handoff-only change selects
+   `handoff-contracts`). Each checkpoint owns the actual plan and rollup selected
+   for its changed paths;
+5. frontend production build for frontend changes;
+6. API schema, pagination, stable ordering, query-budget, no-write, and error-state
    tests for changed read models;
-6. real browser at desktop and 390x844 for visible workflows, including console,
+7. real browser at desktop and 390x844 for visible workflows, including console,
    focus, overflow, reload, and Back/Forward evidence;
-7. `git diff --check`, state-handoff validation, changed-file/status review, and
-   protected-boundary diff/hash evidence;
-8. PR Release candidate and review-disposition gates before merge.
+8. `git diff --check`, changed-file/status review, protected-boundary diff/hash
+   evidence, and `scripts/validate_state_handoff.py` after any `STATE.md` edit
+   **or any catalog edit** — the validator now checks every count that a
+   `STATE.md` sentence attributes to `tests/validation_catalog.json` against the
+   catalog itself, so a catalog change can invalidate handoff prose that this
+   checkpoint did not touch. Never write an inventory count into `STATE.md`
+   without re-deriving it from the catalog at write time;
+9. PR Release candidate and review-disposition gates before merge.
 
 Checkpoints changing workbook-domain registry, projection, ChangeSet parsing,
 writer capability, affected-model derivation, generation, or publication also
@@ -1001,6 +1045,9 @@ separately requested and approved.
 - A registry/write-capability checkpoint proves source row → projection → schema
   → operation → ChangeSet → guarded copied-workbook write → fresh generation →
   re-import. Green import/package checks alone do not prove runtime parity.
+- Catalog-derived counts are the only citable inventory numbers. A checkpoint
+  that re-measures a gate updates the catalog rather than prose, and quotes a
+  measured pass count only as dated evidence of one run.
 - No live dealer submission, production deployment/cache purge, or WordPress
   media mutation is a validation step.
 
@@ -1028,6 +1075,9 @@ At checkpoint closeout:
 
 - mark only evidence-backed ledger items complete;
 - record exact tests/build/browser proof and relevant gates not run;
+- when the checkpoint added or retargeted a catalog gate, record the scope
+  `scripts/catalog_change_scope.py` assigned and whether the full inventory
+  therefore ran;
 - record companion files as updated, inspected-no-change, or not applicable;
 - update `fable5loop/STATE.md` with the exact next authorized action;
 - inspect final status/diff and preserve unrelated work;
@@ -1043,6 +1093,9 @@ Explicit approval is required before:
 - introducing a durable DB migration, new terminal lifecycle state, public API
   break, dependency, workbook schema/column, generated contract field, or
   deployment assumption;
+- editing `schema`, `ci`, or `serial_groups` in `tests/validation_catalog.json`,
+  or retargeting or removing an existing gate, because those reroute selection
+  for gates the checkpoint does not own;
 - choosing product data or conflict resolution when workbook authority does not
   establish the answer;
 - changing canonical workbook data or applying against the canonical workbook;
@@ -1077,9 +1130,9 @@ Each authorized checkpoint appends one concise dated record containing:
   `f0e023d`; registry-derived structure index, shared schema editor, contextual
   pre-Save evidence, capability/dependency refusal, synthetic completeness,
   isolated durable-save proof, desktop/mobile Chrome proof, protected hashes,
-  focused 33-test owners, frontend build, and the 335-pass Manager serial gate
-  are recorded above. No workbook, generated, customer-runtime, dealer,
-  dependency, schema, or deployment boundary changed. Residual risk: none
+  focused owners, frontend build, and the catalog-selected Manager serial gate
+  are recorded above with that run's dated counts. No workbook, generated,
+  customer-runtime, dealer, dependency, schema, or deployment boundary changed. Residual risk: none
   implied. Delivery branch `feat/workbook-manager-structure-management`;
   implementation `f0e023d`, review remediation `3c37031`, closeout `48dffda`,
   and PR #62 (`https://github.com/seanzmc/27vette/pull/62`) are delivered. Both
