@@ -6,9 +6,15 @@ import {
   Link, RefreshCw, Save, SearchX,
 } from "lucide-react";
 import { api } from "../api.js";
+import {
+  ALL_MODELS, assetInScope, assignmentTargetsInScope, reconciliationModel,
+} from "../assetScope.js";
 
 const PAGE_SIZE = 24;
 const LINK_LOOKUP_PAGE_SIZE = 100;
+const EMPTY_FILTERS = {
+  section: "", target_type: "", coverage_intent: "", status: "",
+};
 const STATUS_LABELS = {
   safe_proposal: "Safe proposals",
   covered: "Covered",
@@ -127,7 +133,7 @@ async function findLinkedAsset(itemId, draftId) {
 }
 
 export default function AssetManager({
-  models, modelKey, setModelKey, draftId, draftMutable, draftLifecycle, onChanged,
+  modelKey, setModelKey, draftId, draftMutable, draftLifecycle, onChanged,
   navigation, onNavigationChange,
 }) {
   // §3F: the open image decision is navigation state, not component state, so it
@@ -142,38 +148,48 @@ export default function AssetManager({
       id: id || "",
     });
   }, [navigation, onNavigationChange]);
-  const [filters, setFilters] = useState({
-    model: modelKey || "", section: "", target_type: "",
-    coverage_intent: "", status: "",
-  });
+  const [filters, setFilters] = useState(EMPTY_FILTERS);
   const [offset, setOffset] = useState(0);
   const [data, setData] = useState(null);
+  const [dataScope, setDataScope] = useState("");
   const [linkedAsset, setLinkedAsset] = useState({ id: "", item: null, loading: false, error: "" });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState(null);
   const [actionBusy, setActionBusy] = useState("");
+  const requestRef = React.useRef(0);
 
   const load = useCallback(async (refresh = false) => {
+    const requestId = ++requestRef.current;
+    const requestedScope = modelKey;
     setLoading(true);
     setError("");
     try {
       const result = await api.assetReconciliation({
-        ...filters, offset, limit: PAGE_SIZE, refresh, draft_id: draftId,
+        ...filters, model: reconciliationModel(modelKey),
+        offset, limit: PAGE_SIZE, refresh, draft_id: draftId,
       });
+      if (requestId !== requestRef.current) return;
       setData(result);
+      setDataScope(requestedScope);
     } catch (e) {
+      if (requestId !== requestRef.current) return;
       setError(e.message);
     } finally {
-      setLoading(false);
+      if (requestId === requestRef.current) setLoading(false);
     }
-  }, [filters, offset, draftId]);
+  }, [filters, offset, draftId, modelKey]);
 
   useEffect(() => { load(false); }, [load]);
-
-  const queuedSelection = data?.queue.items.find((item) => item.id === selectedId) || null;
   useEffect(() => {
-    if (!selectedId || !data || queuedSelection) {
+    setFilters(EMPTY_FILTERS);
+    setOffset(0);
+  }, [modelKey]);
+
+  const scopedData = dataScope === modelKey ? data : null;
+  const queuedSelection = scopedData?.queue.items.find((item) => item.id === selectedId) || null;
+  useEffect(() => {
+    if (!selectedId || !scopedData || queuedSelection) {
       setLinkedAsset({ id: "", item: null, loading: false, error: "" });
       return undefined;
     }
@@ -194,23 +210,22 @@ export default function AssetManager({
         }
       });
     return () => { cancelled = true; };
-  }, [selectedId, data, queuedSelection, draftId]);
+  }, [selectedId, scopedData, queuedSelection, draftId]);
 
   const updateFilter = (key, value) => {
     setFilters((current) => ({
       ...current,
       [key]: value,
-      ...(key === "model" ? { section: "" } : {}),
     }));
-    if (key === "model" && value) setModelKey(value);
     setOffset(0);
     if (selectedId) selectAsset("");
   };
   const selected = queuedSelection || (
     linkedAsset.id === selectedId ? linkedAsset.item : null
   );
-  const activeModelCoverage = data?.coverage.models.find(
-    (model) => model.model_key === filters.model
+  const selectedInScope = assetInScope(selected, modelKey);
+  const activeModelCoverage = scopedData?.coverage.models.find(
+    (model) => model.model_key === modelKey
   );
   const runResolution = async (label, payload, { bulk = false } = {}) => {
     setActionBusy(label);
@@ -260,8 +275,8 @@ export default function AssetManager({
 
       {notice && <div className={`notice ${notice.kind}`}>{notice.text}</div>}
       {error && <div className="notice err">Asset reconciliation failed: {error}</div>}
-      {!data && loading && <div className="empty">Loading the shared reconciliation view…</div>}
-      {data && (
+      {!scopedData && loading && <div className="empty">Loading the shared reconciliation view…</div>}
+      {scopedData && (
         <>
           <div className="asset-fingerprint-bar">
             <span className="chip blue">{data.media.source}</span>
@@ -273,7 +288,7 @@ export default function AssetManager({
 
           <div className="section-heading"><CheckCircle2 size={14} /> Coverage dashboard</div>
           <div className="asset-coverage-grid">
-            <CoverageCard label={filters.model || "All promoted models"} value={data.coverage.overall} />
+            <CoverageCard label={modelKey === ALL_MODELS ? "All promoted models" : modelKey} value={data.coverage.overall} />
             {(activeModelCoverage?.sections || data.coverage.models).map((row) => (
               <CoverageCard
                 key={row.section_id || row.model_key}
@@ -281,7 +296,7 @@ export default function AssetManager({
                 value={row}
                 onClick={() => row.section_id
                   ? updateFilter("section", row.section_id)
-                  : updateFilter("model", row.model_key)}
+                  : setModelKey(row.model_key)}
               />
             ))}
           </div>
@@ -328,10 +343,6 @@ export default function AssetManager({
           <div className="section-heading"><Images size={14} /> Resolution inbox</div>
           <div className="panel">
             <div className="panel-head asset-filter-bar">
-              <select className="select" value={filters.model} onChange={(e) => updateFilter("model", e.target.value)}>
-                <option value="">All models</option>
-                {models.map((model) => <option key={model.model_key} value={model.model_key}>{model.label}</option>)}
-              </select>
               <select className="select" value={filters.section} onChange={(e) => updateFilter("section", e.target.value)}>
                 <option value="">All sections</option>
                 {data.facets.sections.map((section) => <option key={section} value={section}>{section}</option>)}
@@ -345,7 +356,7 @@ export default function AssetManager({
                 {data.facets.coverage_intents.map((intent) => <option key={intent} value={intent}>{intent}</option>)}
               </select>
               <button className="btn small" type="button" onClick={() => {
-                setFilters({ model: "", section: "", target_type: "", coverage_intent: "", status: "" });
+                setFilters(EMPTY_FILTERS);
                 setOffset(0);
               }}>Clear filters</button>
               <span className="spacer" />
@@ -398,10 +409,24 @@ export default function AssetManager({
               </button>
             </div>
           )}
-          {selected && (
+          {selected && !selectedInScope && (
+            <div className="notice warn">
+              This image decision belongs to {selected.model_key || "the All models queue"},
+              but the visible scope is {modelKey === ALL_MODELS ? "All models" : modelKey}.
+              Switch the visible scope before reviewing or changing it.{" "}
+              <button
+                className="btn small"
+                type="button"
+                onClick={() => setModelKey(selected.model_key || ALL_MODELS)}
+              >
+                Switch the visible scope
+              </button>
+            </div>
+          )}
+          {selected && selectedInScope && (
             <AssetInspector
               item={selected}
-              assignmentTargets={data.assignment_targets || []}
+              assignmentTargets={assignmentTargetsInScope(data.assignment_targets || [], modelKey)}
               fitValues={data.controls?.image_fit || []}
               draftMutable={draftMutable}
               drafted={(data.draft_asset_resolutions?.item_ids || []).includes(selected.id)}

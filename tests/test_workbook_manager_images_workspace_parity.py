@@ -11,15 +11,32 @@ one of those three gaps and states the change that makes it fail again.
 
 from __future__ import annotations
 
+import json
+import subprocess
 import unittest
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SRC = REPO_ROOT / "workbook-manager" / "frontend" / "src"
+ASSET_SCOPE = SRC / "assetScope.js"
 
 
 def _read(*parts: str) -> str:
     return SRC.joinpath(*parts).read_text(encoding="utf-8")
+
+
+def _run_asset_scope(script: str):
+    result = subprocess.run(
+        [
+            "node", "--input-type=module", "--eval",
+            f"import * as scope from {json.dumps(ASSET_SCOPE.as_uri())};" + script,
+        ],
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return json.loads(result.stdout)
 
 
 class TestImagesWorkspaceParity(unittest.TestCase):
@@ -134,6 +151,64 @@ class TestImagesWorkspaceParity(unittest.TestCase):
         every load, before the operator has chosen anything.
         """
         self.assertNotIn("result.queue.items[0]?.id", self.asset_manager)
+
+    def test_images_scope_adapter_distinguishes_one_model_from_explicit_all_models(self):
+        """IMG-SCOPE-01/02: one owner drives queries, decisions, and target choices."""
+        result = _run_asset_scope(
+            "const rows=[{model_key:'stingray'},{model_key:'z06'},{model_key:''}];"
+            "console.log(JSON.stringify({"
+            "oneQuery:scope.reconciliationModel('stingray'),"
+            "allQuery:scope.reconciliationModel(scope.ALL_MODELS),"
+            "oneMatches:rows.map(row=>scope.assetInScope(row,'stingray')) ,"
+            "allMatches:rows.map(row=>scope.assetInScope(row,scope.ALL_MODELS)),"
+            "oneTargets:scope.assignmentTargetsInScope(rows,'z06')"
+            "}));"
+        )
+        self.assertEqual(result["oneQuery"], "stingray")
+        self.assertEqual(result["allQuery"], "")
+        self.assertEqual(result["oneMatches"], [True, False, False])
+        self.assertEqual(result["allMatches"], [True, True, True])
+        self.assertEqual(result["oneTargets"], [{"model_key": "z06"}])
+
+    def test_global_header_owns_the_images_all_models_scope(self):
+        """IMG-SCOPE-01: Images cannot retain a second model selector."""
+        self.assertIn('tab === "assets" && <option value="*">All models</option>', self.app)
+        self.assertIn('navigation.model === "*" && workspace !== "assets"', self.app)
+        filter_bar = self.asset_manager.split('className="panel-head asset-filter-bar"', 1)[1]
+        self.assertNotIn("filters.model", self.asset_manager)
+        self.assertNotIn('<option value="">All models</option>', filter_bar)
+        self.assertIn("model: reconciliationModel(modelKey)", self.asset_manager)
+
+    def test_clear_filters_preserves_the_global_model_scope(self):
+        """IMG-SCOPE-01: clear resets only secondary Images filters."""
+        clear_handler = self.asset_manager.split(">Clear filters</button>", 1)[0].rsplit(
+            'onClick={() => {', 1
+        )[1]
+        self.assertIn("setFilters(EMPTY_FILTERS)", clear_handler)
+        self.assertNotIn("model", clear_handler)
+        self.assertNotIn("setModelKey", clear_handler)
+
+    def test_only_the_latest_model_request_can_replace_visible_images(self):
+        """IMG-SCOPE-03: a slow prior model response cannot overwrite current scope."""
+        self.assertIn("const requestRef = React.useRef(0);", self.asset_manager)
+        self.assertIn("const requestId = ++requestRef.current;", self.asset_manager)
+        self.assertIn("if (requestId !== requestRef.current) return;", self.asset_manager)
+        self.assertIn("dataScope === modelKey ? data : null", self.asset_manager)
+
+    def test_out_of_scope_deep_link_is_refused_until_scope_changes_explicitly(self):
+        """IMG-SCOPE-02: links never switch models or expose cross-scope actions."""
+        self.assertIn("const selectedInScope = assetInScope(selected, modelKey);", self.asset_manager)
+        self.assertIn("This image decision belongs to", self.asset_manager)
+        self.assertIn("Switch the visible scope", self.asset_manager)
+        self.assertIn("onClick={() => setModelKey(selected.model_key || ALL_MODELS)}", self.asset_manager)
+        self.assertIn("{selected && selectedInScope && (", self.asset_manager)
+
+    def test_assignment_targets_follow_the_same_visible_scope(self):
+        """IMG-SCOPE-02: a scoped decision cannot target another model."""
+        self.assertIn(
+            "assignmentTargetsInScope(data.assignment_targets || [], modelKey)",
+            self.asset_manager,
+        )
 
 
 if __name__ == "__main__":
