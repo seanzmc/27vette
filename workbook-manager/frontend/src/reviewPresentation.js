@@ -17,6 +17,24 @@ function attemptMessages(attempt) {
   return errors.filter(Boolean);
 }
 
+// Rollback errors are already copied into the attempt's top-level
+// result.errors by complete_apply_rebuild(). Presenting the same evidence twice
+// obscures it, so combined message lists keep the first occurrence only.
+function dedupeMessages(messages) {
+  const seen = new Set();
+  return messages.filter((message) => {
+    if (seen.has(message)) return false;
+    seen.add(message);
+    return true;
+  });
+}
+
+const MANUAL_RESOLUTION_STATES = new Set([
+  "manually_resolved_restored",
+  "manually_resolved_applied",
+  "abandoned_unknown",
+]);
+
 function outputRollbackState(rebuild) {
   const generated = rebuild?.generated_contracts?.state || "unknown";
   const publication = rebuild?.publication?.state || "unknown";
@@ -25,24 +43,32 @@ function outputRollbackState(rebuild) {
     : `generated contracts ${generated}; publication ${publication}`;
 }
 
-function applyFailureSummary(applyAttempt) {
+function applyFailureSummary(applyAttempt, manualResolution) {
   if (!applyAttempt || applyAttempt.manager_state === "applied") return null;
+  // A recorded manual resolution supersedes the immutable failed attempt: the
+  // recovery verb is no longer available, so never keep advertising it.
+  const resolvedState = MANUAL_RESOLUTION_STATES.has(manualResolution?.manager_state)
+    ? manualResolution.manager_state
+    : null;
   const result = applyAttempt.result || {};
   const rebuild = result.applyRebuild || null;
   const rollback = rebuild?.rollback || {};
-  const errors = [
+  const errors = dedupeMessages([
     ...attemptMessages(applyAttempt),
     ...(rollback.errors || []).map(messageText),
-  ].filter(Boolean);
+  ].filter(Boolean));
   const allowed = new Set(applyAttempt.allowed_verbs || []);
   const restorationIsSafe = applyAttempt.manager_state === "apply_restored_retryable"
     ? rebuild?.workbook?.state === "restored"
       && rollback.state === "verified"
       && rollback.verified === true
     : applyAttempt.manager_state !== "workbook_state_unknown";
-  const safeToRetryOrCancel = restorationIsSafe
+  const safeToRetryOrCancel = !resolvedState
+    && restorationIsSafe
     && (allowed.has("retry_apply") || allowed.has("cancel"));
-  const nextAction = safeToRetryOrCancel
+  const nextAction = resolvedState
+    ? `none; manual recovery recorded (${resolvedState.replaceAll("_", " ")})`
+    : safeToRetryOrCancel
     ? [
         allowed.has("retry_apply") ? "retry apply" : "",
         allowed.has("cancel") ? "cancel" : "",
@@ -76,18 +102,18 @@ export function lifecyclePresentation({
           || `Manual recovery recorded: ${manualResolution.manager_state || "resolved"}`,
       ]
     : [];
-  const messages = [
+  const messages = dedupeMessages([
     ...warnings,
     ...attemptMessages(previewAttempt),
     ...attemptMessages(approvalAttempt),
     ...attemptMessages(applyAttempt),
     ...rollbackErrors,
     ...manualMessages,
-  ];
+  ]);
 
   return {
     empty: messages.length === 0,
     messages,
-    apply_summary: applyFailureSummary(applyAttempt),
+    apply_summary: applyFailureSummary(applyAttempt, manualResolution),
   };
 }

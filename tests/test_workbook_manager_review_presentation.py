@@ -317,6 +317,49 @@ class TestReviewTerminologyAndResults(unittest.TestCase):
         self.assertEqual(result["apply_summary"]["next_action"], "manual recovery")
         self.assertIn("hash mismatch", result["messages"])
 
+    def test_rollback_errors_are_not_presented_twice(self):
+        """APPLY-ERR-01: complete_apply_rebuild already copies rollback errors."""
+        result = _run_presentation(
+            "const attempt={id:'attempt-3',manager_state:'workbook_state_unknown',"
+            "allowed_verbs:['manual_resolution'],result:{ok:false,"
+            "errors:['RuntimeError: forced failure','hash mismatch'],"
+            "applyRebuild:{status:'unknown',workbook:{state:'unknown'},"
+            "generated_contracts:{state:'unknown'},publication:{state:'unknown'},"
+            "rollback:{state:'unknown',verified:false,errors:['hash mismatch']}}}};"
+            "console.log(JSON.stringify(presentation.lifecyclePresentation({applyAttempt:attempt})));"
+        )
+        self.assertEqual(
+            result["messages"],
+            ["RuntimeError: forced failure", "hash mismatch"],
+        )
+        self.assertEqual(result["apply_summary"]["error"], "RuntimeError: forced failure")
+
+    def test_manual_resolution_supersedes_stale_next_action(self):
+        """APPLY-ERR-03: a recorded recovery never keeps advertising recovery."""
+        for state in (
+            "manually_resolved_restored",
+            "manually_resolved_applied",
+            "abandoned_unknown",
+        ):
+            with self.subTest(state=state):
+                result = _run_presentation(
+                    "const attempt={id:'attempt-4',manager_state:'workbook_state_unknown',"
+                    "allowed_verbs:['manual_resolution'],result:{ok:false,"
+                    "errors:['restore failed'],applyRebuild:{status:'unknown',"
+                    "workbook:{state:'unknown'},generated_contracts:{state:'unknown'},"
+                    "publication:{state:'unknown'},"
+                    "rollback:{state:'unknown',verified:false,errors:[]}}}};"
+                    f"const resolution={{id:'res-1',manager_state:{json.dumps(state)},"
+                    "evidence:{note:'operator restored the workbook by hand'}};"
+                    "console.log(JSON.stringify(presentation.lifecyclePresentation("
+                    "{applyAttempt:attempt,manualResolution:resolution})));"
+                )
+                summary = result["apply_summary"]
+                self.assertFalse(summary["safe_to_retry_or_cancel"])
+                self.assertNotEqual(summary["next_action"], "manual recovery")
+                self.assertIn("manual recovery recorded", summary["next_action"])
+                self.assertIn(state.replace("_", " "), summary["next_action"])
+
     def test_review_exposes_mutable_discard_and_rejected_correction(self):
         """DRAFT-01–05: visible actions match the actual lifecycle paths."""
         source = (

@@ -23,15 +23,18 @@ Keep this file small — it is read at the start of every session:
   P1.4–P1.5 / WM-004–WM-005, truthful failure and entity scope presentation.
 - **Active workflow:** Normal repository path.
 - **Branch/commit:** `feat/workbook-manager-checkpoint-1d`; implementation
-  `e663793`; closeout `a45addd`; PR #67 open.
+  `e663793`; closeout `a45addd`; Codex review fixes on top; PR #67 open.
 - **Last completed:** Checkpoint 1D adds operation-backed model context and exact
   operation IDs to each semantic review entity, fail-closes missing/contradictory
   scope, and renders a normalized Apply failure/rollback/next-action summary
   above unchanged immutable attempt evidence.
 - **Current status:** APPLY-ERR-01–03 and SCOPE-01–03 are evidence-backed closed.
-  Checkpoint 1D is pushed and under review in PR #67; required release-candidate
-  CI and Codex finding disposition are green at delivery head `44470a6`.
-- **Validation:** Focused owner 23 passed plus 12 subtests; complete README Manager
+  Both Codex P2 findings on PR #67 are addressed in the presentation adapter:
+  combined message lists deduplicate rollback errors that
+  `complete_apply_rebuild()` already copies into `result.errors`, and a recorded
+  manual resolution supersedes the stale `manual recovery` next action.
+- **Validation:** Focused owner 25 passed plus 15 subtests after the review fixes
+  (was 23 plus 12); frontend build passed; complete README Manager
   checkpoint 371 passed, 2 skipped, 74 subtests. Catalog-selected layered
   validation reported `ok: true` for 21 gates in 122.502 seconds, including the
   frontend build and isolated six-model candidate lane. Isolated Chrome proved
@@ -39,7 +42,7 @@ Keep this file small — it is read at the start of every session:
   no false empty state, unchanged raw attempt JSON, no console errors, and no
   horizontal overflow. Python compilation, diff checks, and protected hashes
   passed.
-- **Next action:** Review PR #67; merge only on explicit user request. Checkpoint
+- **Next action:** Re-review PR #67 after the Codex fixes; merge only on explicit user request. Checkpoint
   1E needs new explicit authorization and must not begin automatically.
 - **Blockers or closeout gaps:** None in Checkpoint 1D implementation or required
   CI; PR #67 review and merge decision remain pending.
