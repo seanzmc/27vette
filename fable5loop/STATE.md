@@ -23,30 +23,27 @@ Keep this file small — it is read at the start of every session:
   P1.6 / WM-006, one visible Images model scope; the 1E review follow-up is
   recorded there.
 - **Active workflow:** Normal repository path.
-- **Branch/commit:** `feat/workbook-manager-checkpoint-1e`; implementation
-  `e41b133`; closeout `f900bd7`; delivery `969fedb`; bulk-scope review fix at
-  HEAD; PR #68 open.
-- **Last completed:** Checkpoint 1E one visible Images model scope, plus the
-  P1 review fix: "Add all safe matches to draft" now sends the effective model
-  (empty = explicit All models) and the server stages only that scope's safe
-  proposals; All-models behavior and the single-item lane are unchanged.
-- **Current status:** IMG-SCOPE-01–03 closed with the bulk lane now inside the
-  same visible-scope contract; the audit-spec 1E follow-up records the finding
-  and fix. All P1 Checkpoints 1A–1E are closed; no P2 work is authorized
-  automatically.
-- **Validation:** For the review fix: frontend production build passed; the
-  Manager serial group ran in one pytest process: 357 passed, 2 skipped, 77
-  subtests in 91.41s, including the new scoped-bulk API test and parity test;
-  diff checks clean. Prior 1E closure evidence at `969fedb`: owner gate 14
-  passed, README Manager checkpoint 379/2/77 in 82.30s, layered 22-gate run
-  `ok: true` 122.893s, isolated Chrome scope proofs. Required
-  release-candidate CI and Codex finding disposition passed at delivery head
-  `969fedb`; the review-fix head is pending CI.
-- **Next action:** Re-review PR #68 for the bulk-scope fix and required CI;
-  merge only on explicit user request. Start P2 only after separate
-  authorization.
-- **Blockers or closeout gaps:** None in implementation; PR review and merge
-  decision remain pending.
+- **Branch/commit:** `feat/workbook-manager-checkpoint-1e`; implementation and
+  review fix at `819f442`; PR #68 open and mergeable.
+- **Last completed:** Checkpoint 1E one visible Images model scope plus its P1
+  review closure. The scoped bulk-safe fix was validated at `819f442`, the
+  responder replied to the exact Codex thread with commit/test evidence, and
+  GitHub readback reports that thread resolved.
+- **Current status:** IMG-SCOPE-01–03 and all P1 Checkpoints 1A–1E are closed.
+  PR #68's implementation and review disposition are complete; no P2 work is
+  authorized automatically.
+- **Validation:** At `819f442`, the Manager serial group passed 381 tests with 2
+  skipped and 77 subtests in 87.23s, including the scoped-bulk API and frontend
+  parity owners; the frontend production build passed. GitHub GraphQL readback
+  on 2026-08-31 reported review thread `PRRT_kwDOSMmCTs6dzmdz`
+  `isResolved: true`; the disposition context and every required
+  release-candidate check passed at that implementation head. The responder
+  poller then returned `{ "wakeAgent": false }`. Read the live PR rollup for
+  the docs-only handoff head before merge.
+- **Next action:** After the live PR rollup is green, merge PR #68 only on
+  explicit user request. Start P2 only after separate authorization.
+- **Blockers or closeout gaps:** None; only the user-controlled merge decision
+  remains.
 - **Protected boundaries:** Canonical workbook, generated runtime contracts,
   `form-app/data.js`, cache-bearing HTML, backend/API contracts, write/apply
   semantics, dealer submission, dependencies, deployment, and WordPress media
