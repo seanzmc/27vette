@@ -1222,5 +1222,6 @@ Each authorized checkpoint appends one concise dated record containing:
 - **2026-08-31 — Checkpoint 1D / P1.4–P1.5 / WM-004–WM-005:** closed by
   implementation `e663793`; acceptance and validation evidence are recorded in
   the checkpoint section above. Closeout `a45addd`; delivery PR #67
-  (`https://github.com/seanzmc/27vette/pull/67`). Checkpoint 1E remains
-  unauthorized.
+  (`https://github.com/seanzmc/27vette/pull/67`). Required release-candidate CI
+  and Codex finding disposition passed at delivery head `44470a6`. Checkpoint 1E
+  remains unauthorized.
