@@ -145,6 +145,78 @@ class TestDurableDraftEditing(unittest.TestCase):
                 projection.close()
                 state.close()
 
+    def test_operation_plan_add_replay_coalesces_to_the_stored_row(self):
+        """Codex P2 (PR 69): a retried add-based plan must not fail with
+        duplicate_record when the first attempt committed but its response
+        was lost; identical replay coalesces to the same durable row."""
+        with tempfile.TemporaryDirectory(prefix="wbm-draft-plan-add-") as raw:
+            projection, state = self._stores(Path(raw))
+            try:
+                context = {
+                    "projection_state": "current",
+                    "base_workbook_sha256": "sha",
+                    "base_workbook_mtime_ns": "1",
+                    "draft_id": "draft-plan-add",
+                    "session_id": "browser",
+                    "actor": "test",
+                }
+                plan = [
+                    {
+                        "table": "options", "model_id": "stingray", "op": "add",
+                        "key": {"option_id": "opt_guided"},
+                        "record": {
+                            "option_id": "opt_guided", "rpo": "GID",
+                            "option_name": "Guided Option", "price": "350",
+                            "section_id": "sec_ext_001", "selectable": "True",
+                            "display_order": "45", "active": "True",
+                        },
+                    },
+                ]
+
+                first = drafts.save_operation_plan(
+                    projection, state, operations=plan, **context
+                )
+                second = drafts.save_operation_plan(
+                    projection, state, operations=plan, **context
+                )
+                self.assertEqual(
+                    [operation["id"] for operation in second],
+                    [operation["id"] for operation in first],
+                )
+                self.assertEqual(second[0]["action"], "add")
+                self.assertEqual(second[0]["final"]["option_name"], "Guided Option")
+                self.assertEqual(
+                    len(drafts.list_operations(state, "draft-plan-add")), 1
+                )
+
+                with self.assertRaises(drafts.DraftError) as ctx:
+                    drafts.save_operation_plan(
+                        projection,
+                        state,
+                        operations=[
+                            {
+                                "table": "options", "model_id": "stingray",
+                                "op": "add",
+                                "key": {"option_id": "opt_guided"},
+                                "record": {
+                                    "option_id": "opt_guided", "rpo": "GID",
+                                    "option_name": "Renamed", "price": "350",
+                                    "section_id": "sec_ext_001",
+                                    "selectable": "True",
+                                    "display_order": "45", "active": "True",
+                                },
+                            },
+                        ],
+                        **context,
+                    )
+                self.assertEqual(ctx.exception.code, "duplicate_record")
+                self.assertEqual(
+                    len(drafts.list_operations(state, "draft-plan-add")), 1
+                )
+            finally:
+                projection.close()
+                state.close()
+
     def test_draft_creation_requires_current_projection(self):
         with tempfile.TemporaryDirectory(prefix="wbm-draft-state-") as raw:
             root = Path(raw)
