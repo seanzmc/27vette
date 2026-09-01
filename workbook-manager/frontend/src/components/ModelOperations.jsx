@@ -180,16 +180,18 @@ export default function ModelOperations({
     if (!dataReady) return null;
     const scrollTop = window.scrollY;
     const key = Object.fromEntries(schema.key.map((k) => [k, String(row[k] ?? "")]));
+    const operationModelId = schema.model_context?.required
+      ? (schema.model_context.value || modelKey)
+      : "";
     const existing = await api.draftOperations(draftId);
     const priorOperation = (existing.operations || []).find((candidate) => (
       candidate.table_name === table
+      && String(candidate.model_id ?? "") === operationModelId
       && Object.keys(key).every((name) => String(candidate.entity_key?.[name] ?? "") === key[name])
     )) || null;
     const operation = await saveDraft({
       table,
-      model_id: schema.model_context?.required
-        ? (schema.model_context.value || modelKey)
-        : "",
+      model_id: operationModelId,
       op: "delete",
       key,
     });
