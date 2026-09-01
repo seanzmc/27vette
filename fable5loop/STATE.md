@@ -18,36 +18,35 @@ Keep this file small — it is read at the start of every session:
 
 ## Current handoff
 
-- **Updated:** 2026-08-31
-- **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 1E /
-  P1.6 / WM-006, one visible Images model scope; the 1E review follow-up is
-  recorded there.
+- **Updated:** 2026-09-01
+- **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 2A /
+  P2.1–P2.4 / WM-007 and WM-008, coordinated graph maintenance and safe raw
+  operations; closure evidence is recorded at the checkpoint.
 - **Active workflow:** Normal repository path.
-- **Branch/commit:** `feat/workbook-manager-checkpoint-1e`; implementation and
-  review fix at `819f442`; PR #68 open and mergeable.
-- **Last completed:** Checkpoint 1E one visible Images model scope plus its P1
-  review closure. The scoped bulk-safe fix was validated at `819f442`, the
-  responder replied to the exact Codex thread with commit/test evidence, and
-  GitHub readback reports that thread resolved.
-- **Current status:** IMG-SCOPE-01–03 and all P1 Checkpoints 1A–1E are closed.
-  PR #68's implementation and review disposition are complete; no P2 work is
-  authorized automatically.
-- **Validation:** At `819f442`, the Manager serial group passed 381 tests with 2
-  skipped and 77 subtests in 87.23s, including the scoped-bulk API and frontend
-  parity owners; the frontend production build passed. GitHub GraphQL readback
-  on 2026-08-31 reported review thread `PRRT_kwDOSMmCTs6dzmdz`
-  `isResolved: true`; the disposition context and every required
-  release-candidate check passed at that implementation head. The responder
-  poller then returned `{ "wakeAgent": false }`. Read the live PR rollup for
-  the docs-only handoff head before merge.
-- **Next action:** After the live PR rollup is green, merge PR #68 only on
-  explicit user request. Start P2 only after separate authorization.
-- **Blockers or closeout gaps:** None; only the user-controlled merge decision
-  remains.
+- **Branch/commit:** `feat/workbook-manager-checkpoint-2a`; implementation
+  `87a2095`; this verified docs closeout is the branch's second commit.
+- **Last completed:** Checkpoint 2A guided option creation, draft-effective
+  connected-delete planning, atomic/idempotent operation-plan save, confirmed
+  no-dependent delete with durable Undo, and in-place Advanced context refresh.
+- **Current status:** GRAPH-01–06 and RAW-01–04 are closed. Checkpoint 2A is at
+  its verified stop boundary; no later P2 checkpoint has begun.
+- **Validation:** Catalog-owned Manager checkpoint: 416 passed, 2 skipped, 77
+  subtests in 92.61s. Validation-catalog/state owners: 40 passed. Frontend build,
+  backend `py_compile`, and `git diff --check` passed. Isolated copied-workbook
+  Chrome proof saved one option plus six explicit OVS rows as seven operations,
+  left a connected plan entirely at Keep, proved raw delete/Undo as `7 → 8 → 7`,
+  retained URL/scroll, reported zero captured console errors, and had 1425/1425
+  document/client width. Protected paths have no diff from `origin/main`.
+- **Next action:** Commit this docs-only receipt, push the task branch, open the
+  PR, and inspect the live required-check/review rollup. Do not begin Checkpoint
+  2B without a new user instruction.
+- **Blockers or closeout gaps:** None before delivery; remote CI/review remain to
+  be observed after PR creation.
 - **Protected boundaries:** Canonical workbook, generated runtime contracts,
-  `form-app/data.js`, cache-bearing HTML, backend/API contracts, write/apply
-  semantics, dealer submission, dependencies, deployment, and WordPress media
-  unchanged.
+  `form-app/data.js`, cache-bearing HTML, write/apply semantics, dealer
+  submission, deployment, and WordPress media unchanged. Manager APIs changed
+  additively for graph context, draft-effective dependency plans, and atomic
+  operation-plan save.
 
 ## Verified facts
 
