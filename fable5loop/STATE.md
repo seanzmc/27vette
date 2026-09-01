@@ -19,43 +19,34 @@ Keep this file small — it is read at the start of every session:
 ## Current handoff
 
 - **Updated:** 2026-09-01
-- **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 2A /
-  P2.1–P2.4 / WM-007 and WM-008, coordinated graph maintenance and safe raw
-  operations; closure evidence is recorded at the checkpoint.
+- **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 2B /
+  P2.5–P2.7 / WM-009, practical and truthful media triage; closure evidence is
+  recorded inline and in §14.
 - **Active workflow:** Normal repository path.
-- **Branch/commit:** `feat/workbook-manager-checkpoint-2a`; implementation
-  `87a2095`; verified docs closeout `eee9557`; PR #69 Codex P2 remediation
-  `465a56d` (shared-root dependency scan), `dbfe8c9` (conditional-reference
-  traversal), `731c3c5` (add-replay plan idempotency), `df4e336` (undo model
-  identity); PR #69 open.
-- **Last completed:** Addressed all four unresolved Codex P2 review threads on
-  PR #69 with one focused commit and a regression test each; replied and
-  resolved each thread after the remote head carried the fixes.
-- **Current status:** GRAPH-01–06 and RAW-01–04 remain closed. Checkpoint 2A
-  review remediation is complete; no later P2 checkpoint has begun.
-- **Validation:** Workbook_manager serial group (15 files, one process):
-  369 passed, 2 skipped, 77 subtests; the single failure
-  (`TestStructureEndpoint::test_structure_update_saves_owned_draft_intent_
-  without_projection_write`) is a pre-existing TestApi env-teardown
-  interaction reproduced identically on base `8c3a13d` with the same test
-  pair. Targeted `changeset_lifecycle + drafts + form_graph` run: 80 passed,
-  36 subtests. `connected_editing` 31 passed; frontend `npm ci && build`
-  green; `git diff --check` and backend `py_compile` clean. New regressions:
-  shared-interior plan classifies 3 `model_interior_scope` + 6
-  `interior_components`; option plans classify `assets`/`default_selection_
-  rules` conditional dependents; identical add-plan replay coalesces while a
-  differing replay still rejects; undo prior-operation lookup matches model
-  identity.
-- **Next action:** Await re-review/merge of PR #69. The pre-existing flake
-  above is the only known open test-isolation defect and needs its own scoped
-  pass; do not begin Checkpoint 2B without a new user instruction.
-- **Blockers or closeout gaps:** None on this remediation; the flake above is
-  reported, not fixed here.
+- **Branch/commit:** `feat/workbook-manager-checkpoint-2b`; implementation
+  `845c105`; verified documentation closeout and PR delivery are in progress.
+- **Last completed:** Closed MEDIA-01–06: replaced the unbounded assignment
+  target select with fingerprint-bound searchable pages, separated empty from
+  API-error/Retry and stale states, preserved the open selection through
+  refresh, and split wildcard presentation from exact/shared ownership.
+- **Current status:** Checkpoint 2B implementation and local exit gate are
+  complete. Exact ownership stages an ordinary model-scoped asset add;
+  ambiguous shared ownership fails closed with its evidence.
+- **Validation:** Complete Manager command: 398 passed, 2 skipped, 77 subtests.
+  Catalog-selected layered run: `ok: true`, 42 gates in 223.549 seconds,
+  including frontend build, isolated six-model candidate, and one-process
+  Manager group (377 passed, 2 skipped, 77 subtests). Focused owners, backend
+  `py_compile`, `git diff --check`, desktop/390x844 isolated Chrome, and
+  protected hash/diff checks passed.
+- **Next action:** Push the verified closeout and open the Checkpoint 2B PR;
+  await review. Do not begin Checkpoint 2C without a new user instruction.
+- **Blockers or closeout gaps:** None before delivery. Remote release-candidate
+  CI and Codex finding disposition will be pending after PR creation.
 - **Protected boundaries:** Canonical workbook, generated runtime contracts,
   `form-app/data.js`, cache-bearing HTML, write/apply semantics, dealer
   submission, deployment, and WordPress media unchanged. Manager APIs changed
-  additively for graph context, draft-effective dependency plans, and atomic
-  operation-plan save.
+  additively only for paged asset lookup and explicit wildcard ownership
+  resolution through ordinary durable draft operations.
 
 ## Verified facts
 

@@ -130,7 +130,12 @@ exact ChangeSet emission, and shared-service preview and approval lifecycles:
   Asset Manager tab presents overall/model/section coverage, distinct status
   queues, lazy thumbnails, current/candidate lineage, broken-image states, and
   a runtime-pinned fit/position/body-style-hover preview. `GET
-  /api/assets/media-options` provides bounded inventory selection. Individual
+  /api/assets/media-options` and `/api/assets/assignment-targets` provide
+  fingerprint-bound, searchable, paged inventory and human-labeled target
+  selection while retaining canonical IDs. Empty results, API failures with
+  Retry, and stale inventory are distinct states. Wildcard-conflict presentation
+  edits are separate from explicit exact/shared ownership operations; ambiguous
+  shared ownership stays blocked with its reason. Individual
   decisions and server-classified safe bulk proposals go through `POST
   /api/drafts/{draft_id}/asset-resolutions` and `/asset-resolutions/safe`; the
   bulk lane carries the effective Images model scope and enforces it
@@ -236,9 +241,11 @@ newline-delimited URL list instead; `WBM_ASSET_MEDIA_TIMEOUT` (default 10),
 2. **Inspect and resolve assets** — Asset Manager consumes the same pure reconciliation
    owner as `scripts/sync_asset_map.py`, then returns fingerprinted,
    server-filtered coverage and resolution pages. Safe proposals, explicit
-   ambiguous choices, stable-inventory/manual assignments, stale deactivation,
-   operational ignores, and fit/position/hover edits enter the active durable
-   draft. Bulk acceptance is server-derived and excludes ambiguous, stale,
+   ambiguous choices, bounded stable-inventory/manual assignment lookup, exact
+   or unambiguous shared wildcard ownership, stale deactivation, operational
+   ignores, and fit/position/hover edits enter the active durable draft. Lookup
+   failures remain retryable errors rather than empty results. Bulk acceptance
+   is server-derived and excludes ambiguous, stale,
    wildcard-conflict, unmatched, and unparseable items. No workbook or media
    write is reachable until the exact approved Apply and Rebuild action.
 3. **Edit durable draft** — Form Structure workspace (models, runtime steps, section

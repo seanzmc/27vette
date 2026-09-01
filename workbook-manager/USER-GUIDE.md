@@ -150,8 +150,17 @@ Select a card or one of the status boxes to narrow the list.
 | **Unparseable media** | The Manager cannot tell what an available image belongs to. | Assign it manually when you know the answer, or ignore that exact image. |
 | **Dead URLs** | A saved image link no longer loads. | Replace it when the Manager offers a clear action. If no action is offered, leave it unresolved and record the item for follow-up. |
 | **Stale targets** | An old image row points to something that is no longer current. | Review it, then use **Add explicit stale-row deactivation** when it should be turned off. |
-| **Wildcard conflicts** | A broad image assignment clashes with a more specific one. | Compare the images and save an intentional display edit only when the correct result is clear. |
+| **Wildcard conflicts** | A broad image assignment clashes with a more specific one. | Treat **Edit presentation only** and **Resolve ownership conflict** as separate decisions. Create exact model ownership when that is the intended owner. Update shared wildcard ownership only when the Manager says every affected model has one unambiguous candidate; otherwise leave the blocked conflict unresolved. |
 | **Ignored media** | That exact image was intentionally skipped earlier. | No action is needed unless the image list changes and it returns for review. |
+
+Image and assignment-target searches return one bounded page at a time. Target
+results lead with the workbook-authored name and retain the canonical ID, model,
+type, and section underneath. **No matches** means the search succeeded with no
+result. A red failure message means the search did not complete; use **Retry**
+instead of treating it as an empty inventory. If the inventory or target
+fingerprint changes, search again before saving. Refreshing reconciliation keeps
+the open item and unsaved candidate/target choice so you can finish or close it
+explicitly.
 
 ### Adjust how an image looks
 
