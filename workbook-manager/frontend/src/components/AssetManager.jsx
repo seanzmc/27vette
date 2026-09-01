@@ -513,6 +513,9 @@ function AssetInspector({
         offset, limit: MEDIA_LOOKUP_PAGE_SIZE,
       });
       setInventoryLookup({ ...result, status: "ready", error: "" });
+      // A successful search replaces the visible result page, so a selection
+      // made on an earlier page or query is dropped unless it is still visible.
+      setInventoryUrl((current) => (result.items.some((option) => option.url === current) ? current : ""));
     } catch (error) {
       setInventoryLookup((current) => ({
         ...current, status: "error", error: error.message,
@@ -526,6 +529,7 @@ function AssetInspector({
         model: reconciliationModel(modelKey), offset, limit: TARGET_LOOKUP_PAGE_SIZE,
       });
       setTargetLookup({ ...result, status: "ready", error: "" });
+      setTargetItemId((current) => (result.items.some((target) => target.item_id === current) ? current : ""));
     } catch (error) {
       setTargetLookup((current) => ({
         ...current, status: "error", error: error.message,
@@ -538,6 +542,14 @@ function AssetInspector({
   const targetsStale = targetLookup.fingerprints
     && targetLookup.fingerprints.reconciliation_sha256
       !== reconciliationFingerprints.reconciliation_sha256;
+  // A stale fingerprint hides the result list; a selection it referenced must
+  // not survive as a hidden ID that keeps the durable action enabled.
+  useEffect(() => {
+    if (inventoryStale) setInventoryUrl("");
+  }, [inventoryStale]);
+  useEffect(() => {
+    if (targetsStale) setTargetItemId("");
+  }, [targetsStale]);
   // §3C dirty contract: the shell must be able to refuse a silent close while
   // unsaved preview, candidate, inventory, or assignment decisions are pending.
   // Preview is compared against the same `initial` it is seeded from; the three
@@ -548,6 +560,14 @@ function AssetInspector({
       || Boolean(selectedCandidate || inventoryUrl || targetItemId),
     [preview, initial, selectedCandidate, inventoryUrl, targetItemId],
   );
+  // Durable lookup actions stage only a selection that belongs to the current
+  // successful, non-stale result page — never a hidden earlier ID.
+  const inventorySelectionCurrent = inventoryLookup.status === "ready"
+    && !inventoryStale
+    && inventoryLookup.items.some((option) => option.url === inventoryUrl);
+  const targetSelectionCurrent = targetLookup.status === "ready"
+    && !targetsStale
+    && targetLookup.items.some((target) => target.item_id === targetItemId);
 
   const resolve = (resolution_kind, extra = {}) => onResolve({
     resolution_kind,
@@ -742,7 +762,7 @@ function AssetInspector({
               <span className="toolbar">
                 <button
                   className="btn primary"
-                  disabled={!draftMutable || !!busy || !inventoryUrl}
+                  disabled={!draftMutable || !!busy || !inventorySelectionCurrent}
                   onClick={() => resolve("inventory_match", {
                     selected_url: inventoryUrl,
                     values: presentationOnly,
@@ -805,7 +825,7 @@ function AssetInspector({
               <span className="toolbar">
                 <button
                   className="btn primary"
-                  disabled={!draftMutable || !!busy || !targetItemId}
+                  disabled={!draftMutable || !!busy || !targetSelectionCurrent}
                   onClick={() => resolve("assign_media", {
                     target_item_id: targetItemId,
                     values: presentationOnly,
