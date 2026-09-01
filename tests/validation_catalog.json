@@ -2600,6 +2600,43 @@
       "notes": "CI passes changed paths through --changed-file-list so spaces are preserved and deleted paths remain classifiable.",
       "collected_tests": 8,
       "baseline_result": "pass"
+    },
+    {
+      "id": "py.test_workbook_manager_spec_governance",
+      "command": ".venv/bin/python -m pytest tests/test_workbook_manager_spec_governance.py -q",
+      "test_files": [
+        "tests/test_workbook_manager_spec_governance.py"
+      ],
+      "layer": 0,
+      "primary_authority": "structural_invariant",
+      "changed_surfaces": [
+        "workbook_manager",
+        "workbook_domain_registry"
+      ],
+      "reads": [
+        "workbook-manager/audit-spec.md",
+        "workbook-manager/wbookMgrAuditRpt.md",
+        "workbook-manager/backend/app/catalog.py",
+        "scripts/corvette_form_generator/workbook_domain/registry.py",
+        "scripts/corvette_form_generator/model_configs.py",
+        "scripts/corvette_form_generator/runtime_metadata.py",
+        "scripts/corvette_form_generator/schema_validation.py",
+        "tests/validation_catalog.json"
+      ],
+      "writes": [],
+      "isolation": "read_only",
+      "generates": false,
+      "hashes_protected_roots": false,
+      "serial_group": null,
+      "ci_policy": "not_run_now",
+      "checkpoint_policy": "changed_surface",
+      "approximate_seconds": 0.37,
+      "acceptance_locks": [],
+      "disposition": "keep",
+      "disposition_reason": "Executable owner of the audit-spec invariants that were prose-only: 23-item ledger equals the audit backlog, finding-to-scenario traceability, checkbox-to-closure correspondence, residual-risk honesty, closure delivery consistency, and a registry-derived family-by-surface matrix in which every cell is positively classified. Each check is proven by a seeded mutation in the same file.",
+      "notes": "Pure text and in-process object checks; imports the Manager catalog and generator role lists but opens no workbook, projection, or server. Measured 0.37 s wall on 2026-09-01.",
+      "collected_tests": 10,
+      "baseline_result": "pass"
     }
   ],
   "suites": [
@@ -2772,6 +2809,7 @@
         "py.test_workbook_manager_generated_parity",
         "py.test_workbook_manager_form_graph",
         "py.test_workbook_manager_import_projection",
+        "py.test_workbook_manager_spec_governance",
         "py.test_workbook_truth"
       ],
       "serial_required": true,

@@ -146,8 +146,14 @@ def test_validator_rejects_stale_catalog_count(tmp_path: Path) -> None:
     copy_scaffold(tmp_path)
     state = state_path(tmp_path)
     text = state.read_text(encoding="utf-8")
-    assert "holds 75 gates" in text
-    state.write_text(text.replace("holds 75 gates", "holds 59 gates"), encoding="utf-8")
+    # Anchor on the live count so an additive catalog gate does not break the
+    # seed; the validator itself is what must notice a stale number.
+    import json
+
+    live = len(json.loads((ROOT / "tests" / "validation_catalog.json").read_text())["gates"])
+    anchor = f"holds {live} gates"
+    assert anchor in text
+    state.write_text(text.replace(anchor, "holds 59 gates"), encoding="utf-8")
     issues = validate(tmp_path)
     assert any("claims 59 gates" in issue for issue in issues), issues
 
