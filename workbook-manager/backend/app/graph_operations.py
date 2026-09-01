@@ -7,7 +7,13 @@ import sqlite3
 from collections import deque
 from typing import Any
 
-from .catalog import SPEC_BY_TABLE, TABLE_SPECS, TableSpec
+from .catalog import (
+    REFERENCE_OPTION_PRESENTATION,
+    SPEC_BY_FAMILY,
+    SPEC_BY_TABLE,
+    TABLE_SPECS,
+    TableSpec,
+)
 
 
 def _truthy(value: Any) -> bool:
@@ -114,6 +120,49 @@ def _identity(spec: TableSpec, row: dict, model_id: str) -> tuple:
     return (spec.table, _row_model(spec, row, model_id), _row_key(spec, row))
 
 
+def _conditional_edges(spec: TableSpec) -> tuple[dict, ...]:
+    """Registered conditional references of one spec as resolved edges.
+
+    Each edge carries the discriminator that activates it, the column holding
+    the referenced value, the concrete target table, and the target column the
+    value resolves against (presentation domains such as ``option_rpos`` match
+    the option RPO rather than the option id).
+    """
+
+    meta = dict(spec.conditional_ref)
+    if not meta:
+        return ()
+    discriminator_column = str(meta.get("discriminator") or "")
+    source_column = str(meta.get("column") or "")
+    if not discriminator_column or not source_column:
+        return ()
+    edges: list[dict] = []
+    for discriminator_value, family in dict(spec.conditional_refs).items():
+        if family is None:
+            continue
+        target = SPEC_BY_FAMILY[family].table if family in SPEC_BY_FAMILY else family
+        presentation = REFERENCE_OPTION_PRESENTATION.get(target)
+        if presentation is None:
+            raise ValueError(
+                f"{spec.table}.{source_column} conditional target {family!r} "
+                "has no reference presentation"
+            )
+        table = str(presentation.get("table") or target)
+        if SPEC_BY_TABLE.get(table) is None:
+            raise ValueError(
+                f"{spec.table}.{source_column} conditional target {family!r} "
+                f"resolves to unknown table {table!r}"
+            )
+        edges.append({
+            "discriminator_column": discriminator_column,
+            "discriminator_value": str(discriminator_value),
+            "column": source_column,
+            "target_table": table,
+            "match_column": str(presentation["value"]),
+        })
+    return tuple(edges)
+
+
 def dependency_plan(
     conn: sqlite3.Connection,
     operations: list[dict],
@@ -152,6 +201,14 @@ def dependency_plan(
     visited = {root_identity}
     queue = deque([(root_spec, root_row, 0)])
     dependents: list[dict] = []
+    conditional_edge_memo: dict[str, tuple[dict, ...]] = {}
+
+    def conditional_edges_for(spec: TableSpec) -> tuple[dict, ...]:
+        cached = conditional_edge_memo.get(spec.table)
+        if cached is None:
+            cached = _conditional_edges(spec)
+            conditional_edge_memo[spec.table] = cached
+        return cached
 
     while queue:
         target_spec, target_row, parent_depth = queue.popleft()
@@ -159,48 +216,86 @@ def dependency_plan(
         if not target_value:
             continue
         for other in TABLE_SPECS:
-            for ref in other.refs:
-                targets = ref.union_tables if ref.scope == "model_union" else (ref.target_table,)
-                if target_spec.table not in targets:
+            direct_columns = [
+                ref.column for ref in other.refs
+                if target_spec.table in (
+                    ref.union_tables if ref.scope == "model_union" else (ref.target_table,)
+                )
+            ]
+            conditional = [
+                edge for edge in conditional_edges_for(other)
+                if edge["target_table"] == target_spec.table
+            ]
+            if not direct_columns and not conditional:
+                continue
+            for row in effective[other.table]:
+                via_field = ""
+                why = ""
+                for column in direct_columns:
+                    if str(row.get(column) or "") != target_value:
+                        continue
+                    via_field = column
+                    why = (
+                        f"{other.table}.{column} references "
+                        f"{target_spec.table}.{target_spec.key[0]}={target_value}"
+                    )
+                    break
+                if not via_field:
+                    row_discriminator = ""
+                    for edge in conditional:
+                        if not row_discriminator:
+                            row_discriminator = str(
+                                row.get(edge["discriminator_column"]) or ""
+                            ).strip().lower()
+                        if row_discriminator != edge["discriminator_value"].strip().lower():
+                            continue
+                        match_value = str(target_row.get(edge["match_column"]) or "")
+                        if not match_value:
+                            continue
+                        if str(row.get(edge["column"]) or "") != match_value:
+                            continue
+                        via_field = edge["column"]
+                        why = (
+                            f"{other.table}.{edge['column']} references "
+                            f"{target_spec.table}.{edge['match_column']}={match_value} "
+                            f"when {edge['discriminator_column']}="
+                            f"{edge['discriminator_value']}"
+                        )
+                        break
+                if not via_field:
                     continue
-                for row in effective[other.table]:
-                    if str(row.get(ref.column) or "") != target_value:
-                        continue
-                    identity = _identity(other, row, model_id)
-                    if identity in visited:
-                        continue
-                    visited.add(identity)
-                    depth = parent_depth + 1
-                    entity_key = {name: str(row.get(name) or "") for name in other.key}
-                    allowed_actions = ["keep", "delete"]
-                    if other.column_by_name("active") is not None and _truthy(row.get("active")):
-                        allowed_actions.append("deactivate")
-                    item = {
-                        "table": other.table,
-                        "family": other.editor_family or other.family,
-                        "model_id": _row_model(other, row, model_id),
-                        "entity_key": entity_key,
-                        "src_sheet": str(row.get("src_sheet") or ""),
-                        "src_row": row.get("src_row"),
-                        "depth": depth,
-                        "classification": "direct" if depth == 1 else "transitive",
-                        "via_field": ref.column,
-                        "why": (
-                            f"{other.table}.{ref.column} references "
-                            f"{target_spec.table}.{target_spec.key[0]}={target_value}"
-                        ),
-                        "parent": {
-                            "table": target_spec.table,
-                            "entity_key": {
-                                name: str(target_row.get(name) or "")
-                                for name in target_spec.key
-                            },
+                identity = _identity(other, row, model_id)
+                if identity in visited:
+                    continue
+                visited.add(identity)
+                depth = parent_depth + 1
+                entity_key = {name: str(row.get(name) or "") for name in other.key}
+                allowed_actions = ["keep", "delete"]
+                if other.column_by_name("active") is not None and _truthy(row.get("active")):
+                    allowed_actions.append("deactivate")
+                item = {
+                    "table": other.table,
+                    "family": other.editor_family or other.family,
+                    "model_id": _row_model(other, row, model_id),
+                    "entity_key": entity_key,
+                    "src_sheet": str(row.get("src_sheet") or ""),
+                    "src_row": row.get("src_row"),
+                    "depth": depth,
+                    "classification": "direct" if depth == 1 else "transitive",
+                    "via_field": via_field,
+                    "why": why,
+                    "parent": {
+                        "table": target_spec.table,
+                        "entity_key": {
+                            name: str(target_row.get(name) or "")
+                            for name in target_spec.key
                         },
-                        "allowed_actions": allowed_actions,
-                        "selected_action": "keep",
-                    }
-                    dependents.append(item)
-                    queue.append((other, row, depth))
+                    },
+                    "allowed_actions": allowed_actions,
+                    "selected_action": "keep",
+                }
+                dependents.append(item)
+                queue.append((other, row, depth))
 
     dependents.sort(
         key=lambda item: (

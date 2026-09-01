@@ -160,6 +160,50 @@ class TestCheckpoint2AGraphPlanning(FormGraphCase):
         )
         self.assertFalse(plan["complete"])
 
+    def test_option_dependency_plan_traverses_registered_conditional_references(self):
+        # Codex P2 (PR 69): assets.target_id (when target_type=option) and
+        # default_selection_rules.condition_id (option-targeting conditions)
+        # are registered conditional references, so deleting the referenced
+        # option must classify them instead of claiming a complete plan.
+        nwi_plan = mainmod.graph_operations.dependency_plan(
+            self.conn,
+            [],
+            table="options",
+            model_id="stingray",
+            key={"option_id": "opt_nwi_001"},
+        )
+        rpo_rule = next(
+            item for item in nwi_plan["dependents"]
+            if item["table"] == "default_selection_rules"
+            and item["entity_key"]["rule_id"] == "default_nga"
+        )
+        self.assertEqual(rpo_rule["via_field"], "condition_id")
+        self.assertIn("when condition_type=unless_selected_rpo", rpo_rule["why"])
+
+        j57_plan = mainmod.graph_operations.dependency_plan(
+            self.conn,
+            [],
+            table="options",
+            model_id="grand_sport",
+            key={"option_id": "opt_j57_001"},
+        )
+        asset_dependent = next(
+            item for item in j57_plan["dependents"] if item["table"] == "assets"
+        )
+        self.assertEqual(asset_dependent["entity_key"]["target_id"], "opt_j57_001")
+        self.assertEqual(asset_dependent["via_field"], "target_id")
+        self.assertIn("when target_type=option", asset_dependent["why"])
+        option_rule = next(
+            item for item in j57_plan["dependents"]
+            if item["table"] == "default_selection_rules"
+            and item["entity_key"]["rule_id"] == "gs_default_j6d_with_j57"
+        )
+        self.assertEqual(option_rule["via_field"], "condition_id")
+        self.assertIn(
+            "when condition_type=when_selected_unless_selected_section",
+            option_rule["why"],
+        )
+
     def test_group_dependency_plan_uses_draft_effective_member_rows(self):
         group_id = "grp_pcx_excludes_blocked_choices"
         base_members = self.conn.execute(
