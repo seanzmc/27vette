@@ -378,7 +378,9 @@ export default function App() {
                   setModelKey={setModelKey}
                   draftId={draftId}
                   draftMutable={draftMutable}
-                  onChanged={refreshManager}
+                  navigation={navigation}
+                  onNavigationChange={commitNavigation}
+                  onChanged={refreshDraftInPlace}
                 />
               </section>
             ) : (

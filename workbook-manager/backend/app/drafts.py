@@ -98,6 +98,21 @@ def _operation_dict(row) -> dict:
     return result
 
 
+def _stored_operation(state_conn: sqlite3.Connection, operation_id: int) -> dict:
+    stored = state_conn.execute(
+        "SELECT * FROM draft_operations WHERE id=?", (operation_id,)
+    ).fetchone()
+    result = _operation_dict(stored)
+    result["asset_resolutions"] = [
+        _asset_resolution_dict(row)
+        for row in state_conn.execute(
+            "SELECT * FROM draft_asset_resolutions WHERE operation_id=? ORDER BY id",
+            (operation_id,),
+        ).fetchall()
+    ]
+    return result
+
+
 REVIEW_SUMMARY_SCHEMA_VERSION = "workbook-manager-review-summary-1"
 
 # §6.1 semantic entity types lead the review grouping; families map to them.
@@ -2502,7 +2517,9 @@ def save_operation(
 
     Individual add/delete operations resolve identity and ownership here, but
     relational validity is intentionally deferred until the complete immutable
-    ChangeSet reaches the shared final-graph preview service.
+    ChangeSet reaches the shared final-graph preview service. A repeated add
+    of an identical record coalesces to the stored add instead of raising
+    ``duplicate_record``, so retried operation plans stay idempotent.
     """
     if projection_state != "current":
         raise DraftError(
@@ -2540,9 +2557,12 @@ def save_operation(
     ).fetchone()
     prior_operation = _operation_dict(prior_row) if prior_row is not None else None
     prior_is_add = prior_operation is not None and prior_operation["action"] == "add"
+    arrived_add = op == "add"
     if op in {"update", "delete"} and row is None and not prior_is_add:
         raise DraftError("record_not_found", "projected record was not found")
-    if op == "add" and (row is not None or prior_operation is not None):
+    if op == "add" and (
+        row is not None or (prior_operation is not None and not prior_is_add)
+    ):
         raise DraftError("duplicate_record", "projected record already exists")
 
     supplied = record or {}
@@ -2619,6 +2639,28 @@ def save_operation(
             "draft operation requires a resolved source sheet and physical key",
         )
     timestamp = _now()
+
+    if prior_is_add and arrived_add:
+        # A replayed add (lost response, double submit) coalesces to the
+        # durable add when its stored intent is identical, keeping operation
+        # plans idempotent; anything else remains a genuine duplicate of an
+        # already-added draft row. An ``update`` merged into a prior add
+        # rewrites ``op`` above and keeps flowing through the normal
+        # coalescing path instead.
+        assert prior_operation is not None
+        if _json(final or {}) != _json(prior_operation.get("final") or {}):
+            raise DraftError("duplicate_record", "projected record already exists")
+        if asset_evidence is not None:
+            _upsert_asset_resolution(
+                state_conn,
+                draft_id=draft_id,
+                operation_id=int(prior_row["id"]),
+                evidence=asset_evidence,
+                timestamp=timestamp,
+            )
+            if manage_transaction:
+                state_conn.commit()
+        return _stored_operation(state_conn, int(prior_row["id"]))
 
     if manage_transaction:
         state_conn.execute("BEGIN IMMEDIATE")
@@ -2757,15 +2799,55 @@ def save_operation(
             state_conn.rollback()
         raise
 
-    stored = state_conn.execute(
-        "SELECT * FROM draft_operations WHERE id=?", (operation_id,)
-    ).fetchone()
-    result = _operation_dict(stored)
-    result["asset_resolutions"] = [
-        _asset_resolution_dict(row)
-        for row in state_conn.execute(
-            "SELECT * FROM draft_asset_resolutions WHERE operation_id=? ORDER BY id",
-            (operation_id,),
-        ).fetchall()
-    ]
-    return result
+    assert operation_id is not None
+    return _stored_operation(state_conn, operation_id)
+
+
+def save_operation_plan(
+    projection_conn: sqlite3.Connection,
+    state_conn: sqlite3.Connection,
+    *,
+    projection_state: str,
+    base_workbook_sha256: str,
+    base_workbook_mtime_ns: str,
+    draft_id: str,
+    operations: list[dict[str, Any]],
+    session_id: str = "",
+    actor: str = "",
+) -> list[dict]:
+    """Store one explicit operation plan atomically on the mutable draft.
+
+    Every member uses the ordinary registered operation contract. A failure in
+    any member rolls the entire plan back; replay coalesces to the same durable
+    rows through ``save_operation``'s existing identity rules.
+    """
+
+    if not operations:
+        raise DraftError("empty_operation_plan", "operation plan must not be empty")
+    state_conn.execute("BEGIN IMMEDIATE")
+    stored: list[dict] = []
+    try:
+        for operation in operations:
+            result = save_operation(
+                projection_conn,
+                state_conn,
+                projection_state=projection_state,
+                base_workbook_sha256=base_workbook_sha256,
+                base_workbook_mtime_ns=base_workbook_mtime_ns,
+                draft_id=draft_id,
+                table=str(operation.get("table") or ""),
+                model_id=str(operation.get("model_id") or ""),
+                op=str(operation.get("op") or ""),
+                key=dict(operation.get("key") or {}),
+                record=operation.get("record"),
+                session_id=session_id,
+                actor=actor,
+                manage_transaction=False,
+            )
+            if result is not None:
+                stored.append(result)
+        state_conn.commit()
+    except Exception:
+        state_conn.rollback()
+        raise
+    return stored

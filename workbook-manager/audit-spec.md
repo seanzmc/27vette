@@ -1,8 +1,8 @@
 # Workbook Manager Audit Remediation Specification
 
-Status: proposed 2026-08-29. This specification resolves the remediation scope
-identified in `wbookMgrAuditRpt.md`; it does not authorize implementation by
-itself. Once implementation is authorized, a checkpoint proceeds under
+Status: Checkpoint 2A closed 2026-09-01. This specification resolves the
+remediation scope identified in `wbookMgrAuditRpt.md`; it does not authorize
+implementation by itself. Once implementation is authorized, a checkpoint proceeds under
 `AGENTS.md` autonomy rules and must still stop at its exit gate before a later
 checkpoint begins; a further explicit approval is required only where a
 checkpoint raises a new product, architectural, or protected-boundary decision,
@@ -156,19 +156,19 @@ cross-draft apply immediately creates a P0 stop and supersedes this sequence.
   directly and eliminate the false “No recorded warnings or failures” state.
 - [x] **P1.5 / WM-005 — Per-entity model scope.** Render operation/entity-specific
   model context; reserve the union for the draft summary.
-- [ ] **P1.6 / WM-006 — Images model scope.** Eliminate disagreement between the
+- [x] **P1.6 / WM-006 — Images model scope.** Eliminate disagreement between the
   global model header and Images filters/results/actions.
 
 ### P2 — required for dependable daily maintenance
 
-- [ ] **P2.1 / WM-008 — Guided option creation.** Create an option together with
+- [x] **P2.1 / WM-008 — Guided option creation.** Create an option together with
   explicit active-variant OVS coverage.
-- [ ] **P2.2 / WM-008 — Dependency-delete planning.** Build an explicit,
+- [x] **P2.2 / WM-008 — Dependency-delete planning.** Build an explicit,
   selectable option/group dependency plan and bulk-draft the chosen ordinary
   operations.
-- [ ] **P2.3 / WM-007 — Raw-delete safety.** Require confirmation or offer an
+- [x] **P2.3 / WM-007 — Raw-delete safety.** Require confirmation or offer an
   immediate, durable Undo before a no-dependent delete remains in the draft.
-- [ ] **P2.4 / WM-007 — Advanced continuity.** Preserve selected model,
+- [x] **P2.4 / WM-007 — Advanced continuity.** Preserve selected model,
   collection, search, page/offset, scroll, and editor context after draft saves.
 - [ ] **P2.5 / WM-009 — Media target lookup.** Replace the 837-item native select
   with bounded searchable/paged assignment-target selection.
@@ -698,6 +698,8 @@ view's model predicate server-side before staging anything.
 
 ### Checkpoint 2A — coordinated graph maintenance and safe raw operations
 
+Authorization gate: fulfilled by the user's explicit approval on 2026-08-31.
+
 Objective: close P2.1, P2.2, P2.3, and P2.4 / WM-007 and WM-008.
 
 Required subpasses:
@@ -721,6 +723,26 @@ partial bulk persistence, or bypassing final-graph validation.
 Exit gate: GRAPH-01–06 and RAW-01–04 pass; isolated browser proof creates one
 option with complete OVS coverage, plans a connected delete without committing
 unselected dependencies, undoes a raw delete, and retains Advanced context.
+
+**Closed 2026-09-01 — implementation `87a2095`.** Registry-derived graph
+planning now enumerates active variants independently of existing OVS rows and
+classifies direct/transitive dependents against the draft-effective graph. The
+Advanced workspace stages one option plus six explicit OVS rows through one
+atomic/idempotent operation plan, leaves every connected-delete action at Keep
+until the operator chooses it, confirms no-dependent deletes, and durably
+restores the immediately undone operation without discarding prior same-row
+intent. Advanced model, collection, query, offset, editor, URL, and scroll
+context refresh in place; final-graph preview remains the write authority.
+
+Exit evidence: the complete catalog-owned Manager checkpoint ran in one process
+with `416 passed, 2 skipped, 77 subtests passed`; frontend build and backend
+`py_compile` passed. Isolated Chrome against a copied workbook observed six
+blank OVS statuses, seven atomically saved operations, an unselected connected
+plan whose only default was Keep, raw-delete operation count `7 → 8 → 7` after
+Undo, preserved Advanced URL/scroll, zero captured console errors, and no
+document overflow at 1440 px. `stingray_master.xlsx`, `form-output/`, and
+`form-app/` have no diff from `origin/main`; protected hashes remained
+`3127e663…` (workbook), `3794c9cd…` (`data.js`), and `370de000…` (`index.html`).
 
 ### Checkpoint 2B — practical and truthful media triage
 

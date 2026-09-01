@@ -18,36 +18,44 @@ Keep this file small — it is read at the start of every session:
 
 ## Current handoff
 
-- **Updated:** 2026-08-31
-- **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 1E /
-  P1.6 / WM-006, one visible Images model scope; the 1E review follow-up is
-  recorded there.
+- **Updated:** 2026-09-01
+- **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 2A /
+  P2.1–P2.4 / WM-007 and WM-008, coordinated graph maintenance and safe raw
+  operations; closure evidence is recorded at the checkpoint.
 - **Active workflow:** Normal repository path.
-- **Branch/commit:** `feat/workbook-manager-checkpoint-1e`; implementation and
-  review fix at `819f442`; PR #68 open and mergeable.
-- **Last completed:** Checkpoint 1E one visible Images model scope plus its P1
-  review closure. The scoped bulk-safe fix was validated at `819f442`, the
-  responder replied to the exact Codex thread with commit/test evidence, and
-  GitHub readback reports that thread resolved.
-- **Current status:** IMG-SCOPE-01–03 and all P1 Checkpoints 1A–1E are closed.
-  PR #68's implementation and review disposition are complete; no P2 work is
-  authorized automatically.
-- **Validation:** At `819f442`, the Manager serial group passed 381 tests with 2
-  skipped and 77 subtests in 87.23s, including the scoped-bulk API and frontend
-  parity owners; the frontend production build passed. GitHub GraphQL readback
-  on 2026-08-31 reported review thread `PRRT_kwDOSMmCTs6dzmdz`
-  `isResolved: true`; the disposition context and every required
-  release-candidate check passed at that implementation head. The responder
-  poller then returned `{ "wakeAgent": false }`. Read the live PR rollup for
-  the docs-only handoff head before merge.
-- **Next action:** After the live PR rollup is green, merge PR #68 only on
-  explicit user request. Start P2 only after separate authorization.
-- **Blockers or closeout gaps:** None; only the user-controlled merge decision
-  remains.
+- **Branch/commit:** `feat/workbook-manager-checkpoint-2a`; implementation
+  `87a2095`; verified docs closeout `eee9557`; PR #69 Codex P2 remediation
+  `465a56d` (shared-root dependency scan), `dbfe8c9` (conditional-reference
+  traversal), `731c3c5` (add-replay plan idempotency), `df4e336` (undo model
+  identity); PR #69 open.
+- **Last completed:** Addressed all four unresolved Codex P2 review threads on
+  PR #69 with one focused commit and a regression test each; replied and
+  resolved each thread after the remote head carried the fixes.
+- **Current status:** GRAPH-01–06 and RAW-01–04 remain closed. Checkpoint 2A
+  review remediation is complete; no later P2 checkpoint has begun.
+- **Validation:** Workbook_manager serial group (15 files, one process):
+  369 passed, 2 skipped, 77 subtests; the single failure
+  (`TestStructureEndpoint::test_structure_update_saves_owned_draft_intent_
+  without_projection_write`) is a pre-existing TestApi env-teardown
+  interaction reproduced identically on base `8c3a13d` with the same test
+  pair. Targeted `changeset_lifecycle + drafts + form_graph` run: 80 passed,
+  36 subtests. `connected_editing` 31 passed; frontend `npm ci && build`
+  green; `git diff --check` and backend `py_compile` clean. New regressions:
+  shared-interior plan classifies 3 `model_interior_scope` + 6
+  `interior_components`; option plans classify `assets`/`default_selection_
+  rules` conditional dependents; identical add-plan replay coalesces while a
+  differing replay still rejects; undo prior-operation lookup matches model
+  identity.
+- **Next action:** Await re-review/merge of PR #69. The pre-existing flake
+  above is the only known open test-isolation defect and needs its own scoped
+  pass; do not begin Checkpoint 2B without a new user instruction.
+- **Blockers or closeout gaps:** None on this remediation; the flake above is
+  reported, not fixed here.
 - **Protected boundaries:** Canonical workbook, generated runtime contracts,
-  `form-app/data.js`, cache-bearing HTML, backend/API contracts, write/apply
-  semantics, dealer submission, dependencies, deployment, and WordPress media
-  unchanged.
+  `form-app/data.js`, cache-bearing HTML, write/apply semantics, dealer
+  submission, deployment, and WordPress media unchanged. Manager APIs changed
+  additively for graph context, draft-effective dependency plans, and atomic
+  operation-plan save.
 
 ## Verified facts
 
