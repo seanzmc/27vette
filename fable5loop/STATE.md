@@ -20,35 +20,38 @@ Keep this file small — it is read at the start of every session:
 
 - **Updated:** 2026-09-01
 - **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 2B /
-  P2.5–P2.7 / WM-009, practical and truthful media triage; closure evidence is
-  recorded inline and in §14.
+  P2.5–P2.7 / WM-009; PR #70 review remediation (Codex P2 review-body finding).
 - **Active workflow:** Normal repository path.
 - **Branch/commit:** `feat/workbook-manager-checkpoint-2b`; implementation
-  `845c105`; verified documentation closeout `e6f14fb`; PR #70
-  (`https://github.com/seanzmc/27vette/pull/70`) open.
-- **Last completed:** Closed MEDIA-01–06: replaced the unbounded assignment
-  target select with fingerprint-bound searchable pages, separated empty from
-  API-error/Retry and stale states, preserved the open selection through
-  refresh, and split wildcard presentation from exact/shared ownership.
-- **Current status:** Checkpoint 2B implementation and local exit gate are
-  complete. Exact ownership stages an ordinary model-scoped asset add;
-  ambiguous shared ownership fails closed with its evidence.
-- **Validation:** Complete Manager command: 398 passed, 2 skipped, 77 subtests.
-  Catalog-selected layered run: `ok: true`, 42 gates in 223.549 seconds,
-  including frontend build, isolated six-model candidate, and one-process
-  Manager group (377 passed, 2 skipped, 77 subtests). Focused owners, backend
-  `py_compile`, `git diff --check`, desktop/390x844 isolated Chrome, and
-  protected hash/diff checks passed.
-- **Next action:** Await PR #70 review and remote release-candidate/Codex
-  finding-disposition results. Do not begin Checkpoint 2C without a new user
-  instruction.
-- **Blockers or closeout gaps:** None locally. Remote release-candidate CI and
-  Codex finding disposition are pending.
+  `845c105`; verified documentation closeout `e6f14fb`; PR #70 review fix
+  `536ab44`; PR #70 (`https://github.com/seanzmc/27vette/pull/70`) open.
+- **Last completed:** Disposed the Codex P2 review-body finding on PR #70:
+  `AssetManager.jsx` target/inventory lookup selections now drop when a
+  successful search replaces the visible page or the lookup goes stale, and
+  "Assign to selected target" / "Use selected inventory image" enable only for
+  a selection belonging to the current successful, non-stale result page. The
+  bot review (PRR_kwDOSMmCTs8AAAABLrkWIg) is marked done via ROCKET reaction,
+  read back `viewerHasReacted: true`.
+- **Current status:** Fix `536ab44` is the PR head. No unresolved Codex
+  P0–P5 threads remain on the repository.
+- **Validation:** Frontend gate `npm --prefix workbook-manager/frontend ci
+  --include=dev && npm run build` passed; `tests/
+  test_workbook_manager_images_workspace_parity.py` 19 passed; `git diff
+  --check` clean; isolated-instance headless-Chrome proof (fresh selection
+  binds, page replace / no-result / failed search / live stale flip via
+  inventory SHA change all clear the selection and disable the action, retry
+  recovers) with zero console errors and no horizontal overflow. Full Manager
+  pytest group not run: frontend-only change, no backend/API surface touched.
+- **Next action:** Await remote release-candidate CI and Codex
+  finding-disposition results on `536ab44`. Do not begin Checkpoint 2C without
+  a new user instruction.
+- **Blockers or closeout gaps:** None locally; remote CI pending at handoff
+  time.
 - **Protected boundaries:** Canonical workbook, generated runtime contracts,
   `form-app/data.js`, cache-bearing HTML, write/apply semantics, dealer
-  submission, deployment, and WordPress media unchanged. Manager APIs changed
-  additively only for paged asset lookup and explicit wildcard ownership
-  resolution through ordinary durable draft operations.
+  submission, deployment, and WordPress media unchanged. The fix is
+  frontend-only selection-state binding; no API, workbook, or generated
+  contract changed.
 
 ## Verified facts
 
