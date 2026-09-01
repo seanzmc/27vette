@@ -19,41 +19,40 @@ Keep this file small — it is read at the start of every session:
 ## Current handoff
 
 - **Updated:** 2026-09-01
-- **Owning specification:** none new — analysis task; findings draft at
-  `docs/wbm-governance-consolidation.md` (task prompt: untracked
-  `docs/wbm-consolidation-prompt.md`). Governs `workbook-manager/audit-spec.md`
-  + `AGENTS.md` consolidation; no ledger item changed.
-- **Active workflow:** PAUSED mid-Phase-5 at user request; resume here.
+- **Owning specification:** none new — analysis-only task. Findings document
+  `docs/wbm-governance-consolidation.md` (11,994 B; task prompt untracked at
+  `docs/wbm-consolidation-prompt.md`). No ledger item, app code, registry,
+  workbook, or generated artifact changed.
+- **Active workflow:** Workbook Manager governance consolidation — COMPLETE,
+  delivered for review. Next repository work is the §7 recommendation below.
+- **Current status:** findings document within prose budget (11,994 B <
+  12,077 B saved); all gates green; PR open, awaiting review.
 - **Branch/commit:** `docs/wbm-governance-consolidation` from `origin/main`
-  `25c7234`; WIP commit on this branch (see `git log -1`); not pushed, no PR.
-- **Last completed:** Phases 1–4 done with evidence in the draft: inventory
-  (12 authorities), 8-conflict register (C1 "closed" vocabulary largest;
-  C2 1C "still coalesces" is a false positive — DRAFT-02 + `drafts.py` test
-  `:296`), cost table (gates ≈2 min local/≤10 min CI; 17 Codex findings on 7
-  PRs after green gates; 20 docs-only spec commits), Phase 3 gate
-  `tests/test_workbook_manager_spec_governance.py` (10 tests, 0.37 s) with RED
-  shown on 3 real-file seeds then reverted, registered additively in
-  `tests/validation_catalog.json` + `suite.full_python_inventory`.
-- **Current status:** Draft is 16,671 B; deletion list saves net 12,043 B
-  (measured, §6). Draft is OVER the prose budget by ~4.6 KB and §7 (next
-  action) is a stub.
-- **Validation:** `test_workbook_manager_spec_governance.py` 10 passed;
-  `test_catalog_change_scope.py` + `test_validation_catalog.py` 57 passed;
-  `scripts/catalog_change_scope.py --base origin/main --head` → `full: false,
-  gate(s) added`; Manager serial group (catalog 15-file command) 377 passed,
-  2 skipped, 77 subtests, 91.36 s; `git diff --check` clean at commit.
-- **Next action:** (1) cut draft §1–§3 prose to < 12,043 B — tables can
-  shrink to path/line + one-clause cells; (2) write §7: recommend one docs-only
-  PR applying §6 verbatim with the new gate as guard, before Checkpoint 2C;
-  argue vs matrix-first / 2C-first; (3) optional +30 lines: pin per-family
-  Manager surface in `family_surface_matrix` (resume item noted in §5);
-  (4) `scripts/validate_state_handoff.py`, `git diff --check`, push, open PR
-  to `main` (do not merge).
-- **Blockers or closeout gaps:** none; catalog `owning_specification` points
-  at an archived path (C8) — fix in a catalog-only commit, not here.
-- **Protected boundaries:** No application code, registry, workbook,
-  generated artifact, `form-app/data.js`, dealer, deployment, or WordPress
-  change. Only new files: the test, the draft, plus the additive catalog gate.
+  `25c7234`; PR open to `main` (URL in the PR list); not merged.
+- **Last completed:** Phases 1–5. Inventory (12 authorities), 8-conflict
+  register (C1 "closed" vocabulary largest; C2 1C "still coalesces" is a false
+  positive — DRAFT-02 + `test_workbook_manager_drafts.py:296`), measured cost
+  table (gates ≈2 min local/≤10 min CI; 17 Codex findings on 7 PRs after green
+  gates; 20 docs-only spec commits), structural finding (registry hypothesis
+  partly wrong; drift surfaces are `MODEL_COLLECTIONS`/roles/`REQUIRED_SHEETS`),
+  deletion list (net −12,077 B measured), §7 next action. New gate
+  `tests/test_workbook_manager_spec_governance.py` (10 tests, 0.11 s) incl.
+  per-family Manager-surface pin (15 Advanced / 10 structure / 1 read-only);
+  RED shown on 3 real-file seeds then reverted, 12 more seeds in-file.
+- **Validation:** spec_governance 10 passed; `test_state_handoff` +
+  `test_catalog_change_scope` + `test_validation_catalog` 71 passed;
+  `catalog_change_scope.py` base→head `full: false, gate(s) added`; Manager
+  serial group 377 passed/2 skipped/77 subtests 91.36 s;
+  `validate_state_handoff.py` passed; `git diff --check` clean.
+- **Next action:** per findings §7 — one docs-only PR applying deletion list
+  §6 verbatim to `workbook-manager/audit-spec.md` and `AGENTS.md`, guarded by
+  the new gate (it forces the 1A/2A PR additions and removal of the `{1A, 2A}`
+  exception). Then Checkpoint 2C.
+- **Blockers or closeout gaps:** none. Latent: catalog `owning_specification`
+  points at an archived path (C8) — catalog-only fix; `test_state_handoff.py`
+  seed anchor now derives the gate count from the live catalog (was literal 75).
+- **Protected boundaries:** dealer submission, deployment, workbook, generated
+  artifacts, `form-app/data.js`, WordPress — untouched.
 
 ## Verified facts
 

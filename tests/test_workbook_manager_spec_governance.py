@@ -376,6 +376,26 @@ def family_surface_matrix(
 # is out of scope here; the cell is classified rather than left blank.
 KNOWN_UNCHECKED_HEADER_ROLES = frozenset({"color_overrides_sheet", "variant_option_overrides_sheet"})
 
+# Where each registry family is exposed in the Manager today (verified against
+# the live matrix 2026-09-01). Moving a family between surfaces is a product
+# decision (audit §2, P2.9 PRES-01/05), so it must be made here explicitly
+# rather than by editing MODEL_COLLECTIONS / structure_specs() alone.
+PINNED_MANAGER_SURFACE = {
+    "advanced_collection": frozenset({
+        "asset_map", "color_overrides", "default_selection_rules", "exclusive_groups",
+        "exclusive_members", "interior_components", "interiors", "model_interior_scope",
+        "options", "ovs", "price_rules", "rule_group_members", "rule_groups",
+        "rule_mapping", "variant_overrides",
+    }),
+    "structure_index": frozenset({
+        "context_section_master_meta", "model_master", "model_registry_promotion",
+        "model_variants", "model_workbook_sources", "order_summary_sections_meta",
+        "runtime_steps_meta", "section_presentation_meta", "step_order_summary_map_meta",
+        "variant_master",
+    }),
+    "shared_read_only": frozenset({"sections"}),
+}
+
 
 def check_family_matrix_is_fully_classified(matrix: dict[str, dict[str, str]]) -> None:
     unchecked = {
@@ -386,6 +406,16 @@ def check_family_matrix_is_fully_classified(matrix: dict[str, dict[str, str]]) -
         f"{sorted(unchecked ^ KNOWN_UNCHECKED_HEADER_ROLES)}"
     )
     assert len(matrix) == len(registry.EDITOR_SHEET_META) + len(registry.READONLY_SHEET_META)
+    live = {
+        surface: frozenset(f for f, row in matrix.items() if row["manager_surface"] == surface)
+        for surface in PINNED_MANAGER_SURFACE
+    }
+    drift = {
+        surface: sorted(live[surface] ^ PINNED_MANAGER_SURFACE[surface])
+        for surface in PINNED_MANAGER_SURFACE
+        if live[surface] != PINNED_MANAGER_SURFACE[surface]
+    }
+    assert not drift, f"family moved between Manager surfaces; re-pin deliberately: {drift}"
 
 
 # --- tests against the live repository ----------------------------------------
@@ -501,4 +531,13 @@ def test_checks_fail_on_seeded_violations(spec_lines, audit_text):
     with pytest.raises(AssertionError):
         check_family_matrix_is_fully_classified(
             family_surface_matrix(header_match_roles=tuple(registry.SOURCE_ROLE_FAMILIES))
+        )
+    # §9 / P2.9: a family silently moved from Advanced to the structure index
+    # (dropped from MODEL_COLLECTIONS and given a structure spec) must re-pin.
+    with pytest.raises(AssertionError, match="moved between Manager surfaces"):
+        check_family_matrix_is_fully_classified(
+            family_surface_matrix(
+                model_collections=tuple(t for t in manager_catalog.MODEL_COLLECTIONS if t != "pricing"),
+                structure_tables=tuple(manager_catalog.STRUCTURE_TABLES) + ("pricing",),
+            )
         )
