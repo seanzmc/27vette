@@ -1672,3 +1672,82 @@ def test_asset_manager_snapshot_is_typed_parity_view_with_candidates_and_fingerp
     assert changed.fingerprints["workbook_sha256"] == snapshot.fingerprints["workbook_sha256"]
     assert changed.fingerprints["media_inventory_sha256"] != snapshot.fingerprints["media_inventory_sha256"]
     assert changed.fingerprints["reconciliation_sha256"] != snapshot.fingerprints["reconciliation_sha256"]
+
+
+def test_asset_manager_lookup_helpers_page_media_and_human_labeled_targets(
+    tmp_path: Path,
+) -> None:
+    workbook_path = tmp_path / "asset-manager-lookups.xlsx"
+    make_coverage_workbook(workbook_path)
+    urls = [
+        "https://example.test/27vette/c-abc.png",
+        "https://example.test/27vette/c-dsp.png",
+        "https://example.test/27vette/c-req-a.png",
+        "https://example.test/27vette/c-req-b.png",
+    ]
+    snapshot = asset_map_sync.build_asset_manager_snapshot(
+        workbook_path, urls, media_source="fixture"
+    )
+
+    media = asset_map_sync.search_asset_manager_media(
+        snapshot, "c-", offset=1, limit=2
+    )
+    assert media["total"] == 4
+    assert media["offset"] == 1
+    assert media["limit"] == 2
+    assert [item["label"] for item in media["items"]] == ["c-dsp", "c-req-a"]
+
+    targets = asset_map_sync.search_asset_manager_targets(
+        snapshot, "existing row", model_key="stingray", offset=0, limit=1
+    )
+    assert targets["total"] == 1
+    assert targets["offset"] == 0
+    assert targets["limit"] == 1
+    assert targets["items"] == [{
+        "item_id": targets["items"][0]["item_id"],
+        "label": "Existing Row",
+        "canonical_id": "opt_exist_001",
+        "model_key": "stingray",
+        "section_id": "sec_opt_001",
+        "target_type": "option",
+        "target_id": "opt_exist_001",
+        "rpo": "exi",
+    }]
+
+
+def test_wildcard_ownership_resolution_distinguishes_exact_and_shared_paths() -> None:
+    items = [
+        {
+            "id": "stingray-z51", "kind": "target", "status": "wildcard_conflict",
+            "model_key": "stingray", "target_type": "option", "target_id": "opt_z51",
+            "current_values": {"model_key": "*", "image_url": "shared-old.png"},
+            "proposed_values": {"image_url": "stingray-new.png"},
+        },
+        {
+            "id": "z06-z51", "kind": "target", "status": "wildcard_conflict",
+            "model_key": "z06", "target_type": "option", "target_id": "opt_z51",
+            "current_values": {"model_key": "*", "image_url": "shared-old.png"},
+            "proposed_values": {"image_url": "z06-new.png"},
+        },
+    ]
+
+    asset_map_sync.add_wildcard_ownership_resolution(items)
+
+    resolution = items[0]["ownership_resolution"]
+    assert resolution["shared_owner"] == {
+        "model_key": "*", "target_type": "option", "target_id": "opt_z51",
+        "image_url": "shared-old.png",
+    }
+    assert resolution["current_exact_owner"] is None
+    assert resolution["affected_models"] == ["stingray", "z06"]
+    assert resolution["exact_operation"]["allowed"] is True
+    assert resolution["shared_operation"]["allowed"] is False
+    assert "different candidate URLs" in resolution["shared_operation"]["blocked_reason"]
+
+    items[1]["proposed_values"]["image_url"] = "stingray-new.png"
+    asset_map_sync.add_wildcard_ownership_resolution(items)
+    assert items[0]["ownership_resolution"]["shared_operation"] == {
+        "allowed": True,
+        "candidate_url": "stingray-new.png",
+        "blocked_reason": "",
+    }

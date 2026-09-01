@@ -25,7 +25,8 @@ for p in (str(BACKEND), str(REPO_ROOT / "scripts")):
         sys.path.insert(0, p)
 
 from app import db as dbmod                     # noqa: E402
-from app import naming, staging, sync as syncmod  # noqa: E402
+from app import asset_resolutions, naming, staging, sync as syncmod  # noqa: E402
+from corvette_form_generator.asset_map_sync import AssetManagerSnapshot  # noqa: E402
 from app.catalog import (  # noqa: E402
     SPEC_BY_TABLE,
     TABLE_SPECS,
@@ -213,6 +214,64 @@ class TestNaming(unittest.TestCase):
     def test_unconfirmed_prefix_is_not_stripped(self):
         self.assertEqual(naming.strip_prefix("sec_pain_001", ("opt_",)),
                          ("", "sec_pain_001"))
+
+
+class TestAssetWildcardResolution(unittest.TestCase):
+    def _snapshot(self, shared_allowed: bool) -> AssetManagerSnapshot:
+        candidate_url = "https://example.test/stingray-z51.png"
+        item = {
+            "id": "stingray-z51", "kind": "target", "status": "wildcard_conflict",
+            "model_key": "stingray", "target_type": "option", "target_id": "opt_z51",
+            "workbook_target": {
+                "model_key": "stingray", "target_type": "option", "target_id": "opt_z51",
+            },
+            "current_values": {
+                "model_key": "*", "image_url": "https://example.test/shared-z51.png",
+            },
+            "proposed_values": {"image_url": candidate_url},
+            "candidate": {},
+            "ownership_resolution": {
+                "exact_operation": {
+                    "allowed": True, "candidate_url": candidate_url, "blocked_reason": "",
+                },
+                "shared_operation": {
+                    "allowed": shared_allowed,
+                    "candidate_url": candidate_url if shared_allowed else "",
+                    "blocked_reason": "Affected models have different candidate URLs.",
+                },
+            },
+        }
+        return AssetManagerSnapshot(
+            fingerprints={}, media={}, coverage_ruleset={}, items=(item,),
+            action_counts={}, media_urls=(),
+        )
+
+    def test_exact_wildcard_resolution_emits_an_ordinary_model_add(self):
+        _target, key, record, op, evidence = asset_resolutions._prepare_operation(
+            self._snapshot(False),
+            item_id="stingray-z51",
+            resolution_kind="resolve_wildcard_exact",
+            selected_url="",
+            target_item_id="",
+            values={"image_fit": "cover", "image_position": "center"},
+        )
+        self.assertEqual(op, "add")
+        self.assertEqual(key, {
+            "model_key": "stingray", "target_type": "option", "target_id": "opt_z51",
+        })
+        self.assertEqual(record["image_url"], "https://example.test/stingray-z51.png")
+        self.assertEqual(evidence["resolution_kind"], "resolve_wildcard_exact")
+
+    def test_ambiguous_shared_wildcard_resolution_is_refused(self):
+        with self.assertRaisesRegex(Exception, "different candidate URLs"):
+            asset_resolutions._prepare_operation(
+                self._snapshot(False),
+                item_id="stingray-z51",
+                resolution_kind="resolve_wildcard_shared",
+                selected_url="",
+                target_item_id="",
+                values={},
+            )
 
 
 class TestStagingWorkflow(ImportedWorkbookCase):
@@ -1002,6 +1061,37 @@ class TestApi(unittest.TestCase):
         else:
             os.environ["WBM_PROJECTION_DB"] = cls.previous_projection_env
         shutil.rmtree(cls.tmpdir, ignore_errors=True)
+
+    def test_asset_lookup_endpoints_are_fingerprint_bound_searchable_and_paged(self):
+        self.mainmod.asset_workspace.clear_cache()
+        media = self.client.get(
+            "/api/assets/media-options",
+            params={"query": "", "offset": 1, "limit": 2},
+        )
+        self.assertEqual(media.status_code, 200, media.text)
+        self.assertGreater(media.json()["total"], 2)
+        self.assertEqual(media.json()["offset"], 1)
+        self.assertEqual(media.json()["limit"], 2)
+        self.assertEqual(len(media.json()["items"]), 2)
+
+        targets = self.client.get(
+            "/api/assets/assignment-targets",
+            params={
+                "model": "stingray", "query": "z51", "offset": 0, "limit": 2,
+            },
+        )
+        self.assertEqual(targets.status_code, 200, targets.text)
+        self.assertGreater(targets.json()["total"], 0)
+        self.assertLessEqual(len(targets.json()["items"]), 2)
+        self.assertTrue(all(
+            item["model_key"] == "stingray"
+            and item["label"]
+            and item["canonical_id"]
+            for item in targets.json()["items"]
+        ))
+        self.assertEqual(
+            targets.json()["fingerprints"], media.json()["fingerprints"]
+        )
 
     def test_checkpoint_2a_graph_and_atomic_plan_api(self):
         variants = self.client.get("/api/graph/option-create/z06")

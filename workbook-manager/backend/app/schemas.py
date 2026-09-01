@@ -68,7 +68,7 @@ class ManualResolutionRequest(BaseModel):
 class AssetResolutionRequest(BaseModel):
     item_id: str
     resolution_kind: str = Field(
-        pattern="^(accept_safe|select_candidate|inventory_match|manual_url|assign_media|edit|deactivate|ignore)$"
+        pattern="^(accept_safe|select_candidate|inventory_match|manual_url|assign_media|edit|resolve_wildcard_exact|resolve_wildcard_shared|deactivate|ignore)$"
     )
     fingerprints: dict[str, str]
     selected_url: str = ""

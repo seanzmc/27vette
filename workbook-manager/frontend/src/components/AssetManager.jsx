@@ -7,11 +7,13 @@ import {
 } from "lucide-react";
 import { api } from "../api.js";
 import {
-  ALL_MODELS, assetInScope, assignmentTargetsInScope, reconciliationModel,
+  ALL_MODELS, assetInScope, reconciliationModel,
 } from "../assetScope.js";
 
 const PAGE_SIZE = 24;
 const LINK_LOOKUP_PAGE_SIZE = 100;
+const MEDIA_LOOKUP_PAGE_SIZE = 12;
+const TARGET_LOOKUP_PAGE_SIZE = 12;
 const EMPTY_FILTERS = {
   section: "", target_type: "", coverage_intent: "", status: "",
 };
@@ -194,7 +196,12 @@ export default function AssetManager({
       return undefined;
     }
     let cancelled = false;
-    setLinkedAsset({ id: selectedId, item: null, loading: true, error: "" });
+    setLinkedAsset((current) => ({
+      id: selectedId,
+      item: current.id === selectedId ? current.item : null,
+      loading: true,
+      error: "",
+    }));
     findLinkedAsset(selectedId, draftId)
       .then((item) => {
         if (!cancelled) setLinkedAsset({ id: selectedId, item, loading: false, error: "" });
@@ -426,7 +433,8 @@ export default function AssetManager({
           {selected && selectedInScope && (
             <AssetInspector
               item={selected}
-              assignmentTargets={assignmentTargetsInScope(data.assignment_targets || [], modelKey)}
+              modelKey={modelKey}
+              reconciliationFingerprints={data.fingerprints}
               fitValues={data.controls?.image_fit || []}
               draftMutable={draftMutable}
               drafted={(data.draft_asset_resolutions?.item_ids || []).includes(selected.id)}
@@ -445,7 +453,8 @@ export default function AssetManager({
 }
 
 function AssetInspector({
-  item, assignmentTargets, fitValues, draftMutable, drafted, busy, onResolve, onClose,
+  item, modelKey, reconciliationFingerprints, fitValues, draftMutable, drafted,
+  busy, onResolve, onClose,
 }) {
   const initial = useMemo(() => ({
     ...item.proposed_values,
@@ -460,17 +469,24 @@ function AssetInspector({
   const [selectedCandidate, setSelectedCandidate] = useState("");
   const [targetItemId, setTargetItemId] = useState("");
   const [inventoryQuery, setInventoryQuery] = useState("");
-  const [inventory, setInventory] = useState([]);
+  const [inventoryLookup, setInventoryLookup] = useState({
+    status: "idle", error: "", items: [], total: 0, offset: 0, fingerprints: null,
+  });
   const [inventoryUrl, setInventoryUrl] = useState("");
-  const [searching, setSearching] = useState(false);
+  const [targetQuery, setTargetQuery] = useState("");
+  const [targetLookup, setTargetLookup] = useState({
+    status: "idle", error: "", items: [], total: 0, offset: 0, fingerprints: null,
+  });
   useEffect(() => {
     setPreview(initial);
     setShowHover(false);
     setSelectedCandidate("");
     setTargetItemId("");
-    setInventory([]);
+    setInventoryLookup({ status: "idle", error: "", items: [], total: 0, offset: 0, fingerprints: null });
     setInventoryUrl("");
-  }, [initial]);
+    setTargetQuery("");
+    setTargetLookup({ status: "idle", error: "", items: [], total: 0, offset: 0, fingerprints: null });
+  }, [item.id]);
   const displayed = showHover && preview.hover_image_url
     ? { ...preview, image_url: preview.hover_image_url, image_alt: preview.hover_image_alt, image_position: preview.hover_image_position }
     : preview;
@@ -490,15 +506,38 @@ function AssetInspector({
   const presentationOnly = { ...resolutionValues };
   delete presentationOnly.image_url;
   delete presentationOnly.hover_image_url;
-  const searchInventory = async () => {
-    setSearching(true);
+  const searchInventory = async (offset = 0) => {
+    setInventoryLookup((current) => ({ ...current, status: "loading", error: "" }));
     try {
-      const result = await api.assetMediaOptions(inventoryQuery, 50);
-      setInventory(result.items || []);
-    } finally {
-      setSearching(false);
+      const result = await api.assetMediaOptions(inventoryQuery, {
+        offset, limit: MEDIA_LOOKUP_PAGE_SIZE,
+      });
+      setInventoryLookup({ ...result, status: "ready", error: "" });
+    } catch (error) {
+      setInventoryLookup((current) => ({
+        ...current, status: "error", error: error.message,
+      }));
     }
   };
+  const searchTargets = async (offset = 0) => {
+    setTargetLookup((current) => ({ ...current, status: "loading", error: "" }));
+    try {
+      const result = await api.assetAssignmentTargets(targetQuery, {
+        model: reconciliationModel(modelKey), offset, limit: TARGET_LOOKUP_PAGE_SIZE,
+      });
+      setTargetLookup({ ...result, status: "ready", error: "" });
+    } catch (error) {
+      setTargetLookup((current) => ({
+        ...current, status: "error", error: error.message,
+      }));
+    }
+  };
+  const inventoryStale = inventoryLookup.fingerprints
+    && inventoryLookup.fingerprints.media_inventory_sha256
+      !== reconciliationFingerprints.media_inventory_sha256;
+  const targetsStale = targetLookup.fingerprints
+    && targetLookup.fingerprints.reconciliation_sha256
+      !== reconciliationFingerprints.reconciliation_sha256;
   // §3C dirty contract: the shell must be able to refuse a silent close while
   // unsaved preview, candidate, inventory, or assignment decisions are pending.
   // Preview is compared against the same `initial` it is seeded from; the three
@@ -671,17 +710,34 @@ function AssetInspector({
               <label>Search stable media inventory
                 <span className="toolbar compact-toolbar">
                   <input className="text" value={inventoryQuery} onChange={(e) => setInventoryQuery(e.target.value)} placeholder="RPO or filename" />
-                  <button className="btn small" type="button" disabled={searching} onClick={searchInventory}>Search</button>
+                  <button className="btn small" type="button" disabled={inventoryLookup.status === "loading"} onClick={() => searchInventory(0)}>Search</button>
                 </span>
               </label>
-              {inventory.length > 0 && (
+              {inventoryLookup.status === "loading" && <div className="notice">Searching media inventory…</div>}
+              {inventoryLookup.status === "error" && (
+                <div className="notice err">Inventory search failed: {inventoryLookup.error}{" "}
+                  <button className="btn small" type="button" onClick={() => searchInventory(inventoryLookup.offset)}>Retry inventory search</button>
+                </div>
+              )}
+              {inventoryStale && <div className="notice warn">The media inventory changed. Search again before selecting an image.</div>}
+              {inventoryLookup.status === "ready" && !inventoryLookup.items.length && (
+                <div className="empty">No inventory images match this search.</div>
+              )}
+              {inventoryLookup.items.length > 0 && !inventoryStale && (
                 <select className="select" value={inventoryUrl} onChange={(e) => {
                   setInventoryUrl(e.target.value);
                   if (e.target.value) setPreview({ ...preview, image_url: e.target.value });
                 }}>
                   <option value="">Select an inventory image</option>
-                  {inventory.map((option) => <option key={option.url} value={option.url}>{option.label} · {option.url}</option>)}
+                  {inventoryLookup.items.map((option) => <option key={option.url} value={option.url}>{option.label} · {option.url}</option>)}
                 </select>
+              )}
+              {inventoryLookup.status === "ready" && inventoryLookup.total > 0 && (
+                <span className="toolbar">
+                  <button className="btn small" type="button" disabled={!inventoryLookup.offset} onClick={() => searchInventory(Math.max(0, inventoryLookup.offset - MEDIA_LOOKUP_PAGE_SIZE))}>Previous inventory</button>
+                  <span>{inventoryLookup.offset + 1}–{Math.min(inventoryLookup.offset + MEDIA_LOOKUP_PAGE_SIZE, inventoryLookup.total)} of {inventoryLookup.total}</span>
+                  <button className="btn small" type="button" disabled={inventoryLookup.offset + MEDIA_LOOKUP_PAGE_SIZE >= inventoryLookup.total} onClick={() => searchInventory(inventoryLookup.offset + MEDIA_LOOKUP_PAGE_SIZE)}>Next inventory</button>
+                </span>
               )}
               <span className="toolbar">
                 <button
@@ -706,15 +762,46 @@ function AssetInspector({
           {["unmatched", "unparseable"].includes(item.status) && (
             <div className="asset-resolution-stack">
               <label>Assign media to an existing promoted target
-                <select className="select" value={targetItemId} onChange={(e) => setTargetItemId(e.target.value)}>
-                  <option value="">Select workbook target</option>
-                  {assignmentTargets.map((target) => (
-                    <option key={target.item_id} value={target.item_id}>
-                      {target.model_key} · {target.rpo || target.target_id} · {target.label}
-                    </option>
-                  ))}
-                </select>
+                <span className="toolbar compact-toolbar">
+                  <input className="text" value={targetQuery} onChange={(e) => setTargetQuery(e.target.value)} placeholder="Name, RPO, or canonical ID" />
+                  <button className="btn small" type="button" disabled={targetLookup.status === "loading"} onClick={() => searchTargets(0)}>Search targets</button>
+                </span>
               </label>
+              {targetLookup.status === "loading" && <div className="notice">Searching assignment targets…</div>}
+              {targetLookup.status === "error" && (
+                <div className="notice err">Target search failed: {targetLookup.error}{" "}
+                  <button className="btn small" type="button" onClick={() => searchTargets(targetLookup.offset)}>Retry target search</button>
+                </div>
+              )}
+              {targetsStale && <div className="notice warn">The target list changed. Search again before assigning media.</div>}
+              {targetLookup.status === "ready" && !targetLookup.items.length && (
+                <div className="empty">No workbook targets match this search.</div>
+              )}
+              {targetLookup.items.length > 0 && !targetsStale && (
+                <div className="asset-target-results" role="radiogroup" aria-label="Assignment targets">
+                  {targetLookup.items.map((target) => (
+                    <button
+                      className={targetItemId === target.item_id ? "selected" : ""}
+                      type="button"
+                      role="radio"
+                      aria-checked={targetItemId === target.item_id}
+                      key={target.item_id}
+                      onClick={() => setTargetItemId(target.item_id)}
+                    >
+                      <strong>{target.label}</strong>
+                      <span className="mono">{target.canonical_id}</span>
+                      <small>{target.model_key} · {target.target_type} · {target.section_id}</small>
+                    </button>
+                  ))}
+                </div>
+              )}
+              {targetLookup.status === "ready" && targetLookup.total > 0 && (
+                <span className="toolbar">
+                  <button className="btn small" type="button" disabled={!targetLookup.offset} onClick={() => searchTargets(Math.max(0, targetLookup.offset - TARGET_LOOKUP_PAGE_SIZE))}>Previous targets</button>
+                  <span>{targetLookup.offset + 1}–{Math.min(targetLookup.offset + TARGET_LOOKUP_PAGE_SIZE, targetLookup.total)} of {targetLookup.total}</span>
+                  <button className="btn small" type="button" disabled={targetLookup.offset + TARGET_LOOKUP_PAGE_SIZE >= targetLookup.total} onClick={() => searchTargets(targetLookup.offset + TARGET_LOOKUP_PAGE_SIZE)}>Next targets</button>
+                </span>
+              )}
               <span className="toolbar">
                 <button
                   className="btn primary"
@@ -741,10 +828,43 @@ function AssetInspector({
               })}
             ><Ban size={14} /> Add explicit stale-row deactivation</button>
           )}
-          {["covered", "wildcard_conflict"].includes(item.status) && (
+          {item.status === "covered" && (
             <button className="btn primary" disabled={!draftMutable || !!busy} onClick={() => resolve("edit")}>
               <Save size={14} /> Save presentation edits to draft
             </button>
+          )}
+          {item.status === "wildcard_conflict" && (
+            <div className="asset-resolution-stack">
+              <div className="section-heading">Edit presentation</div>
+              <p className="muted">Presentation fields do not decide which model owns the image URL.</p>
+              <button className="btn" disabled={!draftMutable || !!busy} onClick={() => resolve("edit", { values: presentationOnly })}>
+                <Save size={14} /> Edit presentation only
+              </button>
+              <div className="section-heading">Resolve ownership conflict</div>
+              <dl className="identity-list">
+                <dt>Shared wildcard</dt>
+                <dd className="mono">{item.ownership_resolution?.shared_owner?.image_url || "none"}</dd>
+                <dt>Current exact ownership</dt>
+                <dd>{item.ownership_resolution?.current_exact_owner ? "present" : "none"}</dd>
+                <dt>Affected models</dt>
+                <dd>{item.ownership_resolution?.affected_models?.join(", ") || "unknown"}</dd>
+              </dl>
+              <button
+                className="btn primary"
+                disabled={!draftMutable || !!busy || !item.ownership_resolution?.exact_operation?.allowed}
+                onClick={() => resolve("resolve_wildcard_exact", { values: presentationOnly })}
+              >Create exact model ownership</button>
+              <button
+                className="btn"
+                disabled={!draftMutable || !!busy || !item.ownership_resolution?.shared_operation?.allowed}
+                onClick={() => resolve("resolve_wildcard_shared", { values: presentationOnly })}
+              >Update shared wildcard ownership</button>
+              {!item.ownership_resolution?.shared_operation?.allowed && (
+                <div className="notice warn">
+                  {item.ownership_resolution?.shared_operation?.blocked_reason || "Shared ownership cannot be resolved unambiguously."}
+                </div>
+              )}
+            </div>
           )}
           {item.status === "ignored" && (
             <div className="notice ok">This exact media identity is ignored by durable manager evidence. Any inventory fingerprint change returns it to review.</div>
