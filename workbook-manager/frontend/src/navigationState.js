@@ -18,13 +18,20 @@ export function parseNavigation(search, defaultModel = "stingray") {
   const requestedType = text(params.get("type"));
   const requestedId = text(params.get("id"));
   const hasEntity = ENTITY_TYPES.has(requestedType) && Boolean(requestedId);
-  return {
+  const navigation = {
     model,
     workspace,
     type: hasEntity ? requestedType : "",
     id: hasEntity ? requestedId : "",
     query: text(params.get("query")),
   };
+  if (workspace === "advanced") {
+    const offset = Number.parseInt(params.get("offset") || "0", 10);
+    navigation.collection = text(params.get("collection"));
+    navigation.offset = Number.isFinite(offset) && offset > 0 ? offset : 0;
+    navigation.editor = text(params.get("editor"));
+  }
+  return navigation;
 }
 
 export function serializeNavigation(navigation) {
@@ -38,6 +45,11 @@ export function serializeNavigation(navigation) {
     params.set("id", text(navigation.id));
   }
   if (text(navigation?.query)) params.set("query", text(navigation.query));
+  if (navigation?.workspace === "advanced") {
+    if (text(navigation.collection)) params.set("collection", text(navigation.collection));
+    if (Number(navigation.offset) > 0) params.set("offset", String(Number(navigation.offset)));
+    if (text(navigation.editor)) params.set("editor", text(navigation.editor));
+  }
   return `?${params.toString()}`;
 }
 

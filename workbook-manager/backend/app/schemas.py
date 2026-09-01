@@ -36,6 +36,12 @@ class DraftOperationRequest(BaseModel):
     actor: str = ""
 
 
+class DraftOperationPlanRequest(BaseModel):
+    operations: list[DraftOperationRequest] = Field(min_length=1)
+    session_id: str = ""
+    actor: str = ""
+
+
 class DraftCorrectionRequest(BaseModel):
     correction_draft_id: str
     selected_operation_ids: list[int]

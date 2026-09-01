@@ -83,6 +83,115 @@ class FormGraphCase(unittest.TestCase):
         cls._fixture.assert_unmutated()
 
 
+class TestCheckpoint2AGraphPlanning(FormGraphCase):
+    def test_guided_option_variants_come_from_active_registration_not_existing_ovs(self):
+        self.conn.execute("SAVEPOINT cp2a_variants")
+        try:
+            before = mainmod.graph_operations.active_model_variants(self.conn, "z06")
+            self.assertEqual(
+                [row["variant_id"] for row in before],
+                ["1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67", "3lz_h67"],
+            )
+            self.conn.execute(
+                "DELETE FROM option_availability WHERE model_id='z06'"
+            )
+            after = mainmod.graph_operations.active_model_variants(self.conn, "z06")
+            self.assertEqual(after, before)
+        finally:
+            self.conn.execute("ROLLBACK TO cp2a_variants")
+            self.conn.execute("RELEASE cp2a_variants")
+
+    def test_option_dependency_plan_classifies_direct_and_transitive_rows_without_selection(self):
+        plan = mainmod.graph_operations.dependency_plan(
+            self.conn,
+            [],
+            table="options",
+            model_id="stingray",
+            key={"option_id": "opt_pcx_001"},
+        )
+
+        direct_group = next(
+            item for item in plan["dependents"]
+            if item["table"] == "rule_groups"
+            and item["entity_key"]["group_id"] == "grp_pcx_excludes_blocked_choices"
+        )
+        self.assertEqual(direct_group["depth"], 1)
+        self.assertEqual(direct_group["classification"], "direct")
+        member = next(
+            item for item in plan["dependents"]
+            if item["table"] == "rule_group_members"
+            and item["entity_key"]["group_id"] == "grp_pcx_excludes_blocked_choices"
+        )
+        self.assertGreater(member["depth"], 1)
+        self.assertEqual(member["classification"], "transitive")
+        self.assertEqual(member["selected_action"], "keep")
+        self.assertIn("delete", member["allowed_actions"])
+        self.assertTrue(member["src_sheet"])
+        self.assertTrue(member["why"])
+
+    def test_group_dependency_plan_uses_draft_effective_member_rows(self):
+        group_id = "grp_pcx_excludes_blocked_choices"
+        base_members = self.conn.execute(
+            "SELECT * FROM rule_group_members WHERE model_id='stingray' "
+            "AND group_id=? ORDER BY id LIMIT 2",
+            (group_id,),
+        ).fetchall()
+        removed = dict(base_members[0])
+        added_option = self.conn.execute(
+            "SELECT option_id FROM options WHERE model_id='stingray' "
+            "AND option_id NOT IN (SELECT target_id FROM rule_group_members "
+            "WHERE model_id='stingray' AND group_id=?) ORDER BY id LIMIT 1",
+            (group_id,),
+        ).fetchone()["option_id"]
+        operations = [
+            {
+                "id": 901,
+                "table_name": "rule_group_members",
+                "family": "rule_group_members",
+                "model_id": "stingray",
+                "entity_key": {
+                    "group_id": group_id,
+                    "target_id": removed["target_id"],
+                },
+                "action": "delete",
+                "original": removed,
+                "final": None,
+            },
+            {
+                "id": 902,
+                "table_name": "rule_group_members",
+                "family": "rule_group_members",
+                "model_id": "stingray",
+                "entity_key": {"group_id": group_id, "target_id": added_option},
+                "action": "add",
+                "original": None,
+                "final": {
+                    "group_id": group_id,
+                    "target_id": added_option,
+                    "display_order": "999",
+                    "active": "True",
+                },
+                "source_sheet": removed["src_sheet"],
+                "source_row": None,
+            },
+        ]
+
+        plan = mainmod.graph_operations.dependency_plan(
+            self.conn,
+            operations,
+            table="rule_groups",
+            model_id="stingray",
+            key={"group_id": group_id},
+        )
+        member_keys = {
+            item["entity_key"]["target_id"]
+            for item in plan["dependents"]
+            if item["table"] == "rule_group_members"
+        }
+        self.assertNotIn(removed["target_id"], member_keys)
+        self.assertIn(added_option, member_keys)
+
+
 class TestGraphMembership(FormGraphCase):
 
     def test_every_promoted_model_step_has_connected_sections_or_explicit_empty_evidence(self):

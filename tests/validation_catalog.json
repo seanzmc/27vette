@@ -2087,7 +2087,7 @@
       "disposition": "keep",
       "disposition_reason": "Checkpoint 3C owner for registry-control validation, explicit renderer coverage, drawer/sheet accessibility, unsaved-close handling, bounded references, and one-in-flight draft Save behavior.",
       "notes": "Uses Node only for dependency-free validation-helper execution; browser viewport and focus evidence remains a separate checkpoint gate.",
-      "collected_tests": 8,
+      "collected_tests": 30,
       "baseline_result": "pass"
     },
     {
@@ -2178,10 +2178,10 @@
       "approximate_seconds": 55.94,
       "acceptance_locks": [],
       "disposition": "rewrite",
-      "disposition_reason": "Largest Python file (65 tests) and the main contributor to the 791.25s Manager checkpoint. Checkpoint 5 builds one verified immutable real-workbook projection/candidate fixture per checkpoint run and clones it; negative cases move to compact workbooks and SQLite fixtures. Every distinct Layer 3 real-workbook acceptance boundary is retained. WBM_SLOW_GATE=1 adds two scratch-copy shared-writer tests.",
+      "disposition_reason": "Largest Python file (78 tests) and the main contributor to the Manager checkpoint. Checkpoint 5 builds one verified immutable real-workbook projection/candidate fixture per checkpoint run and clones it; negative cases move to compact workbooks and SQLite fixtures. Every distinct Layer 3 real-workbook acceptance boundary is retained. WBM_SLOW_GATE=1 adds two scratch-copy shared-writer tests.",
       "notes": "",
-      "collected_tests": 65,
-      "baseline_result": "pass_63_skip_2"
+      "collected_tests": 78,
+      "baseline_result": "pass_76_skip_2"
     },
     {
       "id": "py.test_workbook_manager_api_concurrency",
@@ -2339,7 +2339,7 @@
       "disposition": "keep",
       "disposition_reason": "Durable draft behavior; Draft Save must not write or regenerate.",
       "notes": "",
-      "collected_tests": 6,
+      "collected_tests": 9,
       "baseline_result": "pass"
     },
     {
@@ -2441,7 +2441,7 @@
       "disposition": "keep",
       "disposition_reason": "Checkpoint 4 owner for model-scoped form-graph membership, non-navigable classifications, contextual section/step editing integration, and fresh runtime evidence across every promoted model.",
       "notes": "Generates six runtime contracts under an isolated temporary root and verifies protected workbook/generated/publication hashes remain unchanged. Catalog hashes_protected_roots is false because this gate belongs to the workbook_manager serial group; that field denotes protected_artifacts group selection rather than internal hash assertions.",
-      "collected_tests": 21,
+      "collected_tests": 29,
       "baseline_result": "pass"
     },
     {

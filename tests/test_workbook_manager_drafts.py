@@ -78,6 +78,73 @@ class TestDurableDraftEditing(unittest.TestCase):
         projection.commit()
         return projection, state
 
+    def test_operation_plan_is_atomic_and_idempotent(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-draft-plan-") as raw:
+            projection, state = self._stores(Path(raw))
+            try:
+                projection.execute(
+                    "INSERT INTO options(src_sheet, src_row, src_family, physical_key, "
+                    "model_context, model_id, option_id, rpo, option_name, price, active) "
+                    "VALUES(?,?,?,?,?,?,?,?,?,?,?)",
+                    ("stingray_options", 11, "options", '[\"opt_other\"]',
+                     '[\"stingray\"]', "stingray", "opt_other", "OTH", "Other",
+                     "200", "True"),
+                )
+                projection.commit()
+                context = {
+                    "projection_state": "current",
+                    "base_workbook_sha256": "sha",
+                    "base_workbook_mtime_ns": "1",
+                    "draft_id": "draft-plan",
+                    "session_id": "browser",
+                    "actor": "test",
+                }
+                plan = [
+                    {
+                        "table": "options", "model_id": "stingray", "op": "update",
+                        "key": {"option_id": "opt_test"},
+                        "record": {"price": "125"},
+                    },
+                    {
+                        "table": "options", "model_id": "stingray", "op": "update",
+                        "key": {"option_id": "opt_other"},
+                        "record": {"price": "250"},
+                    },
+                ]
+
+                first = drafts.save_operation_plan(projection, state, operations=plan, **context)
+                second = drafts.save_operation_plan(projection, state, operations=plan, **context)
+                self.assertEqual(
+                    [operation["id"] for operation in second],
+                    [operation["id"] for operation in first],
+                )
+                self.assertEqual(len(drafts.list_operations(state, "draft-plan")), 2)
+
+                with self.assertRaises(drafts.DraftError):
+                    drafts.save_operation_plan(
+                        projection,
+                        state,
+                        operations=[
+                            {
+                                "table": "options", "model_id": "stingray", "op": "update",
+                                "key": {"option_id": "opt_test"},
+                                "record": {"price": "999"},
+                            },
+                            {
+                                "table": "options", "model_id": "stingray", "op": "update",
+                                "key": {"option_id": "missing"},
+                                "record": {"price": "1"},
+                            },
+                        ],
+                        **context,
+                    )
+                stored = drafts.list_operations(state, "draft-plan")
+                self.assertEqual(stored[0]["final"]["price"], "125")
+                self.assertEqual(stored[1]["final"]["price"], "250")
+            finally:
+                projection.close()
+                state.close()
+
     def test_draft_creation_requires_current_projection(self):
         with tempfile.TemporaryDirectory(prefix="wbm-draft-state-") as raw:
             root = Path(raw)

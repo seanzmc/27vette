@@ -2769,3 +2769,53 @@ def save_operation(
         ).fetchall()
     ]
     return result
+
+
+def save_operation_plan(
+    projection_conn: sqlite3.Connection,
+    state_conn: sqlite3.Connection,
+    *,
+    projection_state: str,
+    base_workbook_sha256: str,
+    base_workbook_mtime_ns: str,
+    draft_id: str,
+    operations: list[dict[str, Any]],
+    session_id: str = "",
+    actor: str = "",
+) -> list[dict]:
+    """Store one explicit operation plan atomically on the mutable draft.
+
+    Every member uses the ordinary registered operation contract. A failure in
+    any member rolls the entire plan back; replay coalesces to the same durable
+    rows through ``save_operation``'s existing identity rules.
+    """
+
+    if not operations:
+        raise DraftError("empty_operation_plan", "operation plan must not be empty")
+    state_conn.execute("BEGIN IMMEDIATE")
+    stored: list[dict] = []
+    try:
+        for operation in operations:
+            result = save_operation(
+                projection_conn,
+                state_conn,
+                projection_state=projection_state,
+                base_workbook_sha256=base_workbook_sha256,
+                base_workbook_mtime_ns=base_workbook_mtime_ns,
+                draft_id=draft_id,
+                table=str(operation.get("table") or ""),
+                model_id=str(operation.get("model_id") or ""),
+                op=str(operation.get("op") or ""),
+                key=dict(operation.get("key") or {}),
+                record=operation.get("record"),
+                session_id=session_id,
+                actor=actor,
+                manage_transaction=False,
+            )
+            if result is not None:
+                stored.append(result)
+        state_conn.commit()
+    except Exception:
+        state_conn.rollback()
+        raise
+    return stored

@@ -825,7 +825,7 @@ class TestPass1BrowserContainment(unittest.TestCase):
         self.assertIn("APPLY AND REBUILD", sync_source)
         self.assertIn("api.saveDraftOperation", operations_source)
         self.assertIn("api.saveDraftOperation", structure_source)
-        self.assertIn("await loadRows();\n    onChanged();", operations_source)
+        self.assertIn("await loadRows();\n    await onChanged();", operations_source)
         self.assertIn("await load(modelKey);\n    onChanged();", structure_source)
         self.assertNotIn("onChanged({ draft: Boolean(operation) })", operations_source)
         self.assertNotIn("onChanged({ draft: Boolean(operation) })", structure_source)
@@ -1002,6 +1002,46 @@ class TestApi(unittest.TestCase):
         else:
             os.environ["WBM_PROJECTION_DB"] = cls.previous_projection_env
         shutil.rmtree(cls.tmpdir, ignore_errors=True)
+
+    def test_checkpoint_2a_graph_and_atomic_plan_api(self):
+        variants = self.client.get("/api/graph/option-create/z06")
+        self.assertEqual(variants.status_code, 200, variants.text)
+        self.assertEqual(
+            [row["variant_id"] for row in variants.json()["active_variants"]],
+            ["1lz_h07", "2lz_h07", "3lz_h07", "1lz_h67", "2lz_h67", "3lz_h67"],
+        )
+
+        plan = self.client.post(
+            "/api/records/options/dependency-plan",
+            params={"draft_id": "api-cp2a-plan"},
+            json={"model_id": "stingray", "key": {"option_id": "opt_pcx_001"}},
+        )
+        self.assertEqual(plan.status_code, 200, plan.text)
+        self.assertGreater(plan.json()["count"], 1)
+        self.assertTrue(all(
+            item["selected_action"] == "keep"
+            for item in plan.json()["dependents"]
+        ))
+
+        response = self.client.post(
+            "/api/drafts/api-cp2a-plan/operation-plan",
+            json={
+                "actor": "api-test",
+                "session_id": "browser",
+                "operations": [
+                    {
+                        "table": "options", "model_id": "stingray", "op": "update",
+                        "key": {"option_id": "opt_pcx_001"},
+                        "record": {"option_name": "Checkpoint 2A API test"},
+                    }
+                ],
+            },
+        )
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual(len(response.json()["operations"]), 1)
+        self.client.delete(
+            f"/api/drafts/api-cp2a-plan/operations/{response.json()['operations'][0]['id']}"
+        )
 
     def test_status_and_models(self):
         status = self.client.get("/api/status").json()

@@ -30,6 +30,7 @@ from . import (
     drafts,
     explorer,
     form_graph as form_graph_mod,
+    graph_operations,
     importer,
     staging,
     sync as syncmod,
@@ -44,6 +45,7 @@ from .schemas import (
     CommitRequest,
     DraftCorrectionRequest,
     DraftOperationRequest,
+    DraftOperationPlanRequest,
     ManualResolutionRequest,
     StageChangeRequest,
     SyncRequest,
@@ -1417,6 +1419,40 @@ def dependencies_post(
     return {"table": table, "dependents": deps, "count": len(deps)}
 
 
+@app.get("/api/graph/option-create/{model_id}")
+def guided_option_create_context(
+    model_id: str, conn=Depends(projection_connection)
+):
+    return {
+        "model_id": model_id,
+        "option_table": "options",
+        "ovs_table": "option_availability",
+        "active_variants": graph_operations.active_model_variants(conn, model_id),
+    }
+
+
+@app.post("/api/records/{table}/dependency-plan")
+def dependency_plan_post(
+    table: str,
+    body: dict,
+    draft_id: str = Query(""),
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
+    try:
+        return graph_operations.dependency_plan(
+            conn,
+            drafts.list_operations(state_conn, draft_id) if draft_id else [],
+            table=table,
+            model_id=str(body.get("model_id") or ""),
+            key=dict(body.get("key") or {}),
+        )
+    except ValueError as exc:
+        raise HTTPException(422, detail={
+            "status": "invalid_dependency_plan", "message": str(exc)
+        }) from exc
+
+
 # ── staged changes ───────────────────────────────────────────────────
 
 @app.get("/api/drafts")
@@ -1463,6 +1499,36 @@ def save_draft_operation(
             session_id=payload.session_id,
             actor=payload.actor,
         )
+    except drafts.DraftError as exc:
+        raise _draft_error(exc)
+
+
+@app.post("/api/drafts/{draft_id}/operation-plan")
+def save_draft_operation_plan(
+    draft_id: str,
+    payload: DraftOperationPlanRequest,
+    _lock=Depends(durable_write_lock),
+    conn=Depends(projection_connection),
+    state_conn=Depends(state_connection),
+):
+    workbook = _workbook_state(conn)
+    run = conn.execute(
+        "SELECT * FROM import_runs ORDER BY id DESC LIMIT 1"
+    ).fetchone()
+    projection = _projection_state(conn, run, workbook)
+    try:
+        operations = drafts.save_operation_plan(
+            conn,
+            state_conn,
+            projection_state=projection["state"],
+            base_workbook_sha256=workbook["imported_sha256"],
+            base_workbook_mtime_ns=workbook["imported_mtime_ns"],
+            draft_id=draft_id,
+            operations=[operation.model_dump() for operation in payload.operations],
+            session_id=payload.session_id,
+            actor=payload.actor,
+        )
+        return {"draft_id": draft_id, "operations": operations}
     except drafts.DraftError as exc:
         raise _draft_error(exc)
 

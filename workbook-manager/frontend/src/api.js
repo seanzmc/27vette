@@ -81,12 +81,24 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ model_id: modelId, key }),
     }),
+  guidedOptionContext: (modelId) =>
+    request(`/api/graph/option-create/${encodeURIComponent(modelId)}`),
+  dependencyPlan: (table, modelId, key, draftId = "") =>
+    request(`/api/records/${table}/dependency-plan?draft_id=${encodeURIComponent(draftId)}`, {
+      method: "POST",
+      body: JSON.stringify({ model_id: modelId, key }),
+    }),
   drafts: (limit = 50) => request(`/api/drafts?limit=${limit}`),
   draftLifecycle: (draftId) => request(`/api/drafts/${draftId}`),
   draftOperations: (draftId) =>
     request(`/api/drafts/${draftId}/operations`),
   saveDraftOperation: (draftId, payload) =>
     request(`/api/drafts/${draftId}/operations`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  saveDraftOperationPlan: (draftId, payload) =>
+    request(`/api/drafts/${draftId}/operation-plan`, {
       method: "POST",
       body: JSON.stringify(payload),
     }),

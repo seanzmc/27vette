@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "workbook-manager" / "frontend" / "src"
 VALIDATION_MODULE = FRONTEND / "editorValidation.js"
 NAVIGATION_MODULE = FRONTEND / "navigationState.js"
+GRAPH_OPERATIONS_MODULE = FRONTEND / "graphOperationsModel.js"
 
 
 def run_navigation(script: str):
@@ -37,6 +38,121 @@ def run_navigation(script: str):
         check=True,
     )
     return json.loads(result.stdout)
+
+
+def run_graph_operations(script: str):
+    result = subprocess.run(
+        [
+            "node",
+            "--input-type=module",
+            "--eval",
+            (
+                "import { pathToFileURL } from 'node:url';"
+                f"const moduleUrl = pathToFileURL({json.dumps(str(GRAPH_OPERATIONS_MODULE))}).href;"
+                "const api = await import(moduleUrl);"
+                + script
+            ),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return json.loads(result.stdout)
+
+
+def test_guided_option_plan_requires_explicit_status_for_every_active_variant():
+    result = run_graph_operations(
+        "const option={table:'options',model_id:'z06',op:'add',"
+        "key:{option_id:'opt_new'},record:{option_id:'opt_new',rpo:'NEW'}};"
+        "const variants=[{variant_id:'coupe'},{variant_id:'convertible'}];"
+        "const incomplete=api.optionCreationPlan(option,variants,{coupe:'available'});"
+        "const complete=api.optionCreationPlan(option,variants,{"
+        "coupe:'available',convertible:'unavailable'});"
+        "console.log(JSON.stringify({incomplete,complete}));"
+    )
+    assert result["incomplete"]["complete"] is False
+    assert result["incomplete"]["missing_variant_ids"] == ["convertible"]
+    assert result["incomplete"]["operations"] == []
+    assert result["complete"]["complete"] is True
+    assert result["complete"]["missing_variant_ids"] == []
+    assert result["complete"]["operations"][0]["table"] == "options"
+    assert [operation["key"]["variant_id"] for operation in result["complete"]["operations"][1:]] == [
+        "coupe", "convertible",
+    ]
+    assert [operation["record"]["status"] for operation in result["complete"]["operations"][1:]] == [
+        "available", "unavailable",
+    ]
+
+
+def test_dependency_plan_emits_only_explicit_complete_selection():
+    result = run_graph_operations(
+        "const root={table:'options',model_id:'stingray',key:{option_id:'opt_x'}};"
+        "const deps=["
+        "{table:'option_availability',model_id:'stingray',entity_key:{option_id:'opt_x',variant_id:'v1'}},"
+        "{table:'rule_groups',model_id:'stingray',entity_key:{group_id:'g1'},allowed_actions:['keep','delete','deactivate']}];"
+        "const incomplete=api.dependencyDeletionOperations(root,deps,{'0':'delete'});"
+        "const complete=api.dependencyDeletionOperations(root,deps,{'0':'delete','1':'deactivate'});"
+        "console.log(JSON.stringify({incomplete,complete}));"
+    )
+    assert result["incomplete"]["complete"] is False
+    assert result["incomplete"]["operations"] == []
+    assert result["complete"]["complete"] is True
+    assert result["complete"]["operations"][-1]["table"] == "options"
+    assert result["complete"]["operations"][0]["op"] == "delete"
+    assert result["complete"]["operations"][1]["record"] == {"active": "False"}
+
+
+def test_checkpoint_2a_raw_ui_wires_confirmation_undo_and_context_preservation():
+    operations = (FRONTEND / "components" / "ModelOperations.jsx").read_text()
+    api_source = (FRONTEND / "api.js").read_text()
+    app_source = (FRONTEND / "App.jsx").read_text()
+
+    for phrase in (
+        "Set availability for every active variant",
+        "Delete plan",
+        "Nothing is selected automatically",
+        "Confirm delete",
+        "Undo delete",
+    ):
+        assert phrase in operations
+    assert "api.guidedOptionContext" in operations
+    assert "api.dependencyPlan" in operations
+    assert "api.saveDraftOperationPlan" in operations
+    assert "api.discardDraftOperation" in operations
+    assert "disabled={!guidedPlan?.complete}" in operations
+    assert "restoreScrollPosition(scrollTop)" in operations
+    assert operations.count("const scrollTop = window.scrollY") >= 4
+    assert "navigation={navigation}" in app_source
+    assert "onNavigationChange={commitNavigation}" in app_source
+    assert "onChanged={refreshDraftInPlace}" in app_source
+    assert "/api/graph/option-create/" in api_source
+    assert "/dependency-plan" in api_source
+    assert "/operation-plan" in api_source
+
+
+def test_advanced_navigation_round_trips_collection_query_offset_and_editor_context():
+    result = run_navigation(
+        "const parsed=api.parseNavigation('?model=z06&workspace=advanced&'"
+        "+'collection=option_availability&query=carbon&offset=200&editor=opt_c1');"
+        "console.log(JSON.stringify({parsed,serialized:api.serializeNavigation(parsed)}));"
+    )
+    assert result == {
+        "parsed": {
+            "model": "z06",
+            "workspace": "advanced",
+            "type": "",
+            "id": "",
+            "query": "carbon",
+            "collection": "option_availability",
+            "offset": 200,
+            "editor": "opt_c1",
+        },
+        "serialized": (
+            "?model=z06&workspace=advanced&query=carbon&collection=option_availability"
+            "&offset=200&editor=opt_c1"
+        ),
+    }
 
 
 def test_navigation_state_round_trips_only_canonical_reloadable_context():
