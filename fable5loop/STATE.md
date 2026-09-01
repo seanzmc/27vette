@@ -24,26 +24,33 @@ Keep this file small — it is read at the start of every session:
   operations; closure evidence is recorded at the checkpoint.
 - **Active workflow:** Normal repository path.
 - **Branch/commit:** `feat/workbook-manager-checkpoint-2a`; implementation
-  `87a2095`; verified docs closeout `eee9557`; PR #69 open and mergeable.
-- **Last completed:** Checkpoint 2A guided option creation, draft-effective
-  connected-delete planning, atomic/idempotent operation-plan save, confirmed
-  no-dependent delete with durable Undo, and in-place Advanced context refresh.
-- **Current status:** GRAPH-01–06 and RAW-01–04 are closed. Checkpoint 2A is at
-  its verified stop boundary; no later P2 checkpoint has begun.
-- **Validation:** Catalog-owned Manager checkpoint: 416 passed, 2 skipped, 77
-  subtests in 92.61s. Validation-catalog/state owners: 40 passed. Frontend build,
-  backend `py_compile`, and `git diff --check` passed. Isolated copied-workbook
-  Chrome proof saved one option plus six explicit OVS rows as seven operations,
-  left a connected plan entirely at Keep, proved raw delete/Undo as `7 → 8 → 7`,
-  retained URL/scroll, reported zero captured console errors, and had 1425/1425
-  document/client width. Protected paths have no diff from `origin/main`. GitHub
-  readback created PR #69 at `eee9557`; its first rollup was mergeable with plan
-  validation and disposition refresh still in progress.
-- **Next action:** Inspect PR #69's completed required-check/review rollup and
-  address only evidence-backed findings. Do not begin Checkpoint 2B without a
-  new user instruction.
-- **Blockers or closeout gaps:** Remote CI/review are pending on PR #69; no local
-  implementation or validation blocker remains.
+  `87a2095`; verified docs closeout `eee9557`; PR #69 Codex P2 remediation
+  `465a56d` (shared-root dependency scan), `dbfe8c9` (conditional-reference
+  traversal), `731c3c5` (add-replay plan idempotency), `df4e336` (undo model
+  identity); PR #69 open.
+- **Last completed:** Addressed all four unresolved Codex P2 review threads on
+  PR #69 with one focused commit and a regression test each; replied and
+  resolved each thread after the remote head carried the fixes.
+- **Current status:** GRAPH-01–06 and RAW-01–04 remain closed. Checkpoint 2A
+  review remediation is complete; no later P2 checkpoint has begun.
+- **Validation:** Workbook_manager serial group (15 files, one process):
+  369 passed, 2 skipped, 77 subtests; the single failure
+  (`TestStructureEndpoint::test_structure_update_saves_owned_draft_intent_
+  without_projection_write`) is a pre-existing TestApi env-teardown
+  interaction reproduced identically on base `8c3a13d` with the same test
+  pair. Targeted `changeset_lifecycle + drafts + form_graph` run: 80 passed,
+  36 subtests. `connected_editing` 31 passed; frontend `npm ci && build`
+  green; `git diff --check` and backend `py_compile` clean. New regressions:
+  shared-interior plan classifies 3 `model_interior_scope` + 6
+  `interior_components`; option plans classify `assets`/`default_selection_
+  rules` conditional dependents; identical add-plan replay coalesces while a
+  differing replay still rejects; undo prior-operation lookup matches model
+  identity.
+- **Next action:** Await re-review/merge of PR #69. The pre-existing flake
+  above is the only known open test-isolation defect and needs its own scoped
+  pass; do not begin Checkpoint 2B without a new user instruction.
+- **Blockers or closeout gaps:** None on this remediation; the flake above is
+  reported, not fixed here.
 - **Protected boundaries:** Canonical workbook, generated runtime contracts,
   `form-app/data.js`, cache-bearing HTML, write/apply semantics, dealer
   submission, deployment, and WordPress media unchanged. Manager APIs changed
