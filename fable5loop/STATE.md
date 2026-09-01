@@ -24,7 +24,7 @@ Keep this file small — it is read at the start of every session:
   operations; closure evidence is recorded at the checkpoint.
 - **Active workflow:** Normal repository path.
 - **Branch/commit:** `feat/workbook-manager-checkpoint-2a`; implementation
-  `87a2095`; this verified docs closeout is the branch's second commit.
+  `87a2095`; verified docs closeout `eee9557`; PR #69 open and mergeable.
 - **Last completed:** Checkpoint 2A guided option creation, draft-effective
   connected-delete planning, atomic/idempotent operation-plan save, confirmed
   no-dependent delete with durable Undo, and in-place Advanced context refresh.
@@ -36,12 +36,14 @@ Keep this file small — it is read at the start of every session:
   Chrome proof saved one option plus six explicit OVS rows as seven operations,
   left a connected plan entirely at Keep, proved raw delete/Undo as `7 → 8 → 7`,
   retained URL/scroll, reported zero captured console errors, and had 1425/1425
-  document/client width. Protected paths have no diff from `origin/main`.
-- **Next action:** Commit this docs-only receipt, push the task branch, open the
-  PR, and inspect the live required-check/review rollup. Do not begin Checkpoint
-  2B without a new user instruction.
-- **Blockers or closeout gaps:** None before delivery; remote CI/review remain to
-  be observed after PR creation.
+  document/client width. Protected paths have no diff from `origin/main`. GitHub
+  readback created PR #69 at `eee9557`; its first rollup was mergeable with plan
+  validation and disposition refresh still in progress.
+- **Next action:** Inspect PR #69's completed required-check/review rollup and
+  address only evidence-backed findings. Do not begin Checkpoint 2B without a
+  new user instruction.
+- **Blockers or closeout gaps:** Remote CI/review are pending on PR #69; no local
+  implementation or validation blocker remains.
 - **Protected boundaries:** Canonical workbook, generated runtime contracts,
   `form-app/data.js`, cache-bearing HTML, write/apply semantics, dealer
   submission, deployment, and WordPress media unchanged. Manager APIs changed
