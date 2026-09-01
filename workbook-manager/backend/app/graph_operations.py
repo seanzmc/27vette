@@ -39,9 +39,23 @@ def _row_key(spec: TableSpec, row: dict) -> tuple[str, ...]:
     return tuple(str(row.get(name) or "") for name in spec.key)
 
 
+def _operation_model(operation: dict, spec: TableSpec) -> str:
+    """Model identity an operation belongs to, mirroring stored row ownership."""
+    final = operation.get("final") or operation.get("original") or {}
+    if spec.model_scoped:
+        return str(operation.get("model_id") or "")
+    if spec.has_model_key_column:
+        return str(final.get("model_key") or operation.get("model_id") or "")
+    return ""
+
+
 def _operation_applies(operation: dict, spec: TableSpec, model_id: str) -> bool:
     if operation.get("table_name") != spec.table:
         return False
+    if not model_id:
+        # Shared-root scans carry no model context; every operation for the
+        # table applies at its own stored model identity.
+        return True
     operation_model = str(operation.get("model_id") or "")
     if spec.model_scoped:
         return operation_model == model_id
@@ -59,20 +73,22 @@ def _effective_rows(
 ) -> list[dict]:
     where = ""
     params: tuple[str, ...] = ()
-    if spec.model_scoped:
-        where, params = " WHERE model_id=?", (model_id,)
-    elif spec.has_model_key_column:
-        where, params = " WHERE model_key=?", (model_id,)
-    rows = {
-        _row_key(spec, dict(row)): dict(row)
-        for row in conn.execute(f'SELECT * FROM "{spec.table}"{where}', params).fetchall()
-    }
+    if model_id:
+        if spec.model_scoped:
+            where, params = " WHERE model_id=?", (model_id,)
+        elif spec.has_model_key_column:
+            where, params = " WHERE model_key=?", (model_id,)
+    rows: dict[tuple, dict] = {}
+    for row in conn.execute(f'SELECT * FROM "{spec.table}"{where}', params).fetchall():
+        row = dict(row)
+        rows[_identity(spec, row, model_id)] = row
     for operation in operations:
         if not _operation_applies(operation, spec, model_id):
             continue
         key = tuple(str((operation.get("entity_key") or {}).get(name) or "") for name in spec.key)
+        identity = (spec.table, _operation_model(operation, spec), key)
         if operation.get("action") == "delete":
-            rows.pop(key, None)
+            rows.pop(identity, None)
             continue
         effective = dict(operation.get("final") or {})
         effective.update({
@@ -80,7 +96,9 @@ def _effective_rows(
             "src_row": operation.get("source_row"),
             "model_id": operation.get("model_id") or effective.get("model_id") or "",
         })
-        rows[key] = effective
+        if spec.has_model_key_column and not effective.get("model_key"):
+            effective["model_key"] = _operation_model(operation, spec)
+        rows[identity] = effective
     return list(rows.values())
 
 
@@ -104,7 +122,13 @@ def dependency_plan(
     model_id: str,
     key: dict[str, str],
 ) -> dict:
-    """Classify direct/transitive dependents in the draft-effective graph."""
+    """Classify direct/transitive dependents in the draft-effective graph.
+
+    A concrete ``model_id`` scopes every scanned table to that model's rows.
+    An empty ``model_id`` (shared roots such as ``interiors`` carry no model
+    context) scans every model-scoped and model-key table across all models so
+    the plan still classifies cross-model dependents.
+    """
 
     root_spec = SPEC_BY_TABLE.get(table)
     if root_spec is None:

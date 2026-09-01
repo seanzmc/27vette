@@ -129,6 +129,37 @@ class TestCheckpoint2AGraphPlanning(FormGraphCase):
         self.assertTrue(member["src_sheet"])
         self.assertTrue(member["why"])
 
+    def test_shared_interior_dependency_plan_scans_every_model_scope(self):
+        # Codex P2 (PR 69): shared roots reach the planner with an empty
+        # model_id, and the scan must still classify model-scoped and
+        # model-key dependents across every model instead of offering the
+        # raw no-dependent delete flow.
+        plan = mainmod.graph_operations.dependency_plan(
+            self.conn,
+            [],
+            table="interiors",
+            model_id="",
+            key={"interior_id": "1LT_AE4_HTJ_N26"},
+        )
+
+        scope = [
+            item for item in plan["dependents"]
+            if item["table"] == "model_interior_scope"
+        ]
+        components = [
+            item for item in plan["dependents"]
+            if item["table"] == "interior_components"
+        ]
+        self.assertEqual(
+            sorted(item["model_id"] for item in scope),
+            ["grand_sport", "grand_sport_x", "stingray"],
+        )
+        self.assertEqual(len(components), 6)
+        self.assertTrue(
+            all(item["via_field"] == "interior_id" for item in scope + components)
+        )
+        self.assertFalse(plan["complete"])
+
     def test_group_dependency_plan_uses_draft_effective_member_rows(self):
         group_id = "grp_pcx_excludes_blocked_choices"
         base_members = self.conn.execute(
