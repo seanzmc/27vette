@@ -206,7 +206,7 @@ class TestImagesWorkspaceParity(unittest.TestCase):
     def test_assignment_targets_follow_the_same_visible_scope(self):
         """IMG-SCOPE-02: a scoped decision cannot target another model."""
         self.assertIn(
-            "assignmentTargetsInScope(data.assignment_targets || [], modelKey)",
+            "model: reconciliationModel(modelKey)",
             self.asset_manager,
         )
 
@@ -219,6 +219,52 @@ class TestImagesWorkspaceParity(unittest.TestCase):
         """
         toolbar = self.asset_manager.split('"asset-draft-toolbar', 1)[1]
         self.assertIn("boundPayload({ model: reconciliationModel(modelKey) })", toolbar)
+
+    def test_checkpoint_2b_uses_bounded_paged_lookup_instead_of_native_target_select(self):
+        self.assertIn("api.assetAssignmentTargets", self.asset_manager)
+        self.assertIn("TARGET_LOOKUP_PAGE_SIZE", self.asset_manager)
+        self.assertIn("targetLookup.total", self.asset_manager)
+        assignment = self.asset_manager.split(
+            "Assign media to an existing promoted target", 1
+        )[1].split("Ignore this exact media identity", 1)[0]
+        self.assertNotIn("<select", assignment)
+        self.assertIn("canonical_id", assignment)
+        self.assertIn("Previous targets", assignment)
+        self.assertIn("Next targets", assignment)
+
+    def test_checkpoint_2b_lookup_states_distinguish_empty_error_retry_and_stale(self):
+        for text in (
+            "Searching media inventory…",
+            "No inventory images match this search.",
+            "Inventory search failed:",
+            "Retry inventory search",
+            "The media inventory changed. Search again before selecting an image.",
+            "Searching assignment targets…",
+            "No workbook targets match this search.",
+            "Target search failed:",
+            "Retry target search",
+        ):
+            self.assertIn(text, self.asset_manager)
+
+    def test_checkpoint_2b_refresh_preserves_pending_lookup_and_candidate_choices(self):
+        reset_effect = self.asset_manager.split("setPreview(initial);", 1)[1].split(
+            "const displayed", 1
+        )[0]
+        self.assertIn("}, [item.id]);", reset_effect)
+        self.assertNotIn("}, [initial]);", reset_effect)
+        self.assertIn(
+            "item: current.id === selectedId ? current.item : null",
+            self.asset_manager,
+        )
+
+    def test_checkpoint_2b_splits_presentation_from_wildcard_ownership_resolution(self):
+        wildcard = self.asset_manager.split('item.status === "wildcard_conflict"', 1)[1]
+        self.assertIn("Edit presentation only", wildcard)
+        self.assertIn("Resolve ownership conflict", wildcard)
+        self.assertIn("Create exact model ownership", wildcard)
+        self.assertIn("Update shared wildcard ownership", wildcard)
+        self.assertIn("ownership_resolution", wildcard)
+        self.assertNotIn("Save presentation edits to draft", wildcard.split("</div>", 1)[0])
 
 
 if __name__ == "__main__":

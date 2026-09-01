@@ -26,7 +26,8 @@ FIT_VALUES = set(EDITOR_SHEET_META["asset_map"]["enums"]["image_fit"])
 POSITION_RE = re.compile(r"^[\w\s.%/-]+$")
 RESOLUTION_KINDS = {
     "accept_safe", "select_candidate", "inventory_match", "manual_url",
-    "assign_media", "edit", "deactivate", "ignore",
+    "assign_media", "edit", "resolve_wildcard_exact", "resolve_wildcard_shared",
+    "deactivate", "ignore",
 }
 
 
@@ -152,6 +153,34 @@ def _prepare_operation(
     target_item = source_item
     media_url = selected_url.strip()
 
+    if resolution_kind in {"resolve_wildcard_exact", "resolve_wildcard_shared"}:
+        if source_item.get("status") != "wildcard_conflict":
+            raise drafts.DraftError(
+                "asset_resolution_not_wildcard_conflict",
+                "ownership resolution requires a wildcard conflict",
+            )
+        ownership = source_item.get("ownership_resolution") or {}
+        operation_name = (
+            "exact_operation" if resolution_kind == "resolve_wildcard_exact"
+            else "shared_operation"
+        )
+        operation = ownership.get(operation_name) or {}
+        if not operation.get("allowed"):
+            raise drafts.DraftError(
+                "asset_wildcard_resolution_blocked",
+                operation.get("blocked_reason") or "ownership resolution is ambiguous",
+            )
+        media_url = str(operation.get("candidate_url") or "")
+        if resolution_kind == "resolve_wildcard_exact":
+            target_item = {
+                **source_item,
+                "current_values": {},
+                "proposed_values": {
+                    **(source_item.get("proposed_values") or {}),
+                    "image_url": media_url,
+                },
+            }
+
     if resolution_kind == "assign_media":
         if source_item.get("status") not in {"unmatched", "unparseable"}:
             raise drafts.DraftError(
@@ -202,6 +231,8 @@ def _prepare_operation(
         _validate_url(media_url, "image_url")
         proposed["image_url"] = media_url
     elif resolution_kind == "assign_media":
+        proposed["image_url"] = media_url
+    elif resolution_kind in {"resolve_wildcard_exact", "resolve_wildcard_shared"}:
         proposed["image_url"] = media_url
     elif resolution_kind == "deactivate":
         if source_item.get("status") != "stale_target":

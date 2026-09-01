@@ -58,8 +58,13 @@ export const api = {
     });
     return request(`/api/assets/reconciliation?${q.toString()}`);
   },
-  assetMediaOptions: (query = "", limit = 50) =>
-    request(`/api/assets/media-options?query=${encodeURIComponent(query)}&limit=${limit}`),
+  assetMediaOptions: (query = "", { offset = 0, limit = 25 } = {}) =>
+    request(`/api/assets/media-options?query=${encodeURIComponent(query)}&offset=${offset}&limit=${limit}`),
+  assetAssignmentTargets: (
+    query = "", { model = "", offset = 0, limit = 25 } = {}
+  ) => request(
+    `/api/assets/assignment-targets?query=${encodeURIComponent(query)}&model=${encodeURIComponent(model)}&offset=${offset}&limit=${limit}`
+  ),
   schema: (table, model = "") =>
     request(`/api/records/${table}/schema?model=${encodeURIComponent(model)}`),
   referenceOptions: (

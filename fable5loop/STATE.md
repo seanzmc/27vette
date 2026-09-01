@@ -19,43 +19,39 @@ Keep this file small — it is read at the start of every session:
 ## Current handoff
 
 - **Updated:** 2026-09-01
-- **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 2A /
-  P2.1–P2.4 / WM-007 and WM-008, coordinated graph maintenance and safe raw
-  operations; closure evidence is recorded at the checkpoint.
+- **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 2B /
+  P2.5–P2.7 / WM-009; PR #70 review remediation (Codex P2 review-body finding).
 - **Active workflow:** Normal repository path.
-- **Branch/commit:** `feat/workbook-manager-checkpoint-2a`; implementation
-  `87a2095`; verified docs closeout `eee9557`; PR #69 Codex P2 remediation
-  `465a56d` (shared-root dependency scan), `dbfe8c9` (conditional-reference
-  traversal), `731c3c5` (add-replay plan idempotency), `df4e336` (undo model
-  identity); PR #69 open.
-- **Last completed:** Addressed all four unresolved Codex P2 review threads on
-  PR #69 with one focused commit and a regression test each; replied and
-  resolved each thread after the remote head carried the fixes.
-- **Current status:** GRAPH-01–06 and RAW-01–04 remain closed. Checkpoint 2A
-  review remediation is complete; no later P2 checkpoint has begun.
-- **Validation:** Workbook_manager serial group (15 files, one process):
-  369 passed, 2 skipped, 77 subtests; the single failure
-  (`TestStructureEndpoint::test_structure_update_saves_owned_draft_intent_
-  without_projection_write`) is a pre-existing TestApi env-teardown
-  interaction reproduced identically on base `8c3a13d` with the same test
-  pair. Targeted `changeset_lifecycle + drafts + form_graph` run: 80 passed,
-  36 subtests. `connected_editing` 31 passed; frontend `npm ci && build`
-  green; `git diff --check` and backend `py_compile` clean. New regressions:
-  shared-interior plan classifies 3 `model_interior_scope` + 6
-  `interior_components`; option plans classify `assets`/`default_selection_
-  rules` conditional dependents; identical add-plan replay coalesces while a
-  differing replay still rejects; undo prior-operation lookup matches model
-  identity.
-- **Next action:** Await re-review/merge of PR #69. The pre-existing flake
-  above is the only known open test-isolation defect and needs its own scoped
-  pass; do not begin Checkpoint 2B without a new user instruction.
-- **Blockers or closeout gaps:** None on this remediation; the flake above is
-  reported, not fixed here.
+- **Branch/commit:** `feat/workbook-manager-checkpoint-2b`; implementation
+  `845c105`; verified documentation closeout `e6f14fb`; PR #70 review fix
+  `536ab44`; PR #70 (`https://github.com/seanzmc/27vette/pull/70`) open.
+- **Last completed:** Disposed the Codex P2 review-body finding on PR #70:
+  `AssetManager.jsx` target/inventory lookup selections now drop when a
+  successful search replaces the visible page or the lookup goes stale, and
+  "Assign to selected target" / "Use selected inventory image" enable only for
+  a selection belonging to the current successful, non-stale result page. The
+  bot review (PRR_kwDOSMmCTs8AAAABLrkWIg) is marked done via ROCKET reaction,
+  read back `viewerHasReacted: true`.
+- **Current status:** Fix `536ab44` is the PR head. No unresolved Codex
+  P0–P5 threads remain on the repository.
+- **Validation:** Frontend gate `npm --prefix workbook-manager/frontend ci
+  --include=dev && npm run build` passed; `tests/
+  test_workbook_manager_images_workspace_parity.py` 19 passed; `git diff
+  --check` clean; isolated-instance headless-Chrome proof (fresh selection
+  binds, page replace / no-result / failed search / live stale flip via
+  inventory SHA change all clear the selection and disable the action, retry
+  recovers) with zero console errors and no horizontal overflow. Full Manager
+  pytest group not run: frontend-only change, no backend/API surface touched.
+- **Next action:** Await remote release-candidate CI and Codex
+  finding-disposition results on `536ab44`. Do not begin Checkpoint 2C without
+  a new user instruction.
+- **Blockers or closeout gaps:** None locally; remote CI pending at handoff
+  time.
 - **Protected boundaries:** Canonical workbook, generated runtime contracts,
   `form-app/data.js`, cache-bearing HTML, write/apply semantics, dealer
-  submission, deployment, and WordPress media unchanged. Manager APIs changed
-  additively for graph context, draft-effective dependency plans, and atomic
-  operation-plan save.
+  submission, deployment, and WordPress media unchanged. The fix is
+  frontend-only selection-state binding; no API, workbook, or generated
+  contract changed.
 
 ## Verified facts
 

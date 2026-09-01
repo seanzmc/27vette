@@ -1484,6 +1484,64 @@ def _current_asset_for_target(
     return {}, "missing"
 
 
+def add_wildcard_ownership_resolution(items: list[dict[str, Any]]) -> None:
+    """Annotate wildcard conflicts with truthful ordinary-operation choices."""
+
+    for item in items:
+        if item.get("status") != "wildcard_conflict":
+            continue
+        target_type = item.get("target_type", "")
+        target_id = item.get("target_id", "")
+        shared_targets = [
+            candidate for candidate in items
+            if candidate.get("kind") == "target"
+            and candidate.get("target_type") == target_type
+            and candidate.get("target_id") == target_id
+            and candidate.get("current_values", {}).get("model_key") == WILDCARD_MODEL_KEY
+        ]
+        candidate_urls = {
+            str(candidate.get("proposed_values", {}).get("image_url") or "")
+            for candidate in shared_targets
+        }
+        candidate_urls.discard("")
+        shared_candidate = next(iter(candidate_urls)) if len(candidate_urls) == 1 else ""
+        current = item.get("current_values", {})
+        exact_owner = next((
+            candidate.get("current_values")
+            for candidate in items
+            if candidate.get("kind") == "target"
+            and candidate.get("model_key") == item.get("model_key")
+            and candidate.get("target_type") == target_type
+            and candidate.get("target_id") == target_id
+            and candidate.get("current_values", {}).get("model_key") == item.get("model_key")
+        ), None)
+        item["ownership_resolution"] = {
+            "shared_owner": {
+                "model_key": WILDCARD_MODEL_KEY,
+                "target_type": target_type,
+                "target_id": target_id,
+                "image_url": current.get("image_url", ""),
+            },
+            "current_exact_owner": exact_owner,
+            "affected_models": sorted({
+                str(candidate.get("model_key") or "") for candidate in shared_targets
+                if candidate.get("model_key")
+            }),
+            "exact_operation": {
+                "allowed": bool(item.get("model_key") and item.get("proposed_values", {}).get("image_url")),
+                "candidate_url": item.get("proposed_values", {}).get("image_url", ""),
+                "blocked_reason": "" if item.get("proposed_values", {}).get("image_url") else "No candidate URL is available for this exact model target.",
+            },
+            "shared_operation": {
+                "allowed": bool(shared_targets and len(candidate_urls) == 1),
+                "candidate_url": shared_candidate,
+                "blocked_reason": "" if shared_targets and len(candidate_urls) == 1 else (
+                    "Affected models have different candidate URLs; shared wildcard ownership cannot be changed unambiguously."
+                ),
+            },
+        }
+
+
 def build_asset_manager_snapshot(
     workbook_path: Path | str,
     media_urls: Iterable[str],
@@ -1659,6 +1717,7 @@ def build_asset_manager_snapshot(
             "supports_hover": False,
         })
 
+    add_wildcard_ownership_resolution(items)
     items.sort(key=lambda item: (
         ASSET_MANAGER_STATUSES.index(item["status"])
         if item["status"] in ASSET_MANAGER_STATUSES else len(ASSET_MANAGER_STATUSES),
@@ -1795,7 +1854,11 @@ def filter_asset_manager_snapshot(
 
 
 def search_asset_manager_media(
-    snapshot: AssetManagerSnapshot, query: str = "", *, limit: int = 50
+    snapshot: AssetManagerSnapshot,
+    query: str = "",
+    *,
+    offset: int = 0,
+    limit: int = 50,
 ) -> dict[str, Any]:
     """Return a bounded inventory selector bound to the snapshot fingerprints."""
 
@@ -1803,11 +1866,67 @@ def search_asset_manager_media(
     matches = [
         url for url in snapshot.media_urls
         if not needle or needle in url.lower() or needle in filename_stem(url)
-    ][:max(1, min(limit, 100))]
+    ]
+    bounded_limit = max(1, min(limit, 100))
+    bounded_offset = max(0, offset)
     return {
         "fingerprints": snapshot.fingerprints,
         "query": query,
-        "items": [{"url": url, "label": filename_stem(url)} for url in matches],
+        "total": len(matches),
+        "offset": bounded_offset,
+        "limit": bounded_limit,
+        "items": [
+            {"url": url, "label": filename_stem(url)}
+            for url in matches[bounded_offset:bounded_offset + bounded_limit]
+        ],
+    }
+
+
+def search_asset_manager_targets(
+    snapshot: AssetManagerSnapshot,
+    query: str = "",
+    *,
+    model_key: str = "",
+    offset: int = 0,
+    limit: int = 25,
+) -> dict[str, Any]:
+    """Return bounded human-labeled workbook targets from one bound snapshot."""
+
+    needle = query.strip().lower()
+    matches = []
+    for item in snapshot.items:
+        if item.get("kind") != "target" or item.get("model_key") == WILDCARD_MODEL_KEY:
+            continue
+        if model_key and item.get("model_key") != model_key:
+            continue
+        searchable = " ".join(str(item.get(field, "")) for field in (
+            "label", "rpo", "target_id", "target_type", "section_id", "model_key"
+        )).lower()
+        if needle and needle not in searchable:
+            continue
+        matches.append({
+            "item_id": item["id"],
+            "label": item.get("label", "") or item.get("target_id", ""),
+            "canonical_id": item.get("target_id", ""),
+            "model_key": item.get("model_key", ""),
+            "section_id": item.get("section_id", ""),
+            "target_type": item.get("target_type", ""),
+            "target_id": item.get("target_id", ""),
+            "rpo": item.get("rpo", ""),
+        })
+    matches.sort(key=lambda item: (
+        item["label"].lower(), item["canonical_id"], item["model_key"], item["item_id"]
+    ))
+    bounded_limit = max(1, min(limit, 100))
+    bounded_offset = max(0, offset)
+    return {
+        "fingerprints": snapshot.fingerprints,
+        "query": query,
+        "model_key": model_key,
+        "total": len(matches),
+        "offset": bounded_offset,
+        "limit": bounded_limit,
+        "items": matches[bounded_offset:bounded_offset + bounded_limit],
     }
 
 

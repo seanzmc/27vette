@@ -792,6 +792,7 @@ def asset_reconciliation(
 @app.get("/api/assets/media-options")
 def asset_media_options(
     query: str = Query("", max_length=200),
+    offset: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
     conn=Depends(projection_connection),
 ):
@@ -803,8 +804,47 @@ def asset_media_options(
         })
     try:
         return asset_workspace.search_media_options(
-            config.DEFAULT_WORKBOOK, query, limit=limit
+            config.DEFAULT_WORKBOOK, query, offset=offset, limit=limit
         )
+    except asset_workspace.asset_map_sync.WordPressMediaFetchError as exc:
+        raise HTTPException(502, detail={
+            "status": "asset_media_inventory_unavailable",
+            "message": str(exc),
+        }) from exc
+    except (OSError, ValueError) as exc:
+        raise HTTPException(422, detail={
+            "status": "asset_reconciliation_failed",
+            "message": str(exc),
+        }) from exc
+
+
+@app.get("/api/assets/assignment-targets")
+def asset_assignment_targets(
+    query: str = Query("", max_length=200),
+    model: str = Query("", max_length=80),
+    offset: int = Query(0, ge=0),
+    limit: int = Query(25, ge=1, le=100),
+    conn=Depends(projection_connection),
+):
+    workbook = _workbook_state(conn)
+    if workbook["state"] != "current":
+        raise HTTPException(409, detail={
+            "status": "asset_reconciliation_workbook_not_current",
+            "message": "Asset Manager requires a verified current projection of the workbook.",
+        })
+    try:
+        return asset_workspace.search_assignment_targets(
+            config.DEFAULT_WORKBOOK,
+            query,
+            model_key=model,
+            offset=offset,
+            limit=limit,
+        )
+    except asset_workspace.asset_map_sync.WordPressMediaFetchError as exc:
+        raise HTTPException(502, detail={
+            "status": "asset_media_inventory_unavailable",
+            "message": str(exc),
+        }) from exc
     except (OSError, ValueError) as exc:
         raise HTTPException(422, detail={
             "status": "asset_reconciliation_failed",

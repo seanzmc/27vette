@@ -170,11 +170,11 @@ cross-draft apply immediately creates a P0 stop and supersedes this sequence.
   immediate, durable Undo before a no-dependent delete remains in the draft.
 - [x] **P2.4 / WM-007 — Advanced continuity.** Preserve selected model,
   collection, search, page/offset, scroll, and editor context after draft saves.
-- [ ] **P2.5 / WM-009 — Media target lookup.** Replace the 837-item native select
+- [x] **P2.5 / WM-009 — Media target lookup.** Replace the 837-item native select
   with bounded searchable/paged assignment-target selection.
-- [ ] **P2.6 / WM-009 — Media feedback.** Show explicit empty-result and API-error
+- [x] **P2.6 / WM-009 — Media feedback.** Show explicit empty-result and API-error
   states for inventory/media search.
-- [ ] **P2.7 / WM-009 — Wildcard conflicts.** Distinguish presentation editing
+- [x] **P2.7 / WM-009 — Wildcard conflicts.** Distinguish presentation editing
   from ownership-conflict resolution and provide a truthful resolution path or
   an explicit blocked reason.
 - [ ] **P2.8 / WM-010 — Draft-effective details.** Render proposed effective
@@ -765,6 +765,63 @@ Exit gate: MEDIA-01–06 pass with bounded query counts and real-browser evidenc
 for no results, API failure/retry, paged assignment, resolvable conflict, and
 blocked ambiguous conflict. No WordPress mutation occurs.
 
+**Closed 2026-09-01 — implementation `845c105`.** Asset inventory and assignment
+targets now use fingerprint-bound, server-filtered pages instead of an unbounded
+target select. Human target labels lead while canonical IDs, type, model, and
+section remain visible. Loading, no-results, API-error/Retry, stale-fingerprint,
+selection, and paging states remain distinct, and reconciliation refresh keeps
+the open inspector plus its unsaved candidate and target choice.
+
+Wildcard-conflict presentation fields are now explicitly separate from
+ownership. The reconciliation snapshot exposes the shared wildcard owner,
+current exact ownership, affected models, candidate URL, and one allowed or
+blocked result for each ordinary exact/shared operation. Exact ownership can be
+authored as a model row; shared ownership is refused when affected models have
+different candidates rather than implying that a presentation edit resolves it.
+
+Acceptance evidence:
+
+- MEDIA-01–04: focused helper/API tests cover bounded media and target pages,
+  human labels plus canonical IDs, model scope, and shared reconciliation
+  fingerprints. Source-contract tests cover separate loading, empty, error,
+  Retry, stale, selection, and paging states. Isolated Chrome rendered a
+  no-match empty result, a forced API failure distinct from that result, a
+  successful Retry, a twelve-result target page, and a selected target that
+  stayed selected after reconciliation refresh.
+- MEDIA-05–06: helper and resolution tests cover exact ownership as an ordinary
+  model-scoped `assets` add and refuse ambiguous shared ownership. Isolated
+  Chrome showed presentation and ownership as separate actions, staged the
+  exact-model operation, and displayed the disabled shared action with the
+  different-candidate blocked reason.
+- Browser/protected proof: the isolated server used a copied workbook/output
+  root on `127.0.0.1:8062`. Desktop and 390x844 checks retained the inspector
+  and selected target through refresh, kept dirty-close protection, reported
+  no captured console/runtime errors, and measured no document-level overflow
+  at 390 px. No WordPress request mutated media. Canonical
+  `stingray_master.xlsx`, `form-output/`, and `form-app/` remained clean versus
+  `origin/main`; hashes stayed `3127e663…` (workbook), `3794c9cd…` (`data.js`),
+  and `370de000…` (`index.html`).
+- Validation: the complete catalog-owned Manager checkpoint passed in one
+  process with `398 passed, 2 skipped, 77 subtests`; frontend production build,
+  backend `py_compile`, focused owners, and `git diff --check` passed. The
+  catalog-selected layered run reported `ok: true` across 42 gates in 223.549
+  seconds, including the isolated all-model candidate lane, frontend build, and
+  one-process Manager group (`377 passed, 2 skipped, 77 subtests`).
+
+Checkpoint drift disposition:
+
+| Surface | Checkpoint 2B disposition |
+|---|---|
+| Registry/workbook authority | Inspected, no change; target identity and asset writable fields continue to derive from workbook-owned reconciliation and the registered `asset_map` contract. |
+| Projection representation | Inspected, no schema change; lookups read the current fingerprint-bound snapshot. |
+| API/read model | Media lookup gained offset metadata; a bounded model-aware assignment-target lookup and wildcard-ownership evidence were added. |
+| Editor/mutation capability | Images gained paged target selection and two explicit wildcard ownership actions; both still emit ordinary durable `assets` operations. |
+| Draft overlay/review/history | Existing draft evidence, fingerprint staleness, Review links, and unsaved-close handling are preserved; no lifecycle/history shape changed. |
+| Writer/apply impact | Inspected, no change; no copied or canonical Apply/Rebuild ran because this read/triage checkpoint saves draft intent only. |
+| Generator/publication impact | No change; protected workbook, generated contracts, publication bundle, and cache-bearing HTML remained byte-identical. |
+| Focused test owner | Existing `test_asset_map_sync.py`, `test_workbook_manager.py`, and `test_workbook_manager_images_workspace_parity.py`; no catalog edit or new gate. |
+| README/User Guide | Updated bounded lookup, truthful error/Retry states, and separate wildcard ownership guidance without changing validation commands. |
+
 ### Checkpoint 2C — draft-effective connected details
 
 Objective: close P2.8 / WM-010.
@@ -1325,3 +1382,23 @@ Each authorized checkpoint appends one concise dated record containing:
   at delivery head `969fedb`. Residual risk: none implied. All P1 audit
   checkpoints 1A–1E are closed; P2 remains separately authorized checkpoint by
   checkpoint.
+- **2026-09-01 — Checkpoint 2B / P2.5–P2.7 / WM-009:** closed by implementation
+  `845c105`. Fingerprint-bound media and assignment-target lookups are bounded,
+  searchable, paged, model-aware, and labeled with human names plus canonical
+  evidence. Empty, API-error/Retry, stale, selection, and refresh-continuity
+  states remain distinct. Wildcard presentation editing is separate from exact
+  or shared ownership operations, and ambiguous shared ownership stays blocked.
+  MEDIA-01–06 RED/GREEN owners, the 398-test complete Manager command, the
+  catalog-selected 42-gate layered run, frontend build, Python compilation,
+  isolated desktop/mobile Chrome proof, and protected hashes are recorded in
+  the checkpoint section above. README and operator guidance were updated;
+  registry, projection schema, writer, ChangeSet, generated/customer runtime,
+  dependencies, dealer, deployment, and WordPress media were inspected with no
+  change. Copied-workbook Apply/Rebuild, live WordPress mutation, dealer
+  submission, and deployment were not run because this checkpoint changes only
+  read/triage and ordinary draft-intent composition. Residual risk: none
+  implied. Delivery branch `feat/workbook-manager-checkpoint-2b`, implementation
+  `845c105`, closeout `e6f14fb`, and PR #70
+  (`https://github.com/seanzmc/27vette/pull/70`) are delivered; remote
+  release-candidate CI and Codex finding disposition are pending. Checkpoint 2C
+  does not begin without a new user instruction.

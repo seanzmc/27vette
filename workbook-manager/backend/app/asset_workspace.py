@@ -139,7 +139,27 @@ def get_asset_manager_view(
 
 
 def search_media_options(
-    workbook_path: Path, query: str, *, limit: int = 50
+    workbook_path: Path, query: str, *, offset: int = 0, limit: int = 50
 ) -> dict[str, Any]:
     snapshot = get_asset_manager_snapshot(workbook_path)
-    return asset_map_sync.search_asset_manager_media(snapshot, query, limit=limit)
+    return asset_map_sync.search_asset_manager_media(
+        snapshot, query, offset=offset, limit=limit
+    )
+
+
+def search_assignment_targets(
+    workbook_path: Path,
+    query: str,
+    *,
+    model_key: str = "",
+    offset: int = 0,
+    limit: int = 25,
+) -> dict[str, Any]:
+    snapshot = get_asset_manager_snapshot(workbook_path)
+    return asset_map_sync.search_asset_manager_targets(
+        snapshot,
+        query,
+        model_key=model_key,
+        offset=offset,
+        limit=limit,
+    )
