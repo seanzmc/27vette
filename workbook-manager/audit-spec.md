@@ -1398,5 +1398,7 @@ Each authorized checkpoint appends one concise dated record containing:
   submission, and deployment were not run because this checkpoint changes only
   read/triage and ordinary draft-intent composition. Residual risk: none
   implied. Delivery branch `feat/workbook-manager-checkpoint-2b`, implementation
-  `845c105`; PR creation follows the verified documentation closeout. Checkpoint
-  2C does not begin without a new user instruction.
+  `845c105`, closeout `e6f14fb`, and PR #70
+  (`https://github.com/seanzmc/27vette/pull/70`) are delivered; remote
+  release-candidate CI and Codex finding disposition are pending. Checkpoint 2C
+  does not begin without a new user instruction.

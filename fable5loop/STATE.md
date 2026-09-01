@@ -24,7 +24,8 @@ Keep this file small — it is read at the start of every session:
   recorded inline and in §14.
 - **Active workflow:** Normal repository path.
 - **Branch/commit:** `feat/workbook-manager-checkpoint-2b`; implementation
-  `845c105`; verified documentation closeout and PR delivery are in progress.
+  `845c105`; verified documentation closeout `e6f14fb`; PR #70
+  (`https://github.com/seanzmc/27vette/pull/70`) open.
 - **Last completed:** Closed MEDIA-01–06: replaced the unbounded assignment
   target select with fingerprint-bound searchable pages, separated empty from
   API-error/Retry and stale states, preserved the open selection through
@@ -38,10 +39,11 @@ Keep this file small — it is read at the start of every session:
   Manager group (377 passed, 2 skipped, 77 subtests). Focused owners, backend
   `py_compile`, `git diff --check`, desktop/390x844 isolated Chrome, and
   protected hash/diff checks passed.
-- **Next action:** Push the verified closeout and open the Checkpoint 2B PR;
-  await review. Do not begin Checkpoint 2C without a new user instruction.
-- **Blockers or closeout gaps:** None before delivery. Remote release-candidate
-  CI and Codex finding disposition will be pending after PR creation.
+- **Next action:** Await PR #70 review and remote release-candidate/Codex
+  finding-disposition results. Do not begin Checkpoint 2C without a new user
+  instruction.
+- **Blockers or closeout gaps:** None locally. Remote release-candidate CI and
+  Codex finding disposition are pending.
 - **Protected boundaries:** Canonical workbook, generated runtime contracts,
   `form-app/data.js`, cache-bearing HTML, write/apply semantics, dealer
   submission, deployment, and WordPress media unchanged. Manager APIs changed
