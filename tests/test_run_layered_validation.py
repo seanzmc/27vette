@@ -27,6 +27,14 @@ def _load_planner():
     return module
 
 
+def _load_runner():
+    spec = importlib.util.spec_from_file_location("run_layered_validation", SCRIPT)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def _catalog(tmp_path: Path) -> Path:
     data = json.loads(CATALOG.read_text(encoding="utf-8"))
     data["gates"] = [
@@ -491,6 +499,37 @@ def test_pr_planner_selects_catalog_gates_that_read_a_changed_governance_doc():
     assert [s["name"] for s in planner.plan_validation(["fable5loop/STATE.md"])["include"]] == [
         "handoff-contracts"
     ]
+
+
+def test_spec_governance_gate_is_selected_for_its_generator_inputs():
+    """A generator-file diff must run the governance gate that pins its roles.
+
+    The gate's assertions import ``model_configs``, ``runtime_metadata``, and
+    ``schema_validation`` to pin generation roles, metadata roles, header
+    parity, and required sheets, but it declared only Manager surfaces, so the
+    layered selector never picked it for those files: they classify to the
+    ``generator`` surface through the ``scripts/`` prefix mapping, and nothing
+    else selects a layer 0 gate from ``reads``.
+    """
+
+    runner = _load_runner()
+    catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
+    governance = next(
+        gate
+        for gate in catalog["gates"]
+        if gate["id"] == "py.test_workbook_manager_spec_governance"
+    )
+    for path in (
+        "scripts/corvette_form_generator/model_configs.py",
+        "scripts/corvette_form_generator/runtime_metadata.py",
+        "scripts/corvette_form_generator/schema_validation.py",
+    ):
+        assert path in governance["reads"], path
+        selected, surfaces, _ = runner.selected_gates(catalog, [path])
+        assert "generator" in surfaces, path
+        assert "py.test_workbook_manager_spec_governance" in {
+            gate["id"] for gate in selected
+        }, path
 
 
 def test_ci_infrastructure_only_runs_contracts_not_product_inventory():

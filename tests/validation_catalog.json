@@ -2611,7 +2611,8 @@
       "primary_authority": "structural_invariant",
       "changed_surfaces": [
         "workbook_manager",
-        "workbook_domain_registry"
+        "workbook_domain_registry",
+        "generator"
       ],
       "reads": [
         "workbook-manager/audit-spec.md",
