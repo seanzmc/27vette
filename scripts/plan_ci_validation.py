@@ -233,6 +233,54 @@ def _docs_only_shard() -> dict[str, object]:
     )
 
 
+def _catalog_read_owner_gate_ids(
+    doc_paths: Iterable[str],
+    *,
+    repo_root: Path = REPO_ROOT,
+) -> tuple[str, ...]:
+    """Layer 0-3 catalog gates that declare one of ``doc_paths`` in ``reads``.
+
+    ``_is_documentation`` keeps ``.md`` paths out of the layered runner, so a
+    gate whose *input* is a governance document (``workbook-manager/audit-spec.md``
+    for ``py.test_workbook_manager_spec_governance``) was never selected by the
+    diff it exists to guard. The catalog already records that dependency; this
+    reads it instead of keeping a third hand-written path list.
+    """
+
+    wanted = set(doc_paths)
+    if not wanted:
+        return ()
+    catalog = json.loads((repo_root / CATALOG_PATH).read_text(encoding="utf-8"))
+    return tuple(
+        sorted(
+            gate["id"]
+            for gate in catalog["gates"]
+            if int(gate.get("layer", 4)) < 4
+            and wanted.intersection(gate.get("reads", ()))
+        )
+    )
+
+
+def _docs_read_owners_shard(
+    gate_ids: Iterable[str],
+    *,
+    repo_root: Path = REPO_ROOT,
+) -> dict[str, object]:
+    """Run the cataloged gates that read the changed documentation files."""
+
+    catalog = json.loads((repo_root / CATALOG_PATH).read_text(encoding="utf-8"))
+    by_id = {gate["id"]: gate for gate in catalog["gates"]}
+    ordered = sorted(dict.fromkeys(gate_ids))
+    return _shard(
+        "docs-read-owners",
+        " && ".join(str(by_id[gate_id]["command"]) for gate_id in ordered),
+        description=(
+            "Run the catalog gates that read the changed documentation: "
+            + ", ".join(ordered)
+        ),
+    )
+
+
 def _handoff_contract_shard() -> dict[str, object]:
     return _shard(
         "handoff-contracts",
@@ -438,6 +486,10 @@ SMOKE_EXEMPT_SHARD_PREFIXES = {
     # Emitted only for gates a purely additive catalog edit declared, and the
     # command is those gates' own catalog commands.
     "catalog-new-gates": "requires an additive catalog diff to exist",
+    # Command is the catalog commands of whichever gates declare a changed
+    # documentation path in `reads`; smoke-ci-contracts and the docs-only smoke
+    # prove the wiring (plain catalog commands, project deps) it reuses.
+    "docs-read-owners": "command is derived from the changed docs' catalog readers",
 }
 
 
@@ -701,6 +753,39 @@ def plan_validation(
 
     if handoff_changed:
         _add(shards, _handoff_contract_shard())
+
+    # Documentation is excluded from the layered runner above, so a cataloged
+    # gate that *reads* a changed document is selected here from the catalog's
+    # own `reads` declarations rather than from a hand-kept path list. Handoff
+    # files already own the handoff-contracts shard and are not repeated here.
+    doc_read_owners = _catalog_read_owner_gate_ids(
+        path
+        for path in paths
+        if _is_documentation(path) and not path.startswith("fable5loop/")
+    )
+    if doc_read_owners:
+        # Skip gates an already-planned shard runs (ci-contracts runs the always
+        # gates that read README.md), so a wide diff does not re-run them. A gate
+        # counts as planned when every test file it owns already appears in a
+        # planned command.
+        planned_commands = " && ".join(str(shard["command"]) for shard in shards.values())
+        catalog_gates = {
+            gate["id"]: gate
+            for gate in json.loads((REPO_ROOT / CATALOG_PATH).read_text(encoding="utf-8"))["gates"]
+        }
+
+        def _already_planned(gate_id: str) -> bool:
+            gate: dict[str, object] = catalog_gates[gate_id]
+            if str(gate["command"]) in planned_commands:
+                return True
+            files = [str(path) for path in (gate.get("test_files") or [])]  # type: ignore[union-attr]
+            return bool(files) and all(path in planned_commands for path in files)
+
+        doc_read_owners = tuple(
+            gate_id for gate_id in doc_read_owners if not _already_planned(gate_id)
+        )
+    if doc_read_owners:
+        _add(shards, _docs_read_owners_shard(doc_read_owners))
 
     if layered_paths:
         _add(shards, _layered_changed_surfaces_shard(layered_paths))

@@ -287,6 +287,45 @@ def check_residual_risk_is_not_contradicted(lines: list[str]) -> None:
 CLOSED_WITHOUT_PR_RECORD = frozenset({"1A", "2A"})
 
 
+# §11.2 item 1 (2026-09-01 amendment): a RED is a failing assertion against
+# existing code, never an existence failure. This regex is the checkable half of
+# that rule — it catches a closure that *cites* an existence failure as its RED.
+# It cannot verify that a RED ever ran, that it ran against the unmodified tree,
+# or that the assertion it names was the decisive one; those remain review.
+EXISTENCE_FAILURE_RE = re.compile(
+    r"\b(?:RED|first failed|failures? proved|initial focused .{0,40}?failed)\b[^.]{0,200}?"
+    r"(?:`404`|\b404\b|ERR_MODULE_NOT_FOUND|ModuleNotFoundError|ImportError|"
+    r"\bmissing (?:\w+ )?(?:endpoint|import|selector|module|symbol)\b|\babsent (?:\w+ )?(?:selector|endpoint|route|import)\b|"
+    r"\bundefined (?:symbol|export)\b|is not defined\b|cannot find module\b)",
+    re.I | re.S,
+)
+
+# Closures written before the rule and left as evidence: 1A (`404`), 1B (absent
+# registry selector), 1D (`ERR_MODULE_NOT_FOUND`). Fixing them would be
+# retroactive editing of evidence; the set is pinned so the exception cannot grow
+# and shrinks (failing the assertion) if a record is rewritten.
+RED_EXISTENCE_FAILURE_RECORDS = frozenset({"1A", "1B", "1D"})
+
+
+def check_red_evidence_is_not_an_existence_failure(lines: list[str]) -> None:
+    """§11.2 item 1: no closed checkpoint may cite a 404 / missing import / absent
+    selector as its RED proof, except the three pre-rule records pinned above."""
+    offenders = {
+        checkpoint
+        for checkpoint, record in completion_records(lines).items()
+        if EXISTENCE_FAILURE_RE.search(record)
+    }
+    # Checkpoint bodies carry validation prose above the closure line; include it.
+    for name, body in checkpoint_bodies(lines).items():
+        if name in closed_checkpoints(lines) and EXISTENCE_FAILURE_RE.search("\n".join(body)):
+            offenders.add(name)
+    assert offenders == RED_EXISTENCE_FAILURE_RECORDS, (
+        "closed checkpoints citing an existence failure as RED changed; "
+        f"now {sorted(offenders)}, pinned {sorted(RED_EXISTENCE_FAILURE_RECORDS)}. "
+        "A new entry violates §11.2 item 1; a removed entry means re-pin."
+    )
+
+
 def check_every_closed_checkpoint_records_delivery(lines: list[str]) -> None:
     """§12/§14: a closed checkpoint names its PR, and any CI/merge wording it
     carries is self-consistent (never 'pending' beside 'passed' or 'merged').
@@ -418,6 +457,53 @@ def check_family_matrix_is_fully_classified(matrix: dict[str, dict[str, str]]) -
     assert not drift, f"family moved between Manager surfaces; re-pin deliberately: {drift}"
 
 
+# --- preserved-sheet universe pin (Checkpoint 2D precondition) -----------------
+
+# The four sheets Checkpoint 2D (spec §7, "direct management of preserved
+# sheets") will register as writable families, and the generator's required
+# fixed-sheet list. Neither is registry-derived: `KNOWN_PRESERVED_SHEETS`
+# (catalog.py:25-31) is the only thing separating `workbook_preserved_known`
+# from `workbook_preserved_unknown` in classify_workbook_sheets (catalog.py:
+# 437-441), and `REQUIRED_SHEETS` (schema_validation.py:84-96) is what
+# `required_sheet_names()` (catalog.py:478-485) and the importer's
+# `missing_sheet` error (importer.py:320-326) key on. 2D moves sheets *out* of
+# the first set and *into* the registry; pinning both here makes that move a
+# deliberate edit rather than a side effect, and catches a sheet renamed or
+# dropped from the generator list before the Manager silently reclassifies it
+# as unknown.
+PINNED_PRESERVED_SHEETS = frozenset({
+    "PriceRef", "context_choice_copy", "rule_phrase_map", "runtime_rule_exceptions",
+})
+PINNED_REQUIRED_SHEETS = frozenset({
+    "model_master", "model_workbook_sources", "model_variants", "model_registry_promotion",
+    "variant_master", "section_master", "lt_interiors", "LZ_Interiors",
+    "model_interior_scope", "interior_components", "PriceRef",
+})
+
+
+def check_preserved_and_required_sheets_are_pinned(
+    *,
+    preserved=manager_catalog.KNOWN_PRESERVED_SHEETS,
+    required=schema_validation.REQUIRED_SHEETS,
+    table_specs=manager_catalog.TABLE_SPECS,
+) -> None:
+    """2D precondition: the preserved-sheet set and the generator's required-sheet
+    list match their pins, and no preserved sheet is *also* already addressed by
+    a Manager `TableSpec.sheet` (which would make it both workbook-owned and
+    Manager-projected)."""
+    assert set(preserved) == PINNED_PRESERVED_SHEETS, (
+        "KNOWN_PRESERVED_SHEETS changed; Checkpoint 2D owns that move — re-pin deliberately: "
+        f"{sorted(set(preserved) ^ PINNED_PRESERVED_SHEETS)}"
+    )
+    assert set(required) == PINNED_REQUIRED_SHEETS, (
+        "REQUIRED_SHEETS changed; re-pin deliberately: "
+        f"{sorted(set(required) ^ PINNED_REQUIRED_SHEETS)}"
+    )
+    spec_sheets = {sheet for spec in table_specs for sheet in (spec.sheet or ())}
+    overlap = spec_sheets & set(preserved)
+    assert not overlap, f"preserved sheets already addressed by a Manager TableSpec: {sorted(overlap)}"
+
+
 # --- tests against the live repository ----------------------------------------
 
 
@@ -451,6 +537,14 @@ def test_every_closed_checkpoint_names_its_pr_with_consistent_delivery_state(spe
 
 def test_every_registry_family_and_role_is_classified_on_every_surface():
     check_family_matrix_is_fully_classified(family_surface_matrix())
+
+
+def test_preserved_and_required_sheet_universes_are_pinned():
+    check_preserved_and_required_sheets_are_pinned()
+
+
+def test_no_new_closure_cites_an_existence_failure_as_red(spec_lines):
+    check_red_evidence_is_not_an_existence_failure(spec_lines)
 
 
 def test_this_gate_is_cataloged_as_read_only():
@@ -540,4 +634,32 @@ def test_checks_fail_on_seeded_violations(spec_lines, audit_text):
                 model_collections=tuple(t for t in manager_catalog.MODEL_COLLECTIONS if t != "pricing"),
                 structure_tables=tuple(manager_catalog.STRUCTURE_TABLES) + ("pricing",),
             )
+        )
+    # 2D precondition: a preserved sheet dropped (as 2D will do) or a required
+    # sheet renamed must re-pin; a preserved sheet that gains a TableSpec is a
+    # dual-ownership error.
+    with pytest.raises(AssertionError, match="KNOWN_PRESERVED_SHEETS changed"):
+        check_preserved_and_required_sheets_are_pinned(
+            preserved=tuple(s for s in manager_catalog.KNOWN_PRESERVED_SHEETS if s != "PriceRef")
+        )
+    with pytest.raises(AssertionError, match="REQUIRED_SHEETS changed"):
+        check_preserved_and_required_sheets_are_pinned(
+            required=tuple(s if s != "LZ_Interiors" else "lz_interiors" for s in schema_validation.REQUIRED_SHEETS)
+        )
+    with pytest.raises(AssertionError, match="already addressed by a Manager TableSpec"):
+        spec = manager_catalog.TABLE_SPECS[0]
+        check_preserved_and_required_sheets_are_pinned(
+            table_specs=(*manager_catalog.TABLE_SPECS, spec.__class__(**{**spec.__dict__, "sheet": ("PriceRef",)}))
+        )
+    # §11.2 item 1: a new closure citing an existence failure as RED (2B gains one)
+    # fails; a pre-rule record rewritten to remove its 404 also fails (re-pin).
+    with pytest.raises(AssertionError, match="citing an existence failure as RED changed"):
+        check_red_evidence_is_not_an_existence_failure(
+            seeded("**Closed 2026-09-01 — implementation `845c105`.**",
+                   "**Closed 2026-09-01 — implementation `845c105`.** RED tests first failed with `404` on the absent endpoint.")
+        )
+    with pytest.raises(AssertionError, match="citing an existence failure as RED changed"):
+        check_red_evidence_is_not_an_existence_failure(
+            seeded("focused RED failures proved the missing endpoint (`404`), missing",
+                   "focused RED failures proved the wrong status list, missing")
         )

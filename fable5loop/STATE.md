@@ -19,40 +19,46 @@ Keep this file small — it is read at the start of every session:
 ## Current handoff
 
 - **Updated:** 2026-09-01
-- **Owning specification:** none new — analysis-only task. Findings document
-  `docs/wbm-governance-consolidation.md` (11,994 B; task prompt untracked at
-  `docs/wbm-consolidation-prompt.md`). No ledger item, app code, registry,
-  workbook, or generated artifact changed.
-- **Active workflow:** Workbook Manager governance consolidation — COMPLETE,
-  delivered for review. Next repository work is the §7 recommendation below.
-- **Current status:** findings document within prose budget (11,994 B <
-  12,077 B saved); all gates green; PR open, awaiting review.
-- **Branch/commit:** `docs/wbm-governance-consolidation` from `origin/main`
-  `25c7234`; PR open to `main` (URL in the PR list); not merged.
-- **Last completed:** Phases 1–5. Inventory (12 authorities), 8-conflict
-  register (C1 "closed" vocabulary largest; C2 1C "still coalesces" is a false
-  positive — DRAFT-02 + `test_workbook_manager_drafts.py:296`), measured cost
-  table (gates ≈2 min local/≤10 min CI; 17 Codex findings on 7 PRs after green
-  gates; 20 docs-only spec commits), structural finding (registry hypothesis
-  partly wrong; drift surfaces are `MODEL_COLLECTIONS`/roles/`REQUIRED_SHEETS`),
-  deletion list (net −12,077 B measured), §7 next action. New gate
-  `tests/test_workbook_manager_spec_governance.py` (10 tests, 0.11 s) incl.
-  per-family Manager-surface pin (15 Advanced / 10 structure / 1 read-only);
-  RED shown on 3 real-file seeds then reverted, 12 more seeds in-file.
-- **Validation:** spec_governance 10 passed; `test_state_handoff` +
-  `test_catalog_change_scope` + `test_validation_catalog` 71 passed;
-  `catalog_change_scope.py` base→head `full: false, gate(s) added`; Manager
-  serial group 377 passed/2 skipped/77 subtests 91.36 s;
-  `validate_state_handoff.py` passed; `git diff --check` clean.
-- **Next action:** per findings §7 — one docs-only PR applying deletion list
-  §6 verbatim to `workbook-manager/audit-spec.md` and `AGENTS.md`, guarded by
-  the new gate (it forces the 1A/2A PR additions and removal of the `{1A, 2A}`
-  exception). Then Checkpoint 2C.
+- **Owning specification:** `workbook-manager/audit-spec.md` (§6 preamble,
+  §11.2 item 1, §14 bullet amended — RED rule). Report:
+  `docs/wbm-consolidation-followup.md` (task prompt untracked at
+  `docs/wbm-followup-prompt.md`). No app code, workbook, or artifact changed.
+- **Active workflow:** Workbook Manager governance consolidation — follow-up
+  pass COMPLETE; PR open. Checkpoint 2C not opened.
+- **Current status:** (1) CI classifier defect **(b)** proved and fixed:
+  `plan_ci_validation.py` planned `audit-spec.md`+`AGENTS.md` as the
+  `docs-only` echo while the catalog selector chose 23 gates; new
+  `docs-read-owners` shard selects Layer 0-3 gates whose catalog `reads`
+  names a changed document (no `ci`/`path_surfaces` edit). (2) RED rule
+  written into the spec and half-mechanised (existence-failure citations
+  fail; pre-rule 1A/1B/1D pinned). Retro count: 16 of 17 code findings + 1
+  half would plausibly have been caught. (3) Ambient-binding class named
+  (action-scope binding drift), 14 sites enumerated, 4 live divergences
+  (`ModelOperations.jsx:272-296` undo lifetime; `AssetManager.jsx:339` bulk
+  button on old-scope counts; `GroupEditor.jsx:200-207` hidden member ID;
+  `App.jsx:65-71` `*` leaks off Images). (4) `KNOWN_PRESERVED_SHEETS` /
+  `REQUIRED_SHEETS` pinned in the governance gate ahead of 2D.
+- **Branch/commit:** `docs/wbm-consolidation-followup` from
+  `docs/wbm-governance-consolidation` `0da6f9a` (PR #71 base); PR open to
+  `main`; not merged.
+- **Last completed:** the four corrections above; governance gate 10→12 tests.
+- **Validation:** spec_governance 12 passed (+ real-file RED seed reverted);
+  planner test RED against stashed planner → GREEN; CI-contract owners 80
+  passed; finalize 4 OK / split 5 OK; `test_state_handoff` +
+  `test_catalog_change_scope` + `test_validation_catalog` 61 passed;
+  `catalog_change_scope` vs `0da6f9a` `descriptive catalog fields only`;
+  `validate_state_handoff.py` passed; `git diff --check` clean. Not run:
+  Manager serial group (no Manager source/fixture change), browser (no UI).
+- **Next action:** merge this PR (planner fix runs `--full` once), then the §6
+  deletion PR — which will now plan as `docs-read-owners` and run the gate —
+  folding both findings documents into its description and deleting them.
+  Then a stop under AGENTS §4 for the §3.3 ambient-binding checkpoint
+  (four live sites), before 2C.
 - **Blockers or closeout gaps:** none. Latent: catalog `owning_specification`
-  points at an archived path (C8) — catalog-only fix; `test_state_handoff.py`
-  seed anchor now derives the gate count from the live catalog (was literal 75).
+  (C8) still points at an archived path.
 - **Protected boundaries:** dealer submission, deployment, workbook, generated
-  artifacts, `form-app/data.js`, WordPress — untouched.
+  artifacts, `form-app/data.js`, WordPress, catalog `ci`/`serial_groups` —
+  untouched.
 
 ## Verified facts
 

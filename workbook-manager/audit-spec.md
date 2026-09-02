@@ -347,9 +347,10 @@ objects, and stale cross-workspace query parameters are not URL state.
 
 ## 6. P1 implementation checkpoints
 
-Each checkpoint is independently useful and must be authorized, RED-tested,
-implemented, browser-proved where visible, closed in this specification, and
-stopped before the next begins.
+Each checkpoint is independently useful and must be authorized, RED-tested (a
+failing assertion against existing code, per §11.2 item 1 — not an existence
+failure), implemented, browser-proved where visible, closed in this
+specification, and stopped before the next begins.
 
 ### Checkpoint 1A — trustworthy durable workflow history
 
@@ -1174,7 +1175,18 @@ so completeness cannot pass over a shrunken universe.
 
 Every checkpoint:
 
-1. RED proof against the unmodified implementation;
+1. RED proof against the unmodified implementation. A RED counts only when the
+   failing assertion runs against code that already exists: the test reaches the
+   asserted route/function/element and the failure is a wrong value, wrong
+   state, or wrong response body (or a rejected call that should have been
+   accepted, and vice-versa). A `404`, `ERR_MODULE_NOT_FOUND`, missing import,
+   missing selector, or undefined symbol is an existence failure and is not
+   RED evidence — those failures cannot distinguish a wrong implementation from
+   an absent one, and 0 of the 17 review findings on PRs #58–#70 would have
+   surfaced as one. For a checkpoint that adds a new surface, the RED must
+   target an existing surface the new behavior changes (a list that must now
+   include a new state, a response field that must now carry a new value).
+   Record the exact assertion message in the closure, not "tests first failed";
 2. exact focused tests while editing;
 3. current catalog-selected Manager serial group in one process locally; CI no
    longer runs it that way — the planner splits the owner into five disjoint
@@ -1299,7 +1311,7 @@ Each authorized checkpoint appends one concise dated record containing:
 
 - ledger items closed;
 - files/families/APIs changed;
-- RED and acceptance evidence;
+- RED and acceptance evidence, quoting the RED assertion message (§11.2 item 1);
 - browser and protected-boundary proof;
 - relevant checks not run and why;
 - residual risk or “none implied”;

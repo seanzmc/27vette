@@ -456,6 +456,43 @@ def test_pr_planner_uses_a_no_toolchain_check_for_docs_only():
     assert plan["include"][0]["node"] is False
 
 
+def test_pr_planner_selects_catalog_gates_that_read_a_changed_governance_doc():
+    """A docs-only diff must still run the gate whose *input* is that document.
+
+    Before this, ``workbook-manager/audit-spec.md`` + ``AGENTS.md`` planned as
+    ``["docs-only"]`` — an echo — while the catalog's layered selector chose 23
+    gates for the same paths, including ``py.test_workbook_manager_spec_governance``
+    whose ``reads`` names the spec. The two classifiers disagreed on selection,
+    not just on a label. The selection is catalog-derived (``reads``), so a new
+    doc-reading gate is picked up without editing the planner.
+    """
+
+    planner = _load_planner()
+    catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
+    readers_of_spec = {
+        gate["id"]
+        for gate in catalog["gates"]
+        if "workbook-manager/audit-spec.md" in gate.get("reads", ()) and gate["layer"] < 4
+    }
+    assert "py.test_workbook_manager_spec_governance" in readers_of_spec
+
+    plan = planner.plan_validation(["workbook-manager/audit-spec.md", "AGENTS.md"])
+    names = [shard["name"] for shard in plan["include"]]
+    assert names == ["docs-read-owners"], names
+    command = plan["include"][0]["command"]
+    for gate_id in readers_of_spec:
+        gate = next(g for g in catalog["gates"] if g["id"] == gate_id)
+        assert gate["command"] in command, (gate_id, command)
+    assert plan["include"][0]["python"] is True
+
+    # A document nothing in the catalog reads still plans as the echo shard, and
+    # a handoff-only diff keeps its dedicated shard without a duplicate.
+    assert [s["name"] for s in planner.plan_validation(["docs/x.md"])["include"]] == ["docs-only"]
+    assert [s["name"] for s in planner.plan_validation(["fable5loop/STATE.md"])["include"]] == [
+        "handoff-contracts"
+    ]
+
+
 def test_ci_infrastructure_only_runs_contracts_not_product_inventory():
     planner = _load_planner()
     plan = planner.plan_validation(["scripts/plan_ci_validation.py"])
@@ -775,6 +812,7 @@ def _scenario_reachable_shards(planner) -> dict[str, dict]:
         ["tests/workbook_manager_fixtures.py"],
         ["form-app/app.js"],
         ["fable5loop/STATE.md"],
+        ["workbook-manager/audit-spec.md", "AGENTS.md"],
     )
     reachable = {
         str(shard["name"]): shard
