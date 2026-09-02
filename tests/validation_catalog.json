@@ -2598,7 +2598,7 @@
       "disposition": "keep",
       "disposition_reason": "Catalog-driven CI selection, conservative fallback, shared serial-group one-process execution, changed-path transport, and stage-timed report contract.",
       "notes": "CI passes changed paths through --changed-file-list so spaces are preserved and deleted paths remain classifiable.",
-      "collected_tests": 8,
+      "collected_tests": 10,
       "baseline_result": "pass"
     },
     {

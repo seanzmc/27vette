@@ -520,6 +520,19 @@ def test_pr_planner_selects_catalog_gates_that_read_a_changed_governance_doc():
     ]
 
 
+def test_pr_planner_routes_each_governance_document_through_its_catalog_reader():
+    """Both documents the spec-governance gate reads select it — without a
+    hand-kept path list in the planner (the catalog ``reads`` field owns it)."""
+
+    planner = _load_planner()
+    assert not hasattr(planner, "SPEC_GOVERNANCE_DOC_PATHS")
+    for doc in ("workbook-manager/audit-spec.md", "workbook-manager/wbookMgrAuditRpt.md"):
+        plan = planner.plan_validation([doc])
+        names = [shard["name"] for shard in plan["include"]]
+        assert names == ["catalog-read-owners"], (doc, names)
+        assert "tests/test_workbook_manager_spec_governance.py" in plan["include"][0]["command"]
+
+
 def test_pr_planner_selects_catalog_gates_that_read_changed_manager_code():
     """A Manager-source diff must run the gate that pins the changed file.
 

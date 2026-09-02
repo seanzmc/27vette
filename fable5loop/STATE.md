@@ -21,11 +21,16 @@ Keep this file small — it is read at the start of every session:
 - **Updated:** 2026-09-02
 - **Owning specification:** `workbook-manager/audit-spec.md` (§6 preamble,
   §11.2 item 1, §14 bullet amended — RED rule). Report:
-  `docs/wbm-consolidation-followup.md` (task prompt untracked at
-  `docs/wbm-followup-prompt.md`). No app code, workbook, or artifact changed.
+  `docs/wbm-consolidation-followup.md`; task prompts tracked at
+  `docs/wbm-consolidation-prompt.md`, `docs/wbm-followup-prompt.md`;
+  `docs/pr-coder-runbook.md` added. No app code, workbook, or artifact changed.
 - **Active workflow:** Workbook Manager governance consolidation — follow-up
-  pass COMPLETE; PR open (both Codex P2 review findings fixed on the branch).
-  Checkpoint 2C not opened.
+  pass COMPLETE; PR #72 open (both Codex P2 review findings fixed), merged
+  with `main` after PR #71 landed. Conflict resolution: `main`'s hand-kept
+  `SPEC_GOVERNANCE_DOC_PATHS` / `spec-governance` shard (+ smoke) is
+  superseded by `catalog-read-owners`; list, shard, and smoke removed, `main`'s
+  two routing tests folded into one catalog-reader routing test, split-plan
+  contract back to 19 shards / 5 smokes. Checkpoint 2C not opened.
 - **Current status:** (1) CI classifier defect **(b)** proved and fixed:
   `plan_ci_validation.py` planned `audit-spec.md`+`AGENTS.md` as the
   `docs-only` echo while the catalog selector chose 23 gates; the read-owner
@@ -46,19 +51,18 @@ Keep this file small — it is read at the start of every session:
   explorer/drafts/api.js reader gates that were silently skipped.
 - **Branch/commit:** `docs/wbm-consolidation-followup` from
   `docs/wbm-governance-consolidation` `0da6f9a` (PR #71 base); PR open to
-  `main`; not merged. Review fixes: `a9832ff` (generator surface),
-  planner/read-owner commit on top.
+  `main`; not merged. Review fixes `a9832ff`, `9bff41d`; merge of
+  `origin/main` (`ebd5ccc`) + tracked docs on top.
 - **Last completed:** the four corrections above; governance gate 10→12 tests;
   both PR #72 review findings fixed and validated.
-- **Validation:** spec_governance 12 passed (+ real-file RED seed reverted);
-  planner tests RED against pre-fix planner → GREEN; catalog-contract owners
-  115 passed; finalize 4 OK / split 5 OK; `test_state_handoff` +
-  `test_catalog_change_scope` + `test_validation_catalog` 61 passed;
-  `catalog_change_scope` vs `0da6f9a` `descriptive catalog fields only` (vs
-  `main`: gate additive); `validate_state_handoff.py` passed; `git diff
-  --check` clean. Not run: Manager serial group (no Manager source/fixture
-  change), browser (no UI).
-- **Next action:** merge this PR (planner fix runs `--full` once), then the §6
+- **Validation:** post-merge 2026-09-02: `test_run_layered_validation` +
+  split/finalize plan contracts + `test_validation_catalog` +
+  `test_catalog_change_scope` + `test_workbook_manager_spec_governance` +
+  `test_state_handoff` — 124 passed; `validate_state_handoff.py` passed;
+  `git diff --check` clean. Pre-merge evidence (RED→GREEN planner tests,
+  `catalog_change_scope`) in `docs/wbm-consolidation-followup.md`. Not run:
+  Manager serial group (no Manager source/fixture change), browser (no UI).
+- **Next action:** merge PR #72 (planner fix runs `--full` once), then the §6
   deletion PR — which will now plan as `catalog-read-owners` and run the gate —
   folding both findings documents into its description and deleting them.
   Then a stop under AGENTS §4 for the §3.3 ambient-binding checkpoint
