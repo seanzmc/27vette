@@ -138,6 +138,20 @@ MANAGER_SUPPORT_TESTS = (
     "tests/test_workbook_manager_apply_rebuild.py",
 )
 
+# The spec-governance gate is the executable owner of the audit-spec
+# invariants and reads these two workbook-manager documents. _is_documentation
+# classifies every .md path as documentation and keeps it out of
+# layered_paths, so the catalog's surface declaration alone can never fire:
+# without this explicit selection an audit-spec or audit-report edit plans
+# only the docs-only echo shard and the gate never runs in PR CI.
+SPEC_GOVERNANCE_DOC_PATHS = frozenset(
+    {
+        "workbook-manager/audit-spec.md",
+        "workbook-manager/wbookMgrAuditRpt.md",
+    }
+)
+SPEC_GOVERNANCE_TEST = "tests/test_workbook_manager_spec_governance.py"
+
 CI_INFRA_PATHS = {
     ".github/workflows/release-candidate.yml",
     ".github/workflows/codex-finding-disposition.yml",
@@ -239,6 +253,14 @@ def _handoff_contract_shard() -> dict[str, object]:
         ".venv/bin/python scripts/validate_state_handoff.py && "
         ".venv/bin/python -m pytest tests/test_state_handoff.py -q",
         description="Validate the operational handoff contract.",
+    )
+
+
+def _spec_governance_shard() -> dict[str, object]:
+    return _shard(
+        "spec-governance",
+        _pytest_command(SPEC_GOVERNANCE_TEST),
+        description="Run the executable audit-spec invariants when the spec or its report changes.",
     )
 
 
@@ -464,6 +486,7 @@ def _smoke_shards() -> tuple[dict[str, object], ...]:
             _handoff_contract_shard(),
             _manager_read_explorer_shard(),
             _docs_only_shard(),
+            _spec_governance_shard(),
         )
     )
 
@@ -598,6 +621,7 @@ def plan_validation(
     manager_fixture_changed = MANAGER_FIXTURE_HELPER in paths
     handoff_changed = any(path.startswith("fable5loop/") for path in paths)
     ci_changed = any(_is_ci_infrastructure(path) for path in paths)
+    spec_governance_changed = bool(SPEC_GOVERNANCE_DOC_PATHS.intersection(paths))
 
     layered_paths = [
         path
@@ -701,6 +725,9 @@ def plan_validation(
 
     if handoff_changed:
         _add(shards, _handoff_contract_shard())
+
+    if spec_governance_changed:
+        _add(shards, _spec_governance_shard())
 
     if layered_paths:
         _add(shards, _layered_changed_surfaces_shard(layered_paths))

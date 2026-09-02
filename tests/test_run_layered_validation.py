@@ -456,6 +456,24 @@ def test_pr_planner_uses_a_no_toolchain_check_for_docs_only():
     assert plan["include"][0]["node"] is False
 
 
+def test_pr_planner_routes_audit_spec_edits_through_the_governance_gate():
+    planner = _load_planner()
+    plan = planner.plan_validation(["workbook-manager/audit-spec.md"])
+    # _is_documentation keeps every .md path out of layered_paths, so the
+    # spec-governance gate must be selected by these paths explicitly or an
+    # audit-spec edit plans only the docs-only echo shard.
+    assert [shard["name"] for shard in plan["include"]] == ["spec-governance"]
+    assert "tests/test_workbook_manager_spec_governance.py" in plan["include"][0]["command"]
+
+
+def test_pr_planner_routes_the_audit_report_through_the_governance_gate():
+    planner = _load_planner()
+    plan = planner.plan_validation(["workbook-manager/wbookMgrAuditRpt.md"])
+    names = [shard["name"] for shard in plan["include"]]
+    assert "spec-governance" in names
+    assert "docs-only" not in names
+
+
 def test_ci_infrastructure_only_runs_contracts_not_product_inventory():
     planner = _load_planner()
     plan = planner.plan_validation(["scripts/plan_ci_validation.py"])
@@ -492,6 +510,7 @@ def test_manual_full_plan_partitions_every_measured_heavy_owner():
         "smoke-handoff-contracts",
         "smoke-manager-read-explorer",
         "smoke-docs-only",
+        "smoke-spec-governance",
     ]
 
     product = plan["include"][0]
@@ -775,6 +794,7 @@ def _scenario_reachable_shards(planner) -> dict[str, dict]:
         ["tests/workbook_manager_fixtures.py"],
         ["form-app/app.js"],
         ["fable5loop/STATE.md"],
+        ["workbook-manager/audit-spec.md"],
     )
     reachable = {
         str(shard["name"]): shard
@@ -915,6 +935,7 @@ def test_smoke_shards_keep_the_real_shard_wiring():
             planner._manager_review_shard(),
             planner._handoff_contract_shard(),
             planner._docs_only_shard(),
+            planner._spec_governance_shard(),
         )
     }
 
