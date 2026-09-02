@@ -248,14 +248,33 @@ def check_checkboxes_match_closures(lines: list[str]) -> None:
             )
 
 
+# Exit-gate scenarios currently carrying §10 `— closed <date>` labels (live
+# spec, 2026-09-01): the five DRAFT scenarios of closed Checkpoint 1C.
+# Checkpoints 1A, 1B, 1D, 1E, 2A, and 2B closed through their §6–8/§14 records
+# without per-scenario labels — §10 itself defines no mandatory label — so an
+# empty `marked` is legitimate for them. Pinning the labeled set closes the one
+# drift the per-row loop below cannot see: removing any or all current labels
+# leaves `marked` empty, the loop then asserts nothing, and the check stayed
+# green. Now that removal fails here until the pin is deliberately updated
+# alongside the spec edit.
+EXPECTED_CLOSED_SCENARIOS = frozenset({
+    "DRAFT-01", "DRAFT-02", "DRAFT-03", "DRAFT-04", "DRAFT-05",
+})
+
+
 def check_closed_scenarios_belong_to_closed_checkpoints(lines: list[str]) -> None:
     """§10 `— closed <date>` labels: only on scenarios whose checkpoint is
-    closed, and then on every scenario of that exit gate, not a subset."""
+    closed, then on every scenario of that exit gate, not a subset, and never
+    silently removed from the labeled set."""
     bodies, closed = checkpoint_bodies(lines), closed_checkpoints(lines)
     closed_scenarios = {
         sid for sid, line in scenario_definitions(lines).items()
         if re.search(r"— closed \d{4}-\d{2}-\d{2}", line)
     }
+    assert closed_scenarios == EXPECTED_CLOSED_SCENARIOS, (
+        "closed-scenario labels changed; relabel deliberately and update "
+        f"EXPECTED_CLOSED_SCENARIOS: {sorted(closed_scenarios ^ EXPECTED_CLOSED_SCENARIOS)}"
+    )
     for row in traceability_rows(lines):
         named = {t for t in expand_ranges(row["scenarios"]) if "-" in t}
         for checkpoint in re.findall(r"\b[0-9][A-Z]\b", row["checkpoint"]):
@@ -510,6 +529,13 @@ def test_checks_fail_on_seeded_violations(spec_lines, audit_text):
     with pytest.raises(AssertionError):
         check_closed_scenarios_belong_to_closed_checkpoints(
             seeded("- **EFFECTIVE-01:**", "- **EFFECTIVE-01 — closed 2026-09-01:**")
+        )
+    # §10: strip every closure label from Checkpoint 1C's scenarios. `marked`
+    # is then empty and the per-row loop asserts nothing, so the pinned labeled
+    # set is what must go red here.
+    with pytest.raises(AssertionError):
+        check_closed_scenarios_belong_to_closed_checkpoints(
+            seeded(" — closed 2026-08-31", "", count=5)
         )
     # §14: defer work in the same record that claims no residual risk.
     with pytest.raises(AssertionError):
