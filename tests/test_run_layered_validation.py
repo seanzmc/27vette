@@ -27,6 +27,14 @@ def _load_planner():
     return module
 
 
+def _load_runner():
+    spec = importlib.util.spec_from_file_location("run_layered_validation", SCRIPT)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def _catalog(tmp_path: Path) -> Path:
     data = json.loads(CATALOG.read_text(encoding="utf-8"))
     data["gates"] = [
@@ -313,7 +321,14 @@ def test_pr_planner_keeps_manager_partitions_when_the_diff_adds_frontend_files()
         "manager-non-api-sync-and-export",
         "manager-non-api-export-overlay",
         "handoff-contracts",
+        "catalog-read-owners",
     ]
+    # The read-owners shard runs the gates that pin files this diff touches
+    # exactly: the review display-label contract reads explorer.py, and the
+    # control-metadata gate reads frontend/src/api.js.
+    read_owners = plan["include"][-1]
+    assert "tests/test_group_display_label_contract.py" in read_owners["command"]
+    assert "tests/test_workbook_manager_control_metadata.py" in read_owners["command"]
     commands = "\n".join(str(shard["command"]) for shard in plan["include"])
     assert "test_workbook_manager_generated_parity.py" not in commands
     assert "test_workbook_manager_apply_rebuild.py" not in commands
@@ -352,11 +367,17 @@ def test_pr_planner_routes_explorer_only_to_exact_api_nodes():
     assert [shard["name"] for shard in plan["include"]] == [
         "ci-contracts",
         "manager-read-explorer",
+        "catalog-read-owners",
     ]
-    explorer = plan["include"][-1]
+    explorer = plan["include"][-2]
     assert explorer["python"] is True
     assert explorer["node"] is False
     assert "test_connected_group_detail_leads_with_description_and_named_members" in explorer["command"]
+    # The display-label gate pins explorer.py itself (catalog `reads`), so an
+    # explorer-only diff runs it alongside the API acceptance slice.
+    assert (
+        "tests/test_group_display_label_contract.py" in plan["include"][-1]["command"]
+    )
     assert "test_workbook_manager_generated_parity.py" not in explorer["command"]
 
 
@@ -413,7 +434,13 @@ def test_pr_planner_routes_drafts_to_api_and_lifecycle_owners():
         "ci-contracts",
         "manager-api-core",
         "manager-drafts",
+        "catalog-read-owners",
     ]
+    # The review-presentation gate pins drafts.py itself (catalog `reads`).
+    assert (
+        "tests/test_workbook_manager_review_presentation.py"
+        in plan["include"][-1]["command"]
+    )
 
 
 def test_pr_planner_runs_handoff_contracts_for_state_changes():
@@ -456,22 +483,121 @@ def test_pr_planner_uses_a_no_toolchain_check_for_docs_only():
     assert plan["include"][0]["node"] is False
 
 
-def test_pr_planner_routes_audit_spec_edits_through_the_governance_gate():
-    planner = _load_planner()
-    plan = planner.plan_validation(["workbook-manager/audit-spec.md"])
-    # _is_documentation keeps every .md path out of layered_paths, so the
-    # spec-governance gate must be selected by these paths explicitly or an
-    # audit-spec edit plans only the docs-only echo shard.
-    assert [shard["name"] for shard in plan["include"]] == ["spec-governance"]
-    assert "tests/test_workbook_manager_spec_governance.py" in plan["include"][0]["command"]
+def test_pr_planner_selects_catalog_gates_that_read_a_changed_governance_doc():
+    """A docs-only diff must still run the gate whose *input* is that document.
 
+    Before this, ``workbook-manager/audit-spec.md`` + ``AGENTS.md`` planned as
+    ``["docs-only"]`` — an echo — while the catalog's layered selector chose 23
+    gates for the same paths, including ``py.test_workbook_manager_spec_governance``
+    whose ``reads`` names the spec. The two classifiers disagreed on selection,
+    not just on a label. The selection is catalog-derived (``reads``), so a new
+    doc-reading gate is picked up without editing the planner.
+    """
 
-def test_pr_planner_routes_the_audit_report_through_the_governance_gate():
     planner = _load_planner()
-    plan = planner.plan_validation(["workbook-manager/wbookMgrAuditRpt.md"])
+    catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
+    readers_of_spec = {
+        gate["id"]
+        for gate in catalog["gates"]
+        if "workbook-manager/audit-spec.md" in gate.get("reads", ()) and gate["layer"] < 4
+    }
+    assert "py.test_workbook_manager_spec_governance" in readers_of_spec
+
+    plan = planner.plan_validation(["workbook-manager/audit-spec.md", "AGENTS.md"])
     names = [shard["name"] for shard in plan["include"]]
-    assert "spec-governance" in names
-    assert "docs-only" not in names
+    assert names == ["catalog-read-owners"], names
+    command = plan["include"][0]["command"]
+    for gate_id in readers_of_spec:
+        gate = next(g for g in catalog["gates"] if g["id"] == gate_id)
+        assert gate["command"] in command, (gate_id, command)
+    assert plan["include"][0]["python"] is True
+
+    # A document nothing in the catalog reads still plans as the echo shard, and
+    # a handoff-only diff keeps its dedicated shard without a duplicate.
+    assert [s["name"] for s in planner.plan_validation(["docs/x.md"])["include"]] == ["docs-only"]
+    assert [s["name"] for s in planner.plan_validation(["fable5loop/STATE.md"])["include"]] == [
+        "handoff-contracts"
+    ]
+
+
+def test_pr_planner_routes_each_governance_document_through_its_catalog_reader():
+    """Both documents the spec-governance gate reads select it — without a
+    hand-kept path list in the planner (the catalog ``reads`` field owns it)."""
+
+    planner = _load_planner()
+    assert not hasattr(planner, "SPEC_GOVERNANCE_DOC_PATHS")
+    for doc in ("workbook-manager/audit-spec.md", "workbook-manager/wbookMgrAuditRpt.md"):
+        plan = planner.plan_validation([doc])
+        names = [shard["name"] for shard in plan["include"]]
+        assert names == ["catalog-read-owners"], (doc, names)
+        assert "tests/test_workbook_manager_spec_governance.py" in plan["include"][0]["command"]
+
+
+def test_pr_planner_selects_catalog_gates_that_read_changed_manager_code():
+    """A Manager-source diff must run the gate that pins the changed file.
+
+    ``py.test_workbook_manager_spec_governance`` reads
+    ``workbook-manager/backend/app/catalog.py`` and pins its family-to-surface
+    mapping, but the read-owner lookup only considered documentation paths, so
+    a ``catalog.py``-only diff planned ci-contracts + manager-projection and
+    the guard never ran. Exact ``reads`` matches participate in selection for
+    Manager sources the way they already do for documents; the broad glob
+    reads (``workbook-manager/**``) stay out so the narrow Manager shards keep
+    their ownership.
+    """
+
+    planner = _load_planner()
+    plan = planner.plan_validation(["workbook-manager/backend/app/catalog.py"])
+    names = [shard["name"] for shard in plan["include"]]
+    assert "catalog-read-owners" in names, names
+    owners = next(s for s in plan["include"] if s["name"] == "catalog-read-owners")
+    catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
+    governance = next(
+        gate
+        for gate in catalog["gates"]
+        if gate["id"] == "py.test_workbook_manager_spec_governance"
+    )
+    assert governance["command"] in owners["command"]
+
+    # A Manager file nothing pins exactly is unaffected: the narrow shards own
+    # it, and no glob-read gate is resurrected on its behalf.
+    projection_plan = planner.plan_validation(
+        ["workbook-manager/backend/app/projection.py"]
+    )
+    assert "catalog-read-owners" not in {
+        s["name"] for s in projection_plan["include"]
+    }
+
+
+def test_spec_governance_gate_is_selected_for_its_generator_inputs():
+    """A generator-file diff must run the governance gate that pins its roles.
+
+    The gate's assertions import ``model_configs``, ``runtime_metadata``, and
+    ``schema_validation`` to pin generation roles, metadata roles, header
+    parity, and required sheets, but it declared only Manager surfaces, so the
+    layered selector never picked it for those files: they classify to the
+    ``generator`` surface through the ``scripts/`` prefix mapping, and nothing
+    else selects a layer 0 gate from ``reads``.
+    """
+
+    runner = _load_runner()
+    catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
+    governance = next(
+        gate
+        for gate in catalog["gates"]
+        if gate["id"] == "py.test_workbook_manager_spec_governance"
+    )
+    for path in (
+        "scripts/corvette_form_generator/model_configs.py",
+        "scripts/corvette_form_generator/runtime_metadata.py",
+        "scripts/corvette_form_generator/schema_validation.py",
+    ):
+        assert path in governance["reads"], path
+        selected, surfaces, _ = runner.selected_gates(catalog, [path])
+        assert "generator" in surfaces, path
+        assert "py.test_workbook_manager_spec_governance" in {
+            gate["id"] for gate in selected
+        }, path
 
 
 def test_ci_infrastructure_only_runs_contracts_not_product_inventory():
@@ -510,7 +636,6 @@ def test_manual_full_plan_partitions_every_measured_heavy_owner():
         "smoke-handoff-contracts",
         "smoke-manager-read-explorer",
         "smoke-docs-only",
-        "smoke-spec-governance",
     ]
 
     product = plan["include"][0]
@@ -794,7 +919,7 @@ def _scenario_reachable_shards(planner) -> dict[str, dict]:
         ["tests/workbook_manager_fixtures.py"],
         ["form-app/app.js"],
         ["fable5loop/STATE.md"],
-        ["workbook-manager/audit-spec.md"],
+        ["workbook-manager/audit-spec.md", "AGENTS.md"],
     )
     reachable = {
         str(shard["name"]): shard
@@ -935,7 +1060,6 @@ def test_smoke_shards_keep_the_real_shard_wiring():
             planner._manager_review_shard(),
             planner._handoff_contract_shard(),
             planner._docs_only_shard(),
-            planner._spec_governance_shard(),
         )
     }
 

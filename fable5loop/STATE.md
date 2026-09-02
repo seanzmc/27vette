@@ -18,41 +18,60 @@ Keep this file small — it is read at the start of every session:
 
 ## Current handoff
 
-- **Updated:** 2026-09-01
-- **Owning specification:** none new — analysis-only task. Findings document
-  `docs/wbm-governance-consolidation.md` (11,994 B; task prompt untracked at
-  `docs/wbm-consolidation-prompt.md`). No ledger item, app code, registry,
-  workbook, or generated artifact changed.
-- **Active workflow:** Workbook Manager governance consolidation — COMPLETE,
-  delivered for review. Next repository work is the §7 recommendation below.
-- **Current status:** findings document within prose budget (11,994 B <
-  12,077 B saved); all gates green; PR open, awaiting review.
-- **Branch/commit:** `docs/wbm-governance-consolidation` from `origin/main`
-  `25c7234`; PR open to `main` (URL in the PR list); not merged.
-- **Last completed:** Phases 1–5. Inventory (12 authorities), 8-conflict
-  register (C1 "closed" vocabulary largest; C2 1C "still coalesces" is a false
-  positive — DRAFT-02 + `test_workbook_manager_drafts.py:296`), measured cost
-  table (gates ≈2 min local/≤10 min CI; 17 Codex findings on 7 PRs after green
-  gates; 20 docs-only spec commits), structural finding (registry hypothesis
-  partly wrong; drift surfaces are `MODEL_COLLECTIONS`/roles/`REQUIRED_SHEETS`),
-  deletion list (net −12,077 B measured), §7 next action. New gate
-  `tests/test_workbook_manager_spec_governance.py` (10 tests, 0.11 s) incl.
-  per-family Manager-surface pin (15 Advanced / 10 structure / 1 read-only);
-  RED shown on 3 real-file seeds then reverted, 12 more seeds in-file.
-- **Validation:** spec_governance 10 passed; `test_state_handoff` +
-  `test_catalog_change_scope` + `test_validation_catalog` 71 passed;
-  `catalog_change_scope.py` base→head `full: false, gate(s) added`; Manager
-  serial group 377 passed/2 skipped/77 subtests 91.36 s;
-  `validate_state_handoff.py` passed; `git diff --check` clean.
-- **Next action:** per findings §7 — one docs-only PR applying deletion list
-  §6 verbatim to `workbook-manager/audit-spec.md` and `AGENTS.md`, guarded by
-  the new gate (it forces the 1A/2A PR additions and removal of the `{1A, 2A}`
-  exception). Then Checkpoint 2C.
+- **Updated:** 2026-09-02
+- **Owning specification:** `workbook-manager/audit-spec.md` (§6 preamble,
+  §11.2 item 1, §14 bullet amended — RED rule). Report:
+  `docs/wbm-consolidation-followup.md`; task prompts tracked at
+  `docs/wbm-consolidation-prompt.md`, `docs/wbm-followup-prompt.md`;
+  `docs/pr-coder-runbook.md` added. No app code, workbook, or artifact changed.
+- **Active workflow:** Workbook Manager governance consolidation — follow-up
+  pass COMPLETE; PR #72 open (both Codex P2 review findings fixed), merged
+  with `main` after PR #71 landed. Conflict resolution: `main`'s hand-kept
+  `SPEC_GOVERNANCE_DOC_PATHS` / `spec-governance` shard (+ smoke) is
+  superseded by `catalog-read-owners`; list, shard, and smoke removed, `main`'s
+  two routing tests folded into one catalog-reader routing test, split-plan
+  contract back to 19 shards / 5 smokes. Checkpoint 2C not opened.
+- **Current status:** (1) CI classifier defect **(b)** proved and fixed:
+  `plan_ci_validation.py` planned `audit-spec.md`+`AGENTS.md` as the
+  `docs-only` echo while the catalog selector chose 23 gates; the read-owner
+  shard selects Layer 0-3 gates whose catalog `reads` names a changed path —
+  now for Manager sources too (exact matches only), renamed
+  `catalog-read-owners` (2026-09-02 review fix; `catalog.py`-only diffs ran
+  the governance gate never). (2) RED rule
+  written into the spec and half-mechanised (existence-failure citations
+  fail; pre-rule 1A/1B/1D pinned). Retro count: 16 of 17 code findings + 1
+  half would plausibly have been caught. (3) Ambient-binding class named
+  (action-scope binding drift), 14 sites enumerated, 4 live divergences
+  (`ModelOperations.jsx:272-296` undo lifetime; `AssetManager.jsx:339` bulk
+  button on old-scope counts; `GroupEditor.jsx:200-207` hidden member ID;
+  `App.jsx:65-71` `*` leaks off Images). (4) `KNOWN_PRESERVED_SHEETS` /
+  `REQUIRED_SHEETS` pinned in the governance gate ahead of 2D. (5) 2026-09-02
+  Codex P2s: governance gate declares `generator` (its three generator inputs
+  select it); read-owner selection covers Manager code, surfacing
+  explorer/drafts/api.js reader gates that were silently skipped.
+- **Branch/commit:** `docs/wbm-consolidation-followup` from
+  `docs/wbm-governance-consolidation` `0da6f9a` (PR #71 base); PR open to
+  `main`; not merged. Review fixes `a9832ff`, `9bff41d`; merge of
+  `origin/main` (`ebd5ccc`) + tracked docs on top.
+- **Last completed:** the four corrections above; governance gate 10→12 tests;
+  both PR #72 review findings fixed and validated.
+- **Validation:** post-merge 2026-09-02: `test_run_layered_validation` +
+  split/finalize plan contracts + `test_validation_catalog` +
+  `test_catalog_change_scope` + `test_workbook_manager_spec_governance` +
+  `test_state_handoff` — 124 passed; `validate_state_handoff.py` passed;
+  `git diff --check` clean. Pre-merge evidence (RED→GREEN planner tests,
+  `catalog_change_scope`) in `docs/wbm-consolidation-followup.md`. Not run:
+  Manager serial group (no Manager source/fixture change), browser (no UI).
+- **Next action:** merge PR #72 (planner fix runs `--full` once), then the §6
+  deletion PR — which will now plan as `catalog-read-owners` and run the gate —
+  folding both findings documents into its description and deleting them.
+  Then a stop under AGENTS §4 for the §3.3 ambient-binding checkpoint
+  (four live sites), before 2C.
 - **Blockers or closeout gaps:** none. Latent: catalog `owning_specification`
-  points at an archived path (C8) — catalog-only fix; `test_state_handoff.py`
-  seed anchor now derives the gate count from the live catalog (was literal 75).
+  (C8) still points at an archived path.
 - **Protected boundaries:** dealer submission, deployment, workbook, generated
-  artifacts, `form-app/data.js`, WordPress — untouched.
+  artifacts, `form-app/data.js`, WordPress, catalog `ci`/`serial_groups` —
+  untouched.
 
 ## Verified facts
 

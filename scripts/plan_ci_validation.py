@@ -138,20 +138,6 @@ MANAGER_SUPPORT_TESTS = (
     "tests/test_workbook_manager_apply_rebuild.py",
 )
 
-# The spec-governance gate is the executable owner of the audit-spec
-# invariants and reads these two workbook-manager documents. _is_documentation
-# classifies every .md path as documentation and keeps it out of
-# layered_paths, so the catalog's surface declaration alone can never fire:
-# without this explicit selection an audit-spec or audit-report edit plans
-# only the docs-only echo shard and the gate never runs in PR CI.
-SPEC_GOVERNANCE_DOC_PATHS = frozenset(
-    {
-        "workbook-manager/audit-spec.md",
-        "workbook-manager/wbookMgrAuditRpt.md",
-    }
-)
-SPEC_GOVERNANCE_TEST = "tests/test_workbook_manager_spec_governance.py"
-
 CI_INFRA_PATHS = {
     ".github/workflows/release-candidate.yml",
     ".github/workflows/codex-finding-disposition.yml",
@@ -247,20 +233,66 @@ def _docs_only_shard() -> dict[str, object]:
     )
 
 
+def _catalog_read_owner_gate_ids(
+    changed_paths: Iterable[str],
+    *,
+    repo_root: Path = REPO_ROOT,
+) -> tuple[str, ...]:
+    """Layer 0-3 catalog gates that name one of ``changed_paths`` in ``reads``.
+
+    Exact matching is deliberate. Documentation never reaches the layered
+    runner, Manager sources are owned by the hand-classified Manager shards,
+    and the layered selector matches only ``changed_surfaces``, so a gate
+    whose *input* is one of those paths (``workbook-manager/audit-spec.md`` or
+    ``workbook-manager/backend/app/catalog.py`` for
+    ``py.test_workbook_manager_spec_governance``) was never selected by the
+    diff it exists to guard. The wide glob reads the rest of the suite
+    declares (``workbook-manager/**``) are deliberately not expanded here:
+    that would rebuild the every-source-edit explosion the Manager shards
+    exist to avoid. The catalog already records the exact dependency; this
+    reads it instead of keeping a third hand-written path list.
+    """
+
+    wanted = set(changed_paths)
+    if not wanted:
+        return ()
+    catalog = json.loads((repo_root / CATALOG_PATH).read_text(encoding="utf-8"))
+    return tuple(
+        sorted(
+            gate["id"]
+            for gate in catalog["gates"]
+            if int(gate.get("layer", 4)) < 4
+            and wanted.intersection(gate.get("reads", ()))
+        )
+    )
+
+
+def _catalog_read_owners_shard(
+    gate_ids: Iterable[str],
+    *,
+    repo_root: Path = REPO_ROOT,
+) -> dict[str, object]:
+    """Run the cataloged gates that read the changed documentation or Manager code."""
+
+    catalog = json.loads((repo_root / CATALOG_PATH).read_text(encoding="utf-8"))
+    by_id = {gate["id"]: gate for gate in catalog["gates"]}
+    ordered = sorted(dict.fromkeys(gate_ids))
+    return _shard(
+        "catalog-read-owners",
+        " && ".join(str(by_id[gate_id]["command"]) for gate_id in ordered),
+        description=(
+            "Run the catalog gates that read the changed documentation or "
+            "Manager sources: " + ", ".join(ordered)
+        ),
+    )
+
+
 def _handoff_contract_shard() -> dict[str, object]:
     return _shard(
         "handoff-contracts",
         ".venv/bin/python scripts/validate_state_handoff.py && "
         ".venv/bin/python -m pytest tests/test_state_handoff.py -q",
         description="Validate the operational handoff contract.",
-    )
-
-
-def _spec_governance_shard() -> dict[str, object]:
-    return _shard(
-        "spec-governance",
-        _pytest_command(SPEC_GOVERNANCE_TEST),
-        description="Run the executable audit-spec invariants when the spec or its report changes.",
     )
 
 
@@ -460,6 +492,11 @@ SMOKE_EXEMPT_SHARD_PREFIXES = {
     # Emitted only for gates a purely additive catalog edit declared, and the
     # command is those gates' own catalog commands.
     "catalog-new-gates": "requires an additive catalog diff to exist",
+    # Command is the catalog commands of whichever gates declare a changed
+    # documentation or Manager-source path in `reads`; smoke-ci-contracts and
+    # the docs-only smoke prove the wiring (plain catalog commands, project
+    # deps) it reuses.
+    "catalog-read-owners": "command is derived from the changed paths' catalog readers",
 }
 
 
@@ -486,7 +523,6 @@ def _smoke_shards() -> tuple[dict[str, object], ...]:
             _handoff_contract_shard(),
             _manager_read_explorer_shard(),
             _docs_only_shard(),
-            _spec_governance_shard(),
         )
     )
 
@@ -621,7 +657,6 @@ def plan_validation(
     manager_fixture_changed = MANAGER_FIXTURE_HELPER in paths
     handoff_changed = any(path.startswith("fable5loop/") for path in paths)
     ci_changed = any(_is_ci_infrastructure(path) for path in paths)
-    spec_governance_changed = bool(SPEC_GOVERNANCE_DOC_PATHS.intersection(paths))
 
     layered_paths = [
         path
@@ -726,8 +761,43 @@ def plan_validation(
     if handoff_changed:
         _add(shards, _handoff_contract_shard())
 
-    if spec_governance_changed:
-        _add(shards, _spec_governance_shard())
+    # Documentation is excluded from the layered runner above, and Manager
+    # sources are owned by the hand-classified shards there, so a cataloged
+    # gate that *reads* one of those changed files is selected here from the
+    # catalog's own `reads` declarations rather than from a hand-kept path
+    # list. Handoff files already own the handoff-contracts shard and are not
+    # repeated here.
+    read_owner_gate_ids = _catalog_read_owner_gate_ids(
+        path
+        for path in paths
+        if (
+            _is_documentation(path) and not path.startswith("fable5loop/")
+        )
+        or path in manager_source_paths
+    )
+    if read_owner_gate_ids:
+        # Skip gates an already-planned shard runs (ci-contracts runs the always
+        # gates that read README.md), so a wide diff does not re-run them. A gate
+        # counts as planned when every test file it owns already appears in a
+        # planned command.
+        planned_commands = " && ".join(str(shard["command"]) for shard in shards.values())
+        catalog_by_id = {
+            gate["id"]: gate
+            for gate in json.loads((REPO_ROOT / CATALOG_PATH).read_text(encoding="utf-8"))["gates"]
+        }
+
+        def _already_planned(gate_id: str) -> bool:
+            gate: dict[str, object] = catalog_by_id[gate_id]
+            if str(gate["command"]) in planned_commands:
+                return True
+            files = [str(path) for path in (gate.get("test_files") or [])]  # type: ignore[union-attr]
+            return bool(files) and all(path in planned_commands for path in files)
+
+        read_owner_gate_ids = tuple(
+            gate_id for gate_id in read_owner_gate_ids if not _already_planned(gate_id)
+        )
+    if read_owner_gate_ids:
+        _add(shards, _catalog_read_owners_shard(read_owner_gate_ids))
 
     if layered_paths:
         _add(shards, _layered_changed_surfaces_shard(layered_paths))
