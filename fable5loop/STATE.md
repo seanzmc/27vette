@@ -19,39 +19,40 @@ Keep this file small — it is read at the start of every session:
 ## Current handoff
 
 - **Updated:** 2026-09-01
-- **Owning specification:** `workbook-manager/audit-spec.md` — Checkpoint 2B /
-  P2.5–P2.7 / WM-009; PR #70 review remediation (Codex P2 review-body finding).
-- **Active workflow:** Normal repository path.
-- **Branch/commit:** `feat/workbook-manager-checkpoint-2b`; implementation
-  `845c105`; verified documentation closeout `e6f14fb`; PR #70 review fix
-  `536ab44`; PR #70 (`https://github.com/seanzmc/27vette/pull/70`) open.
-- **Last completed:** Disposed the Codex P2 review-body finding on PR #70:
-  `AssetManager.jsx` target/inventory lookup selections now drop when a
-  successful search replaces the visible page or the lookup goes stale, and
-  "Assign to selected target" / "Use selected inventory image" enable only for
-  a selection belonging to the current successful, non-stale result page. The
-  bot review (PRR_kwDOSMmCTs8AAAABLrkWIg) is marked done via ROCKET reaction,
-  read back `viewerHasReacted: true`.
-- **Current status:** Fix `536ab44` is the PR head. No unresolved Codex
-  P0–P5 threads remain on the repository.
-- **Validation:** Frontend gate `npm --prefix workbook-manager/frontend ci
-  --include=dev && npm run build` passed; `tests/
-  test_workbook_manager_images_workspace_parity.py` 19 passed; `git diff
-  --check` clean; isolated-instance headless-Chrome proof (fresh selection
-  binds, page replace / no-result / failed search / live stale flip via
-  inventory SHA change all clear the selection and disable the action, retry
-  recovers) with zero console errors and no horizontal overflow. Full Manager
-  pytest group not run: frontend-only change, no backend/API surface touched.
-- **Next action:** Await remote release-candidate CI and Codex
-  finding-disposition results on `536ab44`. Do not begin Checkpoint 2C without
-  a new user instruction.
-- **Blockers or closeout gaps:** None locally; remote CI pending at handoff
-  time.
-- **Protected boundaries:** Canonical workbook, generated runtime contracts,
-  `form-app/data.js`, cache-bearing HTML, write/apply semantics, dealer
-  submission, deployment, and WordPress media unchanged. The fix is
-  frontend-only selection-state binding; no API, workbook, or generated
-  contract changed.
+- **Owning specification:** none new — analysis-only task. Findings document
+  `docs/wbm-governance-consolidation.md` (11,994 B; task prompt untracked at
+  `docs/wbm-consolidation-prompt.md`). No ledger item, app code, registry,
+  workbook, or generated artifact changed.
+- **Active workflow:** Workbook Manager governance consolidation — COMPLETE,
+  delivered for review. Next repository work is the §7 recommendation below.
+- **Current status:** findings document within prose budget (11,994 B <
+  12,077 B saved); all gates green; PR open, awaiting review.
+- **Branch/commit:** `docs/wbm-governance-consolidation` from `origin/main`
+  `25c7234`; PR open to `main` (URL in the PR list); not merged.
+- **Last completed:** Phases 1–5. Inventory (12 authorities), 8-conflict
+  register (C1 "closed" vocabulary largest; C2 1C "still coalesces" is a false
+  positive — DRAFT-02 + `test_workbook_manager_drafts.py:296`), measured cost
+  table (gates ≈2 min local/≤10 min CI; 17 Codex findings on 7 PRs after green
+  gates; 20 docs-only spec commits), structural finding (registry hypothesis
+  partly wrong; drift surfaces are `MODEL_COLLECTIONS`/roles/`REQUIRED_SHEETS`),
+  deletion list (net −12,077 B measured), §7 next action. New gate
+  `tests/test_workbook_manager_spec_governance.py` (10 tests, 0.11 s) incl.
+  per-family Manager-surface pin (15 Advanced / 10 structure / 1 read-only);
+  RED shown on 3 real-file seeds then reverted, 12 more seeds in-file.
+- **Validation:** spec_governance 10 passed; `test_state_handoff` +
+  `test_catalog_change_scope` + `test_validation_catalog` 71 passed;
+  `catalog_change_scope.py` base→head `full: false, gate(s) added`; Manager
+  serial group 377 passed/2 skipped/77 subtests 91.36 s;
+  `validate_state_handoff.py` passed; `git diff --check` clean.
+- **Next action:** per findings §7 — one docs-only PR applying deletion list
+  §6 verbatim to `workbook-manager/audit-spec.md` and `AGENTS.md`, guarded by
+  the new gate (it forces the 1A/2A PR additions and removal of the `{1A, 2A}`
+  exception). Then Checkpoint 2C.
+- **Blockers or closeout gaps:** none. Latent: catalog `owning_specification`
+  points at an archived path (C8) — catalog-only fix; `test_state_handoff.py`
+  seed anchor now derives the gate count from the live catalog (was literal 75).
+- **Protected boundaries:** dealer submission, deployment, workbook, generated
+  artifacts, `form-app/data.js`, WordPress — untouched.
 
 ## Verified facts
 
@@ -67,7 +68,7 @@ Keep this file small — it is read at the start of every session:
 
 - 2026-08-17: `tests/conftest.py` owns the `scripts/` `sys.path` insertion for the whole test directory, so no pytest command needs `PYTHONPATH=scripts` and every `tests/test_*.py` file runs standalone. The options-sheet quality CLI still needs it, because it is a module invocation rather than a pytest run. Evidence: `env -u PYTHONPATH .venv/bin/python -m pytest <file> -q` for the three previously order-dependent files — 15, 32 and 18 passed.
 
-- 2026-08-17: The validation inventory now has a machine-readable owner. `tests/validation_catalog.json` holds 75 gates, 7 suites, 5 acceptance-lock records, 55 coverage-ledger entries, 7 stale assertions, 10 findings, and 8 expensive setups (counts current as of 2026-08-29 and enforced against the catalog by `scripts/validate_state_handoff.py`; the 2026-08-17 baseline recorded 59/6/33/8 and had gone stale unnoticed); `tests/test_validation_catalog.py` enforces the five §7 conditions with a forced mutation behind each, at gate and suite level. Read counts, timings, layer, authority class, isolation, serialization, and disposition from the catalog rather than re-measuring or re-deriving them. Measured serial baseline on Node 26.7.0 / Python 3.14.7: Node readiness lane 109.27 s / 298 tests / 292 pass; all 16 Node files 111.75 s / 305 tests; Python metadata gate 176.60 s; Manager checkpoint 1,123.47 s; full Python inventory 2,381.46 s / 734 collected. Evidence: `docs/archive/completed-specs/fast-layered-validation/2026-08-17-fast-layered-validation-suite-checkpoint-0-baseline.md`.
+- 2026-08-17: The validation inventory now has a machine-readable owner. `tests/validation_catalog.json` holds 76 gates, 7 suites, 5 acceptance-lock records, 55 coverage-ledger entries, 7 stale assertions, 10 findings, and 8 expensive setups (counts current as of 2026-09-01 and enforced against the catalog by `scripts/validate_state_handoff.py`; the 2026-08-17 baseline recorded 59/6/33/8 and had gone stale unnoticed); `tests/test_validation_catalog.py` enforces the five §7 conditions with a forced mutation behind each, at gate and suite level. Read counts, timings, layer, authority class, isolation, serialization, and disposition from the catalog rather than re-measuring or re-deriving them. Measured serial baseline on Node 26.7.0 / Python 3.14.7: Node readiness lane 109.27 s / 298 tests / 292 pass; all 16 Node files 111.75 s / 305 tests; Python metadata gate 176.60 s; Manager checkpoint 1,123.47 s; full Python inventory 2,381.46 s / 734 collected. Evidence: `docs/archive/completed-specs/fast-layered-validation/2026-08-17-fast-layered-validation-suite-checkpoint-0-baseline.md`.
 
 - 2026-08-13: The focused GSX/ZR1/ZR1X hotfix now present on `origin/main` corrected workbook-owned GSX 3LT AH2 pricing to `$0` while retaining the 2LT `$1,695` charge, activated ZR1/ZR1X C2Z as non-selectable Standard Equipment with coupe-only `standard` ownership and convertible `unavailable` ownership, regenerated and published the three affected runtime contracts, advanced the data-bundle cache token from 31 to 32, and added focused runtime regression coverage. Its guarded workbook batches, package/schema gates, 67-case runtime switching gate, composed six-model candidate lane, and local browser proof passed before PR #11 merged as `c34f584`. Evidence: `form-output/workbook-edit-log.jsonl`, `tests/multi-model-runtime-switching.test.mjs`, and commit `c34f584`.
 
