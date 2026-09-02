@@ -18,18 +18,21 @@ Keep this file small — it is read at the start of every session:
 
 ## Current handoff
 
-- **Updated:** 2026-09-01
+- **Updated:** 2026-09-02
 - **Owning specification:** `workbook-manager/audit-spec.md` (§6 preamble,
   §11.2 item 1, §14 bullet amended — RED rule). Report:
   `docs/wbm-consolidation-followup.md` (task prompt untracked at
   `docs/wbm-followup-prompt.md`). No app code, workbook, or artifact changed.
 - **Active workflow:** Workbook Manager governance consolidation — follow-up
-  pass COMPLETE; PR open. Checkpoint 2C not opened.
+  pass COMPLETE; PR open (both Codex P2 review findings fixed on the branch).
+  Checkpoint 2C not opened.
 - **Current status:** (1) CI classifier defect **(b)** proved and fixed:
   `plan_ci_validation.py` planned `audit-spec.md`+`AGENTS.md` as the
-  `docs-only` echo while the catalog selector chose 23 gates; new
-  `docs-read-owners` shard selects Layer 0-3 gates whose catalog `reads`
-  names a changed document (no `ci`/`path_surfaces` edit). (2) RED rule
+  `docs-only` echo while the catalog selector chose 23 gates; the read-owner
+  shard selects Layer 0-3 gates whose catalog `reads` names a changed path —
+  now for Manager sources too (exact matches only), renamed
+  `catalog-read-owners` (2026-09-02 review fix; `catalog.py`-only diffs ran
+  the governance gate never). (2) RED rule
   written into the spec and half-mechanised (existence-failure citations
   fail; pre-rule 1A/1B/1D pinned). Retro count: 16 of 17 code findings + 1
   half would plausibly have been caught. (3) Ambient-binding class named
@@ -37,20 +40,26 @@ Keep this file small — it is read at the start of every session:
   (`ModelOperations.jsx:272-296` undo lifetime; `AssetManager.jsx:339` bulk
   button on old-scope counts; `GroupEditor.jsx:200-207` hidden member ID;
   `App.jsx:65-71` `*` leaks off Images). (4) `KNOWN_PRESERVED_SHEETS` /
-  `REQUIRED_SHEETS` pinned in the governance gate ahead of 2D.
+  `REQUIRED_SHEETS` pinned in the governance gate ahead of 2D. (5) 2026-09-02
+  Codex P2s: governance gate declares `generator` (its three generator inputs
+  select it); read-owner selection covers Manager code, surfacing
+  explorer/drafts/api.js reader gates that were silently skipped.
 - **Branch/commit:** `docs/wbm-consolidation-followup` from
   `docs/wbm-governance-consolidation` `0da6f9a` (PR #71 base); PR open to
-  `main`; not merged.
-- **Last completed:** the four corrections above; governance gate 10→12 tests.
+  `main`; not merged. Review fixes: `a9832ff` (generator surface),
+  planner/read-owner commit on top.
+- **Last completed:** the four corrections above; governance gate 10→12 tests;
+  both PR #72 review findings fixed and validated.
 - **Validation:** spec_governance 12 passed (+ real-file RED seed reverted);
-  planner test RED against stashed planner → GREEN; CI-contract owners 80
-  passed; finalize 4 OK / split 5 OK; `test_state_handoff` +
+  planner tests RED against pre-fix planner → GREEN; catalog-contract owners
+  115 passed; finalize 4 OK / split 5 OK; `test_state_handoff` +
   `test_catalog_change_scope` + `test_validation_catalog` 61 passed;
-  `catalog_change_scope` vs `0da6f9a` `descriptive catalog fields only`;
-  `validate_state_handoff.py` passed; `git diff --check` clean. Not run:
-  Manager serial group (no Manager source/fixture change), browser (no UI).
+  `catalog_change_scope` vs `0da6f9a` `descriptive catalog fields only` (vs
+  `main`: gate additive); `validate_state_handoff.py` passed; `git diff
+  --check` clean. Not run: Manager serial group (no Manager source/fixture
+  change), browser (no UI).
 - **Next action:** merge this PR (planner fix runs `--full` once), then the §6
-  deletion PR — which will now plan as `docs-read-owners` and run the gate —
+  deletion PR — which will now plan as `catalog-read-owners` and run the gate —
   folding both findings documents into its description and deleting them.
   Then a stop under AGENTS §4 for the §3.3 ambient-binding checkpoint
   (four live sites), before 2C.

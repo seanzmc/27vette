@@ -74,7 +74,45 @@ Consequence for ordering: this PR *is* the classifier fix, and because it
 touches `scripts/plan_ci_validation.py` the workflow's regex (`release-candidate.yml:59`)
 forces `--full` — the whole inventory runs once on this PR, which is the
 correct cost for a planner change. The §6 deletion PR that follows will plan as
-`docs-read-owners` and actually run the gate.
+`catalog-read-owners` and actually run the gate.
+
+### 1b. Review corrections (2026-09-02, PR #72 Codex P2 ×2)
+
+**Finding 1 — Manager code bypassed the read-owner guard.** The lookup fed only
+`_is_documentation()` paths, so a `catalog.py`-only diff planned
+`ci-contracts` + `manager-projection` and never ran the governance gate that
+imports `catalog.py` and pins its family-to-surface mapping. Fix: the lookup
+now also feeds `manager_source_paths`, and the shard is renamed
+`docs-read-owners` → `catalog-read-owners` (it no longer covers only docs).
+Exact `reads` matches only — the wide globs (`workbook-manager/**`) the rest of
+the suite declares are deliberately not expanded, because that would rebuild
+the every-source-edit explosion the narrow Manager shards exist to avoid.
+
+**Finding 2 — the gate's own generator inputs never selected it.** Its
+assertions import `model_configs` / `runtime_metadata` / `schema_validation`,
+but it declared only `workbook_manager` + `workbook_domain_registry` surfaces;
+those three files classify to `generator` via the `scripts/` prefix. Fix:
+`generator` added to the gate's `changed_surfaces` (catalog edit; committed
+separately as `a9832ff`).
+
+The generalization surfaced two more real catalog-declared dependencies the
+planner had been silently skipping: `explorer.py` →
+`py.test_group_display_label_contract`, `drafts.py` →
+`py.test_workbook_manager_review_presentation`, and (in the wide diff)
+`frontend/src/api.js` → `py.test_workbook_manager_control_metadata`. The three
+pinned planner plans were updated to include `catalog-read-owners` with those
+commands; `main.py`, frontend components, and `styles.css` match nothing
+exactly and are unaffected.
+
+RED → GREEN: `test_pr_planner_selects_catalog_gates_that_read_changed_manager_code`
+failed against the pre-fix planner with
+`['ci-contracts', 'manager-projection']`; the generator-input test failed with
+the gate absent from the selected set. Both pass after. Contract owners:
+`test_run_layered_validation` + `test_validation_catalog` +
+`test_codex_finding_disposition` + `test_catalog_change_scope` +
+`test_workbook_manager_spec_governance` 115 passed; `scripts/test_finalize…`
+4 OK, `scripts/test_split…` 5 OK; `catalog_change_scope` vs `main` reports the
+gate as additive.
 
 ## 2. RED rule
 
