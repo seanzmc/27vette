@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { api } from "../api.js";
+import { operationOverlay } from "../draftOverlayModel.js";
 import {
   applyDraftOverlay,
   editorTarget,
@@ -9,8 +10,19 @@ import {
   matchingDraftOperation,
   relationshipImpact,
 } from "../optionEditorModel.js";
+import DraftOverlay from "./DraftOverlay.jsx";
 import RecordForm from "./RecordForm.jsx";
 import EditorShell from "./EditorShell.jsx";
+
+const OPTION_IMPACT_LABELS = {
+  availability: "Availability rows",
+  groups: "Groups",
+  rules: "Rules",
+  pricingRules: "Pricing rules",
+  variantOverrides: "Variant overrides",
+  defaultRules: "Default rules",
+  images: "Images",
+};
 
 // These are contextual intent headings only. The schema still owns every
 // included field (the schema column list is the editable field list), renderer
@@ -28,41 +40,17 @@ const OPTION_FIELD_GROUPS = [
   { label: "Base pricing", fields: ["price"] },
 ];
 
-// Post-Save state for this option: the effective draft overlay plus direct
-// impact, both derived from durable evidence rather than optimistic local
-// guesses.
-function DraftOverlay({ detail, operation, impact }) {
-  const changed = Object.entries(operation?.changed_fields || {});
+// Post-Save state for this option: the durable operation rendered through the
+// shared Checkpoint 2C overlay panel, never a local diff.
+function SavedOverlay({ operation, impact }) {
+  const overlay = operationOverlay(operation, impact);
   return (
     <div className="option-editor-overlay" data-testid="option-draft-overlay">
-      <h3>Draft overlay</h3>
-      {changed.length === 0 ? (
-        <p className="muted">No effective draft changes remain for this option.</p>
-      ) : (
-        <div className="field-diff">
-          {changed.map(([field, pair]) => (
-            <React.Fragment key={field}>
-              <div className="field-name">{field}</div>
-              <div className="before-value">
-                {pair.before === null ? <em>SQL NULL</em> : String(pair.before)}
-              </div>
-              <div className="after-value">
-                {pair.after === null ? <em>SQL NULL</em> : String(pair.after)}
-              </div>
-            </React.Fragment>
-          ))}
-        </div>
-      )}
-      <h3>Direct impact</h3>
-      <div className="detail-facts">
-        <span><strong>Availability rows</strong>{impact.availability}</span>
-        <span><strong>Groups</strong>{impact.groups}</span>
-        <span><strong>Rules</strong>{impact.rules}</span>
-        <span><strong>Pricing rules</strong>{impact.pricingRules}</span>
-        <span><strong>Variant overrides</strong>{impact.variantOverrides}</span>
-        <span><strong>Default rules</strong>{impact.defaultRules}</span>
-        <span><strong>Images</strong>{impact.images}</span>
-      </div>
+      <DraftOverlay
+        overlay={overlay}
+        impactLabels={OPTION_IMPACT_LABELS}
+        emptyMessage="No effective draft changes remain for this option."
+      />
       <p className="muted">
         Saved to the durable draft only. Review the complete graph in Review &amp;
         Apply; the workbook changes only through Write Approved Changes &amp; Rebuild Form Data.
@@ -162,7 +150,7 @@ export default function OptionEditor({
       }
     >
       {error && <div className="notice err" role="alert">{error}</div>}
-      <DraftOverlay detail={detail} operation={savedOperation} impact={impact} />
+      <SavedOverlay operation={savedOperation} impact={impact} />
     </EditorShell>
   );
 

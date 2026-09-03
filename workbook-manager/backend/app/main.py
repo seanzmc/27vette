@@ -612,6 +612,15 @@ def connected_option(
             lineage=detail["technical"]["lineage"],
             base=detail["option"],
             projection_workbook_sha256=_workbook_state(conn)["imported_sha256"],
+            direct_impact={
+                "availability": len(detail["availability"]),
+                "groups": len(detail["exclusive_groups"]) + len(detail["rule_groups"]),
+                "rules": len(detail["rules"]),
+                "pricing": len(detail["pricing"]),
+                "variant_overrides": len(detail["variant_overrides"]),
+                "default_rules": len(detail["default_rules"]),
+                "assets": len(detail["assets"]),
+            },
         )
     except drafts.DraftError as exc:
         raise _draft_error(exc)
@@ -641,6 +650,7 @@ def connected_group(
             lineage=detail["technical"]["lineage"],
             base=detail["group"],
             projection_workbook_sha256=_workbook_state(conn)["imported_sha256"],
+            direct_impact={"members": detail["member_count"]},
         )
     except drafts.DraftError as exc:
         raise _draft_error(exc)
@@ -761,6 +771,13 @@ def asset_reconciliation(
             "image_fit": list(image_fit.enum if image_fit is not None else ()),
         }
         evidence = drafts.list_asset_resolutions(state_conn, draft_id) if draft_id else []
+        view["queue"]["items"] = drafts.overlay_asset_items(
+            state_conn,
+            draft_id=draft_id,
+            items=view["queue"]["items"],
+            evidence=evidence,
+            projection_workbook_sha256=workbook["imported_sha256"],
+        )
         view["draft_asset_resolutions"] = {
             "count": len(evidence),
             "item_ids": [row["item_id"] for row in evidence],

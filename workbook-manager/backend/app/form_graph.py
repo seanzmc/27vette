@@ -23,6 +23,8 @@ from copy import deepcopy
 from collections import defaultdict
 from typing import Any
 
+from . import draft_overlay
+
 BUCKET_STEP_KEYS = frozenset({"standard_equipment"})
 STRUCTURE_GRAPH_VERSION = "cp4-1"
 _TRUE_VALUES = frozenset({"1", "true", "yes", "y"})
@@ -571,18 +573,25 @@ SUMMARY_OVERLAY_TABLES = frozenset({
 OPTION_GRAPH_FIELDS = frozenset({"section_id", "active"})
 
 
-def _overlay_metadata(operation: dict) -> dict:
-    return {
-        "state": (
-            "added" if operation.get("action") == "add"
-            else "pending_deletion" if operation.get("action") == "delete"
-            else "modified"
-        ),
-        "operation_id": operation.get("id"),
-        "family": operation.get("family"),
-        "action": operation.get("action"),
-        "changed_fields": operation.get("changed_fields") or {},
-    }
+def _overlay_metadata(operation: dict, base: dict | None = None) -> dict:
+    """Graph-node overlay through the shared Checkpoint 2C adapter.
+
+    ``apply_draft_overlay`` runs only after ``overlay_binding_conflicts`` has
+    cleared the draft (``conflicted_draft_overlay`` handles the other branch), so
+    node overlays carry no conflicts here.
+    """
+    return draft_overlay.overlay(
+        draft_id=str(operation.get("draft_id") or ""),
+        operation={**operation, "id": operation.get("id") or 0},
+        base=base,
+    )
+
+
+def _node_base(node: dict, operation: dict) -> dict | None:
+    editor = node.get("editor") or {}
+    if editor.get("table") == operation.get("table_name"):
+        return editor.get("record")
+    return None
 
 
 def _is_graph_operation(operation: dict, model_key: str) -> bool:
@@ -635,6 +644,9 @@ def _apply_section_operation(node: dict, operation: dict, overlay: dict) -> None
     final = operation.get("final") or {}
     placement = node["placement_evidence"]
     deleting = action == "delete"
+    # The node's display_name becomes the draft-effective label below; keep the
+    # authored one so the UI can show authored → proposed (EFFECTIVE-01).
+    node.setdefault("authored_display_name", node["display_name"])
 
     if table == "context_sections":
         placement["context_active"] = False if deleting else _truthy(
@@ -738,7 +750,6 @@ def _apply_option_operation(
     result: dict,
     nodes: dict[str, dict],
     operation: dict,
-    overlay: dict,
 ) -> None:
     entity_key = operation.get("entity_key") or {}
     final = operation.get("final") or {}
@@ -755,15 +766,29 @@ def _apply_option_operation(
             current = match
             break
 
+    overlay = _overlay_metadata(operation, deepcopy(current))
     action = operation.get("action")
     changed = set(operation.get("changed_fields") or {})
+
+    def member_overlay(node: dict, before: int, after: int) -> dict:
+        return draft_overlay.membership(
+            draft_id=str(operation.get("draft_id") or ""),
+            operation={**operation, "id": operation.get("id") or 0},
+            field="options",
+            before=before,
+            after=after,
+        )
+
+    source_membership = None
     if source is not None and action in {"update", "delete"}:
+        before = len(source["options"])
         source["options"] = [
             row for row in source["options"] if row.get("option_id") != option_id
         ]
+        source_membership = member_overlay(source, before, len(source["options"]))
     if action == "delete":
-        if source is not None:
-            source["draft_overlay"] = overlay
+        if source is not None and source_membership is not None:
+            source["draft_overlay"] = source_membership
         return
 
     effective = deepcopy(current or {"option_id": option_id})
@@ -785,10 +810,14 @@ def _apply_option_operation(
         nodes[destination_id] = destination
     effective["section_id"] = destination_id
     effective["draft_overlay"] = overlay
+    destination_before = len(destination["options"])
     destination["options"].append(effective)
-    if source is not None:
-        source["draft_overlay"] = overlay
-    destination["draft_overlay"] = overlay
+    if source is not None and source_membership is not None:
+        source["draft_overlay"] = source_membership
+    if destination is not source:
+        destination["draft_overlay"] = member_overlay(
+            destination, destination_before, len(destination["options"])
+        )
 
 
 def _rebuild_effective_topology(result: dict) -> None:
@@ -918,12 +947,12 @@ def apply_draft_overlay(graph: dict, operations: list[dict]) -> dict:
         table = operation.get("table_name")
         entity_key = operation.get("entity_key") or {}
         final = operation.get("final") or {}
-        overlay = _overlay_metadata(operation)
         if table == "form_steps":
             step_key = entity_key.get("step_key") or final.get("step_key")
             for step in result.get("steps", []):
                 if step.get("step_key") != step_key:
                     continue
+                overlay = _overlay_metadata(operation, deepcopy(step))
                 step.update({key: value for key, value in final.items() if key in step})
                 if final.get("step_label"):
                     step["display_name"] = final["step_label"]
@@ -931,9 +960,12 @@ def apply_draft_overlay(graph: dict, operations: list[dict]) -> dict:
         elif table in SECTION_OVERLAY_TABLES:
             section_id = entity_key.get("section_id") or final.get("section_id")
             if section_id in nodes:
-                _apply_section_operation(nodes[section_id], operation, overlay)
+                node = nodes[section_id]
+                _apply_section_operation(
+                    node, operation, _overlay_metadata(operation, _node_base(node, operation))
+                )
         elif table == "options":
-            _apply_option_operation(result, nodes, operation, overlay)
+            _apply_option_operation(result, nodes, operation)
         summaries.append({
             "operation_id": operation.get("id"),
             "table_name": table,

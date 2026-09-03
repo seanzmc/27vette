@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Filter, LayoutPanelTop, Pencil, X } from "lucide-react";
 import { api } from "../api.js";
+import { hasDraftOverlay, overlayBlockReason, overlayStateLabel } from "../draftOverlayModel.js";
+import DraftOverlay, { EffectiveText } from "./DraftOverlay.jsx";
 import RecordForm from "./RecordForm.jsx";
 
 const FILTERS = [
@@ -42,13 +44,13 @@ function matchesFilter(section, filter) {
   if (filter === "empty") return section.empty;
   if (filter === "inactive") return section.classification === "inactive";
   if (filter === "buckets") return section.classification === "bucket_section";
-  if (filter === "draft") return section.draft_overlay?.state !== "unchanged";
+  if (filter === "draft") return hasDraftOverlay(section.draft_overlay);
   return true;
 }
 
 function stateLabel(section) {
-  if (section.draft_overlay?.state !== "unchanged") {
-    return `Draft ${section.draft_overlay.state.replaceAll("_", " ")}`;
+  if (hasDraftOverlay(section.draft_overlay)) {
+    return overlayStateLabel(section.draft_overlay);
   }
   if (section.classification === "bucket_section") return "Bucket";
   if (section.classification === "unresolved") return "Unresolved";
@@ -90,6 +92,13 @@ export default function SectionsLayout({
   const selected = structure?.graph.section_nodes.find(
     (section) => section.section_id === selectedId
   ) || null;
+  // A conflicted graph overlay (stale binding, terminal draft) blocks every
+  // section mutation with the exact reason; authored values stay displayed.
+  const graphOverlay = structure?.graph.draft_overlay;
+  const graphBlocked = graphOverlay?.state === "conflicted"
+    ? overlayBlockReason(graphOverlay) : "";
+  const editBlocked = !draftMutable
+    ? "The active draft is locked; start a new draft to edit." : graphBlocked;
   const visible = useMemo(
     () => (structure?.graph.section_nodes || []).filter(
       (section) => matchesFilter(section, filter)
@@ -191,7 +200,7 @@ export default function SectionsLayout({
                   <span>{step.runtime_order}</span>
                   <strong>{step.display_name}</strong>
                   <small>{step.section_count} section{step.section_count === 1 ? "" : "s"}</small>
-                  {step.draft_overlay?.state && <em>{step.draft_overlay.state}</em>}
+                  {hasDraftOverlay(step.draft_overlay) && <em>{overlayStateLabel(step.draft_overlay)}</em>}
                 </li>
               ))}
             </ol>
@@ -240,7 +249,7 @@ export default function SectionsLayout({
                 <div className="section-detail-heading">
                   <div>
                     <span className="eyebrow">Connected section detail</span>
-                    <h2>{selected.display_name}</h2>
+                    <h2><EffectiveText overlay={selected.draft_overlay} field="display_label" authored={selected.authored_display_name ?? selected.display_name} /></h2>
                     <span className="mono faint">{selected.section_id}</span>
                   </div>
                   <button className="icon-btn" type="button" onClick={() => navigateSection("")} aria-label="Close section detail">
@@ -249,7 +258,7 @@ export default function SectionsLayout({
                 </div>
 
                 <div className="detail-facts">
-                  <div><span>Runtime placement</span><strong>{selected.step_key || "Unresolved"}</strong></div>
+                  <div><span>Runtime placement</span><strong><EffectiveText overlay={selected.draft_overlay} field="step_key" authored={selected.step_key || "Unresolved"} /></strong></div>
                   <div><span>Workbook evidence</span><strong>{selected.workbook_evidence}</strong></div>
                   <div><span>Fresh-runtime evidence</span><strong>{selected.runtime_evidence}</strong></div>
                   <div><span>State</span><strong>{stateLabel(selected)}</strong></div>
@@ -261,21 +270,20 @@ export default function SectionsLayout({
                   <small>Base: {structure.graph.parity.base_status.replaceAll("_", " ")}</small>
                 </div>
 
-                {selected.draft_overlay?.state !== "unchanged" && (
-                  <div className="notice warn draft_overlay">
-                    Draft {selected.draft_overlay.state.replaceAll("_", " ")} · operation {selected.draft_overlay.operation_id}
-                  </div>
+                {graphBlocked && (
+                  <div className="notice err" role="alert">{graphBlocked} Authored values remain in effect.</div>
                 )}
+                <DraftOverlay overlay={selected.draft_overlay} impactLabels={{ options: "Options" }} testId="section-draft-overlay" />
 
                 <div className="section-detail-actions">
                   {selected.editor ? (
-                    <button className="btn primary" disabled={!draftMutable} onClick={() => startEdit(selected)}>
+                    <button className="btn primary" disabled={Boolean(editBlocked)} title={editBlocked || "Edit section"} onClick={() => startEdit(selected)}>
                       <Pencil size={14} /> Edit section
                     </button>
                   ) : (
                     <>
                       <span className="readonly-label">Reference only · section_master</span>
-                      <button className="btn" disabled={!draftMutable} onClick={() => startEdit(selected)}>
+                      <button className="btn" disabled={Boolean(editBlocked)} title={editBlocked || "Add display metadata"} onClick={() => startEdit(selected)}>
                         Add display metadata
                       </button>
                     </>

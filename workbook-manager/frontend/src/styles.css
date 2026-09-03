@@ -432,6 +432,20 @@ input.text:disabled { opacity: .5; }
 .field-diff .field-name { color: var(--text-dim); background: rgba(255,255,255,.02); }
 .field-diff .before-value { color: var(--red); background: rgba(242,100,124,.04); }
 .field-diff .after-value { color: var(--green); background: rgba(56,198,139,.04); }
+/* Checkpoint 2C — shared draft-effective overlay treatment */
+.draft-overlay { display: grid; gap: 10px; margin: 10px 0; padding: 12px 14px; border-left: 3px solid var(--blue); }
+.draft-overlay.added { border-left-color: var(--green); }
+.draft-overlay.pending_deletion { border-left-color: var(--red); }
+.draft-overlay.conflicted { border-left-color: var(--red); background: rgba(242,100,124,.06); }
+.draft-overlay-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.draft-overlay-head strong { font-size: 13px; }
+.draft-overlay-reason { margin: 0; font-size: 12px; color: var(--text-dim); }
+.draft-overlay h3 { margin: 4px 0 0; font-size: 12px; }
+.effective-text { display: inline-flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.effective-text .authored-value { color: var(--text-faint); text-decoration-color: var(--red); }
+.effective-text .proposed-value { color: var(--green); }
+.form-section-card.draft-pending_deletion, .step-row.draft-pending_deletion { outline: 1px dashed rgba(242,100,124,.5); }
+.form-section-card.draft-added, .step-row.draft-added { outline: 1px dashed rgba(56,198,139,.5); }
 .member-add-panel {
   display: grid; gap: 10px; margin-bottom: 22px; padding: 14px;
   border: 1px solid var(--border); border-radius: 9px; background: rgba(74,163,255,.04);

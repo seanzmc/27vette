@@ -1852,9 +1852,12 @@ class TestApi(unittest.TestCase):
             "draft_id": "reserved-before-first-save",
             "draft_revision": 0,
             "state": "unchanged",
+            "operation": None,
             "base": None,
             "proposed": None,
             "effective": None,
+            "changed_fields": {},
+            "direct_impact": None,
             "conflicts": [],
         })
 
@@ -2081,6 +2084,174 @@ class TestApi(unittest.TestCase):
             detail["draft_overlay"]["effective"]["notes"], proposed_notes
         )
         self.assertEqual(detail["group"]["notes"], base["group"]["notes"])
+        self.assertEqual(
+            self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200
+        )
+
+    def test_connected_overlay_carries_changed_fields_operation_identity_and_impact(self):
+        """Checkpoint 2C EFFECTIVE-01: the detail response itself carries what
+        the draft will produce — changed-field list, exact operation identity,
+        and direct impact — not just a state word the browser must re-derive."""
+        base = self.client.get(
+            "/api/explorer/stingray/options/opt_5zu_001"
+        ).json()
+        original_name = base["option"]["option_name"]
+        draft_id = "connected-option-2c-fields"
+        proposed_name = f"{original_name} 2C"
+        saved = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "options",
+                "model_id": "stingray",
+                "op": "update",
+                "key": {"option_id": "opt_5zu_001"},
+                "record": {"option_name": proposed_name},
+                "actor": "connected-overlay-test",
+            },
+        ).json()
+
+        overlay = self.client.get(
+            "/api/explorer/stingray/options/opt_5zu_001",
+            params={"draft_id": draft_id},
+        ).json()["draft_overlay"]
+
+        self.assertEqual(overlay["state"], "modified")
+        self.assertEqual(overlay["changed_fields"], {
+            "option_name": {"before": original_name, "after": proposed_name},
+        })
+        self.assertEqual(overlay["operation"]["id"], saved["id"])
+        self.assertEqual(overlay["operation"]["action"], "update")
+        self.assertEqual(overlay["operation"]["table_name"], "options")
+        self.assertEqual(overlay["operation"]["source_sheet"], saved["source_sheet"])
+        self.assertEqual(overlay["operation"]["physical_key"], saved["physical_key"])
+        self.assertEqual(overlay["operation"]["entity_key"], {"option_id": "opt_5zu_001"})
+        self.assertEqual(overlay["draft_revision"], saved["id"])
+        self.assertEqual(overlay["direct_impact"], {
+            "availability": len(base["availability"]),
+            "groups": len(base["exclusive_groups"]) + len(base["rule_groups"]),
+            "rules": len(base["rules"]),
+            "pricing": len(base["pricing"]),
+            "variant_overrides": len(base["variant_overrides"]),
+            "default_rules": len(base["default_rules"]),
+            "assets": len(base["assets"]),
+        })
+        self.assertEqual(
+            self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200
+        )
+
+    def test_connected_overlay_of_a_terminal_draft_is_conflicted_not_modified(self):
+        """Checkpoint 2C EFFECTIVE-04: a cancelled draft's intent is no longer
+        active, so its overlay must be a blocked/conflicted state that never
+        replaces the authored value — the same rule the structure graph already
+        applies through overlay_binding_conflicts."""
+        draft_id = "connected-option-2c-terminal"
+        saved = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "options",
+                "model_id": "stingray",
+                "op": "update",
+                "key": {"option_id": "opt_5zu_001"},
+                "record": {"option_name": "Cancelled draft name"},
+                "actor": "connected-overlay-test",
+            },
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+        self.assertEqual(
+            self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200
+        )
+
+        detail = self.client.get(
+            "/api/explorer/stingray/options/opt_5zu_001",
+            params={"draft_id": draft_id},
+        ).json()
+
+        self.assertNotEqual(detail["option"]["option_name"], "Cancelled draft name")
+        self.assertEqual(detail["draft_overlay"]["state"], "conflicted")
+        self.assertIsNone(detail["draft_overlay"]["effective"])
+        self.assertEqual(
+            detail["draft_overlay"]["conflicts"][0]["code"], "draft_terminal"
+        )
+
+    def test_structure_section_node_overlay_uses_the_connected_overlay_contract(self):
+        """Checkpoint 2C: the Sections & Layout graph node and the connected
+        option detail expose one overlay shape — proposed/effective values and
+        changed fields — rather than two independently patched summaries."""
+        draft_id = "structure-section-2c-overlay"
+        base_graph = self.client.get("/api/structure/stingray").json()["graph"]
+        section_id = next(
+            row["section_id"] for row in base_graph["section_nodes"]
+            if row.get("editor") and row["editor"]["table"] == "section_presentation"
+        )
+        saved = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "section_presentation",
+                "model_id": "stingray",
+                "op": "update",
+                "key": {"model_key": "stingray", "section_id": section_id},
+                "record": {"display_label": "Paint finish 2C"},
+                "actor": "connected-overlay-test",
+            },
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+
+        graph = self.client.get(
+            "/api/structure/stingray", params={"draft_id": draft_id}
+        ).json()["graph"]
+        node = next(
+            row for row in graph["section_nodes"] if row["section_id"] == section_id
+        )
+        overlay = node["draft_overlay"]
+
+        self.assertEqual(overlay["state"], "modified")
+        self.assertEqual(overlay["operation"]["id"], saved.json()["id"])
+        self.assertEqual(overlay["operation"]["table_name"], "section_presentation")
+        self.assertEqual(overlay["proposed"]["display_label"], "Paint finish 2C")
+        self.assertEqual(overlay["effective"]["display_label"], "Paint finish 2C")
+        self.assertEqual(
+            overlay["changed_fields"]["display_label"]["after"], "Paint finish 2C"
+        )
+        self.assertEqual(overlay["conflicts"], [])
+        self.assertEqual(
+            self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200
+        )
+
+    def test_asset_reconciliation_items_carry_the_draft_operation_overlay(self):
+        """Checkpoint 2C required work 3: asset detail with an ordinary draft
+        operation shows the coalesced operation beside the engine proposal."""
+        draft_id = "asset-2c-overlay"
+        self.mainmod.asset_workspace.clear_cache()
+        view = self.client.get(
+            "/api/assets/reconciliation",
+            params={"status": "safe_proposal", "draft_id": draft_id},
+        ).json()
+        item = view["queue"]["items"][0]
+        self.assertEqual(item["draft_overlay"]["state"], "unchanged")
+        saved = self.client.post(
+            f"/api/drafts/{draft_id}/asset-resolutions",
+            json={
+                "item_id": item["id"],
+                "resolution_kind": "accept_safe",
+                "fingerprints": view["fingerprints"],
+                "values": {"image_fit": "contain"},
+                "actor": "asset-test",
+            },
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+
+        after = self.client.get(
+            "/api/assets/reconciliation",
+            params={"status": "safe_proposal", "draft_id": draft_id},
+        ).json()
+        drafted = next(row for row in after["queue"]["items"] if row["id"] == item["id"])
+        overlay = drafted["draft_overlay"]
+
+        self.assertEqual(overlay["state"], saved.json()["action"] == "add" and "added" or "modified")
+        self.assertEqual(overlay["operation"]["id"], saved.json()["id"])
+        self.assertEqual(overlay["operation"]["table_name"], "assets")
+        self.assertEqual(overlay["effective"]["image_fit"], "contain")
+        self.assertEqual(overlay["changed_fields"]["image_fit"]["after"], "contain")
         self.assertEqual(
             self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200
         )

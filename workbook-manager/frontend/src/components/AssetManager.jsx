@@ -6,6 +6,8 @@ import {
   Link, RefreshCw, Save, SearchX,
 } from "lucide-react";
 import { api } from "../api.js";
+import { hasDraftOverlay, overlayBlockReason } from "../draftOverlayModel.js";
+import DraftOverlay from "./DraftOverlay.jsx";
 import {
   ALL_MODELS, assetInScope, reconciliationModel,
 } from "../assetScope.js";
@@ -576,6 +578,10 @@ function AssetInspector({
     target_item_id: "",
     ...extra,
   });
+  // EFFECTIVE-04: a stale or terminal draft overlay blocks every durable
+  // resolution on this item with the exact reason; the authored image stays.
+  const overlayBlocked = overlayBlockReason(item.draft_overlay);
+  const canResolve = draftMutable && !overlayBlocked;
   return (
     <EditorShell
       title={`${item.rpo?.toUpperCase() || item.label} · ${item.label}`}
@@ -705,18 +711,26 @@ function AssetInspector({
           {drafted && (
             <div className="notice ok">This item already has evidence in Review &amp; Apply. Saving again may refine the same physical-row operation, but cannot silently retarget it.</div>
           )}
+          <DraftOverlay
+            overlay={item.draft_overlay}
+            impactLabels={{}}
+            testId="asset-draft-overlay"
+          />
+          {overlayBlocked && (
+            <div className="notice err" role="alert">{overlayBlocked} The current workbook image above remains in effect.</div>
+          )}
           {!draftMutable && (
             <div className="notice warn">This draft is no longer mutable. Start a new draft to resolve another asset.</div>
           )}
           {item.status === "safe_proposal" && (
-            <button className="btn primary" disabled={!draftMutable || !!busy} onClick={() => resolve("accept_safe")}>
+            <button className="btn primary" disabled={!canResolve || !!busy} onClick={() => resolve("accept_safe")}>
               <CheckCircle2 size={14} /> Add safe proposal to draft
             </button>
           )}
           {item.status === "ambiguous" && (
             <button
               className="btn primary"
-              disabled={!draftMutable || !!busy || !selectedCandidate}
+              disabled={!canResolve || !!busy || !selectedCandidate}
               onClick={() => resolve("select_candidate", {
                 selected_url: selectedCandidate,
                 values: presentationOnly,
@@ -762,7 +776,7 @@ function AssetInspector({
               <span className="toolbar">
                 <button
                   className="btn primary"
-                  disabled={!draftMutable || !!busy || !inventorySelectionCurrent}
+                  disabled={!canResolve || !!busy || !inventorySelectionCurrent}
                   onClick={() => resolve("inventory_match", {
                     selected_url: inventoryUrl,
                     values: presentationOnly,
@@ -770,7 +784,7 @@ function AssetInspector({
                 >Use selected inventory image</button>
                 <button
                   className="btn"
-                  disabled={!draftMutable || !!busy || !preview.image_url}
+                  disabled={!canResolve || !!busy || !preview.image_url}
                   onClick={() => resolve("manual_url", {
                     selected_url: preview.image_url,
                     values: presentationOnly,
@@ -825,7 +839,7 @@ function AssetInspector({
               <span className="toolbar">
                 <button
                   className="btn primary"
-                  disabled={!draftMutable || !!busy || !targetSelectionCurrent}
+                  disabled={!canResolve || !!busy || !targetSelectionCurrent}
                   onClick={() => resolve("assign_media", {
                     target_item_id: targetItemId,
                     values: presentationOnly,
@@ -833,7 +847,7 @@ function AssetInspector({
                 ><Link size={14} /> Assign to selected target</button>
                 <button
                   className="btn"
-                  disabled={!draftMutable || !!busy}
+                  disabled={!canResolve || !!busy}
                   onClick={() => resolve("ignore", { values: {} })}
                 ><Ban size={14} /> Ignore this exact media identity</button>
               </span>
@@ -842,14 +856,14 @@ function AssetInspector({
           {item.status === "stale_target" && (
             <button
               className="btn danger"
-              disabled={!draftMutable || !!busy}
+              disabled={!canResolve || !!busy}
               onClick={() => resolve("deactivate", {
                 values: { ...resolutionValues, active: false },
               })}
             ><Ban size={14} /> Add explicit stale-row deactivation</button>
           )}
           {item.status === "covered" && (
-            <button className="btn primary" disabled={!draftMutable || !!busy} onClick={() => resolve("edit")}>
+            <button className="btn primary" disabled={!canResolve || !!busy} onClick={() => resolve("edit")}>
               <Save size={14} /> Save presentation edits to draft
             </button>
           )}
@@ -857,7 +871,7 @@ function AssetInspector({
             <div className="asset-resolution-stack">
               <div className="section-heading">Edit presentation</div>
               <p className="muted">Presentation fields do not decide which model owns the image URL.</p>
-              <button className="btn" disabled={!draftMutable || !!busy} onClick={() => resolve("edit", { values: presentationOnly })}>
+              <button className="btn" disabled={!canResolve || !!busy} onClick={() => resolve("edit", { values: presentationOnly })}>
                 <Save size={14} /> Edit presentation only
               </button>
               <div className="section-heading">Resolve ownership conflict</div>
@@ -871,12 +885,12 @@ function AssetInspector({
               </dl>
               <button
                 className="btn primary"
-                disabled={!draftMutable || !!busy || !item.ownership_resolution?.exact_operation?.allowed}
+                disabled={!canResolve || !!busy || !item.ownership_resolution?.exact_operation?.allowed}
                 onClick={() => resolve("resolve_wildcard_exact", { values: presentationOnly })}
               >Create exact model ownership</button>
               <button
                 className="btn"
-                disabled={!draftMutable || !!busy || !item.ownership_resolution?.shared_operation?.allowed}
+                disabled={!canResolve || !!busy || !item.ownership_resolution?.shared_operation?.allowed}
                 onClick={() => resolve("resolve_wildcard_shared", { values: presentationOnly })}
               >Update shared wildcard ownership</button>
               {!item.ownership_resolution?.shared_operation?.allowed && (

@@ -119,6 +119,17 @@ membership, labels, or ordering for you.
 The screen will confirm that the change was saved to the draft. The workbook
 has not changed yet.
 
+After you save, the item's detail shows both values: the current workbook
+value is struck through and the proposed draft value appears beside it, with a
+**Draft modified**, **Draft added**, or **Draft deletion pending** notice that
+names the exact draft operation and lists every changed field as
+Authored → Proposed. This stays visible after you close the editor, reload the
+page, or move Back and Forward. If you change the value back to what the
+workbook already has, the notice disappears because the draft no longer holds a
+change. If the notice says **Draft blocked**, the draft is bound to an older
+workbook import or is no longer active: the workbook values remain in effect and
+editing stays disabled until you start a new draft.
+
 If a group is marked **read-only**, it cannot be changed from this Manager. Do
 not try to work around that restriction.
 

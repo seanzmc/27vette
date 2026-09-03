@@ -2,8 +2,20 @@ import React, { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ExternalLink, LockKeyhole, Pencil, Search } from "lucide-react";
 import { api } from "../api.js";
 import { navigationForDestination } from "../navigationState.js";
+import { effectiveValue, overlayBlockReason } from "../draftOverlayModel.js";
+import DraftOverlay, { EffectiveText } from "./DraftOverlay.jsx";
 import GroupEditor from "./GroupEditor.jsx";
 import OptionEditor from "./OptionEditor.jsx";
+
+const OPTION_IMPACT_LABELS = {
+  availability: "Availability rows",
+  groups: "Groups",
+  rules: "Rules",
+  pricing: "Pricing rules",
+  variant_overrides: "Variant overrides",
+  default_rules: "Default rules",
+  assets: "Images",
+};
 
 function TechnicalDetails({ data }) {
   if (!data) return null;
@@ -15,21 +27,11 @@ function TechnicalDetails({ data }) {
   );
 }
 
-function DraftOverlay({ overlay }) {
-  if (!overlay || overlay.state === "unchanged") return null;
-  const changed = Object.keys(overlay.effective || overlay.base || {}).filter(
-    (key) => overlay.base?.[key] !== overlay.effective?.[key]
-  );
-  return (
-    <div className={`panel draft-overlay ${overlay.state}`} role="status">
-      <strong>Draft {overlay.state.replaceAll("_", " ")}</strong>
-      <span>
-        {overlay.state === "pending_deletion"
-          ? "This record remains in the workbook until Write Approved Changes & Rebuild Form Data."
-          : `${changed.length} proposed field change${changed.length === 1 ? "" : "s"}.`}
-      </span>
-    </div>
-  );
+// Edit buttons stay disabled for a locked draft or a blocked (stale/terminal)
+// overlay; the exact reason is the tooltip (EFFECTIVE-04).
+function editDisabledReason(draftMutable, overlay) {
+  if (!draftMutable) return "The active draft is locked; start a new draft to edit.";
+  return overlayBlockReason(overlay);
 }
 
 function EntityLink({ destination, children, onNavigate }) {
@@ -67,36 +69,41 @@ function GroupDetail({
   draftId, draftMutable, onChanged,
 }) {
   const [editing, setEditing] = useState("");
+  const overlay = detail.draft_overlay;
+  const blocked = editDisabledReason(draftMutable, overlay);
   return (
     <section className="explorer-detail" aria-labelledby="group-detail-heading">
       <button className="btn small" onClick={onBack}><ArrowLeft size={14} /> Back to results</button>
       <div className="readonly-label"><LockKeyhole size={14} /> Reference view · edits save to the durable draft</div>
-      <h2 id="group-detail-heading">{detail.label}</h2>
-      <DraftOverlay overlay={detail.draft_overlay} />
-      <p>{detail.notes || "No explanatory notes are authored for this group."}</p>
+      <h2 id="group-detail-heading">
+        <EffectiveText overlay={overlay} field="display_label" authored={detail.label} />
+      </h2>
+      <DraftOverlay overlay={overlay} impactLabels={{ members: "Members" }} testId="group-draft-overlay" />
+      <p><EffectiveText overlay={overlay} field="notes" authored={detail.notes || "No explanatory notes are authored for this group."} /></p>
       <div className="detail-facts">
         <span><strong>Type</strong>{detail.group_type}</span>
-        <span><strong>Behavior</strong>{detail.behavior?.replaceAll("_", " ")}</span>
+        <span><strong>Behavior</strong><EffectiveText overlay={overlay} field={detail.group_type === "exclusive" ? "selection_mode" : "group_type"} authored={detail.behavior?.replaceAll("_", " ")} /></span>
+        <span><strong>Active</strong><EffectiveText overlay={overlay} field="active" authored={detail.active ? "Yes" : "No"} /></span>
         <span><strong>Members</strong>{detail.member_count}</span>
       </div>
       <div className="detail-actions">
         <button
           className="btn small"
-          disabled={!draftMutable}
-          title={draftMutable ? "Edit registered group fields in the durable draft" : "The active draft is locked; start a new draft to edit."}
+          disabled={Boolean(blocked)}
+          title={blocked || "Edit registered group fields in the durable draft"}
           onClick={() => setEditing("facts")}
         >
           <Pencil size={14} /> Edit group in draft
         </button>
         <button
           className="btn small"
-          disabled={!draftMutable}
-          title={draftMutable ? "Add, remove, activate, or reorder members in the durable draft" : "The active draft is locked; start a new draft to edit."}
+          disabled={Boolean(blocked)}
+          title={blocked || "Add, remove, activate, or reorder members in the durable draft"}
           onClick={() => setEditing("members")}
         >
           <Pencil size={14} /> Manage members in draft
         </button>
-        {!draftMutable && <span className="muted">Draft locked — editing unavailable.</span>}
+        {blocked && <span className="muted">{draftMutable ? "Editing blocked — see the draft notice above." : "Draft locked — editing unavailable."}</span>}
         <button className="btn small" onClick={() => onDiagnostic("where_used", detail.destination.entity_id)}>
           Where this group is used
         </button>
@@ -135,29 +142,45 @@ function OptionDetail({
 }) {
   const [editing, setEditing] = useState(false);
   const { option } = detail;
+  const overlay = detail.draft_overlay;
+  const blocked = editDisabledReason(draftMutable, overlay);
+  // The heading is the RPO — name pair; when the draft changes either half, the
+  // heading shows the authored label struck through beside the proposed label.
+  const proposedLabel = [
+    effectiveValue(overlay, "rpo", option.rpo),
+    effectiveValue(overlay, "option_name", option.option_name),
+  ].map((part) => String(part ?? "").trim()).filter(Boolean).join(" — ") || option.label;
+  const price = (value) => (value === null || value === undefined || value === ""
+    ? "Not specified" : `$${Number(value).toLocaleString()}`);
+  const yesNo = (value) => (value === "True" ? "Yes" : "No");
+  const copyField = overlay?.changed_fields?.description ? "description" : "detail_raw";
   return (
     <section className="explorer-detail" aria-labelledby="option-detail-heading">
       <button className="btn small" onClick={onBack}><ArrowLeft size={14} /> Back to results</button>
       <div className="readonly-label"><LockKeyhole size={14} /> Reference view · edits save to the durable draft</div>
-      <h2 id="option-detail-heading">{option.label}</h2>
-      <DraftOverlay overlay={detail.draft_overlay} />
-      <p>{option.description || option.detail_raw || "No additional customer copy is authored."}</p>
+      <h2 id="option-detail-heading">
+        {proposedLabel !== option.label
+          ? <span className="effective-text" data-field="label"><s className="authored-value">{option.label}</s><span className="proposed-value">{proposedLabel}</span></span>
+          : option.label}
+      </h2>
+      <DraftOverlay overlay={overlay} impactLabels={OPTION_IMPACT_LABELS} testId="option-draft-overlay" />
+      <p><EffectiveText overlay={overlay} field={copyField} authored={option.description || option.detail_raw || "No additional customer copy is authored."} /></p>
       <div className="detail-facts">
-        <span><strong>Section</strong>{detail.section?.section_name || "Unmapped"}</span>
-        <span><strong>Base price</strong>{option.price === null ? "Not specified" : `$${Number(option.price).toLocaleString()}`}</span>
-        <span><strong>Selectable</strong>{option.selectable === "True" ? "Yes" : "No"}</span>
-        <span><strong>Active</strong>{option.active === "True" ? "Yes" : "No"}</span>
+        <span><strong>Section</strong><EffectiveText overlay={overlay} field="section_id" authored={detail.section?.section_name || "Unmapped"} /></span>
+        <span><strong>Base price</strong><EffectiveText overlay={overlay} field="price" authored={option.price} format={price} /></span>
+        <span><strong>Selectable</strong><EffectiveText overlay={overlay} field="selectable" authored={option.selectable} format={yesNo} /></span>
+        <span><strong>Active</strong><EffectiveText overlay={overlay} field="active" authored={option.active} format={yesNo} /></span>
       </div>
       <div className="detail-actions">
         <button
           className="btn small"
-          disabled={!draftMutable}
-          title={draftMutable ? "Edit this option in the durable draft" : "The active draft is locked; start a new draft to edit."}
+          disabled={Boolean(blocked)}
+          title={blocked || "Edit this option in the durable draft"}
           onClick={() => setEditing(true)}
         >
           <Pencil size={14} /> Edit option in draft
         </button>
-        {!draftMutable && <span className="muted">Draft locked — editing unavailable.</span>}
+        {blocked && <span className="muted">{draftMutable ? "Editing blocked — see the draft notice above." : "Draft locked — editing unavailable."}</span>}
         <button className="btn small" onClick={() => onDiagnostic("where_used", option.option_id)}>
           Where this option is used
         </button>
