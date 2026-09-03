@@ -50,6 +50,17 @@ export function fieldChange(overlay, field) {
   return { before: pair.before ?? null, after: pair.after ?? null };
 }
 
+// A section node's heading lives in the owning table's name field:
+// context-section edits change `section_name`, section-presentation edits
+// change `display_label`. Reads the overlay's own operation identity, so a
+// membership-only overlay (a child-row op) still resolves to display_label and
+// falls back to the authored heading.
+export function sectionHeadingField(overlay) {
+  return overlay?.operation?.table_name === "context_sections"
+    ? "section_name"
+    : "display_label";
+}
+
 export function changedFieldEntries(overlay) {
   return Object.entries(overlay?.changed_fields || {}).map(([field, pair]) => ({
     field,

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Filter, LayoutPanelTop, Pencil, X } from "lucide-react";
 import { api } from "../api.js";
-import { hasDraftOverlay, overlayBlockReason, overlayStateLabel } from "../draftOverlayModel.js";
+import { hasDraftOverlay, overlayBlockReason, overlayStateLabel, sectionHeadingField } from "../draftOverlayModel.js";
 import DraftOverlay, { EffectiveText } from "./DraftOverlay.jsx";
 import RecordForm from "./RecordForm.jsx";
 
@@ -249,7 +249,7 @@ export default function SectionsLayout({
                 <div className="section-detail-heading">
                   <div>
                     <span className="eyebrow">Connected section detail</span>
-                    <h2><EffectiveText overlay={selected.draft_overlay} field="display_label" authored={selected.authored_display_name ?? selected.display_name} /></h2>
+                    <h2><EffectiveText overlay={selected.draft_overlay} field={sectionHeadingField(selected.draft_overlay)} authored={selected.authored_display_name ?? selected.display_name} /></h2>
                     <span className="mono faint">{selected.section_id}</span>
                   </div>
                   <button className="icon-btn" type="button" onClick={() => navigateSection("")} aria-label="Close section detail">

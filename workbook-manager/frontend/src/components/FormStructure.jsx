@@ -3,7 +3,7 @@ import {
   BookOpen, Boxes, ChevronRight, Layers, LockKeyhole, Pencil, TriangleAlert,
 } from "lucide-react";
 import { api } from "../api.js";
-import { hasDraftOverlay, overlayBlockReason, overlayStateLabel } from "../draftOverlayModel.js";
+import { hasDraftOverlay, overlayBlockReason, overlayStateLabel, sectionHeadingField } from "../draftOverlayModel.js";
 import { humanize } from "../naming.js";
 import DraftOverlay, { EffectiveText } from "./DraftOverlay.jsx";
 import ModelOperations from "./ModelOperations.jsx";
@@ -41,7 +41,7 @@ function SectionCard({ section, editBlocked, onEdit }) {
   return (
     <article className={`form-section-card ${hasDraftOverlay(overlay) ? `draft-${overlay.state}` : ""}`}>
       <div className="form-section-card-copy">
-        <strong><EffectiveText overlay={overlay} field="display_label" authored={section.authored_display_name ?? section.display_name} /></strong>
+        <strong><EffectiveText overlay={overlay} field={sectionHeadingField(overlay)} authored={section.authored_display_name ?? section.display_name} /></strong>
         <span className="mono faint">{section.section_id}</span>
         <span className="section-evidence">
           Workbook: {section.workbook_evidence} · Fresh runtime: {section.runtime_evidence}
