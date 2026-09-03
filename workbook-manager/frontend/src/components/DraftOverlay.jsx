@@ -30,9 +30,19 @@ export function EffectiveText({
   if (overlay.state === "added") {
     return <span className={`effective-text ${className}`} data-field={field}><span className="proposed-value">{proposed}</span></span>;
   }
+  // The struck-through side is the authored value. Structure nodes arrive
+  // already mutated to their effective value, so the caller's `authored` prop
+  // can itself be the proposed value; when it provably mirrors `pair.after`,
+  // fall back to the backend-owned `pair.before`. Otherwise the prop keeps its
+  // own display semantics (derived labels like Yes/No or factual fallbacks).
+  const authoredValue = String(authored) === String(pair.after)
+    ? pair.before === null || pair.before === undefined
+      ? cell(pair.before)
+      : format(pair.before)
+    : format(authored);
   return (
     <span className={`effective-text ${className}`} data-field={field}>
-      <s className="authored-value">{format(authored)}</s>
+      <s className="authored-value">{authoredValue}</s>
       <span className="proposed-value">{proposed}</span>
     </span>
   );
