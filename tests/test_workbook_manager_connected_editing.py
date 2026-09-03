@@ -968,3 +968,201 @@ def test_group_editor_wires_existing_draft_dependency_and_registry_contracts():
     assert "GroupEditor" in explorer_source
     assert "draftMutable" in explorer_source
     assert "api.saveDraftOperation" not in explorer_source
+
+
+# ── Checkpoint 2C: one draft-effective overlay across connected surfaces ──────
+
+DRAFT_OVERLAY_MODULE = FRONTEND / "draftOverlayModel.js"
+
+
+def run_draft_overlay_model(script: str):
+    result = subprocess.run(
+        [
+            "node",
+            "--input-type=module",
+            "--eval",
+            (
+                "import { pathToFileURL } from 'node:url';"
+                f"const moduleUrl = pathToFileURL({json.dumps(str(DRAFT_OVERLAY_MODULE))}).href;"
+                "const api = await import(moduleUrl);"
+                + script
+            ),
+        ],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return json.loads(result.stdout)
+
+
+MODIFIED_OVERLAY = {
+    "draft_id": "d1", "draft_revision": 7, "state": "modified",
+    "operation": {"id": 7, "action": "update", "table_name": "options"},
+    "base": {"option_name": "Authored", "price": "625"},
+    "proposed": {"option_name": "Proposed", "price": "625"},
+    "effective": {"option_name": "Proposed", "price": "625"},
+    "changed_fields": {"option_name": {"before": "Authored", "after": "Proposed"}},
+    "direct_impact": {"rules": 2},
+    "conflicts": [],
+}
+
+
+def test_draft_overlay_helpers_never_replace_authored_values_when_blocked_or_deleting():
+    """EFFECTIVE-02/04: only modified/added overlays surface a proposed value;
+    pending deletion and conflicted overlays keep the authored value and expose
+    the exact blocking reason. The helpers read the adapter's shape and never
+    re-diff rows."""
+    conflicted = {
+        **MODIFIED_OVERLAY, "state": "conflicted", "effective": None,
+        "conflicts": [{"code": "draft_binding_stale",
+                       "message": "The draft is bound to a different workbook import."}],
+    }
+    deleting = {**MODIFIED_OVERLAY, "state": "pending_deletion", "effective": None,
+                "proposed": None}
+    unchanged = {**MODIFIED_OVERLAY, "state": "unchanged", "operation": None,
+                 "changed_fields": {}}
+    result = run_draft_overlay_model(
+        "const m=" + json.dumps(MODIFIED_OVERLAY) + ";"
+        "const c=" + json.dumps(conflicted) + ";"
+        "const d=" + json.dumps(deleting) + ";"
+        "const u=" + json.dumps(unchanged) + ";"
+        "console.log(JSON.stringify({"
+        "modified: api.effectiveValue(m,'option_name','Authored'),"
+        "untouched: api.effectiveValue(m,'price','625'),"
+        "conflicted: api.effectiveValue(c,'option_name','Authored'),"
+        "deleting: api.effectiveValue(d,'option_name','Authored'),"
+        "blockReason: api.overlayBlockReason(c),"
+        "noBlock: api.overlayBlockReason(m),"
+        "labels: [m,c,d,u].map(api.overlayStateLabel),"
+        "active: [m,c,d,u].map(api.hasDraftOverlay),"
+        "change: api.fieldChange(m,'option_name'),"
+        "opLabel: api.operationLabel(m),"
+        "}));"
+    )
+    assert result["modified"] == "Proposed"
+    assert result["untouched"] == "625"
+    assert result["conflicted"] == "Authored"
+    assert result["deleting"] == "Authored"
+    assert result["blockReason"] == "The draft is bound to a different workbook import."
+    assert result["noBlock"] == ""
+    assert result["labels"] == [
+        "Draft modified", "Draft blocked", "Draft deletion pending", "",
+    ]
+    assert result["active"] == [True, True, True, False]
+    assert result["change"] == {"before": "Authored", "after": "Proposed"}
+    assert result["opLabel"] == "operation 7 · update · options"
+
+
+def test_saved_operation_projects_into_the_same_overlay_shape_as_the_backend():
+    """An editor's post-Save panel renders the POST response through the same
+    shape the detail routes return, so both go through one DraftOverlay."""
+    operation = {
+        "id": 12, "draft_id": "d1", "action": "delete", "table_name": "options",
+        "family": "options", "model_id": "stingray", "source_sheet": "stingray_options",
+        "source_row": 12, "physical_key": '["opt_x_001"]',
+        "entity_key": {"option_id": "opt_x_001"},
+        "original": {"option_name": "Authored"}, "final": None,
+        "changed_fields": {"option_name": {"before": "Authored", "after": None}},
+    }
+    result = run_draft_overlay_model(
+        "console.log(JSON.stringify(api.operationOverlay("
+        + json.dumps(operation) + ", {rules: 2})));"
+    )
+    assert result["state"] == "pending_deletion"
+    assert result["effective"] is None
+    assert result["base"] == {"option_name": "Authored"}
+    assert result["operation"]["id"] == 12
+    assert result["operation"]["physical_key"] == '["opt_x_001"]'
+    assert result["direct_impact"] == {"rules": 2}
+    assert sorted(result) == sorted(MODIFIED_OVERLAY)
+
+
+def test_section_heading_field_follows_the_owning_table():
+    """Context-section edits change `section_name`, presentation edits change
+    `display_label`; the heading lookup must follow the overlay's own
+    operation, so context-section titles also show authored → proposed."""
+    context_overlay = {
+        **MODIFIED_OVERLAY,
+        "operation": {
+            **MODIFIED_OVERLAY["operation"], "table_name": "context_sections",
+        },
+        "changed_fields": {
+            "section_name": {"before": "Authored title", "after": "Proposed title"},
+        },
+    }
+    presentation_overlay = {
+        **MODIFIED_OVERLAY,
+        "operation": {
+            **MODIFIED_OVERLAY["operation"], "table_name": "section_presentation",
+        },
+    }
+    membership_overlay = {
+        **MODIFIED_OVERLAY,
+        "operation": None,
+        "changed_fields": {"options": {"before": 9, "after": 11}},
+    }
+    result = run_draft_overlay_model(
+        "const c=" + json.dumps(context_overlay) + ";"
+        "const p=" + json.dumps(presentation_overlay) + ";"
+        "const m=" + json.dumps(membership_overlay) + ";"
+        "console.log(JSON.stringify({"
+        "context: api.sectionHeadingField(c),"
+        "presentation: api.sectionHeadingField(p),"
+        "membership: api.sectionHeadingField(m),"
+        "none: api.sectionHeadingField(null),"
+        "}));"
+    )
+    assert result["context"] == "section_name"
+    assert result["presentation"] == "display_label"
+    assert result["membership"] == "display_label"
+    assert result["none"] == "display_label"
+
+
+def test_effective_text_keeps_display_semantics_and_backend_authored_values():
+    """F1: the struck-through side must be the authored value. Structure nodes
+    arrive already mutated to their effective value, so when the caller's
+    `authored` prop provably mirrors `pair.after`, EffectiveText falls back to
+    the backend-owned `pair.before` (Proposed → Proposed was the defect); props
+    with their own display semantics (Yes/No, fallbacks) keep them."""
+    shared = (FRONTEND / "components" / "DraftOverlay.jsx").read_text()
+    # The mutated-node fallback and its guard are present in the one shared
+    # renderer, so no surface can reintroduce the independent patch.
+    assert "String(authored) === String(pair.after)" in shared
+    assert "pair.before" in shared
+    assert '<s className="authored-value">{authoredValue}</s>' in shared
+
+
+def test_every_connected_surface_renders_the_one_shared_draft_overlay():
+    """§7 2C item 1: no surface patches headings or diffs independently."""
+    components = FRONTEND / "components"
+    shared = (components / "DraftOverlay.jsx").read_text()
+    assert "changedFieldEntries" in shared
+    assert "overlayBlockReason" in shared
+    assert "Authored" in shared and "Proposed" in shared
+
+    for name in (
+        "ConnectedExplorer.jsx", "SectionsLayout.jsx", "FormStructure.jsx",
+        "OptionEditor.jsx", "GroupEditor.jsx", "AssetManager.jsx",
+    ):
+        source = (components / name).read_text()
+        assert 'from "./DraftOverlay.jsx"' in source, name
+        # The retired local renderers must not come back.
+        assert "function DraftOverlay(" not in source, name
+        assert "function FieldDiff(" not in source, name
+        assert "<h3>Draft overlay</h3>" not in source, name
+        assert ".replaceAll(\"_\", \" \")}</strong>" not in source.replace(
+            "behavior?.replaceAll", "").replace("display_behavior.replaceAll", ""
+        ).replace("rule_type?.replaceAll", "").replace("base_status.replaceAll", ""), name
+
+    explorer = (components / "ConnectedExplorer.jsx").read_text()
+    # Headings and facts read the draft-effective value, not only the authored one.
+    assert 'field="option_name"' in explorer or 'effectiveValue(overlay, "option_name"' in explorer
+    assert 'field="display_label"' in explorer
+    assert "editDisabledReason(draftMutable, overlay)" in explorer
+    structure = (components / "FormStructure.jsx").read_text()
+    assert "api.structure(key, draftId)" in structure
+    assert "draftRevision" in structure
+    assets = (components / "AssetManager.jsx").read_text()
+    assert "overlayBlockReason(item.draft_overlay)" in assets
+    assert "canResolve" in assets

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Check, ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react";
 import { api } from "../api.js";
+import { operationOverlay } from "../draftOverlayModel.js";
 import {
   addMember,
   applyGroupDraftOverlay,
@@ -12,6 +13,7 @@ import {
   moveMember,
   removeMember,
 } from "../groupEditorModel.js";
+import DraftOverlay from "./DraftOverlay.jsx";
 import EditorShell from "./EditorShell.jsx";
 import RecordForm from "./RecordForm.jsx";
 
@@ -27,28 +29,15 @@ const GROUP_FIELD_GROUPS = [
   { label: "Operator notes", fields: ["notes"] },
 ];
 
-function FieldDiff({ operation }) {
-  const changed = Object.entries(operation?.changed_fields || {});
+// Post-Save state for this group, rendered through the shared Checkpoint 2C
+// overlay panel from the durable operation.
+function SavedOverlay({ operation }) {
   return (
     <div className="group-editor-overlay" data-testid="group-draft-overlay">
-      <h3>Draft overlay</h3>
-      {!changed.length ? (
-        <p className="muted">No effective draft changes remain for this group.</p>
-      ) : (
-        <div className="field-diff">
-          {changed.map(([field, pair]) => (
-            <React.Fragment key={field}>
-              <div className="field-name">{field}</div>
-              <div className="before-value">
-                {pair.before === null ? <em>SQL NULL</em> : String(pair.before)}
-              </div>
-              <div className="after-value">
-                {pair.after === null ? <em>SQL NULL</em> : String(pair.after)}
-              </div>
-            </React.Fragment>
-          ))}
-        </div>
-      )}
+      <DraftOverlay
+        overlay={operationOverlay(operation)}
+        emptyMessage="No effective draft changes remain for this group."
+      />
       <p className="muted">
         Saved to the durable draft only. The workbook changes only through Apply
         and Rebuild.
@@ -103,7 +92,7 @@ function GroupFactsEditor({
         </>
       )}
     >
-      <FieldDiff operation={savedOperation} />
+      <SavedOverlay operation={savedOperation} />
     </EditorShell>
   );
 

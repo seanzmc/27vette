@@ -26,6 +26,7 @@ from corvette_form_generator.workbook_domain.changeset import (
 )
 from corvette_form_generator.workbook_domain import service as workbook_service
 
+from . import draft_overlay
 from .catalog import SPEC_BY_TABLE, projection_value
 from .staging import _editable_guard, _fetch_row, target_sheet_for
 
@@ -414,24 +415,21 @@ def connected_overlay(
     lineage: dict,
     base: dict,
     projection_workbook_sha256: str,
+    direct_impact: dict | None = None,
 ) -> dict:
-    """Return one projection-preserving overlay for a connected entity."""
-    empty = {
-        "draft_id": draft_id,
-        "draft_revision": 0,
-        "state": "unchanged",
-        "base": None,
-        "proposed": None,
-        "effective": None,
-        "conflicts": [],
-    }
+    """Return one projection-preserving overlay for a connected entity.
+
+    Thin read wrapper over ``draft_overlay.overlay``: it locates the coalesced
+    operation for this exact physical row and the draft's binding conflicts,
+    then delegates the shape to the shared adapter.
+    """
     if not draft_id:
-        return empty
+        return draft_overlay.unchanged(draft_id)
     draft = state_conn.execute(
         "SELECT * FROM workflow_drafts WHERE id=?", (draft_id,)
     ).fetchone()
     if draft is None:
-        return empty
+        return draft_overlay.unchanged(draft_id)
     operation_row = state_conn.execute(
         "SELECT * FROM draft_operations WHERE draft_id=? AND source_sheet=? "
         "AND family=? AND physical_key=? AND (model_id='' OR model_id=?) "
@@ -445,46 +443,136 @@ def connected_overlay(
         ),
     ).fetchone()
     if operation_row is None:
-        return empty
-    operation = _operation_dict(operation_row)
-    operation_base = (
-        operation.get("original")
-        if operation["action"] == "add"
-        else operation.get("original") or base
+        return draft_overlay.unchanged(draft_id)
+    return draft_overlay.overlay(
+        draft_id=draft_id,
+        operation=_operation_dict(operation_row),
+        base=base,
+        conflicts=overlay_binding_conflicts(
+            state_conn,
+            draft_id=draft_id,
+            projection_workbook_sha256=projection_workbook_sha256,
+        ),
+        direct_impact=direct_impact,
     )
-    if draft["base_workbook_sha256"] != projection_workbook_sha256:
-        return {
-            "draft_id": draft_id,
-            "draft_revision": int(operation["id"]),
-            "state": "conflicted",
-            "base": operation_base,
-            "proposed": operation.get("final"),
-            "effective": None,
-            "conflicts": [{
-                "code": "draft_binding_stale",
-                "message": "The draft is bound to a different workbook import.",
-            }],
-        }
-    state = {
-        "update": "modified",
-        "add": "added",
-        "delete": "pending_deletion",
-    }[operation["action"]]
-    proposed = operation.get("final")
-    return {
-        "draft_id": draft_id,
-        "draft_revision": int(operation["id"]),
-        "state": state,
-        "base": operation_base,
-        "proposed": proposed,
-        "effective": proposed if state != "pending_deletion" else None,
-        "conflicts": [],
+
+
+def connected_group_overlay(
+    state_conn: sqlite3.Connection,
+    *,
+    draft_id: str,
+    model_key: str,
+    group_id: str,
+    member_table: str,
+    member_group_field: str,
+    parent_overlay: dict,
+    authored_member_count: int,
+) -> dict:
+    """Compose member-table operations into one connected group overlay.
+
+    "Manage members" saves operations against ``exclusive_group_members`` /
+    ``rule_group_members`` rows, not the parent group row, so a parent-lineage
+    lookup alone reports ``unchanged`` after member edits. Member operations
+    share the group's identity through their registered group reference column;
+    their add/delete deltas fold into one ``members`` count pair beside any
+    parent-row changed fields. The parent's own operation keeps ownership of
+    state and identity; without one, the first member operation stands in.
+    """
+    if not draft_id or not member_table:
+        return parent_overlay
+    member_operations = [
+        _operation_dict(row)
+        for row in state_conn.execute(
+            "SELECT * FROM draft_operations WHERE draft_id=? AND table_name=? "
+            "AND (model_id='' OR model_id=?) ORDER BY id",
+            (draft_id, member_table, model_key),
+        ).fetchall()
+        if str((_operation_dict(row).get("entity_key") or {}).get(
+            member_group_field
+        ) or "") == group_id
+    ]
+    if not member_operations:
+        return parent_overlay
+    delta = sum(
+        1 if operation.get("action") == "add"
+        else -1 if operation.get("action") == "delete"
+        else 0
+        for operation in member_operations
+    )
+    composite = {**parent_overlay}
+    composite["changed_fields"] = {
+        **dict(parent_overlay.get("changed_fields") or {}),
+        "members": {
+            "before": authored_member_count,
+            "after": authored_member_count + delta,
+        },
     }
+    if composite.get("state") == "unchanged":
+        composite["state"] = "modified"
+        composite["draft_revision"] = int(member_operations[0]["id"])
+        composite["operation"] = draft_overlay.operation_identity(
+            member_operations[0]
+        )
+    return composite
 
 
 def _asset_resolution_dict(row) -> dict:
     result = dict(row)
     result["evidence"] = json.loads(result.pop("evidence_json"))
+    return result
+
+
+def overlay_asset_items(
+    state_conn: sqlite3.Connection,
+    *,
+    draft_id: str,
+    items: list[dict],
+    evidence: list[dict],
+    projection_workbook_sha256: str,
+) -> list[dict]:
+    """Attach the Checkpoint 2C overlay to each Asset Manager queue item.
+
+    An asset item is bound to its ordinary ``assets`` draft operation through the
+    durable resolution evidence (``item_id`` → ``operation_id``), the same link
+    Review & Apply shows. Operational ignores carry no workbook operation and
+    stay ``unchanged`` here; their ``ignored`` status is already applied by the
+    reconciliation filter.
+    """
+    if not draft_id or not items:
+        return [{**item, "draft_overlay": draft_overlay.unchanged(draft_id)} for item in items]
+    operation_by_item = {
+        row["item_id"]: row["operation_id"]
+        for row in evidence if row.get("operation_id") is not None
+    }
+    wanted = {
+        operation_by_item[item["id"]] for item in items if item["id"] in operation_by_item
+    }
+    operations: dict[int, dict] = {}
+    if wanted:
+        placeholders = ",".join("?" for _ in wanted)
+        for row in state_conn.execute(
+            f"SELECT * FROM draft_operations WHERE draft_id=? AND id IN ({placeholders})",
+            (draft_id, *wanted),
+        ).fetchall():
+            operation = _operation_dict(row)
+            operations[int(operation["id"])] = operation
+    conflicts = overlay_binding_conflicts(
+        state_conn,
+        draft_id=draft_id,
+        projection_workbook_sha256=projection_workbook_sha256,
+    ) if operations else []
+    result = []
+    for item in items:
+        operation = operations.get(operation_by_item.get(item["id"], -1))
+        result.append({
+            **item,
+            "draft_overlay": draft_overlay.overlay(
+                draft_id=draft_id,
+                operation=operation,
+                base=item.get("current_values") or None,
+                conflicts=conflicts,
+            ),
+        })
     return result
 
 

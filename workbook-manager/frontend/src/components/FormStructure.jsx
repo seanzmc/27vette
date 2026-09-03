@@ -3,7 +3,9 @@ import {
   BookOpen, Boxes, ChevronRight, Layers, LockKeyhole, Pencil, TriangleAlert,
 } from "lucide-react";
 import { api } from "../api.js";
+import { hasDraftOverlay, overlayBlockReason, overlayStateLabel, sectionHeadingField } from "../draftOverlayModel.js";
 import { humanize } from "../naming.js";
+import DraftOverlay, { EffectiveText } from "./DraftOverlay.jsx";
 import ModelOperations from "./ModelOperations.jsx";
 import RecordForm from "./RecordForm.jsx";
 
@@ -33,12 +35,13 @@ const SECTION_FIELD_GROUPS = [
   { label: "Operator notes", fields: ["notes"] },
 ];
 
-function SectionCard({ section, draftMutable, onEdit }) {
+function SectionCard({ section, editBlocked, onEdit }) {
   const editable = Boolean(section.editor);
+  const overlay = section.draft_overlay;
   return (
-    <article className="form-section-card">
+    <article className={`form-section-card ${hasDraftOverlay(overlay) ? `draft-${overlay.state}` : ""}`}>
       <div className="form-section-card-copy">
-        <strong>{section.display_name}</strong>
+        <strong><EffectiveText overlay={overlay} field={sectionHeadingField(overlay)} authored={section.authored_display_name ?? section.display_name} /></strong>
         <span className="mono faint">{section.section_id}</span>
         <span className="section-evidence">
           Workbook: {section.workbook_evidence} · Fresh runtime: {section.runtime_evidence}
@@ -51,13 +54,18 @@ function SectionCard({ section, draftMutable, onEdit }) {
           {section.display_behavior && (
             <span className="chip warn">{section.display_behavior.replaceAll("_", " ")}</span>
           )}
+          {hasDraftOverlay(overlay) && (
+            <span className={`chip ${overlay.state === "conflicted" ? "err" : "blue"}`}>{overlayStateLabel(overlay)}</span>
+          )}
         </div>
+        <DraftOverlay overlay={overlay} testId="structure-section-draft-overlay" />
       </div>
       {editable ? (
         <button
           type="button"
           className="btn small"
-          disabled={!draftMutable}
+          disabled={Boolean(editBlocked)}
+          title={editBlocked || "Edit section"}
           onClick={() => onEdit(section)}
         >
           <Pencil size={14} /> Edit section
@@ -71,7 +79,8 @@ function SectionCard({ section, draftMutable, onEdit }) {
           <button
             type="button"
             className="btn small"
-            disabled={!draftMutable}
+            disabled={Boolean(editBlocked)}
+            title={editBlocked || "Add display metadata"}
             onClick={() => onEdit(section)}
           >
             Add display metadata
@@ -83,7 +92,7 @@ function SectionCard({ section, draftMutable, onEdit }) {
 }
 
 export default function FormStructure({
-  models, modelKey, setModelKey, draftId, draftMutable, onChanged,
+  models, modelKey, setModelKey, draftId, draftRevision, draftMutable, onChanged,
 }) {
   const [structure, setStructure] = useState(null);
   const [structureFamilies, setStructureFamilies] = useState([]);
@@ -93,7 +102,7 @@ export default function FormStructure({
   const load = async (key) => {
     try {
       const [nextStructure, familyIndex] = await Promise.all([
-        api.structure(key),
+        api.structure(key, draftId),
         api.structureFamilies(key),
       ]);
       setStructure(nextStructure);
@@ -109,7 +118,15 @@ export default function FormStructure({
     setStructureFamilies([]);
     setEditing(null);
     if (modelKey) load(modelKey);
-  }, [modelKey]);
+  }, [modelKey, draftId, draftRevision]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // A conflicted graph overlay (stale binding, terminal draft) blocks structure
+  // mutation with the exact reason while authored values stay displayed.
+  const graphOverlay = structure?.graph.draft_overlay;
+  const graphBlocked = graphOverlay?.state === "conflicted"
+    ? overlayBlockReason(graphOverlay) : "";
+  const editBlocked = !draftMutable
+    ? "The active draft is locked; start a new draft to edit." : graphBlocked;
 
   const startEdit = async ({
     table, mode = "edit", initial, title, target, saveLabel, fieldGroups,
@@ -233,6 +250,9 @@ export default function FormStructure({
         )}
       </div>
 
+      {graphBlocked && (
+        <div className="notice err" role="alert">{graphBlocked} Authored values remain in effect; structure editing is blocked.</div>
+      )}
       {error && <div className="notice err" role="alert">{error}</div>}
       {!structure && !error && <div className="panel empty">Loading form graph…</div>}
 
@@ -265,23 +285,25 @@ export default function FormStructure({
               <div className="empty">No active workbook-owned runtime steps for this model.</div>
             )}
             {structure.graph.steps.map((step, index) => (
-              <section className="step-row" key={step.step_key}>
+              <section className={`step-row ${hasDraftOverlay(step.draft_overlay) ? `draft-${step.draft_overlay.state}` : ""}`} key={step.step_key}>
                 <span className="step-num">{step.runtime_order || index + 1}</span>
                 <div className="step-main">
                   <div className="step-title-row">
                     <div>
-                      <div className="label">{step.display_name}</div>
+                      <div className="label"><EffectiveText overlay={step.draft_overlay} field="step_label" authored={step.display_name} /></div>
                       <div className="key">{step.step_key}</div>
                     </div>
                     <button
                       type="button"
                       className="btn small"
-                      disabled={!draftMutable}
+                      disabled={Boolean(editBlocked)}
+                      title={editBlocked || "Edit step"}
                       onClick={() => editStep(step)}
                     >
                       <Pencil size={14} /> Edit step
                     </button>
                   </div>
+                  <DraftOverlay overlay={step.draft_overlay} testId="structure-step-draft-overlay" />
                   <div className="step-sections">
                     {!step.sections.length ? (
                       <div className="proven-empty">
@@ -292,7 +314,7 @@ export default function FormStructure({
                       <SectionCard
                         key={section.section_id}
                         section={section}
-                        draftMutable={draftMutable}
+                        editBlocked={editBlocked}
                         onEdit={editSection}
                       />
                     ))}
@@ -315,7 +337,7 @@ export default function FormStructure({
                     <SectionCard
                       key={section.section_id}
                       section={section}
-                      draftMutable={draftMutable}
+                      editBlocked={editBlocked}
                       onEdit={editSection}
                     />
                   ))}
@@ -349,7 +371,7 @@ export default function FormStructure({
                 <div className="unmapped-row" key={section.section_id}>
                   <strong>{section.display_name}</strong>
                   <span>{section.reason}</span>
-                  <button className="btn small" disabled={!draftMutable} onClick={() => editSection(section)}>
+                  <button className="btn small" disabled={Boolean(editBlocked)} title={editBlocked || "Review section metadata"} onClick={() => editSection(section)}>
                     Review section metadata
                   </button>
                 </div>

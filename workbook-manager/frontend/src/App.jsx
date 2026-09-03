@@ -305,6 +305,7 @@ export default function App() {
             modelKey={modelKey}
             setModelKey={setModelKey}
             draftId={draftId}
+            draftRevision={draftRevision}
             draftMutable={draftMutable}
             onChanged={refreshManager}
           />

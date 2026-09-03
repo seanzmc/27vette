@@ -264,6 +264,15 @@ newline-delimited URL list instead; `WBM_ASSET_MEDIA_TIMEOUT` (default 10),
    one coalesced original-to-final operation in `WBM_DB`. Coordinated
    parent/member additions and dependent deletes remain in one draft. Re-import
    remains blocked until the nonterminal draft has a later lifecycle disposition.
+   Every connected read (`/api/explorer/.../options|groups`, `/api/structure`
+   nodes and steps, `/api/assets/reconciliation` items) carries one
+   `draft_overlay` built by `backend/app/draft_overlay.py` from the projected row
+   plus that row's coalesced operation: `state` (`unchanged`, `modified`,
+   `added`, `pending_deletion`, `conflicted`), exact `operation` identity,
+   `base`, `proposed`, `effective`, `changed_fields`, `direct_impact`, and
+   `conflicts`. A stale binding or terminal draft yields `conflicted` with
+   `effective: null`, so authored values are never replaced; the browser renders
+   the overlay through one shared `DraftOverlay` component.
 5. **Emit ChangeSet** — `POST /api/drafts/{draft_id}/commit`
    commits a nonempty mutable draft into one exact immutable
    `workbook-changeset-1` payload. Asset evidence is re-reconciled first and

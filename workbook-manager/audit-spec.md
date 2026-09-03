@@ -177,7 +177,7 @@ cross-draft apply immediately creates a P0 stop and supersedes this sequence.
 - [x] **P2.7 / WM-009 — Wildcard conflicts.** Distinguish presentation editing
   from ownership-conflict resolution and provide a truthful resolution path or
   an explicit blocked reason.
-- [ ] **P2.8 / WM-010 — Draft-effective details.** Render proposed effective
+- [x] **P2.8 / WM-010 — Draft-effective details.** Render proposed effective
   values beside authored/base values throughout connected details.
 - [ ] **P2.9 / WM-002 — Preserved-sheet management.** Add approved direct
   management for `PriceRef`, `context_choice_copy`, `rule_phrase_map`, and
@@ -843,6 +843,104 @@ Required work:
 Exit gate: EFFECTIVE-01–04 pass and no surface shows a “Draft modified” badge
 beside only the stale authored value.
 
+**Closed 2026-09-02 — implementation `dab1dc26`.** One backend adapter,
+`workbook-manager/backend/app/draft_overlay.py`, now turns a projected row plus
+its coalesced draft operation into the single overlay shape every connected read
+returns: `state`, exact `operation` identity, `base`, `proposed`, `effective`,
+`changed_fields`, `direct_impact`, and `conflicts`. `drafts.connected_overlay`
+(option and group details), `form_graph.apply_draft_overlay` (section nodes,
+steps, and placed options), and the new `drafts.overlay_asset_items`
+(`/api/assets/reconciliation` items, bound through the durable resolution
+evidence) all delegate to it; a section whose membership changes through an
+`options` operation carries a membership-count overlay rather than the option's
+own row diff. Terminal and stale drafts flow through the existing
+`overlay_binding_conflicts` so the connected detail reports `conflicted` with
+`effective: null`. The browser renders that shape through one
+`components/DraftOverlay.jsx` (plus `draftOverlayModel.js` helpers) in
+Options & Relationships, Groups, Sections & Layout, Form Overview, the
+post-Save panels of the option and group editors, and the Images inspector;
+the four local diff/badge renderers were deleted. Headings and fact chips
+show the authored value struck through beside the proposed value; pending
+deletion keeps the authored row visible with deletion treatment; a conflicted
+overlay disables every edit/resolve control with the exact conflict message as
+its tooltip. Form Overview now loads the structure with the active draft.
+
+RED evidence (§11.2 item 1), all against the unmodified `118c0894` tree and
+the existing `/api/explorer/stingray/options/opt_5zu_001` route:
+`AssertionError: 'modified' != 'conflicted'` (a cancelled draft still rendered
+as active intent), `KeyError: 'changed_fields'` on the existing overlay body,
+`KeyError: 'operation'` on the existing `/api/structure` section node overlay,
+and `KeyError: 'draft_overlay'` on the existing reconciliation item.
+
+Acceptance evidence:
+
+- EFFECTIVE-01: `test_connected_overlay_carries_changed_fields_operation_identity_and_impact`
+  and `test_structure_section_node_overlay_uses_the_connected_overlay_contract`.
+  Isolated Chrome on `127.0.0.1:8062`: after saving a 5ZU name change through
+  the real editor and closing it, the heading read `5ZU — Body-Color High Wing
+  Spoiler` (struck) beside `5ZU — Body-Color High Wing Spoiler 2C`; a second
+  save changed price and the Base price chip read `$1,395` → `$1,495`; both
+  survived hard reload and Back/Forward across three details. A
+  `section_presentation.display_label` edit rendered `Stripes` → `Stripes 2C`
+  in Sections & Layout and on the Form Overview card.
+- EFFECTIVE-02: `test_connected_option_deep_link_resolves_a_draft_added_record_only`,
+  `test_connected_option_keeps_pending_deletion_inspectable`, and the form-graph
+  overlay owners. Chrome: the draft-added `2CA` option rendered proposed-only
+  ("no authored value yet"); pending-delete 5V7 kept `$650` and every authored
+  fact visible under "Draft deletion pending · operation 3 · delete · options".
+- EFFECTIVE-03: the editor reverted the name to its authored value; the post-Save
+  panel read "No effective draft changes remain for this option", the detail
+  heading returned to the authored label with no overlay, and the tray showed
+  `0 changes` (existing coalescing, `test_editor_seeds_reopened_forms_…`).
+- EFFECTIVE-04: `test_connected_overlay_of_a_terminal_draft_is_conflicted_not_modified`,
+  `test_connected_overlay_fails_closed_when_draft_binding_is_stale`, and
+  `test_draft_overlay_helpers_never_replace_authored_values_when_blocked_or_deleting`.
+  Chrome with the draft's `base_workbook_sha256` rewritten: option, section,
+  Form Overview, and Images all kept authored values, showed "The draft is bound
+  to a different workbook import.", and disabled Edit option / Edit section /
+  Edit step / Add safe proposal with that exact message as the tooltip.
+- Add / modify / pending delete / Save / close-reopen / hard reload /
+  Back-Forward / full reversion / stale binding: each proved above.
+- Browser/protected proof: desktop and 390x844 (`scrollWidth 390 = clientWidth
+  390` on option, pending-delete, section, and overview) with zero captured
+  console/runtime errors; focus landed on "Edit option in draft". Canonical
+  `stingray_master.xlsx`, `form-app/data.js`, and all six runtime contracts
+  hashed identical before and after every gate.
+- Validation: RED→GREEN owners in `tests/test_workbook_manager.py` (4 new) and
+  `tests/test_workbook_manager_connected_editing.py` (3 new); the
+  catalog-owned Manager serial group in one process passed `384 passed, 2
+  skipped, 77 subtests` on the final tree; frontend production build, `git diff
+  --check`, and the governance/catalog owners (124 passed) passed. The PR planner
+  selects 12 shards for these paths (`ci-contracts`, `manager-frontend`, the
+  five `manager-*` partitions of `test_workbook_manager.py`,
+  `manager-projection`, `manager-drafts`, `manager-apply-boundaries`,
+  `changed-workbook-manager-connected-editing`, and `catalog-read-owners` →
+  `py.test_workbook_manager_review_presentation`); every file they name ran in
+  the one-process group. Not run: copied-workbook Apply/Rebuild, the all-model
+  candidate lane, and WordPress/dealer/deployment — this checkpoint changes only
+  read models and their presentation, no registry, writer, generation, or
+  publication path. No catalog edit.
+
+Checkpoint drift disposition:
+
+| Surface | Checkpoint 2C disposition |
+|---|---|
+| Registry/workbook authority | Inspected, no change; overlay identity is the existing `source_sheet`/`family`/`physical_key` coalescing key. |
+| Projection representation | Inspected, no change. |
+| API/read model | Connected option/group details, structure nodes/steps/options, and reconciliation items gained the one `draft_overlay` shape (`operation`, `changed_fields`, `direct_impact` added; `unchanged` shape widened). |
+| Editor/mutation capability | No new write path; edit/resolve controls are additionally disabled by a conflicted overlay with the exact reason. |
+| Draft overlay/review/history | The overlay adapter is the change; Review/history shapes untouched. |
+| Writer/apply impact | Inspected, no change; no Apply/Rebuild ran. |
+| Generator/publication impact | No change; protected hashes identical. |
+| Focused test owner | Existing `test_workbook_manager.py`, `test_workbook_manager_form_graph.py`, `test_workbook_manager_connected_editing.py`; no catalog edit. |
+| README/User Guide | Updated: README Workflow step 4 documents the overlay contract; User Guide §4 describes authored/proposed presentation and the blocked state. |
+
+Follow-ups (out of scope, unchanged): the four ambient-binding sites in
+`docs/wbm-consolidation-followup.md`; `ModelOperations.jsx` raw rows and the
+read-only section/rule details in Options & Relationships carry no overlay
+because they permit no draft edits; the Images bulk button
+(`AssetManager.jsx:341`) still keys on `draftMutable` alone.
+
 ### Checkpoint 2D — direct management of preserved sheets
 
 Objective: close P2.9 / the unprojected-sheet half of WM-002.
@@ -1413,4 +1511,28 @@ Each authorized checkpoint appends one concise dated record containing:
   `845c105`, closeout `e6f14fb`, and PR #70
   (`https://github.com/seanzmc/27vette/pull/70`) are delivered; remote
   release-candidate CI and Codex finding disposition are pending. Checkpoint 2C
-  does not begin without a new user instruction.
+  was subsequently authorized and is recorded next.
+- **2026-09-02 — Checkpoint 2C / P2.8 / WM-010:** closed by implementation
+  `dab1dc26`. One backend overlay adapter (`draft_overlay.py`) now feeds
+  option, group, structure node/step/option, and Asset Manager item reads, and
+  one shared `DraftOverlay` component renders authored → proposed values,
+  pending deletion, and blocked/conflicted state across Options &
+  Relationships, Groups, Sections & Layout, Form Overview, both contextual
+  editors' post-Save panels, and the Images inspector. RED assertions against
+  existing routes on the unmodified tree: `AssertionError: 'modified' !=
+  'conflicted'`, `KeyError: 'changed_fields'`, `KeyError: 'operation'`,
+  `KeyError: 'draft_overlay'` (quoted in full in the checkpoint section).
+  EFFECTIVE-01–04 owner tests, isolated desktop/390x844 Chrome proof (Save,
+  close/reopen, hard reload, Back/Forward, full reversion, stale binding, add,
+  modify, pending delete), the one-process Manager serial group (`384 passed, 2
+  skipped, 77 subtests`), frontend build, governance/catalog owners, `git diff
+  --check`, and protected hashes are recorded above. README and User Guide were
+  updated; registry, projection, writer, ChangeSet, generated/customer runtime,
+  dependencies, dealer, deployment, and WordPress media were inspected with no
+  change; copied-workbook Apply/Rebuild and the candidate lane were not run
+  because only read models and presentation changed. Residual risk: none
+  implied. Delivery branch `feat/workbook-manager-checkpoint-2c`, implementation
+  `dab1dc26`, and PR #73 (`https://github.com/seanzmc/27vette/pull/73`) are
+  delivered; remote release-candidate CI and Codex finding disposition are
+  pending. Checkpoint 2D remains gated on its own §5.1 registry proposal and
+  explicit approval; it does not begin without a new user instruction.

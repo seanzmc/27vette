@@ -19,59 +19,50 @@ Keep this file small — it is read at the start of every session:
 ## Current handoff
 
 - **Updated:** 2026-09-02
-- **Owning specification:** `workbook-manager/audit-spec.md` (§6 preamble,
-  §11.2 item 1, §14 bullet amended — RED rule). Report:
-  `docs/wbm-consolidation-followup.md`; task prompts tracked at
-  `docs/wbm-consolidation-prompt.md`, `docs/wbm-followup-prompt.md`;
-  `docs/pr-coder-runbook.md` added. No app code, workbook, or artifact changed.
-- **Active workflow:** Workbook Manager governance consolidation — follow-up
-  pass COMPLETE; PR #72 open (both Codex P2 review findings fixed), merged
-  with `main` after PR #71 landed. Conflict resolution: `main`'s hand-kept
-  `SPEC_GOVERNANCE_DOC_PATHS` / `spec-governance` shard (+ smoke) is
-  superseded by `catalog-read-owners`; list, shard, and smoke removed, `main`'s
-  two routing tests folded into one catalog-reader routing test, split-plan
-  contract back to 19 shards / 5 smokes. Checkpoint 2C not opened.
-- **Current status:** (1) CI classifier defect **(b)** proved and fixed:
-  `plan_ci_validation.py` planned `audit-spec.md`+`AGENTS.md` as the
-  `docs-only` echo while the catalog selector chose 23 gates; the read-owner
-  shard selects Layer 0-3 gates whose catalog `reads` names a changed path —
-  now for Manager sources too (exact matches only), renamed
-  `catalog-read-owners` (2026-09-02 review fix; `catalog.py`-only diffs ran
-  the governance gate never). (2) RED rule
-  written into the spec and half-mechanised (existence-failure citations
-  fail; pre-rule 1A/1B/1D pinned). Retro count: 16 of 17 code findings + 1
-  half would plausibly have been caught. (3) Ambient-binding class named
-  (action-scope binding drift), 14 sites enumerated, 4 live divergences
-  (`ModelOperations.jsx:272-296` undo lifetime; `AssetManager.jsx:339` bulk
-  button on old-scope counts; `GroupEditor.jsx:200-207` hidden member ID;
-  `App.jsx:65-71` `*` leaks off Images). (4) `KNOWN_PRESERVED_SHEETS` /
-  `REQUIRED_SHEETS` pinned in the governance gate ahead of 2D. (5) 2026-09-02
-  Codex P2s: governance gate declares `generator` (its three generator inputs
-  select it); read-owner selection covers Manager code, surfacing
-  explorer/drafts/api.js reader gates that were silently skipped.
-- **Branch/commit:** `docs/wbm-consolidation-followup` from
-  `docs/wbm-governance-consolidation` `0da6f9a` (PR #71 base); PR open to
-  `main`; not merged. Review fixes `a9832ff`, `9bff41d`; merge of
-  `origin/main` (`ebd5ccc`) + tracked docs on top.
-- **Last completed:** the four corrections above; governance gate 10→12 tests;
-  both PR #72 review findings fixed and validated.
-- **Validation:** post-merge 2026-09-02: `test_run_layered_validation` +
-  split/finalize plan contracts + `test_validation_catalog` +
-  `test_catalog_change_scope` + `test_workbook_manager_spec_governance` +
-  `test_state_handoff` — 124 passed; `validate_state_handoff.py` passed;
-  `git diff --check` clean. Pre-merge evidence (RED→GREEN planner tests,
-  `catalog_change_scope`) in `docs/wbm-consolidation-followup.md`. Not run:
-  Manager serial group (no Manager source/fixture change), browser (no UI).
-- **Next action:** merge PR #72 (planner fix runs `--full` once), then the §6
-  deletion PR — which will now plan as `catalog-read-owners` and run the gate —
-  folding both findings documents into its description and deleting them.
-  Then a stop under AGENTS §4 for the §3.3 ambient-binding checkpoint
-  (four live sites), before 2C.
+- **Owning specification:** `workbook-manager/audit-spec.md` (§7 Checkpoint 2C
+  closed; §3 P2.8 checked; §14 record added). Task prompt:
+  `docs/wbm-checkpoint-2c-prompt.md` (lives on branch
+  `claude/fable-5-1-prompting-3cd6c7`, not on `main`).
+- **Active workflow:** Workbook Manager Checkpoint 2C — draft-effective
+  connected details — COMPLETE; PR #73 open, not merged. Checkpoint 2D is not
+  authorized (its §5.1 registry proposal + explicit approval gate is untouched).
+- **Current status:** one backend overlay adapter
+  (`workbook-manager/backend/app/draft_overlay.py`) feeds option/group details,
+  structure nodes/steps/placed options, and Asset Manager items with `state`,
+  exact `operation`, `base`/`proposed`/`effective`, `changed_fields`,
+  `direct_impact`, `conflicts`; terminal/stale drafts report `conflicted` with
+  `effective: null` on connected details (previously a cancelled draft still
+  rendered `modified`). One shared `components/DraftOverlay.jsx` +
+  `draftOverlayModel.js` replaced four local diff/badge renderers; headings and
+  fact chips show authored (struck) → proposed; Form Overview now loads the
+  structure with the active draft. README Workflow step 4 and User Guide §4
+  updated.
+- **Branch/commit:** `feat/workbook-manager-checkpoint-2c` from `origin/main`
+  `118c0894`; implementation `dab1dc26`; closeout commit follows; PR #73
+  (`https://github.com/seanzmc/27vette/pull/73`).
+- **Last completed:** RED (`'modified' != 'conflicted'`, `KeyError:
+  'changed_fields'` / `'operation'` / `'draft_overlay'` on existing routes) →
+  GREEN; isolated Chrome proof desktop + 390x844 of Save, close/reopen, hard
+  reload, Back/Forward, full reversion, stale binding, add, modify, pending
+  delete; spec closure.
+- **Validation:** one-process catalog Manager serial group on the final tree —
+  384 passed, 2 skipped, 77 subtests (94 s); governance + catalog owners 124
+  passed; frontend production build; `git diff --check`; protected hashes
+  (`stingray_master.xlsx`, `form-app/data.js`, six runtime contracts)
+  identical. PR planner selects 12 shards for the changed paths; every file
+  they name ran locally. Not run: copied-workbook Apply/Rebuild, candidate
+  lane, WordPress/dealer/deployment (read-model/presentation change only; no
+  catalog edit). Remote CI + Codex disposition pending.
+- **Next action:** review/merge PR #73 (separate authority). Then, per the
+  2026-09-02 handoff before 2C: the §6 deletion PR folding the two governance
+  findings documents into `audit-spec.md`/`AGENTS.md`, and the §3.3
+  ambient-binding checkpoint (four live sites) — both need a new instruction.
 - **Blockers or closeout gaps:** none. Latent: catalog `owning_specification`
-  (C8) still points at an archived path.
+  (C8) still points at an archived path; `AssetManager.jsx:341` bulk button still
+  keys on `draftMutable` alone (ambient-binding class, out of 2C scope).
 - **Protected boundaries:** dealer submission, deployment, workbook, generated
-  artifacts, `form-app/data.js`, WordPress, catalog `ci`/`serial_groups` —
-  untouched.
+  artifacts, `form-app/data.js`, WordPress, catalog `ci`/`serial_groups`,
+  workbook-domain registry, ChangeSet/writer — untouched.
 
 ## Verified facts
 
