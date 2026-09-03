@@ -746,6 +746,51 @@ def _draft_section_node(result: dict, section_id: str) -> dict | None:
     }
 
 
+def _membership_overlay(operation: dict, field: str, before: int, after: int) -> dict:
+    return draft_overlay.membership(
+        draft_id=str(operation.get("draft_id") or ""),
+        operation={**operation, "id": operation.get("id") or 0},
+        field=field,
+        before=before,
+        after=after,
+    )
+
+
+def _merge_membership(existing: dict | None, incoming: dict) -> dict:
+    """Merge one child-row membership overlay into a parent node's overlay.
+
+    Several option operations can touch the same section within one draft
+    (two adds, an add plus a move away). Each operation is computed against
+    the projection-authored baseline, so merging keeps the earliest
+    ``before`` and combines the deltas — ``9 → 11`` for two additions to an
+    authored nine-option section, not ``10 → 11``.
+    """
+    incoming_pair = incoming["changed_fields"]["options"]
+    if existing is None or existing.get("state") == "unchanged":
+        return incoming
+    current = existing.get("changed_fields", {}).get("options")
+    if not current:
+        return {
+            **existing,
+            "changed_fields": {
+                **dict(existing.get("changed_fields") or {}),
+                "options": incoming_pair,
+            },
+        }
+    merged = {
+        "before": current.get("before", incoming_pair["before"]),
+        "after": current.get("after", incoming_pair["after"])
+        + (incoming_pair["after"] - incoming_pair["before"]),
+    }
+    return {
+        **existing,
+        "changed_fields": {
+            **dict(existing.get("changed_fields") or {}),
+            "options": merged,
+        },
+    }
+
+
 def _apply_option_operation(
     result: dict,
     nodes: dict[str, dict],
@@ -770,25 +815,20 @@ def _apply_option_operation(
     action = operation.get("action")
     changed = set(operation.get("changed_fields") or {})
 
-    def member_overlay(node: dict, before: int, after: int) -> dict:
-        return draft_overlay.membership(
-            draft_id=str(operation.get("draft_id") or ""),
-            operation={**operation, "id": operation.get("id") or 0},
-            field="options",
-            before=before,
-            after=after,
-        )
-
     source_membership = None
     if source is not None and action in {"update", "delete"}:
         before = len(source["options"])
         source["options"] = [
             row for row in source["options"] if row.get("option_id") != option_id
         ]
-        source_membership = member_overlay(source, before, len(source["options"]))
+        source_membership = _membership_overlay(
+            operation, "options", before, len(source["options"])
+        )
     if action == "delete":
         if source is not None and source_membership is not None:
-            source["draft_overlay"] = source_membership
+            source["draft_overlay"] = _merge_membership(
+                source.get("draft_overlay"), source_membership
+            )
         return
 
     effective = deepcopy(current or {"option_id": option_id})
@@ -810,14 +850,26 @@ def _apply_option_operation(
         nodes[destination_id] = destination
     effective["section_id"] = destination_id
     effective["draft_overlay"] = overlay
-    destination_before = len(destination["options"])
-    destination["options"].append(effective)
+    if destination is source:
+        # A same-section update removed and re-added the row, so its
+        # membership is net zero; keep whatever earlier operations merged.
+        destination["options"].append(effective)
+        return
+    # Membership baselines come from the authored projection: _merge_membership
+    # keeps the earliest `before` and accumulates deltas, so successive
+    # operations against one section show 9 → 11 for two adds, not 10 → 11.
     if source is not None and source_membership is not None:
-        source["draft_overlay"] = source_membership
-    if destination is not source:
-        destination["draft_overlay"] = member_overlay(
-            destination, destination_before, len(destination["options"])
+        source["draft_overlay"] = _merge_membership(
+            source.get("draft_overlay"), source_membership
         )
+    before = len(destination["options"])
+    destination["options"].append(effective)
+    destination["draft_overlay"] = _merge_membership(
+        destination.get("draft_overlay"),
+        _membership_overlay(
+            operation, "options", before, len(destination["options"])
+        ),
+    )
 
 
 def _rebuild_effective_topology(result: dict) -> None:
