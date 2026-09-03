@@ -643,7 +643,7 @@ def connected_group(
             "message": f"{group_type} group {group_id!r} was not found for model {model_key!r}",
         })
     try:
-        detail["draft_overlay"] = drafts.connected_overlay(
+        parent_overlay = drafts.connected_overlay(
             state_conn,
             draft_id=draft_id,
             model_key=model_key,
@@ -651,6 +651,17 @@ def connected_group(
             base=detail["group"],
             projection_workbook_sha256=_workbook_state(conn)["imported_sha256"],
             direct_impact={"members": detail["member_count"]},
+        )
+        editor = detail.get("editor") or {}
+        detail["draft_overlay"] = drafts.connected_group_overlay(
+            state_conn,
+            draft_id=draft_id,
+            model_key=model_key,
+            group_id=group_id,
+            member_table=editor.get("member_table") or "",
+            member_group_field=editor.get("member_group_field") or "",
+            parent_overlay=parent_overlay,
+            authored_member_count=detail["member_count"],
         )
     except drafts.DraftError as exc:
         raise _draft_error(exc)

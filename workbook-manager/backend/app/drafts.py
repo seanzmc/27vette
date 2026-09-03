@@ -457,6 +457,65 @@ def connected_overlay(
     )
 
 
+def connected_group_overlay(
+    state_conn: sqlite3.Connection,
+    *,
+    draft_id: str,
+    model_key: str,
+    group_id: str,
+    member_table: str,
+    member_group_field: str,
+    parent_overlay: dict,
+    authored_member_count: int,
+) -> dict:
+    """Compose member-table operations into one connected group overlay.
+
+    "Manage members" saves operations against ``exclusive_group_members`` /
+    ``rule_group_members`` rows, not the parent group row, so a parent-lineage
+    lookup alone reports ``unchanged`` after member edits. Member operations
+    share the group's identity through their registered group reference column;
+    their add/delete deltas fold into one ``members`` count pair beside any
+    parent-row changed fields. The parent's own operation keeps ownership of
+    state and identity; without one, the first member operation stands in.
+    """
+    if not draft_id or not member_table:
+        return parent_overlay
+    member_operations = [
+        _operation_dict(row)
+        for row in state_conn.execute(
+            "SELECT * FROM draft_operations WHERE draft_id=? AND table_name=? "
+            "AND (model_id='' OR model_id=?) ORDER BY id",
+            (draft_id, member_table, model_key),
+        ).fetchall()
+        if str((_operation_dict(row).get("entity_key") or {}).get(
+            member_group_field
+        ) or "") == group_id
+    ]
+    if not member_operations:
+        return parent_overlay
+    delta = sum(
+        1 if operation.get("action") == "add"
+        else -1 if operation.get("action") == "delete"
+        else 0
+        for operation in member_operations
+    )
+    composite = {**parent_overlay}
+    composite["changed_fields"] = {
+        **dict(parent_overlay.get("changed_fields") or {}),
+        "members": {
+            "before": authored_member_count,
+            "after": authored_member_count + delta,
+        },
+    }
+    if composite.get("state") == "unchanged":
+        composite["state"] = "modified"
+        composite["draft_revision"] = int(member_operations[0]["id"])
+        composite["operation"] = draft_overlay.operation_identity(
+            member_operations[0]
+        )
+    return composite
+
+
 def _asset_resolution_dict(row) -> dict:
     result = dict(row)
     result["evidence"] = json.loads(result.pop("evidence_json"))
