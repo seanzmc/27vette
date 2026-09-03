@@ -1078,6 +1078,61 @@ def test_saved_operation_projects_into_the_same_overlay_shape_as_the_backend():
     assert sorted(result) == sorted(MODIFIED_OVERLAY)
 
 
+def test_section_heading_field_follows_the_owning_table():
+    """Context-section edits change `section_name`, presentation edits change
+    `display_label`; the heading lookup must follow the overlay's own
+    operation, so context-section titles also show authored → proposed."""
+    context_overlay = {
+        **MODIFIED_OVERLAY,
+        "operation": {
+            **MODIFIED_OVERLAY["operation"], "table_name": "context_sections",
+        },
+        "changed_fields": {
+            "section_name": {"before": "Authored title", "after": "Proposed title"},
+        },
+    }
+    presentation_overlay = {
+        **MODIFIED_OVERLAY,
+        "operation": {
+            **MODIFIED_OVERLAY["operation"], "table_name": "section_presentation",
+        },
+    }
+    membership_overlay = {
+        **MODIFIED_OVERLAY,
+        "operation": None,
+        "changed_fields": {"options": {"before": 9, "after": 11}},
+    }
+    result = run_draft_overlay_model(
+        "const c=" + json.dumps(context_overlay) + ";"
+        "const p=" + json.dumps(presentation_overlay) + ";"
+        "const m=" + json.dumps(membership_overlay) + ";"
+        "console.log(JSON.stringify({"
+        "context: api.sectionHeadingField(c),"
+        "presentation: api.sectionHeadingField(p),"
+        "membership: api.sectionHeadingField(m),"
+        "none: api.sectionHeadingField(null),"
+        "}));"
+    )
+    assert result["context"] == "section_name"
+    assert result["presentation"] == "display_label"
+    assert result["membership"] == "display_label"
+    assert result["none"] == "display_label"
+
+
+def test_effective_text_keeps_display_semantics_and_backend_authored_values():
+    """F1: the struck-through side must be the authored value. Structure nodes
+    arrive already mutated to their effective value, so when the caller's
+    `authored` prop provably mirrors `pair.after`, EffectiveText falls back to
+    the backend-owned `pair.before` (Proposed → Proposed was the defect); props
+    with their own display semantics (Yes/No, fallbacks) keep them."""
+    shared = (FRONTEND / "components" / "DraftOverlay.jsx").read_text()
+    # The mutated-node fallback and its guard are present in the one shared
+    # renderer, so no surface can reintroduce the independent patch.
+    assert "String(authored) === String(pair.after)" in shared
+    assert "pair.before" in shared
+    assert '<s className="authored-value">{authoredValue}</s>' in shared
+
+
 def test_every_connected_surface_renders_the_one_shared_draft_overlay():
     """§7 2C item 1: no surface patches headings or diffs independently."""
     components = FRONTEND / "components"

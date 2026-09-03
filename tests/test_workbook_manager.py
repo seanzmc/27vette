@@ -2088,6 +2088,94 @@ class TestApi(unittest.TestCase):
             self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200
         )
 
+    def test_connected_group_overlay_composes_member_operations(self):
+        """Checkpoint 2C: member edits saved through "Manage members" target
+        exclusive_group_members rows, so the connected group detail must fold
+        them into one overlay instead of reporting unchanged with the authored
+        member_count."""
+        group_id = "grand_sport_x_excl_1623e1da9d59"
+        detail_url = f"/api/explorer/grand_sport_x/groups/exclusive/{group_id}"
+        base = self.client.get(detail_url).json()
+        authored_count = base["member_count"]
+        # Pick one option that is not yet a member of this group.
+        member_ids = {row["option_id"] for row in base["members"]}
+        draft_id = "connected-group-members-overlay"
+        conn = self.mainmod.open_projection_connection()
+        try:
+            placeholders = ",".join("?" for _ in member_ids) or "''"
+            rows = conn.execute(
+                "SELECT option_id FROM options WHERE model_id='grand_sport_x' "
+                "AND active='True' AND option_id NOT IN "
+                f"({placeholders}) LIMIT 1",
+                tuple(member_ids),
+            ).fetchall()
+        finally:
+            conn.close()
+        self.assertTrue(rows, "expected a non-member option to add")
+        option_id = rows[0]["option_id"]
+
+        member_editor = base["editor"]
+        saved = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": member_editor["member_table"],
+                "model_id": "grand_sport_x",
+                "op": "add",
+                "key": {
+                    member_editor["member_group_field"]: group_id,
+                    member_editor["member_id_field"]: option_id,
+                },
+                "record": {
+                    member_editor["member_group_field"]: group_id,
+                    member_editor["member_id_field"]: option_id,
+                    member_editor["member_order_field"]: 999,
+                    member_editor["member_active_field"]: "True",
+                },
+                "actor": "connected-overlay-test",
+            },
+        )
+        self.assertEqual(saved.status_code, 200, saved.text)
+
+        detail = self.client.get(detail_url, params={"draft_id": draft_id}).json()
+        overlay = detail["draft_overlay"]
+        self.assertEqual(overlay["state"], "modified")
+        self.assertEqual(
+            overlay["changed_fields"].get("members"),
+            {"before": authored_count, "after": authored_count + 1},
+        )
+        self.assertEqual(
+            overlay["operation"]["table_name"],
+            member_editor["member_table"],
+        )
+
+        # Member operations and a parent-row edit compose into one overlay.
+        parent_saved = self.client.post(
+            f"/api/drafts/{draft_id}/operations",
+            json={
+                "table": "exclusive_groups",
+                "model_id": "grand_sport_x",
+                "op": "update",
+                "key": {"group_id": group_id},
+                "record": {"notes": f'{base["group"]["notes"]} members draft'},
+                "actor": "connected-overlay-test",
+            },
+        )
+        self.assertEqual(parent_saved.status_code, 200, parent_saved.text)
+        composed = self.client.get(detail_url, params={"draft_id": draft_id}).json()
+        self.assertEqual(composed["draft_overlay"]["state"], "modified")
+        self.assertEqual(
+            composed["draft_overlay"]["changed_fields"]["members"],
+            {"before": authored_count, "after": authored_count + 1},
+        )
+        self.assertIn("notes", composed["draft_overlay"]["changed_fields"])
+        self.assertEqual(
+            composed["draft_overlay"]["operation"]["table_name"],
+            "exclusive_groups",
+        )
+        self.assertEqual(
+            self.client.post(f"/api/drafts/{draft_id}/cancel").status_code, 200
+        )
+
     def test_connected_overlay_carries_changed_fields_operation_identity_and_impact(self):
         """Checkpoint 2C EFFECTIVE-01: the detail response itself carries what
         the draft will produce — changed-field list, exact operation identity,

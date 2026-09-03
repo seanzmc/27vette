@@ -606,6 +606,124 @@ class TestGraphMembership(FormGraphCase):
         )
         self.assertEqual(nodes[source["section_id"]]["display_behavior"], source["display_behavior"])
 
+    def test_successive_option_adds_accumulate_membership_from_the_authored_count(self):
+        """Checkpoint 2C: two option additions to the same authored section
+        display one accumulated membership pair from the authored baseline
+        (9 → 11), not a chained 10 → 11 from the already-mutated list."""
+        graph = form_graph.build_form_graph(self.conn, "z06")
+        destination = next(
+            node for node in graph["section_nodes"]
+            if len(node["options"]) >= 2
+        )
+        authored_count = len(destination["options"])
+        operations = []
+        for index, option_id in enumerate(("opt_2c_add_a", "opt_2c_add_b")):
+            operations.append({
+                "id": 30 + index,
+                "draft_id": "draft-membership-accumulate",
+                "action": "add",
+                "table_name": "options",
+                "family": "options",
+                "model_id": "z06",
+                "entity_key": {"option_id": option_id},
+                "changed_fields": {
+                    "section_id": {"before": None, "after": destination["section_id"]},
+                    "option_name": {"before": None, "after": f"Added option {index}"},
+                },
+                "final": {
+                    "option_id": option_id,
+                    "section_id": destination["section_id"],
+                    "option_name": f"Added option {index}",
+                    "rpo": f"XX{index}",
+                    "active": "True",
+                },
+            })
+        overlaid = form_graph.apply_draft_overlay(graph, operations)
+        node = next(
+            row for row in overlaid["section_nodes"]
+            if row["section_id"] == destination["section_id"]
+        )
+        overlay = node["draft_overlay"]
+        self.assertEqual(overlay["state"], "modified")
+        self.assertEqual(
+            overlay["changed_fields"]["options"],
+            {"before": authored_count, "after": authored_count + 2},
+        )
+        self.assertEqual(len(node["options"]), authored_count + 2)
+
+    def test_option_moves_into_a_section_accumulate_with_its_other_draft_changes(self):
+        """A move away and an add into the same destination section keep one
+        authored-baseline membership pair instead of overwriting each other."""
+        graph = form_graph.build_form_graph(self.conn, "z06")
+        source = next(
+            node for node in graph["section_nodes"]
+            if node["section_id"] == "sec_pain_001"
+        )
+        moved_option = source["options"][0]
+        destination = next(
+            node for node in graph["section_nodes"]
+            if node["section_id"] not in {"sec_pain_001", source["section_id"]}
+            and node.get("step_key") in {step["step_key"] for step in graph["steps"]}
+            and node["options"]
+        )
+        authored_destination_count = len(destination["options"])
+        operations = [
+            {
+                "id": 41,
+                "draft_id": "draft-membership-mixed",
+                "action": "update",
+                "table_name": "options",
+                "family": "options",
+                "model_id": "z06",
+                "entity_key": {"option_id": moved_option["option_id"]},
+                "changed_fields": {
+                    "section_id": {
+                        "before": source["section_id"],
+                        "after": destination["section_id"],
+                    },
+                },
+                "final": {
+                    **moved_option,
+                    "section_id": destination["section_id"],
+                },
+            },
+            {
+                "id": 42,
+                "draft_id": "draft-membership-mixed",
+                "action": "add",
+                "table_name": "options",
+                "family": "options",
+                "model_id": "z06",
+                "entity_key": {"option_id": "opt_2c_mixed_add"},
+                "changed_fields": {
+                    "section_id": {
+                        "before": None,
+                        "after": destination["section_id"],
+                    },
+                },
+                "final": {
+                    "option_id": "opt_2c_mixed_add",
+                    "section_id": destination["section_id"],
+                    "option_name": "Mixed add",
+                    "rpo": "XY1",
+                    "active": "True",
+                },
+            },
+        ]
+        overlaid = form_graph.apply_draft_overlay(graph, operations)
+        node = next(
+            row for row in overlaid["section_nodes"]
+            if row["section_id"] == destination["section_id"]
+        )
+        self.assertEqual(
+            node["draft_overlay"]["changed_fields"]["options"],
+            {
+                "before": authored_destination_count,
+                "after": authored_destination_count + 2,
+            },
+        )
+        self.assertEqual(len(node["options"]), authored_destination_count + 2)
+
 
 class TestFreshRuntimeParity(FormGraphCase):
     """Spec §16 Checkpoint 4: prove parity against fresh generated metadata."""
