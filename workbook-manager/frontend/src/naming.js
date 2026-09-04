@@ -15,6 +15,16 @@ export function humanize(raw) {
     .join(" ");
 }
 
+// Registry controls own field labels, including validation and raw-table headings.
+export function fieldLabel(column) {
+  return column.control?.label || column.label || humanize(column.name);
+}
+
+// Authored entity names win; an unknown ID stays exact, never decoded into copy.
+export function authoredLabel(canonicalId, name) {
+  return String(name || "").trim() || String(canonicalId || "");
+}
+
 export function displayId(canonicalId, prefixes = []) {
   const cid = String(canonicalId || "");
   for (const p of prefixes) {

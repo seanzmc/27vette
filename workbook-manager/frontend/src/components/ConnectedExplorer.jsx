@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ExternalLink, LockKeyhole, Pencil, Search } from "lucide-react";
 import { api } from "../api.js";
+import { humanize } from "../naming.js";
 import { navigationForDestination } from "../navigationState.js";
 import { effectiveValue, overlayBlockReason } from "../draftOverlayModel.js";
 import DraftOverlay, { EffectiveText } from "./DraftOverlay.jsx";
@@ -82,8 +83,8 @@ function GroupDetail({
       <DraftOverlay overlay={overlay} impactLabels={{ members: "Members" }} testId="group-draft-overlay" />
       <p><EffectiveText overlay={overlay} field="notes" authored={detail.notes || "No explanatory notes are authored for this group."} /></p>
       <div className="detail-facts">
-        <span><strong>Type</strong>{detail.group_type}</span>
-        <span><strong>Behavior</strong><EffectiveText overlay={overlay} field={detail.group_type === "exclusive" ? "selection_mode" : "group_type"} authored={detail.behavior?.replaceAll("_", " ")} /></span>
+        <span><strong>Type</strong>{humanize(detail.group_type)}</span>
+        <span><strong>Behavior</strong><EffectiveText overlay={overlay} field={detail.group_type === "exclusive" ? "selection_mode" : "group_type"} authored={detail.behavior} format={humanize} /></span>
         <span><strong>Active</strong><EffectiveText overlay={overlay} field="active" authored={detail.active ? "Yes" : "No"} /></span>
         <span><strong>Members</strong>{detail.member_count}</span>
       </div>
@@ -121,7 +122,7 @@ function GroupDetail({
         ))}
       </div>
       <DiagnosticResults result={diagnosticResult} onNavigate={onNavigate} />
-      <TechnicalDetails data={{ group_id: detail.group_id, ...detail.technical }} />
+      <TechnicalDetails data={{ group_id: detail.group_id, group: detail.group, ...detail.technical }} />
       {editing && (
         <GroupEditor
           detail={detail}
@@ -199,7 +200,7 @@ function OptionDetail({
       <div className="relationship-list">
         {[...detail.exclusive_groups, ...detail.rule_groups].map((group) => (
           <EntityLink key={`${group.group_type}:${group.group_id}`} onNavigate={onNavigate} destination={group.destination}>
-            <strong>{group.label}</strong><span>{group.behavior?.replaceAll("_", " ")} · {group.member_count} members</span>
+            <strong>{group.label}</strong><span>{humanize(group.behavior)} · {group.member_count} members</span>
           </EntityLink>
         ))}
         {!detail.exclusive_groups.length && !detail.rule_groups.length && <p className="muted">No connected groups.</p>}
@@ -207,7 +208,7 @@ function OptionDetail({
       <h3>Rules</h3>
       <div className="relationship-list compact">
         {detail.rules.map((rule) => (
-          <div key={rule.rule_id}><strong>{rule.rule_type?.replaceAll("_", " ")}</strong><span>{rule.source_rpo || rule.source_id} → {rule.target_rpo || rule.target_id}</span></div>
+          <div key={rule.rule_id}><strong>{humanize(rule.rule_type)}</strong><span>{rule.source_rpo || rule.source_id} → {rule.target_rpo || rule.target_id}</span></div>
         ))}
         {!detail.rules.length && <p className="muted">No incoming or outgoing rules.</p>}
       </div>
@@ -219,7 +220,7 @@ function OptionDetail({
         <span><strong>Images</strong>{detail.assets.length}</span>
       </div>
       <DiagnosticResults result={diagnosticResult} onNavigate={onNavigate} />
-      <TechnicalDetails data={detail.technical} />
+      <TechnicalDetails data={{ ...detail.technical, rules: detail.rules }} />
       {editing && (
         <OptionEditor
           detail={detail}
@@ -260,12 +261,12 @@ function RuleDetail({ detail, onNavigate, onBack }) {
     <section className="explorer-detail" aria-labelledby="rule-detail-heading">
       <button className="btn small" onClick={onBack}><ArrowLeft size={14} /> Back to results</button>
       <div className="readonly-label"><LockKeyhole size={14} /> Reference only · workbook rule</div>
-      <h2 id="rule-detail-heading">{detail.rule.rule_type?.replaceAll("_", " ")}</h2>
+      <h2 id="rule-detail-heading">{humanize(detail.rule.rule_type)}</h2>
       <div className="relationship-list">
         {source && <EntityLink destination={{ workspace: "options", entity_type: "option", entity_id: source.option_id }} onNavigate={onNavigate}><strong>{source.rpo} — {source.option_name}</strong><span>Source option</span></EntityLink>}
         {target && <EntityLink destination={{ workspace: "options", entity_type: "option", entity_id: target.option_id }} onNavigate={onNavigate}><strong>{target.rpo} — {target.option_name}</strong><span>Target option</span></EntityLink>}
       </div>
-      <TechnicalDetails data={detail.technical} />
+      <TechnicalDetails data={{ ...detail.technical, rule: detail.rule }} />
     </section>
   );
 }

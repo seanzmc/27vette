@@ -374,6 +374,7 @@ export default function RecordForm({
                         <span className="required"> Required</span>
                       )}
                     </label>
+                    <small className="field-technical mono">{schema.table}.{column.name}</small>
                     <Renderer
                       id={inputId}
                       column={column}

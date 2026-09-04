@@ -152,7 +152,11 @@ Open **Images**, then select **Refresh inventory** when you want the
 latest image list.
 
 The coverage cards show how much of each model or section already has images.
-Select a card or one of the status boxes to narrow the list.
+The first tile is a summary, not a button. Select a model or section card, or
+one of the status boxes, to narrow the list. Section cards and the Section
+filter lead with workbook-authored names and keep the exact section ID beside
+them. If a name is unavailable, the unchanged ID is shown rather than a guessed
+name. Buttons work with Enter or Space; filters use standard keyboard controls.
 
 ### What the image status names mean
 

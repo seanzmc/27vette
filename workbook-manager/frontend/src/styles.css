@@ -595,12 +595,17 @@ dialog.modal::backdrop { background: rgba(3,6,14,.7); }
 .coverage-card {
   position: relative; overflow: hidden; display: grid; gap: 2px; text-align: left;
   min-height: 92px; padding: 12px; border: 1px solid var(--border);
-  border-radius: 10px; background: var(--bg-panel); color: var(--text); cursor: pointer;
+  border-radius: 10px; background: var(--bg-panel); color: var(--text);
 }
-.coverage-card:hover { border-color: var(--blue); }
+button.coverage-card { cursor: pointer; }
+button.coverage-card:hover, button.coverage-card:focus-visible { border-color: var(--blue); }
 .coverage-card span { color: var(--text-dim); font-size: 11px; overflow-wrap: anywhere; }
 .coverage-card strong { font-size: 22px; color: var(--green); }
 .coverage-card small { color: var(--text-faint); }
+.field-technical {
+  display: block; color: var(--text-faint); font-weight: normal;
+  text-transform: none; overflow-wrap: anywhere;
+}
 .coverage-card i {
   position: absolute; left: 0; bottom: 0; height: 3px; background: var(--green);
   max-width: 100%; pointer-events: none;

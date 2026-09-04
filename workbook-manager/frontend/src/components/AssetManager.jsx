@@ -6,6 +6,7 @@ import {
   Link, RefreshCw, Save, SearchX,
 } from "lucide-react";
 import { api } from "../api.js";
+import { authoredLabel } from "../naming.js";
 import { hasDraftOverlay, overlayBlockReason } from "../draftOverlayModel.js";
 import DraftOverlay from "./DraftOverlay.jsx";
 import {
@@ -96,14 +97,16 @@ function ImagePane({ label, values, fitValues, fallbackAlt = "", lazy = false })
   );
 }
 
-function CoverageCard({ label, value, onClick }) {
+function CoverageCard({ label, technicalId, value, onClick }) {
+  const Tag = onClick ? "button" : "div";
   return (
-    <button className="coverage-card" onClick={onClick} type="button">
+    <Tag className="coverage-card" onClick={onClick} type={onClick ? "button" : undefined}>
       <span>{label}</span>
+      {technicalId && <small className="mono">{technicalId}</small>}
       <strong>{value.coverage_pct}%</strong>
       <small>{value.covered} covered · {value.missing} missing · {value.total_targets} total</small>
       <i style={{ width: `${value.coverage_pct}%` }} />
-    </button>
+    </Tag>
   );
 }
 
@@ -137,7 +140,7 @@ async function findLinkedAsset(itemId, draftId) {
 }
 
 export default function AssetManager({
-  modelKey, setModelKey, draftId, draftMutable, draftLifecycle, onChanged,
+  models = [], modelKey, setModelKey, draftId, draftMutable, draftLifecycle, onChanged,
   navigation, onNavigationChange,
 }) {
   // §3F: the open image decision is navigation state, not component state, so it
@@ -162,6 +165,51 @@ export default function AssetManager({
   const [notice, setNotice] = useState(null);
   const [actionBusy, setActionBusy] = useState("");
   const requestRef = React.useRef(0);
+  const [sectionNames, setSectionNames] = useState({});
+  const [labelError, setLabelError] = useState("");
+  useEffect(() => {
+    let cancelled = false;
+    setSectionNames({});
+    setLabelError("");
+    (async () => {
+      const names = {};
+      let offset = 0;
+      while (true) {
+        const page = await api.referenceOptions("options", "section_id", {
+          model: reconciliationModel(modelKey), limit: 100, offset,
+        });
+        if (cancelled) return;
+        page.options.forEach((option) => { names[option.value] = option.label; });
+        offset += page.options.length;
+        if (!page.options.length || offset >= page.total) break;
+      }
+      offset = 0;
+      const contextNames = {};
+      while (true) {
+        const page = await api.records("context_sections", {
+          model: reconciliationModel(modelKey), limit: 100, offset,
+        });
+        if (cancelled) return;
+        page.records.forEach((row) => {
+          if (!row.section_name?.trim()) return;
+          contextNames[row.section_id] ||= new Set();
+          contextNames[row.section_id].add(row.section_name.trim());
+        });
+        offset += page.records.length;
+        if (!page.records.length || offset >= page.total) break;
+      }
+      Object.entries(contextNames).forEach(([id, labels]) => {
+        // All-model scope may contain different authored names for the same ID.
+        names[id] = [...labels].sort().join(" / ");
+      });
+      setSectionNames(names);
+    })().catch(() => {
+      if (!cancelled) setLabelError("Section names could not be loaded; exact section IDs are shown.");
+    });
+    return () => { cancelled = true; };
+  }, [modelKey]);
+  const sectionLabel = (id) => authoredLabel(id, sectionNames[id]);
+  const modelLabel = (key) => authoredLabel(key, models.find((model) => model.model_key === key)?.label);
 
   const load = useCallback(async (refresh = false) => {
     const requestId = ++requestRef.current;
@@ -297,11 +345,12 @@ export default function AssetManager({
 
           <div className="section-heading"><CheckCircle2 size={14} /> Coverage dashboard</div>
           <div className="asset-coverage-grid">
-            <CoverageCard label={modelKey === ALL_MODELS ? "All promoted models" : modelKey} value={data.coverage.overall} />
+            <CoverageCard label={modelKey === ALL_MODELS ? "All promoted models" : modelLabel(modelKey)} value={data.coverage.overall} />
             {(activeModelCoverage?.sections || data.coverage.models).map((row) => (
               <CoverageCard
                 key={row.section_id || row.model_key}
-                label={row.section_id || row.model_key}
+                label={row.section_id ? sectionLabel(row.section_id) : modelLabel(row.model_key)}
+                technicalId={row.section_id || row.model_key}
                 value={row}
                 onClick={() => row.section_id
                   ? updateFilter("section", row.section_id)
@@ -350,17 +399,18 @@ export default function AssetManager({
           </div>
 
           <div className="section-heading"><Images size={14} /> Resolution inbox</div>
+          {labelError && <div className="notice warn">{labelError}</div>}
           <div className="panel">
             <div className="panel-head asset-filter-bar">
-              <select className="select" value={filters.section} onChange={(e) => updateFilter("section", e.target.value)}>
+              <select className="select" aria-label="Section" value={filters.section} onChange={(e) => updateFilter("section", e.target.value)}>
                 <option value="">All sections</option>
-                {data.facets.sections.map((section) => <option key={section} value={section}>{section}</option>)}
+                {data.facets.sections.map((section) => <option key={section} value={section}>{sectionLabel(section)}{sectionNames[section] && sectionNames[section] !== section ? ` — ${section}` : ""}</option>)}
               </select>
-              <select className="select" value={filters.target_type} onChange={(e) => updateFilter("target_type", e.target.value)}>
+              <select className="select" aria-label="Target type" value={filters.target_type} onChange={(e) => updateFilter("target_type", e.target.value)}>
                 <option value="">All target types</option>
                 {data.facets.target_types.map((type) => <option key={type} value={type}>{type}</option>)}
               </select>
-              <select className="select" value={filters.coverage_intent} onChange={(e) => updateFilter("coverage_intent", e.target.value)}>
+              <select className="select" aria-label="Coverage intent" value={filters.coverage_intent} onChange={(e) => updateFilter("coverage_intent", e.target.value)}>
                 <option value="">Expected + not expected</option>
                 {data.facets.coverage_intents.map((intent) => <option key={intent} value={intent}>{intent}</option>)}
               </select>

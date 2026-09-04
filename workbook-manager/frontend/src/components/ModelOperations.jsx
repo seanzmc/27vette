@@ -6,7 +6,7 @@ import { api } from "../api.js";
 import {
   dependencyDeletionOperations, optionCreationPlan,
 } from "../graphOperationsModel.js";
-import { displayId } from "../naming.js";
+import { fieldLabel } from "../naming.js";
 import { operationModelId } from "../operationScope.js";
 import RecordForm from "./RecordForm.jsx";
 
@@ -409,7 +409,10 @@ export default function ModelOperations({
           <table className="data">
             <thead>
               <tr>
-                {previewCols.map((c) => <th key={c.name}>{c.label}</th>)}
+                {previewCols.map((c) => <th key={c.name}>
+                  {fieldLabel(c)}
+                  <small className="field-technical mono">{schema.table}.{c.name}</small>
+                </th>)}
                 <th style={{ textAlign: "right" }}>Actions</th>
               </tr>
             </thead>
@@ -433,7 +436,7 @@ export default function ModelOperations({
                   {previewCols.map((c) => (
                     <td key={c.name} title={r[c.name]}>
                       {c.is_key && c.name === schema.key[0] ? (
-                        <span title={`display: ${r._display_id}`}>{r[c.name]}</span>
+                        <span>{r[c.name]}</span>
                       ) : (
                         r[c.name] || <span className="faint">—</span>
                       )}

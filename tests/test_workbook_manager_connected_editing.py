@@ -19,6 +19,19 @@ NAVIGATION_MODULE = FRONTEND / "navigationState.js"
 GRAPH_OPERATIONS_MODULE = FRONTEND / "graphOperationsModel.js"
 
 
+def test_checkpoint_3b_raw_labels_share_registry_owner_and_keep_evidence():
+    operations = (FRONTEND / "components" / "ModelOperations.jsx").read_text()
+    explorer = (FRONTEND / "components" / "ConnectedExplorer.jsx").read_text()
+    form = (FRONTEND / "components" / "RecordForm.jsx").read_text()
+    assert "{fieldLabel(c)}" in operations
+    assert "{schema.table}.{c.name}" in operations
+    assert "{schema.table}.{column.name}" in form
+    assert "humanize(rule.rule_type)" in explorer
+    assert "rules: detail.rules" in explorer
+    assert "rule: detail.rule" in explorer
+    assert "_display_id" not in operations
+
+
 def run_navigation(script: str):
     result = subprocess.run(
         [
@@ -370,7 +383,7 @@ def test_numeric_and_url_controls_apply_registered_constraints():
         "notInteger": "Order must be a whole number.",
         "tooLarge": "Order must be no more than 9.",
         "validInteger": "",
-        "badUrl": "Image url must be a complete http or https URL.",
+        "badUrl": "Image URL must be a complete http or https URL.",
         "validUrl": "",
     }
 

@@ -316,9 +316,12 @@ newline-delimited URL list instead; `WBM_ASSET_MEDIA_TIMEOUT` (default 10),
 - `option_id` is **model-scoped** (verified: 144–186 ids overlap across
   models) — SQLite enforces `UNIQUE(model_id, option_id)`; rule/group/price
   ids are stored model-scoped as well; `interior_id` is global.
-- Canonical IDs are never rewritten. Display names/ids (`Title Case`,
-  confirmed-prefix stripping like `opt_z51_001 → Z51 001`) are derived at
-  display time only (`naming.py` / `naming.js`) and are reversible.
+- Canonical IDs are never rewritten or decoded into business labels. Section
+  and model names come from authored workbook data; raw field headings prefer
+  registry control labels. Exact table/field names remain visible beside raw
+  headings and editor controls, and connected technical details retain exact
+  relationship rows. Legacy derived display IDs remain API metadata, not the
+  human-name authority (`naming.py` / `naming.js`).
 - Workbook coordinates and ownership (`src_sheet`, `src_row`, family, physical
   key, model context) are traceability metadata. Shared physical source rows are
   projected once per physical sheet/key even when several models register them.

@@ -257,6 +257,32 @@ class TestImagesWorkspaceParity(unittest.TestCase):
             self.asset_manager,
         )
 
+    def test_checkpoint_3b_authored_labels_never_decode_opaque_ids(self):
+        result = subprocess.run(
+            ["node", "--input-type=module", "--eval",
+             f"import * as n from {json.dumps((SRC / 'naming.js').as_uri())};"
+             "const label=n.authoredLabel || ((id)=>n.displayId(id));"
+             "console.log(JSON.stringify([label('sec_pain_001','Exterior Color'),"
+             "label('sec_pain_001','  ')]));"],
+            capture_output=True, text=True, check=True,
+        )
+        self.assertEqual(json.loads(result.stdout), ["Exterior Color", "sec_pain_001"])
+
+    def test_checkpoint_3b_coverage_has_static_summary_and_named_filters(self):
+        card = self.asset_manager.split("function CoverageCard", 1)[1].split("function QueueThumbnail", 1)[0]
+        self.assertIn('const Tag = onClick ? "button" : "div";', card)
+        self.assertIn('type={onClick ? "button" : undefined}', card)
+        self.assertIn('technicalId={row.section_id || row.model_key}', self.asset_manager)
+        self.assertIn('sectionLabel(section)', self.asset_manager)
+        for name in ("Section", "Target type", "Coverage intent"):
+            self.assertIn(f'aria-label="{name}"', self.asset_manager)
+
+    def test_checkpoint_3b_context_sections_also_use_authored_names(self):
+        self.assertIn('api.records("context_sections"', self.asset_manager)
+        self.assertIn("row.section_name", self.asset_manager)
+        self.assertIn("offset >= page.total", self.asset_manager)
+        self.assertIn("if (cancelled) return;", self.asset_manager)
+
     def test_checkpoint_2b_splits_presentation_from_wildcard_ownership_resolution(self):
         wildcard = self.asset_manager.split('item.status === "wildcard_conflict"', 1)[1]
         self.assertIn("Edit presentation only", wildcard)

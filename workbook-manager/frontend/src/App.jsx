@@ -335,6 +335,7 @@ export default function App() {
         )}
         {ready && tab === "assets" && (
           <AssetManager
+            models={models}
             modelKey={modelKey}
             setModelKey={setModelKey}
             navigation={navigation}

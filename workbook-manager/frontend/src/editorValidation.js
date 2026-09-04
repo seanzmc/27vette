@@ -1,8 +1,4 @@
-function fieldLabel(column) {
-  return column.control?.label || column.label || String(column.name || "")
-    .replaceAll("_", " ")
-    .replace(/^./, (letter) => letter.toUpperCase());
-}
+import { fieldLabel } from "./naming.js";
 
 export function validateField(column, value, referenceState = {}) {
   const control = column.control;
