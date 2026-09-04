@@ -1323,7 +1323,10 @@ index after a diagnostic Back action, showed 53 diagnostic rows with model
 parameters, and ranked `Z51 — Z51 Performance Package` first with direct and
 mention reasons on Stingray. Reload retained the URL-owned modes, captured
 startup/runtime errors were empty after the corrected build, and 390px mobile
-width was `390=390`. Final catalog-selected validation is recorded in §14.
+width was `390=390`. Final catalog-selected validation passed 26 gates in 11
+stages (`ok: true`, 160.676 seconds), including the one-process Manager group
+(415 passed, 2 skipped, 79 subtests), frontend build, governance, catalog, and
+state owners.
 This checkpoint changes Manager read models, navigation, and presentation
 only. Workbook data, generated/publication artifacts, customer runtime,
 ChangeSet/writer behavior, dealer submission, dependencies, deployment, cache
@@ -1907,3 +1910,14 @@ Each authorized checkpoint appends one concise dated record containing:
   replied to with evidence and resolved. Residual risk remains none implied.
   The merge-status correction recorded on the Checkpoint 3A branch is
   post-merge reconciliation only and changes no Checkpoint 2D behavior.
+- **2026-09-04 — Checkpoint 3A / P3.1–P3.3 / WM-011:** closed by
+  implementation `422e2b2a`. DISC-01–06 evidence is recorded inline in the
+  checkpoint section. Delivery PR #75
+  (`https://github.com/seanzmc/27vette/pull/75`) is open. Final local
+  catalog-selected validation passed all 26 selected gates in 11 stages
+  (`ok: true`, 160.676 seconds), including the one-process Manager group (415
+  passed, 2 skipped, 79 subtests) and frontend production build. Canonical
+  workbook, generated/publication artifacts,
+  customer runtime, ChangeSet/writer behavior, dealer submission, dependencies,
+  deployment, cache purge, and external services remain unchanged. Residual
+  risk: none implied.

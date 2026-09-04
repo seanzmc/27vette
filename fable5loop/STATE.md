@@ -30,19 +30,20 @@ Keep this file small — it is read at the start of every session:
   distinct diagnostics mode, URL-owned navigation, focused tests, and browser
   proof. The implementation is `422e2b2a`.
 - **Branch/commit:** `feat/workbook-manager-checkpoint-3a` from `origin/main`
-  `97318798`; implementation `422e2b2a`; closeout docs are uncommitted.
+  `97318798`; implementation `422e2b2a`; closeout `4ae4e4f8`; PR #75
+  (`https://github.com/seanzmc/27vette/pull/75`) is open.
 - **Last completed:** Checkpoint 2D-B merged via PR #74 after release-candidate CI,
   Codex disposition, and both review threads passed/resolved.
 - **Validation:** focused API 4 passed; connected frontend owner 38 passed;
   frontend build passed. Isolated Chrome proved the 24-row Groups index,
   exact/direct Z51 first with reasons, separate 53-result diagnostic mode,
   reload/Back restoration, zero captured runtime errors, and `390=390` mobile
-  width. The catalog-selected closeout run currently stops only because the
-  governance owner requires a closed checkpoint's real delivery PR number.
-- **Next action:** commit/push the closeout, open the 3A PR, record its number in
-  §14, then rerun the catalog-selected closeout validation to green.
-- **Blockers or closeout gaps:** real PR number required by
-  `test_workbook_manager_spec_governance.py` before the final gate can pass.
+  width. Final catalog-selected validation passed all 26 selected gates in 11
+  stages (`ok: true`, 160.676 seconds), including the one-process Manager group
+  (415 passed, 2 skipped, 79 subtests), frontend build, and governance/catalog/
+  state owners.
+- **Next action:** review PR #75; merge only on explicit user request.
+- **Blockers or closeout gaps:** none. Remote PR checks may still be pending.
 - **Protected boundaries:** dealer submission, deployment, workbook, generated
   artifacts, `form-app/data.js`, customer runtime, WordPress, catalog
   `ci`/`serial_groups`, ChangeSet dialect, and external services — unchanged.
