@@ -285,6 +285,8 @@ export default function ConnectedExplorer({
   const timer = useRef(null);
   const detailRequest = useRef(0);
   const searchRequest = useRef(0);
+  const groupRequest = useRef(0);
+  const preDiagnostic = useRef(null);
   const query = navigation.query;
   const diagnosticKey = navigation.diagnostic || "";
   const diagnosticEntity = navigation.diagnostic_entity || "";
@@ -308,14 +310,52 @@ export default function ConnectedExplorer({
   }, [modelKey]);
 
   useEffect(() => {
+    // A generation counter ignores any response whose request parameters are
+    // no longer current: an older index request resolving after a newer one
+    // (model, group type, or page switched mid-flight) must never overwrite
+    // groupPage or error with the superseded model's rows.
+    const generation = ++groupRequest.current;
     if (mode !== "groups" || query.trim() || diagnosticKey || navigation.type) {
       setGroupPage(null);
       return;
     }
     api.explorerGroups(modelKey, { groupType, offset, limit: 24 })
-      .then((data) => { setGroupPage(data); setError(""); })
-      .catch((e) => { setGroupPage(null); setError(e.message); });
+      .then((data) => {
+        if (generation !== groupRequest.current) return;
+        setGroupPage(data);
+        setError("");
+      })
+      .catch((e) => {
+        if (generation !== groupRequest.current) return;
+        setGroupPage(null);
+        setError(e.message);
+      });
   }, [mode, modelKey, groupType, offset, query, diagnosticKey, navigation.type]);
+
+  useEffect(() => {
+    const generation = ++searchRequest.current;
+    if (!query.trim() || diagnosticKey) {
+      setResults([]);
+      return;
+    }
+    timer.current = setTimeout(async () => {
+      try {
+        // In the Groups workspace the search is scoped server-side to group
+        // entities before pagination, so a page cannot be filled (or emptied)
+        // by other entity types outranking the matching groups.
+        const data = await api.explorerSearch(modelKey, query, {
+          offset, limit: 40, entityType: mode === "groups" ? "group" : "",
+        });
+        if (generation !== searchRequest.current) return;
+        setResults(data.results);
+        setSearchPage(data);
+        setError("");
+      } catch (e) {
+        if (generation === searchRequest.current) setError(e.message);
+      }
+    }, 180);
+    return () => clearTimeout(timer.current);
+  }, [mode, modelKey, query, offset, diagnosticKey]);
 
   useEffect(() => {
     if (!diagnosticKey || navigation.type) {
@@ -367,27 +407,6 @@ export default function ConnectedExplorer({
   }, [modelKey, navigation.type, navigation.id, draftId, draftRevision]);
 
   useEffect(() => {
-    clearTimeout(timer.current);
-    const generation = ++searchRequest.current;
-    if (!query.trim() || diagnosticKey) {
-      setResults([]);
-      return;
-    }
-    timer.current = setTimeout(async () => {
-      try {
-        const data = await api.explorerSearch(modelKey, query, { offset, limit: 40 });
-        if (generation !== searchRequest.current) return;
-        setResults(data.results);
-        setSearchPage(data);
-        setError("");
-      } catch (e) {
-        if (generation === searchRequest.current) setError(e.message);
-      }
-    }, 180);
-    return () => clearTimeout(timer.current);
-  }, [modelKey, query, offset, diagnosticKey]);
-
-  useEffect(() => {
     const focusKey = window.history.state?.focusKey;
     if (navigation.type || !focusKey || !results.length) return;
     requestAnimationFrame(() => {
@@ -405,6 +424,10 @@ export default function ConnectedExplorer({
   };
 
   const runDiagnostic = async (item, entityId = "") => {
+    // Retain the exact pre-diagnostic navigation (query, offset, model, and
+    // workspace) so "Back to results" restores the documented prior index or
+    // search state instead of a cleared, unfiltered one.
+    preDiagnostic.current = navigation;
     onNavigationChange({
       ...navigation, type: "", id: "", query: "", offset: 0, diagnostic: item.key,
       diagnostic_entity: entityId,
@@ -413,10 +436,28 @@ export default function ConnectedExplorer({
 
   const runEntityDiagnostic = (key, entityId) => runDiagnostic({ key }, entityId);
 
+  const backToIndex = () => {
+    // Restore the exact retained pre-diagnostic index/search navigation (with
+    // replace, so the diagnostic adds no extra history entry); deep-linked
+    // diagnostics have no retained state and fall back to the model index.
+    if (preDiagnostic.current) {
+      onNavigationChange({ ...preDiagnostic.current }, { replace: true });
+      preDiagnostic.current = null;
+      return;
+    }
+    onNavigationChange({ ...navigation, diagnostic: "", diagnostic_entity: "" });
+  };
+
   const backToResults = () => {
     const previous = window.history.state?.returnNavigation;
     if (previous) {
       window.history.back();
+    } else if (diagnosticKey && preDiagnostic.current) {
+      // Replace the diagnostic entry with the retained pre-diagnostic
+      // navigation: the prior index/search returns exactly and no extra
+      // history entry accumulates behind it.
+      onNavigationChange({ ...preDiagnostic.current }, { replace: true });
+      preDiagnostic.current = null;
     } else {
       onNavigationChange({ ...navigation, type: "", id: "" });
     }
@@ -434,9 +475,7 @@ export default function ConnectedExplorer({
   if (diagnosticKey && !navigation.type) {
     return (
       <section className="explorer-workspace" aria-labelledby="diagnostics-heading">
-        <button className="btn small" onClick={() => onNavigationChange({
-          ...navigation, diagnostic: "", diagnostic_entity: "",
-        })}><ArrowLeft size={14} /> Back to results</button>
+        <button className="btn small" onClick={backToIndex}><ArrowLeft size={14} /> Back to results</button>
         <div className="workspace-hero">
           <div><span className="eyebrow">Read-only connected view</span><h2 id="diagnostics-heading">Diagnostics</h2>
             <p>{diagnostic?.definition || "Run a named diagnostic for the selected model."}</p></div>

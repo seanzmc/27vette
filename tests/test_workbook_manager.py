@@ -2426,6 +2426,61 @@ class TestApi(unittest.TestCase):
             for row in classified[:first_mention]
         ))
 
+    def test_groups_workspace_search_scopes_entities_before_pagination(self):
+        # Codex PR 75: the backend pages the combined cross-entity result set
+        # before any client-side group filter runs, so a page full of equally
+        # ranked non-group matches pushes matching groups past the visible
+        # window while total/has_more describe the unfiltered set. The Groups
+        # workspace therefore requests server-side entity scoping, which must
+        # be applied before the page slice and pagination metadata.
+        unscoped = self.client.get(
+            "/api/explorer/stingray/search",
+            params={"query": "exhaust", "limit": 100},
+        ).json()
+        self.assertTrue(unscoped["results"])
+        self.assertTrue(any(row["entity_type"] != "group" for row in unscoped["results"]))
+        self.assertTrue(any(row["entity_type"] == "group" for row in unscoped["results"]))
+
+        scoped = self.client.get(
+            "/api/explorer/stingray/search",
+            params={"query": "exhaust", "limit": 2, "entity_type": "group"},
+        )
+        self.assertEqual(scoped.status_code, 200, scoped.text)
+        scoped_payload = scoped.json()
+        group_count = sum(
+            1 for row in unscoped["results"] if row["entity_type"] == "group"
+        )
+        self.assertEqual(scoped_payload["total"], group_count)
+        self.assertTrue(scoped_payload["results"])
+        self.assertTrue(all(
+            row["entity_type"] == "group" for row in scoped_payload["results"]
+        ))
+        self.assertLessEqual(len(scoped_payload["results"]), 2)
+        self.assertEqual(scoped_payload["offset"], 0)
+        self.assertEqual(scoped_payload["limit"], 2)
+        # The scoped page continues the same ranking the combined search
+        # assigned to those groups: a client-side post-pagination filter would
+        # drop rows, not reorder them.
+        scoped_ids = [row["entity_id"] for row in scoped_payload["results"]]
+        unscoped_group_ids = [
+            row["entity_id"] for row in unscoped["results"]
+            if row["entity_type"] == "group"
+        ]
+        self.assertEqual(scoped_ids, unscoped_group_ids[:len(scoped_ids)])
+        self.assertLess(scoped_payload["total"], unscoped["total"])
+
+        # The last scoped page ends without padding from other entity types.
+        tail_offset = max(group_count - 2, 0)
+        paged = self.client.get(
+            "/api/explorer/stingray/search",
+            params={
+                "query": "exhaust", "limit": 2, "entity_type": "group",
+                "offset": tail_offset,
+            },
+        ).json()
+        self.assertTrue(all(row["entity_type"] == "group" for row in paged["results"]))
+        self.assertEqual(len(paged["results"]), group_count - tail_offset)
+
     def test_groups_index_is_scoped_stable_paginated_and_useful_without_search(self):
         first = self.client.get(
             "/api/explorer/grand_sport_x/groups",

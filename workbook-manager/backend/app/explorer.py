@@ -430,8 +430,16 @@ def _classified_result(row: dict, reasons: list[dict]) -> dict:
 
 
 def search(
-    conn, model_key: str, query: str, *, offset: int = 0, limit: int = 40
+    conn, model_key: str, query: str, *, offset: int = 0, limit: int = 40,
+    entity_type: str = "",
 ) -> dict:
+    """Search the model's connected entities.
+
+    `entity_type` narrows the ranked result set to one entity type before
+    pagination, so a page always reflects the scoped set: the Groups workspace
+    must page over matching groups, not over whatever slice of the combined
+    cross-entity ranking happens to fall in the offset window.
+    """
     results: list[dict] = []
     for option in _rows(conn, "SELECT o.*, s.section_name FROM options o LEFT JOIN "
                         "form_sections s ON s.section_id=o.section_id WHERE o.model_id=?",
@@ -507,6 +515,8 @@ def search(
         row["rank"], entity_order.get(row["entity_type"], 9),
         row["label"].casefold(), row["entity_id"],
     ))
+    if entity_type:
+        results = [row for row in results if row["entity_type"] == entity_type]
     total = len(results)
     page = results[offset:offset + limit]
     return {"offset": offset, "limit": limit, "total": total,

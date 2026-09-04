@@ -246,6 +246,41 @@ def test_checkpoint_3a_explorer_has_distinct_index_search_and_diagnostics_presen
     assert "explorerGroups:" in api_source
 
 
+def test_groups_workspace_search_is_scoped_server_side_before_pagination():
+    source = (FRONTEND / "components" / "ConnectedExplorer.jsx").read_text()
+    api_source = (FRONTEND / "api.js").read_text()
+
+    # The Groups workspace requests entity scoping from the backend, so the
+    # page slice and pagination metadata describe the matching groups instead
+    # of a combined ranking where other entity types can crowd them out.
+    assert "entityType: mode === \"groups\" ? \"group\" : \"\"" in source
+    assert "entity_type=${encodeURIComponent(entityType)}" in api_source
+
+
+def test_explorer_guards_group_index_against_stale_responses():
+    source = (FRONTEND / "components" / "ConnectedExplorer.jsx").read_text()
+
+    # The group-index loader carries a generation check like the search and
+    # detail loaders: a superseded response (model, group type, or page
+    # switched mid-flight) must never overwrite groupPage or error.
+    assert "groupRequest = useRef(0)" in source
+    assert "const generation = ++groupRequest.current" in source
+    assert source.count("generation !== groupRequest.current") == 2
+    assert "if (generation !== groupRequest.current) return;" in source
+
+
+def test_diagnostic_back_to_results_restores_retained_prediagnostic_navigation():
+    source = (FRONTEND / "components" / "ConnectedExplorer.jsx").read_text()
+
+    # runDiagnostic retains the exact pre-diagnostic navigation; the
+    # diagnostic screen's "Back to results" restores it with replace so the
+    # prior index/search returns exactly and no extra history entry is added.
+    assert "preDiagnostic.current = navigation;" in source
+    assert "onClick={backToIndex}" in source
+    assert "onNavigationChange({ ...preDiagnostic.current }, { replace: true })" in source
+    assert source.count("preDiagnostic.current = null;") == 2
+
+
 def test_app_owns_native_history_and_reuses_lifecycle_for_the_draft_tray():
     app_source = (FRONTEND / "App.jsx").read_text()
     explorer_source = (FRONTEND / "components" / "ConnectedExplorer.jsx").read_text()

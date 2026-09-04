@@ -702,9 +702,12 @@ def explorer_search(
     query: str = Query(..., min_length=1, max_length=200),
     offset: int = Query(0, ge=0, le=10000),
     limit: int = Query(40, ge=1, le=100),
+    entity_type: str = Query("", pattern="^(|group|option|section|rule)$"),
     conn=Depends(projection_connection),
 ):
-    page = explorer.search(conn, model_key, query, offset=offset, limit=limit)
+    page = explorer.search(
+        conn, model_key, query, offset=offset, limit=limit, entity_type=entity_type
+    )
     return {"model_key": model_key, "query": query, **page}
 
 
