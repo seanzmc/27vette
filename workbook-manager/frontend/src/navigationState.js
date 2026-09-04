@@ -25,6 +25,20 @@ export function parseNavigation(search, defaultModel = "stingray") {
     id: hasEntity ? requestedId : "",
     query: text(params.get("query")),
   };
+  if (["options", "groups"].includes(workspace)) {
+    const offset = Number.parseInt(params.get("offset") || "0", 10);
+    if (params.has("offset")) navigation.offset = Number.isFinite(offset) && offset > 0 ? offset : 0;
+    if (params.has("diagnostic")) navigation.diagnostic = text(params.get("diagnostic"));
+    if (params.has("diagnostic_entity")) {
+      navigation.diagnostic_entity = text(params.get("diagnostic_entity"));
+    }
+    if (workspace === "groups") {
+      const groupType = text(params.get("group_type"));
+      if (params.has("group_type")) {
+        navigation.group_type = ["exclusive", "rule"].includes(groupType) ? groupType : "all";
+      }
+    }
+  }
   if (workspace === "advanced") {
     const offset = Number.parseInt(params.get("offset") || "0", 10);
     navigation.collection = text(params.get("collection"));
@@ -45,6 +59,16 @@ export function serializeNavigation(navigation) {
     params.set("id", text(navigation.id));
   }
   if (text(navigation?.query)) params.set("query", text(navigation.query));
+  if (["options", "groups"].includes(navigation?.workspace)) {
+    if (Number(navigation.offset) > 0) params.set("offset", String(Number(navigation.offset)));
+    if (text(navigation.diagnostic)) params.set("diagnostic", text(navigation.diagnostic));
+    if (text(navigation.diagnostic_entity)) {
+      params.set("diagnostic_entity", text(navigation.diagnostic_entity));
+    }
+    if (navigation.workspace === "groups" && ["exclusive", "rule"].includes(navigation.group_type)) {
+      params.set("group_type", navigation.group_type);
+    }
+  }
   if (navigation?.workspace === "advanced") {
     if (text(navigation.collection)) params.set("collection", text(navigation.collection));
     if (Number(navigation.offset) > 0) params.set("offset", String(Number(navigation.offset)));

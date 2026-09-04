@@ -45,12 +45,14 @@ export const api = {
     request(`/api/explorer/${encodeURIComponent(model)}/sections/${encodeURIComponent(sectionId)}`),
   connectedRule: (model, ruleId) =>
     request(`/api/explorer/${encodeURIComponent(model)}/rules/${encodeURIComponent(ruleId)}`),
-  explorerSearch: (model, query, limit = 40) =>
-    request(`/api/explorer/${encodeURIComponent(model)}/search?query=${encodeURIComponent(query)}&limit=${limit}`),
+  explorerSearch: (model, query, { offset = 0, limit = 40 } = {}) =>
+    request(`/api/explorer/${encodeURIComponent(model)}/search?query=${encodeURIComponent(query)}&offset=${offset}&limit=${limit}`),
+  explorerGroups: (model, { groupType = "all", offset = 0, limit = 24 } = {}) =>
+    request(`/api/explorer/${encodeURIComponent(model)}/groups?group_type=${encodeURIComponent(groupType)}&offset=${offset}&limit=${limit}`),
   explorerDiagnostics: (model) =>
     request(`/api/explorer/${encodeURIComponent(model)}/diagnostics`),
-  explorerDiagnostic: (model, key, { entityId = "", limit = 100 } = {}) =>
-    request(`/api/explorer/${encodeURIComponent(model)}/diagnostics/${encodeURIComponent(key)}?entity_id=${encodeURIComponent(entityId)}&limit=${limit}`),
+  explorerDiagnostic: (model, key, { entityId = "", offset = 0, limit = 100 } = {}) =>
+    request(`/api/explorer/${encodeURIComponent(model)}/diagnostics/${encodeURIComponent(key)}?entity_id=${encodeURIComponent(entityId)}&offset=${offset}&limit=${limit}`),
   assetReconciliation: (params = {}) => {
     const q = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {

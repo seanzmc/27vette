@@ -288,6 +288,77 @@ def group_detail(conn, model_key: str, group_type: str, group_id: str) -> dict |
     return {"model_key": model_key, **summary, "group": group, "editor": editor}
 
 
+def group_index(
+    conn, model_key: str, *, group_type: str = "all", offset: int = 0, limit: int = 24
+) -> dict:
+    """Return a stable model-scoped group index with a fixed query count."""
+    if group_type not in {"all", "exclusive", "rule"}:
+        raise ValueError("group_type must be all, exclusive, or rule")
+    results: list[dict] = []
+    if group_type in {"all", "exclusive"}:
+        rows = _rows(conn, """
+            SELECT g.*, COUNT(m.id) AS member_count,
+                   COUNT(DISTINCT s.section_name) AS section_count,
+                   MIN(s.section_name) AS section_name
+            FROM exclusive_groups g
+            LEFT JOIN exclusive_group_members m
+              ON m.model_id=g.model_id AND m.group_id=g.group_id
+            LEFT JOIN options o
+              ON o.model_id=m.model_id AND o.option_id=m.option_id
+            LEFT JOIN form_sections s ON s.section_id=o.section_id
+            WHERE g.model_id=? GROUP BY g.id
+        """, (model_key,))
+        for group in rows:
+            members = ([{"section_name": group["section_name"]}]
+                       if group.get("section_count") == 1 else [])
+            results.append({
+                "entity_type": "group", "entity_id": f"exclusive:{group['group_id']}",
+                "group_type": "exclusive", "group_id": group["group_id"],
+                "label": _exclusive_group_label(group, members),
+                "display_label": group.get("display_label") or "",
+                "notes": group.get("notes") or "",
+                "behavior": group.get("selection_mode") or "",
+                "member_count": int(group.get("member_count") or 0),
+                "active": group.get("active") == "True",
+                "destination": {"workspace": "groups", "entity_type": "group",
+                                "entity_id": f"exclusive:{group['group_id']}"},
+            })
+    if group_type in {"all", "rule"}:
+        rows = _rows(conn, """
+            SELECT g.*, COUNT(m.id) AS member_count,
+                   source.rpo AS source_rpo, source.option_name AS source_name
+            FROM rule_groups g
+            LEFT JOIN rule_group_members m
+              ON m.model_id=g.model_id AND m.group_id=g.group_id
+            LEFT JOIN options source
+              ON source.model_id=g.model_id AND source.option_id=g.source_id
+            WHERE g.model_id=? GROUP BY g.id
+        """, (model_key,))
+        for group in rows:
+            source = ({"rpo": group.get("source_rpo"), "option_name": group.get("source_name")}
+                      if group.get("source_rpo") or group.get("source_name") else None)
+            results.append({
+                "entity_type": "group", "entity_id": f"rule:{group['group_id']}",
+                "group_type": "rule", "group_id": group["group_id"],
+                "label": _rule_group_label(group, source, []),
+                "display_label": group.get("display_label") or "",
+                "notes": group.get("notes") or "",
+                "behavior": group.get("group_type") or "",
+                "member_count": int(group.get("member_count") or 0),
+                "active": group.get("active") == "True",
+                "destination": {"workspace": "groups", "entity_type": "group",
+                                "entity_id": f"rule:{group['group_id']}"},
+            })
+    results.sort(key=lambda row: (
+        row["label"].casefold(), row["group_type"], row["group_id"].casefold()
+    ))
+    total = len(results)
+    page = results[offset:offset + limit]
+    return {"model_key": model_key, "group_type": group_type, "offset": offset,
+            "limit": limit, "total": total, "has_more": offset + len(page) < total,
+            "results": page}
+
+
 def section_detail(conn, model_key: str, section_id: str) -> dict | None:
     section = _row(conn.execute(
         "SELECT * FROM form_sections WHERE section_id=? AND EXISTS (SELECT 1 "
@@ -335,52 +406,81 @@ def _search_rank(query: str, values: list[Any]) -> int | None:
     return None
 
 
-def search(conn, model_key: str, query: str, *, limit: int = 40) -> list[dict]:
+def _match_reasons(query: str, fields: list[tuple[str, str, Any]]) -> list[dict]:
+    reasons = []
+    for match_class, field, value in fields:
+        quality = _search_rank(query, [value])
+        if quality is not None:
+            reasons.append({"class": match_class, "field": field,
+                            "value": str(value or ""), "quality": quality})
+    order = {"direct": 0, "mention": 1, "relationship": 2}
+    reasons.sort(key=lambda row: (order[row["class"]], row["field"], row["value"].casefold()))
+    return reasons
+
+
+def _classified_result(row: dict, reasons: list[dict]) -> dict:
+    classes = []
+    for reason in reasons:
+        if reason["class"] not in classes:
+            classes.append(reason["class"])
+    primary = classes[0]
+    quality = min(reason["quality"] for reason in reasons if reason["class"] == primary)
+    return {**row, "rank": {"direct": 0, "mention": 3, "relationship": 6}[primary] + quality,
+            "match_classes": classes, "match_reasons": reasons}
+
+
+def search(
+    conn, model_key: str, query: str, *, offset: int = 0, limit: int = 40
+) -> dict:
     results: list[dict] = []
     for option in _rows(conn, "SELECT o.*, s.section_name FROM options o LEFT JOIN "
                         "form_sections s ON s.section_id=o.section_id WHERE o.model_id=?",
                         (model_key,)):
-        rank = _search_rank(query, [option.get("rpo"), option.get("option_name"),
-                                    option.get("option_id"), option.get("section_name"),
-                                    option.get("description"), option.get("detail_raw")])
-        if rank is not None:
-            results.append({
+        reasons = _match_reasons(query, [
+            ("direct", "RPO", option.get("rpo")), ("direct", "name", option.get("option_name")),
+            ("direct", "canonical ID", option.get("option_id")),
+            ("mention", "section", option.get("section_name")),
+            ("mention", "description", option.get("description")),
+            ("mention", "authored detail", option.get("detail_raw")),
+        ])
+        if reasons:
+            results.append(_classified_result({
                 "entity_type": "option", "entity_id": option["option_id"],
                 "label": option_label(option), "context": option.get("section_name") or "",
-                "rank": rank,
                 "destination": {"workspace": "options", "entity_type": "option",
                                 "entity_id": option["option_id"]},
-            })
-    for group in _rows(conn, "SELECT * FROM exclusive_groups WHERE model_id=?", (model_key,)):
-        summary = _exclusive_group_summary(conn, model_key, group)
-        rank = _search_rank(query, [summary["label"], summary["group_id"], summary["notes"]])
-        if rank is not None:
-            results.append({
-                "entity_type": "group", "entity_id": f"exclusive:{group['group_id']}",
-                "label": summary["label"], "context": "Exclusive group", "rank": rank,
+            }, reasons))
+    for summary in group_index(conn, model_key, limit=100000)["results"]:
+        reasons = _match_reasons(query, [
+            ("direct", "name", summary["display_label"]),
+            ("direct", "canonical ID", summary["group_id"]),
+            ("mention", "display context", summary["label"]),
+            ("mention", "notes", summary["notes"]),
+            ("relationship", "source and behavior",
+             summary["label"] if summary["group_type"] == "rule" else ""),
+            ("relationship", "group behavior", summary["behavior"]),
+        ])
+        if reasons:
+            results.append(_classified_result({
+                "entity_type": "group", "entity_id": summary["entity_id"],
+                "label": summary["label"],
+                "context": "Exclusive group" if summary["group_type"] == "exclusive" else "Rule group",
                 "destination": summary["destination"],
-            })
-    for group in _rows(conn, "SELECT * FROM rule_groups WHERE model_id=?", (model_key,)):
-        summary = _rule_group_summary(conn, model_key, group)
-        rank = _search_rank(query, [summary["label"], summary["group_id"], summary["notes"],
-                                    summary["behavior"]])
-        if rank is not None:
-            results.append({
-                "entity_type": "group", "entity_id": f"rule:{group['group_id']}",
-                "label": summary["label"], "context": "Rule group", "rank": rank,
-                "destination": summary["destination"],
-            })
+            }, reasons))
     for section in _rows(conn, "SELECT DISTINCT s.* FROM form_sections s JOIN options o "
                          "ON o.section_id=s.section_id WHERE o.model_id=?", (model_key,)):
-        rank = _search_rank(query, [section.get("section_name"), section.get("section_id")])
-        if rank is not None:
-            results.append({
+        reasons = _match_reasons(query, [
+            ("direct", "name", section.get("section_name")),
+            ("direct", "canonical ID", section.get("section_id")),
+        ])
+        if reasons:
+            results.append(_classified_result({
                 "entity_type": "section", "entity_id": section["section_id"],
                 "label": section.get("section_name") or section["section_id"],
-                "context": "Form section", "rank": rank,
+                "context": "Form section",
                 "destination": {"workspace": "sections", "entity_type": "section",
                                 "entity_id": section["section_id"]},
-            })
+            }, reasons))
     for rule in _rows(conn, "SELECT r.*, source.rpo source_rpo, source.option_name source_name, "
                       "target.rpo target_rpo, target.option_name target_name FROM rule_mappings r "
                       "LEFT JOIN options source ON source.model_id=r.model_id AND source.option_id=r.source_id "
@@ -389,18 +489,28 @@ def search(conn, model_key: str, query: str, *, limit: int = 40) -> list[dict]:
         label = f"{option_label({'rpo': rule.get('source_rpo'), 'option_name': rule.get('source_name')})} " \
                 f"{(rule.get('rule_type') or 'relates to').replace('_', ' ')} " \
                 f"{option_label({'rpo': rule.get('target_rpo'), 'option_name': rule.get('target_name')})}"
-        rank = _search_rank(query, [rule.get("rule_id"), rule.get("rule_type"), label,
-                                    rule.get("original_detail_raw")])
-        if rank is not None:
-            results.append({
+        reasons = _match_reasons(query, [
+            ("direct", "canonical ID", rule.get("rule_id")),
+            ("relationship", "relationship type", rule.get("rule_type")),
+            ("relationship", "relationship", label),
+            ("mention", "authored detail", rule.get("original_detail_raw")),
+        ])
+        if reasons:
+            results.append(_classified_result({
                 "entity_type": "rule", "entity_id": rule["rule_id"], "label": label,
-                "context": "Option relationship", "rank": rank,
+                "context": "Option relationship",
                 "destination": {"workspace": "rules", "entity_type": "rule",
                                 "entity_id": rule["rule_id"]},
-            })
-    results.sort(key=lambda row: (row["rank"], row["entity_type"], row["label"].casefold(),
-                                  row["entity_id"]))
-    return results[:limit]
+            }, reasons))
+    entity_order = {"option": 0, "section": 1, "rule": 2, "group": 3}
+    results.sort(key=lambda row: (
+        row["rank"], entity_order.get(row["entity_type"], 9),
+        row["label"].casefold(), row["entity_id"],
+    ))
+    total = len(results)
+    page = results[offset:offset + limit]
+    return {"offset": offset, "limit": limit, "total": total,
+            "has_more": offset + len(page) < total, "results": page}
 
 
 DIAGNOSTICS = (

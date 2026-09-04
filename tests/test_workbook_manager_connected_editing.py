@@ -219,6 +219,33 @@ def test_detail_clears_cross_model_selection_before_the_next_load():
     assert 0 < guard - load_effect < 800
 
 
+def test_checkpoint_3a_navigation_round_trips_index_search_and_diagnostics_modes():
+    result = run_navigation(
+        "const index=api.parseNavigation('?model=z06&workspace=groups&group_type=rule&offset=24');"
+        "const search=api.parseNavigation('?model=z06&workspace=groups&query=Z51');"
+        "const diagnostic=api.parseNavigation('?model=z06&workspace=groups&diagnostic=missing_required_images');"
+        "console.log(JSON.stringify({index,search,diagnostic,serialized:api.serializeNavigation(diagnostic)}));"
+    )
+    assert result["index"]["group_type"] == "rule"
+    assert result["index"]["offset"] == 24
+    assert result["search"]["query"] == "Z51"
+    assert result["diagnostic"]["diagnostic"] == "missing_required_images"
+    assert result["serialized"].endswith("diagnostic=missing_required_images")
+
+
+def test_checkpoint_3a_explorer_has_distinct_index_search_and_diagnostics_presentations():
+    source = (FRONTEND / "components" / "ConnectedExplorer.jsx").read_text()
+    api_source = (FRONTEND / "api.js").read_text()
+
+    assert "api.explorerGroups" in source
+    assert "Group type" in source
+    assert "No groups match this model and group type." in source
+    assert "Match reasons" in source
+    assert "Diagnostics" in source
+    assert "result.diagnostic.label" in source
+    assert "explorerGroups:" in api_source
+
+
 def test_app_owns_native_history_and_reuses_lifecycle_for_the_draft_tray():
     app_source = (FRONTEND / "App.jsx").read_text()
     explorer_source = (FRONTEND / "components" / "ConnectedExplorer.jsx").read_text()
@@ -241,7 +268,7 @@ def test_app_owns_native_history_and_reuses_lifecycle_for_the_draft_tray():
     assert "navigation.type" in explorer_source
     assert "navigation.id" in explorer_source
     assert "connectedOption(modelKey, navigation.id, draftId)" in explorer_source
-    assert "api.explorerSearch(modelKey, query)" in explorer_source
+    assert "api.explorerSearch(modelKey, query," in explorer_source
     assert "draftRevision" in explorer_source
     assert "draft_overlay" in explorer_source
     assert "detailError" in explorer_source

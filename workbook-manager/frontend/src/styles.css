@@ -88,11 +88,15 @@ main { padding: 20px 22px 60px; max-width: 1280px; margin: 0 auto; }
 .readonly-label { display: inline-flex; align-items: center; gap: 6px; color: var(--blue); font-size: 12px; padding: 5px 9px; border: 1px solid rgba(74,163,255,.35); border-radius: 8px; background: rgba(74,163,255,.08); }
 .explorer-search { display: flex; align-items: center; gap: 8px; margin: 14px 0; }
 .explorer-search .text { font-size: 15px; padding: 10px 12px; }
+.explorer-filter { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; color: var(--text-dim); }
+.explorer-filter select { min-width: 180px; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 .search-results, .relationship-list { display: grid; gap: 7px; }
 .entity-link { width: 100%; display: grid; grid-template-columns: auto minmax(0,1fr) auto auto; gap: 9px; align-items: center; text-align: left; padding: 10px 12px; color: var(--text); background: var(--bg-panel); border: 1px solid var(--border); border-radius: 9px; cursor: pointer; }
 .entity-link:hover { border-color: var(--blue); }
 .entity-link > span:last-of-type { color: var(--text-dim); }
+.entity-link > span:last-of-type > span, .entity-link > span:last-of-type > small { display: block; }
+.entity-link > span:last-of-type > small { margin-top: 3px; color: var(--text-faint); }
 .result-type { padding: 2px 6px; border-radius: 5px; color: var(--accent); background: rgba(245,185,66,.1); font-size: 10px; text-transform: uppercase; }
 .diagnostic-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(210px,1fr)); gap: 8px; }
 .diagnostic-grid button { display: grid; gap: 5px; text-align: left; color: var(--text); background: var(--bg-panel); border: 1px solid var(--border); border-radius: 9px; padding: 12px; cursor: pointer; }
@@ -100,6 +104,8 @@ main { padding: 20px 22px 60px; max-width: 1280px; margin: 0 auto; }
 .diagnostic-grid span { color: var(--text-dim); font-size: 11px; }
 .diagnostic-results { margin-top: 14px; }
 .diagnostic-results .relationship-list { padding: 10px; }
+.diagnostic-results > .muted { margin: 0; padding: 0 10px 8px; }
+.explorer-pagination { display: flex; justify-content: center; align-items: center; gap: 12px; padding: 14px; }
 .explorer-detail { max-width: 980px; margin: 0 auto; }
 .explorer-detail > .readonly-label { margin-top: 16px; }
 .explorer-detail h2 { font-size: 26px; margin: 10px 0 4px; }

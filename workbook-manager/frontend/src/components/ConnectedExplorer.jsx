@@ -52,6 +52,7 @@ function DiagnosticResults({ result, onNavigate }) {
   return (
     <div className="panel diagnostic-results">
       <div className="panel-head"><strong>{result.diagnostic.label}</strong><span>{result.results.length} results</span></div>
+      <p className="muted">Parameters: model {result.model_key}{result.entity_id ? ` · entity ${result.entity_id}` : ""}</p>
       <div className="relationship-list">
         {result.results.map((row) => (
           <EntityLink key={`${row.entity_type}:${row.entity_id}`} destination={row.destination} onNavigate={onNavigate}>
@@ -274,6 +275,8 @@ export default function ConnectedExplorer({
   draftId, draftRevision, draftMutable, onChanged,
 }) {
   const [results, setResults] = useState([]);
+  const [searchPage, setSearchPage] = useState(null);
+  const [groupPage, setGroupPage] = useState(null);
   const [selected, setSelected] = useState(null);
   const [diagnostics, setDiagnostics] = useState([]);
   const [diagnosticResult, setDiagnosticResult] = useState(null);
@@ -283,6 +286,10 @@ export default function ConnectedExplorer({
   const detailRequest = useRef(0);
   const searchRequest = useRef(0);
   const query = navigation.query;
+  const diagnosticKey = navigation.diagnostic || "";
+  const diagnosticEntity = navigation.diagnostic_entity || "";
+  const groupType = navigation.group_type || "all";
+  const offset = navigation.offset || 0;
 
   const navigate = (destination) => {
     const focusKey = `${destination.entity_type}:${destination.entity_id}`;
@@ -299,6 +306,26 @@ export default function ConnectedExplorer({
     setDiagnosticResult(null);
     api.explorerDiagnostics(modelKey).then((data) => setDiagnostics(data.diagnostics)).catch((e) => setError(e.message));
   }, [modelKey]);
+
+  useEffect(() => {
+    if (mode !== "groups" || query.trim() || diagnosticKey || navigation.type) {
+      setGroupPage(null);
+      return;
+    }
+    api.explorerGroups(modelKey, { groupType, offset, limit: 24 })
+      .then((data) => { setGroupPage(data); setError(""); })
+      .catch((e) => { setGroupPage(null); setError(e.message); });
+  }, [mode, modelKey, groupType, offset, query, diagnosticKey, navigation.type]);
+
+  useEffect(() => {
+    if (!diagnosticKey || navigation.type) {
+      setDiagnosticResult(null);
+      return;
+    }
+    api.explorerDiagnostic(modelKey, diagnosticKey, { entityId: diagnosticEntity, offset, limit: 100 })
+      .then((data) => { setDiagnosticResult(data); setResults([]); setError(""); })
+      .catch((e) => { setDiagnosticResult(null); setError(e.message); });
+  }, [modelKey, diagnosticKey, diagnosticEntity, offset, navigation.type]);
 
   useEffect(() => {
     const generation = ++detailRequest.current;
@@ -342,22 +369,23 @@ export default function ConnectedExplorer({
   useEffect(() => {
     clearTimeout(timer.current);
     const generation = ++searchRequest.current;
-    if (!query.trim()) {
+    if (!query.trim() || diagnosticKey) {
       setResults([]);
       return;
     }
     timer.current = setTimeout(async () => {
       try {
-        const data = await api.explorerSearch(modelKey, query);
+        const data = await api.explorerSearch(modelKey, query, { offset, limit: 40 });
         if (generation !== searchRequest.current) return;
         setResults(data.results);
+        setSearchPage(data);
         setError("");
       } catch (e) {
         if (generation === searchRequest.current) setError(e.message);
       }
     }, 180);
     return () => clearTimeout(timer.current);
-  }, [modelKey, query]);
+  }, [modelKey, query, offset, diagnosticKey]);
 
   useEffect(() => {
     const focusKey = window.history.state?.focusKey;
@@ -371,14 +399,16 @@ export default function ConnectedExplorer({
   }, [navigation.type, results]);
 
   const search = (value) => {
-    onNavigationChange({ ...navigation, query: value }, { replace: true });
+    onNavigationChange({
+      ...navigation, query: value, diagnostic: "", diagnostic_entity: "", offset: 0,
+    }, { replace: true });
   };
 
   const runDiagnostic = async (item, entityId = "") => {
-    try {
-      const data = await api.explorerDiagnostic(modelKey, item.key, { entityId, limit: 100 });
-      setDiagnosticResult(data); setError("");
-    } catch (e) { setError(e.message); }
+    onNavigationChange({
+      ...navigation, type: "", id: "", query: "", offset: 0, diagnostic: item.key,
+      diagnostic_entity: entityId,
+    });
   };
 
   const runEntityDiagnostic = (key, entityId) => runDiagnostic({ key }, entityId);
@@ -397,7 +427,34 @@ export default function ConnectedExplorer({
   if (selected?.entity_type === "section") return <SectionDetail detail={selected} onNavigate={navigate} onBack={backToResults} />;
   if (selected?.entity_type === "rule") return <RuleDetail detail={selected} onNavigate={navigate} onBack={backToResults} />;
 
-  const visible = results.filter((row) => mode !== "groups" || row.entity_type === "group");
+  const visible = query.trim()
+    ? results.filter((row) => mode !== "groups" || row.entity_type === "group")
+    : (mode === "groups" ? (groupPage?.results || []) : []);
+  const diagnostic = diagnostics.find((item) => item.key === diagnosticKey);
+  if (diagnosticKey && !navigation.type) {
+    return (
+      <section className="explorer-workspace" aria-labelledby="diagnostics-heading">
+        <button className="btn small" onClick={() => onNavigationChange({
+          ...navigation, diagnostic: "", diagnostic_entity: "",
+        })}><ArrowLeft size={14} /> Back to results</button>
+        <div className="workspace-hero">
+          <div><span className="eyebrow">Read-only connected view</span><h2 id="diagnostics-heading">Diagnostics</h2>
+            <p>{diagnostic?.definition || "Run a named diagnostic for the selected model."}</p></div>
+          <div className="readonly-label"><LockKeyhole size={14} /> Reference only</div>
+        </div>
+        {error && <div className="notice err">{error}</div>}
+        {!error && !diagnosticResult && <p className="muted">Loading diagnostic results…</p>}
+        {diagnosticResult && <DiagnosticResults result={diagnosticResult} onNavigate={navigate} />}
+        {diagnosticResult && (offset > 0 || diagnosticResult.has_more) && (
+          <div className="explorer-pagination">
+            <button className="btn small" disabled={!offset} onClick={() => onNavigationChange({ ...navigation, offset: Math.max(0, offset - 100) })}>Previous</button>
+            <span>Results {offset + 1}–{offset + diagnosticResult.results.length}</span>
+            <button className="btn small" disabled={!diagnosticResult.has_more} onClick={() => onNavigationChange({ ...navigation, offset: offset + 100 })}>Next</button>
+          </div>
+        )}
+      </section>
+    );
+  }
   return (
     <section className="explorer-workspace">
       <div className="workspace-hero">
@@ -413,6 +470,16 @@ export default function ConnectedExplorer({
         <span className="sr-only">Search options, groups, sections, and rules</span>
         <input autoFocus className="text" value={query} onChange={(e) => search(e.target.value)} placeholder="Search by RPO, name, group, section, rule, or ID…" />
       </label>
+      {mode === "groups" && !query.trim() && (
+        <label className="explorer-filter">Group type
+          <select value={groupType} onChange={(event) => onNavigationChange({
+            ...navigation, group_type: event.target.value, offset: 0,
+          })}>
+            <option value="all">All groups</option><option value="exclusive">Exclusive groups</option>
+            <option value="rule">Rule groups</option>
+          </select>
+        </label>
+      )}
       {error && <div className="notice err">{error}</div>}
       {detailError && <div className="notice err">{detailError}</div>}
       {detailError && navigation.type && (
@@ -422,11 +489,31 @@ export default function ConnectedExplorer({
         {visible.map((row) => (
           <EntityLink key={`${row.entity_type}:${row.entity_id}`} destination={row.destination} onNavigate={navigate}>
             <span className={`result-type ${row.entity_type}`}>{row.entity_type}</span>
-            <strong>{row.label}</strong><span>{row.context}</span>
+            <strong>{row.label}</strong>
+            <span>{query.trim()
+              ? <><span>{row.context}</span><small>Match reasons: {row.match_reasons.map((reason) => `${reason.class} · ${reason.field}`).join(", ")}</small></>
+              : <>{row.group_id} · {row.member_count} members · {row.active ? "Active" : "Inactive"}</>}</span>
           </EntityLink>
         ))}
+        {mode === "groups" && !query.trim() && groupPage && !visible.length && (
+          <p className="muted">No groups match this model and group type.</p>
+        )}
       </div>
-      <h3>Named diagnostics</h3>
+      {mode === "groups" && !query.trim() && groupPage?.total > groupPage?.limit && (
+        <div className="explorer-pagination">
+          <button className="btn small" disabled={!offset} onClick={() => onNavigationChange({ ...navigation, offset: Math.max(0, offset - 24) })}>Previous</button>
+          <span>{offset + 1}–{offset + visible.length} of {groupPage.total}</span>
+          <button className="btn small" disabled={!groupPage.has_more} onClick={() => onNavigationChange({ ...navigation, offset: offset + 24 })}>Next</button>
+        </div>
+      )}
+      {query.trim() && searchPage?.total > searchPage?.limit && (
+        <div className="explorer-pagination">
+          <button className="btn small" disabled={!offset} onClick={() => onNavigationChange({ ...navigation, offset: Math.max(0, offset - 40) })}>Previous</button>
+          <span>{offset + 1}–{offset + visible.length} of {searchPage.total}</span>
+          <button className="btn small" disabled={!searchPage.has_more} onClick={() => onNavigationChange({ ...navigation, offset: offset + 40 })}>Next</button>
+        </div>
+      )}
+      <h3>Diagnostics</h3>
       <div className="diagnostic-grid">
         {diagnostics.map((item) => (
           <button

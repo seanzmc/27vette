@@ -2357,6 +2357,8 @@ class TestApi(unittest.TestCase):
         self.assertEqual(option["model_key"], "stingray")
         self.assertEqual(option["results"][0]["entity_type"], "option")
         self.assertEqual(option["results"][0]["entity_id"], "opt_5zu_001")
+        self.assertEqual(option["results"][0]["match_classes"][0], "direct")
+        self.assertTrue(option["results"][0]["match_reasons"])
         self.assertEqual(option["results"][0]["destination"], {
             "workspace": "options", "entity_type": "option",
             "entity_id": "opt_5zu_001",
@@ -2402,6 +2404,85 @@ class TestApi(unittest.TestCase):
         self.assertEqual(rule.json()["destination"], rule_result["destination"])
         self.assertIn("source_option", rule.json())
         self.assertIn("target_option", rule.json())
+
+        classified = self.client.get(
+            "/api/explorer/stingray/search", params={"query": "Z51", "limit": 100}
+        ).json()["results"]
+        self.assertTrue(classified)
+        self.assertEqual(classified[0]["match_classes"][0], "direct")
+        self.assertTrue(all(row["match_classes"] for row in classified))
+        self.assertTrue(all(row["match_reasons"] for row in classified))
+        self.assertEqual(
+            len({(row["entity_type"], row["entity_id"]) for row in classified}),
+            len(classified),
+        )
+        first_mention = next(
+            (index for index, row in enumerate(classified)
+             if row["match_classes"][0] != "direct"),
+            len(classified),
+        )
+        self.assertTrue(all(
+            row["match_classes"][0] == "direct"
+            for row in classified[:first_mention]
+        ))
+
+    def test_groups_index_is_scoped_stable_paginated_and_useful_without_search(self):
+        first = self.client.get(
+            "/api/explorer/grand_sport_x/groups",
+            params={"group_type": "all", "offset": 0, "limit": 3},
+        )
+        self.assertEqual(first.status_code, 200, first.text)
+        payload = first.json()
+        self.assertEqual(payload["model_key"], "grand_sport_x")
+        self.assertEqual(payload["offset"], 0)
+        self.assertEqual(payload["limit"], 3)
+        self.assertGreater(payload["total"], 3)
+        self.assertEqual(len(payload["results"]), 3)
+        for row in payload["results"]:
+            self.assertIn(row["group_type"], {"exclusive", "rule"})
+            self.assertTrue(row["label"])
+            self.assertTrue(row["group_id"])
+            self.assertIsInstance(row["member_count"], int)
+            self.assertIsInstance(row["active"], bool)
+
+        second = self.client.get(
+            "/api/explorer/grand_sport_x/groups",
+            params={"group_type": "all", "offset": 3, "limit": 3},
+        ).json()
+        self.assertFalse({row["entity_id"] for row in payload["results"]}
+                         & {row["entity_id"] for row in second["results"]})
+        exclusive = self.client.get(
+            "/api/explorer/grand_sport_x/groups",
+            params={"group_type": "exclusive", "limit": 100},
+        ).json()
+        self.assertTrue(exclusive["results"])
+        self.assertTrue(all(row["group_type"] == "exclusive"
+                            for row in exclusive["results"]))
+
+    def test_checkpoint_3a_index_search_and_diagnostics_have_fixed_query_budgets(self):
+        conn = sqlite3.connect(self.mainmod.config.DEFAULT_PROJECTION_DB)
+        conn.row_factory = sqlite3.Row
+        statements = []
+        conn.set_trace_callback(statements.append)
+        try:
+            self.mainmod.explorer.group_index(conn, "stingray", limit=1)
+            group_queries = len([sql for sql in statements
+                                 if sql.lstrip().upper().startswith("SELECT")])
+            statements.clear()
+            self.mainmod.explorer.search(conn, "stingray", "Z51", limit=1)
+            search_queries = len([sql for sql in statements
+                                  if sql.lstrip().upper().startswith("SELECT")])
+            statements.clear()
+            self.mainmod.explorer.diagnostic_results(
+                conn, "stingray", "variant_availability_differences", limit=1
+            )
+            diagnostic_queries = len([sql for sql in statements
+                                      if sql.lstrip().upper().startswith("SELECT")])
+        finally:
+            conn.close()
+        self.assertEqual(group_queries, 2)
+        self.assertEqual(search_queries, 5)
+        self.assertEqual(diagnostic_queries, 1)
 
     def test_named_diagnostics_are_bounded_defined_scoped_and_traceable(self):
         catalog = self.client.get(
