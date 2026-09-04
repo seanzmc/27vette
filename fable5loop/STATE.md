@@ -19,21 +19,19 @@ Keep this file small — it is read at the start of every session:
 ## Current handoff
 
 - **Updated:** 2026-09-04
-- **Owning specification:** `workbook-manager/audit-spec.md` (§8 Checkpoint 3A;
-  §10 DISC-01–06). Checkpoint 2D-B closure remains in §7 and §14.
-- **Active workflow:** Workbook Manager Checkpoint 3A — discoverable Groups,
-  classified search, and distinct diagnostics mode — implemented locally.
-- **Current status:** PR #74 merged to `main` as `97318798`. The stale PR status
-  in this handoff and the owning spec has been reconciled on the 3A branch only;
-  this is post-merge documentation reconciliation and changes no 2D behavior.
-  Checkpoint 3A now has the paged Groups index, classified deterministic search,
-  distinct diagnostics mode, URL-owned navigation, focused tests, and browser
-  proof. The implementation is `422e2b2a`.
-- **Branch/commit:** `feat/workbook-manager-checkpoint-3a` from `origin/main`
-  `97318798`; implementation `422e2b2a`; closeout `4ae4e4f8`; PR #75
-  (`https://github.com/seanzmc/27vette/pull/75`) is open.
-- **Last completed:** Checkpoint 2D-B merged via PR #74 after release-candidate CI,
-  Codex disposition, and both review threads passed/resolved.
+- **Owning specification:** `workbook-manager/audit-spec.md` (§8 Checkpoint 3A
+  closure; §10 DISC-01–06; §14 completion record).
+- **Active workflow:** Workbook Manager Checkpoint 3A — COMPLETE and merged.
+- **Current status:** the paged Groups index, classified deterministic search,
+  distinct diagnostics mode, and URL-owned navigation are on `main`. PR #75
+  review remediation additionally scoped explorer search before pagination and
+  hardened navigation against stale cross-workspace state. This reconciliation
+  changes documentation only.
+- **Branch/commit:** PR #75 (`https://github.com/seanzmc/27vette/pull/75`)
+  merged to `main` as `c087e5bf`; implementation `422e2b2a`, closeout
+  `4ae4e4f8`/`90e42a7e`, review remediation `278c1f7d`.
+- **Last completed:** Checkpoint 3A merged after release-candidate CI, Codex
+  disposition, and review remediation passed.
 - **Validation:** focused API 4 passed; connected frontend owner 38 passed;
   frontend build passed. Isolated Chrome proved the 24-row Groups index,
   exact/direct Z51 first with reasons, separate 53-result diagnostic mode,
@@ -42,8 +40,10 @@ Keep this file small — it is read at the start of every session:
   stages (`ok: true`, 160.676 seconds), including the one-process Manager group
   (415 passed, 2 skipped, 79 subtests), frontend build, and governance/catalog/
   state owners.
-- **Next action:** review PR #75; merge only on explicit user request.
-- **Blockers or closeout gaps:** none. Remote PR checks may still be pending.
+- **Next action:** await explicit authorization for Checkpoint 3B (human
+  technical labels and dead coverage control).
+- **Blockers or closeout gaps:** none. PR #75 release-candidate and Codex
+  disposition checks passed before merge.
 - **Protected boundaries:** dealer submission, deployment, workbook, generated
   artifacts, `form-app/data.js`, customer runtime, WordPress, catalog
   `ci`/`serial_groups`, ChangeSet dialect, and external services — unchanged.

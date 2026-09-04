@@ -1913,7 +1913,9 @@ Each authorized checkpoint appends one concise dated record containing:
 - **2026-09-04 — Checkpoint 3A / P3.1–P3.3 / WM-011:** closed by
   implementation `422e2b2a`. DISC-01–06 evidence is recorded inline in the
   checkpoint section. Delivery PR #75
-  (`https://github.com/seanzmc/27vette/pull/75`) is open. Final local
+  (`https://github.com/seanzmc/27vette/pull/75`) merged to `main` as `c087e5bf`
+  on 2026-09-04 after review remediation `278c1f7d` scoped explorer search
+  before pagination and hardened cross-workspace navigation. Final local
   catalog-selected validation passed all 26 selected gates in 11 stages
   (`ok: true`, 160.676 seconds), including the one-process Manager group (415
   passed, 2 skipped, 79 subtests) and frontend production build. Canonical
