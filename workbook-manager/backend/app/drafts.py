@@ -81,6 +81,29 @@ def _json(value: Any) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"))
 
 
+def _new_row_model_context(projection_conn: sqlite3.Connection, spec, model_id: str) -> list[str]:
+    """Ownership for a draft-added row, mirroring the importer's rule.
+
+    A concrete model owns its row. A global fixed family (no model_key column)
+    or a wildcard model_key row is owned by every active model, so
+    Apply/Rebuild regenerates all of them (registry.models_for_write_targets
+    doctrine; audit-spec §7 2D-A D1/D2).
+    """
+    if model_id and model_id != WILDCARD_MODEL_KEY:
+        return [model_id]
+    if spec.has_model_key_column and model_id != WILDCARD_MODEL_KEY:
+        return []
+    if spec.model_scoped or spec.role:
+        return [model_id] if model_id else []
+    return sorted(
+        str(row["model_key"])
+        for row in projection_conn.execute(
+            "SELECT model_key FROM models WHERE active='True'"
+        ).fetchall()
+        if str(row["model_key"] or "").strip()
+    )
+
+
 def _semantic_row(spec, row) -> dict[str, Any]:
     return {column.sql_name(): row[column.sql_name()] for column in spec.columns}
 
@@ -2622,10 +2645,16 @@ def save_operation(
             "invalid_draft_action",
             f"unsupported draft action {op!r}",
         )
-    if set(key) != set(spec.key) or any(not str(key.get(name, "")).strip() for name in spec.key):
+    if set(key) != set(spec.key) or not spec.key_is_complete(key):
+        blank_ok = spec.blank_key_columns()
         raise DraftError(
             "invalid_entity_key",
-            f"draft key must contain exactly nonblank fields: {', '.join(spec.key)}",
+            "draft key must contain exactly the fields "
+            + ", ".join(spec.key)
+            + (
+                f" (blank allowed only for {', '.join(sorted(blank_ok))})"
+                if blank_ok else ", all nonblank"
+            ),
         )
     row = _fetch_row(projection_conn, spec, model_id, key)
     source_sheet = str(
@@ -2849,7 +2878,7 @@ def save_operation(
             _json(changed_fields),
             str(
                 row["model_context"] if row is not None
-                else _json([model_id] if model_id else [])
+                else _json(_new_row_model_context(projection_conn, spec, model_id))
                 or "[]"
             ),
         )

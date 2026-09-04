@@ -3,6 +3,7 @@ import { Check } from "lucide-react";
 import { api } from "../api.js";
 import { isDraftDirty, validateDraft, validateField } from "../editorValidation.js";
 import EditorShell from "./EditorShell.jsx";
+import { operationModelId } from "../operationScope.js";
 
 function blankOption(control, prompt = "Choose a value") {
   if (control.blank === "forbidden" || control.blank === "never_blank_key") {
@@ -282,9 +283,9 @@ export default function RecordForm({
       ]));
       const operation = await saveFn({
         table: schema.table,
-        model_id: schema.model_context?.required
-          ? (schema.model_context.value || modelKey)
-          : "",
+        // A row that authors its own model_key (including a shared "*" copy
+        // row) owns the operation; otherwise fall back to the schema context.
+        model_id: operationModelId(schema, mode === "edit" ? initial : draft, modelKey),
         op: mode === "edit" ? "update" : "add",
         key,
         record: draft,

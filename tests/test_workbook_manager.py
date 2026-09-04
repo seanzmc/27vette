@@ -923,10 +923,16 @@ class TestPass1BrowserContainment(unittest.TestCase):
     def test_form_payload_uses_schema_model_context_for_model_key_families(self):
         record_form = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
                        "components" / "RecordForm.jsx").read_text()
+        scope = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
+                 "operationScope.js").read_text()
         structure = (REPO_ROOT / "workbook-manager" / "frontend" / "src" /
                      "components" / "FormStructure.jsx").read_text()
-        self.assertIn("schema.model_context?.required", record_form)
-        self.assertIn("schema.model_context.value || modelKey", record_form)
+        # Checkpoint 2D-B: the scope derivation moved into one dependency-free
+        # module so a row's own model_key (including the shared "*" copy rows)
+        # owns the operation before the schema context fallback applies.
+        self.assertIn("operationModelId(schema", record_form)
+        self.assertIn("context.source === \"row_model_key\"", scope)
+        self.assertIn("return context.value || modelKey", scope)
         self.assertNotIn("model_id: schema.model_scoped ? modelKey", record_form)
         self.assertIn("saveFn={saveDraft}", structure)
         self.assertNotIn('model_id: ""', structure)
@@ -2892,7 +2898,14 @@ class TestApi(unittest.TestCase):
         self.assertEqual(attempt["manager_state"], "applied")
         evidence = attempt["result"]["applyRebuild"]
         self.assertEqual(evidence["status"], "current")
-        self.assertEqual(evidence["affected_models"], ["stingray"])
+        # The selected asset row is wildcard-owned. Checkpoint 2D-B aligned
+        # stored wildcard ownership with its real all-model generation scope,
+        # so the mixed draft rebuilds every active model rather than borrowing
+        # the current Stingray selector.
+        self.assertEqual(
+            evidence["affected_models"],
+            ["grand_sport", "grand_sport_x", "stingray", "z06", "zr1", "zr1x"],
+        )
         self.assertEqual(evidence["workbook"]["state"], "applied")
         self.assertEqual(evidence["generated_contracts"]["state"], "current")
         self.assertEqual(evidence["publication"]["state"], "current")

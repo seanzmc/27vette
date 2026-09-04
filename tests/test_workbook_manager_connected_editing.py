@@ -133,14 +133,16 @@ def test_checkpoint_2a_raw_ui_wires_confirmation_undo_and_context_preservation()
 
 def test_undo_delete_matches_prior_operations_by_model_identity():
     source = (FRONTEND / "components" / "ModelOperations.jsx").read_text()
+    scope = (FRONTEND / "operationScope.js").read_text()
 
     # Codex P2 (PR 69): entity keys such as option_id collide across models
     # in model-scoped collections, so the undo prior-operation lookup must
     # also match the stored model identity instead of restoring another
     # model's operation for the same key.
-    assert "const operationModelId = schema.model_context?.required" in source
-    assert 'String(candidate.model_id ?? "") === operationModelId' in source
-    assert "model_id: operationModelId" in source
+    assert "const scopedModel = operationModelId(schema, row, modelKey)" in source
+    assert 'String(candidate.model_id ?? "") === scopedModel' in source
+    assert "model_id: scopedModel" in source
+    assert "context.source === \"row_model_key\"" in scope
 
 
 def test_advanced_navigation_round_trips_collection_query_offset_and_editor_context():

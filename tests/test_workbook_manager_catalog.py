@@ -89,7 +89,12 @@ class TestCatalogParity(unittest.TestCase):
         self.assertEqual(set(catalog.WRITABLE_FAMILIES), set(EDITOR_SHEET_META))
         for family, shared in EDITOR_SHEET_META.items():
             spec = catalog.SPEC_BY_FAMILY[family]
-            self.assertEqual(spec.key, tuple(shared["key"]), family)
+            # spec.key holds SQL names (catalog._build_spec sanitizes the
+            # registry headers); PriceRef is the first family whose key headers
+            # differ from their SQL spelling.
+            self.assertEqual(
+                spec.key, tuple(catalog.sanitize_identifier(k) for k in shared["key"]), family
+            )
             self.assertEqual(tuple(c.header for c in spec.columns), tuple(shared["columns"]), family)
             self.assertEqual(
                 {c.header: c.ctype for c in spec.columns if c.ctype != "text"},
@@ -120,8 +125,10 @@ class TestCatalogParity(unittest.TestCase):
                 set(REQUIRED_SHEETS) - set(classifications),
             )
             self.assertEqual(classifications["section_master"].disposition, "managed_read_only")
-            for sheet in ("PriceRef", "context_choice_copy", "rule_phrase_map", "runtime_rule_exceptions"):
-                self.assertEqual(classifications[sheet].disposition, "workbook_preserved_known")
+            for sheet in ("PriceRef", "context_choice_copy"):
+                self.assertEqual(classifications[sheet].disposition, "managed_writable", sheet)
+            for sheet in ("rule_phrase_map", "runtime_rule_exceptions"):
+                self.assertEqual(classifications[sheet].disposition, "workbook_preserved_known", sheet)
             self.assertNotIn(
                 "raw_rows",
                 {classification.disposition for classification in classifications.values()},

@@ -18,51 +18,53 @@ Keep this file small — it is read at the start of every session:
 
 ## Current handoff
 
-- **Updated:** 2026-09-02
-- **Owning specification:** `workbook-manager/audit-spec.md` (§7 Checkpoint 2C
-  closed; §3 P2.8 checked; §14 record added). Task prompt:
-  `docs/wbm-checkpoint-2c-prompt.md` (lives on branch
-  `claude/fable-5-1-prompting-3cd6c7`, not on `main`).
-- **Active workflow:** Workbook Manager Checkpoint 2C — draft-effective
-  connected details — COMPLETE; PR #73 open, not merged. Checkpoint 2D is not
-  authorized (its §5.1 registry proposal + explicit approval gate is untouched).
-- **Current status:** one backend overlay adapter
-  (`workbook-manager/backend/app/draft_overlay.py`) feeds option/group details,
-  structure nodes/steps/placed options, and Asset Manager items with `state`,
-  exact `operation`, `base`/`proposed`/`effective`, `changed_fields`,
-  `direct_impact`, `conflicts`; terminal/stale drafts report `conflicted` with
-  `effective: null` on connected details (previously a cancelled draft still
-  rendered `modified`). One shared `components/DraftOverlay.jsx` +
-  `draftOverlayModel.js` replaced four local diff/badge renderers; headings and
-  fact chips show authored (struck) → proposed; Form Overview now loads the
-  structure with the active draft. README Workflow step 4 and User Guide §4
-  updated.
-- **Branch/commit:** `feat/workbook-manager-checkpoint-2c` from `origin/main`
-  `118c0894`; implementation `dab1dc26`; closeout commit follows; PR #73
-  (`https://github.com/seanzmc/27vette/pull/73`).
-- **Last completed:** RED (`'modified' != 'conflicted'`, `KeyError:
-  'changed_fields'` / `'operation'` / `'draft_overlay'` on existing routes) →
-  GREEN; isolated Chrome proof desktop + 390x844 of Save, close/reopen, hard
-  reload, Back/Forward, full reversion, stale binding, add, modify, pending
-  delete; spec closure.
-- **Validation:** one-process catalog Manager serial group on the final tree —
-  384 passed, 2 skipped, 77 subtests (94 s); governance + catalog owners 124
-  passed; frontend production build; `git diff --check`; protected hashes
-  (`stingray_master.xlsx`, `form-app/data.js`, six runtime contracts)
-  identical. PR planner selects 12 shards for the changed paths; every file
-  they name ran locally. Not run: copied-workbook Apply/Rebuild, candidate
-  lane, WordPress/dealer/deployment (read-model/presentation change only; no
-  catalog edit). Remote CI + Codex disposition pending.
-- **Next action:** review/merge PR #73 (separate authority). Then, per the
-  2026-09-02 handoff before 2C: the §6 deletion PR folding the two governance
-  findings documents into `audit-spec.md`/`AGENTS.md`, and the §3.3
-  ambient-binding checkpoint (four live sites) — both need a new instruction.
-- **Blockers or closeout gaps:** none. Latent: catalog `owning_specification`
-  (C8) still points at an archived path; `AssetManager.jsx:341` bulk button still
-  keys on `draftMutable` alone (ambient-binding class, out of 2C scope).
+- **Updated:** 2026-09-03
+- **Owning specification:** `workbook-manager/audit-spec.md` (§7 Checkpoint 2D-B
+  closure; §3 P2.9 checked; §10 PRES-01–05 constrained to the approved scope;
+  §14 completion record). Task prompt: `docs/wbm-checkpoint-2d-prompt.md`.
+- **Active workflow:** Workbook Manager Checkpoint 2D-B — approved direct
+  management for `PriceRef` and `context_choice_copy` — COMPLETE locally;
+  PR #74 review remediation is ready to deliver. `rule_phrase_map` and
+  `runtime_rule_exceptions` remain the approved preserved read-only exceptions.
+- **Current status:** the shared registry now owns both writable schemas,
+  conditional trim/body-style references, PriceRef optional-key and fail-closed
+  normalized-key/Seat-trim rules, and wildcard authority. Projection/import,
+  durable drafts, ChangeSets, and Apply/Rebuild carry all-active-model ownership
+  for global and registered `*` rows; schema-driven Advanced editors browse and
+  save both families. Closeout fixed only concrete checkpoint regressions: the
+  new `context_choice_copy.active` type-drift pin, two stale ownership/source
+  assertions, lowercase trim choices that made authored `1LT` locally invalid,
+  and a review-found concrete-model writer guard that accepted values belonging
+  only to another model. That guard now derives values from active memberships
+  and active variant facts for the operation's owning model set. Root/Manager
+  READMEs and catalog ownership are updated.
+- **Branch/commit:** `feat/workbook-manager-checkpoint-2d-b` from `origin/main`
+  `b810c285`; implementation commit `1f4a9c7d`; review fix `fb3d637b`; closeout
+  documentation is the branch tip; PR #74
+  (`https://github.com/seanzmc/27vette/pull/74`) open, not merged.
+- **Last completed:** Codex P2 remediation with Stingray/1LZ RED→GREEN and
+  catalog-selected review-closeout validation.
+- **Validation:** catalog-selected layered runner for all 24 then-current changed
+  paths → `ok: true`, 57 selected gates / 42 stages in 451.171 s; one-process
+  Manager group 410 passed, 2 skipped, 79 subtests; focused preserved-family
+  owner 21 passed; frontend production build, package/schema, six-model candidate,
+  generated parity, governance/catalog/state owners passed. Isolated generation
+  for PriceRef and wildcard context copy changed exactly the three LT contracts;
+  Z06/ZR1/ZR1X were semantically identical. Chrome rendered 21/3 rows, saved two
+  six-model-owned draft operations, had zero captured errors and no 390px
+  overflow; isolated and canonical workbook SHA-256 matched. Final governance,
+  catalog/state owners, state validation, and `git diff --check` passed after
+  closeout edits. Review remediation then passed 49 catalog-selected gates in
+  34 stages (`ok: true`, 292.988 s), including the Manager group (411 passed, 2
+  skipped, 79 subtests); focused owner 22 passed; schema-standardization and
+  governance/catalog/state owners passed.
+- **Next action:** review/merge PR #74 only on explicit user request.
+- **Blockers or closeout gaps:** none. Release-candidate CI and Codex finding
+  disposition passed on review-fix head `fb3d637b`; both review threads were
+  replied to with test evidence and resolved. Do not merge without approval.
 - **Protected boundaries:** dealer submission, deployment, workbook, generated
-  artifacts, `form-app/data.js`, WordPress, catalog `ci`/`serial_groups`,
-  workbook-domain registry, ChangeSet/writer — untouched.
+  artifacts, `form-app/data.js`, customer runtime, WordPress, catalog
+  `ci`/`serial_groups`, ChangeSet dialect, and external services — unchanged.
 
 ## Verified facts
 
@@ -78,7 +80,7 @@ Keep this file small — it is read at the start of every session:
 
 - 2026-08-17: `tests/conftest.py` owns the `scripts/` `sys.path` insertion for the whole test directory, so no pytest command needs `PYTHONPATH=scripts` and every `tests/test_*.py` file runs standalone. The options-sheet quality CLI still needs it, because it is a module invocation rather than a pytest run. Evidence: `env -u PYTHONPATH .venv/bin/python -m pytest <file> -q` for the three previously order-dependent files — 15, 32 and 18 passed.
 
-- 2026-08-17: The validation inventory now has a machine-readable owner. `tests/validation_catalog.json` holds 76 gates, 7 suites, 5 acceptance-lock records, 55 coverage-ledger entries, 7 stale assertions, 10 findings, and 8 expensive setups (counts current as of 2026-09-01 and enforced against the catalog by `scripts/validate_state_handoff.py`; the 2026-08-17 baseline recorded 59/6/33/8 and had gone stale unnoticed); `tests/test_validation_catalog.py` enforces the five §7 conditions with a forced mutation behind each, at gate and suite level. Read counts, timings, layer, authority class, isolation, serialization, and disposition from the catalog rather than re-measuring or re-deriving them. Measured serial baseline on Node 26.7.0 / Python 3.14.7: Node readiness lane 109.27 s / 298 tests / 292 pass; all 16 Node files 111.75 s / 305 tests; Python metadata gate 176.60 s; Manager checkpoint 1,123.47 s; full Python inventory 2,381.46 s / 734 collected. Evidence: `docs/archive/completed-specs/fast-layered-validation/2026-08-17-fast-layered-validation-suite-checkpoint-0-baseline.md`.
+- 2026-08-17: The validation inventory now has a machine-readable owner. `tests/validation_catalog.json` holds 77 gates, 7 suites, 5 acceptance-lock records, 55 coverage-ledger entries, 7 stale assertions, 10 findings, and 8 expensive setups (counts current as of 2026-09-03 and enforced against the catalog by `scripts/validate_state_handoff.py`; the 2026-08-17 baseline recorded 59/6/33/8 and had gone stale unnoticed); `tests/test_validation_catalog.py` enforces the five §7 conditions with a forced mutation behind each, at gate and suite level. Read counts, timings, layer, authority class, isolation, serialization, and disposition from the catalog rather than re-measuring or re-deriving them. Measured serial baseline on Node 26.7.0 / Python 3.14.7: Node readiness lane 109.27 s / 298 tests / 292 pass; all 16 Node files 111.75 s / 305 tests; Python metadata gate 176.60 s; Manager checkpoint 1,123.47 s; full Python inventory 2,381.46 s / 734 collected. Evidence: `docs/archive/completed-specs/fast-layered-validation/2026-08-17-fast-layered-validation-suite-checkpoint-0-baseline.md`.
 
 - 2026-08-13: The focused GSX/ZR1/ZR1X hotfix now present on `origin/main` corrected workbook-owned GSX 3LT AH2 pricing to `$0` while retaining the 2LT `$1,695` charge, activated ZR1/ZR1X C2Z as non-selectable Standard Equipment with coupe-only `standard` ownership and convertible `unavailable` ownership, regenerated and published the three affected runtime contracts, advanced the data-bundle cache token from 31 to 32, and added focused runtime regression coverage. Its guarded workbook batches, package/schema gates, 67-case runtime switching gate, composed six-model candidate lane, and local browser proof passed before PR #11 merged as `c34f584`. Evidence: `form-output/workbook-edit-log.jsonl`, `tests/multi-model-runtime-switching.test.mjs`, and commit `c34f584`.
 

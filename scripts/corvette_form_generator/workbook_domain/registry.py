@@ -274,7 +274,47 @@ EDITOR_SHEET_META: dict[str, dict] = {
         "enums": {},
         "refs": {},
     },
+    # Checkpoint 2D-B: direct management of the PriceRef interior price
+    # reference. Key and blank semantics follow the readers (pricing.py:17-58):
+    # OptionType is normalized by the consumer (strip non-alphanumerics,
+    # lowercase) and interior_components authors both `two_tone` and `twotone`
+    # for one row, so no closed enum is proven; blank Trim is the universal
+    # component fallback key and is the one registry-optional key column.
+    "price_ref": {
+        "key": ("OptionType", "Trim", "Code"),
+        "types": {"Price": "int"},
+        "enums": {},
+        "refs": {},
+    },
+    # Checkpoint 2D-B: trim/body-style card tooltip copy consumed by
+    # contract.py:103-145. context_type is finite by the consumer's two literal
+    # call sites; value resolves against variant trims or body styles depending
+    # on context_type; body_style and model_key accept `*` (the generator treats
+    # blank as `*`, so blank is refused here to keep one spelling).
+    "context_choice_copy": {
+        "key": ("model_key", "context_type", "value", "body_style"),
+        "types": {"active": "bool"},
+        # context_type is closed by the consumer's two literal call sites
+        # (contract.py:172 body_style, contract.py:207 trim_level); registering
+        # it as an enum makes the writer and drafts refuse anything else.
+        "enums": {
+            "context_type": ("body_style", "trim_level"),
+            "body_style": ("*", "coupe", "convertible"),
+        },
+        "refs": {},
+        "conditional_ref": {"discriminator": "context_type", "column": "value"},
+        "conditional_refs": {
+            "trim_level": "variant_trim_levels",
+            "body_style": "variant_body_styles",
+        },
+    },
 }
+
+# Families whose `model_key` may be the wildcard `*` on a Manager write. The
+# generator expands `*` to every promoted model (asset_map via contract.py:46,
+# context_choice_copy via contract.py:110-111); ownership for such rows is every
+# active model. Any other family refuses a wildcard write.
+WILDCARD_MODEL_FAMILIES: frozenset[str] = frozenset(("asset_map", "context_choice_copy"))
 
 # Complete workbook-writable column ownership. These tuples include free-text
 # fields as well as typed/reference fields; consumers must not infer writable
@@ -305,6 +345,8 @@ WRITABLE_COLUMNS: dict[str, tuple[str, ...]] = {
     "context_section_master_meta": ("model_key", "context_type", "section_id", "section_name", "selection_mode", "choice_mode", "is_required", "standard_behavior", "section_display_order", "step_key", "step_label", "active", "notes"),
     "order_summary_sections_meta": ("model_key", "section_key", "section_label", "display_order", "active", "notes"),
     "step_order_summary_map_meta": ("model_key", "step_key", "section_key", "active", "notes"),
+    "price_ref": ("OptionType", "Trim", "Code", "Price"),
+    "context_choice_copy": ("model_key", "context_type", "value", "body_style", "info_tooltip", "active", "notes"),
 }
 
 # Blanks are accepted only for explicitly optional writable columns. Required
@@ -335,6 +377,11 @@ OPTIONAL_COLUMNS: dict[str, tuple[str, ...]] = {
     "asset_map": ("image_alt", "hover_image_url", "hover_image_alt", "hover_image_position", "notes"),
     "section_presentation_meta": ("display_label", "step_key", "display_behavior", "section_display_order", "standard_equipment_bucket", "standard_equipment_group_type", "auto_added_bucket"),
     "context_section_master_meta": ("section_display_order",),
+    # Blank Trim is the universal component fallback key (pricing.py:58). It is
+    # the only key column the registry declares optional; the shared writer,
+    # importer, and drafts accept a blank key value exactly there.
+    "price_ref": ("Trim",),
+    "context_choice_copy": ("notes",),
 }
 
 # Columns required only once a row is effectively active, beyond the generic
@@ -347,6 +394,10 @@ OPTIONAL_COLUMNS: dict[str, tuple[str, ...]] = {
 # Manager-facing unless a separate runtime contract makes them customer-visible.
 ACTIVE_ROW_REQUIRED_COLUMNS: dict[str, tuple[str, ...]] = {
     "exclusive_groups": ("display_label",),
+    # Checkpoint 2D-B: contract.py:113 silently drops an active copy row whose
+    # tooltip is blank, so a blank tooltip on an active row is an authoring
+    # error rather than "no tooltip". Inactive rows may stay blank.
+    "context_choice_copy": ("info_tooltip",),
 }
 
 
@@ -376,6 +427,18 @@ for _family, _meta in EDITOR_SHEET_META.items():
         or column in ACTIVE_ROW_REQUIRED_COLUMNS.get(_family, ())
     )
 
+
+def optional_key_columns(family: str) -> frozenset[str]:
+    """Key columns the registry lets be blank.
+
+    One rule for every write surface (controls, importer, drafts, editor
+    writer): a key column may be blank exactly when the family declares it in
+    ``OPTIONAL_COLUMNS``. Today that is only ``price_ref.Trim``; every other key
+    column stays ``never_blank_key``.
+    """
+    meta = EDITOR_SHEET_META[family]
+    return frozenset(column for column in meta["key"] if column in meta["optional_columns"])
+
 # ── Checkpoint 3B field-control metadata (spec §10.1) ─────────────────
 #
 # Every writable field above has an explicit control entry in FIELD_CONTROLS;
@@ -387,7 +450,9 @@ for _family, _meta in EDITOR_SHEET_META.items():
 #
 # blank semantics: "forbidden" = registry-required, must be non-blank;
 # "allowed" = optional or the registered domain contains "" (blank means
-# inherit/unset); "never_blank_key" = key columns, required always.
+# inherit/unset); "never_blank_key" = key columns, required always;
+# "optional_key" = a key column the registry declares optional (blank is a
+# meaningful key value, e.g. PriceRef.Trim universal fallback).
 CONTROL_KINDS: frozenset[str] = frozenset((
     "boolean", "finite", "reference", "integer", "money", "url",
     "structured_text", "short_text", "long_text",
@@ -409,11 +474,13 @@ def humanize(name: str) -> str:
 LONG_FORM_FIELDS: frozenset[str] = frozenset((
     "description", "detail_raw", "original_detail_raw", "disabled_reason",
     "notes", "note", "setup_description", "section_name", "display_name",
+    "info_tooltip",
     "interior_seat_label", "interior_parent_group_label", "interior_leaf_label",
     "interior_variant_label", "interior_color_family", "interior_material_family",
 ))
 
 SHORT_FORM_FIELDS: frozenset[str] = frozenset((
+    "Code", "OptionType", "value",
     "Color Overrides", "Detail from Disclosure", "Interior Code",
     "Interior Name", "Material", "Seat", "Stitch", "Suede", "Trim",
     "Two Tone", "artifact_path", "body_style", "choice_mode",
@@ -471,6 +538,7 @@ def _controls_for(family: str) -> dict[str, dict]:
     """Build controls from deliberate structural and text classifications."""
     meta = EDITOR_SHEET_META[family]
     keys = set(meta["key"])
+    blank_keys = optional_key_columns(family)
     types = meta.get("types", {})
     enums = meta.get("enums", {})
     refs = meta.get("refs", {})
@@ -521,8 +589,11 @@ def _controls_for(family: str) -> dict[str, dict]:
             "label": label,
             "group": humanize(family),
             "order": order,
-            "blank": "never_blank_key" if column in keys
-            else ("allowed" if blank_allowed else "forbidden"),
+            "blank": (
+                "optional_key" if column in blank_keys
+                else "never_blank_key" if column in keys
+                else ("allowed" if blank_allowed else "forbidden")
+            ),
             "help": {
                 "boolean": "Choose Yes or No; use inherit only when blank is allowed.",
                 "finite": "Choose one registered value.",
@@ -577,6 +648,8 @@ GLOBAL_SHEET_FAMILIES: dict[str, str] = {
     "context_section_master": "context_section_master_meta",
     "order_summary_sections": "order_summary_sections_meta",
     "step_order_summary_map": "step_order_summary_map_meta",
+    "PriceRef": "price_ref",
+    "context_choice_copy": "context_choice_copy",
 }
 
 
