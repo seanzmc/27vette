@@ -18,50 +18,32 @@ Keep this file small — it is read at the start of every session:
 
 ## Current handoff
 
-- **Updated:** 2026-09-03
-- **Owning specification:** `workbook-manager/audit-spec.md` (§7 Checkpoint 2D-B
-  closure; §3 P2.9 checked; §10 PRES-01–05 constrained to the approved scope;
-  §14 completion record). Task prompt: `docs/wbm-checkpoint-2d-prompt.md`.
-- **Active workflow:** Workbook Manager Checkpoint 2D-B — approved direct
-  management for `PriceRef` and `context_choice_copy` — COMPLETE locally;
-  PR #74 review remediation is ready to deliver. `rule_phrase_map` and
-  `runtime_rule_exceptions` remain the approved preserved read-only exceptions.
-- **Current status:** the shared registry now owns both writable schemas,
-  conditional trim/body-style references, PriceRef optional-key and fail-closed
-  normalized-key/Seat-trim rules, and wildcard authority. Projection/import,
-  durable drafts, ChangeSets, and Apply/Rebuild carry all-active-model ownership
-  for global and registered `*` rows; schema-driven Advanced editors browse and
-  save both families. Closeout fixed only concrete checkpoint regressions: the
-  new `context_choice_copy.active` type-drift pin, two stale ownership/source
-  assertions, lowercase trim choices that made authored `1LT` locally invalid,
-  and a review-found concrete-model writer guard that accepted values belonging
-  only to another model. That guard now derives values from active memberships
-  and active variant facts for the operation's owning model set. Root/Manager
-  READMEs and catalog ownership are updated.
-- **Branch/commit:** `feat/workbook-manager-checkpoint-2d-b` from `origin/main`
-  `b810c285`; implementation commit `1f4a9c7d`; review fix `fb3d637b`; closeout
-  documentation is the branch tip; PR #74
-  (`https://github.com/seanzmc/27vette/pull/74`) open, not merged.
-- **Last completed:** Codex P2 remediation with Stingray/1LZ RED→GREEN and
-  catalog-selected review-closeout validation.
-- **Validation:** catalog-selected layered runner for all 24 then-current changed
-  paths → `ok: true`, 57 selected gates / 42 stages in 451.171 s; one-process
-  Manager group 410 passed, 2 skipped, 79 subtests; focused preserved-family
-  owner 21 passed; frontend production build, package/schema, six-model candidate,
-  generated parity, governance/catalog/state owners passed. Isolated generation
-  for PriceRef and wildcard context copy changed exactly the three LT contracts;
-  Z06/ZR1/ZR1X were semantically identical. Chrome rendered 21/3 rows, saved two
-  six-model-owned draft operations, had zero captured errors and no 390px
-  overflow; isolated and canonical workbook SHA-256 matched. Final governance,
-  catalog/state owners, state validation, and `git diff --check` passed after
-  closeout edits. Review remediation then passed 49 catalog-selected gates in
-  34 stages (`ok: true`, 292.988 s), including the Manager group (411 passed, 2
-  skipped, 79 subtests); focused owner 22 passed; schema-standardization and
-  governance/catalog/state owners passed.
-- **Next action:** review/merge PR #74 only on explicit user request.
-- **Blockers or closeout gaps:** none. Release-candidate CI and Codex finding
-  disposition passed on review-fix head `fb3d637b`; both review threads were
-  replied to with test evidence and resolved. Do not merge without approval.
+- **Updated:** 2026-09-04
+- **Owning specification:** `workbook-manager/audit-spec.md` (§8 Checkpoint 3A;
+  §10 DISC-01–06). Checkpoint 2D-B closure remains in §7 and §14.
+- **Active workflow:** Workbook Manager Checkpoint 3A — discoverable Groups,
+  classified search, and distinct diagnostics mode — implemented locally.
+- **Current status:** PR #74 merged to `main` as `97318798`. The stale PR status
+  in this handoff and the owning spec has been reconciled on the 3A branch only;
+  this is post-merge documentation reconciliation and changes no 2D behavior.
+  Checkpoint 3A now has the paged Groups index, classified deterministic search,
+  distinct diagnostics mode, URL-owned navigation, focused tests, and browser
+  proof. The implementation is `422e2b2a`.
+- **Branch/commit:** `feat/workbook-manager-checkpoint-3a` from `origin/main`
+  `97318798`; implementation `422e2b2a`; closeout `4ae4e4f8`; PR #75
+  (`https://github.com/seanzmc/27vette/pull/75`) is open.
+- **Last completed:** Checkpoint 2D-B merged via PR #74 after release-candidate CI,
+  Codex disposition, and both review threads passed/resolved.
+- **Validation:** focused API 4 passed; connected frontend owner 38 passed;
+  frontend build passed. Isolated Chrome proved the 24-row Groups index,
+  exact/direct Z51 first with reasons, separate 53-result diagnostic mode,
+  reload/Back restoration, zero captured runtime errors, and `390=390` mobile
+  width. Final catalog-selected validation passed all 26 selected gates in 11
+  stages (`ok: true`, 160.676 seconds), including the one-process Manager group
+  (415 passed, 2 skipped, 79 subtests), frontend build, and governance/catalog/
+  state owners.
+- **Next action:** review PR #75; merge only on explicit user request.
+- **Blockers or closeout gaps:** none. Remote PR checks may still be pending.
 - **Protected boundaries:** dealer submission, deployment, workbook, generated
   artifacts, `form-app/data.js`, customer runtime, WordPress, catalog
   `ci`/`serial_groups`, ChangeSet dialect, and external services — unchanged.

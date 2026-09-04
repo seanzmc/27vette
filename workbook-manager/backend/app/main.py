@@ -700,11 +700,33 @@ def connected_rule(
 def explorer_search(
     model_key: str,
     query: str = Query(..., min_length=1, max_length=200),
+    offset: int = Query(0, ge=0, le=10000),
     limit: int = Query(40, ge=1, le=100),
+    entity_type: str = Query("", pattern="^(|group|option|section|rule)$"),
     conn=Depends(projection_connection),
 ):
-    return {"model_key": model_key, "query": query,
-            "results": explorer.search(conn, model_key, query, limit=limit)}
+    page = explorer.search(
+        conn, model_key, query, offset=offset, limit=limit, entity_type=entity_type
+    )
+    return {"model_key": model_key, "query": query, **page}
+
+
+@app.get("/api/explorer/{model_key}/groups")
+def explorer_groups(
+    model_key: str,
+    group_type: str = Query("all"),
+    offset: int = Query(0, ge=0),
+    limit: int = Query(24, ge=1, le=100),
+    conn=Depends(projection_connection),
+):
+    try:
+        return explorer.group_index(
+            conn, model_key, group_type=group_type, offset=offset, limit=limit
+        )
+    except ValueError as exc:
+        raise HTTPException(422, detail={
+            "status": "invalid_group_type", "message": str(exc),
+        }) from exc
 
 
 @app.get("/api/explorer/{model_key}/diagnostics")
@@ -717,12 +739,13 @@ def explorer_diagnostic_results(
     model_key: str,
     diagnostic_key: str,
     entity_id: str = Query("", max_length=240),
+    offset: int = Query(0, ge=0, le=10000),
     limit: int = Query(100, ge=1, le=200),
     conn=Depends(projection_connection),
 ):
     try:
         results = explorer.diagnostic_results(
-            conn, model_key, diagnostic_key, entity_id=entity_id, limit=limit
+            conn, model_key, diagnostic_key, entity_id=entity_id, limit=offset + limit + 1
         )
     except ValueError as exc:
         raise HTTPException(422, detail={
@@ -735,8 +758,11 @@ def explorer_diagnostic_results(
         })
     definition = next(item for item in explorer.diagnostic_catalog()
                       if item["key"] == diagnostic_key)
+    total_loaded = len(results)
+    page = results[offset:offset + limit]
     return {"model_key": model_key, "diagnostic": definition,
-            "entity_id": entity_id, "results": results}
+            "entity_id": entity_id, "offset": offset, "limit": limit,
+            "has_more": total_loaded > offset + len(page), "results": page}
 
 
 @app.get("/api/assets/reconciliation")

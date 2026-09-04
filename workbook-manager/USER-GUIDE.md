@@ -72,10 +72,15 @@ The Manager has seven workspaces:
 | **Form Overview** | Model and form copy, steps/sections, plus registered promotion, source-routing, variant, and order-summary structure. |
 | **Sections & Layout** | Section structure and layout details. |
 | **Options & Relationships** | Options, prices, rules, colors, interiors, and connected model details. |
-| **Groups** | Rule and exclusive-group relationships. |
+| **Groups** | Browse paged rule and exclusive-group lists by model/type, or search their relationships. |
 | **Images** | Image coverage, missing or broken images, matching, crop, and position. |
 | **Review & Apply** | Review every pending change and complete the final approval process. |
 | **Advanced & Recovery** | Durable workflow history, recovery evidence, and the raw collection browser. |
+
+Options and Groups search results explain whether the match came from the
+record's identity/name, descriptive workbook text, or a relationship. Named
+diagnostics open as their own result screen; use Back to return to the prior
+index or search, and reload restores the same mode.
 
 ## 4. Make a normal workbook change
 

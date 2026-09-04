@@ -1,8 +1,8 @@
 # Workbook Manager Audit Remediation Specification
 
-Status: Checkpoint 2D-B closed 2026-09-03 for the two approved writable
-families; `rule_phrase_map` and `runtime_rule_exceptions` retain the approved
-read-only exceptions. This specification resolves the
+Status: Checkpoint 3A closed 2026-09-04; Checkpoint 2D-B remains closed for the
+two approved writable families, while `rule_phrase_map` and
+`runtime_rule_exceptions` retain the approved read-only exceptions. This specification resolves the
 remediation scope identified in `wbookMgrAuditRpt.md`; it does not authorize
 implementation by itself. Once implementation is authorized, a checkpoint proceeds under
 `AGENTS.md` autonomy rules and must still stop at its exit gate before a later
@@ -189,11 +189,11 @@ cross-draft apply immediately creates a P0 stop and supersedes this sequence.
 
 ### P3 — usability and polish
 
-- [ ] **P3.1 / WM-011 — Groups index.** Add a browse/index mode with useful
+- [x] **P3.1 / WM-011 — Groups index.** Add a browse/index mode with useful
   counts and stable ordering; search must not be required to discover groups.
-- [ ] **P3.2 / WM-011 — Search classes.** Distinguish direct identity/name matches
+- [x] **P3.2 / WM-011 — Search classes.** Distinguish direct identity/name matches
   from descriptive mentions and relationship matches.
-- [ ] **P3.3 / WM-011 — Diagnostics mode.** Present diagnostics as a separate
+- [x] **P3.3 / WM-011 — Diagnostics mode.** Present diagnostics as a separate
   result state rather than appending them below retained search results.
 - [ ] **P3.4 / WM-011 — Query cleanup.** Clear query parameters that are
   irrelevant to the destination workspace while preserving canonical reloadable
@@ -1275,10 +1275,12 @@ suites; fixtures and old exact pins were updated. Canonical workbook, tracked
 runtime contracts, published `data.js`, customer runtime, dealer submission,
 dependencies, deployment, cache purge, and WordPress media were not changed.
 No live/canonical Apply or external mutation ran. Residual risk: none implied.
-Delivery branch `feat/workbook-manager-checkpoint-2d-b`; commit and PR are
-delivered as implementation `1f4a9c7d` and PR #74
-(`https://github.com/seanzmc/27vette/pull/74`). Remote release-candidate CI and
-Codex finding disposition are pending.
+Delivery branch `feat/workbook-manager-checkpoint-2d-b`; implementation
+`1f4a9c7d` plus review remediation `fb3d637b` and closeout `69259124` reached
+`main` when PR #74 (`https://github.com/seanzmc/27vette/pull/74`) merged as
+`97318798` on 2026-09-04. Release-candidate CI and Codex finding disposition
+passed before merge. This 3A-branch edit is post-merge status reconciliation
+only; it changes no Checkpoint 2D behavior.
 
 ## 8. P3 implementation checkpoints
 
@@ -1300,6 +1302,35 @@ Required work:
 5. preserve Back/Forward and reload for index, search, detail, and diagnostics.
 
 Exit gate: DISC-01–06 pass with query budgets and real-browser proof.
+
+**Closed 2026-09-04 — implementation `422e2b2a`.**
+
+Closure (2026-09-04): DISC-01–06 are implemented. The model-scoped Groups
+index now loads without a query, filters `all`/`exclusive`/`rule`, leads with
+the authored/factual label and retains canonical ID, member count, active
+state, stable ordering, bounded pages, and an explicit empty state. Search
+returns one row per entity with ordered direct/mention/relationship classes
+and field-level reasons; exact/direct Z51 ranks first. Diagnostics replace the
+index/search presentation and expose their heading, definition, model/entity
+parameters, result count, loading/error/empty states, and bounded paging.
+Navigation serializes index filters/offsets, search, detail, and diagnostics so
+reload and Back/Forward restore each mode. Fixed query budgets are two SELECTs
+for the combined Groups index, five for cross-entity search, and one for the
+representative diagnostic. Focused API tests passed 4; the connected frontend
+owner passed 38; the production build passed. Isolated Chrome on
+`127.0.0.1:8063` rendered 24 first-page Grand Sport X groups, restored the
+index after a diagnostic Back action, showed 53 diagnostic rows with model
+parameters, and ranked `Z51 — Z51 Performance Package` first with direct and
+mention reasons on Stingray. Reload retained the URL-owned modes, captured
+startup/runtime errors were empty after the corrected build, and 390px mobile
+width was `390=390`. Final catalog-selected validation passed 26 gates in 11
+stages (`ok: true`, 160.676 seconds), including the one-process Manager group
+(415 passed, 2 skipped, 79 subtests), frontend build, governance, catalog, and
+state owners.
+This checkpoint changes Manager read models, navigation, and presentation
+only. Workbook data, generated/publication artifacts, customer runtime,
+ChangeSet/writer behavior, dealer submission, dependencies, deployment, cache
+purge, and external services are unchanged.
 
 ### Checkpoint 3B — human technical labels and dead coverage control
 
@@ -1863,8 +1894,9 @@ Each authorized checkpoint appends one concise dated record containing:
   customer runtime, dealer, dependencies, deployment, cache purge, and WordPress
   media remain unchanged. Residual risk: none implied. Delivery branch
   `feat/workbook-manager-checkpoint-2d-b`; implementation commit `1f4a9c7d`;
-  delivery PR #74 (`https://github.com/seanzmc/27vette/pull/74`) is open. Remote
-  release-candidate CI passed. Codex review found the already-fixed handoff
+  delivery PR #74 (`https://github.com/seanzmc/27vette/pull/74`) merged to
+  `main` as `97318798` on 2026-09-04. Remote release-candidate CI passed. Codex
+  review found the already-fixed handoff
   drift on implementation commit `1f4a9c7d` plus one concrete P2: the
   copied-workbook guard accepted a concrete model's context-copy value when it
   existed only on another model. The guard now derives trim/body-style domains
@@ -1876,3 +1908,16 @@ Each authorized checkpoint appends one concise dated record containing:
   the focused owner passed 22 tests. Release-candidate CI and the Codex finding
   disposition passed on review-fix head `fb3d637b`; both review threads were
   replied to with evidence and resolved. Residual risk remains none implied.
+  The merge-status correction recorded on the Checkpoint 3A branch is
+  post-merge reconciliation only and changes no Checkpoint 2D behavior.
+- **2026-09-04 — Checkpoint 3A / P3.1–P3.3 / WM-011:** closed by
+  implementation `422e2b2a`. DISC-01–06 evidence is recorded inline in the
+  checkpoint section. Delivery PR #75
+  (`https://github.com/seanzmc/27vette/pull/75`) is open. Final local
+  catalog-selected validation passed all 26 selected gates in 11 stages
+  (`ok: true`, 160.676 seconds), including the one-process Manager group (415
+  passed, 2 skipped, 79 subtests) and frontend production build. Canonical
+  workbook, generated/publication artifacts,
+  customer runtime, ChangeSet/writer behavior, dealer submission, dependencies,
+  deployment, cache purge, and external services remain unchanged. Residual
+  risk: none implied.
