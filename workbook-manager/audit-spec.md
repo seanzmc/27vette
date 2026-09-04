@@ -1,6 +1,8 @@
 # Workbook Manager Audit Remediation Specification
 
-Status: Checkpoint 2A closed 2026-09-01. This specification resolves the
+Status: Checkpoint 2D-B closed 2026-09-03 for the two approved writable
+families; `rule_phrase_map` and `runtime_rule_exceptions` retain the approved
+read-only exceptions. This specification resolves the
 remediation scope identified in `wbookMgrAuditRpt.md`; it does not authorize
 implementation by itself. Once implementation is authorized, a checkpoint proceeds under
 `AGENTS.md` autonomy rules and must still stop at its exit gate before a later
@@ -179,9 +181,11 @@ cross-draft apply immediately creates a P0 stop and supersedes this sequence.
   an explicit blocked reason.
 - [x] **P2.8 / WM-010 — Draft-effective details.** Render proposed effective
   values beside authored/base values throughout connected details.
-- [ ] **P2.9 / WM-002 — Preserved-sheet management.** Add approved direct
-  management for `PriceRef`, `context_choice_copy`, `rule_phrase_map`, and
-  `runtime_rule_exceptions`, with registry-owned schemas and guarded writes.
+- [x] **P2.9 / WM-002 — Preserved-sheet management.** Add approved direct
+  management for `PriceRef` and `context_choice_copy` with registry-owned
+  schemas and guarded writes; retain the user-approved read-only exceptions for
+  `rule_phrase_map` (no consumer) and `runtime_rule_exceptions` (no generation
+  path) rather than inventing runtime semantics.
 
 ### P3 — usability and polish
 
@@ -958,25 +962,322 @@ Required family inventory:
 | `rule_phrase_map` | direct browse/search and guarded add/update/delete | parser/generator consumers, phrase uniqueness/order/default semantics |
 | `runtime_rule_exceptions` | direct browse/search and guarded add/update/delete, including a truthful empty state | runtime-exception consumer, model/option references, active/empty-sheet behavior |
 
-Required work after approval:
+#### Checkpoint 2D-A — Preserved-Sheet Inventory and Proposal (2026-09-03, corrected 2026-09-03)
 
-1. register each family once in the workbook-domain registry with complete keys,
-   columns, controls, references, active/blank semantics, and ownership;
-2. project rows with exact source lineage and round-trip preserved values;
-3. expose contextual or schema-driven raw editing without a custom write path;
-4. include the families in ChangeSet parsing, dependency inspection, preview,
-   guarded apply, affected-model derivation, export/re-import, and history;
-5. add complete-candidate inventory tests so empty `runtime_rule_exceptions` is a
-   positively represented empty family, not omitted coverage;
-6. prove generated parity from an isolated copied-workbook edit for each family,
-   including a no-runtime-impact case where appropriate;
-7. update READMEs only after commands/architecture/operator guidance actually
-   change.
+Discovery report and exact proposal for the four preserved sheets per §5.1.
+Implementation is not authorized here; this proposal stops for explicit user
+approval before Checkpoint 2D-B. The 2026-09-03 correction pass re-derived
+every consumer, enum, order, and affected-model claim against the active
+runtime and the Manager's live write route; claims that could not be backed by
+current code were removed. The workbook inventory in §1 was re-read from
+`stingray_master.xlsx` and is unchanged.
 
-Exit gate: PRES-01–05 pass; all four sheets are represented and editable through
-the guarded lane; no row is lost on unchanged export/re-import; generated impact
-matches fresh isolated generation; the canonical workbook remains untouched by
-validation.
+##### 1. Physical workbook contracts
+
+Read with openpyxl (`data_only=False`) on 2026-09-03. Cell types are openpyxl
+`data_type` codes (`s` string, `n` numeric/blank, `b` boolean). No family has a
+formula. The `runtime_rule_exceptions` header row is present with zero data
+rows; it is an existing family, not absent evidence.
+
+| Sheet | Literal headers (casing, order) | Cell types observed | Excel table / filter | Physical key | Semantic key | Data rows | Row order |
+|---|---|---|---|---|---|---|---|
+| `PriceRef` | `OptionType`, `Trim`, `Code`, `Price` | `OptionType` s; `Trim` s or blank (7 blank rows, all non-`Seat`); `Code` s; `Price` n (integers 350–2095) | `Table_8` at `A1:D22` (the only one of the four with an Excel table; `editor_ops.resize_sheet_tables` already handles A1-anchored tables, `editor_ops.py:1112-1125`) | row position | `(OptionType, Trim, Code)` **after consumer normalization** — `pricing.py:17,33,43` lowercases and strips non-alphanumerics from `OptionType` and maps `_`→space in `Trim`, so `TwoTone`/`two_tone`/`Two Tone` are one key | 21 | Not semantic: readers build dicts (`pricing.py:28,43`); on a duplicate normalized key the **last row silently wins**. Authoring grouping by `OptionType` is presentation only. |
+| `context_choice_copy` | `model_key`, `context_type`, `value`, `body_style`, `info_tooltip`, `active`, `notes` | all s; `active` is the text `'True'` (no Excel booleans) | none; stale autofilter `A1:H4` | row position | `(model_key, context_type, value, body_style)` compared case-insensitively on `context_type`/`value`/`body_style` (`contract.py:126-140`) | 6 (3 × `*`, 3 × `z06`) | Semantic only among rows of equal specificity: `contract.py:129-145` scores model match 2 + body-style match 1 and keeps the first row with a strictly greater score, so the **earlier of two equally specific matches wins**. No such pair exists today. |
+| `rule_phrase_map` | `phrase`, `rule_type`, `direction`, `stop_phrases`, `review_flag_default`, `active`, `notes` | `phrase`/`rule_type`/`direction`/`notes` s; `stop_phrases` s or blank (4 blank); `review_flag_default`, `active` Excel booleans (`b`) | none; autofilter `A1:G7` | row position | `phrase` (unique today) | 6 | **No active consumer reads this sheet** (§3), so no order semantics can be claimed. The prior proposal's "earlier phrases take precedence" statement is withdrawn. Physical order is still preserved by the in-place writer. |
+| `runtime_rule_exceptions` | `model_key`, `exception_id`, `source_option_id`, `target_option_id`, `exception_type`, `body_style_scope`, `trim_level_scope`, `variant_scope`, `disabled_reason`, `active`, `notes` | header only | none; stale autofilter `A1:K5` | row position | `(model_key, exception_id)` | 0 | Not semantic. The only loader (`_load_rule_rows`, `runtime_metadata.py:441`) sorts by `(priority, exception_id)`; the sheet has **no `priority` column**, so the effective order is `exception_id`. The prior "ordered by priority" claim is corrected. |
+
+##### 2. Columns, references, and blank semantics
+
+**`PriceRef`** (consumers: `interiors.py:149-151,185,192-196`; `pricing.py`)
+
+| Column | Role | Domain proven by consumer | Blank / normalization |
+|---|---|---|---|
+| `OptionType` | key, required | Observed: `Seat`, `Stitching`, `Suede`, `TwoTone`, `R6X`. Consumer domain is `Seat` (`pricing.py:23`, case-insensitive) plus any value whose normalized form matches an active `interior_components.price_ref_type` (`interiors.py:36-39`). Registering a closed enum is **not** proven: `interior_components` authors both `two_tone` and `twotone` for the same PriceRef row, and the consumer accepts any spelling. Proposed control: `short_text` with a fail-closed normalized-key uniqueness lint (§5). | never blank (key). |
+| `Trim` | key, optional | `Seat` rows: required non-blank (`pricing.py:27` drops blank-trim seat rows); values are interior-sheet `Trim` spellings `1LT 2LT 3LT 3LT R6X 1LZ 2LZ 3LZ 3LZ R6X` (`_`→space). Component rows: blank means the universal fallback `(type, "", code)` (`pricing.py:58`). Compound `3LT R6X`/`3LZ R6X` are R6X delta inputs (`pricing.py:61-73`), not `variant_master` references. | `None` ≡ `""` ≡ universal. Excel stores blank as `None`; the writer must write `None`, not `""`, to keep round-trip equality. |
+| `Code` | key, required | Seat rows: `lt_interiors`/`LZ_Interiors` `Seat` codes (`AE4 AH2 AUP`; `AQ9` is authored on interiors but has no PriceRef row and therefore prices at 0). Component rows: `interior_components.price_ref_code` (`36S 37S 38S N26 N2Z TU7 R6X`). No registered reference table holds these codes; proposed control `short_text`. | never blank. |
+| `Price` | required | Whole dollars; `money()` (`workbook.py:29-36`) coerces text and rounds. | blank → 0 silently; register `int` so blank is refused. |
+
+Inbound: `interior_components(price_ref_type, price_ref_code, price_trim_scope)` (40 distinct active triples, all six models); interiors sheets' `Trim`/`Seat` (seat base and R6X delta). Outbound: none registered. Delete dependency: deleting a referenced row does not fail generation — it silently prices the component at 0 (`pricing.py:58`) or drops the R6X delta (`pricing.py:71-72`). Dependency inspection must therefore refuse deletes/key edits of referenced rows or surface them as blocking.
+
+**`context_choice_copy`** (consumer: `contract.py:103-145` via `inspection.py:634,661`; runtime `app.js:2136,2214`)
+
+| Column | Role | Domain proven by consumer | Blank |
+|---|---|---|---|
+| `model_key` | key, required | `*` or a `model_master.model_key`; `contract.py:110` treats blank as `*`. | blank ≡ `*` for the generator; registry must refuse blank so the two spellings do not coexist. |
+| `context_type` | key, required | Consumer calls with exactly `body_style` (`contract.py:172`) and `trim_level` (`contract.py:207`); only `trim_level` is authored. Proven finite: `("body_style", "trim_level")`. | never blank. |
+| `value` | key, required | Conditional on `context_type`: `trim_level` → `variant_master.trim_level` (compared case-insensitively; authored upper-case); `body_style` → `variant_master.body_style`. | never blank. |
+| `body_style` | key, required | `*` or `variant_master.body_style` (`coupe`, `convertible`); `contract.py:134` treats blank as `*`. | refuse blank (same reason as `model_key`). |
+| `info_tooltip` | required | Free customer copy. `contract.py:113` **drops rows with blank tooltip silently**, so blank is an authoring error, not "no tooltip". | forbidden. |
+| `active` | required bool | `workbook_truthy` (`true/yes/1/y`); stored as text `'True'`. | registry bool with text storage detected by `editor_ops._bool_storage_for_sheet`. |
+| `notes` | optional | Manager-facing. | allowed. |
+
+Outbound: `model_key`→`model_master`; `value`/`body_style`→`variant_master`. Inbound: none. Delete dependency: none (a missing row yields an empty tooltip).
+
+**`rule_phrase_map`** — no active reader. `load_rule_phrase_map` and `_LEGACY_RULE_PHRASE_FALLBACKS` were deleted with zero callers (`56c8a746`; `docs/superpowers/specs/2026-07-23-validation-single-lane-active-surface-cleanup.md:812`), and the raw-ingest compiler that consumed the sheet was retired 2026-07-23 (AGENTS §8). Remaining mentions are the sheet-name inventories in `README.md:64`, `tests/workbook_domain_fixtures.py:156`, `catalog.KNOWN_PRESERVED_SHEETS`, and the governance/catalog pins. Consequently no enum (`rule_type`, `direction`), blank rule (`stop_phrases`), default (`review_flag_default`), or order semantics can be *proven*; they can only be *observed*. Observed: `rule_type ∈ {excludes, requires, includes}`, `direction ∈ {source_to_mentioned, mentioned_to_source}`, `stop_phrases` is `|`-separated text or blank, `review_flag_default` is always `True`. The `review_flag` taxonomy itself is retired repo-wide, so `review_flag_default` is a dead column.
+
+**`runtime_rule_exceptions`** — loader defined but unreachable (§3). The **active runtime** contract is `app.js:711-754`:
+
+| Column | Runtime read | Domain proven by `app.js` |
+|---|---|---|
+| `exception_type` | `app.js:729,739,749` | exactly one value: `remove_target_when_source_selected`. The prior proposal's `("override", "disable")` enum was invented and is withdrawn. |
+| `source_option_id`, `target_option_id` | `app.js:730-732,740-743,751-752` | option ids matched against `state.selected`; both required for the one recognized type. |
+| `body_style_scope`, `trim_level_scope`, `variant_scope` | `app.js:716-718` via `scopeMatches` (`app.js:698-705`) | `|`-separated list; blank or containing `*` matches everything (same structured-scope syntax as `rule_groups`/`default_selection_rules`). |
+| `exception_id` | not read by `app.js`; used by the loader as sort/identity key | required non-blank (`_load_rule_rows` drops rows with a blank id). |
+| `model_key`, `active` | consumed by `active_rows` (`runtime_metadata.py:67-79`): `model_key ∈ {model, all, shared, *}`; `active` blank defaults **True** | registry must refuse blank `active` so the permissive default cannot be authored. |
+| `disabled_reason`, `notes` | **not read** by `app.js:711-754` | free text. |
+
+##### 3. Consumers and preservation paths (active repository paths only)
+
+| Path | `PriceRef` | `context_choice_copy` | `rule_phrase_map` | `runtime_rule_exceptions` |
+|---|---|---|---|---|
+| Schema/package validation | `REQUIRED_SHEETS` (`schema_validation.py:95`); `PRICE_COLUMNS["PriceRef"]=("Price",)` (`:43`) | none | none | none |
+| Generator read | `interiors.py:149-151` → `price_ref_prices`/`price_ref_component_prices` → interior `price` and `interior_components[].price` | `contract.py:103-115` → `context_choice_info_tooltip` → `contextChoices[].info_tooltip` | **none** | `load_runtime_rule_exceptions` (`runtime_metadata.py:418`) — **zero callers** in `scripts/`. Removed from assembly in `8c005a87` (2026-07-26) with `production.py`. |
+| Generated artifacts | every `form-output/runtime/*-runtime-contract.json` `interiors[]` | `contextChoices[].info_tooltip` in every contract (8 per LT model, 6 per ZR1/ZR1X) | none | **no contract and `form-app/data.js` carry a `runtimeRuleExceptions` key** (0 matches). `README.md:72` ("Stingray additionally carries `runtimeRuleExceptions`") is stale and is flagged, not edited here. |
+| Browser runtime | `app.js` interior pricing | `app.js:2136,2214` | none | `app.js:711-754` is live code that would consume the key if generation emitted it; today `generatedRuleExceptions()` always returns `[]`. |
+| Tests encoding the contract | `tests/stingray-form-regression.test.mjs:1928,2012,2796`; `tests/test_schema_validation_metadata.py:156,229`; `tests/test_workbook_manager.py:774-778` (verbatim preservation on unchanged export) | none beyond generated-parity | `tests/workbook_domain_fixtures.py:156` (name only) | `tests/stingray-form-regression.test.mjs:2047-2054` asserts the key is absent or empty |
+| Manager today | `catalog.KNOWN_PRESERVED_SHEETS` → `workbook_preserved_known`; `sheet_dispositions` `model_context=[]`; copied verbatim on export (unchanged export is byte-identical, `test_workbook_manager.py:766`) | same | same | same |
+| Fixtures to co-change in 2D-B | `tests/workbook_manager_fixtures.py:103` builds compact `PriceRef` with headers `("code","label","value")` — becomes a `missing_columns` import error once `PriceRef` is managed | none | none | none |
+
+##### 4. Affected-model and generated-impact derivation
+
+The Manager derives affected models from stored operation ownership only:
+`apply_rebuild.derive_affected_models` (`:156-172`) unions `model_id` and
+`model_context`, discards `""` and `"*"`, intersects with promoted models, and
+`_canonical_generate_candidate` (`:197-200`) **raises** when the result is
+empty. Proved 2026-09-03 against a fresh projection of the canonical workbook:
+
+- fixed sheets without `model_key` project `model_context=[]` (`variants`: 32 rows `[]`), and `derive_affected_models([{"model_id": "", "model_context": []}])` → `[]`;
+- `*` rows project `model_context=["*"]` (`assets`: 28 rows), and `derive_affected_models([{"model_id": "*", "model_context": ["*"]}])` → `[]`;
+- `staging.py:79-81` refuses any `*` write outside `asset_map` (pinned by `test_asset_wildcard_is_the_only_writable_wildcard_model_scope`).
+
+The registry's own doctrine (`registry.models_for_write_targets`, `registry.py:679-715`: a global-family target widens to every active model) has **no caller** in the Manager. Two ownership authorities therefore disagree, and the proposal must name which one 2D-B wires. This is an approval decision (D1 below), not an implementation detail.
+
+| Family | Exact ownership (what a mutation can change) | How it is derivable from projected data | Manager today | No-runtime-impact case |
+|---|---|---|---|---|
+| `PriceRef` | **Inferred through interiors, never global.** Seat row `(Seat, T, C)`: models whose `interior_source_sheet` (`model_workbook_sources`) contains an interior with `Trim=T`,`Seat=C` **and** whose active `model_interior_scope` includes it — measured: LT trims → `stingray, grand_sport, grand_sport_x`; `1LZ/3LZ` → `z06, zr1, zr1x`; `2LZ` → `z06` only (ZR1/ZR1X scope has no 2LZ). Component row `(type, trim, code)`: `model_key` of active `interior_components` rows whose normalized `(price_ref_type, price_ref_code, price_trim_scope)` matches, plus rows falling back to the blank-trim key. | Yes — `interior_components`, `interiors`, `model_interior_scope`, `sheet_registry` are all projected tables. | `model_context=[]` → Apply raises. | Add a row whose normalized key matches no active `interior_components` triple and no interiors `Trim/Seat` pair (e.g. `Stitching / <blank> / 39S`): isolated regeneration of all six contracts is byte-identical. Editing `Price` on any *referenced* row is never zero-impact. |
+| `context_choice_copy` | Direct from `model_key`. Concrete → that model. `*` → every promoted model that has a variant matching `(context_type, value, body_style)` (`contract.py:135-140`); e.g. `*/trim_level/1LT/*` reaches only the three LT models, `*/…/1LZ/*` only the three LZ models. | Yes — `model_variants` + `variants`. | concrete rows: `model_context=[model]`, applies; `*` rows (3 of 6): refused by `staging.py:79-81`, and would derive `[]`. | Editing `notes`; editing an `active=False` row; adding a row whose `value` matches no promoted variant. Each is provable by isolated regeneration. |
+| `rule_phrase_map` | No consumer → **every mutation is zero-runtime-impact.** | n/a | `model_context=[]` → Apply raises (no promoted model to regenerate). | Every edit. |
+| `runtime_rule_exceptions` | Direct from `model_key` (`*`/`all`/`shared` = every promoted model per `active_rows`). **Generation is not wired**, so today every mutation is zero-runtime-impact; the "exact expected model diff" claimed by the prior PRES-04 cannot occur without a generator change that is outside this proposal. | Yes, once wired. | empty; `*` rows would be refused as above. | Every edit, until generation is wired. |
+
+##### 5. Exact registry and Manager proposal (not implemented)
+
+Registry additions (`scripts/corvette_form_generator/workbook_domain/registry.py`), stated as data so 2D-B has nothing to invent. Column names are the literal headers; `sanitize_identifier` yields the SQL names (`optiontype`, `trim`, `code`, `price`).
+
+```python
+# EDITOR_SHEET_META
+"price_ref": {
+    "key": ("OptionType", "Trim", "Code"),
+    "types": {"Price": "int"},          # control kind resolves to "money" (name contains "price")
+    "enums": {},                        # no closed OptionType enum is proven (§2)
+    "refs": {},
+},
+"context_choice_copy": {
+    "key": ("model_key", "context_type", "value", "body_style"),
+    "types": {"active": "bool"},
+    "enums": {"body_style": ("*", "coupe", "convertible")},
+    "refs": {},
+    "conditional_ref": {"discriminator": "context_type", "column": "value"},
+    "conditional_refs": {"trim_level": "variant_trim_levels", "body_style": "variant_body_styles"},
+},
+"runtime_rule_exceptions": {
+    "key": ("model_key", "exception_id"),
+    "types": {"active": "bool"},
+    "enums": {
+        "exception_type": ("remove_target_when_source_selected",),   # app.js:729,739,749 — the only recognized value
+    },
+    "refs": {"source_option_id": "options", "target_option_id": "options"},
+},
+
+# PROVEN_FINITE_VALUES
+("context_choice_copy", "context_type"): ("body_style", "trim_level"),   # contract.py:172,207
+
+# WRITABLE_COLUMNS
+"price_ref": ("OptionType", "Trim", "Code", "Price"),
+"context_choice_copy": ("model_key", "context_type", "value", "body_style", "info_tooltip", "active", "notes"),
+"runtime_rule_exceptions": ("model_key", "exception_id", "source_option_id", "target_option_id",
+                            "exception_type", "body_style_scope", "trim_level_scope", "variant_scope",
+                            "disabled_reason", "active", "notes"),
+
+# OPTIONAL_COLUMNS
+"price_ref": ("Trim",),                     # blank = universal fallback key; Seat rows still need it (lint below)
+"context_choice_copy": ("notes",),
+"runtime_rule_exceptions": ("body_style_scope", "trim_level_scope", "variant_scope", "disabled_reason", "notes"),
+
+# Text-control classification (otherwise _controls_for fails closed and the §10.8 test names the field)
+SHORT_FORM_FIELDS  += {"OptionType", "Code", "value", "exception_id", "source_option_id", "target_option_id"}
+LONG_FORM_FIELDS   += {"info_tooltip"}
+# body_style_scope / trim_level_scope / variant_scope are already STRUCTURED_TEXT_FIELDS.
+
+# GLOBAL_SHEET_FAMILIES
+"PriceRef": "price_ref",
+"context_choice_copy": "context_choice_copy",
+"runtime_rule_exceptions": "runtime_rule_exceptions",
+```
+
+`rule_phrase_map` is deliberately **absent** from the block above: with no consumer, any `enums`, blank rule, or default written into the registry would be new semantics (D4).
+
+Derived requiredness (from the loop at `registry.py:353-377`): `price_ref` required-on-add `OptionType, Code, Price`; `context_choice_copy` required `model_key, context_type, value, body_style, info_tooltip, active`; `runtime_rule_exceptions` required `model_key, exception_id, source_option_id, target_option_id, exception_type, active`. Key columns are `immutable_on_edit`.
+
+Two reference domains named above do not exist yet: `variant_trim_levels` and `variant_body_styles` (distinct `variant_master.trim_level` / `body_style`, compared case-insensitively). They belong in `catalog.REFERENCE_OPTION_PRESENTATION` next to the existing derived domain `option_rpos` (`catalog.py:181-184`) — a presentation fact over a projected column, not a parallel registry.
+
+Manager adapter (`workbook-manager/backend/app/catalog.py`):
+
+```python
+# _ROUTING  (table, fixed sheet, role, model_scoped, has_model_key_column, label, id prefixes)
+"price_ref":               ("price_ref", "PriceRef", "", False, False, "Interior price reference (PriceRef)", ()),
+"context_choice_copy":     ("context_choice_copy", "context_choice_copy", "", False, True, "Trim and body-style card copy", ()),
+"runtime_rule_exceptions": ("runtime_rule_exceptions", "runtime_rule_exceptions", "", False, True, "Runtime rule exceptions", ()),
+```
+
+- Classification: `price_ref` → `SHARED_TABLES` (fixed, no `model_key`; browse/search like `interiors`). `context_choice_copy`, `runtime_rule_exceptions` → `MODEL_COLLECTIONS` (row-owned `model_key`, like `default_selection_rules`). None joins `structure_specs()`.
+- `KNOWN_PRESERVED_SHEETS` shrinks to whatever is not registered (see D4 for `rule_phrase_map`); `PINNED_PRESERVED_SHEETS`/`PINNED_REQUIRED_SHEETS` in `tests/test_workbook_manager_spec_governance.py:511-518` are re-pinned deliberately; `tests/test_workbook_manager_catalog.py:123` changes from `workbook_preserved_known` to `managed_writable`.
+- `staging.py:87-97` `active_fixed` gains the two `model_key` families so a concrete model context is required and validated.
+- Capabilities (delegating to the durable mutation-ownership guard, as Checkpoint 1B does):
+
+| Family | add | update | delete | reorder |
+|---|---|---|---|---|
+| `price_ref` | allowed; **blocked** `price_ref_duplicate_normalized_key` when the normalized `(OptionType, Trim, Code)` already exists; **blocked** `price_ref_seat_requires_trim` for `Seat` rows with blank `Trim` | allowed on `Price` only (keys immutable) | **blocked** `price_ref_referenced` while any active `interior_components` triple or interiors `Trim/Seat` pair resolves to the row (§2 delete dependency) | not offered — order is not semantic (§1) |
+| `context_choice_copy` | allowed for concrete `model_key`; `*` per D2 | allowed; `*` rows per D2 | allowed (no dependents) | not offered; blocked reason `order_not_semantic_unless_equal_specificity` surfaced only when two rows share `(context_type, value)` and specificity |
+| `runtime_rule_exceptions` | **blocked** `runtime_exception_generation_not_wired` until D3 resolves | blocked, same reason | blocked, same reason (nothing to delete today) | not offered |
+
+- Source lineage: `src_sheet`, `src_row`, `physical_key` exactly as other fixed families (`importer.py:433-450`). For `price_ref`, `physical_key` must hold the **literal** headers' values; the normalized key is a validation lint, not the stored identity.
+- Browse/search and empty state: `runtime_rule_exceptions` with zero rows must render as a present family with zero rows. Note `_import_fixed` (`importer.py:320-331`) errors on a missing sheet only when it is in `REQUIRED_SHEETS`; a registered but absent sheet is silently skipped. PRES-05 must therefore distinguish "present, 0 rows" from "sheet missing" (`required_sheet_names()` makes every managed sheet required, `catalog.py:478-485`).
+- Projection shape: exactly the writable columns plus lineage; nothing else is necessarily derived.
+- Editor reach: the existing versioned schema response and shared `RecordForm`/`EditorShell` already render any `EDITOR_SHEET_META` family; no custom write path.
+- Affected-model wiring (D1): at `save_operation` time, `model_context` for `price_ref` is computed from projected `interior_components`/`interiors`/`model_interior_scope` (§4); for `*` rows in the two model families it is expanded to promoted models. Alternatively the Manager adopts `registry.models_for_write_targets` widening. Either way `derive_affected_models` must stop returning `[]` for these families, and the fixture at `tests/test_workbook_manager_fixtures.py`/`workbook_manager_fixtures.py:103` must gain real `PriceRef` headers.
+
+##### 6. Operation and regression matrix (PRES-01–05, proposed for 2D-B; nothing here has run)
+
+Every row names the behavior and the persisted result it must assert; fixtures are isolated copies of the canonical workbook (`clone_workbook`) unless stated.
+
+| # | Behavior | `PriceRef` | `context_choice_copy` | `rule_phrase_map` | `runtime_rule_exceptions` | Persisted assertion |
+|---|---|---|---|---|---|---|
+| M1 | Unchanged import → export → re-import | all 21 rows, `Trim=None` blanks, `Price` int cells, `Table_8` ref `A1:D22` | 6 rows, `active` text `'True'` | 6 rows, `b`-typed booleans, `None` `stop_phrases` | header-only sheet retained | export byte-identical to source (`test_workbook_manager.py:766`); re-imported projection row-for-row equal; unrelated sheets untouched |
+| M2 | Isolated add | `Stitching / <blank> / 39S / 495` (unreferenced) | `zr1 / trim_level / 1LZ / * / <copy> / True` | n/a (D4) | `stingray / ex_test / opt_z51_001 / opt_fe1_001 / remove_target_when_source_selected / … / True` (only if D3 wires generation) | exact new last row with expected cell types; `Table_8` resized to `A1:D23`; no other cell changed (full-workbook cell diff) |
+| M3 | Isolated update | `Seat/1LT/AE4` `Price` 1095→1195 | `z06/trim_level/1LZ/*` `info_tooltip` | n/a | scope field on the M2 row | exactly one cell differs from the pre-image |
+| M4 | Isolated delete | unreferenced row from M2 | the M2 row | n/a | the M2 row | row removed, rows below shift up by one, `Table_8` shrinks |
+| M5 | Duplicate key fails closed | add `Seat/1LT/AE4` (literal dup) **and** add `Two Tone/<blank>/TU7` (normalized dup of `TwoTone`) | add `*/trim_level/1LT/*` | n/a | add second `stingray/ex_test` | draft operation refused with the named blocked reason; no ChangeSet emitted |
+| M6 | Invalid reference / enum | n/a (no registered ref) | `context_type=colour`; `value=4LT`; `body_style=targa` | n/a | `exception_type=override`; `source_option_id=opt_nope` | refused; reason names the field |
+| M7 | Illegal blank | blank `Price`; blank `Code`; `Seat` with blank `Trim` | blank `info_tooltip`; blank `model_key`; blank `body_style` | n/a | blank `active`; blank `exception_id` | refused; `Trim` blank on a `Stitching` row is **accepted** and round-trips as `None` |
+| M8 | Immutable key change | change `Code` on an existing row | change `value` | n/a | change `exception_id` | refused `immutable_on_edit` |
+| M9 | Unknown control / stale binding | payload with `Notes` column; operation saved against a superseded projection hash | same | n/a | same | refused `unknown_fields` / `projection_not_current` |
+| M10 | Two operations on one key | update `Price` then delete same row in one draft | update then delete same row | n/a | same | coalesced to the terminal action; ChangeSet holds one row change |
+| M11 | Mixed add/update/delete in one draft | M2 + M3 + M4 targets | same | n/a | same | one ChangeSet, three `row_changes`, applied in update→delete→add order (`editor_ops.py:1097-1107`) with correct final row positions |
+| M12 | Full reversion | 1095→1195→1095 | tooltip A→B→A | n/a | same | draft has no effective operation; nothing emitted |
+| M13 | Dependency refusal | delete `Seat/3LT/AE4` (referenced by `interior_components` in three models) | n/a | n/a | n/a | `price_ref_referenced` names the referencing models and interiors |
+| M14 | Preview → ChangeSet → guarded apply → history → rollback | M3 on a copied workbook with `APPLY_OUTPUT_ROOT` isolated | M3 | n/a | M2 | ChangeSet `targets` equals the §4 model set; workbook cell verified after apply; history row present once; rollback restores the byte-identical pre-image |
+| M15 | Predicted affected models = fresh isolated generation | M3 → exactly `stingray, grand_sport, grand_sport_x` contracts change: each `1LT` AE4 `interior_components` seat line rises by 100 while the authored top-level interior price remains unchanged; ZR1/ZR1X/Z06 are semantically identical | `*/trim_level/1LT/*` tooltip → the three LT contracts' `contextChoices[].info_tooltip`, LZ contracts identical | any edit → six contracts byte-identical | M2 → six contracts byte-identical **until** D3 wires generation, then exactly `stingray` gains a `runtimeRuleExceptions` entry | `test_workbook_manager_generated_parity.py`-style semantic comparison of all six contracts plus `form-app/data.js` |
+| M16 | Zero-impact global edit reaches Apply | M2 (unreferenced add) | `notes` edit | any | any | Apply/Rebuild completes rather than raising "resolve no affected promoted model"; outcome per D1 |
+| M17 | Truthful empty state | n/a | n/a | n/a | zero-row sheet lists as present with 0 rows and (post-D3) an enabled add action; a workbook copy with the sheet **deleted** imports with `missing_sheet` and is not shown as an empty family | API inventory count includes the family; browser proof of the empty-state copy |
+| M18 | Registry completeness | remove any one of the three families from `GLOBAL_SHEET_FAMILIES` in a patched registry | | | | `test_sheet_catalog_classifies_every_live_workbook_sheet` and `test_every_registry_family_and_role_is_classified_on_every_surface` fail naming the sheet |
+
+##### 7. Cross-family and ownership review
+
+- **Same key, different names.** `PriceRef.Code` ↔ `interior_components.price_ref_code` ↔ interiors `Seat`; `PriceRef.Trim` (`3LT R6X`) ↔ `interior_components.price_trim_scope` (`3LT_R6X`) ↔ interiors `Trim` (`3LT_R6X`); `PriceRef.OptionType` ↔ `price_ref_type` under `price_ref_component_type_key`. Dependency inspection must compare normalized forms.
+- **Composed operations on reload.** Editing a `PriceRef` row changes the *effective* `price` of every interior row that references it; Checkpoint 2C's draft-overlay adapter must compose `price_ref` operations into interior detail overlays the way member operations compose into group overlays (`draft_overlay.py`).
+- **Accumulation from authored baseline.** Two `price_ref` operations affecting one interior (seat row + component row) must accumulate; `interiors.price` in the projection is the *authored* interior `Price`, while the generated price adds the R6X delta — projected rows already contain effective-looking values that are not the PriceRef contribution.
+- **Sheet classification move.** `PriceRef` leaves `KNOWN_PRESERVED_SHEETS`, stays in `REQUIRED_SHEETS`, and becomes `managed_writable`; `required_sheet_names()` is unchanged for it and newly includes the other registered sheets. `check_preserved_and_required_sheets_are_pinned` must be re-pinned in the same commit.
+- **Accidental omission.** M18 covers it; additionally an omitted family silently keeps `workbook_preserved_known` and is copied verbatim, so the failure is loud only because of those two tests.
+- **Fixture drift.** `workbook_manager_fixtures.py:103` compact `PriceRef` headers are wrong for a managed sheet (§3).
+- **Wildcard doctrine.** `context_choice_copy` `*` rows and `asset_map` `*` rows share one problem: `staging.py:79-81` and `derive_affected_models` disagree with the generator's `*`-means-every-model semantics (D2).
+
+##### 8. Approval decision table
+
+Decisions the user must make (none is resolved here):
+
+- **D1 — affected-model authority for global/derived families.** (a) compute `model_context` at save time from projected dependents (§4, exact), or (b) adopt `registry.models_for_write_targets` widening (every active model regenerates; unaffected contracts come back byte-identical). Also whether a proven zero-impact write may Apply with regeneration skipped, or always regenerates.
+- **D2 — wildcard writes.** Extend the `asset_map`-only wildcard allowance to `context_choice_copy` (and later `runtime_rule_exceptions`), with `*` expanded to promoted models for ownership; or keep `*` rows read-only in the Manager.
+- **D3 — `runtime_rule_exceptions` generation.** Re-wire `load_runtime_rule_exceptions` into assembly (emit `runtimeRuleExceptions` only when the model has active rows, matching `stingray-form-regression.test.mjs:2047-2054`) as a scoped generator change with its own runtime proof; or leave the sheet unwired and manage it as inert data. Registering write capability for a sheet whose rows cannot reach the runtime would misrepresent impact.
+- **D4 — `rule_phrase_map`.** Retire the sheet (workbook + inventories + pins) or keep it as a preserved raw sheet; managing it as a writable family requires inventing enums for a consumer that no longer exists.
+
+| Family | Proposed contract | Evidence | Residual risk | Unresolved | Disposition |
+|---|---|---|---|---|---|
+| `PriceRef` | fixed shared family `price_ref`; key `(OptionType, Trim, Code)`; `Price` money; `Trim` optional with Seat-row lint; normalized-key uniqueness; referenced-row delete refusal; no reorder | §2–§4; `pricing.py`, `interiors.py`, 40 active `interior_components` triples, interiors `Trim/Seat` sets | normalized-key collisions are undetectable by the literal key alone; `AQ9` seats already price at 0 (pre-existing data gap, not created here) | D1 (ownership must be derived — today Apply raises) | **Constrained approval** — approve the contract; 2D-B may begin only after D1 is chosen, and the uniqueness/dependency lints in §5 are part of the contract, not optional |
+| `context_choice_copy` | model family; key `(model_key, context_type, value, body_style)`; `context_type` finite `{body_style, trim_level}`; `value` conditional reference to variant trims/body styles; `info_tooltip` required; `active` text-bool; no reorder | `contract.py:103-145`, `inspection.py:634,661`, six contracts' `contextChoices[].info_tooltip`, `app.js:2136` | 3 of 6 live rows are `*` and are unwritable today; blank `model_key`/`body_style` are consumer-equivalent to `*` and must be refused | D2; D1 for `*` ownership | **Constrained approval** — approve for concrete-`model_key` rows now; `*` rows browse-only until D2 |
+| `rule_phrase_map` | none proposed | zero consumers (`56c8a746`, AGENTS §8) | registering observed values would create semantics | D4 | **Blocked** pending D4 (retire vs. preserve) |
+| `runtime_rule_exceptions` | model family; key `(model_key, exception_id)`; `exception_type` finite `{remove_target_when_source_selected}`; option references; structured scopes; `active` required; truthful empty state | `app.js:711-754`; `runtime_metadata.py:418,441`; `8c005a87`; 0 `runtimeRuleExceptions` occurrences in artifacts | writes would be inert; the prior proposal's enum and "exact model diff" were unsupported | D3; D2 for `*`/`all`/`shared` | **Blocked** pending D3 — browse and empty-state projection may proceed (PRES-05 read half), add/update/delete stay blocked with reason `runtime_exception_generation_not_wired` |
+
+Stale references flagged, not edited (outside this pass's file scope): `README.md:72` (`runtimeRuleExceptions` carried by Stingray), `README.md:64` (`rule_phrase_map` listed as a live runtime metadata sheet).
+
+Required work after approval (2D-B, only for families whose disposition above is approved or constrained-approved and whose named decision is resolved):
+1. Register each approved family once in `registry.py` with the exact keys, columns, controls, references, and blank semantics in §5;
+2. Move the registered sheets out of `KNOWN_PRESERVED_SHEETS`, add `_ROUTING`/collection membership and `staging.active_fixed` entries, and re-pin the governance and catalog tests in the same commit;
+3. Wire the chosen D1 ownership derivation so `derive_affected_models` is never empty for a real operation, and fix the compact `PriceRef` fixture headers;
+4. Project rows with exact lineage and prove unchanged export byte-identity (M1);
+5. Expose schema-driven editing through the shared `RecordForm`/`EditorShell` with the blocked reasons in §5;
+6. Run the matrix M1–M18 for each approved family; PRES-04 is the byte comparison in M15/M16, and PRES-05 is M17;
+7. Update READMEs only where commands, architecture, or operator guidance actually change, and correct the two stale README lines above.
+
+Exit gate: PRES-01–05 pass for every approved family; no row is lost on unchanged export/re-import; generated impact matches fresh isolated generation for every M15 case; the canonical workbook remains untouched by validation.
+
+#### Checkpoint 2D-B — Approved Preserved-Family Management (closed 2026-09-03)
+
+**Closed 2026-09-03 — implementation `1f4a9c7d`.**
+
+Checkpoint 2D-B closes P2.9 / WM-002 for the user-approved scope. D1 uses the
+registry's conservative global-write doctrine: fixed global rows and registered
+wildcard rows carry every active model in durable operation ownership, so a real
+write can never reach Apply/Rebuild with an empty affected-model set. D2 permits
+`context_choice_copy` wildcard writes and preserves `model_id="*"` while storing
+the six concrete affected models. D3 and D4 keep `runtime_rule_exceptions` and
+`rule_phrase_map` as known preserved read-only sheets; no generator field,
+consumer semantics, or invented enum was added.
+
+`PriceRef` and `context_choice_copy` now derive keys, writable columns, controls,
+conditional references, optional-key behavior, active-row requiredness, and
+wildcard authority from the shared workbook-domain registry. Import projects all
+21/6 rows with exact physical lineage. Blank `PriceRef.Trim` keys use SQL `NULL`
+consistently across import, lookup, validation, coalescing, and writes. The shared
+writer rejects blank Seat trims and normalized duplicate PriceRef keys. Existing
+schema-driven Advanced editors browse and draft both families; the frontend uses
+the row's own `model_key` before selector fallback, and trim reference options
+retain canonical uppercase workbook spelling.
+
+Acceptance evidence:
+
+- PRES-01–03: the focused owner passed 21 tests, covering registry/catalog
+  completeness, 21/6-row projection and lineage, optional blank keys, six-model
+  ownership, wildcard writes, draft coalescing/reversion, exact copied-workbook
+  add/update/delete cells, table resizing, and fail-closed key/reference/type
+  cases. Unchanged reconstruction was byte-identical.
+- PRES-04: isolated copied-workbook generation for all six models proved a
+  `Seat/1LT/AE4` PriceRef increase and a `*/trim_level/1LT/*` tooltip edit each
+  change exactly `stingray`, `grand_sport`, and `grand_sport_x`; Z06, ZR1, and
+  ZR1X remained semantically identical after generated timestamps were removed.
+  The PriceRef delta is carried by each AE4 component line, not the authored
+  top-level interior price; M15 above is corrected to match this live behavior.
+  The Manager serial group also completed the copied-workbook guarded
+  Apply/Rebuild and six-model publication path.
+- PRES-05 is satisfied by the approved exception: the zero-row
+  `runtime_rule_exceptions` sheet remains positively classified as a known
+  preserved sheet and is not presented as add-capable while generation is
+  unwired. `rule_phrase_map` likewise remains preserved read-only.
+- The catalog-selected layered run passed all 57 selected gates in 42 stages
+  (`ok: true`, 451.171 seconds), including package/schema checks, composed
+  six-model candidate validation, frontend production build, and the one-process
+  Manager group (410 passed, 2 skipped, 79 subtests). The only warning was the
+  existing Starlette/httpx deprecation. Concrete checkpoint failures fixed during
+  closeout were the newly exposed `context_choice_copy.active` type-drift pin,
+  two stale ownership/source assertions, and lowercase reference options that
+  made an authored `1LT` row locally invalid.
+- Isolated Chrome at desktop and 390x844 rendered 21 PriceRef rows and the three
+  wildcard context-copy rows for Stingray, saved one draft operation for each,
+  and API readback showed `price_ref` model context and `context_choice_copy`
+  wildcard context both expanding to all six active models. Reload and
+  Back/Forward retained the draft; captured console errors were empty and mobile
+  document width was `390=390`. The isolated workbook remained SHA-256-identical
+  to the canonical source because Save is draft-only.
+
+Companions: root and Manager READMEs now describe the two managed families and
+the two preserved exceptions; the catalog adds the focused owner to the Manager
+suites; fixtures and old exact pins were updated. Canonical workbook, tracked
+runtime contracts, published `data.js`, customer runtime, dealer submission,
+dependencies, deployment, cache purge, and WordPress media were not changed.
+No live/canonical Apply or external mutation ran. Residual risk: none implied.
+Delivery branch `feat/workbook-manager-checkpoint-2d-b`; commit and PR are
+delivered as implementation `1f4a9c7d` and PR #74
+(`https://github.com/seanzmc/27vette/pull/74`). Remote release-candidate CI and
+Codex finding disposition are pending.
 
 ## 8. P3 implementation checkpoints
 
@@ -1105,16 +1406,17 @@ editable routes, and relevant generated consumers, then classify every member.
   dependency authority for every structure family.
 - **STRUCT-04:** Adding a synthetic writable structure spec in a patched registry
   makes completeness follow it or fail with the missing family name.
-- **PRES-01:** Every one of the four preserved sheets has registry, projection,
-  browse, schema, and guarded mutation coverage.
+- **PRES-01:** Each approved writable family has registry, projection, browse,
+  schema, and guarded mutation coverage; every excepted family remains
+  positively classified and read-only for its recorded reason.
 - **PRES-02:** Unchanged import/export/re-import preserves exact cell values,
   types, row order where semantically owned, formulas, and unrelated sheets.
-- **PRES-03:** One isolated copied-workbook edit per family reaches the intended
-  cell and no other workbook row.
+- **PRES-03:** One isolated copied-workbook edit per approved writable family
+  reaches the intended cell and no other workbook row.
 - **PRES-04:** Fresh isolated generation/publication shows exactly the expected
   affected models/contracts or proves no runtime impact.
-- **PRES-05:** Empty `runtime_rule_exceptions` remains visible and add-capable,
-  and is included in total-family coverage.
+- **PRES-05:** Empty `runtime_rule_exceptions` remains positively represented in
+  total-family coverage and read-only while its generation path is unwired.
 
 ### Draft correction
 
@@ -1531,8 +1833,34 @@ Each authorized checkpoint appends one concise dated record containing:
   dependencies, dealer, deployment, and WordPress media were inspected with no
   change; copied-workbook Apply/Rebuild and the candidate lane were not run
   because only read models and presentation changed. Residual risk: none
-  implied. Delivery branch `feat/workbook-manager-checkpoint-2c`, implementation
-  `dab1dc26`, and PR #73 (`https://github.com/seanzmc/27vette/pull/73`) are
-  delivered; remote release-candidate CI and Codex finding disposition are
-  pending. Checkpoint 2D remains gated on its own §5.1 registry proposal and
-  explicit approval; it does not begin without a new user instruction.
+  implied. Delivery PR #73 (`https://github.com/seanzmc/27vette/pull/73`) from
+  `feat/workbook-manager-checkpoint-2c` was delivered. Review surfaced four P2
+  findings (authored-value display on mutated nodes, context-section heading
+  field selection, member-operation composition into connected group overlays,
+  and section-membership baseline accumulation), remediated before merge in
+  `3a1df68`, `c8c0fc3`, `18157cf`, `8a4d795`, and regression-covered in
+  `7d3c2e0` (389 passed, 2 skipped, 77 subtests in the serial group).
+  Current-head release-candidate CI and Codex finding disposition passed,
+  and PR #73 merged to `main` as `b810c285` on 2026-09-03. Checkpoint 2D was
+  subsequently authorized for the constrained decisions recorded in its 2D-B
+  closure above.
+- **2026-09-03 — Checkpoint 2D-B / P2.9 / WM-002:** closed for the approved
+  `PriceRef` and `context_choice_copy` write scope, with `rule_phrase_map` and
+  `runtime_rule_exceptions` retained as explicit read-only exceptions. The RED
+  against base `b810c285` reached the existing classification surface and failed
+  with `Items in the first set but not the second: 'PriceRef',
+  'context_choice_copy'`; this was a wrong retained-family state, not a missing
+  route or symbol. Registry, projection, ownership, draft, copied-workbook
+  writer, generated-parity, catalog, frontend, and browser evidence is recorded
+  in the checkpoint section above. The catalog-selected run passed 57 gates in
+  42 stages (`ok: true`, 451.171 seconds), including the one-process Manager
+  group (410 passed, 2 skipped, 79 subtests), frontend build, package/schema,
+  and composed six-model candidate gates. Isolated generation proved the exact
+  three LT-model impact for both representative edits; desktop/mobile browser
+  proof saved both operations with six-model ownership and no workbook write,
+  console error, or overflow. Canonical workbook, generated/publication data,
+  customer runtime, dealer, dependencies, deployment, cache purge, and WordPress
+  media remain unchanged. Residual risk: none implied. Delivery branch
+  `feat/workbook-manager-checkpoint-2d-b`; implementation commit `1f4a9c7d`;
+  delivery PR #74 (`https://github.com/seanzmc/27vette/pull/74`) is open. Remote
+  release-candidate CI and Codex finding disposition are pending.
