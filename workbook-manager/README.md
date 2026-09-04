@@ -125,6 +125,11 @@ exact ChangeSet emission, and shared-service preview and approval lifecycles:
   as entity scope. Controls derive from registry
   `field_kind`, finite values, and reference metadata; optional blanks remain
   SQL `NULL`.
+- The Groups workspace opens on a model-scoped, type-filtered, paginated index
+  with authored labels, canonical IDs, member counts, and active state. Connected
+  search explains direct, descriptive, and relationship matches in deterministic
+  order. Named diagnostics use a separate reloadable result mode rather than
+  appearing below stale index or search results.
 - `GET /api/assets/reconciliation` exposes the shared asset-sync reconciliation
   result as a fingerprint-bound, server-filtered, bounded queue. The
   Asset Manager tab presents overall/model/section coverage, distinct status
