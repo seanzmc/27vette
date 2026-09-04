@@ -254,7 +254,8 @@ newline-delimited URL list instead; `WBM_ASSET_MEDIA_TIMEOUT` (default 10),
    mappings) and Model Operations
    workspace (options, OVS, exclusive groups + members, rule mapping, rule
    groups + members, pricing, variant overrides, assets, interior scope,
-   components; shared interiors/color overrides). Collections come from the
+   components, trim/body-style card copy; shared interiors/color overrides and
+   the shared `PriceRef` interior-price reference). Collections come from the
    workbook's own `model_workbook_sources` registry, not a hardcoded list. The
    structure index likewise follows registered fixed-sheet specs and reuses the
    versioned schema, shared editor shell, dependency inspection, and durable
@@ -316,10 +317,13 @@ newline-delimited URL list instead; `WBM_ASSET_MEDIA_TIMEOUT` (default 10),
 - Workbook coordinates and ownership (`src_sheet`, `src_row`, family, physical
   key, model context) are traceability metadata. Shared physical source rows are
   projected once per physical sheet/key even when several models register them.
-- `section_master` and the raw-preserved sheets (`PriceRef`,
-  `context_choice_copy`, `rule_phrase_map`, `runtime_rule_exceptions`) are
-  read-only because no gated write family exists for them. Edit ownership is
-  derived from the workbook model/source lifecycle matrix, not runtime
+- `PriceRef` and `context_choice_copy` use registry-owned schemas and the same
+  guarded draft/write route as other managed families. Global `PriceRef` rows
+  and wildcard context-copy rows carry all-active-model ownership so
+  Apply/Rebuild cannot silently derive an empty model set. `section_master`,
+  `rule_phrase_map`, and `runtime_rule_exceptions` remain read-only; the latter
+  two have no active generation path. Edit ownership is derived from the
+  workbook model/source lifecycle matrix, not the current UI selector or runtime
   publication state.
 
 ## Tests
@@ -351,6 +355,7 @@ changes.
   tests/test_workbook_manager_review_presentation.py \
   tests/test_workbook_manager_images_workspace_parity.py \
   tests/test_workbook_manager_catalog.py \
+  tests/test_workbook_manager_preserved_families.py \
   tests/test_workbook_manager_import_projection.py \
   tests/test_workbook_manager_fixtures.py \
   tests/test_workbook_manager_generated_parity.py \

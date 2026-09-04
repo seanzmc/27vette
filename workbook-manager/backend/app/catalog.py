@@ -19,12 +19,15 @@ from corvette_form_generator.workbook_domain.registry import (
     GROUP_MEMBERSHIP_FAMILIES,
     READONLY_SHEET_META,
     SOURCE_ROLE_FAMILIES,
+    optional_key_columns,
 )
 
 
+# Checkpoint 2D-B moved PriceRef and context_choice_copy into the registry.
+# rule_phrase_map has no active consumer and runtime_rule_exceptions has no
+# generation path (audit-spec §7 2D-A, decisions D3/D4); both stay preserved
+# raw and read-only until a separate decision retires or rewires them.
 KNOWN_PRESERVED_SHEETS = (
-    "PriceRef",
-    "context_choice_copy",
     "rule_phrase_map",
     "runtime_rule_exceptions",
 )
@@ -85,6 +88,40 @@ class TableSpec:
 
     def ref_contract(self) -> tuple:
         return self.shared_contract
+
+    def blank_key_columns(self) -> frozenset[str]:
+        """SQL names of key columns the registry lets be blank (optional keys)."""
+        if not self.editor_family or self.editor_family not in EDITOR_SHEET_META:
+            return frozenset()
+        return frozenset(
+            sanitize_identifier(column) for column in optional_key_columns(self.editor_family)
+        )
+
+    def key_predicate(self, key: dict) -> tuple[str, list[str]]:
+        """SQL predicate matching a projected row by registered key.
+
+        Blank optional key values are stored as NULL by ``projection_value``,
+        so they match ``IS NULL`` rather than ``= ''``.
+        """
+        clauses: list[str] = []
+        params: list[str] = []
+        blank_ok = self.blank_key_columns()
+        for name in self.key:
+            value = str(key.get(name, "") or "").strip()
+            if value == "" and name in blank_ok:
+                clauses.append(f'"{name}" IS NULL')
+                continue
+            clauses.append(f'"{name}"=?')
+            params.append(value)
+        return " AND ".join(clauses), params
+
+    def key_is_complete(self, key: dict) -> bool:
+        """Every key column present; blank only where the registry allows it."""
+        blank_ok = self.blank_key_columns()
+        return all(
+            str(key.get(name, "") or "").strip() != "" or name in blank_ok
+            for name in self.key
+        )
 
 
 @dataclass(frozen=True)
@@ -163,6 +200,8 @@ _ROUTING: dict[str, tuple] = {
     "model_interior_scope": ("model_interior_scope", "model_interior_scope", "", False, True, "", ()),
     "interior_components": ("interior_components", "interior_components", "", False, True, "", ()),
     "asset_map": ("assets", "asset_map", "", False, True, "Assets (asset map)", ()),
+    "price_ref": ("price_ref", "PriceRef", "", False, False, "Interior price reference (PriceRef)", ()),
+    "context_choice_copy": ("context_choice_copy", "context_choice_copy", "", False, True, "Trim and body-style card copy", ()),
 }
 
 _FAMILY_TO_TABLE = {family: routing[0] for family, routing in _ROUTING.items()}
@@ -203,6 +242,20 @@ REFERENCE_OPTION_PRESENTATION: dict[str, dict] = {
     "exclusive_groups": {
         "value": "group_id", "labels": ("display_label",),
         "active": "active",
+    },
+    # Derived domains for context_choice_copy.value: distinct variant trims or
+    # body styles, read from projected variant_master columns the way
+    # contract.py:126-140 matches them (case-insensitively).
+    "variant_trim_levels": {
+        "table": "variants", "value": "trim_level", "labels": ("trim_level",),
+        # The projection normalizes variant trim levels to lowercase, while
+        # context_choice_copy authors and emits the workbook's uppercase RPO
+        # spelling. The consumer compares case-insensitively; present the
+        # canonical workbook spelling so an existing row remains selectable.
+        "canonical_case": "upper",
+    },
+    "variant_body_styles": {
+        "table": "variants", "value": "body_style", "labels": ("body_style",),
     },
 }
 
@@ -343,8 +396,9 @@ MODEL_COLLECTIONS = (
     "assets",
     "model_interior_scope",
     "interior_components",
+    "context_choice_copy",
 )
-SHARED_TABLES = ("interiors", "color_overrides", "form_sections")
+SHARED_TABLES = ("interiors", "color_overrides", "form_sections", "price_ref")
 
 # Context labels are Manager read-model metadata only. The index membership,
 # writable shape, and capabilities still derive from the registered specs.

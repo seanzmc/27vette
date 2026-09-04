@@ -462,6 +462,8 @@ PINNED_MANAGER_SURFACE = {
         "exclusive_members", "interior_components", "interiors", "model_interior_scope",
         "options", "ovs", "price_rules", "rule_group_members", "rule_groups",
         "rule_mapping", "variant_overrides",
+        # Checkpoint 2D-B: preserved sheets promoted to managed families.
+        "price_ref", "context_choice_copy",
     }),
     "structure_index": frozenset({
         "context_section_master_meta", "model_master", "model_registry_promotion",
@@ -508,8 +510,11 @@ def check_family_matrix_is_fully_classified(matrix: dict[str, dict[str, str]]) -
 # deliberate edit rather than a side effect, and catches a sheet renamed or
 # dropped from the generator list before the Manager silently reclassifies it
 # as unknown.
+# Checkpoint 2D-B moved PriceRef and context_choice_copy into the registry;
+# rule_phrase_map (no consumer) and runtime_rule_exceptions (no generation
+# path) stay preserved raw per the approved 2D-A decisions D3/D4.
 PINNED_PRESERVED_SHEETS = frozenset({
-    "PriceRef", "context_choice_copy", "rule_phrase_map", "runtime_rule_exceptions",
+    "rule_phrase_map", "runtime_rule_exceptions",
 })
 PINNED_REQUIRED_SHEETS = frozenset({
     "model_master", "model_workbook_sources", "model_variants", "model_registry_promotion",
@@ -708,7 +713,7 @@ def test_checks_fail_on_seeded_violations(spec_lines, audit_text):
     # dual-ownership error.
     with pytest.raises(AssertionError, match="KNOWN_PRESERVED_SHEETS changed"):
         check_preserved_and_required_sheets_are_pinned(
-            preserved=tuple(s for s in manager_catalog.KNOWN_PRESERVED_SHEETS if s != "PriceRef")
+            preserved=tuple(s for s in manager_catalog.KNOWN_PRESERVED_SHEETS if s != "rule_phrase_map")
         )
     with pytest.raises(AssertionError, match="REQUIRED_SHEETS changed"):
         check_preserved_and_required_sheets_are_pinned(
@@ -717,7 +722,7 @@ def test_checks_fail_on_seeded_violations(spec_lines, audit_text):
     with pytest.raises(AssertionError, match="already addressed by a Manager TableSpec"):
         spec = manager_catalog.TABLE_SPECS[0]
         check_preserved_and_required_sheets_are_pinned(
-            table_specs=(*manager_catalog.TABLE_SPECS, spec.__class__(**{**spec.__dict__, "sheet": ("PriceRef",)}))
+            table_specs=(*manager_catalog.TABLE_SPECS, spec.__class__(**{**spec.__dict__, "sheet": ("rule_phrase_map",)}))
         )
     # §11.2 item 1: a new closure citing an existence failure as RED (2B gains one)
     # fails; a pre-rule record rewritten to remove its 404 also fails (re-pin).

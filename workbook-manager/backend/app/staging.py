@@ -23,6 +23,7 @@ from datetime import datetime, timezone
 from corvette_form_generator.model_configs import discover_generation_model_configs
 
 from .catalog import SPEC_BY_TABLE, TableSpec
+from corvette_form_generator.workbook_domain.registry import WILDCARD_MODEL_FAMILIES
 from .validation import find_dependents, validate_record
 
 
@@ -37,8 +38,7 @@ class StagingError(Exception):
 
 
 def _fetch_row(conn, spec: TableSpec, model_id: str, key: dict):
-    where = " AND ".join(f'"{k}"=?' for k in spec.key)
-    params = [str(key.get(k, "")) for k in spec.key]
+    where, params = spec.key_predicate(key)
     if spec.model_scoped:
         where = "model_id=? AND " + where
         params = [model_id, *params]
@@ -77,8 +77,11 @@ def _editable_guard(
             f"model context {model_id!r} does not match row model_key {row_model!r}"
         )
     if candidate_model == "*":
-        if spec.editor_family != "asset_map":
-            return reject("wildcard model scope is writable only for asset_map")
+        if spec.editor_family not in WILDCARD_MODEL_FAMILIES:
+            return reject(
+                "wildcard model scope is writable only for "
+                + ", ".join(sorted(WILDCARD_MODEL_FAMILIES))
+            )
         return []
 
     model_definition = spec.editor_family == "model_master"
@@ -94,6 +97,7 @@ def _editable_guard(
         "order_summary_sections_meta",
         "step_order_summary_map_meta",
         "asset_map",
+        "context_choice_copy",
     }
     model_owned = spec.model_scoped or bool(spec.role) or model_definition or topology or publication or active_fixed
     if not model_owned:
@@ -431,15 +435,14 @@ def _apply_change(conn, spec: TableSpec, change: dict) -> None:
         sets = ", ".join(f'"{c.sql_name()}"=?' for c in spec.columns)
         params = [str(record.get(c.sql_name(), "") or "")
                   for c in spec.columns]
-        where = " AND ".join(f'"{k}"=?' for k in spec.key)
-        params += [str(key.get(k, "")) for k in spec.key]
+        where, key_params = spec.key_predicate(key)
+        params += key_params
         if spec.model_scoped:
             where = "model_id=? AND " + where
             params.insert(len(spec.columns), model_id)
         conn.execute(f"UPDATE {spec.table} SET {sets} WHERE {where}", params)
     elif change["op"] == "delete":
-        where = " AND ".join(f'"{k}"=?' for k in spec.key)
-        params = [str(key.get(k, "")) for k in spec.key]
+        where, params = spec.key_predicate(key)
         if spec.model_scoped:
             where = "model_id=? AND " + where
             params = [model_id, *params]

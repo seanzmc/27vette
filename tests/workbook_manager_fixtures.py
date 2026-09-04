@@ -100,8 +100,6 @@ def _empty_required_sheets(workbook: Workbook, *, omit: set[str] | None = None) 
             _append(workbook, sheet, _INTERIOR_HEADERS, [])
         elif sheet == "section_master":
             _append(workbook, sheet, _COMPACT_SHEET_HEADERS["sections"], [])
-        elif sheet == "PriceRef":
-            _append(workbook, sheet, ("code", "label", "value"), [])
         else:
             family = GLOBAL_SHEET_FAMILIES[sheet]
             _append(workbook, sheet, _COMPACT_SHEET_HEADERS[family], [])

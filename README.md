@@ -61,7 +61,7 @@ Canonical workbook: `stingray_master.xlsx`.
 
 Shared/Stingray source sheets: `model_master`, `model_registry_promotion`, `variant_master`, `section_master`, `stingray_options`, `stingray_ovs`, `rule_mapping`, `price_rules`, `rule_groups`, `rule_group_members`, `exclusive_groups`, `exclusive_group_members`, `color_overrides`, `lt_interiors`, `LZ_Interiors`, `PriceRef`, `asset_map`.
 
-Runtime metadata/audit sheets: `model_workbook_sources`, `model_variants`, `model_interior_scope`, `interior_components`, `runtime_steps`, `context_section_master`, `context_choice_copy`, `section_presentation`, `order_summary_sections`, `step_order_summary_map`, `default_selection_rules`, `runtime_rule_exceptions`, `variant_option_overrides`, `rule_phrase_map`.
+Runtime metadata/audit sheets: `model_workbook_sources`, `model_variants`, `model_interior_scope`, `interior_components`, `runtime_steps`, `context_section_master`, `context_choice_copy`, `section_presentation`, `order_summary_sections`, `step_order_summary_map`, `default_selection_rules`, and `variant_option_overrides`. `rule_phrase_map` and `runtime_rule_exceptions` remain preserved raw sheets: neither has an active generation path, so the Workbook Manager keeps them read-only rather than implying runtime impact.
 
 Model-scoped sheets, all five promoted non-Stingray models active (`grandSport_*`, `grand_sport_x_*`, `z06_*`, `zr1_*`, `zr1x_*`): `<model>_{options, ovs, rule_mapping, price_rules, rule_groups, rule_group_members, exclusive_groups, exclusive_members, variant_overrides}`. `grand_sport_x_*` is the exception to that template — it names its group-member sheet `grand_sport_x_rule_members` and adds `grand_sport_x_color_overrides`. Read the actual sheet names from the workbook rather than deriving them from the prefix.
 
@@ -69,7 +69,7 @@ Model-scoped sheets, all five promoted non-Stingray models active (`grandSport_*
 
 ## Generated Data Contract
 
-Each model dataset: `dataset`, `variants`, `steps`, `sections`, `contextChoices`, `choices`, `standardEquipment`, `ruleGroups`, `exclusiveGroups`, `rules`, `priceRules`, `interiors`, `colorOverrides`, `defaultSelectionRules`, `validation`. Stingray additionally carries `runtimeRuleExceptions`. All promoted models carry workbook-owned `orderSummary` metadata (`sections`, `stepMap`) in `data` and workbook-owned Vehicle Setup presentation copy in the registry-level `vehicleSetup` object. Registry shape:
+Each model dataset: `dataset`, `variants`, `steps`, `sections`, `contextChoices`, `choices`, `standardEquipment`, `ruleGroups`, `exclusiveGroups`, `rules`, `priceRules`, `interiors`, `colorOverrides`, `defaultSelectionRules`, `validation`. No current generated contract carries `runtimeRuleExceptions`. All promoted models carry workbook-owned `orderSummary` metadata (`sections`, `stepMap`) in `data` and workbook-owned Vehicle Setup presentation copy in the registry-level `vehicleSetup` object. Registry shape:
 
 ```js
 window.CORVETTE_FORM_DATA = {

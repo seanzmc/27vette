@@ -40,6 +40,7 @@ from corvette_form_generator.workbook_domain.registry import (
     EDITOR_SHEET_META,
     GLOBAL_SHEET_FAMILIES,
     SOURCE_ROLE_FAMILIES,
+    optional_key_columns,
 )
 from corvette_form_generator.workbook_package import assert_valid_workbook_package
 
@@ -321,6 +322,26 @@ _REF_FAMILY = {"options": ("options", "option_id"), "rule_groups": ("rule_groups
 _DORDER_GROUP_COL = {"options": "section_id", "rule_group_members": "group_id",
                      "exclusive_members": "group_id"}
 
+# Derived reference domains whose consumer compares case-insensitively
+# (contract.py:126-140 lowercases both sides for context copy lookups).
+_CASE_INSENSITIVE_REF_KINDS = frozenset(("variant_trim_levels", "variant_body_styles"))
+
+
+def price_ref_normalized_key(row: dict) -> tuple[str, str, str]:
+    """The key PriceRef readers actually look up (pricing.py:17,33,43).
+
+    OptionType drops non-alphanumerics and lowercases; Trim maps ``_`` to a
+    space; Code is stripped. Two physical rows with one normalized key are a
+    silent last-row-wins collision for the generator, so the writer refuses it.
+    """
+    from corvette_form_generator.pricing import price_ref_component_type_key
+
+    return (
+        price_ref_component_type_key(str(row.get("OptionType") or "")),
+        str(row.get("Trim") or "").strip().replace("_", " "),
+        str(row.get("Code") or "").strip(),
+    )
+
 
 def _registry_maps(extract):
     registry, sheet_family = model_sheet_registry(extract)
@@ -337,11 +358,11 @@ def _key_tuple(key, keycols):
     return tuple(str(key.get(k) or "").strip() for k in keycols)
 
 
-def _sheet_key_index(extract, sheet, keycols):
+def _sheet_key_index(extract, sheet, keycols, blank_keys=frozenset()):
     index = {}
     for row in rows_of(extract, sheet):
         kt = tuple(str(row.get(k) or "").strip() for k in keycols)
-        if all(kt):
+        if all(value or column in blank_keys for value, column in zip(kt, keycols)):
             index[kt] = row
     return index
 
@@ -374,6 +395,15 @@ def _single_ref_domain(extract, maps, batch_adds, sheet, refkind, *, models=None
                if r.get("model_key") in models and workbook_truthy(r.get("active"))}
         return ids or {str(r.get("variant_id")).strip()
                        for r in rows_of(extract, "variant_master") if r.get("variant_id")}
+    if refkind in ("variant_trim_levels", "variant_body_styles"):
+        # Derived domains over variant_master, compared case-insensitively the
+        # way contract.py:126-135 compares context copy against variants.
+        column = "trim_level" if refkind == "variant_trim_levels" else "body_style"
+        return {
+            str(r.get(column) or "").strip().lower()
+            for r in rows_of(extract, "variant_master")
+            if str(r.get(column) or "").strip()
+        }
     if refkind == "option_rpos":
         rpos = set()
         for model in models:
@@ -574,6 +604,36 @@ def reference_graph_summary(extract: dict) -> dict:
     }
 
 
+def _price_ref_lints(extract, prepared, errors):
+    """Fail closed on PriceRef rows the readers would silently mis-price.
+
+    Seat rows need a Trim (pricing.py:27 drops blank-trim seat rows), and the
+    final sheet may not hold two rows with one normalized key (dict lookups keep
+    the last row). Both are checked over the batch-final row set so an update
+    cannot sneak a collision past the literal-key duplicate check.
+    """
+    price_ops = [o for o in prepared if o.get("_family") == "price_ref"]
+    if not price_ops:
+        return
+    sheet = price_ops[0]["sheet"]
+    final_rows = _final_rows_by_sheet(extract, prepared).get(sheet, [])
+    seen: dict[tuple[str, str, str], int] = {}
+    for row in final_rows:
+        normalized = price_ref_normalized_key(row)
+        if normalized[0] == "seat" and not normalized[1]:
+            errors.append(
+                f"{sheet}: Seat rows require Trim (blank Trim is only a component fallback key): "
+                f"{row.get('Code')!r}"
+            )
+        seen[normalized] = seen.get(normalized, 0) + 1
+    for normalized, count in sorted(seen.items()):
+        if count > 1:
+            errors.append(
+                f"{sheet}: {count} rows share normalized PriceRef key {normalized!r}; "
+                "readers keep only the last row"
+            )
+
+
 def _prepare_batch(extract, batch):
     errors: list[str] = []
     warnings: list[dict] = []
@@ -705,7 +765,8 @@ def _prepare_batch(extract, batch):
         if sorted(key) != sorted(keycols):
             errors.append(f"{ctx}: key must be exactly {keycols}")
             continue
-        if any(not str(v or "").strip() for v in key.values()):
+        blank_keys = optional_key_columns(family)
+        if any(not str(v or "").strip() and k not in blank_keys for k, v in key.items()):
             errors.append(f"{ctx}: blank key value")
             continue
         row = {k: v for k, v in (o.get("row") or {}).items() if not str(k).startswith("_")}
@@ -737,7 +798,7 @@ def _prepare_batch(extract, batch):
         if bad:
             continue
         if sheet not in key_indexes:
-            key_indexes[sheet] = _sheet_key_index(extract, sheet, keycols)
+            key_indexes[sheet] = _sheet_key_index(extract, sheet, keycols, blank_keys)
         kt = _key_tuple(key, keycols)
         effective_row = dict(key_indexes[sheet].get(kt, {}))
         effective_row.update(key)
@@ -804,7 +865,8 @@ def _prepare_batch(extract, batch):
                     bad = True
                 else:
                     domain = _ref_domain(extract, maps, batch_adds, sheet, refkind, row=effective_row)
-                    if value not in domain:
+                    probe = value.lower() if refkind in _CASE_INSENSITIVE_REF_KINDS else value
+                    if probe not in domain:
                         errors.append(f"{ctx}: {column}={value!r} not found in {_ref_label(refkind)}")
                         bad = True
         if bad:
@@ -837,6 +899,7 @@ def _prepare_batch(extract, batch):
         return errors, warnings, prepared
 
     # composite-level integrity
+    _price_ref_lints(extract, prepared, errors)
     for o in prepared:
         if o["action"] != "add":
             continue

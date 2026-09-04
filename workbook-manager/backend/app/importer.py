@@ -39,6 +39,7 @@ from .catalog import (
     reconcile_columns,
 )
 from .validation import check_references
+from corvette_form_generator.workbook_domain.registry import WILDCARD_MODEL_FAMILIES
 
 
 def _now() -> str:
@@ -72,6 +73,32 @@ def _sheet_rows(ws) -> tuple[list[str], list[tuple[int, dict]]]:
     return headers, rows
 
 
+def _key_values(spec: TableSpec, rec: dict) -> tuple[str, ...]:
+    """Key values from a header-keyed sheet record.
+
+    ``spec.key`` holds SQL names; the record is keyed by literal headers.
+    Every pre-2D family had headers equal to their SQL names, so the two were
+    interchangeable until PriceRef (``OptionType`` -> ``optiontype``).
+    """
+    values = []
+    for key in spec.key:
+        column = spec.column_by_name(key)
+        header = column.header if column is not None else key
+        values.append(str(rec.get(header, "") or "").strip())
+    return tuple(values)
+
+
+def _active_model_keys(wb) -> set[str]:
+    if "model_master" not in wb.sheetnames:
+        return set()
+    _, rows = _sheet_rows(wb["model_master"])
+    return {
+        str(r.get("model_key") or "").strip()
+        for _, r in rows
+        if _truthy(r.get("active", "")) and str(r.get("model_key") or "").strip()
+    }
+
+
 def _registry_rows(wb) -> list[dict]:
     _, rows = _sheet_rows(wb["model_workbook_sources"])
     return [r for _, r in rows if _truthy(r.get("active", ""))]
@@ -95,6 +122,7 @@ class Importer:
         self.workbook_path = Path(workbook_path)
         self.issues: list[dict] = []
         self.row_counts: dict[str, int] = {}
+        self.active_models: list[str] = []
 
     # ── issue reporting ───────────────────────────────────────────────
     def issue(self, severity, category, *, sheet="", src_row=None,
@@ -171,6 +199,12 @@ class Importer:
 
         registry = _registry_rows(wb)
         handled_sheets: set[str] = set()
+        # D1 ownership doctrine (registry.models_for_write_targets): a row in a
+        # global fixed family, or a wildcard model_key row, can change any
+        # model's generated output, so it is owned by every active model.
+        # Recorded at import so drafts, ChangeSets, and Apply/Rebuild derive a
+        # non-empty affected set from stored ownership rather than UI state.
+        self.active_models = sorted(_active_model_keys(wb))
 
         for spec in TABLE_SPECS:
             if spec.role:
@@ -327,7 +361,10 @@ class Importer:
                                message=f"expected sheet {sheet!r} not found")
                 continue
             handled.add(sheet)
-            total += self._ingest_sheet(wb, sheet, spec, model_id=None)
+            total += self._ingest_sheet(
+                wb, sheet, spec, model_id=None,
+                model_context=None if spec.has_model_key_column else list(self.active_models),
+            )
         self.row_counts[spec.table] = total
 
     def _import_model_scoped(self, wb, spec: TableSpec, registry, handled,
@@ -411,7 +448,7 @@ class Importer:
                 else "missing_required_headers"
             )
             for idx, rec in rows:
-                keyvals = tuple(rec.get(key, "") for key in spec.key)
+                keyvals = _key_values(spec, rec)
                 row_context = list(model_context or ([model_id] if model_id else []))
                 if spec.has_model_key_column:
                     row_model = str(rec.get("model_key") or "").strip()
@@ -441,15 +478,19 @@ class Importer:
         seen_keys: set[tuple] = set()
         count = 0
         for idx, rec in rows:
-            keyvals = tuple(rec.get(k, "") for k in spec.key)
+            keyvals = _key_values(spec, rec)
             key_id = (model_id or "",) + keyvals if spec.model_scoped else keyvals
             key_label = "/".join(v for v in keyvals if v) or f"row{idx}"
             row_context = list(model_context or ([model_id] if model_id else []))
             if spec.has_model_key_column:
                 row_model = str(rec.get("model_key") or "").strip()
                 row_context = [row_model] if row_model else []
-            missing_keys = [key for key, value in zip(spec.key, keyvals) if value == ""]
-            if any(v == "" for v in keyvals):
+                if row_model == "*" and (spec.editor_family in WILDCARD_MODEL_FAMILIES):
+                    row_context = list(self.active_models)
+            blank_ok = spec.blank_key_columns()
+            missing_keys = [key for key, value in zip(spec.key, keyvals)
+                            if value == "" and key not in blank_ok]
+            if missing_keys:
                 self.issue("error", "missing_identifier", sheet=sheet,
                            src_row=idx, table=spec.table,
                            model=model_id or "", key=key_label,

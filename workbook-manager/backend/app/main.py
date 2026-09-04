@@ -51,6 +51,7 @@ from .schemas import (
     SyncRequest,
     TableSchemaOut,
 )
+from corvette_form_generator.workbook_domain.registry import WILDCARD_MODEL_FAMILIES
 from .catalog import (
     MODEL_COLLECTIONS,
     REFERENCE_OPTION_PRESENTATION,
@@ -526,12 +527,13 @@ def collections(model_key: str, conn=Depends(projection_connection)):
                 f"SELECT COUNT(*) c FROM {table} WHERE model_id=?",
                 (model_key,)).fetchone()["c"]
         elif spec.has_model_key_column:
+            # Wildcard rows apply to every model (registry.WILDCARD_MODEL_FAMILIES),
+            # so they are part of the selected model's collection.
             count = conn.execute(
-                f"SELECT COUNT(*) c FROM {table} WHERE model_key=?",
-                (model_key,)).fetchone()["c"]
-            if count == 0 and table not in ("assets",):
-                # still list core collections; skip only empty optional ones
-                pass
+                f"SELECT COUNT(*) c FROM {table} WHERE model_key=? OR "
+                "(model_key='*' AND ?)",
+                (model_key, 1 if spec.editor_family in WILDCARD_MODEL_FAMILIES else 0),
+            ).fetchone()["c"]
         else:
             count = conn.execute(
                 f"SELECT COUNT(*) c FROM {table}").fetchone()["c"]
@@ -1038,6 +1040,15 @@ def _validate_control_integrity(spec) -> None:
                 f"{spec.table}.{header}: key control must be immutable on edit"
             )
         blank = control.get("blank", "")
+        is_key = c.sql_name() in spec.key
+        if is_key and blank not in ("never_blank_key", "optional_key"):
+            raise SchemaIntegrityError(
+                f"{spec.table}.{header}: key control blank={blank!r} must be a key blank rule"
+            )
+        if blank == "optional_key" and not (is_key and header in spec.optional_columns):
+            raise SchemaIntegrityError(
+                f"{spec.table}.{header}: optional_key blank rule requires a registry-optional key column"
+            )
         should_allow_blank = (
             header in spec.optional_columns
             or "" in c.enum
@@ -1336,15 +1347,20 @@ def _reference_target_select(target: str, scope: str, model: str,
         where.append(narrowing)
         params.append(model)
 
+    value_sql = f'CAST("{value}" AS TEXT)'
+    if presentation.get("canonical_case") == "upper":
+        value_sql = f"UPPER({value_sql})"
     label = _label_sql(labels)
+    if presentation.get("canonical_case") == "upper" and labels == (value,):
+        label = value_sql
     active = (
         f"CASE WHEN COALESCE(CAST(\"{active_column}\" AS TEXT), 'True')="
         "'False' THEN 0 ELSE 1 END"
         if active_column else "1"
     )
     sql = (
-        f'SELECT CAST("{value}" AS TEXT) AS value, '
-        f"COALESCE(NULLIF({label}, ''), CAST(\"{value}\" AS TEXT)) AS label, "
+        f"SELECT {value_sql} AS value, "
+        f"COALESCE(NULLIF({label}, ''), {value_sql}) AS label, "
         f"{active} AS active FROM \"{table}\" WHERE " + " AND ".join(where)
     )
     return sql, params
@@ -1449,7 +1465,10 @@ def records(table: str, model: str = "", search: str = "",
         where.append("model_id=?")
         params.append(model)
     elif spec.has_model_key_column and model:
-        where.append("model_key=?")
+        if spec.editor_family in WILDCARD_MODEL_FAMILIES and model != "*":
+            where.append("(model_key=? OR model_key='*')")
+        else:
+            where.append("model_key=?")
         params.append(model)
     if search:
         like = f"%{search}%"

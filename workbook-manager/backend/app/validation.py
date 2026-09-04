@@ -165,9 +165,10 @@ def validate_record(conn: sqlite3.Connection, spec: TableSpec, model_id: str,
                 f"{col.sql_name()} is {kind} and cannot be set through a "
                 "draft operation")
 
-    # key completeness
+    # key completeness (blank allowed only for registry-optional key columns)
+    blank_ok = spec.blank_key_columns()
     for k in spec.key:
-        if str(record.get(k, "")).strip() == "":
+        if str(record.get(k, "") or "").strip() == "" and k not in blank_ok:
             err(k, f"key field {k!r} is required")
     if errors:
         return errors
@@ -204,8 +205,7 @@ def validate_record(conn: sqlite3.Connection, spec: TableSpec, model_id: str,
 
     # uniqueness within scope
     if op == "add":
-        where = " AND ".join(f'"{k}"=?' for k in spec.key)
-        params = [str(record.get(k, "")) for k in spec.key]
+        where, params = spec.key_predicate(record)
         if spec.model_scoped:
             where = "model_id=? AND " + where
             params = [model_id, *params]

@@ -7,6 +7,7 @@ import {
   dependencyDeletionOperations, optionCreationPlan,
 } from "../graphOperationsModel.js";
 import { displayId } from "../naming.js";
+import { operationModelId } from "../operationScope.js";
 import RecordForm from "./RecordForm.jsx";
 
 export default function ModelOperations({
@@ -138,7 +139,7 @@ export default function ModelOperations({
         );
         const result = await api.dependencies(
           table,
-          schema.model_context?.required ? (schema.model_context.value || modelKey) : "",
+          operationModelId(schema, row, modelKey),
           key,
         );
         dependents = result.dependents || [];
@@ -180,18 +181,16 @@ export default function ModelOperations({
     if (!dataReady) return null;
     const scrollTop = window.scrollY;
     const key = Object.fromEntries(schema.key.map((k) => [k, String(row[k] ?? "")]));
-    const operationModelId = schema.model_context?.required
-      ? (schema.model_context.value || modelKey)
-      : "";
+    const scopedModel = operationModelId(schema, row, modelKey);
     const existing = await api.draftOperations(draftId);
     const priorOperation = (existing.operations || []).find((candidate) => (
       candidate.table_name === table
-      && String(candidate.model_id ?? "") === operationModelId
+      && String(candidate.model_id ?? "") === scopedModel
       && Object.keys(key).every((name) => String(candidate.entity_key?.[name] ?? "") === key[name])
     )) || null;
     const operation = await saveDraft({
       table,
-      model_id: operationModelId,
+      model_id: scopedModel,
       op: "delete",
       key,
     });
@@ -207,9 +206,7 @@ export default function ModelOperations({
   const inspectDelete = async (row) => {
     if (!dataReady) return;
     const key = Object.fromEntries(schema.key.map((name) => [name, String(row[name] ?? "")]));
-    const scopedModel = schema.model_context?.required
-      ? (schema.model_context.value || modelKey)
-      : "";
+    const scopedModel = operationModelId(schema, row, modelKey);
     try {
       const result = await api.dependencyPlan(table, scopedModel, key, draftId);
       if (result.dependents.length) {

@@ -164,10 +164,11 @@ test("registered sheets conform to their family's declared cell types", () => {
   // they are tolerated today — but they are real registry non-conformance and
   // the editor's own coercion path expects the declared type.
   //
-  // Pinned exactly. A tenth violation, or drift in any currently-clean column,
+  // Pinned exactly. A new violation, or drift in any currently-clean column,
   // fails this test. Fixing these requires a workbook write, which the
   // owning cleanup spec (§6) does not authorize.
   const KNOWN_TYPE_DRIFT = [
+    "context_choice_copy.active",
     "context_section_master.active",
     "context_section_master.is_required",
     "default_selection_rules.priority",
