@@ -459,6 +459,20 @@ class TestWorkbookWriteAndParity(unittest.TestCase):
             self.assertTrue(any("value=" in e and "4LT" in e for e in result["errors"]), result["errors"])
             self.assertEqual(copy.read_bytes(), WORKBOOK.read_bytes())
 
+    def test_context_choice_reference_is_scoped_to_active_model_variants(self):
+        with tempfile.TemporaryDirectory(prefix="wbm-2db-model-ref-") as raw:
+            copy = Path(raw) / "copy.xlsx"
+            shutil.copy2(WORKBOOK, copy)
+            result = self._apply(copy, [
+                {"action": "add", "sheet": "context_choice_copy",
+                 "key": {"model_key": "stingray", "context_type": "trim_level", "value": "1LZ", "body_style": "*"},
+                 "row": {"model_key": "stingray", "context_type": "trim_level", "value": "1LZ", "body_style": "*",
+                         "info_tooltip": "unreachable copy", "active": True}},
+            ])
+            self.assertFalse(result["ok"])
+            self.assertTrue(any("value=" in error and "1LZ" in error for error in result["errors"]), result["errors"])
+            self.assertEqual(copy.read_bytes(), WORKBOOK.read_bytes())
+
 
 if __name__ == "__main__":
     unittest.main()

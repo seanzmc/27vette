@@ -396,13 +396,24 @@ def _single_ref_domain(extract, maps, batch_adds, sheet, refkind, *, models=None
         return ids or {str(r.get("variant_id")).strip()
                        for r in rows_of(extract, "variant_master") if r.get("variant_id")}
     if refkind in ("variant_trim_levels", "variant_body_styles"):
-        # Derived domains over variant_master, compared case-insensitively the
-        # way contract.py:126-135 compares context copy against variants.
+        # Derive only from active variant memberships for the row's owning
+        # model(s). contract.py emits context choices from that same model
+        # variant set, so accepting a value found only on another model would
+        # permit valid-looking copy that can never reach the generated form.
         column = "trim_level" if refkind == "variant_trim_levels" else "body_style"
+        variant_ids = {
+            str(r.get("variant_id") or "").strip()
+            for r in rows_of(extract, "model_variants")
+            if str(r.get("model_key") or "").strip() in models
+            and workbook_truthy(r.get("active"))
+            and str(r.get("variant_id") or "").strip()
+        }
         return {
             str(r.get(column) or "").strip().lower()
             for r in rows_of(extract, "variant_master")
-            if str(r.get(column) or "").strip()
+            if str(r.get("variant_id") or "").strip() in variant_ids
+            and workbook_truthy(r.get("active"))
+            and str(r.get(column) or "").strip()
         }
     if refkind == "option_rpos":
         rpos = set()

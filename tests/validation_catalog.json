@@ -2308,9 +2308,9 @@
       "approximate_seconds": 45.0,
       "acceptance_locks": [],
       "disposition": "keep",
-      "disposition_reason": "Checkpoint 2D-B owner: PriceRef and context_choice_copy registry contract, optional-key blank rule, projection ownership, draft operations, isolated writer edits, and fail-closed lints (PRES-01..05).",
+      "disposition_reason": "Checkpoint 2D-B owner: PriceRef and context_choice_copy registry contract, optional-key blank rule, projection ownership, model-scoped active-variant references, draft operations, isolated writer edits, and fail-closed lints (PRES-01..05).",
       "notes": "Every workbook write happens on an isolated copy; the canonical workbook is read-only here.",
-      "collected_tests": 21,
+      "collected_tests": 22,
       "baseline_result": "pass"
     },
     {

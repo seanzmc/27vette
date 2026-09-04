@@ -1235,11 +1235,12 @@ retain canonical uppercase workbook spelling.
 
 Acceptance evidence:
 
-- PRES-01–03: the focused owner passed 21 tests, covering registry/catalog
+- PRES-01–03: the focused owner passed 22 tests, covering registry/catalog
   completeness, 21/6-row projection and lineage, optional blank keys, six-model
-  ownership, wildcard writes, draft coalescing/reversion, exact copied-workbook
-  add/update/delete cells, table resizing, and fail-closed key/reference/type
-  cases. Unchanged reconstruction was byte-identical.
+  ownership, wildcard writes, model-scoped active-variant references, draft
+  coalescing/reversion, exact copied-workbook add/update/delete cells, table
+  resizing, and fail-closed key/reference/type cases. Unchanged reconstruction
+  was byte-identical.
 - PRES-04: isolated copied-workbook generation for all six models proved a
   `Seat/1LT/AE4` PriceRef increase and a `*/trim_level/1LT/*` tooltip edit each
   change exactly `stingray`, `grand_sport`, and `grand_sport_x`; Z06, ZR1, and
@@ -1863,4 +1864,14 @@ Each authorized checkpoint appends one concise dated record containing:
   media remain unchanged. Residual risk: none implied. Delivery branch
   `feat/workbook-manager-checkpoint-2d-b`; implementation commit `1f4a9c7d`;
   delivery PR #74 (`https://github.com/seanzmc/27vette/pull/74`) is open. Remote
-  release-candidate CI and Codex finding disposition are pending.
+  release-candidate CI passed. Codex review found the already-fixed handoff
+  drift on implementation commit `1f4a9c7d` plus one concrete P2: the
+  copied-workbook guard accepted a concrete model's context-copy value when it
+  existed only on another model. The guard now derives trim/body-style domains
+  from active `model_variants` memberships and active `variant_master` rows for
+  the operation's owning model set; a Stingray/1LZ regression proves the
+  unreachable copy is refused without changing the workbook. Review-closeout
+  layered validation passed 49 selected gates in 34 stages (`ok: true`, 292.988
+  seconds), including the Manager group (411 passed, 2 skipped, 79 subtests);
+  the focused owner passed 22 tests. Current-head remote CI and Codex thread
+  disposition are pending the review-fix push.

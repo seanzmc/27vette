@@ -24,7 +24,7 @@ Keep this file small — it is read at the start of every session:
   §14 completion record). Task prompt: `docs/wbm-checkpoint-2d-prompt.md`.
 - **Active workflow:** Workbook Manager Checkpoint 2D-B — approved direct
   management for `PriceRef` and `context_choice_copy` — COMPLETE locally;
-  repository delivery is next. `rule_phrase_map` and
+  PR #74 review remediation is ready to deliver. `rule_phrase_map` and
   `runtime_rule_exceptions` remain the approved preserved read-only exceptions.
 - **Current status:** the shared registry now owns both writable schemas,
   conditional trim/body-style references, PriceRef optional-key and fail-closed
@@ -33,14 +33,17 @@ Keep this file small — it is read at the start of every session:
   for global and registered `*` rows; schema-driven Advanced editors browse and
   save both families. Closeout fixed only concrete checkpoint regressions: the
   new `context_choice_copy.active` type-drift pin, two stale ownership/source
-  assertions, and lowercase trim choices that made authored `1LT` locally
-  invalid. Root/Manager READMEs and catalog ownership are updated.
+  assertions, lowercase trim choices that made authored `1LT` locally invalid,
+  and a review-found concrete-model writer guard that accepted values belonging
+  only to another model. That guard now derives values from active memberships
+  and active variant facts for the operation's owning model set. Root/Manager
+  READMEs and catalog ownership are updated.
 - **Branch/commit:** `feat/workbook-manager-checkpoint-2d-b` from `origin/main`
   `b810c285`; implementation commit `1f4a9c7d`; closeout documentation is the
   branch tip; PR #74 (`https://github.com/seanzmc/27vette/pull/74`) open, not
   merged.
-- **Last completed:** final catalog, copied-workbook generation, and isolated
-  desktop/mobile browser proof; spec and handoff closeout.
+- **Last completed:** Codex P2 remediation with Stingray/1LZ RED→GREEN and
+  catalog-selected review-closeout validation.
 - **Validation:** catalog-selected layered runner for all 24 then-current changed
   paths → `ok: true`, 57 selected gates / 42 stages in 451.171 s; one-process
   Manager group 410 passed, 2 skipped, 79 subtests; focused preserved-family
@@ -51,10 +54,14 @@ Keep this file small — it is read at the start of every session:
   six-model-owned draft operations, had zero captured errors and no 390px
   overflow; isolated and canonical workbook SHA-256 matched. Final governance,
   catalog/state owners, state validation, and `git diff --check` passed after
-  closeout edits.
-- **Next action:** observe PR #74 remote CI/review. Do not merge.
-- **Blockers or closeout gaps:** none local. Remote release-candidate CI and
-  Codex finding disposition are pending on PR #74.
+  closeout edits. Review remediation then passed 49 catalog-selected gates in
+  34 stages (`ok: true`, 292.988 s), including the Manager group (411 passed, 2
+  skipped, 79 subtests); focused owner 22 passed; schema-standardization and
+  governance/catalog/state owners passed.
+- **Next action:** commit/push the review fix, reply to and resolve both Codex
+  threads with evidence, then observe current-head CI. Do not merge.
+- **Blockers or closeout gaps:** none local. Current-head remote CI and Codex
+  finding disposition await the review-fix push/thread resolution.
 - **Protected boundaries:** dealer submission, deployment, workbook, generated
   artifacts, `form-app/data.js`, customer runtime, WordPress, catalog
   `ci`/`serial_groups`, ChangeSet dialect, and external services — unchanged.
