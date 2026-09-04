@@ -1873,5 +1873,6 @@ Each authorized checkpoint appends one concise dated record containing:
   unreachable copy is refused without changing the workbook. Review-closeout
   layered validation passed 49 selected gates in 34 stages (`ok: true`, 292.988
   seconds), including the Manager group (411 passed, 2 skipped, 79 subtests);
-  the focused owner passed 22 tests. Current-head remote CI and Codex thread
-  disposition are pending the review-fix push.
+  the focused owner passed 22 tests. Release-candidate CI and the Codex finding
+  disposition passed on review-fix head `fb3d637b`; both review threads were
+  replied to with evidence and resolved. Residual risk remains none implied.

@@ -39,9 +39,9 @@ Keep this file small — it is read at the start of every session:
   and active variant facts for the operation's owning model set. Root/Manager
   READMEs and catalog ownership are updated.
 - **Branch/commit:** `feat/workbook-manager-checkpoint-2d-b` from `origin/main`
-  `b810c285`; implementation commit `1f4a9c7d`; closeout documentation is the
-  branch tip; PR #74 (`https://github.com/seanzmc/27vette/pull/74`) open, not
-  merged.
+  `b810c285`; implementation commit `1f4a9c7d`; review fix `fb3d637b`; closeout
+  documentation is the branch tip; PR #74
+  (`https://github.com/seanzmc/27vette/pull/74`) open, not merged.
 - **Last completed:** Codex P2 remediation with Stingray/1LZ RED→GREEN and
   catalog-selected review-closeout validation.
 - **Validation:** catalog-selected layered runner for all 24 then-current changed
@@ -58,10 +58,10 @@ Keep this file small — it is read at the start of every session:
   34 stages (`ok: true`, 292.988 s), including the Manager group (411 passed, 2
   skipped, 79 subtests); focused owner 22 passed; schema-standardization and
   governance/catalog/state owners passed.
-- **Next action:** commit/push the review fix, reply to and resolve both Codex
-  threads with evidence, then observe current-head CI. Do not merge.
-- **Blockers or closeout gaps:** none local. Current-head remote CI and Codex
-  finding disposition await the review-fix push/thread resolution.
+- **Next action:** review/merge PR #74 only on explicit user request.
+- **Blockers or closeout gaps:** none. Release-candidate CI and Codex finding
+  disposition passed on review-fix head `fb3d637b`; both review threads were
+  replied to with test evidence and resolved. Do not merge without approval.
 - **Protected boundaries:** dealer submission, deployment, workbook, generated
   artifacts, `form-app/data.js`, customer runtime, WordPress, catalog
   `ci`/`serial_groups`, ChangeSet dialect, and external services — unchanged.
