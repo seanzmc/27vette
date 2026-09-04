@@ -459,6 +459,52 @@ class TestWorkbookWriteAndParity(unittest.TestCase):
             self.assertTrue(any("value=" in e and "4LT" in e for e in result["errors"]), result["errors"])
             self.assertEqual(copy.read_bytes(), WORKBOOK.read_bytes())
 
+    def test_context_choice_copy_domains_scope_to_the_row_models(self):
+        """The value domain follows the row's model scope, not all variants.
+
+        The generator builds each model's choices from its active
+        model_variants memberships, so a concrete row's `value` must resolve
+        against those variants only; a trim another model supplies would never
+        be emitted (contract.py:126-140 matches case-insensitively). Wildcard
+        rows own every model and validate against the union. Applied through
+        the real write path on isolated copies.
+        """
+
+        def attempt(model_key: str, value: str) -> dict:
+            with tempfile.TemporaryDirectory(prefix="wbm-2db-scope-") as raw:
+                copy = Path(raw) / "copy.xlsx"
+                shutil.copy2(WORKBOOK, copy)
+                key = {"model_key": model_key, "context_type": "trim_level",
+                       "value": value, "body_style": "*"}
+                return self._apply(copy, [
+                    {"action": "add", "sheet": "context_choice_copy", "key": key,
+                     "row": {**key, "info_tooltip": f"{model_key} {value} copy",
+                             "active": True}},
+                ])
+
+        # Stingray generates 1LT-3LT only; 1LZ exists solely because Z06
+        # supplies it, so a guarded Stingray write must be refused.
+        result = attempt("stingray", "1LZ")
+        self.assertFalse(result["ok"])
+        self.assertTrue(
+            any("value='1LZ' not found in variant_trim_levels" in e for e in result["errors"]),
+            result["errors"],
+        )
+        # ZR1 generates 1LZ/3LZ; 2LZ belongs to Z06.
+        result = attempt("zr1", "2LZ")
+        self.assertFalse(result["ok"])
+        # A concrete row for a trim its own model generates stays writable.
+        self.assertTrue(attempt("stingray", "1LT")["ok"])
+        self.assertTrue(attempt("zr1", "3LZ")["ok"])
+        # Wildcard rows validate against the union of every model's trims.
+        self.assertTrue(attempt("*", "1LZ")["ok"])
+        result = attempt("*", "9LT")
+        self.assertFalse(result["ok"])
+        self.assertTrue(
+            any("value='9LT' not found in variant_trim_levels" in e for e in result["errors"]),
+            result["errors"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

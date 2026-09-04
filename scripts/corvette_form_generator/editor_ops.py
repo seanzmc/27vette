@@ -397,12 +397,36 @@ def _single_ref_domain(extract, maps, batch_adds, sheet, refkind, *, models=None
                        for r in rows_of(extract, "variant_master") if r.get("variant_id")}
     if refkind in ("variant_trim_levels", "variant_body_styles"):
         # Derived domains over variant_master, compared case-insensitively the
-        # way contract.py:126-135 compares context copy against variants.
+        # way contract.py:126-135 compares context copy against variants. A
+        # concrete context_choice_copy row resolves against only the trims and
+        # body styles its affected models actually generate (active
+        # model_variants memberships): the generator builds each model's
+        # choices from config.variant_ids, so copy for a trim another model
+        # supplies would never be emitted. Only a wildcard row (affected
+        # models = every registry model) validates against the union. The
+        # fallback to every variant_master value keeps the domain usable when
+        # the affected models have no active membership to read.
         column = "trim_level" if refkind == "variant_trim_levels" else "body_style"
-        return {
-            str(r.get(column) or "").strip().lower()
-            for r in rows_of(extract, "variant_master")
+        master_rows = [
+            r for r in rows_of(extract, "variant_master")
             if str(r.get(column) or "").strip()
+        ]
+        by_variant_id = {
+            str(r.get("variant_id")).strip(): r for r in master_rows
+            if str(r.get("variant_id") or "").strip()
+        }
+        memberships = [
+            r for r in rows_of(extract, "model_variants")
+            if str(r.get("model_key") or "").strip() in models
+            and workbook_truthy(r.get("active"))
+        ]
+        scoped = set()
+        for r in memberships:
+            master = by_variant_id.get(str(r.get("variant_id") or "").strip())
+            if master is not None:
+                scoped.add(str(master.get(column)).strip().lower())
+        return scoped or {
+            str(r.get(column)).strip().lower() for r in master_rows
         }
     if refkind == "option_rpos":
         rpos = set()
