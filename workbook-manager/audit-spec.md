@@ -1,6 +1,6 @@
 # Workbook Manager Audit Remediation Specification
 
-Status: Checkpoint 3A closed 2026-09-04; Checkpoint 2D-B remains closed for the
+Status: Checkpoint 3B closed 2026-09-04; Checkpoint 2D-B remains closed for the
 two approved writable families, while `rule_phrase_map` and
 `runtime_rule_exceptions` retain the approved read-only exceptions. This specification resolves the
 remediation scope identified in `wbookMgrAuditRpt.md`; it does not authorize
@@ -198,12 +198,12 @@ cross-draft apply immediately creates a P0 stop and supersedes this sequence.
 - [ ] **P3.4 / WM-011 — Query cleanup.** Clear query parameters that are
   irrelevant to the destination workspace while preserving canonical reloadable
   context.
-- [ ] **P3.5 / WM-009 and WM-011 — Human labels.** Improve human labels for
+- [x] **P3.5 / WM-009 and WM-011 — Human labels.** Improve human labels for
   section IDs and raw technical fields without replacing canonical IDs in
   technical evidence.
 - [ ] **P3.6 / WM-011 — Narrow containment.** Contain Advanced tables/toolbars at
   390x844 without document-level horizontal overflow.
-- [ ] **P3.7 / WM-009 — Coverage control.** Remove button semantics from the dead
+- [x] **P3.7 / WM-009 — Coverage control.** Remove button semantics from the dead
   overall-coverage tile or implement a defined filter/navigation action.
 - [ ] **P3.8 / WM-011-adjacent audit UX — First-run/lifecycle copy.** Consolidate
   duplicate first-run reload actions and standardize lifecycle naming while
@@ -1351,6 +1351,66 @@ Required work:
 
 Exit gate: POLISH-01–06 pass; no dead button semantics remain and canonical
 identifiers stay recoverable.
+
+**Closed 2026-09-04 — implementation `10b8da7e`.**
+
+Closure (2026-09-04): POLISH-01–06 pass. `naming.js` centralizes authored-name
+fallback and registry-first field labels. Images reads section names through
+the existing bounded reference lookup and context-section records routes;
+model names reuse the header's authored model catalog. Missing names retain
+unchanged IDs, and label-load failure is visible. No new endpoint, dependency,
+schema, registry vocabulary, or business label was introduced. Overall coverage
+is a static `div`; actionable model/section cards retain native buttons.
+
+Acceptance evidence:
+
+- **POLISH-01/03:** isolated Chrome at `127.0.0.1:8053` displayed `Paint` with
+  `sec_pain_001` and `Body Style` with `sec_context_body_style` in coverage and
+  filters. The context-section source was added after browser inspection caught
+  its omission from the ordinary section reference domain. Node proves authored
+  labels win and blank names retain `sec_pain_001`, not `Sec Pain 001`.
+- **POLISH-02:** Advanced headings prefer the same registry control labels as
+  editing/validation; exact `options.option_id` through `options.detail_raw`
+  remain visible with `text-transform: none`. Editor fields expose exact
+  table/field names beside their associated labels. Connected rule/group types
+  use the shared display formatter; technical details retain original rows.
+  Chrome showed `Excludes` and the exact rule ID, `rule_type: excludes`,
+  source/target IDs, and `rule_mapping` row 17 in expanded evidence.
+- **POLISH-04/05:** Chrome Enter selected Paint and the visible filter became
+  `sec_pain_001` with `1–10 of 10`; Space selected Body Style. Enter on the
+  All-model Grand Sport X card changed the URL/model to `grand_sport_x`.
+  Native arrow keys operated Section, Target type, and Coverage intent; the
+  accessibility tree named all three. Space opened Technical details. Overall
+  coverage has no role/button/type/tab stop (`DIV`, `tabIndex: -1`). Images
+  measured `390=390` at 390x844; captured runtime errors were empty.
+- **POLISH-06:** the existing outcome-specific wildcard labels were preserved
+  and browser-verified: `Edit presentation only`, `Create exact model ownership`,
+  and `Update shared wildcard ownership`; the ambiguous shared action remained
+  disabled. No browser resolution, draft save, or workbook write was performed.
+
+RED assertions caught the unconditional coverage button, raw heading wiring,
+opaque-ID decoding (`Sec Pain 001`), and missing context-section lookup before
+their fixes. Focused frontend owners passed 64 tests. Final catalog-selected
+validation passed all 26 gates in 11 stages (`ok: true`, 163.540 seconds),
+including the one-process Manager group (423 passed, 2 opt-in scratch-writer
+tests skipped, 79 subtests), generated parity, six-model candidate lane, frontend
+build, governance/catalog, and state owners. `git diff --check` and all nine
+protected workbook/runtime-contract/data.js/cache-HTML hashes passed.
+After recording the real PR URL, closeout governance/state tests passed
+26 tests and the standalone state-handoff validator passed.
+
+Companions: Manager README/User Guide and existing test owners updated; root
+README, backend/schema/registry, generated artifacts, customer runtime, and
+dealer behavior inspected with no change. No live inventory refresh, deployment,
+cache purge, WordPress mutation, or dealer submission was run. The copied
+workbook was imported through the existing verified path for browser proof;
+Apply/Rebuild browser execution was unnecessary for this presentation-only
+checkpoint. Residual risks: npm reported five audit findings (two moderate,
+three high) in unchanged dependencies, and the Manager gate emitted its
+Starlette/httpx deprecation warning; neither was changed or suppressed.
+Checkpoint 3C remains separately authorized. Delivery branch:
+`feat/workbook-manager-checkpoint-3b`; implementation `10b8da7e`; PR #77
+(`https://github.com/seanzmc/27vette/pull/77`). Remote CI/review remains pending.
 
 ### Checkpoint 3C — navigation cleanup, narrow Advanced, first-run copy
 

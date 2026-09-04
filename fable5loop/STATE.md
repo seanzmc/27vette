@@ -19,31 +19,33 @@ Keep this file small — it is read at the start of every session:
 ## Current handoff
 
 - **Updated:** 2026-09-04
-- **Owning specification:** `workbook-manager/audit-spec.md` (§8 Checkpoint 3A
-  closure; §10 DISC-01–06; §14 completion record).
-- **Active workflow:** Workbook Manager Checkpoint 3A — COMPLETE and merged.
-- **Current status:** the paged Groups index, classified deterministic search,
-  distinct diagnostics mode, and URL-owned navigation are on `main`. PR #75
-  review remediation additionally scoped explorer search before pagination and
-  hardened navigation against stale cross-workspace state. This reconciliation
-  changes documentation only.
-- **Branch/commit:** PR #75 (`https://github.com/seanzmc/27vette/pull/75`)
-  merged to `main` as `c087e5bf`; implementation `422e2b2a`, closeout
-  `4ae4e4f8`/`90e42a7e`, review remediation `278c1f7d`.
-- **Last completed:** Checkpoint 3A merged after release-candidate CI, Codex
-  disposition, and review remediation passed.
-- **Validation:** focused API 4 passed; connected frontend owner 38 passed;
-  frontend build passed. Isolated Chrome proved the 24-row Groups index,
-  exact/direct Z51 first with reasons, separate 53-result diagnostic mode,
-  reload/Back restoration, zero captured runtime errors, and `390=390` mobile
-  width. Final catalog-selected validation passed all 26 selected gates in 11
-  stages (`ok: true`, 160.676 seconds), including the one-process Manager group
-  (415 passed, 2 skipped, 79 subtests), frontend build, and governance/catalog/
-  state owners.
-- **Next action:** await explicit authorization for Checkpoint 3B (human
-  technical labels and dead coverage control).
-- **Blockers or closeout gaps:** none. PR #75 release-candidate and Codex
-  disposition checks passed before merge.
+- **Owning specification:** `workbook-manager/audit-spec.md` (§8 Checkpoint 3B
+  closure; §10 POLISH-01–06).
+- **Active workflow:** Workbook Manager Checkpoint 3B — implemented and locally
+  verified; delivered through PR #77.
+- **Current status:** authored section/context/model names lead Images cards and
+  filters; registry labels lead raw fields with exact technical evidence;
+  connected relationship details preserve original rows. Overall coverage is a
+  static summary, not a dead button. Checkpoint 3C was not started.
+- **Branch/commit:** `feat/workbook-manager-checkpoint-3b` from `origin/main`
+  `3fb55e0d`; implementation `10b8da7e`; PR #77
+  (`https://github.com/seanzmc/27vette/pull/77`).
+- **Last completed:** Checkpoint 3B POLISH-01–06, including the browser-discovered
+  context-section label gap. Prior Checkpoint 3A and its merge reconciliation
+  are already on main via PRs #75/#76.
+- **Validation:** focused frontend owners 64 passed; production build passed.
+  Final catalog-selected run passed 26 gates in 11 stages (`ok: true`, 163.540
+  seconds), including Manager serial group (423 passed, 2 opt-in scratch-writer
+  tests skipped, 79 subtests), generated parity and six-model candidate lane.
+  Isolated Chrome proved authored labels, native Enter/Space/arrow behavior,
+  accessible filter names, exact raw/rule evidence, distinct wildcard actions,
+  zero captured runtime errors, and Images `390=390` width. Nine protected
+  hashes and `git diff --check` passed.
+- **Next action:** review PR #77; merge only on explicit user request.
+  Checkpoint 3C requires separate authorization.
+- **Blockers or closeout gaps:** no implementation blocker. Remote CI/review is
+  pending. Unchanged dependencies report five npm audit findings (two moderate,
+  three high); Manager tests emit a Starlette/httpx deprecation warning.
 - **Protected boundaries:** dealer submission, deployment, workbook, generated
   artifacts, `form-app/data.js`, customer runtime, WordPress, catalog
   `ci`/`serial_groups`, ChangeSet dialect, and external services — unchanged.
