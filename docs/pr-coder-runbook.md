@@ -5,7 +5,7 @@ review findings on open PRs of this repo so they can be merged. This is not a
 scratch tracker; keep it current when the mechanism changes.
 
 **Owner:** Sean · **Runs:** webhook-triggered, plus an hourly safety net
-**Last updated:** 2026-09-01
+**Last updated:** 2026-09-04
 
 ## Purpose
 
@@ -51,7 +51,8 @@ cheap; a silently dropped P0 is not.
 - [ ] `GITHUB_TOKEN` in `~/.hermes/profiles/pr-coder/.env` = classic PAT (`repo` scope) for the **`stingray-pr-agent`** machine account
 - [ ] `stingray-pr-agent` is a collaborator on `seanzmc/27vette` with Write, invite accepted
 - [ ] Repo-local git identity in the clone so commits are the bot's, not yours
-- [ ] OpenRouter key for the model
+- [ ] Existing shared Hermes OpenAI Codex subscription authentication (the same
+      credentials used by `vette-coder`)
 
 Only the profile's own `.env` is loaded (`$HERMES_HOME/.env`). The root
 `~/.hermes/.env` and other profiles' `.env` files are separate scopes and cannot
@@ -61,7 +62,10 @@ clobber this token.
 
 | Thing | Value |
 |---|---|
-| Model | `z-ai/glm-5.3-flash` / `openrouter` (profile default) |
+| Model | `gpt-6-astra` / `openai-codex` (profile default and responder job pin) |
+| Reasoning | `low` (profile default and responder job pin) |
+| Inference transport | Codex Responses at `https://chatgpt.com/backend-api/codex` |
+| Model authentication | Shared `~/.hermes/auth.json`; neither profile overrides its `openai-codex` credentials |
 | Responder cron job | `2939d914f9ab`, every 1h, script `pr-review-gate.py`, delivers to `discord:1544037088368922716` |
 | Watchdog cron job | `08830ae9547d`, every 20m, `no_agent`, script `pr-agent-watchdog.py` |
 | Webhook route | `codex-pr-finding`, listener `*:8644`, script `pr-codex-trigger.py` |
@@ -74,6 +78,31 @@ clobber this token.
 The webhook is the primary trigger; the hourly cron is the recovery path for a
 missed delivery, a failed run, or a push that did not close its finding. Both
 call the same gate, which re-reads GitHub every time and trusts no cached state.
+
+The responder's job-level model, provider, and reasoning pins take precedence
+over profile defaults. Update both when changing this bot. Hermes reads the
+shared Codex credentials through its normal profile fallback; do not copy
+OAuth tokens between profiles or modify `~/.codex/auth.json`.
+
+### Astra instructions
+
+The profile's `SOUL.md` owns the bot-specific procedure; the cron prompt selects
+the gate findings and reinforces completion checks. The 2026-09-04 revision
+follows [OpenAI's Astra prompting guidance](https://developers.openai.com/api/docs/guides/latest-model?model=gpt-6-astra):
+
+- Complete routine, authorized fixes through validation and remote read-back;
+  report genuine approval blockers with the exact governing instruction.
+- Reconcile instruction layers: this responder uses existing PR branches;
+  the contributor instruction to open a new PR does not apply. Skills and
+  imported memories cannot override current scope or protected boundaries.
+- Work inline with one worker at low reasoning. Run required changed-surface
+  checks, avoiding redundant tests and repeated passing checks.
+- Keep milestone notifications and final reports concise and evidence-based.
+
+The prior contradiction between the general GitHub-write restriction and the
+existing review-body reaction procedure is removed. Reaction completion rules,
+identity checks, workbook/dealer restrictions, and merge restrictions are
+unchanged. No global skills or imported memory files were rewritten.
 
 ## Procedure — routine checks
 
@@ -154,9 +183,31 @@ Restore the file, then `hermes -p pr-coder gateway restart`. To disable the
 automation entirely without unpicking anything, pause both cron jobs and
 deactivate GitHub hook `672883313`.
 
+The Astra migration's profile config, SOUL, and job snapshot are backed up in
+`~/.hermes/profiles/pr-coder/backups/astra-20260904_203114/`. To roll back, restore
+the config and SOUL and use `hermes -p pr-coder cron edit 2939d914f9ab` to restore
+the old model/provider/prompt and clear the reasoning pin (`--reasoning-effort
+''`). Do not overwrite the live jobs file with its backup: its schedule/run
+state may have advanced. Restart only the `pr-coder` gateway afterward.
+
+## Astra migration verification (2026-09-04)
+
+The scheduler resolved `gpt-6-astra`, `low`, `openai-codex`, and Codex Responses
+with the same shared auth source as `vette-coder`. Config comparisons confirmed
+only intended profile/job fields changed; the watchdog's configuration was
+preserved. The gateway restarted successfully (new worker PID 31053).
+
+A live subscription response completed with Astra and low reasoning. The
+standalone tool probe's assertion failed twice because it inspected only the
+terminal response's empty `output`, rather than accumulating streaming tool
+items. Hermes's existing `agent/codex_runtime.py` explicitly handles that
+format. Model access is verified; tool execution and a full PR-fix cycle were
+not verified by this probe. No PR work or Discord messages were triggered for
+validation. Repository runtime tests are not relevant to this configuration
+and documentation change.
+
 ## Known gaps
 
 - The full loop has never run end to end under the `stingray-pr-agent` identity. The next review-body finding is its first real exercise — watch that run.
 - The classic PAT expires ~2026-12-01. Expiry now warns loudly in the gate output, but only if someone reads it; keep a calendar reminder.
-- Cron job `2939d914f9ab` still carries a redundant `"model": "glm-5.3-flash"` override duplicating the profile default. Harmless; clear it next time that job is edited.
 - The gate raises rather than paginates past 100 open PRs, 100 threads per PR, 50 reviews per PR, or 20 comments per thread. It fails loudly, which is correct, but it will need pagination eventually.

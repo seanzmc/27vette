@@ -19,36 +19,33 @@ Keep this file small — it is read at the start of every session:
 ## Current handoff
 
 - **Updated:** 2026-09-04
-- **Owning specification:** `workbook-manager/audit-spec.md` (§8 Checkpoint 3B
-  closure; §10 POLISH-01–06).
-- **Active workflow:** Workbook Manager Checkpoint 3B — implemented and locally
-  verified; delivered through PR #77.
-- **Current status:** authored section/context/model names lead Images cards and
-  filters; registry labels lead raw fields with exact technical evidence;
-  connected relationship details preserve original rows. Overall coverage is a
-  static summary, not a dead button. Checkpoint 3C was not started.
-- **Branch/commit:** `feat/workbook-manager-checkpoint-3b` from `origin/main`
-  `3fb55e0d`; implementation `10b8da7e`; PR #77
-  (`https://github.com/seanzmc/27vette/pull/77`).
-- **Last completed:** Checkpoint 3B POLISH-01–06, including the browser-discovered
-  context-section label gap. Prior Checkpoint 3A and its merge reconciliation
-  are already on main via PRs #75/#76.
-- **Validation:** focused frontend owners 64 passed; production build passed.
-  Final catalog-selected run passed 26 gates in 11 stages (`ok: true`, 163.540
-  seconds), including Manager serial group (423 passed, 2 opt-in scratch-writer
-  tests skipped, 79 subtests), generated parity and six-model candidate lane.
-  Isolated Chrome proved authored labels, native Enter/Space/arrow behavior,
-  accessible filter names, exact raw/rule evidence, distinct wildcard actions,
-  zero captured runtime errors, and Images `390=390` width. Nine protected
-  hashes and `git diff --check` passed.
-- **Next action:** review PR #77; merge only on explicit user request.
-  Checkpoint 3C requires separate authorization.
-- **Blockers or closeout gaps:** no implementation blocker. Remote CI/review is
-  pending. Unchanged dependencies report five npm audit findings (two moderate,
-  three high); Manager tests emit a Starlette/httpx deprecation warning.
-- **Protected boundaries:** dealer submission, deployment, workbook, generated
-  artifacts, `form-app/data.js`, customer runtime, WordPress, catalog
-  `ci`/`serial_groups`, ChangeSet dialect, and external services — unchanged.
+- **Owning specification:** `docs/pr-coder-runbook.md` (configuration and
+  Astra instructions; no new product specification).
+- **Active workflow:** PR responder model and prompt migration.
+- **Current status:** local `pr-coder` profile and responder job pin
+  `gpt-6-astra` / `openai-codex` / `low`; shared Hermes Codex subscription
+  credentials are the same source used by `vette-coder`. Gateway restarted.
+- **Branch/commit:** `codex/pr-coder-astra-low`; this documentation change
+  records the already-applied local profile update.
+- **Last completed:** backed up config/SOUL/job, applied scoped model and
+  instruction edits, removed conflicting bot guidance, updated runbook.
+- **Validation:** scheduler resolved Astra/low/Codex Responses with shared
+  auth; unrelated config/job fields and watchdog configuration matched backup.
+  Live subscription response completed with model Astra and reasoning low.
+  Two standalone tool probes failed their final-output assertion because
+  Codex returns tool items through streaming events; Hermes already handles
+  those events. Tool-call behavior and the full PR cycle are not claimed
+  verified. New gateway PID 31053 confirmed.
+  `git diff --check` and the state handoff validator passed.
+- **Next action:** review the documentation PR; merge only on explicit request.
+  The next natural responder run will exercise the complete PR lifecycle.
+- **Blockers or closeout gaps:** none for configuration delivery; full PR
+  lifecycle was not triggered as a test. Backup:
+  `~/.hermes/profiles/pr-coder/backups/astra-20260904_203114/`.
+- **Protected boundaries:** workbook, generated artifacts, customer runtime,
+  dealer submission, GitHub review bot, `vette-coder`, schedules, notification
+  destinations, identity and closure rules unchanged. No tokens copied and
+  no live GitHub/Discord test messages sent.
 
 ## Verified facts
 
