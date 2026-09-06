@@ -18,34 +18,26 @@ Keep this file small — it is read at the start of every session:
 
 ## Current handoff
 
-- **Updated:** 2026-09-04
-- **Owning specification:** `docs/pr-coder-runbook.md` (configuration and
-  Astra instructions; no new product specification).
-- **Active workflow:** PR responder model and prompt migration.
-- **Current status:** local `pr-coder` profile and responder job pin
-  `gpt-6-astra` / `openai-codex` / `low`; shared Hermes Codex subscription
-  credentials are the same source used by `vette-coder`. Gateway restarted.
-- **Branch/commit:** `codex/pr-coder-astra-low`; this documentation change
-  records the already-applied local profile update.
-- **Last completed:** backed up config/SOUL/job, applied scoped model and
-  instruction edits, removed conflicting bot guidance, updated runbook.
-- **Validation:** scheduler resolved Astra/low/Codex Responses with shared
-  auth; unrelated config/job fields and watchdog configuration matched backup.
-  Live subscription response completed with model Astra and reasoning low.
-  Two standalone tool probes failed their final-output assertion because
-  Codex returns tool items through streaming events; Hermes already handles
-  those events. Tool-call behavior and the full PR cycle are not claimed
-  verified. New gateway PID 31053 confirmed.
-  `git diff --check` and the state handoff validator passed.
-- **Next action:** review the documentation PR; merge only on explicit request.
-  The next natural responder run will exercise the complete PR lifecycle.
-- **Blockers or closeout gaps:** none for configuration delivery; full PR
-  lifecycle was not triggered as a test. Backup:
-  `~/.hermes/profiles/pr-coder/backups/astra-20260904_203114/`.
+- **Updated:** 2026-09-06
+- **Owning specification:** none; automation maintenance for `AGENTS.md`.
+- **Active workflow:** durable agent-guide refresh for PR finding closeout.
+- **Current status:** `AGENTS.md` now records that GitHub-owned Codex finding
+  disposition and live review evidence, not local notes or bot reports, decide
+  whether unresolved P0/P1 findings still block PR closeout. Runbook commands
+  remain in `docs/pr-coder-runbook.md`.
+- **Branch/commit:** `codex/update-agents-pr-finding-closeout`; PR #79:
+  `https://github.com/seanzmc/27vette/pull/79`.
+- **Last completed:** inspected recent history since the last automation run,
+  `README.md`, `docs/pr-coder-runbook.md`, `workbook-manager/README.md`,
+  and the existing `AGENTS.md` scope before making a single AGENTS paragraph
+  plus this handoff update.
+- **Validation:** `.venv/bin/python scripts/validate_state_handoff.py` and
+  `git diff --check -- AGENTS.md fable5loop/STATE.md` passed.
+- **Next action:** review PR #79; merge only on explicit request.
+- **Blockers or closeout gaps:** none known.
 - **Protected boundaries:** workbook, generated artifacts, customer runtime,
-  dealer submission, GitHub review bot, `vette-coder`, schedules, notification
-  destinations, identity and closure rules unchanged. No tokens copied and
-  no live GitHub/Discord test messages sent.
+  dealer submission, GitHub review bot, Hermes profiles, schedules,
+  notification destinations, and live GitHub/Discord messages unchanged.
 
 ## Verified facts
 
