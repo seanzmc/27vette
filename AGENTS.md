@@ -105,6 +105,8 @@ Do not cite `generate_form.py` stdout `validation_errors: 0` as proof of a clean
 
 Report every check run with its result, and every relevant gate not run with the reason. Never claim validation passed without real tool output.
 
+For PR review closeout, GitHub owns Codex finding state. The `codex-finding-disposition` status and live review-thread/review-body evidence decide whether unresolved P0/P1 findings still block merge; local notes, bot reports, or pushed fixes are not enough without that read-back. Operational responder details and commands belong in `docs/pr-coder-runbook.md`.
+
 ## 11. Companion-File Impact
 
 Proportional to risk. Per changed surface, inspect what co-changes: workbook/data → artifacts, registry, contract tests, docs; generator → outputs, schema tests, script docs, runtime consumers; runtime → generated fields, tests, workflows, dealer flow; styling → HTML/JS state hooks, responsive behavior; tests/gates → workflow docs and tests encoding the old contract; docs → README consistency and stale references. Report each relevant companion as updated, inspected-no-change, or n/a.
