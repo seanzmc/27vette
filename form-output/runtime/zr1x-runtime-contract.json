@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "zr1x_options",
-    "generated_at": "2026-08-23T07:05:27+00:00",
+    "generated_at": "2026-10-08T18:43:59+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -16,7 +16,7 @@
       "trim_level": "1LZ",
       "body_style": "coupe",
       "display_name": "Corvette ZR1X Coupe 1LZ",
-      "base_price": 227395,
+      "base_price": 227695,
       "display_order": 29,
       "source_active": "True",
       "preview_included": true
@@ -28,7 +28,7 @@
       "trim_level": "3LZ",
       "body_style": "coupe",
       "display_name": "Corvette ZR1X Coupe 3LZ",
-      "base_price": 238395,
+      "base_price": 238695,
       "display_order": 30,
       "source_active": "True",
       "preview_included": true
@@ -40,7 +40,7 @@
       "trim_level": "1LZ",
       "body_style": "convertible",
       "display_name": "Corvette ZR1X Convertible 1LZ",
-      "base_price": 237395,
+      "base_price": 237695,
       "display_order": 31,
       "source_active": "True",
       "preview_included": true
@@ -52,7 +52,7 @@
       "trim_level": "3LZ",
       "body_style": "convertible",
       "display_name": "Corvette ZR1X Convertible 3LZ",
-      "base_price": 248395,
+      "base_price": 248695,
       "display_order": 32,
       "source_active": "True",
       "preview_included": true
@@ -607,7 +607,7 @@
       "body_style": "coupe",
       "trim_level": "1LZ",
       "variant_id": "1lz_s07",
-      "base_price": 227395,
+      "base_price": 227695,
       "display_order": 29
     },
     {
@@ -622,7 +622,7 @@
       "body_style": "coupe",
       "trim_level": "3LZ",
       "variant_id": "3lz_s07",
-      "base_price": 238395,
+      "base_price": 238695,
       "display_order": 30
     },
     {
@@ -637,7 +637,7 @@
       "body_style": "convertible",
       "trim_level": "1LZ",
       "variant_id": "1lz_s67",
-      "base_price": 237395,
+      "base_price": 237695,
       "display_order": 31
     },
     {
@@ -652,7 +652,7 @@
       "body_style": "convertible",
       "trim_level": "3LZ",
       "variant_id": "3lz_s67",
-      "base_price": 248395,
+      "base_price": 248695,
       "display_order": 32
     }
   ],

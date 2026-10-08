@@ -18,26 +18,27 @@ Keep this file small — it is read at the start of every session:
 
 ## Current handoff
 
-- **Updated:** 2026-09-06
-- **Owning specification:** none; automation maintenance for `AGENTS.md`.
-- **Active workflow:** durable agent-guide refresh for PR finding closeout.
-- **Current status:** `AGENTS.md` now records that GitHub-owned Codex finding
-  disposition and live review evidence, not local notes or bot reports, decide
-  whether unresolved P0/P1 findings still block PR closeout. Runbook commands
-  remain in `docs/pr-coder-runbook.md`.
-- **Branch/commit:** `codex/update-agents-pr-finding-closeout`; PR #79:
-  `https://github.com/seanzmc/27vette/pull/79`.
-- **Last completed:** inspected recent history since the last automation run,
-  `README.md`, `docs/pr-coder-runbook.md`, `workbook-manager/README.md`,
-  and the existing `AGENTS.md` scope before making a single AGENTS paragraph
-  plus this handoff update.
-- **Validation:** `.venv/bin/python scripts/validate_state_handoff.py` and
-  `git diff --check -- AGENTS.md fable5loop/STATE.md` passed.
-- **Next action:** review PR #79; merge only on explicit request.
+- **Updated:** 2026-10-08
+- **Owning specification:** none; owner-requested interim price update while
+  CorvetteCatalog replaces this form.
+- **Active workflow:** MY2027 price schedule effective September 28, 2026.
+- **Current status:** all 32 `variant_master.base_price` values rose by $300
+  (manufacturer base prices +$300; destination $2,495 unchanged), written
+  through `scripts/apply_workbook_changeset.py` (ChangeSet
+  `ceba6de84897685bb621792d`, approved by Sean). The workbook freeze is broken
+  for this dual edit only; CorvetteCatalog accepted the same change.
+- **Branch/commit:** `claude/base-prices-2026-09-28`; PR to `main` (merging
+  deploys the live form through the WordPress.com GitHub deployment).
+- **Last completed:** workbook write, six model contracts and `form-app/data.js`
+  regenerated (diff is `base_price` values and timestamps only); one test that
+  hard-coded the old 2LT convertible price now reads the variant's price.
+- **Validation:** package and schema validation, no issues; all 17 default
+  Node gates pass (including source-to-contract and source-to-registry parity
+  and `runtime-state-matrix`); Python metadata gate 159 passed.
+- **Next action:** owner review; merge only on explicit request (deploys).
 - **Blockers or closeout gaps:** none known.
-- **Protected boundaries:** workbook, generated artifacts, customer runtime,
-  dealer submission, GitHub review bot, Hermes profiles, schedules,
-  notification destinations, and live GitHub/Discord messages unchanged.
+- **Protected boundaries:** dealer submission, option prices, rules, runtime
+  code and every other workbook sheet unchanged.
 
 ## Verified facts
 
