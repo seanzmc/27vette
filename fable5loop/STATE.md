@@ -31,7 +31,8 @@ Keep this file small — it is read at the start of every session:
   deploys the live form through the WordPress.com GitHub deployment).
 - **Last completed:** workbook write, six model contracts and `form-app/data.js`
   regenerated (diff is `base_price` values and timestamps only); one test that
-  hard-coded the old 2LT convertible price now reads the variant's price.
+  hard-coded the old 2LT convertible price now reads the variant's price;
+  `form-app/index.html` loads `data.js?v=38` so cached registries refresh.
 - **Validation:** package and schema validation, no issues; all 17 default
   Node gates pass (including source-to-contract and source-to-registry parity
   and `runtime-state-matrix`); Python metadata gate 159 passed.
