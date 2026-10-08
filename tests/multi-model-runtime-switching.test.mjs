@@ -757,7 +757,8 @@ test("runtime keeps body and trim choices functional inside vehicle setup", () =
   assert.equal(order.vehicle.body_style, "convertible");
   assert.equal(order.vehicle.trim_level, "2LT");
   assert.equal(order.vehicle.display_name, "Corvette Stingray Convertible 2LT");
-  assert.equal(order.vehicle.base_price, 87595);
+  // The order carries the selected variant's workbook price; source parity pins the amount.
+  assert.equal(order.vehicle.base_price, runtime.data.variants.find((variant) => variant.variant_id === "2lt_c67").base_price);
 });
 
 test("runtime renders Stingray paint image media from generated choice data", () => {

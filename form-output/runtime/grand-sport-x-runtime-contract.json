@@ -5,7 +5,7 @@
     "model_year": "2027",
     "source_workbook": "stingray_master.xlsx",
     "source_sheet": "grand_sport_x_options",
-    "generated_at": "2026-08-27T22:54:47+00:00",
+    "generated_at": "2026-10-08T18:43:56+00:00",
     "status": "runtime_active"
   },
   "variants": [
@@ -16,7 +16,7 @@
       "trim_level": "1LT",
       "body_style": "coupe",
       "display_name": "Corvette Grand Sport X Coupe 1LT",
-      "base_price": 112195,
+      "base_price": 112495,
       "display_order": 13,
       "source_active": "True",
       "preview_included": true
@@ -28,7 +28,7 @@
       "trim_level": "2LT",
       "body_style": "coupe",
       "display_name": "Corvette Grand Sport X Coupe 2LT",
-      "base_price": 117695,
+      "base_price": 117995,
       "display_order": 14,
       "source_active": "True",
       "preview_included": true
@@ -40,7 +40,7 @@
       "trim_level": "3LT",
       "body_style": "coupe",
       "display_name": "Corvette Grand Sport X Coupe 3LT",
-      "base_price": 122845,
+      "base_price": 123145,
       "display_order": 15,
       "source_active": "True",
       "preview_included": true
@@ -52,7 +52,7 @@
       "trim_level": "1LT",
       "body_style": "convertible",
       "display_name": "Corvette Grand Sport X Convertible 1LT",
-      "base_price": 119195,
+      "base_price": 119495,
       "display_order": 16,
       "source_active": "True",
       "preview_included": true
@@ -64,7 +64,7 @@
       "trim_level": "2LT",
       "body_style": "convertible",
       "display_name": "Corvette Grand Sport X Convertible 2LT",
-      "base_price": 124695,
+      "base_price": 124995,
       "display_order": 17,
       "source_active": "True",
       "preview_included": true
@@ -76,7 +76,7 @@
       "trim_level": "3LT",
       "body_style": "convertible",
       "display_name": "Corvette Grand Sport X Convertible 3LT",
-      "base_price": 129845,
+      "base_price": 130145,
       "display_order": 18,
       "source_active": "True",
       "preview_included": true
@@ -722,7 +722,7 @@
       "body_style": "coupe",
       "trim_level": "1LT",
       "variant_id": "1lt_g07",
-      "base_price": 112195,
+      "base_price": 112495,
       "display_order": 13
     },
     {
@@ -737,7 +737,7 @@
       "body_style": "coupe",
       "trim_level": "2LT",
       "variant_id": "2lt_g07",
-      "base_price": 117695,
+      "base_price": 117995,
       "display_order": 14
     },
     {
@@ -752,7 +752,7 @@
       "body_style": "coupe",
       "trim_level": "3LT",
       "variant_id": "3lt_g07",
-      "base_price": 122845,
+      "base_price": 123145,
       "display_order": 15
     },
     {
@@ -767,7 +767,7 @@
       "body_style": "convertible",
       "trim_level": "1LT",
       "variant_id": "1lt_g67",
-      "base_price": 119195,
+      "base_price": 119495,
       "display_order": 16
     },
     {
@@ -782,7 +782,7 @@
       "body_style": "convertible",
       "trim_level": "2LT",
       "variant_id": "2lt_g67",
-      "base_price": 124695,
+      "base_price": 124995,
       "display_order": 17
     },
     {
@@ -797,7 +797,7 @@
       "body_style": "convertible",
       "trim_level": "3LT",
       "variant_id": "3lt_g67",
-      "base_price": 129845,
+      "base_price": 130145,
       "display_order": 18
     }
   ],

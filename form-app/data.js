@@ -24,7 +24,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "stingray_options",
-          "generated_at": "2026-08-27T22:54:48+00:00",
+          "generated_at": "2026-10-08T18:43:54+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -35,7 +35,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "1LT",
             "body_style": "coupe",
             "display_name": "Corvette Stingray Coupe 1LT",
-            "base_price": 73495,
+            "base_price": 73795,
             "display_order": 1,
             "source_active": "True",
             "preview_included": true
@@ -47,7 +47,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "2LT",
             "body_style": "coupe",
             "display_name": "Corvette Stingray Coupe 2LT",
-            "base_price": 80595,
+            "base_price": 80895,
             "display_order": 2,
             "source_active": "True",
             "preview_included": true
@@ -59,7 +59,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "3LT",
             "body_style": "coupe",
             "display_name": "Corvette Stingray Coupe 3LT",
-            "base_price": 85245,
+            "base_price": 85545,
             "display_order": 3,
             "source_active": "True",
             "preview_included": true
@@ -71,7 +71,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "1LT",
             "body_style": "convertible",
             "display_name": "Corvette Stingray Convertible 1LT",
-            "base_price": 80495,
+            "base_price": 80795,
             "display_order": 4,
             "source_active": "True",
             "preview_included": true
@@ -83,7 +83,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "2LT",
             "body_style": "convertible",
             "display_name": "Corvette Stingray Convertible 2LT",
-            "base_price": 87595,
+            "base_price": 87895,
             "display_order": 5,
             "source_active": "True",
             "preview_included": true
@@ -95,7 +95,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "3LT",
             "body_style": "convertible",
             "display_name": "Corvette Stingray Convertible 3LT",
-            "base_price": 92245,
+            "base_price": 92545,
             "display_order": 6,
             "source_active": "True",
             "preview_included": true
@@ -676,7 +676,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "coupe",
             "trim_level": "1LT",
             "variant_id": "1lt_c07",
-            "base_price": 73495,
+            "base_price": 73795,
             "display_order": 1
           },
           {
@@ -691,7 +691,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "coupe",
             "trim_level": "2LT",
             "variant_id": "2lt_c07",
-            "base_price": 80595,
+            "base_price": 80895,
             "display_order": 2
           },
           {
@@ -706,7 +706,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "coupe",
             "trim_level": "3LT",
             "variant_id": "3lt_c07",
-            "base_price": 85245,
+            "base_price": 85545,
             "display_order": 3
           },
           {
@@ -721,7 +721,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "convertible",
             "trim_level": "1LT",
             "variant_id": "1lt_c67",
-            "base_price": 80495,
+            "base_price": 80795,
             "display_order": 4
           },
           {
@@ -736,7 +736,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "convertible",
             "trim_level": "2LT",
             "variant_id": "2lt_c67",
-            "base_price": 87595,
+            "base_price": 87895,
             "display_order": 5
           },
           {
@@ -751,7 +751,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "convertible",
             "trim_level": "3LT",
             "variant_id": "3lt_c67",
-            "base_price": 92245,
+            "base_price": 92545,
             "display_order": 6
           }
         ],
@@ -52725,7 +52725,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grandSport_options",
-          "generated_at": "2026-08-23T07:05:23+00:00",
+          "generated_at": "2026-10-08T18:43:55+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -52736,7 +52736,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "1LT",
             "body_style": "coupe",
             "display_name": "Corvette Grand Sport Coupe 1LT",
-            "base_price": 88495,
+            "base_price": 88795,
             "display_order": 7,
             "source_active": "True",
             "preview_included": true
@@ -52748,7 +52748,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "2LT",
             "body_style": "coupe",
             "display_name": "Corvette Grand Sport Coupe 2LT",
-            "base_price": 95595,
+            "base_price": 95895,
             "display_order": 8,
             "source_active": "True",
             "preview_included": true
@@ -52760,7 +52760,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "3LT",
             "body_style": "coupe",
             "display_name": "Corvette Grand Sport Coupe 3LT",
-            "base_price": 100245,
+            "base_price": 100545,
             "display_order": 9,
             "source_active": "True",
             "preview_included": true
@@ -52772,7 +52772,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "1LT",
             "body_style": "convertible",
             "display_name": "Corvette Grand Sport Convertible 1LT",
-            "base_price": 95495,
+            "base_price": 95795,
             "display_order": 10,
             "source_active": "True",
             "preview_included": true
@@ -52784,7 +52784,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "2LT",
             "body_style": "convertible",
             "display_name": "Corvette Grand Sport Convertible 2LT",
-            "base_price": 102595,
+            "base_price": 102895,
             "display_order": 11,
             "source_active": "True",
             "preview_included": true
@@ -52796,7 +52796,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "3LT",
             "body_style": "convertible",
             "display_name": "Corvette Grand Sport Convertible 3LT",
-            "base_price": 107245,
+            "base_price": 107545,
             "display_order": 12,
             "source_active": "True",
             "preview_included": true
@@ -53442,7 +53442,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "coupe",
             "trim_level": "1LT",
             "variant_id": "1lt_e07",
-            "base_price": 88495,
+            "base_price": 88795,
             "display_order": 7
           },
           {
@@ -53457,7 +53457,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "coupe",
             "trim_level": "2LT",
             "variant_id": "2lt_e07",
-            "base_price": 95595,
+            "base_price": 95895,
             "display_order": 8
           },
           {
@@ -53472,7 +53472,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "coupe",
             "trim_level": "3LT",
             "variant_id": "3lt_e07",
-            "base_price": 100245,
+            "base_price": 100545,
             "display_order": 9
           },
           {
@@ -53487,7 +53487,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "convertible",
             "trim_level": "1LT",
             "variant_id": "1lt_e67",
-            "base_price": 95495,
+            "base_price": 95795,
             "display_order": 10
           },
           {
@@ -53502,7 +53502,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "convertible",
             "trim_level": "2LT",
             "variant_id": "2lt_e67",
-            "base_price": 102595,
+            "base_price": 102895,
             "display_order": 11
           },
           {
@@ -53517,7 +53517,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "convertible",
             "trim_level": "3LT",
             "variant_id": "3lt_e67",
-            "base_price": 107245,
+            "base_price": 107545,
             "display_order": 12
           }
         ],
@@ -107260,7 +107260,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "grand_sport_x_options",
-          "generated_at": "2026-08-27T22:54:47+00:00",
+          "generated_at": "2026-10-08T18:43:56+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -107271,7 +107271,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "1LT",
             "body_style": "coupe",
             "display_name": "Corvette Grand Sport X Coupe 1LT",
-            "base_price": 112195,
+            "base_price": 112495,
             "display_order": 13,
             "source_active": "True",
             "preview_included": true
@@ -107283,7 +107283,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "2LT",
             "body_style": "coupe",
             "display_name": "Corvette Grand Sport X Coupe 2LT",
-            "base_price": 117695,
+            "base_price": 117995,
             "display_order": 14,
             "source_active": "True",
             "preview_included": true
@@ -107295,7 +107295,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "3LT",
             "body_style": "coupe",
             "display_name": "Corvette Grand Sport X Coupe 3LT",
-            "base_price": 122845,
+            "base_price": 123145,
             "display_order": 15,
             "source_active": "True",
             "preview_included": true
@@ -107307,7 +107307,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "1LT",
             "body_style": "convertible",
             "display_name": "Corvette Grand Sport X Convertible 1LT",
-            "base_price": 119195,
+            "base_price": 119495,
             "display_order": 16,
             "source_active": "True",
             "preview_included": true
@@ -107319,7 +107319,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "2LT",
             "body_style": "convertible",
             "display_name": "Corvette Grand Sport X Convertible 2LT",
-            "base_price": 124695,
+            "base_price": 124995,
             "display_order": 17,
             "source_active": "True",
             "preview_included": true
@@ -107331,7 +107331,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "3LT",
             "body_style": "convertible",
             "display_name": "Corvette Grand Sport X Convertible 3LT",
-            "base_price": 129845,
+            "base_price": 130145,
             "display_order": 18,
             "source_active": "True",
             "preview_included": true
@@ -107977,7 +107977,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "coupe",
             "trim_level": "1LT",
             "variant_id": "1lt_g07",
-            "base_price": 112195,
+            "base_price": 112495,
             "display_order": 13
           },
           {
@@ -107992,7 +107992,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "coupe",
             "trim_level": "2LT",
             "variant_id": "2lt_g07",
-            "base_price": 117695,
+            "base_price": 117995,
             "display_order": 14
           },
           {
@@ -108007,7 +108007,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "coupe",
             "trim_level": "3LT",
             "variant_id": "3lt_g07",
-            "base_price": 122845,
+            "base_price": 123145,
             "display_order": 15
           },
           {
@@ -108022,7 +108022,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "convertible",
             "trim_level": "1LT",
             "variant_id": "1lt_g67",
-            "base_price": 119195,
+            "base_price": 119495,
             "display_order": 16
           },
           {
@@ -108037,7 +108037,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "convertible",
             "trim_level": "2LT",
             "variant_id": "2lt_g67",
-            "base_price": 124695,
+            "base_price": 124995,
             "display_order": 17
           },
           {
@@ -108052,7 +108052,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "convertible",
             "trim_level": "3LT",
             "variant_id": "3lt_g67",
-            "base_price": 129845,
+            "base_price": 130145,
             "display_order": 18
           }
         ],
@@ -161353,7 +161353,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "z06_options",
-          "generated_at": "2026-08-27T22:54:48+00:00",
+          "generated_at": "2026-10-08T18:43:57+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -161364,7 +161364,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "1LZ",
             "body_style": "coupe",
             "display_name": "Corvette Z06 Coupe 1LZ",
-            "base_price": 121395,
+            "base_price": 121695,
             "display_order": 19,
             "source_active": "True",
             "preview_included": true
@@ -161376,7 +161376,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "2LZ",
             "body_style": "coupe",
             "display_name": "Corvette Z06 Coupe 2LZ",
-            "base_price": 130295,
+            "base_price": 130595,
             "display_order": 20,
             "source_active": "True",
             "preview_included": true
@@ -161388,7 +161388,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "3LZ",
             "body_style": "coupe",
             "display_name": "Corvette Z06 Coupe 3LZ",
-            "base_price": 134945,
+            "base_price": 135245,
             "display_order": 21,
             "source_active": "True",
             "preview_included": true
@@ -161400,7 +161400,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "1LZ",
             "body_style": "convertible",
             "display_name": "Corvette Z06 Convertible 1LZ",
-            "base_price": 128395,
+            "base_price": 128695,
             "display_order": 22,
             "source_active": "True",
             "preview_included": true
@@ -161412,7 +161412,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "2LZ",
             "body_style": "convertible",
             "display_name": "Corvette Z06 Convertible 2LZ",
-            "base_price": 137295,
+            "base_price": 137595,
             "display_order": 23,
             "source_active": "True",
             "preview_included": true
@@ -161424,7 +161424,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "3LZ",
             "body_style": "convertible",
             "display_name": "Corvette Z06 Convertible 3LZ",
-            "base_price": 141945,
+            "base_price": 142245,
             "display_order": 24,
             "source_active": "True",
             "preview_included": true
@@ -162057,7 +162057,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "coupe",
             "trim_level": "1LZ",
             "variant_id": "1lz_h07",
-            "base_price": 121395,
+            "base_price": 121695,
             "display_order": 19
           },
           {
@@ -162072,7 +162072,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "coupe",
             "trim_level": "2LZ",
             "variant_id": "2lz_h07",
-            "base_price": 130295,
+            "base_price": 130595,
             "display_order": 20
           },
           {
@@ -162087,7 +162087,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "coupe",
             "trim_level": "3LZ",
             "variant_id": "3lz_h07",
-            "base_price": 134945,
+            "base_price": 135245,
             "display_order": 21
           },
           {
@@ -162102,7 +162102,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "convertible",
             "trim_level": "1LZ",
             "variant_id": "1lz_h67",
-            "base_price": 128395,
+            "base_price": 128695,
             "display_order": 22
           },
           {
@@ -162117,7 +162117,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "convertible",
             "trim_level": "2LZ",
             "variant_id": "2lz_h67",
-            "base_price": 137295,
+            "base_price": 137595,
             "display_order": 23
           },
           {
@@ -162132,7 +162132,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "convertible",
             "trim_level": "3LZ",
             "variant_id": "3lz_h67",
-            "base_price": 141945,
+            "base_price": 142245,
             "display_order": 24
           }
         ],
@@ -215017,7 +215017,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "zr1_options",
-          "generated_at": "2026-08-23T07:05:26+00:00",
+          "generated_at": "2026-10-08T18:43:58+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -215028,7 +215028,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "1LZ",
             "body_style": "coupe",
             "display_name": "Corvette ZR1 Coupe 1LZ",
-            "base_price": 197195,
+            "base_price": 197495,
             "display_order": 25,
             "source_active": "True",
             "preview_included": true
@@ -215040,7 +215040,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "3LZ",
             "body_style": "coupe",
             "display_name": "Corvette ZR1 Coupe 3LZ",
-            "base_price": 208195,
+            "base_price": 208495,
             "display_order": 26,
             "source_active": "True",
             "preview_included": true
@@ -215052,7 +215052,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "1LZ",
             "body_style": "convertible",
             "display_name": "Corvette ZR1 Convertible 1LZ",
-            "base_price": 207195,
+            "base_price": 207495,
             "display_order": 27,
             "source_active": "True",
             "preview_included": true
@@ -215064,7 +215064,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "3LZ",
             "body_style": "convertible",
             "display_name": "Corvette ZR1 Convertible 3LZ",
-            "base_price": 218195,
+            "base_price": 218495,
             "display_order": 28,
             "source_active": "True",
             "preview_included": true
@@ -215619,7 +215619,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "coupe",
             "trim_level": "1LZ",
             "variant_id": "1lz_r07",
-            "base_price": 197195,
+            "base_price": 197495,
             "display_order": 25
           },
           {
@@ -215634,7 +215634,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "coupe",
             "trim_level": "3LZ",
             "variant_id": "3lz_r07",
-            "base_price": 208195,
+            "base_price": 208495,
             "display_order": 26
           },
           {
@@ -215649,7 +215649,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "convertible",
             "trim_level": "1LZ",
             "variant_id": "1lz_r67",
-            "base_price": 207195,
+            "base_price": 207495,
             "display_order": 27
           },
           {
@@ -215664,7 +215664,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "convertible",
             "trim_level": "3LZ",
             "variant_id": "3lz_r67",
-            "base_price": 218195,
+            "base_price": 218495,
             "display_order": 28
           }
         ],
@@ -247184,7 +247184,7 @@ window.CORVETTE_FORM_DATA = {
           "model_year": "2027",
           "source_workbook": "stingray_master.xlsx",
           "source_sheet": "zr1x_options",
-          "generated_at": "2026-08-23T07:05:27+00:00",
+          "generated_at": "2026-10-08T18:43:59+00:00",
           "status": "runtime_active"
         },
         "variants": [
@@ -247195,7 +247195,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "1LZ",
             "body_style": "coupe",
             "display_name": "Corvette ZR1X Coupe 1LZ",
-            "base_price": 227395,
+            "base_price": 227695,
             "display_order": 29,
             "source_active": "True",
             "preview_included": true
@@ -247207,7 +247207,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "3LZ",
             "body_style": "coupe",
             "display_name": "Corvette ZR1X Coupe 3LZ",
-            "base_price": 238395,
+            "base_price": 238695,
             "display_order": 30,
             "source_active": "True",
             "preview_included": true
@@ -247219,7 +247219,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "1LZ",
             "body_style": "convertible",
             "display_name": "Corvette ZR1X Convertible 1LZ",
-            "base_price": 237395,
+            "base_price": 237695,
             "display_order": 31,
             "source_active": "True",
             "preview_included": true
@@ -247231,7 +247231,7 @@ window.CORVETTE_FORM_DATA = {
             "trim_level": "3LZ",
             "body_style": "convertible",
             "display_name": "Corvette ZR1X Convertible 3LZ",
-            "base_price": 248395,
+            "base_price": 248695,
             "display_order": 32,
             "source_active": "True",
             "preview_included": true
@@ -247786,7 +247786,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "coupe",
             "trim_level": "1LZ",
             "variant_id": "1lz_s07",
-            "base_price": 227395,
+            "base_price": 227695,
             "display_order": 29
           },
           {
@@ -247801,7 +247801,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "coupe",
             "trim_level": "3LZ",
             "variant_id": "3lz_s07",
-            "base_price": 238395,
+            "base_price": 238695,
             "display_order": 30
           },
           {
@@ -247816,7 +247816,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "convertible",
             "trim_level": "1LZ",
             "variant_id": "1lz_s67",
-            "base_price": 237395,
+            "base_price": 237695,
             "display_order": 31
           },
           {
@@ -247831,7 +247831,7 @@ window.CORVETTE_FORM_DATA = {
             "body_style": "convertible",
             "trim_level": "3LZ",
             "variant_id": "3lz_s67",
-            "base_price": 248395,
+            "base_price": 248695,
             "display_order": 32
           }
         ],
